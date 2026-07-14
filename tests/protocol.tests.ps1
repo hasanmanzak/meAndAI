@@ -61,6 +61,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-update-automation.md',
     '.ai/memory/log/2026-07-14-bounded-self-validation.md',
     '.ai/memory/log/2026-07-14-convergent-completion-scan.md',
+    '.ai/memory/log/2026-07-14-urgent-gate-order.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
@@ -299,6 +300,7 @@ if ($memoryTemplateFiles.Count -lt 3) {
 $updateTestPath = Join-Path $root 'tests/protocol-update.tests.ps1'
 $protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
 $featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
+$normalizedProtocolContent = [regex]::Replace($protocolContent, '\s+', ' ')
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',
@@ -339,6 +341,20 @@ foreach ($requiredText in @(
     }
 }
 
+foreach ($requiredText in @(
+    'does not change gate order',
+    'authorize implementation before Gate 1',
+    'the evidence for a gate MUST exist before that gate is',
+    'numbered-decision process in Section 1',
+    'owner, risk, tests, deferred evidence',
+    'linked follow-up',
+    'review or expiry condition'
+)) {
+    if (-not $normalizedProtocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0020 urgent-work gate contract is missing '$requiredText'"
+    }
+}
+
 if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
@@ -353,4 +369,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0019.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0020.' -ForegroundColor Green
