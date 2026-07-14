@@ -2,7 +2,7 @@
 
 - Finding: `FIND-0049`
 - Tracking: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11)
-- Delivery: pending draft pull request from `agent/clarify-cleanup-comment`
+- Delivery: [pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12)
 - Owning feature:
   [FEAT-0002](../../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
 - Target protocol release: `v0.3.2`

@@ -137,7 +137,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | `FIND-0038` | False-green risk | Medium | Resolved | Mocks assert exact leases and hide later pages without `--paginate` |
 | `FIND-0039` | Logic duplication | Medium | Resolved | Planning and live gates share one pure candidate validator |
 | `FIND-0040` | Delivery evidence | High | Resolved | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) passed Ubuntu and Windows CI |
-| `FIND-0049` | Audit clarity | Low | Resolved | Conditional cleanup wording and `TEST-0021`; tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) |
+| `FIND-0049` | Audit clarity | Low | Resolved | Conditional cleanup wording and `TEST-0021`; tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and [PR #12](https://github.com/hasanmanzak/meAndAI/pull/12) |
 
 ## Scan limitations
 

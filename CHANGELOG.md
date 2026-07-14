@@ -13,7 +13,8 @@ This project uses the `M.m.rev` version format defined in the
   leases, and cleanup failure behavior.
 - Added executable `TEST-0021` coverage for the emitted audit message contract.
 
-Related work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
+Related work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and
+[pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
 
 ## 0.3.1 - 2026-07-14
 

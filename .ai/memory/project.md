@@ -14,8 +14,7 @@ Last verified: **2026-07-14**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
-- Current delivery: pending draft pull request from
-  `agent/clarify-cleanup-comment`.
+- Current delivery: [pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
 
 ## Collaboration constraints
 
