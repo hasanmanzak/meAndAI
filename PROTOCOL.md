@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.2.1**<br>
+Protocol version: **0.3.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -212,6 +212,28 @@ or when architectural confidence is insufficient, scan the entire tracked
 project at the highest practical detail. Sampling alone is not a project scan.
 State any inaccessible, generated, binary, external, or otherwise unreviewed
 scope explicitly.
+
+### Post-development convergence scan
+
+After development is declared complete, perform a full-project scan under this
+section. Document every observation, classify it, and order actionable findings
+from highest to lowest severity before remediation. Resolve the highest-priority
+actionable in-scope findings first.
+
+After remediation, repeat the full-project scan. The completion condition is a
+convergence pass with no unresolved actionable in-scope finding. A finding is
+not cleared merely by relabeling it: an accepted residual risk requires an
+owner, rationale, and link, while an external or legacy follow-up may be
+separated only under the rules in Gate 5.
+
+The cycle MUST remain bounded. Before the first pass, declare the scan scope,
+exclusions, and a finite validation budget; the default is one initial scan and
+one confirmation scan after remediation. Every additional pass requires changed
+diff, failed evidence, or a new actionable finding within that budget. An
+unchanged scan MUST NOT be repeated. If the budget is exhausted, progress
+requires new authority or input, or the same blocker cannot be changed by
+another pass, stop as blocked, preserve the evidence, and request direction.
+Budget exhaustion is never a successful completion state.
 
 The scan MUST cover:
 

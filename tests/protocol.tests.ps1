@@ -60,16 +60,20 @@ $requiredFiles = @(
     '.ai/memory/log/README.md',
     '.ai/memory/log/2026-07-14-update-automation.md',
     '.ai/memory/log/2026-07-14-bounded-self-validation.md',
+    '.ai/memory/log/2026-07-14-convergent-completion-scan.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
     'docs/features/FEAT-0001-common-development-protocol/test-cases.md',
     'docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md',
     'docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md',
+    'docs/features/FEAT-0003-convergent-completion-scan/README.md',
+    'docs/features/FEAT-0003-convergent-completion-scan/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
     'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md',
+    'docs/decisions/DEC-0004-bounded-completion-convergence.md',
     'templates/project/AGENTS.submodule.md',
     'templates/project/AGENTS.repository-reference.md',
     'templates/project/.ai/memory/README.md',
@@ -311,6 +315,29 @@ if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
     Add-Failure 'TEST-0018 feature template is missing the bounded self-review default'
 }
 
+foreach ($requiredText in @(
+    'After development is declared complete',
+    'highest to lowest severity',
+    'no unresolved actionable in-scope finding',
+    'finite validation budget',
+    'An unchanged scan MUST NOT be repeated',
+    'stop as blocked',
+    'Budget exhaustion is never a successful completion state'
+)) {
+    if (-not $protocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0019 post-development convergence contract is missing '$requiredText'"
+    }
+}
+foreach ($requiredText in @(
+    'post-development full-project scan',
+    'finite validation budget',
+    'non-blocking follow-ups are owned and linked'
+)) {
+    if (-not $featureTemplate.Contains($requiredText)) {
+        Add-Failure "TEST-0019 feature template is missing '$requiredText'"
+    }
+}
+
 if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
@@ -325,4 +352,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0018.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0019.' -ForegroundColor Green

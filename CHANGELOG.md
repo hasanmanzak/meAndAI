@@ -4,6 +4,21 @@ This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
 
+## 0.3.0 - 2026-07-14
+
+### Added
+
+- Added a bounded post-development full-project convergence scan that records
+  findings, resolves them from highest to lowest severity, and requires zero
+  unresolved actionable in-scope findings for completion.
+- Added explicit scope, validation-budget, progress, and blocked-state controls
+  so repeated scans cannot become an unchanged review loop.
+- Added [FEAT-0003](docs/features/FEAT-0003-convergent-completion-scan/README.md),
+  [DEC-0004](docs/decisions/DEC-0004-bounded-completion-convergence.md), and
+  executable `TEST-0019` contract coverage.
+
+Related work: [issue #7](https://github.com/hasanmanzak/meAndAI/issues/7).
+
 ## 0.2.1 - 2026-07-14
 
 ### Changed
