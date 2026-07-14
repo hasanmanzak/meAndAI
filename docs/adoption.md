@@ -25,7 +25,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.3.0
+git -C .ai/protocol checkout v0.3.1
 git add .gitmodules .ai/protocol
 ```
 
@@ -220,7 +220,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.3.0`
+- ref: `v0.3.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -266,7 +266,7 @@ For a submodule without the updater, or for the one-time `v0.1.0` migration:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.3.0
+git -C .ai/protocol checkout v0.3.1
 git add .ai/protocol
 ```
 
@@ -308,8 +308,8 @@ After substituting the real branch, tag, and verified SHA, inspect these
 commands as one checklist:
 
 ```powershell
-$branch = 'automation/meandai-protocol-v0.3.0'
-$targetTag = 'v0.3.0'
+$branch = 'automation/meandai-protocol-v0.3.1'
+$targetTag = 'v0.3.1'
 $expectedSha = '<verified-40-character-orphan-head-sha>'
 $defaultBranch = (gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name').Trim()
 git ls-remote --heads origin "refs/heads/$branch"

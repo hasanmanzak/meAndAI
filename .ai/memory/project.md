@@ -7,14 +7,14 @@ Last verified: **2026-07-14**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.3.0`
-- Maintenance scope: bounded post-development convergence tracked by
-  [issue #7](https://github.com/hasanmanzak/meAndAI/issues/7).
+- Current protocol version: `0.3.1`
+- Maintenance scope: urgent-work gate-order clarification tracked by
+  [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #7](https://github.com/hasanmanzak/meAndAI/issues/7).
-- Current delivery: [pull request #8](https://github.com/hasanmanzak/meAndAI/pull/8).
+- Latest tracked work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
+- Current delivery: [pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
 
 ## Collaboration constraints
 

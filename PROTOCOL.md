@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.3.0**<br>
+Protocol version: **0.3.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -394,6 +394,10 @@ framework. Add automation only when it enforces a real recurring rule more
 reliably than a short documented check. Prefer small, inspectable scripts and
 native project tooling over a universal bootstrapper.
 
-Urgent work may compress sequencing but not evidence: record the exception,
-risk, tests, and follow-up as linked work. No exception permits a knowingly
-incorrect completion claim.
+Urgent work may compress elapsed time, but it does not change gate order or
+authorize implementation before Gate 1. Evidence may be concise and gates may
+run back-to-back, but the evidence for a gate MUST exist before that gate is
+passed. Any deviation requires the numbered-decision process in Section 1,
+including its owner, risk, tests, deferred evidence, linked follow-up, and review
+or expiry condition. No exception permits a knowingly incorrect completion
+claim.

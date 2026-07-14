@@ -4,6 +4,20 @@ This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
 
+## 0.3.1 - 2026-07-14
+
+### Changed
+
+- Clarified that urgent work may compress elapsed time but cannot reorder gates
+  or authorize implementation before Definition of Ready.
+- Required concise evidence to exist before its gate and routed real deviations
+  through the existing numbered-decision process instead of retrospective
+  evidence.
+- Added executable `TEST-0020` coverage for the urgent-work contract.
+
+Related work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9) and
+[pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
+
 ## 0.3.0 - 2026-07-14
 
 ### Added

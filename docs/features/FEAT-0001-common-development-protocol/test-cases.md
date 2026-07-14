@@ -22,6 +22,7 @@ PowerShell 7 environments may use `pwsh -NoProfile -File tests/protocol.tests.ps
 | `TEST-0007` | `SUBF-0003` | Issue forms and the PR template receive targeted identifier, label, and evidence-prompt checks. | Expected tracking semantics are present; full YAML schema is manually reviewed. | Passed | Structural plus manual schema review |
 | `TEST-0008` | `SUBF-0002` | Submodule and repository-reference adapters are distinguished and memory remains outside the protocol path. | Each adoption mode loads its real entry point without cross-project memory coupling. | Passed | Structural test |
 | `TEST-0018` | `SUBF-0001` | Inspect the bounded self-validation contract and feature template. | One normal review pass and final verification command are the default; only blockers reopen scope; recursive validator chains require a concrete risk and decision. | Passed | Structural test |
+| `TEST-0020` | `SUBF-0001` | Inspect the urgent-work exception contract for [FIND-0047](https://github.com/hasanmanzak/meAndAI/issues/9). | Urgency compresses elapsed time, not gate order; Gate 1 remains pre-implementation and deviations preserve tests and linked follow-up through the numbered-decision process. | Passed | Structural test |
 
 ## Evidence
 
@@ -31,6 +32,9 @@ Evidence is recorded after each run:
 | --- | --- | --- | --- |
 | 2026-07-14 | Baseline `a6e3064` plus current test harness; Windows PowerShell 5.1.19041.7417 | Expected failure | `TEST-0001` reported the protocol files absent before implementation. |
 | 2026-07-14 | Windows PowerShell 5.1.19041.7417 | Pass | `TEST-0001` through `TEST-0008`; `git diff --cached --check` clean. |
+| 2026-07-14 | Windows PowerShell 5.1 | Pass | Initial `TEST-0001` through `TEST-0020`; FIND-0047 fresh-diff review then preserved tests and linked follow-up. |
+| 2026-07-14 | Windows PowerShell 5.1 | Expected blocker | Confirmation exposed `FIND-0048`: TEST-0020 exact-string matching crossed a Markdown line wrap. |
+| 2026-07-14 | Windows PowerShell 5.1 | Pass | Whitespace-normalized `TEST-0020`; full suite passed through `TEST-0020`. |
 
 ## Manual evidence
 
