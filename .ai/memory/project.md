@@ -14,6 +14,7 @@ Last verified: **2026-07-14**
 - Current tracked feature:
   [FEAT-0001](../../docs/features/FEAT-0001-common-development-protocol/README.md)
   / [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1)
+  / [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2)
 
 ## Collaboration constraints
 
@@ -37,6 +38,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0001` is establishing the first protocol release.
-- The release is complete only after tests, self-review, pull request, merge,
-  and tag `v0.1.0`.
+- `FEAT-0001` delivery and review are recorded in
+  [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2).
+- The post-merge release action is publication and verification of tag
+  `v0.1.0`.

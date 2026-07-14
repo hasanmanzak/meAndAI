@@ -12,5 +12,6 @@ This project uses the `M.m.rev` version format defined in the
 - Feature, decision, test, issue, and pull request templates.
 - Structural protocol validation and its documented test scenarios.
 
-Related work: [FEAT-0001](docs/features/FEAT-0001-common-development-protocol/README.md)
-and [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1).
+Related work: [FEAT-0001](docs/features/FEAT-0001-common-development-protocol/README.md),
+[issue #1](https://github.com/hasanmanzak/meAndAI/issues/1), and
+[pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2).

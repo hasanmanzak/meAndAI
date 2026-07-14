@@ -2,7 +2,7 @@
 
 | ID | Feature | Status | Version |
 | --- | --- | --- | --- |
-| [FEAT-0001](FEAT-0001-common-development-protocol/README.md) | Portable common development protocol | In review | 0.1.0 |
+| [FEAT-0001](FEAT-0001-common-development-protocol/README.md) | Portable common development protocol | Complete | 0.1.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

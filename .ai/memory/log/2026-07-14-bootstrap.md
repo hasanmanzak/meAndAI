@@ -17,8 +17,9 @@ bootstrap framework.
 - Memory isolation is defined by
   [DEC-0002](../../../docs/decisions/DEC-0002-project-local-memory.md).
 - Initial delivery is tracked by
-  [FEAT-0001](../../../docs/features/FEAT-0001-common-development-protocol/README.md)
-  and [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1).
+  [FEAT-0001](../../../docs/features/FEAT-0001-common-development-protocol/README.md),
+  [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1), and
+  [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2).
 - The target release is `v0.1.0`.
 
 ## Continuation
