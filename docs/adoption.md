@@ -25,7 +25,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.2.1
+git -C .ai/protocol checkout v0.3.0
 git add .gitmodules .ai/protocol
 ```
 
@@ -220,7 +220,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.2.1`
+- ref: `v0.3.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -266,7 +266,7 @@ For a submodule without the updater, or for the one-time `v0.1.0` migration:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.2.1
+git -C .ai/protocol checkout v0.3.0
 git add .ai/protocol
 ```
 

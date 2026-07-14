@@ -79,13 +79,18 @@ Default to one bounded fresh-diff pass and one final relevant verification
 command. Classify observations as blocking or follow-up, record the stop
 condition, and do not recursively add validators unless a concrete risk and
 decision require them.
+
+When a post-development full-project scan is required, record its declared
+scope, exclusions, finite validation budget, prioritized findings, remediation,
+and convergence or blocked outcome.
+
 ## Definition of Done
 
 - [ ] Acceptance criteria met.
 - [ ] Mandatory test code and scenario mapping complete.
 - [ ] Test commands and successful results recorded.
 - [ ] Bounded self-review stop condition and explicitly required scans complete.
-- [ ] No unresolved blocking finding or known new debt.
+- [ ] No unresolved blocking finding; non-blocking follow-ups are owned and linked.
 - [ ] Documentation, links, version, and project memory current.
 - [ ] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed; if CI is not configured, rationale recorded.

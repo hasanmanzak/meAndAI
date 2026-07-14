@@ -2,7 +2,7 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-14**<br>
-Protocol version: **0.2.1**
+Protocol version: **0.3.0**
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer
@@ -11,7 +11,7 @@ creates its own `.ai/memory` outside the protocol submodule.
 Read in this order:
 
 1. [Project snapshot](project.md)
-2. Most recent dated record in [log](log/README.md)
+2. The current continuation identified in the [log index](log/README.md)
 3. Canonical feature and decision documents linked by those records
 
 Memory ownership and boundaries are defined by
