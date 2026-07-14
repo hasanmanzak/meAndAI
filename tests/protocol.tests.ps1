@@ -63,6 +63,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-convergent-completion-scan.md',
     '.ai/memory/log/2026-07-14-urgent-gate-order.md',
     '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
+    '.ai/memory/log/2026-07-15-feat-0002-release-gate-evidence.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',

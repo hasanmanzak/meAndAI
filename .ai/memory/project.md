@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-14**
+Last verified: **2026-07-15**
 
 ## Verified facts
 
@@ -8,13 +8,14 @@ Last verified: **2026-07-14**
 - Visibility: private
 - Default branch: `main`
 - Current protocol version: `0.3.2`
-- Maintenance scope: updater cleanup-comment clarity tracked by
-  [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
+- Maintenance scope: FEAT-0002 post-merge evidence reconciliation tracked by
+  [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
-- Current delivery: [pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
+- Latest tracked work: [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13).
+- Current delivery: pending draft pull request from
+  `agent/reconcile-feat-0002-release-gate`.
 
 ## Collaboration constraints
 
@@ -48,3 +49,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0003](../../docs/features/FEAT-0003-convergent-completion-scan/README.md).
 - `v0.3.2` makes the updater's pre-cleanup audit comment conditional without
   changing cleanup ordering, safety gates, leases, or compensation behavior.
+- FEAT-0002's historical post-merge gate was reconciled on 2026-07-15 against
+  merged [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) and remote tag
+  [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0); this evidence
+  correction does not create a new protocol release.

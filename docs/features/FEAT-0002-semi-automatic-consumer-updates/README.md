@@ -138,6 +138,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | `FIND-0039` | Logic duplication | Medium | Resolved | Planning and live gates share one pure candidate validator |
 | `FIND-0040` | Delivery evidence | High | Resolved | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) passed Ubuntu and Windows CI |
 | `FIND-0049` | Audit clarity | Low | Resolved | Conditional cleanup wording and `TEST-0021`; tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and [PR #12](https://github.com/hasanmanzak/meAndAI/pull/12) |
+| `FIND-0050` | Traceability | Low | Resolved | Post-merge evidence reconciled with [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4), tag [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0), and its [merge commit](https://github.com/hasanmanzak/meAndAI/commit/0a664648117bc92f92f28bc98e4627c3c1121d65); tracked by [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13) |
 
 ## Scan limitations
 
@@ -161,4 +162,4 @@ supersede an untouched older proposal. It never approves or merges the update.
 
 ## Post-merge release gate
 
-- [ ] The delivery PR is merged and `v0.2.0` is pushed and remotely verified.
+- [x] [Pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4) is merged and tag [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0) is pushed and remotely verified at merge commit [`0a664648`](https://github.com/hasanmanzak/meAndAI/commit/0a664648117bc92f92f28bc98e4627c3c1121d65).
