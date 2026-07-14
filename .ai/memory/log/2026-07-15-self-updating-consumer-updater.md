@@ -5,6 +5,7 @@
 - Decision:
   [DEC-0005](../../../docs/decisions/DEC-0005-consumer-scoped-fine-grained-pat.md)
 - Tracking: [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15)
+- Delivery: [pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16)
 - Target protocol release: `v0.4.0`
 
 ## Durable outcomes

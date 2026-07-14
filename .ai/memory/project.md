@@ -14,7 +14,7 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
-- Current delivery: FEAT-0004 pull request pending publication.
+- Current delivery: [FEAT-0004 pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16).
 
 ## Collaboration constraints
 

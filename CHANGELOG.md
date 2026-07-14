@@ -24,7 +24,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0004](docs/features/FEAT-0004-self-updating-consumer-updater/README.md),
 [DEC-0005](docs/decisions/DEC-0005-consumer-scoped-fine-grained-pat.md), and
-[issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
+[issue #15](https://github.com/hasanmanzak/meAndAI/issues/15) delivered by
+[pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16).
 
 ## 0.3.2 - 2026-07-14
 

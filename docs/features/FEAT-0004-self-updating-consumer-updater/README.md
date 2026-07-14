@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In review |
+| Status | Complete |
 | Target version | 0.4.0 |
 | Issue | [#15](https://github.com/hasanmanzak/meAndAI/issues/15) |
-| Pull request | Pending |
+| Pull request | [#16](https://github.com/hasanmanzak/meAndAI/pull/16) |
 | Decision | [DEC-0005](../../decisions/DEC-0005-consumer-scoped-fine-grained-pat.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -113,6 +113,7 @@ insufficient.
 - Preserved decision: [DEC-0003](../../decisions/DEC-0003-reviewed-consumer-update-supersession.md)
 - Adoption guide: [Consumer adoption](../../adoption.md)
 - Tracking: [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15)
+- Delivery: [pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16)
 
 ## Definition of Ready
 
@@ -169,8 +170,8 @@ attribution, and the one-time pre-v0.4 migration remain explicitly owned risks
 - [x] Slice reviews and bounded convergence scan complete.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Issue, pull request, decisions, and related work cross-linked.
+- [x] Local review gates pass; merge remains conditional on configured PR CI.
 
 ## Post-merge release gate
 
