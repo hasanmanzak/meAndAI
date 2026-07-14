@@ -8,7 +8,9 @@
   [FEAT-0002](../features/FEAT-0002-semi-automatic-consumer-updates/README.md)
 - Related decisions:
   [DEC-0001](DEC-0001-portable-protocol-reference.md),
-  [DEC-0002](DEC-0002-project-local-memory.md)
+  [DEC-0002](DEC-0002-project-local-memory.md), and
+  [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), which supersedes
+  only the mutation credential, managed-path, and copied-updater clauses
 - Operational guide: [Adoption and recovery](../adoption.md)
 
 ## Context

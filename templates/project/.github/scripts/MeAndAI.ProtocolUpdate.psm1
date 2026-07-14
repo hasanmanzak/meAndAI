@@ -27,6 +27,30 @@ function Test-MeAndAIProtocolTag {
     return $null -ne (ConvertTo-ProtocolVersionRecord $Tag)
 }
 
+function Test-MeAndAIExactOrdinalPathSet {
+    param([object[]]$Actual, [object[]]$Expected)
+
+    $actualValues = @($Actual | ForEach-Object { [string]$_ })
+    $expectedValues = @($Expected | ForEach-Object { [string]$_ })
+    if ($actualValues.Count -ne $expectedValues.Count) {
+        return $false
+    }
+
+    $actualSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($path in $actualValues) {
+        if (-not $actualSet.Add($path)) {
+            return $false
+        }
+    }
+    $expectedSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($path in $expectedValues) {
+        if (-not $expectedSet.Add($path)) {
+            return $false
+        }
+    }
+    return $actualSet.SetEquals($expectedSet)
+}
+
 function Get-MeAndAIProtocolCandidateProblems {
     [CmdletBinding()]
     param(
@@ -75,10 +99,33 @@ function Get-MeAndAIProtocolCandidateProblems {
         [string]$Candidate.ObservedHeadSha -cne [string]$Candidate.ExpectedHeadSha) {
         $problems.Add('head SHA changed')
     }
-    $changedPaths = @($Candidate.ChangedPaths)
-    if ($changedPaths.Count -ne 1 -or
-        [string]$changedPaths[0] -cne [string]$Context.ProtocolPath) {
-        $problems.Add('changed paths are no longer protocol-only')
+    $managedPaths = @($Context.ManagedPaths | ForEach-Object { [string]$_ })
+    $expectedChangedPaths = @($Candidate.ExpectedChangedPaths | ForEach-Object { [string]$_ })
+    $expectedSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $managedSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $expectedPathsValid = $true
+    foreach ($path in $managedPaths) {
+        if (-not $managedSet.Add($path)) {
+            $expectedPathsValid = $false
+        }
+    }
+    foreach ($path in $expectedChangedPaths) {
+        if (-not $expectedSet.Add($path) -or -not $managedSet.Contains($path)) {
+            $expectedPathsValid = $false
+        }
+    }
+    if (-not $expectedSet.Contains([string]$Context.ProtocolPath)) {
+        $expectedPathsValid = $false
+    }
+    if (-not $expectedPathsValid) {
+        $problems.Add('expected changed paths are outside the managed update contract')
+    }
+    elseif (-not (Test-MeAndAIExactOrdinalPathSet `
+        -Actual @($Candidate.ChangedPaths) -Expected $expectedChangedPaths)) {
+        $problems.Add('changed paths do not match the expected managed update set')
+    }
+    if (-not [bool]$Candidate.ManagedAssetEntriesMatchTarget) {
+        $problems.Add('managed updater assets do not match the target release')
     }
 
     return @($problems)
@@ -114,7 +161,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
     $ignoredTags = [System.Collections.Generic.List[string]]::new()
     $requiredSnapshotProperties = @(
         'SchemaVersion', 'CurrentTag', 'AvailableTags', 'Repository',
-        'DefaultBranch', 'BranchPrefix', 'ProtocolPath', 'TrustedActor', 'Candidates'
+        'DefaultBranch', 'BranchPrefix', 'ProtocolPath', 'ManagedPaths',
+        'TrustedActor', 'Candidates'
     )
 
     foreach ($property in $requiredSnapshotProperties) {
@@ -184,6 +232,7 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         DefaultBranch = [string]$Snapshot.DefaultBranch
         BranchPrefix = [string]$Snapshot.BranchPrefix
         ProtocolPath = [string]$Snapshot.ProtocolPath
+        ManagedPaths = @($Snapshot.ManagedPaths)
         TrustedActor = [string]$Snapshot.TrustedActor
     }
     foreach ($candidate in @($Snapshot.Candidates)) {
@@ -192,7 +241,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
             'BranchExists', 'ExpectedHeadSha', 'ApiHeadSha', 'ObservedHeadSha', 'MarkerSchema', 'MarkerTargetTag',
             'MarkerProtocolSha', 'MarkerHeadSha', 'MarkerRepository',
             'ExpectedProtocolSha', 'ProtocolEntryMode', 'ProtocolEntrySha',
-            'BaseRef', 'Draft', 'SameRepository', 'AuthorLogin', 'ChangedPaths'
+            'BaseRef', 'Draft', 'SameRepository', 'AuthorLogin', 'ChangedPaths',
+            'ExpectedChangedPaths', 'ManagedAssetEntriesMatchTarget'
         )
         $missing = @($requiredCandidateProperties | Where-Object { $_ -notin $candidate.PSObject.Properties.Name })
         if ($missing.Count -gt 0) {
@@ -328,5 +378,5 @@ function Resolve-MeAndAIProtocolUpdatePlan {
 
 Export-ModuleMember -Function @(
     'Resolve-MeAndAIProtocolUpdatePlan', 'Get-MeAndAIProtocolCandidateProblems',
-    'Test-MeAndAIProtocolTag'
+    'Test-MeAndAIProtocolTag', 'Test-MeAndAIExactOrdinalPathSet'
 )

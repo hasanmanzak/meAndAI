@@ -7,14 +7,14 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.3.2`
-- Maintenance scope: FEAT-0002 post-merge evidence reconciliation tracked by
-  [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13).
+- Current protocol version: `0.4.0`
+- Current scope: self-updating consumer updater and fine-grained PAT boundary
+  tracked by [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13).
-- Current delivery: [pull request #14](https://github.com/hasanmanzak/meAndAI/pull/14).
+- Latest tracked work: [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
+- Current delivery: [FEAT-0004 pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16).
 
 ## Collaboration constraints
 
@@ -48,6 +48,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0003](../../docs/features/FEAT-0003-convergent-completion-scan/README.md).
 - `v0.3.2` makes the updater's pre-cleanup audit comment conditional without
   changing cleanup ordering, safety gates, leases, or compensation behavior.
+- `v0.4.0` uses consumer secret `MEANDAI_UPDATER_TOKEN` for repository-scoped
+  writes and reconciles target-different updater assets in the same draft PR as
+  the protocol pointer. Pre-v0.4 consumer copies need one reviewed migration.
 - FEAT-0002's historical post-merge gate was reconciled on 2026-07-15 against
   merged [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) and remote tag
   [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0); this evidence

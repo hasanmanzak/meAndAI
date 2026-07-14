@@ -34,8 +34,10 @@ function New-Candidate {
         [string]$ApiHeadSha = '',
         [string]$ObservedHeadSha = '',
         [bool]$SameRepository = $true,
-        [string]$AuthorLogin = 'github-actions[bot]',
+        [string]$AuthorLogin = 'updater-owner',
         [string[]]$ChangedPaths = @('.ai/protocol'),
+        [string[]]$ExpectedChangedPaths = $null,
+        [bool]$ManagedAssetEntriesMatchTarget = $true,
         [int]$MarkerSchema = 1,
         [bool]$BranchExists = $true,
         [string]$ProtocolSha = ('2' * 40),
@@ -53,6 +55,9 @@ function New-Candidate {
     }
     if (-not $ProtocolEntrySha) {
         $ProtocolEntrySha = $ProtocolSha
+    }
+    if ($null -eq $ExpectedChangedPaths) {
+        $ExpectedChangedPaths = @($ChangedPaths)
     }
 
     [pscustomobject]@{
@@ -77,6 +82,8 @@ function New-Candidate {
         SameRepository = $SameRepository
         AuthorLogin = $AuthorLogin
         ChangedPaths = @($ChangedPaths)
+        ExpectedChangedPaths = @($ExpectedChangedPaths)
+        ManagedAssetEntriesMatchTarget = $ManagedAssetEntriesMatchTarget
     }
 }
 
@@ -95,7 +102,13 @@ function Invoke-Plan {
         DefaultBranch = 'main'
         BranchPrefix = 'automation/meandai-protocol-'
         ProtocolPath = '.ai/protocol'
-        TrustedActor = 'github-actions[bot]'
+        ManagedPaths = @(
+            '.ai/protocol',
+            '.github/workflows/meandai-protocol-update.yml',
+            '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        )
+        TrustedActor = 'updater-owner'
         Candidates = @($Candidates)
     }
 
@@ -158,6 +171,37 @@ $plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') -C
 Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0015 non-protocol changes must block cleanup'
 Assert-Equal 0 @($plan.Operations).Count 'TEST-0015 consumer changes must remain untouched'
 
+$managedPaths = @(
+    '.ai/protocol',
+    '.github/workflows/meandai-protocol-update.yml',
+    '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+)
+$managedUpdate = New-Candidate -Number 33 -TargetTag 'v0.2.0' `
+    -ChangedPaths $managedPaths -ExpectedChangedPaths $managedPaths
+$plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($managedUpdate)
+Assert-Equal 'PendingLatest' $plan.State 'TEST-0026 exact managed updater paths should remain idempotent'
+
+$missingManagedPath = New-Candidate -Number 34 -TargetTag 'v0.2.0' `
+    -ChangedPaths @('.ai/protocol') -ExpectedChangedPaths $managedPaths
+$plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($missingManagedPath)
+Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0026 missing expected updater paths must block cleanup'
+
+$wrongManagedBlob = New-Candidate -Number 35 -TargetTag 'v0.2.0' `
+    -ChangedPaths $managedPaths -ExpectedChangedPaths $managedPaths `
+    -ManagedAssetEntriesMatchTarget $false
+$plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($wrongManagedBlob)
+Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0026 wrong updater target blobs must block cleanup'
+
+$caseDriftedManagedPath = New-Candidate -Number 36 -TargetTag 'v0.2.0' `
+    -ChangedPaths @('.ai/protocol', '.github/Workflows/meandai-protocol-update.yml') `
+    -ExpectedChangedPaths @('.ai/protocol', '.github/Workflows/meandai-protocol-update.yml')
+$plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($caseDriftedManagedPath)
+Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0026 case-drifted managed paths must block cleanup'
+
 $wrongGitlink = New-Candidate -Number 29 -TargetTag 'v0.2.0' -ProtocolEntrySha ('9' * 40)
 $plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') -Candidates @($wrongGitlink)
 Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0015 wrong protocol gitlink SHA must block cleanup'
@@ -200,12 +244,12 @@ if ($failures.Count -eq 0) {
     $adoption = Get-Content -LiteralPath $adoptionPath -Raw
 
     $ci = Get-Content -LiteralPath $ciPath -Raw
-    foreach ($required in @('schedule:', 'workflow_dispatch:', 'contents: write', 'pull-requests: write', 'concurrency:', 'cancel-in-progress: false', 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0', 'MEANDAI_PROTOCOL_TOKEN', 'persist-credentials: false', 'GH_TOKEN: ${{ github.token }}', 'Invoke-MeAndAIProtocolUpdate.ps1')) {
+    foreach ($required in @('schedule:', 'workflow_dispatch:', 'contents: read', 'concurrency:', 'cancel-in-progress: false', 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0', 'MEANDAI_UPDATER_TOKEN', 'token: ${{ secrets.MEANDAI_UPDATER_TOKEN }}', 'token: ${{ secrets.MEANDAI_PROTOCOL_TOKEN || github.token }}', 'persist-credentials: false', 'GH_TOKEN: ${{ secrets.MEANDAI_UPDATER_TOKEN }}', 'Invoke-MeAndAIProtocolUpdate.ps1')) {
         if (-not $workflow.Contains($required)) {
             Add-Failure "TEST-0017 workflow is missing '$required'"
         }
     }
-    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'issues: write', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
+    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'issues: write', 'contents: write', 'pull-requests: write', 'GH_TOKEN: ${{ github.token }}', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
         if ($workflow.Contains($forbidden)) {
             Add-Failure "TEST-0017 workflow contains forbidden behavior '$forbidden'"
         }
@@ -225,12 +269,12 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 repository CI contains forbidden behavior '$forbidden'"
         }
     }
-    foreach ($required in @("'pr', 'create'", '--draft', 'meandai-protocol-update', 'ClosePullRequest', 'DeleteBranch', 'Assert-ManagedPullRequestSafe', 'Get-RemoteBranchHead', 'ExpectedProtocolSha', '--paginate', '--force-with-lease=', '-isnot [long]')) {
+    foreach ($required in @("'pr', 'create'", '--draft', 'meandai-protocol-update', 'ClosePullRequest', 'DeleteBranch', 'Assert-ManagedPullRequestSafe', 'Get-AuthenticatedUpdaterActor', 'Assert-CurrentManagedAssets', 'Get-ExpectedManagedPaths', 'Assert-StagedManagedUpdate', 'ManagedAssetEntriesMatchTarget', 'Get-RemoteBranchHead', 'ExpectedProtocolSha', '--paginate', '--force-with-lease=', '-isnot [long]')) {
         if (-not $adapter.Contains($required)) {
             Add-Failure "TEST-0017 adapter is missing '$required'"
         }
     }
-    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_PROTOCOL_TOKEN', 'v0.1.0', 'one-time', 'collision', 'submodule-only', '$defaultBranch', '$targetTag', 'git ls-tree', '160000 -> 160000')) {
+    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_UPDATER_TOKEN', 'meAndAI Updater - <repo>', 'MEANDAI_PROTOCOL_TOKEN', 'v0.4.0', 'one-time', 'collision', 'submodule-only', '$defaultBranch', '$targetTag', 'git ls-tree', '160000 -> 160000')) {
         if (-not $adoption.Contains($required)) {
             Add-Failure "TEST-0017 adoption guidance is missing '$required'"
         }
@@ -254,4 +298,4 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host 'Protocol update tests passed: TEST-0009 through TEST-0017 and TEST-0021.' -ForegroundColor Green
+Write-Host 'Protocol update tests passed: TEST-0009 through TEST-0017 and TEST-0021 through TEST-0026.' -ForegroundColor Green

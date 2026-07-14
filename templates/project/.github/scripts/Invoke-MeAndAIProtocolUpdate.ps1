@@ -3,12 +3,29 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$BranchPrefix = 'automation/meandai-protocol-',
-    [string]$TrustedActor = 'github-actions[bot]'
+    [string]$BranchPrefix = 'automation/meandai-protocol-'
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+$ManagedUpdaterAssets = @(
+    [pscustomobject]@{
+        ConsumerPath = '.github/workflows/meandai-protocol-update.yml'
+        TemplatePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+        TemplatePath = 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    }
+)
+$ManagedPaths = @($ProtocolPath) + @($ManagedUpdaterAssets | ForEach-Object {
+    [string]$_.ConsumerPath
+})
 
 function Invoke-Native {
     param([string]$Command, [string[]]$Arguments)
@@ -38,6 +55,173 @@ function Invoke-GhPagedJson {
     foreach ($encodedItem in $encodedItems) {
         $json = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(([string]$encodedItem).Trim()))
         $json | ConvertFrom-Json
+    }
+}
+
+function Get-AuthenticatedUpdaterActor {
+    $user = Invoke-GhJson -Arguments @('api', 'user')
+    $loginProperty = if ($null -ne $user) { $user.PSObject.Properties['login'] } else { $null }
+    $login = if ($null -ne $loginProperty) { [string]$loginProperty.Value } else { '' }
+    if ([string]::IsNullOrWhiteSpace($login)) {
+        throw 'Unable to resolve the authenticated updater actor from MEANDAI_UPDATER_TOKEN.'
+    }
+    return $login
+}
+
+function Get-LocalTreeEntry {
+    param(
+        [string]$Commit,
+        [string]$Path,
+        [string]$RepositoryPath = ''
+    )
+
+    $arguments = if ($RepositoryPath) {
+        @('-C', $RepositoryPath, 'ls-tree', $Commit, '--', $Path)
+    }
+    else {
+        @('ls-tree', $Commit, '--', $Path)
+    }
+    $output = @(Invoke-Native -Command 'git' -Arguments $arguments)
+    $empty = [pscustomobject]@{ Mode = ''; Type = ''; Sha = ''; Path = '' }
+    if ($output.Count -ne 1) {
+        return $empty
+    }
+    $match = [regex]::Match(
+        [string]$output[0],
+        '^(?<mode>[0-9]{6})\s+(?<type>[^\s]+)\s+(?<sha>[0-9a-f]{40})\t(?<path>.+)$'
+    )
+    if (-not $match.Success -or
+        [string]$match.Groups['path'].Value -cne $Path) {
+        return $empty
+    }
+    return [pscustomobject]@{
+        Mode = [string]$match.Groups['mode'].Value
+        Type = [string]$match.Groups['type'].Value
+        Sha = [string]$match.Groups['sha'].Value
+        Path = [string]$match.Groups['path'].Value
+    }
+}
+
+function Get-StagedTreeEntry {
+    param([string]$Path)
+
+    $output = @(Invoke-Native -Command 'git' -Arguments @(
+        'ls-files', '--stage', '--', $Path
+    ))
+    $empty = [pscustomobject]@{ Mode = ''; Sha = ''; Path = '' }
+    if ($output.Count -ne 1) {
+        return $empty
+    }
+    $match = [regex]::Match(
+        [string]$output[0],
+        '^(?<mode>[0-9]{6})\s+(?<sha>[0-9a-f]{40})\s+0\t(?<path>.+)$'
+    )
+    if (-not $match.Success -or
+        [string]$match.Groups['path'].Value -cne $Path) {
+        return $empty
+    }
+    return [pscustomobject]@{
+        Mode = [string]$match.Groups['mode'].Value
+        Sha = [string]$match.Groups['sha'].Value
+        Path = [string]$match.Groups['path'].Value
+    }
+}
+
+function Assert-CurrentManagedAssets {
+    param(
+        [string]$BaseCommit,
+        [string]$CurrentProtocolSha,
+        [string]$SourcePath,
+        [object[]]$Assets
+    )
+
+    foreach ($asset in $Assets) {
+        $consumerEntry = Get-LocalTreeEntry -Commit $BaseCommit `
+            -Path ([string]$asset.ConsumerPath)
+        $templateEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+            -Commit $CurrentProtocolSha -Path ([string]$asset.TemplatePath)
+        $consumerValid = $consumerEntry.Mode -ceq '100644' -and
+            $consumerEntry.Type -ceq 'blob' -and
+            $consumerEntry.Sha -match '^[0-9a-f]{40}$'
+        $templateValid = $templateEntry.Mode -ceq '100644' -and
+            $templateEntry.Type -ceq 'blob' -and
+            $templateEntry.Sha -match '^[0-9a-f]{40}$'
+        if (-not $consumerValid -or -not $templateValid -or
+            $consumerEntry.Sha -cne $templateEntry.Sha) {
+            throw "Managed asset '$($asset.ConsumerPath)' does not match the current pinned updater template; manual review is required."
+        }
+    }
+}
+
+function Get-ExpectedManagedPaths {
+    param(
+        [string]$BaseCommit,
+        [string]$TargetProtocolSha,
+        [string]$SourcePath,
+        [string]$ProtocolPath,
+        [object[]]$Assets
+    )
+
+    $paths = [System.Collections.Generic.List[string]]::new()
+    $paths.Add($ProtocolPath)
+    foreach ($asset in $Assets) {
+        $consumerEntry = Get-LocalTreeEntry -Commit $BaseCommit `
+            -Path ([string]$asset.ConsumerPath)
+        $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+            -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+        if ($consumerEntry.Mode -cne '100644' -or
+            $consumerEntry.Type -cne 'blob' -or
+            $consumerEntry.Sha -notmatch '^[0-9a-f]{40}$') {
+            throw "Managed consumer asset '$($asset.ConsumerPath)' is missing or invalid."
+        }
+        if ($targetEntry.Mode -cne '100644' -or
+            $targetEntry.Type -cne 'blob' -or
+            $targetEntry.Sha -notmatch '^[0-9a-f]{40}$') {
+            throw "Target release is missing canonical updater template '$($asset.TemplatePath)'."
+        }
+        if ($consumerEntry.Mode -cne $targetEntry.Mode -or
+            $consumerEntry.Sha -cne $targetEntry.Sha) {
+            $paths.Add([string]$asset.ConsumerPath)
+        }
+    }
+    return @($paths)
+}
+
+function Assert-StagedManagedUpdate {
+    param(
+        [string[]]$ExpectedPaths,
+        [string]$TargetProtocolSha,
+        [string]$SourcePath,
+        [string]$ProtocolPath,
+        [object[]]$Assets
+    )
+
+    $stagedPaths = @(Invoke-Native -Command 'git' -Arguments @(
+        'diff', '--cached', '--name-only'
+    ))
+    if (-not (Test-MeAndAIExactOrdinalPathSet `
+        -Actual $stagedPaths -Expected $ExpectedPaths)) {
+        throw "Upgrade staging does not match the expected managed paths: $($stagedPaths -join ', ')."
+    }
+
+    $protocolEntry = Get-StagedTreeEntry -Path $ProtocolPath
+    if ($protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Sha -cne $TargetProtocolSha) {
+        throw "Staged protocol gitlink does not match target commit '$TargetProtocolSha'."
+    }
+    foreach ($asset in $Assets) {
+        if ([string]$asset.ConsumerPath -cnotin $ExpectedPaths) {
+            continue
+        }
+        $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+            -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+        $stagedEntry = Get-StagedTreeEntry -Path ([string]$asset.ConsumerPath)
+        if ($targetEntry.Mode -cne '100644' -or
+            $targetEntry.Type -cne 'blob' -or
+            $stagedEntry.Mode -cne $targetEntry.Mode -or
+            $stagedEntry.Sha -cne $targetEntry.Sha) {
+            throw "Staged updater asset '$($asset.ConsumerPath)' does not match the target release blob."
+        }
     }
 }
 
@@ -165,11 +349,11 @@ function Get-RemoteBranchHead {
     return $parts[0]
 }
 
-function Get-ProtocolTreeEntry {
-    param([string]$Repository, [string]$HeadSha, [string]$ProtocolPath)
+function Get-RepositoryTreeEntry {
+    param([string]$Repository, [string]$HeadSha, [string]$Path)
 
-    $empty = [pscustomobject]@{ Mode = ''; Sha = '' }
-    $segments = @($ProtocolPath.Split('/', [StringSplitOptions]::RemoveEmptyEntries))
+    $empty = [pscustomobject]@{ Mode = ''; Type = ''; Sha = '' }
+    $segments = @($Path.Split('/', [StringSplitOptions]::RemoveEmptyEntries))
     if ($segments.Count -eq 0) {
         return $empty
     }
@@ -192,7 +376,11 @@ function Get-ProtocolTreeEntry {
         }
         $entry = $matches[0]
         if ($index -eq $segments.Count - 1) {
-            return [pscustomobject]@{ Mode = [string]$entry.mode; Sha = [string]$entry.sha }
+            return [pscustomobject]@{
+                Mode = [string]$entry.mode
+                Type = [string]$entry.type
+                Sha = [string]$entry.sha
+            }
         }
         if ([string]$entry.type -ne 'tree' -or [string]$entry.mode -ne '040000' -or
             [string]$entry.sha -notmatch '^[0-9a-f]{40}$') {
@@ -204,22 +392,63 @@ function Get-ProtocolTreeEntry {
     return $empty
 }
 
+function Test-ManagedAssetEntriesMatchTarget {
+    param(
+        [string]$Repository,
+        [string]$HeadSha,
+        [string[]]$ExpectedPaths,
+        [string]$TargetProtocolSha,
+        [string]$SourcePath,
+        [object[]]$Assets
+    )
+
+    foreach ($asset in $Assets) {
+        if ([string]$asset.ConsumerPath -cnotin $ExpectedPaths) {
+            continue
+        }
+        $expected = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+            -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+        $observed = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha $HeadSha -Path ([string]$asset.ConsumerPath)
+        if ($expected.Mode -cne '100644' -or
+            $expected.Type -cne 'blob' -or
+            $observed.Mode -cne $expected.Mode -or
+            $observed.Type -cne $expected.Type -or
+            $observed.Sha -cne $expected.Sha) {
+            return $false
+        }
+    }
+    return $true
+}
+
 function Assert-ManagedPullRequestSafe {
     param(
         [string]$Repository,
         $Operation,
         [string]$ProtocolPath,
-        [string]$TrustedActor
+        [string]$TrustedActor,
+        [string]$SourcePath,
+        [string]$BaseCommit,
+        [object[]]$ManagedAssets,
+        [string[]]$ManagedPaths
     )
 
     $number = [int]$Operation.PullRequestNumber
     $details = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$number")
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$number/files?per_page=100")
     $marker = Get-ProtocolMarker ([string]$details.body)
-    $protocolEntry = Get-ProtocolTreeEntry -Repository $Repository `
-        -HeadSha ([string]$details.head.sha) -ProtocolPath $ProtocolPath
+    $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
+        -HeadSha ([string]$details.head.sha) -Path $ProtocolPath
     $remoteHead = Get-RemoteBranchHead -Branch ([string]$Operation.Branch)
     $changedPaths = @($files | ForEach-Object { [string]$_.filename })
+    $expectedChangedPaths = @(Get-ExpectedManagedPaths -BaseCommit $BaseCommit `
+        -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+        -SourcePath $SourcePath -ProtocolPath $ProtocolPath -Assets $ManagedAssets)
+    $managedAssetsMatch = Test-ManagedAssetEntriesMatchTarget `
+        -Repository $Repository -HeadSha ([string]$details.head.sha) `
+        -ExpectedPaths $expectedChangedPaths `
+        -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+        -SourcePath $SourcePath -Assets $ManagedAssets
     $state = [string]$details.state
     $candidate = [pscustomobject]@{
         PullRequestState = if ($state) {
@@ -245,11 +474,14 @@ function Assert-ManagedPullRequestSafe {
             [string]$details.head.repo.full_name -ceq $Repository
         AuthorLogin = [string]$details.user.login
         ChangedPaths = $changedPaths
+        ExpectedChangedPaths = $expectedChangedPaths
+        ManagedAssetEntriesMatchTarget = $managedAssetsMatch
     }
     $context = [pscustomobject]@{
         Repository = $Repository; DefaultBranch = [string]$env:DEFAULT_BRANCH
         BranchPrefix = [string]$script:BranchPrefix
-        ProtocolPath = $ProtocolPath; TrustedActor = $TrustedActor
+        ProtocolPath = $ProtocolPath; ManagedPaths = $ManagedPaths
+        TrustedActor = $TrustedActor
     }
     $problems = @(Get-MeAndAIProtocolCandidateProblems -Candidate $candidate -Context $context)
 
@@ -275,6 +507,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $sourcePath '.git'))) {
     throw "Pinned protocol source checkout is missing: $sourcePath"
 }
 Import-Module $modulePath -Force
+$TrustedActor = Get-AuthenticatedUpdaterActor
 
 $submodulePaths = @(Invoke-Native -Command 'git' -Arguments @(
     'config', '-f', '.gitmodules', '--get-regexp', '^submodule\..*\.path$'
@@ -302,11 +535,19 @@ if ($submoduleUrl -notin $allowedUrls) {
     throw "Protocol submodule URL does not match '$ProtocolRepository'."
 }
 
-$treeEntry = (Invoke-Native -Command 'git' -Arguments @('ls-tree', 'HEAD', '--', $ProtocolPath)) -join ''
-if ($treeEntry -notmatch '^160000\s+commit\s+(?<sha>[0-9a-f]{40})\s+') {
+$baseHeadSha = ((Invoke-Native -Command 'git' -Arguments @(
+    'rev-parse', 'HEAD'
+)) -join '').Trim()
+if ($baseHeadSha -notmatch '^[0-9a-f]{40}$') {
+    throw 'Unable to resolve the consumer default-branch head.'
+}
+$protocolBaseEntry = Get-LocalTreeEntry -Commit $baseHeadSha -Path $ProtocolPath
+if ($protocolBaseEntry.Mode -cne '160000' -or
+    $protocolBaseEntry.Type -cne 'commit' -or
+    $protocolBaseEntry.Sha -notmatch '^[0-9a-f]{40}$') {
     throw "'$ProtocolPath' is not a protocol submodule gitlink."
 }
-$currentProtocolSha = $Matches.sha
+$currentProtocolSha = $protocolBaseEntry.Sha
 
 $availableTags = @(
     Invoke-Native -Command 'git' -Arguments @('-C', $sourcePath, 'tag', '--list', 'v*') |
@@ -326,6 +567,9 @@ if ($currentTags.Count -ne 1) {
     throw "Current protocol gitlink $currentProtocolSha must resolve to exactly one canonical stable release tag; found $($currentTags.Count)."
 }
 $currentTag = $currentTags[0]
+Assert-CurrentManagedAssets -BaseCommit $baseHeadSha `
+    -CurrentProtocolSha $currentProtocolSha -SourcePath $sourcePath `
+    -Assets $ManagedUpdaterAssets
 
 $repository = $env:GITHUB_REPOSITORY
 $pulls = @(Invoke-GhPagedJson -Endpoint "repos/$repository/pulls?state=open&per_page=100")
@@ -358,9 +602,22 @@ foreach ($pull in $pulls) {
             '-C', $sourcePath, 'rev-list', '-n', '1', $target
         )) -join '').Trim()
     }
-    $protocolEntry = Get-ProtocolTreeEntry -Repository $repository `
-        -HeadSha ([string]$details.head.sha) -ProtocolPath $ProtocolPath
+    $protocolEntry = Get-RepositoryTreeEntry -Repository $repository `
+        -HeadSha ([string]$details.head.sha) -Path $ProtocolPath
     $observedRemoteHead = Get-RemoteBranchHead -Branch ([string]$details.head.ref)
+    $expectedChangedPaths = @($ProtocolPath)
+    $managedAssetsMatchTarget = $false
+    if ($expectedProtocolSha -match '^[0-9a-f]{40}$') {
+        $expectedChangedPaths = @(Get-ExpectedManagedPaths `
+            -BaseCommit $baseHeadSha -TargetProtocolSha $expectedProtocolSha `
+            -SourcePath $sourcePath -ProtocolPath $ProtocolPath `
+            -Assets $ManagedUpdaterAssets)
+        $managedAssetsMatchTarget = Test-ManagedAssetEntriesMatchTarget `
+            -Repository $repository -HeadSha ([string]$details.head.sha) `
+            -ExpectedPaths $expectedChangedPaths `
+            -TargetProtocolSha $expectedProtocolSha -SourcePath $sourcePath `
+            -Assets $ManagedUpdaterAssets
+    }
     $candidates.Add([pscustomobject]@{
         PullRequestNumber = [int]$details.number
         PullRequestState = [string]$details.state.Substring(0, 1).ToUpperInvariant() + [string]$details.state.Substring(1)
@@ -383,6 +640,8 @@ foreach ($pull in $pulls) {
         SameRepository = $null -ne $details.head.repo -and [string]$details.head.repo.full_name -ceq $repository
         AuthorLogin = [string]$details.user.login
         ChangedPaths = @($files | ForEach-Object { [string]$_.filename })
+        ExpectedChangedPaths = $expectedChangedPaths
+        ManagedAssetEntriesMatchTarget = $managedAssetsMatchTarget
     })
 }
 
@@ -394,6 +653,7 @@ $snapshot = [pscustomobject]@{
     DefaultBranch = $env:DEFAULT_BRANCH
     BranchPrefix = $BranchPrefix
     ProtocolPath = $ProtocolPath
+    ManagedPaths = $ManagedPaths
     TrustedActor = $TrustedActor
     Candidates = @($candidates)
 }
@@ -426,6 +686,20 @@ if ($create.Count -eq 1) {
     if ($LASTEXITCODE -ne 0) {
         throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."
     }
+    $expectedManagedPaths = @(Get-ExpectedManagedPaths `
+        -BaseCommit $baseHeadSha -TargetProtocolSha $targetSha `
+        -SourcePath $sourcePath -ProtocolPath $ProtocolPath `
+        -Assets $ManagedUpdaterAssets)
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourcePath, 'checkout', '--detach', $targetSha
+    ) | Out-Null
+    foreach ($asset in $ManagedUpdaterAssets) {
+        $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
+        $templateFile = Join-Path $sourcePath $relativeTemplatePath
+        if (-not (Test-Path -LiteralPath $templateFile -PathType Leaf)) {
+            throw "Target release checkout is missing updater template '$($asset.TemplatePath)'."
+        }
+    }
 
     $createdBranch = [string]$create[0].Branch
     if ($null -ne (Get-RemoteBranchHead -Branch $createdBranch)) {
@@ -434,10 +708,19 @@ if ($create.Count -eq 1) {
 
     Invoke-Native -Command 'git' -Arguments @('switch', '-c', $createdBranch) | Out-Null
     Invoke-Native -Command 'git' -Arguments @('update-index', '--add', '--cacheinfo', "160000,$targetSha,$ProtocolPath") | Out-Null
-    $stagedPaths = @(Invoke-Native -Command 'git' -Arguments @('diff', '--cached', '--name-only'))
-    if ($stagedPaths.Count -ne 1 -or [string]$stagedPaths[0] -ne $ProtocolPath) {
-        throw "Upgrade staging escaped the protocol gitlink: $($stagedPaths -join ', ')."
+    foreach ($asset in $ManagedUpdaterAssets) {
+        $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
+        $relativeConsumerPath = [string]$asset.ConsumerPath -replace '/', [IO.Path]::DirectorySeparatorChar
+        Copy-Item -LiteralPath (Join-Path $sourcePath $relativeTemplatePath) `
+            -Destination (Join-Path $workspace $relativeConsumerPath) -Force
     }
+    $addArguments = @('add', '--') + @($ManagedUpdaterAssets | ForEach-Object {
+        [string]$_.ConsumerPath
+    })
+    Invoke-Native -Command 'git' -Arguments $addArguments | Out-Null
+    Assert-StagedManagedUpdate -ExpectedPaths $expectedManagedPaths `
+        -TargetProtocolSha $targetSha -SourcePath $sourcePath `
+        -ProtocolPath $ProtocolPath -Assets $ManagedUpdaterAssets
 
     Invoke-Native -Command 'git' -Arguments @('config', 'user.name', 'github-actions[bot]') | Out-Null
     Invoke-Native -Command 'git' -Arguments @('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com') | Out-Null
@@ -470,7 +753,7 @@ if ($create.Count -eq 1) {
             '- [ ] Create or link the tracked issue and allocate its stable work ID.',
             '- [ ] Read every intervening meAndAI changelog entry.',
             '- [ ] Review incompatible or newly mandatory rules.',
-            '- [ ] Reconcile copied templates without overwriting project customizations.',
+            '- [ ] Review the managed updater asset changes included in this proposal.',
             '- [ ] Update the consumer project memory pinned-version fact.',
             '- [ ] Run project tests and complete DoR/DoD review.'
         ) -join [Environment]::NewLine
@@ -492,7 +775,9 @@ if ($create.Count -eq 1) {
             ExpectedProtocolSha = $targetSha
         }
         Assert-ManagedPullRequestSafe -Repository $repository -Operation $createdOperation `
-            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor
+            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+            -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+            -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
         $createdPullRequest = [pscustomobject]@{ number = [int]$createdPullRequest.number }
         Write-Host "Created replacement draft PR: $url"
     }
@@ -513,7 +798,9 @@ if ($create.Count -eq 1) {
                         throw 'Replacement PR identity is ambiguous during rollback.'
                     }
                     Assert-ManagedPullRequestSafe -Repository $repository -Operation $createdOperation `
-                        -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor
+                        -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+                        -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+                        -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
                     Invoke-Native -Command 'gh' -Arguments @(
                         'api', '--method', 'PATCH', "repos/$repository/pulls/$($createdOperation.PullRequestNumber)",
                         '-f', 'state=closed'
@@ -594,10 +881,14 @@ foreach ($operation in @($plan.Operations | Where-Object Kind -eq 'ClosePullRequ
         throw "Resolver did not provide exactly one paired branch cleanup for PR #$($operation.PullRequestNumber)."
     }
     Assert-ManagedPullRequestSafe -Repository $repository -Operation $operation `
-        -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor
+        -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+        -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+        -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
     if ($null -ne $replacementOperation) {
         Assert-ManagedPullRequestSafe -Repository $repository -Operation $replacementOperation `
-            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor
+            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+            -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+            -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
     }
     $comment = if ($null -ne $replacementPullRequestNumber) {
         "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup will attempt to close this PR and delete its unchanged branch. If branch deletion fails, the workflow will try to reopen the PR and preserve the branch."
