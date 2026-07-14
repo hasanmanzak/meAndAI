@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Ready for review |
+| Status | Complete |
 | Target version | 0.2.0 |
 | Issue | [#3](https://github.com/hasanmanzak/meAndAI/issues/3) |
-| Pull request | Pending publication |
+| Pull request | [#4](https://github.com/hasanmanzak/meAndAI/pull/4) |
 | Tests | [Scenarios and evidence](test-cases.md) |
 
 ## Problem
@@ -80,7 +80,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0004` | Canonical version resolver and shared candidate validator | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0009`, `TEST-0010`, `TEST-0013`, `TEST-0014`; passed 2026-07-14 | `FIND-0024`, `FIND-0025`, `FIND-0030`, `FIND-0036`, `FIND-0037`, `FIND-0039` resolved | Complete |
 | `SUBF-0005` | Consumer adapter and compensated supersession | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0011`, `TEST-0012`, `TEST-0015`; adapter and real-Git lease fixtures passed 2026-07-14 | `FIND-0020` through `FIND-0029`, `FIND-0035`, and `FIND-0038` resolved | Complete |
-| `SUBF-0006` | Adoption, security boundary, and workflow templates | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0016`, `TEST-0017`; local structural suite passed 2026-07-14 | `FIND-0032` through `FIND-0034` resolved; `FIND-0040` awaits PR CI | Ready for review |
+| `SUBF-0006` | Adoption, security boundary, and workflow templates | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0016`, `TEST-0017`; local and PR CI passed 2026-07-14 | `FIND-0032` through `FIND-0034` and `FIND-0040` resolved | Complete |
 
 ## Definition of Ready
 
@@ -132,7 +132,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | `FIND-0037` | Exactness | Medium | Resolved | Canonical tag grammar and ref, marker, SHA, and path checks are case-sensitive |
 | `FIND-0038` | False-green risk | Medium | Resolved | Mocks assert exact leases and hide later pages without `--paginate` |
 | `FIND-0039` | Logic duplication | Medium | Resolved | Planning and live gates share one pure candidate validator |
-| `FIND-0040` | Delivery evidence | High | Release gate | Local evidence is complete; GitHub Ubuntu/Windows CI and PR linkage remain required before merge |
+| `FIND-0040` | Delivery evidence | High | Resolved | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) passed Ubuntu and Windows CI |
 
 ## Scan limitations
 
@@ -150,9 +150,9 @@ supersede an untouched older proposal. It never approves or merges the update.
 - [x] Every subfeature completed self-review.
 - [x] Full repository scan findings and limitations are recorded.
 - [x] Documentation, version metadata, links, and project memory are current.
-- [ ] Pull request and final commit are cross-linked from this record and issue #3.
-- [ ] Ubuntu and Windows GitHub CI checks pass on the published pull request.
-- [ ] Review gate is satisfied.
+- [x] [Pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4) and issue #3 cross-link the canonical records.
+- [x] Ubuntu and Windows GitHub CI checks pass on the published pull request.
+- [x] Review gate is satisfied.
 
 ## Post-merge release gate
 

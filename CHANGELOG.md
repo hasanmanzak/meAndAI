@@ -29,7 +29,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0002](docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md),
 [DEC-0003](docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md),
-and [issue #3](https://github.com/hasanmanzak/meAndAI/issues/3).
+[issue #3](https://github.com/hasanmanzak/meAndAI/issues/3), and
+[pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4).
 
 ## 0.1.0 - 2026-07-14
 
