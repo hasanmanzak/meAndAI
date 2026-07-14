@@ -58,13 +58,17 @@ $requiredFiles = @(
     '.ai/memory/README.md',
     '.ai/memory/project.md',
     '.ai/memory/log/README.md',
+    '.ai/memory/log/2026-07-14-update-automation.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
     'docs/features/FEAT-0001-common-development-protocol/test-cases.md',
+    'docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md',
+    'docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
+    'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md',
     'templates/project/AGENTS.submodule.md',
     'templates/project/AGENTS.repository-reference.md',
     'templates/project/.ai/memory/README.md',
@@ -73,6 +77,9 @@ $requiredFiles = @(
     'templates/feature/README.md',
     'templates/feature/test-cases.md',
     'templates/decision.md',
+    'templates/project/.github/workflows/meandai-protocol-update.yml',
+    'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+    'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
     '.github/PULL_REQUEST_TEMPLATE.md',
     '.github/ISSUE_TEMPLATE/config.yml',
     '.github/ISSUE_TEMPLATE/epic.yml',
@@ -80,7 +87,10 @@ $requiredFiles = @(
     '.github/ISSUE_TEMPLATE/subfeature.yml',
     '.github/ISSUE_TEMPLATE/task.yml',
     '.github/ISSUE_TEMPLATE/bug.yml',
-    '.github/ISSUE_TEMPLATE/finding.yml'
+    '.github/ISSUE_TEMPLATE/finding.yml',
+    'tests/protocol-update-adapter.tests.ps1',
+    'tests/protocol-update.tests.ps1',
+    '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
 
@@ -112,14 +122,19 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
             }
         }
 
+        $currentReference = "v$version"
+        $adoptionContent = Get-Content -LiteralPath (Join-Path $root 'docs/adoption.md') -Raw
+        if (-not $adoptionContent.Contains($currentReference)) {
+            Add-Failure 'TEST-0006 adoption guide is missing the current protocol reference'
+        }
+
         foreach ($relativePath in @(
-            'docs/adoption.md',
             'templates/project/AGENTS.submodule.md',
             'templates/project/AGENTS.repository-reference.md'
         )) {
             $content = Get-Content -LiteralPath (Join-Path $root $relativePath) -Raw
             $references = [regex]::Matches($content, 'v\d+\.\d+\.\d+')
-            if ($references.Count -eq 0 -or @($references.Value | Where-Object { $_ -ne "v$version" }).Count -gt 0) {
+            if ($references.Count -eq 0 -or @($references.Value | Where-Object { $_ -ne $currentReference }).Count -gt 0) {
                 Add-Failure "TEST-0006 stale or missing protocol reference in $relativePath"
             }
         }
@@ -276,10 +291,19 @@ if ($memoryTemplateFiles.Count -lt 3) {
     Add-Failure 'TEST-0008 project-local memory template set is incomplete'
 }
 
+$updateTestPath = Join-Path $root 'tests/protocol-update.tests.ps1'
+if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
+    $engine = (Get-Process -Id $PID).Path
+    & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure 'TEST-0009 through TEST-0017 protocol update validation failed'
+    }
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0008.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0017.' -ForegroundColor Green

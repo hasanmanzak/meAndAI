@@ -7,14 +7,15 @@ Last verified: **2026-07-14**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.1.0`
+- Current protocol version: `0.2.0`
+- Released baseline: `v0.1.0`; `v0.2.0` remains a release candidate until
+  its delivery pull request, cross-platform CI, merge, and tag are complete.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Current tracked feature:
-  [FEAT-0001](../../docs/features/FEAT-0001-common-development-protocol/README.md)
-  / [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1)
-  / [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2)
+  [FEAT-0002](../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
+  / [issue #3](https://github.com/hasanmanzak/meAndAI/issues/3)
 
 ## Collaboration constraints
 
@@ -38,7 +39,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0001` delivery and review are recorded in
+- Existing consumers pinned to immutable `v0.1.0` require one manual upgrade
+  and updater installation; consumers adopting `v0.2.0` receive the updater
+  assets during initial collision-safe adoption.
+- The current release target is `v0.2.0`; publication evidence is pending.
+  Prior delivery is recorded in
   [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2).
-- The post-merge release action is publication and verification of tag
-  `v0.1.0`.

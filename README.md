@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.1.0**
+Current protocol version: **0.2.0**
 
 ## Start here
 
@@ -25,6 +25,10 @@ inside the protocol submodule.
 The initial implementation is tracked by
 [FEAT-0001](docs/features/FEAT-0001-common-development-protocol/README.md) and
 [GitHub issue #1](https://github.com/hasanmanzak/meAndAI/issues/1).
+
+Semi-automatic, review-only consumer updates are tracked by
+[FEAT-0002](docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
+and [GitHub issue #3](https://github.com/hasanmanzak/meAndAI/issues/3).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.
