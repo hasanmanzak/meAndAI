@@ -15,7 +15,8 @@ This project uses the `M.m.rev` version format defined in the
   evidence.
 - Added executable `TEST-0020` coverage for the urgent-work contract.
 
-Related work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
+Related work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9) and
+[pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
 
 ## 0.3.0 - 2026-07-14
 

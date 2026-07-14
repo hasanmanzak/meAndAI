@@ -14,7 +14,7 @@ Last verified: **2026-07-14**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
-- Current delivery: pull request pending publication.
+- Current delivery: [pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
 
 ## Collaboration constraints
 

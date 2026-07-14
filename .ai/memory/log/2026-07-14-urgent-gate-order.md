@@ -2,6 +2,7 @@
 
 - Finding: `FIND-0047`
 - Tracking: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9)
+- Delivery: [pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10)
 - Owning feature:
   [FEAT-0001](../../../docs/features/FEAT-0001-common-development-protocol/README.md)
 - Target protocol release: `v0.3.1`
