@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-14**<br>
+Last reviewed: **2026-07-15**<br>
 Protocol version: **0.3.2**
 
 This directory is the portable, curated handoff between the maintainer and AI
