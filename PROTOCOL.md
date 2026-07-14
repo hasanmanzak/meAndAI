@@ -174,8 +174,10 @@ request is prohibited.
 Do not create validator-for-validator chains, recursive bootstrap layers, or
 universal semantic or AI-memory validators unless a concrete project risk and
 numbered decision require them. Prefer existing compiler, test, linter, link,
-and CI evidence. An ordinary feature or patch does not imply a new full-project
-scan; the triggers in [Full-project scans](#5-full-project-scans) still apply.
+and CI evidence. The post-development convergence scan in
+[Full-project scans](#5-full-project-scans) is the single default completion
+scan. Do not add another full-project scan to an ordinary feature or patch
+unless the remaining triggers in that section require it.
 ### Gate 6 - Definition of Done
 
 Work is done only when:
@@ -217,8 +219,9 @@ scope explicitly.
 
 After development is declared complete, perform a full-project scan under this
 section. Document every observation, classify it, and order actionable findings
-from highest to lowest severity before remediation. Resolve the highest-priority
-actionable in-scope findings first.
+from highest to lowest priority before remediation, using severity, impact, and
+dependency order as inputs. Resolve the highest-priority actionable in-scope
+findings first.
 
 After remediation, repeat the full-project scan. The completion condition is a
 convergence pass with no unresolved actionable in-scope finding. A finding is

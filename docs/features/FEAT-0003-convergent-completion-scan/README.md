@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In progress |
+| Status | Complete |
 | Target version | 0.3.0 |
 | Issue | [#7](https://github.com/hasanmanzak/meAndAI/issues/7) |
-| Pull request | Pending draft publication |
+| Pull request | [#8](https://github.com/hasanmanzak/meAndAI/pull/8) |
 | Protocol | [Post-development convergence scan](../../../PROTOCOL.md#post-development-convergence-scan) |
 | Decision | [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
 | Tests | [Test scenarios](test-cases.md) |
@@ -70,6 +70,7 @@ decomposition is not applicable.
 - Decision: [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md)
 - Related feature: [FEAT-0001](../FEAT-0001-common-development-protocol/README.md)
 - Related issue: [#7](https://github.com/hasanmanzak/meAndAI/issues/7)
+- Pull request: [#8](https://github.com/hasanmanzak/meAndAI/pull/8)
 
 ## Definition of Ready
 
@@ -86,7 +87,7 @@ decomposition is not applicable.
 
 1. Development completion requires a full-project scan.
 2. Findings are documented, classified, and resolved from highest to lowest
-   severity.
+   priority using severity, impact, and dependency order.
 3. Remediation repeats until no unresolved actionable in-scope finding remains.
 4. Every repeat has changed diff, failed evidence, or a new actionable finding
    within a declared finite budget.
@@ -96,30 +97,35 @@ decomposition is not applicable.
 
 ## Self-review
 
-Pending the final test run and fresh-diff review. The declared review scope is
-the complete tracked repository with generated content and `.git` excluded. The
-validation budget is the existing repository baseline, one remediation slice,
-one final full-project contract/test pass, and one fresh-diff inspection.
+Completed on 2026-07-14. The declared scope was the complete tracked repository,
+using the existing repository-wide contract/implementation audit as baseline,
+the complete `main`-to-branch diff, the structural/link/updater test suite, and
+live issue/PR metadata. `.git`, generated test fixtures, and external GitHub
+implementation were excluded from file review. The finite budget was one
+remediation slice, one confirmation review, and one blocker-driven test retry.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0041` | Process gap / High / High | Completion scanning lacked a convergence contract; add the protocol subsection. | Resolved in diff; verification pending |
-| `FIND-0042` | Loop risk / High / High | Literal repetition could be unbounded; add finite budget, progress, and blocked conditions. | Resolved in diff; verification pending |
-| `FIND-0043` | Regression risk / Medium / High | The new contract could drift; add template alignment and `TEST-0019`. | Resolved in diff; verification pending |
+| `FIND-0041` | Process gap / High / High | Completion scanning lacked a convergence contract; added the protocol subsection. | Resolved |
+| `FIND-0042` | Loop risk / High / High | Literal repetition could be unbounded; added finite budget, progress, and blocked conditions. | Resolved |
+| `FIND-0045` | Semantic contract / High / High | Severity was incorrectly used as a synonym for priority; priority now uses severity, impact, and dependency order. | Resolved |
+| `FIND-0046` | Process conflict / High / High | Gate 5 said ordinary work did not imply a project scan; aligned it with the single default convergence scan. | Resolved |
+| `FIND-0043` | Regression risk / Medium / High | The new contract could drift; added template alignment and `TEST-0019`. | Resolved |
+| `FIND-0044` | Test defect / Medium / High | The first run matched a line-wrapped sentence literally and failed falsely; narrowed the assertion without weakening semantics. | Resolved; retry passed |
 
 Shared finding scope is `FEAT-0003`; impact is protocol execution behavior;
 canonical evidence is the linked protocol section, decision, and test scenario.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
-- [ ] Mandatory test code and scenario mapping complete.
-- [ ] Test command and successful result recorded.
-- [ ] Bounded self-review and required convergence scan complete.
-- [ ] No unresolved blocking finding; non-blocking follow-ups are owned and linked.
-- [ ] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decision, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Acceptance criteria met.
+- [x] Mandatory test code and scenario mapping complete.
+- [x] Test command and successful result recorded.
+- [x] Bounded self-review and required convergence scan complete.
+- [x] No unresolved blocking finding; non-blocking follow-ups are owned and linked.
+- [x] Documentation, links, version, and project memory current.
+- [x] Issue, pull request, decision, and related work cross-linked.
+- [x] Local review gates pass; merge remains conditional on configured PR CI.
 
 ## Post-merge release gate
 

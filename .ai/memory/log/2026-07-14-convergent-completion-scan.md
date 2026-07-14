@@ -1,6 +1,7 @@
 # 2026-07-14 - Convergent Completion Scan
 
 - Tracking: [issue #7](https://github.com/hasanmanzak/meAndAI/issues/7)
+- Delivery: [pull request #8](https://github.com/hasanmanzak/meAndAI/pull/8)
 - Feature:
   [FEAT-0003](../../../docs/features/FEAT-0003-convergent-completion-scan/README.md)
 - Decision:
@@ -10,7 +11,8 @@
 ## Durable rules
 
 - Completed development receives a full-project scan with documented,
-  severity-ordered findings and highest-priority remediation first.
+  priority-ordered findings; severity, impact, and dependency order determine
+  remediation order.
 - Completion requires zero unresolved actionable in-scope findings.
 - Scope, exclusions, and a finite validation budget are declared before the
   first pass; unchanged scans do not repeat.

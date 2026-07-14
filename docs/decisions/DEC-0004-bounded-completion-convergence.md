@@ -1,7 +1,7 @@
 # DEC-0004 - Require Bounded Post-Development Convergence
 
 - Classification: Decision
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-14
 - Decision owners: Repository maintainers
 - Related feature:
@@ -17,12 +17,12 @@ progress, or a stop condition can instead produce a blind validation loop.
 ## Decision
 
 After development is declared complete, document and prioritize full-project
-scan findings, remediate the highest-severity actionable in-scope findings, and
-repeat until a convergence pass has none unresolved. Before scanning, declare a
-finite validation budget, scope, and exclusions. Every repeat requires changed
-diff, failed evidence, or a new actionable finding. Budget exhaustion, missing
-authority, or an unchanged blocker produces a blocked outcome rather than
-completion.
+scan findings using severity, impact, and dependency order, remediate the
+highest-priority actionable in-scope findings, and repeat until a convergence
+pass has none unresolved. Before scanning, declare a finite validation budget,
+scope, and exclusions. Every repeat requires changed diff, failed evidence, or
+a new actionable finding. Budget exhaustion, missing authority, or an unchanged
+blocker produces a blocked outcome rather than completion.
 
 Owned residual risks and non-blocking legacy follow-ups remain visible and
 linked; relabeling alone does not clear a finding. The default budget is one
@@ -31,7 +31,7 @@ initial scan and one confirmation scan after remediation.
 ## Consequences
 
 - Completion has an explicit repository-wide quality condition.
-- High-severity actionable findings are handled before lower-priority work.
+- High-priority actionable findings are handled before lower-priority work.
 - The process can stop safely without claiming success when convergence cannot
   be reached inside its authority or budget.
 - Consumers adopting `v0.3.0` receive a stricter prospective completion gate;

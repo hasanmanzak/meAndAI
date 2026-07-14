@@ -317,10 +317,11 @@ if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
 
 foreach ($requiredText in @(
     'After development is declared complete',
-    'highest to lowest severity',
+    'highest to lowest priority',
+    'severity, impact, and',
     'no unresolved actionable in-scope finding',
     'finite validation budget',
-    'An unchanged scan MUST NOT be repeated',
+    'unchanged scan MUST NOT be repeated',
     'stop as blocked',
     'Budget exhaustion is never a successful completion state'
 )) {
