@@ -18,6 +18,7 @@ Implementations:
 | `TEST-0015` | `SUBF-0005` | Ownership, marker count, case, API/remote head, tree, path, draft/base state, or branch lease changes before mutation. | Ambiguous or human work is preserved; paired cleanup failure attempts to reopen the PR. | Passed | Shared-validator and adapter race fixtures |
 | `TEST-0016` | `SUBF-0006` | A higher incompatible major exists without a newer same-major release. | Workflow reports manual migration and opens no automatic PR. | Passed | Resolver test |
 | `TEST-0017` | `SUBF-0006` | Inspect workflow/adoption controls, immutable actions, permissions, triggers, pagination, origin validation, and repository CI. | Required review-only controls exist; auto-merge, mutable actions, and `pull_request_target` do not. | Passed locally and in PR CI | Structural and invalid-origin tests |
+| `TEST-0021` | `SUBF-0005` | Inspect the audit comment emitted before managed PR and branch cleanup, including the branch-deletion compensation path. | The comment describes cleanup as an attempt, explains reopen/preserve compensation, and does not promise branch removal before deletion succeeds. | Passed | Adapter body fixture and structural assertion |
 
 ## Evidence
 
@@ -28,6 +29,8 @@ Implementations:
 | Parse | 2026-07-14 | Final pre-publication working tree | Windows PowerShell 5.1 AST parser | Parse resolver, adapter, and both updater test files | No parser errors |
 | Git leases | 2026-07-14 | Final pre-publication working tree | Local temporary bare and working Git repositories | Expected-absent creation and expected-head deletion smoke test | Passed |
 | PR CI | 2026-07-14 | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) | GitHub-hosted Ubuntu and Windows PowerShell 7 | [Actions run 29348128999](https://github.com/hasanmanzak/meAndAI/actions/runs/29348128999) | Passed |
+| Red - `TEST-0021` | 2026-07-14 | Working tree after adding the comment contract test | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol-update-adapter.tests.ps1` | Exit `1`; the existing guaranteed-removal wording failed all five new assertions |
+| Green - `TEST-0021` | 2026-07-14 | `v0.3.2` pre-publication working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Exit `0`; `TEST-0001` through `TEST-0021` passed |
 
 The adapter fixture returns only the first 100 pull requests unless the caller
 uses `--paginate`, asserts exact expected-absent and expected-head lease

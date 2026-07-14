@@ -600,10 +600,10 @@ foreach ($operation in @($plan.Operations | Where-Object Kind -eq 'ClosePullRequ
             -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor
     }
     $comment = if ($null -ne $replacementPullRequestNumber) {
-        "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. This unchanged automation branch will be removed."
+        "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup will attempt to close this PR and delete its unchanged branch. If branch deletion fails, the workflow will try to reopen the PR and preserve the branch."
     }
     else {
-        "The default branch already contains ``$($operation.TargetTag)``. This stale, unchanged automation branch will be removed."
+        "The default branch already contains ``$($operation.TargetTag)``. Automated cleanup will attempt to close this PR and delete its unchanged branch. If branch deletion fails, the workflow will try to reopen the PR and preserve the branch."
     }
     Invoke-Native -Command 'gh' -Arguments @('api', '--method', 'POST', "repos/$repository/issues/$($operation.PullRequestNumber)/comments", '-f', "body=$comment") | Out-Null
     Invoke-Native -Command 'gh' -Arguments @('api', '--method', 'PATCH', "repos/$repository/pulls/$($operation.PullRequestNumber)", '-f', 'state=closed') | Out-Null

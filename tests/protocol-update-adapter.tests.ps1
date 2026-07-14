@@ -5,6 +5,7 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+$adapterContent = Get-Content -LiteralPath $adapterSource -Raw
 $failures = [System.Collections.Generic.List[string]]::new()
 $script:Scenario = $null
 
@@ -201,6 +202,8 @@ function global:gh {
     }
 
     if ($method -eq 'POST' -and $endpoint -like '*/issues/21/comments') {
+        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
+        $script:Scenario.OldPullRequestComment = $bodyArgument.Substring('body='.Length)
         Add-ScenarioEvent 'comment-old-pr'
         '{}'
         return
@@ -402,6 +405,7 @@ function Invoke-AdapterScenario {
         OldBranch = 'automation/meandai-protocol-v0.2.0'
         NewBranch = 'automation/meandai-protocol-v0.3.0'
         OldBody = $oldBody
+        OldPullRequestComment = ''
         NewBody = $initialNewBody
         NewDraft = $NewDraft
         MutateOldAfterSnapshot = $MutateOldAfterSnapshot
@@ -470,6 +474,21 @@ foreach ($event in $successOrder) {
         break
     }
     $previous = $index
+}
+
+$cleanupAttemptText = 'Automated cleanup will attempt to close this PR and delete its unchanged branch.'
+$cleanupCompensationText = 'If branch deletion fails, the workflow will try to reopen the PR and preserve the branch.'
+foreach ($requiredText in @($cleanupAttemptText, $cleanupCompensationText)) {
+    if (-not $success.OldPullRequestComment.Contains($requiredText)) {
+        Add-Failure "TEST-0021 emitted cleanup comment is missing '$requiredText'"
+    }
+    if ([regex]::Matches($adapterContent, [regex]::Escape($requiredText)).Count -ne 2) {
+        Add-Failure "TEST-0021 both cleanup comment paths must contain '$requiredText'"
+    }
+}
+if ($success.OldPullRequestComment.Contains('will be removed') -or
+    $adapterContent.Contains('automation branch will be removed')) {
+    Add-Failure 'TEST-0021 cleanup comments must not promise branch removal before it succeeds.'
 }
 
 $verificationFailure = Invoke-AdapterScenario -Name 'verification-failure' -NewDraft $false
@@ -615,4 +634,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol update adapter tests passed: TEST-0011 and TEST-0015.' -ForegroundColor Green
+Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, and TEST-0021.' -ForegroundColor Green

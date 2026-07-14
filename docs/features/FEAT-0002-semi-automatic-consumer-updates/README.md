@@ -35,6 +35,8 @@ supersede an untouched older proposal. It never approves or merges the update.
 - Replacement creation and full verification before old-proposal cleanup.
 - Fresh validation of both proposals, expected-state Git leases, and PR reopen
   compensation when paired branch cleanup fails.
+- State-aware cleanup comments that describe attempted mutation and the
+  reopen/preserve compensation path without promising success.
 - A shared pure candidate validator used by planning and live mutation gates.
 - Private-repository credential and GitHub Actions permission guidance.
 - A one-time manual migration for consumers pinned to immutable `v0.1.0`.
@@ -79,7 +81,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | ID | Slice | Tracking | Tests and latest run | Self-review and findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0004` | Canonical version resolver and shared candidate validator | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0009`, `TEST-0010`, `TEST-0013`, `TEST-0014`; passed 2026-07-14 | `FIND-0024`, `FIND-0025`, `FIND-0030`, `FIND-0036`, `FIND-0037`, `FIND-0039` resolved | Complete |
-| `SUBF-0005` | Consumer adapter and compensated supersession | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0011`, `TEST-0012`, `TEST-0015`; adapter and real-Git lease fixtures passed 2026-07-14 | `FIND-0020` through `FIND-0029`, `FIND-0035`, and `FIND-0038` resolved | Complete |
+| `SUBF-0005` | Consumer adapter and compensated supersession | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0011`, `TEST-0012`, `TEST-0015`, `TEST-0021`; adapter and real-Git lease fixtures passed 2026-07-14 | `FIND-0020` through `FIND-0029`, `FIND-0035`, `FIND-0038`, and `FIND-0049` resolved | Complete |
 | `SUBF-0006` | Adoption, security boundary, and workflow templates | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0016`, `TEST-0017`; local and PR CI passed 2026-07-14 | `FIND-0032` through `FIND-0034` and `FIND-0040` resolved | Complete |
 
 ## Definition of Ready
@@ -102,7 +104,9 @@ supersede an untouched older proposal. It never approves or merges the update.
 4. A newer compatible release is created and fully revalidated before an
    untouched older proposal is closed and lease-deleted.
 5. Failed creation, ambiguous ownership, case-only drift, missing refs, or human
-   changes stop or compensate without deleting ambiguous work.
+   changes stop or compensate without deleting ambiguous work; pre-cleanup
+   comments describe the attempted action and compensation without promising
+   successful branch removal.
 6. Automation never merges, applies a new major, or rewrites consumer memory,
    feature records, decisions, or copied templates.
 7. Existing `v0.1.0` consumers have an explicit one-time reviewed migration.
@@ -133,6 +137,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 | `FIND-0038` | False-green risk | Medium | Resolved | Mocks assert exact leases and hide later pages without `--paginate` |
 | `FIND-0039` | Logic duplication | Medium | Resolved | Planning and live gates share one pure candidate validator |
 | `FIND-0040` | Delivery evidence | High | Resolved | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) passed Ubuntu and Windows CI |
+| `FIND-0049` | Audit clarity | Low | Resolved | Conditional cleanup wording and `TEST-0021`; tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) |
 
 ## Scan limitations
 
