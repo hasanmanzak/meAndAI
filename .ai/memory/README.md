@@ -2,7 +2,7 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-14**<br>
-Protocol version: **0.2.0**
+Protocol version: **0.2.1**
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

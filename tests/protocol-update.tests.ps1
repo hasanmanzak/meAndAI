@@ -200,12 +200,12 @@ if ($failures.Count -eq 0) {
     $adoption = Get-Content -LiteralPath $adoptionPath -Raw
 
     $ci = Get-Content -LiteralPath $ciPath -Raw
-    foreach ($required in @('schedule:', 'workflow_dispatch:', 'contents: write', 'pull-requests: write', 'issues: write', 'concurrency:', 'cancel-in-progress: false', 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0', 'MEANDAI_PROTOCOL_TOKEN', 'persist-credentials: false', 'GH_TOKEN: ${{ github.token }}', 'Invoke-MeAndAIProtocolUpdate.ps1')) {
+    foreach ($required in @('schedule:', 'workflow_dispatch:', 'contents: write', 'pull-requests: write', 'concurrency:', 'cancel-in-progress: false', 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0', 'MEANDAI_PROTOCOL_TOKEN', 'persist-credentials: false', 'GH_TOKEN: ${{ github.token }}', 'Invoke-MeAndAIProtocolUpdate.ps1')) {
         if (-not $workflow.Contains($required)) {
             Add-Failure "TEST-0017 workflow is missing '$required'"
         }
     }
-    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
+    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'issues: write', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
         if ($workflow.Contains($forbidden)) {
             Add-Failure "TEST-0017 workflow contains forbidden behavior '$forbidden'"
         }
@@ -230,7 +230,7 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 adapter is missing '$required'"
         }
     }
-    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_PROTOCOL_TOKEN', 'v0.1.0', 'one-time', 'collision')) {
+    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_PROTOCOL_TOKEN', 'v0.1.0', 'one-time', 'collision', 'submodule-only', '$defaultBranch', '$targetTag', 'git ls-tree', '160000 -> 160000')) {
         if (-not $adoption.Contains($required)) {
             Add-Failure "TEST-0017 adoption guidance is missing '$required'"
         }

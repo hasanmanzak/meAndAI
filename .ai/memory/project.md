@@ -7,15 +7,13 @@ Last verified: **2026-07-14**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.2.0`
-- Released baseline: `v0.1.0`; `v0.2.0` remains a release candidate until
-  its delivery pull request, cross-platform CI, merge, and tag are complete.
+- Current protocol version: `0.2.1`
+- Maintenance scope: bounded self-validation and compact follow-up corrections
+  tracked by [issue #5](https://github.com/hasanmanzak/meAndAI/issues/5).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Current tracked feature:
-  [FEAT-0002](../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
-  / [issue #3](https://github.com/hasanmanzak/meAndAI/issues/3)
+- Current tracked work: [issue #5](https://github.com/hasanmanzak/meAndAI/issues/5).
 
 ## Collaboration constraints
 
@@ -42,6 +40,6 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Existing consumers pinned to immutable `v0.1.0` require one manual upgrade
   and updater installation; consumers adopting `v0.2.0` receive the updater
   assets during initial collision-safe adoption.
-- The current release target is `v0.2.0`; publication evidence is pending.
-  Prior delivery is recorded in
-  [pull request #2](https://github.com/hasanmanzak/meAndAI/pull/2).
+- `v0.2.0` delivered the updater in
+  [pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4); `v0.2.1`
+  refines validation bounds and documentation without changing updater behavior.

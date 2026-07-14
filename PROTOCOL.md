@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.2.0**<br>
+Protocol version: **0.2.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -151,6 +151,31 @@ blocking issue. It MUST NOT be deferred merely so a later scan can say the new
 code should have been written differently. Legacy findings may be scheduled
 separately only when they do not invalidate the new work and are linked.
 
+
+#### Bounded self-validation
+
+Unless a known risk or project decision requires more, the default validation
+budget is:
+
+1. one fresh-diff self-review pass after the declared tests;
+2. one final relevant verification command after fixes; and
+3. one triage that classifies each observation as blocking or follow-up.
+
+Only a blocking finding that invalidates acceptance, correctness, safety,
+compatibility, or required evidence reopens implementation scope. A
+non-blocking improvement is linked for later work and MUST NOT trigger another
+review loop in the current delivery.
+
+Stop validation when acceptance criteria and declared tests pass, no blocking
+finding remains, and the evidence and unreviewed scope are recorded. Repeating
+an unchanged review without new diff, failed evidence, or an explicit user
+request is prohibited.
+
+Do not create validator-for-validator chains, recursive bootstrap layers, or
+universal semantic or AI-memory validators unless a concrete project risk and
+numbered decision require them. Prefer existing compiler, test, linter, link,
+and CI evidence. An ordinary feature or patch does not imply a new full-project
+scan; the triggers in [Full-project scans](#5-full-project-scans) still apply.
 ### Gate 6 - Definition of Done
 
 Work is done only when:
@@ -209,6 +234,12 @@ Each finding is recorded as `FIND-NNNN` with classification, severity
 affected scope, impact, recommended action, status, and links to related issues,
 pull requests, features, decisions, tests, and documentation. Separate verified
 defects from risks and optional improvements.
+
+A compact finding register MAY declare shared scope, confidence, impact, and
+canonical evidence links once when they apply unambiguously to every listed
+row. Each row still records its identifier, classification, severity, specific
+evidence, action, and status. Do not split one coherent observation into
+multiple records merely to increase detail.
 
 ## 6. Documentation graph
 
@@ -290,8 +321,9 @@ The updater MUST:
 - bind each managed proposal to its Git submodule mode, single changed protocol
   path, trusted actor, same-repository head, consumer default branch, and draft
   state;
-- compare the marker, API head, and live remote ref with the planned head before
-  every mutation;
+- compare the marker, API head, and live remote ref with the planned head
+  immediately before each destructive cleanup sequence, then enforce the
+  expected-head lease immediately before branch deletion;
 - use expected-state Git leases for automation branch creation and deletion,
   and attempt to reopen an old PR when its paired branch cleanup fails;
 - fail closed after interrupted creation and require lease-safe reviewed

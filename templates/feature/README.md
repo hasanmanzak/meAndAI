@@ -74,12 +74,17 @@ Record date, reviewed diff/scope, findings, fixes, residual risks, and evidence
 for the feature and for every declared subfeature. Number and classify each
 finding, including findings fixed in the same slice.
 
+
+Default to one bounded fresh-diff pass and one final relevant verification
+command. Classify observations as blocking or follow-up, record the stop
+condition, and do not recursively add validators unless a concrete risk and
+decision require them.
 ## Definition of Done
 
 - [ ] Acceptance criteria met.
 - [ ] Mandatory test code and scenario mapping complete.
 - [ ] Test commands and successful results recorded.
-- [ ] Self-review and required scans complete.
+- [ ] Bounded self-review stop condition and explicitly required scans complete.
 - [ ] No unresolved blocking finding or known new debt.
 - [ ] Documentation, links, version, and project memory current.
 - [ ] Issue, pull request, decisions, and related work cross-linked.

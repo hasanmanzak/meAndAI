@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+
+## 0.2.1 - 2026-07-14
+
+### Changed
+
+- Bounded normal self-validation to one fresh-diff review and one final
+  verification command; only blocking findings reopen delivery scope.
+- Prohibited recursive validator/bootstrap chains without a concrete risk and
+  numbered decision, while retaining explicit full-scan triggers.
+- Separated common consumer assets from submodule-only updater assets.
+- Tightened the documented orphan-branch recovery checks for default branch,
+  gitlink mode, and target tag without adding automation.
+- Removed unused `issues: write` permission and corrected small contract and
+  historical test-description drift.
+
+Related work: [issue #5](https://github.com/hasanmanzak/meAndAI/issues/5).
 ## 0.2.0 - 2026-07-14
 
 ### Added
