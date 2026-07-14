@@ -1,0 +1,47 @@
+name: Subfeature
+description: Define an independently reviewable and testable feature slice.
+title: "[SUBF-NNNN] "
+labels: ["type:subfeature", "priority:p2"]
+body:
+  - type: input
+    id: work_id
+    attributes:
+      label: Work ID
+      placeholder: SUBF-0001
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent feature
+      description: Link the owning FEAT-NNNN issue and feature document.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome, scope, and contracts
+      description: State the slice, non-goals, invariants, semantic types, boundaries, and consumers.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and tests
+      description: Link numbered TEST-NNNN scenarios and state test-code and baseline-run status.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and risks
+      description: Link blocking work, decisions, and owned RISK-NNNN records.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Related records
+      description: Link related issues, pull requests, decisions, wiki pages, or docs.
+    validations:
+      required: true

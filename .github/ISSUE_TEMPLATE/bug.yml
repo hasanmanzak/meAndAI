@@ -1,0 +1,47 @@
+name: Bug
+description: Report confirmed incorrect behavior with reproduction evidence.
+title: "[BUG-NNNN] "
+labels: ["type:bug", "priority:p2"]
+body:
+  - type: input
+    id: work_id
+    attributes:
+      label: Work ID
+      placeholder: BUG-0001
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Actual and expected behavior
+      description: Separate observed behavior from the expected contract.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and evidence
+      description: Include environment, minimal steps, redacted logs/files, commits, and frequency; never paste secrets or unnecessary personal data.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and suspected scope
+      description: State affected users, domain invariants, severity, and compatibility risk.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Regression scenarios
+      description: Define numbered TEST-NNNN scenarios that fail before the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Related records
+      description: Link related issues, pull requests, features, decisions, wiki pages, or docs.
+    validations:
+      required: true

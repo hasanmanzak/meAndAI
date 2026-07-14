@@ -1,0 +1,80 @@
+name: Review finding
+description: Record an evidence-backed audit or self-review observation.
+title: "[FIND-NNNN] "
+labels: ["type:finding", "priority:p2"]
+body:
+  - type: input
+    id: work_id
+    attributes:
+      label: Finding ID
+      placeholder: FIND-0001
+    validations:
+      required: true
+  - type: dropdown
+    id: disposition
+    attributes:
+      label: Disposition
+      options:
+        - Confirmed defect
+        - Risk
+        - Optional improvement
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Correctness
+        - Architecture
+        - Refactor
+        - Duplication
+        - Test gap
+        - Documentation drift
+        - Security or privacy
+        - Performance or operations
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - critical
+        - high
+        - medium
+        - low
+        - info
+    validations:
+      required: true
+  - type: dropdown
+    id: confidence
+    attributes:
+      label: Confidence
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and affected scope
+      description: Cite files, lines, behavior, and commands; redact secrets and unnecessary personal data.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and recommended action
+      description: Explain why it matters and the smallest safe remediation.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Related records
+      description: Link related issues, pull requests, features, decisions, tests, wiki pages, or docs.
+    validations:
+      required: true

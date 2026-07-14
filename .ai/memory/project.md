@@ -1,0 +1,42 @@
+# Project Snapshot
+
+Last verified: **2026-07-14**
+
+## Verified facts
+
+- Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
+- Visibility: private
+- Default branch: `main`
+- Current protocol version: `0.1.0`
+- Content language: English
+- Purpose: provide a shared development protocol that other projects can pin
+  while retaining independent project memory.
+- Current tracked feature:
+  [FEAT-0001](../../docs/features/FEAT-0001-common-development-protocol/README.md)
+  / [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1)
+
+## Collaboration constraints
+
+- When authorization and tooling are available, carry approved repository and
+  GitHub work through validation and publication instead of stopping at advice.
+- An explicit request to wait for future instructions is a hard stop for edits,
+  implementation, and detailed planning until the next concrete directive.
+- Treat continuity requirements as part of scope and answer the stated
+  project/tool question directly.
+- Do not invent implementation and claim completion without repository evidence.
+- Large work is decomposed and reviewed slice by slice.
+- Repository content is written in English; conversation language follows the
+  user.
+
+## Engineering direction
+
+The canonical rules are in the [common protocol](../../PROTOCOL.md). Defaults
+are Domain-Driven Design, Rich Entity Model, and Test-Driven Development, with a
+documented project decision required when another approach better fits the
+domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
+
+## Open context
+
+- `FEAT-0001` is establishing the first protocol release.
+- The release is complete only after tests, self-review, pull request, merge,
+  and tag `v0.1.0`.
