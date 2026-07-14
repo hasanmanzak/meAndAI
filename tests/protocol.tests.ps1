@@ -59,6 +59,7 @@ $requiredFiles = @(
     '.ai/memory/project.md',
     '.ai/memory/log/README.md',
     '.ai/memory/log/2026-07-14-update-automation.md',
+    '.ai/memory/log/2026-07-14-bounded-self-validation.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
@@ -271,7 +272,7 @@ if (-not $submoduleAdapter.Contains('.ai/protocol/PROTOCOL.md') -or
     -not $adoption.Contains('templates/project/.ai/memory/') -or
     -not $adoption.Contains('`.ai/memory/`') -or
     -not $adoption.Contains('repository-reference consumer MUST request') -or
-    -not $adoption.Contains('collision preflight') -or
+    -not $adoption.Contains('preflight before writing') -or
     -not $adoption.Contains('config.yml` is deliberately excluded')) {
     Add-Failure 'TEST-0008 adoption adapters do not preserve entry-point and memory isolation semantics'
 }
@@ -292,6 +293,24 @@ if ($memoryTemplateFiles.Count -lt 3) {
 }
 
 $updateTestPath = Join-Path $root 'tests/protocol-update.tests.ps1'
+$protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
+$featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
+foreach ($requiredText in @(
+    'one fresh-diff self-review pass',
+    'one final relevant verification command',
+    'Only a blocking finding',
+    'Stop validation when',
+    'validator-for-validator',
+    'MUST NOT trigger another'
+)) {
+    if (-not $protocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0018 bounded self-validation contract is missing '$requiredText'"
+    }
+}
+if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
+    Add-Failure 'TEST-0018 feature template is missing the bounded self-review default'
+}
+
 if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
@@ -306,4 +325,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0017.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0018.' -ForegroundColor Green

@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.2.0**
+Current protocol version: **0.2.1**
 
 ## Start here
 

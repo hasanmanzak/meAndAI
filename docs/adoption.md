@@ -25,7 +25,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.2.0
+git -C .ai/protocol checkout v0.2.1
 git add .gitmodules .ai/protocol
 ```
 
@@ -62,9 +62,6 @@ following source-to-target mapping from the pinned protocol ref:
 | `templates/project/.ai/memory/` | `.ai/memory/` |
 | `.github/ISSUE_TEMPLATE/{bug,epic,feature,finding,subfeature,task}.yml` | `.github/ISSUE_TEMPLATE/` |
 | `.github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` |
-| `templates/project/.github/workflows/meandai-protocol-update.yml` | `.github/workflows/meandai-protocol-update.yml` |
-| `templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1` | `.github/scripts/MeAndAI.ProtocolUpdate.psm1` |
-| `templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1` | `.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1` |
 | `templates/feature/` | A new `docs/features/FEAT-NNNN-*/` record |
 | `templates/decision.md` | A new `docs/decisions/DEC-NNNN-*.md` record |
 
@@ -73,6 +70,17 @@ its contact link describes this protocol repository and follows its current
 `main`. Create a consumer-owned configuration whose links point to the
 consumer's documentation or to the exact pinned protocol tag.
 
+
+Submodule consumers also materialize these submodule-only automation assets:
+
+| Pinned source | Consumer-owned target |
+| --- | --- |
+| `templates/project/.github/workflows/meandai-protocol-update.yml` | `.github/workflows/meandai-protocol-update.yml` |
+| `templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1` | `.github/scripts/MeAndAI.ProtocolUpdate.psm1` |
+| `templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1` | `.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1` |
+
+Opaque repository-reference consumers MUST NOT copy these three files unchanged.
+They use a reviewed provider-specific adapter or the manual update process.
 For a submodule consumer, the following command initializes only absent files.
 It aborts on every collision instead of overwriting consumer rules:
 
@@ -136,12 +144,11 @@ Before enabling the updater:
 
 1. Add a repository Actions secret named `MEANDAI_PROTOCOL_TOKEN`. It must be a
    read-only credential that can clone this private `meAndAI` repository. The
-   consumer's `GITHUB_TOKEN` remains responsible for consumer contents, pull
-   request, and issue mutations.
+   consumer's `GITHUB_TOKEN` remains responsible for consumer contents and
+   pull request mutations.
 2. In **Settings > Actions > General > Workflow permissions**, allow GitHub
    Actions to create and approve pull requests. The workflow declares only the
-   consumer permissions it uses: `contents: write`, `pull-requests: write`, and
-   `issues: write`.
+   consumer permissions it uses: `contents: write` and `pull-requests: write`.
 3. Keep credentials out of repository files, project memory, workflow output,
    issue bodies, and pull request bodies. Adoption cannot create the secret or
    enable the repository setting on the maintainer's behalf.
@@ -178,12 +185,13 @@ review gates. The complete contract is recorded in
 [FEAT-0002](features/FEAT-0002-semi-automatic-consumer-updates/README.md) and
 [DEC-0003](decisions/DEC-0003-reviewed-consumer-update-supersession.md).
 
-A repository-reference consumer MUST request the same pinned source paths from
-its provider and write them to the consumer-owned targets in the table. Apply
-the same collision preflight before writing anything. If the provider exposes
-only `PROTOCOL.md`, create equivalent project-owned assets through reviewed
-changes or use submodule mode for template installation; a moving `main`
-download is not an acceptable fallback.
+A repository-reference consumer MUST request the common pinned source paths
+from the first table and write them to those consumer-owned targets. It MUST NOT
+copy the submodule-only updater assets unchanged. Apply the same collision
+preflight before writing anything. If the provider exposes only `PROTOCOL.md`,
+create equivalent project-owned tracking assets through reviewed changes or use
+submodule mode for template installation; a moving `main` download is not an
+acceptable fallback.
 
 
 A repository-reference automation adapter MUST define and test the provider's
@@ -212,7 +220,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.2.0`
+- ref: `v0.2.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -258,7 +266,7 @@ For a submodule without the updater, or for the one-time `v0.1.0` migration:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.2.0
+git -C .ai/protocol checkout v0.2.1
 git add .ai/protocol
 ```
 
@@ -287,27 +295,39 @@ request creation can leave a reserved automation branch without a managed pull
 request. The expected-absent creation lease makes the next run stop instead of
 overwriting it. Disable or wait for update runs before recovery, then:
 
-1. capture the exact remote branch SHA;
+1. read the actual consumer default branch and capture the exact remote branch
+   SHA;
 2. verify that no open or closed pull request owns the branch;
 3. fetch that SHA and verify that its only change from the consumer default
-   branch is the `.ai/protocol` gitlink update; and
-4. delete only that exact SHA with an expected-head lease.
+   branch is `.ai/protocol`, with gitlink mode `160000` before and after;
+4. verify that the new gitlink SHA resolves to the intended canonical protocol
+   tag; and
+5. delete only that exact branch SHA with an expected-head lease.
 
-For example, after substituting the real target branch and verified SHA:
+After substituting the real branch, tag, and verified SHA, inspect these
+commands as one checklist:
 
 ```powershell
 $branch = 'automation/meandai-protocol-v0.3.0'
+$targetTag = 'v0.3.0'
 $expectedSha = '<verified-40-character-orphan-head-sha>'
+$defaultBranch = (gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name').Trim()
 git ls-remote --heads origin "refs/heads/$branch"
 gh pr list --state all --head $branch --json number,state,headRefName,headRefOid
+git fetch origin "refs/heads/$defaultBranch:refs/remotes/origin/$defaultBranch"
 git fetch origin "refs/heads/$branch"
-git diff --name-status "origin/main...FETCH_HEAD"
+git diff --name-only "origin/$defaultBranch...FETCH_HEAD"
+git diff --raw --no-abbrev "origin/$defaultBranch...FETCH_HEAD" -- .ai/protocol
+git ls-tree FETCH_HEAD -- .ai/protocol
+git -C .ai/protocol fetch --tags
+git -C .ai/protocol rev-parse "$targetTag^{commit}"
 git push --force-with-lease="refs/heads/${branch}:$expectedSha" origin ":refs/heads/$branch"
 ```
 
-Do not delete the branch if any SHA, ownership, pull-request, path, or active-run
-check is uncertain. Preserve it, record a finding, and resolve it through normal
-review.
+`--name-only` must return only `.ai/protocol`; `--raw` must return one
+`160000 -> 160000` entry; and the `ls-tree` SHA must equal the tag's commit.
+Do not delete the branch if any default-branch, SHA, ownership, pull-request,
+path, mode, tag, or active-run check is uncertain.
 
 ## Portability and privacy
 
