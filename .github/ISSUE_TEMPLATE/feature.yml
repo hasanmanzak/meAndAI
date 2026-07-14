@@ -1,0 +1,47 @@
+name: Feature
+description: Define a ready, independently valuable capability.
+title: "[FEAT-NNNN] "
+labels: ["type:feature", "priority:p2"]
+body:
+  - type: input
+    id: work_id
+    attributes:
+      label: Work ID
+      placeholder: FEAT-0001
+    validations:
+      required: true
+  - type: textarea
+    id: problem_outcome
+    attributes:
+      label: Problem and intended outcome
+      description: State the problem, value, scope, and non-goals.
+    validations:
+      required: true
+  - type: textarea
+    id: contracts
+    attributes:
+      label: Domain and boundary contracts
+      description: Include invariants, semantic types, units, nullability, errors, consumers, and compatibility.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and test states
+      description: Link TEST-NNNN scenarios and state test-code and baseline-run status.
+    validations:
+      required: true
+  - type: textarea
+    id: decomposition
+    attributes:
+      label: Decomposition, dependencies, and risks
+      description: Link child work, decisions, dependencies, and owned RISK-NNNN records.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Related records
+      description: Link feature docs, decisions, issues, pull requests, wiki pages, or external docs.
+    validations:
+      required: true

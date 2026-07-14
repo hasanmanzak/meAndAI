@@ -1,0 +1,41 @@
+name: Epic
+description: Track an outcome spanning multiple features.
+title: "[EPIC-NNNN] "
+labels: ["type:epic", "priority:p2"]
+body:
+  - type: input
+    id: work_id
+    attributes:
+      label: Work ID
+      description: Reserve the next EPIC-NNNN identifier.
+      placeholder: EPIC-0001
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: State the measurable business or engineering outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: features
+    attributes:
+      label: Feature decomposition
+      description: Link child feature issues or describe the planned breakdown.
+    validations:
+      required: true
+  - type: textarea
+    id: success
+    attributes:
+      label: Success measures and risks
+      description: Include measurable success, major risks, and dependencies.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Related records
+      description: Link related issues, pull requests, features, decisions, wiki pages, or docs.
+    validations:
+      required: true

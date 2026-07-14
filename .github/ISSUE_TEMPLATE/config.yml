@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Common protocol
+    url: https://github.com/hasanmanzak/meAndAI/blob/main/PROTOCOL.md
+    about: Read the current delivery and quality rules before opening work.
