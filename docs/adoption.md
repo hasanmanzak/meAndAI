@@ -25,7 +25,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.3.2
+git -C .ai/protocol checkout v0.4.0
 git add .gitmodules .ai/protocol
 ```
 
@@ -126,11 +126,27 @@ foreach ($copy in $copies) {
 ```
 
 The copy above is the updater's one-time bootstrap. A workflow cannot install
-itself into a consumer that does not already contain it. Therefore consumers
-pinned to immutable `v0.1.0` must manually move the submodule to `v0.2.0`, run
-this collision-safe copy, review the resulting files, and merge them once. New
-consumers adopting `v0.2.0` or later receive the same assets during initial
-adoption.
+itself into a consumer that does not already contain it. New consumers adopting
+`v0.4.0` or later receive these assets during initial adoption. Consumers with
+copied updater assets from `v0.2.x` or `v0.3.x` require the reviewed one-time
+`v0.4.0` migration below; their old updater cannot retroactively add its own
+self-update behavior.
+
+#### One-time v0.4.0 updater migration
+
+Before migration, merge or manually close every old managed update pull request
+and verify that no reserved automation branch remains. Do not let the new PAT
+identity adopt an old `github-actions[bot]` proposal.
+
+1. Record the current protocol tag and verify all three consumer updater files
+   exactly match that tag's templates. Stop and merge customizations manually if
+   any file differs.
+2. Create the repository-scoped fine-grained PAT described below and store it as
+   `MEANDAI_UPDATER_TOKEN`.
+3. Move `.ai/protocol` to `v0.4.0`, replace only the three updater targets with
+   their `v0.4.0` templates, and review the pointer and asset diff together.
+4. Run the consumer's tests and merge the migration through its normal pull
+   request gates. Later compatible updates reconcile these assets themselves.
 
 ### Update workflow prerequisites and behavior
 
@@ -142,28 +158,33 @@ remains valid protocol usage, but it uses the manual reviewed update process
 because the generic updater cannot infer its current major unambiguously.
 Before enabling the updater:
 
-1. Add a repository Actions secret named `MEANDAI_PROTOCOL_TOKEN`. It must be a
-   read-only credential that can clone this private `meAndAI` repository. The
-   consumer's `GITHUB_TOKEN` remains responsible for consumer contents and
-   pull request mutations.
-2. In **Settings > Actions > General > Workflow permissions**, allow GitHub
-   Actions to create and approve pull requests. The workflow declares only the
-   consumer permissions it uses: `contents: write` and `pull-requests: write`.
-3. Keep credentials out of repository files, project memory, workflow output,
+1. Create a fine-grained PAT named `meAndAI Updater - <repo>`. Select only the
+   consumer repository and grant `Contents: read and write`, `Pull requests:
+   read and write`, and `Workflows: read and write`; `Metadata: read` is
+   implicit. Store it as the repository Actions secret
+   `MEANDAI_UPDATER_TOKEN`.
+2. While `meAndAI` is private, add a separate Actions secret named
+   `MEANDAI_PROTOCOL_TOKEN` with read-only access to this repository. Omit this
+   source credential when the configured protocol repository is public; the
+   workflow falls back to its read-only `GITHUB_TOKEN` for that checkout.
+3. Keep both credentials out of repository files, project memory, workflow output,
    issue bodies, and pull request bodies. Adoption cannot create the secret or
-   enable the repository setting on the maintainer's behalf.
+   choose its expiry on the maintainer's behalf.
 
-Any workflow with consumer `contents: write` can interfere with automation
-branches under the shared `github-actions[bot]` identity. Limit write-capable
-workflows to reviewed code; consumers needing stronger identity separation may
-replace `GITHUB_TOKEN` with a dedicated GitHub App through a project decision.
+PAT activity is attributed to its human owner. Do not reuse the updater token
+across unrelated repositories or expose it to other workflows. Before rotating
+to a token owned by another user, merge or manually close the existing managed
+proposal; actor rotation intentionally fails closed. Reconsider a GitHub App
+when automation must be independent of a human identity or centrally governed
+across multiple owners.
 
 The schedule and manual dispatch provide eventual detection, not an immediate
-release notification. A pull request created with `GITHUB_TOKEN` may require a
-maintainer to approve its workflow runs under the consumer repository's Actions
-policy. See GitHub's documentation for
+release notification. The workflow keeps its own `GITHUB_TOKEN` read-only and
+uses the fine-grained PAT only for consumer checkout, branch push, and pull
+request operations. Consumer Actions policies still govern resulting workflow
+runs. See GitHub's documentation for
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
-and [repository Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository).
+and [fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
 The updater selects the highest numeric canonical tag in the current major and
 uses a draft pull request as the review gate. It never approves or merges a pull
@@ -175,14 +196,20 @@ Its state rules are:
 | Consumer already pins the latest compatible tag | No change |
 | One valid managed pull request already targets the latest tag | Keep it; no duplicate pull request |
 | An older valid managed pull request is open and a newer compatible tag exists | Create and fully verify the newer replacement first; revalidate both proposals before each cleanup, then close the old PR and delete only its expected branch head; try to reopen the old PR if paired cleanup fails |
-| Ownership, canonical marker, planned head, protocol commit, gitlink mode, changed path, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
+| Ownership, canonical marker, planned head, protocol commit, gitlink mode, expected managed path/blob set, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
 | A higher major exists | Report that explicit migration is required; do not propose it automatically |
 
-Managed update pull requests change only the `.ai/protocol` gitlink. Consumer
-memory, root instructions, feature records, decisions, and copied templates are
-not rewritten. Maintainers still apply the project's normal DoR, DoD, CI, and
-review gates. The complete contract is recorded in
-[FEAT-0002](features/FEAT-0002-semi-automatic-consumer-updates/README.md) and
+Managed update pull requests change the `.ai/protocol` gitlink and only the
+target-different subset of the three canonical updater assets. Before mutation,
+all current copies must equal the pinned templates; customization stops for
+manual review. The running job continues with its already loaded updater code,
+and a merged proposal supplies the updater used by the next run. Consumer
+memory, root instructions, feature records, decisions, tests, and other files
+are not rewritten. Maintainers still apply the project's normal DoR, DoD, CI,
+and review gates. The evolved contract is recorded in
+[FEAT-0004](features/FEAT-0004-self-updating-consumer-updater/README.md) and
+[DEC-0005](decisions/DEC-0005-consumer-scoped-fine-grained-pat.md), preserving
+the supersession rules in
 [DEC-0003](decisions/DEC-0003-reviewed-consumer-update-supersession.md).
 
 A repository-reference consumer MUST request the common pinned source paths
@@ -220,7 +247,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.3.2`
+- ref: `v0.4.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -262,11 +289,12 @@ condition.
 5. Run the consuming project's tests and documentation-link checks.
 6. Update the pinned version in project memory and merge through a pull request.
 
-For a submodule without the updater, or for the one-time `v0.1.0` migration:
+For a submodule without the updater, use the target release selected by the
+reviewed migration; the current example installs `v0.4.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.3.2
+git -C .ai/protocol checkout v0.4.0
 git add .ai/protocol
 ```
 
@@ -275,8 +303,10 @@ git add .ai/protocol
 After the workflow and scripts are committed on the consumer's default branch,
 the daily schedule or `workflow_dispatch` checks for a newer compatible
 canonical tag. If one exists, the workflow opens a deterministic draft branch
-and pull request for the exact target. The maintainer reviews and merges it
-through the consuming project's ordinary gates.
+and pull request for the exact target. The same proposal contains the protocol
+gitlink plus only those canonical updater assets whose target-release blobs
+differ. The maintainer reviews and merges it through the consuming project's
+ordinary gates.
 
 If another release appears before merge, the newer proposal supersedes the
 older one. Supersession is replacement-first and compensated, not a distributed
@@ -298,18 +328,18 @@ overwriting it. Disable or wait for update runs before recovery, then:
 1. read the actual consumer default branch and capture the exact remote branch
    SHA;
 2. verify that no open or closed pull request owns the branch;
-3. fetch that SHA and verify that its only change from the consumer default
-   branch is `.ai/protocol`, with gitlink mode `160000` before and after;
-4. verify that the new gitlink SHA resolves to the intended canonical protocol
-   tag; and
+3. fetch that SHA and verify its changes are exactly `.ai/protocol` plus the
+   target-different subset of the three canonical updater assets;
+4. verify the gitlink resolves to the intended canonical protocol tag and every
+   changed updater blob/mode equals that tag's template; and
 5. delete only that exact branch SHA with an expected-head lease.
 
 After substituting the real branch, tag, and verified SHA, inspect these
 commands as one checklist:
 
 ```powershell
-$branch = 'automation/meandai-protocol-v0.3.2'
-$targetTag = 'v0.3.2'
+$branch = 'automation/meandai-protocol-v0.4.0'
+$targetTag = 'v0.4.0'
 $expectedSha = '<verified-40-character-orphan-head-sha>'
 $defaultBranch = (gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name').Trim()
 git ls-remote --heads origin "refs/heads/$branch"
@@ -317,17 +347,20 @@ gh pr list --state all --head $branch --json number,state,headRefName,headRefOid
 git fetch origin "refs/heads/$defaultBranch:refs/remotes/origin/$defaultBranch"
 git fetch origin "refs/heads/$branch"
 git diff --name-only "origin/$defaultBranch...FETCH_HEAD"
-git diff --raw --no-abbrev "origin/$defaultBranch...FETCH_HEAD" -- .ai/protocol
-git ls-tree FETCH_HEAD -- .ai/protocol
+git diff --raw --no-abbrev "origin/$defaultBranch...FETCH_HEAD" -- .ai/protocol .github/workflows/meandai-protocol-update.yml .github/scripts/MeAndAI.ProtocolUpdate.psm1 .github/scripts/Invoke-MeAndAIProtocolUpdate.ps1
+git ls-tree FETCH_HEAD -- .ai/protocol .github/workflows/meandai-protocol-update.yml .github/scripts/MeAndAI.ProtocolUpdate.psm1 .github/scripts/Invoke-MeAndAIProtocolUpdate.ps1
 git -C .ai/protocol fetch --tags
 git -C .ai/protocol rev-parse "$targetTag^{commit}"
+git -C .ai/protocol ls-tree "$targetTag" -- templates/project/.github/workflows/meandai-protocol-update.yml templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1 templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1
 git push --force-with-lease="refs/heads/${branch}:$expectedSha" origin ":refs/heads/$branch"
 ```
 
-`--name-only` must return only `.ai/protocol`; `--raw` must return one
-`160000 -> 160000` entry; and the `ls-tree` SHA must equal the tag's commit.
-Do not delete the branch if any default-branch, SHA, ownership, pull-request,
-path, mode, tag, or active-run check is uncertain.
+`--name-only` must return `.ai/protocol` plus exactly the target-different
+managed asset subset. The raw gitlink entry must be `160000 -> 160000`, every
+changed asset must remain `100644`, the gitlink SHA must equal the tag commit,
+and each changed asset blob must equal its listed target template. Do not delete
+the branch if any default-branch, SHA, ownership, pull-request, path, blob, mode,
+tag, or active-run check is uncertain.
 
 ## Portability and privacy
 

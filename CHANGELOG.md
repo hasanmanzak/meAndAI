@@ -3,6 +3,29 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.4.0 - 2026-07-15
+
+### Added
+
+- Added a self-reconciling consumer updater that proposes the protocol gitlink
+  and the exact target-different updater workflow/script subset in one draft PR.
+- Added current-template drift detection and target path/mode/blob validation
+  before proposal creation or supersession cleanup.
+- Added executable `TEST-0022` through `TEST-0026` coverage for authentication,
+  actor rotation, deterministic asset staging, drift, and multi-path proposals.
+
+### Changed
+
+- Consumer mutations now use the repository-scoped fine-grained PAT secret
+  `MEANDAI_UPDATER_TOKEN`; the workflow `GITHUB_TOKEN` is read-only and private
+  protocol reads remain separated through `MEANDAI_PROTOCOL_TOKEN`.
+- Existing pre-v0.4 consumers require one reviewed updater migration; later
+  compatible proposals update their own managed assets after merge.
+
+Related work: [FEAT-0004](docs/features/FEAT-0004-self-updating-consumer-updater/README.md),
+[DEC-0005](docs/decisions/DEC-0005-consumer-scoped-fine-grained-pat.md), and
+[issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
+
 ## 0.3.2 - 2026-07-14
 
 ### Changed

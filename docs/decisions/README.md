@@ -6,6 +6,7 @@
 | [DEC-0002](DEC-0002-project-local-memory.md) | Keep AI memory local to each consuming project | Accepted | 2026-07-14 |
 | [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md) | Use review-only updates with replacement-first supersession | Accepted | 2026-07-14 |
 | [DEC-0004](DEC-0004-bounded-completion-convergence.md) | Require bounded post-development convergence | Accepted | 2026-07-14 |
+| [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) | Use a consumer-scoped fine-grained PAT for updater mutations | Accepted | 2026-07-15 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

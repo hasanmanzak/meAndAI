@@ -8,6 +8,7 @@
 | Issue | [#3](https://github.com/hasanmanzak/meAndAI/issues/3) |
 | Pull request | [#4](https://github.com/hasanmanzak/meAndAI/pull/4) |
 | Tests | [Scenarios and evidence](test-cases.md) |
+| Successor | [FEAT-0004](../FEAT-0004-self-updating-consumer-updater/README.md) evolves authentication and managed updater assets in 0.4.0 |
 
 ## Problem
 

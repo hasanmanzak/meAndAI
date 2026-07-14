@@ -5,6 +5,7 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+$workflowSource = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $adapterContent = Get-Content -LiteralPath $adapterSource -Raw
 $failures = [System.Collections.Generic.List[string]]::new()
 $script:Scenario = $null
@@ -31,6 +32,7 @@ function ConvertTo-TestPullJson {
         [string]$Branch,
         [string]$HeadSha,
         [string]$Body,
+        [string]$AuthorLogin = 'updater-owner',
         [bool]$Draft = $true
     )
 
@@ -39,7 +41,7 @@ function ConvertTo-TestPullJson {
         state = 'open'
         draft = $Draft
         body = $Body
-        user = [pscustomobject]@{ login = 'github-actions[bot]' }
+        user = [pscustomobject]@{ login = $AuthorLogin }
         head = [pscustomobject]@{
             ref = $Branch
             sha = $HeadSha
@@ -68,8 +70,23 @@ function global:git {
             return
         }
     }
+    if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'ls-tree') {
+        $commit = [string]$arguments[3]
+        $path = [string]$arguments[-1]
+        $key = "$commit|$path"
+        if ($script:Scenario.SourceTreeEntries.ContainsKey($key)) {
+            "100644 blob $($script:Scenario.SourceTreeEntries[$key])`t$path"
+        }
+        return
+    }
     if ($arguments[0] -eq 'ls-tree') {
-        "160000 commit $($script:Scenario.CurrentProtocolSha)`t.ai/protocol"
+        $path = [string]$arguments[-1]
+        if ($path -eq '.ai/protocol') {
+            "160000 commit $($script:Scenario.CurrentProtocolSha)`t.ai/protocol"
+        }
+        elseif ($script:Scenario.ConsumerTreeEntries.ContainsKey($path)) {
+            "100644 blob $($script:Scenario.ConsumerTreeEntries[$path])`t$path"
+        }
         return
     }
     if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'tag') {
@@ -90,6 +107,10 @@ function global:git {
     }
     if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'merge-base') {
         Add-ScenarioEvent 'verify-lineage'
+        return
+    }
+    if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'checkout') {
+        Add-ScenarioEvent 'checkout-target-assets'
         return
     }
     if ($arguments[0] -eq 'ls-remote') {
@@ -114,11 +135,36 @@ function global:git {
         return
     }
     if ($arguments[0] -eq 'diff' -and $arguments -contains '--cached') {
-        '.ai/protocol'
+        @($script:Scenario.ExpectedStagedPaths)
+        return
+    }
+    if ($arguments[0] -eq 'ls-files' -and $arguments -contains '--stage') {
+        $path = [string]$arguments[-1]
+        if ($path -eq '.ai/protocol') {
+            "160000 $($script:Scenario.TargetProtocolSha) 0`t$path"
+        }
+        elseif ($script:Scenario.TargetConsumerBlobs.ContainsKey($path)) {
+            $stagedBlob = if ($script:Scenario.WrongStagedAssetBlob -and
+                $path -eq '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1') {
+                '0' * 40
+            }
+            else { $script:Scenario.TargetConsumerBlobs[$path] }
+            "100644 $stagedBlob 0`t$path"
+        }
+        return
+    }
+    if ($arguments[0] -eq 'add') {
+        Add-ScenarioEvent 'stage-target-assets'
         return
     }
     if ($arguments[0] -eq 'rev-parse') {
-        $script:Scenario.NewHead
+        $script:Scenario.RevParseCalls++
+        if ($script:Scenario.RevParseCalls -eq 1) {
+            $script:Scenario.BaseHead
+        }
+        else {
+            $script:Scenario.NewHead
+        }
         return
     }
     if ($arguments[0] -eq 'push') {
@@ -194,6 +240,18 @@ function global:gh {
         throw "Unexpected fake gh command: $($arguments -join ' ')"
     }
 
+    if ($arguments.Count -eq 2 -and $arguments[1] -eq 'user') {
+        Add-ScenarioEvent 'resolve-updater-actor'
+        if ($script:Scenario.InvalidAuthenticatedActor) {
+            '{}'
+        }
+        else {
+            [pscustomobject]@{ login = $script:Scenario.AuthenticatedActor } |
+                ConvertTo-Json -Compress
+        }
+        return
+    }
+
     $endpoint = @($arguments | Where-Object { $_ -like 'repos/*' })[0]
     $method = 'GET'
     $methodIndex = [array]::IndexOf($arguments, '--method')
@@ -264,7 +322,8 @@ function global:gh {
         $head = if ($script:Scenario.MutateOldAfterSnapshot -and
             $script:Scenario.OldDetailCalls -gt 1) { 'd' * 40 } else { $script:Scenario.OldHead }
         ConvertTo-TestPullJson -Number 21 -Branch $script:Scenario.OldBranch `
-            -HeadSha $head -Body $script:Scenario.OldBody
+            -HeadSha $head -Body $script:Scenario.OldBody `
+            -AuthorLogin $script:Scenario.OldAuthorLogin
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls/21/files?per_page=100') {
@@ -279,17 +338,19 @@ function global:gh {
     }
     if ($endpoint -eq "repos/owner/consumer/git/trees/$('c' * 40)") {
         [pscustomobject]@{
-            tree = @([pscustomobject]@{
-                path = '.ai'; mode = '040000'; type = 'tree'; sha = 'e' * 40
-            })
+            tree = @(
+                [pscustomobject]@{ path = '.ai'; mode = '040000'; type = 'tree'; sha = 'e' * 40 },
+                [pscustomobject]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '6' * 40 }
+            )
         } | ConvertTo-Json -Depth 5 -Compress
         return
     }
     if ($endpoint -eq "repos/owner/consumer/git/trees/$('d' * 40)") {
         [pscustomobject]@{
-            tree = @([pscustomobject]@{
-                path = '.ai'; mode = '040000'; type = 'tree'; sha = 'f' * 40
-            })
+            tree = @(
+                [pscustomobject]@{ path = '.ai'; mode = '040000'; type = 'tree'; sha = 'f' * 40 },
+                [pscustomobject]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '7' * 40 }
+            )
         } | ConvertTo-Json -Depth 5 -Compress
         return
     }
@@ -302,6 +363,58 @@ function global:gh {
             tree = @([pscustomobject]@{
                 path = 'protocol'; mode = '160000'; type = 'commit'; sha = $protocolSha
             })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -eq "repos/owner/consumer/git/trees/$('6' * 40)" -or
+        $endpoint -eq "repos/owner/consumer/git/trees/$('7' * 40)") {
+        $isNew = $endpoint -like "*$('6' * 40)"
+        [pscustomobject]@{
+            tree = @(
+                [pscustomobject]@{
+                    path = 'workflows'; mode = '040000'; type = 'tree'
+                    sha = if ($isNew) { '8' * 40 } else { '9' * 40 }
+                },
+                [pscustomobject]@{
+                    path = 'scripts'; mode = '040000'; type = 'tree'
+                    sha = if ($isNew) { 'a' * 40 } else { 'b' * 40 }
+                }
+            )
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -eq "repos/owner/consumer/git/trees/$('8' * 40)" -or
+        $endpoint -eq "repos/owner/consumer/git/trees/$('9' * 40)") {
+        $workflowBlob = if ($endpoint -like "*$('8' * 40)") {
+            $script:Scenario.TargetWorkflowBlob
+        }
+        else { $script:Scenario.CurrentWorkflowBlob }
+        [pscustomobject]@{
+            tree = @([pscustomobject]@{
+                path = 'meandai-protocol-update.yml'; mode = '100644'; type = 'blob'
+                sha = $workflowBlob
+            })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -eq "repos/owner/consumer/git/trees/$('a' * 40)" -or
+        $endpoint -eq "repos/owner/consumer/git/trees/$('b' * 40)") {
+        $isNew = $endpoint -like "*$('a' * 40)"
+        [pscustomobject]@{
+            tree = @(
+                [pscustomobject]@{
+                    path = 'MeAndAI.ProtocolUpdate.psm1'; mode = '100644'; type = 'blob'
+                    sha = $script:Scenario.CurrentModuleBlob
+                },
+                [pscustomobject]@{
+                    path = 'Invoke-MeAndAIProtocolUpdate.ps1'; mode = '100644'; type = 'blob'
+                    sha = if ($isNew) {
+                        if ($script:Scenario.WrongTargetAssetBlob) { '0' * 40 }
+                        else { $script:Scenario.TargetAdapterBlob }
+                    }
+                    else { $script:Scenario.CurrentAdapterBlob }
+                }
+            )
         } | ConvertTo-Json -Depth 5 -Compress
         return
     }
@@ -324,11 +437,13 @@ function global:gh {
         }
         ConvertTo-TestPullJson -Number 30 -Branch $script:Scenario.NewBranch `
             -HeadSha $script:Scenario.NewHead -Body $script:Scenario.NewBody `
-            -Draft $newDraft
+            -AuthorLogin $script:Scenario.AuthenticatedActor -Draft $newDraft
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls/30/files?per_page=100') {
-        ConvertTo-TestBase64Json ([pscustomobject]@{ filename = '.ai/protocol' })
+        foreach ($path in $script:Scenario.ExpectedStagedPaths) {
+            ConvertTo-TestBase64Json ([pscustomobject]@{ filename = $path })
+        }
         return
     }
 
@@ -352,15 +467,30 @@ function Invoke-AdapterScenario {
         [bool]$CaseVariantDuplicateMarker = $false,
         [bool]$NonCanonicalOldMarker = $false,
         [bool]$InvalidSubmoduleUrl = $false,
+        [bool]$MissingUpdaterToken = $false,
+        [bool]$InvalidAuthenticatedActor = $false,
+        [string]$AuthenticatedActor = 'updater-owner',
+        [string]$OldAuthorLogin = 'updater-owner',
+        [bool]$DriftCurrentAsset = $false,
+        [bool]$WrongStagedAssetBlob = $false,
+        [bool]$WrongTargetAssetBlob = $false,
         [int]$LeadingUnmanagedCount = 0
     )
 
     $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-adapter-$Name-$([guid]::NewGuid().ToString('N'))"
     $scriptsPath = Join-Path $tempRoot '.github/scripts'
+    $workflowsPath = Join-Path $tempRoot '.github/workflows'
     $sourceGitPath = Join-Path $tempRoot '.meandai-update-source/.git'
-    New-Item -ItemType Directory -Force $scriptsPath, $sourceGitPath | Out-Null
+    $sourceScriptsPath = Join-Path $tempRoot '.meandai-update-source/templates/project/.github/scripts'
+    $sourceWorkflowsPath = Join-Path $tempRoot '.meandai-update-source/templates/project/.github/workflows'
+    New-Item -ItemType Directory -Force $scriptsPath, $workflowsPath, $sourceGitPath, `
+        $sourceScriptsPath, $sourceWorkflowsPath | Out-Null
     Copy-Item -LiteralPath $moduleSource -Destination (Join-Path $scriptsPath 'MeAndAI.ProtocolUpdate.psm1')
     Copy-Item -LiteralPath $adapterSource -Destination (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
+    Copy-Item -LiteralPath $workflowSource -Destination (Join-Path $workflowsPath 'meandai-protocol-update.yml')
+    Copy-Item -LiteralPath $moduleSource -Destination (Join-Path $sourceScriptsPath 'MeAndAI.ProtocolUpdate.psm1')
+    Copy-Item -LiteralPath $adapterSource -Destination (Join-Path $sourceScriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
+    Copy-Item -LiteralPath $workflowSource -Destination (Join-Path $sourceWorkflowsPath 'meandai-protocol-update.yml')
 
     $oldHead = 'a' * 40
     $oldMarker = [ordered]@{
@@ -390,6 +520,30 @@ function Invoke-AdapterScenario {
         head = 'b' * 40; repository = 'owner/consumer'
     } | ConvertTo-Json -Compress
     $initialNewBody = if ($ExistingReplacement) { "<!-- meandai-protocol-update:$newMarker -->" } else { '' }
+    $currentWorkflowBlob = '1' * 40
+    $currentModuleBlob = '2' * 40
+    $currentAdapterBlob = '3' * 40
+    $targetWorkflowBlob = '4' * 40
+    $targetAdapterBlob = '5' * 40
+    $consumerTreeEntries = @{
+        '.github/workflows/meandai-protocol-update.yml' = if ($DriftCurrentAsset) { '0' * 40 } else { $currentWorkflowBlob }
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1' = $currentModuleBlob
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1' = $currentAdapterBlob
+    }
+    $targetConsumerBlobs = @{
+        '.github/workflows/meandai-protocol-update.yml' = $targetWorkflowBlob
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1' = $currentModuleBlob
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1' = $targetAdapterBlob
+    }
+    $sourceTreeEntries = @{}
+    foreach ($sha in @(('1' * 40), ('2' * 40))) {
+        $sourceTreeEntries["$sha|templates/project/.github/workflows/meandai-protocol-update.yml"] = $currentWorkflowBlob
+        $sourceTreeEntries["$sha|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
+        $sourceTreeEntries["$sha|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $currentAdapterBlob
+    }
+    $sourceTreeEntries["$('3' * 40)|templates/project/.github/workflows/meandai-protocol-update.yml"] = $targetWorkflowBlob
+    $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
+    $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $targetAdapterBlob
     $script:Scenario = [pscustomobject]@{
         Name = $Name
         Events = [System.Collections.Generic.List[string]]::new()
@@ -400,6 +554,21 @@ function Invoke-AdapterScenario {
         OldHead = $oldHead
         ExpectedOldHead = $oldHead
         NewHead = 'b' * 40
+        BaseHead = '0' * 40
+        RevParseCalls = 0
+        CurrentWorkflowBlob = $currentWorkflowBlob
+        CurrentModuleBlob = $currentModuleBlob
+        CurrentAdapterBlob = $currentAdapterBlob
+        TargetWorkflowBlob = $targetWorkflowBlob
+        TargetAdapterBlob = $targetAdapterBlob
+        ConsumerTreeEntries = $consumerTreeEntries
+        TargetConsumerBlobs = $targetConsumerBlobs
+        SourceTreeEntries = $sourceTreeEntries
+        ExpectedStagedPaths = @(
+            '.ai/protocol',
+            '.github/workflows/meandai-protocol-update.yml',
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        )
         OldBranchExists = $OldBranchExists
         NewBranchExists = $ExistingReplacement
         OldBranch = 'automation/meandai-protocol-v0.2.0'
@@ -417,6 +586,11 @@ function Invoke-AdapterScenario {
         CoordinateNewHeadMutation = $CoordinateNewHeadMutation
         NewDetailCalls = 0
         InvalidSubmoduleUrl = $InvalidSubmoduleUrl
+        InvalidAuthenticatedActor = $InvalidAuthenticatedActor
+        AuthenticatedActor = $AuthenticatedActor
+        OldAuthorLogin = $OldAuthorLogin
+        WrongStagedAssetBlob = $WrongStagedAssetBlob
+        WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
         RemoveOldBeforeDelete = $RemoveOldBeforeDelete
         OldProbeCalls = 0
@@ -437,7 +611,7 @@ function Invoke-AdapterScenario {
         $env:GITHUB_REPOSITORY = 'owner/consumer'
         $env:GITHUB_WORKSPACE = $tempRoot
         $env:DEFAULT_BRANCH = 'main'
-        $env:GH_TOKEN = 'redacted-test-token'
+        $env:GH_TOKEN = if ($MissingUpdaterToken) { $null } else { 'redacted-test-token' }
         $env:GITHUB_STEP_SUMMARY = $null
         & (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     }
@@ -464,6 +638,80 @@ function Get-EventIndex {
 $success = Invoke-AdapterScenario -Name 'success'
 if ($success.Threw) {
     Add-Failure "TEST-0011 replacement scenario failed: $($success.Error)"
+}
+foreach ($event in @('checkout-target-assets', 'stage-target-assets')) {
+    if ((Get-EventIndex $success $event) -lt 0 -or
+        (Get-EventIndex $success $event) -gt (Get-EventIndex $success 'push-new')) {
+        Add-Failure "TEST-0024 '$event' must occur before the replacement branch is pushed."
+    }
+}
+
+$missingUpdaterToken = Invoke-AdapterScenario -Name 'missing-updater-token' `
+    -MissingUpdaterToken $true
+if (-not $missingUpdaterToken.Threw -or
+    $missingUpdaterToken.Error -notlike "*Required workflow environment 'GH_TOKEN' is missing*") {
+    Add-Failure 'TEST-0022 missing updater token must fail before authentication or mutation.'
+}
+if ((Get-EventIndex $missingUpdaterToken 'resolve-updater-actor') -ge 0 -or
+    (Get-EventIndex $missingUpdaterToken 'push-new') -ge 0 -or
+    (Get-EventIndex $missingUpdaterToken 'create-new-pr') -ge 0) {
+    Add-Failure 'TEST-0022 missing updater token reached authentication or mutation.'
+}
+
+$invalidAuthenticatedActor = Invoke-AdapterScenario -Name 'invalid-authenticated-actor' `
+    -InvalidAuthenticatedActor $true
+if (-not $invalidAuthenticatedActor.Threw -or
+    $invalidAuthenticatedActor.Error -notlike '*authenticated updater actor*') {
+    Add-Failure "TEST-0023 an empty authenticated PAT identity must fail closed: $($invalidAuthenticatedActor.Error)"
+}
+if ((Get-EventIndex $invalidAuthenticatedActor 'push-new') -ge 0 -or
+    (Get-EventIndex $invalidAuthenticatedActor 'create-new-pr') -ge 0) {
+    Add-Failure 'TEST-0023 invalid authenticated identity caused mutation.'
+}
+
+$rotatedActor = Invoke-AdapterScenario -Name 'rotated-actor' `
+    -OldAuthorLogin 'previous-owner'
+if (-not $rotatedActor.Threw -or $rotatedActor.Error -notlike '*manual review*') {
+    Add-Failure 'TEST-0023 PAT-owner rotation must not adopt an older managed proposal.'
+}
+if ((Get-EventIndex $rotatedActor 'push-new') -ge 0 -or
+    (Get-EventIndex $rotatedActor 'close-old-pr') -ge 0 -or
+    (Get-EventIndex $rotatedActor 'delete-old-branch') -ge 0) {
+    Add-Failure 'TEST-0023 actor rotation mutated an ambiguously owned proposal.'
+}
+
+$driftedCurrentAsset = Invoke-AdapterScenario -Name 'drifted-current-asset' `
+    -DriftCurrentAsset $true
+if (-not $driftedCurrentAsset.Threw -or
+    $driftedCurrentAsset.Error -notlike '*current pinned updater template*') {
+    Add-Failure "TEST-0025 current managed asset drift must fail closed: $($driftedCurrentAsset.Error)"
+}
+if ((Get-EventIndex $driftedCurrentAsset 'push-new') -ge 0 -or
+    (Get-EventIndex $driftedCurrentAsset 'create-new-pr') -ge 0 -or
+    (Get-EventIndex $driftedCurrentAsset 'close-old-pr') -ge 0) {
+    Add-Failure 'TEST-0025 current managed asset drift caused a remote mutation.'
+}
+
+$wrongStagedAsset = Invoke-AdapterScenario -Name 'wrong-staged-asset' `
+    -WrongStagedAssetBlob $true
+if (-not $wrongStagedAsset.Threw -or
+    $wrongStagedAsset.Error -notlike '*Staged updater asset*target release blob*') {
+    Add-Failure "TEST-0024 wrong staged updater blob must fail before push: $($wrongStagedAsset.Error)"
+}
+if ((Get-EventIndex $wrongStagedAsset 'push-new') -ge 0 -or
+    (Get-EventIndex $wrongStagedAsset 'create-new-pr') -ge 0) {
+    Add-Failure 'TEST-0024 wrong staged updater blob reached remote mutation.'
+}
+
+$wrongTargetAsset = Invoke-AdapterScenario -Name 'wrong-target-asset' `
+    -ExistingReplacement $true -WrongTargetAssetBlob $true
+if (-not $wrongTargetAsset.Threw -or $wrongTargetAsset.Error -notlike '*manual review*') {
+    Add-Failure "TEST-0026 wrong target asset blob must block reconciliation: $($wrongTargetAsset.Error)"
+}
+if ((Get-EventIndex $wrongTargetAsset 'close-old-pr') -ge 0 -or
+    (Get-EventIndex $wrongTargetAsset 'delete-old-branch') -ge 0 -or
+    (Get-EventIndex $wrongTargetAsset 'close-new-pr') -ge 0) {
+    Add-Failure 'TEST-0026 wrong target asset blob allowed destructive cleanup.'
 }
 $successOrder = @('create-new-pr', 'verify-new-pr', 'read-old-pr-2', 'close-old-pr', 'delete-old-branch')
 $previous = -1
@@ -634,4 +882,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, and TEST-0021.' -ForegroundColor Green
+Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, and TEST-0021 through TEST-0026.' -ForegroundColor Green

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.3.2**<br>
+Protocol version: **0.4.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -325,9 +325,10 @@ common-protocol version in its project memory.
 
 ### Consumer update proposals
 
-A GitHub submodule consumer adopting `v0.2.0` or later MUST install the
-consumer-owned update workflow supplied by the pinned protocol, or record a
-decision that defines an equivalent reviewed update control for its platform.
+A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
+self-reconciling, consumer-owned update workflow supplied by the pinned
+protocol, or record a decision that defines an equivalent reviewed update
+control for its platform.
 The updater MUST:
 
 - consider only canonical lowercase `vM.m.rev` tags with no leading zeros and
@@ -343,9 +344,9 @@ The updater MUST:
 - require exactly one canonical case-sensitive ownership marker and bind it to
   the consumer repository, target tag, expected protocol commit, and planned
   branch head;
-- bind each managed proposal to its Git submodule mode, single changed protocol
-  path, trusted actor, same-repository head, consumer default branch, and draft
-  state;
+- bind each managed proposal to its Git submodule mode, exact expected managed
+  path set and target blobs, authenticated updater actor, same-repository head,
+  consumer default branch, and draft state;
 - compare the marker, API head, and live remote ref with the planned head
   immediately before each destructive cleanup sequence, then enforce the
   expected-head lease immediately before branch deletion;
@@ -353,17 +354,25 @@ The updater MUST:
   and attempt to reopen an old PR when its paired branch cleanup fails;
 - fail closed after interrupted creation and require lease-safe reviewed
   recovery for an orphan reserved branch;
-- update only the deterministic protocol pointer and never rewrite project
-  memory, domain records, or other consumer-owned files; and
+- verify that all current managed updater copies equal the pinned release before
+  mutation, then update the deterministic protocol pointer plus only the
+  target-different canonical workflow and updater scripts;
+- use a consumer-repository-scoped write credential with explicit Contents,
+  Pull requests, and Workflows permissions while keeping any private-source read
+  credential separate and the workflow `GITHUB_TOKEN` read-only;
+- never rewrite project memory, root instructions, domain records, feature or
+  decision records, tests, or other consumer-owned files; and
 - keep credentials outside repository content, project memory, logs, and pull
   request bodies.
 
 The supplied generic automation supports the recommended `.ai/protocol` Git
 submodule. Updating an opaque repository reference requires a deterministic,
 provider-specific adapter or a manual reviewed upgrade.
-A consumer pinned to an earlier immutable release remains governed by that pin;
-`v0.1.0` consumers are not retroactively invalidated by the prospective
-`v0.2.0` updater requirement.
+A consumer pinned to an earlier immutable release remains governed by that pin.
+Pre-`v0.4.0` copied updater code cannot acquire self-reconciliation
+retroactively; one reviewed migration installs the `v0.4.0` assets and
+credential contract. Earlier consumers are not invalidated by this prospective
+requirement.
 
 ## 9. Project-local AI memory
 
