@@ -1,0 +1,53 @@
+name: meAndAI protocol update
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: meandai-protocol-update-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  propose-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validate private protocol credential
+        shell: pwsh
+        env:
+          PROTOCOL_TOKEN: ${{ secrets.MEANDAI_PROTOCOL_TOKEN }}
+        run: |
+          if (-not $env:PROTOCOL_TOKEN) {
+            throw 'MEANDAI_PROTOCOL_TOKEN is required with read-only access to the private meAndAI repository.'
+          }
+
+      - name: Check out consumer default branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          submodules: false
+
+      - name: Check out protocol release inventory
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: hasanmanzak/meAndAI
+          token: ${{ secrets.MEANDAI_PROTOCOL_TOKEN }}
+          path: .meandai-update-source
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve and propose protocol update
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          ./.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1

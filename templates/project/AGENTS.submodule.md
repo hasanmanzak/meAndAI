@@ -3,7 +3,7 @@
 These instructions apply to the consuming repository.
 
 1. Read the local common protocol at `.ai/protocol/PROTOCOL.md`, pinned from
-   [meAndAI v0.1.0](https://github.com/hasanmanzak/meAndAI/blob/v0.1.0/PROTOCOL.md).
+   [meAndAI v0.2.0](https://github.com/hasanmanzak/meAndAI/blob/v0.2.0/PROTOCOL.md).
 2. Read this project's `.ai/memory/README.md`.
 3. Read the relevant project-owned feature and decision documents before work.
 4. Apply project-specific rules below. A relaxation of the common protocol

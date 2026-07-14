@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.1.0**<br>
+Protocol version: **0.2.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -86,6 +86,14 @@ Implementation MUST NOT start until the work item has:
 - a decomposition into reviewable slices when the work is not small;
 - numbered test scenarios, including failure and boundary behavior; and
 - an implementation and verification approach appropriate to the repository.
+
+An automated dependency updater MAY create a deterministic, pointer-only draft
+proposal before Gate 1 solely as a discovery artifact. The proposal MUST remain
+draft and MUST NOT be treated as implementation authorization, marked ready, or
+merged until a stable work ID, linked issue, impact review, test plan, and the
+remaining Definition of Ready are complete. This narrow exception does not
+authorize product logic, domain behavior, schema, generated-code, or unrelated
+file changes.
 
 ### Gate 2 - Design and contract review
 
@@ -248,11 +256,57 @@ Versions use `M.m.rev` and Git tags use `vM.m.rev`.
 - `m`: backward-compatible feature or meaningful capability addition.
 - `rev`: backward-compatible correction, clarification, or maintenance change.
 
+A new mandatory control MAY be introduced in `m` only when it applies
+prospectively to consumers that choose to adopt or upgrade to that release and
+does not invalidate a consumer correctly pinned to an earlier release. A forced
+migration of already conforming consumers is incompatible and increments `M`.
+
 Every released version updates `VERSION`, relevant current-release metadata,
 and `CHANGELOG.md`. Historical feature target versions remain unchanged.
 Consumers SHOULD pin a tag or commit, never an unqualified moving branch. A
 consuming project versions its own product independently and records the pinned
 common-protocol version in its project memory.
+
+### Consumer update proposals
+
+A GitHub submodule consumer adopting `v0.2.0` or later MUST install the
+consumer-owned update workflow supplied by the pinned protocol, or record a
+decision that defines an equivalent reviewed update control for its platform.
+The updater MUST:
+
+- consider only canonical lowercase `vM.m.rev` tags with no leading zeros and
+  compare their numeric parts;
+- propose only same-major upgrades and leave major migrations for explicit
+  maintainer review;
+- open a draft pull request and never merge it automatically;
+- maintain at most one unambiguous, automation-owned update pull request;
+- create and verify a newer replacement before closing an older superseded pull
+  request and deleting its branch;
+- stop without cleanup when ownership, metadata, changed paths, branch content,
+  authentication, or replacement verification is ambiguous;
+- require exactly one canonical case-sensitive ownership marker and bind it to
+  the consumer repository, target tag, expected protocol commit, and planned
+  branch head;
+- bind each managed proposal to its Git submodule mode, single changed protocol
+  path, trusted actor, same-repository head, consumer default branch, and draft
+  state;
+- compare the marker, API head, and live remote ref with the planned head before
+  every mutation;
+- use expected-state Git leases for automation branch creation and deletion,
+  and attempt to reopen an old PR when its paired branch cleanup fails;
+- fail closed after interrupted creation and require lease-safe reviewed
+  recovery for an orphan reserved branch;
+- update only the deterministic protocol pointer and never rewrite project
+  memory, domain records, or other consumer-owned files; and
+- keep credentials outside repository content, project memory, logs, and pull
+  request bodies.
+
+The supplied generic automation supports the recommended `.ai/protocol` Git
+submodule. Updating an opaque repository reference requires a deterministic,
+provider-specific adapter or a manual reviewed upgrade.
+A consumer pinned to an earlier immutable release remains governed by that pin;
+`v0.1.0` consumers are not retroactively invalidated by the prospective
+`v0.2.0` updater requirement.
 
 ## 9. Project-local AI memory
 
