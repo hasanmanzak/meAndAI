@@ -62,6 +62,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-bounded-self-validation.md',
     '.ai/memory/log/2026-07-14-convergent-completion-scan.md',
     '.ai/memory/log/2026-07-14-urgent-gate-order.md',
+    '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
@@ -359,7 +360,7 @@ if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0009 through TEST-0017 protocol update validation failed'
+        Add-Failure 'TEST-0009 through TEST-0017 and TEST-0021 protocol update validation failed'
     }
 }
 
@@ -369,4 +370,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0020.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0021.' -ForegroundColor Green

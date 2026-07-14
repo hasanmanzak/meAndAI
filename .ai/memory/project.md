@@ -7,14 +7,14 @@ Last verified: **2026-07-14**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.3.1`
-- Maintenance scope: urgent-work gate-order clarification tracked by
-  [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
+- Current protocol version: `0.3.2`
+- Maintenance scope: updater cleanup-comment clarity tracked by
+  [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9).
-- Current delivery: [pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
+- Latest tracked work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11).
+- Current delivery: [pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
 
 ## Collaboration constraints
 
@@ -46,3 +46,5 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   refines validation bounds and documentation without changing updater behavior.
 - `v0.3.0` adds the bounded post-development convergence scan in
   [FEAT-0003](../../docs/features/FEAT-0003-convergent-completion-scan/README.md).
+- `v0.3.2` makes the updater's pre-cleanup audit comment conditional without
+  changing cleanup ordering, safety gates, leases, or compensation behavior.

@@ -254,4 +254,4 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host 'Protocol update tests passed: TEST-0009 through TEST-0017.' -ForegroundColor Green
+Write-Host 'Protocol update tests passed: TEST-0009 through TEST-0017 and TEST-0021.' -ForegroundColor Green

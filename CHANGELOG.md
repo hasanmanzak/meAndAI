@@ -3,6 +3,18 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.3.2 - 2026-07-14
+
+### Changed
+
+- Reworded updater cleanup comments to describe close/delete as an attempt and
+  to explain the reopen/preserve compensation path when branch deletion fails.
+- Preserved the existing replacement-first ordering, live safety gates, branch
+  leases, and cleanup failure behavior.
+- Added executable `TEST-0021` coverage for the emitted audit message contract.
+
+Related work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and
+[pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
 
 ## 0.3.1 - 2026-07-14
 

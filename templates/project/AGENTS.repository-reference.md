@@ -5,7 +5,7 @@ These instructions apply to the consuming repository.
 1. Resolve and read the common protocol through the configured repository
    reference provider before planning or editing:
    - repository: `https://github.com/hasanmanzak/meAndAI`
-   - ref: `v0.3.1`
+   - ref: `v0.3.2`
    - entry point: `PROTOCOL.md`
 2. Read this project's local `.ai/memory/README.md`.
 3. Read the relevant project-owned feature and decision documents before work.
