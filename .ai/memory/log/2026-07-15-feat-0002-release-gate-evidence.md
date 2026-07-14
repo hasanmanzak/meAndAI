@@ -2,8 +2,7 @@
 
 - Finding: `FIND-0050`
 - Tracking: [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13)
-- Delivery: pending draft pull request from
-  `agent/reconcile-feat-0002-release-gate`
+- Delivery: [pull request #14](https://github.com/hasanmanzak/meAndAI/pull/14)
 - Owning feature:
   [FEAT-0002](../../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
 - Release impact: none; current protocol remains `v0.3.2`

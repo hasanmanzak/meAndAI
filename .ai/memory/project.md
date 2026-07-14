@@ -14,8 +14,7 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13).
-- Current delivery: pending draft pull request from
-  `agent/reconcile-feat-0002-release-gate`.
+- Current delivery: [pull request #14](https://github.com/hasanmanzak/meAndAI/pull/14).
 
 ## Collaboration constraints
 
