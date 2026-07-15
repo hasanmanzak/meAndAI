@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature correction |
-| Status | Implemented; delivery gates pending |
+| Status | Ready for merge |
 | Target version | 0.8.0 |
 | Issue | [#34](https://github.com/hasanmanzak/meAndAI/issues/34) |
 | Pull request | [#35](https://github.com/hasanmanzak/meAndAI/pull/35) |
@@ -81,16 +81,16 @@ fail the same regression boundary instead of reappearing in later scans.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0052 through TEST-0059](test-cases.md) |
-| Test code | Green locally | `TEST-0052` through `TEST-0059` are implemented; every child suite passed and the post-blocker structure gate passed, with hosted matrix CI remaining as the delivery gate |
+| Test code | Green locally and hosted | `TEST-0052` through `TEST-0059` passed; hosted Ubuntu, Windows, and GitGuardian checks passed on PR #35 |
 | Baseline run | Passed | `v0.7.3` passed `TEST-0001` through `TEST-0051` on Windows, Ubuntu, and GitGuardian before this work |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0021` | Launcher proposal, path, run, and history invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0052` through `TEST-0056`; focused pass, 2026-07-15 | `FIND-0076`, `FIND-0077`, `FIND-0080`, `FIND-0082`, `FIND-0092`; resolved | Reviewed |
-| `SUBF-0022` | Immutable release, bootstrap, and supersession invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0056` through `TEST-0058`; complete parent invocation passed the child suites | `FIND-0078`, `FIND-0079`, `FIND-0081`; resolved | Reviewed |
-| `SUBF-0023` | Durable validation and release evidence | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0059`; post-blocker structure confirmation passed | `FIND-0083` through `FIND-0091`; resolved | Reviewed |
+| `SUBF-0021` | Launcher proposal, path, run, and history invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0052` through `TEST-0056`; local and hosted pass, 2026-07-15 | `FIND-0076`, `FIND-0077`, `FIND-0080`, `FIND-0082`, `FIND-0092`; resolved | Complete |
+| `SUBF-0022` | Immutable release, bootstrap, and supersession invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0056` through `TEST-0058`; local and hosted pass | `FIND-0078`, `FIND-0079`, `FIND-0081`; resolved | Complete |
+| `SUBF-0023` | Durable validation and release evidence | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0059`; local and hosted pass | `FIND-0083` through `FIND-0091`; resolved | Complete |
 
 ## Decisions and relationships
 
@@ -180,21 +180,22 @@ child suite and exposed one structural blocker: the new active-pin check treated
 absent versions and an action dependency release comment as protocol pins. The
 same check also found the hidden bootstrap adapter's genuinely stale default.
 The default and predicate were corrected; the final structure-only confirmation
-passed `TEST-0059`. Hosted Windows/Ubuntu CI remains the combined delivery gate.
+passed `TEST-0059`.
 The first hosted run then passed Windows but exposed a Linux-only empty file URI
 in the shallow-history fixture. One cross-platform URI helper replaced the
-platform-dependent cast; no production behavior changed.
+platform-dependent cast; no production behavior changed. The corrected hosted
+run passed Ubuntu, Windows, and GitGuardian on PR #35.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
+- [x] Acceptance criteria met.
 - [x] Mandatory test code and scenario mapping complete.
 - [x] Test commands and successful results recorded.
 - [x] Slice reviews and bounded convergence scan complete.
 - [x] No unresolved blocking finding; residual limitations are explicit.
 - [x] Documentation, links, version, changelog, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Applicable CI and review gates pass.
 
 ## Release gate
 
