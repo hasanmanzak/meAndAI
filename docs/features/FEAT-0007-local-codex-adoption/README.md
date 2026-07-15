@@ -183,3 +183,90 @@ scan stops here.
 [`v0.6.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1) resolves to
 that exact merge commit. The owned delivery branch was deleted locally and
 remotely after merge verification.
+
+## BUG-0001 correction for v0.6.2
+
+| Field | Value |
+| --- | --- |
+| Classification | Bug correction |
+| Status | Complete |
+| Target version | 0.6.2 |
+| Issue | [#24](https://github.com/hasanmanzak/meAndAI/issues/24) |
+| Pull request | [#25](https://github.com/hasanmanzak/meAndAI/pull/25) |
+| Test | [`TEST-0042`](test-cases.md) |
+
+### Problem and outcome
+
+The v0.6.1 launcher unconditionally calls `gh secret set` for both mapped
+repository Actions secrets. On an existing repository, that can replace a
+maintainer-managed secret even though the launcher only needs to create a
+missing mapping.
+
+The correction lists repository Actions secret names, preserves every existing
+mapped name without attempting a write, and creates only missing mapped
+secrets. GitHub does not expose stored secret values, so presence is not treated
+as value validation.
+
+### Scope and contracts
+
+- Compare the two canonical secret names case-insensitively against the
+  repository-level Actions-secret name list.
+- Do not read `FG_PAT.txt`, preflight its token, or call `gh secret set` for
+  `MEANDAI_UPDATER_TOKEN` when that secret already exists.
+- Continue requiring `MEANDAI_RO_FG_PAT.txt` as the private protocol source
+  credential, but do not write `MEANDAI_PROTOCOL_TOKEN` when that secret exists.
+- Retain tracked-file and Git-history safety checks for both credential paths,
+  including when an optional source file is absent because its mapped secret
+  already exists.
+- Preserve the v0.6.1 new-repository behavior: both missing secrets are created
+  before seed publication.
+- Fail closed if the existing secret-name list cannot be obtained or a required
+  missing secret has no valid local credential file.
+
+No secret value comparison, rotation, deletion, organization/environment secret
+management, or general credential manager is in scope. This correction refines
+the deterministic reconciliation boundary in
+[DEC-0008](../../decisions/DEC-0008-local-codex-execution.md); it does not require
+a new architectural decision.
+
+### Readiness and acceptance
+
+- [x] Stable ID and linked issue exist.
+- [x] Problem, outcome, scope, non-goals, credential ownership, ordering, and
+      failure behavior are explicit.
+- [x] `RISK-0043`: a present secret may contain an invalid or stale value.
+      Owner: consumer maintainer. Response: preserve it by name, make no claim
+      about its value, and let the bounded lifecycle expose an unusable secret.
+- [x] `TEST-0042` covers existing-secret preservation, missing-secret creation,
+      omitted updater source input, and new-repository regression behavior.
+- [x] Verification is bounded to one focused red/green run, one fresh-diff
+      review, and one complete protocol run.
+
+Acceptance requires zero `gh secret set` calls for already-present mapped
+names, exactly one call for each missing mapped name, unchanged credential
+redaction and history gates, and a green `TEST-0001` through `TEST-0042` suite.
+
+### Verification and self-review
+
+| ID | Priority | Finding | Resolution |
+| --- | --- | --- | --- |
+| `FIND-0060` | P2 | The first documentation assertion treated Markdown line wrapping as semantic content and failed twice on one correctly worded sentence. | Normalized guide whitespace before checking the complete sentence; the next full run passed. |
+| `FIND-0061` | P1 | Making `FG_PAT.txt` optional initially skipped its Git-history check when the file was absent. | Moved required-file presence evaluation after unconditional tracked-path and history checks; added an absent-but-historical regression fixture. |
+
+The focused pre-implementation run failed because the launcher had no
+`gh secret list` contract. The first focused green run passed in 43.3 seconds.
+After `FIND-0060` was resolved, the complete Windows PowerShell 5.1 suite passed
+`TEST-0001` through `TEST-0042` in 91.7 seconds. The post-review focused
+confirmation for `FIND-0061` passed `TEST-0033` through `TEST-0042` in 44.9
+seconds. `git diff --check` reported no whitespace error.
+
+### Definition of Done
+
+- [x] Existing mapped repository secrets are preserved without a set attempt.
+- [x] Only missing mappings read their required mutation input and are created.
+- [x] Credential redaction, tracked-path, and history gates remain intact.
+- [x] New-repository provisioning remains backward compatible.
+- [x] `TEST-0042`, the complete regression suite, and bounded self-review pass.
+- [x] Protocol, guides, changelog, version metadata, feature record, and project
+      memory are synchronized.
+- [x] No unresolved blocking or actionable in-scope finding remains.

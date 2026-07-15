@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.6.1**<br>
+Protocol version: **0.6.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -373,8 +373,19 @@ used, their values MUST be stored only as `MEANDAI_UPDATER_TOKEN` and
 `MEANDAI_PROTOCOL_TOKEN`, respectively. The values MUST travel through
 standard input rather than command arguments and MUST NOT be printed, tracked,
 committed, deleted, or written to project memory. Tracked or historically
-committed credential files require rotation and MUST block the launcher. Both
-secrets MUST be reconciled before the seed is pushed.
+committed credential files require rotation and MUST block the launcher.
+
+For an existing repository, reconciliation MUST first list repository-level
+Actions secret names without requesting their values. An existing canonical
+name MUST be preserved without a `set` operation; only a missing canonical name
+MAY be created from its mapped local input. GitHub does not expose stored secret
+values, so name presence MUST NOT be reported as value, scope, expiry, or
+usability validation. `MEANDAI_RO_FG_PAT.txt` remains a local source credential
+for fetching the private tagged protocol. `FG_PAT.txt` is required and read only
+when `MEANDAI_UPDATER_TOKEN` is missing. Tracking and history checks still apply
+to both credential paths when an optional source file is currently absent. Both
+canonical secret names MUST be present, whether preserved or created, before
+the seed is pushed.
 
 After publication, the launcher MAY dispatch the lifecycle workflow and wait
 for the exact published commit under a finite timeout. If that run creates one

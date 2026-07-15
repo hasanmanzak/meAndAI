@@ -3,6 +3,23 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.6.2 - 2026-07-15
+
+### Fixed
+
+- The quick-adoption launcher now lists repository-level Actions secret names
+  and preserves an existing `MEANDAI_UPDATER_TOKEN` or
+  `MEANDAI_PROTOCOL_TOKEN` without calling `gh secret set` for that name.
+- Only missing mapped secrets are created. `FG_PAT.txt` is neither required nor
+  read when the updater secret already exists; the private protocol source file
+  remains required for exact tagged-source retrieval.
+- Existing credential-file tracking and history gates remain active even when
+  an optional source file is absent, and a present secret name is explicitly
+  not treated as validation of its hidden value, scope, expiry, or usability.
+
+Related work: [BUG-0001](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
+and [issue #24](https://github.com/hasanmanzak/meAndAI/issues/24).
+
 ## 0.6.1 - 2026-07-15
 
 ### Changed

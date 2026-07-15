@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.6.1',
+    [string]$ProtocolTag = 'v0.6.2',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -192,13 +192,14 @@ function Add-LocalTokenExcludes {
 }
 
 function Assert-TokenFilesAreLocalOnly {
-    param([Parameter(Mandatory)][string]$Repository)
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [string[]]$RequiredFileNames = @()
+    )
 
     foreach ($name in $tokenMappings.Keys) {
         $path = Join-Path $Repository $name
-        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
-            throw "Required local credential file '$name' is missing from the target root."
-        }
+        $exists = Test-Path -LiteralPath $path -PathType Leaf
 
         $tracked = Invoke-Git -Repository $Repository -Arguments @(
             'ls-files', '--error-unmatch', '--', $name
@@ -215,6 +216,10 @@ function Assert-TokenFilesAreLocalOnly {
             if ($history.ExitCode -eq 0 -and (@($history.Output) -join '').Trim()) {
                 throw "Credential file '$name' appears in repository history. Rotate that token and clean the history before rerunning."
             }
+        }
+
+        if (-not $exists -and $RequiredFileNames -ccontains $name) {
+            throw "Required local credential file '$name' is missing from the target root."
         }
     }
 }
@@ -292,6 +297,36 @@ function Set-RepositorySecret {
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to store repository Actions secret '$Name'."
     }
+}
+
+function Get-RepositorySecretNames {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    # gh secret list exposes repository secret names, never their stored values.
+    $listed = Invoke-External -Command 'gh' -Arguments @(
+        'secret', 'list', '--repo', $Repository, '--json', 'name'
+    )
+    try {
+        $items = @(((@($listed.Output) -join [Environment]::NewLine) | ConvertFrom-Json))
+    }
+    catch {
+        throw 'GitHub CLI returned invalid repository Actions secret metadata.'
+    }
+
+    $names = [System.Collections.Generic.List[string]]::new()
+    foreach ($item in $items) {
+        if ($null -eq $item -or $null -eq $item.PSObject.Properties['name']) {
+            throw 'GitHub CLI returned incomplete repository Actions secret metadata.'
+        }
+        $name = ([string]$item.name).Trim()
+        if (-not $name) {
+            throw 'GitHub CLI returned an empty repository Actions secret name.'
+        }
+        if ($names -notcontains $name) {
+            $names.Add($name)
+        }
+    }
+    return @($names)
 }
 
 function Write-CanonicalWorkflow {
@@ -1076,7 +1111,6 @@ else {
 }
 
 Add-LocalTokenExcludes -Repository $target
-Assert-TokenFilesAreLocalOnly -Repository $target
 
 $headResult = Invoke-Git -Repository $target -Arguments @('rev-parse', '--verify', 'HEAD') -AllowFailure
 $hasHead = $headResult.ExitCode -eq 0
@@ -1095,6 +1129,14 @@ if ($hasRemote) {
     )
     $remoteIsEmpty = -not ((@($remoteHeads.Output) -join '').Trim())
 }
+
+$requiredTokenFiles = if ($hasRemote) {
+    @('MEANDAI_RO_FG_PAT.txt')
+}
+else {
+    @($tokenMappings.Keys)
+}
+Assert-TokenFilesAreLocalOnly -Repository $target -RequiredFileNames $requiredTokenFiles
 
 if (-not $hasRemote -and $hasHead) {
     throw "A repository with commits but no '$RemoteName' is outside the safe new-repository flow. Connect and reconcile it manually."
@@ -1252,21 +1294,39 @@ if ($emailResult.ExitCode -ne 0 -or -not ((@($emailResult.Output) -join '').Trim
     ) | Out-Null
 }
 
-$updaterToken = Read-LocalToken -Path (Join-Path $target 'FG_PAT.txt')
-try {
-    $targetInfo = Invoke-GitHubApi -Uri "https://api.github.com/repos/$repository" -Token $updaterToken
-    if (-not ([string]$targetInfo.full_name).Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
-        throw 'identity mismatch'
-    }
+$existingSecretNames = if ($hasRemote) {
+    @(Get-RepositorySecretNames -Repository $repository)
 }
-catch {
-    throw "The updater token cannot access '$repository'. Add this repository to the token's selected-repository grant, then rerun."
+else {
+    @()
+}
+$updaterSecretMissing = $existingSecretNames -notcontains 'MEANDAI_UPDATER_TOKEN'
+$updaterToken = $null
+if ($updaterSecretMissing) {
+    $updaterTokenPath = Join-Path $target 'FG_PAT.txt'
+    if (-not (Test-Path -LiteralPath $updaterTokenPath -PathType Leaf)) {
+        throw "Required local credential file 'FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_UPDATER_TOKEN' does not exist."
+    }
+    $updaterToken = Read-LocalToken -Path $updaterTokenPath
+    try {
+        $targetInfo = Invoke-GitHubApi -Uri "https://api.github.com/repos/$repository" -Token $updaterToken
+        if (-not ([string]$targetInfo.full_name).Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'identity mismatch'
+        }
+    }
+    catch {
+        throw "The updater token cannot access '$repository'. Add this repository to the token's selected-repository grant, then rerun."
+    }
 }
 
 $workflowFullPath = Join-Path $target ($workflowTargetPath -replace '/', [IO.Path]::DirectorySeparatorChar)
 [void](Write-CanonicalWorkflow -Path $workflowFullPath -Bytes $workflowBytes)
 
 foreach ($entry in $tokenMappings.GetEnumerator()) {
+    if ($existingSecretNames -contains $entry.Value) {
+        Write-Host "Repository Actions secret '$($entry.Value)' already exists and was preserved."
+        continue
+    }
     $value = if ($entry.Key -ceq 'FG_PAT.txt') { $updaterToken } else { $protocolToken }
     Set-RepositorySecret -Repository $repository -Name $entry.Value -Value $value
 }
@@ -1301,7 +1361,7 @@ if ($createdCommit -or $remoteIsEmpty) {
 }
 
 Write-Host "meAndAI quick adoption seed is ready in $repository at $ProtocolTag."
-Write-Host 'Both repository Actions secrets were reconciled before publication.'
+Write-Host 'Repository Actions secrets were reconciled by preserving existing names and creating only missing names.'
 
 if ($SkipLifecycleDispatch) {
     Write-Host 'Lifecycle dispatch was explicitly skipped. Run the meAndAI AI capabilities lifecycle workflow before adoption.'
