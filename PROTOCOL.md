@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.4.0**<br>
+Protocol version: **0.5.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -88,12 +88,15 @@ Implementation MUST NOT start until the work item has:
 - an implementation and verification approach appropriate to the repository.
 
 An automated dependency updater MAY create a deterministic, pointer-only draft
-proposal before Gate 1 solely as a discovery artifact. The proposal MUST remain
-draft and MUST NOT be treated as implementation authorization, marked ready, or
-merged until a stable work ID, linked issue, impact review, test plan, and the
-remaining Definition of Ready are complete. This narrow exception does not
-authorize product logic, domain behavior, schema, generated-code, or unrelated
-file changes.
+proposal before Gate 1 solely as a discovery artifact. The AI-capabilities
+lifecycle MAY likewise create a deterministic adoption discovery draft that
+contains only absent canonical adoption assets or a transient handoff manifest.
+Either proposal MUST remain draft and MUST NOT be treated as implementation
+authorization, marked ready, or merged until a stable work ID, linked issue,
+impact review, test plan, and the remaining Definition of Ready are complete.
+This narrow exception does not authorize product logic, domain behavior,
+schema, generated-code, semantic collision resolution, or unrelated file
+changes.
 
 ### Gate 2 - Design and contract review
 
@@ -324,6 +327,34 @@ consuming project versions its own product independently and records the pinned
 common-protocol version in its project memory.
 
 ### Consumer update proposals
+
+#### AI-capabilities lifecycle
+
+A GitHub submodule consumer adopting `v0.5.0` or later MAY begin with only the
+canonical workflow at `.github/workflows/meandai-protocol-update.yml`. That
+workflow is the seed for one AI-capabilities lifecycle covering first adoption,
+bootstrap, and later updates. It MUST execute bootstrap code only from the
+immutable protocol tag embedded in the seed and verify that source identity
+before proposing consumer changes.
+
+Deterministic adoption discovery classifies declared target paths, not the
+presence of unrelated application code. When every target is absent except an
+exact seed workflow, automation MAY open a draft containing the protocol
+gitlink, canonical project adapter, memory skeleton, repository templates,
+local updater scripts, and the transient handoff manifest at
+`.ai/adoption/meandai-capabilities.json`. When any target collides, the draft
+MUST contain only that manifest and MUST preserve every existing target. The
+workflow MUST NOT imply that an AI agent is running; an explicitly invoked
+agent or maintainer owns labels, project records, memory tailoring, semantic
+merges, project tests, link validation, and manifest removal.
+
+The deterministic adoption branch and its single draft are retained on later
+runs. Missing proposal ownership, seed drift, an existing manifest, an orphan
+branch, or any other ambiguous state MUST block without reset, deletion, or
+overwrite. The manifest MUST be removed before the draft becomes ready or
+merges. After reviewed adoption, the local updater owns compatible update
+discovery and supersession under the controls below. The source-only bootstrap
+resolver and adapter are not copied into the consumer.
 
 A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
 self-reconciling, consumer-owned update workflow supplied by the pinned

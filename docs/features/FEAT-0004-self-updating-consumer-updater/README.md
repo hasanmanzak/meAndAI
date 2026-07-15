@@ -9,6 +9,7 @@
 | Pull request | [#16](https://github.com/hasanmanzak/meAndAI/pull/16) |
 | Decision | [DEC-0005](../../decisions/DEC-0005-consumer-scoped-fine-grained-pat.md) |
 | Tests | [Test scenarios](test-cases.md) |
+| Successor | [FEAT-0005](../FEAT-0005-ai-capabilities-lifecycle/README.md) adds workflow-seeded adoption while preserving this updater |
 
 ## Problem
 

@@ -19,13 +19,52 @@ This boundary is defined by
 [DEC-0001](decisions/DEC-0001-portable-protocol-reference.md) and
 [DEC-0002](decisions/DEC-0002-project-local-memory.md).
 
+## Workflow-only AI capabilities lifecycle
+
+For a new submodule consumer on `v0.5.0`, the only repository file that must be
+seeded manually is the exact canonical
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.5.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+at `.github/workflows/meandai-protocol-update.yml`. Configure the two
+[credentials](#update-workflow-prerequisites-and-behavior), then run the
+workflow manually or wait for its schedule. The workflow checks out the exact
+tag embedded in its own reviewed content; it never executes a moving `main`.
+
+The same operation covers an empty repository, a populated repository, and an
+already adopted repository. Classification depends only on collisions with
+declared adoption targets; unrelated application files do not prevent the
+deterministic path.
+
+| State | Proposal and next owner |
+| --- | --- |
+| `BootstrapReady` | No target collides. One deterministic draft adds `.gitmodules`, the `.ai/protocol` gitlink, `AGENTS.md`, the memory skeleton, issue/PR templates, local updater scripts, and `.ai/adoption/meandai-capabilities.json`. |
+| `AdoptionReviewRequired` | At least one target collides. The draft adds only `.ai/adoption/meandai-capabilities.json`, listing the exact paths that need semantic review. No consumer target is overwritten. |
+| `PendingAdoption` | The deterministic branch and one draft already exist. Later runs retain them and create nothing else. |
+| `Update` | Adoption is complete, so the reviewed consumer-owned updater performs same-major update discovery and supersession. |
+| `BlockedManualReview` | Seed identity, manifest ownership, branch/PR ownership, source, or another prerequisite is ambiguous. The run stops without cleanup or overwrite. |
+
+The workflow does not start an AI agent. It opens a durable, review-only
+handoff. Invoke Codex or another maintainer explicitly on the draft; that actor
+must reconcile collisions, create or verify Agile labels, create project-owned
+feature and decision records, tailor local memory, add and run project tests,
+repair links, and remove the manifest before marking the pull request ready or
+merging it. A full `BootstrapReady` proposal still contains the manifest
+because deterministic file installation is not evidence that the
+project-specific work is complete.
+
+`MeAndAI.CapabilitiesBootstrap.psm1` and
+`Invoke-MeAndAICapabilitiesBootstrap.ps1` are source-only launch assets. They
+run from the pinned protocol checkout and are not copied to the consumer. Once
+the reviewed adoption draft merges, future compatible releases update the
+protocol gitlink and the three consumer-owned updater assets through the same
+workflow.
+
 ## Recommended: pinned Git submodule
 
 From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.4.0
+git -C .ai/protocol checkout v0.5.0
 git add .gitmodules .ai/protocol
 ```
 
@@ -81,6 +120,8 @@ Submodule consumers also materialize these submodule-only automation assets:
 
 Opaque repository-reference consumers MUST NOT copy these three files unchanged.
 They use a reviewed provider-specific adapter or the manual update process.
+The two AI-capabilities bootstrap files beside these scripts are deliberately
+source-only and MUST NOT be materialized in the consumer.
 For a submodule consumer, the following command initializes only absent files.
 It aborts on every collision instead of overwriting consumer rules:
 
@@ -125,11 +166,11 @@ foreach ($copy in $copies) {
 }
 ```
 
-The copy above is the updater's one-time bootstrap. A workflow cannot install
-itself into a consumer that does not already contain it. New consumers adopting
-`v0.4.0` or later receive these assets during initial adoption. Consumers with
-copied updater assets from `v0.2.x` or `v0.3.x` require the reviewed one-time
-`v0.4.0` migration below; their old updater cannot retroactively add its own
+The copy above remains the manual adoption alternative. Starting with `v0.5.0`,
+the exact seed workflow can install the absent deterministic assets through the
+review-only lifecycle described above. Consumers with copied updater assets
+from `v0.2.x` or `v0.3.x` still require the reviewed one-time `v0.4.0`
+migration below; their immutable old updater cannot retroactively add its own
 self-update behavior.
 
 #### One-time v0.4.0 updater migration
@@ -247,7 +288,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.4.0`
+- ref: `v0.5.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -290,11 +331,11 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.4.0`:
+reviewed migration; the current example installs `v0.5.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.4.0
+git -C .ai/protocol checkout v0.5.0
 git add .ai/protocol
 ```
 

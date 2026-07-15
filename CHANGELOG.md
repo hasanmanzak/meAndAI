@@ -3,6 +3,37 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.5.0 - 2026-07-15
+
+### Added
+
+- Added one workflow-seeded AI-capabilities lifecycle for first adoption,
+  collision-free bootstrap, semantic handoff, and later protocol updates.
+- Added source-pinned lifecycle planning and bootstrap adapters with
+  deterministic draft branches, expected-absent leases, and exact staged-path
+  validation.
+- Added a transient adoption manifest for project-specific labels, records,
+  memory, semantic merge, tests, links, and explicit completion by an invoked
+  agent or maintainer.
+- Added executable `TEST-0027` through `TEST-0032` coverage for workflow
+  routing, empty and populated consumers, collisions, idempotency, orphan
+  recovery boundaries, credentials, and updater regression.
+
+### Changed
+
+- The consumer update workflow is now also the sole adoption seed. Complete
+  existing installations continue to delegate to the v0.4 local updater.
+- Collision-free consumers receive deterministic core assets in a draft;
+  colliding consumers receive a manifest-only draft and no existing target is
+  overwritten.
+- GitHub Actions explicitly remains a deterministic repository actor and does
+  not claim to start or impersonate an AI agent.
+
+Related work: [FEAT-0005](docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md),
+[DEC-0006](docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md), and
+[issue #17](https://github.com/hasanmanzak/meAndAI/issues/17), delivered by
+[pull request #18](https://github.com/hasanmanzak/meAndAI/pull/18).
+
 ## 0.4.0 - 2026-07-15
 
 ### Added

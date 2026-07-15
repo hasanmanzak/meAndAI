@@ -72,11 +72,14 @@ $requiredFiles = @(
     'docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md',
     'docs/features/FEAT-0003-convergent-completion-scan/README.md',
     'docs/features/FEAT-0003-convergent-completion-scan/test-cases.md',
+    'docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md',
+    'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
     'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md',
     'docs/decisions/DEC-0004-bounded-completion-convergence.md',
+    'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md',
     'templates/project/AGENTS.submodule.md',
     'templates/project/AGENTS.repository-reference.md',
     'templates/project/.ai/memory/README.md',
@@ -88,6 +91,8 @@ $requiredFiles = @(
     'templates/project/.github/workflows/meandai-protocol-update.yml',
     'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1',
     'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
+    'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1',
+    'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1',
     '.github/PULL_REQUEST_TEMPLATE.md',
     '.github/ISSUE_TEMPLATE/config.yml',
     '.github/ISSUE_TEMPLATE/epic.yml',
@@ -98,6 +103,8 @@ $requiredFiles = @(
     '.github/ISSUE_TEMPLATE/finding.yml',
     'tests/protocol-update-adapter.tests.ps1',
     'tests/protocol-update.tests.ps1',
+    'tests/capabilities-bootstrap.tests.ps1',
+    'tests/capabilities-bootstrap-adapter.tests.ps1',
     '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
@@ -365,10 +372,19 @@ if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     }
 }
 
+$capabilitiesTestPath = Join-Path $root 'tests/capabilities-bootstrap.tests.ps1'
+if (Test-Path -LiteralPath $capabilitiesTestPath -PathType Leaf) {
+    $engine = (Get-Process -Id $PID).Path
+    & $engine -NoProfile -ExecutionPolicy Bypass -File $capabilitiesTestPath
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure 'TEST-0027 through TEST-0032 AI capabilities lifecycle validation failed'
+    }
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0026.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0032.' -ForegroundColor Green
