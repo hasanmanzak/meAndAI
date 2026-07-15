@@ -6,6 +6,7 @@
   [BUG-0003](../../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
 - Tracking: [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32)
 - Delivery: [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33)
+- CI: [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023)
 - Test:
   [TEST-0051](../../../docs/features/FEAT-0007-local-codex-adoption/test-cases.md)
 
@@ -31,6 +32,7 @@ ready; the maintainer owns merge.
 `TEST-0051` failed on six missing explicit boundary statements and passed after
 the guide clarification. The first complete run exposed and resolved one stale
 escaped version matcher (`FIND-0075`); the bounded confirmation then passed
-`TEST-0001` through `TEST-0051` in 143.7 seconds. CI, merge, and annotated-tag
-evidence remain pending in pull request #33. Runtime launcher, credential,
-workflow, publication, and consumer behavior are intentionally unchanged.
+`TEST-0001` through `TEST-0051` in 143.7 seconds. PR #33 then passed Ubuntu,
+Windows, and GitGuardian. Merge and annotated-tag evidence remain pending.
+Runtime launcher, credential, workflow, publication, and consumer behavior are
+intentionally unchanged.

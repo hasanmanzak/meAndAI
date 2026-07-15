@@ -455,4 +455,7 @@ finding remains and validation stops.
 - [x] Fresh-diff review finds no behavior or security-boundary drift.
 - [x] Documentation, version, changelog, project memory, issue, and pull request
       links are synchronized.
-- [ ] Required CI and review gates pass.
+- [x] Applicable CI passed in
+      [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023)
+      on Ubuntu and Windows; GitGuardian also passed. The final evidence commit
+      must retain those checks before merge.
