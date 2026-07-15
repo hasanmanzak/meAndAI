@@ -1,7 +1,7 @@
 name: meAndAI AI capabilities lifecycle
 
 env:
-  BOOTSTRAP_PROTOCOL_TAG: v0.6.3
+  BOOTSTRAP_PROTOCOL_TAG: v0.7.1
 
 on:
   schedule:

@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.6.3**
+Current protocol version: **0.7.1**
 
 ## Start here
 
@@ -13,6 +13,7 @@ Current protocol version: **0.6.3**
 - Use [quick adoption](docs/quick-adoption.md) for the one-command local seed.
 - Browse the [feature index](docs/features/README.md) and
   [decision index](docs/decisions/README.md).
+- Browse incubating possibilities in the [idea index](docs/ideas/README.md).
 - Read this repository's isolated [project memory](.ai/memory/README.md).
 - See the [changelog](CHANGELOG.md) for version history.
 
@@ -53,8 +54,13 @@ The v0.6.2 existing-secret preservation correction is tracked by
 [BUG-0001](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
 and [GitHub issue #24](https://github.com/hasanmanzak/meAndAI/issues/24).
 
-The v0.6.3 optional local credential-file correction is tracked by
-[BUG-0002](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063)
+Repository-native idea incubation for this protocol and its consumers is
+tracked by [FEAT-0008](docs/features/FEAT-0008-idea-incubation/README.md),
+[DEC-0009](docs/decisions/DEC-0009-repository-native-idea-incubation.md), and
+[GitHub issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
+
+The v0.7.1 optional local credential-file correction is tracked by
+[BUG-0002](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
 and [GitHub issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 
 This repository is private. A consuming environment must have GitHub access to

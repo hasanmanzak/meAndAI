@@ -7,7 +7,7 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.6.3`
+- Current protocol version: `0.7.1`
 - Current scope: optional local credential-source files for configured existing
   targets, tracked by [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 - Content language: English
@@ -15,14 +15,14 @@ Last verified: **2026-07-15**
   while retaining independent project memory.
 - Latest tracked work: [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 - Current release candidate: implemented
-  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063),
+  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071),
   published in [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29)
-  and targeting `v0.6.3` after review, merge, and the separate tag gate.
+  and targeting `v0.7.1` after review, merge, and the separate tag gate.
 - Latest released delivery before the current candidate: completed
-  [BUG-0001](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
-  in merged [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25),
-  released at exact merge commit `334df5a4119e63549f8208700959ee77ec470241`
-  by annotated tag [`v0.6.2`](https://github.com/hasanmanzak/meAndAI/tree/v0.6.2).
+  [FEAT-0008](../../docs/features/FEAT-0008-idea-incubation/README.md) in
+  merged [pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28),
+  released at exact merge commit `1b420322058d73a974ccb61d8b7f828eb38cce8e`
+  by annotated tag [`v0.7.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0).
 
 ## Collaboration constraints
 
@@ -76,7 +76,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   only missing mappings. GitHub does not reveal stored values, so the launcher
   does not claim to validate an existing secret's value. `FG_PAT.txt` is not
   required or read when `MEANDAI_UPDATER_TOKEN` already exists.
-- `v0.6.3` makes both local credential files optional for an existing target
+- `v0.7.0` adds repository-native `IDEA-NNNN` incubation, a pinned consumer
+  template, and absent-only idea-index installation for new collision-free
+  adoption. Ideas do not authorize implementation or bypass delivery gates.
+- `v0.7.1` makes both local credential files optional for an existing target
   when their mapped repository secrets already exist. With no protocol file,
   exact workflow and semantic-source retrieval uses the authenticated local
   `gh` identity; stored secret values remain unreadable. Missing secrets and

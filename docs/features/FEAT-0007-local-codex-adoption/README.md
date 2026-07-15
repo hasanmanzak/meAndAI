@@ -271,16 +271,16 @@ seconds. `git diff --check` reported no whitespace error.
       memory are synchronized.
 - [x] No unresolved blocking or actionable in-scope finding remains.
 
-## BUG-0002 correction for v0.6.3
+## BUG-0002 correction for v0.7.1
 
 | Field | Value |
 | --- | --- |
 | Classification | Bug correction |
 | Status | Implemented and verified; delivery pending |
-| Target version | 0.6.3 |
+| Target version | 0.7.1 |
 | Issue | [#27](https://github.com/hasanmanzak/meAndAI/issues/27) |
 | Pull request | [#29](https://github.com/hasanmanzak/meAndAI/pull/29) |
-| Test | [`TEST-0043`](test-cases.md) |
+| Test | [`TEST-0045`](test-cases.md) |
 
 ### Problem and outcome
 
@@ -324,11 +324,11 @@ architectural boundary.
 - [x] Stable `BUG-0002` ID and linked issue #27 exist.
 - [x] Problem, outcome, scope, non-goals, ownership, ordering, and failure
       behavior are explicit.
-- [x] `RISK-0044`: the authenticated `gh` identity may lack private meAndAI
+- [x] `RISK-0048`: the authenticated `gh` identity may lack private meAndAI
       source access even though the target secret name exists. Owner: consumer
       maintainer. Response: fail with an actionable source-access error; never
       request or recover the stored secret value.
-- [x] `TEST-0043` covers both files absent with both secrets present, a missing
+- [x] `TEST-0045` covers both files absent with both secrets present, a missing
       secret with its file absent, recovery with the required file, and the
       unchanged new-repository requirement.
 - [x] Verification is bounded to one focused red/green line, one fresh-diff
@@ -336,7 +336,13 @@ architectural boundary.
 
 Acceptance requires a configured existing target to proceed with both local
 files absent, while every missing target secret still requires its own file and
-all `TEST-0001` through `TEST-0043` scenarios pass.
+all `TEST-0001` through `TEST-0045` scenarios pass.
+
+### Integration finding
+
+| ID | Classification | Finding | Resolution | Status |
+| --- | --- | --- | --- | --- |
+| `FIND-0065` | Integration / High | `main` advanced to `v0.7.0` through PR #28 while BUG-0002 was based on `v0.6.2`, claiming the provisional `TEST-0043` and `RISK-0044` identifiers. | Merged the complete `v0.7.0` delivery, retargeted this correction to `v0.7.1`, and renumbered its unmerged records after `TEST-0044` and `RISK-0047` to `TEST-0045` and `RISK-0048`. | Resolved |
 
 ### Definition of Done
 
@@ -344,7 +350,8 @@ all `TEST-0001` through `TEST-0043` scenarios pass.
 - [x] File-free workflow and semantic-source retrieval preserve exact source
       verification without reading stored secret values.
 - [x] Missing-secret and new-repository credential gates remain fail-closed.
-- [x] `TEST-0043` passes its focused real-Git regression suite.
-- [x] The complete protocol suite and bounded fresh-diff review pass.
+- [x] `TEST-0045` passes its focused real-Git regression suite on the integrated
+      `v0.7.1` working tree.
+- [x] The complete `v0.7.1` protocol suite and bounded fresh-diff review pass.
 - [ ] Documentation, project memory, pull-request evidence, merge, and the
-      separate `v0.6.3` tag gate are complete.
+      separate `v0.7.1` tag gate are complete.

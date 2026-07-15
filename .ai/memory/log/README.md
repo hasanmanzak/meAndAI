@@ -9,6 +9,7 @@ and follow its canonical links.
 
 ## History
 
+- [2026-07-15 - Repository-native idea incubation](2026-07-15-idea-incubation.md)
 - [2026-07-15 - Existing Actions-secret preservation](2026-07-15-existing-secret-preservation.md)
 - [2026-07-15 - Local Codex adoption completion](2026-07-15-local-codex-adoption.md)
 - [2026-07-15 - Quick adoption launcher](2026-07-15-quick-adoption-launcher.md)

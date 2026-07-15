@@ -47,6 +47,7 @@ function Copy-SourceFixture {
         'templates/project/.ai/memory/README.md',
         'templates/project/.ai/memory/project.md',
         'templates/project/.ai/memory/log/README.md',
+        'templates/project/docs/ideas/README.md',
         'templates/project/.github/workflows/meandai-protocol-update.yml',
         'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1',
         'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
@@ -97,6 +98,7 @@ function New-BootstrapFixture {
         [string]$Name,
         [bool]$AddApplicationFile = $false,
         [bool]$AddAgentsCollision = $false,
+        [bool]$AddIdeasCollision = $false,
         [bool]$AddManifestCollision = $false,
         [bool]$DriftSeedWorkflow = $false
     )
@@ -131,6 +133,11 @@ function New-BootstrapFixture {
     }
     if ($AddAgentsCollision) {
         [IO.File]::WriteAllText((Join-Path $consumer 'AGENTS.md'), "consumer-owned instructions`n")
+    }
+    if ($AddIdeasCollision) {
+        $ideasPath = Join-Path $consumer 'docs/ideas/README.md'
+        New-Item -ItemType Directory -Force (Split-Path -Parent $ideasPath) | Out-Null
+        [IO.File]::WriteAllText($ideasPath, "# Consumer-owned ideas`n")
     }
     if ($AddManifestCollision) {
         $manifestPath = Join-Path $consumer '.ai/adoption/meandai-capabilities.json'
@@ -210,7 +217,7 @@ try {
         $paths = @(Get-RemoteChangedPaths -Fixture $empty)
         foreach ($required in @(
             '.ai/adoption/meandai-capabilities.json', '.ai/protocol', '.gitmodules',
-            'AGENTS.md', '.ai/memory/README.md',
+            'AGENTS.md', '.ai/memory/README.md', 'docs/ideas/README.md',
             '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
             '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
         )) {
@@ -228,6 +235,33 @@ try {
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
             $global:LastPullRequestHead -cne 'automation/meandai-capabilities-v0.5.0') {
             Add-Failure 'TEST-0028 bootstrap did not create the deterministic draft proposal.'
+        }
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $ideasCollision = New-BootstrapFixture -Name 'ideas-collision' -AddIdeasCollision $true
+    $result = Invoke-BootstrapFixture -Fixture $ideasCollision
+    if ($result.Threw) {
+        Add-Failure "TEST-0044 idea-index collision handoff failed: $($result.Error)"
+    }
+    else {
+        $paths = @(Get-RemoteChangedPaths -Fixture $ideasCollision)
+        if ($paths.Count -ne 1 -or
+            [string]$paths[0] -cne '.ai/adoption/meandai-capabilities.json') {
+            Add-Failure "TEST-0044 idea-index collision escaped manifest-only scope: $($paths -join ', ')."
+        }
+        $manifest = (Invoke-Git -Repository $ideasCollision.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:.ai/adoption/meandai-capabilities.json'
+        )) -join "`n" | ConvertFrom-Json
+        if (@($manifest.collisions) -cnotcontains 'docs/ideas/README.md') {
+            Add-Failure 'TEST-0044 manifest did not record the consumer idea-index collision.'
+        }
+        $consumerIdeas = (Invoke-Git -Repository $ideasCollision.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:docs/ideas/README.md'
+        )) -join "`n"
+        if ($consumerIdeas -cne '# Consumer-owned ideas') {
+            Add-Failure 'TEST-0044 collision proposal overwrote the consumer idea index.'
         }
     }
 
@@ -332,4 +366,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031.' -ForegroundColor Green
+Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031 and TEST-0044.' -ForegroundColor Green

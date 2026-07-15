@@ -68,7 +68,10 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-15-quick-adoption-launcher.md',
     '.ai/memory/log/2026-07-15-local-codex-adoption.md',
     '.ai/memory/log/2026-07-15-existing-secret-preservation.md',
+    '.ai/memory/log/2026-07-15-idea-incubation.md',
     'docs/adoption.md',
+    'docs/ideas/README.md',
+    'docs/ideas/IDEA-0001-role-based-multi-agent-protocol.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
     'docs/features/FEAT-0001-common-development-protocol/test-cases.md',
@@ -82,6 +85,8 @@ $requiredFiles = @(
     'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
     'docs/features/FEAT-0007-local-codex-adoption/README.md',
     'docs/features/FEAT-0007-local-codex-adoption/test-cases.md',
+    'docs/features/FEAT-0008-idea-incubation/README.md',
+    'docs/features/FEAT-0008-idea-incubation/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
@@ -90,6 +95,7 @@ $requiredFiles = @(
     'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md',
     'docs/decisions/DEC-0007-local-quick-adoption-boundary.md',
     'docs/decisions/DEC-0008-local-codex-execution.md',
+    'docs/decisions/DEC-0009-repository-native-idea-incubation.md',
     'docs/quick-adoption.md',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
@@ -100,6 +106,8 @@ $requiredFiles = @(
     'templates/feature/README.md',
     'templates/feature/test-cases.md',
     'templates/decision.md',
+    'templates/idea.md',
+    'templates/project/docs/ideas/README.md',
     'templates/project/.github/workflows/meandai-protocol-update.yml',
     'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1',
     'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
@@ -118,6 +126,7 @@ $requiredFiles = @(
     'tests/capabilities-bootstrap.tests.ps1',
     'tests/capabilities-bootstrap-adapter.tests.ps1',
     'tests/quick-adoption.tests.ps1',
+    'tests/idea-incubation.tests.ps1',
     'tests/fixtures/Invoke-MockCodex.ps1',
     'tests/fixtures/Invoke-MockCodex.cmd',
     'tests/fixtures/Invoke-MockCodex.sh',
@@ -402,7 +411,16 @@ if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0043 quick adoption validation failed'
+        Add-Failure 'TEST-0033 through TEST-0042 and TEST-0045 quick adoption validation failed'
+    }
+}
+
+$ideaTestPath = Join-Path $root 'tests/idea-incubation.tests.ps1'
+if (Test-Path -LiteralPath $ideaTestPath -PathType Leaf) {
+    $engine = (Get-Process -Id $PID).Path
+    & $engine -NoProfile -ExecutionPolicy Bypass -File $ideaTestPath
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure 'TEST-0043 and TEST-0044 idea-incubation validation failed'
     }
 }
 
@@ -412,4 +430,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0043.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0045.' -ForegroundColor Green

@@ -31,9 +31,9 @@ uses the authenticated local `gh` identity for exact tagged-source retrieval.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.6.3`, the only repository file required
+For a new submodule consumer on `v0.7.1`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.6.3/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.7.1/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. The workflow checks out the exact tag
@@ -76,7 +76,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.6.3
+git -C .ai/protocol checkout v0.7.1
 git add .gitmodules .ai/protocol
 ```
 
@@ -111,10 +111,17 @@ following source-to-target mapping from the pinned protocol ref:
 | Pinned source | Consumer-owned target |
 | --- | --- |
 | `templates/project/.ai/memory/` | `.ai/memory/` |
+| `templates/project/docs/ideas/README.md` | `docs/ideas/README.md` |
+| `templates/idea.md` | A new `docs/ideas/IDEA-NNNN-*.md` record |
 | `.github/ISSUE_TEMPLATE/{bug,epic,feature,finding,subfeature,task}.yml` | `.github/ISSUE_TEMPLATE/` |
 | `.github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` |
 | `templates/feature/` | A new `docs/features/FEAT-NNNN-*/` record |
 | `templates/decision.md` | A new `docs/decisions/DEC-NNNN-*.md` record |
+
+The idea index is an absent-only initial-adoption target. Automation never
+creates individual idea records and the compatible updater never manages
+consumer-owned `docs/ideas` content. An existing consumer may create the index
+and later records from its pinned templates without migrating its updater.
 
 The repository's `.github/ISSUE_TEMPLATE/config.yml` is deliberately excluded:
 its contact link describes this protocol repository and follows its current
@@ -148,6 +155,10 @@ $copies = foreach ($form in $forms) {
 $copies += @{
     Source = '.ai/protocol/.github/PULL_REQUEST_TEMPLATE.md'
     Target = '.github/PULL_REQUEST_TEMPLATE.md'
+}
+$copies += @{
+    Source = '.ai/protocol/templates/project/docs/ideas/README.md'
+    Target = 'docs/ideas/README.md'
 }
 $copies += @(
     @{
@@ -300,7 +311,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.6.3`
+- ref: `v0.7.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -343,11 +354,11 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.6.3`:
+reviewed migration; the current example installs `v0.7.1`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.6.3
+git -C .ai/protocol checkout v0.7.1
 git add .ai/protocol
 ```
 
