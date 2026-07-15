@@ -63,6 +63,21 @@ function New-TempRoot {
     return $path
 }
 
+function ConvertTo-TestFileUri {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
+    $builder = [UriBuilder]::new()
+    $builder.Scheme = [Uri]::UriSchemeFile
+    $builder.Host = ''
+    $builder.Path = $resolvedPath
+    $uri = $builder.Uri.AbsoluteUri
+    if ([string]::IsNullOrWhiteSpace($uri)) {
+        throw "Unable to create a file URI for test path '$resolvedPath'."
+    }
+    return $uri
+}
+
 function Set-TestGitIdentity {
     param([string]$Repository)
 
@@ -860,7 +875,7 @@ try {
         Set-Content -LiteralPath (Join-Path $shallowSource 'app.txt') -Value 'app' -Encoding UTF8
         Invoke-TestGit -Repository $shallowSource -Arguments @('add', 'app.txt') | Out-Null
         Invoke-TestGit -Repository $shallowSource -Arguments @('commit', '-m', 'Initial') | Out-Null
-        $shallowSourceUri = ([Uri]$shallowSource).AbsoluteUri
+        $shallowSourceUri = ConvertTo-TestFileUri -Path $shallowSource
         Invoke-TestGit -Repository $shallowRoot -Arguments @(
             'clone', '--depth', '1', $shallowSourceUri, $shallowRepo
         ) | Out-Null

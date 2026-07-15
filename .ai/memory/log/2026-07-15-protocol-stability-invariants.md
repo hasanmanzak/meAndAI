@@ -42,6 +42,13 @@
   over-broad active-pin predicate and the hidden bootstrap adapter's stale
   default. The minimal correction passed `git diff --check` and the final
   structure-only `TEST-0059` confirmation.
+- PR #35's first hosted run passed Windows and exposed a Linux-only empty
+  file-URI conversion in the shallow-history fixture. `FIND-0092` replaced the
+  path cast with one cross-platform `UriBuilder` boundary; production code was
+  unaffected.
+- The focused quick-adoption suite and structure gate passed locally after the
+  portability fix; the hosted Ubuntu rerun remains the authoritative platform
+  confirmation.
 - Remaining gates: hosted matrix CI, pull-request review/merge, and an
   immutable `v0.8.0` release targeting the exact merge commit. Release
   identifier and commit evidence must stay pending until those events occur.
