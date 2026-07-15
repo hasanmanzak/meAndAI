@@ -1,0 +1,68 @@
+@{
+    SchemaVersion = 1
+    Authorities = @(
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/protocol.tests.ps1'
+            TestIds = @(
+                'TEST-0001', 'TEST-0002', 'TEST-0003', 'TEST-0004',
+                'TEST-0005', 'TEST-0006', 'TEST-0007', 'TEST-0008',
+                'TEST-0018', 'TEST-0019', 'TEST-0020', 'TEST-0044',
+                'TEST-0047', 'TEST-0050', 'TEST-0056', 'TEST-0059',
+                'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076'
+            )
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/protocol-update.tests.ps1'
+            TestIds = @(
+                'TEST-0009', 'TEST-0010', 'TEST-0011', 'TEST-0012',
+                'TEST-0013', 'TEST-0014', 'TEST-0015', 'TEST-0016',
+                'TEST-0017', 'TEST-0021', 'TEST-0022', 'TEST-0023',
+                'TEST-0024', 'TEST-0025', 'TEST-0026', 'TEST-0048',
+                'TEST-0058', 'TEST-0061', 'TEST-0072'
+            )
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities-bootstrap.tests.ps1'
+            TestIds = @(
+                'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
+                'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
+                'TEST-0068', 'TEST-0071'
+            )
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/quick-adoption.tests.ps1'
+            TestIds = @(
+                'TEST-0033', 'TEST-0034', 'TEST-0035', 'TEST-0036',
+                'TEST-0038', 'TEST-0039', 'TEST-0040',
+                'TEST-0041', 'TEST-0042', 'TEST-0045', 'TEST-0046',
+                'TEST-0049', 'TEST-0051', 'TEST-0052', 'TEST-0053',
+                'TEST-0054', 'TEST-0055', 'TEST-0060', 'TEST-0063',
+                'TEST-0069', 'TEST-0070', 'TEST-0073'
+            )
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/idea-incubation.tests.ps1'
+            TestIds = @('TEST-0043')
+        }
+        @{
+            Evidence = 'GitHubActionsSemantic'
+            Owner = '.github/workflows/protocol-tests.yml'
+            TestIds = @('TEST-0067', 'TEST-0075')
+        }
+        @{
+            Evidence = 'ExternalPostPublication'
+            Owner = 'tests/Verify-PostPublicationEvidence.ps1'
+            TestIds = @('TEST-0065')
+        }
+        @{
+            Evidence = 'HistoricalSuperseded'
+            Owner = 'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md'
+            TestIds = @('TEST-0037')
+        }
+    )
+}

@@ -93,7 +93,7 @@ and merge to the maintainer.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0033 through TEST-0037](test-cases.md) |
+| Scenarios | Defined | [TEST-0033 through TEST-0037](test-cases.md); `TEST-0037` is historical and superseded by FEAT-0007 local scenarios |
 | Test code | Automated and green | `tests/quick-adoption.tests.ps1`; red state first confirmed the launcher and guide were absent |
 | Baseline run | Passed | Windows PowerShell 5.1 `TEST-0001` through `TEST-0032` on 2026-07-15 before FEAT-0006 changes |
 | Feature and regression run | Passed | Windows PowerShell 5.1 `TEST-0001` through `TEST-0037` on 2026-07-15 |
@@ -103,7 +103,7 @@ and merge to the maintainer.
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0011` | Credential-safe seed installation in an existing consumer | [Issue #19](https://github.com/hasanmanzak/meAndAI/issues/19) | `TEST-0033`, `TEST-0034`, `TEST-0036`; pass | `FIND-0053`, `FIND-0054`; resolved | Implemented |
-| `SUBF-0012` | New-repository creation, quick guide, and agent handoff | [Issue #19](https://github.com/hasanmanzak/meAndAI/issues/19) | `TEST-0035`, `TEST-0037`; pass | `FIND-0055`; resolved | Implemented |
+| `SUBF-0012` | New-repository creation, quick guide, and historical Cloud handoff | [Issue #19](https://github.com/hasanmanzak/meAndAI/issues/19) | `TEST-0035`; `TEST-0037` historical pass, now superseded by FEAT-0007 | `FIND-0055`; resolved for v0.6.0 | Implemented; handoff superseded |
 
 ## Decisions and relationships
 
@@ -159,7 +159,7 @@ complete. No additional bootstrap or validator layer was added.
 | --- | --- | --- | --- |
 | `FIND-0053` | Recovery / High / High | A newly created remote left empty by an updater-token grant failure could not be resumed. Empty-remote identity, history, tree, branch, and exact-seed gates now permit only the launcher-owned recovery path; `TEST-0036` reproduces the grant-and-rerun sequence. | Resolved |
 | `FIND-0054` | Portability / High / High | Case-insensitive regex matching under the Turkish locale rejected the ASCII capital `I` in `meAndAI`. Identifier and version validation now uses culture-independent case-sensitive matching; the Windows Turkish-locale run passes. | Resolved |
-| `FIND-0055` | Idempotency / High / High | An exact rerun could request a second Codex Cloud task on the same draft. A fixed HTML ownership marker is checked before commenting; `TEST-0037` confirms one task across two runs. | Resolved |
+| `FIND-0055` | Idempotency / High / High | At v0.6.0, an exact rerun could request a second Codex Cloud task on the same draft. A fixed HTML ownership marker was checked before commenting; historical `TEST-0037` confirmed one task across two runs. FEAT-0007 later removed the Cloud path and owns active local behavior under distinct TEST IDs. | Resolved for v0.6.0; superseded behavior |
 
 The final local command passed all `TEST-0001` through `TEST-0037`; no
 unresolved actionable in-scope finding remained.

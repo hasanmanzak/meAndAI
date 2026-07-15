@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.8.1',
+    [string]$TargetTag = 'v0.8.2',
     [string]$BranchPrefix = 'automation/meandai-capabilities-'
 )
 
@@ -198,6 +198,55 @@ function Get-RemoteBranchHead {
     return ([string]$output[0]).Split("`t")[0]
 }
 
+function Get-RemoteBranchesByPrefix {
+    param([Parameter(Mandatory)][string]$Prefix)
+
+    $refPrefix = "refs/heads/$Prefix"
+    $output = @(Invoke-Native -Command 'git' -Arguments @(
+        'ls-remote', '--heads', 'origin', "$refPrefix*"
+    ))
+    $branches = [System.Collections.Generic.List[object]]::new()
+    $names = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($line in $output) {
+        $match = [regex]::Match(
+            [string]$line,
+            '^(?<sha>[0-9a-f]{40})\s+(?<ref>refs/heads/.+)$'
+        )
+        if (-not $match.Success -or
+            -not $match.Groups['ref'].Value.StartsWith(
+                $refPrefix, [StringComparison]::Ordinal
+            )) {
+            throw 'The reserved adoption branch inventory is invalid.'
+        }
+        $name = $match.Groups['ref'].Value.Substring('refs/heads/'.Length)
+        if (-not $names.Add($name)) {
+            throw "Reserved adoption branch '$name' is ambiguous."
+        }
+        $branches.Add([pscustomobject]@{
+            Name = $name
+            Sha = [string]$match.Groups['sha'].Value
+        })
+    }
+    return @($branches)
+}
+
+function Test-ExactRemoteBranchInventory {
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Expected,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Actual
+    )
+
+    $expectedRows = @($Expected | ForEach-Object {
+        "$([string]$_.Name)`t$([string]$_.Sha)"
+    } | Sort-Object)
+    $actualRows = @($Actual | ForEach-Object {
+        "$([string]$_.Name)`t$([string]$_.Sha)"
+    } | Sort-Object)
+    return Test-ExactOrdinalSequence -Actual $actualRows -Expected $expectedRows
+}
+
 function Get-OpenAdoptionPullRequests {
     param([string]$Repository, [string]$Branch)
 
@@ -227,7 +276,9 @@ function Test-ExactAdoptionPullRequestMarker {
         [string]$TargetTag,
         [string]$TargetSha,
         [string]$ExpectedActor,
-        [string]$ExpectedState
+        [string]$ExpectedState,
+        [ValidateSet('Proposed', 'Completed')]
+        [string]$ExpectedPhase = 'Proposed'
     )
 
     foreach ($property in @(
@@ -238,12 +289,13 @@ function Test-ExactAdoptionPullRequestMarker {
             return $false
         }
     }
+    $expectedDraft = $ExpectedPhase -ceq 'Proposed'
     if ([string]$PullRequest.state -cne 'OPEN' -or
         [string]$PullRequest.headRefName -cne $Branch -or
         [string]$PullRequest.headRefOid -cne $RemoteHead -or
         [string]$PullRequest.baseRefName -cne $BaseBranch -or
         $PullRequest.isDraft -isnot [bool] -or
-        -not [bool]$PullRequest.isDraft -or
+        [bool]$PullRequest.isDraft -ne $expectedDraft -or
         [string]$PullRequest.number -cnotmatch '^[1-9][0-9]*$' -or
         [string]$PullRequest.url -cnotmatch "/pull/$([regex]::Escape([string]$PullRequest.number))/?$") {
         return $false
@@ -304,7 +356,8 @@ function Test-ExactAdoptionPullRequestMarker {
     }
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
     if (-not (
-        $phase -ceq 'Proposed' -and
+        $phase -ceq $ExpectedPhase -and
+        ($ExpectedPhase -ceq 'Proposed' -or $schema -eq 3) -and
         [string]$marker.state -ceq $ExpectedState -and
         [string]$marker.target -ceq $TargetTag -and
         [string]$marker.protocolSha -ceq $TargetSha -and
@@ -519,6 +572,64 @@ function Test-ExactAdoptionProposal {
         -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch
 }
 
+function Test-ExactCompletedAdoptionProposal {
+    param(
+        [object[]]$PullRequests,
+        [string]$RemoteHead,
+        [string]$Repository,
+        [string]$Branch,
+        [string]$BaseBranch,
+        [string]$TargetTag,
+        [string]$TargetSha,
+        [string]$ExpectedActor,
+        [string]$ExpectedState,
+        [string]$SourcePath
+    )
+
+    if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
+        return $false
+    }
+    $pullRequest = $PullRequests[0]
+    if (-not (Test-ExactAdoptionPullRequestMarker -PullRequest $pullRequest `
+        -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch `
+        -BaseBranch $BaseBranch -TargetTag $TargetTag -TargetSha $TargetSha `
+        -ExpectedActor $ExpectedActor -ExpectedState $ExpectedState `
+        -ExpectedPhase 'Completed')) {
+        return $false
+    }
+
+    Invoke-Native -Command 'git' -Arguments @(
+        'fetch', '--no-tags', 'origin', "refs/heads/$Branch"
+    ) | Out-Null
+    $fetchedHead = ((Invoke-Native -Command 'git' -Arguments @(
+        'rev-parse', 'FETCH_HEAD'
+    )) -join '').Trim()
+    if ($fetchedHead -cne $RemoteHead) {
+        return $false
+    }
+    $manifestEntry = Get-TreeEntry -RepositoryPath $workspace `
+        -Commit $RemoteHead -Path $ManifestPath
+    $protocolEntry = Get-TreeEntry -RepositoryPath $workspace `
+        -Commit $RemoteHead -Path $ProtocolPath
+    $completedSeed = Get-TreeEntry -RepositoryPath $workspace `
+        -Commit $RemoteHead -Path ([string]$SeedWorkflow.ConsumerPath)
+    $sourceSeed = Get-TreeEntry -RepositoryPath $SourcePath `
+        -Commit $TargetSha -Path ([string]$SeedWorkflow.TemplatePath)
+    if ($manifestEntry.Path -or
+        $protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit' -or
+        $protocolEntry.Sha -cne $TargetSha -or
+        $completedSeed.Mode -cne '100644' -or
+        $completedSeed.Type -cne 'blob' -or
+        $sourceSeed.Mode -cne '100644' -or
+        $sourceSeed.Type -cne 'blob' -or
+        $completedSeed.Sha -cne $sourceSeed.Sha) {
+        return $false
+    }
+    return Test-ExactAdoptionContinuity -PullRequest $pullRequest `
+        -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch
+}
+
 function Write-Utf8NoBom {
     param([string]$Path, [string]$Content)
 
@@ -670,7 +781,25 @@ $actor = ((Invoke-Native -Command 'gh' -Arguments @(
 if ($actor -notmatch '^[A-Za-z0-9_.-]+$') {
     throw 'The authenticated updater identity is invalid.'
 }
+$reservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
+$unexpectedReservedBranches = @($reservedBranches | Where-Object {
+    [string]$_.Name -cne $branch
+})
+if ($unexpectedReservedBranches.Count -gt 0) {
+    throw "The reserved adoption branch namespace contains unowned or stale state: $(@($unexpectedReservedBranches.Name) -join ', '). Manual review is required."
+}
+$inventoriedTarget = @($reservedBranches | Where-Object {
+    [string]$_.Name -ceq $branch
+})
+if ($inventoriedTarget.Count -gt 1) {
+    throw "Remote adoption branch '$branch' is ambiguous."
+}
 $remoteBranchHead = Get-RemoteBranchHead -Branch $branch
+if (($inventoriedTarget.Count -eq 0 -and $remoteBranchHead) -or
+    ($inventoriedTarget.Count -eq 1 -and
+     [string]$inventoriedTarget[0].Sha -cne $remoteBranchHead)) {
+    throw 'The reserved adoption branch namespace changed during inventory.'
+}
 $pullRequests = @(Get-OpenAdoptionPullRequests `
     -Repository $env:GITHUB_REPOSITORY -Branch $branch)
 $proposalContract = Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobject]@{
@@ -686,13 +815,24 @@ $proposalContract = Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobj
 $existingProposalValid = if ($proposalContract.State -cin @(
     'BootstrapReady', 'AdoptionReviewRequired'
 )) {
-    Test-ExactAdoptionProposal -PullRequests $pullRequests `
-    -RemoteHead $remoteBranchHead -Repository $env:GITHUB_REPOSITORY `
+    $proposedValid = Test-ExactAdoptionProposal -PullRequests $pullRequests `
+        -RemoteHead $remoteBranchHead -Repository $env:GITHUB_REPOSITORY `
         -Branch $branch -BaseBranch $env:DEFAULT_BRANCH -BaseHead $baseHead `
         -TargetTag $TargetTag -TargetSha $targetSha -ExpectedActor $actor `
         -ExpectedState ([string]$proposalContract.State) `
         -ProposalMode ([string]$proposalContract.ProposalMode) `
         -Collisions @($collisions) -TargetPaths $targetPaths -SourcePath $sourcePath
+    if ($proposedValid) {
+        $true
+    }
+    else {
+        Test-ExactCompletedAdoptionProposal -PullRequests $pullRequests `
+            -RemoteHead $remoteBranchHead -Repository $env:GITHUB_REPOSITORY `
+            -Branch $branch -BaseBranch $env:DEFAULT_BRANCH `
+            -TargetTag $TargetTag -TargetSha $targetSha -ExpectedActor $actor `
+            -ExpectedState ([string]$proposalContract.State) `
+            -SourcePath $sourcePath
+    }
 }
 else { $false }
 $snapshot = [pscustomobject]@{
@@ -709,8 +849,8 @@ $plan = Resolve-MeAndAICapabilitiesLifecycle -Snapshot $snapshot
 Add-RunSummary "## meAndAI AI capabilities lifecycle`n`n- Target: ``$TargetTag```n- State: ``$($plan.State)```n- Proposal: ``$($plan.ProposalMode)``"
 
 if ($plan.State -ceq 'PendingAdoption') {
-    Write-Host "AI capabilities lifecycle state: PendingAdoption. Existing draft retained."
-    exit 0
+    Write-Host 'AI capabilities lifecycle state: PendingAdoption. Existing maintainer-review proposal retained without mutation.'
+    return
 }
 if ($plan.State -ceq 'Update') {
     throw 'Bootstrap adapter reached Update unexpectedly; use the local updater.'
@@ -805,6 +945,11 @@ $headSha = ((Invoke-Native -Command 'git' -Arguments @(
     'rev-parse', 'HEAD'
 )) -join '').Trim()
 $ref = "refs/heads/$branch"
+$confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
+if (-not (Test-ExactRemoteBranchInventory -Expected $reservedBranches `
+    -Actual $confirmedReservedBranches)) {
+    throw 'The reserved adoption branch namespace changed before proposal publication.'
+}
 Invoke-Native -Command 'git' -Arguments @(
     'push', '--set-upstream', "--force-with-lease=${ref}:",
     'origin', "$branch`:$ref"

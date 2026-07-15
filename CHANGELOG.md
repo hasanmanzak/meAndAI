@@ -3,6 +3,30 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.2 - 2026-07-16
+
+### Fixed
+
+- Tighten exact adoption-issue ownership, serialize secret reconciliation, and
+  align completed-proposal retention and reserved-branch orphan recovery.
+- Replace identifier-substring and contract-dropping test evidence with
+  scenario-owned assertions, credential-boundary checks, and a recurring
+  actionlint gate.
+- Make the completion scan mandatory in the feature template, preserve the
+  distinct evidence contract for every finding disposition, and keep release
+  facts pending in-repository until their external post-publication authority
+  records them.
+- Correct the v0.8.1 audit ledger and explicitly retain the historical fact
+  that publication claims were written before publication evidence existed.
+
+Exact release/tag/commit and hosted verification facts are intentionally
+retained after publication by [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38)
+and the GitHub Release rather than predicted in this changelog commit.
+
+Related work: [FEAT-0012](docs/features/FEAT-0012-v082-correction/README.md),
+[DEC-0012](docs/decisions/DEC-0012-bounded-correction-and-external-release-evidence.md),
+and [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
+
 ## 0.8.1 - 2026-07-15
 
 ### Fixed

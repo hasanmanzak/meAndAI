@@ -9,7 +9,7 @@ repository suites.
 | `TEST-0034` | `SUBF-0011` | Run in a clean populated consumer on its connected default branch. | Both secrets precede one workflow-only commit/push; the exact run succeeds; the application tree and history remain unchanged otherwise. | Real-Git integration | Automated | Mock GitHub API/CLI plus bare remote |
 | `TEST-0035` | `SUBF-0012` | Run in a directory without its own Git repository or origin. | The launcher initializes `main`, creates a private owner/directory-name remote, pushes only the workflow, and leaves unrelated local files untracked. | Real-Git integration | Automated | Mock GitHub API/CLI plus bare remote |
 | `TEST-0036` | `SUBF-0011` | Rerun an exact seed, resume after a selected-repository grant failure, then present seed drift. | Exact and empty-remote recovery create no duplicate commit or task; ambiguous state blocks before later mutation. | Negative / recovery | Automated | Integration fixtures |
-| `TEST-0037` | `SUBF-0012` | Use the remote quick command and hand the generated draft to Codex Cloud. | One bounded lifecycle dispatch and one marker-protected `@codex` task occur; the guide retains a complete manual prompt and merge boundary. | Documentation / handoff | Automated | Structural assertions and mocked GitHub boundary |
+| `TEST-0037` | `SUBF-0012` | Historical v0.6.0 Codex Cloud handoff; this behavior was removed by FEAT-0007. | Historical evidence remains attributable to v0.6.0 and the identifier is never reused for local Codex behavior. Active local behavior is covered by [TEST-0038 through TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md). | Historical documentation / handoff | Superseded (never reuse) | Historical v0.6.0 evidence only |
 
 ## Required coverage
 
@@ -18,11 +18,15 @@ repository suites.
 - Exact source/tag/blob and workflow collision behavior.
 - Repository/default-branch identity and dirty-state failure.
 - Exact-seed rerun and partial-operation recovery.
-- Bounded lifecycle dispatch and idempotent Codex Cloud delegation, with no
-  approval or merge.
+- Historical bounded lifecycle dispatch and Codex Cloud delegation at v0.6.0;
+  active local completion is owned by FEAT-0007 and its distinct TEST IDs.
 - Regression of the v0.5 lifecycle and updater suites.
 
 ## Evidence
+
+`TEST-0037` passed for the historical v0.6.0 behavior recorded below. FEAT-0007
+then removed that behavior. Supersession preserves the evidence but permanently
+retires the identifier from active executable assertions.
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |

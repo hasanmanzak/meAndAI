@@ -119,6 +119,22 @@ function global:git {
         return
     }
     if ($arguments[0] -eq 'ls-remote') {
+        if ([string]$arguments[-1] -ceq 'refs/heads/automation/meandai-protocol-*') {
+            $script:Scenario.ReservedInventoryCalls++
+            Add-ScenarioEvent "inventory-reserved-$($script:Scenario.ReservedInventoryCalls)"
+            if ($script:Scenario.OldBranchExists) {
+                "$($script:Scenario.OldHead)`trefs/heads/$($script:Scenario.OldBranch)"
+            }
+            if ($script:Scenario.NewBranchExists) {
+                "$($script:Scenario.NewHead)`trefs/heads/$($script:Scenario.NewBranch)"
+            }
+            if ($script:Scenario.ReservedOrphanBranchExists -or
+                ($script:Scenario.ReservedNamespaceRace -and
+                 $script:Scenario.ReservedInventoryCalls -gt 1)) {
+                "$($script:Scenario.ReservedOrphanHead)`trefs/heads/$($script:Scenario.ReservedOrphanBranch)"
+            }
+            return
+        }
         $branch = ([string]$arguments[-1]).Substring('refs/heads/'.Length)
         Add-ScenarioEvent "probe-$branch"
         if ($branch -eq $script:Scenario.OldBranch) {
@@ -578,6 +594,8 @@ function Invoke-AdapterScenario {
         [bool]$DriftCurrentAsset = $false,
         [bool]$WrongStagedAssetBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
+        [bool]$ReservedOrphanBranchExists = $false,
+        [bool]$ReservedNamespaceRace = $false,
         [int]$LeadingUnmanagedCount = 0,
         [ValidateSet('Valid', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')]
         [string]$ReleaseMode = 'Valid',
@@ -687,6 +705,11 @@ function Invoke-AdapterScenario {
         NewBranchExists = $ExistingReplacement
         OldBranch = 'automation/meandai-protocol-v0.2.0'
         NewBranch = 'automation/meandai-protocol-v0.3.0'
+        ReservedOrphanBranch = 'automation/meandai-protocol-v0.2.5'
+        ReservedOrphanHead = '7' * 40
+        ReservedOrphanBranchExists = $ReservedOrphanBranchExists
+        ReservedNamespaceRace = $ReservedNamespaceRace
+        ReservedInventoryCalls = 0
         OldBody = $oldBody
         OldPullRequestComment = ''
         NewBody = $initialNewBody
@@ -826,7 +849,7 @@ foreach ($forbiddenEvent in @(
 }
 
 $pendingLatest = Invoke-AdapterScenario -Name 'pending-latest' `
-    -ExistingReplacement $true -OldCandidateExists $false
+    -ExistingReplacement $true -OldCandidateExists $false -OldBranchExists $false
 if ($pendingLatest.Threw -or
     (Get-EventIndex $pendingLatest 'verify-release-tag-ref') -lt 0 -or
     (Get-EventIndex $pendingLatest 'checkout-target-assets') -ge 0) {
@@ -1048,6 +1071,24 @@ if (-not $creationRace.Threw -or (Get-EventIndex $creationRace 'reject-new-branc
 if ((Get-EventIndex $creationRace 'delete-new-branch') -ge 0 -or
     (Get-EventIndex $creationRace 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0015 a foreign concurrently-created branch was mutated.'
+}
+
+$reservedOrphan = Invoke-AdapterScenario -Name 'reserved-orphan' `
+    -OldCandidateExists $false -OldBranchExists $false `
+    -ReservedOrphanBranchExists $true
+if (-not $reservedOrphan.Threw -or
+    $reservedOrphan.Error -notlike '*no single open proposal with matching live ownership*' -or
+    (Get-EventIndex $reservedOrphan 'push-new') -ge 0) {
+    Add-Failure 'TEST-0072 an orphan in the full reserved updater namespace did not block before mutation.'
+}
+
+$reservedNamespaceRace = Invoke-AdapterScenario -Name 'reserved-namespace-race' `
+    -ReservedNamespaceRace $true
+if (-not $reservedNamespaceRace.Threw -or
+    $reservedNamespaceRace.Error -notlike '*namespace changed before replacement publication*' -or
+    (Get-EventIndex $reservedNamespaceRace 'push-new') -ge 0 -or
+    (Get-EventIndex $reservedNamespaceRace 'close-old-pr') -ge 0) {
+    Add-Failure 'TEST-0072 a reserved updater branch appearing after inventory did not block before publication.'
 }
 
 $missingBranch = Invoke-AdapterScenario -Name 'missing-branch' -OldBranchExists $false

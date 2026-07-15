@@ -84,6 +84,20 @@ blanket range message.
 | Test code | Planned before production changes | Existing suites receive focused regression cases; no new framework |
 | Baseline run | Passed | v0.8.0 complete suite passed locally before this correction; the new scenarios are expected to expose the recorded gaps |
 
+## Historical scan boundary and finite budget
+
+This section reconstructs the FEAT-0011 scan declaration that its original
+record should have contained. It describes the evidence available to that
+delivery; it does not claim that the later FEAT-0012 findings were absent.
+
+| Field | Historical declaration |
+| --- | --- |
+| Tracked scope | The complete post-change inventory of 102 tracked files: root protocol/version/release records, source launcher, consumer workflow and updater/bootstrap scripts, all PowerShell test suites and fixtures, templates, feature/decision/idea documentation, and project memory |
+| Exclusions | External consumer repositories and their runtime state. No tracked generated or binary files existed. PSScriptAnalyzer was unavailable; hosted Windows/Ubuntu CI and PowerShell parsing supplied the declared portability evidence. Publication state did not yet exist during the pre-merge review. |
+| Budget | One initial full-project scan, remediation of its blocking findings, and one confirmation scan. The later hosted `matrix.shell` failure was new failed evidence and reopened only its affected CI slice; it did not authorize another unchanged scan. |
+| Initial result | `FIND-0093` through `FIND-0101` were prioritized and resolved in the slices below. |
+| Historical stop claim | The local suite, slice reviews, and confirmation were reported green; hosted CI then exposed the fifth in-slice blocker. FEAT-0012 later proved that the evidence model still allowed `FIND-0102` through `FIND-0111`. |
+
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
@@ -140,30 +154,53 @@ blanket range message.
 
 ## Findings register
 
-| ID | Classification / severity / confidence | Required resolution | Status |
-| --- | --- | --- | --- |
-| `FIND-0093` | Credential identity / High / High | Preserve and enforce `github.com` in every launcher GitHub operation | Resolved |
-| `FIND-0094` | Release authority / High / High | Use protocol credential and commit-bound immutable-release evidence | Resolved |
-| `FIND-0095` | Path integrity / High / High | Validate complete bootstrap rename provenance | Resolved |
-| `FIND-0096` | Process semantics / High / High | Unify finding disposition and bounded stop conditions | Resolved |
-| `FIND-0097` | Workflow causality / Medium / High | Add dispatch correlation and issue convergence | Resolved |
-| `FIND-0098` | Closure consistency / Medium / High | Reconcile published state, labels, memory, indexes, and durable links | Resolved |
-| `FIND-0099` | Test evidence / Medium / High | Couple declared scenarios to executed assertions and supported boundaries | Resolved |
-| `FIND-0100` | Test isolation / Medium / High | Restrict cleanup to run-owned temporary roots | Resolved |
-| `FIND-0101` | CI least privilege / Low / High | Disable checkout credential persistence | Resolved |
+All rows had high confidence, affected the authorized FEAT-0011 scope, and were
+`Blocking` until the referenced correction passed. The rows remain historical;
+the later derivative evidence gaps are owned by
+[FEAT-0012](../FEAT-0012-v082-correction/README.md).
+
+| ID | Classification | Severity / confidence | Evidence and affected scope | Impact | Required action | Status and links |
+| --- | --- | --- | --- | --- | --- | --- |
+| `FIND-0093` | Verified defect - credential identity | High / High | Host identity was dropped before launcher GitHub operations in the [source launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A configured alternate CLI host could receive metadata or secret operations | Preserve and enforce `github.com` through every launcher-owned operation | Resolved by `TEST-0060`; [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) |
+| `FIND-0094` | Verified defect - release authority | High / High | Updater release checks did not bind source credential, immutable state, and fetched commit in the [updater adapter](../../../templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1) | A wrong authority or moved pre-publication tag could drive mutation | Use the protocol credential and exact locked-commit evidence | Resolved by `TEST-0061`; [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
+| `FIND-0095` | Verified defect - path integrity | High / High | Bootstrap evidence could omit a rename-away source in the [bootstrap adapter](../../../templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1) | An unrelated consumer path could be removed while the destination appeared allowed | Validate complete source/destination provenance | Resolved by `TEST-0062` |
+| `FIND-0096` | Verified process defect | High / High | Review and scan completion used conflicting actionable/blocking terminology in the [protocol](../../../PROTOCOL.md) | Relabeling could hide a blocker or trigger an unchanged loop | Use one mutually exclusive disposition taxonomy and finite stop condition | Resolved by `TEST-0064`; [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
+| `FIND-0097` | Verified defect - workflow causality | Medium / High | Workflow-run selection used an insufficient time/commit window and issue creation lacked convergence in the [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A concurrent run or issue could be mistaken for the launcher session | Add dispatch correlation and post-create issue convergence | Resolved by `TEST-0063` |
+| `FIND-0098` | Verified governance defect | Medium / High | Feature/index/memory/issue projections and branch-bound links could drift after publication | Canonical records could report inconsistent completion state | Reconcile current projections and use durable links | Resolved by historical `TEST-0065`; current v0.8.1 facts are retained by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and [release v0.8.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1) |
+| `FIND-0099` | Verified evidence defect | Medium / High | Test-range text, asset counts, timeout claims, YAML parsing, and runtime labels exceeded the assertions in the repository suites | Green tests could overstate executed coverage | Couple each claim to focused executable evidence and supported boundaries | Partially corrected by historical `TEST-0066`/`TEST-0067`; the remaining semantic ownership gap is `FIND-0104` in [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
+| `FIND-0100` | Verified defect - test isolation | Medium / High | Cleanup selected same-prefix temporary paths not proven to belong to the current run | One suite could delete another run's workspace | Maintain an owned temporary-root ledger | Resolved by `TEST-0068` |
+| `FIND-0101` | Verified risk - CI least privilege | Low / High | Root checkout persisted a credential unnecessary to read-only validation in [protocol CI](../../../.github/workflows/protocol-tests.yml) | A later step had broader credential availability than required | Set checkout credential persistence to false | Resolved by `TEST-0068` |
+
+## In-slice blocking observations
+
+The original review narrative mentioned five blocking observations without
+making their ownership auditable. They were derivative implementation/test
+failures under the root findings above, not independent root findings. All five
+blocked their slice until corrected:
+
+| No. | Owning finding | Classification / severity | Evidence and impact | Resolution / status |
+| --- | --- | --- | --- | --- |
+| 1 | `FIND-0093` | Test fixture contract / High | An escaped mock URI prevented the host-qualified fixture from exercising the intended request | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
+| 2 | `FIND-0097` | Boundary binding / High | An empty issue inventory bound incorrectly and could hide the zero-result convergence path | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
+| 3 | `FIND-0099` | Timeout fixture semantics / High | The timeout fixture selected the wrong mock mode and did not exercise the documented path | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
+| 4 | `FIND-0099` | Process termination race / High | A child-process race hid the canonical timeout result | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
+| 5 | `FIND-0099` | Workflow compatibility / High | Hosted Actions rejected unsupported `matrix.shell` before any validation job started | Replaced with OS-qualified constant shells in [protocol CI](../../../.github/workflows/protocol-tests.yml); actionlint and hosted CI passed before merge |
 
 ## Self-review
 
-Each slice received its focused review. The review found and corrected four
-blocking fixture or implementation defects: an escaped mock URI, an empty issue
-inventory binding failure, a timeout fixture using the wrong mock mode, and a
-process-termination race that hid the canonical timeout result. The complete
-suite then passed once in 225.3 seconds. The bounded confirmation found no
-remaining code or protocol finding. The first hosted publication gate then
-exposed one unsupported `matrix.shell` context before any job could start; the
-workflow now uses constant OS-qualified shells, its regression rejects that
-invalid expression, and actionlint reports zero errors. No unchanged scan or
-validator layer was added.
+Each slice received its focused review. The five blocking observations are now
+enumerated and owned above. Four local fixture/implementation blockers were
+corrected before the complete suite passed once in 225.3 seconds. The bounded
+confirmation reported no remaining finding; new hosted evidence then exposed
+the unsupported `matrix.shell` context before any job could start. The workflow
+was corrected and hosted CI passed without adding an unchanged scan or validator
+layer.
+
+**2026-07-16 correction:** the confirmation claim was too strong because the
+test-evidence model could still accept identifier substrings and contract-poor
+mocks. The later full-project scan recorded `FIND-0102` through `FIND-0111` in
+[FEAT-0012](../FEAT-0012-v082-correction/README.md). That correction does not
+rewrite the commands that passed; it limits what those commands proved.
 
 ## Definition of Done
 
@@ -180,6 +217,15 @@ validator layer was added.
       retained by the linked pull request, issue, and immutable release.
 
 ## Post-merge release evidence
+
+This section was authored in the FEAT-0011 pre-merge commit as though the
+immutable release already existed. That was incorrect evidence timing and is
+recorded as `FIND-0108` in
+[FEAT-0012](../FEAT-0012-v082-correction/README.md). The release was later
+published validly; the current facts below come from its external records and
+do not retroactively validate the premature claim. Issue #36 also omitted direct
+links back to FEAT-0011 and DEC-0011; future delivery issues must satisfy the
+bidirectional link rule before closure.
 
 | Field | Evidence |
 | --- | --- |

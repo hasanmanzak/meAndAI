@@ -1,27 +1,33 @@
 # Project Snapshot
 
-Last verified: **2026-07-15**
+Last verified: **2026-07-16**
 
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.1`
-- Current scope: completed end-to-end protocol stability closure, tracked by
-  [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md),
-  [DEC-0011](../../docs/decisions/DEC-0011-qualified-evidence-and-closure.md),
-  and [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36).
+- Current protocol version: `0.8.2`. Exact publication state is authoritative
+  in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
+  [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38), not duplicated
+  in this repository snapshot.
+- Current scope: the completed bounded correction of `FIND-0102` through `FIND-0111`,
+  tracked by [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md),
+  [DEC-0012](../../docs/decisions/DEC-0012-bounded-correction-and-external-release-evidence.md),
+  and [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: completed [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md),
-  with delivery evidence owned by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36)
-  and [pull request #37](https://github.com/hasanmanzak/meAndAI/pull/37).
-- Latest completed release delivery: FEAT-0011, published as immutable release
+- Latest tracked work: completed [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md),
+  with delivery and later post-publication evidence owned by
+  [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
+- Historical v0.8.1 delivery: FEAT-0011 was published as immutable release
   [`v0.8.1`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1).
   The release and issue retain the exact pull request, target commit, checks,
-  and post-publication verification without predicting them inside that commit.
+  and post-publication verification. The FEAT-0011 pre-merge commit had already
+  described that release as published; [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md)
+  records this premature claim as `FIND-0108` rather than treating later valid
+  publication as retroactive evidence.
 
 ## Collaboration constraints
 
@@ -99,6 +105,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   old adapter may propose the ordinary v0.8.1 review PR; that proposal installs
   the new workflow and adapter together. After merge, later runs pass the
   separate `PROTOCOL_TOKEN` without a manual seed replacement.
+- `v0.8.2` closes `FIND-0102` through `FIND-0111` with exact issue ownership,
+  repository-scoped secret serialization, completed-proposal retention, full
+  reserved-branch inventory, contract-bearing test evidence, recurring
+  actionlint, auditable scan records, external publication evidence, and the
+  mandatory bounded consumer completion scan.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.
