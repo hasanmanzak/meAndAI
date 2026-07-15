@@ -270,3 +270,88 @@ seconds. `git diff --check` reported no whitespace error.
 - [x] Protocol, guides, changelog, version metadata, feature record, and project
       memory are synchronized.
 - [x] No unresolved blocking or actionable in-scope finding remains.
+
+## BUG-0002 correction for v0.7.1
+
+| Field | Value |
+| --- | --- |
+| Classification | Bug correction |
+| Status | Implemented and verified; delivery pending |
+| Target version | 0.7.1 |
+| Issue | [#27](https://github.com/hasanmanzak/meAndAI/issues/27) |
+| Pull request | [#29](https://github.com/hasanmanzak/meAndAI/pull/29) |
+| Test | [`TEST-0045`](test-cases.md) |
+
+### Problem and outcome
+
+The v0.6.2 launcher makes `FG_PAT.txt` optional when its mapped updater secret
+exists, but still requires `MEANDAI_RO_FG_PAT.txt` before it can inspect and
+preserve an existing `MEANDAI_PROTOCOL_TOKEN`. Consequently, a fully configured
+existing target cannot rerun quick adoption without retaining the two local
+credential files.
+
+For an existing connected target, each local token file becomes required only
+when its mapped repository Actions secret is missing. If
+`MEANDAI_PROTOCOL_TOKEN` exists and its source file is absent, the launcher uses
+the already-required authenticated local `gh` session to fetch the exact tagged
+private protocol source and applies the same Git-blob verification. It never
+reads the stored repository secret value.
+
+### Scope and contracts
+
+- Inspect repository secret names before deciding which local files are
+  required on an existing connected target.
+- Preserve an existing mapped secret without a set operation, whether or not
+  its local source file exists.
+- Use `MEANDAI_RO_FG_PAT.txt` for source retrieval when present. When it is
+  absent and `MEANDAI_PROTOCOL_TOKEN` exists, use authenticated `gh api` for
+  the exact workflow and `gh repo clone` for the exact semantic-adoption
+  snapshot. Verify the workflow blob and snapshot commit as before.
+- Require a mapped local file when its repository secret is missing; do not use
+  `gh` authentication as a substitute for provisioning that missing secret.
+- Keep both files mandatory for a new repository, before remote creation.
+- Preserve exact-tag validation, Git-blob verification, tracked-path/history
+  gates, standard-input secret writes, redaction, and new-repository behavior.
+
+Reading repository secret values, importing organization/environment secrets,
+rotating credentials, or adding a credential manager is out of scope. This is a
+transport fallback inside the authenticated launcher boundary already accepted
+by [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md), not a new
+architectural boundary.
+
+### Readiness and acceptance
+
+- [x] Stable `BUG-0002` ID and linked issue #27 exist.
+- [x] Problem, outcome, scope, non-goals, ownership, ordering, and failure
+      behavior are explicit.
+- [x] `RISK-0048`: the authenticated `gh` identity may lack private meAndAI
+      source access even though the target secret name exists. Owner: consumer
+      maintainer. Response: fail with an actionable source-access error; never
+      request or recover the stored secret value.
+- [x] `TEST-0045` covers both files absent with both secrets present, a missing
+      secret with its file absent, recovery with the required file, and the
+      unchanged new-repository requirement.
+- [x] Verification is bounded to one focused red/green line, one fresh-diff
+      review, and one complete protocol run.
+
+Acceptance requires a configured existing target to proceed with both local
+files absent, while every missing target secret still requires its own file and
+all `TEST-0001` through `TEST-0045` scenarios pass.
+
+### Integration finding
+
+| ID | Classification | Finding | Resolution | Status |
+| --- | --- | --- | --- | --- |
+| `FIND-0065` | Integration / High | `main` advanced to `v0.7.0` through PR #28 while BUG-0002 was based on `v0.6.2`, claiming the provisional `TEST-0043` and `RISK-0044` identifiers. | Merged the complete `v0.7.0` delivery, retargeted this correction to `v0.7.1`, and renumbered its unmerged records after `TEST-0044` and `RISK-0047` to `TEST-0045` and `RISK-0048`. | Resolved |
+
+### Definition of Done
+
+- [x] Existing-target file requirements derive from repository secret names.
+- [x] File-free workflow and semantic-source retrieval preserve exact source
+      verification without reading stored secret values.
+- [x] Missing-secret and new-repository credential gates remain fail-closed.
+- [x] `TEST-0045` passes its focused real-Git regression suite on the integrated
+      `v0.7.1` working tree.
+- [x] The complete `v0.7.1` protocol suite and bounded fresh-diff review pass.
+- [ ] Documentation, project memory, pull-request evidence, merge, and the
+      separate `v0.7.1` tag gate are complete.

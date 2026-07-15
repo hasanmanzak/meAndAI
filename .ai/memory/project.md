@@ -7,19 +7,22 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.7.0`
-- Current scope: repository-native idea incubation shared with consumers,
-  tracked by [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
+- Current protocol version: `0.7.1`
+- Current scope: optional local credential-source files for configured existing
+  targets, tracked by [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
-- Current release candidate: [FEAT-0008](../../docs/features/FEAT-0008-idea-incubation/README.md),
-  targeting `v0.7.0` after review, merge, and the separate post-merge tag gate.
-- Latest released delivery: completed
-  [BUG-0001](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
-  in [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25), released
-  as [`v0.6.2`](https://github.com/hasanmanzak/meAndAI/tree/v0.6.2).
+- Latest tracked work: [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
+- Current release candidate: implemented
+  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071),
+  published in [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29)
+  and targeting `v0.7.1` after review, merge, and the separate tag gate.
+- Latest released delivery before the current candidate: completed
+  [FEAT-0008](../../docs/features/FEAT-0008-idea-incubation/README.md) in
+  merged [pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28),
+  released at exact merge commit `1b420322058d73a974ccb61d8b7f828eb38cce8e`
+  by annotated tag [`v0.7.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0).
 
 ## Collaboration constraints
 
@@ -76,6 +79,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.7.0` adds repository-native `IDEA-NNNN` incubation, a pinned consumer
   template, and absent-only idea-index installation for new collision-free
   adoption. Ideas do not authorize implementation or bypass delivery gates.
+- `v0.7.1` makes both local credential files optional for an existing target
+  when their mapped repository secrets already exist. With no protocol file,
+  exact workflow and semantic-source retrieval uses the authenticated local
+  `gh` identity; stored secret values remain unreadable. Missing secrets and
+  new repositories still require their mapped local files.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.
