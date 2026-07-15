@@ -16,8 +16,9 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32).
-- Current release delivery: `v0.7.3` documentation correction in progress;
-  pull-request and tag evidence are pending.
+- Current release delivery: `v0.7.3` documentation correction is under review
+  in [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33); merge
+  and tag evidence are pending.
 - Latest completed release delivery:
   [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md) in
   [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31). Its

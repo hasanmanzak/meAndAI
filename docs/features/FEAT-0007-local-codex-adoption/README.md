@@ -368,10 +368,10 @@ that exact release commit.
 | Field | Value |
 | --- | --- |
 | Classification | Documentation bug correction |
-| Status | Implemented and locally verified; delivery pending |
+| Status | Implemented and locally verified; review pending |
 | Target version | 0.7.3 |
 | Issue | [#32](https://github.com/hasanmanzak/meAndAI/issues/32) |
-| Pull request | Pending |
+| Pull request | [#33](https://github.com/hasanmanzak/meAndAI/pull/33) |
 | Test | [`TEST-0051`](test-cases.md) |
 
 ### Problem and outcome
@@ -453,6 +453,6 @@ finding remains and validation stops.
       84.7 seconds afterward.
 - [x] The complete protocol suite and link checks pass through `TEST-0051`.
 - [x] Fresh-diff review finds no behavior or security-boundary drift.
-- [x] Documentation, version, changelog, project memory, and issue links are
-      synchronized; the pull-request link is pending creation.
+- [x] Documentation, version, changelog, project memory, issue, and pull request
+      links are synchronized.
 - [ ] Required CI and review gates pass.
