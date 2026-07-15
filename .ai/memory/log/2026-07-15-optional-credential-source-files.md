@@ -4,6 +4,7 @@
 - Target release: `v0.6.3`
 - Work item: [BUG-0002](../../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063)
 - Tracking: [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27)
+- Delivery: [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29)
 - Test: [TEST-0043](../../../docs/features/FEAT-0007-local-codex-adoption/test-cases.md)
 
 ## Durable behavior
@@ -31,5 +32,5 @@ The focused green run passed `TEST-0033` through `TEST-0043`, including a
 file-free semantic-adoption snapshot, missing-secret failure/recovery, and the
 new-repository gate. The bounded fresh-diff review left no unresolved blocker,
 and the final complete run passed `TEST-0001` through `TEST-0043` in 103.8
-seconds. Pull-request, merge, and tag evidence remain to be recorded before
-release closure.
+seconds. The implementation is published in pull request #29; merge and tag
+evidence remain to be recorded before release closure.

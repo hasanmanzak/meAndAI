@@ -16,7 +16,8 @@ Last verified: **2026-07-15**
 - Latest tracked work: [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 - Current release candidate: implemented
   [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063),
-  targeting `v0.6.3`; pull-request publication and release verification remain.
+  published in [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29)
+  and targeting `v0.6.3` after review, merge, and the separate tag gate.
 - Latest released delivery before the current candidate: completed
   [BUG-0001](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
   in merged [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25),

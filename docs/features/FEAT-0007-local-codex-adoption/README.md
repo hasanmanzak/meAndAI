@@ -279,6 +279,7 @@ seconds. `git diff --check` reported no whitespace error.
 | Status | Implemented and verified; delivery pending |
 | Target version | 0.6.3 |
 | Issue | [#27](https://github.com/hasanmanzak/meAndAI/issues/27) |
+| Pull request | [#29](https://github.com/hasanmanzak/meAndAI/pull/29) |
 | Test | [`TEST-0043`](test-cases.md) |
 
 ### Problem and outcome
