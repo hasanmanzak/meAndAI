@@ -15,10 +15,11 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
-- Current release candidate: implemented
-  [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md),
-  published in [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31)
-  and targeting `v0.7.2` through review and the separate annotated tag gate.
+- Current release delivery: completed
+  [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md) in
+  [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31). Its
+  immutable release authority is the separate annotated
+  [`v0.7.2` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2).
 - Latest released delivery before the current candidate: completed
   [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
   in merged [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29),

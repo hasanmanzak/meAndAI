@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature correction |
-| Status | Implemented; release gate pending |
+| Status | Complete |
 | Target version | 0.7.2 |
 | Issue | [#30](https://github.com/hasanmanzak/meAndAI/issues/30) |
 | Pull request | [#31](https://github.com/hasanmanzak/meAndAI/pull/31) |
@@ -182,4 +182,15 @@ scan or hardening pass.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, changelog, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates passed.
+- [x] Applicable CI and review gates passed in
+      [Protocol validation run 29433627977](https://github.com/hasanmanzak/meAndAI/actions/runs/29433627977)
+      on Ubuntu and Windows; GitGuardian also passed. The current PR head must
+      retain those required checks before merge.
+
+## Release authority
+
+[Pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31) is the reviewed
+delivery record. After merge, the annotated
+[`v0.7.2` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2) is the
+immutable release authority; creating that tag remains a separate post-merge
+gate and does not rewrite this feature history.
