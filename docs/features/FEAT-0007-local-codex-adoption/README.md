@@ -176,8 +176,10 @@ scan stops here.
 - [x] Issue, pull request, decisions, and related work cross-linked.
 - [x] Applicable CI and review gates pass.
 
-## Post-merge release gate
+## Release evidence
 
-After pull request #22 merges, tag the merged `main` commit as `v0.6.1`, push
-the tag, and verify that the remote tag and release metadata resolve to that
-exact merge commit.
+[Pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22) merged as
+`a4ffefa698b079815edebda86204150b03707957`. The remote annotated
+[`v0.6.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1) resolves to
+that exact merge commit. The owned delivery branch was deleted locally and
+remotely after merge verification.

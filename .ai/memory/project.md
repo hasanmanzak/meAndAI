@@ -14,7 +14,7 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #21](https://github.com/hasanmanzak/meAndAI/issues/21).
-- Current delivery: completed [FEAT-0007](../../docs/features/FEAT-0007-local-codex-adoption/README.md) in [pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22); merge and `v0.6.1` tagging remain.
+- Latest delivery: completed [FEAT-0007](../../docs/features/FEAT-0007-local-codex-adoption/README.md) in merged [pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22), released at exact merge commit `a4ffefa698b079815edebda86204150b03707957` by annotated tag [`v0.6.1`](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1).
 
 ## Collaboration constraints
 
