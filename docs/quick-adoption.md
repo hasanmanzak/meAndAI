@@ -53,18 +53,18 @@ never placed in the Codex prompt.
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It
-downloads the launcher from the exact `v0.6.2` tag into the OS temp directory
+downloads the launcher from the exact `v0.7.0` tag into the OS temp directory
 and runs it; it does not execute a moving `main` file.
 
 ```powershell
-$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.7.0.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.0' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'
-gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $launcher -Encoding UTF8
+$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.7.0.ps1'
+gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.0' | Set-Content -LiteralPath $launcher -Encoding UTF8
 & $launcher -TargetPath .
 ```
 

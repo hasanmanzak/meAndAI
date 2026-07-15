@@ -130,7 +130,7 @@ function Get-MockCodexCalls {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.6.2'
+    $branch = 'automation/meandai-capabilities-v0.7.0'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -160,7 +160,7 @@ function Publish-MockAdoptionBranch {
         operation = 'ai-capabilities-adoption'
         state = 'BootstrapReady'
         repository = $global:QuickAdoptionRepoName
-        targetTag = 'v0.6.2'
+        targetTag = 'v0.7.0'
         protocolSha = ('a' * 40)
         collisions = @()
         proposedPaths = @('.ai/protocol', '.ai/adoption/meandai-capabilities.json')
@@ -176,7 +176,7 @@ function Publish-MockAdoptionBranch {
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.6.2'
+    $branch = 'automation/meandai-capabilities-v0.7.0'
     Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
         'push', 'origin', '--delete', $branch
     ) | Out-Null
@@ -194,7 +194,7 @@ function global:Invoke-RestMethod {
         [string]$Method = 'Get'
     )
 
-    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.6\.2$') {
+    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.7\.0$') {
         return [pscustomobject]@{
             content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
             encoding = 'base64'
@@ -228,7 +228,7 @@ function global:Invoke-WebRequest {
     $sourceRoot = Join-Path $archiveRoot 'openai-mock-protocol'
     New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourceRoot 'PROTOCOL.md') -Value '# Mock protocol source' -Encoding UTF8
-    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.6.2' -NoNewline
+    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.7.0' -NoNewline
     Compress-Archive -LiteralPath $sourceRoot -DestinationPath $OutFile -Force
 }
 
@@ -319,7 +319,7 @@ function global:gh {
         $global:QuickAdoptionIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.6.2'
+            title = 'Track meAndAI AI capabilities adoption from v0.7.0'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
         }
@@ -370,7 +370,7 @@ function global:gh {
             number = 42
             url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
             isDraft = ($global:QuickAdoptionPrReadyCalls -eq 0)
-            headRefName = 'automation/meandai-capabilities-v0.6.2'
+            headRefName = 'automation/meandai-capabilities-v0.7.0'
             headRefOid = $global:QuickAdoptionPrHead
         }) | ConvertTo-Json -Compress)
     }
@@ -406,7 +406,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.6.2',
+            'v0.7.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -462,7 +462,7 @@ try {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.6.2',
+            'v0.7.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -564,7 +564,7 @@ try {
             Add-Failure 'TEST-0039 launcher did not reconcile the deterministic Agile labels and adoption issue.'
         }
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.6.2'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.0'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/ai-adoption.md') {
@@ -657,7 +657,7 @@ try {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' did not block before readiness."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.6.2'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.0'
             ))
             if ($negativePaths -contains 'docs/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."

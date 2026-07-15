@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.6.2**<br>
+Protocol version: **0.7.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -40,8 +40,9 @@ credentials, secrets, tokens, and unnecessary personal data.
 
 ## 3. Traceable identifiers
 
-Every material work item or conclusion MUST have a stable identifier. GitHub's
-issue number is a link, not a replacement for the domain identifier.
+Every material work item, conclusion, or durable incubating idea MUST have a
+stable identifier. GitHub's issue number is a link, not a replacement for the
+domain identifier.
 
 | Identifier | Classification | Purpose |
 | --- | --- | --- |
@@ -51,17 +52,41 @@ issue number is a link, not a replacement for the domain identifier.
 | `TASK-NNNN` | Task | Bounded implementation or maintenance work |
 | `BUG-NNNN` | Bug | Confirmed incorrect behavior |
 | `FIND-NNNN` | Finding | Audit or review observation requiring triage |
+| `IDEA-NNNN` | Idea | Durable possibility not yet authorized as work |
 | `DEC-NNNN` | Decision | Architectural or process decision |
 | `TEST-NNNN` | Test scenario | Verifiable behavior or quality condition |
 | `RISK-NNNN` | Risk | Explicit uncertainty with impact and response |
 
 Numbers are repository-local, four digits, monotonically allocated per class,
 and never reused. Titles begin with the identifier. Records state status,
-classification, relevant links, and the evidence supporting closure.
+classification, relevant links, and the evidence supporting closure or outcome
+where applicable.
 
 A `RISK-NNNN` record lives in the owning feature or decision. Create a linked
 GitHub finding when a risk is independent, unresolved, or needs separate
 ownership. Test records identify their feature or subfeature and current state.
+
+### Idea incubation
+
+Use `IDEA-NNNN` only for a possibility that is valuable enough to preserve
+across machines and collaborators but has not been selected, scoped, or
+authorized for delivery. An idea is not a work item, decision, backlog
+commitment, or implementation instruction. It does not authorize implementation
+and does not satisfy Definition of Ready.
+
+An idea record lives under `docs/ideas`, uses exactly one of `Exploring`,
+`Parked`, `Promoted`, or `Rejected`, and states its observation, possibility,
+potential value, concerns, promotion condition, and outcome. It does not require
+an issue, owner, test, target version, delivery date, or acceptance criteria.
+Do not record low-value passing thoughts merely because the classification
+exists.
+
+Promotion creates and links the appropriate `EPIC-NNNN`, `FEAT-NNNN`,
+`TASK-NNNN`, or `DEC-NNNN` record. That new record independently satisfies the
+normal planning and delivery gates; the idea contributes history, not readiness
+evidence. Promoted and rejected records remain indexed with their rationale and
+bidirectional links instead of being deleted or silently rewritten. Use the
+pinned `templates/idea.md` when creating a record.
 
 ## 4. Delivery lifecycle and review gates
 
@@ -271,6 +296,8 @@ multiple records merely to increase detail.
 
 ## 6. Documentation graph
 
+- Every durable pre-work idea is indexed under `docs/ideas` and links any
+  promoted work or decision.
 - Every feature has `docs/features/FEAT-NNNN-slug/README.md` and
   `test-cases.md`.
 - Every material architectural or process decision has

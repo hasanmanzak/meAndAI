@@ -3,6 +3,32 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.7.0 - 2026-07-15
+
+### Added
+
+- Added repository-native `IDEA-NNNN` incubation for durable possibilities
+  that are not yet authorized delivery work.
+- Added bounded `Exploring`, `Parked`, `Promoted`, and `Rejected` states, a
+  canonical idea index and template, and explicit promotion links into the
+  existing work and decision graph.
+- Added the parked role-based multi-agent protocol idea without implementing
+  that feature.
+- Added a pinned consumer idea template and absent-only idea-index installation
+  during collision-free initial submodule adoption.
+- Added executable `TEST-0043` and `TEST-0044` lifecycle, ownership, and
+  bootstrap regression coverage.
+
+### Changed
+
+- Existing consumers may opt into `docs/ideas` from their immutable protocol
+  pin without migration. Compatible updater managed paths remain unchanged and
+  never rewrite consumer idea content.
+
+Related work: [FEAT-0008](docs/features/FEAT-0008-idea-incubation/README.md),
+[DEC-0009](docs/decisions/DEC-0009-repository-native-idea-incubation.md), and
+[issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
+
 ## 0.6.2 - 2026-07-15
 
 ### Fixed
