@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.7.3**<br>
+Protocol version: **0.8.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -231,9 +231,19 @@ risks, linked work IDs, and version impact. Merge only after all pre-merge gates
 pass. Successful merged branches MAY be deleted locally and remotely.
 
 Feature Definition of Done is a pre-merge delivery gate. Publishing a version
-tag is a separate post-merge release gate: update the default branch, tag the
-merged release commit, push the tag, and verify the remote reference. A version
-tag MUST NOT be required by the feature's pre-merge Definition of Done.
+is a separate post-merge release gate. For GitHub releases governed by this
+protocol at `v0.8.0` or later, repository release immutability MUST be enabled
+before publication; create the published GitHub Release and its tag for the
+exact merged commit, then verify the release API reports the exact tag,
+non-draft/non-prerelease state, `immutable: true`, and the expected commit.
+Creating a movable tag before that release is not publication evidence.
+Historical tags remain valid records of what was published at the time but are
+not retroactively described as externally locked. A release identifier MUST
+NOT be required by the feature's pre-merge Definition of Done.
+Exact release-target evidence MUST be written to an external post-publication
+record, such as the GitHub Release or linked issue/PR comment. A repository
+document MAY link that record after publication but MUST NOT predict or attempt
+to embed the hash of the commit that contains the document itself.
 
 ## 5. Full-project scans
 
@@ -349,9 +359,10 @@ migration of already conforming consumers is incompatible and increments `M`.
 
 Every released version updates `VERSION`, relevant current-release metadata,
 and `CHANGELOG.md`. Historical feature target versions remain unchanged.
-Consumers SHOULD pin a tag or commit, never an unqualified moving branch. A
-consuming project versions its own product independently and records the pinned
-common-protocol version in its project memory.
+Consumers SHOULD pin the tag of a verified immutable release or an explicitly
+reviewed commit, never an unqualified moving branch. A consuming project
+versions its own product independently and records the pinned common-protocol
+version in its project memory.
 
 ### Consumer update proposals
 
@@ -360,9 +371,10 @@ common-protocol version in its project memory.
 A GitHub submodule consumer adopting `v0.5.0` or later MAY begin with only the
 canonical workflow at `.github/workflows/meandai-protocol-update.yml`. That
 workflow is the seed for one AI-capabilities lifecycle covering first adoption,
-bootstrap, and later updates. It MUST execute bootstrap code only from the
-immutable protocol tag embedded in the seed and verify that source identity
-before proposing consumer changes.
+bootstrap, and later updates. It MUST verify that the embedded protocol tag has
+an exact published immutable release before checking out or executing bootstrap
+code, then verify that checked-out source identity before proposing consumer
+changes.
 
 Deterministic adoption discovery classifies declared target paths, not the
 presence of unrelated application code. When every target is absent except an
@@ -386,9 +398,11 @@ resolver and adapter are not copied into the consumer.
 #### Local quick-adoption launcher
 
 A consumer adopting `v0.6.0` or later MAY use the protocol's source-only local
-launcher to establish the seed workflow. The launcher MUST fetch the workflow
-from an exact protocol tag, verify the returned Git blob, reject a differing
-existing seed, and stage and publish only
+launcher to establish the seed workflow. For `v0.8.0` or later, the download
+command and launcher MUST verify the exact published immutable release before
+retrieving or accepting executable source. The launcher MUST fetch the workflow
+from that exact tag, verify the returned Git blob, reject a differing existing
+seed, and stage and publish only
 `.github/workflows/meandai-protocol-update.yml`. Existing connected consumers
 MUST be clean, on their synchronized GitHub default branch, and preserve all
 consumer-owned content. A new directory MAY be initialized and connected to a
@@ -456,6 +470,8 @@ The updater MUST:
 
 - consider only canonical lowercase `vM.m.rev` tags with no leading zeros and
   compare their numeric parts;
+- require the selected update target to have an exact published immutable
+  release before target checkout, staging, or remote mutation;
 - propose only same-major upgrades and leave major migrations for explicit
   maintainer review;
 - open a draft pull request and never merge it automatically;
@@ -491,7 +507,7 @@ The updater MUST:
 The supplied generic automation supports the recommended `.ai/protocol` Git
 submodule. Updating an opaque repository reference requires a deterministic,
 provider-specific adapter or a manual reviewed upgrade.
-A consumer pinned to an earlier immutable release remains governed by that pin.
+A consumer pinned to an earlier reviewed release remains governed by that pin.
 Pre-`v0.4.0` copied updater code cannot acquire self-reconciliation
 retroactively; one reviewed migration installs the `v0.4.0` assets and
 credential contract. Earlier consumers are not invalidated by this prospective

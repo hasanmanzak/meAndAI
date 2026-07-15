@@ -40,7 +40,7 @@ supersede an untouched older proposal. It never approves or merges the update.
   reopen/preserve compensation path without promising success.
 - A shared pure candidate validator used by planning and live mutation gates.
 - Private-repository credential and GitHub Actions permission guidance.
-- A one-time manual migration for consumers pinned to immutable `v0.1.0`.
+- A one-time manual migration for consumers pinned to exact `v0.1.0`.
 - Windows and Ubuntu `pwsh` repository CI.
 
 ## Non-goals

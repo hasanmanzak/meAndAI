@@ -25,7 +25,7 @@ that an explicitly invoked agent or maintainer completes under the protocol.
 ## Decision
 
 The canonical update workflow also acts as the only consumer seed. It checks
-out `meAndAI` at an immutable bootstrap tag embedded in that workflow. When both
+out `meAndAI` at an exact bootstrap release embedded in that workflow. When both
 local updater files exist, the workflow executes the local updater exactly as
 before. When either is absent, it executes a small source-only bootstrap
 adapter from the pinned checkout. A partial installation is therefore adoption

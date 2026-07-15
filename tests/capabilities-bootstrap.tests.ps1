@@ -96,7 +96,11 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.7.3',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.8.0',
+        'Verify immutable protocol release',
+        "'X-GitHub-Api-Version' = '2026-03-10'",
+        'immutable',
+        'published_at',
         'ref: ${{ env.BOOTSTRAP_PROTOCOL_TAG }}',
         'MeAndAI.ProtocolUpdate.psm1',
         'Invoke-MeAndAIProtocolUpdate.ps1',
@@ -198,4 +202,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities lifecycle tests passed: TEST-0027 through TEST-0032, TEST-0044, and TEST-0047.' -ForegroundColor Green
+Write-Host 'AI capabilities lifecycle tests passed: TEST-0027 through TEST-0032, TEST-0044, TEST-0047, and TEST-0057.' -ForegroundColor Green

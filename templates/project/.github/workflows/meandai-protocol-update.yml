@@ -1,7 +1,8 @@
 name: meAndAI AI capabilities lifecycle
 
 env:
-  BOOTSTRAP_PROTOCOL_TAG: v0.7.3
+  PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
+  BOOTSTRAP_PROTOCOL_TAG: v0.8.0
 
 on:
   schedule:
@@ -27,6 +28,32 @@ jobs:
         run: |
           if (-not $env:UPDATER_TOKEN) {
             throw 'MEANDAI_UPDATER_TOKEN is required with consumer-scoped Contents, Pull requests, and Workflows write access.'
+          }
+
+      - name: Verify immutable protocol release
+        shell: pwsh
+        env:
+          PROTOCOL_TOKEN: ${{ secrets.MEANDAI_PROTOCOL_TOKEN || github.token }}
+        run: |
+          if (-not $env:PROTOCOL_TOKEN) {
+            throw 'A protocol read token is required to verify the bootstrap release.'
+          }
+          $headers = @{
+            Accept = 'application/vnd.github+json'
+            Authorization = "Bearer $env:PROTOCOL_TOKEN"
+            'X-GitHub-Api-Version' = '2026-03-10'
+            'User-Agent' = 'meAndAI-consumer-lifecycle'
+          }
+          $tag = [Uri]::EscapeDataString($env:BOOTSTRAP_PROTOCOL_TAG)
+          $uri = "https://api.github.com/repos/$env:PROTOCOL_REPOSITORY/releases/tags/$tag"
+          $release = Invoke-RestMethod -Method Get -Uri $uri -Headers $headers
+          $publishedAt = [DateTimeOffset]::MinValue
+          if ([string]$release.tag_name -cne $env:BOOTSTRAP_PROTOCOL_TAG -or
+              $release.draft -isnot [bool] -or $release.draft -or
+              $release.prerelease -isnot [bool] -or $release.prerelease -or
+              $release.immutable -isnot [bool] -or -not $release.immutable -or
+              -not [DateTimeOffset]::TryParse([string]$release.published_at, [ref]$publishedAt)) {
+            throw "Bootstrap source '$env:BOOTSTRAP_PROTOCOL_TAG' is not an exact published immutable GitHub Release."
           }
 
       - name: Check out consumer default branch

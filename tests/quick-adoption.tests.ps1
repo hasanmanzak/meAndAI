@@ -63,6 +63,21 @@ function New-TempRoot {
     return $path
 }
 
+function ConvertTo-TestFileUri {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
+    $builder = [UriBuilder]::new()
+    $builder.Scheme = [Uri]::UriSchemeFile
+    $builder.Host = ''
+    $builder.Path = $resolvedPath
+    $uri = $builder.Uri.AbsoluteUri
+    if ([string]::IsNullOrWhiteSpace($uri)) {
+        throw "Unable to create a file URI for test path '$resolvedPath'."
+    }
+    return $uri
+}
+
 function Set-TestGitIdentity {
     param([string]$Repository)
 
@@ -90,6 +105,7 @@ function Get-GitBlobSha {
 
 function Reset-Mocks {
     $global:QuickAdoptionGhCalls = [System.Collections.Generic.List[object]]::new()
+    $global:QuickAdoptionRestCalls = [System.Collections.Generic.List[object]]::new()
     $global:QuickAdoptionSecrets = [System.Collections.Generic.List[object]]::new()
     $global:QuickAdoptionExistingSecrets = [System.Collections.Generic.List[string]]::new()
     $global:QuickAdoptionRepoName = ''
@@ -98,6 +114,7 @@ function Reset-Mocks {
     $global:QuickAdoptionNewRemote = ''
     $global:QuickAdoptionTargetPath = ''
     $global:QuickAdoptionDenyTargetAccess = $false
+    $global:QuickAdoptionReleaseMode = 'Immutable'
     $codexLogRoot = New-TempRoot -Name 'codex-log'
     $global:QuickAdoptionCodexLog = Join-Path $codexLogRoot 'calls.jsonl'
     New-Item -ItemType File -Path $global:QuickAdoptionCodexLog -Force | Out-Null
@@ -106,9 +123,16 @@ function Reset-Mocks {
     $env:MEANDAI_TEST_CODEX_TARGET = ''
     $env:MEANDAI_TEST_CODEX_REMOTE = ''
     $global:QuickAdoptionPrReadyCalls = 0
+    $global:QuickAdoptionPrBodyEditCalls = 0
     $global:QuickAdoptionPrHead = ''
+    $global:QuickAdoptionPrBody = ''
+    $global:QuickAdoptionPrDraft = $true
+    $global:QuickAdoptionPrState = 'OPEN'
     $global:QuickAdoptionRemotePath = ''
     $global:QuickAdoptionRunListCalls = 0
+    $global:QuickAdoptionWorkflowDispatched = $false
+    $global:QuickAdoptionRunMode = 'Single'
+    $global:QuickAdoptionPublishedHead = ''
     $global:QuickAdoptionPrListCalls = 0
     $global:QuickAdoptionProposalMode = 'ValidFull'
     $global:QuickAdoptionPrMetadataMode = 'Valid'
@@ -129,7 +153,7 @@ function Reset-Mocks {
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'PROTOCOL.md') `
         -Value '# Mock protocol source' -Encoding UTF8
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'VERSION') `
-        -Value '0.7.3' -NoNewline
+        -Value '0.8.0' -NoNewline
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
         'add', 'PROTOCOL.md', 'VERSION'
     ) | Out-Null
@@ -137,10 +161,32 @@ function Reset-Mocks {
         'commit', '-m', 'Create mock protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
-        'tag', 'v0.7.3'
+        'tag', 'v0.8.0'
     ) | Out-Null
     $global:QuickAdoptionProtocolSha = (@(Invoke-TestGit `
         -Repository $global:QuickAdoptionProtocolRepository -Arguments @('rev-parse', 'HEAD')))[0]
+}
+
+function Initialize-MockAdoptionPullRequestBody {
+    if ($global:QuickAdoptionPrBody) {
+        return
+    }
+    $proposalState = if ($global:QuickAdoptionProposalMode -ceq 'ManifestOnly') {
+        'AdoptionReviewRequired'
+    }
+    else {
+        'BootstrapReady'
+    }
+    $marker = [ordered]@{
+        schema = 2
+        state = $proposalState
+        target = 'v0.8.0'
+        protocolSha = $global:QuickAdoptionProtocolSha
+        head = $global:QuickAdoptionPrHead
+        repository = $global:QuickAdoptionRepoName
+        actor = $global:QuickAdoptionOwner
+    } | ConvertTo-Json -Compress
+    $global:QuickAdoptionPrBody = "<!-- meandai-capabilities-adoption:$marker -->`n`nMock adoption proposal."
 }
 
 function Get-MockCodexCalls {
@@ -157,7 +203,7 @@ function Get-MockCodexCalls {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.7.3'
+    $branch = 'automation/meandai-capabilities-v0.8.0'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -165,6 +211,7 @@ function Publish-MockAdoptionBranch {
         if ($remoteLine.Count -eq 1) {
             $global:QuickAdoptionPrHead = ([string]$remoteLine[0]).Split("`t")[0]
         }
+        Initialize-MockAdoptionPullRequestBody
         return
     }
 
@@ -191,7 +238,7 @@ function Publish-MockAdoptionBranch {
         operation = 'ai-capabilities-adoption'
         state = if ($manifestOnly) { 'AdoptionReviewRequired' } else { 'BootstrapReady' }
         repository = $global:QuickAdoptionRepoName
-        targetTag = 'v0.7.3'
+        targetTag = 'v0.8.0'
         protocolSha = $global:QuickAdoptionProtocolSha
         collisions = if ($manifestOnly) { @('AGENTS.md') } else { @() }
         proposedPaths = @('.ai/protocol', '.ai/adoption/meandai-capabilities.json')
@@ -221,16 +268,23 @@ function Publish-MockAdoptionBranch {
     Invoke-TestGit -Repository $clone -Arguments @('commit', '-m', 'Create mock adoption draft') | Out-Null
     Invoke-TestGit -Repository $clone -Arguments @('push', 'origin', $branch) | Out-Null
     $global:QuickAdoptionPrHead = (@(Invoke-TestGit -Repository $clone -Arguments @('rev-parse', 'HEAD')))[0]
+    Initialize-MockAdoptionPullRequestBody
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.7.3'
+    $branch = 'automation/meandai-capabilities-v0.8.0'
     Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
         'push', 'origin', '--delete', $branch
     ) | Out-Null
     $global:QuickAdoptionPrHead = ''
+    $global:QuickAdoptionPrBody = ''
+    $global:QuickAdoptionPrDraft = $true
+    $global:QuickAdoptionPrState = 'OPEN'
     $global:QuickAdoptionPrReadyCalls = 0
+    $global:QuickAdoptionPrBodyEditCalls = 0
     $global:QuickAdoptionRunListCalls = 0
+    $global:QuickAdoptionWorkflowDispatched = $false
+    $global:QuickAdoptionPublishedHead = ''
     $global:QuickAdoptionPrListCalls = 0
 }
 
@@ -242,7 +296,26 @@ function global:Invoke-RestMethod {
         [string]$Method = 'Get'
     )
 
-    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.7\.3$') {
+    $global:QuickAdoptionRestCalls.Add([pscustomobject]@{
+        Method = $Method
+        Uri = $Uri
+    })
+
+    if ($Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.0$') {
+        if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
+            throw 'Mock release is missing.'
+        }
+        return [pscustomobject]@{
+            id = 73
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.0' }
+            draft = $false
+            prerelease = $false
+            immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
+            published_at = '2026-07-15T00:00:00Z'
+        }
+    }
+
+    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.8\.0$') {
         return [pscustomobject]@{
             content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
             encoding = 'base64'
@@ -276,7 +349,7 @@ function global:Invoke-WebRequest {
     $sourceRoot = Join-Path $archiveRoot 'openai-mock-protocol'
     New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourceRoot 'PROTOCOL.md') -Value '# Mock protocol source' -Encoding UTF8
-    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.7.3' -NoNewline
+    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.8.0' -NoNewline
     Compress-Archive -LiteralPath $sourceRoot -DestinationPath $OutFile -Force
 }
 
@@ -305,7 +378,22 @@ function global:gh {
     if ($joined -eq 'api user --jq .login') {
         return $global:QuickAdoptionOwner
     }
-    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.3'
+    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.0'
+    $protocolReleaseEndpoint = 'repos/hasanmanzak/meAndAI/releases/tags/v0.8.0'
+    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
+        $Arguments -contains $protocolReleaseEndpoint) {
+        if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
+            throw 'Mock release is missing.'
+        }
+        return (@{
+            id = 73
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.0' }
+            draft = $false
+            prerelease = $false
+            immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
+            published_at = '2026-07-15T00:00:00Z'
+        } | ConvertTo-Json -Compress)
+    }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
         $Arguments -contains $protocolSourceEndpoint) {
         return (@{
@@ -384,7 +472,7 @@ function global:gh {
         $global:QuickAdoptionIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.7.3'
+            title = 'Track meAndAI AI capabilities adoption from v0.8.0'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
         }
@@ -428,8 +516,12 @@ function global:gh {
         return
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'workflow' -and $Arguments[1] -eq 'run') {
+        $global:QuickAdoptionWorkflowDispatched = $true
         Publish-MockAdoptionBranch
         return
+    }
+    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'workflow' -and $Arguments[1] -eq 'view') {
+        return 'name: meAndAI AI Capabilities Lifecycle'
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'run' -and $Arguments[1] -eq 'list') {
         $global:QuickAdoptionRunListCalls++
@@ -441,14 +533,49 @@ function global:gh {
             throw 'Mock run list did not receive the published commit filter.'
         }
         $head = $Arguments[$commitIndex + 1]
-        return (@([ordered]@{
-            databaseId = 7001
-            createdAt = [DateTimeOffset]::UtcNow.ToString('o')
+        $global:QuickAdoptionPublishedHead = $head
+        $runs = [System.Collections.Generic.List[object]]::new()
+        $runs.Add([ordered]@{
+            databaseId = 6999
+            createdAt = [DateTimeOffset]::UtcNow.AddMinutes(-10).ToString('o')
             headSha = $head
             status = 'completed'
             conclusion = 'success'
+            url = 'https://github.com/test-owner/consumer/actions/runs/6999'
+        })
+        if ($global:QuickAdoptionWorkflowDispatched) {
+            $runs.Add([ordered]@{
+                databaseId = 7001
+                createdAt = [DateTimeOffset]::UtcNow.ToString('o')
+                headSha = $head
+                status = 'completed'
+                conclusion = 'success'
+                url = 'https://github.com/test-owner/consumer/actions/runs/7001'
+            })
+            if ($global:QuickAdoptionRunMode -ceq 'Ambiguous') {
+                $runs.Add([ordered]@{
+                    databaseId = 7002
+                    createdAt = [DateTimeOffset]::UtcNow.AddSeconds(1).ToString('o')
+                    headSha = $head
+                    status = 'completed'
+                    conclusion = 'success'
+                    url = 'https://github.com/test-owner/consumer/actions/runs/7002'
+                })
+            }
+        }
+        return (@($runs) | ConvertTo-Json -Compress)
+    }
+    if ($Arguments.Count -ge 3 -and $Arguments[0] -eq 'run' -and $Arguments[1] -eq 'view') {
+        if ([string]$Arguments[2] -cne '7001') {
+            throw "Mock launcher followed unexpected workflow run '$($Arguments[2])'."
+        }
+        return ([ordered]@{
+            databaseId = 7001
+            headSha = $global:QuickAdoptionPublishedHead
+            status = 'completed'
+            conclusion = 'success'
             url = 'https://github.com/test-owner/consumer/actions/runs/7001'
-        }) | ConvertTo-Json -Compress)
+        } | ConvertTo-Json -Compress)
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'list') {
         Publish-MockAdoptionBranch
@@ -456,8 +583,8 @@ function global:gh {
             throw "Mock adoption head is invalid: '$($global:QuickAdoptionPrHead)'"
         }
         $global:QuickAdoptionPrListCalls++
-        if ($global:QuickAdoptionPrListCalls -gt 2) {
-            throw 'Mock deterministic pull request was queried more than twice.'
+        if ($global:QuickAdoptionPrListCalls -gt 12) {
+            throw 'Mock deterministic pull request was queried unexpectedly often.'
         }
         $proposalState = if ($global:QuickAdoptionProposalMode -ceq 'ManifestOnly') {
             'AdoptionReviewRequired'
@@ -465,29 +592,26 @@ function global:gh {
         else {
             'BootstrapReady'
         }
-        $marker = [ordered]@{
-            schema = 2
-            state = $proposalState
-            target = 'v0.7.3'
-            protocolSha = $global:QuickAdoptionProtocolSha
-            head = $global:QuickAdoptionPrHead
-            repository = $global:QuickAdoptionRepoName
-            actor = $global:QuickAdoptionOwner
-        } | ConvertTo-Json -Compress
+        Initialize-MockAdoptionPullRequestBody
         $pullRequest = [ordered]@{
             number = 42
             url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
-            isDraft = ($global:QuickAdoptionPrReadyCalls -eq 0)
-            state = 'OPEN'
+            isDraft = $global:QuickAdoptionPrDraft
+            state = $global:QuickAdoptionPrState
             baseRefName = $global:QuickAdoptionDefaultBranch
-            headRefName = 'automation/meandai-capabilities-v0.7.3'
+            headRefName = 'automation/meandai-capabilities-v0.8.0'
             headRefOid = $global:QuickAdoptionPrHead
             headRepository = [ordered]@{ nameWithOwner = $global:QuickAdoptionRepoName }
             author = [ordered]@{ login = $global:QuickAdoptionOwner }
-            body = "<!-- meandai-capabilities-adoption:$marker -->`n`nMock adoption proposal."
+            body = $global:QuickAdoptionPrBody
         }
         switch ($global:QuickAdoptionPrMetadataMode) {
             'WrongBase' { $pullRequest.baseRefName = 'develop' }
+            'WrongBaseAfterFirst' {
+                if ($global:QuickAdoptionPrListCalls -gt 1) {
+                    $pullRequest.baseRefName = 'develop'
+                }
+            }
             'ForeignHead' {
                 $pullRequest.headRepository = [ordered]@{ nameWithOwner = 'foreign-owner/consumer' }
             }
@@ -500,7 +624,7 @@ function global:gh {
                 $badMarker = [ordered]@{
                     schema = 2
                     state = $proposalState
-                    target = 'v0.7.3'
+                    target = 'v0.8.0'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = ('0' * 40)
                     repository = $global:QuickAdoptionRepoName
@@ -513,9 +637,23 @@ function global:gh {
         }
         return (@($pullRequest) | ConvertTo-Json -Depth 5 -Compress)
     }
+    if ($Arguments.Count -ge 3 -and $Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'edit') {
+        if ([string]$Arguments[2] -cne '42') {
+            throw 'Mock pull-request edit identity mismatch.'
+        }
+        $bodyIndex = [Array]::IndexOf([object[]]$Arguments, '--body-file')
+        if ($bodyIndex -lt 0 -or $bodyIndex + 1 -ge $Arguments.Count) {
+            throw 'Mock pull-request edit did not use a body file.'
+        }
+        $global:QuickAdoptionPrBody = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
+        $global:QuickAdoptionPrBodyEditCalls++
+        $global:QuickAdoptionEvents.Add('pr-body-edit')
+        return
+    }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'ready') {
         $global:QuickAdoptionEvents.Add('pr-ready')
         $global:QuickAdoptionPrReadyCalls++
+        $global:QuickAdoptionPrDraft = $false
         return
     }
 
@@ -546,7 +684,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.7.3',
+            'v0.8.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -580,6 +718,9 @@ try {
             'Set-AdoptionIssueReadyForReview',
             'Get-ValidatedAdoptionManifest',
             'Get-ValidatedAdoptionChangeSet',
+            'Get-ValidatedImmutableProtocolRelease',
+            'X-GitHub-Api-Version: 2026-03-10',
+            'published immutable GitHub Release',
             'prior manifest removal has no launcher-owned validation evidence',
             '160000',
             '--force-with-lease'
@@ -616,11 +757,18 @@ try {
         }
     }
 
+    if (Test-Path -LiteralPath $mockCodexScriptPath -PathType Leaf) {
+        $mockCodex = Get-Content -LiteralPath $mockCodexScriptPath -Raw
+        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.8.0')) {
+            Add-Failure 'TEST-0059 mock Codex remote-race fixture is not pinned to the current adoption branch.'
+        }
+    }
+
     if (Test-Path -LiteralPath $guidePath -PathType Leaf) {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.7.3',
+            'v0.8.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -638,6 +786,9 @@ try {
             'preserves either canonical name that already exists',
             'does not validate value, scope, expiry, or usability',
             'selected-repository',
+            'published immutable GitHub Release',
+            'X-GitHub-Api-Version: 2026-03-10',
+            'releases/tags/',
             'Codex prompt',
             'Quick command'
         )) {
@@ -651,7 +802,10 @@ try {
             'never copied into the isolated clone',
             'parent launcher retains network access',
             'configured model service remains reachable',
-            'before and after this Codex step'
+            'before and after this Codex step',
+            'locally reachable Git refs and reflogs',
+            'rejects shallow repositories',
+            'cannot prove the absence of a credential path in remote commits'
         )) {
             if (-not $normalizedGuide.Contains($requiredBoundary)) {
                 Add-Failure "TEST-0051 quick guide does not explain '$requiredBoundary'"
@@ -667,6 +821,120 @@ try {
     }
 
     if ($failures.Count -eq 0) {
+        Reset-Mocks
+        $historyRoot = New-TempRoot -Name 'reflog-history'
+        $historyRepo = Join-Path $historyRoot 'consumer'
+        New-Item -ItemType Directory -Path $historyRepo -Force | Out-Null
+        & git init -b main $historyRepo 2>&1 | Out-Null
+        Set-TestGitIdentity -Repository $historyRepo
+        Set-Content -LiteralPath (Join-Path $historyRepo 'app.txt') -Value 'app' -Encoding UTF8
+        Invoke-TestGit -Repository $historyRepo -Arguments @('add', 'app.txt') | Out-Null
+        Invoke-TestGit -Repository $historyRepo -Arguments @('commit', '-m', 'Initial') | Out-Null
+        $cleanHead = (@(Invoke-TestGit -Repository $historyRepo `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+        Set-Content -LiteralPath (Join-Path $historyRepo 'FG_PAT.txt') -Value 'exposed' -NoNewline
+        Invoke-TestGit -Repository $historyRepo -Arguments @('add', '-f', 'FG_PAT.txt') | Out-Null
+        Invoke-TestGit -Repository $historyRepo -Arguments @('commit', '-m', 'Expose path') | Out-Null
+        $exposedHead = (@(Invoke-TestGit -Repository $historyRepo `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+        Invoke-TestGit -Repository $historyRepo -Arguments @('checkout', '--detach', $cleanHead) | Out-Null
+        Invoke-TestGit -Repository $historyRepo -Arguments @('branch', '-f', 'main', $cleanHead) | Out-Null
+        Invoke-TestGit -Repository $historyRepo -Arguments @('checkout', 'main') | Out-Null
+        Set-Content -LiteralPath (Join-Path $historyRepo 'FG_PAT.txt') -Value 'replacement' -NoNewline
+        Set-Content -LiteralPath (Join-Path $historyRepo 'MEANDAI_RO_FG_PAT.txt') -Value 'reader' -NoNewline
+        $reflogFixtureEvidence = @(Invoke-TestGit -Repository $historyRepo -Arguments @(
+            'log', '--all', '--reflog', '--format=%H', '--', 'FG_PAT.txt'
+        ))
+        $trackedFixturePath = @(Invoke-TestGit -Repository $historyRepo -Arguments @(
+            'ls-files', '--', 'FG_PAT.txt'
+        ))
+        if ($reflogFixtureEvidence -cnotcontains $exposedHead -or
+            $trackedFixturePath.Count -ne 0) {
+            Add-Failure 'TEST-0055 reflog-only fixture did not establish its declared precondition.'
+        }
+        $reflogBlocked = $false
+        $reflogMessage = ''
+        try {
+            & $launcherPath -TargetPath $historyRepo -SkipLifecycleDispatch | Out-Null
+        }
+        catch {
+            $reflogBlocked = $true
+            $reflogMessage = $_.Exception.Message
+        }
+        if (-not $reflogBlocked -or
+            -not $reflogMessage.Contains('locally reachable ref or reflog history')) {
+            Add-Failure "TEST-0055 a credential path reachable only through reflog evidence did not fail closed: $reflogMessage"
+        }
+
+        $shallowRoot = New-TempRoot -Name 'shallow-history'
+        $shallowSource = Join-Path $shallowRoot 'source'
+        $shallowRepo = Join-Path $shallowRoot 'consumer'
+        New-Item -ItemType Directory -Path $shallowSource -Force | Out-Null
+        & git init -b main $shallowSource 2>&1 | Out-Null
+        Set-TestGitIdentity -Repository $shallowSource
+        Set-Content -LiteralPath (Join-Path $shallowSource 'app.txt') -Value 'app' -Encoding UTF8
+        Invoke-TestGit -Repository $shallowSource -Arguments @('add', 'app.txt') | Out-Null
+        Invoke-TestGit -Repository $shallowSource -Arguments @('commit', '-m', 'Initial') | Out-Null
+        $shallowSourceUri = ConvertTo-TestFileUri -Path $shallowSource
+        Invoke-TestGit -Repository $shallowRoot -Arguments @(
+            'clone', '--depth', '1', $shallowSourceUri, $shallowRepo
+        ) | Out-Null
+        $shallowGitHubUrl = 'https://github.com/test-owner/shallow-consumer.git'
+        Invoke-TestGit -Repository $shallowRepo -Arguments @(
+            'config', "url.$shallowSourceUri.insteadOf", $shallowGitHubUrl
+        ) | Out-Null
+        Invoke-TestGit -Repository $shallowRepo -Arguments @(
+            'remote', 'set-url', 'origin', $shallowGitHubUrl
+        ) | Out-Null
+        Set-Content -LiteralPath (Join-Path $shallowRepo 'FG_PAT.txt') -Value 'writer' -NoNewline
+        Set-Content -LiteralPath (Join-Path $shallowRepo 'MEANDAI_RO_FG_PAT.txt') -Value 'reader' -NoNewline
+        $shallowBlocked = $false
+        $shallowMessage = ''
+        try {
+            & $launcherPath -TargetPath $shallowRepo -SkipLifecycleDispatch | Out-Null
+        }
+        catch {
+            $shallowBlocked = $true
+            $shallowMessage = $_.Exception.Message
+        }
+        if (-not $shallowBlocked -or -not $shallowMessage.Contains('non-shallow repository')) {
+            Add-Failure 'TEST-0055 shallow history did not fail closed before credential or remote mutation.'
+        }
+    }
+
+    if ($failures.Count -eq 0) {
+        Reset-Mocks
+        $mutableRoot = New-TempRoot -Name 'mutable-release'
+        $mutableRepo = Join-Path $mutableRoot 'consumer'
+        New-Item -ItemType Directory -Path $mutableRepo -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $mutableRepo 'FG_PAT.txt') `
+            -Value 'write-token-value' -NoNewline
+        Set-Content -LiteralPath (Join-Path $mutableRepo 'MEANDAI_RO_FG_PAT.txt') `
+            -Value 'read-token-value' -NoNewline
+        $global:QuickAdoptionTargetPath = $mutableRepo
+        $global:QuickAdoptionRepoName = 'test-owner/mutable-release'
+        $global:QuickAdoptionReleaseMode = 'Mutable'
+        $mutableReleaseBlocked = $false
+        try {
+            & $launcherPath -TargetPath $mutableRepo -Owner test-owner `
+                -RepositoryName mutable-release -SkipLifecycleDispatch | Out-Null
+        }
+        catch {
+            $mutableReleaseBlocked = $true
+        }
+        $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
+            $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.0$'
+        })
+        $prematureMutations = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and
+            (($_.Arguments[0] -eq 'repo' -and $_.Arguments[1] -eq 'create') -or
+             ($_.Arguments[0] -eq 'secret' -and $_.Arguments[1] -eq 'set'))
+        })
+        if (-not $mutableReleaseBlocked -or $releaseCalls.Count -ne 1 -or
+            $prematureMutations.Count -ne 0) {
+            Add-Failure 'TEST-0056 mutable protocol release did not block before repository or secret mutation.'
+        }
+
         Reset-Mocks
         $existingRoot = New-TempRoot -Name 'existing'
         $existingRepo = Join-Path $existingRoot 'consumer'
@@ -723,6 +991,10 @@ try {
             $global:QuickAdoptionPrReadyCalls -ne 1) {
             Add-Failure 'TEST-0039 default adoption did not complete once through local Codex and mark the draft ready.'
         }
+        if ($global:QuickAdoptionPrBodyEditCalls -ne 1 -or
+            $global:QuickAdoptionPrBody -notmatch [regex]::Escape($global:QuickAdoptionPrHead)) {
+            Add-Failure 'TEST-0052 launcher did not persist the completed proposal head exactly once.'
+        }
         $reviewEvents = @($global:QuickAdoptionEvents | Where-Object {
             $_ -ceq 'issue-label:add:status:needs-review'
         })
@@ -745,7 +1017,7 @@ try {
             Add-Failure 'TEST-0039 launcher did not reconcile the deterministic Agile labels and adoption issue.'
         }
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.3'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.0'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/ai-adoption.md') {
@@ -772,6 +1044,7 @@ try {
         Remove-Item -LiteralPath (Join-Path $existingRepo 'FG_PAT.txt') -Force
         Remove-Item -LiteralPath (Join-Path $existingRepo 'MEANDAI_RO_FG_PAT.txt') -Force
         $headBeforeRerun = (Invoke-Git -Repository $existingRepo -Arguments @('rev-parse', 'HEAD'))[0]
+        $bodyEditsBeforeRerun = $global:QuickAdoptionPrBodyEditCalls
         & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
         $headAfterRerun = (Invoke-Git -Repository $existingRepo -Arguments @('rev-parse', 'HEAD'))[0]
         if ($headBeforeRerun -cne $headAfterRerun) {
@@ -785,13 +1058,14 @@ try {
             ($_.Arguments -join ' ') -eq 'login status'
         })
         if ($rerunExecCalls.Count -ne 1 -or $rerunLoginCalls.Count -ne 1 -or
-            $global:QuickAdoptionPrReadyCalls -ne 1) {
-            Add-Failure 'TEST-0041 exact rerun repeated local Codex discovery, execution, or pull-request readiness.'
+            $global:QuickAdoptionPrReadyCalls -ne 1 -or
+            $global:QuickAdoptionPrBodyEditCalls -ne $bodyEditsBeforeRerun) {
+            Add-Failure 'TEST-0052 exact rerun repeated semantic work or the completed proposal transition.'
         }
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.3'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.0'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
@@ -861,7 +1135,10 @@ try {
             Add-Failure "TEST-0040 an unverified manifest-free draft was promoted or reprocessed automatically (ready calls: $($global:QuickAdoptionPrReadyCalls); Codex calls: $codexCallCountBeforeUnverifiedDraft -> $($codexCallsAfterUnverifiedDraft.Count))."
         }
 
-        foreach ($negativeMode in @('Unauthenticated', 'LeaveManifest', 'CreateCommit', 'RemoteRace')) {
+        foreach ($negativeMode in @(
+            'Unauthenticated', 'LeaveManifest', 'CreateCommit', 'RemoteRace',
+            'RenameWorkflowAway'
+        )) {
             Reset-MockAdoptionProposal
             $env:MEANDAI_TEST_CODEX_MODE = $negativeMode
             $reviewEventCountBeforeNegative = @($global:QuickAdoptionEvents | Where-Object {
@@ -884,7 +1161,7 @@ try {
                 Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.3'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.0'
             ))
             if ($negativePaths -contains 'docs/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
@@ -893,6 +1170,37 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionRunMode = 'Ambiguous'
+        $ambiguousRunBlocked = $false
+        $codexCountBeforeAmbiguousRun = @(Get-MockCodexCalls).Count
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $ambiguousRunBlocked = $true
+        }
+        if (-not $ambiguousRunBlocked -or
+            @(Get-MockCodexCalls).Count -ne $codexCountBeforeAmbiguousRun -or
+            $global:QuickAdoptionPrReadyCalls -ne 0) {
+            Add-Failure 'TEST-0054 multiple unseen workflow runs did not block before semantic completion.'
+        }
+        $global:QuickAdoptionRunMode = 'Single'
+        Reset-MockAdoptionProposal
+
+        $global:QuickAdoptionPrMetadataMode = 'WrongBaseAfterFirst'
+        $lateMetadataBlocked = $false
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $lateMetadataBlocked = $true
+        }
+        if (-not $lateMetadataBlocked -or $global:QuickAdoptionPrReadyCalls -ne 0) {
+            Add-Failure 'TEST-0052 a pull-request identity change after initial resolution did not block publication.'
+        }
+        $global:QuickAdoptionPrMetadataMode = 'Valid'
+        Reset-MockAdoptionProposal
+
         $global:QuickAdoptionProposalMode = 'ManifestOnly'
         $collisionCompleted = $true
         try {
@@ -902,10 +1210,10 @@ try {
             $collisionCompleted = $false
         }
         $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.7.3', '--', '.ai/protocol'
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.8.0', '--', '.ai/protocol'
         )))
         $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.3'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.0'
         ))
         $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
         if (-not $collisionCompleted -or $global:QuickAdoptionPrReadyCalls -ne 1 -or
@@ -1096,4 +1404,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Quick-adoption tests passed: TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, TEST-0049, and TEST-0051.' -ForegroundColor Green
+Write-Host 'Quick-adoption tests passed: TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, and TEST-0049 through TEST-0056.' -ForegroundColor Green

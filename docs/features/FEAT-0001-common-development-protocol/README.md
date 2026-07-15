@@ -138,6 +138,7 @@ this feature.
 | `FIND-0017` | Test gap / High / High | `TEST-0008` named memory isolation without checking memory ownership and placement | Added adapter, adoption mapping, template-set, and consumer-layout assertions; fixed. |
 | `FIND-0018` | Adoption defect / Medium / High | Copied issue configuration followed moving `main`, and copy commands could replace consumer files | Excluded repository-specific config and made submodule/repository-reference initialization collision-safe; fixed. |
 | `FIND-0019` | Traceability gate / High / High | Acceptance and DoD cannot close before the delivery PR exists | Published [PR #2](https://github.com/hasanmanzak/meAndAI/pull/2) and linked it to issue #1 plus the canonical records; fixed. |
+| `FIND-0048` | Test reliability / Medium / High | `TEST-0020` matched an exact phrase across a Markdown line wrap and failed after an otherwise clean confirmation | Normalized insignificant whitespace in the assertion and reran the bounded confirmation; fixed. |
 
 No unresolved blocking finding or known new debt remains. The issue, pull
 request, feature, decisions, and tests form a clickable graph. External tag

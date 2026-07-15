@@ -7,23 +7,24 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.7.3`
-- Current scope: quick-adoption execution-boundary documentation clarity,
-  tracked by
-  [BUG-0003](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
-  and [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32).
+- Current protocol version: `0.8.0`
+- Current scope: stable protocol automation and evidence invariants, tracked by
+  [FEAT-0010](../../docs/features/FEAT-0010-protocol-stability-invariants/README.md),
+  [DEC-0010](../../docs/decisions/DEC-0010-stable-automation-invariants.md),
+  and [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32).
-- Current release delivery: `v0.7.3` documentation correction is under review
-  in [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33); merge
-  and tag evidence are pending.
+- Latest tracked work: [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
+- Current release delivery: `v0.8.0` is in progress on
+  `codex/protocol-stability-invariants` through
+  [pull request #35](https://github.com/hasanmanzak/meAndAI/pull/35); merge and
+  immutable GitHub Release evidence remain pending at their respective gates.
 - Latest completed release delivery:
-  [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md) in
-  [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31). Its
-  immutable release authority is the separate annotated
-  [`v0.7.2` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2).
+  [BUG-0003](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
+  in merged [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33),
+  recorded by the historical annotated
+  [`v0.7.3` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3).
 - Latest released delivery before the current candidate: completed
   [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
   in merged [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29),

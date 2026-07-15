@@ -33,12 +33,14 @@ function ConvertTo-TestPullJson {
         [string]$HeadSha,
         [string]$Body,
         [string]$AuthorLogin = 'updater-owner',
-        [bool]$Draft = $true
+        [bool]$Draft = $true,
+        [ValidateSet('open', 'closed')]
+        [string]$State = 'open'
     )
 
     [pscustomobject]@{
         number = $Number
-        state = 'open'
+        state = $State
         draft = $Draft
         body = $Body
         user = [pscustomobject]@{ login = $AuthorLogin }
@@ -59,7 +61,10 @@ function global:git {
 
     if ($arguments[0] -eq 'config' -and $arguments -contains '.gitmodules') {
         if ($arguments -contains '--get-regexp') {
-            "submodule.meandai.path`t.ai/protocol"
+            $path = if ($script:Scenario.WrongCaseSubmodulePath) {
+                '.AI/protocol'
+            } else { '.ai/protocol' }
+            "submodule.meandai.path`t$path"
             return
         }
         if ($arguments -contains '--get') {
@@ -269,9 +274,15 @@ function global:gh {
     if ($method -eq 'PATCH' -and $endpoint -like '*/pulls/21') {
         if ($arguments -contains 'state=open') {
             Add-ScenarioEvent 'reopen-old-pr'
+            if (-not $script:Scenario.ReopenOldNoOp) {
+                $script:Scenario.OldPullRequestState = 'open'
+            }
         }
         else {
             Add-ScenarioEvent 'close-old-pr'
+            if (-not $script:Scenario.CloseOldNoOp) {
+                $script:Scenario.OldPullRequestState = 'closed'
+            }
         }
         '{}'
         return
@@ -284,6 +295,21 @@ function global:gh {
             Add-ScenarioEvent 'close-new-pr'
         }
         '{}'
+        return
+    }
+    if ($endpoint -eq 'repos/hasanmanzak/meAndAI/releases/tags/v0.3.0') {
+        Add-ScenarioEvent 'verify-immutable-release'
+        if ($arguments -cnotcontains 'X-GitHub-Api-Version: 2026-03-10') {
+            throw 'Immutable release lookup omitted the required GitHub API version.'
+        }
+        $release = [ordered]@{
+            tag_name = if ($script:Scenario.ReleaseMode -ceq 'WrongTag') { 'v0.2.0' } else { 'v0.3.0' }
+            draft = $script:Scenario.ReleaseMode -ceq 'Draft'
+            prerelease = $script:Scenario.ReleaseMode -ceq 'Prerelease'
+            immutable = $script:Scenario.ReleaseMode -cne 'Mutable'
+            published_at = if ($script:Scenario.ReleaseMode -ceq 'Unpublished') { $null } else { '2026-07-15T00:00:00Z' }
+        }
+        $release | ConvertTo-Json -Compress
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls?state=open&per_page=100') {
@@ -323,7 +349,8 @@ function global:gh {
             $script:Scenario.OldDetailCalls -gt 1) { 'd' * 40 } else { $script:Scenario.OldHead }
         ConvertTo-TestPullJson -Number 21 -Branch $script:Scenario.OldBranch `
             -HeadSha $head -Body $script:Scenario.OldBody `
-            -AuthorLogin $script:Scenario.OldAuthorLogin
+            -AuthorLogin $script:Scenario.OldAuthorLogin `
+            -State $script:Scenario.OldPullRequestState
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls/21/files?per_page=100') {
@@ -423,6 +450,7 @@ function global:gh {
     if ($endpoint -eq 'repos/owner/consumer/pulls/30') {
         $script:Scenario.NewDetailCalls++
         Add-ScenarioEvent 'verify-new-pr'
+        Add-ScenarioEvent "verify-new-pr-$($script:Scenario.NewDetailCalls)"
         $newDraft = $script:Scenario.NewDraft
         if ($script:Scenario.CoordinateNewHeadMutation -and
             $script:Scenario.NewDetailCalls -gt 1) {
@@ -435,6 +463,10 @@ function global:gh {
         }
         if ($script:Scenario.MutateNewAfterSnapshot -and
             $script:Scenario.NewDetailCalls -gt 1) {
+            $newDraft = $false
+        }
+        if ($script:Scenario.MutateReplacementAfterOldClose -and
+            $script:Scenario.OldPullRequestState -ceq 'closed') {
             $newDraft = $false
         }
         ConvertTo-TestPullJson -Number 30 -Branch $script:Scenario.NewBranch `
@@ -478,16 +510,20 @@ function Invoke-AdapterScenario {
         [bool]$MutateOldAfterSnapshot = $false,
         [bool]$ExistingReplacement = $false,
         [bool]$MutateNewAfterSnapshot = $false,
+        [bool]$MutateReplacementAfterOldClose = $false,
         [bool]$CoordinateNewHeadMutation = $false,
         [bool]$ConcurrentNewBranch = $false,
         [bool]$OldBranchExists = $true,
         [bool]$RemoveOldBeforeDelete = $false,
         [bool]$ChangeOldBeforeDelete = $false,
+        [bool]$CloseOldNoOp = $false,
+        [bool]$ReopenOldNoOp = $false,
         [bool]$AliasCurrentTag = $false,
         [bool]$DuplicateOldMarker = $false,
         [bool]$CaseVariantDuplicateMarker = $false,
         [bool]$NonCanonicalOldMarker = $false,
         [bool]$InvalidSubmoduleUrl = $false,
+        [bool]$WrongCaseSubmodulePath = $false,
         [bool]$MissingUpdaterToken = $false,
         [bool]$InvalidAuthenticatedActor = $false,
         [string]$AuthenticatedActor = 'updater-owner',
@@ -496,6 +532,8 @@ function Invoke-AdapterScenario {
         [bool]$WrongStagedAssetBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
         [int]$LeadingUnmanagedCount = 0,
+        [ValidateSet('Valid', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')]
+        [string]$ReleaseMode = 'Valid',
         [ValidateSet('None', 'InventoryRename', 'RevalidationRename')]
         [string]$RenameMode = 'None'
     )
@@ -603,24 +641,30 @@ function Invoke-AdapterScenario {
         MutateOldAfterSnapshot = $MutateOldAfterSnapshot
         ConcurrentNewBranch = $ConcurrentNewBranch
         ChangeOldBeforeDelete = $ChangeOldBeforeDelete
+        CloseOldNoOp = $CloseOldNoOp
+        ReopenOldNoOp = $ReopenOldNoOp
         AliasCurrentTag = $AliasCurrentTag
         ExistingReplacement = $ExistingReplacement
         MutateNewAfterSnapshot = $MutateNewAfterSnapshot
+        MutateReplacementAfterOldClose = $MutateReplacementAfterOldClose
         CoordinateNewHeadMutation = $CoordinateNewHeadMutation
         NewDetailCalls = 0
         InvalidSubmoduleUrl = $InvalidSubmoduleUrl
+        WrongCaseSubmodulePath = $WrongCaseSubmodulePath
         InvalidAuthenticatedActor = $InvalidAuthenticatedActor
         AuthenticatedActor = $AuthenticatedActor
         OldAuthorLogin = $OldAuthorLogin
         WrongStagedAssetBlob = $WrongStagedAssetBlob
         WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
+        ReleaseMode = $ReleaseMode
         RenameMode = $RenameMode
         NewFilesCalls = 0
         RemoveOldBeforeDelete = $RemoveOldBeforeDelete
         OldProbeCalls = 0
 
         OldDetailCalls = 0
+        OldPullRequestState = 'open'
         Threw = $false
         Error = ''
     }
@@ -668,6 +712,27 @@ foreach ($event in @('checkout-target-assets', 'stage-target-assets')) {
     if ((Get-EventIndex $success $event) -lt 0 -or
         (Get-EventIndex $success $event) -gt (Get-EventIndex $success 'push-new')) {
         Add-Failure "TEST-0024 '$event' must occur before the replacement branch is pushed."
+    }
+}
+if ((Get-EventIndex $success 'verify-immutable-release') -lt 0 -or
+    (Get-EventIndex $success 'verify-immutable-release') -gt
+        (Get-EventIndex $success 'checkout-target-assets')) {
+    Add-Failure 'TEST-0056 the selected target release must be verified before target checkout.'
+}
+foreach ($releaseMode in @('Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')) {
+    $invalidRelease = Invoke-AdapterScenario -Name "release-$releaseMode" `
+        -ReleaseMode $releaseMode
+    if (-not $invalidRelease.Threw -or
+        $invalidRelease.Error -notlike '*published, non-prerelease, immutable GitHub Release*') {
+        Add-Failure "TEST-0056 $releaseMode target release did not fail closed: $($invalidRelease.Error)"
+    }
+    foreach ($forbiddenEvent in @(
+        'checkout-target-assets', 'push-new', 'create-new-pr',
+        'close-old-pr', 'delete-old-branch'
+    )) {
+        if ((Get-EventIndex $invalidRelease $forbiddenEvent) -ge 0) {
+            Add-Failure "TEST-0056 $releaseMode target release reached mutation '$forbiddenEvent'."
+        }
     }
 }
 
@@ -738,7 +803,11 @@ if ((Get-EventIndex $wrongTargetAsset 'close-old-pr') -ge 0 -or
     (Get-EventIndex $wrongTargetAsset 'close-new-pr') -ge 0) {
     Add-Failure 'TEST-0026 wrong target asset blob allowed destructive cleanup.'
 }
-$successOrder = @('create-new-pr', 'verify-new-pr', 'read-old-pr-2', 'close-old-pr', 'delete-old-branch')
+$successOrder = @(
+    'create-new-pr', 'verify-new-pr-1', 'read-old-pr-2', 'verify-new-pr-2',
+    'close-old-pr', 'read-old-pr-3', 'verify-new-pr-3',
+    'delete-old-branch', 'read-old-pr-4', 'verify-new-pr-4', 'comment-old-pr'
+)
 $previous = -1
 foreach ($event in $successOrder) {
     $index = Get-EventIndex -Scenario $success -Event $event
@@ -749,15 +818,16 @@ foreach ($event in $successOrder) {
     $previous = $index
 }
 
-$cleanupAttemptText = 'Automated cleanup will attempt to close this PR and delete its unchanged branch.'
-$cleanupCompensationText = 'If branch deletion fails, the workflow will try to reopen the PR and preserve the branch.'
-foreach ($requiredText in @($cleanupAttemptText, $cleanupCompensationText)) {
-    if (-not $success.OldPullRequestComment.Contains($requiredText)) {
-        Add-Failure "TEST-0021 emitted cleanup comment is missing '$requiredText'"
-    }
-    if ([regex]::Matches($adapterContent, [regex]::Escape($requiredText)).Count -ne 2) {
-        Add-Failure "TEST-0021 both cleanup comment paths must contain '$requiredText'"
-    }
+$cleanupCompletedText = 'Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease.'
+if (-not $success.OldPullRequestComment.Contains($cleanupCompletedText)) {
+    Add-Failure "TEST-0021 emitted cleanup comment is missing '$cleanupCompletedText'"
+}
+if ([regex]::Matches($adapterContent, [regex]::Escape($cleanupCompletedText)).Count -ne 2) {
+    Add-Failure "TEST-0021 both cleanup comment paths must contain '$cleanupCompletedText'"
+}
+if ((Get-EventIndex $success 'comment-old-pr') -lt
+    (Get-EventIndex $success 'delete-old-branch')) {
+    Add-Failure 'TEST-0021 cleanup completion must not be announced before branch deletion is verified.'
 }
 if ($success.OldPullRequestComment.Contains('will be removed') -or
     $adapterContent.Contains('automation branch will be removed')) {
@@ -795,6 +865,29 @@ if ((Get-EventIndex $replacementRace 'close-old-pr') -ge 0 -or
     (Get-EventIndex $replacementRace 'delete-old-branch') -ge 0 -or
     (Get-EventIndex $replacementRace 'close-new-pr') -ge 0) {
     Add-Failure 'TEST-0015 changed replacement allowed destructive supersession.'
+}
+
+$postCloseReplacementRace = Invoke-AdapterScenario `
+    -Name 'post-close-replacement-race' -ExistingReplacement $true `
+    -MutateReplacementAfterOldClose $true
+if (-not $postCloseReplacementRace.Threw -or
+    $postCloseReplacementRace.Error -notlike '*reopened and the branch preserved*') {
+    Add-Failure "TEST-0058 post-close replacement mutation was not compensated: $($postCloseReplacementRace.Error)"
+}
+if ((Get-EventIndex $postCloseReplacementRace 'close-old-pr') -lt 0 -or
+    (Get-EventIndex $postCloseReplacementRace 'reopen-old-pr') -lt 0 -or
+    (Get-EventIndex $postCloseReplacementRace 'delete-old-branch') -ge 0) {
+    Add-Failure 'TEST-0058 post-close replacement mutation must reopen the old PR and preserve its branch.'
+}
+
+$closeNoOp = Invoke-AdapterScenario -Name 'close-no-op' -CloseOldNoOp $true
+if (-not $closeNoOp.Threw -or
+    $closeNoOp.Error -notlike '*reopened and the branch preserved*') {
+    Add-Failure "TEST-0058 a no-op close was not detected and compensated: $($closeNoOp.Error)"
+}
+if ((Get-EventIndex $closeNoOp 'reopen-old-pr') -lt 0 -or
+    (Get-EventIndex $closeNoOp 'delete-old-branch') -ge 0) {
+    Add-Failure 'TEST-0058 a no-op close must not permit branch deletion.'
 }
 
 foreach ($renameMode in @('InventoryRename', 'RevalidationRename')) {
@@ -862,6 +955,17 @@ if ((Get-EventIndex $deleteRace 'reopen-old-pr') -lt 0 -or
     Add-Failure 'TEST-0015 failed branch cleanup must reopen the old PR and preserve the branch.'
 }
 
+$compensationFailure = Invoke-AdapterScenario -Name 'compensation-failure' `
+    -ChangeOldBeforeDelete $true -ReopenOldNoOp $true
+if (-not $compensationFailure.Threw -or
+    $compensationFailure.Error -notlike '*could not be reopened*Manual recovery is required*') {
+    Add-Failure "TEST-0058 compensation failure did not require manual recovery: $($compensationFailure.Error)"
+}
+if ((Get-EventIndex $compensationFailure 'reopen-old-pr') -lt 0 -or
+    (Get-EventIndex $compensationFailure 'delete-old-branch') -ge 0) {
+    Add-Failure 'TEST-0058 compensation failure must preserve the unchanged old branch.'
+}
+
 $pagination = Invoke-AdapterScenario -Name 'pagination' -LeadingUnmanagedCount 101
 if ($pagination.Threw -or (Get-EventIndex $pagination 'close-old-pr') -lt 0) {
     Add-Failure "TEST-0017 paged PR inventory did not find the managed PR after 101 unrelated PRs: $($pagination.Error)"
@@ -913,6 +1017,21 @@ if ((Get-EventIndex $invalidOrigin 'create-new-pr') -ge 0 -or
     Add-Failure 'TEST-0017 mismatched protocol origin caused a mutation.'
 }
 
+$wrongCaseSubmodulePath = Invoke-AdapterScenario -Name 'wrong-case-submodule-path' `
+    -WrongCaseSubmodulePath $true
+if (-not $wrongCaseSubmodulePath.Threw -or
+    $wrongCaseSubmodulePath.Error -notlike "*'.ai/protocol' must have exactly one .gitmodules entry*") {
+    Add-Failure "TEST-0058 case-variant protocol path did not fail closed: $($wrongCaseSubmodulePath.Error)"
+}
+foreach ($forbiddenEvent in @(
+    'verify-immutable-release', 'push-new', 'create-new-pr',
+    'close-old-pr', 'delete-old-branch'
+)) {
+    if ((Get-EventIndex $wrongCaseSubmodulePath $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0058 case-variant protocol path reached '$forbiddenEvent'."
+    }
+}
+
 Remove-Item Function:\git -ErrorAction SilentlyContinue
 Remove-Item Function:\gh -ErrorAction SilentlyContinue
 Remove-Variable MeAndAITestScenario -Scope Global -ErrorAction SilentlyContinue
@@ -923,4 +1042,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, TEST-0021 through TEST-0026, and TEST-0048.' -ForegroundColor Green
+Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, TEST-0021 through TEST-0026, TEST-0048, TEST-0056, and TEST-0058.' -ForegroundColor Green

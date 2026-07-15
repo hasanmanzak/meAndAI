@@ -79,7 +79,7 @@ insufficient.
   separate ownership and permission semantics; the updater receives only
   `GH_TOKEN`, while workflow wiring selects the credential implementation.
 - Consumers and compatibility: new `v0.4.0` adopters receive the complete
-  contract. Earlier immutable pins remain valid, but their copied updater needs
+  contract. Earlier exact pins remain valid, but their copied updater needs
   one reviewed migration because old code cannot retroactively update itself.
 - Error behavior: absent credentials, identity ambiguity, current-asset drift,
   missing target blobs, and unexpected paths fail before destructive cleanup.

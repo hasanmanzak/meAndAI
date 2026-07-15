@@ -442,7 +442,7 @@ the existing quick-adoption regressions in 84.7 seconds. The complete
 confirmation passed `TEST-0001` through `TEST-0051` in 143.7 seconds. The
 fresh-diff review found no credential-like value, whitespace error, PowerShell
 parse error, behavior change, or unclassified active `v0.7.2` reference. The
-only executable changes are immutable `v0.7.3` pin defaults and matching test
+only executable changes are exact `v0.7.3` pin defaults and matching test
 fixtures. Existing full-suite link checks passed, so no actionable in-scope
 finding remains and validation stops.
 
@@ -459,3 +459,17 @@ finding remains and validation stops.
       [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023)
       on Ubuntu and Windows; GitGuardian also passed. The final evidence commit
       must retain those checks before merge.
+
+### Post-merge release evidence for BUG-0003
+
+[Pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33) is the reviewed
+delivery record. `v0.7.3` predates the external immutable-release authority in
+[DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md); its
+historical annotated tag remains a release record without an external lock.
+
+| Field | Evidence |
+| --- | --- |
+| Release authority | Historical annotated tag; no external immutability claim |
+| Release identifier | [`v0.7.3`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3), tag object `2f74f1f4b28bd63bb04a1b9f9f30b1603d0b164e` |
+| Target commit | [`45afd8c15c155fb3f7cb0e5abb4876a3d44b27af`](https://github.com/hasanmanzak/meAndAI/commit/45afd8c15c155fb3f7cb0e5abb4876a3d44b27af) |
+| Verification evidence | Local annotated-tag dereference and remote `refs/tags/v0.7.3` publication verified on 2026-07-15 |

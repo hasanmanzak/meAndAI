@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$StructureOnly)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -17,6 +17,35 @@ function Assert-File {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         Add-Failure "TEST-0001 missing required file: $RelativePath"
     }
+}
+
+function Get-IndexedMarkdownTargets {
+    param(
+        [Parameter(Mandatory)][string]$IndexRelativePath,
+        [Parameter(Mandatory)][string]$TargetPattern
+    )
+
+    $indexPath = Join-Path $root $IndexRelativePath
+    if (-not (Test-Path -LiteralPath $indexPath -PathType Leaf)) {
+        return @()
+    }
+    $indexDirectory = Split-Path -Parent $indexPath
+    $targets = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    $content = Get-Content -LiteralPath $indexPath -Raw
+    foreach ($match in [regex]::Matches(
+        $content,
+        '(?<!!)\[[^\]]+\]\((?<target>[^)#]+\.md)(?:#[^)]+)?\)'
+    )) {
+        $target = [uri]::UnescapeDataString($match.Groups['target'].Value)
+        $absolute = [IO.Path]::GetFullPath((Join-Path $indexDirectory $target))
+        $relative = $absolute.Substring($root.Length + 1).Replace('\', '/')
+        if ($relative -cmatch $TargetPattern) {
+            [void]$targets.Add($relative)
+        }
+    }
+    return @($targets)
 }
 
 function Get-MarkdownAnchors {
@@ -58,45 +87,12 @@ $requiredFiles = @(
     '.ai/memory/README.md',
     '.ai/memory/project.md',
     '.ai/memory/log/README.md',
-    '.ai/memory/log/2026-07-14-update-automation.md',
-    '.ai/memory/log/2026-07-14-bounded-self-validation.md',
-    '.ai/memory/log/2026-07-14-convergent-completion-scan.md',
-    '.ai/memory/log/2026-07-14-urgent-gate-order.md',
-    '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
-    '.ai/memory/log/2026-07-15-feat-0002-release-gate-evidence.md',
-    '.ai/memory/log/2026-07-15-optional-credential-source-files.md',
-    '.ai/memory/log/2026-07-15-quick-adoption-launcher.md',
-    '.ai/memory/log/2026-07-15-local-codex-adoption.md',
-    '.ai/memory/log/2026-07-15-existing-secret-preservation.md',
-    '.ai/memory/log/2026-07-15-idea-incubation.md',
     'docs/adoption.md',
-    'docs/ideas/README.md',
-    'docs/ideas/IDEA-0001-role-based-multi-agent-protocol.md',
-    'docs/features/README.md',
-    'docs/features/FEAT-0001-common-development-protocol/README.md',
-    'docs/features/FEAT-0001-common-development-protocol/test-cases.md',
-    'docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md',
-    'docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md',
-    'docs/features/FEAT-0003-convergent-completion-scan/README.md',
-    'docs/features/FEAT-0003-convergent-completion-scan/test-cases.md',
-    'docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md',
-    'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
-    'docs/features/FEAT-0006-quick-adoption-launcher/README.md',
-    'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
-    'docs/features/FEAT-0007-local-codex-adoption/README.md',
-    'docs/features/FEAT-0007-local-codex-adoption/test-cases.md',
-    'docs/features/FEAT-0008-idea-incubation/README.md',
-    'docs/features/FEAT-0008-idea-incubation/test-cases.md',
-    'docs/decisions/README.md',
-    'docs/decisions/DEC-0001-portable-protocol-reference.md',
-    'docs/decisions/DEC-0002-project-local-memory.md',
-    'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md',
-    'docs/decisions/DEC-0004-bounded-completion-convergence.md',
-    'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md',
-    'docs/decisions/DEC-0007-local-quick-adoption-boundary.md',
-    'docs/decisions/DEC-0008-local-codex-execution.md',
-    'docs/decisions/DEC-0009-repository-native-idea-incubation.md',
     'docs/quick-adoption.md',
+    'docs/README.md',
+    'docs/ideas/README.md',
+    'docs/features/README.md',
+    'docs/decisions/README.md',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
     'templates/project/AGENTS.repository-reference.md',
@@ -121,18 +117,69 @@ $requiredFiles = @(
     '.github/ISSUE_TEMPLATE/task.yml',
     '.github/ISSUE_TEMPLATE/bug.yml',
     '.github/ISSUE_TEMPLATE/finding.yml',
-    'tests/protocol-update-adapter.tests.ps1',
-    'tests/protocol-update.tests.ps1',
-    'tests/capabilities-bootstrap.tests.ps1',
-    'tests/capabilities-bootstrap-adapter.tests.ps1',
-    'tests/quick-adoption.tests.ps1',
-    'tests/idea-incubation.tests.ps1',
     'tests/fixtures/Invoke-MockCodex.ps1',
     'tests/fixtures/Invoke-MockCodex.cmd',
     'tests/fixtures/Invoke-MockCodex.sh',
     '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
+
+$indexedRecords = @(
+    Get-IndexedMarkdownTargets -IndexRelativePath 'docs/features/README.md' `
+        -TargetPattern '^docs/features/FEAT-\d{4}-[^/]+/README\.md$'
+    Get-IndexedMarkdownTargets -IndexRelativePath 'docs/decisions/README.md' `
+        -TargetPattern '^docs/decisions/DEC-\d{4}-.+\.md$'
+    Get-IndexedMarkdownTargets -IndexRelativePath 'docs/ideas/README.md' `
+        -TargetPattern '^docs/ideas/IDEA-\d{4}-.+\.md$'
+    Get-IndexedMarkdownTargets -IndexRelativePath '.ai/memory/log/README.md' `
+        -TargetPattern '^\.ai/memory/log/\d{4}-\d{2}-\d{2}-.+\.md$'
+)
+foreach ($relativePath in $indexedRecords) {
+    Assert-File $relativePath
+    if ($relativePath -cmatch '^docs/features/.+/README\.md$') {
+        Assert-File ((Split-Path $relativePath -Parent) + '/test-cases.md')
+    }
+}
+
+$indexedSet = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::Ordinal
+)
+foreach ($relativePath in $indexedRecords) {
+    [void]$indexedSet.Add($relativePath)
+}
+$recordPatterns = @(
+    'docs/features/FEAT-*/README.md',
+    'docs/decisions/DEC-*.md',
+    'docs/ideas/IDEA-*.md',
+    '.ai/memory/log/????-??-??-*.md'
+)
+foreach ($pattern in $recordPatterns) {
+    foreach ($file in @(Get-ChildItem -Path (Join-Path $root $pattern) -File)) {
+        $relative = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
+        if (-not $indexedSet.Contains($relative)) {
+            Add-Failure "TEST-0059 canonical record is missing from its index: $relative"
+        }
+    }
+}
+
+$testSuites = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') -File `
+    -Filter '*.tests.ps1' | Where-Object {
+        $_.Name -cne 'protocol.tests.ps1' -and
+        $_.BaseName -cnotmatch '-adapter\.tests$'
+    })
+if ($testSuites.Count -eq 0) {
+    Add-Failure 'TEST-0059 no canonical child test suites were discovered.'
+}
+$adapterSuites = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') -File `
+    -Filter '*-adapter.tests.ps1')
+foreach ($adapterSuite in $adapterSuites) {
+    $owners = @($testSuites | Where-Object {
+        (Get-Content -LiteralPath $_.FullName -Raw).Contains($adapterSuite.Name)
+    })
+    if ($owners.Count -ne 1) {
+        Add-Failure "TEST-0059 adapter suite must have exactly one discovered parent: $($adapterSuite.Name)"
+    }
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -168,14 +215,28 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
             Add-Failure 'TEST-0006 adoption guide is missing the current protocol reference'
         }
 
-        foreach ($relativePath in @(
-            'templates/project/AGENTS.submodule.md',
-            'templates/project/AGENTS.repository-reference.md'
-        )) {
-            $content = Get-Content -LiteralPath (Join-Path $root $relativePath) -Raw
+        $projectTemplateRoot = Join-Path $root 'templates/project'
+        foreach ($file in @(Get-ChildItem -LiteralPath $projectTemplateRoot -Recurse -File)) {
+            $relativePath = $file.FullName.Substring($root.Length + 1)
+            $content = Get-Content -LiteralPath $file.FullName -Raw
             $references = [regex]::Matches($content, 'v\d+\.\d+\.\d+')
-            if ($references.Count -eq 0 -or @($references.Value | Where-Object { $_ -ne $currentReference }).Count -gt 0) {
-                Add-Failure "TEST-0006 stale or missing protocol reference in $relativePath"
+            foreach ($reference in $references) {
+                $lineStart = $content.LastIndexOf("`n", $reference.Index)
+                $lineEnd = $content.IndexOf("`n", $reference.Index)
+                if ($lineStart -lt 0) { $lineStart = 0 } else { $lineStart++ }
+                if ($lineEnd -lt 0) { $lineEnd = $content.Length }
+                $line = $content.Substring($lineStart, $lineEnd - $lineStart)
+
+                # A pinned action's release comment identifies that dependency,
+                # not the meAndAI protocol version carried by the template.
+                if ($line -match '^\s*uses:\s*[^#]+#\s*v\d+\.\d+\.\d+\s*$') {
+                    continue
+                }
+
+                if ($reference.Value -ne $currentReference) {
+                    Add-Failure "TEST-0006 stale protocol reference in $relativePath"
+                    break
+                }
             }
         }
 
@@ -221,8 +282,117 @@ foreach ($entry in $releaseMetadataChecks.GetEnumerator()) {
     }
 }
 
-$markdownFiles = Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.md' |
-    Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
+$validatorSource = Get-Content -LiteralPath (Join-Path $root 'tests/protocol.tests.ps1') -Raw
+foreach ($requiredText in @(
+    'Get-IndexedMarkdownTargets',
+    'ls-files --cached --others',
+    "-Filter '*.tests.ps1'",
+    'StructureOnly'
+)) {
+    if (-not ([regex]::Replace($validatorSource, '\s+', ' ')).Contains($requiredText)) {
+        Add-Failure "TEST-0059 repository validator is missing '$requiredText'"
+    }
+}
+
+$ciWorkflow = Get-Content -LiteralPath (Join-Path $root '.github/workflows/protocol-tests.yml') -Raw
+if (-not $ciWorkflow.Contains('timeout-minutes:')) {
+    Add-Failure 'TEST-0059 repository CI has no explicit job timeout.'
+}
+
+$docsIndex = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw
+foreach ($requiredText in @(
+    '[Quick adoption](quick-adoption.md)',
+    '[Idea index](ideas/README.md)',
+    '[Project memory](../.ai/memory/README.md)',
+    '[Changelog](../CHANGELOG.md)'
+)) {
+    if (-not $docsIndex.Contains($requiredText)) {
+        Add-Failure "TEST-0059 documentation router is missing '$requiredText'"
+    }
+}
+
+$featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
+foreach ($requiredText in @(
+    '## Post-merge release evidence',
+    'Release authority',
+    'Release identifier',
+    'Target commit',
+    'Verification evidence',
+    'external post-publication record'
+)) {
+    if (-not $featureTemplate.Contains($requiredText)) {
+        Add-Failure "TEST-0059 feature template release schema is missing '$requiredText'"
+    }
+}
+
+$initialFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0001-common-development-protocol/README.md'
+) -Raw
+if (-not $initialFeature.Contains('`FIND-0048`')) {
+    Add-Failure 'TEST-0059 FIND-0048 is missing from its canonical feature finding register.'
+}
+
+$localCodexFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0007-local-codex-adoption/README.md'
+) -Raw
+foreach ($requiredText in @(
+    '45afd8c15c155fb3f7cb0e5abb4876a3d44b27af',
+    '2f74f1f4b28bd63bb04a1b9f9f30b1603d0b164e',
+    '[Pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33)'
+)) {
+    if (-not $localCodexFeature.Contains($requiredText)) {
+        Add-Failure "TEST-0059 v0.7.3 release record is missing '$requiredText'"
+    }
+}
+
+$integrityFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0009-adoption-integrity/README.md'
+) -Raw
+if (-not $integrityFeature.Contains('historical annotated tag') -or
+    $integrityFeature.Contains('is the immutable release authority')) {
+    Add-Failure 'TEST-0059 v0.7.2 release evidence overstates annotated-tag authority.'
+}
+
+$bootstrapAdapterPath = Join-Path $root `
+    'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
+$bootstrapTokens = $null
+$bootstrapParseErrors = $null
+$bootstrapAst = [Management.Automation.Language.Parser]::ParseFile(
+    $bootstrapAdapterPath, [ref]$bootstrapTokens, [ref]$bootstrapParseErrors
+)
+$oversizedBootstrapFunctions = @($bootstrapAst.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+    ($node.Extent.EndLineNumber - $node.Extent.StartLineNumber + 1) -gt 180
+}, $true))
+if (@($bootstrapParseErrors).Count -gt 0 -or
+    $oversizedBootstrapFunctions.Count -gt 0) {
+    Add-Failure 'TEST-0059 bootstrap exact-state validation exceeds the bounded 180-line responsibility seam.'
+}
+
+$protocolDecision = Get-Content -LiteralPath (
+    Join-Path $root 'docs/decisions/DEC-0010-stable-automation-invariants.md'
+) -Raw
+foreach ($requiredText in @(
+    '**Bounded responsibility seams.**',
+    'external post-publication release'
+)) {
+    if (-not $protocolDecision.Contains($requiredText)) {
+        Add-Failure "TEST-0059 stable-invariant decision is missing '$requiredText'"
+    }
+}
+
+$trackedMarkdownOutput = @(& git -C $root ls-files --cached --others `
+    --exclude-standard -- '*.md' 2>&1)
+if ($LASTEXITCODE -ne 0) {
+    Add-Failure "TEST-0059 root Git Markdown inventory failed: $($trackedMarkdownOutput -join ' ')"
+    $markdownFiles = @()
+}
+else {
+    $markdownFiles = @($trackedMarkdownOutput | Where-Object { $_ } | ForEach-Object {
+        Get-Item -LiteralPath (Join-Path $root ([string]$_))
+    })
+}
 
 foreach ($file in $markdownFiles) {
     $markdown = Get-Content -LiteralPath $file.FullName -Raw
@@ -362,7 +532,6 @@ if ($memoryTemplateFiles.Count -lt 3) {
     Add-Failure 'TEST-0008 project-local memory template set is incomplete'
 }
 
-$updateTestPath = Join-Path $root 'tests/protocol-update.tests.ps1'
 $protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
 $featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
 $normalizedProtocolContent = [regex]::Replace($protocolContent, '\s+', ' ')
@@ -420,38 +589,13 @@ foreach ($requiredText in @(
     }
 }
 
-if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
+if (-not $StructureOnly) {
     $engine = (Get-Process -Id $PID).Path
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
-    if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0009 through TEST-0017, TEST-0021 through TEST-0026, and TEST-0048 protocol update validation failed'
-    }
-}
-
-$capabilitiesTestPath = Join-Path $root 'tests/capabilities-bootstrap.tests.ps1'
-if (Test-Path -LiteralPath $capabilitiesTestPath -PathType Leaf) {
-    $engine = (Get-Process -Id $PID).Path
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $capabilitiesTestPath
-    if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0027 through TEST-0032, TEST-0044, and TEST-0047 AI capabilities lifecycle validation failed'
-    }
-}
-
-$quickAdoptionTestPath = Join-Path $root 'tests/quick-adoption.tests.ps1'
-if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
-    $engine = (Get-Process -Id $PID).Path
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
-    if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, TEST-0049 through TEST-0051 quick adoption validation failed'
-    }
-}
-
-$ideaTestPath = Join-Path $root 'tests/idea-incubation.tests.ps1'
-if (Test-Path -LiteralPath $ideaTestPath -PathType Leaf) {
-    $engine = (Get-Process -Id $PID).Path
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $ideaTestPath
-    if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0043 and TEST-0044 idea-incubation validation failed'
+    foreach ($suite in $testSuites) {
+        & $engine -NoProfile -ExecutionPolicy Bypass -File $suite.FullName
+        if ($LASTEXITCODE -ne 0) {
+            Add-Failure "Child test suite failed: $($suite.Name)"
+        }
     }
 }
 
@@ -461,4 +605,9 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0051.' -ForegroundColor Green
+if ($StructureOnly) {
+    Write-Host 'Protocol structure validation passed, including TEST-0059.' -ForegroundColor Green
+}
+else {
+    Write-Host 'Protocol validation passed: TEST-0001 through TEST-0059.' -ForegroundColor Green
+}

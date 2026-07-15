@@ -94,3 +94,16 @@ and convergence or blocked outcome.
 - [ ] Documentation, links, version, and project memory current.
 - [ ] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed; if CI is not configured, rationale recorded.
+
+## Post-merge release evidence
+
+Keep this gate separate from the pre-merge Definition of Done. Complete it only
+after publication; use `Pending` before then and never predict a commit or
+release identifier.
+
+| Field | Evidence |
+| --- | --- |
+| Release authority | Published immutable GitHub Release, historical annotated tag, or explicit N/A rationale |
+| Release identifier | Exact tag/release link or `Pending` |
+| Target commit | Exact full commit SHA/link from an external post-publication record, or `Pending` |
+| Verification evidence | External release API/ref/check result and date, or `Pending` |

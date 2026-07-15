@@ -4,9 +4,11 @@ This guide installs the one-file seed for the meAndAI AI-capabilities
 lifecycle. It supports both a clean existing GitHub repository and a local
 directory that has no repository or `origin` yet.
 
-The launcher creates the repository when needed, provisions credentials,
-publishes the exact seed, dispatches the lifecycle workflow, and waits for its
-bounded result. If that run creates a semantic adoption draft, the launcher
+The download command first verifies the requested immutable GitHub Release.
+The launcher repeats that verification before accepting executable source,
+creates the repository when needed, provisions credentials, publishes the exact
+seed, dispatches the lifecycle workflow, and waits for its bounded result. If
+that run creates a semantic adoption draft, the launcher
 uses local Codex CLI synchronously in a temporary clone, validates and pushes
 the result, and marks the pull request ready. The launcher, not Codex,
 reconciles the common labels and adoption issue. It never approves or merges;
@@ -42,15 +44,19 @@ consumer exists may need that repository added after the launcher's first
 attempt; update the grant and rerun the same command.
 
 Do not commit either token file. The launcher adds both names to
-`.git/info/exclude` and blocks tracked or historically committed copies even
-when an optional source file is currently absent. For an existing repository it
-lists repository-level Actions secret names, preserves either canonical name
-that already exists, and sends a value through `gh secret set` only for a
-missing name. GitHub does not reveal stored values, so this presence check does
-not validate value, scope, expiry, or usability. Organization and environment
-secrets do not replace these two repository secrets. Secret provisioning is
-deterministic PowerShell/`gh` work; it does not require Codex and values are
-never placed in the Codex prompt.
+`.git/info/exclude`, rejects shallow repositories, and blocks copies found in
+the index or in locally reachable Git refs and reflogs even when an optional
+source file is currently absent. This local check cannot prove the absence of a
+credential path in remote commits that were never fetched or that have already
+been pruned or garbage-collected. Rotate the credential and inspect the remote
+history whenever prior exposure is suspected. For an existing repository the
+launcher lists repository-level Actions secret names, preserves either
+canonical name that already exists, and sends a value through `gh secret set`
+only for a missing name. GitHub does not reveal stored values, so this presence
+check does not validate value, scope, expiry, or usability. Organization and
+environment secrets do not replace these two repository secrets. Secret
+provisioning is deterministic PowerShell/`gh` work; it does not require Codex
+and values are never placed in the Codex prompt.
 
 When `MEANDAI_PROTOCOL_TOKEN` exists but its local file is absent, the launcher
 does not and cannot recover the stored value. It uses the authenticated local
@@ -60,19 +66,37 @@ private protocol repository, the launcher stops with a source-access error.
 
 ## Quick command
 
-Open PowerShell in the target directory and paste this single line. It
-downloads the launcher from the exact `v0.7.3` tag into the OS temp directory
-and runs it; it does not execute a moving `main` file.
+Open PowerShell in the target directory and paste this single line. It verifies
+that `v0.8.0` is an exact published immutable GitHub Release before downloading
+the launcher from its locked tag into the OS temp directory; it does not
+execute a moving `main` file.
 
 ```powershell
-$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.7.3.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.3' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$t='v0.8.0'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.7.3.ps1'
-gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.3' | Set-Content -LiteralPath $launcher -Encoding UTF8
+$tag = 'v0.8.0'
+$release = gh api -H 'Accept: application/vnd.github+json' `
+  -H 'X-GitHub-Api-Version: 2026-03-10' `
+  "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
+$publishedAt = [DateTimeOffset]::MinValue
+if ([string]$release.tag_name -cne $tag -or
+    $release.draft -isnot [bool] -or $release.draft -or
+    $release.prerelease -isnot [bool] -or $release.prerelease -or
+    $release.immutable -isnot [bool] -or -not $release.immutable -or
+    -not [DateTimeOffset]::TryParse(
+      [string]$release.published_at, [ref]$publishedAt
+    )) {
+  throw "Protocol release $tag is not published and immutable."
+}
+$launcher = Join-Path $env:TEMP "Invoke-MeAndAIQuickAdoption-$tag.ps1"
+gh api -H 'Accept: application/vnd.github.raw+json' `
+  -H 'X-GitHub-Api-Version: 2026-03-10' `
+  "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$tag" |
+  Set-Content -LiteralPath $launcher -Encoding UTF8
 & $launcher -TargetPath .
 ```
 
