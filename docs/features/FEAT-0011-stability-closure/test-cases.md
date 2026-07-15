@@ -38,3 +38,4 @@ Implementations:
 | --- | --- | --- | --- | --- |
 | 2026-07-15 | `main` at `v0.8.0` | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Baseline pass in 203.7 seconds before FEAT-0011; new scenarios not yet implemented |
 | 2026-07-15 | FEAT-0011 publication candidate; exact commit retained by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | All discovered suites passed in 225.3 seconds, including `TEST-0060` through `TEST-0068` |
+| 2026-07-15 | FEAT-0011 publication candidate | actionlint 1.7.12 plus Windows PowerShell 5.1 | `actionlint .github/workflows/protocol-tests.yml`; `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1 -StructureOnly` | Zero workflow errors; protocol structure pass after replacing unsupported dynamic shell context |

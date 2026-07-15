@@ -16,7 +16,10 @@ test claims map to executable scenarios without physical-line or blanket-range
 proxies.
 
 All discovered protocol suites passed on Windows PowerShell 5.1 in 225.3
-seconds. The bounded confirmation found no unresolved blocking finding.
+seconds. The first hosted publication gate exposed an unsupported dynamic shell
+context before job creation; constant OS-qualified steps plus a structural
+regression corrected it, and actionlint then reported zero errors. The bounded
+confirmation found no unresolved blocking finding.
 
 The implementation remains inside the existing scripts, fixtures, protocol
 documents, and CI workflow. No hosted coordinator, semantic memory validator,

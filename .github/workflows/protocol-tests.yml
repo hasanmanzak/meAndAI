@@ -18,9 +18,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            shell: pwsh
           - os: windows-latest
-            shell: powershell
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
@@ -32,6 +30,11 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: ruby -e "require 'yaml'; YAML.load_file('templates/project/.github/workflows/meandai-protocol-update.yml')"
-      - name: Run protocol validation
-        shell: ${{ matrix.shell }}
+      - name: Run protocol validation on PowerShell 7
+        if: runner.os == 'Linux'
+        shell: pwsh
+        run: ./tests/protocol.tests.ps1
+      - name: Run protocol validation on Windows PowerShell 5.1
+        if: runner.os == 'Windows'
+        shell: powershell
         run: ./tests/protocol.tests.ps1

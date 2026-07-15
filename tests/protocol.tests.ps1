@@ -321,11 +321,14 @@ if (-not $ciWorkflow.Contains('timeout-minutes:')) {
 foreach ($requiredText in @(
     'persist-credentials: false', 'os: ubuntu-latest', 'shell: pwsh',
     'os: windows-latest', 'shell: powershell', 'Parse consumer workflow YAML',
-    "require 'yaml'"
+    "require 'yaml'", "if: runner.os == 'Linux'", "if: runner.os == 'Windows'"
 )) {
     if (-not $ciWorkflow.Contains($requiredText)) {
         Add-Failure "TEST-0067 repository CI compatibility contract is missing '$requiredText'"
     }
+}
+if ($ciWorkflow.Contains('shell: ${{ matrix.shell }}')) {
+    Add-Failure 'TEST-0067 repository CI uses matrix context where the shell field does not permit it.'
 }
 
 $docsIndex = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw

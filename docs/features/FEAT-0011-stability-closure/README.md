@@ -159,7 +159,11 @@ blocking fixture or implementation defects: an escaped mock URI, an empty issue
 inventory binding failure, a timeout fixture using the wrong mock mode, and a
 process-termination race that hid the canonical timeout result. The complete
 suite then passed once in 225.3 seconds. The bounded confirmation found no
-remaining blocking finding; no unchanged scan or validator layer was added.
+remaining code or protocol finding. The first hosted publication gate then
+exposed one unsupported `matrix.shell` context before any job could start; the
+workflow now uses constant OS-qualified shells, its regression rejects that
+invalid expression, and actionlint reports zero errors. No unchanged scan or
+validator layer was added.
 
 ## Definition of Done
 
