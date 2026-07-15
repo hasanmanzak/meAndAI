@@ -24,12 +24,12 @@ the maintainer performs the final review and merge.
   temporary package `@openai/codex@0.144.4` without a global install.
 - An existing connected consumer is clean, checked out on its GitHub default
   branch, and synchronized with `origin`.
-- The target directory contains these two local-only files:
+- The target directory contains the applicable local-only files:
 
-| Local file | Content | Actions secret created by the launcher |
-| --- | --- | --- |
-| `FG_PAT.txt` | Consumer updater fine-grained PAT | `MEANDAI_UPDATER_TOKEN` |
-| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | `MEANDAI_PROTOCOL_TOKEN` |
+| Local file | Content | Requirement | Actions secret mapping |
+| --- | --- | --- | --- |
+| `FG_PAT.txt` | Consumer updater fine-grained PAT | Required for a new repository or when `MEANDAI_UPDATER_TOKEN` is absent; not read when that secret exists | `MEANDAI_UPDATER_TOKEN` |
+| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | Required to fetch the exact private protocol source | `MEANDAI_PROTOCOL_TOKEN` |
 
 The updater token needs repository access plus `Contents: Read and write`,
 `Pull requests: Read and write`, and `Workflows: Read and write` for its
@@ -40,26 +40,31 @@ consumer exists may need that repository added after the launcher's first
 attempt; update the grant and rerun the same command.
 
 Do not commit either token file. The launcher adds both names to
-`.git/info/exclude`, blocks tracked or historically committed copies, transfers
-their values only to the two named repository secrets, and leaves the local
-files in place. Secret provisioning is deterministic PowerShell/`gh` work; it
-does not require Codex and the values are never placed in the Codex prompt.
+`.git/info/exclude` and blocks tracked or historically committed copies even
+when an optional source file is currently absent. For an existing repository it
+lists repository-level Actions secret names, preserves either canonical name
+that already exists, and sends a value through `gh secret set` only for a
+missing name. GitHub does not reveal stored values, so this presence check does
+not validate value, scope, expiry, or usability. Organization and environment
+secrets do not replace these two repository secrets. Secret provisioning is
+deterministic PowerShell/`gh` work; it does not require Codex and values are
+never placed in the Codex prompt.
 
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It
-downloads the launcher from the exact `v0.6.1` tag into the OS temp directory
+downloads the launcher from the exact `v0.6.2` tag into the OS temp directory
 and runs it; it does not execute a moving `main` file.
 
 ```powershell
-$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.6.1.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.1' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.6.1.ps1'
-gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.1' | Set-Content -LiteralPath $launcher -Encoding UTF8
+$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'
+gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $launcher -Encoding UTF8
 & $launcher -TargetPath .
 ```
 
@@ -76,9 +81,9 @@ override the inferred identity or visibility:
 & $launcher -TargetPath . -Owner 'my-owner' -RepositoryName 'my-repo' -Visibility private
 ```
 
-Running the command is explicit authorization to read the two fixed token
-files and transmit their contents only to the selected `<owner>/<repository>`
-as `MEANDAI_UPDATER_TOKEN` and `MEANDAI_PROTOCOL_TOKEN` Actions secrets. The
+Running the command is explicit authorization to read the applicable fixed
+token files and transmit a value only when its mapped repository secret is
+missing. Existing mapped secret names are preserved without overwrite. The
 values are not command-line arguments and are not printed.
 
 If remote creation succeeds but a later credential, commit, workflow, or local
@@ -87,7 +92,8 @@ condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 ## Default execution order
 
-Only after both secrets are stored and the seed commit is pushed, the launcher:
+Only after both repository secret names are present—either preserved or
+created—and the seed commit is pushed, the launcher:
 
 1. Dispatches **meAndAI AI capabilities lifecycle** on the default branch.
 2. Waits up to 15 minutes for that exact commit's run and fails if it is not
