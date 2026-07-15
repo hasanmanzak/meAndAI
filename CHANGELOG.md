@@ -3,6 +3,36 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.6.0 - 2026-07-15
+
+### Added
+
+- Added one source-only PowerShell launcher that installs the exact tagged
+  lifecycle workflow into a clean connected consumer or creates a private
+  GitHub repository for a new local directory.
+- Added credential-safe provisioning from `FG_PAT.txt` and
+  `MEANDAI_RO_FG_PAT.txt` to the fixed repository Actions secrets without
+  printing, committing, deleting, or passing token values as arguments.
+- Added fail-closed repository, branch, source-blob, workflow-collision,
+  token-history, exact-staging, and updater-token-access gates.
+- Added a concise quick adoption guide, consumer Codex handoff prompt, and
+  executable `TEST-0033` through `TEST-0037` coverage.
+- Added bounded post-publication lifecycle dispatch and a marker-protected
+  Codex Cloud task on the deterministic adoption draft.
+
+### Changed
+
+- First adoption may now begin with one local launcher invocation through the
+  successful lifecycle run and durable Codex Cloud handoff; final review and
+  merge remain explicit maintainer gates.
+- New-directory adoption publishes only the canonical seed workflow and leaves
+  unrelated local content untracked.
+
+Related work: [FEAT-0006](docs/features/FEAT-0006-quick-adoption-launcher/README.md),
+[DEC-0007](docs/decisions/DEC-0007-local-quick-adoption-boundary.md), and
+[issue #19](https://github.com/hasanmanzak/meAndAI/issues/19), delivered by
+[pull request #20](https://github.com/hasanmanzak/meAndAI/pull/20).
+
 ## 0.5.0 - 2026-07-15
 
 ### Added

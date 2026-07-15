@@ -4,12 +4,13 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.5.0**
+Current protocol version: **0.6.0**
 
 ## Start here
 
 - Read the [common protocol](PROTOCOL.md).
 - Follow the [adoption guide](docs/adoption.md) in a consuming repository.
+- Use [quick adoption](docs/quick-adoption.md) for the one-command local seed.
 - Browse the [feature index](docs/features/README.md) and
   [decision index](docs/decisions/README.md).
 - Read this repository's isolated [project memory](.ai/memory/README.md).
@@ -38,6 +39,11 @@ Workflow-only adoption, collision-aware agent handoff, and the unified
 AI-capabilities lifecycle are tracked by
 [FEAT-0005](docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md) and
 [GitHub issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
+
+One-command local repository creation, secret provisioning, and seed
+publication are tracked by
+[FEAT-0006](docs/features/FEAT-0006-quick-adoption-launcher/README.md) and
+[GitHub issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.
