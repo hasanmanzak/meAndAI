@@ -1,7 +1,7 @@
 # DEC-0007 - Use a Local Quick-Adoption Launcher with Explicit Credential Files
 
 - Classification: Decision
-- Status: Accepted
+- Status: Superseded in part by [DEC-0008](DEC-0008-local-codex-execution.md)
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer administrators
 - Related features: [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md)

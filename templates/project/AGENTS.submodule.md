@@ -6,7 +6,7 @@ These instructions apply to the consuming repository.
    adoption handoff. Complete its project-specific tasks and remove the
    manifest before the pull request becomes ready or merges.
 2. Read the local common protocol at `.ai/protocol/PROTOCOL.md`, pinned from
-   [meAndAI v0.6.0](https://github.com/hasanmanzak/meAndAI/blob/v0.6.0/PROTOCOL.md).
+   [meAndAI v0.6.1](https://github.com/hasanmanzak/meAndAI/blob/v0.6.1/PROTOCOL.md).
 3. Read this project's `.ai/memory/README.md`.
 4. Read the relevant project-owned feature and decision documents before work.
 5. Apply project-specific rules below. A relaxation of the common protocol

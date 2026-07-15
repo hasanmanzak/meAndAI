@@ -22,14 +22,14 @@ This boundary is defined by
 For the shortest supported setup, follow the
 [quick adoption guide](quick-adoption.md). It creates or validates the GitHub
 repository, provisions the required secrets, publishes only the lifecycle
-seed, dispatches its bounded run, and hands the resulting draft to Codex Cloud
-without merging it.
+seed, dispatches its bounded run, and completes any resulting semantic draft
+through local Codex CLI without merging it.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.6.0`, the only repository file required
+For a new submodule consumer on `v0.6.1`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.6.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.6.1/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. The workflow checks out the exact tag
@@ -49,11 +49,13 @@ deterministic path.
 | `BlockedManualReview` | Seed identity, manifest ownership, branch/PR ownership, source, or another prerequisite is ambiguous. The run stops without cleanup or overwrite. |
 
 The workflow does not start an AI agent. It opens a durable, review-only
-handoff. Invoke Codex or another maintainer explicitly on the draft; that actor
-must reconcile collisions, create or verify Agile labels, create project-owned
-feature and decision records, tailor local memory, add and run project tests,
-repair links, and remove the manifest before marking the pull request ready or
-merging it. A full `BootstrapReady` proposal still contains the manifest
+handoff. In the quick-adoption path, the launcher reconciles the common Agile
+labels and one marked adoption issue before invoking local Codex with spawned
+network access disabled. In a manual path, the maintainer must create or verify
+those GitHub records. The semantic actor must reconcile collisions, create
+project-owned feature and decision records, tailor local memory, add and run
+project tests, repair links, and remove the manifest before marking the pull
+request ready or merging it. A full `BootstrapReady` proposal still contains the manifest
 because deterministic file installation is not evidence that the
 project-specific work is complete.
 
@@ -70,7 +72,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.6.0
+git -C .ai/protocol checkout v0.6.1
 git add .gitmodules .ai/protocol
 ```
 
@@ -294,7 +296,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.6.0`
+- ref: `v0.6.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -337,11 +339,11 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.6.0`:
+reviewed migration; the current example installs `v0.6.1`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.6.0
+git -C .ai/protocol checkout v0.6.1
 git add .ai/protocol
 ```
 

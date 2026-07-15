@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.6.0**<br>
+Protocol version: **0.6.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -377,14 +377,31 @@ committed credential files require rotation and MUST block the launcher. Both
 secrets MUST be reconciled before the seed is pushed.
 
 After publication, the launcher MAY dispatch the lifecycle workflow and wait
-for the exact published commit under a finite timeout. When Codex Cloud is
-configured for the consumer, it MAY then place one idempotently marked,
-maintainer-authored `@codex` task on the single deterministic adoption draft.
-That task MUST direct the agent to resolve the transient manifest, complete the
-project-owned records and tests, apply bounded review gates, push only to the
-draft branch, and never merge. Missing or ambiguous workflow runs, drafts, or
-delegation ownership MUST block or leave a clear manual handoff; automation
-MUST NOT approve or merge the pull request.
+for the exact published commit under a finite timeout. If that run creates one
+deterministic adoption draft with a transient manifest, the launcher MAY invoke
+an authenticated local Codex CLI synchronously in a temporary clone of the
+draft's exact head. Secret provisioning MUST remain deterministic launcher
+work: token values and source credential files MUST NOT enter the clone, agent
+prompt, command arguments, output, or project memory. An installed CLI is
+preferred; a temporary fallback MUST be version-pinned and MUST NOT perform a
+global installation.
+
+Before local semantic work, the launcher MUST idempotently reconcile the common
+Agile labels and one canonically marked, project-owned adoption issue through
+its authenticated GitHub boundary. The local agent MUST receive that issue
+reference, run under a finite timeout with spawned-command network disabled,
+resolve the transient manifest, complete the repository-local records and
+tests, apply bounded review gates, and leave every GitHub mutation and Git
+publication operation to the launcher. Before publication, the launcher MUST
+verify the unchanged draft head, manifest removal, credential-file absence, a
+valid reviewable change set, and an unchanged live remote branch. It MAY then
+create one completion commit, push it only with an exact expected-head lease,
+and mark the pull request ready. A draft whose manifest was already absent when
+the launcher inspected it MUST NOT be promoted automatically because its
+completion provenance is unknown. Missing or ambiguous workflow runs, drafts,
+local CLI authentication, semantic results, or branch ownership MUST block or
+leave a clear manual handoff. Neither launcher nor agent may approve or merge
+the pull request.
 
 A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
 self-reconciling, consumer-owned update workflow supplied by the pinned
