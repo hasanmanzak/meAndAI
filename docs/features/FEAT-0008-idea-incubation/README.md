@@ -154,4 +154,6 @@ unresolved actionable in-scope finding remains, so the bounded scan stops.
 - [x] No unresolved blocking finding; residual risks are owned and linked.
 - [x] Documentation, links, version, changelog, and project memory current.
 - [x] Issue, pull request, decision, and related records cross-linked.
-- [ ] Applicable CI and review gates passed.
+- [x] Applicable CI and review gates passed in
+  [Protocol validation run 29423653441](https://github.com/hasanmanzak/meAndAI/actions/runs/29423653441)
+  on Ubuntu and Windows; GitGuardian also passed.
