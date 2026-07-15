@@ -29,3 +29,4 @@ repository suites.
 | 2026-07-15 | `main` at `v0.5.0` before FEAT-0006 changes | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: existing `TEST-0001` through `TEST-0032` baseline |
 | 2026-07-15 | FEAT-0006 pre-delivery working tree | Windows PowerShell 5.1, Turkish locale | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Pass: `TEST-0033` through `TEST-0037` |
 | 2026-07-15 | FEAT-0006 pre-delivery working tree | Windows PowerShell 5.1, Turkish locale | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: `TEST-0001` through `TEST-0037` in 99.5 seconds |
+| 2026-07-15 | PR #20 commit `31563a3` | GitHub-hosted Ubuntu and Windows plus GitGuardian | [Protocol validation run](https://github.com/hasanmanzak/meAndAI/actions/runs/29413498953) | Pass: Ubuntu, Windows, and secret scan |

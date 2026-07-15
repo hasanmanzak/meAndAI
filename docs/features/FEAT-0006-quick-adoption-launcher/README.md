@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In review |
+| Status | Complete |
 | Target version | 0.6.0 |
 | Issue | [#19](https://github.com/hasanmanzak/meAndAI/issues/19) |
 | Pull request | [#20](https://github.com/hasanmanzak/meAndAI/pull/20) |
@@ -173,7 +173,7 @@ unresolved actionable in-scope finding remained.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Applicable CI and review gates pass.
 
 ## Post-merge release gate
 
