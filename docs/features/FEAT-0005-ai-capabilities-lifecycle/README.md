@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In review |
+| Status | Complete |
 | Target version | 0.5.0 |
 | Issue | [#17](https://github.com/hasanmanzak/meAndAI/issues/17) |
 | Pull request | [#18](https://github.com/hasanmanzak/meAndAI/pull/18) |
@@ -204,7 +204,7 @@ risks remain `RISK-0022` through `RISK-0028`.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Applicable CI and review gates pass.
 
 ## Post-merge release gate
 
