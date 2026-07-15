@@ -7,15 +7,14 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.5.0`
-- Current scope: workflow-seeded AI-capabilities adoption, bootstrap, handoff,
-  and update lifecycle tracked by
-  [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
+- Current protocol version: `0.6.0`
+- Current scope: one-command local AI-capabilities adoption seeding tracked by
+  [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
-- Current delivery: [FEAT-0005 pull request #18](https://github.com/hasanmanzak/meAndAI/pull/18).
+- Latest tracked work: [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
+- Current delivery: [FEAT-0006](../../docs/features/FEAT-0006-quick-adoption-launcher/README.md); pull request pending.
 
 ## Collaboration constraints
 
@@ -55,6 +54,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.5.0` lets a submodule consumer seed only the canonical workflow. It
   proposes all absent deterministic adoption assets or a manifest-only semantic
   handoff on collision, then delegates later releases to the local updater.
+- `v0.6.0` adds a source-only local launcher that creates or validates the
+  consumer repository, provisions both fixed Actions secrets, and publishes
+  only the exact seed workflow. It then runs the bounded lifecycle and places
+  one idempotent Codex Cloud adoption task on the draft; it never merges.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

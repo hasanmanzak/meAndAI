@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.5.0**<br>
+Protocol version: **0.6.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -355,6 +355,36 @@ overwrite. The manifest MUST be removed before the draft becomes ready or
 merges. After reviewed adoption, the local updater owns compatible update
 discovery and supersession under the controls below. The source-only bootstrap
 resolver and adapter are not copied into the consumer.
+
+#### Local quick-adoption launcher
+
+A consumer adopting `v0.6.0` or later MAY use the protocol's source-only local
+launcher to establish the seed workflow. The launcher MUST fetch the workflow
+from an exact protocol tag, verify the returned Git blob, reject a differing
+existing seed, and stage and publish only
+`.github/workflows/meandai-protocol-update.yml`. Existing connected consumers
+MUST be clean, on their synchronized GitHub default branch, and preserve all
+consumer-owned content. A new directory MAY be initialized and connected to a
+new private repository by default, but unrelated local files MUST remain
+unpublished.
+
+When the explicit local inputs `FG_PAT.txt` and `MEANDAI_RO_FG_PAT.txt` are
+used, their values MUST be stored only as `MEANDAI_UPDATER_TOKEN` and
+`MEANDAI_PROTOCOL_TOKEN`, respectively. The values MUST travel through
+standard input rather than command arguments and MUST NOT be printed, tracked,
+committed, deleted, or written to project memory. Tracked or historically
+committed credential files require rotation and MUST block the launcher. Both
+secrets MUST be reconciled before the seed is pushed.
+
+After publication, the launcher MAY dispatch the lifecycle workflow and wait
+for the exact published commit under a finite timeout. When Codex Cloud is
+configured for the consumer, it MAY then place one idempotently marked,
+maintainer-authored `@codex` task on the single deterministic adoption draft.
+That task MUST direct the agent to resolve the transient manifest, complete the
+project-owned records and tests, apply bounded review gates, push only to the
+draft branch, and never merge. Missing or ambiguous workflow runs, drafts, or
+delegation ownership MUST block or leave a clear manual handoff; automation
+MUST NOT approve or merge the pull request.
 
 A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
 self-reconciling, consumer-owned update workflow supplied by the pinned

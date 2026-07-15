@@ -64,6 +64,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-urgent-gate-order.md',
     '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
     '.ai/memory/log/2026-07-15-feat-0002-release-gate-evidence.md',
+    '.ai/memory/log/2026-07-15-quick-adoption-launcher.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
@@ -74,12 +75,17 @@ $requiredFiles = @(
     'docs/features/FEAT-0003-convergent-completion-scan/test-cases.md',
     'docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md',
     'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
+    'docs/features/FEAT-0006-quick-adoption-launcher/README.md',
+    'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
     'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md',
     'docs/decisions/DEC-0004-bounded-completion-convergence.md',
     'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md',
+    'docs/decisions/DEC-0007-local-quick-adoption-boundary.md',
+    'docs/quick-adoption.md',
+    'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
     'templates/project/AGENTS.repository-reference.md',
     'templates/project/.ai/memory/README.md',
@@ -105,6 +111,7 @@ $requiredFiles = @(
     'tests/protocol-update.tests.ps1',
     'tests/capabilities-bootstrap.tests.ps1',
     'tests/capabilities-bootstrap-adapter.tests.ps1',
+    'tests/quick-adoption.tests.ps1',
     '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
@@ -381,10 +388,19 @@ if (Test-Path -LiteralPath $capabilitiesTestPath -PathType Leaf) {
     }
 }
 
+$quickAdoptionTestPath = Join-Path $root 'tests/quick-adoption.tests.ps1'
+if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
+    $engine = (Get-Process -Id $PID).Path
+    & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
+    if ($LASTEXITCODE -ne 0) {
+        Add-Failure 'TEST-0033 through TEST-0037 quick adoption validation failed'
+    }
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0032.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0037.' -ForegroundColor Green

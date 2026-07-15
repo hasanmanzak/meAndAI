@@ -19,15 +19,21 @@ This boundary is defined by
 [DEC-0001](decisions/DEC-0001-portable-protocol-reference.md) and
 [DEC-0002](decisions/DEC-0002-project-local-memory.md).
 
+For the shortest supported setup, follow the
+[quick adoption guide](quick-adoption.md). It creates or validates the GitHub
+repository, provisions the required secrets, publishes only the lifecycle
+seed, dispatches its bounded run, and hands the resulting draft to Codex Cloud
+without merging it.
+
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.5.0`, the only repository file that must be
-seeded manually is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.5.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+For a new submodule consumer on `v0.6.0`, the only repository file required
+before the lifecycle runs is the exact canonical
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.6.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
-[credentials](#update-workflow-prerequisites-and-behavior), then run the
-workflow manually or wait for its schedule. The workflow checks out the exact
-tag embedded in its own reviewed content; it never executes a moving `main`.
+[credentials](#update-workflow-prerequisites-and-behavior), then use quick
+adoption or run the workflow manually. The workflow checks out the exact tag
+embedded in its own reviewed content; it never executes a moving `main`.
 
 The same operation covers an empty repository, a populated repository, and an
 already adopted repository. Classification depends only on collisions with
@@ -64,7 +70,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.5.0
+git -C .ai/protocol checkout v0.6.0
 git add .gitmodules .ai/protocol
 ```
 
@@ -288,7 +294,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.5.0`
+- ref: `v0.6.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -331,11 +337,11 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.5.0`:
+reviewed migration; the current example installs `v0.6.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.5.0
+git -C .ai/protocol checkout v0.6.0
 git add .ai/protocol
 ```
 
