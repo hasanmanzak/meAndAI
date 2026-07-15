@@ -61,18 +61,18 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It
-downloads the launcher from the exact `v0.7.2` tag into the OS temp directory
+downloads the launcher from the exact `v0.7.3` tag into the OS temp directory
 and runs it; it does not execute a moving `main` file.
 
 ```powershell
-$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.7.2.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.2' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.7.3.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.3' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.7.2.ps1'
-gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.2' | Set-Content -LiteralPath $launcher -Encoding UTF8
+$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.7.3.ps1'
+gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.7.3' | Set-Content -LiteralPath $launcher -Encoding UTF8
 & $launcher -TargetPath .
 ```
 
@@ -149,7 +149,37 @@ the draft ready; the maintainer must validate that prior change manually.
 
 ## Codex prompt
 
-The launcher supplies a scoped prompt over standard input. Its essential
+The displayed prompt is not the adoption entry point. Run the
+[quick command](#quick-command) from the original target directory; the parent
+PowerShell launcher starts and owns the end-to-end operation. By the time it
+supplies this prompt to Codex, the launcher has already:
+
+1. created or validated the GitHub repository;
+2. reconciled both repository Actions secret names, reading an applicable
+   local credential file only when its mapped secret was missing;
+3. published the seed, completed the lifecycle run, resolved its deterministic
+   draft, and reconciled the adoption labels and issue; and
+4. cloned the exact draft head into a separate OS temporary directory for the
+   Codex workspace.
+
+For a new repository, place both credential files in the original target
+directory before running the quick command. For an existing repository, each
+file is required only when its mapped secret is missing, as described under
+[Prerequisites](#prerequisites). The launcher excludes these files from Git and
+never commits, pushes, or deletes them. They are never copied into the isolated
+clone. Therefore, "intentionally absent" below refers only to the temporary
+Codex workspace; it does not say that the files were absent from, or never
+required in, the original target.
+
+The parent launcher retains network access and owns `gh`, GitHub API, and
+remote Git operations before and after the Codex phase. Only commands spawned
+inside the Codex session have network access disabled. The configured model
+service remains reachable by Codex itself, so this is network-restricted local
+orchestration rather than offline inference. After Codex returns, the launcher
+validates the result, creates the completion commit, lease-pushes the draft,
+and marks the pull request ready; the maintainer still owns merge.
+
+The launcher supplies its scoped prompt over standard input. Its essential
 contract is:
 
 ```text
@@ -163,17 +193,22 @@ local memory, tests, evidence, and clickable links. Reference the project-owned
 adoption issue already created by the launcher. Do not invent project facts.
 Remove the manifest only when all adoption gates are satisfied.
 
-Secret provisioning is complete: FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and
-MEANDAI_RO_FG_PAT.txt maps to MEANDAI_PROTOCOL_TOKEN. The files are intentionally
-absent. Do not search for, request, print, recreate, or modify credential values
-or repository secrets.
+Secret provisioning was reconciled by the parent launcher before this Codex
+step. FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and MEANDAI_RO_FG_PAT.txt maps to
+MEANDAI_PROTOCOL_TOKEN. When a mapped secret was missing, its source file was
+read only from the maintainer's original target directory. Those files were
+never committed or copied into the isolated clone, so they are intentionally
+absent from this Codex workspace. Do not search for, request, print, recreate,
+or modify credential values or repository secrets.
 
-Spawned-command network access is disabled. Do not invoke gh, GitHub APIs,
-remote Git operations, or another external service. Do not change the pinned
-protocol or lifecycle workflow. Do not commit, push, approve, mark ready,
-merge, close, or delete; the launcher owns GitHub records and publication and
-the maintainer owns merge. Keep review bounded and report the exact blocker if
-project facts or required evidence are unavailable.
+The parent launcher owns GitHub and remote Git operations before and after this
+Codex step. Network access is disabled only for commands spawned during this
+step. Within this clone, do not invoke gh, GitHub APIs, remote Git operations,
+or another external service. Do not change the pinned protocol or lifecycle
+workflow. Do not commit, push, approve, mark ready, merge, close, or delete;
+the launcher owns GitHub records and publication and the maintainer owns merge.
+Keep review bounded and report the exact blocker if project facts or required
+evidence are unavailable.
 ```
 
 For lifecycle states, collision semantics, and the manual alternative, see the
