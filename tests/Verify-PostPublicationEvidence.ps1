@@ -60,7 +60,13 @@ $repositoryApi = "$apiRoot/repos/$Repository"
 function Invoke-GitHubGet {
     param([Parameter(Mandatory)][AllowEmptyString()][string]$Path)
 
-    return Invoke-RestMethod -Method Get -Uri "$repositoryApi/$Path" -Headers $headers
+    $uri = if ([string]::IsNullOrEmpty($Path)) {
+        $repositoryApi
+    }
+    else {
+        "$repositoryApi/$Path"
+    }
+    return Invoke-RestMethod -Method Get -Uri $uri -Headers $headers
 }
 
 $encodedTag = ConvertTo-ApiPath $Tag

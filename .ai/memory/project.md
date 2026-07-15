@@ -7,7 +7,7 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.2`. Exact publication state is authoritative
+- Current protocol version: `0.8.3`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
   [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38), not duplicated
   in this repository snapshot.
@@ -110,6 +110,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   reserved-branch inventory, contract-bearing test evidence, recurring
   actionlint, auditable scan records, external publication evidence, and the
   mandatory bounded consumer completion scan.
+- `v0.8.3` corrects the post-publication verifier's repository-root URL after
+  the immutable v0.8.2 external run exposed an invalid trailing slash. The
+  focused mock now rejects that URL shape.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

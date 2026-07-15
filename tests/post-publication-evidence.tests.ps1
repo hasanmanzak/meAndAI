@@ -38,7 +38,7 @@ function global:Invoke-RestMethod {
     }
     $global:MeAndAIPostPublicationRequests.Add($Uri)
 
-    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/') {
+    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer') {
         return [pscustomobject]@{ default_branch = 'main' }
     }
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/releases/tags/v1.2.3') {
@@ -133,6 +133,18 @@ try {
         $valid = Invoke-PostPublicationScenario -Mode 'Valid'
         if ($valid.Threw) {
             Add-Failure "TEST-0076 valid published evidence failed: $($valid.Error)"
+        }
+        $repositoryRootRequests = @($global:MeAndAIPostPublicationRequests |
+            Where-Object {
+                $_ -ceq 'https://api.test/repos/example/meandai-consumer'
+            })
+        $invalidTrailingRootRequests = @($global:MeAndAIPostPublicationRequests |
+            Where-Object {
+                $_ -ceq 'https://api.test/repos/example/meandai-consumer/'
+            })
+        if ($repositoryRootRequests.Count -ne 1 -or
+            $invalidTrailingRootRequests.Count -ne 0) {
+            Add-Failure 'TEST-0076 repository metadata endpoint used an invalid trailing slash.'
         }
         foreach ($requiredPath in @(
             '/releases/tags/v1.2.3', '/git/ref/tags/v1.2.3',
