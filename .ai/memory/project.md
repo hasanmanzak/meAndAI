@@ -16,7 +16,8 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: completed [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md),
-  with delivery evidence owned by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36).
+  with delivery evidence owned by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36)
+  and [pull request #37](https://github.com/hasanmanzak/meAndAI/pull/37).
 - Latest completed release delivery: FEAT-0011, published as immutable release
   [`v0.8.1`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1).
   The release and issue retain the exact pull request, target commit, checks,

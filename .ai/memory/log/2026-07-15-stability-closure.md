@@ -3,6 +3,7 @@
 - Work: [FEAT-0011](../../../docs/features/FEAT-0011-stability-closure/README.md)
 - Decision: [DEC-0011](../../../docs/decisions/DEC-0011-qualified-evidence-and-closure.md)
 - Tracking: [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36)
+- Delivery: [pull request #37](https://github.com/hasanmanzak/meAndAI/pull/37)
 - Target: `0.8.1`
 - Status: Complete; exact publication evidence is retained by issue #36 and the
   immutable `v0.8.1` release.

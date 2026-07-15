@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.8.1 |
 | Issue | [#36](https://github.com/hasanmanzak/meAndAI/issues/36) |
-| Pull request | Recorded in [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and updated before publication |
+| Pull request | [#37](https://github.com/hasanmanzak/meAndAI/pull/37) |
 | Decision | [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
