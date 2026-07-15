@@ -5,7 +5,7 @@
 - Work item: [FEAT-0007](../../../docs/features/FEAT-0007-local-codex-adoption/README.md)
 - Decision: [DEC-0008](../../../docs/decisions/DEC-0008-local-codex-execution.md)
 - Tracking: [issue #21](https://github.com/hasanmanzak/meAndAI/issues/21)
-- Delivery: pull request pending
+- Delivery: [pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22)
 - Target release: `v0.6.1`
 
 ## Durable outcome
@@ -37,5 +37,5 @@
   authentication/manifest/commit/race failures, unverified-draft handling,
   idempotency, and v0.6.1 regression metadata.
 - The full Windows PowerShell 5.1 suite passed `TEST-0001` through `TEST-0041`
-  in 94.4 seconds on 2026-07-15. Record the pull request, CI, merge, and release
-  tag before closing FEAT-0007.
+  in 94.4 seconds on 2026-07-15. Record CI, merge, and the release tag before
+  closing FEAT-0007.

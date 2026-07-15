@@ -6,7 +6,7 @@
 | Status | In review |
 | Target version | 0.6.1 |
 | Issue | [#21](https://github.com/hasanmanzak/meAndAI/issues/21) |
-| Pull request | Pending |
+| Pull request | [#22](https://github.com/hasanmanzak/meAndAI/pull/22) |
 | Decision | [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -108,6 +108,7 @@ lease. The maintainer retains the final pull-request review and merge gate.
 - Seed handoff: [DEC-0006](../../decisions/DEC-0006-seed-workflow-adoption-handoff.md)
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking: [issue #21](https://github.com/hasanmanzak/meAndAI/issues/21)
+- Delivery: [pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22)
 
 ## Definition of Ready
 
@@ -172,5 +173,5 @@ scan stops here.
 - [x] Both slice reviews and bounded scan stop condition complete.
 - [x] No unresolved blocking finding; residual risks explicit and owned.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.
