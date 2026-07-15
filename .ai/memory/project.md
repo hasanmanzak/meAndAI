@@ -7,22 +7,19 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.6.2`
-- Current scope: existing Actions-secret preservation in the quick-adoption
-  launcher, tracked by [issue #24](https://github.com/hasanmanzak/meAndAI/issues/24).
+- Current protocol version: `0.7.0`
+- Current scope: repository-native idea incubation shared with consumers,
+  tracked by [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #24](https://github.com/hasanmanzak/meAndAI/issues/24).
-- Current release candidate: completed
+- Latest tracked work: [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26).
+- Current release candidate: [FEAT-0008](../../docs/features/FEAT-0008-idea-incubation/README.md),
+  targeting `v0.7.0` after review, merge, and the separate post-merge tag gate.
+- Latest released delivery: completed
   [BUG-0001](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
-  in [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25), targeting
-  `v0.6.2` after the separate post-merge tag gate.
-- Latest released delivery before the current candidate: completed
-  [FEAT-0007](../../docs/features/FEAT-0007-local-codex-adoption/README.md) in
-  merged [pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22),
-  released at exact merge commit `a4ffefa698b079815edebda86204150b03707957`
-  by annotated tag [`v0.6.1`](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1).
+  in [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25), released
+  as [`v0.6.2`](https://github.com/hasanmanzak/meAndAI/tree/v0.6.2).
 
 ## Collaboration constraints
 
@@ -76,6 +73,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   only missing mappings. GitHub does not reveal stored values, so the launcher
   does not claim to validate an existing secret's value. `FG_PAT.txt` is not
   required or read when `MEANDAI_UPDATER_TOKEN` already exists.
+- `v0.7.0` adds repository-native `IDEA-NNNN` incubation, a pinned consumer
+  template, and absent-only idea-index installation for new collision-free
+  adoption. Ideas do not authorize implementation or bypass delivery gates.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

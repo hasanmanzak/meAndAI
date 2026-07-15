@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.6.2',
+    [string]$TargetTag = 'v0.7.0',
     [string]$BranchPrefix = 'automation/meandai-capabilities-'
 )
 
@@ -30,6 +30,10 @@ $AdoptionAssets = @(
     [pscustomobject]@{
         ConsumerPath = '.ai/memory/log/README.md'
         TemplatePath = 'templates/project/.ai/memory/log/README.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = 'docs/ideas/README.md'
+        TemplatePath = 'templates/project/docs/ideas/README.md'
     },
     [pscustomobject]@{
         ConsumerPath = '.github/ISSUE_TEMPLATE/bug.yml'
