@@ -26,7 +26,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0010](docs/features/FEAT-0010-protocol-stability-invariants/README.md),
 [DEC-0010](docs/decisions/DEC-0010-stable-automation-invariants.md), and
-[issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
+[issue #34](https://github.com/hasanmanzak/meAndAI/issues/34), delivered through
+[pull request #35](https://github.com/hasanmanzak/meAndAI/pull/35).
 
 ## 0.7.3 - 2026-07-15
 

@@ -6,7 +6,7 @@
 | Status | Implemented; delivery gates pending |
 | Target version | 0.8.0 |
 | Issue | [#34](https://github.com/hasanmanzak/meAndAI/issues/34) |
-| Pull request | Pending publication |
+| Pull request | [#35](https://github.com/hasanmanzak/meAndAI/pull/35) |
 | Decision | [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -189,7 +189,7 @@ passed `TEST-0059`. Hosted Windows/Ubuntu CI remains the combined delivery gate.
 - [x] Slice reviews and bounded convergence scan complete.
 - [x] No unresolved blocking finding; residual limitations are explicit.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.
 
 ## Release gate

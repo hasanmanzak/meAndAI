@@ -5,6 +5,7 @@
 - Feature: [FEAT-0010](../../../docs/features/FEAT-0010-protocol-stability-invariants/README.md)
 - Decision: [DEC-0010](../../../docs/decisions/DEC-0010-stable-automation-invariants.md)
 - Tracking: [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34)
+- Delivery: [pull request #35](https://github.com/hasanmanzak/meAndAI/pull/35)
 - Branch: `codex/protocol-stability-invariants`
 - Target: `0.8.0`
 

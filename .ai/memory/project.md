@@ -17,8 +17,9 @@ Last verified: **2026-07-15**
   while retaining independent project memory.
 - Latest tracked work: [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
 - Current release delivery: `v0.8.0` is in progress on
-  `codex/protocol-stability-invariants`; pull-request, merge, and immutable
-  GitHub Release evidence remain pending at their respective gates.
+  `codex/protocol-stability-invariants` through
+  [pull request #35](https://github.com/hasanmanzak/meAndAI/pull/35); merge and
+  immutable GitHub Release evidence remain pending at their respective gates.
 - Latest completed release delivery:
   [BUG-0003](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
   in merged [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33),
