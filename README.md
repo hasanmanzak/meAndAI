@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.6.0**
+Current protocol version: **0.6.1**
 
 ## Start here
 
@@ -44,6 +44,10 @@ One-command local repository creation, secret provisioning, and seed
 publication are tracked by
 [FEAT-0006](docs/features/FEAT-0006-quick-adoption-launcher/README.md) and
 [GitHub issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
+
+Local Codex completion without a hosted GitHub-agent connection is tracked by
+[FEAT-0007](docs/features/FEAT-0007-local-codex-adoption/README.md) and
+[GitHub issue #21](https://github.com/hasanmanzak/meAndAI/issues/21).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.

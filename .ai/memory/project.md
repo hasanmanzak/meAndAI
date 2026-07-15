@@ -7,14 +7,14 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.6.0`
-- Current scope: one-command local AI-capabilities adoption seeding tracked by
-  [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
+- Current protocol version: `0.6.1`
+- Current scope: local Codex completion for one-command AI-capabilities adoption
+  tracked by [issue #21](https://github.com/hasanmanzak/meAndAI/issues/21).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
-- Current delivery: [FEAT-0006 pull request #20](https://github.com/hasanmanzak/meAndAI/pull/20).
+- Latest tracked work: [issue #21](https://github.com/hasanmanzak/meAndAI/issues/21).
+- Current delivery: [FEAT-0007](../../docs/features/FEAT-0007-local-codex-adoption/README.md); pull request pending.
 
 ## Collaboration constraints
 
@@ -58,6 +58,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   consumer repository, provisions both fixed Actions secrets, and publishes
   only the exact seed workflow. It then runs the bounded lifecycle and places
   one idempotent Codex Cloud adoption task on the draft; it never merges.
+- `v0.6.1` corrects that post-workflow boundary: no consumer Cloud connection
+  or `@codex` comment is used. An authenticated local CLI works synchronously
+  in a credential-free temporary clone under a finite timeout. The launcher
+  owns labels, the marked adoption issue, verification, and the lease-protected
+  push; Codex-spawned commands have network disabled. Secret creation remains
+  deterministic and AI-free.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

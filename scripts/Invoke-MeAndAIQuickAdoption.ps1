@@ -6,12 +6,17 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.6.0',
+    [string]$ProtocolTag = 'v0.6.1',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
+    [ValidateRange(1, 120)]
+    [int]$CodexTimeoutMinutes = 30,
     [switch]$SkipLifecycleDispatch,
-    [switch]$SkipCodexDelegation
+    [Alias('SkipCodexDelegation')]
+    [switch]$SkipLocalCodex,
+    [string]$CodexCommand = '',
+    [string]$TemporaryCodexVersion = '0.144.4'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -23,6 +28,20 @@ $tokenMappings = [ordered]@{
     'FG_PAT.txt' = 'MEANDAI_UPDATER_TOKEN'
     'MEANDAI_RO_FG_PAT.txt' = 'MEANDAI_PROTOCOL_TOKEN'
 }
+$adoptionLabels = @(
+    [pscustomobject]@{ Name = 'type:epic'; Color = '5319e7'; Description = 'Agile epic' },
+    [pscustomobject]@{ Name = 'type:feature'; Color = '1d76db'; Description = 'User-facing feature' },
+    [pscustomobject]@{ Name = 'type:subfeature'; Color = '0e8a16'; Description = 'Independently testable feature slice' },
+    [pscustomobject]@{ Name = 'type:task'; Color = 'd4c5f9'; Description = 'Implementation or maintenance task' },
+    [pscustomobject]@{ Name = 'type:bug'; Color = 'd73a4a'; Description = 'Defect' },
+    [pscustomobject]@{ Name = 'type:finding'; Color = 'fbca04'; Description = 'Review or scan finding' },
+    [pscustomobject]@{ Name = 'priority:p0'; Color = 'b60205'; Description = 'Critical priority' },
+    [pscustomobject]@{ Name = 'priority:p1'; Color = 'd93f0b'; Description = 'High priority' },
+    [pscustomobject]@{ Name = 'priority:p2'; Color = 'fbca04'; Description = 'Normal priority' },
+    [pscustomobject]@{ Name = 'priority:p3'; Color = '0e8a16'; Description = 'Low priority' },
+    [pscustomobject]@{ Name = 'status:blocked'; Color = 'b60205'; Description = 'Blocked by an unresolved dependency' },
+    [pscustomobject]@{ Name = 'status:needs-review'; Color = '5319e7'; Description = 'Ready for maintainer review' }
+)
 
 function Invoke-External {
     param(
@@ -368,7 +387,7 @@ function Get-AdoptionPullRequest {
     for ($attempt = 1; $attempt -le 6; $attempt++) {
         $list = Invoke-External -Command 'gh' -Arguments @(
             'pr', 'list', '--repo', $Repository, '--state', 'open', '--head', $branch,
-            '--limit', '10', '--json', 'number,url,isDraft,headRefName'
+            '--limit', '10', '--json', 'number,url,isDraft,headRefName,headRefOid'
         )
         try {
             $pullRequests = @(((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json))
@@ -376,14 +395,19 @@ function Get-AdoptionPullRequest {
         catch {
             throw 'GitHub CLI returned invalid adoption pull-request metadata.'
         }
-        $matches = @($pullRequests | Where-Object { $_.headRefName -ceq $branch })
-        if ($matches.Count -eq 1) {
-            if (-not [bool]$matches[0].isDraft) {
-                throw 'The deterministic adoption pull request is unexpectedly not a draft.'
+        $matchingPullRequests = @($pullRequests | Where-Object { $_.headRefName -ceq $branch })
+        if ($matchingPullRequests.Count -eq 1) {
+            foreach ($property in @('number', 'url', 'isDraft', 'headRefName', 'headRefOid')) {
+                if ($null -eq $matchingPullRequests[0].PSObject.Properties[$property]) {
+                    throw "The deterministic adoption pull request is missing '$property' metadata."
+                }
             }
-            return $matches[0]
+            if ([string]$matchingPullRequests[0].headRefOid -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'The deterministic adoption pull request has an invalid head commit.'
+            }
+            return $matchingPullRequests[0]
         }
-        if ($matches.Count -gt 1) {
+        if ($matchingPullRequests.Count -gt 1) {
             throw 'More than one open deterministic adoption pull request was found.'
         }
         if ($attempt -lt 6) {
@@ -394,50 +418,636 @@ function Get-AdoptionPullRequest {
     return $null
 }
 
-function Send-CodexAdoptionDelegation {
-    param(
-        [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)][int]$PullRequestNumber
-    )
+function Ensure-AdoptionLabels {
+    param([Parameter(Mandatory)][string]$Repository)
 
-    $marker = '<!-- meandai-codex-adoption-v1 -->'
-    $view = Invoke-External -Command 'gh' -Arguments @(
-        'pr', 'view', [string]$PullRequestNumber, '--repo', $Repository, '--json', 'comments'
+    $list = Invoke-External -Command 'gh' -Arguments @(
+        'label', 'list', '--repo', $Repository, '--limit', '1000', '--json', 'name'
     )
     try {
-        $pullRequest = ((@($view.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        $parsed = ((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        $existing = @($parsed | Where-Object { $null -ne $_ })
     }
     catch {
-        throw 'GitHub CLI returned invalid pull-request comment metadata.'
-    }
-    if (@($pullRequest.comments | Where-Object { ([string]$_.body).Contains($marker) }).Count -gt 0) {
-        return $false
+        throw 'GitHub CLI returned invalid repository-label metadata.'
     }
 
-    $prompt = @"
-@codex Complete this consumer repository's meAndAI AI-capabilities adoption on the current pull-request branch.
+    $names = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    foreach ($label in $existing) {
+        if ($null -eq $label.PSObject.Properties['name'] -or
+            [string]::IsNullOrWhiteSpace([string]$label.name)) {
+            throw 'GitHub CLI returned an invalid repository label.'
+        }
+        [void]$names.Add([string]$label.name)
+    }
 
-Read AGENTS.md, the pinned .ai/protocol/PROTOCOL.md, and .ai/adoption/meandai-capabilities.json before editing. Preserve project semantics; resolve every manifest collision deliberately; create or reconcile the required local memory, feature and decision records, tests, links, templates, and Agile labels; then remove the manifest.
-
-Do not invent project facts, expose credentials, overwrite consumer-owned files mechanically, or enter an unbounded validation loop. Satisfy DoR, decompose material work, self-review each slice, run relevant tests, perform the bounded final scan, and push the completed changes to this pull-request branch. Do not merge. When every gate is satisfied, mark the pull request ready if your GitHub permissions allow it and leave concise test evidence; otherwise report the exact blocker.
-
-$marker
-"@
-    $promptPath = [IO.Path]::GetTempFileName()
-    try {
-        [IO.File]::WriteAllText($promptPath, $prompt, [Text.UTF8Encoding]::new($false))
-        # gh pr comment uses a body file so the task prompt is not a shell argument.
+    foreach ($label in $adoptionLabels) {
+        if ($names.Contains([string]$label.Name)) {
+            continue
+        }
         Invoke-External -Command 'gh' -Arguments @(
-            'pr', 'comment', [string]$PullRequestNumber, '--repo', $Repository,
-            '--body-file', $promptPath
+            'label', 'create', [string]$label.Name, '--repo', $Repository,
+            '--color', [string]$label.Color, '--description', [string]$label.Description
         ) | Out-Null
+        [void]$names.Add([string]$label.Name)
     }
-    finally {
-        if (Test-Path -LiteralPath $promptPath) {
-            Remove-Item -LiteralPath $promptPath -Force
+}
+
+function Ensure-AdoptionIssue {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$TemporaryDirectory
+    )
+
+    $marker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
+        $ProtocolTag, [string]$PullRequest.number
+    $list = Invoke-External -Command 'gh' -Arguments @(
+        'issue', 'list', '--repo', $Repository, '--state', 'all', '--limit', '1000',
+        '--json', 'number,url,title,body,state'
+    )
+    try {
+        $parsed = ((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        $issues = @($parsed | Where-Object { $null -ne $_ })
+    }
+    catch {
+        throw 'GitHub CLI returned invalid adoption-issue metadata.'
+    }
+    $matchingIssues = @($issues | Where-Object {
+        $null -ne $_.PSObject.Properties['body'] -and
+        ([string]$_.body).Contains($marker)
+    })
+    if ($matchingIssues.Count -gt 1) {
+        throw 'More than one project-owned adoption issue has the canonical marker.'
+    }
+    if ($matchingIssues.Count -eq 1) {
+        $issue = $matchingIssues[0]
+        if ([string]$issue.url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
+            [int]$issue.number -le 0) {
+            throw 'The project-owned adoption issue has invalid identity metadata.'
+        }
+        if ([string]$issue.state -ceq 'CLOSED') {
+            Invoke-External -Command 'gh' -Arguments @(
+                'issue', 'reopen', [string]$issue.number, '--repo', $Repository
+            ) | Out-Null
+        }
+        Invoke-External -Command 'gh' -Arguments @(
+            'issue', 'edit', [string]$issue.number, '--repo', $Repository,
+            '--add-label', 'type:feature', '--add-label', 'priority:p1',
+            '--add-label', 'status:needs-review'
+        ) | Out-Null
+        return $issue
+    }
+
+    $bodyPath = Join-Path $TemporaryDirectory 'adoption-issue.md'
+    $body = @(
+        $marker,
+        '## AI capabilities adoption tracking',
+        '',
+        "- Protocol release: ``$ProtocolTag``",
+        "- Adoption draft: $($PullRequest.url)",
+        '',
+        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+        '',
+        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+    ) -join [Environment]::NewLine
+    [IO.File]::WriteAllText($bodyPath, $body + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
+    $created = Invoke-External -Command 'gh' -Arguments @(
+        'issue', 'create', '--repo', $Repository,
+        '--title', "Track meAndAI AI capabilities adoption from $ProtocolTag",
+        '--body-file', $bodyPath,
+        '--label', 'type:feature', '--label', 'priority:p1',
+        '--label', 'status:needs-review'
+    )
+    $url = ((@($created.Output) -join [Environment]::NewLine).Trim())
+    if ($url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/(?<number>[1-9][0-9]*)/?$') {
+        throw 'Created adoption issue returned an unrecognized URL.'
+    }
+    return [pscustomobject]@{
+        number = [int]$Matches.number
+        url = $url
+        title = "Track meAndAI AI capabilities adoption from $ProtocolTag"
+        body = $body
+        state = 'OPEN'
+    }
+}
+
+function ConvertTo-ProcessArgument {
+    param([AllowEmptyString()][Parameter(Mandatory)][string]$Value)
+
+    if ($Value.Length -gt 0 -and $Value -notmatch '[\s"]') {
+        return $Value
+    }
+    $builder = [Text.StringBuilder]::new()
+    [void]$builder.Append('"')
+    $backslashes = 0
+    foreach ($character in $Value.ToCharArray()) {
+        if ($character -eq '\') {
+            $backslashes++
+            continue
+        }
+        if ($character -eq '"') {
+            [void]$builder.Append(('\' * (($backslashes * 2) + 1)))
+            [void]$builder.Append('"')
+            $backslashes = 0
+            continue
+        }
+        if ($backslashes -gt 0) {
+            [void]$builder.Append(('\' * $backslashes))
+            $backslashes = 0
+        }
+        [void]$builder.Append($character)
+    }
+    if ($backslashes -gt 0) {
+        [void]$builder.Append(('\' * ($backslashes * 2)))
+    }
+    [void]$builder.Append('"')
+    return $builder.ToString()
+}
+
+function New-ExternalProcessRunner {
+    param(
+        [Parameter(Mandatory)]$CommandInfo,
+        [string[]]$PrefixArguments = @(),
+        [Parameter(Mandatory)][string]$Description
+    )
+
+    if ($CommandInfo.CommandType -eq [Management.Automation.CommandTypes]::Application) {
+        $extension = [IO.Path]::GetExtension([string]$CommandInfo.Source)
+        if ($extension -in @('.cmd', '.bat')) {
+            if ($env:OS -cne 'Windows_NT' -or -not $env:ComSpec) {
+                throw "The $Description resolved to a Windows command wrapper on a non-Windows host."
+            }
+            return [pscustomobject]@{
+                Command = [string]$env:ComSpec
+                PrefixArguments = @('/d', '/c', 'call', [string]$CommandInfo.Source) + @($PrefixArguments)
+                Description = $Description
+            }
+        }
+        return [pscustomobject]@{
+            Command = [string]$CommandInfo.Source
+            PrefixArguments = @($PrefixArguments)
+            Description = $Description
         }
     }
-    return $true
+    throw "The $Description must resolve to a native executable or command wrapper."
+}
+
+function Resolve-LocalCodexRunner {
+    param(
+        [string]$ExplicitCommand,
+        [Parameter(Mandatory)][string]$FallbackVersion
+    )
+
+    if ($FallbackVersion -cnotmatch '^\d+\.\d+\.\d+$') {
+        throw 'TemporaryCodexVersion must use the M.m.rev form.'
+    }
+
+    $installedName = if ($ExplicitCommand) { $ExplicitCommand } else { 'codex' }
+    $installed = @(Get-Command $installedName -All -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandType -eq [Management.Automation.CommandTypes]::Application } |
+        Select-Object -First 1)
+    if ($installed.Count -eq 1) {
+        return New-ExternalProcessRunner -CommandInfo $installed[0] `
+            -Description 'installed local Codex CLI'
+    }
+
+    if ($ExplicitCommand) {
+        throw "The explicitly selected Codex command '$ExplicitCommand' is not available."
+    }
+
+    $npxCandidates = @(Get-Command 'npx' -All -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandType -eq [Management.Automation.CommandTypes]::Application })
+    $npx = if ($env:OS -eq 'Windows_NT') {
+        @($npxCandidates | Where-Object { [IO.Path]::GetExtension([string]$_.Source) -ieq '.cmd' } |
+            Select-Object -First 1)
+    }
+    else {
+        @($npxCandidates | Select-Object -First 1)
+    }
+    if ($npx.Count -eq 1) {
+        return New-ExternalProcessRunner -CommandInfo $npx[0] `
+            -PrefixArguments @('-y', "@openai/codex@$FallbackVersion") `
+            -Description "temporary @openai/codex@$FallbackVersion through npx"
+    }
+
+    throw 'Codex CLI is not installed and npx is unavailable for the pinned temporary fallback.'
+}
+
+function Invoke-BoundedProcess {
+    param(
+        [Parameter(Mandatory)]$Runner,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [AllowEmptyString()][string]$StandardInput = '',
+        [Parameter(Mandatory)][ValidateRange(1, 120)][int]$TimeoutMinutes,
+        [Parameter(Mandatory)][string]$Operation
+    )
+
+    $allArguments = @($Runner.PrefixArguments) + @($Arguments)
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = [string]$Runner.Command
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardInput = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $argumentListProperty = $startInfo.GetType().GetProperty('ArgumentList')
+    if ($null -ne $argumentListProperty) {
+        $nativeArgumentList = $argumentListProperty.GetValue($startInfo, $null)
+        foreach ($argument in $allArguments) {
+            [void]$nativeArgumentList.Add([string]$argument)
+        }
+    }
+    else {
+        $startInfo.Arguments = (@($allArguments | ForEach-Object {
+            ConvertTo-ProcessArgument -Value ([string]$_)
+        }) -join ' ')
+    }
+
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        if (-not $process.Start()) {
+            throw "Unable to start $Operation."
+        }
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        if ($StandardInput) {
+            $process.StandardInput.Write($StandardInput)
+        }
+        $process.StandardInput.Close()
+        $timeoutMilliseconds = [int][Math]::Min(
+            [int]::MaxValue,
+            [TimeSpan]::FromMinutes($TimeoutMinutes).TotalMilliseconds
+        )
+        if (-not $process.WaitForExit($timeoutMilliseconds)) {
+            try {
+                $process.Kill($true)
+            }
+            catch {
+                if ($env:OS -eq 'Windows_NT') {
+                    & "$env:SystemRoot\System32\taskkill.exe" /PID $process.Id /T /F 2>$null | Out-Null
+                }
+                else {
+                    try { $process.Kill() } catch { }
+                }
+            }
+            [void]$process.WaitForExit(5000)
+            throw "$Operation exceeded the $TimeoutMinutes minute limit and was terminated."
+        }
+        $process.WaitForExit()
+        return [pscustomobject]@{
+            ExitCode = [int]$process.ExitCode
+            StdOut = [string]$stdoutTask.GetAwaiter().GetResult()
+            StdErr = [string]$stderrTask.GetAwaiter().GetResult()
+        }
+    }
+    finally {
+        $process.Dispose()
+    }
+}
+
+function Get-ProcessFailureDetail {
+    param([Parameter(Mandatory)]$Result)
+
+    $detail = (@($Result.StdOut, $Result.StdErr) -join [Environment]::NewLine).Trim()
+    if ($detail.Length -gt 1200) {
+        $detail = $detail.Substring(0, 1200) + '...'
+    }
+    return $detail
+}
+
+function Assert-LocalCodexLogin {
+    param(
+        [Parameter(Mandatory)]$Runner,
+        [Parameter(Mandatory)][int]$TimeoutMinutes
+    )
+
+    $result = Invoke-BoundedProcess -Runner $Runner -Arguments @('login', 'status') `
+        -TimeoutMinutes $TimeoutMinutes -Operation 'Local Codex authentication check'
+    if ($result.ExitCode -ne 0) {
+        $detail = Get-ProcessFailureDetail -Result $result
+        throw "Local Codex authentication check failed with code $($result.ExitCode). $detail"
+    }
+}
+
+function Invoke-LocalCodexExec {
+    param(
+        [Parameter(Mandatory)]$Runner,
+        [Parameter(Mandatory)][string]$WorkingDirectory,
+        [Parameter(Mandatory)][string]$Prompt,
+        [Parameter(Mandatory)][string]$OutputPath,
+        [Parameter(Mandatory)][int]$TimeoutMinutes
+    )
+
+    # codex exec receives the scoped prompt through stdin and is bounded by the launcher.
+    $arguments = @(
+        'exec',
+        '--ephemeral',
+        '--ignore-user-config',
+        '--sandbox', 'workspace-write',
+        '--config', 'approval_policy="never"',
+        '--config', 'sandbox_workspace_write.network_access=false',
+        '--config', 'shell_environment_policy.inherit="core"',
+        '--cd', $WorkingDirectory,
+        '--output-last-message', $OutputPath,
+        '-'
+    )
+
+    $result = Invoke-BoundedProcess -Runner $Runner -Arguments $arguments `
+        -StandardInput $Prompt -TimeoutMinutes $TimeoutMinutes `
+        -Operation 'Local Codex adoption execution'
+    if ($result.ExitCode -ne 0) {
+        $detail = Get-ProcessFailureDetail -Result $result
+        throw "Local Codex exited with code $($result.ExitCode). $detail"
+    }
+}
+
+function Get-ProtocolSourceSnapshot {
+    param(
+        [Parameter(Mandatory)][string]$Token,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][string]$Destination
+    )
+
+    if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'The adoption manifest contains an invalid protocol commit.'
+    }
+    $archivePath = Join-Path $Destination 'protocol-source.zip'
+    $extractPath = Join-Path $Destination 'protocol-source'
+    [IO.Directory]::CreateDirectory($extractPath) | Out-Null
+    $headers = @{
+        Accept = 'application/vnd.github+json'
+        Authorization = "Bearer $Token"
+        'X-GitHub-Api-Version' = '2022-11-28'
+        'User-Agent' = 'meAndAI-quick-adoption'
+    }
+    $uri = "https://api.github.com/repos/$ProtocolRepository/zipball/$Commit"
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers $headers -OutFile $archivePath
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath -Force
+    }
+    catch {
+        throw 'Unable to download the exact protocol source snapshot required for semantic adoption.'
+    }
+
+    $roots = @(Get-ChildItem -LiteralPath $extractPath -Directory)
+    if ($roots.Count -ne 1 -or
+        -not (Test-Path -LiteralPath (Join-Path $roots[0].FullName 'PROTOCOL.md') -PathType Leaf)) {
+        throw 'The exact protocol source snapshot has an unexpected structure.'
+    }
+    $versionPath = Join-Path $roots[0].FullName 'VERSION'
+    if (-not (Test-Path -LiteralPath $versionPath -PathType Leaf) -or
+        [IO.File]::ReadAllText($versionPath).Trim() -cne $ProtocolTag.Substring(1)) {
+        throw 'The protocol source snapshot version does not match the requested tag.'
+    }
+    return $roots[0].FullName
+}
+
+function Assert-CredentialFilesAbsent {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    foreach ($name in $tokenMappings.Keys) {
+        $matches = @(Get-ChildItem -LiteralPath $Repository -Recurse -Force -File -Filter $name)
+        if ($matches.Count -gt 0) {
+            throw "Credential file '$name' must not exist in the isolated Codex clone."
+        }
+    }
+}
+
+function Get-RemoteBranchHead {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Remote,
+        [Parameter(Mandatory)][string]$Branch
+    )
+
+    $result = Invoke-Git -Repository $Repository -Arguments @(
+        'ls-remote', '--heads', $Remote, "refs/heads/$Branch"
+    )
+    $lines = @($result.Output | Where-Object { $_ })
+    if ($lines.Count -ne 1) {
+        throw 'The deterministic adoption branch is missing or ambiguous on the remote.'
+    }
+    $parts = ([string]$lines[0]).Split("`t")
+    if ($parts.Count -ne 2 -or $parts[0] -cnotmatch '^[0-9a-f]{40}$' -or
+        $parts[1] -cne "refs/heads/$Branch") {
+        throw 'The deterministic adoption branch returned invalid remote metadata.'
+    }
+    return $parts[0]
+}
+
+function Complete-AdoptionWithLocalCodex {
+    param(
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$ProtocolToken
+    )
+
+    $branch = [string]$PullRequest.headRefName
+    $expectedHead = [string]$PullRequest.headRefOid
+    $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository -Remote $RemoteName -Branch $branch
+    if ($remoteHead -cne $expectedHead) {
+        throw 'The pull-request head and live adoption branch differ before local execution.'
+    }
+
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-local-adoption-$([guid]::NewGuid().ToString('N'))"
+    $clonePath = Join-Path $temporaryRoot 'consumer'
+    [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
+    try {
+        $remoteUrl = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+            'remote', 'get-url', $RemoteName
+        )).Output -join '').Trim())
+        Invoke-External -Command 'git' -Arguments @(
+            'clone', '--no-tags', '--single-branch', '--branch', $branch,
+            $remoteUrl, $clonePath
+        ) | Out-Null
+
+        $cloneHead = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+            'rev-parse', 'HEAD'
+        )).Output -join '').Trim())
+        if ($cloneHead -cne $expectedHead) {
+            throw 'The isolated clone did not resolve to the expected pull-request head.'
+        }
+        Assert-CredentialFilesAbsent -Repository $clonePath
+
+        $manifestRelativePath = '.ai/adoption/meandai-capabilities.json'
+        $manifestPath = Join-Path $clonePath `
+            ($manifestRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
+        if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            return [pscustomobject]@{
+                Ran = $false
+                Pushed = $false
+                Ready = -not [bool]$PullRequest.isDraft
+                RequiresManualReview = [bool]$PullRequest.isDraft
+                Runner = 'not required'
+            }
+        }
+        if (-not [bool]$PullRequest.isDraft) {
+            throw 'The adoption manifest remains but the pull request is no longer a draft.'
+        }
+
+        try {
+            $manifest = [IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json
+        }
+        catch {
+            throw 'The adoption manifest is not valid JSON.'
+        }
+        if ([int]$manifest.schema -ne 1 -or
+            [string]$manifest.operation -cne 'ai-capabilities-adoption' -or
+            -not ([string]$manifest.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -or
+            [string]$manifest.targetTag -cne $ProtocolTag -or
+            [string]$manifest.protocolSha -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'The adoption manifest identity does not match this repository and protocol release.'
+        }
+
+        $protocolSource = Get-ProtocolSourceSnapshot -Token $ProtocolToken `
+            -Commit ([string]$manifest.protocolSha) -Destination $temporaryRoot
+
+        Ensure-AdoptionLabels -Repository $Repository
+        $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
+            -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+
+        $runner = Resolve-LocalCodexRunner -ExplicitCommand $CodexCommand `
+            -FallbackVersion $TemporaryCodexVersion
+        Assert-LocalCodexLogin -Runner $runner -TimeoutMinutes $CodexTimeoutMinutes
+
+        $resultPath = Join-Path $temporaryRoot 'codex-result.txt'
+        $prompt = @"
+Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($PullRequest.number) in this isolated temporary clone.
+
+Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $protocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($adoptionIssue.url); reference that issue from the local feature record. Do not invent project facts; if required facts are unavailable, stop as blocked. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($manifest.protocolSha); never substitute a moving ref.
+
+Secret provisioning is already complete: FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and MEANDAI_RO_FG_PAT.txt maps to MEANDAI_PROTOCOL_TOKEN. Those source files are intentionally absent. Do not search for, request, print, recreate, or modify credential values or repository secrets.
+
+Work only in this clone. Spawned-command network access is disabled: do not invoke gh, GitHub APIs, remote Git operations, or any other external service. Preserve any existing pinned protocol gitlink and do not change the lifecycle workflow. Do not commit, push, approve, mark the pull request ready, merge, close, delete, or alter branches. The launcher owns GitHub records and Git publication; the maintainer owns merge.
+
+Keep validation bounded: implement reviewable slices, run relevant tests, perform one fresh-diff self-review and the protocol's bounded completion scan, fix blocking findings only, and avoid recursive validators. Remove .ai/adoption/meandai-capabilities.json only when all adoption gates are satisfied.
+
+Your final response must start with MEANDAI_ADOPTION_READY only when the manifest has been removed and the repository-local adoption work is complete. Otherwise start with MEANDAI_ADOPTION_BLOCKED and state the exact blocker. Include concise test evidence.
+"@
+        Invoke-LocalCodexExec -Runner $runner -WorkingDirectory $clonePath `
+            -Prompt $prompt -OutputPath $resultPath `
+            -TimeoutMinutes $CodexTimeoutMinutes
+
+        if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) {
+            throw 'Local Codex completed without a final result file.'
+        }
+        $result = [IO.File]::ReadAllText($resultPath).Trim()
+        if (-not $result.StartsWith('MEANDAI_ADOPTION_READY', [StringComparison]::Ordinal)) {
+            if ($result.Length -gt 1200) { $result = $result.Substring(0, 1200) + '...' }
+            throw "Local Codex did not declare the adoption ready. $result"
+        }
+
+        $headAfterCodex = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+            'rev-parse', 'HEAD'
+        )).Output -join '').Trim())
+        if ($headAfterCodex -cne $expectedHead) {
+            throw 'Local Codex created a commit; the launcher will not publish an agent-owned history.'
+        }
+        if (Test-Path -LiteralPath $manifestPath) {
+            throw 'Local Codex declared readiness but left the transient adoption manifest.'
+        }
+        Assert-CredentialFilesAbsent -Repository $clonePath
+        Invoke-Git -Repository $clonePath -Arguments @('diff', '--check') | Out-Null
+
+        Invoke-Git -Repository $clonePath -Arguments @('add', '-A') | Out-Null
+        $changedPaths = @((Invoke-Git -Repository $clonePath -Arguments @(
+            'diff', '--cached', '--name-only', '--diff-filter=ACMRTD'
+        )).Output | Where-Object { $_ })
+        if ($changedPaths.Count -eq 0) {
+            throw 'Local Codex produced no reviewable adoption change.'
+        }
+        foreach ($forbiddenPath in @($workflowTargetPath) + @($tokenMappings.Keys)) {
+            if ($changedPaths -ccontains $forbiddenPath) {
+                throw "Local Codex changed protected adoption path '$forbiddenPath'."
+            }
+        }
+        if (@($changedPaths | Where-Object { $_ -clike '.ai/protocol/*' }).Count -gt 0) {
+            throw 'Local Codex changed files inside the protocol reference instead of preserving one gitlink.'
+        }
+        if ($changedPaths -ccontains '.ai/protocol') {
+            $protocolIndex = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+                'ls-files', '--stage', '--', '.ai/protocol'
+            )).Output -join '').Trim())
+            $expectedProtocolIndex = "160000 $([string]$manifest.protocolSha) 0`t.ai/protocol"
+            if ($protocolIndex -cne $expectedProtocolIndex) {
+                throw 'The completed protocol reference is not the exact manifest gitlink.'
+            }
+            $gitmodulesPath = Join-Path $clonePath '.gitmodules'
+            $protocolModulePath = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+                'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.path'
+            )).Output -join '').Trim())
+            $protocolModuleUrl = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+                'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.url'
+            )).Output -join '').Trim())
+            if ($protocolModulePath -cne '.ai/protocol' -or
+                $protocolModuleUrl -cne "https://github.com/$ProtocolRepository.git") {
+                throw 'The completed protocol submodule metadata is not canonical.'
+            }
+            $protocolWorktree = Join-Path $clonePath '.ai/protocol'
+            $protocolHead = ((@(Invoke-Git -Repository $protocolWorktree -Arguments @(
+                'rev-parse', 'HEAD'
+            )).Output -join '').Trim())
+            $protocolStatus = @((Invoke-Git -Repository $protocolWorktree -Arguments @(
+                'status', '--porcelain=v1', '--untracked-files=all'
+            )).Output | Where-Object { $_ })
+            if ($protocolHead -cne [string]$manifest.protocolSha -or $protocolStatus.Count -ne 0) {
+                throw 'The completed protocol submodule is not clean at the exact manifest commit.'
+            }
+        }
+        Invoke-Git -Repository $clonePath -Arguments @('diff', '--cached', '--check') | Out-Null
+
+        $liveHead = Get-RemoteBranchHead -Repository $clonePath -Remote 'origin' -Branch $branch
+        if ($liveHead -cne $expectedHead) {
+            throw 'The adoption branch changed while local Codex was running; no local result was published.'
+        }
+
+        $targetName = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+            'config', 'user.name'
+        )).Output -join '').Trim())
+        $targetEmail = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+            'config', 'user.email'
+        )).Output -join '').Trim())
+        Invoke-Git -Repository $clonePath -Arguments @('config', 'user.name', $targetName) | Out-Null
+        Invoke-Git -Repository $clonePath -Arguments @('config', 'user.email', $targetEmail) | Out-Null
+        Invoke-Git -Repository $clonePath -Arguments @(
+            'commit', '-m', "Complete meAndAI AI capabilities adoption for $ProtocolTag"
+        ) | Out-Null
+        $publishedHead = ((@(Invoke-Git -Repository $clonePath -Arguments @(
+            'rev-parse', 'HEAD'
+        )).Output -join '').Trim())
+        Invoke-Git -Repository $clonePath -Arguments @(
+            'push', 'origin',
+            "--force-with-lease=refs/heads/$branch`:$expectedHead",
+            "HEAD:refs/heads/$branch"
+        ) | Out-Null
+        $verifiedHead = Get-RemoteBranchHead -Repository $clonePath -Remote 'origin' -Branch $branch
+        if ($verifiedHead -cne $publishedHead) {
+            throw 'The adoption branch did not resolve to the launcher-published commit.'
+        }
+
+        Invoke-External -Command 'gh' -Arguments @(
+            'pr', 'ready', [string]$PullRequest.number, '--repo', $Repository
+        ) | Out-Null
+        return [pscustomobject]@{
+            Ran = $true
+            Pushed = $true
+            Ready = $true
+            Runner = $runner.Description
+            Head = $publishedHead
+            Result = $result
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
 }
 
 foreach ($command in @('git', 'gh')) {
@@ -703,25 +1313,48 @@ else {
     $run = Invoke-LifecycleWorkflow -Repository $repository -Branch $defaultBranch -HeadSha $publishedHead
     Write-Host "Lifecycle workflow completed successfully: $($run.url)"
 
-    $adoptionPullRequest = Get-AdoptionPullRequest -Repository $repository
+    $adoptionPullRequestResults = @(Get-AdoptionPullRequest -Repository $repository)
+    if ($adoptionPullRequestResults.Count -gt 1) {
+        $types = @($adoptionPullRequestResults | ForEach-Object { $_.GetType().FullName }) -join ', '
+        throw "Adoption pull-request resolution returned ambiguous results: $types"
+    }
+    $adoptionPullRequest = if ($adoptionPullRequestResults.Count -eq 1) {
+        $adoptionPullRequestResults[0]
+    }
+    else {
+        $null
+    }
     if ($null -eq $adoptionPullRequest) {
         Write-Host 'No open deterministic adoption draft was produced; inspect the successful lifecycle run before continuing.'
     }
     else {
+        if ($null -eq $adoptionPullRequest.PSObject.Properties['url']) {
+            $propertyNames = @($adoptionPullRequest.PSObject.Properties | ForEach-Object { $_.Name }) -join ', '
+            throw "Resolved adoption pull-request metadata has unexpected properties: $propertyNames"
+        }
         Write-Host "Adoption draft: $($adoptionPullRequest.url)"
-        if ($SkipCodexDelegation) {
-            Write-Host 'Codex Cloud delegation was explicitly skipped; use the quick-guide prompt on this draft.'
+        if ($SkipLocalCodex) {
+            Write-Host 'Local Codex execution was explicitly skipped; use the quick-guide prompt in an isolated checkout of this draft.'
         }
         else {
-            $delegated = Send-CodexAdoptionDelegation -Repository $repository -PullRequestNumber $adoptionPullRequest.number
-            if ($delegated) {
-                Write-Host 'Codex Cloud adoption task was requested on the draft. Wait for its completion and review the evidence before merging.'
+            $completion = Complete-AdoptionWithLocalCodex -TargetRepository $target `
+                -Repository $repository -PullRequest $adoptionPullRequest `
+                -ProtocolToken $protocolToken
+            if ($completion.Ran) {
+                Write-Host "Local Codex completed synchronously through $($completion.Runner)."
+                Write-Host "The validated adoption commit was pushed and the pull request is ready: $($adoptionPullRequest.url)"
             }
             else {
-                Write-Host 'The draft already contains the meAndAI Codex delegation marker; no duplicate task was requested.'
+                Write-Host 'The adoption manifest was already absent; local Codex was not run again.'
+                if ($completion.Ready) {
+                    Write-Host "The pull request was already ready for the maintainer's final review: $($adoptionPullRequest.url)"
+                }
+                else {
+                    Write-Host "The draft was not changed because prior manifest removal has no launcher-owned validation evidence; review it and mark it ready manually: $($adoptionPullRequest.url)"
+                }
             }
         }
     }
 }
 
-Write-Host 'The launcher never approves or merges the adoption pull request.'
+Write-Host 'The launcher never approves or merges the adoption pull request; the maintainer owns the final merge.'

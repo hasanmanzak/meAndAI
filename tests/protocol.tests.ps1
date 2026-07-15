@@ -65,6 +65,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
     '.ai/memory/log/2026-07-15-feat-0002-release-gate-evidence.md',
     '.ai/memory/log/2026-07-15-quick-adoption-launcher.md',
+    '.ai/memory/log/2026-07-15-local-codex-adoption.md',
     'docs/adoption.md',
     'docs/features/README.md',
     'docs/features/FEAT-0001-common-development-protocol/README.md',
@@ -77,6 +78,8 @@ $requiredFiles = @(
     'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
     'docs/features/FEAT-0006-quick-adoption-launcher/README.md',
     'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
+    'docs/features/FEAT-0007-local-codex-adoption/README.md',
+    'docs/features/FEAT-0007-local-codex-adoption/test-cases.md',
     'docs/decisions/README.md',
     'docs/decisions/DEC-0001-portable-protocol-reference.md',
     'docs/decisions/DEC-0002-project-local-memory.md',
@@ -84,6 +87,7 @@ $requiredFiles = @(
     'docs/decisions/DEC-0004-bounded-completion-convergence.md',
     'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md',
     'docs/decisions/DEC-0007-local-quick-adoption-boundary.md',
+    'docs/decisions/DEC-0008-local-codex-execution.md',
     'docs/quick-adoption.md',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
@@ -112,6 +116,9 @@ $requiredFiles = @(
     'tests/capabilities-bootstrap.tests.ps1',
     'tests/capabilities-bootstrap-adapter.tests.ps1',
     'tests/quick-adoption.tests.ps1',
+    'tests/fixtures/Invoke-MockCodex.ps1',
+    'tests/fixtures/Invoke-MockCodex.cmd',
+    'tests/fixtures/Invoke-MockCodex.sh',
     '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
@@ -393,7 +400,7 @@ if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0037 quick adoption validation failed'
+        Add-Failure 'TEST-0033 through TEST-0041 quick adoption validation failed'
     }
 }
 
@@ -403,4 +410,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0037.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0041.' -ForegroundColor Green

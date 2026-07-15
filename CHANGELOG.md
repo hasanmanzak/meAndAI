@@ -3,6 +3,37 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.6.1 - 2026-07-15
+
+### Changed
+
+- Replaced the hosted GitHub-agent handoff with synchronous local Codex CLI
+  execution in an isolated temporary clone of the exact adoption PR head.
+- Added installed-CLI discovery and a pinned, non-global
+  `@openai/codex@0.144.4` fallback through `npx`.
+- Added immutable `headRefOid`, unchanged-agent-head, manifest-removal,
+  credential-file, protected-path, remote-head, exact-lease, and post-push
+  verification gates before the adoption pull request becomes ready.
+- Added a finite local Codex process limit and disabled network access for
+  commands spawned by the agent. The launcher now owns deterministic Agile
+  label and adoption-issue reconciliation.
+- A manifest-free draft with no launcher-owned completion evidence is left for
+  manual readiness review instead of being promoted automatically.
+- Kept secret provisioning entirely in deterministic PowerShell/`gh` work;
+  Codex receives only the fixed filename-to-secret-name mapping and never the
+  token values or source files.
+- Preserved `-SkipCodexDelegation` as a compatibility alias for the clearer
+  `-SkipLocalCodex` switch.
+
+### Removed
+
+- Removed the Codex Cloud prerequisite, `@codex` pull-request comments, and
+  marker-based delegation state from active quick-adoption behavior.
+
+Related work: [FEAT-0007](docs/features/FEAT-0007-local-codex-adoption/README.md),
+[DEC-0008](docs/decisions/DEC-0008-local-codex-execution.md), and
+[issue #21](https://github.com/hasanmanzak/meAndAI/issues/21).
+
 ## 0.6.0 - 2026-07-15
 
 ### Added
