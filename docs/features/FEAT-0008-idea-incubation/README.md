@@ -6,7 +6,7 @@
 | Status | Implemented |
 | Target version | 0.7.0 |
 | Issue | [#26](https://github.com/hasanmanzak/meAndAI/issues/26) |
-| Pull request | Pending |
+| Pull request | [#28](https://github.com/hasanmanzak/meAndAI/pull/28) |
 | Decision | [DEC-0009](../../decisions/DEC-0009-repository-native-idea-incubation.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -90,7 +90,8 @@ collision-free submodule adoptions also receive an absent idea index.
 - Decision: [DEC-0009](../../decisions/DEC-0009-repository-native-idea-incubation.md)
 - Portable protocol: [DEC-0001](../../decisions/DEC-0001-portable-protocol-reference.md)
 - Adoption handoff: [DEC-0006](../../decisions/DEC-0006-seed-workflow-adoption-handoff.md)
-- Tracking: [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26)
+- Tracking: [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) and
+  [pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28)
 
 ## Definition of Ready
 
@@ -152,5 +153,5 @@ unresolved actionable in-scope finding remains, so the bounded scan stops.
 - [x] Bounded self-review and convergence stop condition complete.
 - [x] No unresolved blocking finding; residual risks are owned and linked.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [ ] Issue, pull request, decision, and related records cross-linked.
+- [x] Issue, pull request, decision, and related records cross-linked.
 - [ ] Applicable CI and review gates passed.
