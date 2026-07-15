@@ -31,7 +31,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0005](docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md),
 [DEC-0006](docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md), and
-[issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
+[issue #17](https://github.com/hasanmanzak/meAndAI/issues/17), delivered by
+[pull request #18](https://github.com/hasanmanzak/meAndAI/pull/18).
 
 ## 0.4.0 - 2026-07-15
 

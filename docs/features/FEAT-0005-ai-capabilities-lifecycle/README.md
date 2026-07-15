@@ -6,7 +6,7 @@
 | Status | In review |
 | Target version | 0.5.0 |
 | Issue | [#17](https://github.com/hasanmanzak/meAndAI/issues/17) |
-| Pull request | Pending |
+| Pull request | [#18](https://github.com/hasanmanzak/meAndAI/pull/18) |
 | Decision | [DEC-0006](../../decisions/DEC-0006-seed-workflow-adoption-handoff.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -203,7 +203,7 @@ risks remain `RISK-0022` through `RISK-0028`.
 - [x] Slice reviews and bounded convergence scan complete.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.
 
 ## Post-merge release gate

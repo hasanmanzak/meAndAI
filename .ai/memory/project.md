@@ -15,8 +15,7 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
-- Current delivery: [FEAT-0005](../../docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md)
-  on branch `codex/feat-0005-ai-capabilities-lifecycle`.
+- Current delivery: [FEAT-0005 pull request #18](https://github.com/hasanmanzak/meAndAI/pull/18).
 
 ## Collaboration constraints
 

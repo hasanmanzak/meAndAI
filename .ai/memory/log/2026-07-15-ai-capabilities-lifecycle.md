@@ -5,6 +5,7 @@
 - Work item: [FEAT-0005](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md)
 - Decision: [DEC-0006](../../../docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md)
 - Tracking: [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17)
+- Delivery: [pull request #18](https://github.com/hasanmanzak/meAndAI/pull/18)
 - Target release: `v0.5.0`
 
 ## Durable outcome
