@@ -7,29 +7,20 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.0`
-- Current scope: stable protocol automation and evidence invariants, tracked by
-  [FEAT-0010](../../docs/features/FEAT-0010-protocol-stability-invariants/README.md),
-  [DEC-0010](../../docs/decisions/DEC-0010-stable-automation-invariants.md),
-  and [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
+- Current protocol version: `0.8.1`
+- Current scope: completed end-to-end protocol stability closure, tracked by
+  [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md),
+  [DEC-0011](../../docs/decisions/DEC-0011-qualified-evidence-and-closure.md),
+  and [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
-- Current release delivery: `v0.8.0` is in progress on
-  `codex/protocol-stability-invariants` through
-  [pull request #35](https://github.com/hasanmanzak/meAndAI/pull/35); merge and
-  immutable GitHub Release evidence remain pending at their respective gates.
-- Latest completed release delivery:
-  [BUG-0003](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
-  in merged [pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33),
-  recorded by the historical annotated
-  [`v0.7.3` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3).
-- Latest released delivery before the current candidate: completed
-  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
-  in merged [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29),
-  released at exact merge commit `42e653e23ccb11034a735b8c3c420accf5f19964`
-  by annotated tag [`v0.7.1`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1).
+- Latest tracked work: completed [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md),
+  with delivery evidence owned by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36).
+- Latest completed release delivery: FEAT-0011, published as immutable release
+  [`v0.8.1`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1).
+  The release and issue retain the exact pull request, target commit, checks,
+  and post-publication verification without predicting them inside that commit.
 
 ## Collaboration constraints
 
@@ -99,6 +90,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   launcher, applicable credential files stay in the original target and are
   absent only from the isolated Codex clone, and only Codex-spawned commands
   lose network access. It changes documentation and structural coverage only.
+- `v0.8.0` establishes immutable-release, exact proposal-state, rename,
+  workflow-run, supersession, and canonical repository-evidence invariants.
+- `v0.8.1` carries repository host, release credential/commit, complete path,
+  dispatch session, finding disposition, test evidence, and cleanup ownership
+  through every mutation and closure boundary. An existing v0.8.0 consumer's
+  old adapter may propose the ordinary v0.8.1 review PR; that proposal installs
+  the new workflow and adapter together. After merge, later runs pass the
+  separate `PROTOCOL_TOKEN` without a manual seed replacement.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

@@ -105,7 +105,7 @@ function global:git {
                 if ($script:Scenario.AliasCurrentTag) { $script:Scenario.CurrentProtocolSha }
                 else { $script:Scenario.MiddleProtocolSha }
             }
-            'v0.3.0' { $script:Scenario.TargetProtocolSha }
+            'v0.3.0' { $script:Scenario.LocalTargetProtocolSha }
             default { throw "Unexpected tag lookup '$($arguments[-1])'." }
         }
         return
@@ -233,8 +233,15 @@ function global:gh {
     $arguments = @($args | ForEach-Object { [string]$_ })
     $global:LASTEXITCODE = 0
     $isPaginated = $arguments -contains '--paginate'
+    $script:Scenario.GhCalls.Add([pscustomobject]@{
+        Arguments = @($arguments)
+        Token = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
+    })
 
     if ($arguments[0] -eq 'pr' -and $arguments[1] -eq 'create') {
+        if ($env:GH_TOKEN -cne 'updater-write-token') {
+            throw 'Consumer pull-request creation used the wrong credential.'
+        }
         $bodyIndex = [array]::IndexOf($arguments, '--body')
         $script:Scenario.NewBody = $arguments[$bodyIndex + 1]
         Add-ScenarioEvent 'create-new-pr'
@@ -297,6 +304,13 @@ function global:gh {
         '{}'
         return
     }
+    $protocolEndpoint = $endpoint -like 'repos/hasanmanzak/meAndAI/*'
+    if ($protocolEndpoint -and $env:GH_TOKEN -cne 'protocol-read-token') {
+        throw 'Protocol source metadata used the consumer mutation credential.'
+    }
+    if (-not $protocolEndpoint -and $env:GH_TOKEN -cne 'updater-write-token') {
+        throw 'Consumer repository metadata used the protocol source credential.'
+    }
     if ($endpoint -eq 'repos/hasanmanzak/meAndAI/releases/tags/v0.3.0') {
         Add-ScenarioEvent 'verify-immutable-release'
         if ($arguments -cnotcontains 'X-GitHub-Api-Version: 2026-03-10') {
@@ -312,6 +326,35 @@ function global:gh {
         $release | ConvertTo-Json -Compress
         return
     }
+    if ($endpoint -eq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.3.0') {
+        Add-ScenarioEvent 'verify-release-tag-ref'
+        $objectType = if ($script:Scenario.ReleaseTagMode -cin @('Annotated', 'Nested')) {
+            'tag'
+        }
+        else { 'commit' }
+        $objectSha = if ($objectType -ceq 'tag') {
+            '4' * 40
+        }
+        else { $script:Scenario.ReleaseCommitSha }
+        [ordered]@{
+            object = [ordered]@{ type = $objectType; sha = $objectSha }
+        } | ConvertTo-Json -Depth 3 -Compress
+        return
+    }
+    if ($endpoint -eq "repos/hasanmanzak/meAndAI/git/tags/$('4' * 40)") {
+        Add-ScenarioEvent 'verify-annotated-release-tag'
+        $resolvedType = if ($script:Scenario.ReleaseTagMode -ceq 'Nested') {
+            'tag'
+        }
+        else { 'commit' }
+        [ordered]@{
+            object = [ordered]@{
+                type = $resolvedType
+                sha = $script:Scenario.ReleaseCommitSha
+            }
+        } | ConvertTo-Json -Depth 3 -Compress
+        return
+    }
     if ($endpoint -eq 'repos/owner/consumer/pulls?state=open&per_page=100') {
         $visibleUnmanaged = if ($isPaginated) {
             $script:Scenario.LeadingUnmanagedCount
@@ -323,10 +366,12 @@ function global:gh {
             })
         }
         if ($isPaginated -or $script:Scenario.LeadingUnmanagedCount -lt 100) {
-            ConvertTo-TestBase64Json ([pscustomobject]@{
-                number = 21; body = $script:Scenario.OldBody
-                head = [pscustomobject]@{ ref = $script:Scenario.OldBranch }
-            })
+            if ($script:Scenario.OldCandidateExists) {
+                ConvertTo-TestBase64Json ([pscustomobject]@{
+                    number = 21; body = $script:Scenario.OldBody
+                    head = [pscustomobject]@{ ref = $script:Scenario.OldBranch }
+                })
+            }
             if ($script:Scenario.ExistingReplacement) {
                 ConvertTo-TestBase64Json ([pscustomobject]@{
                     number = 30; body = $script:Scenario.NewBody
@@ -509,6 +554,7 @@ function Invoke-AdapterScenario {
         [bool]$NewDraft = $true,
         [bool]$MutateOldAfterSnapshot = $false,
         [bool]$ExistingReplacement = $false,
+        [bool]$OldCandidateExists = $true,
         [bool]$MutateNewAfterSnapshot = $false,
         [bool]$MutateReplacementAfterOldClose = $false,
         [bool]$CoordinateNewHeadMutation = $false,
@@ -525,6 +571,7 @@ function Invoke-AdapterScenario {
         [bool]$InvalidSubmoduleUrl = $false,
         [bool]$WrongCaseSubmodulePath = $false,
         [bool]$MissingUpdaterToken = $false,
+        [bool]$MissingProtocolToken = $false,
         [bool]$InvalidAuthenticatedActor = $false,
         [string]$AuthenticatedActor = 'updater-owner',
         [string]$OldAuthorLogin = 'updater-owner',
@@ -534,6 +581,9 @@ function Invoke-AdapterScenario {
         [int]$LeadingUnmanagedCount = 0,
         [ValidateSet('Valid', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')]
         [string]$ReleaseMode = 'Valid',
+        [ValidateSet('Lightweight', 'Annotated', 'Nested')]
+        [string]$ReleaseTagMode = 'Lightweight',
+        [bool]$MismatchedReleaseCommit = $false,
         [ValidateSet('None', 'InventoryRename', 'RevalidationRename')]
         [string]$RenameMode = 'None'
     )
@@ -608,9 +658,12 @@ function Invoke-AdapterScenario {
     $script:Scenario = [pscustomobject]@{
         Name = $Name
         Events = [System.Collections.Generic.List[string]]::new()
+        GhCalls = [System.Collections.Generic.List[object]]::new()
         CurrentProtocolSha = '1' * 40
         MiddleProtocolSha = '2' * 40
         TargetProtocolSha = '3' * 40
+        LocalTargetProtocolSha = if ($MismatchedReleaseCommit) { '6' * 40 } else { '3' * 40 }
+        ReleaseCommitSha = '3' * 40
         OldProtocolSha = '2' * 40
         OldHead = $oldHead
         ExpectedOldHead = $oldHead
@@ -645,6 +698,7 @@ function Invoke-AdapterScenario {
         ReopenOldNoOp = $ReopenOldNoOp
         AliasCurrentTag = $AliasCurrentTag
         ExistingReplacement = $ExistingReplacement
+        OldCandidateExists = $OldCandidateExists
         MutateNewAfterSnapshot = $MutateNewAfterSnapshot
         MutateReplacementAfterOldClose = $MutateReplacementAfterOldClose
         CoordinateNewHeadMutation = $CoordinateNewHeadMutation
@@ -658,6 +712,7 @@ function Invoke-AdapterScenario {
         WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
         ReleaseMode = $ReleaseMode
+        ReleaseTagMode = $ReleaseTagMode
         RenameMode = $RenameMode
         NewFilesCalls = 0
         RemoveOldBeforeDelete = $RemoveOldBeforeDelete
@@ -671,7 +726,10 @@ function Invoke-AdapterScenario {
     $global:MeAndAITestScenario = $script:Scenario
 
     $savedEnvironment = @{}
-    foreach ($nameKey in @('GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN', 'GITHUB_STEP_SUMMARY')) {
+    foreach ($nameKey in @(
+        'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
+        'PROTOCOL_TOKEN', 'GITHUB_STEP_SUMMARY'
+    )) {
         $savedEnvironment[$nameKey] = [Environment]::GetEnvironmentVariable($nameKey)
     }
     $savedLocation = Get-Location
@@ -680,7 +738,8 @@ function Invoke-AdapterScenario {
         $env:GITHUB_REPOSITORY = 'owner/consumer'
         $env:GITHUB_WORKSPACE = $tempRoot
         $env:DEFAULT_BRANCH = 'main'
-        $env:GH_TOKEN = if ($MissingUpdaterToken) { $null } else { 'redacted-test-token' }
+        $env:GH_TOKEN = if ($MissingUpdaterToken) { $null } else { 'updater-write-token' }
+        $env:PROTOCOL_TOKEN = if ($MissingProtocolToken) { $null } else { 'protocol-read-token' }
         $env:GITHUB_STEP_SUMMARY = $null
         & (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     }
@@ -719,6 +778,60 @@ if ((Get-EventIndex $success 'verify-immutable-release') -lt 0 -or
         (Get-EventIndex $success 'checkout-target-assets')) {
     Add-Failure 'TEST-0056 the selected target release must be verified before target checkout.'
 }
+if ((Get-EventIndex $success 'verify-release-tag-ref') -lt 0) {
+    Add-Failure 'TEST-0061 lightweight release commit evidence was not resolved.'
+}
+$protocolCalls = @($success.GhCalls | Where-Object {
+    @($_.Arguments | Where-Object {
+        [string]$_ -like 'repos/hasanmanzak/meAndAI/*'
+    }).Count -gt 0
+})
+$consumerCalls = @($success.GhCalls | Where-Object {
+    @($_.Arguments | Where-Object {
+        [string]$_ -like 'repos/hasanmanzak/meAndAI/*'
+    }).Count -eq 0
+})
+if (@($protocolCalls | Where-Object { $_.Token -cne 'protocol-read-token' }).Count -ne 0 -or
+    @($consumerCalls | Where-Object { $_.Token -cne 'updater-write-token' }).Count -ne 0) {
+    Add-Failure 'TEST-0061 protocol-read and consumer-write credentials crossed authority boundaries.'
+}
+
+$annotatedRelease = Invoke-AdapterScenario -Name 'annotated-release' `
+    -ReleaseTagMode 'Annotated'
+if ($annotatedRelease.Threw -or
+    (Get-EventIndex $annotatedRelease 'verify-annotated-release-tag') -lt 0) {
+    Add-Failure "TEST-0061 annotated release tag did not resolve to its exact commit: $($annotatedRelease.Error)"
+}
+
+$nestedRelease = Invoke-AdapterScenario -Name 'nested-release' `
+    -ReleaseTagMode 'Nested'
+if (-not $nestedRelease.Threw -or
+    $nestedRelease.Error -notlike '*does not resolve directly to one commit*') {
+    Add-Failure "TEST-0061 nested annotated release tag did not fail closed: $($nestedRelease.Error)"
+}
+
+$mismatchedRelease = Invoke-AdapterScenario -Name 'mismatched-release-commit' `
+    -MismatchedReleaseCommit $true
+if (-not $mismatchedRelease.Threw -or
+    $mismatchedRelease.Error -notlike '*does not match the checked-out exact tag commit*') {
+    Add-Failure "TEST-0061 moved release commit did not fail closed: $($mismatchedRelease.Error)"
+}
+foreach ($forbiddenEvent in @(
+    'checkout-target-assets', 'push-new', 'create-new-pr',
+    'close-old-pr', 'delete-old-branch'
+)) {
+    if ((Get-EventIndex $mismatchedRelease $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0061 mismatched release commit reached mutation '$forbiddenEvent'."
+    }
+}
+
+$pendingLatest = Invoke-AdapterScenario -Name 'pending-latest' `
+    -ExistingReplacement $true -OldCandidateExists $false
+if ($pendingLatest.Threw -or
+    (Get-EventIndex $pendingLatest 'verify-release-tag-ref') -lt 0 -or
+    (Get-EventIndex $pendingLatest 'checkout-target-assets') -ge 0) {
+    Add-Failure "TEST-0061 zero-operation latest proposal skipped release proof or mutated state: $($pendingLatest.Error)"
+}
 foreach ($releaseMode in @('Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')) {
     $invalidRelease = Invoke-AdapterScenario -Name "release-$releaseMode" `
         -ReleaseMode $releaseMode
@@ -746,6 +859,18 @@ if ((Get-EventIndex $missingUpdaterToken 'resolve-updater-actor') -ge 0 -or
     (Get-EventIndex $missingUpdaterToken 'push-new') -ge 0 -or
     (Get-EventIndex $missingUpdaterToken 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0022 missing updater token reached authentication or mutation.'
+}
+
+$missingProtocolToken = Invoke-AdapterScenario -Name 'missing-protocol-token' `
+    -MissingProtocolToken $true
+if (-not $missingProtocolToken.Threw -or
+    $missingProtocolToken.Error -notlike "*Required workflow environment 'PROTOCOL_TOKEN' is missing*") {
+    Add-Failure 'TEST-0061 missing protocol token must fail before authentication or mutation.'
+}
+if ((Get-EventIndex $missingProtocolToken 'resolve-updater-actor') -ge 0 -or
+    (Get-EventIndex $missingProtocolToken 'push-new') -ge 0 -or
+    (Get-EventIndex $missingProtocolToken 'create-new-pr') -ge 0) {
+    Add-Failure 'TEST-0061 missing protocol token reached authentication or mutation.'
 }
 
 $invalidAuthenticatedActor = Invoke-AdapterScenario -Name 'invalid-authenticated-actor' `
@@ -1042,4 +1167,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, TEST-0021 through TEST-0026, TEST-0048, TEST-0056, and TEST-0058.' -ForegroundColor Green
+Write-Host 'Protocol update adapter tests passed for all declared scenarios in this suite.' -ForegroundColor Green

@@ -40,9 +40,9 @@ Finite scope, evidence-based repetition, and a blocked exit prevent blind loops.
 
 ## Readiness evidence
 
-- Domain and contracts: the semantic states are `actionable`, `in scope`,
-  `resolved`, `accepted residual risk`, `converged`, and `blocked`; completion
-  cannot be inferred from validation-budget exhaustion.
+- Domain and contracts: every observation has exactly one of `Blocking`,
+  `AcceptedResidual`, `ExternalOrLegacyFollowUp`, or `OptionalImprovement`;
+  completion cannot be inferred from validation-budget exhaustion.
 - Consumers and dependencies: this repository and consumers that intentionally
   adopt `v0.3.0`; consumers on earlier exact pins remain unchanged.
 - Verification: `TEST-0019`, the existing structural/link suite, one fresh-diff
@@ -88,7 +88,8 @@ decomposition is not applicable.
 1. Development completion requires a full-project scan.
 2. Findings are documented, classified, and resolved from highest to lowest
    priority using severity, impact, and dependency order.
-3. Remediation repeats until no unresolved actionable in-scope finding remains.
+3. Remediation and the confirmation pass leave no unresolved `Blocking`
+   finding; other dispositions remain visible without reopening the loop.
 4. Every repeat has changed diff, failed evidence, or a new actionable finding
    within a declared finite budget.
 5. Budget exhaustion or missing authority produces a documented blocked state,

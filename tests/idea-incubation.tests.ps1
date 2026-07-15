@@ -101,4 +101,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Idea-incubation tests passed: TEST-0043 and TEST-0044.' -ForegroundColor Green
+Write-Host 'Idea-incubation tests passed for all declared scenarios in this suite.' -ForegroundColor Green

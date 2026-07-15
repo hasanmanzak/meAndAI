@@ -31,9 +31,9 @@ uses the authenticated local `gh` identity for exact tagged-source retrieval.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.8.0`, the only repository file required
+For a new submodule consumer on `v0.8.1`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.8.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.8.1/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -77,7 +77,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.8.0'
+$tag = 'v0.8.1'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -266,6 +266,13 @@ runs. See GitHub's documentation for
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
 and [fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
+Starting with `v0.8.1`, the updater adapter receives the read-only
+`MEANDAI_PROTOCOL_TOKEN` separately and uses it for release and tag-commit API
+evidence; `MEANDAI_UPDATER_TOKEN` remains limited to consumer reads and writes.
+An installed v0.8.0 adapter can propose the normal v0.8.1 update PR. That PR
+replaces the workflow and adapter together, so no separate manual workflow seed
+is required before the reviewed update merges.
+
 The updater identifies the highest numeric canonical tag in the current major,
 requires its exact published immutable-release metadata before target checkout
 or mutation, and uses a draft pull request as the review gate. It never
@@ -328,7 +335,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.8.0`
+- ref: `v0.8.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -373,11 +380,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.8.0`:
+before checkout; the current example then installs `v0.8.1`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.8.0
+git -C .ai/protocol checkout v0.8.1
 git add .ai/protocol
 ```
 

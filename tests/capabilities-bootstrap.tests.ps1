@@ -96,7 +96,9 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.8.0',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.8.1',
+        'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
+        'correlation_id:',
         'Verify immutable protocol release',
         "'X-GitHub-Api-Version' = '2026-03-10'",
         'immutable',
@@ -107,7 +109,8 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
         'Invoke-MeAndAICapabilitiesBootstrap.ps1',
         'Local updater installation is partial',
         'MEANDAI_UPDATER_TOKEN',
-        'MEANDAI_PROTOCOL_TOKEN'
+        'MEANDAI_PROTOCOL_TOKEN',
+        'PROTOCOL_TOKEN: ${{ secrets.MEANDAI_PROTOCOL_TOKEN || github.token }}'
     )) {
         if (-not $workflow.Contains($required)) {
             Add-Failure "TEST-0027 workflow is missing '$required'"
@@ -202,4 +205,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities lifecycle tests passed: TEST-0027 through TEST-0032, TEST-0044, TEST-0047, and TEST-0057.' -ForegroundColor Green
+Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in this suite.' -ForegroundColor Green

@@ -1,13 +1,19 @@
 name: meAndAI AI capabilities lifecycle
+run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]
 
 env:
   PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
-  BOOTSTRAP_PROTOCOL_TAG: v0.8.0
+  BOOTSTRAP_PROTOCOL_TAG: v0.8.1
 
 on:
   schedule:
     - cron: "17 5 * * *"
   workflow_dispatch:
+    inputs:
+      correlation_id:
+        description: Launcher correlation identity
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -79,6 +85,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.MEANDAI_UPDATER_TOKEN }}
+          PROTOCOL_TOKEN: ${{ secrets.MEANDAI_PROTOCOL_TOKEN || github.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           $modulePath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'

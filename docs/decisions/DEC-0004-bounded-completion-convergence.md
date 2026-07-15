@@ -16,16 +16,23 @@ progress, or a stop condition can instead produce a blind validation loop.
 
 ## Decision
 
-After development is declared complete, document and prioritize full-project
-scan findings using severity, impact, and dependency order, remediate the
-highest-priority actionable in-scope findings, and repeat until a convergence
-pass has none unresolved. Before scanning, declare a finite validation budget,
+After development is declared complete, assign every full-project scan
+observation exactly one protocol disposition. `Blocking` means actionable and
+in the current scope; it is the only disposition that reopens implementation or
+prevents completion. `AcceptedResidual`, `ExternalOrLegacyFollowUp`, and
+`OptionalImprovement` remain visible with their required authority, ownership,
+rationale, and links but are not unresolved actionable in-scope findings.
+
+Prioritize `Blocking` findings using severity, impact, and dependency order,
+remediate them, and use the budgeted confirmation pass to prove none remain.
+Before scanning, declare a finite validation budget,
 scope, and exclusions. Every repeat requires changed diff, failed evidence, or
 a new actionable finding. Budget exhaustion, missing authority, or an unchanged
 blocker produces a blocked outcome rather than completion.
 
-Owned residual risks and non-blocking legacy follow-ups remain visible and
-linked; relabeling alone does not clear a finding. The default budget is one
+The four dispositions are mutually exclusive and reclassification requires new
+evidence, changed scope, or recorded accepting authority; relabeling alone does
+not clear a finding. The default budget is one
 initial scan and one confirmation scan after remediation.
 
 ## Consequences

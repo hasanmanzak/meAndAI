@@ -3,6 +3,24 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.1 - 2026-07-15
+
+### Fixed
+
+- Kept GitHub.com host identity on launcher metadata and secret operations and
+  correlated each lifecycle dispatch to its exact workflow run.
+- Used the read-only protocol credential to bind immutable releases to exact
+  lightweight or annotated tag commits before any updater mutation.
+- Exposed both sides of bootstrap renames, converged raced adoption issues, and
+  limited fixture cleanup to paths owned by the current run.
+- Unified bounded finding dispositions, reconciled v0.8.0 publication records,
+  and replaced false-green line/range proxies with executable scenario, asset,
+  timeout, YAML, PowerShell, and least-privilege CI evidence.
+
+Related work: [FEAT-0011](docs/features/FEAT-0011-stability-closure/README.md),
+[DEC-0011](docs/decisions/DEC-0011-qualified-evidence-and-closure.md), and
+[issue #36](https://github.com/hasanmanzak/meAndAI/issues/36).
+
 ## 0.8.0 - 2026-07-15
 
 ### Added

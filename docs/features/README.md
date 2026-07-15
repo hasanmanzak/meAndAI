@@ -11,7 +11,8 @@
 | [FEAT-0007](FEAT-0007-local-codex-adoption/README.md) | Local Codex completion for quick adoption | Complete | 0.6.1 |
 | [FEAT-0008](FEAT-0008-idea-incubation/README.md) | Repository-native idea incubation | Complete | 0.7.0 |
 | [FEAT-0009](FEAT-0009-adoption-integrity/README.md) | Adoption and updater integrity hardening | Complete | 0.7.2 |
-| [FEAT-0010](FEAT-0010-protocol-stability-invariants/README.md) | Protocol stability invariants | In progress | 0.8.0 |
+| [FEAT-0010](FEAT-0010-protocol-stability-invariants/README.md) | Protocol stability invariants | Complete | 0.8.0 |
+| [FEAT-0011](FEAT-0011-stability-closure/README.md) | End-to-end protocol stability closure | Complete | 0.8.1 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
