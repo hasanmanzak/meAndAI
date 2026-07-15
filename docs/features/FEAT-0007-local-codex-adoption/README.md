@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature correction |
-| Status | In review |
+| Status | Complete |
 | Target version | 0.6.1 |
 | Issue | [#21](https://github.com/hasanmanzak/meAndAI/issues/21) |
 | Pull request | [#22](https://github.com/hasanmanzak/meAndAI/pull/22) |
@@ -174,4 +174,10 @@ scan stops here.
 - [x] No unresolved blocking finding; residual risks explicit and owned.
 - [x] Documentation, links, version, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates pass.
+- [x] Applicable CI and review gates pass.
+
+## Post-merge release gate
+
+After pull request #22 merges, tag the merged `main` commit as `v0.6.1`, push
+the tag, and verify that the remote tag and release metadata resolve to that
+exact merge commit.

@@ -37,5 +37,7 @@
   authentication/manifest/commit/race failures, unverified-draft handling,
   idempotency, and v0.6.1 regression metadata.
 - The full Windows PowerShell 5.1 suite passed `TEST-0001` through `TEST-0041`
-  in 94.4 seconds on 2026-07-15. Record CI, merge, and the release tag before
-  closing FEAT-0007.
+  in 94.4 seconds on 2026-07-15. PR #22 commit `9191cb0` then passed the
+  [Ubuntu, Windows, and GitGuardian checks](https://github.com/hasanmanzak/meAndAI/actions/runs/29418825486).
+- FEAT-0007 is complete. Merge PR #22, tag the resulting `main` commit as
+  `v0.6.1`, and verify the remote tag before ending the release operation.

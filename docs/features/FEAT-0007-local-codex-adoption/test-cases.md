@@ -27,3 +27,4 @@ and the existing repository suites.
 | --- | --- | --- | --- | --- |
 | 2026-07-15 | `main` at `v0.6.0` before FEAT-0007 changes | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: existing TEST-0001 through TEST-0037 baseline |
 | 2026-07-15 | FEAT-0007 pre-delivery working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: `TEST-0001` through `TEST-0041` in 94.4 seconds |
+| 2026-07-15 | PR #22 commit `9191cb0` | GitHub-hosted Ubuntu and Windows plus GitGuardian | [Protocol validation run](https://github.com/hasanmanzak/meAndAI/actions/runs/29418825486) | Pass: Ubuntu, Windows, and secret scan |
