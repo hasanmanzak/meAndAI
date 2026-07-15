@@ -17,8 +17,8 @@ Last verified: **2026-07-15**
 - Latest tracked work: [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
 - Current release candidate: implemented
   [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md),
-  targeting `v0.7.2` through its reviewed pull request and separate annotated
-  tag gate.
+  published in [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31)
+  and targeting `v0.7.2` through review and the separate annotated tag gate.
 - Latest released delivery before the current candidate: completed
   [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
   in merged [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29),

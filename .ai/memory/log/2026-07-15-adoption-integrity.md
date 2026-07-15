@@ -4,6 +4,7 @@
 - Target release: `v0.7.2`
 - Work item: [FEAT-0009](../../../docs/features/FEAT-0009-adoption-integrity/README.md)
 - Tracking: [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30)
+- Delivery: [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31)
 - Tests: [TEST-0046 through TEST-0050](../../../docs/features/FEAT-0009-adoption-integrity/test-cases.md)
 
 ## Durable behavior

@@ -6,7 +6,7 @@
 | Status | Implemented; release gate pending |
 | Target version | 0.7.2 |
 | Issue | [#30](https://github.com/hasanmanzak/meAndAI/issues/30) |
-| Pull request | Not opened yet |
+| Pull request | [#31](https://github.com/hasanmanzak/meAndAI/pull/31) |
 | Tests | [Test scenarios](test-cases.md) |
 
 ## Problem
@@ -181,5 +181,5 @@ scan or hardening pass.
 - [x] Slice reviews and bounded scan stop condition complete.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
