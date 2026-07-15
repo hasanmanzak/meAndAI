@@ -3,6 +3,20 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.3 - 2026-07-16
+
+### Fixed
+
+- Removed the invalid trailing slash from the post-publication verifier's
+  repository-metadata endpoint and made the focused mock reject that URL shape.
+- Retained the immutable v0.8.2 failure as external evidence in
+  [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38); v0.8.3 carries
+  only this bounded correction and the required active release pins.
+
+Related work: [FEAT-0012](docs/features/FEAT-0012-v082-correction/README.md),
+[DEC-0012](docs/decisions/DEC-0012-bounded-correction-and-external-release-evidence.md),
+and [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
+
 ## 0.8.2 - 2026-07-16
 
 ### Fixed

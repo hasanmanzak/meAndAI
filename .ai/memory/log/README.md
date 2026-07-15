@@ -6,7 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 No open implementation continuation. The completed bounded v0.8.2 correction
-is recorded in [FEAT-0012](../../../docs/features/FEAT-0012-v082-correction/README.md).
+and its v0.8.3 post-publication verifier repair are recorded in
+[FEAT-0012](../../../docs/features/FEAT-0012-v082-correction/README.md).
 Exact publication evidence is owned externally by
 [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38) and the GitHub
 Release instead of being predicted in repository memory.

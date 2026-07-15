@@ -4,7 +4,7 @@
 | --- | --- |
 | Classification | Feature correction |
 | Status | Complete |
-| Target version | 0.8.2 |
+| Target version | 0.8.3 |
 | Issue | [#38](https://github.com/hasanmanzak/meAndAI/issues/38) |
 | Pull request | Pending |
 | Decision | [DEC-0012](../../decisions/DEC-0012-bounded-correction-and-external-release-evidence.md) |
@@ -148,6 +148,8 @@ post-publication facts.
    and preserves each disposition's distinct evidence requirement.
 10. FEAT-0012 retains `Pending` publication fields before merge and designates
     issue #38 as the stable external authority for later exact evidence.
+11. The external verifier calls the exact repository metadata resource without
+    a trailing slash, and its focused mock rejects the invalid URL shape.
 
 ## Initial findings register
 
@@ -170,6 +172,23 @@ and later publication evidence.
 | `FIND-0110` | Verified recovery defect | Medium / High | Recovery checked only the current target branch rather than the complete reserved namespace | [Updater adapter](../../../templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1) | An older interrupted branch can coexist with a new proposal and hide ambiguous ownership | Inventory and validate every reserved remote branch before mutation | `Resolved` / Complete | Passed `TEST-0072`, [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
 | `FIND-0111` | Verified protocol/template drift | Medium / High | The feature template made the completion scan conditional and collapsed four evidence contracts into one statement | [Consumer feature template](../../../templates/feature/README.md) | Consumers can skip the required scan or close a disposition without its required evidence | Make the scan mandatory and state each disposition contract exactly | `Resolved` / Complete | Passed local `TEST-0076`, [protocol review gate](../../../PROTOCOL.md#gate-5---self-review) |
 
+## BUG-0004 - Repository-root verifier URL correction
+
+| Field | Evidence |
+| --- | --- |
+| Classification | Post-publication integration defect |
+| Status | Resolved for v0.8.3; external verification pending publication |
+| Owning finding | `FIND-0108` |
+| Tracking | [Issue #38](https://github.com/hasanmanzak/meAndAI/issues/38) |
+| Failed evidence | [v0.8.2 post-publication run 29454981897](https://github.com/hasanmanzak/meAndAI/actions/runs/29454981897) |
+
+The first real external run called the repository metadata endpoint with an
+extra trailing slash. GitHub returned 404, while the focused mock had accepted
+the same invalid URL and therefore produced a false green result. The v0.8.3
+repair builds the empty-path request from the exact repository root and adds a
+negative regression that rejects the trailing-slash form. No new verifier or
+scan layer is introduced.
+
 ## Self-review
 
 Each slice received one focused fresh-diff review against the fixed findings
@@ -184,6 +203,8 @@ than being deferred or turned into another scan cycle.
 | `FIND-0105` | Moving source verification before the lock initially bypassed a present read-only protocol token | Select the verified local read token before lock mutation and use authenticated `gh` only when the file is absent; focused quick-adoption and full suites pass |
 | `FIND-0106` | The first actionlint package name did not match the official release asset | Pin the verified `linux_amd64` artifact and SHA-256; local actionlint reports zero errors |
 | `FIND-0108` | The first post-publication verifier required permanent default-branch equality and mixed release evidence into the feature commit | Verify released-commit ancestry and keep exact publication facts in issue #38 and the GitHub Release; verifier fixtures pass |
+| `FIND-0108` / `BUG-0004` | The real v0.8.2 external run exposed an invalid repository-root trailing slash that the mock also accepted | Remove the slash, make the focused mock reject it, retain the failed run, and publish the bounded v0.8.3 repair |
+| `FIND-0108` / `BUG-0004` | The first v0.8.3 full run exposed two escaped legacy-version fixture matchers that a plain-version search had missed | Align the exact matchers, search both plain and escaped legacy pins, and rerun the complete suite successfully in 264.4 seconds |
 | `FIND-0110` | A complete initial reserved-branch inventory could still change before the first mutation | Revalidate the exact namespace immediately before publication or cleanup; `TEST-0072` passes |
 
 The bounded confirmation reused the declared repository inventory, reviewed the
