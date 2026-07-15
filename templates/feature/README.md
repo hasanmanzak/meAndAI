@@ -78,12 +78,18 @@ finding, including findings fixed in the same slice.
 Default to one bounded fresh-diff pass and one final relevant verification
 command. Assign each observation exactly one protocol disposition: `Blocking`,
 `AcceptedResidual`, `ExternalOrLegacyFollowUp`, or `OptionalImprovement`.
-Record the stop condition, and do not recursively add validators unless a
-concrete risk and decision require them.
+Record its required evidence contract: `Blocking` requires a verified fix for
+completion; otherwise a durable blocking issue remains open and Definition of
+Done remains incomplete. `AcceptedResidual` needs accepting authority, owner,
+rationale, evidence, and review condition; `ExternalOrLegacyFollowUp` needs a
+durable owner and link proving it is outside this change; and
+`OptionalImprovement` needs evidence that its absence does not invalidate the
+current work. Do not recursively add validators unless a concrete risk and
+decision require them.
 
-When a post-development full-project scan is required, record its declared
-scope, exclusions, finite validation budget, prioritized findings, remediation,
-and convergence or blocked outcome.
+After development, the post-development full-project scan is mandatory. Record
+its declared scope, exclusions, finite validation budget, prioritized findings,
+remediation, and convergence or blocked outcome.
 
 ## Definition of Done
 
@@ -99,12 +105,17 @@ and convergence or blocked outcome.
 ## Post-merge release evidence
 
 Keep this gate separate from the pre-merge Definition of Done. Complete it only
-after publication; use `Pending` before then and never predict a commit or
-release identifier.
+after publication. Before merge, designate one stable external evidence
+authority, normally the delivery issue, as the external post-publication record;
+keep every publication-dependent field `Pending`, and never predict a commit or
+release identifier. Publication writes the exact facts to that external
+authority and the GitHub Release; it does not require a follow-up
+documentation-only pull request.
 
 | Field | Evidence |
 | --- | --- |
-| Release authority | Published immutable GitHub Release, historical annotated tag, or explicit N/A rationale |
-| Release identifier | Exact tag/release link or `Pending` |
-| Target commit | Exact full commit SHA/link from an external post-publication record, or `Pending` |
-| Verification evidence | External release API/ref/check result and date, or `Pending` |
+| External evidence authority | Stable issue or PR link selected before merge |
+| Release authority | `Pending`; after publication, recorded externally as an immutable GitHub Release, historical annotated tag, or explicit N/A rationale |
+| Release identifier | `Pending`; exact tag/release link is written to the external authority after publication |
+| Target commit | `Pending`; exact full commit SHA/link is written to the external authority after publication |
+| Verification evidence | `Pending`; release API/ref/check result and date are written to the external authority after publication |

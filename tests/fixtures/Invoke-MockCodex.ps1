@@ -93,6 +93,25 @@ if ($mode -ceq 'RenameWorkflowAway') {
         throw 'Unable to rename the protected mock lifecycle workflow.'
     }
 }
+if ($mode -ceq 'CaseMoveWorkflow') {
+    $workflowPath = Join-Path $working '.github/workflows/meandai-protocol-update.yml'
+    $temporaryWorkflowPath = Join-Path $working '.github/workflows/meandai-protocol-update.case-move'
+    $caseMovedPath = Join-Path $working '.github/workflows/MeAndAI-protocol-update.yml'
+    & git -C $working mv -- $workflowPath $temporaryWorkflowPath
+    if ($LASTEXITCODE -eq 0) {
+        & git -C $working mv -- $temporaryWorkflowPath $caseMovedPath
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to case-move the protected mock lifecycle workflow.'
+    }
+}
+if ($mode -ceq 'CaseVariantCredential') {
+    [IO.File]::WriteAllText(
+        (Join-Path $working 'fg_pat.txt'),
+        'non-secret-test-placeholder',
+        [Text.UTF8Encoding]::new($false)
+    )
+}
 if ($mode -cne 'LeaveManifest') {
     Remove-Item -LiteralPath $manifestPath -Force
 }
@@ -112,7 +131,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.8.1' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.8.2' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

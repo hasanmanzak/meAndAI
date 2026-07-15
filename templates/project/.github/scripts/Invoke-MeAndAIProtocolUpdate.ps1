@@ -481,6 +481,63 @@ function Get-RemoteBranchHead {
     return $parts[0]
 }
 
+function Get-RemoteBranchesByPrefix {
+    param([Parameter(Mandatory)][string]$Prefix)
+
+    $refPrefix = "refs/heads/$Prefix"
+    $output = @(Invoke-Native -Command 'git' -Arguments @(
+        'ls-remote', '--heads', 'origin', "$refPrefix*"
+    ))
+    $branches = [System.Collections.Generic.List[object]]::new()
+    $names = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($line in $output) {
+        $match = [regex]::Match(
+            [string]$line,
+            '^(?<sha>[0-9a-f]{40})\s+(?<ref>refs/heads/.+)$'
+        )
+        if (-not $match.Success -or
+            -not $match.Groups['ref'].Value.StartsWith(
+                $refPrefix, [StringComparison]::Ordinal
+            )) {
+            throw 'The reserved updater branch inventory is invalid.'
+        }
+        $name = $match.Groups['ref'].Value.Substring('refs/heads/'.Length)
+        if (-not $names.Add($name)) {
+            throw "Reserved updater branch '$name' is ambiguous."
+        }
+        $branches.Add([pscustomobject]@{
+            Name = $name
+            Sha = [string]$match.Groups['sha'].Value
+        })
+    }
+    return @($branches)
+}
+
+function Test-ExactRemoteBranchInventory {
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Expected,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Actual
+    )
+
+    $expectedRows = @($Expected | ForEach-Object {
+        "$([string]$_.Name)`t$([string]$_.Sha)"
+    } | Sort-Object)
+    $actualRows = @($Actual | ForEach-Object {
+        "$([string]$_.Name)`t$([string]$_.Sha)"
+    } | Sort-Object)
+    if ($expectedRows.Count -ne $actualRows.Count) {
+        return $false
+    }
+    for ($index = 0; $index -lt $expectedRows.Count; $index++) {
+        if ($expectedRows[$index] -cne $actualRows[$index]) {
+            return $false
+        }
+    }
+    return $true
+}
+
 function Get-RepositoryTreeEntry {
     param([string]$Repository, [string]$HeadSha, [string]$Path)
 
@@ -785,6 +842,30 @@ foreach ($pull in $pulls) {
     })
 }
 
+$reservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
+foreach ($reservedBranch in $reservedBranches) {
+    $owners = @($candidates | Where-Object {
+        [string]$_.HeadRef -ceq [string]$reservedBranch.Name -and
+        [bool]$_.BranchExists -and
+        [string]$_.ObservedHeadSha -ceq [string]$reservedBranch.Sha
+    })
+    if ($owners.Count -ne 1) {
+        throw "Reserved updater branch '$($reservedBranch.Name)' has no single open proposal with matching live ownership; manual review is required."
+    }
+}
+foreach ($candidate in @($candidates | Where-Object {
+    [bool]$_.BranchExists -and
+    ([string]$_.HeadRef).StartsWith($BranchPrefix, [StringComparison]::Ordinal)
+})) {
+    $inventoried = @($reservedBranches | Where-Object {
+        [string]$_.Name -ceq [string]$candidate.HeadRef -and
+        [string]$_.Sha -ceq [string]$candidate.ObservedHeadSha
+    })
+    if ($inventoried.Count -ne 1) {
+        throw "Reserved updater branch '$($candidate.HeadRef)' changed during namespace inventory; manual review is required."
+    }
+}
+
 $snapshot = [pscustomobject]@{
     SchemaVersion = 1
     CurrentTag = $currentTag
@@ -832,6 +913,7 @@ if ($create.Count -gt 1) {
 $createdPullRequest = $null
 $createdBranch = $null
 $createdOperation = $null
+$reservedNamespaceRevalidated = $false
 if ($create.Count -eq 1) {
     $targetTag = [string]$create[0].TargetTag
     if ($null -eq $releaseEvidence -or
@@ -887,6 +969,12 @@ if ($create.Count -eq 1) {
     $pushSucceeded = $false
     $marker = ''
     try {
+        $confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
+        if (-not (Test-ExactRemoteBranchInventory -Expected $reservedBranches `
+            -Actual $confirmedReservedBranches)) {
+            throw 'The reserved updater branch namespace changed before replacement publication.'
+        }
+        $reservedNamespaceRevalidated = $true
         $createdRef = "refs/heads/$createdBranch"
         Invoke-Native -Command 'git' -Arguments @(
             'push', '--set-upstream', "--force-with-lease=${createdRef}:",
@@ -1030,7 +1118,16 @@ if ($plan.State -eq 'Supersede') {
 }
 
 $deleteOperations = @($plan.Operations | Where-Object Kind -eq 'DeleteBranch')
-foreach ($operation in @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest')) {
+$closeOperations = @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest')
+if (-not $reservedNamespaceRevalidated -and $closeOperations.Count -gt 0) {
+    $confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
+    if (-not (Test-ExactRemoteBranchInventory -Expected $reservedBranches `
+        -Actual $confirmedReservedBranches)) {
+        throw 'The reserved updater branch namespace changed before proposal cleanup.'
+    }
+    $reservedNamespaceRevalidated = $true
+}
+foreach ($operation in $closeOperations) {
     $deleteOperation = @($deleteOperations | Where-Object {
         $_.PullRequestNumber -eq $operation.PullRequestNumber -and $_.Branch -eq $operation.Branch
     })

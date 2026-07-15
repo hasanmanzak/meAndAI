@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.8.1',
+    [string]$ProtocolTag = 'v0.8.2',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -26,6 +26,7 @@ Set-StrictMode -Version Latest
 
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
+$secretLockLabel = 'meandai:secret-reconciliation-lock'
 $tokenMappings = [ordered]@{
     'FG_PAT.txt' = 'MEANDAI_UPDATER_TOKEN'
     'MEANDAI_RO_FG_PAT.txt' = 'MEANDAI_PROTOCOL_TOKEN'
@@ -429,6 +430,75 @@ function Get-RepositorySecretNames {
         }
     }
     return @($names)
+}
+
+function Get-RepositoryLabelRecord {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    $encodedName = [Uri]::EscapeDataString($Name)
+    $view = Invoke-External -Command 'gh' -Arguments @(
+        'api',
+        '-H', 'Accept: application/vnd.github+json',
+        '-H', 'X-GitHub-Api-Version: 2026-03-10',
+        "repos/$Repository/labels/$encodedName"
+    )
+    try {
+        $label = ((@($view.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+    }
+    catch {
+        throw "GitHub CLI returned invalid metadata for repository label '$Name'."
+    }
+    if ($null -eq $label -or $null -eq $label.PSObject.Properties['name'] -or
+        $null -eq $label.PSObject.Properties['description'] -or
+        [string]$label.name -cne $Name) {
+        throw "Repository label '$Name' has incomplete or mismatched identity metadata."
+    }
+    return $label
+}
+
+function Enter-RepositorySecretReconciliationLock {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    $nonce = [guid]::NewGuid().ToString('N')
+    $description = "meAndAI secret reconciliation lock session $nonce"
+    $created = Invoke-External -Command 'gh' -Arguments @(
+        'label', 'create', $secretLockLabel, '--repo', $Repository,
+        '--color', 'ededed', '--description', $description
+    ) -AllowFailure
+    if ($created.ExitCode -ne 0) {
+        throw "Repository secret reconciliation is already locked or a stale '$secretLockLabel' label exists. Inspect the label and resolve ownership manually before rerunning."
+    }
+
+    $observed = Get-RepositoryLabelRecord -Repository $Repository -Name $secretLockLabel
+    if ([string]$observed.description -cne $description) {
+        throw 'The repository secret-reconciliation lock could not be verified after creation.'
+    }
+    return [pscustomobject]@{
+        Name = $secretLockLabel
+        Description = $description
+    }
+}
+
+function Exit-RepositorySecretReconciliationLock {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Lock
+    )
+
+    $observed = Get-RepositoryLabelRecord -Repository $Repository -Name ([string]$Lock.Name)
+    if ([string]$observed.description -cne [string]$Lock.Description) {
+        throw 'The repository secret-reconciliation lock ownership changed; the launcher did not remove it.'
+    }
+    $encodedName = [Uri]::EscapeDataString([string]$Lock.Name)
+    Invoke-External -Command 'gh' -Arguments @(
+        'api', '--method', 'DELETE',
+        '-H', 'Accept: application/vnd.github+json',
+        '-H', 'X-GitHub-Api-Version: 2026-03-10',
+        "repos/$Repository/labels/$encodedName"
+    ) | Out-Null
 }
 
 function Write-CanonicalWorkflow {
@@ -907,19 +977,37 @@ function Get-AdoptionIssueInventory {
 function Get-MarkedAdoptionIssues {
     param(
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Issues,
-        [Parameter(Mandatory)][string]$Marker
+        [Parameter(Mandatory)][string]$Marker,
+        [Parameter(Mandatory)][string]$ExpectedTitle,
+        [Parameter(Mandatory)][string]$ExpectedBody
     )
 
     $numbers = [System.Collections.Generic.HashSet[int]]::new()
-    $matching = @($Issues | Where-Object {
-        $null -ne $_.PSObject.Properties['body'] -and
-        ([string]$_.body).Contains($Marker)
-    } | Sort-Object { [int]$_.number })
-    foreach ($issue in $matching) {
+    $canonicalMarkerPattern = '\A' + [regex]::Escape($Marker) + '(?:\r?\n|\z)'
+    $matching = [System.Collections.Generic.List[object]]::new()
+    $normalizedExpectedBody = $ExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    foreach ($issue in $Issues) {
+        if ($null -eq $issue.PSObject.Properties['body']) {
+            continue
+        }
+        $body = [string]$issue.body
+        $canonicalLines = [regex]::Matches(
+            $body,
+            '(?m)^' + [regex]::Escape($Marker) + '\r?$'
+        )
+        if (-not [regex]::IsMatch($body, $canonicalMarkerPattern)) {
+            continue
+        }
         foreach ($property in @('number', 'url', 'title', 'body', 'state')) {
             if ($null -eq $issue.PSObject.Properties[$property]) {
                 throw 'A project-owned adoption issue has incomplete identity metadata.'
             }
+        }
+        $normalizedBody = $body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+        if ($canonicalLines.Count -ne 1 -or
+            [string]$issue.title -cne $ExpectedTitle -or
+            $normalizedBody -cne $normalizedExpectedBody) {
+            throw 'A canonically marked adoption issue has drifted from its exact owned record; manual review is required.'
         }
         if ([string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
             [string]$issue.url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
@@ -927,8 +1015,9 @@ function Get-MarkedAdoptionIssues {
             -not $numbers.Add([int]$issue.number)) {
             throw 'A project-owned adoption issue has invalid or duplicate identity metadata.'
         }
+        $matching.Add($issue)
     }
-    return @($matching)
+    return @($matching | Sort-Object { [int]$_.number })
 }
 
 function Ensure-AdoptionIssue {
@@ -940,6 +1029,18 @@ function Ensure-AdoptionIssue {
 
     $marker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
         $ProtocolTag, [string]$PullRequest.number
+    $issueTitle = "Track meAndAI AI capabilities adoption from $ProtocolTag"
+    $issueBody = @(
+        $marker,
+        '## AI capabilities adoption tracking',
+        '',
+        "- Protocol release: ``$ProtocolTag``",
+        "- Adoption draft: $($PullRequest.url)",
+        '',
+        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+        '',
+        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+    ) -join [Environment]::NewLine
     $completed = [string]$PullRequest.meAndAIMarker.phase -ceq 'Completed'
     $desiredStatusLabel = if ($completed) {
         'status:needs-review'
@@ -950,28 +1051,18 @@ function Ensure-AdoptionIssue {
     }
     else { 'status:needs-review' }
     $matchingIssues = @(Get-MarkedAdoptionIssues `
-        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker)
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
+        -ExpectedTitle $issueTitle -ExpectedBody $issueBody)
 
     if ($matchingIssues.Count -eq 0) {
         $bodyPath = Join-Path $TemporaryDirectory 'adoption-issue.md'
-        $body = @(
-            $marker,
-            '## AI capabilities adoption tracking',
-            '',
-            "- Protocol release: ``$ProtocolTag``",
-            "- Adoption draft: $($PullRequest.url)",
-            '',
-            'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
-            '',
-            'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
-        ) -join [Environment]::NewLine
         [IO.File]::WriteAllText(
-            $bodyPath, $body + [Environment]::NewLine,
+            $bodyPath, $issueBody + [Environment]::NewLine,
             [Text.UTF8Encoding]::new($false)
         )
         $created = Invoke-External -Command 'gh' -Arguments @(
             'issue', 'create', '--repo', $Repository,
-            '--title', "Track meAndAI AI capabilities adoption from $ProtocolTag",
+            '--title', $issueTitle,
             '--body-file', $bodyPath,
             '--label', 'type:feature', '--label', 'priority:p1',
             '--label', $desiredStatusLabel
@@ -981,7 +1072,8 @@ function Ensure-AdoptionIssue {
             throw 'Created adoption issue returned an unrecognized URL.'
         }
         $matchingIssues = @(Get-MarkedAdoptionIssues `
-            -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker)
+            -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
+            -ExpectedTitle $issueTitle -ExpectedBody $issueBody)
     }
 
     if ($matchingIssues.Count -eq 0) {
@@ -1002,7 +1094,8 @@ function Ensure-AdoptionIssue {
     }
 
     $converged = @(Get-MarkedAdoptionIssues `
-        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker |
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
+        -ExpectedTitle $issueTitle -ExpectedBody $issueBody |
         Where-Object { [string]$_.state -ceq 'OPEN' })
     if ($converged.Count -ne 1 -or [int]$converged[0].number -ne $canonicalNumber) {
         throw 'Project-owned adoption issues did not converge to one canonical open identity.'
@@ -1286,7 +1379,7 @@ function Get-ProtocolSourceSnapshot {
         $headers = @{
             Accept = 'application/vnd.github+json'
             Authorization = "Bearer $Token"
-            'X-GitHub-Api-Version' = '2022-11-28'
+            'X-GitHub-Api-Version' = '2026-03-10'
             'User-Agent' = 'meAndAI-quick-adoption'
         }
         $uri = "https://api.github.com/repos/$ProtocolRepository/zipball/$Commit"
@@ -1337,8 +1430,11 @@ function Get-ProtocolSourceSnapshot {
 function Assert-CredentialFilesAbsent {
     param([Parameter(Mandatory)][string]$Repository)
 
+    $files = @(Get-ChildItem -LiteralPath $Repository -Recurse -Force -File)
     foreach ($name in $tokenMappings.Keys) {
-        $matches = @(Get-ChildItem -LiteralPath $Repository -Recurse -Force -File -Filter $name)
+        $matches = @($files | Where-Object {
+            ([string]$_.Name).Equals($name, [StringComparison]::OrdinalIgnoreCase)
+        })
         if ($matches.Count -gt 0) {
             throw "Credential file '$name' must not exist in the isolated Codex clone."
         }
@@ -1895,23 +1991,15 @@ if ($emailResult.ExitCode -ne 0 -or -not ((@($emailResult.Output) -join '').Trim
     ) | Out-Null
 }
 
-$existingSecretNames = if ($hasRemote) {
-    @(Get-RepositorySecretNames -Repository $repository)
-}
-else {
-    @()
-}
-$protocolSecretMissing = $existingSecretNames -notcontains 'MEANDAI_PROTOCOL_TOKEN'
 $protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
 $protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
-if ($protocolSecretMissing -and -not $protocolTokenFileExists) {
-    throw "Required local credential file 'MEANDAI_RO_FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_PROTOCOL_TOKEN' does not exist."
-}
-if ($null -eq $protocolToken -and $protocolTokenFileExists) {
-    $protocolToken = Read-LocalToken -Path $protocolTokenPath
-}
 if ($null -eq $workflowBytes) {
-    if ($protocolToken) {
+    # Executable source authority is verified before the temporary lock label
+    # performs the first repository mutation. Prefer the local read-only token
+    # when its verified file is present; otherwise use the authenticated gh
+    # identity without attempting to recover an existing Actions secret.
+    if ($protocolTokenFileExists) {
+        $protocolToken = Read-LocalToken -Path $protocolTokenPath
         $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
     }
     else {
@@ -1919,36 +2007,72 @@ if ($null -eq $workflowBytes) {
     }
 }
 
-$updaterSecretMissing = $existingSecretNames -notcontains 'MEANDAI_UPDATER_TOKEN'
-$updaterToken = $null
-if ($updaterSecretMissing) {
-    $updaterTokenPath = Join-Path $target 'FG_PAT.txt'
-    if (-not (Test-Path -LiteralPath $updaterTokenPath -PathType Leaf)) {
-        throw "Required local credential file 'FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_UPDATER_TOKEN' does not exist."
+$secretLock = Enter-RepositorySecretReconciliationLock -Repository $repository
+$secretOperationError = $null
+$secretLockCleanupError = $null
+try {
+    # The name inventory and every missing-secret write share one GitHub-wide
+    # critical section. A competing host cannot act on the same stale snapshot.
+    $existingSecretNames = @(Get-RepositorySecretNames -Repository $repository)
+    $protocolSecretMissing = $existingSecretNames -notcontains 'MEANDAI_PROTOCOL_TOKEN'
+    if ($protocolSecretMissing -and -not $protocolTokenFileExists) {
+        throw "Required local credential file 'MEANDAI_RO_FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_PROTOCOL_TOKEN' does not exist."
     }
-    $updaterToken = Read-LocalToken -Path $updaterTokenPath
-    try {
-        $targetInfo = Invoke-GitHubApi -Uri "https://api.github.com/repos/$repository" -Token $updaterToken
-        if (-not ([string]$targetInfo.full_name).Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
-            throw 'identity mismatch'
+    if ($null -eq $protocolToken -and $protocolTokenFileExists) {
+        $protocolToken = Read-LocalToken -Path $protocolTokenPath
+    }
+
+    $updaterSecretMissing = $existingSecretNames -notcontains 'MEANDAI_UPDATER_TOKEN'
+    $updaterToken = $null
+    if ($updaterSecretMissing) {
+        $updaterTokenPath = Join-Path $target 'FG_PAT.txt'
+        if (-not (Test-Path -LiteralPath $updaterTokenPath -PathType Leaf)) {
+            throw "Required local credential file 'FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_UPDATER_TOKEN' does not exist."
+        }
+        $updaterToken = Read-LocalToken -Path $updaterTokenPath
+        try {
+            $targetInfo = Invoke-GitHubApi -Uri "https://api.github.com/repos/$repository" -Token $updaterToken
+            if (-not ([string]$targetInfo.full_name).Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
+                throw 'identity mismatch'
+            }
+        }
+        catch {
+            throw "The updater token cannot access '$repository'. Add this repository to the token's selected-repository grant, then rerun."
         }
     }
-    catch {
-        throw "The updater token cannot access '$repository'. Add this repository to the token's selected-repository grant, then rerun."
+
+    foreach ($entry in $tokenMappings.GetEnumerator()) {
+        if ($existingSecretNames -contains $entry.Value) {
+            Write-Host "Repository Actions secret '$($entry.Value)' already exists and was preserved."
+            continue
+        }
+        $value = if ($entry.Key -ceq 'FG_PAT.txt') { $updaterToken } else { $protocolToken }
+        Set-RepositorySecret -Repository $repository -Name $entry.Value -Value $value
     }
+}
+catch {
+    $secretOperationError = $_.Exception
+}
+finally {
+    try {
+        Exit-RepositorySecretReconciliationLock -Repository $repository -Lock $secretLock
+    }
+    catch {
+        $secretLockCleanupError = $_.Exception
+    }
+}
+if ($null -ne $secretOperationError) {
+    if ($null -ne $secretLockCleanupError) {
+        throw "$($secretOperationError.Message) Secret-lock cleanup also failed: $($secretLockCleanupError.Message)"
+    }
+    throw $secretOperationError
+}
+if ($null -ne $secretLockCleanupError) {
+    throw $secretLockCleanupError
 }
 
 $workflowFullPath = Join-Path $target ($workflowTargetPath -replace '/', [IO.Path]::DirectorySeparatorChar)
 [void](Write-CanonicalWorkflow -Path $workflowFullPath -Bytes $workflowBytes)
-
-foreach ($entry in $tokenMappings.GetEnumerator()) {
-    if ($existingSecretNames -contains $entry.Value) {
-        Write-Host "Repository Actions secret '$($entry.Value)' already exists and was preserved."
-        continue
-    }
-    $value = if ($entry.Key -ceq 'FG_PAT.txt') { $updaterToken } else { $protocolToken }
-    Set-RepositorySecret -Repository $repository -Name $entry.Value -Value $value
-}
 
 Invoke-Git -Repository $target -Arguments @('add', '--', $workflowTargetPath) | Out-Null
 $staged = @((Invoke-Git -Repository $target -Arguments @(

@@ -58,6 +58,18 @@ environment secrets do not replace these two repository secrets. Secret
 provisioning is deterministic PowerShell/`gh` work; it does not require Codex
 and values are never placed in the Codex prompt.
 
+Secret-name inventory and missing-secret writes run inside one temporary,
+repository-scoped lock represented by the label
+`meandai:secret-reconciliation-lock`. The launcher creates that label with a
+unique session nonce, verifies the same nonce before removing it, and fails
+closed if the label already exists or its ownership changes. This uses the
+local authenticated `gh` label authority already required for adoption; it does
+not add updater-PAT permissions. If a process crash leaves a stale lock, first
+confirm that no quick-adoption launcher is running for the repository, inspect
+the label description, then delete only that label through the repository UI or
+`gh label delete meandai:secret-reconciliation-lock --repo <owner>/<repo> --yes`
+before rerunning. Never remove a lock owned by an active or uncertain session.
+
 When `MEANDAI_PROTOCOL_TOKEN` exists but its local file is absent, the launcher
 does not and cannot recover the stored value. It uses the authenticated local
 `gh` identity only to retrieve the exact tagged workflow and clone the exact
@@ -67,18 +79,18 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It verifies
-that `v0.8.1` is an exact published immutable GitHub Release before downloading
+that `v0.8.2` is an exact published immutable GitHub Release before downloading
 the launcher from its locked tag into the OS temp directory; it does not
 execute a moving `main` file.
 
 ```powershell
-$t='v0.8.1'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$t='v0.8.2'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$tag = 'v0.8.1'
+$tag = 'v0.8.2'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json

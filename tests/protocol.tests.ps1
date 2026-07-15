@@ -120,6 +120,9 @@ $requiredFiles = @(
     'tests/fixtures/Invoke-MockCodex.ps1',
     'tests/fixtures/Invoke-MockCodex.cmd',
     'tests/fixtures/Invoke-MockCodex.sh',
+    'tests/scenario-ownership.psd1',
+    'tests/Verify-PostPublicationEvidence.ps1',
+    'tests/post-publication-evidence.tests.ps1',
     '.github/workflows/protocol-tests.yml'
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
@@ -166,7 +169,7 @@ $testSuites = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') -File `
     -Filter '*.tests.ps1' | Where-Object {
         $_.Name -cne 'protocol.tests.ps1' -and
         $_.BaseName -cnotmatch '-adapter\.tests$'
-    })
+    } | Sort-Object Name)
 if ($testSuites.Count -eq 0) {
     Add-Failure 'TEST-0059 no canonical child test suites were discovered.'
 }
@@ -181,23 +184,156 @@ foreach ($adapterSuite in $adapterSuites) {
     }
 }
 
-$declaredTestIds = [System.Collections.Generic.HashSet[string]]::new(
-    [System.StringComparer]::Ordinal
-)
+$scenarioDeclarations = @{}
 foreach ($testCaseFile in @(Get-ChildItem -LiteralPath (Join-Path $root 'docs/features') `
     -Recurse -File -Filter 'test-cases.md')) {
-    $testCaseContent = Get-Content -LiteralPath $testCaseFile.FullName -Raw
-    foreach ($match in [regex]::Matches($testCaseContent, 'TEST-\d{4}')) {
-        [void]$declaredTestIds.Add($match.Value)
+    $relativeTestCasePath = $testCaseFile.FullName.Substring($root.Length + 1).Replace('\', '/')
+    $lineNumber = 0
+    foreach ($line in @(Get-Content -LiteralPath $testCaseFile.FullName)) {
+        $lineNumber++
+        if ($line -notmatch '^\|\s*`(?<id>TEST-\d{4})`\s*\|') {
+            continue
+        }
+
+        $testId = $Matches.id
+        if (-not $scenarioDeclarations.ContainsKey($testId)) {
+            $scenarioDeclarations[$testId] = [System.Collections.Generic.List[object]]::new()
+        }
+        $scenarioDeclarations[$testId].Add([pscustomobject]@{
+            Path = $relativeTestCasePath
+            LineNumber = $lineNumber
+            Line = $line
+        })
     }
 }
-$executableTestSource = (@(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
-    -File -Filter '*.ps1' | ForEach-Object {
-        Get-Content -LiteralPath $_.FullName -Raw
-    }) -join [Environment]::NewLine)
-foreach ($testId in @($declaredTestIds | Sort-Object)) {
-    if (-not $executableTestSource.Contains($testId)) {
-        Add-Failure "TEST-0066 declared scenario has no executable test identity: $testId"
+foreach ($testId in @($scenarioDeclarations.Keys | Sort-Object)) {
+    if ($scenarioDeclarations[$testId].Count -ne 1) {
+        $locations = @($scenarioDeclarations[$testId] | ForEach-Object {
+            "$($_.Path):$($_.LineNumber)"
+        }) -join ', '
+        Add-Failure "TEST-0074 scenario ID must have exactly one canonical declaration: $testId ($locations)"
+    }
+}
+
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$scenarioAuthorityData = $null
+if (Test-Path -LiteralPath $scenarioAuthorityPath -PathType Leaf) {
+    try {
+        $scenarioAuthorityData = Import-PowerShellDataFile -LiteralPath $scenarioAuthorityPath
+    }
+    catch {
+        Add-Failure "TEST-0074 scenario authority data is invalid: $($_.Exception.Message)"
+    }
+}
+
+$scenarioAuthorities = @()
+$authorityByTestId = @{}
+if ($null -ne $scenarioAuthorityData) {
+    if ($scenarioAuthorityData.SchemaVersion -ne 1) {
+        Add-Failure 'TEST-0074 scenario authority schema version must be 1.'
+    }
+    $scenarioAuthorities = @($scenarioAuthorityData.Authorities)
+    $allowedEvidenceKinds = @(
+        'ExecutableSuite', 'GitHubActionsSemantic',
+        'ExternalPostPublication', 'HistoricalSuperseded'
+    )
+    $canonicalSuiteOwners = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    [void]$canonicalSuiteOwners.Add('tests/protocol.tests.ps1')
+    foreach ($suite in $testSuites) {
+        [void]$canonicalSuiteOwners.Add("tests/$($suite.Name)")
+    }
+
+    foreach ($authority in $scenarioAuthorities) {
+        $evidence = [string]$authority.Evidence
+        $owner = ([string]$authority.Owner).Replace('\', '/')
+        $testIds = @($authority.TestIds)
+        if ($allowedEvidenceKinds -cnotcontains $evidence) {
+            Add-Failure "TEST-0074 unsupported scenario evidence kind '$evidence'."
+            continue
+        }
+        if ($owner -notmatch '^[^/]+(?:/[^/]+)+$' -or
+            $owner -match '(^|/)\.\.(/|$)' -or
+            -not (Test-Path -LiteralPath (Join-Path $root $owner) -PathType Leaf)) {
+            Add-Failure "TEST-0074 scenario authority owner is missing or unsafe: '$owner'."
+            continue
+        }
+        if ($testIds.Count -eq 0) {
+            Add-Failure "TEST-0074 scenario authority '$owner' has no test IDs."
+            continue
+        }
+
+        switch ($evidence) {
+            'ExecutableSuite' {
+                if (-not $canonicalSuiteOwners.Contains($owner)) {
+                    Add-Failure "TEST-0074 executable owner is not a discovered canonical suite: '$owner'."
+                }
+            }
+            'GitHubActionsSemantic' {
+                if ($owner -cne '.github/workflows/protocol-tests.yml') {
+                    Add-Failure "TEST-0074 GitHub Actions evidence has an invalid owner: '$owner'."
+                }
+            }
+            'ExternalPostPublication' {
+                if ($owner -cne 'tests/Verify-PostPublicationEvidence.ps1') {
+                    Add-Failure "TEST-0074 post-publication evidence has an invalid owner: '$owner'."
+                }
+            }
+            'HistoricalSuperseded' {
+                if ($owner -cnotmatch '^docs/features/FEAT-\d{4}-[^/]+/test-cases\.md$') {
+                    Add-Failure "TEST-0074 superseded evidence has an invalid canonical owner: '$owner'."
+                }
+            }
+        }
+
+        foreach ($testIdValue in $testIds) {
+            $testId = [string]$testIdValue
+            if ($testId -cnotmatch '^TEST-\d{4}$') {
+                Add-Failure "TEST-0074 malformed scenario identity '$testId' in '$owner'."
+                continue
+            }
+            if ($authorityByTestId.ContainsKey($testId)) {
+                Add-Failure "TEST-0074 scenario has multiple evidence authorities: $testId."
+                continue
+            }
+            $authorityByTestId[$testId] = [pscustomobject]@{
+                Evidence = $evidence
+                Owner = $owner
+            }
+        }
+    }
+}
+
+foreach ($testId in @($scenarioDeclarations.Keys | Sort-Object)) {
+    if (-not $authorityByTestId.ContainsKey($testId)) {
+        Add-Failure "TEST-0074 declared scenario has no canonical evidence authority: $testId."
+    }
+}
+foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
+    if (-not $scenarioDeclarations.ContainsKey($testId)) {
+        Add-Failure "TEST-0074 scenario authority has no canonical declaration: $testId."
+        continue
+    }
+
+    $authority = $authorityByTestId[$testId]
+    if ($authority.Evidence -ceq 'HistoricalSuperseded') {
+        $declaration = $scenarioDeclarations[$testId][0]
+        $replacementIds = @([regex]::Matches($declaration.Line, 'TEST-\d{4}') |
+            ForEach-Object { $_.Value } | Where-Object { $_ -cne $testId })
+        if ($declaration.Path -cne $authority.Owner -or
+            $declaration.Line -cnotmatch '\|\s*Superseded(?:\s*\([^|]+\))?\s*\|' -or
+            $replacementIds.Count -eq 0) {
+            Add-Failure "TEST-0074 superseded scenario lacks its status or replacement identity: $testId."
+        }
+
+        foreach ($activeTestSource in @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
+            -File -Filter '*.ps1')) {
+            $activeContent = Get-Content -LiteralPath $activeTestSource.FullName -Raw
+            if ([regex]::IsMatch($activeContent, "(?<![A-Za-z0-9-])$testId(?![A-Za-z0-9-])")) {
+                Add-Failure "TEST-0074 superseded scenario is still asserted by $($activeTestSource.Name): $testId."
+            }
+        }
     }
 }
 
@@ -329,6 +465,20 @@ foreach ($requiredText in @(
 }
 if ($ciWorkflow.Contains('shell: ${{ matrix.shell }}')) {
     Add-Failure 'TEST-0067 repository CI uses matrix context where the shell field does not permit it.'
+}
+foreach ($requiredText in @(
+    'Install checksummed actionlint v1.7.12',
+    'ACTIONLINT_VERSION: 1.7.12',
+    'ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8',
+    'actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz',
+    'sha256sum --check --strict',
+    'Run actionlint semantic workflow validation',
+    '.github/workflows/protocol-tests.yml',
+    'templates/project/.github/workflows/meandai-protocol-update.yml'
+)) {
+    if (-not $ciWorkflow.Contains($requiredText)) {
+        Add-Failure "TEST-0075 recurring actionlint semantic gate is missing '$requiredText'."
+    }
 }
 
 $docsIndex = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw
@@ -622,23 +772,36 @@ foreach ($requiredText in @(
     }
 }
 
-$stabilityFeature = Get-Content -LiteralPath (
-    Join-Path $root 'docs/features/FEAT-0010-protocol-stability-invariants/README.md'
+$postPublicationVerifier = Get-Content -LiteralPath (
+    Join-Path $root 'tests/Verify-PostPublicationEvidence.ps1'
 ) -Raw
-$localCodexFeature = Get-Content -LiteralPath (
-    Join-Path $root 'docs/features/FEAT-0007-local-codex-adoption/README.md'
-) -Raw
-$projectMemory = Get-Content -LiteralPath (Join-Path $root '.ai/memory/project.md') -Raw
-$overview = Get-Content -LiteralPath (Join-Path $root 'README.md') -Raw
-$overviewNormalized = [regex]::Replace($overview, '\s+', ' ')
-if (-not $stabilityFeature.Contains('| Status | Complete |') -or
-    -not $stabilityFeature.Contains('releases/tag/v0.8.0') -or
-    -not $stabilityFeature.Contains('a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821') -or
-    -not $localCodexFeature.Contains('| Status | Complete |') -or
-    $projectMemory.Contains('v0.8.0` is in progress') -or
-    -not $projectMemory.Contains('[issue #36]') -or
-    -not $overviewNormalized.Contains('deliberately does not duplicate that changing inventory')) {
-    Add-Failure 'TEST-0065 published feature, memory, and canonical routing projections are not reconciled.'
+foreach ($requiredText in @(
+    'releases/tags/', 'git/ref/tags/', 'compare/',
+    'git/matching-refs/heads/', 'issues/', 'contents/',
+    "'immutable'", 'ExternalPostPublication'
+)) {
+    $combinedEvidenceContract = $postPublicationVerifier + "`n" +
+        (Get-Content -LiteralPath (Join-Path $root 'tests/scenario-ownership.psd1') -Raw)
+    if (-not $combinedEvidenceContract.Contains($requiredText)) {
+        Add-Failure "TEST-0076 post-publication evidence contract is missing '$requiredText'."
+    }
+}
+$postPublicationJobIndex = $ciWorkflow.IndexOf(
+    "`n  post-publication:", [StringComparison]::Ordinal
+)
+if ($postPublicationJobIndex -lt 0) {
+    Add-Failure 'TEST-0076 CI has no separate post-publication evidence job.'
+}
+else {
+    $preMergeWorkflow = $ciWorkflow.Substring(0, $postPublicationJobIndex)
+    $postPublicationWorkflow = $ciWorkflow.Substring($postPublicationJobIndex)
+    if ($preMergeWorkflow.Contains('Verify-PostPublicationEvidence.ps1') -or
+        -not $postPublicationWorkflow.Contains(
+            "if: github.event_name == 'workflow_dispatch' && inputs.verify_post_publication"
+        ) -or
+        -not $postPublicationWorkflow.Contains('Verify-PostPublicationEvidence.ps1')) {
+        Add-Failure 'TEST-0076 post-publication authority is mixed into the pre-merge validation gate.'
+    }
 }
 foreach ($requiredText in @(
     'post-development full-project scan',
@@ -665,11 +828,29 @@ foreach ($requiredText in @(
 }
 
 if (-not $StructureOnly) {
+    $completedSuiteOwners = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
     $engine = (Get-Process -Id $PID).Path
     foreach ($suite in $testSuites) {
         & $engine -NoProfile -ExecutionPolicy Bypass -File $suite.FullName
         if ($LASTEXITCODE -ne 0) {
             Add-Failure "Child test suite failed: $($suite.Name)"
+        }
+        else {
+            [void]$completedSuiteOwners.Add("tests/$($suite.Name)")
+        }
+    }
+
+    if ($failures.Count -eq 0) {
+        [void]$completedSuiteOwners.Add('tests/protocol.tests.ps1')
+    }
+    $requiredSuiteOwners = @($authorityByTestId.Values | Where-Object {
+        $_.Evidence -ceq 'ExecutableSuite'
+    } | ForEach-Object { $_.Owner } | Sort-Object -Unique)
+    foreach ($owner in $requiredSuiteOwners) {
+        if (-not $completedSuiteOwners.Contains($owner)) {
+            Add-Failure "TEST-0074 canonical suite has no successful completion evidence: $owner."
         }
     }
 }

@@ -112,6 +112,8 @@ function Reset-Mocks {
     $global:QuickAdoptionRestCalls = [System.Collections.Generic.List[object]]::new()
     $global:QuickAdoptionSecrets = [System.Collections.Generic.List[object]]::new()
     $global:QuickAdoptionExistingSecrets = [System.Collections.Generic.List[string]]::new()
+    $global:QuickAdoptionExpectedUpdaterToken = 'write-token-value'
+    $global:QuickAdoptionExpectedProtocolToken = 'read-token-value'
     $global:QuickAdoptionRepoName = ''
     $global:QuickAdoptionDefaultBranch = 'main'
     $global:QuickAdoptionOwner = 'test-owner'
@@ -142,6 +144,11 @@ function Reset-Mocks {
     $global:QuickAdoptionProposalMode = 'ValidFull'
     $global:QuickAdoptionPrMetadataMode = 'Valid'
     $global:QuickAdoptionLabels = [System.Collections.Generic.List[string]]::new()
+    $global:QuickAdoptionLabelRecords = [System.Collections.Generic.Dictionary[string, object]]::new(
+        [StringComparer]::Ordinal
+    )
+    $global:QuickAdoptionSecretLockMode = 'Normal'
+    $global:QuickAdoptionSecretLockViewCalls = 0
     $global:QuickAdoptionIssue = $null
     $global:QuickAdoptionIssues = [System.Collections.Generic.List[object]]::new()
     $global:QuickAdoptionIssueRace = $false
@@ -160,7 +167,7 @@ function Reset-Mocks {
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'PROTOCOL.md') `
         -Value '# Mock protocol source' -Encoding UTF8
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'VERSION') `
-        -Value '0.8.1' -NoNewline
+        -Value '0.8.2' -NoNewline
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
         'add', 'PROTOCOL.md', 'VERSION'
     ) | Out-Null
@@ -168,7 +175,7 @@ function Reset-Mocks {
         'commit', '-m', 'Create mock protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
-        'tag', 'v0.8.1'
+        'tag', 'v0.8.2'
     ) | Out-Null
     $global:QuickAdoptionProtocolSha = (@(Invoke-TestGit `
         -Repository $global:QuickAdoptionProtocolRepository -Arguments @('rev-parse', 'HEAD')))[0]
@@ -187,7 +194,7 @@ function Initialize-MockAdoptionPullRequestBody {
     $marker = [ordered]@{
         schema = 2
         state = $proposalState
-        target = 'v0.8.1'
+        target = 'v0.8.2'
         protocolSha = $global:QuickAdoptionProtocolSha
         head = $global:QuickAdoptionPrHead
         repository = $global:QuickAdoptionRepoName
@@ -210,7 +217,7 @@ function Get-MockCodexCalls {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.8.1'
+    $branch = 'automation/meandai-capabilities-v0.8.2'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -245,7 +252,7 @@ function Publish-MockAdoptionBranch {
         operation = 'ai-capabilities-adoption'
         state = if ($manifestOnly) { 'AdoptionReviewRequired' } else { 'BootstrapReady' }
         repository = $global:QuickAdoptionRepoName
-        targetTag = 'v0.8.1'
+        targetTag = 'v0.8.2'
         protocolSha = $global:QuickAdoptionProtocolSha
         collisions = if ($manifestOnly) { @('AGENTS.md') } else { @() }
         proposedPaths = @('.ai/protocol', '.ai/adoption/meandai-capabilities.json')
@@ -279,7 +286,7 @@ function Publish-MockAdoptionBranch {
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.8.1'
+    $branch = 'automation/meandai-capabilities-v0.8.2'
     Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
         'push', 'origin', '--delete', $branch
     ) | Out-Null
@@ -303,18 +310,34 @@ function global:Invoke-RestMethod {
         [string]$Method = 'Get'
     )
 
+    $credentialBoundary = if ($Uri -match '/repos/hasanmanzak/meAndAI/') {
+        'protocol-read'
+    }
+    else { 'consumer-write' }
+    $expectedToken = if ($credentialBoundary -ceq 'protocol-read') {
+        $global:QuickAdoptionExpectedProtocolToken
+    }
+    else { $global:QuickAdoptionExpectedUpdaterToken }
+    if ($Method -cne 'Get' -or
+        [string]$Headers.Accept -cne 'application/vnd.github+json' -or
+        [string]$Headers.Authorization -cne "Bearer $expectedToken" -or
+        [string]$Headers['X-GitHub-Api-Version'] -cne '2026-03-10' -or
+        [string]$Headers['User-Agent'] -cne 'meAndAI-quick-adoption') {
+        throw "TEST-0073 REST credential boundary '$credentialBoundary' used invalid method or headers."
+    }
     $global:QuickAdoptionRestCalls.Add([pscustomobject]@{
         Method = $Method
         Uri = $Uri
+        CredentialBoundary = $credentialBoundary
     })
 
-    if ($Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.1$') {
+    if ($Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.2$') {
         if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
             throw 'Mock release is missing.'
         }
         return [pscustomobject]@{
             id = 73
-            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.1' }
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.2' }
             draft = $false
             prerelease = $false
             immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
@@ -322,7 +345,7 @@ function global:Invoke-RestMethod {
         }
     }
 
-    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.8\.1$') {
+    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.8\.2$') {
         return [pscustomobject]@{
             content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
             encoding = 'base64'
@@ -352,12 +375,28 @@ function global:Invoke-WebRequest {
     if ($Uri -notmatch '/repos/hasanmanzak/meAndAI/zipball/[0-9a-f]{40}$') {
         throw "Unexpected Invoke-WebRequest call: $Uri"
     }
+    if ([string]$Headers.Accept -cne 'application/vnd.github+json' -or
+        [string]$Headers.Authorization -cne "Bearer $($global:QuickAdoptionExpectedProtocolToken)" -or
+        [string]$Headers['X-GitHub-Api-Version'] -cne '2026-03-10' -or
+        [string]$Headers['User-Agent'] -cne 'meAndAI-quick-adoption') {
+        throw 'TEST-0073 protocol archive download used invalid authorization or API-version headers.'
+    }
     $archiveRoot = New-TempRoot -Name 'protocol-source'
     $sourceRoot = Join-Path $archiveRoot 'openai-mock-protocol'
     New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourceRoot 'PROTOCOL.md') -Value '# Mock protocol source' -Encoding UTF8
-    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.8.1' -NoNewline
+    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.8.2' -NoNewline
     Compress-Archive -LiteralPath $sourceRoot -DestinationPath $OutFile -Force
+}
+
+function Assert-MockGhApiHeaders {
+    param([Parameter(Mandatory)][string[]]$Arguments)
+
+    $accept = @($Arguments | Where-Object { $_ -ceq 'Accept: application/vnd.github+json' })
+    $version = @($Arguments | Where-Object { $_ -ceq 'X-GitHub-Api-Version: 2026-03-10' })
+    if ($accept.Count -ne 1 -or $version.Count -ne 1) {
+        throw 'TEST-0073 authenticated gh API call omitted its exact Accept or API-version header.'
+    }
 }
 
 function global:gh {
@@ -386,16 +425,43 @@ function global:gh {
     if ($joined -eq 'api user --jq .login') {
         return $global:QuickAdoptionOwner
     }
-    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.1'
-    $protocolReleaseEndpoint = 'repos/hasanmanzak/meAndAI/releases/tags/v0.8.1'
+    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.2'
+    $protocolReleaseEndpoint = 'repos/hasanmanzak/meAndAI/releases/tags/v0.8.2'
+    $secretLockEndpoint = "repos/$($global:QuickAdoptionRepoName)/labels/meandai%3Asecret-reconciliation-lock"
+    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
+        $Arguments -contains $secretLockEndpoint) {
+        Assert-MockGhApiHeaders -Arguments $Arguments
+        if ($Arguments -contains 'DELETE') {
+            if (-not $global:QuickAdoptionLabelRecords.ContainsKey('meandai:secret-reconciliation-lock')) {
+                throw 'Mock secret lock delete targeted an absent label.'
+            }
+            [void]$global:QuickAdoptionLabelRecords.Remove('meandai:secret-reconciliation-lock')
+            return
+        }
+        $global:QuickAdoptionSecretLockViewCalls++
+        $record = $global:QuickAdoptionLabelRecords['meandai:secret-reconciliation-lock']
+        if ($null -eq $record) {
+            throw 'Mock secret lock lookup targeted an absent label.'
+        }
+        if ($global:QuickAdoptionSecretLockMode -ceq 'OwnershipChanged' -and
+            $global:QuickAdoptionSecretLockViewCalls -gt 1) {
+            $record = [pscustomobject]@{
+                name = 'meandai:secret-reconciliation-lock'
+                description = 'foreign lock owner'
+            }
+            $global:QuickAdoptionLabelRecords['meandai:secret-reconciliation-lock'] = $record
+        }
+        return ($record | ConvertTo-Json -Compress)
+    }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
         $Arguments -contains $protocolReleaseEndpoint) {
+        Assert-MockGhApiHeaders -Arguments $Arguments
         if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
             throw 'Mock release is missing.'
         }
         return (@{
             id = 73
-            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.1' }
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.8.2' }
             draft = $false
             prerelease = $false
             immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
@@ -404,6 +470,7 @@ function global:gh {
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
         $Arguments -contains $protocolSourceEndpoint) {
+        Assert-MockGhApiHeaders -Arguments $Arguments
         return (@{
             content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
             encoding = 'base64'
@@ -445,9 +512,19 @@ function global:gh {
         return (ConvertTo-Json -InputObject $items -Compress)
     }
     if ($Arguments.Count -ge 3 -and $Arguments[0] -eq 'secret' -and $Arguments[1] -eq 'set') {
+        $expectedValue = switch -CaseSensitive ($Arguments[2]) {
+            'MEANDAI_UPDATER_TOKEN' { $global:QuickAdoptionExpectedUpdaterToken }
+            'MEANDAI_PROTOCOL_TOKEN' { $global:QuickAdoptionExpectedProtocolToken }
+            default { throw "TEST-0073 unexpected repository secret mapping '$($Arguments[2])'." }
+        }
+        if ($Arguments.Count -ne 5 -or $Arguments[3] -cne '--repo' -or
+            $Arguments[4] -cne $global:QuickAdoptionRepoName -or
+            $stdin -cne $expectedValue) {
+            throw "TEST-0073 repository secret '$($Arguments[2])' did not receive its exact stdin-only mapped value."
+        }
         $global:QuickAdoptionSecrets.Add([pscustomobject]@{
             Name = $Arguments[2]
-            Value = $stdin
+            InputValidated = $true
             Arguments = @($Arguments)
         })
         if ($global:QuickAdoptionExistingSecrets -notcontains $Arguments[2]) {
@@ -461,6 +538,24 @@ function global:gh {
         }) | ConvertTo-Json -Compress)
     }
     if ($Arguments.Count -ge 3 -and $Arguments[0] -eq 'label' -and $Arguments[1] -eq 'create') {
+        $descriptionIndex = [Array]::IndexOf([object[]]$Arguments, '--description')
+        $description = if ($descriptionIndex -ge 0 -and
+            $descriptionIndex + 1 -lt $Arguments.Count) {
+            [string]$Arguments[$descriptionIndex + 1]
+        }
+        else { '' }
+        if ([string]$Arguments[2] -ceq 'meandai:secret-reconciliation-lock') {
+            if ($global:QuickAdoptionLabelRecords.ContainsKey([string]$Arguments[2])) {
+                $global:LASTEXITCODE = 1
+                'label already exists'
+                return
+            }
+            $global:QuickAdoptionLabelRecords.Add([string]$Arguments[2], [pscustomobject]@{
+                name = [string]$Arguments[2]
+                description = $description
+            })
+            return
+        }
         if ($global:QuickAdoptionLabels -notcontains $Arguments[2]) {
             $global:QuickAdoptionLabels.Add($Arguments[2])
         }
@@ -480,7 +575,7 @@ function global:gh {
         $createdIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.8.1'
+            title = 'Track meAndAI AI capabilities adoption from v0.8.2'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
         }
@@ -490,7 +585,7 @@ function global:gh {
             $global:QuickAdoptionIssues.Add([pscustomobject]@{
                 number = 83
                 url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/83"
-                title = 'Track meAndAI AI capabilities adoption from v0.8.1'
+                title = 'Track meAndAI AI capabilities adoption from v0.8.2'
                 body = $createdIssue.body
                 state = 'OPEN'
             })
@@ -498,7 +593,7 @@ function global:gh {
                 number = 82
                 url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/82"
                 title = 'Similar maintainer issue'
-                body = 'No canonical adoption marker.'
+                body = "> $(([string]$createdIssue.body -split '\r?\n', 2)[0])`nQuoted ownership marker; this is not the canonical record."
                 state = 'OPEN'
             })
         }
@@ -567,6 +662,9 @@ function global:gh {
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'run' -and $Arguments[1] -eq 'list') {
         $global:QuickAdoptionRunListCalls++
         if ($global:QuickAdoptionRunListCalls -gt 2) {
+            if ($global:QuickAdoptionRunMode -ceq 'Zero') {
+                throw 'Mock zero-run wait budget exhausted after repeated polling.'
+            }
             throw 'Mock completed workflow was polled more than twice.'
         }
         $commitIndex = [Array]::IndexOf([object[]]$Arguments, '--commit')
@@ -585,7 +683,8 @@ function global:gh {
             conclusion = 'success'
             url = 'https://github.com/test-owner/consumer/actions/runs/6999'
         })
-        if ($global:QuickAdoptionWorkflowDispatched) {
+        if ($global:QuickAdoptionWorkflowDispatched -and
+            $global:QuickAdoptionRunMode -cne 'Zero') {
             $expectedTitle = "meAndAI AI capabilities lifecycle [$($global:QuickAdoptionCorrelationId)]"
             $runs.Add([ordered]@{
                 databaseId = 7000
@@ -654,7 +753,7 @@ function global:gh {
             isDraft = $global:QuickAdoptionPrDraft
             state = $global:QuickAdoptionPrState
             baseRefName = $global:QuickAdoptionDefaultBranch
-            headRefName = 'automation/meandai-capabilities-v0.8.1'
+            headRefName = 'automation/meandai-capabilities-v0.8.2'
             headRefOid = $global:QuickAdoptionPrHead
             headRepository = [ordered]@{ nameWithOwner = $global:QuickAdoptionRepoName }
             author = [ordered]@{ login = $global:QuickAdoptionOwner }
@@ -679,7 +778,7 @@ function global:gh {
                 $badMarker = [ordered]@{
                     schema = 2
                     state = $proposalState
-                    target = 'v0.8.1'
+                    target = 'v0.8.2'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = ('0' * 40)
                     repository = $global:QuickAdoptionRepoName
@@ -739,7 +838,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.8.1',
+            'v0.8.2',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -748,6 +847,9 @@ try {
             '.github/workflows/meandai-protocol-update.yml',
             'Invoke-RestMethod',
             'Get-RepositorySecretNames',
+            'Enter-RepositorySecretReconciliationLock',
+            'Exit-RepositorySecretReconciliationLock',
+            'meandai:secret-reconciliation-lock',
             'gh secret list',
             'gh secret set',
             'already exists and was preserved',
@@ -788,6 +890,9 @@ try {
         if ($launcher -match '[''"]--body[''"]') {
             Add-Failure "TEST-0033 launcher contains forbidden secret body argument '--body'"
         }
+        if ($launcher.Contains("'label', 'view'")) {
+            Add-Failure 'TEST-0070 launcher relies on the unsupported gh label view subcommand.'
+        }
         foreach ($forbidden in @(
             '@codex', 'Codex Cloud', 'gh pr merge', 'git add .',
             'sandbox_workspace_write.network_access=true'
@@ -813,7 +918,7 @@ try {
 
     if (Test-Path -LiteralPath $mockCodexScriptPath -PathType Leaf) {
         $mockCodex = Get-Content -LiteralPath $mockCodexScriptPath -Raw
-        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.8.1')) {
+        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.8.2')) {
             Add-Failure 'TEST-0059 mock Codex remote-race fixture is not pinned to the current adoption branch.'
         }
     }
@@ -822,7 +927,7 @@ try {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.8.1',
+            'v0.8.2',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -847,7 +952,7 @@ try {
             'Quick command'
         )) {
             if (-not $normalizedGuide.Contains($required)) {
-                Add-Failure "TEST-0037 quick guide is missing '$required'"
+                Add-Failure "TEST-0041 quick guide is missing '$required'"
             }
         }
         foreach ($requiredBoundary in @(
@@ -977,7 +1082,7 @@ try {
             $mutableReleaseBlocked = $true
         }
         $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
-            $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.1$'
+            $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.8\.2$'
         })
         $prematureMutations = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and
@@ -1025,9 +1130,49 @@ try {
             Add-Failure 'TEST-0034 existing adoption did not reconcile both required secrets.'
         }
         foreach ($secret in $global:QuickAdoptionSecrets) {
-            if ($secret.Arguments -contains '--body') {
-                Add-Failure 'TEST-0033 secret value was eligible for command-line transfer.'
+            if ($secret.Arguments -contains '--body' -or
+                $secret.InputValidated -isnot [bool] -or
+                -not $secret.InputValidated -or
+                $null -ne $secret.PSObject.Properties['Value']) {
+                Add-Failure 'TEST-0073 secret mapping was not asserted through redacted stdin-only evidence.'
             }
+        }
+        $restBoundaries = @($global:QuickAdoptionRestCalls.CredentialBoundary | Sort-Object -Unique)
+        if ($restBoundaries -cnotcontains 'protocol-read' -or
+            $restBoundaries -cnotcontains 'consumer-write' -or
+            @($global:QuickAdoptionRestCalls | Where-Object {
+                $null -ne $_.PSObject.Properties['Authorization']
+            }).Count -ne 0) {
+            Add-Failure 'TEST-0073 REST mocks did not prove both credential roles without retaining authorization values.'
+        }
+        $lockCreateCalls = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 3 -and $_.Arguments[0] -ceq 'label' -and
+            $_.Arguments[1] -ceq 'create' -and
+            $_.Arguments[2] -ceq 'meandai:secret-reconciliation-lock'
+        })
+        $lockDeleteCalls = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'api' -and
+            $_.Arguments -ccontains 'DELETE' -and
+            $_.Arguments -ccontains 'repos/test-owner/consumer/labels/meandai%3Asecret-reconciliation-lock'
+        })
+        $firstSecretListCall = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'secret' -and
+            $_.Arguments[1] -ceq 'list'
+        } | Select-Object -First 1)
+        $firstSecretSetCall = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'secret' -and
+            $_.Arguments[1] -ceq 'set'
+        } | Select-Object -First 1)
+        if ($lockCreateCalls.Count -ne 1 -or $lockDeleteCalls.Count -ne 1 -or
+            $firstSecretListCall.Count -ne 1 -or $firstSecretSetCall.Count -ne 1 -or
+            $global:QuickAdoptionGhCalls.IndexOf($lockCreateCalls[0]) -ge
+                $global:QuickAdoptionGhCalls.IndexOf($firstSecretListCall[0]) -or
+            $global:QuickAdoptionGhCalls.IndexOf($firstSecretListCall[0]) -ge
+                $global:QuickAdoptionGhCalls.IndexOf($firstSecretSetCall[0]) -or
+            $global:QuickAdoptionGhCalls.IndexOf($firstSecretSetCall[0]) -ge
+                $global:QuickAdoptionGhCalls.IndexOf($lockDeleteCalls[0]) -or
+            $global:QuickAdoptionLabelRecords.ContainsKey('meandai:secret-reconciliation-lock')) {
+            Add-Failure 'TEST-0070 secret inventory and writes were not enclosed by one owned atomic GitHub lock.'
         }
         if ($runOutput.Contains('write-token-value') -or $runOutput.Contains('read-token-value')) {
             Add-Failure 'TEST-0033 launcher output exposed a token value.'
@@ -1053,17 +1198,22 @@ try {
             [Environment]::GetEnvironmentVariable('GH_HOST', 'Process') -cne 'ghe.example.invalid') {
             Add-Failure 'TEST-0060 launcher GitHub operations were redirected by caller GH_HOST or did not restore it.'
         }
+        $canonicalIssueMarker = '<!-- meandai-local-adoption:v0.8.2:pr-42 -->'
         $openMarkedIssues = @($global:QuickAdoptionIssues | Where-Object {
             [string]$_.state -ceq 'OPEN' -and
-            ([string]$_.body).Contains('<!-- meandai-local-adoption:v0.8.1:pr-42 -->')
+            [regex]::IsMatch(
+                [string]$_.body,
+                '\A' + [regex]::Escape($canonicalIssueMarker) + '(?:\r?\n|\z)'
+            )
         })
-        $unmarkedIssue = @($global:QuickAdoptionIssues | Where-Object {
+        $quotedIssue = @($global:QuickAdoptionIssues | Where-Object {
             [int]$_.number -eq 82
         })
         if ($openMarkedIssues.Count -ne 1 -or [int]$openMarkedIssues[0].number -ne 83 -or
             $global:QuickAdoptionEvents -notcontains 'issue-close:84' -or
-            $unmarkedIssue.Count -ne 1 -or [string]$unmarkedIssue[0].state -cne 'OPEN') {
-            Add-Failure 'TEST-0063 concurrent issue creation did not converge without touching an unmarked issue.'
+            $quotedIssue.Count -ne 1 -or [string]$quotedIssue[0].state -cne 'OPEN' -or
+            -not ([string]$quotedIssue[0].body).StartsWith('> ', [StringComparison]::Ordinal)) {
+            Add-Failure 'TEST-0069 exact issue ownership did not converge without claiming a quoted marker.'
         }
         if ($global:QuickAdoptionPrBodyEditCalls -ne 1 -or
             $global:QuickAdoptionPrBody -notmatch [regex]::Escape($global:QuickAdoptionPrHead)) {
@@ -1090,8 +1240,96 @@ try {
             $null -eq $global:QuickAdoptionIssue) {
             Add-Failure 'TEST-0039 launcher did not reconcile the deterministic Agile labels and adoption issue.'
         }
+
+        $quotedIssueOriginalBody = [string]$quotedIssue[0].body
+        $quotedIssueOriginalTitle = [string]$quotedIssue[0].title
+        $quotedIssue[0].body = "$canonicalIssueMarker`n## Not the canonical adoption record"
+        $quotedIssue[0].title = 'Drifted marked issue'
+        $issueEventsBeforeDrift = $global:QuickAdoptionEvents.Count
+        $codexCallsBeforeIssueDrift = @(Get-MockCodexCalls).Count
+        $issueDriftBlocked = $false
+        $issueDriftError = ''
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $issueDriftBlocked = $true
+            $issueDriftError = $_.Exception.Message
+        }
+        if (-not $issueDriftBlocked -or
+            $issueDriftError -notlike '*drifted from its exact owned record*' -or
+            $global:QuickAdoptionEvents.Count -ne $issueEventsBeforeDrift -or
+            @(Get-MockCodexCalls).Count -ne $codexCallsBeforeIssueDrift) {
+            Add-Failure 'TEST-0069 first-line marker drift was normalized or mutated instead of blocking exact ownership.'
+        }
+        $quotedIssue[0].body = $quotedIssueOriginalBody
+        $quotedIssue[0].title = $quotedIssueOriginalTitle
+
+        $secretListsBeforeContention = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'secret' -and
+            $_.Arguments[1] -ceq 'list'
+        }).Count
+        $secretWritesBeforeContention = $global:QuickAdoptionSecrets.Count
+        $global:QuickAdoptionLabelRecords['meandai:secret-reconciliation-lock'] = [pscustomobject]@{
+            name = 'meandai:secret-reconciliation-lock'
+            description = 'stale or competing session'
+        }
+        $contentionBlocked = $false
+        $contentionError = ''
+        try {
+            & $launcherPath -TargetPath $existingRepo -SkipLifecycleDispatch `
+                -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $contentionBlocked = $true
+            $contentionError = $_.Exception.Message
+        }
+        $secretListsAfterContention = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'secret' -and
+            $_.Arguments[1] -ceq 'list'
+        }).Count
+        if (-not $contentionBlocked -or
+            $contentionError -notlike '*already locked or a stale*' -or
+            $secretListsAfterContention -ne $secretListsBeforeContention -or
+            $global:QuickAdoptionSecrets.Count -ne $secretWritesBeforeContention -or
+            -not $global:QuickAdoptionLabelRecords.ContainsKey('meandai:secret-reconciliation-lock')) {
+            Add-Failure 'TEST-0070 a competing or stale lock did not fail closed before secret inventory and writes.'
+        }
+        [void]$global:QuickAdoptionLabelRecords.Remove('meandai:secret-reconciliation-lock')
+
+        $deleteCountBeforeOwnerChange = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'api' -and
+            $_.Arguments -ccontains 'DELETE' -and
+            $_.Arguments -ccontains 'repos/test-owner/consumer/labels/meandai%3Asecret-reconciliation-lock'
+        }).Count
+        $global:QuickAdoptionSecretLockMode = 'OwnershipChanged'
+        $global:QuickAdoptionSecretLockViewCalls = 0
+        $ownerChangeBlocked = $false
+        $ownerChangeError = ''
+        try {
+            & $launcherPath -TargetPath $existingRepo -SkipLifecycleDispatch `
+                -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $ownerChangeBlocked = $true
+            $ownerChangeError = $_.Exception.Message
+        }
+        $deleteCountAfterOwnerChange = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'api' -and
+            $_.Arguments -ccontains 'DELETE' -and
+            $_.Arguments -ccontains 'repos/test-owner/consumer/labels/meandai%3Asecret-reconciliation-lock'
+        }).Count
+        if (-not $ownerChangeBlocked -or
+            $ownerChangeError -notlike '*lock ownership changed*' -or
+            $deleteCountAfterOwnerChange -ne $deleteCountBeforeOwnerChange -or
+            -not $global:QuickAdoptionLabelRecords.ContainsKey('meandai:secret-reconciliation-lock')) {
+            Add-Failure 'TEST-0070 changed lock ownership was deleted or accepted instead of failing closed.'
+        }
+        [void]$global:QuickAdoptionLabelRecords.Remove('meandai:secret-reconciliation-lock')
+        $global:QuickAdoptionSecretLockMode = 'Normal'
+        $global:QuickAdoptionSecretLockViewCalls = 0
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.1'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.2'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/ai-adoption.md') {
@@ -1139,7 +1377,7 @@ try {
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.1'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.8.2'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
@@ -1211,7 +1449,7 @@ try {
 
         foreach ($negativeMode in @(
             'Unauthenticated', 'LeaveManifest', 'CreateCommit', 'RemoteRace',
-            'RenameWorkflowAway'
+            'RenameWorkflowAway', 'CaseMoveWorkflow', 'CaseVariantCredential'
         )) {
             Reset-MockAdoptionProposal
             $env:MEANDAI_TEST_CODEX_MODE = $negativeMode
@@ -1226,7 +1464,9 @@ try {
                 $blocked = $true
             }
             if (-not $blocked -or $global:QuickAdoptionPrReadyCalls -ne 0) {
-                $testId = if ($negativeMode -ceq 'RenameWorkflowAway') { 'TEST-0053' } else { 'TEST-0040' }
+                $testId = if ($negativeMode -cin @(
+                    'RenameWorkflowAway', 'CaseMoveWorkflow', 'CaseVariantCredential'
+                )) { 'TEST-0053' } else { 'TEST-0040' }
                 Add-Failure "$testId local Codex negative mode '$negativeMode' did not block before readiness."
             }
             $reviewEventCountAfterNegative = @($global:QuickAdoptionEvents | Where-Object {
@@ -1236,7 +1476,7 @@ try {
                 Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.1'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.2'
             ))
             if ($negativePaths -contains 'docs/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
@@ -1262,6 +1502,23 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionRunMode = 'Zero'
+        $zeroRunBlocked = $false
+        $codexCountBeforeZeroRun = @(Get-MockCodexCalls).Count
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $zeroRunBlocked = $true
+        }
+        if (-not $zeroRunBlocked -or $global:QuickAdoptionRunListCalls -lt 3 -or
+            @(Get-MockCodexCalls).Count -ne $codexCountBeforeZeroRun -or
+            $global:QuickAdoptionPrReadyCalls -ne 0) {
+            Add-Failure 'TEST-0054 zero unseen workflow runs did not wait and block before semantic completion.'
+        }
+        $global:QuickAdoptionRunMode = 'Single'
+        Reset-MockAdoptionProposal
+
         $global:QuickAdoptionRunMode = 'Ambiguous'
         $ambiguousRunBlocked = $false
         $codexCountBeforeAmbiguousRun = @(Get-MockCodexCalls).Count
@@ -1302,10 +1559,10 @@ try {
             $collisionCompleted = $false
         }
         $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.8.1', '--', '.ai/protocol'
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.8.2', '--', '.ai/protocol'
         )))
         $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.1'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.8.2'
         ))
         $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
         if (-not $collisionCompleted -or $global:QuickAdoptionPrReadyCalls -ne 1 -or
@@ -1409,6 +1666,8 @@ try {
         New-Item -ItemType Directory -Path (Join-Path $newRepo 'src') -Force | Out-Null
         Set-Content -LiteralPath (Join-Path $newRepo 'src/app.txt') -Value 'local-only' -Encoding UTF8
         Set-Content -LiteralPath (Join-Path $newRepo 'MEANDAI_RO_FG_PAT.txt') -Value 'new-read-token' -NoNewline
+        $global:QuickAdoptionExpectedProtocolToken = 'new-read-token'
+        $global:QuickAdoptionExpectedUpdaterToken = 'new-write-token'
         $global:QuickAdoptionRepoName = 'test-owner/new-consumer'
         $global:QuickAdoptionTargetPath = $newRepo
         $global:QuickAdoptionNewRemote = $newRemote

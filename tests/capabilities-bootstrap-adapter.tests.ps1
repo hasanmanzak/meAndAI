@@ -318,8 +318,65 @@ try {
         }
     }
 
+    if (-not $result.Threw) {
+        $completedBranch = 'automation/meandai-capabilities-v0.5.0'
+        Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'switch', $completedBranch
+        ) | Out-Null
+        Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'rm', '.ai/adoption/meandai-capabilities.json'
+        ) | Out-Null
+        $completionEvidence = Join-Path $empty.Consumer 'docs/adoption-complete.md'
+        [IO.Directory]::CreateDirectory((Split-Path -Parent $completionEvidence)) | Out-Null
+        [IO.File]::WriteAllText($completionEvidence, "# Reviewed adoption`n")
+        Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'add', 'docs/adoption-complete.md'
+        ) | Out-Null
+        Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'commit', '-m', 'Complete reviewed adoption proposal'
+        ) | Out-Null
+        Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'push', 'origin', $completedBranch
+        ) | Out-Null
+        $completedHead = (@(Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'rev-parse', 'HEAD'
+        )))[0]
+        $completedProtocolSha = (@(Invoke-Git -Repository $empty.Source -Arguments @(
+            'rev-parse', 'v0.5.0^{commit}'
+        )))[0]
+        $completedMarker = [ordered]@{
+            schema = 3
+            phase = 'Completed'
+            state = 'BootstrapReady'
+            target = 'v0.5.0'
+            protocolSha = $completedProtocolSha
+            head = $completedHead
+            repository = 'owner/consumer'
+            actor = 'owner'
+        } | ConvertTo-Json -Compress
+        $global:PullRequestExists = $true
+        $global:ExistingPullRequestHead = $completedHead
+        $global:ExistingPullRequestProtocolSha = $completedProtocolSha
+        $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$completedMarker -->"
+        $global:ExistingPullRequestIsDraft = $false
+        $createCallsBeforeCompletedRerun = $global:PullRequestCreateCalls
+        Invoke-Git -Repository $empty.Consumer -Arguments @('switch', 'main') | Out-Null
+        $result = Invoke-BootstrapFixture -Fixture $empty
+        $retainedHead = (@(Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'ls-remote', '--heads', 'origin', "refs/heads/$completedBranch"
+        )))[0]
+        if ($result.Threw -or
+            $global:PullRequestCreateCalls -ne $createCallsBeforeCompletedRerun -or
+            $retainedHead -cnotmatch "^$completedHead\s+refs/heads/$([regex]::Escape($completedBranch))$" -or
+            [string]$global:ExistingPullRequestBody -cne "<!-- meandai-capabilities-adoption:$completedMarker -->") {
+            Add-Failure "TEST-0071 exact completed non-draft proposal was not retained without mutation: $($result.Error)"
+        }
+    }
+
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
     $ideasCollision = New-BootstrapFixture -Name 'ideas-collision' -AddIdeasCollision $true
     $result = Invoke-BootstrapFixture -Fixture $ideasCollision
     if ($result.Threw) {
@@ -567,6 +624,121 @@ try {
         if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
             Add-Failure "TEST-0062 rename-away proposal was retained: $($result.Error)"
         }
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $manifestRename = New-BootstrapFixture -Name 'manifest-rename-source' `
+        -AddAgentsCollision $true -AddRenameSource $true
+    $result = Invoke-BootstrapFixture -Fixture $manifestRename
+    if ($result.Threw) {
+        Add-Failure "TEST-0062 manifest-only rename fixture could not create its first proposal: $($result.Error)"
+    }
+    else {
+        $manifestBranch = 'automation/meandai-capabilities-v0.5.0'
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'fetch', 'origin', $manifestBranch
+        ) | Out-Null
+        $manifestText = (@(Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:.ai/adoption/meandai-capabilities.json'
+        )) -join "`n") + "`n"
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @('switch', 'main') | Out-Null
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'push', 'origin', '--delete', $manifestBranch
+        ) | Out-Null
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'branch', '-D', $manifestBranch
+        ) | Out-Null
+        [IO.File]::WriteAllText(
+            (Join-Path $manifestRename.Consumer 'legacy-agents.md'),
+            $manifestText,
+            [Text.UTF8Encoding]::new($false)
+        )
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'add', 'legacy-agents.md'
+        ) | Out-Null
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'commit', '-m', 'Prepare manifest rename source'
+        ) | Out-Null
+        Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+            'push', 'origin', 'main'
+        ) | Out-Null
+        $global:PullRequestExists = $false
+        $global:ExistingPullRequestBody = ''
+        $result = Invoke-BootstrapFixture -Fixture $manifestRename
+        if ($result.Threw) {
+            Add-Failure "TEST-0062 manifest-only rename fixture could not recreate its proposal: $($result.Error)"
+        }
+        else {
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'switch', $manifestBranch
+            ) | Out-Null
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'rm', 'legacy-agents.md'
+            ) | Out-Null
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'commit', '--amend', '--no-edit'
+            ) | Out-Null
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'push', '--force', 'origin', $manifestBranch
+            ) | Out-Null
+            $global:ExistingPullRequestHead = (@(Invoke-Git `
+                -Repository $manifestRename.Consumer -Arguments @('rev-parse', 'HEAD')))[0]
+            $global:ExistingPullRequestProtocolSha = (@(Invoke-Git `
+                -Repository $manifestRename.Source -Arguments @(
+                    'rev-parse', 'v0.5.0^{commit}'
+                )))[0]
+            $global:ExistingPullRequestBody = ''
+            $global:PullRequestExists = $true
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @('switch', 'main') | Out-Null
+            Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'fetch', 'origin', $manifestBranch
+            ) | Out-Null
+            $manifestRenameStatus = @(Invoke-Git -Repository $manifestRename.Consumer -Arguments @(
+                'diff', '--no-renames', '--name-status', 'main', 'FETCH_HEAD', '--'
+            ))
+            if ($manifestRenameStatus -cnotcontains "D`tlegacy-agents.md" -or
+                $manifestRenameStatus -cnotcontains "A`t.ai/adoption/meandai-capabilities.json") {
+                Add-Failure 'TEST-0062 real Git fixture did not expose both sides of the manifest-only rename provenance.'
+            }
+            $result = Invoke-BootstrapFixture -Fixture $manifestRename
+            if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+                Add-Failure "TEST-0062 manifest-only rename-away proposal was retained: $($result.Error)"
+            }
+        }
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $reservedNamespace = New-BootstrapFixture -Name 'reserved-namespace'
+    $staleReservedBranch = 'automation/meandai-capabilities-v0.4.0'
+    Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @(
+        'switch', '-c', $staleReservedBranch
+    ) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $reservedNamespace.Consumer 'stale-adoption.txt'),
+        "stale`n"
+    )
+    Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @(
+        'add', 'stale-adoption.txt'
+    ) | Out-Null
+    Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @(
+        'commit', '-m', 'Create stale reserved adoption branch'
+    ) | Out-Null
+    Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @(
+        'push', 'origin', $staleReservedBranch
+    ) | Out-Null
+    Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @('switch', 'main') | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $reservedNamespace
+    $unexpectedTarget = @(Invoke-Git -Repository $reservedNamespace.Consumer -Arguments @(
+        'ls-remote', '--heads', 'origin', 'refs/heads/automation/meandai-capabilities-v0.5.0'
+    ))
+    if (-not $result.Threw -or
+        $result.Error -notlike '*reserved adoption branch namespace*unowned or stale*' -or
+        $global:PullRequestCreateCalls -ne 0 -or $unexpectedTarget.Count -ne 0) {
+        Add-Failure "TEST-0072 stale branch outside the current adoption target did not block before mutation: $($result.Error)"
     }
 
     $global:PullRequestExists = $false

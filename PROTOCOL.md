@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.8.1**<br>
+Protocol version: **0.8.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -61,6 +61,14 @@ Numbers are repository-local, four digits, monotonically allocated per class,
 and never reused. Titles begin with the identifier. Records state status,
 classification, relevant links, and the evidence supporting closure or outcome
 where applicable.
+
+A `TEST-NNNN` identifier belongs to exactly one canonical scenario record and
+MUST NOT be reused for a different behavior. A superseded scenario remains as
+historical evidence with status `Superseded` and links its active replacement.
+Executable evidence MUST identify one owning suite and evidence kind whose
+successful run covers the documented behavior. Declared variants require
+focused fixture coverage recorded by that scenario; finding the identifier as
+an unstructured source substring is not scenario-coverage evidence.
 
 A `RISK-NNNN` record lives in the owning feature or decision. Create a linked
 GitHub finding when a risk is independent, unresolved, or needs separate
@@ -260,6 +268,12 @@ Exact release-target evidence MUST be written to an external post-publication
 record, such as the GitHub Release or linked issue/PR comment. A repository
 document MAY link that record after publication but MUST NOT predict or attempt
 to embed the hash of the commit that contains the document itself.
+A pre-merge feature record MAY designate a stable external issue as its
+post-publication evidence authority while all publication-dependent fields
+remain `Pending`. After publication, the exact tag, commit, release state, and
+check results are written to that authority and the GitHub Release. A second
+documentation-only pull request is not required merely to copy those external
+facts into the repository.
 
 ## 5. Full-project scans
 
@@ -331,8 +345,11 @@ multiple records merely to increase detail.
 - Feature records link their issue, pull request, decisions, dependencies,
   tests, and related documentation.
 - Decisions link affected features and superseded or related decisions.
-- Issues and pull requests link canonical repository documents and related
-  issues, pull requests, wiki pages, or external documentation.
+- Before closure, an issue links its owning canonical feature and every
+  applicable decision; the feature links back to the issue. A delivery issue
+  also links the pull request and the stable external authority for any
+  post-publication evidence. Pull requests link the same canonical records and
+  related issues, pull requests, wiki pages, or external documentation.
 - Links MUST be relative for repository files and absolute for GitHub or
   external resources. They MUST be clickable and validated before completion;
   record automated local-link results and manual or automated external-link
@@ -406,10 +423,14 @@ merges, project tests, link validation, and manifest removal.
 The deterministic adoption branch and its single draft are retained on later
 runs. Missing proposal ownership, seed drift, an existing manifest, an orphan
 branch, or any other ambiguous state MUST block without reset, deletion, or
-overwrite. The manifest MUST be removed before the draft becomes ready or
-merges. After reviewed adoption, the local updater owns compatible update
-discovery and supersession under the controls below. The source-only bootstrap
-resolver and adapter are not copied into the consumer.
+overwrite. After verified local completion removes the manifest and marks the
+proposal ready, that exact completed proposal MUST remain retained until
+maintainer merge or explicit reviewed disposition; a later lifecycle run MUST
+NOT misclassify it as a pending draft or create a duplicate. The manifest MUST
+be removed before the draft becomes ready or merges. After reviewed adoption,
+the local updater owns compatible update discovery and supersession under the
+controls below. The source-only bootstrap resolver and adapter are not copied
+into the consumer.
 
 #### Local quick-adoption launcher
 
@@ -440,6 +461,13 @@ rewriting its value; only a missing name MAY be created from its mapped local
 input. GitHub does not expose stored secret values, so name presence MUST NOT be
 reported as value, scope, expiry, or usability validation.
 
+The live secret-name inventory and every missing-secret write MUST share one
+repository-scoped, remotely visible exclusivity boundary. That boundary is
+acquired before the inventory, is owned by an unambiguous session identity, and
+is released only by that owner. A stale, contended, changed, or unverifiable
+lock MUST block before secret inventory or mutation; recovery is explicit
+maintainer work after proving no active session owns it.
+
 When `MEANDAI_PROTOCOL_TOKEN` exists and `MEANDAI_RO_FG_PAT.txt` is absent, the
 launcher MAY use the authenticated local `gh` identity to retrieve the exact
 tagged workflow and exact protocol commit. Git-blob and commit verification
@@ -463,8 +491,11 @@ global installation.
 
 Before local semantic work, the launcher MUST idempotently reconcile the common
 Agile labels and one canonically marked, project-owned adoption issue through
-its authenticated GitHub boundary. The local agent MUST receive that issue
-reference, run under a finite timeout with spawned-command network disabled,
+its authenticated GitHub boundary. Ownership requires exactly one parsed
+canonical marker on the first body line; marker-like text in quotations,
+examples, or unrelated prose is not ownership evidence, and duplicate or
+malformed markers MUST block. The local agent MUST receive that issue reference,
+run under a finite timeout with spawned-command network disabled,
 resolve the transient manifest, complete the repository-local records and
 tests, apply bounded review gates, and leave every GitHub mutation and Git
 publication operation to the launcher. Before publication, the launcher MUST
@@ -509,6 +540,9 @@ The updater MUST:
   and attempt to reopen an old PR when its paired branch cleanup fails;
 - fail closed after interrupted creation and require lease-safe reviewed
   recovery for an orphan reserved branch;
+- inventory the complete reserved automation-branch namespace before mutation;
+  checking only the currently selected target branch is insufficient, and an
+  ambiguous older orphan MUST block;
 - verify that all current managed updater copies equal the pinned release before
   mutation, then update the deterministic protocol pointer plus only the
   target-different canonical workflow and updater scripts;

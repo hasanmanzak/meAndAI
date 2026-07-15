@@ -5,11 +5,15 @@ and follow its canonical links.
 
 ## Current continuation
 
-No open implementation continuation. External delivery evidence for the latest
-completed work is retained by its linked issue, pull request, and release.
+No open implementation continuation. The completed bounded v0.8.2 correction
+is recorded in [FEAT-0012](../../../docs/features/FEAT-0012-v082-correction/README.md).
+Exact publication evidence is owned externally by
+[issue #38](https://github.com/hasanmanzak/meAndAI/issues/38) and the GitHub
+Release instead of being predicted in repository memory.
 
 ## History
 
+- [2026-07-16 - Bounded v0.8.2 correction](2026-07-16-v082-correction.md)
 - [2026-07-15 - Stability closure](2026-07-15-stability-closure.md)
 - [2026-07-15 - Protocol stability invariants](2026-07-15-protocol-stability-invariants.md)
 - [2026-07-15 - Quick-adoption boundary clarity](2026-07-15-quick-adoption-boundary-clarity.md)

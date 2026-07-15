@@ -1,8 +1,12 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-15**<br>
-Protocol version: **0.8.1**
+Last reviewed: **2026-07-16**<br>
+Protocol version: **0.8.2**
+
+Exact publication state is authoritative only in
+[GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and the
+linked delivery record; it is not projected into this pre-merge memory file.
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer
