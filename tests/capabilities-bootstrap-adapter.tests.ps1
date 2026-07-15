@@ -6,6 +6,10 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $failures = [System.Collections.Generic.List[string]]::new()
+$tempRoots = [System.Collections.Generic.List[string]]::new()
+$cleanupSentinel = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-capabilities-foreign-$([guid]::NewGuid().ToString('N'))"
+New-Item -ItemType Directory -Path $cleanupSentinel -Force | Out-Null
 $global:PullRequestExists = $false
 $global:PullRequestCreateCalls = 0
 $global:LastPullRequestBody = ''
@@ -163,10 +167,12 @@ function New-BootstrapFixture {
         [bool]$AddAgentsCollision = $false,
         [bool]$AddIdeasCollision = $false,
         [bool]$AddManifestCollision = $false,
+        [bool]$AddRenameSource = $false,
         [bool]$DriftSeedWorkflow = $false
     )
 
     $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-capabilities-$Name-$([guid]::NewGuid().ToString('N'))"
+    $tempRoots.Add($tempRoot)
     $consumer = Join-Path $tempRoot 'consumer'
     $remote = Join-Path $tempRoot 'remote.git'
     $source = Join-Path $consumer '.meandai-update-source'
@@ -206,6 +212,10 @@ function New-BootstrapFixture {
         $manifestPath = Join-Path $consumer '.ai/adoption/meandai-capabilities.json'
         New-Item -ItemType Directory -Force (Split-Path -Parent $manifestPath) | Out-Null
         [IO.File]::WriteAllText($manifestPath, "{}`n")
+    }
+    if ($AddRenameSource) {
+        Copy-Item -LiteralPath (Join-Path $root 'templates/project/AGENTS.submodule.md') `
+            -Destination (Join-Path $consumer 'legacy-agents.md')
     }
     Invoke-Git -Repository $consumer -Arguments @('add', '.') | Out-Null
     Invoke-Git -Repository $consumer -Arguments @('commit', '-m', 'Seed consumer') | Out-Null
@@ -277,16 +287,20 @@ try {
         Add-Failure "TEST-0028 collision-free bootstrap failed: $($result.Error)"
     }
     else {
-        $paths = @(Get-RemoteChangedPaths -Fixture $empty)
-        foreach ($required in @(
-            '.ai/adoption/meandai-capabilities.json', '.ai/protocol', '.gitmodules',
-            'AGENTS.md', '.ai/memory/README.md', 'docs/ideas/README.md',
-            '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
-            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
-        )) {
-            if ($paths -cnotcontains $required) {
-                Add-Failure "TEST-0028 bootstrap proposal is missing '$required'"
-            }
+        $paths = @(Get-RemoteChangedPaths -Fixture $empty | Sort-Object)
+        $expectedPaths = @(
+            '.ai/adoption/meandai-capabilities.json', '.ai/memory/log/README.md',
+            '.ai/memory/project.md', '.ai/memory/README.md', '.ai/protocol',
+            '.github/ISSUE_TEMPLATE/bug.yml', '.github/ISSUE_TEMPLATE/epic.yml',
+            '.github/ISSUE_TEMPLATE/feature.yml', '.github/ISSUE_TEMPLATE/finding.yml',
+            '.github/ISSUE_TEMPLATE/subfeature.yml', '.github/ISSUE_TEMPLATE/task.yml',
+            '.github/PULL_REQUEST_TEMPLATE.md',
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
+            '.github/scripts/MeAndAI.ProtocolUpdate.psm1', '.gitmodules',
+            'AGENTS.md', 'docs/ideas/README.md'
+        ) | Sort-Object
+        if (($paths -join '|') -cne ($expectedPaths -join '|')) {
+            Add-Failure "TEST-0066 bootstrap proposal asset inventory is not exact: $($paths -join ', ')."
         }
         $protocolEntry = (Invoke-Git -Repository $empty.Consumer -Arguments @(
             'ls-tree', 'FETCH_HEAD', '--', '.ai/protocol'
@@ -513,6 +527,49 @@ try {
     $global:ExistingPullRequestMetadataMode = 'Valid'
 
     $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestMetadataMode = 'Valid'
+    $global:ExistingPullRequestBody = ''
+    $rename = New-BootstrapFixture -Name 'rename-source' -AddRenameSource $true
+    $result = Invoke-BootstrapFixture -Fixture $rename
+    if ($result.Threw) {
+        Add-Failure "TEST-0062 rename provenance fixture could not create its baseline proposal: $($result.Error)"
+    }
+    else {
+        Invoke-Git -Repository $rename.Consumer -Arguments @(
+            'switch', 'automation/meandai-capabilities-v0.5.0'
+        ) | Out-Null
+        Invoke-Git -Repository $rename.Consumer -Arguments @('rm', 'legacy-agents.md') | Out-Null
+        Invoke-Git -Repository $rename.Consumer -Arguments @(
+            'commit', '--amend', '--no-edit'
+        ) | Out-Null
+        Invoke-Git -Repository $rename.Consumer -Arguments @(
+            'push', '--force', 'origin', 'automation/meandai-capabilities-v0.5.0'
+        ) | Out-Null
+        $global:ExistingPullRequestHead = (@(Invoke-Git `
+            -Repository $rename.Consumer -Arguments @('rev-parse', 'HEAD')))[0]
+        $global:ExistingPullRequestProtocolSha = (@(Invoke-Git `
+            -Repository $rename.Source -Arguments @('rev-parse', 'v0.5.0^{commit}')))[0]
+        $global:ExistingPullRequestBody = ''
+        Invoke-Git -Repository $rename.Consumer -Arguments @('switch', 'main') | Out-Null
+        Invoke-Git -Repository $rename.Consumer -Arguments @(
+            'fetch', 'origin', 'automation/meandai-capabilities-v0.5.0'
+        ) | Out-Null
+        $renameStatus = @(Invoke-Git -Repository $rename.Consumer -Arguments @(
+            'diff', '--name-status', '--find-renames', 'main', 'FETCH_HEAD', '--'
+        ))
+        if (@($renameStatus | Where-Object {
+            [string]$_ -match '^R100\s+legacy-agents\.md\s+AGENTS\.md$'
+        }).Count -ne 1) {
+            Add-Failure 'TEST-0062 real Git fixture did not form the intended rename-away provenance.'
+        }
+        $result = Invoke-BootstrapFixture -Fixture $rename
+        if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+            Add-Failure "TEST-0062 rename-away proposal was retained: $($result.Error)"
+        }
+    }
+
+    $global:PullRequestExists = $false
     $orphan = New-BootstrapFixture -Name 'orphan'
     Invoke-Git -Repository $orphan.Consumer -Arguments @('switch', '-c', 'automation/meandai-capabilities-v0.5.0') | Out-Null
     [IO.File]::WriteAllText((Join-Path $orphan.Consumer 'orphan.txt'), "orphan`n")
@@ -527,8 +584,17 @@ try {
 }
 finally {
     Remove-Item Function:\gh -ErrorAction SilentlyContinue
-    Get-ChildItem ([IO.Path]::GetTempPath()) -Directory -Filter 'meandai-capabilities-*' |
-        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    foreach ($path in $tempRoots) {
+        if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+    if (-not (Test-Path -LiteralPath $cleanupSentinel -PathType Container)) {
+        Add-Failure 'TEST-0068 cleanup removed an unowned same-prefix temporary directory.'
+    }
+    elseif (Test-Path -LiteralPath $cleanupSentinel) {
+        Remove-Item -LiteralPath $cleanupSentinel -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 if ($failures.Count -gt 0) {
@@ -537,4 +603,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031, TEST-0044, TEST-0047, and TEST-0057.' -ForegroundColor Green
+Write-Host 'AI capabilities bootstrap adapter tests passed for all declared scenarios in this suite.' -ForegroundColor Green

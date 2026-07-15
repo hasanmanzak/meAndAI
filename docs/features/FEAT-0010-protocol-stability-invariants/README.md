@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature correction |
-| Status | Ready for merge |
+| Status | Complete |
 | Target version | 0.8.0 |
 | Issue | [#34](https://github.com/hasanmanzak/meAndAI/issues/34) |
 | Pull request | [#35](https://github.com/hasanmanzak/meAndAI/pull/35) |
@@ -197,10 +197,11 @@ run passed Ubuntu, Windows, and GitGuardian on PR #35.
 - [x] Issue, pull request, decisions, and related work cross-linked.
 - [x] Applicable CI and review gates pass.
 
-## Release gate
+## Post-merge release evidence
 
-After merge, publish `v0.8.0` as an immutable GitHub Release targeting the exact
-merge commit, then verify the locked tag, release API state, and remote commit.
-Repository release immutability was enabled and verified on 2026-07-15; release
-identifier and target evidence remain correctly pending until merge and belong
-in the external release/issue record after publication.
+| Field | Evidence |
+| --- | --- |
+| Release authority | Published immutable GitHub Release |
+| Release identifier | [`v0.8.0`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.0) |
+| Target commit | [`a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821`](https://github.com/hasanmanzak/meAndAI/commit/a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821) |
+| Verification evidence | Release and locked tag target verified after PR #35 merged on 2026-07-15 |

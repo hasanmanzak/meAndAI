@@ -368,7 +368,7 @@ that exact release commit.
 | Field | Value |
 | --- | --- |
 | Classification | Documentation bug correction |
-| Status | Implemented and locally verified; review pending |
+| Status | Complete |
 | Target version | 0.7.3 |
 | Issue | [#32](https://github.com/hasanmanzak/meAndAI/issues/32) |
 | Pull request | [#33](https://github.com/hasanmanzak/meAndAI/pull/33) |

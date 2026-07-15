@@ -67,18 +67,18 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It verifies
-that `v0.8.0` is an exact published immutable GitHub Release before downloading
+that `v0.8.1` is an exact published immutable GitHub Release before downloading
 the launcher from its locked tag into the OS temp directory; it does not
 execute a moving `main` file.
 
 ```powershell
-$t='v0.8.0'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$t='v0.8.1'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$tag = 'v0.8.0'
+$tag = 'v0.8.1'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -167,7 +167,9 @@ For troubleshooting or a deliberately manual handoff:
 `-SkipCodexDelegation` remains an alias for `-SkipLocalCodex` for v0.6.0 caller
 compatibility. The workflow wait is bounded by `-WorkflowTimeoutMinutes 15`
 (allowed range: 1 through 60). Local authentication and execution are bounded
-by `-CodexTimeoutMinutes 30` (allowed range: 1 through 120). If a draft already
+by `-CodexTimeoutMinutes 30` (allowed range: 1 through 120).
+`-CodexTimeoutSeconds` is an optional finer-grained override; zero preserves
+the minute setting. If a draft already
 lacks the manifest when inspected, the launcher does not rerun Codex or mark
 the draft ready; the maintainer must validate that prior change manually.
 

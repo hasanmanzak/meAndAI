@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.8.0**<br>
+Protocol version: **0.8.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -179,6 +179,24 @@ blocking issue. It MUST NOT be deferred merely so a later scan can say the new
 code should have been written differently. Legacy findings may be scheduled
 separately only when they do not invalidate the new work and are linked.
 
+Every review or scan observation receives exactly one disposition:
+
+- `Blocking`: actionable, in the current scope, and capable of invalidating an
+  acceptance criterion, correctness, safety, compatibility, or required
+  evidence. It reopens implementation and prevents completion.
+- `AcceptedResidual`: not unresolved actionable work. It requires the explicit
+  accepting authority, owner, rationale, evidence link, and review condition.
+- `ExternalOrLegacyFollowUp`: actionable but outside the authorized current
+  scope. It requires a durable owner and link and MUST NOT conceal a defect
+  introduced or exposed by the current change.
+- `OptionalImprovement`: non-required improvement whose absence does not
+  invalidate the current work. It MAY be linked for later consideration.
+
+These dispositions are mutually exclusive. `Actionable in-scope finding` means
+`Blocking` throughout this protocol. Relabeling or wording alone cannot change
+a disposition; reclassification requires new evidence, changed scope, or the
+recorded accepting authority.
+
 
 #### Bounded self-validation
 
@@ -187,14 +205,12 @@ budget is:
 
 1. one fresh-diff self-review pass after the declared tests;
 2. one final relevant verification command after fixes; and
-3. one triage that classifies each observation as blocking or follow-up.
+3. one triage that assigns each observation one disposition defined above.
 
-Only a blocking finding that invalidates acceptance, correctness, safety,
-compatibility, or required evidence reopens implementation scope. A
-non-blocking improvement is linked for later work and MUST NOT trigger another
-review loop in the current delivery.
+Only a `Blocking` finding reopens implementation scope. The other dispositions
+MUST NOT trigger another review loop in the current delivery.
 
-Stop validation when acceptance criteria and declared tests pass, no blocking
+Stop validation when acceptance criteria and declared tests pass, no `Blocking`
 finding remains, and the evidence and unreviewed scope are recorded. Repeating
 an unchanged review without new diff, failed evidence, or an explicit user
 request is prohibited.
@@ -214,7 +230,7 @@ Work is done only when:
 - mandatory test code exists and all declared scenarios map to executable tests
   or an explicitly justified manual check;
 - test commands, environment, and results are recorded;
-- the self-review and required project scan have no unresolved blocking finding;
+- the self-review and required project scan have no unresolved `Blocking` finding;
 - no known duplication, semantic misuse, invariant leak, or unjustified SOLID
   violation was introduced;
 - feature and decision documents, cross-links, changelog/version when relevant,
@@ -256,16 +272,16 @@ scope explicitly.
 ### Post-development convergence scan
 
 After development is declared complete, perform a full-project scan under this
-section. Document every observation, classify it, and order actionable findings
-from highest to lowest priority before remediation, using severity, impact, and
-dependency order as inputs. Resolve the highest-priority actionable in-scope
-findings first.
+section. Document every observation, assign its disposition, and order
+`Blocking` findings from highest to lowest priority before remediation, using
+severity, impact, and dependency order as inputs. Resolve the highest-priority
+`Blocking` findings first.
 
-After remediation, repeat the full-project scan. The completion condition is a
-convergence pass with no unresolved actionable in-scope finding. A finding is
-not cleared merely by relabeling it: an accepted residual risk requires an
-owner, rationale, and link, while an external or legacy follow-up may be
-separated only under the rules in Gate 5.
+After remediation, run the one budgeted confirmation scan. The completion
+condition is no unresolved `Blocking` finding. `AcceptedResidual`,
+`ExternalOrLegacyFollowUp`, and `OptionalImprovement` records remain visible
+under Gate 5 but are not unresolved actionable in-scope findings. A finding is
+not cleared or reclassified merely by relabeling it.
 
 The cycle MUST remain bounded. Before the first pass, declare the scan scope,
 exclusions, and a finite validation budget; the default is one initial scan and

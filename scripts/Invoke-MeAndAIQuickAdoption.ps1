@@ -6,12 +6,14 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.8.0',
+    [string]$ProtocolTag = 'v0.8.1',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
     [ValidateRange(1, 120)]
     [int]$CodexTimeoutMinutes = 30,
+    [ValidateRange(0, 7200)]
+    [int]$CodexTimeoutSeconds = 0,
     [switch]$SkipLifecycleDispatch,
     [Alias('SkipCodexDelegation')]
     [switch]$SkipLocalCodex,
@@ -48,20 +50,35 @@ function Invoke-External {
     param(
         [Parameter(Mandatory)][string]$Command,
         [string[]]$Arguments = @(),
+        [AllowNull()][string]$InputText = $null,
         [switch]$AllowFailure
     )
 
     $previousPreference = $ErrorActionPreference
+    $previousGitHubHost = [Environment]::GetEnvironmentVariable('GH_HOST', 'Process')
     $ErrorActionPreference = 'Continue'
     try {
+        if ($Command -ceq 'gh') {
+            [Environment]::SetEnvironmentVariable('GH_HOST', 'github.com', 'Process')
+        }
         $global:LASTEXITCODE = 0
-        $output = @(& $Command @Arguments 2>&1)
+        $output = if ($PSBoundParameters.ContainsKey('InputText')) {
+            @($InputText | & $Command @Arguments 2>&1)
+        }
+        else {
+            @(& $Command @Arguments 2>&1)
+        }
         $exitCode = $LASTEXITCODE
         if ($null -eq $exitCode) {
             $exitCode = 0
         }
     }
     finally {
+        if ($Command -ceq 'gh') {
+            [Environment]::SetEnvironmentVariable(
+                'GH_HOST', $previousGitHubHost, 'Process'
+            )
+        }
         $ErrorActionPreference = $previousPreference
     }
 
@@ -374,9 +391,12 @@ function Set-RepositorySecret {
     )
 
     # gh secret set reads the value from stdin when no body argument is used.
-    $global:LASTEXITCODE = 0
-    $Value | & gh secret set $Name --repo $Repository 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
+    try {
+        Invoke-External -Command 'gh' -Arguments @(
+            'secret', 'set', $Name, '--repo', $Repository
+        ) -InputText $Value | Out-Null
+    }
+    catch {
         throw "Unable to store repository Actions secret '$Name'."
     }
 }
@@ -448,6 +468,8 @@ function Invoke-LifecycleWorkflow {
     )
 
     $workflowName = [IO.Path]::GetFileName($workflowTargetPath)
+    $correlationId = [guid]::NewGuid().ToString('N')
+    $expectedRunTitle = "meAndAI AI capabilities lifecycle [$correlationId]"
     $registered = $false
     for ($attempt = 1; $attempt -le 6; $attempt++) {
         $view = Invoke-External -Command 'gh' -Arguments @(
@@ -469,7 +491,7 @@ function Invoke-LifecycleWorkflow {
     $listArguments = @(
         'run', 'list', '--repo', $Repository, '--workflow', $workflowName,
         '--event', 'workflow_dispatch', '--branch', $Branch, '--commit', $HeadSha,
-        '--limit', '100', '--json', 'databaseId,createdAt,headSha,status,conclusion,url'
+        '--limit', '100', '--json', 'databaseId,createdAt,displayTitle,headSha,status,conclusion,url'
     )
     $baselineResult = Invoke-External -Command 'gh' -Arguments $listArguments
     try {
@@ -489,7 +511,8 @@ function Invoke-LifecycleWorkflow {
 
     $dispatchStarted = [DateTimeOffset]::UtcNow.AddSeconds(-5)
     Invoke-External -Command 'gh' -Arguments @(
-        'workflow', 'run', $workflowName, '--repo', $Repository, '--ref', $Branch
+        'workflow', 'run', $workflowName, '--repo', $Repository, '--ref', $Branch,
+        '--field', "correlation_id=$correlationId"
     ) | Out-Null
 
     $deadline = [DateTimeOffset]::UtcNow.AddMinutes($WorkflowTimeoutMinutes)
@@ -508,6 +531,7 @@ function Invoke-LifecycleWorkflow {
                 if ($null -eq $run.PSObject.Properties['databaseId'] -or
                     [string]$run.databaseId -cnotmatch '^[1-9][0-9]*$' -or
                     $null -eq $run.PSObject.Properties['createdAt'] -or
+                    $null -eq $run.PSObject.Properties['displayTitle'] -or
                     $null -eq $run.PSObject.Properties['headSha']) {
                     throw 'GitHub CLI returned incomplete workflow-run metadata.'
                 }
@@ -518,7 +542,9 @@ function Invoke-LifecycleWorkflow {
                     throw 'GitHub CLI returned an invalid workflow-run timestamp.'
                 }
                 if (-not $baselineIds.Contains([long]$run.databaseId) -and
-                    [string]$run.headSha -ceq $HeadSha -and $createdAt -ge $dispatchStarted) {
+                    [string]$run.headSha -ceq $HeadSha -and
+                    [string]$run.displayTitle -ceq $expectedRunTitle -and
+                    $createdAt -ge $dispatchStarted) {
                     $candidates.Add($run)
                 }
             }
@@ -532,7 +558,7 @@ function Invoke-LifecycleWorkflow {
         if ($null -ne $observedRunId) {
             $view = Invoke-External -Command 'gh' -Arguments @(
                 'run', 'view', [string]$observedRunId, '--repo', $Repository,
-                '--json', 'databaseId,headSha,status,conclusion,url'
+                '--json', 'databaseId,displayTitle,headSha,status,conclusion,url'
             )
             try {
                 $run = ((@($view.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
@@ -541,7 +567,8 @@ function Invoke-LifecycleWorkflow {
                 throw 'GitHub CLI returned invalid workflow-run detail metadata.'
             }
             if ([long]$run.databaseId -ne [long]$observedRunId -or
-                [string]$run.headSha -cne $HeadSha) {
+                [string]$run.headSha -cne $HeadSha -or
+                [string]$run.displayTitle -cne $expectedRunTitle) {
                 throw 'The observed lifecycle workflow run no longer matches its dispatch identity.'
             }
             if ([string]$run.status -ceq 'completed') {
@@ -861,6 +888,49 @@ function Ensure-AdoptionLabels {
     }
 }
 
+function Get-AdoptionIssueInventory {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    $list = Invoke-External -Command 'gh' -Arguments @(
+        'issue', 'list', '--repo', $Repository, '--state', 'all', '--limit', '1000',
+        '--json', 'number,url,title,body,state'
+    )
+    try {
+        $parsed = ((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        return @($parsed | Where-Object { $null -ne $_ })
+    }
+    catch {
+        throw 'GitHub CLI returned invalid adoption-issue metadata.'
+    }
+}
+
+function Get-MarkedAdoptionIssues {
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Issues,
+        [Parameter(Mandatory)][string]$Marker
+    )
+
+    $numbers = [System.Collections.Generic.HashSet[int]]::new()
+    $matching = @($Issues | Where-Object {
+        $null -ne $_.PSObject.Properties['body'] -and
+        ([string]$_.body).Contains($Marker)
+    } | Sort-Object { [int]$_.number })
+    foreach ($issue in $matching) {
+        foreach ($property in @('number', 'url', 'title', 'body', 'state')) {
+            if ($null -eq $issue.PSObject.Properties[$property]) {
+                throw 'A project-owned adoption issue has incomplete identity metadata.'
+            }
+        }
+        if ([string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
+            [string]$issue.url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
+            [string]$issue.state -cnotin @('OPEN', 'CLOSED') -or
+            -not $numbers.Add([int]$issue.number)) {
+            throw 'A project-owned adoption issue has invalid or duplicate identity metadata.'
+        }
+    }
+    return @($matching)
+}
+
 function Ensure-AdoptionIssue {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -879,75 +949,71 @@ function Ensure-AdoptionIssue {
         'status:in-progress'
     }
     else { 'status:needs-review' }
-    $list = Invoke-External -Command 'gh' -Arguments @(
-        'issue', 'list', '--repo', $Repository, '--state', 'all', '--limit', '1000',
-        '--json', 'number,url,title,body,state'
-    )
-    try {
-        $parsed = ((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
-        $issues = @($parsed | Where-Object { $null -ne $_ })
-    }
-    catch {
-        throw 'GitHub CLI returned invalid adoption-issue metadata.'
-    }
-    $matchingIssues = @($issues | Where-Object {
-        $null -ne $_.PSObject.Properties['body'] -and
-        ([string]$_.body).Contains($marker)
-    })
-    if ($matchingIssues.Count -gt 1) {
-        throw 'More than one project-owned adoption issue has the canonical marker.'
-    }
-    if ($matchingIssues.Count -eq 1) {
-        $issue = $matchingIssues[0]
-        if ([string]$issue.url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
-            [int]$issue.number -le 0) {
-            throw 'The project-owned adoption issue has invalid identity metadata.'
+    $matchingIssues = @(Get-MarkedAdoptionIssues `
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker)
+
+    if ($matchingIssues.Count -eq 0) {
+        $bodyPath = Join-Path $TemporaryDirectory 'adoption-issue.md'
+        $body = @(
+            $marker,
+            '## AI capabilities adoption tracking',
+            '',
+            "- Protocol release: ``$ProtocolTag``",
+            "- Adoption draft: $($PullRequest.url)",
+            '',
+            'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+            '',
+            'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+        ) -join [Environment]::NewLine
+        [IO.File]::WriteAllText(
+            $bodyPath, $body + [Environment]::NewLine,
+            [Text.UTF8Encoding]::new($false)
+        )
+        $created = Invoke-External -Command 'gh' -Arguments @(
+            'issue', 'create', '--repo', $Repository,
+            '--title', "Track meAndAI AI capabilities adoption from $ProtocolTag",
+            '--body-file', $bodyPath,
+            '--label', 'type:feature', '--label', 'priority:p1',
+            '--label', $desiredStatusLabel
+        )
+        $createdUrl = ((@($created.Output) -join [Environment]::NewLine).Trim())
+        if ($createdUrl -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$') {
+            throw 'Created adoption issue returned an unrecognized URL.'
         }
-        if ([string]$issue.state -ceq 'CLOSED') {
-            Invoke-External -Command 'gh' -Arguments @(
-                'issue', 'reopen', [string]$issue.number, '--repo', $Repository
-            ) | Out-Null
-        }
-        Invoke-External -Command 'gh' -Arguments @(
-            'issue', 'edit', [string]$issue.number, '--repo', $Repository,
-            '--add-label', 'type:feature', '--add-label', 'priority:p1',
-            '--add-label', $desiredStatusLabel,
-            '--remove-label', $supersededStatusLabel
-        ) | Out-Null
-        return $issue
+        $matchingIssues = @(Get-MarkedAdoptionIssues `
+            -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker)
     }
 
-    $bodyPath = Join-Path $TemporaryDirectory 'adoption-issue.md'
-    $body = @(
-        $marker,
-        '## AI capabilities adoption tracking',
-        '',
-        "- Protocol release: ``$ProtocolTag``",
-        "- Adoption draft: $($PullRequest.url)",
-        '',
-        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
-        '',
-        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
-    ) -join [Environment]::NewLine
-    [IO.File]::WriteAllText($bodyPath, $body + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
-    $created = Invoke-External -Command 'gh' -Arguments @(
-        'issue', 'create', '--repo', $Repository,
-        '--title', "Track meAndAI AI capabilities adoption from $ProtocolTag",
-        '--body-file', $bodyPath,
-        '--label', 'type:feature', '--label', 'priority:p1',
-        '--label', $desiredStatusLabel
-    )
-    $url = ((@($created.Output) -join [Environment]::NewLine).Trim())
-    if ($url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/(?<number>[1-9][0-9]*)/?$') {
-        throw 'Created adoption issue returned an unrecognized URL.'
+    if ($matchingIssues.Count -eq 0) {
+        throw 'The created adoption issue was not observable during convergence.'
     }
-    return [pscustomobject]@{
-        number = [int]$Matches.number
-        url = $url
-        title = "Track meAndAI AI capabilities adoption from $ProtocolTag"
-        body = $body
-        state = 'OPEN'
+    $canonicalNumber = [int]$matchingIssues[0].number
+    if ([string]$matchingIssues[0].state -ceq 'CLOSED') {
+        Invoke-External -Command 'gh' -Arguments @(
+            'issue', 'reopen', [string]$canonicalNumber, '--repo', $Repository
+        ) | Out-Null
     }
+    foreach ($duplicate in @($matchingIssues | Select-Object -Skip 1)) {
+        if ([string]$duplicate.state -ceq 'OPEN') {
+            Invoke-External -Command 'gh' -Arguments @(
+                'issue', 'close', [string]$duplicate.number, '--repo', $Repository
+            ) | Out-Null
+        }
+    }
+
+    $converged = @(Get-MarkedAdoptionIssues `
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker |
+        Where-Object { [string]$_.state -ceq 'OPEN' })
+    if ($converged.Count -ne 1 -or [int]$converged[0].number -ne $canonicalNumber) {
+        throw 'Project-owned adoption issues did not converge to one canonical open identity.'
+    }
+    Invoke-External -Command 'gh' -Arguments @(
+        'issue', 'edit', [string]$canonicalNumber, '--repo', $Repository,
+        '--add-label', 'type:feature', '--add-label', 'priority:p1',
+        '--add-label', $desiredStatusLabel,
+        '--remove-label', $supersededStatusLabel
+    ) | Out-Null
+    return $converged[0]
 }
 
 function Set-AdoptionIssueReadyForReview {
@@ -1070,7 +1136,8 @@ function Invoke-BoundedProcess {
         [Parameter(Mandatory)]$Runner,
         [Parameter(Mandatory)][string[]]$Arguments,
         [AllowEmptyString()][string]$StandardInput = '',
-        [Parameter(Mandatory)][ValidateRange(1, 120)][int]$TimeoutMinutes,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$TimeoutMilliseconds,
+        [Parameter(Mandatory)][string]$TimeoutDescription,
         [Parameter(Mandatory)][string]$Operation
     )
 
@@ -1107,24 +1174,26 @@ function Invoke-BoundedProcess {
             $process.StandardInput.Write($StandardInput)
         }
         $process.StandardInput.Close()
-        $timeoutMilliseconds = [int][Math]::Min(
-            [int]::MaxValue,
-            [TimeSpan]::FromMinutes($TimeoutMinutes).TotalMilliseconds
-        )
-        if (-not $process.WaitForExit($timeoutMilliseconds)) {
+        if (-not $process.WaitForExit($TimeoutMilliseconds)) {
             try {
                 $process.Kill($true)
             }
             catch {
-                if ($env:OS -eq 'Windows_NT') {
-                    & "$env:SystemRoot\System32\taskkill.exe" /PID $process.Id /T /F 2>$null | Out-Null
-                }
-                else {
-                    try { $process.Kill() } catch { }
+                if (-not $process.HasExited) {
+                    if ($env:OS -eq 'Windows_NT') {
+                        try {
+                            & "$env:SystemRoot\System32\taskkill.exe" `
+                                /PID $process.Id /T /F 2>&1 | Out-Null
+                        }
+                        catch { }
+                    }
+                    else {
+                        try { $process.Kill() } catch { }
+                    }
                 }
             }
             [void]$process.WaitForExit(5000)
-            throw "$Operation exceeded the $TimeoutMinutes minute limit and was terminated."
+            throw "$Operation exceeded the $TimeoutDescription limit and was terminated."
         }
         $process.WaitForExit()
         return [pscustomobject]@{
@@ -1151,11 +1220,14 @@ function Get-ProcessFailureDetail {
 function Assert-LocalCodexLogin {
     param(
         [Parameter(Mandatory)]$Runner,
-        [Parameter(Mandatory)][int]$TimeoutMinutes
+        [Parameter(Mandatory)][int]$TimeoutMilliseconds,
+        [Parameter(Mandatory)][string]$TimeoutDescription
     )
 
     $result = Invoke-BoundedProcess -Runner $Runner -Arguments @('login', 'status') `
-        -TimeoutMinutes $TimeoutMinutes -Operation 'Local Codex authentication check'
+        -TimeoutMilliseconds $TimeoutMilliseconds `
+        -TimeoutDescription $TimeoutDescription `
+        -Operation 'Local Codex authentication check'
     if ($result.ExitCode -ne 0) {
         $detail = Get-ProcessFailureDetail -Result $result
         throw "Local Codex authentication check failed with code $($result.ExitCode). $detail"
@@ -1168,7 +1240,8 @@ function Invoke-LocalCodexExec {
         [Parameter(Mandatory)][string]$WorkingDirectory,
         [Parameter(Mandatory)][string]$Prompt,
         [Parameter(Mandatory)][string]$OutputPath,
-        [Parameter(Mandatory)][int]$TimeoutMinutes
+        [Parameter(Mandatory)][int]$TimeoutMilliseconds,
+        [Parameter(Mandatory)][string]$TimeoutDescription
     )
 
     # codex exec receives the scoped prompt through stdin and is bounded by the launcher.
@@ -1186,7 +1259,8 @@ function Invoke-LocalCodexExec {
     )
 
     $result = Invoke-BoundedProcess -Runner $Runner -Arguments $arguments `
-        -StandardInput $Prompt -TimeoutMinutes $TimeoutMinutes `
+        -StandardInput $Prompt -TimeoutMilliseconds $TimeoutMilliseconds `
+        -TimeoutDescription $TimeoutDescription `
         -Operation 'Local Codex adoption execution'
     if ($result.ExitCode -ne 0) {
         $detail = Get-ProcessFailureDetail -Result $result
@@ -1401,7 +1475,23 @@ function Invoke-AdoptionCodexCompletion {
 
     $runner = Resolve-LocalCodexRunner -ExplicitCommand $CodexCommand `
         -FallbackVersion $TemporaryCodexVersion
-    Assert-LocalCodexLogin -Runner $runner -TimeoutMinutes $CodexTimeoutMinutes
+    $timeoutMilliseconds = if ($CodexTimeoutSeconds -gt 0) {
+        [int][Math]::Min(
+            [int]::MaxValue, [TimeSpan]::FromSeconds($CodexTimeoutSeconds).TotalMilliseconds
+        )
+    }
+    else {
+        [int][Math]::Min(
+            [int]::MaxValue, [TimeSpan]::FromMinutes($CodexTimeoutMinutes).TotalMilliseconds
+        )
+    }
+    $timeoutDescription = if ($CodexTimeoutSeconds -gt 0) {
+        "$CodexTimeoutSeconds second(s)"
+    }
+    else { "$CodexTimeoutMinutes minute(s)" }
+    Assert-LocalCodexLogin -Runner $runner `
+        -TimeoutMilliseconds $timeoutMilliseconds `
+        -TimeoutDescription $timeoutDescription
     $resultPath = Join-Path $TemporaryRoot 'codex-result.txt'
     $prompt = @"
 Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($PullRequest.number) in this isolated temporary clone.
@@ -1417,7 +1507,9 @@ Keep validation bounded: implement reviewable slices, run relevant tests, perfor
 Your final response must start with MEANDAI_ADOPTION_READY only when the manifest has been removed and the repository-local adoption work is complete. Otherwise start with MEANDAI_ADOPTION_BLOCKED and state the exact blocker. Include concise test evidence.
 "@
     Invoke-LocalCodexExec -Runner $runner -WorkingDirectory $ClonePath `
-        -Prompt $prompt -OutputPath $resultPath -TimeoutMinutes $CodexTimeoutMinutes
+        -Prompt $prompt -OutputPath $resultPath `
+        -TimeoutMilliseconds $timeoutMilliseconds `
+        -TimeoutDescription $timeoutDescription
     if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) {
         throw 'Local Codex completed without a final result file.'
     }

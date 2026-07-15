@@ -5,10 +5,13 @@ and follow its canonical links.
 
 ## Current continuation
 
-- [2026-07-15 - Protocol stability invariants](2026-07-15-protocol-stability-invariants.md)
+No open implementation continuation. External delivery evidence for the latest
+completed work is retained by its linked issue, pull request, and release.
 
 ## History
 
+- [2026-07-15 - Stability closure](2026-07-15-stability-closure.md)
+- [2026-07-15 - Protocol stability invariants](2026-07-15-protocol-stability-invariants.md)
 - [2026-07-15 - Quick-adoption boundary clarity](2026-07-15-quick-adoption-boundary-clarity.md)
 - [2026-07-15 - Adoption and updater integrity](2026-07-15-adoption-integrity.md)
 - [2026-07-15 - Repository-native idea incubation](2026-07-15-idea-incubation.md)

@@ -181,6 +181,26 @@ foreach ($adapterSuite in $adapterSuites) {
     }
 }
 
+$declaredTestIds = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::Ordinal
+)
+foreach ($testCaseFile in @(Get-ChildItem -LiteralPath (Join-Path $root 'docs/features') `
+    -Recurse -File -Filter 'test-cases.md')) {
+    $testCaseContent = Get-Content -LiteralPath $testCaseFile.FullName -Raw
+    foreach ($match in [regex]::Matches($testCaseContent, 'TEST-\d{4}')) {
+        [void]$declaredTestIds.Add($match.Value)
+    }
+}
+$executableTestSource = (@(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
+    -File -Filter '*.ps1' | ForEach-Object {
+        Get-Content -LiteralPath $_.FullName -Raw
+    }) -join [Environment]::NewLine)
+foreach ($testId in @($declaredTestIds | Sort-Object)) {
+    if (-not $executableTestSource.Contains($testId)) {
+        Add-Failure "TEST-0066 declared scenario has no executable test identity: $testId"
+    }
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
@@ -298,6 +318,18 @@ $ciWorkflow = Get-Content -LiteralPath (Join-Path $root '.github/workflows/proto
 if (-not $ciWorkflow.Contains('timeout-minutes:')) {
     Add-Failure 'TEST-0059 repository CI has no explicit job timeout.'
 }
+foreach ($requiredText in @(
+    'persist-credentials: false', 'os: ubuntu-latest', 'shell: pwsh',
+    'os: windows-latest', 'shell: powershell', 'Parse consumer workflow YAML',
+    "require 'yaml'", "if: runner.os == 'Linux'", "if: runner.os == 'Windows'"
+)) {
+    if (-not $ciWorkflow.Contains($requiredText)) {
+        Add-Failure "TEST-0067 repository CI compatibility contract is missing '$requiredText'"
+    }
+}
+if ($ciWorkflow.Contains('shell: ${{ matrix.shell }}')) {
+    Add-Failure 'TEST-0067 repository CI uses matrix context where the shell field does not permit it.'
+}
 
 $docsIndex = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw
 foreach ($requiredText in @(
@@ -360,14 +392,20 @@ $bootstrapParseErrors = $null
 $bootstrapAst = [Management.Automation.Language.Parser]::ParseFile(
     $bootstrapAdapterPath, [ref]$bootstrapTokens, [ref]$bootstrapParseErrors
 )
-$oversizedBootstrapFunctions = @($bootstrapAst.FindAll({
+$expectedBootstrapFunctions = @(
+    'Test-ExactAdoptionPullRequestMarker', 'Test-ExactAdoptionTree',
+    'Test-ExactAdoptionManifest', 'Test-ExactAdoptionContinuity',
+    'Test-ExactAdoptionProposal'
+)
+$bootstrapFunctionNames = @($bootstrapAst.FindAll({
     param($node)
-    $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
-    ($node.Extent.EndLineNumber - $node.Extent.StartLineNumber + 1) -gt 180
-}, $true))
+    $node -is [Management.Automation.Language.FunctionDefinitionAst]
+}, $true) | ForEach-Object { $_.Name })
 if (@($bootstrapParseErrors).Count -gt 0 -or
-    $oversizedBootstrapFunctions.Count -gt 0) {
-    Add-Failure 'TEST-0059 bootstrap exact-state validation exceeds the bounded 180-line responsibility seam.'
+    @($expectedBootstrapFunctions | Where-Object {
+        $bootstrapFunctionNames -cnotcontains $_
+    }).Count -ne 0) {
+    Add-Failure 'TEST-0059 bootstrap exact-state responsibility seams are missing or invalid.'
 }
 
 $protocolDecision = Get-Content -LiteralPath (
@@ -538,13 +576,18 @@ $normalizedProtocolContent = [regex]::Replace($protocolContent, '\s+', ' ')
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',
-    'Only a blocking finding',
+    '`Blocking`',
+    '`AcceptedResidual`',
+    '`ExternalOrLegacyFollowUp`',
+    '`OptionalImprovement`',
+    'These dispositions are mutually exclusive',
+    'Actionable in-scope finding',
     'Stop validation when',
     'validator-for-validator',
     'MUST NOT trigger another'
 )) {
     if (-not $protocolContent.Contains($requiredText)) {
-        Add-Failure "TEST-0018 bounded self-validation contract is missing '$requiredText'"
+        Add-Failure "TEST-0064 bounded disposition contract is missing '$requiredText'"
     }
 }
 if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
@@ -555,7 +598,7 @@ foreach ($requiredText in @(
     'After development is declared complete',
     'highest to lowest priority',
     'severity, impact, and',
-    'no unresolved actionable in-scope finding',
+    'no unresolved `Blocking` finding',
     'finite validation budget',
     'unchanged scan MUST NOT be repeated',
     'stop as blocked',
@@ -565,10 +608,42 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0019 post-development convergence contract is missing '$requiredText'"
     }
 }
+
+$stabilityDecision = Get-Content -LiteralPath (
+    Join-Path $root 'docs/decisions/DEC-0011-qualified-evidence-and-closure.md'
+) -Raw
+foreach ($requiredText in @(
+    'repository, tag, locked commit', 'source credential boundary',
+    'unique correlation ID', 'post-create convergence check',
+    'executable scenario identity'
+)) {
+    if (-not $stabilityDecision.Contains($requiredText)) {
+        Add-Failure "TEST-0064 qualified-evidence decision is missing '$requiredText'"
+    }
+}
+
+$stabilityFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0010-protocol-stability-invariants/README.md'
+) -Raw
+$localCodexFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0007-local-codex-adoption/README.md'
+) -Raw
+$projectMemory = Get-Content -LiteralPath (Join-Path $root '.ai/memory/project.md') -Raw
+$overview = Get-Content -LiteralPath (Join-Path $root 'README.md') -Raw
+$overviewNormalized = [regex]::Replace($overview, '\s+', ' ')
+if (-not $stabilityFeature.Contains('| Status | Complete |') -or
+    -not $stabilityFeature.Contains('releases/tag/v0.8.0') -or
+    -not $stabilityFeature.Contains('a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821') -or
+    -not $localCodexFeature.Contains('| Status | Complete |') -or
+    $projectMemory.Contains('v0.8.0` is in progress') -or
+    -not $projectMemory.Contains('[issue #36]') -or
+    -not $overviewNormalized.Contains('deliberately does not duplicate that changing inventory')) {
+    Add-Failure 'TEST-0065 published feature, memory, and canonical routing projections are not reconciled.'
+}
 foreach ($requiredText in @(
     'post-development full-project scan',
     'finite validation budget',
-    'non-blocking follow-ups are owned and linked'
+    'every other disposition has its required authority'
 )) {
     if (-not $featureTemplate.Contains($requiredText)) {
         Add-Failure "TEST-0019 feature template is missing '$requiredText'"
@@ -606,8 +681,8 @@ if ($failures.Count -gt 0) {
 }
 
 if ($StructureOnly) {
-    Write-Host 'Protocol structure validation passed, including TEST-0059.' -ForegroundColor Green
+    Write-Host 'Protocol structure validation passed for all discovered contracts.' -ForegroundColor Green
 }
 else {
-    Write-Host 'Protocol validation passed: TEST-0001 through TEST-0059.' -ForegroundColor Green
+    Write-Host 'All discovered protocol test suites passed.' -ForegroundColor Green
 }

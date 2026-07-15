@@ -38,8 +38,23 @@ function Invoke-Native {
 }
 
 function Invoke-GhJson {
-    param([string[]]$Arguments)
-    $text = (Invoke-Native -Command 'gh' -Arguments $Arguments) -join [Environment]::NewLine
+    param(
+        [string[]]$Arguments,
+        [AllowNull()][string]$Token = $null
+    )
+
+    $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
+    try {
+        if ($PSBoundParameters.ContainsKey('Token')) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
+        }
+        $text = (Invoke-Native -Command 'gh' -Arguments $Arguments) -join [Environment]::NewLine
+    }
+    finally {
+        if ($PSBoundParameters.ContainsKey('Token')) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
+        }
+    }
     if (-not $text) {
         return $null
     }
@@ -58,16 +73,17 @@ function Invoke-GhPagedJson {
     }
 }
 
-function Assert-ImmutableProtocolRelease {
+function Get-ImmutableProtocolReleaseEvidence {
     param(
         [string]$Repository,
-        [string]$Tag
+        [string]$Tag,
+        [string]$ProtocolToken
     )
 
     if (-not (Test-MeAndAIProtocolTag -Tag $Tag)) {
         throw "Selected protocol target '$Tag' is not a canonical release tag."
     }
-    $release = Invoke-GhJson -Arguments @(
+    $release = Invoke-GhJson -Token $ProtocolToken -Arguments @(
         'api',
         '-H', 'Accept: application/vnd.github+json',
         '-H', 'X-GitHub-Api-Version: 2026-03-10',
@@ -87,6 +103,48 @@ function Assert-ImmutableProtocolRelease {
             [string]$release.published_at, [ref]$publishedAt
         )) {
         throw "Protocol target '$Tag' is not an exact published, non-prerelease, immutable GitHub Release."
+    }
+
+    $reference = Invoke-GhJson -Token $ProtocolToken -Arguments @(
+        'api',
+        '-H', 'Accept: application/vnd.github+json',
+        '-H', 'X-GitHub-Api-Version: 2026-03-10',
+        "repos/$Repository/git/ref/tags/$Tag"
+    )
+    if ($null -eq $reference -or $null -eq $reference.PSObject.Properties['object'] -or
+        $null -eq $reference.object -or
+        $null -eq $reference.object.PSObject.Properties['type'] -or
+        $null -eq $reference.object.PSObject.Properties['sha']) {
+        throw "Protocol release '$Tag' is missing exact tag-reference evidence."
+    }
+    $objectType = [string]$reference.object.type
+    $objectSha = [string]$reference.object.sha
+    if ($objectSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Protocol release '$Tag' has an invalid tag object identity."
+    }
+    if ($objectType -ceq 'tag') {
+        $annotatedTag = Invoke-GhJson -Token $ProtocolToken -Arguments @(
+            'api',
+            '-H', 'Accept: application/vnd.github+json',
+            '-H', 'X-GitHub-Api-Version: 2026-03-10',
+            "repos/$Repository/git/tags/$objectSha"
+        )
+        if ($null -eq $annotatedTag -or
+            $null -eq $annotatedTag.PSObject.Properties['object'] -or
+            $null -eq $annotatedTag.object -or
+            [string]$annotatedTag.object.type -cne 'commit' -or
+            [string]$annotatedTag.object.sha -cnotmatch '^[0-9a-f]{40}$') {
+            throw "Protocol release '$Tag' annotated tag does not resolve directly to one commit."
+        }
+        $objectSha = [string]$annotatedTag.object.sha
+    }
+    elseif ($objectType -cne 'commit') {
+        throw "Protocol release '$Tag' tag reference does not resolve to a commit."
+    }
+
+    return [pscustomobject]@{
+        Tag = $Tag
+        CommitSha = $objectSha
     }
 }
 
@@ -569,7 +627,10 @@ function Assert-ManagedPullRequestSafe {
     }
 }
 
-foreach ($name in @('GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN')) {
+foreach ($name in @(
+    'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
+    'PROTOCOL_TOKEN'
+)) {
     if (-not [Environment]::GetEnvironmentVariable($name)) {
         throw "Required workflow environment '$name' is missing."
     }
@@ -745,13 +806,23 @@ if ($plan.State -eq 'BlockedManualReview') {
 if ($plan.State -eq 'MajorUpgradeRequired') {
     throw "A new protocol major '$($plan.LatestAvailableTag)' requires a manual migration."
 }
+$releaseEvidence = $null
+if ([string]$plan.LatestCompatibleTag -cne [string]$plan.CurrentTag) {
+    $releaseEvidence = Get-ImmutableProtocolReleaseEvidence `
+        -Repository $ProtocolRepository `
+        -Tag ([string]$plan.LatestCompatibleTag) `
+        -ProtocolToken $env:PROTOCOL_TOKEN
+    $localTargetSha = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourcePath, 'rev-list', '-n', '1', [string]$plan.LatestCompatibleTag
+    )) -join '').Trim()
+    if ($localTargetSha -cne [string]$releaseEvidence.CommitSha) {
+        throw "Protocol release '$($plan.LatestCompatibleTag)' does not match the checked-out exact tag commit."
+    }
+}
 if (@($plan.Operations).Count -eq 0) {
     Write-Host "Protocol update state: $($plan.State). No mutation required."
     exit 0
 }
-
-Assert-ImmutableProtocolRelease -Repository $ProtocolRepository `
-    -Tag ([string]$plan.LatestCompatibleTag)
 
 $create = @($plan.Operations | Where-Object Kind -eq 'CreateUpgrade')
 if ($create.Count -gt 1) {
@@ -763,7 +834,11 @@ $createdBranch = $null
 $createdOperation = $null
 if ($create.Count -eq 1) {
     $targetTag = [string]$create[0].TargetTag
-    $targetSha = ((Invoke-Native -Command 'git' -Arguments @('-C', $sourcePath, 'rev-list', '-n', '1', $targetTag)) -join '').Trim()
+    if ($null -eq $releaseEvidence -or
+        [string]$releaseEvidence.Tag -cne $targetTag) {
+        throw "Resolver target '$targetTag' lacks matching immutable release evidence."
+    }
+    $targetSha = [string]$releaseEvidence.CommitSha
     & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetSha
     if ($LASTEXITCODE -ne 0) {
         throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."

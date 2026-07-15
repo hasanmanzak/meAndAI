@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.8.0',
+    [string]$TargetTag = 'v0.8.1',
     [string]$BranchPrefix = 'automation/meandai-capabilities-'
 )
 
@@ -358,7 +358,7 @@ function Test-ExactAdoptionTree {
         return $false
     }
     $actualChangedPaths = @(Invoke-Native -Command 'git' -Arguments @(
-        'diff', '--name-only', $BaseHead, $RemoteHead, '--'
+        'diff', '--no-renames', '--name-only', $BaseHead, $RemoteHead, '--'
     ) | ForEach-Object { [string]$_ })
     if (-not (Test-MeAndAIExactOrdinalPathSet `
         -Actual $actualChangedPaths -Expected $expectedChangedPaths)) {
@@ -547,7 +547,7 @@ function Assert-StagedProposal {
     )
 
     $stagedPaths = @(Invoke-Native -Command 'git' -Arguments @(
-        'diff', '--cached', '--name-only'
+        'diff', '--cached', '--no-renames', '--name-only'
     ))
     if (-not (Test-MeAndAIExactOrdinalPathSet `
         -Actual $stagedPaths -Expected $ExpectedPaths)) {
