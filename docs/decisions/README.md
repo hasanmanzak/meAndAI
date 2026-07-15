@@ -8,7 +8,7 @@
 | [DEC-0004](DEC-0004-bounded-completion-convergence.md) | Require bounded post-development convergence | Accepted | 2026-07-14 |
 | [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) | Use a consumer-scoped fine-grained PAT for updater mutations | Accepted | 2026-07-15 |
 | [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md) | Use a seed workflow with collision-aware adoption handoff | Accepted | 2026-07-15 |
-| [DEC-0007](DEC-0007-local-quick-adoption-boundary.md) | Use a local quick-adoption launcher with explicit credential files | Accepted | 2026-07-15 |
+| [DEC-0007](DEC-0007-local-quick-adoption-boundary.md) | Use a local quick-adoption launcher with explicit credential files | Partially superseded by [DEC-0008](DEC-0008-local-codex-execution.md) | 2026-07-15 |
 | [DEC-0008](DEC-0008-local-codex-execution.md) | Complete semantic adoption with local Codex CLI | Accepted | 2026-07-15 |
 | [DEC-0009](DEC-0009-repository-native-idea-incubation.md) | Keep pre-work ideas as repository-native records | Accepted | 2026-07-15 |
 

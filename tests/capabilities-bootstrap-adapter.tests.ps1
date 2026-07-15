@@ -10,6 +10,9 @@ $global:PullRequestExists = $false
 $global:PullRequestCreateCalls = 0
 $global:LastPullRequestBody = ''
 $global:LastPullRequestHead = ''
+$global:ExistingPullRequestMetadataMode = 'Valid'
+$global:ExistingPullRequestHead = ''
+$global:ExistingPullRequestProtocolSha = ''
 
 function Add-Failure {
     param([string]$Message)
@@ -73,9 +76,37 @@ function Copy-SourceFixture {
 function global:gh {
     $arguments = @($args | ForEach-Object { [string]$_ })
     $global:LASTEXITCODE = 0
+    if (($arguments -join ' ') -ceq 'api user --jq .login') {
+        'owner'
+        return
+    }
     if ($arguments[0] -eq 'pr' -and $arguments[1] -eq 'list') {
         if ($global:PullRequestExists) {
-            '[{"number":40,"headRefName":"automation/meandai-capabilities-v0.5.0","isDraft":true,"state":"OPEN"}]'
+            $marker = [ordered]@{
+                schema = 2
+                state = 'BootstrapReady'
+                target = 'v0.5.0'
+                protocolSha = $global:ExistingPullRequestProtocolSha
+                head = $global:ExistingPullRequestHead
+                repository = 'owner/consumer'
+                actor = 'owner'
+            } | ConvertTo-Json -Compress
+            $pullRequest = [ordered]@{
+                number = 40
+                url = 'https://github.com/owner/consumer/pull/40'
+                headRefName = 'automation/meandai-capabilities-v0.5.0'
+                headRefOid = $global:ExistingPullRequestHead
+                baseRefName = 'main'
+                headRepository = [ordered]@{ nameWithOwner = 'owner/consumer' }
+                author = [ordered]@{ login = 'owner' }
+                body = "<!-- meandai-capabilities-adoption:$marker -->"
+                isDraft = $true
+                state = 'OPEN'
+            }
+            if ($global:ExistingPullRequestMetadataMode -ceq 'WrongAuthor') {
+                $pullRequest.author = [ordered]@{ login = 'untrusted-actor' }
+            }
+            @($pullRequest) | ConvertTo-Json -Depth 5 -Compress
         }
         else { '[]' }
         return
@@ -233,6 +264,8 @@ try {
         }
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
+            -not $global:LastPullRequestBody.Contains('"schema":2') -or
+            -not $global:LastPullRequestBody.Contains('"actor":"owner"') -or
             $global:LastPullRequestHead -cne 'automation/meandai-capabilities-v0.5.0') {
             Add-Failure 'TEST-0028 bootstrap did not create the deterministic draft proposal.'
         }
@@ -329,17 +362,31 @@ try {
 
     $global:PullRequestExists = $true
     $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestMetadataMode = 'Valid'
     $pending = New-BootstrapFixture -Name 'pending'
     Invoke-Git -Repository $pending.Consumer -Arguments @('switch', '-c', 'automation/meandai-capabilities-v0.5.0') | Out-Null
     [IO.File]::WriteAllText((Join-Path $pending.Consumer 'pending.txt'), "pending`n")
     Invoke-Git -Repository $pending.Consumer -Arguments @('add', 'pending.txt') | Out-Null
     Invoke-Git -Repository $pending.Consumer -Arguments @('commit', '-m', 'Pending adoption') | Out-Null
     Invoke-Git -Repository $pending.Consumer -Arguments @('push', 'origin', 'automation/meandai-capabilities-v0.5.0') | Out-Null
+    $global:ExistingPullRequestHead = (@(Invoke-Git -Repository $pending.Consumer -Arguments @(
+        'rev-parse', 'HEAD'
+    )))[0]
+    $global:ExistingPullRequestProtocolSha = (@(Invoke-Git -Repository $pending.Source -Arguments @(
+        'rev-parse', 'v0.5.0^{commit}'
+    )))[0]
     Invoke-Git -Repository $pending.Consumer -Arguments @('switch', 'main') | Out-Null
     $result = Invoke-BootstrapFixture -Fixture $pending
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 0) {
         Add-Failure "TEST-0031 pending adoption should be retained without duplication: $($result.Error)"
     }
+
+    $global:ExistingPullRequestMetadataMode = 'WrongAuthor'
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+        Add-Failure "TEST-0047 untrusted existing proposal ownership must block: $($result.Error)"
+    }
+    $global:ExistingPullRequestMetadataMode = 'Valid'
 
     $global:PullRequestExists = $false
     $orphan = New-BootstrapFixture -Name 'orphan'
@@ -366,4 +413,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031 and TEST-0044.' -ForegroundColor Green
+Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031, TEST-0044, and TEST-0047.' -ForegroundColor Green

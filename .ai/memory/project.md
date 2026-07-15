@@ -7,22 +7,24 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.7.1`
-- Current scope: optional local credential-source files for configured existing
-  targets, tracked by [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
+- Current protocol version: `0.7.2`
+- Current scope: adoption and updater integrity hardening, tracked by
+  [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md) and
+  [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
-- Current release candidate: implemented
-  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071),
-  published in [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29)
-  and targeting `v0.7.1` after review, merge, and the separate tag gate.
+- Latest tracked work: [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
+- Current release delivery: completed
+  [FEAT-0009](../../docs/features/FEAT-0009-adoption-integrity/README.md) in
+  [pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31). Its
+  immutable release authority is the separate annotated
+  [`v0.7.2` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2).
 - Latest released delivery before the current candidate: completed
-  [FEAT-0008](../../docs/features/FEAT-0008-idea-incubation/README.md) in
-  merged [pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28),
-  released at exact merge commit `1b420322058d73a974ccb61d8b7f828eb38cce8e`
-  by annotated tag [`v0.7.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0).
+  [BUG-0002](../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
+  in merged [pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29),
+  released at exact merge commit `42e653e23ccb11034a735b8c3c420accf5f19964`
+  by annotated tag [`v0.7.1`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1).
 
 ## Collaboration constraints
 
@@ -84,6 +86,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   exact workflow and semantic-source retrieval uses the authenticated local
   `gh` identity; stored secret values remain unreadable. Missing secrets and
   new repositories still require their mapped local files.
+- `v0.7.2` binds adoption proposals to canonical repository, base, actor, head,
+  and marker evidence; validates exact protocol pins regardless of diff shape;
+  rejects updater rename provenance; and moves adoption issues to review only
+  after verified readiness.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

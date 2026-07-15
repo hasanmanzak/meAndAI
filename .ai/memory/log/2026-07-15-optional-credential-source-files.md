@@ -35,5 +35,7 @@ provisional `TEST-0043` ID became `TEST-0045` after merged v0.7.0 work claimed
 to `RISK-0048` and target `v0.7.1`. The implementation is published in pull
 request #29. The integrated focused run passed `TEST-0033` through `TEST-0042`
 and `TEST-0045` in 62.7 seconds; the complete suite passed `TEST-0001` through
-`TEST-0045` in 111.2 seconds with no unresolved fresh-diff blocker. Merge and
-tag evidence remain before release closure.
+`TEST-0045` in 111.2 seconds with no unresolved fresh-diff blocker. Pull request
+#29 then merged at `42e653e23ccb11034a735b8c3c420accf5f19964`, and annotated tag
+[`v0.7.1`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1) resolves to that
+exact release commit. BUG-0002 is complete.

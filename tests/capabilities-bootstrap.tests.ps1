@@ -38,7 +38,8 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             [string[]]$Collisions = @(),
             [bool]$ManifestExists = $false,
             [bool]$RemoteBranchExists = $false,
-            [int]$OpenPullRequestCount = 0
+            [int]$OpenPullRequestCount = 0,
+            [bool]$ExistingProposalValid = $false
         )
 
         Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobject]@{
@@ -49,6 +50,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             ManifestExists = $ManifestExists
             RemoteBranchExists = $RemoteBranchExists
             OpenPullRequestCount = $OpenPullRequestCount
+            ExistingProposalValid = $ExistingProposalValid
         })
     }
 
@@ -70,9 +72,13 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0030 collisions should require semantic review'
     Assert-Equal 'AGENTS.md,.gitmodules' (@($plan.Collisions) -join ',') 'TEST-0030 collision paths should remain exact and deterministic'
 
-    $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1
+    $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1 `
+        -ExistingProposalValid $true
     Assert-Equal 'PendingAdoption' $plan.State 'TEST-0031 one pending adoption proposal should remain idempotent'
     Assert-Equal 'None' $plan.ProposalMode 'TEST-0031 pending work must not be replaced'
+
+    $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1
+    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0047 an unverified existing proposal must block'
 
     $plan = Invoke-LifecyclePlan -RemoteBranchExists $true
     Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 orphan adoption branch must block'
@@ -90,7 +96,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.7.1',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.7.2',
         'ref: ${{ env.BOOTSTRAP_PROTOCOL_TAG }}',
         'MeAndAI.ProtocolUpdate.psm1',
         'Invoke-MeAndAIProtocolUpdate.ps1',
@@ -192,4 +198,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities lifecycle tests passed: TEST-0027 through TEST-0032 and TEST-0044.' -ForegroundColor Green
+Write-Host 'AI capabilities lifecycle tests passed: TEST-0027 through TEST-0032, TEST-0044, and TEST-0047.' -ForegroundColor Green

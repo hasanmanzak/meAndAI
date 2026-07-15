@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.7.1',
+    [string]$ProtocolTag = 'v0.7.2',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -40,6 +40,7 @@ $adoptionLabels = @(
     [pscustomobject]@{ Name = 'priority:p2'; Color = 'fbca04'; Description = 'Normal priority' },
     [pscustomobject]@{ Name = 'priority:p3'; Color = '0e8a16'; Description = 'Low priority' },
     [pscustomobject]@{ Name = 'status:blocked'; Color = 'b60205'; Description = 'Blocked by an unresolved dependency' },
+    [pscustomobject]@{ Name = 'status:in-progress'; Color = '1d76db'; Description = 'Implementation in progress' },
     [pscustomobject]@{ Name = 'status:needs-review'; Color = '5319e7'; Description = 'Ready for maintainer review' }
 )
 
@@ -432,14 +433,101 @@ function Invoke-LifecycleWorkflow {
     throw "The lifecycle workflow did not complete within $WorkflowTimeoutMinutes minute(s)."
 }
 
+function Get-ValidatedAdoptionMarker {
+    param(
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$ExpectedActor
+    )
+
+    $requiredProperties = @(
+        'number', 'url', 'isDraft', 'state', 'baseRefName', 'headRefName',
+        'headRefOid', 'headRepository', 'author', 'body'
+    )
+    foreach ($property in $requiredProperties) {
+        if ($null -eq $PullRequest.PSObject.Properties[$property]) {
+            throw "The deterministic adoption pull request is missing '$property' metadata."
+        }
+    }
+    if ([string]$PullRequest.state -cne 'OPEN' -or
+        [string]$PullRequest.baseRefName -cne $BaseBranch -or
+        [string]$PullRequest.headRefName -cne $Branch -or
+        [string]$PullRequest.headRefOid -cnotmatch '^[0-9a-f]{40}$' -or
+        $PullRequest.isDraft -isnot [bool]) {
+        throw 'The deterministic adoption pull request has invalid lifecycle metadata.'
+    }
+    if ($null -eq $PullRequest.headRepository -or
+        $null -eq $PullRequest.headRepository.PSObject.Properties['nameWithOwner'] -or
+        -not ([string]$PullRequest.headRepository.nameWithOwner).Equals(
+            $Repository, [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'The deterministic adoption pull request does not originate in the target repository.'
+    }
+    if ($null -eq $PullRequest.author -or
+        $null -eq $PullRequest.author.PSObject.Properties['login'] -or
+        -not ([string]$PullRequest.author.login).Equals(
+            $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'The deterministic adoption pull request author does not match the authenticated maintainer.'
+    }
+    if ([string]$PullRequest.number -cnotmatch '^[1-9][0-9]*$' -or
+        [string]$PullRequest.url -cnotmatch "/pull/$([regex]::Escape([string]$PullRequest.number))/?$") {
+        throw 'The deterministic adoption pull request has invalid identity metadata.'
+    }
+
+    $body = [string]$PullRequest.body
+    $markerStarts = [regex]::Matches(
+        $body, '<!--\s*meandai-capabilities-adoption:',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    $markerMatches = [regex]::Matches(
+        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
+        throw 'The deterministic adoption pull request does not contain one canonical ownership marker.'
+    }
+    try {
+        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
+    }
+    catch {
+        throw 'The deterministic adoption pull request ownership marker is invalid JSON.'
+    }
+    $expectedMarkerProperties = @(
+        'schema', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor'
+    )
+    $actualMarkerProperties = @($marker.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($actualMarkerProperties.Count -ne $expectedMarkerProperties.Count -or
+        @($expectedMarkerProperties | Where-Object { $actualMarkerProperties -cnotcontains $_ }).Count -ne 0) {
+        throw 'The deterministic adoption pull request ownership marker has an unexpected schema.'
+    }
+    if ([int]$marker.schema -ne 2 -or
+        [string]$marker.state -cnotin @('BootstrapReady', 'AdoptionReviewRequired') -or
+        [string]$marker.target -cne $ProtocolTag -or
+        [string]$marker.protocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+        [string]$marker.head -cne [string]$PullRequest.headRefOid -or
+        -not ([string]$marker.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -or
+        -not ([string]$marker.actor).Equals($ExpectedActor, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
+    }
+    return $marker
+}
+
 function Get-AdoptionPullRequest {
-    param([Parameter(Mandatory)][string]$Repository)
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$ExpectedActor
+    )
 
     $branch = "automation/meandai-capabilities-$ProtocolTag"
     for ($attempt = 1; $attempt -le 6; $attempt++) {
         $list = Invoke-External -Command 'gh' -Arguments @(
             'pr', 'list', '--repo', $Repository, '--state', 'open', '--head', $branch,
-            '--limit', '10', '--json', 'number,url,isDraft,headRefName,headRefOid'
+            '--limit', '10', '--json',
+            'number,url,isDraft,state,baseRefName,headRefName,headRefOid,headRepository,author,body'
         )
         try {
             $pullRequests = @(((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json))
@@ -449,14 +537,11 @@ function Get-AdoptionPullRequest {
         }
         $matchingPullRequests = @($pullRequests | Where-Object { $_.headRefName -ceq $branch })
         if ($matchingPullRequests.Count -eq 1) {
-            foreach ($property in @('number', 'url', 'isDraft', 'headRefName', 'headRefOid')) {
-                if ($null -eq $matchingPullRequests[0].PSObject.Properties[$property]) {
-                    throw "The deterministic adoption pull request is missing '$property' metadata."
-                }
-            }
-            if ([string]$matchingPullRequests[0].headRefOid -cnotmatch '^[0-9a-f]{40}$') {
-                throw 'The deterministic adoption pull request has an invalid head commit.'
-            }
+            $marker = Get-ValidatedAdoptionMarker -PullRequest $matchingPullRequests[0] `
+                -Repository $Repository -Branch $branch -BaseBranch $BaseBranch `
+                -ExpectedActor $ExpectedActor
+            $matchingPullRequests[0] | Add-Member -NotePropertyName meAndAIMarker `
+                -NotePropertyValue $marker -Force
             return $matchingPullRequests[0]
         }
         if ($matchingPullRequests.Count -gt 1) {
@@ -548,7 +633,7 @@ function Ensure-AdoptionIssue {
         Invoke-External -Command 'gh' -Arguments @(
             'issue', 'edit', [string]$issue.number, '--repo', $Repository,
             '--add-label', 'type:feature', '--add-label', 'priority:p1',
-            '--add-label', 'status:needs-review'
+            '--add-label', 'status:in-progress', '--remove-label', 'status:needs-review'
         ) | Out-Null
         return $issue
     }
@@ -571,7 +656,7 @@ function Ensure-AdoptionIssue {
         '--title', "Track meAndAI AI capabilities adoption from $ProtocolTag",
         '--body-file', $bodyPath,
         '--label', 'type:feature', '--label', 'priority:p1',
-        '--label', 'status:needs-review'
+        '--label', 'status:in-progress'
     )
     $url = ((@($created.Output) -join [Environment]::NewLine).Trim())
     if ($url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/(?<number>[1-9][0-9]*)/?$') {
@@ -584,6 +669,19 @@ function Ensure-AdoptionIssue {
         body = $body
         state = 'OPEN'
     }
+}
+
+function Set-AdoptionIssueReadyForReview {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Issue
+    )
+
+    Invoke-External -Command 'gh' -Arguments @(
+        'issue', 'edit', [string]$Issue.number, '--repo', $Repository,
+        '--remove-label', 'status:in-progress',
+        '--add-label', 'status:needs-review'
+    ) | Out-Null
 }
 
 function ConvertTo-ProcessArgument {
@@ -894,6 +992,91 @@ function Assert-CredentialFilesAbsent {
     }
 }
 
+function Assert-AdoptionProtocolReference {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$ProtocolSha
+    )
+
+    $protocolIndex = ((@(Invoke-Git -Repository $Repository -Arguments @(
+        'ls-files', '--stage', '--', '.ai/protocol'
+    )).Output -join '').Trim())
+    $expectedProtocolIndex = "160000 $ProtocolSha 0`t.ai/protocol"
+    if ($protocolIndex -cne $expectedProtocolIndex) {
+        throw 'The completed protocol reference is not the exact manifest gitlink.'
+    }
+
+    $gitmodulesPath = Join-Path $Repository '.gitmodules'
+    $protocolModulePath = ((@(Invoke-Git -Repository $Repository -Arguments @(
+        'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.path'
+    )).Output -join '').Trim())
+    $protocolModuleUrl = ((@(Invoke-Git -Repository $Repository -Arguments @(
+        'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.url'
+    )).Output -join '').Trim())
+    if ($protocolModulePath -cne '.ai/protocol' -or
+        $protocolModuleUrl -cne "https://github.com/$ProtocolRepository.git") {
+        throw 'The completed protocol submodule metadata is not canonical.'
+    }
+}
+
+function Get-ValidatedAdoptionManifest {
+    param(
+        [Parameter(Mandatory)][string]$ManifestPath,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest
+    )
+
+    try {
+        $manifest = [IO.File]::ReadAllText($ManifestPath) | ConvertFrom-Json
+    }
+    catch {
+        throw 'The adoption manifest is not valid JSON.'
+    }
+    if ([int]$manifest.schema -ne 1 -or
+        [string]$manifest.operation -cne 'ai-capabilities-adoption' -or
+        -not ([string]$manifest.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -or
+        [string]$manifest.targetTag -cne $ProtocolTag -or
+        [string]$manifest.protocolSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'The adoption manifest identity does not match this repository and protocol release.'
+    }
+    if ([string]$PullRequest.meAndAIMarker.state -cne [string]$manifest.state -or
+        [string]$PullRequest.meAndAIMarker.protocolSha -cne [string]$manifest.protocolSha) {
+        throw 'The adoption manifest does not match the pull-request ownership marker.'
+    }
+    return $manifest
+}
+
+function Get-ValidatedAdoptionChangeSet {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Manifest
+    )
+
+    Assert-CredentialFilesAbsent -Repository $Repository
+    Invoke-Git -Repository $Repository -Arguments @('diff', '--check') | Out-Null
+    Invoke-Git -Repository $Repository -Arguments @(
+        'add', '-A', '--', '.', ':(exclude).ai/protocol'
+    ) | Out-Null
+    $changedPaths = @((Invoke-Git -Repository $Repository -Arguments @(
+        'diff', '--cached', '--name-only', '--diff-filter=ACMRTD'
+    )).Output | Where-Object { $_ })
+    if ($changedPaths.Count -eq 0) {
+        throw 'Local Codex produced no reviewable adoption change.'
+    }
+    foreach ($forbiddenPath in @($workflowTargetPath) + @($tokenMappings.Keys)) {
+        if ($changedPaths -ccontains $forbiddenPath) {
+            throw "Local Codex changed protected adoption path '$forbiddenPath'."
+        }
+    }
+    if (@($changedPaths | Where-Object { $_ -clike '.ai/protocol/*' }).Count -gt 0) {
+        throw 'Local Codex changed files inside the protocol reference instead of preserving one gitlink.'
+    }
+    Assert-AdoptionProtocolReference -Repository $Repository `
+        -ProtocolSha ([string]$Manifest.protocolSha)
+    Invoke-Git -Repository $Repository -Arguments @('diff', '--cached', '--check') | Out-Null
+    return $changedPaths
+}
+
 function Get-RemoteBranchHead {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -956,6 +1139,8 @@ function Complete-AdoptionWithLocalCodex {
         $manifestPath = Join-Path $clonePath `
             ($manifestRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
         if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            Assert-AdoptionProtocolReference -Repository $clonePath `
+                -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha)
             return [pscustomobject]@{
                 Ran = $false
                 Pushed = $false
@@ -968,18 +1153,11 @@ function Complete-AdoptionWithLocalCodex {
             throw 'The adoption manifest remains but the pull request is no longer a draft.'
         }
 
-        try {
-            $manifest = [IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json
-        }
-        catch {
-            throw 'The adoption manifest is not valid JSON.'
-        }
-        if ([int]$manifest.schema -ne 1 -or
-            [string]$manifest.operation -cne 'ai-capabilities-adoption' -or
-            -not ([string]$manifest.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -or
-            [string]$manifest.targetTag -cne $ProtocolTag -or
-            [string]$manifest.protocolSha -cnotmatch '^[0-9a-f]{40}$') {
-            throw 'The adoption manifest identity does not match this repository and protocol release.'
+        $manifest = Get-ValidatedAdoptionManifest -ManifestPath $manifestPath `
+            -Repository $Repository -PullRequest $PullRequest
+        if ([string]$manifest.state -ceq 'BootstrapReady') {
+            Assert-AdoptionProtocolReference -Repository $clonePath `
+                -ProtocolSha ([string]$manifest.protocolSha)
         }
 
         $protocolSource = Get-ProtocolSourceSnapshot -Token $ProtocolToken `
@@ -1029,55 +1207,7 @@ Your final response must start with MEANDAI_ADOPTION_READY only when the manifes
         if (Test-Path -LiteralPath $manifestPath) {
             throw 'Local Codex declared readiness but left the transient adoption manifest.'
         }
-        Assert-CredentialFilesAbsent -Repository $clonePath
-        Invoke-Git -Repository $clonePath -Arguments @('diff', '--check') | Out-Null
-
-        Invoke-Git -Repository $clonePath -Arguments @('add', '-A') | Out-Null
-        $changedPaths = @((Invoke-Git -Repository $clonePath -Arguments @(
-            'diff', '--cached', '--name-only', '--diff-filter=ACMRTD'
-        )).Output | Where-Object { $_ })
-        if ($changedPaths.Count -eq 0) {
-            throw 'Local Codex produced no reviewable adoption change.'
-        }
-        foreach ($forbiddenPath in @($workflowTargetPath) + @($tokenMappings.Keys)) {
-            if ($changedPaths -ccontains $forbiddenPath) {
-                throw "Local Codex changed protected adoption path '$forbiddenPath'."
-            }
-        }
-        if (@($changedPaths | Where-Object { $_ -clike '.ai/protocol/*' }).Count -gt 0) {
-            throw 'Local Codex changed files inside the protocol reference instead of preserving one gitlink.'
-        }
-        if ($changedPaths -ccontains '.ai/protocol') {
-            $protocolIndex = ((@(Invoke-Git -Repository $clonePath -Arguments @(
-                'ls-files', '--stage', '--', '.ai/protocol'
-            )).Output -join '').Trim())
-            $expectedProtocolIndex = "160000 $([string]$manifest.protocolSha) 0`t.ai/protocol"
-            if ($protocolIndex -cne $expectedProtocolIndex) {
-                throw 'The completed protocol reference is not the exact manifest gitlink.'
-            }
-            $gitmodulesPath = Join-Path $clonePath '.gitmodules'
-            $protocolModulePath = ((@(Invoke-Git -Repository $clonePath -Arguments @(
-                'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.path'
-            )).Output -join '').Trim())
-            $protocolModuleUrl = ((@(Invoke-Git -Repository $clonePath -Arguments @(
-                'config', '-f', $gitmodulesPath, '--get', 'submodule..ai/protocol.url'
-            )).Output -join '').Trim())
-            if ($protocolModulePath -cne '.ai/protocol' -or
-                $protocolModuleUrl -cne "https://github.com/$ProtocolRepository.git") {
-                throw 'The completed protocol submodule metadata is not canonical.'
-            }
-            $protocolWorktree = Join-Path $clonePath '.ai/protocol'
-            $protocolHead = ((@(Invoke-Git -Repository $protocolWorktree -Arguments @(
-                'rev-parse', 'HEAD'
-            )).Output -join '').Trim())
-            $protocolStatus = @((Invoke-Git -Repository $protocolWorktree -Arguments @(
-                'status', '--porcelain=v1', '--untracked-files=all'
-            )).Output | Where-Object { $_ })
-            if ($protocolHead -cne [string]$manifest.protocolSha -or $protocolStatus.Count -ne 0) {
-                throw 'The completed protocol submodule is not clean at the exact manifest commit.'
-            }
-        }
-        Invoke-Git -Repository $clonePath -Arguments @('diff', '--cached', '--check') | Out-Null
+        Get-ValidatedAdoptionChangeSet -Repository $clonePath -Manifest $manifest | Out-Null
 
         $liveHead = Get-RemoteBranchHead -Repository $clonePath -Remote 'origin' -Branch $branch
         if ($liveHead -cne $expectedHead) {
@@ -1111,6 +1241,7 @@ Your final response must start with MEANDAI_ADOPTION_READY only when the manifes
         Invoke-External -Command 'gh' -Arguments @(
             'pr', 'ready', [string]$PullRequest.number, '--repo', $Repository
         ) | Out-Null
+        Set-AdoptionIssueReadyForReview -Repository $Repository -Issue $adoptionIssue
         return [pscustomobject]@{
             Ran = $true
             Pushed = $true
@@ -1437,7 +1568,13 @@ else {
     $run = Invoke-LifecycleWorkflow -Repository $repository -Branch $defaultBranch -HeadSha $publishedHead
     Write-Host "Lifecycle workflow completed successfully: $($run.url)"
 
-    $adoptionPullRequestResults = @(Get-AdoptionPullRequest -Repository $repository)
+    $actorResult = Invoke-External -Command 'gh' -Arguments @('api', 'user', '--jq', '.login')
+    $authenticatedActor = ((@($actorResult.Output) -join '').Trim())
+    if ($authenticatedActor -cnotmatch '^[A-Za-z0-9_.-]+$') {
+        throw 'The authenticated GitHub maintainer identity is invalid.'
+    }
+    $adoptionPullRequestResults = @(Get-AdoptionPullRequest -Repository $repository `
+        -BaseBranch $defaultBranch -ExpectedActor $authenticatedActor)
     if ($adoptionPullRequestResults.Count -gt 1) {
         $types = @($adoptionPullRequestResults | ForEach-Object { $_.GetType().FullName }) -join ', '
         throw "Adoption pull-request resolution returned ambiguous results: $types"

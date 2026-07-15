@@ -58,6 +58,48 @@ function Invoke-GhPagedJson {
     }
 }
 
+function Get-ValidatedPullRequestChangedPaths {
+    param([object[]]$Files)
+
+    $paths = [System.Collections.Generic.List[string]]::new()
+    foreach ($file in $Files) {
+        $filenameProperty = if ($null -ne $file) {
+            $file.PSObject.Properties['filename']
+        }
+        else { $null }
+        $statusProperty = if ($null -ne $file) {
+            $file.PSObject.Properties['status']
+        }
+        else { $null }
+        $previousProperty = if ($null -ne $file) {
+            $file.PSObject.Properties['previous_filename']
+        }
+        else { $null }
+        $filename = if ($null -ne $filenameProperty) {
+            [string]$filenameProperty.Value
+        }
+        else { '' }
+        $status = if ($null -ne $statusProperty) {
+            [string]$statusProperty.Value
+        }
+        else { '' }
+        $previousFilename = if ($null -ne $previousProperty) {
+            [string]$previousProperty.Value
+        }
+        else { '' }
+        if ($status -ceq 'renamed' -or
+            -not [string]::IsNullOrWhiteSpace($previousFilename)) {
+            throw 'Pull-request rename metadata is outside the managed update contract.'
+        }
+        if ([string]::IsNullOrWhiteSpace($filename) -or
+            $status -cnotin @('added', 'modified', 'removed')) {
+            throw 'Pull-request file metadata is outside the managed update contract.'
+        }
+        $paths.Add($filename)
+    }
+    return @($paths)
+}
+
 function Get-AuthenticatedUpdaterActor {
     $user = Invoke-GhJson -Arguments @('api', 'user')
     $loginProperty = if ($null -ne $user) { $user.PSObject.Properties['login'] } else { $null }
@@ -440,7 +482,7 @@ function Assert-ManagedPullRequestSafe {
     $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
         -HeadSha ([string]$details.head.sha) -Path $ProtocolPath
     $remoteHead = Get-RemoteBranchHead -Branch ([string]$Operation.Branch)
-    $changedPaths = @($files | ForEach-Object { [string]$_.filename })
+    $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
     $expectedChangedPaths = @(Get-ExpectedManagedPaths -BaseCommit $BaseCommit `
         -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
         -SourcePath $SourcePath -ProtocolPath $ProtocolPath -Assets $ManagedAssets)
@@ -639,7 +681,7 @@ foreach ($pull in $pulls) {
         Draft = [bool]$details.draft
         SameRepository = $null -ne $details.head.repo -and [string]$details.head.repo.full_name -ceq $repository
         AuthorLogin = [string]$details.user.login
-        ChangedPaths = @($files | ForEach-Object { [string]$_.filename })
+        ChangedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
         ExpectedChangedPaths = $expectedChangedPaths
         ManagedAssetEntriesMatchTarget = $managedAssetsMatchTarget
     })

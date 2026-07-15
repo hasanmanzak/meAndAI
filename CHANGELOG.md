@@ -3,6 +3,29 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.7.2 - 2026-07-15
+
+### Fixed
+
+- Bound adoption proposal retention and local completion to one canonical
+  ownership marker, the target repository and base, authenticated actor,
+  same-repository head, live head SHA, protocol tag, and exact protocol commit.
+- Made final protocol gitlink and `.gitmodules` validation unconditional while
+  preserving collision-mode completion without Codex network access or a
+  populated protocol worktree.
+- Rejected GitHub rename and previous-filename metadata in both updater
+  inventory and cleanup revalidation so unmanaged rename sources cannot evade
+  the managed-path contract.
+- Kept adoption issues in progress during fallible work and moved them to
+  `status:needs-review` only after the completion commit is pushed, verified,
+  and the pull request is ready.
+- Reconciled v0.7.0/v0.7.1 release records, clarified optional credential-file
+  and authenticated-`gh` source transport rules, and exposed DEC-0007's partial
+  supersession.
+
+Related work: [FEAT-0009](docs/features/FEAT-0009-adoption-integrity/README.md)
+and [issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
+
 ## 0.7.1 - 2026-07-15
 
 ### Fixed

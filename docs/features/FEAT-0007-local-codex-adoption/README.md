@@ -276,7 +276,7 @@ seconds. `git diff --check` reported no whitespace error.
 | Field | Value |
 | --- | --- |
 | Classification | Bug correction |
-| Status | Implemented and verified; delivery pending |
+| Status | Complete |
 | Target version | 0.7.1 |
 | Issue | [#27](https://github.com/hasanmanzak/meAndAI/issues/27) |
 | Pull request | [#29](https://github.com/hasanmanzak/meAndAI/pull/29) |
@@ -353,5 +353,12 @@ all `TEST-0001` through `TEST-0045` scenarios pass.
 - [x] `TEST-0045` passes its focused real-Git regression suite on the integrated
       `v0.7.1` working tree.
 - [x] The complete `v0.7.1` protocol suite and bounded fresh-diff review pass.
-- [ ] Documentation, project memory, pull-request evidence, merge, and the
+- [x] Documentation, project memory, pull-request evidence, merge, and the
       separate `v0.7.1` tag gate are complete.
+
+### Release evidence
+
+[Pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29) merged the
+correction at commit `42e653e23ccb11034a735b8c3c420accf5f19964`. The annotated
+[`v0.7.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1) resolves to
+that exact release commit.

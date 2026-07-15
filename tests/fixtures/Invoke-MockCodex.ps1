@@ -63,6 +63,25 @@ if (-not $networkDisabled -or $networkEnabled -or
 }
 
 $manifestPath = Join-Path $working '.ai/adoption/meandai-capabilities.json'
+$manifest = [IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json
+$protocolEntry = (& git -C $working ls-files --stage -- .ai/protocol 2>&1) -join ''
+if (-not $protocolEntry) {
+    $gitmodules = @(
+        '[submodule ".ai/protocol"]',
+        "`tpath = .ai/protocol",
+        "`turl = https://github.com/hasanmanzak/meAndAI.git",
+        ''
+    ) -join "`n"
+    [IO.File]::WriteAllText(
+        (Join-Path $working '.gitmodules'),
+        $gitmodules,
+        [Text.UTF8Encoding]::new($false)
+    )
+    & git -C $working update-index --add --cacheinfo "160000,$([string]$manifest.protocolSha),.ai/protocol"
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to stage the mock protocol gitlink.'
+    }
+}
 $evidencePath = Join-Path $working 'docs/ai-adoption.md'
 New-Item -ItemType Directory -Path (Split-Path -Parent $evidencePath) -Force | Out-Null
 Set-Content -LiteralPath $evidencePath -Value '# Local adoption evidence' -Encoding UTF8
@@ -85,7 +104,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.7.1' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.7.2' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.7.1**
+Current protocol version: **0.7.2**
 
 ## Start here
 
@@ -62,6 +62,11 @@ tracked by [FEAT-0008](docs/features/FEAT-0008-idea-incubation/README.md),
 The v0.7.1 optional local credential-file correction is tracked by
 [BUG-0002](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v071)
 and [GitHub issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
+
+Adoption provenance, exact-pin, updater rename, and issue-state hardening for
+v0.7.2 is tracked by
+[FEAT-0009](docs/features/FEAT-0009-adoption-integrity/README.md) and
+[GitHub issue #30](https://github.com/hasanmanzak/meAndAI/issues/30).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.
