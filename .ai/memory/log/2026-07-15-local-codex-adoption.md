@@ -41,3 +41,7 @@
   [Ubuntu, Windows, and GitGuardian checks](https://github.com/hasanmanzak/meAndAI/actions/runs/29418825486).
 - FEAT-0007 is complete. Merge PR #22, tag the resulting `main` commit as
   `v0.6.1`, and verify the remote tag before ending the release operation.
+- Release operation completed: [PR #22](https://github.com/hasanmanzak/meAndAI/pull/22)
+  merged as `a4ffefa698b079815edebda86204150b03707957`; the remote annotated
+  [`v0.6.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1) resolves to
+  that exact commit, and the owned delivery branch was removed.
