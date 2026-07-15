@@ -14,7 +14,7 @@ Last verified: **2026-07-15**
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
-- Current delivery: [FEAT-0006](../../docs/features/FEAT-0006-quick-adoption-launcher/README.md); pull request pending.
+- Current delivery: [FEAT-0006 pull request #20](https://github.com/hasanmanzak/meAndAI/pull/20).
 
 ## Collaboration constraints
 

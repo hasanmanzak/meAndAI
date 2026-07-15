@@ -30,7 +30,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0006](docs/features/FEAT-0006-quick-adoption-launcher/README.md),
 [DEC-0007](docs/decisions/DEC-0007-local-quick-adoption-boundary.md), and
-[issue #19](https://github.com/hasanmanzak/meAndAI/issues/19).
+[issue #19](https://github.com/hasanmanzak/meAndAI/issues/19), delivered by
+[pull request #20](https://github.com/hasanmanzak/meAndAI/pull/20).
 
 ## 0.5.0 - 2026-07-15
 

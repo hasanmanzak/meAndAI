@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed |
+| Status | In review |
 | Target version | 0.6.0 |
 | Issue | [#19](https://github.com/hasanmanzak/meAndAI/issues/19) |
-| Pull request | Pending |
+| Pull request | [#20](https://github.com/hasanmanzak/meAndAI/pull/20) |
 | Decision | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -172,7 +172,7 @@ unresolved actionable in-scope finding remained.
 - [x] Slice reviews and bounded convergence scan complete.
 - [x] No unresolved blocking finding; residual risks are explicit and owned.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.
 
 ## Post-merge release gate

@@ -5,7 +5,7 @@
 - Work item: [FEAT-0006](../../../docs/features/FEAT-0006-quick-adoption-launcher/README.md)
 - Decision: [DEC-0007](../../../docs/decisions/DEC-0007-local-quick-adoption-boundary.md)
 - Tracking: [issue #19](https://github.com/hasanmanzak/meAndAI/issues/19)
-- Delivery: pull request pending
+- Delivery: [pull request #20](https://github.com/hasanmanzak/meAndAI/pull/20)
 - Target release: `v0.6.0`
 
 ## Durable outcome
