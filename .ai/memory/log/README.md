@@ -5,10 +5,11 @@ and follow its canonical links.
 
 ## Current continuation
 
-- [2026-07-15 - Existing Actions-secret preservation](2026-07-15-existing-secret-preservation.md)
+- [2026-07-15 - Optional credential-source files](2026-07-15-optional-credential-source-files.md)
 
 ## History
 
+- [2026-07-15 - Existing Actions-secret preservation](2026-07-15-existing-secret-preservation.md)
 - [2026-07-15 - Local Codex adoption completion](2026-07-15-local-codex-adoption.md)
 - [2026-07-15 - Quick adoption launcher](2026-07-15-quick-adoption-launcher.md)
 - [2026-07-15 - AI capabilities lifecycle](2026-07-15-ai-capabilities-lifecycle.md)

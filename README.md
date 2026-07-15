@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.6.2**
+Current protocol version: **0.6.3**
 
 ## Start here
 
@@ -52,6 +52,10 @@ Local Codex completion without a hosted GitHub-agent connection is tracked by
 The v0.6.2 existing-secret preservation correction is tracked by
 [BUG-0001](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
 and [GitHub issue #24](https://github.com/hasanmanzak/meAndAI/issues/24).
+
+The v0.6.3 optional local credential-file correction is tracked by
+[BUG-0002](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063)
+and [GitHub issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.

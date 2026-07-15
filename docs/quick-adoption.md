@@ -17,7 +17,9 @@ the maintainer performs the final review and merge.
 - PowerShell 5.1 or newer, `git`, and GitHub CLI (`gh`).
 - `gh auth status` succeeds for an account allowed to create the target
   repository when needed, set its Actions secrets, and maintain its adoption
-  labels and issue.
+  labels and issue. When the existing protocol secret is reused without its
+  local source file, that account must also be able to read
+  `hasanmanzak/meAndAI`.
 - [Local Codex CLI](https://github.com/openai/codex#readme) is installed and
   authenticated (`codex login status`). If
   `codex` is absent but `npx` is available, the launcher uses the pinned
@@ -29,7 +31,7 @@ the maintainer performs the final review and merge.
 | Local file | Content | Requirement | Actions secret mapping |
 | --- | --- | --- | --- |
 | `FG_PAT.txt` | Consumer updater fine-grained PAT | Required for a new repository or when `MEANDAI_UPDATER_TOKEN` is absent; not read when that secret exists | `MEANDAI_UPDATER_TOKEN` |
-| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | Required to fetch the exact private protocol source | `MEANDAI_PROTOCOL_TOKEN` |
+| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | Required for a new repository or when `MEANDAI_PROTOCOL_TOKEN` is absent; optional when that secret exists and used for source retrieval when present | `MEANDAI_PROTOCOL_TOKEN` |
 
 The updater token needs repository access plus `Contents: Read and write`,
 `Pull requests: Read and write`, and `Workflows: Read and write` for its
@@ -50,21 +52,27 @@ secrets do not replace these two repository secrets. Secret provisioning is
 deterministic PowerShell/`gh` work; it does not require Codex and values are
 never placed in the Codex prompt.
 
+When `MEANDAI_PROTOCOL_TOKEN` exists but its local file is absent, the launcher
+does not and cannot recover the stored value. It uses the authenticated local
+`gh` identity only to retrieve the exact tagged workflow and clone the exact
+protocol commit required by semantic adoption. If that identity cannot read the
+private protocol repository, the launcher stops with a source-access error.
+
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It
-downloads the launcher from the exact `v0.6.2` tag into the OS temp directory
+downloads the launcher from the exact `v0.6.3` tag into the OS temp directory
 and runs it; it does not execute a moving `main` file.
 
 ```powershell
-$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$p=Join-Path ([IO.Path]::GetTempPath()) 'Invoke-MeAndAIQuickAdoption-v0.6.3.ps1'; gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.3' | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.6.2.ps1'
-gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.2' | Set-Content -LiteralPath $launcher -Encoding UTF8
+$launcher = Join-Path $env:TEMP 'Invoke-MeAndAIQuickAdoption-v0.6.3.ps1'
+gh api -H 'Accept: application/vnd.github.raw+json' 'repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=v0.6.3' | Set-Content -LiteralPath $launcher -Encoding UTF8
 & $launcher -TargetPath .
 ```
 

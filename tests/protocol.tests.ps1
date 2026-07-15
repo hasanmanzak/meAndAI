@@ -64,6 +64,7 @@ $requiredFiles = @(
     '.ai/memory/log/2026-07-14-urgent-gate-order.md',
     '.ai/memory/log/2026-07-14-cleanup-comment-clarity.md',
     '.ai/memory/log/2026-07-15-feat-0002-release-gate-evidence.md',
+    '.ai/memory/log/2026-07-15-optional-credential-source-files.md',
     '.ai/memory/log/2026-07-15-quick-adoption-launcher.md',
     '.ai/memory/log/2026-07-15-local-codex-adoption.md',
     '.ai/memory/log/2026-07-15-existing-secret-preservation.md',
@@ -401,7 +402,7 @@ if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0042 quick adoption validation failed'
+        Add-Failure 'TEST-0033 through TEST-0043 quick adoption validation failed'
     }
 }
 
@@ -411,4 +412,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0042.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0043.' -ForegroundColor Green

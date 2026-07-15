@@ -3,6 +3,24 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.6.3 - 2026-07-15
+
+### Fixed
+
+- Existing connected repositories now require each local credential file only
+  when its mapped repository Actions secret is missing. A configured target can
+  rerun quick adoption after both local files have been removed.
+- When `MEANDAI_PROTOCOL_TOKEN` exists but `MEANDAI_RO_FG_PAT.txt` is absent,
+  the launcher uses the authenticated local GitHub CLI to retrieve the exact
+  tagged workflow and clone the exact semantic-adoption source snapshot. Git
+  blob and manifest-commit verification remain enforced.
+- New repositories still require both local files before remote creation, and
+  a missing target secret still requires its mapped file for provisioning.
+  Stored GitHub secret values are never read or exposed.
+
+Related work: [BUG-0002](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0002-correction-for-v063)
+and [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
+
 ## 0.6.2 - 2026-07-15
 
 ### Fixed

@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.6.2',
+    [string]$ProtocolTag = 'v0.6.3',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -255,7 +255,7 @@ function Invoke-GitHubApi {
 }
 
 function Get-CanonicalWorkflow {
-    param([Parameter(Mandatory)][string]$ProtocolToken)
+    param([string]$ProtocolToken = '')
 
     if ($ProtocolRepository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
         throw "ProtocolRepository '$ProtocolRepository' must use the owner/repository form."
@@ -266,7 +266,24 @@ function Get-CanonicalWorkflow {
 
     $escapedRef = [Uri]::EscapeDataString($ProtocolTag)
     $uri = "https://api.github.com/repos/$ProtocolRepository/contents/$workflowSourcePath`?ref=$escapedRef"
-    $response = Invoke-GitHubApi -Uri $uri -Token $ProtocolToken
+    if ($ProtocolToken) {
+        $response = Invoke-GitHubApi -Uri $uri -Token $ProtocolToken
+    }
+    else {
+        $endpoint = "repos/$ProtocolRepository/contents/$workflowSourcePath`?ref=$escapedRef"
+        try {
+            $result = Invoke-External -Command 'gh' -Arguments @(
+                'api',
+                '-H', 'Accept: application/vnd.github+json',
+                '-H', 'X-GitHub-Api-Version: 2022-11-28',
+                $endpoint
+            )
+            $response = ((@($result.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        }
+        catch {
+            throw "Unable to retrieve the canonical workflow through the authenticated local GitHub CLI. Verify local gh access to '$ProtocolRepository', then rerun."
+        }
+    }
     if ($response.encoding -cne 'base64' -or -not $response.content -or -not $response.sha) {
         throw 'The canonical workflow response is incomplete or uses an unsupported encoding.'
     }
@@ -802,7 +819,7 @@ function Invoke-LocalCodexExec {
 
 function Get-ProtocolSourceSnapshot {
     param(
-        [Parameter(Mandatory)][string]$Token,
+        [string]$Token = '',
         [Parameter(Mandatory)][string]$Commit,
         [Parameter(Mandatory)][string]$Destination
     )
@@ -810,35 +827,60 @@ function Get-ProtocolSourceSnapshot {
     if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
         throw 'The adoption manifest contains an invalid protocol commit.'
     }
-    $archivePath = Join-Path $Destination 'protocol-source.zip'
-    $extractPath = Join-Path $Destination 'protocol-source'
-    [IO.Directory]::CreateDirectory($extractPath) | Out-Null
-    $headers = @{
-        Accept = 'application/vnd.github+json'
-        Authorization = "Bearer $Token"
-        'X-GitHub-Api-Version' = '2022-11-28'
-        'User-Agent' = 'meAndAI-quick-adoption'
+    $sourceRoot = $null
+    if ($Token) {
+        $archivePath = Join-Path $Destination 'protocol-source.zip'
+        $extractPath = Join-Path $Destination 'protocol-source'
+        [IO.Directory]::CreateDirectory($extractPath) | Out-Null
+        $headers = @{
+            Accept = 'application/vnd.github+json'
+            Authorization = "Bearer $Token"
+            'X-GitHub-Api-Version' = '2022-11-28'
+            'User-Agent' = 'meAndAI-quick-adoption'
+        }
+        $uri = "https://api.github.com/repos/$ProtocolRepository/zipball/$Commit"
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers $headers -OutFile $archivePath
+            Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath -Force
+        }
+        catch {
+            throw 'Unable to download the exact protocol source snapshot required for semantic adoption.'
+        }
+
+        $roots = @(Get-ChildItem -LiteralPath $extractPath -Directory)
+        if ($roots.Count -eq 1) {
+            $sourceRoot = $roots[0].FullName
+        }
     }
-    $uri = "https://api.github.com/repos/$ProtocolRepository/zipball/$Commit"
-    try {
-        Invoke-WebRequest -UseBasicParsing -Uri $uri -Headers $headers -OutFile $archivePath
-        Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath -Force
-    }
-    catch {
-        throw 'Unable to download the exact protocol source snapshot required for semantic adoption.'
+    else {
+        $sourceRoot = Join-Path $Destination 'protocol-source'
+        try {
+            Invoke-External -Command 'gh' -Arguments @(
+                'repo', 'clone', $ProtocolRepository, $sourceRoot, '--',
+                '--branch', $ProtocolTag, '--single-branch', '--depth', '1'
+            ) | Out-Null
+            $resolvedCommit = ((@(Invoke-Git -Repository $sourceRoot -Arguments @(
+                'rev-parse', 'HEAD'
+            )).Output -join '').Trim())
+        }
+        catch {
+            throw 'Unable to clone the exact protocol source snapshot through the authenticated local GitHub CLI.'
+        }
+        if ($resolvedCommit -cne $Commit) {
+            throw 'The authenticated protocol source snapshot does not match the adoption manifest commit.'
+        }
     }
 
-    $roots = @(Get-ChildItem -LiteralPath $extractPath -Directory)
-    if ($roots.Count -ne 1 -or
-        -not (Test-Path -LiteralPath (Join-Path $roots[0].FullName 'PROTOCOL.md') -PathType Leaf)) {
+    if (-not $sourceRoot -or
+        -not (Test-Path -LiteralPath (Join-Path $sourceRoot 'PROTOCOL.md') -PathType Leaf)) {
         throw 'The exact protocol source snapshot has an unexpected structure.'
     }
-    $versionPath = Join-Path $roots[0].FullName 'VERSION'
+    $versionPath = Join-Path $sourceRoot 'VERSION'
     if (-not (Test-Path -LiteralPath $versionPath -PathType Leaf) -or
         [IO.File]::ReadAllText($versionPath).Trim() -cne $ProtocolTag.Substring(1)) {
         throw 'The protocol source snapshot version does not match the requested tag.'
     }
-    return $roots[0].FullName
+    return $sourceRoot
 }
 
 function Assert-CredentialFilesAbsent {
@@ -879,7 +921,7 @@ function Complete-AdoptionWithLocalCodex {
         [Parameter(Mandatory)][string]$TargetRepository,
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)]$PullRequest,
-        [Parameter(Mandatory)][string]$ProtocolToken
+        [string]$ProtocolToken = ''
     )
 
     $branch = [string]$PullRequest.headRefName
@@ -1131,7 +1173,7 @@ if ($hasRemote) {
 }
 
 $requiredTokenFiles = if ($hasRemote) {
-    @('MEANDAI_RO_FG_PAT.txt')
+    @()
 }
 else {
     @($tokenMappings.Keys)
@@ -1193,8 +1235,12 @@ else {
     }
 }
 
-$protocolToken = Read-LocalToken -Path (Join-Path $target 'MEANDAI_RO_FG_PAT.txt')
-$workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
+$protocolToken = $null
+$workflowBytes = $null
+if (-not $hasRemote) {
+    $protocolToken = Read-LocalToken -Path (Join-Path $target 'MEANDAI_RO_FG_PAT.txt')
+    $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
+}
 
 if ($hasRemote) {
     $view = Invoke-External -Command 'gh' -Arguments @(
@@ -1300,6 +1346,24 @@ $existingSecretNames = if ($hasRemote) {
 else {
     @()
 }
+$protocolSecretMissing = $existingSecretNames -notcontains 'MEANDAI_PROTOCOL_TOKEN'
+$protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
+$protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
+if ($protocolSecretMissing -and -not $protocolTokenFileExists) {
+    throw "Required local credential file 'MEANDAI_RO_FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_PROTOCOL_TOKEN' does not exist."
+}
+if ($null -eq $protocolToken -and $protocolTokenFileExists) {
+    $protocolToken = Read-LocalToken -Path $protocolTokenPath
+}
+if ($null -eq $workflowBytes) {
+    if ($protocolToken) {
+        $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
+    }
+    else {
+        $workflowBytes = Get-CanonicalWorkflow
+    }
+}
+
 $updaterSecretMissing = $existingSecretNames -notcontains 'MEANDAI_UPDATER_TOKEN'
 $updaterToken = $null
 if ($updaterSecretMissing) {

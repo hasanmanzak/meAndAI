@@ -90,7 +90,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.6.2',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.6.3',
         'ref: ${{ env.BOOTSTRAP_PROTOCOL_TAG }}',
         'MeAndAI.ProtocolUpdate.psm1',
         'Invoke-MeAndAIProtocolUpdate.ps1',
