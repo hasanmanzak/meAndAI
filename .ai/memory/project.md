@@ -7,14 +7,16 @@ Last verified: **2026-07-15**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.4.0`
-- Current scope: self-updating consumer updater and fine-grained PAT boundary
-  tracked by [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
+- Current protocol version: `0.5.0`
+- Current scope: workflow-seeded AI-capabilities adoption, bootstrap, handoff,
+  and update lifecycle tracked by
+  [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: [issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
-- Current delivery: [FEAT-0004 pull request #16](https://github.com/hasanmanzak/meAndAI/pull/16).
+- Latest tracked work: [issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
+- Current delivery: [FEAT-0005](../../docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md)
+  on branch `codex/feat-0005-ai-capabilities-lifecycle`.
 
 ## Collaboration constraints
 
@@ -51,6 +53,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.4.0` uses consumer secret `MEANDAI_UPDATER_TOKEN` for repository-scoped
   writes and reconciles target-different updater assets in the same draft PR as
   the protocol pointer. Pre-v0.4 consumer copies need one reviewed migration.
+- `v0.5.0` lets a submodule consumer seed only the canonical workflow. It
+  proposes all absent deterministic adoption assets or a manifest-only semantic
+  handoff on collision, then delegates later releases to the local updater.
+- The source-only bootstrap resolver and adapter are intentionally small and
+  are not copied to consumers. GitHub Actions does not run an AI agent; an
+  explicitly invoked agent or maintainer completes and removes the manifest.
 - FEAT-0002's historical post-merge gate was reconciled on 2026-07-15 against
   merged [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) and remote tag
   [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0); this evidence

@@ -5,10 +5,11 @@ and follow its canonical links.
 
 ## Current continuation
 
-- [2026-07-15 - Self-updating consumer updater](2026-07-15-self-updating-consumer-updater.md)
+- [2026-07-15 - AI capabilities lifecycle](2026-07-15-ai-capabilities-lifecycle.md)
 
 ## History
 
+- [2026-07-15 - Self-updating consumer updater](2026-07-15-self-updating-consumer-updater.md)
 - [2026-07-14 - Protocol bootstrap](2026-07-14-bootstrap.md)
 - [2026-07-14 - Semi-automatic consumer updates](2026-07-14-update-automation.md)
 - [2026-07-14 - Bounded self-validation](2026-07-14-bounded-self-validation.md)

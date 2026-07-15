@@ -4,7 +4,7 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.4.0**
+Current protocol version: **0.5.0**
 
 ## Start here
 
@@ -33,6 +33,11 @@ and [GitHub issue #3](https://github.com/hasanmanzak/meAndAI/issues/3).
 Fine-grained-PAT authentication and updater self-reconciliation are tracked by
 [FEAT-0004](docs/features/FEAT-0004-self-updating-consumer-updater/README.md)
 and [GitHub issue #15](https://github.com/hasanmanzak/meAndAI/issues/15).
+
+Workflow-only adoption, collision-aware agent handoff, and the unified
+AI-capabilities lifecycle are tracked by
+[FEAT-0005](docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md) and
+[GitHub issue #17](https://github.com/hasanmanzak/meAndAI/issues/17).
 
 This repository is private. A consuming environment must have GitHub access to
 clone or update the reference.

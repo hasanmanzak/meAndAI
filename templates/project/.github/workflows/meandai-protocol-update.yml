@@ -1,4 +1,7 @@
-name: meAndAI protocol update
+name: meAndAI AI capabilities lifecycle
+
+env:
+  BOOTSTRAP_PROTOCOL_TAG: v0.5.0
 
 on:
   schedule:
@@ -40,14 +43,35 @@ jobs:
         with:
           repository: hasanmanzak/meAndAI
           token: ${{ secrets.MEANDAI_PROTOCOL_TOKEN || github.token }}
+          ref: ${{ env.BOOTSTRAP_PROTOCOL_TAG }}
           path: .meandai-update-source
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Resolve and propose protocol update
+      - name: Resolve and propose AI capabilities lifecycle
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.MEANDAI_UPDATER_TOKEN }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          ./.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1
+          $modulePath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+          $adapterPath = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+          $moduleExists = Test-Path -LiteralPath $modulePath -PathType Leaf
+          $adapterExists = Test-Path -LiteralPath $adapterPath -PathType Leaf
+          if ($moduleExists -xor $adapterExists) {
+            Write-Host 'Local updater installation is partial; routing to adoption review.'
+          }
+
+          $protocolEntry = (& git ls-tree HEAD -- .ai/protocol) -join ''
+          $manifestExists = Test-Path -LiteralPath '.ai/adoption/meandai-capabilities.json'
+          $completeLocalUpdater = $moduleExists -and $adapterExists -and
+            $protocolEntry -match '^160000\s+commit\s+[0-9a-f]{40}\s+' -and
+            -not $manifestExists
+
+          if ($completeLocalUpdater) {
+            & "./$adapterPath"
+          }
+          else {
+            $bootstrap = '.meandai-update-source/templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
+            & "./$bootstrap" -TargetTag $env:BOOTSTRAP_PROTOCOL_TAG
+          }
