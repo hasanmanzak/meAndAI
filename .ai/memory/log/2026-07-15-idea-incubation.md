@@ -5,6 +5,7 @@
 - Feature: [FEAT-0008](../../../docs/features/FEAT-0008-idea-incubation/README.md)
 - Decision: [DEC-0009](../../../docs/decisions/DEC-0009-repository-native-idea-incubation.md)
 - Tracking: [issue #26](https://github.com/hasanmanzak/meAndAI/issues/26)
+- Delivery: [pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28)
 - Target release: `v0.7.0`
 
 ## Durable facts
@@ -26,3 +27,10 @@
 - `TEST-0043` covers lifecycle, index, template, and first-idea semantics.
 - `TEST-0044` covers consumer source access, absent-only bootstrap, collision
   preservation, and updater managed-path non-expansion.
+
+## Release evidence
+
+Pull request #28 merged at `1b420322058d73a974ccb61d8b7f828eb38cce8e`,
+and annotated tag
+[`v0.7.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0) resolves to that
+exact release commit. FEAT-0008 is complete.

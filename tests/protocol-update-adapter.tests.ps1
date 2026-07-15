@@ -327,7 +327,9 @@ function global:gh {
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls/21/files?per_page=100') {
-        ConvertTo-TestBase64Json ([pscustomobject]@{ filename = '.ai/protocol' })
+        ConvertTo-TestBase64Json ([pscustomobject]@{
+            filename = '.ai/protocol'; status = 'modified'
+        })
         return
     }
     if ($endpoint -like 'repos/owner/consumer/git/commits/*') {
@@ -441,8 +443,27 @@ function global:gh {
         return
     }
     if ($endpoint -eq 'repos/owner/consumer/pulls/30/files?per_page=100') {
+        $script:Scenario.NewFilesCalls++
         foreach ($path in $script:Scenario.ExpectedStagedPaths) {
-            ConvertTo-TestBase64Json ([pscustomobject]@{ filename = $path })
+            $renameRecord = (
+                $script:Scenario.RenameMode -ceq 'InventoryRename' -and
+                $script:Scenario.NewFilesCalls -eq 1 -and $path -ceq '.ai/protocol'
+            ) -or (
+                $script:Scenario.RenameMode -ceq 'RevalidationRename' -and
+                $script:Scenario.NewFilesCalls -gt 1 -and $path -ceq '.ai/protocol'
+            )
+            if ($renameRecord) {
+                ConvertTo-TestBase64Json ([pscustomobject]@{
+                    filename = $path
+                    status = 'renamed'
+                    previous_filename = 'docs/unmanaged-source.ps1'
+                })
+            }
+            else {
+                ConvertTo-TestBase64Json ([pscustomobject]@{
+                    filename = $path; status = 'modified'
+                })
+            }
         }
         return
     }
@@ -474,7 +495,9 @@ function Invoke-AdapterScenario {
         [bool]$DriftCurrentAsset = $false,
         [bool]$WrongStagedAssetBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
-        [int]$LeadingUnmanagedCount = 0
+        [int]$LeadingUnmanagedCount = 0,
+        [ValidateSet('None', 'InventoryRename', 'RevalidationRename')]
+        [string]$RenameMode = 'None'
     )
 
     $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-adapter-$Name-$([guid]::NewGuid().ToString('N'))"
@@ -592,6 +615,8 @@ function Invoke-AdapterScenario {
         WrongStagedAssetBlob = $WrongStagedAssetBlob
         WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
+        RenameMode = $RenameMode
+        NewFilesCalls = 0
         RemoveOldBeforeDelete = $RemoveOldBeforeDelete
         OldProbeCalls = 0
 
@@ -772,6 +797,22 @@ if ((Get-EventIndex $replacementRace 'close-old-pr') -ge 0 -or
     Add-Failure 'TEST-0015 changed replacement allowed destructive supersession.'
 }
 
+foreach ($renameMode in @('InventoryRename', 'RevalidationRename')) {
+    $renameScenario = Invoke-AdapterScenario -Name "rename-$renameMode" `
+        -ExistingReplacement $true -RenameMode $renameMode
+    if (-not $renameScenario.Threw -or
+        $renameScenario.Error -notlike '*rename metadata is outside the managed update contract*') {
+        Add-Failure "TEST-0048 $renameMode did not fail closed on unmanaged rename provenance: $($renameScenario.Error)"
+    }
+    foreach ($forbiddenEvent in @(
+        'close-old-pr', 'delete-old-branch', 'close-new-pr', 'delete-new-branch'
+    )) {
+        if ((Get-EventIndex $renameScenario $forbiddenEvent) -ge 0) {
+            Add-Failure "TEST-0048 $renameMode reached forbidden mutation '$forbiddenEvent'."
+        }
+    }
+}
+
 $coordinatedHeadRace = Invoke-AdapterScenario -Name 'coordinated-head-race' `
     -ExistingReplacement $true -CoordinateNewHeadMutation $true
 if (-not $coordinatedHeadRace.Threw -or $coordinatedHeadRace.Error -notlike '*head SHA changed*') {
@@ -882,4 +923,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, and TEST-0021 through TEST-0026.' -ForegroundColor Green
+Write-Host 'Protocol update adapter tests passed: TEST-0011, TEST-0015, TEST-0021 through TEST-0026, and TEST-0048.' -ForegroundColor Green

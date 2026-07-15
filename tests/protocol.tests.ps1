@@ -190,6 +190,37 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
     }
 }
 
+$releaseMetadataChecks = [ordered]@{
+    'docs/features/FEAT-0007-local-codex-adoption/README.md' = @(
+        '| Status | Complete |',
+        '`v0.7.1` tag'
+    )
+    'docs/features/FEAT-0008-idea-incubation/README.md' = @(
+        '| Status | Complete |',
+        '`v0.7.0` tag'
+    )
+    'docs/decisions/README.md' = @(
+        'Partially superseded by [DEC-0008]'
+    )
+    '.ai/memory/log/README.md' = @(
+        '2026-07-15-adoption-integrity.md'
+    )
+    'PROTOCOL.md' = @(
+        'Each mapped local credential file is required only',
+        'authenticated local `gh` identity',
+        'MUST NOT substitute for provisioning'
+    )
+}
+foreach ($entry in $releaseMetadataChecks.GetEnumerator()) {
+    $content = Get-Content -LiteralPath (Join-Path $root $entry.Key) -Raw
+    $normalizedContent = [regex]::Replace($content, '\s+', ' ')
+    foreach ($requiredText in $entry.Value) {
+        if (-not $normalizedContent.Contains($requiredText)) {
+            Add-Failure "TEST-0050 release metadata in $($entry.Key) is missing '$requiredText'"
+        }
+    }
+}
+
 $markdownFiles = Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.md' |
     Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' }
 
@@ -393,7 +424,7 @@ if (Test-Path -LiteralPath $updateTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $updateTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0009 through TEST-0017 and TEST-0021 through TEST-0026 protocol update validation failed'
+        Add-Failure 'TEST-0009 through TEST-0017, TEST-0021 through TEST-0026, and TEST-0048 protocol update validation failed'
     }
 }
 
@@ -402,7 +433,7 @@ if (Test-Path -LiteralPath $capabilitiesTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $capabilitiesTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0027 through TEST-0032 AI capabilities lifecycle validation failed'
+        Add-Failure 'TEST-0027 through TEST-0032, TEST-0044, and TEST-0047 AI capabilities lifecycle validation failed'
     }
 }
 
@@ -411,7 +442,7 @@ if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0042 and TEST-0045 quick adoption validation failed'
+        Add-Failure 'TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, TEST-0049, and TEST-0050 quick adoption validation failed'
     }
 }
 
@@ -430,4 +461,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0045.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0050.' -ForegroundColor Green

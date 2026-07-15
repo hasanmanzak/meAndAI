@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Implemented |
+| Status | Complete |
 | Target version | 0.7.0 |
 | Issue | [#26](https://github.com/hasanmanzak/meAndAI/issues/26) |
 | Pull request | [#28](https://github.com/hasanmanzak/meAndAI/pull/28) |
@@ -157,3 +157,10 @@ unresolved actionable in-scope finding remains, so the bounded scan stops.
 - [x] Applicable CI and review gates passed in
   [Protocol validation run 29423653441](https://github.com/hasanmanzak/meAndAI/actions/runs/29423653441)
   on Ubuntu and Windows; GitGuardian also passed.
+
+## Release evidence
+
+[Pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28) merged the
+feature at commit `1b420322058d73a974ccb61d8b7f828eb38cce8e`. The annotated
+[`v0.7.0` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0) resolves to
+that exact release commit.

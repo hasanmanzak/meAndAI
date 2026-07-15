@@ -23,7 +23,8 @@ function Resolve-MeAndAICapabilitiesLifecycle {
 
     $required = @(
         'SchemaVersion', 'LocalUpdaterState', 'SeedWorkflowState', 'Collisions',
-        'ManifestExists', 'RemoteBranchExists', 'OpenPullRequestCount'
+        'ManifestExists', 'RemoteBranchExists', 'OpenPullRequestCount',
+        'ExistingProposalValid'
     )
     $missing = @($required | Where-Object {
         $_ -notin $Snapshot.PSObject.Properties.Name
@@ -59,6 +60,7 @@ function Resolve-MeAndAICapabilitiesLifecycle {
 
     if ($Snapshot.ManifestExists -isnot [bool] -or
         $Snapshot.RemoteBranchExists -isnot [bool] -or
+        $Snapshot.ExistingProposalValid -isnot [bool] -or
         ($Snapshot.OpenPullRequestCount -isnot [int] -and
          $Snapshot.OpenPullRequestCount -isnot [long]) -or
         [long]$Snapshot.OpenPullRequestCount -lt 0) {
@@ -96,9 +98,19 @@ function Resolve-MeAndAICapabilitiesLifecycle {
     $branchExists = [bool]$Snapshot.RemoteBranchExists
     $pullRequestCount = [long]$Snapshot.OpenPullRequestCount
     if ($branchExists -and $pullRequestCount -eq 1) {
+        if (-not [bool]$Snapshot.ExistingProposalValid) {
+            return New-MeAndAICapabilitiesPlan -State 'BlockedManualReview' `
+                -ProposalMode 'None' -Collisions @($collisions) `
+                -Diagnostics @('The existing adoption proposal failed ownership validation.')
+        }
         return New-MeAndAICapabilitiesPlan -State 'PendingAdoption' `
             -ProposalMode 'None' -Collisions @($collisions) `
             -Diagnostics @('A deterministic adoption proposal already exists.')
+    }
+    if ([bool]$Snapshot.ExistingProposalValid) {
+        return New-MeAndAICapabilitiesPlan -State 'BlockedManualReview' `
+            -ProposalMode 'None' -Collisions @($collisions) `
+            -Diagnostics @('Ownership evidence exists without one deterministic proposal.')
     }
     if ($branchExists -or $pullRequestCount -ne 0) {
         return New-MeAndAICapabilitiesPlan -State 'BlockedManualReview' `

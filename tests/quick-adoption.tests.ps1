@@ -110,8 +110,12 @@ function Reset-Mocks {
     $global:QuickAdoptionRemotePath = ''
     $global:QuickAdoptionRunListCalls = 0
     $global:QuickAdoptionPrListCalls = 0
+    $global:QuickAdoptionProposalMode = 'ValidFull'
+    $global:QuickAdoptionPrMetadataMode = 'Valid'
     $global:QuickAdoptionLabels = [System.Collections.Generic.List[string]]::new()
     $global:QuickAdoptionIssue = $null
+    $global:QuickAdoptionIssueLabels = [System.Collections.Generic.List[string]]::new()
+    $global:QuickAdoptionEvents = [System.Collections.Generic.List[string]]::new()
     $global:QuickAdoptionWorkflowBytes = [IO.File]::ReadAllBytes($workflowPath)
     $global:QuickAdoptionWorkflowSha = Get-GitBlobSha -Bytes $global:QuickAdoptionWorkflowBytes
     $protocolFixtureRoot = New-TempRoot -Name 'protocol-repository'
@@ -125,7 +129,7 @@ function Reset-Mocks {
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'PROTOCOL.md') `
         -Value '# Mock protocol source' -Encoding UTF8
     Set-Content -LiteralPath (Join-Path $global:QuickAdoptionProtocolRepository 'VERSION') `
-        -Value '0.7.1' -NoNewline
+        -Value '0.7.2' -NoNewline
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
         'add', 'PROTOCOL.md', 'VERSION'
     ) | Out-Null
@@ -133,7 +137,7 @@ function Reset-Mocks {
         'commit', '-m', 'Create mock protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
-        'tag', 'v0.7.1'
+        'tag', 'v0.7.2'
     ) | Out-Null
     $global:QuickAdoptionProtocolSha = (@(Invoke-TestGit `
         -Repository $global:QuickAdoptionProtocolRepository -Arguments @('rev-parse', 'HEAD')))[0]
@@ -153,7 +157,7 @@ function Get-MockCodexCalls {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.7.1'
+    $branch = 'automation/meandai-capabilities-v0.7.2'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -175,31 +179,52 @@ function Publish-MockAdoptionBranch {
 
     $manifestPath = Join-Path $clone '.ai/adoption/meandai-capabilities.json'
     New-Item -ItemType Directory -Path (Split-Path -Parent $manifestPath) -Force | Out-Null
-    $protocolPath = Join-Path $clone '.ai/protocol'
-    New-Item -ItemType Directory -Path $protocolPath -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $protocolPath 'PROTOCOL.md') -Value '# Mock protocol' -Encoding UTF8
+    $manifestOnly = $global:QuickAdoptionProposalMode -ceq 'ManifestOnly'
+    $proposalProtocolSha = if ($global:QuickAdoptionProposalMode -ceq 'WrongProtocolSha') {
+        (@(Invoke-TestGit -Repository $clone -Arguments @('rev-parse', 'origin/main')))[0]
+    }
+    else {
+        $global:QuickAdoptionProtocolSha
+    }
     $manifest = [ordered]@{
         schema = 1
         operation = 'ai-capabilities-adoption'
-        state = 'BootstrapReady'
+        state = if ($manifestOnly) { 'AdoptionReviewRequired' } else { 'BootstrapReady' }
         repository = $global:QuickAdoptionRepoName
-        targetTag = 'v0.7.1'
+        targetTag = 'v0.7.2'
         protocolSha = $global:QuickAdoptionProtocolSha
-        collisions = @()
+        collisions = if ($manifestOnly) { @('AGENTS.md') } else { @() }
         proposedPaths = @('.ai/protocol', '.ai/adoption/meandai-capabilities.json')
         requiredTasks = @('Remove the manifest before readiness.')
     } | ConvertTo-Json -Depth 5
     Set-Content -LiteralPath $manifestPath -Value $manifest -Encoding UTF8
-    Invoke-TestGit -Repository $clone -Arguments @(
-        'add', '--', '.ai/protocol/PROTOCOL.md', '.ai/adoption/meandai-capabilities.json'
-    ) | Out-Null
+    if (-not $manifestOnly) {
+        $gitmodules = @(
+            '[submodule ".ai/protocol"]',
+            "`tpath = .ai/protocol",
+            "`turl = https://github.com/hasanmanzak/meAndAI.git",
+            ''
+        ) -join "`n"
+        Set-Content -LiteralPath (Join-Path $clone '.gitmodules') -Value $gitmodules -NoNewline
+        Invoke-TestGit -Repository $clone -Arguments @(
+            'update-index', '--add', '--cacheinfo', "160000,$proposalProtocolSha,.ai/protocol"
+        ) | Out-Null
+        Invoke-TestGit -Repository $clone -Arguments @(
+            'add', '--', '.gitmodules', '.ai/adoption/meandai-capabilities.json'
+        ) | Out-Null
+    }
+    else {
+        Invoke-TestGit -Repository $clone -Arguments @(
+            'add', '--', '.ai/adoption/meandai-capabilities.json'
+        ) | Out-Null
+    }
     Invoke-TestGit -Repository $clone -Arguments @('commit', '-m', 'Create mock adoption draft') | Out-Null
     Invoke-TestGit -Repository $clone -Arguments @('push', 'origin', $branch) | Out-Null
     $global:QuickAdoptionPrHead = (@(Invoke-TestGit -Repository $clone -Arguments @('rev-parse', 'HEAD')))[0]
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.7.1'
+    $branch = 'automation/meandai-capabilities-v0.7.2'
     Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
         'push', 'origin', '--delete', $branch
     ) | Out-Null
@@ -217,7 +242,7 @@ function global:Invoke-RestMethod {
         [string]$Method = 'Get'
     )
 
-    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.7\.1$') {
+    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.7\.2$') {
         return [pscustomobject]@{
             content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
             encoding = 'base64'
@@ -251,7 +276,7 @@ function global:Invoke-WebRequest {
     $sourceRoot = Join-Path $archiveRoot 'openai-mock-protocol'
     New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sourceRoot 'PROTOCOL.md') -Value '# Mock protocol source' -Encoding UTF8
-    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.7.1' -NoNewline
+    Set-Content -LiteralPath (Join-Path $sourceRoot 'VERSION') -Value '0.7.2' -NoNewline
     Compress-Archive -LiteralPath $sourceRoot -DestinationPath $OutFile -Force
 }
 
@@ -280,7 +305,7 @@ function global:gh {
     if ($joined -eq 'api user --jq .login') {
         return $global:QuickAdoptionOwner
     }
-    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.1'
+    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.2'
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
         $Arguments -contains $protocolSourceEndpoint) {
         return (@{
@@ -359,9 +384,20 @@ function global:gh {
         $global:QuickAdoptionIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.7.1'
+            title = 'Track meAndAI AI capabilities adoption from v0.7.2'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
+        }
+        for ($index = 0; $index -lt $Arguments.Count - 1; $index++) {
+            if ($Arguments[$index] -ceq '--label') {
+                $label = [string]$Arguments[$index + 1]
+                if ($global:QuickAdoptionIssueLabels -notcontains $label) {
+                    $global:QuickAdoptionIssueLabels.Add($label)
+                }
+                if ($label -ceq 'status:needs-review') {
+                    $global:QuickAdoptionEvents.Add('issue-label:add:status:needs-review')
+                }
+            }
         }
         return $global:QuickAdoptionIssue.url
     }
@@ -372,6 +408,23 @@ function global:gh {
             throw 'Mock adoption issue identity mismatch.'
         }
         $global:QuickAdoptionIssue.state = 'OPEN'
+        if ($Arguments[1] -ceq 'edit') {
+            for ($index = 0; $index -lt $Arguments.Count - 1; $index++) {
+                $operation = [string]$Arguments[$index]
+                $label = [string]$Arguments[$index + 1]
+                if ($operation -ceq '--add-label') {
+                    if ($global:QuickAdoptionIssueLabels -notcontains $label) {
+                        $global:QuickAdoptionIssueLabels.Add($label)
+                    }
+                    if ($label -ceq 'status:needs-review') {
+                        $global:QuickAdoptionEvents.Add('issue-label:add:status:needs-review')
+                    }
+                }
+                elseif ($operation -ceq '--remove-label') {
+                    [void]$global:QuickAdoptionIssueLabels.Remove($label)
+                }
+            }
+        }
         return
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'workflow' -and $Arguments[1] -eq 'run') {
@@ -406,15 +459,62 @@ function global:gh {
         if ($global:QuickAdoptionPrListCalls -gt 2) {
             throw 'Mock deterministic pull request was queried more than twice.'
         }
-        return (@([ordered]@{
+        $proposalState = if ($global:QuickAdoptionProposalMode -ceq 'ManifestOnly') {
+            'AdoptionReviewRequired'
+        }
+        else {
+            'BootstrapReady'
+        }
+        $marker = [ordered]@{
+            schema = 2
+            state = $proposalState
+            target = 'v0.7.2'
+            protocolSha = $global:QuickAdoptionProtocolSha
+            head = $global:QuickAdoptionPrHead
+            repository = $global:QuickAdoptionRepoName
+            actor = $global:QuickAdoptionOwner
+        } | ConvertTo-Json -Compress
+        $pullRequest = [ordered]@{
             number = 42
             url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
             isDraft = ($global:QuickAdoptionPrReadyCalls -eq 0)
-            headRefName = 'automation/meandai-capabilities-v0.7.1'
+            state = 'OPEN'
+            baseRefName = $global:QuickAdoptionDefaultBranch
+            headRefName = 'automation/meandai-capabilities-v0.7.2'
             headRefOid = $global:QuickAdoptionPrHead
-        }) | ConvertTo-Json -Compress)
+            headRepository = [ordered]@{ nameWithOwner = $global:QuickAdoptionRepoName }
+            author = [ordered]@{ login = $global:QuickAdoptionOwner }
+            body = "<!-- meandai-capabilities-adoption:$marker -->`n`nMock adoption proposal."
+        }
+        switch ($global:QuickAdoptionPrMetadataMode) {
+            'WrongBase' { $pullRequest.baseRefName = 'develop' }
+            'ForeignHead' {
+                $pullRequest.headRepository = [ordered]@{ nameWithOwner = 'foreign-owner/consumer' }
+            }
+            'InvalidMarker' {
+                $pullRequest.body = '<!-- meandai-capabilities-adoption:{"schema":1} -->'
+            }
+            'WrongAuthor' { $pullRequest.author = [ordered]@{ login = 'untrusted-actor' } }
+            'NonDraft' { $pullRequest.isDraft = $false }
+            'MarkerHeadMismatch' {
+                $badMarker = [ordered]@{
+                    schema = 2
+                    state = $proposalState
+                    target = 'v0.7.2'
+                    protocolSha = $global:QuickAdoptionProtocolSha
+                    head = ('0' * 40)
+                    repository = $global:QuickAdoptionRepoName
+                    actor = $global:QuickAdoptionOwner
+                } | ConvertTo-Json -Compress
+                $pullRequest.body = "<!-- meandai-capabilities-adoption:$badMarker -->"
+            }
+            'Valid' { }
+            default { throw "Unknown mock pull-request metadata mode '$($global:QuickAdoptionPrMetadataMode)'." }
+        }
+        return (@($pullRequest) | ConvertTo-Json -Depth 5 -Compress)
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'ready') {
+        $global:QuickAdoptionEvents.Add('pr-ready')
         $global:QuickAdoptionPrReadyCalls++
         return
     }
@@ -446,7 +546,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.7.1',
+            'v0.7.2',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -477,6 +577,9 @@ try {
             'WaitForExit',
             'Ensure-AdoptionLabels',
             'Ensure-AdoptionIssue',
+            'Set-AdoptionIssueReadyForReview',
+            'Get-ValidatedAdoptionManifest',
+            'Get-ValidatedAdoptionChangeSet',
             'prior manifest removal has no launcher-owned validation evidence',
             '160000',
             '--force-with-lease'
@@ -496,13 +599,28 @@ try {
                 Add-Failure "TEST-0033 launcher contains forbidden behavior '$forbidden'"
             }
         }
+        $tokens = $null
+        $parseErrors = $null
+        $launcherAst = [System.Management.Automation.Language.Parser]::ParseInput(
+            $launcher, [ref]$tokens, [ref]$parseErrors
+        )
+        $completionFunctions = @($launcherAst.FindAll({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            $node.Name -ceq 'Complete-AdoptionWithLocalCodex'
+        }, $true))
+        if ($parseErrors.Count -ne 0 -or $completionFunctions.Count -ne 1 -or
+            ($completionFunctions[0].Extent.EndLineNumber -
+             $completionFunctions[0].Extent.StartLineNumber + 1) -gt 170) {
+            Add-Failure 'TEST-0050 local adoption completion exceeds its bounded 170-line responsibility seam.'
+        }
     }
 
     if (Test-Path -LiteralPath $guidePath -PathType Leaf) {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.7.1',
+            'v0.7.2',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -593,10 +711,21 @@ try {
             $global:QuickAdoptionPrReadyCalls -ne 1) {
             Add-Failure 'TEST-0039 default adoption did not complete once through local Codex and mark the draft ready.'
         }
+        $reviewEvents = @($global:QuickAdoptionEvents | Where-Object {
+            $_ -ceq 'issue-label:add:status:needs-review'
+        })
+        $readyEventIndex = $global:QuickAdoptionEvents.IndexOf('pr-ready')
+        $reviewEventIndex = $global:QuickAdoptionEvents.IndexOf(
+            'issue-label:add:status:needs-review'
+        )
+        if ($reviewEvents.Count -ne 1 -or $readyEventIndex -lt 0 -or
+            $reviewEventIndex -le $readyEventIndex) {
+            Add-Failure 'TEST-0049 adoption issue review status was not applied exactly once after pull-request readiness.'
+        }
         $expectedLabels = @(
             'type:epic', 'type:feature', 'type:subfeature', 'type:task', 'type:bug',
             'type:finding', 'priority:p0', 'priority:p1', 'priority:p2', 'priority:p3',
-            'status:blocked', 'status:needs-review'
+            'status:blocked', 'status:in-progress', 'status:needs-review'
         )
         if ($global:QuickAdoptionLabels.Count -ne $expectedLabels.Count -or
             @($expectedLabels | Where-Object { $global:QuickAdoptionLabels -notcontains $_ }).Count -ne 0 -or
@@ -604,7 +733,7 @@ try {
             Add-Failure 'TEST-0039 launcher did not reconcile the deterministic Agile labels and adoption issue.'
         }
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.1'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.2'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/ai-adoption.md') {
@@ -650,7 +779,7 @@ try {
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.1'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.7.2'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
@@ -723,6 +852,9 @@ try {
         foreach ($negativeMode in @('Unauthenticated', 'LeaveManifest', 'CreateCommit', 'RemoteRace')) {
             Reset-MockAdoptionProposal
             $env:MEANDAI_TEST_CODEX_MODE = $negativeMode
+            $reviewEventCountBeforeNegative = @($global:QuickAdoptionEvents | Where-Object {
+                $_ -ceq 'issue-label:add:status:needs-review'
+            }).Count
             $blocked = $false
             try {
                 & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
@@ -733,14 +865,79 @@ try {
             if (-not $blocked -or $global:QuickAdoptionPrReadyCalls -ne 0) {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' did not block before readiness."
             }
+            $reviewEventCountAfterNegative = @($global:QuickAdoptionEvents | Where-Object {
+                $_ -ceq 'issue-label:add:status:needs-review'
+            }).Count
+            if ($reviewEventCountAfterNegative -ne $reviewEventCountBeforeNegative) {
+                Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
+            }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.1'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.2'
             ))
             if ($negativePaths -contains 'docs/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
             }
         }
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
+
+        Reset-MockAdoptionProposal
+        $global:QuickAdoptionProposalMode = 'ManifestOnly'
+        $collisionCompleted = $true
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $collisionCompleted = $false
+        }
+        $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.7.2', '--', '.ai/protocol'
+        )))
+        $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.7.2'
+        ))
+        $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
+        if (-not $collisionCompleted -or $global:QuickAdoptionPrReadyCalls -ne 1 -or
+            $collisionEntry.Count -ne 1 -or [string]$collisionEntry[0] -cne $expectedCollisionEntry -or
+            $collisionPaths -contains '.ai/adoption/meandai-capabilities.json') {
+            Add-Failure 'TEST-0046 token-backed manifest-only adoption did not publish the exact canonical protocol gitlink and remove the manifest.'
+        }
+        Reset-MockAdoptionProposal
+        $global:QuickAdoptionProposalMode = 'ValidFull'
+
+        foreach ($metadataMode in @(
+            'WrongBase', 'ForeignHead', 'InvalidMarker', 'WrongAuthor', 'NonDraft',
+            'MarkerHeadMismatch'
+        )) {
+            $global:QuickAdoptionPrMetadataMode = $metadataMode
+            $codexCallCountBeforeInvalidMetadata = @(Get-MockCodexCalls).Count
+            $metadataBlocked = $false
+            try {
+                & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+            }
+            catch {
+                $metadataBlocked = $true
+            }
+            $codexCallCountAfterInvalidMetadata = @(Get-MockCodexCalls).Count
+            if (-not $metadataBlocked -or $global:QuickAdoptionPrReadyCalls -ne 0 -or
+                $codexCallCountAfterInvalidMetadata -ne $codexCallCountBeforeInvalidMetadata) {
+                Add-Failure "TEST-0047 pull-request metadata mode '$metadataMode' did not block before Codex execution and readiness."
+            }
+            Reset-MockAdoptionProposal
+        }
+        $global:QuickAdoptionPrMetadataMode = 'Valid'
+        $global:QuickAdoptionProposalMode = 'WrongProtocolSha'
+        $wrongPinBlocked = $false
+        try {
+            & $launcherPath -TargetPath $existingRepo -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $wrongPinBlocked = $true
+        }
+        if (-not $wrongPinBlocked -or $global:QuickAdoptionPrReadyCalls -ne 0) {
+            Add-Failure 'TEST-0047 a pre-existing protocol gitlink with the wrong SHA was promoted.'
+        }
+        Reset-MockAdoptionProposal
+        $global:QuickAdoptionProposalMode = 'ValidFull'
 
         $secretCountBeforeDrift = $global:QuickAdoptionSecrets.Count
         Set-Content -LiteralPath (Join-Path $existingRepo $workflowRelativePath) -Value 'workflow-drift' -Encoding UTF8
@@ -887,4 +1084,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Quick-adoption tests passed: TEST-0033 through TEST-0042 and TEST-0045.' -ForegroundColor Green
+Write-Host 'Quick-adoption tests passed: TEST-0033 through TEST-0042 and TEST-0045 through TEST-0047 plus TEST-0049.' -ForegroundColor Green

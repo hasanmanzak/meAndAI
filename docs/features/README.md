@@ -9,7 +9,8 @@
 | [FEAT-0005](FEAT-0005-ai-capabilities-lifecycle/README.md) | Unified AI capabilities lifecycle | Complete | 0.5.0 |
 | [FEAT-0006](FEAT-0006-quick-adoption-launcher/README.md) | One-command quick adoption launcher | Complete | 0.6.0 |
 | [FEAT-0007](FEAT-0007-local-codex-adoption/README.md) | Local Codex completion for quick adoption | Complete | 0.6.1 |
-| [FEAT-0008](FEAT-0008-idea-incubation/README.md) | Repository-native idea incubation | In progress | 0.7.0 |
+| [FEAT-0008](FEAT-0008-idea-incubation/README.md) | Repository-native idea incubation | Complete | 0.7.0 |
+| [FEAT-0009](FEAT-0009-adoption-integrity/README.md) | Adoption and updater integrity hardening | In progress | 0.7.2 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

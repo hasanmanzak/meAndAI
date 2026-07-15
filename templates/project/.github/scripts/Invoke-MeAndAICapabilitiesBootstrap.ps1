@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.7.1',
+    [string]$TargetTag = 'v0.7.2',
     [string]$BranchPrefix = 'automation/meandai-capabilities-'
 )
 
@@ -147,7 +147,7 @@ function Get-StagedEntry {
     }
 }
 
-function Get-RemoteBranchState {
+function Get-RemoteBranchHead {
     param([string]$Branch)
 
     $ref = "refs/heads/$Branch"
@@ -161,7 +161,7 @@ function Get-RemoteBranchState {
         $ErrorActionPreference = $previousPreference
     }
     if ($exitCode -eq 2) {
-        return $false
+        return ''
     }
     if ($exitCode -ne 0) {
         throw "git ls-remote failed: $($output -join [Environment]::NewLine)"
@@ -170,7 +170,7 @@ function Get-RemoteBranchState {
         [string]$output[0] -notmatch "^[0-9a-f]{40}\s+$([regex]::Escape($ref))$") {
         throw "Remote adoption branch '$Branch' is ambiguous."
     }
-    return $true
+    return ([string]$output[0]).Split("`t")[0]
 }
 
 function Get-OpenAdoptionPullRequests {
@@ -178,7 +178,8 @@ function Get-OpenAdoptionPullRequests {
 
     $text = (Invoke-Native -Command 'gh' -Arguments @(
         'pr', 'list', '--repo', $Repository, '--state', 'open',
-        '--head', $Branch, '--json', 'number,headRefName,isDraft,state'
+        '--head', $Branch, '--json',
+        'number,url,headRefName,headRefOid,baseRefName,headRepository,author,body,isDraft,state'
     )) -join [Environment]::NewLine
     if ([string]::IsNullOrWhiteSpace($text)) {
         return @()
@@ -189,6 +190,89 @@ function Get-OpenAdoptionPullRequests {
         return @()
     }
     return @($parsed)
+}
+
+function Test-ExistingAdoptionProposal {
+    param(
+        [object[]]$PullRequests,
+        [string]$RemoteHead,
+        [string]$Repository,
+        [string]$Branch,
+        [string]$BaseBranch,
+        [string]$TargetTag,
+        [string]$TargetSha,
+        [string]$ExpectedActor
+    )
+
+    if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
+        return $false
+    }
+    $pullRequest = $PullRequests[0]
+    foreach ($property in @(
+        'number', 'url', 'headRefName', 'headRefOid', 'baseRefName',
+        'headRepository', 'author', 'body', 'isDraft', 'state'
+    )) {
+        if ($null -eq $pullRequest.PSObject.Properties[$property]) {
+            return $false
+        }
+    }
+    if ([string]$pullRequest.state -cne 'OPEN' -or
+        [string]$pullRequest.headRefName -cne $Branch -or
+        [string]$pullRequest.headRefOid -cne $RemoteHead -or
+        [string]$pullRequest.baseRefName -cne $BaseBranch -or
+        $pullRequest.isDraft -isnot [bool] -or
+        [string]$pullRequest.number -cnotmatch '^[1-9][0-9]*$' -or
+        [string]$pullRequest.url -cnotmatch "/pull/$([regex]::Escape([string]$pullRequest.number))/?$") {
+        return $false
+    }
+    if ($null -eq $pullRequest.headRepository -or
+        $null -eq $pullRequest.headRepository.PSObject.Properties['nameWithOwner'] -or
+        -not ([string]$pullRequest.headRepository.nameWithOwner).Equals(
+            $Repository, [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        $null -eq $pullRequest.author -or
+        $null -eq $pullRequest.author.PSObject.Properties['login'] -or
+        -not ([string]$pullRequest.author.login).Equals(
+            $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
+        )) {
+        return $false
+    }
+
+    $body = [string]$pullRequest.body
+    $markerStarts = [regex]::Matches(
+        $body, '<!--\s*meandai-capabilities-adoption:',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    $markerMatches = [regex]::Matches(
+        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
+        return $false
+    }
+    try {
+        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
+    }
+    catch {
+        return $false
+    }
+    $expectedProperties = @(
+        'schema', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor'
+    )
+    $actualProperties = @($marker.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($actualProperties.Count -ne $expectedProperties.Count -or
+        @($expectedProperties | Where-Object { $actualProperties -cnotcontains $_ }).Count -ne 0) {
+        return $false
+    }
+    return (
+        [int]$marker.schema -eq 2 -and
+        [string]$marker.state -cin @('BootstrapReady', 'AdoptionReviewRequired') -and
+        [string]$marker.target -ceq $TargetTag -and
+        [string]$marker.protocolSha -ceq $TargetSha -and
+        [string]$marker.head -ceq $RemoteHead -and
+        ([string]$marker.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -and
+        ([string]$marker.actor).Equals($ExpectedActor, [StringComparison]::OrdinalIgnoreCase)
+    )
 }
 
 function Write-Utf8NoBom {
@@ -336,17 +420,28 @@ elseif ($updaterCount -eq $updaterPaths.Count) { 'Complete' }
 else { 'Partial' }
 
 $branch = "$BranchPrefix$TargetTag"
-$remoteBranchExists = Get-RemoteBranchState -Branch $branch
+$actor = ((Invoke-Native -Command 'gh' -Arguments @(
+    'api', 'user', '--jq', '.login'
+)) -join '').Trim()
+if ($actor -notmatch '^[A-Za-z0-9_.-]+$') {
+    throw 'The authenticated updater identity is invalid.'
+}
+$remoteBranchHead = Get-RemoteBranchHead -Branch $branch
 $pullRequests = @(Get-OpenAdoptionPullRequests `
     -Repository $env:GITHUB_REPOSITORY -Branch $branch)
+$existingProposalValid = Test-ExistingAdoptionProposal -PullRequests $pullRequests `
+    -RemoteHead $remoteBranchHead -Repository $env:GITHUB_REPOSITORY `
+    -Branch $branch -BaseBranch $env:DEFAULT_BRANCH -TargetTag $TargetTag `
+    -TargetSha $targetSha -ExpectedActor $actor
 $snapshot = [pscustomobject]@{
     SchemaVersion = 1
     LocalUpdaterState = $localUpdaterState
     SeedWorkflowState = $seedWorkflowState
     Collisions = @($collisions)
     ManifestExists = $manifestExists
-    RemoteBranchExists = $remoteBranchExists
+    RemoteBranchExists = [bool]$remoteBranchHead
     OpenPullRequestCount = $pullRequests.Count
+    ExistingProposalValid = $existingProposalValid
 }
 $plan = Resolve-MeAndAICapabilitiesLifecycle -Snapshot $snapshot
 Add-RunSummary "## meAndAI AI capabilities lifecycle`n`n- Target: ``$TargetTag```n- State: ``$($plan.State)```n- Proposal: ``$($plan.ProposalMode)``"
@@ -365,10 +460,14 @@ if ($plan.State -ceq 'BlockedManualReview') {
     if ($seedWorkflowState -cne 'Exact') {
         throw "The committed seed workflow does not match '$TargetTag'; manual review is required."
     }
-    if ($remoteBranchExists -and $pullRequests.Count -eq 0) {
+    if ([bool]$remoteBranchHead -and $pullRequests.Count -eq 1 -and
+        -not $existingProposalValid) {
+        throw 'The existing adoption proposal failed ownership validation; manual review is required.'
+    }
+    if ([bool]$remoteBranchHead -and $pullRequests.Count -eq 0) {
         throw "An orphan adoption branch '$branch' exists; manual review is required."
     }
-    throw "AI capabilities adoption requires manual review (remote branch: $remoteBranchExists; open PRs: $($pullRequests.Count)): $($plan.Diagnostics -join '; ')"
+    throw "AI capabilities adoption requires manual review (remote branch: $([bool]$remoteBranchHead); open PRs: $($pullRequests.Count)): $($plan.Diagnostics -join '; ')"
 }
 if ($plan.State -cnotin @('BootstrapReady', 'AdoptionReviewRequired')) {
     throw "Unsupported lifecycle state '$($plan.State)'."
@@ -459,12 +558,13 @@ Invoke-Native -Command 'git' -Arguments @(
 ) | Out-Null
 
 $marker = [ordered]@{
-    schema = 1
+    schema = 2
     state = [string]$plan.State
     target = $TargetTag
     protocolSha = $targetSha
     head = $headSha
     repository = [string]$env:GITHUB_REPOSITORY
+    actor = $actor
 } | ConvertTo-Json -Compress
 $collisionText = if (@($plan.Collisions).Count -gt 0) {
     @($plan.Collisions | ForEach-Object { "- ``$_``" }) -join [Environment]::NewLine
