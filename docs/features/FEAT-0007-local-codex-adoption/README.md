@@ -192,6 +192,7 @@ remotely after merge verification.
 | Status | Complete |
 | Target version | 0.6.2 |
 | Issue | [#24](https://github.com/hasanmanzak/meAndAI/issues/24) |
+| Pull request | [#25](https://github.com/hasanmanzak/meAndAI/pull/25) |
 | Test | [`TEST-0042`](test-cases.md) |
 
 ### Problem and outcome

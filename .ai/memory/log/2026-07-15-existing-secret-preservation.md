@@ -3,6 +3,7 @@
 - Work: `BUG-0001`
 - Target release: `v0.6.2`
 - Tracking: [issue #24](https://github.com/hasanmanzak/meAndAI/issues/24)
+- Delivery: [pull request #25](https://github.com/hasanmanzak/meAndAI/pull/25)
 - Canonical record:
   [FEAT-0007 correction](../../../docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0001-correction-for-v062)
 - Executable contract:
