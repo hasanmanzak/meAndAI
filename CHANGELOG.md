@@ -3,6 +3,29 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.7.3 - 2026-07-15
+
+### Changed
+
+- Clarified that the displayed Codex prompt is not the quick-adoption entry
+  point; the parent PowerShell launcher has already created or validated the
+  repository, reconciled secrets, published the seed, completed the lifecycle,
+  and prepared an isolated draft clone before Codex starts.
+- Explained that applicable credential source files live only in the original
+  target, are never committed, pushed, copied into the temporary clone, or
+  deleted by the launcher, and are intentionally absent only from the Codex
+  workspace.
+- Distinguished the network-enabled parent launcher's GitHub and remote Git
+  work before and after Codex from network-disabled commands spawned inside the
+  Codex step, while retaining configured model-service access and
+  maintainer-owned merge.
+
+This release changes documentation and structural coverage only; launcher,
+credential, workflow, publication, and consumer behavior are unchanged.
+
+Related work: [BUG-0003](docs/features/FEAT-0007-local-codex-adoption/README.md#bug-0003-documentation-clarification-for-v073)
+and [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32).
+
 ## 0.7.2 - 2026-07-15
 
 ### Fixed

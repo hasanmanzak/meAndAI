@@ -362,3 +362,100 @@ all `TEST-0001` through `TEST-0045` scenarios pass.
 correction at commit `42e653e23ccb11034a735b8c3c420accf5f19964`. The annotated
 [`v0.7.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1) resolves to
 that exact release commit.
+
+## BUG-0003 documentation clarification for v0.7.3
+
+| Field | Value |
+| --- | --- |
+| Classification | Documentation bug correction |
+| Status | Implemented and locally verified; review pending |
+| Target version | 0.7.3 |
+| Issue | [#32](https://github.com/hasanmanzak/meAndAI/issues/32) |
+| Pull request | [#33](https://github.com/hasanmanzak/meAndAI/pull/33) |
+| Test | [`TEST-0051`](test-cases.md) |
+
+### Problem and outcome
+
+The quick-adoption prompt says that the two credential source files are
+intentionally absent and that spawned-command network access is disabled. When
+read outside the launcher's execution sequence, those statements can be
+mistaken for instructions not to place required files in a new target or for a
+restriction that prevents initial repository, secret, seed, and publication
+operations.
+
+The guide will make the two execution boundaries explicit: applicable source
+files live only in the maintainer's original target, while Codex works in a
+separate credential-free clone; the network-enabled parent launcher owns
+GitHub and remote Git operations before and after the network-restricted Codex
+step.
+
+### Scope, contracts, and non-goals
+
+- Clarify the user-facing quick guide and its essential prompt contract.
+- State that the quick command, not the displayed prompt, starts adoption.
+- Explain new-target and existing-target credential-file requirements without
+  changing them, and state that the launcher neither copies the files into the
+  clone nor deletes them from the original target.
+- Separate parent-launcher network authority, Codex-spawned command isolation,
+  Codex model-service transport, launcher-owned commit/push/readiness, and
+  maintainer-owned merge.
+- Add one normalized structural documentation regression check.
+
+Changing launcher behavior, the actual runtime prompt, credential handling,
+GitHub permissions, protocol decisions, workflow behavior, or consumer assets
+is out of scope.
+
+### Readiness and acceptance
+
+- [x] Stable `BUG-0003` ID and linked issue #32 exist.
+- [x] Problem, intended outcome, scope, non-goals, affected entry point, and
+      original-target/clone/network/publication ownership contracts are explicit.
+- [x] Existing [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
+      already governs the boundary; no new decision is required.
+- [x] `RISK-0053`: a maintainer may omit required new-target files or expect
+      Codex to provision GitHub state. Owner: documentation maintainers.
+      Response: explicit execution-order explanation plus `TEST-0051`.
+- [x] `TEST-0051` is defined and the pre-change focused suite passed in 85.7
+      seconds after one environment-only ACL retry.
+- [x] Verification is bounded to one focused red/green run, one complete suite,
+      one fresh-diff review, and one final relevant confirmation after blockers.
+
+Acceptance requires the guide to be understandable without implementation
+knowledge, while preserving every existing launcher, credential, network,
+publication, compatibility, and maintainer-merge contract.
+
+### Verification and self-review
+
+The bounded scope was the complete tracked branch diff, with special review of
+the quick guide, active version references, normalized documentation assertion,
+and every executable file changed by the version pin. `.git`, generated test
+repositories, and external GitHub implementation were excluded. The budget was
+one focused red/green line, one complete run, one fresh-diff review, and one
+complete confirmation only after a blocking changed fixture.
+
+| ID | Classification / severity / confidence | Evidence and action | Status |
+| --- | --- | --- | --- |
+| `FIND-0075` | Test fixture / Medium / High | The first complete run reached the real API fallback because one escaped workflow-source matcher still named `v0.7.2`; updated that exact mock boundary to `v0.7.3` and used the allowed complete confirmation. | Resolved |
+
+`TEST-0051` first failed on six absent boundary statements and then passed with
+the existing quick-adoption regressions in 84.7 seconds. The complete
+confirmation passed `TEST-0001` through `TEST-0051` in 143.7 seconds. The
+fresh-diff review found no credential-like value, whitespace error, PowerShell
+parse error, behavior change, or unclassified active `v0.7.2` reference. The
+only executable changes are immutable `v0.7.3` pin defaults and matching test
+fixtures. Existing full-suite link checks passed, so no actionable in-scope
+finding remains and validation stops.
+
+### Definition of Done
+
+- [x] `TEST-0051` failed on all six missing boundary statements before the
+      clarification and passed with the existing quick-adoption regressions in
+      84.7 seconds afterward.
+- [x] The complete protocol suite and link checks pass through `TEST-0051`.
+- [x] Fresh-diff review finds no behavior or security-boundary drift.
+- [x] Documentation, version, changelog, project memory, issue, and pull request
+      links are synchronized.
+- [x] Applicable CI passed in
+      [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023)
+      on Ubuntu and Windows; GitGuardian also passed. The final evidence commit
+      must retain those checks before merge.

@@ -31,9 +31,9 @@ uses the authenticated local `gh` identity for exact tagged-source retrieval.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.7.2`, the only repository file required
+For a new submodule consumer on `v0.7.3`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.7.2/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.7.3/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. The workflow checks out the exact tag
@@ -76,7 +76,7 @@ From the consuming repository root:
 
 ```powershell
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.7.2
+git -C .ai/protocol checkout v0.7.3
 git add .gitmodules .ai/protocol
 ```
 
@@ -311,7 +311,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.7.2`
+- ref: `v0.7.3`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -354,11 +354,11 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.7.2`:
+reviewed migration; the current example installs `v0.7.3`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.7.2
+git -C .ai/protocol checkout v0.7.3
 git add .ai/protocol
 ```
 

@@ -5,10 +5,11 @@ and follow its canonical links.
 
 ## Current continuation
 
-- [2026-07-15 - Adoption and updater integrity](2026-07-15-adoption-integrity.md)
+- [2026-07-15 - Quick-adoption boundary clarity](2026-07-15-quick-adoption-boundary-clarity.md)
 
 ## History
 
+- [2026-07-15 - Adoption and updater integrity](2026-07-15-adoption-integrity.md)
 - [2026-07-15 - Repository-native idea incubation](2026-07-15-idea-incubation.md)
 - [2026-07-15 - Optional credential-source files](2026-07-15-optional-credential-source-files.md)
 - [2026-07-15 - Existing Actions-secret preservation](2026-07-15-existing-secret-preservation.md)

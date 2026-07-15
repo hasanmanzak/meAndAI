@@ -11,6 +11,7 @@ and the existing repository suites.
 | `TEST-0041` | `SUBF-0014` | Exercise seed/secrets/lifecycle/idempotency and inspect v0.6.1 documentation. | Existing guarantees remain green, the old skip switch aliases the new local switch, no active Cloud instruction remains, and version/link metadata is consistent. | Regression / documentation | Passed | Full PowerShell suite |
 | `TEST-0042` | `BUG-0001` | Run quick adoption when both mapped Actions secrets exist, when only one exists, when an optional source path exists only in Git history, and when a new repository has neither. | Existing mapped names are never passed to `gh secret set`; only missing secrets are created; `FG_PAT.txt` is not required or read when its mapped secret exists; historical credential paths still block; new-repository provisioning remains unchanged. | Regression / credential boundary | Passed | Mock GitHub CLI plus real-Git fixtures |
 | `TEST-0045` | `BUG-0002` | Run an existing-target rerun with both mapped secrets present and both local files absent, then remove one secret and exercise failure/recovery; also run the new-repository path. | Existing secret names make their files optional; exact source is fetched through authenticated local `gh` when the protocol file is absent; a missing secret still requires its mapped file; new repositories still require both files. | Regression / source-auth boundary | Passed | Mock GitHub CLI plus real-Git fixtures |
+| `TEST-0051` | `BUG-0003` | Read the quick-adoption guide and its essential Codex prompt contract without relying on surrounding implementation knowledge. | The guide distinguishes the original target from the isolated clone, explains that the prompt is not the adoption entry point, assigns network/GitHub operations to the parent launcher before and after Codex, and retains the model-service exception. | Structural / documentation | Passed | Normalized guide assertions |
 
 ## Required coverage
 
@@ -22,6 +23,8 @@ and the existing repository suites.
 - No Cloud comment, auto-approval, or merge.
 - Existing repository, new repository, credential, lifecycle, bootstrap, and
   updater regression behavior.
+- Original-target versus isolated-clone credential-file ownership and parent
+  launcher versus Codex-spawned network authority.
 
 ## Evidence
 
@@ -39,3 +42,9 @@ and the existing repository suites.
 | 2026-07-15 | BUG-0002 post-review pre-integration working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass in 103.8 seconds on the v0.6.2 base; current v0.7.1 integrated confirmation remains required |
 | 2026-07-15 | BUG-0002 v0.7.1 integrated working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Pass: `TEST-0033` through `TEST-0042` and `TEST-0045` in 62.7 seconds |
 | 2026-07-15 | BUG-0002 v0.7.1 post-review working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: complete `TEST-0001` through `TEST-0045` in 111.2 seconds, including v0.7.0 idea-incubation regressions; no unresolved blocker remained |
+| 2026-07-15 | `main` at `v0.7.2` before BUG-0003 | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Pass: existing quick-adoption suite in 85.7 seconds after one sandbox-only Git signal-pipe ACL retry |
+| 2026-07-15 | BUG-0003 test-first working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Expected fail in 2.5 seconds: six missing explicit launcher/clone/network boundary statements |
+| 2026-07-15 | BUG-0003 clarified-guide working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Pass: existing quick-adoption regressions plus `TEST-0051` in 84.7 seconds |
+| 2026-07-15 | BUG-0003 first complete run | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Failed after unaffected suites passed: `FIND-0075` found one escaped v0.7.2 workflow-source matcher in the quick-adoption mock |
+| 2026-07-15 | BUG-0003 confirmation working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: complete `TEST-0001` through `TEST-0051` in 143.7 seconds |
+| 2026-07-15 | PR #33 commit `c9ab023` | GitHub-hosted Ubuntu and Windows plus GitGuardian | [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023) | Pass: Ubuntu, Windows, and secret scan |

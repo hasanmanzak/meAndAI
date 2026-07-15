@@ -442,7 +442,7 @@ if (Test-Path -LiteralPath $quickAdoptionTestPath -PathType Leaf) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $quickAdoptionTestPath
     if ($LASTEXITCODE -ne 0) {
-        Add-Failure 'TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, TEST-0049, and TEST-0050 quick adoption validation failed'
+        Add-Failure 'TEST-0033 through TEST-0042, TEST-0045 through TEST-0047, TEST-0049 through TEST-0051 quick adoption validation failed'
     }
 }
 
@@ -461,4 +461,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Protocol validation passed: TEST-0001 through TEST-0050.' -ForegroundColor Green
+Write-Host 'Protocol validation passed: TEST-0001 through TEST-0051.' -ForegroundColor Green
