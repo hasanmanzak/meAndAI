@@ -41,7 +41,7 @@ only the narrow internal seams required to keep these checks reviewable.
 - Changing the updater credential model or managed path set.
 - Giving Codex network, GitHub publication, approval, or merge authority.
 - Automatically repairing ambiguous adoption branches or pull requests.
-- Moving or rewriting the immutable `v0.7.1` tag.
+- Moving or rewriting the published `v0.7.1` tag.
 
 ## Readiness evidence
 
@@ -187,10 +187,17 @@ scan or hardening pass.
       on Ubuntu and Windows; GitGuardian also passed. The current PR head must
       retain those required checks before merge.
 
-## Release authority
+## Post-merge release evidence
 
 [Pull request #31](https://github.com/hasanmanzak/meAndAI/pull/31) is the reviewed
-delivery record. After merge, the annotated
-[`v0.7.2` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2) is the
-immutable release authority; creating that tag remains a separate post-merge
-gate and does not rewrite this feature history.
+delivery record. `v0.7.2` predates the external immutable-release authority
+introduced by [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md),
+so its historical annotated tag is a precise publication record but is not
+described as administratively immutable.
+
+| Field | Evidence |
+| --- | --- |
+| Release authority | Historical annotated tag; no external immutability claim |
+| Release identifier | [`v0.7.2`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.2) |
+| Target commit | [`3b55058c58926ff18003d7b15ceb95430ed8045b`](https://github.com/hasanmanzak/meAndAI/commit/3b55058c58926ff18003d7b15ceb95430ed8045b) |
+| Verification evidence | Local tag dereference and remote publication recorded on 2026-07-15 |

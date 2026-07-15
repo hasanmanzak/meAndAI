@@ -13,6 +13,9 @@ $global:LastPullRequestHead = ''
 $global:ExistingPullRequestMetadataMode = 'Valid'
 $global:ExistingPullRequestHead = ''
 $global:ExistingPullRequestProtocolSha = ''
+$global:ExistingPullRequestBody = ''
+$global:ExistingPullRequestIsDraft = $true
+$global:PostCreateRaceApplied = $false
 
 function Add-Failure {
     param([string]$Message)
@@ -82,15 +85,38 @@ function global:gh {
     }
     if ($arguments[0] -eq 'pr' -and $arguments[1] -eq 'list') {
         if ($global:PullRequestExists) {
-            $marker = [ordered]@{
-                schema = 2
-                state = 'BootstrapReady'
-                target = 'v0.5.0'
-                protocolSha = $global:ExistingPullRequestProtocolSha
-                head = $global:ExistingPullRequestHead
-                repository = 'owner/consumer'
-                actor = 'owner'
-            } | ConvertTo-Json -Compress
+            if ($global:ExistingPullRequestMetadataMode -ceq 'PostCreateRace' -and
+                -not $global:PostCreateRaceApplied) {
+                $racePath = Join-Path $env:GITHUB_WORKSPACE 'post-create-race.txt'
+                [IO.File]::WriteAllText($racePath, "race`n")
+                Invoke-Git -Repository $env:GITHUB_WORKSPACE -Arguments @(
+                    'add', 'post-create-race.txt'
+                ) | Out-Null
+                Invoke-Git -Repository $env:GITHUB_WORKSPACE -Arguments @(
+                    'commit', '-m', 'Simulate post-create race'
+                ) | Out-Null
+                Invoke-Git -Repository $env:GITHUB_WORKSPACE -Arguments @(
+                    'push', 'origin', 'automation/meandai-capabilities-v0.5.0'
+                ) | Out-Null
+                $global:ExistingPullRequestHead = (@(Invoke-Git `
+                    -Repository $env:GITHUB_WORKSPACE -Arguments @(
+                        'rev-parse', 'HEAD'
+                    )))[0]
+                $global:PostCreateRaceApplied = $true
+            }
+            $body = $global:ExistingPullRequestBody
+            if ([string]::IsNullOrWhiteSpace($body)) {
+                $marker = [ordered]@{
+                    schema = 2
+                    state = 'BootstrapReady'
+                    target = 'v0.5.0'
+                    protocolSha = $global:ExistingPullRequestProtocolSha
+                    head = $global:ExistingPullRequestHead
+                    repository = 'owner/consumer'
+                    actor = 'owner'
+                } | ConvertTo-Json -Compress
+                $body = "<!-- meandai-capabilities-adoption:$marker -->"
+            }
             $pullRequest = [ordered]@{
                 number = 40
                 url = 'https://github.com/owner/consumer/pull/40'
@@ -99,12 +125,15 @@ function global:gh {
                 baseRefName = 'main'
                 headRepository = [ordered]@{ nameWithOwner = 'owner/consumer' }
                 author = [ordered]@{ login = 'owner' }
-                body = "<!-- meandai-capabilities-adoption:$marker -->"
-                isDraft = $true
+                body = $body
+                isDraft = $global:ExistingPullRequestIsDraft
                 state = 'OPEN'
             }
             if ($global:ExistingPullRequestMetadataMode -ceq 'WrongAuthor') {
                 $pullRequest.author = [ordered]@{ login = 'untrusted-actor' }
+            }
+            if ($global:ExistingPullRequestMetadataMode -ceq 'MovedHead') {
+                $pullRequest.headRefOid = 'ffffffffffffffffffffffffffffffffffffffff'
             }
             @($pullRequest) | ConvertTo-Json -Depth 5 -Compress
         }
@@ -117,6 +146,9 @@ function global:gh {
         $bodyIndex = [array]::IndexOf($arguments, '--body')
         $global:LastPullRequestHead = [string]$arguments[$headIndex + 1]
         $global:LastPullRequestBody = [string]$arguments[$bodyIndex + 1]
+        $global:ExistingPullRequestBody = $global:LastPullRequestBody
+        $global:ExistingPullRequestHead = (@(Invoke-Git `
+            -Repository $env:GITHUB_WORKSPACE -Arguments @('rev-parse', 'HEAD')))[0]
         $global:PullRequestExists = $true
         'https://github.com/owner/consumer/pull/40'
         return
@@ -264,7 +296,8 @@ try {
         }
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
-            -not $global:LastPullRequestBody.Contains('"schema":2') -or
+            -not $global:LastPullRequestBody.Contains('"schema":3') -or
+            -not $global:LastPullRequestBody.Contains('"phase":"Proposed"') -or
             -not $global:LastPullRequestBody.Contains('"actor":"owner"') -or
             $global:LastPullRequestHead -cne 'automation/meandai-capabilities-v0.5.0') {
             Add-Failure 'TEST-0028 bootstrap did not create the deterministic draft proposal.'
@@ -360,31 +393,122 @@ try {
         Add-Failure "TEST-0031 drifted seed workflow must block: $($result.Error)"
     }
 
-    $global:PullRequestExists = $true
+    $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $global:ExistingPullRequestMetadataMode = 'Valid'
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $global:PostCreateRaceApplied = $false
     $pending = New-BootstrapFixture -Name 'pending'
-    Invoke-Git -Repository $pending.Consumer -Arguments @('switch', '-c', 'automation/meandai-capabilities-v0.5.0') | Out-Null
-    [IO.File]::WriteAllText((Join-Path $pending.Consumer 'pending.txt'), "pending`n")
-    Invoke-Git -Repository $pending.Consumer -Arguments @('add', 'pending.txt') | Out-Null
-    Invoke-Git -Repository $pending.Consumer -Arguments @('commit', '-m', 'Pending adoption') | Out-Null
-    Invoke-Git -Repository $pending.Consumer -Arguments @('push', 'origin', 'automation/meandai-capabilities-v0.5.0') | Out-Null
-    $global:ExistingPullRequestHead = (@(Invoke-Git -Repository $pending.Consumer -Arguments @(
-        'rev-parse', 'HEAD'
-    )))[0]
     $global:ExistingPullRequestProtocolSha = (@(Invoke-Git -Repository $pending.Source -Arguments @(
         'rev-parse', 'v0.5.0^{commit}'
     )))[0]
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if ($result.Threw -or $global:PullRequestCreateCalls -ne 1) {
+        Add-Failure "TEST-0057 exact pending-adoption fixture creation failed: $($result.Error)"
+    }
     Invoke-Git -Repository $pending.Consumer -Arguments @('switch', 'main') | Out-Null
     $result = Invoke-BootstrapFixture -Fixture $pending
-    if ($result.Threw -or $global:PullRequestCreateCalls -ne 0) {
-        Add-Failure "TEST-0031 pending adoption should be retained without duplication: $($result.Error)"
+    if ($result.Threw -or $global:PullRequestCreateCalls -ne 1) {
+        Add-Failure "TEST-0057 exact pending draft should be retained without duplication: $($result.Error)"
+    }
+
+    $schema3Body = $global:ExistingPullRequestBody
+    $legacyMarker = [ordered]@{
+        schema = 2
+        state = 'BootstrapReady'
+        target = 'v0.5.0'
+        protocolSha = $global:ExistingPullRequestProtocolSha
+        head = $global:ExistingPullRequestHead
+        repository = 'owner/consumer'
+        actor = 'owner'
+    } | ConvertTo-Json -Compress
+    $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$legacyMarker -->"
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if ($result.Threw) {
+        Add-Failure "TEST-0057 exact legacy schema-2 proposal should remain retainable: $($result.Error)"
+    }
+    $global:ExistingPullRequestBody = $schema3Body
+
+    $global:ExistingPullRequestIsDraft = $false
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+        Add-Failure "TEST-0057 non-draft proposal must block: $($result.Error)"
+    }
+    $global:ExistingPullRequestIsDraft = $true
+
+    $global:ExistingPullRequestMetadataMode = 'MovedHead'
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+        Add-Failure "TEST-0057 moved proposal head must block: $($result.Error)"
     }
 
     $global:ExistingPullRequestMetadataMode = 'WrongAuthor'
     $result = Invoke-BootstrapFixture -Fixture $pending
     if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
         Add-Failure "TEST-0047 untrusted existing proposal ownership must block: $($result.Error)"
+    }
+    $global:ExistingPullRequestMetadataMode = 'Valid'
+
+    Invoke-Git -Repository $pending.Consumer -Arguments @(
+        'switch', 'automation/meandai-capabilities-v0.5.0'
+    ) | Out-Null
+    Invoke-Git -Repository $pending.Consumer -Arguments @(
+        'rm', '.ai/adoption/meandai-capabilities.json'
+    ) | Out-Null
+    Invoke-Git -Repository $pending.Consumer -Arguments @(
+        'commit', '--amend', '--no-edit'
+    ) | Out-Null
+    Invoke-Git -Repository $pending.Consumer -Arguments @(
+        'push', '--force-with-lease', 'origin',
+        'automation/meandai-capabilities-v0.5.0'
+    ) | Out-Null
+    $global:ExistingPullRequestHead = (@(Invoke-Git `
+        -Repository $pending.Consumer -Arguments @('rev-parse', 'HEAD')))[0]
+    $global:ExistingPullRequestBody = ''
+    Invoke-Git -Repository $pending.Consumer -Arguments @('switch', 'main') | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $pending
+    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+        Add-Failure "TEST-0057 proposal missing its manifest must block: $($result.Error)"
+    }
+
+    $global:PullRequestExists = $true
+    $global:ExistingPullRequestMetadataMode = 'Valid'
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $arbitrary = New-BootstrapFixture -Name 'arbitrary-pending'
+    Invoke-Git -Repository $arbitrary.Consumer -Arguments @(
+        'switch', '-c', 'automation/meandai-capabilities-v0.5.0'
+    ) | Out-Null
+    [IO.File]::WriteAllText((Join-Path $arbitrary.Consumer 'pending.txt'), "pending`n")
+    Invoke-Git -Repository $arbitrary.Consumer -Arguments @('add', 'pending.txt') | Out-Null
+    Invoke-Git -Repository $arbitrary.Consumer -Arguments @(
+        'commit', '-m', 'Arbitrary pending content'
+    ) | Out-Null
+    Invoke-Git -Repository $arbitrary.Consumer -Arguments @(
+        'push', 'origin', 'automation/meandai-capabilities-v0.5.0'
+    ) | Out-Null
+    $global:ExistingPullRequestHead = (@(Invoke-Git `
+        -Repository $arbitrary.Consumer -Arguments @('rev-parse', 'HEAD')))[0]
+    $global:ExistingPullRequestProtocolSha = (@(Invoke-Git `
+        -Repository $arbitrary.Source -Arguments @('rev-parse', 'v0.5.0^{commit}')))[0]
+    Invoke-Git -Repository $arbitrary.Consumer -Arguments @('switch', 'main') | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $arbitrary
+    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
+        Add-Failure "TEST-0057 arbitrary branch content must not be retained: $($result.Error)"
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestMetadataMode = 'PostCreateRace'
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $global:PostCreateRaceApplied = $false
+    $race = New-BootstrapFixture -Name 'post-create-race'
+    $result = Invoke-BootstrapFixture -Fixture $race
+    if (-not $result.Threw -or
+        $result.Error -notlike '*post-publication validation*') {
+        Add-Failure "TEST-0057 post-create head race must block: $($result.Error)"
     }
     $global:ExistingPullRequestMetadataMode = 'Valid'
 
@@ -413,4 +537,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031, TEST-0044, and TEST-0047.' -ForegroundColor Green
+Write-Host 'AI capabilities bootstrap adapter tests passed: TEST-0028 through TEST-0031, TEST-0044, TEST-0047, and TEST-0057.' -ForegroundColor Green

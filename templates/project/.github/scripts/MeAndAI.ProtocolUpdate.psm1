@@ -61,14 +61,28 @@ function Get-MeAndAIProtocolCandidateProblems {
     $problems = [System.Collections.Generic.List[string]]::new()
     $target = [string]$Candidate.TargetTag
 
-    if ([string]$Candidate.PullRequestState -cne 'Open') {
-        $problems.Add('state is not open')
+    $stateProperty = $Context.PSObject.Properties['ExpectedPullRequestState']
+    $expectedState = if ($null -ne $stateProperty) {
+        [string]$stateProperty.Value
+    }
+    else { 'Open' }
+    $branchProperty = $Context.PSObject.Properties['ExpectedBranchExists']
+    $expectedBranchExists = if ($null -ne $branchProperty) {
+        [bool]$branchProperty.Value
+    }
+    else { $true }
+
+    if ([string]$Candidate.PullRequestState -cne $expectedState) {
+        $problems.Add("state is not $($expectedState.ToLowerInvariant())")
     }
     if ([string]$Candidate.HeadRef -cne "$($Context.BranchPrefix)$target") {
         $problems.Add('head branch is not the deterministic target branch')
     }
-    if (-not [bool]$Candidate.BranchExists) {
-        $problems.Add('remote branch is missing')
+    if ([bool]$Candidate.BranchExists -ne $expectedBranchExists) {
+        $branchProblem = if ($expectedBranchExists) {
+            'remote branch is missing'
+        } else { 'remote branch still exists' }
+        $problems.Add($branchProblem)
     }
     if (-not [bool]$Candidate.SameRepository) {
         $problems.Add('head repository is not the consumer repository')
@@ -93,10 +107,18 @@ function Get-MeAndAIProtocolCandidateProblems {
         [string]$Candidate.ProtocolEntrySha -cne [string]$Candidate.ExpectedProtocolSha) {
         $problems.Add('protocol gitlink does not match the declared release')
     }
-    if ([string]$Candidate.ExpectedHeadSha -cnotmatch '^[0-9a-f]{40}$' -or
+    $headChanged = [string]$Candidate.ExpectedHeadSha -cnotmatch '^[0-9a-f]{40}$' -or
         [string]$Candidate.MarkerHeadSha -cne [string]$Candidate.ExpectedHeadSha -or
-        [string]$Candidate.ApiHeadSha -cne [string]$Candidate.ExpectedHeadSha -or
-        [string]$Candidate.ObservedHeadSha -cne [string]$Candidate.ExpectedHeadSha) {
+        [string]$Candidate.ApiHeadSha -cne [string]$Candidate.ExpectedHeadSha
+    if ($expectedBranchExists) {
+        $headChanged = $headChanged -or
+            [string]$Candidate.ObservedHeadSha -cne [string]$Candidate.ExpectedHeadSha
+    }
+    else {
+        $headChanged = $headChanged -or
+            -not [string]::IsNullOrEmpty([string]$Candidate.ObservedHeadSha)
+    }
+    if ($headChanged) {
         $problems.Add('head SHA changed')
     }
     $managedPaths = @($Context.ManagedPaths | ForEach-Object { [string]$_ })

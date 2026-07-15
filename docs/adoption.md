@@ -31,13 +31,15 @@ uses the authenticated local `gh` identity for exact tagged-source retrieval.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.7.3`, the only repository file required
+For a new submodule consumer on `v0.8.0`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.7.3/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.8.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
-adoption or run the workflow manually. The workflow checks out the exact tag
-embedded in its own reviewed content; it never executes a moving `main`.
+adoption or run the workflow manually. Before checkout, the workflow requires
+the exact tag embedded in its reviewed content to have a published immutable
+GitHub Release, then checks out that locked tag; it never executes a moving
+`main`.
 
 The same operation covers an empty repository, a populated repository, and an
 already adopted repository. Classification depends only on collisions with
@@ -75,8 +77,22 @@ workflow.
 From the consuming repository root:
 
 ```powershell
+$tag = 'v0.8.0'
+$release = gh api -H 'Accept: application/vnd.github+json' `
+  -H 'X-GitHub-Api-Version: 2026-03-10' `
+  "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
+$publishedAt = [DateTimeOffset]::MinValue
+if ([string]$release.tag_name -cne $tag -or
+    $release.draft -isnot [bool] -or $release.draft -or
+    $release.prerelease -isnot [bool] -or $release.prerelease -or
+    $release.immutable -isnot [bool] -or -not $release.immutable -or
+    -not [DateTimeOffset]::TryParse(
+      [string]$release.published_at, [ref]$publishedAt
+    )) {
+  throw "Protocol release $tag is not published and immutable."
+}
 git submodule add https://github.com/hasanmanzak/meAndAI.git .ai/protocol
-git -C .ai/protocol checkout v0.7.3
+git -C .ai/protocol checkout $tag
 git add .gitmodules .ai/protocol
 ```
 
@@ -250,9 +266,10 @@ runs. See GitHub's documentation for
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
 and [fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
-The updater selects the highest numeric canonical tag in the current major and
-uses a draft pull request as the review gate. It never approves or merges a pull
-request.
+The updater identifies the highest numeric canonical tag in the current major,
+requires its exact published immutable-release metadata before target checkout
+or mutation, and uses a draft pull request as the review gate. It never
+approves or merges a pull request.
 Its state rules are:
 
 | Observed state | Result |
@@ -311,7 +328,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.7.3`
+- ref: `v0.8.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -354,11 +371,13 @@ condition.
 6. Update the pinned version in project memory and merge through a pull request.
 
 For a submodule without the updater, use the target release selected by the
-reviewed migration; the current example installs `v0.7.3`:
+reviewed migration. Verify its immutable-release metadata with the same check
+shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
+before checkout; the current example then installs `v0.8.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.7.3
+git -C .ai/protocol checkout v0.8.0
 git add .ai/protocol
 ```
 

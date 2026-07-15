@@ -85,6 +85,14 @@ if (-not $protocolEntry) {
 $evidencePath = Join-Path $working 'docs/ai-adoption.md'
 New-Item -ItemType Directory -Path (Split-Path -Parent $evidencePath) -Force | Out-Null
 Set-Content -LiteralPath $evidencePath -Value '# Local adoption evidence' -Encoding UTF8
+if ($mode -ceq 'RenameWorkflowAway') {
+    $workflowPath = Join-Path $working '.github/workflows/meandai-protocol-update.yml'
+    $renamedPath = Join-Path $working '.github/workflows/meandai-protocol-update-renamed.yml'
+    & git -C $working mv -- $workflowPath $renamedPath
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to rename the protected mock lifecycle workflow.'
+    }
+}
 if ($mode -cne 'LeaveManifest') {
     Remove-Item -LiteralPath $manifestPath -Force
 }
@@ -104,7 +112,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.7.3' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.8.0' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

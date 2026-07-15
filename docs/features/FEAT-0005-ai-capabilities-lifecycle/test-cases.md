@@ -17,7 +17,7 @@ repository/updater suites.
 ## Required coverage
 
 - Success: workflow-only seed produces a deterministic collision-free adoption
-  proposal from an immutable source tag.
+  proposal from an exact source release.
 - Populated repository: arbitrary app content does not imply collision, while
   exact consumer-owned target conflicts require semantic review.
 - Supply chain: source bootstrap execution is pinned and target tag identity is

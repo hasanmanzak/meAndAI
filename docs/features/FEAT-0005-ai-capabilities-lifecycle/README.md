@@ -68,7 +68,7 @@ agent or maintainer.
 
 The seed is the canonical consumer workflow at
 `.github/workflows/meandai-protocol-update.yml`. It checks out the protocol
-source at the workflow's immutable bootstrap tag. If both local updater scripts
+source at the workflow's exact bootstrap tag. If both local updater scripts
 exist, it executes the local updater. Otherwise it executes the source-only
 bootstrap adapter from that checkout.
 
@@ -113,7 +113,7 @@ evidence of collision and are never changed.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0022` | Supply chain | Workflow-only bootstrap executes code not yet stored in the consumer | Mitigated; protocol maintainers | Execute only from the workflow's immutable protocol tag and verify tag/checkout identity |
+| `RISK-0022` | Supply chain | Workflow-only bootstrap executes code not yet stored in the consumer | Mitigated; protocol maintainers | Execute only from the workflow's exact protocol release and verify release/tag/checkout identity |
 | `RISK-0023` | Integrity | A populated repository is misclassified as safe and consumer content is overwritten | Mitigated; bootstrap adapter | Exact target collision inventory, copy-only-when-absent behavior, staged-path validation, and negative fixtures |
 | `RISK-0024` | Semantics | “AI capabilities” is mistaken for an automatically running AI agent | Mitigated; maintainers | Explicit manifest handoff and non-goal; workflow never calls an AI service |
 | `RISK-0025` | Interruption | Branch creation succeeds before PR creation and leaves an orphan | Managed; consumer maintainer | Expected-absent lease, deterministic branch, no overwrite on later runs, and documented recovery |
@@ -157,7 +157,7 @@ evidence of collision and are never changed.
 ## Acceptance criteria
 
 1. A consumer containing only the exact canonical seed workflow can execute
-   bootstrap code from the workflow's immutable protocol tag without local
+   bootstrap code from the workflow's exact protocol release without local
    scripts.
 2. If no adoption target collides, one deterministic draft proposal contains
    the exact protocol gitlink, core adoption assets, and handoff manifest while

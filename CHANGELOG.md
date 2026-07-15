@@ -3,6 +3,31 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.0 - 2026-07-15
+
+### Added
+
+- Made exact published immutable GitHub Releases the external authority for
+  executable bootstrap sources and automatic update targets.
+- Added explicit proposed/completed adoption markers, exact live PR
+  revalidation, dispatch-specific workflow-run identity, and reachable
+  ref/reflog credential-history boundaries.
+
+### Fixed
+
+- Made protected-path and `.gitmodules` checks case-sensitive and rename-safe.
+- Replaced metadata-only adoption retention with one exact draft, marker,
+  manifest, ancestry, tree, and live-ref validator.
+- Made supersession cleanup replacement-first, revalidated, lease-safe, and
+  compensated when close/delete continuity cannot be proven.
+- Derived repository evidence coverage from canonical indexes, excluded nested
+  repositories from root Markdown validation, bounded CI, and reconciled
+  release/finding records through one reusable evidence schema.
+
+Related work: [FEAT-0010](docs/features/FEAT-0010-protocol-stability-invariants/README.md),
+[DEC-0010](docs/decisions/DEC-0010-stable-automation-invariants.md), and
+[issue #34](https://github.com/hasanmanzak/meAndAI/issues/34).
+
 ## 0.7.3 - 2026-07-15
 
 ### Changed
@@ -301,7 +326,7 @@ Related work: [issue #5](https://github.com/hasanmanzak/meAndAI/issues/5).
 
 ### Migration
 
-- Consumers already pinned to immutable `v0.1.0` need one manual upgrade to
+- Consumers already pinned to exact `v0.1.0` need one manual upgrade to
   `v0.2.0` and one-time updater installation. New `v0.2.0` adopters receive the
   updater assets during initial adoption.
 - Repository-reference consumers require a provider-specific deterministic

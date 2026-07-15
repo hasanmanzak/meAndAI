@@ -58,6 +58,38 @@ function Invoke-GhPagedJson {
     }
 }
 
+function Assert-ImmutableProtocolRelease {
+    param(
+        [string]$Repository,
+        [string]$Tag
+    )
+
+    if (-not (Test-MeAndAIProtocolTag -Tag $Tag)) {
+        throw "Selected protocol target '$Tag' is not a canonical release tag."
+    }
+    $release = Invoke-GhJson -Arguments @(
+        'api',
+        '-H', 'Accept: application/vnd.github+json',
+        '-H', 'X-GitHub-Api-Version: 2026-03-10',
+        "repos/$Repository/releases/tags/$Tag"
+    )
+    foreach ($name in @('tag_name', 'draft', 'prerelease', 'immutable', 'published_at')) {
+        if ($null -eq $release -or $null -eq $release.PSObject.Properties[$name]) {
+            throw "Protocol release '$Tag' is missing required immutable-release metadata '$name'."
+        }
+    }
+    $publishedAt = [DateTimeOffset]::MinValue
+    if ([string]$release.tag_name -cne $Tag -or
+        $release.draft -isnot [bool] -or [bool]$release.draft -or
+        $release.prerelease -isnot [bool] -or [bool]$release.prerelease -or
+        $release.immutable -isnot [bool] -or -not [bool]$release.immutable -or
+        -not [DateTimeOffset]::TryParse(
+            [string]$release.published_at, [ref]$publishedAt
+        )) {
+        throw "Protocol target '$Tag' is not an exact published, non-prerelease, immutable GitHub Release."
+    }
+}
+
 function Get-ValidatedPullRequestChangedPaths {
     param([object[]]$Files)
 
@@ -472,7 +504,10 @@ function Assert-ManagedPullRequestSafe {
         [string]$SourcePath,
         [string]$BaseCommit,
         [object[]]$ManagedAssets,
-        [string[]]$ManagedPaths
+        [string[]]$ManagedPaths,
+        [ValidateSet('Open', 'Closed')]
+        [string]$ExpectedPullRequestState = 'Open',
+        [bool]$ExpectedBranchExists = $true
     )
 
     $number = [int]$Operation.PullRequestNumber
@@ -524,6 +559,8 @@ function Assert-ManagedPullRequestSafe {
         BranchPrefix = [string]$script:BranchPrefix
         ProtocolPath = $ProtocolPath; ManagedPaths = $ManagedPaths
         TrustedActor = $TrustedActor
+        ExpectedPullRequestState = $ExpectedPullRequestState
+        ExpectedBranchExists = $ExpectedBranchExists
     }
     $problems = @(Get-MeAndAIProtocolCandidateProblems -Candidate $candidate -Context $context)
 
@@ -556,7 +593,7 @@ $submodulePaths = @(Invoke-Native -Command 'git' -Arguments @(
 ))
 $matchingSubmodules = @($submodulePaths | Where-Object {
     ([string]$_) -match '^(?<key>submodule\..+\.path)\s+(?<path>.+)$' -and
-    $Matches.path -eq $ProtocolPath
+    [string]$Matches.path -ceq $ProtocolPath
 })
 if ($matchingSubmodules.Count -ne 1) {
     throw "'$ProtocolPath' must have exactly one .gitmodules entry."
@@ -712,6 +749,9 @@ if (@($plan.Operations).Count -eq 0) {
     Write-Host "Protocol update state: $($plan.State). No mutation required."
     exit 0
 }
+
+Assert-ImmutableProtocolRelease -Repository $ProtocolRepository `
+    -Tag ([string]$plan.LatestCompatibleTag)
 
 $create = @($plan.Operations | Where-Object Kind -eq 'CreateUpgrade')
 if ($create.Count -gt 1) {
@@ -932,25 +972,33 @@ foreach ($operation in @($plan.Operations | Where-Object Kind -eq 'ClosePullRequ
             -SourcePath $sourcePath -BaseCommit $baseHeadSha `
             -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
     }
-    $comment = if ($null -ne $replacementPullRequestNumber) {
-        "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup will attempt to close this PR and delete its unchanged branch. If branch deletion fails, the workflow will try to reopen the PR and preserve the branch."
-    }
-    else {
-        "The default branch already contains ``$($operation.TargetTag)``. Automated cleanup will attempt to close this PR and delete its unchanged branch. If branch deletion fails, the workflow will try to reopen the PR and preserve the branch."
-    }
-    Invoke-Native -Command 'gh' -Arguments @('api', '--method', 'POST', "repos/$repository/issues/$($operation.PullRequestNumber)/comments", '-f', "body=$comment") | Out-Null
     Invoke-Native -Command 'gh' -Arguments @('api', '--method', 'PATCH', "repos/$repository/pulls/$($operation.PullRequestNumber)", '-f', 'state=closed') | Out-Null
 
     try {
-        $remoteHead = Get-RemoteBranchHead -Branch ([string]$operation.Branch)
-        if ($null -eq $remoteHead) {
-            throw "Managed branch '$($operation.Branch)' disappeared before deletion."
-        }
-        if ($remoteHead -ne [string]$operation.ExpectedHeadSha) {
-            throw "Managed branch '$($operation.Branch)' changed before deletion."
+        Assert-ManagedPullRequestSafe -Repository $repository -Operation $operation `
+            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+            -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+            -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths `
+            -ExpectedPullRequestState Closed -ExpectedBranchExists $true
+        if ($null -ne $replacementOperation) {
+            Assert-ManagedPullRequestSafe -Repository $repository -Operation $replacementOperation `
+                -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+                -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+                -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
         }
         Remove-RemoteBranch -Branch ([string]$operation.Branch) `
             -ExpectedHeadSha ([string]$operation.ExpectedHeadSha)
+        Assert-ManagedPullRequestSafe -Repository $repository -Operation $operation `
+            -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+            -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+            -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths `
+            -ExpectedPullRequestState Closed -ExpectedBranchExists $false
+        if ($null -ne $replacementOperation) {
+            Assert-ManagedPullRequestSafe -Repository $repository -Operation $replacementOperation `
+                -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+                -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+                -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
+        }
     }
     catch {
         $cleanupError = $_.Exception.Message
@@ -959,12 +1007,28 @@ foreach ($operation in @($plan.Operations | Where-Object Kind -eq 'ClosePullRequ
                 'api', '--method', 'PATCH', "repos/$repository/pulls/$($operation.PullRequestNumber)",
                 '-f', 'state=open'
             ) | Out-Null
+            Assert-ManagedPullRequestSafe -Repository $repository -Operation $operation `
+                -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
+                -SourcePath $sourcePath -BaseCommit $baseHeadSha `
+                -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths `
+                -ExpectedPullRequestState Open -ExpectedBranchExists $true
         }
         catch {
             throw "Branch cleanup failed for PR #$($operation.PullRequestNumber), and the PR could not be reopened. Manual recovery is required. Original error: $cleanupError"
         }
         throw "Branch cleanup failed for PR #$($operation.PullRequestNumber); the PR was reopened and the branch preserved. $cleanupError"
     }
+    $comment = if ($null -ne $replacementPullRequestNumber) {
+        "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
+    }
+    else {
+        "The default branch already contains ``$($operation.TargetTag)``. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
+    }
+    Invoke-Native -Command 'gh' -Arguments @(
+        'api', '--method', 'POST',
+        "repos/$repository/issues/$($operation.PullRequestNumber)/comments",
+        '-f', "body=$comment"
+    ) | Out-Null
 }
 
 Write-Host "Protocol update reconciliation completed: $($plan.State)."

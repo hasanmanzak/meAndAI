@@ -44,7 +44,7 @@ Finite scope, evidence-based repetition, and a blocked exit prevent blind loops.
   `resolved`, `accepted residual risk`, `converged`, and `blocked`; completion
   cannot be inferred from validation-budget exhaustion.
 - Consumers and dependencies: this repository and consumers that intentionally
-  adopt `v0.3.0`; consumers pinned to earlier immutable tags remain unchanged.
+  adopt `v0.3.0`; consumers on earlier exact pins remain unchanged.
 - Verification: `TEST-0019`, the existing structural/link suite, one fresh-diff
   self-review, and one final relevant verification command.
 
