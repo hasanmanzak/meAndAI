@@ -2,7 +2,7 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-16**<br>
-Protocol version: **0.8.3**
+Protocol version: **0.8.4**
 
 Exact publication state is authoritative only in
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and the

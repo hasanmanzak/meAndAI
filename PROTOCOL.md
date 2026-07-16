@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.8.3**<br>
+Protocol version: **0.8.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -155,6 +155,12 @@ Mocks MUST express real contracts rather than make an implementation convenient.
 Tests cover success, failure, boundaries, invariants, and regression risk at the
 lowest useful level, with integration or end-to-end coverage where boundaries
 make unit evidence insufficient.
+
+A scenario description and its status MUST match the behavior actually
+exercised. A pre-seeded state followed by a sequential rerun is recovery or
+state-transition evidence, not concurrent-execution evidence. Variants named by
+a scenario require distinct fixtures or an explicit parameterized case for each
+variant.
 
 ### Gate 4 - Small-slice implementation
 
@@ -354,6 +360,10 @@ multiple records merely to increase detail.
   external resources. They MUST be clickable and validated before completion;
   record automated local-link results and manual or automated external-link
   evidence separately.
+- An automated external-evidence query MUST exhaust the provider's pagination
+  contract or fail at a declared finite page limit. A focused fixture MUST place
+  qualifying evidence after the first page when closure depends on comments or
+  another paginated collection.
 - Documentation and implementation change in the same pull request.
 
 ## 7. GitHub tracking
@@ -379,7 +389,8 @@ only when it enforces a recurring gate more reliably than recorded local checks.
 
 ## 8. Versioning
 
-Versions use `M.m.rev` and Git tags use `vM.m.rev`.
+Versions use `M.m.rev` and Git tags use `vM.m.rev`. Each component is an ASCII
+decimal integer with no leading zero unless the component is exactly `0`.
 
 - `M`: incompatible protocol, public contract, data, or adoption change.
 - `m`: backward-compatible feature or meaningful capability addition.
@@ -409,6 +420,11 @@ an exact published immutable release before checking out or executing bootstrap
 code, then verify that checked-out source identity before proposing consumer
 changes.
 
+Before the workflow executes any consumer-local updater copy with repository
+write credentials, trusted code from that exact checked-out release MUST verify
+the local managed updater asset set, file modes, and blobs. A missing or
+differing asset MUST block before the local copy receives either credential.
+
 Deterministic adoption discovery classifies declared target paths, not the
 presence of unrelated application code. When every target is absent except an
 exact seed workflow, automation MAY open a draft containing the protocol
@@ -432,6 +448,11 @@ the local updater owns compatible update discovery and supersession under the
 controls below. The source-only bootstrap resolver and adapter are not copied
 into the consumer.
 
+A transient adoption manifest MUST be validated before it enters an agent
+prompt. Validation includes the exact canonical property inventory, repository
+and release identity, proposed-path and collision sets, and required-task set;
+accepting only a subset of identity fields is insufficient.
+
 #### Local quick-adoption launcher
 
 A consumer adopting `v0.6.0` or later MAY use the protocol's source-only local
@@ -445,6 +466,12 @@ MUST be clean, on their synchronized GitHub default branch, and preserve all
 consumer-owned content. A new directory MAY be initialized and connected to a
 new private repository by default, but unrelated local files MUST remain
 unpublished.
+
+Before the launcher acquires the secret-reconciliation lock or creates a
+repository secret, any existing seed-workflow path MUST be a regular file whose
+bytes exactly match the canonical release seed. Missing seed state may proceed
+to canonical creation; differing or non-file state MUST block before secret
+inventory or mutation.
 
 When the explicit local inputs `FG_PAT.txt` and `MEANDAI_RO_FG_PAT.txt` are
 used, their values MUST be stored only as `MEANDAI_UPDATER_TOKEN` and
@@ -508,6 +535,14 @@ completion provenance is unknown. Missing or ambiguous workflow runs, drafts,
 local CLI authentication, semantic results, or branch ownership MUST block or
 leave a clear manual handoff. Neither launcher nor agent may approve or merge
 the pull request.
+
+When completion spans a remote head update and a later ownership-marker or
+pull-request update, the launcher MUST persist exact pre-push intent that binds
+the previous and planned heads. If the planned head is live, a rerun MUST
+validate and finalize it without repeating semantic work. If the previous head
+is still live, the launcher MUST restore the exact proposal state before any
+retry. Any other head MUST block; push-first state that only the later marker
+can explain is prohibited.
 
 A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
 self-reconciling, consumer-owned update workflow supplied by the pinned

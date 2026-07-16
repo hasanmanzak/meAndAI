@@ -91,12 +91,107 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 
     $plan = Invoke-LifecyclePlan -SeedWorkflowState 'Drifted'
     Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 seed workflow drift must block remote execution'
+
+    $manifestValidator = Get-Command -Name 'Test-MeAndAIExactAdoptionManifest' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $targetPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionTargetPaths' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $proposedPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionProposedPaths' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    if ($null -eq $manifestValidator -or $null -eq $targetPathGetter -or
+        $null -eq $proposedPathGetter) {
+        Add-Failure 'TEST-0080 pure lifecycle module does not export the canonical adoption path contract and validator.'
+    }
+    else {
+        $protocolSha = ('a' * 40) -join ''
+        $expectedCollisions = @('AGENTS.md')
+        $expectedTargetPaths = @(
+            '.gitmodules', '.ai/protocol', 'AGENTS.md',
+            '.ai/memory/README.md', '.ai/memory/project.md',
+            '.ai/memory/log/README.md', 'docs/ideas/README.md',
+            '.github/ISSUE_TEMPLATE/bug.yml',
+            '.github/ISSUE_TEMPLATE/epic.yml',
+            '.github/ISSUE_TEMPLATE/feature.yml',
+            '.github/ISSUE_TEMPLATE/finding.yml',
+            '.github/ISSUE_TEMPLATE/subfeature.yml',
+            '.github/ISSUE_TEMPLATE/task.yml',
+            '.github/PULL_REQUEST_TEMPLATE.md',
+            '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        )
+        $expectedProposedPaths = @(
+            '.github/workflows/meandai-protocol-update.yml'
+        ) + @($expectedTargetPaths)
+        $actualTargetPaths = @(& $targetPathGetter)
+        $actualProposedPaths = @(& $proposedPathGetter)
+        if (($actualTargetPaths -join "`n") -cne ($expectedTargetPaths -join "`n")) {
+            Add-Failure 'TEST-0080 canonical adoption target path inventory is not exact.'
+        }
+        if (($actualProposedPaths -join "`n") -cne ($expectedProposedPaths -join "`n")) {
+            Add-Failure 'TEST-0080 canonical adoption proposed path inventory is not exact.'
+        }
+        $requiredTasks = @(
+            'Create or reconcile the repository labels required by the protocol.',
+            'Create project-owned feature and decision records for adoption.',
+            'Tailor project-local memory without importing protocol-repository facts.',
+            'Resolve every collision through semantic review; do not overwrite blindly.',
+            'Create and run the project test evidence required by DoR and DoD.',
+            'Verify all documentation links and traceability references.',
+            'Remove the manifest before marking the pull request ready or merging it.'
+        )
+        $validManifest = [pscustomobject][ordered]@{
+            schema = 1
+            operation = 'ai-capabilities-adoption'
+            state = 'AdoptionReviewRequired'
+            repository = 'owner/consumer'
+            targetTag = 'v0.8.4'
+            protocolSha = $protocolSha
+            collisions = $expectedCollisions
+            proposedPaths = $expectedProposedPaths
+            requiredTasks = $requiredTasks
+        }
+        function Test-ManifestFixture {
+            param([Parameter(Mandatory)]$Manifest)
+
+            return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
+                -Repository 'owner/consumer' -TargetTag 'v0.8.4' `
+                -ProtocolSha $protocolSha -ExpectedState 'AdoptionReviewRequired' `
+                -ExpectedCollisions $expectedCollisions
+        }
+
+        if (-not (Test-ManifestFixture -Manifest $validManifest)) {
+            Add-Failure 'TEST-0080 exact canonical adoption manifest was rejected.'
+        }
+
+        $invalidManifests = [ordered]@{}
+        $extraProperty = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $extraProperty | Add-Member -NotePropertyName unexpected -NotePropertyValue $true
+        $invalidManifests['additional property'] = $extraProperty
+        $missingProperty = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $missingProperty.PSObject.Properties.Remove('requiredTasks')
+        $invalidManifests['missing property'] = $missingProperty
+        $wrongTasks = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $wrongTasks.requiredTasks = @('Remove the manifest before readiness.')
+        $invalidManifests['wrong required task inventory'] = $wrongTasks
+        $wrongPaths = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $wrongPaths.proposedPaths = @($expectedProposedPaths | Select-Object -Skip 1)
+        $invalidManifests['wrong proposed path inventory'] = $wrongPaths
+        $wrongCollisions = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $wrongCollisions.collisions = @('docs/ideas/README.md')
+        $invalidManifests['wrong collision inventory'] = $wrongCollisions
+
+        foreach ($entry in $invalidManifests.GetEnumerator()) {
+            if (Test-ManifestFixture -Manifest $entry.Value) {
+                Add-Failure "TEST-0080 manifest with $($entry.Key) was accepted."
+            }
+        }
+    }
 }
 
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.8.3',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.8.4',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',
@@ -121,6 +216,12 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
             Add-Failure "TEST-0032 workflow contains forbidden behavior '$forbidden'"
         }
     }
+    $trustedPreflightIndex = $workflow.IndexOf('-ValidateLocalUpdaterOnly', [StringComparison]::Ordinal)
+    $localUpdaterInvocationIndex = $workflow.IndexOf('& "./$adapterPath"', [StringComparison]::Ordinal)
+    if ($trustedPreflightIndex -lt 0 -or $localUpdaterInvocationIndex -lt 0 -or
+        $trustedPreflightIndex -ge $localUpdaterInvocationIndex) {
+        Add-Failure 'TEST-0077 trusted-source updater validation must run before the local updater adapter.'
+    }
 }
 
 if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
@@ -143,7 +244,8 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
         'BootstrapReady',
         'AdoptionReviewRequired',
         'PendingAdoption',
-        'BlockedManualReview'
+        'BlockedManualReview',
+        'ValidateLocalUpdaterOnly'
     )) {
         if (-not $adapter.Contains($required)) {
             Add-Failure "TEST-0028 bootstrap adapter is missing '$required'"

@@ -1,6 +1,6 @@
 # FEAT-0006 Test Scenarios
 
-Planned test implementation: `tests/quick-adoption.tests.ps1` and the existing
+Implementations: `tests/quick-adoption.tests.ps1` and the existing
 repository suites.
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

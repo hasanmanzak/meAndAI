@@ -15,6 +15,17 @@ body:
     attributes:
       label: Disposition
       options:
+        - Blocking
+        - AcceptedResidual
+        - ExternalOrLegacyFollowUp
+        - OptionalImprovement
+    validations:
+      required: true
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Finding classification
+      options:
         - Confirmed defect
         - Risk
         - Optional improvement
