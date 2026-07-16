@@ -5,6 +5,7 @@
 - Feature: [FEAT-0019](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md)
 - Tests: [TEST-0103 and TEST-0104](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md)
 - Issue: [#55](https://github.com/hasanmanzak/meAndAI/issues/55)
+- Pull request: [#56](https://github.com/hasanmanzak/meAndAI/pull/56)
 
 ## Durable continuation
 

@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.4 |
 | Issue | [#55](https://github.com/hasanmanzak/meAndAI/issues/55) |
-| Pull request | Pending |
+| Pull request | [#56](https://github.com/hasanmanzak/meAndAI/pull/56) |
 | Decisions | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md), [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) |
 | Tests | [TEST-0103 and TEST-0104](test-cases.md) |
 
@@ -135,6 +135,7 @@ at setup with Access Denied.
 - Governing decisions: [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) and [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
+- Delivery pull request: [#56](https://github.com/hasanmanzak/meAndAI/pull/56)
 - Consumer evidence: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
 
 ## Self-review and completion
@@ -159,7 +160,7 @@ re-enable, stale active version pin, or unresolved blocking finding.
       `Blocking` finding.
 - [x] Version, changelog, guide, decisions, links, feature index, and project
       memory agree.
-- [ ] Issue and pull request link canonical records and validation evidence.
+- [x] Issue and pull request link canonical records and validation evidence.
 
 ## Post-merge publication gate
 
