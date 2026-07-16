@@ -469,7 +469,29 @@ function global:Invoke-WebRequest {
         Copy-Item -LiteralPath (Join-Path $root "templates/project/.github/scripts/$name") `
             -Destination (Join-Path $protocolScriptDirectory $name)
     }
-    Compress-Archive -LiteralPath $sourceRoot -DestinationPath $OutFile -Force
+    # Compress-Archive omits dot-prefixed directories on non-Windows hosts,
+    # which would silently drop the canonical templates/project/.github tree.
+    # The .NET ZIP API preserves that exact fixture inventory on every runner.
+    if (-not ('System.IO.Compression.ZipFile' -as [type])) {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+    }
+    if (Test-Path -LiteralPath $OutFile) {
+        [IO.File]::Delete($OutFile)
+    }
+    [IO.Compression.ZipFile]::CreateFromDirectory($archiveRoot, $OutFile)
+    $archive = [IO.Compression.ZipFile]::OpenRead($OutFile)
+    try {
+        $capabilitiesEntry = @($archive.Entries | Where-Object {
+            ([string]$_.FullName).Replace('\', '/') -ceq
+                'openai-mock-protocol/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
+        })
+        if ($capabilitiesEntry.Count -ne 1) {
+            throw 'Mock protocol archive omitted the exact capabilities contract module.'
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
 }
 
 function Assert-MockGhApiHeaders {
