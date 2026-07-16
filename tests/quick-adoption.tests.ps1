@@ -1724,7 +1724,10 @@ try {
         $global:QuickAdoptionLabelRecords.Clear()
 
         $global:QuickAdoptionIssueRace = $true
-        $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = 'FailElevated'
+        $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = if ($env:OS -eq 'Windows_NT') {
+            'FailElevated'
+        }
+        else { 'Success' }
         $runOutput = @(& $launcherPath -TargetPath $existingRepo `
             -CodexCommand $mockCodexPath 2>&1) -join [Environment]::NewLine
         $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = 'Success'
@@ -1802,10 +1805,16 @@ try {
             $global:QuickAdoptionPrReadyCalls -ne 1) {
             Add-Failure 'TEST-0039 default adoption did not complete once through local Codex and mark the draft ready.'
         }
-        if (($sandboxModes -join '|') -cne 'elevated|unelevated' -or
-            ($execCalls[0].Arguments -join "`n") -notmatch
-                'windows\.sandbox=[\"'']unelevated[\"'']') {
-            Add-Failure 'TEST-0103 failed elevated preflight did not fall back to the verified unelevated mode before semantic execution.'
+        if ($env:OS -eq 'Windows_NT') {
+            if (($sandboxModes -join '|') -cne 'elevated|unelevated' -or
+                ($execCalls[0].Arguments -join "`n") -notmatch
+                    'windows\.sandbox=[\"'']unelevated[\"'']') {
+                Add-Failure 'TEST-0103 failed elevated preflight did not fall back to the verified unelevated mode before semantic execution.'
+            }
+        }
+        elseif ($sandboxCalls.Count -ne 0 -or
+            ($execCalls[0].Arguments -join "`n").Contains('windows.sandbox=')) {
+            Add-Failure 'TEST-0103 non-Windows execution attempted to select or probe a native Windows sandbox.'
         }
         $publishedMainHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin', 'refs/heads/main'
@@ -2466,41 +2475,43 @@ try {
             Add-Failure "TEST-0040 an unverified manifest-free draft was promoted or reprocessed automatically (ready calls: $($global:QuickAdoptionPrReadyCalls); Codex calls: $codexCallCountBeforeUnverifiedDraft -> $($codexCallsAfterUnverifiedDraft.Count))."
         }
 
-        foreach ($sandboxFailureMode in @('FailAll', 'Residue')) {
-            Reset-MockAdoptionProposal
-            $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = $sandboxFailureMode
-            $sandboxCallsBefore = @(Get-MockCodexSandboxCalls).Count
-            $execCallsBefore = @(Get-MockCodexCalls | Where-Object {
-                $_.Arguments.Count -gt 0 -and $_.Arguments[0] -ceq 'exec'
-            }).Count
-            $sandboxBlocked = $false
-            $sandboxError = ''
-            try {
-                & $launcherPath -TargetPath $existingRepo `
-                    -CodexCommand $mockCodexPath -NoProgress | Out-Null
-            }
-            catch {
-                $sandboxBlocked = $true
-                $sandboxError = $_.Exception.Message
-            }
-            $newSandboxCalls = @(
-                @(Get-MockCodexSandboxCalls) | Select-Object -Skip $sandboxCallsBefore
-            )
-            $execCallsAfter = @(Get-MockCodexCalls | Where-Object {
-                $_.Arguments.Count -gt 0 -and $_.Arguments[0] -ceq 'exec'
-            }).Count
-            $expectedError = if ($sandboxFailureMode -ceq 'Residue') {
-                'probe file'
-            }
-            else {
-                'cannot write'
-            }
-            if (-not $sandboxBlocked -or $newSandboxCalls.Count -ne 2 -or
-                $execCallsAfter -ne $execCallsBefore -or
-                $sandboxError.IndexOf(
-                    $expectedError, [StringComparison]::OrdinalIgnoreCase
-                ) -lt 0) {
-                Add-Failure "TEST-0103 Windows sandbox mode '$sandboxFailureMode' did not block before semantic execution: $sandboxError"
+        if ($env:OS -eq 'Windows_NT') {
+            foreach ($sandboxFailureMode in @('FailAll', 'Residue')) {
+                Reset-MockAdoptionProposal
+                $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = $sandboxFailureMode
+                $sandboxCallsBefore = @(Get-MockCodexSandboxCalls).Count
+                $execCallsBefore = @(Get-MockCodexCalls | Where-Object {
+                    $_.Arguments.Count -gt 0 -and $_.Arguments[0] -ceq 'exec'
+                }).Count
+                $sandboxBlocked = $false
+                $sandboxError = ''
+                try {
+                    & $launcherPath -TargetPath $existingRepo `
+                        -CodexCommand $mockCodexPath -NoProgress | Out-Null
+                }
+                catch {
+                    $sandboxBlocked = $true
+                    $sandboxError = $_.Exception.Message
+                }
+                $newSandboxCalls = @(
+                    @(Get-MockCodexSandboxCalls) | Select-Object -Skip $sandboxCallsBefore
+                )
+                $execCallsAfter = @(Get-MockCodexCalls | Where-Object {
+                    $_.Arguments.Count -gt 0 -and $_.Arguments[0] -ceq 'exec'
+                }).Count
+                $expectedError = if ($sandboxFailureMode -ceq 'Residue') {
+                    'probe file'
+                }
+                else {
+                    'cannot write'
+                }
+                if (-not $sandboxBlocked -or $newSandboxCalls.Count -ne 2 -or
+                    $execCallsAfter -ne $execCallsBefore -or
+                    $sandboxError.IndexOf(
+                        $expectedError, [StringComparison]::OrdinalIgnoreCase
+                    ) -lt 0) {
+                    Add-Failure "TEST-0103 Windows sandbox mode '$sandboxFailureMode' did not block before semantic execution: $sandboxError"
+                }
             }
         }
         $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = 'Success'

@@ -152,6 +152,12 @@ truncate it, and the probe reports its actual bounded timeout rather than the
 longer semantic limit. The same review found no full-access path, network
 re-enable, stale active version pin, or unresolved blocking finding.
 
+The first hosted matrix run exposed one test-portability defect rather than a
+launcher defect: Windows-only fallback and residue fixture expectations also
+ran on Ubuntu, where the launcher correctly performs no native Windows probe.
+Runtime variants are now Windows-gated, while the non-Windows path explicitly
+asserts that no Windows sandbox selection or probe is attempted.
+
 ## Definition of Done
 
 - [x] Acceptance criteria and `TEST-0103` / `TEST-0104` pass.

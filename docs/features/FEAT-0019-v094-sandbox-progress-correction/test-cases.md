@@ -31,6 +31,7 @@ and the complete repository suite.
 | 2026-07-16 | Test-first working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Expected red in 2.6 seconds: 24 focused failures identified the absent sandbox carry-forward, token-free probe, progress lifecycle, empty-consumer prompt, guide, and fixture contracts before integration execution |
 | 2026-07-16 | Reviewed v0.9.4 working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Passed in 359.1 seconds; all 34 owned scenarios passed, including `TEST-0103` and `TEST-0104` |
 | 2026-07-16 | Reviewed v0.9.4 working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Passed in 526.4 seconds; every discovered suite and all declared scenario-ownership gates passed |
+| 2026-07-16 | PR #56 initial hosted matrix | Ubuntu / Windows GitHub-hosted runners | `Protocol validation` run `29534127731` | Windows passed; Ubuntu exposed that the new Windows-only runtime fixture assertions were unconditional. The fixture was platform-gated and the non-Windows no-probe contract was added before merge. |
 
 Pull-request and hosted publication evidence remains pending; issue #55 owns
 the external facts.
