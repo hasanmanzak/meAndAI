@@ -3,8 +3,9 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.8.3',
-    [string]$BranchPrefix = 'automation/meandai-capabilities-'
+    [string]$TargetTag = 'v0.8.4',
+    [string]$BranchPrefix = 'automation/meandai-capabilities-',
+    [switch]$ValidateLocalUpdaterOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -72,16 +73,13 @@ $AdoptionAssets = @(
         TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
     }
 )
+$LocalUpdaterAssets = @($AdoptionAssets | Where-Object {
+    [string]$_.ConsumerPath -cin @(
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    )
+})
 $ManifestPath = '.ai/adoption/meandai-capabilities.json'
-$RequiredTasks = @(
-    'Create or reconcile the repository labels required by the protocol.',
-    'Create project-owned feature and decision records for adoption.',
-    'Tailor project-local memory without importing protocol-repository facts.',
-    'Resolve every collision through semantic review; do not overwrite blindly.',
-    'Create and run the project test evidence required by DoR and DoD.',
-    'Verify all documentation links and traceability references.',
-    'Remove the manifest before marking the pull request ready or merging it.'
-)
 
 function Invoke-Native {
     param([string]$Command, [string[]]$Arguments)
@@ -475,37 +473,9 @@ function Test-ExactAdoptionManifest {
     catch {
         return $false
     }
-    $manifestProperties = @(
-        'schema', 'operation', 'state', 'repository', 'targetTag', 'protocolSha',
-        'collisions', 'proposedPaths', 'requiredTasks'
-    )
-    $actualManifestProperties = @($manifest.PSObject.Properties | ForEach-Object { $_.Name })
-    if ($actualManifestProperties.Count -ne $manifestProperties.Count -or
-        @($manifestProperties | Where-Object {
-            $actualManifestProperties -cnotcontains $_
-        }).Count -ne 0 -or
-        ($manifest.schema -isnot [int] -and $manifest.schema -isnot [long]) -or
-        [long]$manifest.schema -ne 1 -or
-        [string]$manifest.operation -cne 'ai-capabilities-adoption' -or
-        [string]$manifest.state -cne $ExpectedState -or
-        -not ([string]$manifest.repository).Equals(
-            $Repository, [StringComparison]::OrdinalIgnoreCase
-        ) -or
-        [string]$manifest.targetTag -cne $TargetTag -or
-        [string]$manifest.protocolSha -cne $TargetSha -or
-        -not (Test-ExactOrdinalSequence `
-            -Actual @($manifest.collisions | ForEach-Object { [string]$_ }) `
-            -Expected @($Collisions)) -or
-        -not (Test-ExactOrdinalSequence `
-            -Actual @($manifest.proposedPaths | ForEach-Object { [string]$_ }) `
-            -Expected (@([string]$SeedWorkflow.ConsumerPath) + @($TargetPaths))) -or
-        -not (Test-ExactOrdinalSequence `
-            -Actual @($manifest.requiredTasks | ForEach-Object { [string]$_ }) `
-            -Expected $RequiredTasks)) {
-        return $false
-    }
-
-    return $true
+    return Test-MeAndAIExactAdoptionManifest -Manifest $manifest `
+        -Repository $Repository -TargetTag $TargetTag -ProtocolSha $TargetSha `
+        -ExpectedState $ExpectedState -ExpectedCollisions @($Collisions)
 }
 
 function Test-ExactAdoptionContinuity {
@@ -705,6 +675,18 @@ if (-not (Test-Path -LiteralPath $lifecycleModulePath -PathType Leaf) -or
 }
 Import-Module $updateModulePath -Force
 Import-Module $lifecycleModulePath -Force
+$RequiredTasks = @(Get-MeAndAIRequiredAdoptionTasks)
+$targetPaths = @(Get-MeAndAIAdoptionTargetPaths)
+$proposedPaths = @(Get-MeAndAIAdoptionProposedPaths)
+$mappedTargetPaths = @('.gitmodules', $ProtocolPath) + @($AdoptionAssets | ForEach-Object {
+    [string]$_.ConsumerPath
+})
+if (-not (Test-ExactOrdinalSequence -Actual $mappedTargetPaths -Expected $targetPaths) -or
+    -not (Test-ExactOrdinalSequence `
+        -Actual (@([string]$SeedWorkflow.ConsumerPath) + @($targetPaths)) `
+        -Expected $proposedPaths)) {
+    throw 'Bootstrap asset mapping does not match the canonical capabilities path contract.'
+}
 if (-not (Test-MeAndAIProtocolTag -Tag $TargetTag)) {
     throw "Target tag '$TargetTag' is not canonical vM.m.rev."
 }
@@ -753,9 +735,6 @@ foreach ($path in $basePaths) {
     $basePathLookup.Add($path, $path)
 }
 
-$targetPaths = @('.gitmodules', $ProtocolPath) + @($AdoptionAssets | ForEach-Object {
-    [string]$_.ConsumerPath
-})
 $collisions = [System.Collections.Generic.List[string]]::new()
 foreach ($path in $targetPaths) {
     if ($basePathLookup.ContainsKey($path)) {
@@ -763,16 +742,56 @@ foreach ($path in $targetPaths) {
     }
 }
 $manifestExists = $basePathLookup.ContainsKey($ManifestPath)
-$updaterPaths = @(
-    '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
-    '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
-)
+$updaterPaths = @($LocalUpdaterAssets | ForEach-Object { [string]$_.ConsumerPath })
 $updaterCount = @($updaterPaths | Where-Object {
     $basePathLookup.ContainsKey($_)
 }).Count
 $localUpdaterState = if ($updaterCount -eq 0) { 'Absent' }
 elseif ($updaterCount -eq $updaterPaths.Count) { 'Complete' }
 else { 'Partial' }
+
+if ($ValidateLocalUpdaterOnly) {
+    if ($seedWorkflowState -cne 'Exact') {
+        throw "The committed seed workflow does not match '$TargetTag'; local updater validation failed."
+    }
+    if ($manifestExists) {
+        throw 'The transient adoption manifest exists; local updater validation failed.'
+    }
+    $protocolEntry = Get-TreeEntry -RepositoryPath $workspace `
+        -Commit $baseHead -Path $ProtocolPath
+    if ($protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit' -or
+        $protocolEntry.Sha -cne $targetSha) {
+        throw "The committed protocol gitlink does not match '$TargetTag'; local updater validation failed."
+    }
+    if ($LocalUpdaterAssets.Count -ne 2 -or $localUpdaterState -cne 'Complete') {
+        throw 'The committed local updater inventory does not match the pinned release.'
+    }
+    foreach ($asset in $LocalUpdaterAssets) {
+        $sourceEntry = Get-TreeEntry -RepositoryPath $sourcePath `
+            -Commit $targetSha -Path ([string]$asset.TemplatePath)
+        $consumerEntry = Get-TreeEntry -RepositoryPath $workspace `
+            -Commit $baseHead -Path ([string]$asset.ConsumerPath)
+        $workingPath = Join-Path $workspace `
+            (([string]$asset.ConsumerPath) -replace '/', [IO.Path]::DirectorySeparatorChar)
+        if ($sourceEntry.Mode -cne '100644' -or
+            $sourceEntry.Type -cne 'blob' -or
+            $consumerEntry.Mode -cne $sourceEntry.Mode -or
+            $consumerEntry.Type -cne $sourceEntry.Type -or
+            $consumerEntry.Sha -cne $sourceEntry.Sha -or
+            -not (Test-Path -LiteralPath $workingPath -PathType Leaf)) {
+            throw "The local updater asset '$($asset.ConsumerPath)' does not match the pinned release."
+        }
+        $workingSha = ((Invoke-Native -Command 'git' -Arguments @(
+            'hash-object', '--', [string]$asset.ConsumerPath
+        )) -join '').Trim()
+        if ($workingSha -cne $sourceEntry.Sha) {
+            throw "The local updater asset '$($asset.ConsumerPath)' does not match the pinned release."
+        }
+    }
+    Write-Host "Validated the exact local updater against immutable release '$TargetTag'."
+    return
+}
 
 $branch = "$BranchPrefix$TargetTag"
 $actor = ((Invoke-Native -Command 'gh' -Arguments @(
@@ -919,7 +938,7 @@ $manifest = [ordered]@{
     targetTag = $TargetTag
     protocolSha = $targetSha
     collisions = @($plan.Collisions)
-    proposedPaths = @([string]$SeedWorkflow.ConsumerPath) + @($targetPaths)
+    proposedPaths = $proposedPaths
     requiredTasks = $RequiredTasks
 }
 $manifestText = ($manifest | ConvertTo-Json -Depth 5) + "`n"

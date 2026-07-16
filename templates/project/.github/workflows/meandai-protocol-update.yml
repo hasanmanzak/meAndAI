@@ -3,7 +3,7 @@ run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github
 
 env:
   PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
-  BOOTSTRAP_PROTOCOL_TAG: v0.8.3
+  BOOTSTRAP_PROTOCOL_TAG: v0.8.4
 
 on:
   schedule:
@@ -102,10 +102,12 @@ jobs:
             $protocolEntry -match '^160000\s+commit\s+[0-9a-f]{40}\s+' -and
             -not $manifestExists
 
+          $bootstrap = '.meandai-update-source/templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
           if ($completeLocalUpdater) {
+            & "./$bootstrap" -TargetTag $env:BOOTSTRAP_PROTOCOL_TAG `
+              -ValidateLocalUpdaterOnly
             & "./$adapterPath"
           }
           else {
-            $bootstrap = '.meandai-update-source/templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
             & "./$bootstrap" -TargetTag $env:BOOTSTRAP_PROTOCOL_TAG
           }

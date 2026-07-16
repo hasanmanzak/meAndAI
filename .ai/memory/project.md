@@ -7,20 +7,20 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.3`. Exact publication state is authoritative
+- Current protocol version: `0.8.4`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38), not duplicated
+  [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41), not duplicated
   in this repository snapshot.
-- Current scope: the completed bounded correction of `FIND-0102` through `FIND-0111`,
-  tracked by [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md),
-  [DEC-0012](../../docs/decisions/DEC-0012-bounded-correction-and-external-release-evidence.md),
-  and [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
+- Current scope: the bounded correction of `FIND-0112` through `FIND-0122`,
+  tracked by [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md),
+  [DEC-0013](../../docs/decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md),
+  and [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: completed [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md),
+- Latest tracked work: completed [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md),
   with delivery and later post-publication evidence owned by
-  [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38).
+  [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41).
 - Historical v0.8.1 delivery: FEAT-0011 was published as immutable release
   [`v0.8.1`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1).
   The release and issue retain the exact pull request, target commit, checks,
@@ -113,6 +113,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.8.3` corrects the post-publication verifier's repository-root URL after
   the immutable v0.8.2 external run exposed an invalid trailing slash. The
   focused mock now rejects that URL shape.
+- `v0.8.4` is the bounded correction for `FIND-0112` through `FIND-0122`:
+  trusted updater preflight, pre-mutation seed validation, recoverable
+  completion publication, one exact manifest contract, honest and paginated
+  evidence, stable traceability, finding taxonomy, and version boundaries.
+  `RISK-0076` retains the unavailable private-repository `main` protection as a
+  maintainer-owned external follow-up with a visibility/plan review condition.
 - The source-only bootstrap resolver and adapter are intentionally small and
   are not copied to consumers. GitHub Actions does not run an AI agent; an
   explicitly invoked agent or maintainer completes and removes the manifest.

@@ -5,15 +5,15 @@ and follow its canonical links.
 
 ## Current continuation
 
-No open implementation continuation. The completed bounded v0.8.2 correction
-and its v0.8.3 post-publication verifier repair are recorded in
-[FEAT-0012](../../../docs/features/FEAT-0012-v082-correction/README.md).
+The bounded v0.8.4 correction of `FIND-0112` through `FIND-0122` is complete in
+[FEAT-0013](../../../docs/features/FEAT-0013-v084-correction/README.md).
 Exact publication evidence is owned externally by
-[issue #38](https://github.com/hasanmanzak/meAndAI/issues/38) and the GitHub
+[issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) and the GitHub
 Release instead of being predicted in repository memory.
 
 ## History
 
+- [2026-07-16 - Bounded v0.8.4 correction](2026-07-16-v084-correction.md)
 - [2026-07-16 - Bounded v0.8.2 correction](2026-07-16-v082-correction.md)
 - [2026-07-15 - Stability closure](2026-07-15-stability-closure.md)
 - [2026-07-15 - Protocol stability invariants](2026-07-15-protocol-stability-invariants.md)

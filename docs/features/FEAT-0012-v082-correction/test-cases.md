@@ -1,6 +1,6 @@
 # FEAT-0012 Test Scenarios
 
-Planned implementations:
+Implementations:
 
 - [Quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1)
 - [Bootstrap adapter fixtures](../../../tests/capabilities-bootstrap-adapter.tests.ps1)
@@ -10,8 +10,8 @@ Planned implementations:
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0069` | `SUBF-0027` | Reconcile issue bodies containing one canonical ownership marker, quoted/example marker text, malformed markers, and duplicate canonical markers. | Only one exactly parsed canonical marker establishes ownership; incidental or ambiguous text blocks without mutating the wrong issue. | Ownership / boundary | Passed | Quick-adoption issue fixture |
-| `TEST-0070` | `SUBF-0027` | Start concurrent secret reconciliation for the same repository while both launchers initially observe a missing canonical secret. | Repository-scoped serialization and a live in-boundary inventory ensure at most one write; the later launcher preserves the now-existing name. | Concurrency / credential boundary | Passed | Quick-adoption concurrent CLI fixture |
+| `TEST-0069` | `SUBF-0027` | Reconcile issue bodies containing one canonical ownership marker, quoted/example marker text, malformed markers, and duplicate canonical markers. | Only one exactly parsed canonical marker establishes ownership; incidental or ambiguous text blocks without mutating the wrong issue. | Ownership / boundary | Historical partial evidence; explicit malformed/duplicate variants are corrected by [TEST-0081](../FEAT-0013-v084-correction/test-cases.md) | Quick-adoption issue fixture |
+| `TEST-0070` | `SUBF-0027` | Serialize two secret-reconciliation attempts for the same repository, with the later attempt observing a lock and then rerunning after the earlier state is represented. | Repository-scoped serialization and a live in-boundary inventory ensure at most one write; the later attempt preserves the now-existing name. | Serialization / recovery boundary | Passed for the deterministic state model; wording corrected by [TEST-0082](../FEAT-0013-v084-correction/test-cases.md) | Quick-adoption lock and sequential-rerun fixture |
 | `TEST-0071` | `SUBF-0027` | Rerun the lifecycle while an exact ready, manifest-free `Completed` adoption proposal remains open for maintainer review. | Bootstrap retains the valid completed proposal, creates no duplicate, and performs no unrelated mutation. | Lifecycle / integration | Passed | Bootstrap adapter fixture |
 | `TEST-0072` | `SUBF-0027` | Leave an older reserved meAndAI automation branch outside the current target name, with owned and ambiguous variants. | The full reserved namespace is inventoried; only exact owned state is accepted and ambiguity blocks before proposal mutation. | Recovery / integration | Passed | Updater adapter fixture |
 | `TEST-0073` | `SUBF-0028` | Exercise repository metadata, source download, and both secret mappings with distinct credentials and complete request capture. | Tests assert exact repository identity, authorization and API-version headers, source versus consumer token authority, secret name, and stdin value mapping without logging a token. | Security boundary / integration | Passed | Contract-bearing GitHub CLI mocks |
@@ -31,6 +31,15 @@ Planned implementations:
 - Workflow-semantic validation for both Actions files.
 - Mandatory bounded scan/disposition contracts and two-stage release evidence.
 - Existing launcher, bootstrap, updater, protocol, and documentation behavior.
+
+## Evidence correction
+
+[FEAT-0013](../FEAT-0013-v084-correction/README.md) records that the original
+TEST-0069 fixture did not explicitly execute every named malformed/duplicate
+variant and that TEST-0070 modeled serialized recovery rather than simultaneous
+process execution. This note corrects the historical evidence claim without
+reclassifying the fixture as a concurrency test: TEST-0081 supplies the missing
+marker variants, and TEST-0082 owns the serialized contention and rerun evidence.
 
 ## Evidence
 

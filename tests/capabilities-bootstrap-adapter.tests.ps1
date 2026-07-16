@@ -241,7 +241,10 @@ function New-BootstrapFixture {
 }
 
 function Invoke-BootstrapFixture {
-    param($Fixture)
+    param(
+        $Fixture,
+        [switch]$ValidateLocalUpdaterOnly
+    )
 
     $savedEnvironment = @{}
     foreach ($name in @('GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN', 'GITHUB_STEP_SUMMARY')) {
@@ -255,7 +258,14 @@ function Invoke-BootstrapFixture {
         $env:DEFAULT_BRANCH = 'main'
         $env:GH_TOKEN = 'redacted-test-token'
         $env:GITHUB_STEP_SUMMARY = $null
-        & $adapterPath -ProtocolSourcePath '.meandai-update-source' -TargetTag 'v0.5.0'
+        if ($ValidateLocalUpdaterOnly) {
+            & $adapterPath -ProtocolSourcePath '.meandai-update-source' `
+                -TargetTag 'v0.5.0' -ValidateLocalUpdaterOnly
+        }
+        else {
+            & $adapterPath -ProtocolSourcePath '.meandai-update-source' `
+                -TargetTag 'v0.5.0'
+        }
     }
     catch {
         $result.Threw = $true
@@ -270,6 +280,45 @@ function Invoke-BootstrapFixture {
     return $result
 }
 
+function Install-CompleteLocalUpdaterFixture {
+    param([Parameter(Mandatory)]$Fixture)
+
+    $sourceSha = (@(Invoke-Git -Repository $Fixture.Source -Arguments @(
+        'rev-parse', 'v0.5.0^{commit}'
+    )))[0]
+    $scriptsPath = Join-Path $Fixture.Consumer '.github/scripts'
+    New-Item -ItemType Directory -Path $scriptsPath -Force | Out-Null
+    foreach ($name in @(
+        'MeAndAI.ProtocolUpdate.psm1',
+        'Invoke-MeAndAIProtocolUpdate.ps1'
+    )) {
+        Copy-Item -LiteralPath (Join-Path $Fixture.Source `
+            "templates/project/.github/scripts/$name") -Destination (Join-Path $scriptsPath $name)
+    }
+    $gitmodules = @(
+        '[submodule ".ai/protocol"]',
+        "`tpath = .ai/protocol",
+        "`turl = https://github.com/hasanmanzak/meAndAI.git",
+        ''
+    ) -join "`n"
+    [IO.File]::WriteAllText(
+        (Join-Path $Fixture.Consumer '.gitmodules'), $gitmodules,
+        [Text.UTF8Encoding]::new($false)
+    )
+    Invoke-Git -Repository $Fixture.Consumer -Arguments @(
+        'update-index', '--add', '--cacheinfo', "160000,$sourceSha,.ai/protocol"
+    ) | Out-Null
+    Invoke-Git -Repository $Fixture.Consumer -Arguments @(
+        'add', '--', '.gitmodules',
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    ) | Out-Null
+    Invoke-Git -Repository $Fixture.Consumer -Arguments @(
+        'commit', '-m', 'Install exact local updater fixture'
+    ) | Out-Null
+    Invoke-Git -Repository $Fixture.Consumer -Arguments @('push', 'origin', 'main') | Out-Null
+}
+
 function Get-RemoteChangedPaths {
     param($Fixture)
     Invoke-Git -Repository $Fixture.Consumer -Arguments @('fetch', 'origin', 'automation/meandai-capabilities-v0.5.0') | Out-Null
@@ -279,6 +328,32 @@ function Get-RemoteChangedPaths {
 }
 
 try {
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $trustedUpdater = New-BootstrapFixture -Name 'trusted-updater'
+    Install-CompleteLocalUpdaterFixture -Fixture $trustedUpdater
+    $result = Invoke-BootstrapFixture -Fixture $trustedUpdater -ValidateLocalUpdaterOnly
+    if ($result.Threw -or $global:PullRequestCreateCalls -ne 0) {
+        Add-Failure "TEST-0077 exact local updater did not pass source-only preflight without mutation: $($result.Error)"
+    }
+
+    [IO.File]::WriteAllText(
+        (Join-Path $trustedUpdater.Consumer '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'),
+        "# tampered local updater`n"
+    )
+    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @(
+        'add', '--', '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    ) | Out-Null
+    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @(
+        'commit', '-m', 'Tamper local updater fixture'
+    ) | Out-Null
+    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @('push', 'origin', 'main') | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $trustedUpdater -ValidateLocalUpdaterOnly
+    if (-not $result.Threw -or $result.Error -notlike '*local updater*match*pinned release*' -or
+        $global:PullRequestCreateCalls -ne 0) {
+        Add-Failure "TEST-0077 modified local updater was not rejected by source-only preflight: $($result.Error)"
+    }
+
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $empty = New-BootstrapFixture -Name 'empty'

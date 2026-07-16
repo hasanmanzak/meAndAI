@@ -1,6 +1,6 @@
 # FEAT-0005 Test Scenarios
 
-Planned test implementation:
+Implementations:
 `tests/capabilities-bootstrap.tests.ps1`,
 `tests/capabilities-bootstrap-adapter.tests.ps1`, and the existing
 repository/updater suites.

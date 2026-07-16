@@ -64,6 +64,23 @@ if (-not $networkDisabled -or $networkEnabled -or
 
 $manifestPath = Join-Path $working '.ai/adoption/meandai-capabilities.json'
 $manifest = [IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json
+$protocolSourceMatch = [regex]::Match(
+    $stdin,
+    '(?m)^Read the manifest at .*?, the exact protocol source at (?<path>.+?), every applicable AGENTS\.md'
+)
+if (-not $protocolSourceMatch.Success) {
+    throw 'Mock Codex could not resolve the exact protocol source from the launcher prompt.'
+}
+$protocolSource = $protocolSourceMatch.Groups['path'].Value
+$consumerScriptDirectory = Join-Path $working '.github/scripts'
+New-Item -ItemType Directory -Path $consumerScriptDirectory -Force | Out-Null
+foreach ($name in @('MeAndAI.ProtocolUpdate.psm1', 'Invoke-MeAndAIProtocolUpdate.ps1')) {
+    $sourceAsset = Join-Path $protocolSource "templates/project/.github/scripts/$name"
+    if (-not (Test-Path -LiteralPath $sourceAsset -PathType Leaf)) {
+        throw "Mock protocol source is missing '$name'."
+    }
+    Copy-Item -LiteralPath $sourceAsset -Destination (Join-Path $consumerScriptDirectory $name) -Force
+}
 $protocolEntry = (& git -C $working ls-files --stage -- .ai/protocol 2>&1) -join ''
 if (-not $protocolEntry) {
     $gitmodules = @(
@@ -131,7 +148,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.8.3' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.8.4' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

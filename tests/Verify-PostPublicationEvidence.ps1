@@ -69,6 +69,27 @@ function Invoke-GitHubGet {
     return Invoke-RestMethod -Method Get -Uri $uri -Headers $headers
 }
 
+function Invoke-GitHubPagedGet {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [ValidateRange(1, 100)][int]$MaximumPages = 100
+    )
+
+    $results = [System.Collections.Generic.List[object]]::new()
+    for ($page = 1; $page -le $MaximumPages; $page++) {
+        $items = @(Invoke-GitHubGet "$Path`?per_page=100&page=$page")
+        foreach ($item in $items) {
+            if ($null -ne $item) {
+                $results.Add($item)
+            }
+        }
+        if ($items.Count -lt 100) {
+            return @($results)
+        }
+    }
+    throw "TEST-0065 GitHub pagination exceeded the bounded $MaximumPages-page evidence limit."
+}
+
 $encodedTag = ConvertTo-ApiPath $Tag
 $encodedDefaultBranch = ConvertTo-ApiPath $DefaultBranch
 $encodedOwnedBranch = ConvertTo-ApiPath $OwnedBranch
@@ -121,8 +142,8 @@ Assert-PostPublicationCondition ($issue.state -ceq 'closed') `
     'canonical delivery issue is not closed.'
 Assert-PostPublicationCondition ($null -eq $issue.PSObject.Properties['pull_request']) `
     'canonical delivery authority resolves to a pull request instead of an issue.'
-$comments = @(Invoke-GitHubGet "issues/$IssueNumber/comments?per_page=100")
-$issueEvidence = (@($issue.body) + @($comments | ForEach-Object { $_.body })) -join "`n"
+$comments = @(Invoke-GitHubPagedGet "issues/$IssueNumber/comments")
+$issueEvidence = @($comments | ForEach-Object { $_.body }) -join "`n"
 
 $featureRecord = Invoke-GitHubGet "contents/$encodedFeaturePath`?ref=$ExpectedCommit"
 Assert-PostPublicationCondition ($featureRecord.encoding -ceq 'base64') `

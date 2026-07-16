@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.8.3 |
 | Issue | [#38](https://github.com/hasanmanzak/meAndAI/issues/38) |
-| Pull request | Pending |
+| Pull requests | [#39](https://github.com/hasanmanzak/meAndAI/pull/39) and [#40](https://github.com/hasanmanzak/meAndAI/pull/40) |
 | Decision | [DEC-0012](../../decisions/DEC-0012-bounded-correction-and-external-release-evidence.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -228,11 +228,13 @@ the sandbox and did not reproduce there.
 - [x] Applicable local gates pass; hosted CI remains a required pre-merge gate
       and is recorded externally rather than predicted in this commit.
 
-## Post-merge release evidence
+## Hosted publication authority
 
-This table deliberately does not predict publication. After merge, exact
-evidence is written to issue #38 and the GitHub Release; no follow-up
-documentation-only pull request is required solely to mirror those facts.
+The delivery and verifier-repair pull requests are linked above. Exact release,
+commit, and hosted-check facts are recorded in issue #38 and the corresponding
+GitHub Releases. The historical pre-publication fields below deliberately remain
+`Pending`; copying mutable hosted state into this canonical commit is not their
+authority and does not require another documentation-only pull request.
 
 | Field | Evidence |
 | --- | --- |

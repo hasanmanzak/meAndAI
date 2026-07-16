@@ -14,6 +14,7 @@
 | [DEC-0010](DEC-0010-stable-automation-invariants.md) | Stable evidence invariants across protocol automation | Accepted | 2026-07-15 |
 | [DEC-0011](DEC-0011-qualified-evidence-and-closure.md) | Qualified evidence through mutation and closure | Accepted | 2026-07-15 |
 | [DEC-0012](DEC-0012-bounded-correction-and-external-release-evidence.md) | Bound corrective delivery and keep release evidence external | Accepted | 2026-07-16 |
+| [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md) | Verify trusted adoption before mutation and preserve recoverable evidence | Accepted | 2026-07-16 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

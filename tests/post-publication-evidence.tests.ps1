@@ -81,13 +81,39 @@ function global:Invoke-RestMethod {
         return @()
     }
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/issues/42') {
-        $body = "$featureUrl`n$releaseUrl`n$commitUrl"
-        if ($global:MeAndAIPostPublicationMode -ceq 'MissingFeatureEvidence') {
-            $body = "$releaseUrl`n$commitUrl"
+        $body = 'Publication evidence is recorded in issue comments.'
+        if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
+            $body = 'Publication evidence is recorded in a paginated issue comment.'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueBodyOnlyEvidence') {
+            $body = "$featureUrl`n$releaseUrl`n$commitUrl"
         }
         return [pscustomobject]@{ state = 'closed'; body = $body }
     }
-    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100') {
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/42/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        $page = [int]$Matches.page
+        if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
+            if ($page -eq 1) {
+                return @(1..100 | ForEach-Object {
+                    [pscustomobject]@{ body = "unrelated comment $_" }
+                })
+            }
+            if ($page -eq 2) {
+                return ,([pscustomobject]@{
+                    body = "$featureUrl`n$releaseUrl`n$commitUrl"
+                })
+            }
+        }
+        if ($page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -cne 'IssueBodyOnlyEvidence') {
+            $commentBody = if ($global:MeAndAIPostPublicationMode -ceq 'MissingFeatureEvidence') {
+                "$releaseUrl`n$commitUrl"
+            }
+            else {
+                "$featureUrl`n$releaseUrl`n$commitUrl"
+            }
+            return ,([pscustomobject]@{ body = $commentBody })
+        }
         return @()
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$commit") {
@@ -150,7 +176,7 @@ try {
             '/releases/tags/v1.2.3', '/git/ref/tags/v1.2.3',
             "/compare/$commit...main",
             '/git/matching-refs/heads/codex/feat-0042-release-evidence',
-            '/issues/42', '/issues/42/comments?per_page=100',
+            '/issues/42', '/issues/42/comments?per_page=100&page=1',
             "/contents/$featurePath`?ref=$commit"
         )) {
             if (@($global:MeAndAIPostPublicationRequests | Where-Object {
@@ -160,11 +186,22 @@ try {
             }
         }
 
+        $pageTwoEvidence = Invoke-PostPublicationScenario -Mode 'PageTwoCommentEvidence'
+        $commentPageRequests = @($global:MeAndAIPostPublicationRequests | Where-Object {
+            $_ -match '/issues/42/comments\?per_page=100&page='
+        })
+        if ($pageTwoEvidence.Threw -or $commentPageRequests.Count -ne 2 -or
+            $commentPageRequests[0] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=1' -or
+            $commentPageRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=2') {
+            Add-Failure "TEST-0083 verifier did not find evidence located only in the second issue-comment page: $($pageTwoEvidence.Error)"
+        }
+
         foreach ($negative in @(
             @{ Mode = 'MutableRelease'; Error = '*release is not immutable*' },
             @{ Mode = 'DivergedDefaultBranch'; Error = '*not the default-branch head or one of its ancestors*' },
             @{ Mode = 'OwnedBranchExists'; Error = '*owned working branch still exists*' },
-            @{ Mode = 'MissingFeatureEvidence'; Error = '*does not link the canonical feature*' }
+            @{ Mode = 'MissingFeatureEvidence'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'IssueBodyOnlyEvidence'; Error = '*does not link the canonical feature*' }
         )) {
             $result = Invoke-PostPublicationScenario -Mode $negative.Mode
             if (-not $result.Threw -or $result.Error -notlike $negative.Error) {

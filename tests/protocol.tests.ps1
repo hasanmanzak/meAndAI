@@ -343,10 +343,54 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
+function Test-CanonicalProtocolVersion {
+    param([AllowEmptyString()][string]$Value)
+
+    return $Value -cmatch '^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$'
+}
+
+foreach ($validVersion in @('0.0.0', '0.8.4', '1.0.0', '10.20.300')) {
+    if (-not (Test-CanonicalProtocolVersion -Value $validVersion)) {
+        Add-Failure "TEST-0085 canonical version fixture was rejected: '$validVersion'"
+    }
+}
+foreach ($invalidVersion in @(
+    '', 'v0.8.4', '01.0.0', '0.01.0', '0.0.01', '+1.0.0',
+    '1.0', '1.0.0.0', '1.0.-1', ' 1.0.0', '1.0.0 ',
+    ([string][char]0x0661 + '.0.0'), ([string][char]0xFF11 + '.0.0')
+)) {
+    if (Test-CanonicalProtocolVersion -Value $invalidVersion) {
+        Add-Failure "TEST-0085 noncanonical version fixture was accepted: '$invalidVersion'"
+    }
+}
+
+$implementedScenarioPaths = @(
+    'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
+    'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
+    'docs/features/FEAT-0008-idea-incubation/test-cases.md',
+    'docs/features/FEAT-0012-v082-correction/test-cases.md'
+)
+foreach ($relativePath in $implementedScenarioPaths) {
+    $scenarioText = Get-Content -LiteralPath (Join-Path $root $relativePath) -Raw
+    if ($scenarioText -match '(?im)^Planned (?:test )?implementations?:') {
+        Add-Failure "TEST-0085 completed scenario record still describes its implementation as planned: $relativePath"
+    }
+}
+$completedCorrection = Get-Content -LiteralPath `
+    (Join-Path $root 'docs/features/FEAT-0012-v082-correction/README.md') -Raw
+foreach ($stablePullRequest in @(
+    'https://github.com/hasanmanzak/meAndAI/pull/39',
+    'https://github.com/hasanmanzak/meAndAI/pull/40'
+)) {
+    if (-not $completedCorrection.Contains($stablePullRequest)) {
+        Add-Failure "TEST-0085 FEAT-0012 is missing stable merged pull-request link '$stablePullRequest'."
+    }
+}
+
 $versionPath = Join-Path $root 'VERSION'
 if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
     $version = (Get-Content -LiteralPath $versionPath -Raw).Trim()
-    if ($version -notmatch '^\d+\.\d+\.\d+$') {
+    if (-not (Test-CanonicalProtocolVersion -Value $version)) {
         Add-Failure "TEST-0002 VERSION must match M.m.rev; found '$version'"
     }
     else {
@@ -658,7 +702,7 @@ $formExpectations = @{
     'subfeature.yml' = @('[SUBF-NNNN]', 'type:subfeature', 'Parent feature')
     'task.yml' = @('[TASK-NNNN]', 'type:task')
     'bug.yml' = @('[BUG-NNNN]', 'type:bug', 'never paste secrets')
-    'finding.yml' = @('[FIND-NNNN]', 'type:finding', 'id: disposition', 'id: category', 'id: severity', 'id: confidence')
+    'finding.yml' = @('[FIND-NNNN]', 'type:finding', 'id: disposition', 'id: classification', 'id: category', 'id: severity', 'id: confidence')
 }
 
 foreach ($entry in $formExpectations.GetEnumerator()) {
@@ -669,6 +713,34 @@ foreach ($entry in $formExpectations.GetEnumerator()) {
             Add-Failure "TEST-0007 $($entry.Key) is missing '$requiredText'"
         }
     }
+}
+
+$findingForm = Get-Content -LiteralPath (Join-Path $root '.github/ISSUE_TEMPLATE/finding.yml') -Raw
+$dispositionBlock = [regex]::Match(
+    $findingForm,
+    '(?ms)^  - type: dropdown\r?\n    id: disposition\r?\n(?<body>.*?)(?=^  - type:|\z)'
+)
+$classificationBlock = [regex]::Match(
+    $findingForm,
+    '(?ms)^  - type: dropdown\r?\n    id: classification\r?\n(?<body>.*?)(?=^  - type:|\z)'
+)
+$expectedDispositions = @(
+    'Blocking', 'AcceptedResidual', 'ExternalOrLegacyFollowUp', 'OptionalImprovement'
+)
+$actualDispositions = if ($dispositionBlock.Success) {
+    @([regex]::Matches($dispositionBlock.Groups['body'].Value, '(?m)^        - (?<value>\S[^\r\n]*)$') |
+        ForEach-Object { $_.Groups['value'].Value })
+}
+else { @() }
+$expectedClassifications = @('Confirmed defect', 'Risk', 'Optional improvement')
+$actualClassifications = if ($classificationBlock.Success) {
+    @([regex]::Matches($classificationBlock.Groups['body'].Value, '(?m)^        - (?<value>\S[^\r\n]*)$') |
+        ForEach-Object { $_.Groups['value'].Value })
+}
+else { @() }
+if (($actualDispositions -join '|') -cne ($expectedDispositions -join '|') -or
+    ($actualClassifications -join '|') -cne ($expectedClassifications -join '|')) {
+    Add-Failure 'TEST-0084 finding form must keep the four exact review dispositions separate from defect/risk/improvement classification.'
 }
 
 $config = Get-Content -LiteralPath (Join-Path $root '.github/ISSUE_TEMPLATE/config.yml') -Raw

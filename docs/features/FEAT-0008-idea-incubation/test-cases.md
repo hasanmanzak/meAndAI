@@ -1,6 +1,6 @@
 # FEAT-0008 Test Scenarios
 
-Planned implementation: `tests/idea-incubation.tests.ps1`, the existing
+Implementations: `tests/idea-incubation.tests.ps1`, the existing
 bootstrap adapter fixture, and the complete repository suite.
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

@@ -3,6 +3,30 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.4 - 2026-07-16
+
+### Fixed
+
+- Validate consumer-local updater assets through trusted exact-release code
+  before credentials reach them, and reject seed drift before any secret
+  mutation.
+- Make interrupted adoption completion exactly rerunnable and reuse one
+  canonical manifest contract across bootstrap and launcher boundaries.
+- Align marker/serialization evidence with executed fixtures, traverse
+  post-publication comment pagination, separate finding classification from the
+  four protocol dispositions, and exercise canonical version boundaries.
+- Replace stale delivery and planned-implementation wording with stable merged
+  PR and implemented-evidence links while retaining exact publication facts in
+  the external authority.
+
+The unavailable private-repository `main` protection remains maintainer-owned
+`RISK-0076`, with review required when public visibility or a supporting GitHub
+plan makes the control available. This release does not change visibility.
+
+Related work: [FEAT-0013](docs/features/FEAT-0013-v084-correction/README.md),
+[DEC-0013](docs/decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md),
+and [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41).
+
 ## 0.8.3 - 2026-07-16
 
 ### Fixed
