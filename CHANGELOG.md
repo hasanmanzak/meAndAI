@@ -3,6 +3,24 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.3 - 2026-07-16
+
+### Fixed
+
+- Validate adoption pull-request origin through the real GitHub CLI fields
+  `headRepository.name`, `headRepositoryOwner.login`, and Boolean
+  `isCrossRepository` instead of the unavailable
+  `headRepository.nameWithOwner` projection.
+- Model the observed pull-request JSON shape in the quick-adoption integration
+  fixture and reject repository-name, owner, cross-repository, and type drift
+  before local Codex or Git mutation.
+- Preserve the deterministic draft and resumable lifecycle boundary so an
+  affected `v0.9.2` adoption can continue with the corrected launcher.
+
+Related work: [FEAT-0018 / BUG-0006](docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md),
+[TEST-0102](docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md), and
+[issue #53](https://github.com/hasanmanzak/meAndAI/issues/53).
+
 ## 0.9.2 - 2026-07-16
 
 ### Changed

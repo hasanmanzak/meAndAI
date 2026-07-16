@@ -19,6 +19,7 @@
 | [FEAT-0015](FEAT-0015-stability-consistency-mandate/README.md) | Stability and consistency mandate | Complete | 0.9.0 |
 | [FEAT-0016](FEAT-0016-v091-quick-adoption-correction/README.md) | v0.9.1 quick-adoption existing-repository correction | Complete | 0.9.1 |
 | [FEAT-0017](FEAT-0017-v092-single-file-quick-adoption/README.md) | v0.9.2 single-file quick-adoption distribution | Complete | 0.9.2 |
+| [FEAT-0018](FEAT-0018-v093-live-pr-metadata-correction/README.md) | v0.9.3 live adoption PR metadata correction | Complete | 0.9.3 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
