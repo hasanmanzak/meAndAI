@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.9.4**<br>
+Protocol version: **0.9.5**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -580,8 +580,18 @@ MAY fall back from a failed `elevated` probe to `unelevated`, but it MUST report
 that fallback and MUST block when no supported mode can create, verify, and
 remove the probe file. It MUST NOT obtain write access by selecting a
 full-access or sandbox-bypass mode. Progress reporting MUST reflect actual
-launcher phases; work with no measurable completion fraction is indeterminate
-and the display MAY be suppressed without changing behavior.
+launcher phases as normal, line-oriented console output; work with no
+measurable completion fraction MUST NOT receive an invented percentage. The
+display MAY be suppressed without changing behavior.
+
+Semantic `codex exec` MAY expose its documented JSONL event stream as an
+observational channel while the process is active. A launcher that presents
+that stream MUST parse events incrementally, bound and deduplicate displayed
+fields, and render only caller-facing messages and safe activity metadata. It
+MUST NOT display raw reasoning, command arguments or output, credential
+material, or an unfiltered event payload. Streamed text is never readiness
+evidence: the final result artifact and repository validations remain the sole
+authority for publication.
 
 Before local semantic work, the launcher MUST idempotently reconcile the common
 Agile labels and one canonically marked, project-owned adoption issue through
@@ -602,6 +612,17 @@ completion provenance is unknown. Missing or ambiguous workflow runs, drafts,
 local CLI authentication, semantic results, or branch ownership MUST block or
 leave a clear manual handoff. Neither launcher nor agent may approve or merge
 the pull request.
+
+The launcher MUST own every local agent child process and descendant for the
+duration of semantic execution. Timeout, pipeline cancellation, and exceptional
+exit MUST attempt process-tree termination before process disposal and owned
+temporary-root cleanup. On Windows, semantic execution MUST establish
+kill-on-close process containment before model work. Interruption before the
+completion push MUST leave the live proposal head unchanged; interruption in
+the later push/marker window follows the recoverable transition below. A hard
+host termination may prevent temporary-directory cleanup, so residue MUST be
+treated as an owned cleanup artifact, not as permission to publish or delete an
+ambiguous directory automatically.
 
 For a consumer with no application source or product documentation, unavailable
 product purpose, runtime/stack, architecture, build command, and product test

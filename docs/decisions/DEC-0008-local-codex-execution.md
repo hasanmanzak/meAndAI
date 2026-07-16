@@ -4,7 +4,7 @@
 - Status: Accepted
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer maintainers
-- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md), [FEAT-0019](../features/FEAT-0019-v094-sandbox-progress-correction/README.md)
+- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md), [FEAT-0019](../features/FEAT-0019-v094-sandbox-progress-correction/README.md), [FEAT-0020](../features/FEAT-0020-v095-streamed-codex-cancellation/README.md)
 - Related decisions: [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md), [DEC-0007](DEC-0007-local-quick-adoption-boundary.md)
 - Supersedes: [DEC-0007](DEC-0007-local-quick-adoption-boundary.md) only for the post-workflow Codex Cloud handoff
 
@@ -51,6 +51,21 @@ temporary clone. Prefer `elevated`; if it cannot pass the probe, try
 to `codex exec`. If no mode can create, verify, and remove its probe file, block
 before semantic execution. Full-access bypass modes are prohibited.
 
+Run semantic `codex exec` with its documented JSONL mode and consume stdout
+incrementally while the process is active. Present only bounded, deduplicated
+caller-facing messages and safe activity metadata as normal console lines;
+never present raw reasoning, command arguments or output, credential values, or
+unfiltered event payloads. This stream is observational. The separate final
+result file and repository validations remain the only readiness authority.
+
+The launcher owns the semantic child process tree. On Windows it must assign
+the process to a kill-on-close Job Object before model work. Timeout, pipeline
+cancellation, and exceptional exit terminate the tree before process disposal
+and temporary-clone cleanup. A hard PowerShell or host termination can skip the
+directory-cleanup block, leaving a stale owned temporary root, but closing the
+Job Object still terminates its contained process tree. The launcher does not
+delete an ambiguous root automatically.
+
 An empty consumer is eligible for protocol adoption even when product purpose,
 runtime/stack, architecture, build command, and product test command do not yet
 exist. Record those facts as `Not yet established`, validate the adoption
@@ -88,9 +103,12 @@ marks the draft ready.
   launcher never supplies the two protocol PAT values to that process.
 - A finite process timeout terminates stalled local authentication or semantic
   execution instead of allowing an unbounded adoption loop.
-- Phase progress is observational only. Work without a measurable fraction,
-  including semantic Codex execution, is shown as indeterminate and may be
-  suppressed without changing the operation.
+- Phase and streamed Codex activity are observational only, use normal console
+  lines, and may be suppressed without changing the operation. Work without a
+  measurable fraction receives no invented percentage.
+- Ctrl+C before the validated completion push leaves the live proposal head
+  unchanged. The deterministic seed, draft, labels, and issue remain safe to
+  reuse; interruption after the push uses DEC-0013 recovery.
 - Existing v0.6.0 consumers and the manual workflow-only path remain valid.
 
 ## Alternatives considered

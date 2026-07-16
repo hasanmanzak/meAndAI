@@ -20,6 +20,14 @@ $mode = [Environment]::GetEnvironmentVariable('MEANDAI_TEST_CODEX_MODE')
 if (-not $mode) {
     $mode = 'Success'
 }
+
+function Write-CodexJsonEvent {
+    param([Parameter(Mandatory)]$Value)
+
+    [Console]::Out.WriteLine(($Value | ConvertTo-Json -Compress -Depth 8))
+    [Console]::Out.Flush()
+}
+
 if ($Arguments.Count -gt 0 -and $Arguments[0] -ceq 'sandbox') {
     $sandboxMode = [Environment]::GetEnvironmentVariable(
         'MEANDAI_TEST_CODEX_SANDBOX_MODE'
@@ -76,9 +84,11 @@ if ($Arguments.Count -eq 0 -or $Arguments[0] -cne 'exec') {
 
 $workingIndex = [Array]::IndexOf([object[]]$Arguments, '--cd')
 $outputIndex = [Array]::IndexOf([object[]]$Arguments, '--output-last-message')
+$jsonIndex = [Array]::IndexOf([object[]]$Arguments, '--json')
 if ($workingIndex -lt 0 -or $workingIndex + 1 -ge $Arguments.Count -or
-    $outputIndex -lt 0 -or $outputIndex + 1 -ge $Arguments.Count) {
-    throw 'Mock Codex did not receive isolated working and output paths.'
+    $outputIndex -lt 0 -or $outputIndex + 1 -ge $Arguments.Count -or
+    $jsonIndex -lt 0) {
+    throw 'Mock Codex did not receive isolated working/output paths and JSONL streaming.'
 }
 $working = $Arguments[$workingIndex + 1]
 $output = $Arguments[$outputIndex + 1]
@@ -103,6 +113,30 @@ if (-not $networkDisabled -or $networkEnabled -or
     $stdin.Contains('Use gh only') -or $stdin.Contains('Use gh for')) {
     throw "Mock Codex did not receive the enforced network-free publication boundary (disabled=$networkDisabled; enabled=$networkEnabled; arguments=$($Arguments -join '|'))."
 }
+
+Write-CodexJsonEvent ([ordered]@{
+    type = 'thread.started'
+    thread_id = 'mock-adoption-thread'
+})
+Write-CodexJsonEvent ([ordered]@{ type = 'turn.started' })
+Write-CodexJsonEvent ([ordered]@{
+    type = 'item.completed'
+    item = [ordered]@{
+        id = 'message-1'
+        type = 'agent_message'
+        text = 'Inspecting project records.'
+    }
+})
+Write-CodexJsonEvent ([ordered]@{
+    type = 'item.started'
+    item = [ordered]@{
+        id = 'command-1'
+        type = 'command_execution'
+        command = 'git status --porcelain'
+        aggregated_output = 'MEANDAI_TEST_HIDDEN_COMMAND_OUTPUT'
+        status = 'in_progress'
+    }
+})
 
 $manifestPath = Join-Path $working '.ai/adoption/meandai-capabilities.json'
 $manifest = [IO.File]::ReadAllText($manifestPath) | ConvertFrom-Json
@@ -190,7 +224,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.9.4' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.9.5' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'
@@ -216,4 +250,23 @@ if ($mode -ceq 'Sleep') {
     'MEANDAI_ADOPTION_READY - mock local completion',
     [Text.UTF8Encoding]::new($false)
 )
-[Console]::Out.WriteLine('MEANDAI_ADOPTION_READY - mock local completion')
+Write-CodexJsonEvent ([ordered]@{
+    type = 'item.completed'
+    item = [ordered]@{
+        id = 'file-1'
+        type = 'file_change'
+        changes = @([ordered]@{ path = 'docs/ai-adoption.md'; kind = 'update' })
+    }
+})
+Write-CodexJsonEvent ([ordered]@{
+    type = 'item.completed'
+    item = [ordered]@{
+        id = 'message-2'
+        type = 'agent_message'
+        text = 'MEANDAI_ADOPTION_READY - mock local completion'
+    }
+})
+Write-CodexJsonEvent ([ordered]@{
+    type = 'turn.completed'
+    usage = [ordered]@{ input_tokens = 1; output_tokens = 1 }
+})

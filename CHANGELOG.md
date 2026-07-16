@@ -3,6 +3,23 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.5 - 2026-07-17
+
+### Fixed
+
+- Replace the host-managed PowerShell progress overlay with compact normal
+  console lines for actual launcher phases and elapsed local-Codex activity.
+- Consume semantic `codex exec --json` output incrementally and present only
+  bounded caller-facing messages and safe activity metadata; raw reasoning,
+  command output, and streamed false-readiness remain non-authoritative.
+- Establish kill-on-close Windows process-tree containment before semantic
+  model work and terminate the owned tree before timeout or cancellation
+  cleanup, while retaining exact interrupted-publication recovery.
+
+Related work: [FEAT-0020 / BUG-0008](docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md),
+[TEST-0105 and TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md), and
+[issue #57](https://github.com/hasanmanzak/meAndAI/issues/57).
+
 ## 0.9.4 - 2026-07-16
 
 ### Fixed

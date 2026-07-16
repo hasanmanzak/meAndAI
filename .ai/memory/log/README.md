@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The Windows sandbox and progress correction is tracked as
-[FEAT-0019](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md),
-[`TEST-0103` and `TEST-0104`](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md),
-and the [v0.9.4 continuation](2026-07-16-v094-windows-sandbox-progress.md).
-[Issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) owns delivery and
+Streamed local Codex activity and cancellation cleanup are tracked as
+[FEAT-0020](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md),
+[`TEST-0105` and `TEST-0106`](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md),
+and the [v0.9.5 continuation](2026-07-17-v095-streamed-codex-cancellation.md).
+[Issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) owns delivery and
 future post-publication evidence. `FIND-0120` remains the separate open
 external follow-up in issue #44.
 
 ## History
 
+- [2026-07-17 - v0.9.5 streamed Codex activity and cancellation cleanup](2026-07-17-v095-streamed-codex-cancellation.md)
 - [2026-07-16 - v0.9.4 Windows sandbox and progress correction](2026-07-16-v094-windows-sandbox-progress.md)
 - [2026-07-16 - v0.9.3 live PR metadata correction](2026-07-16-v093-live-pr-metadata-correction.md)
 - [2026-07-16 - Single-file quick adoption](2026-07-16-single-file-quick-adoption.md)

@@ -53,6 +53,11 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/quick-adoption-streaming.tests.ps1'
+            TestIds = @('TEST-0105', 'TEST-0106')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/post-publication-evidence.tests.ps1'
             TestIds = @('TEST-0083')
         }
