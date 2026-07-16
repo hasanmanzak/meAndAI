@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.2 - 2026-07-16
+
+### Changed
+
+- Distribute the existing quick-adoption launcher as one named asset of the
+  immutable protocol release instead of presenting its acquisition as an
+  inline PowerShell command stack.
+- Reduce normal consumer-side execution to one local `-File` invocation while
+  keeping the reusable launcher outside the consumer repository.
+- Preserve exact immutable-release validation, canonical-source retrieval,
+  credential handling, lifecycle orchestration, and maintainer-owned merge.
+
+Related work: [FEAT-0017](docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md),
+[TEST-0101](docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md), and
+[issue #51](https://github.com/hasanmanzak/meAndAI/issues/51).
+
 ## 0.9.1 - 2026-07-16
 
 ### Fixed

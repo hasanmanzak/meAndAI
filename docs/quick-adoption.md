@@ -4,8 +4,8 @@ This guide installs the one-file seed for the meAndAI AI-capabilities
 lifecycle. It supports both a clean existing GitHub repository and a local
 directory that has no repository or `origin` yet.
 
-The download command first verifies the requested immutable GitHub Release.
-The launcher repeats that verification before accepting executable source,
+The launcher is distributed as one asset of the requested immutable GitHub
+Release. It verifies that release again before accepting executable source,
 creates the repository when needed, provisions credentials, publishes the exact
 seed, dispatches the lifecycle workflow, and waits for its bounded result. If
 that run creates a semantic adoption draft, the launcher
@@ -13,6 +13,12 @@ uses local Codex CLI synchronously in a temporary clone, validates and pushes
 the result, and marks the pull request ready. The launcher, not Codex,
 reconciles the common labels and adoption issue. It never approves or merges;
 the maintainer performs the final review and merge.
+
+The launcher queries the exact `releases/tags/<tag>` endpoint with
+`X-GitHub-Api-Version: 2026-03-10` and accepts only a published immutable
+GitHub Release whose tag and publication metadata match the requested version.
+This supply-chain check remains inside the reviewed launcher rather than in a
+copy-pasted command stack.
 
 ## Prerequisites
 
@@ -78,39 +84,24 @@ private protocol repository, the launcher stops with a source-access error.
 
 ## Quick command
 
-Open PowerShell in the target directory and paste this single line. It verifies
-that `v0.9.1` is an exact published immutable GitHub Release before downloading
-the launcher from its locked tag into the OS temp directory; it does not
-execute a moving `main` file.
+Download the single
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.2/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.9.2` GitHub Release with an authenticated browser.
+Save the reusable file outside the consumer repository, such as in
+`$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
+launcher reusable across consumers pinned to the same release.
+
+Open PowerShell in the target directory and run exactly one script invocation:
 
 ```powershell
-$t='v0.9.1'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath .
 ```
 
-The same command in a more readable form is:
+If the browser saved the asset elsewhere, change only the `-File` path. The
+launcher itself verifies that `v0.9.2` is an exact published immutable release
+before it downloads canonical source; it never executes a moving `main` file.
 
-```powershell
-$tag = 'v0.9.1'
-$release = gh api -H 'Accept: application/vnd.github+json' `
-  -H 'X-GitHub-Api-Version: 2026-03-10' `
-  "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
-$publishedAt = [DateTimeOffset]::MinValue
-if ([string]$release.tag_name -cne $tag -or
-    $release.draft -isnot [bool] -or $release.draft -or
-    $release.prerelease -isnot [bool] -or $release.prerelease -or
-    $release.immutable -isnot [bool] -or -not $release.immutable -or
-    -not [DateTimeOffset]::TryParse(
-      [string]$release.published_at, [ref]$publishedAt
-    )) {
-  throw "Protocol release $tag is not published and immutable."
-}
-$launcher = Join-Path $env:TEMP "Invoke-MeAndAIQuickAdoption-$tag.ps1"
-gh api -H 'Accept: application/vnd.github.raw+json' `
-  -H 'X-GitHub-Api-Version: 2026-03-10' `
-  "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$tag" |
-  Set-Content -LiteralPath $launcher -Encoding UTF8
-& $launcher -TargetPath .
-```
+## Target behavior and options
 
 For an existing connected repository, no owner or name is needed. The launcher
 validates the GitHub `origin`, preserves application content, commits only
@@ -127,7 +118,7 @@ manually. Unrelated local files remain untracked and are not published. To
 override the inferred identity or visibility:
 
 ```powershell
-& $launcher -TargetPath . -Owner 'my-owner' -RepositoryName 'my-repo' -Visibility private
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -Owner 'my-owner' -RepositoryName 'my-repo' -Visibility private
 ```
 
 Running the command is explicit authorization to read the applicable fixed
@@ -176,8 +167,8 @@ relevant repository context to its configured model service.
 For troubleshooting or a deliberately manual handoff:
 
 ```powershell
-& $launcher -TargetPath . -SkipLifecycleDispatch
-& $launcher -TargetPath . -SkipLocalCodex
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -SkipLifecycleDispatch
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -SkipLocalCodex
 ```
 
 `-SkipLifecycleDispatch` also skips local Codex because no draft is expected.

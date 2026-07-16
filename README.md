@@ -4,18 +4,18 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.9.1**
+Current protocol version: **0.9.2**
 
-For v0.9.1, publication authority is the repository's
+For v0.9.2, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface and
-[issue #49](https://github.com/hasanmanzak/meAndAI/issues/49); this file does
+[issue #51](https://github.com/hasanmanzak/meAndAI/issues/51); this file does
 not assert a pre-merge release state.
 
 ## Start here
 
 - Read the [common protocol](PROTOCOL.md).
 - Follow the [adoption guide](docs/adoption.md) in a consuming repository.
-- Use [quick adoption](docs/quick-adoption.md) for the one-command local seed.
+- Use [quick adoption](docs/quick-adoption.md) for the single-file local seed.
 - Browse the [feature index](docs/features/README.md) and
   [decision index](docs/decisions/README.md).
 - Browse incubating possibilities in the [idea index](docs/ideas/README.md).

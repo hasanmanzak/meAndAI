@@ -26,6 +26,11 @@ leaves unrelated local files untouched.
 Provide one source-only PowerShell launcher at
 `scripts/Invoke-MeAndAIQuickAdoption.ps1`. It runs locally under explicit
 maintainer authority and never becomes a consumer-managed updater asset.
+Distribute that same reviewed file as the named asset
+`Invoke-MeAndAIQuickAdoption.ps1` in the exact immutable protocol release.
+Maintainers keep the reusable launcher outside consumer repositories and run
+it with an explicit target path. The quick path does not add a second wrapper,
+execute a moving source ref, or pipe downloaded text into a shell.
 
 The launcher uses these fixed local inputs and GitHub secret targets:
 
