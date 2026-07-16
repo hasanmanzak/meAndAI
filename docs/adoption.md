@@ -56,9 +56,9 @@ permission.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.9.3`, the only repository file required
+For a new submodule consumer on `v0.9.4`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.3/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.4/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -102,7 +102,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.9.3'
+$tag = 'v0.9.4'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -360,7 +360,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.9.3`
+- ref: `v0.9.4`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -405,11 +405,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.9.3`:
+before checkout; the current example then installs `v0.9.4`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.9.3
+git -C .ai/protocol checkout v0.9.4
 git add .ai/protocol
 ```
 

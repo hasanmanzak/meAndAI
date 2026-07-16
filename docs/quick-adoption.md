@@ -32,6 +32,13 @@ copy-pasted command stack.
   authenticated (`codex login status`). If
   `codex` is absent but `npx` is available, the launcher uses the pinned
   temporary package `@openai/codex@0.144.4` without a global install.
+- On Windows, Codex must have a usable native Windows sandbox. The launcher
+  reads only the active `[windows].sandbox` selection that its isolated
+  `--ignore-user-config` execution would otherwise omit, then runs a token-free
+  workspace-write probe before any model call. It prefers `elevated`, falls
+  back to `unelevated` only when the former fails the probe, and blocks before
+  semantic execution if neither mode can create, verify, and remove the probe
+  file. It never uses `danger-full-access`.
 - An existing connected consumer is clean, checked out on its GitHub default
   branch, and synchronized with `origin`.
 - The target directory contains the applicable local-only files:
@@ -85,8 +92,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.3/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.9.3` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.4/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.9.4` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -98,7 +105,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.9.3` is an exact published immutable release
+launcher itself verifies that `v0.9.4` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -131,16 +138,16 @@ Codex gate blocks, do not delete or reset anything. Resolve the reported
 condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 If `v0.9.2` already created the deterministic draft but stopped with
-`BUG-0006`, download the corrected `v0.9.3` launcher asset and retain the
+`BUG-0006`, download the corrected `v0.9.4` launcher asset and retain the
 proposal's original protocol target while resuming:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -ProtocolTag v0.9.2
 ```
 
-Do not retarget the retained draft to `v0.9.3`. Complete and merge its original
+Do not retarget the retained draft to `v0.9.4`. Complete and merge its original
 adoption first; the installed consumer updater can then propose the ordinary
-reviewed `v0.9.3` upgrade.
+reviewed `v0.9.4` upgrade.
 
 ## Default execution order
 
@@ -158,18 +165,26 @@ created—and the seed commit is pushed, the launcher:
 5. Resolves the installed local Codex CLI or pinned temporary fallback.
 6. Clones only the adoption branch into an OS temporary directory. The original
    checkout and its credential files are not the Codex workspace.
-7. Runs [`codex exec`](https://learn.chatgpt.com/docs/non-interactive-mode)
+7. On Windows, validates the selected native sandbox with a token-free
+   workspace-write probe and passes only the verified mode to the isolated
+   semantic run.
+8. Runs [`codex exec`](https://learn.chatgpt.com/docs/non-interactive-mode)
    synchronously with an ephemeral `workspace-write` session, a 30-minute
    default process limit, and spawned-command network access disabled.
-8. Requires an unchanged Git head, manifest removal, a valid non-empty diff,
+9. Requires an unchanged Git head, manifest removal, a valid non-empty diff,
    absent credential files, and an unchanged live remote branch.
-9. Creates the adoption completion commit, pushes it with an exact
+10. Creates the adoption completion commit, pushes it with an exact
    `--force-with-lease`, and marks the pull request ready without merging it.
 
 An empty consumer receives a deterministic bootstrap proposal. A populated
 consumer with target collisions receives
 `.ai/adoption/meandai-capabilities.json` instead of overwritten files. Local
 Codex uses the exact protocol source snapshot for semantic reconciliation.
+For a genuinely empty consumer, missing product purpose, runtime/stack,
+architecture, build command, and product test command are recorded as
+`Not yet established`. Their absence is not a blocker to protocol adoption,
+and Codex must not invent values; adoption validation remains structural until
+the project establishes those facts.
 
 The CLI process reuses the maintainer's saved local Codex authentication. No
 consumer repository connection to hosted GitHub-agent execution is required.
@@ -181,6 +196,7 @@ For troubleshooting or a deliberately manual handoff:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -SkipLifecycleDispatch
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -SkipLocalCodex
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -NoProgress
 ```
 
 `-SkipLifecycleDispatch` also skips local Codex because no draft is expected.
@@ -189,7 +205,10 @@ compatibility. The workflow wait is bounded by `-WorkflowTimeoutMinutes 15`
 (allowed range: 1 through 60). Local authentication and execution are bounded
 by `-CodexTimeoutMinutes 30` (allowed range: 1 through 120).
 `-CodexTimeoutSeconds` is an optional finer-grained override; zero preserves
-the minute setting. If a draft already
+the minute setting. By default, a PowerShell progress display reports the
+actual launcher phases. Long local Codex work is shown as indeterminate elapsed
+time because it has no truthful completion percentage; `-NoProgress` disables
+the display without changing behavior. If a draft already
 lacks the manifest when inspected, the launcher does not rerun Codex or mark
 the draft ready; the maintainer must validate that prior change manually.
 
@@ -237,6 +256,10 @@ by the launcher, every applicable AGENTS.md, and existing project files. Resolve
 collisions semantically; create or reconcile feature and decision records,
 local memory, tests, evidence, and clickable links. Reference the project-owned
 adoption issue already created by the launcher. Do not invent project facts.
+For an empty consumer, record unavailable product purpose, runtime/stack,
+architecture, build command, and product test command as Not yet established;
+their absence is not a blocker to protocol adoption. Use structural checks and
+do not invent product behavior.
 Remove the manifest only when all adoption gates are satisfied.
 
 Secret provisioning was reconciled by the parent launcher before this Codex
@@ -253,8 +276,8 @@ step. Within this clone, do not invoke gh, GitHub APIs, remote Git operations,
 or another external service. Do not change the pinned protocol or lifecycle
 workflow. Do not commit, push, approve, mark ready, merge, close, or delete;
 the launcher owns GitHub records and publication and the maintainer owns merge.
-Keep review bounded and report the exact blocker if project facts or required
-evidence are unavailable.
+Keep review bounded and report the exact blocker if required non-product facts
+or evidence are unavailable.
 ```
 
 For lifecycle states, collision semantics, and the manual alternative, see the

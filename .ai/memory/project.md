@@ -7,24 +7,24 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.3`. Exact publication state is authoritative
+- Current protocol version: `0.9.4`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) after
+  [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0018](../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md)
-  corrects the launcher's live GitHub pull-request repository metadata
-  contract; [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) owns
-  delivery and future publication evidence.
+- Current scope: [FEAT-0019](../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md)
+  corrects the launcher's native Windows sandbox carry-forward, empty-consumer
+  semantics, and phase progress; [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
+  owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the existing source-only
-  `Invoke-MeAndAIQuickAdoption.ps1` now validates the observed GitHub CLI
-  `headRepository.name`, `headRepositoryOwner.login`, and
-  `isCrossRepository` fields. `TEST-0102` owns this real-shape regression and
-  keeps repository-name, owner, cross-repository, and type mismatches
-  fail-closed. The retained [Derdini draft](https://github.com/hasanmanzak/Derdini/pull/1)
-  remains the resumable consumer evidence; the launcher still never merges.
+- Latest tracked work: the source-only `Invoke-MeAndAIQuickAdoption.ps1`
+  performs a model-free workspace-write probe before local Codex, carries only
+  the verified native Windows sandbox mode, records unavailable empty-project
+  facts as `Not yet established`, and displays truthful phase progress.
+  `TEST-0103` and `TEST-0104` own the regression. The retained
+  [Derdini draft](https://github.com/hasanmanzak/Derdini/pull/1) remains the
+  resumable consumer evidence; the launcher still never merges.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -119,6 +119,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   repository name, repository owner, and Boolean cross-repository fields that
   GitHub CLI actually returns. Affected `v0.9.2` drafts remain retained and may
   be resumed with the corrected launcher.
+- `v0.9.4` validates native Windows workspace writes without a model call,
+  safely carries the verified sandbox implementation across isolated Codex
+  configuration, distinguishes empty-project unknowns from adoption blockers,
+  and makes launcher progress observable without inventing percentages.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,

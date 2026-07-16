@@ -4,7 +4,7 @@
 - Status: Accepted
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer maintainers
-- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md)
+- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md), [FEAT-0019](../features/FEAT-0019-v094-sandbox-progress-correction/README.md)
 - Related decisions: [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md), [DEC-0007](DEC-0007-local-quick-adoption-boundary.md)
 - Supersedes: [DEC-0007](DEC-0007-local-quick-adoption-boundary.md) only for the post-workflow Codex Cloud handoff
 
@@ -43,6 +43,20 @@ Prefer an installed `codex` command. If it is absent, `npx` may run one pinned
 `@openai/codex` package version without installing it globally. Authentication
 must still be present and is never bootstrapped from repository content.
 
+On native Windows, preserve the isolation of `--ignore-user-config` while
+reading only the maintainer's `[windows].sandbox` selection. Before any model
+execution, run a token-free `codex sandbox` workspace-write probe in the
+temporary clone. Prefer `elevated`; if it cannot pass the probe, try
+`unelevated`, announce the fallback, and pass only the verified mode explicitly
+to `codex exec`. If no mode can create, verify, and remove its probe file, block
+before semantic execution. Full-access bypass modes are prohibited.
+
+An empty consumer is eligible for protocol adoption even when product purpose,
+runtime/stack, architecture, build command, and product test command do not yet
+exist. Record those facts as `Not yet established`, validate the adoption
+structure, and do not invent product facts or behavior. Missing evidence for
+actual project behavior remains blocking once such behavior exists.
+
 Before Codex starts, the launcher uses its existing authenticated `gh` boundary
 to create any missing common Agile labels and reconcile one canonically marked
 adoption issue. The prompt supplies that issue URL; Codex performs no GitHub
@@ -74,6 +88,9 @@ marks the draft ready.
   launcher never supplies the two protocol PAT values to that process.
 - A finite process timeout terminates stalled local authentication or semantic
   execution instead of allowing an unbounded adoption loop.
+- Phase progress is observational only. Work without a measurable fraction,
+  including semantic Codex execution, is shown as indeterminate and may be
+  suppressed without changing the operation.
 - Existing v0.6.0 consumers and the manual workflow-only path remain valid.
 
 ## Alternatives considered
