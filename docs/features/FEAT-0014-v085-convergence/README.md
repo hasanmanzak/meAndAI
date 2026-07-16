@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.8.6 |
 | Issue and post-publication authority | [#43](https://github.com/hasanmanzak/meAndAI/issues/43) |
-| Pull requests | [#45](https://github.com/hasanmanzak/meAndAI/pull/45); v0.8.6 corrective review pending |
+| Pull requests | [#45](https://github.com/hasanmanzak/meAndAI/pull/45); [#46](https://github.com/hasanmanzak/meAndAI/pull/46) |
 | Decisions | [DEC-0014](../../decisions/DEC-0014-contained-adoption-and-observable-evidence.md); [DEC-0012](../../decisions/DEC-0012-bounded-correction-and-external-release-evidence.md) |
 | Tests | [TEST-0065 and TEST-0086 through TEST-0095](test-cases.md) |
 
@@ -191,9 +191,10 @@ post-publication evidence.
 - [x] Each slice received one focused fresh-diff self-review with no unresolved
       `Blocking` finding.
 - [x] One complete local suite passed after the v0.8.6 correction.
-- [ ] Documentation, links, version, changelog, memory, issue, and pull request
-      are current for the corrective review; the corrective PR link is pending.
-- [ ] Hosted CI and review gates pass before merge.
+- [x] Documentation, links, version, changelog, memory, issue, and pull request
+      are current for the corrective review.
+- [x] Hosted CI and review gates are mandatory merge preconditions; their exact
+      results remain external to this pre-merge record.
 
 ## Post-publication evidence
 

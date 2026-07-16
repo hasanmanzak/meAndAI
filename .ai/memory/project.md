@@ -24,8 +24,10 @@ Last verified: **2026-07-16**
   post-publication preflight exposed `FIND-0132`: the release-target feature
   state was not complete. The v0.8.6 branch adds the missing pre-publication
   guard and keeps post-publication work outside Definition of Done. Its focused
-  and complete local suites passed on 2026-07-16. Review, immutable corrective
-  release, and the single fresh confirmation scan remain owned by
+  and complete local suites passed on 2026-07-16; corrective review is
+  [pull request #46](https://github.com/hasanmanzak/meAndAI/pull/46).
+  Immutable corrective release and the single fresh confirmation scan remain
+  owned by
   [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
 - Open external follow-up: `FIND-0120` / `RISK-0076` is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Issue
