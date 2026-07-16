@@ -14,7 +14,7 @@ PowerShell 7 environments may use `pwsh -NoProfile -File tests/protocol.tests.ps
 | ID | Related slice | Scenario | Expected result | Status | Automation |
 | --- | --- | --- | --- | --- | --- |
 | `TEST-0001` | All | Required protocol, adoption, memory, feature, decision, and GitHub template files exist. | Every required path resolves to the expected file type. | Passed | Structural test |
-| `TEST-0002` | `SUBF-0001` | `VERSION` is evaluated against `M.m.rev`. | Exactly three non-negative integer components are accepted. | Passed | Structural test |
+| `TEST-0002` | `SUBF-0001` | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`. | Passed | Structural test |
 | `TEST-0003` | All | Inline local Markdown links are resolved relative to their document and remain inside the repository. | No missing, escaped, or invalid-anchor target is reported. | Passed | Structural test |
 | `TEST-0004` | `SUBF-0003` | Every `FEAT-NNNN-*` directory is inspected. | `README.md` and `test-cases.md` both exist. | Passed | Structural test |
 | `TEST-0005` | `SUBF-0003` | Every numbered decision document is inspected. | Required classification, ID, status, context, decision, and consequences sections exist. | Passed | Structural test |

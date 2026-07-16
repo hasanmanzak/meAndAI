@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.8.4',
+    [string]$ProtocolTag = 'v0.8.5',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -27,7 +27,55 @@ Set-StrictMode -Version Latest
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
-$adoptionUpdaterAssets = @(
+$adoptionAssets = @(
+    [pscustomobject]@{
+        ConsumerPath = 'AGENTS.md'
+        TemplatePath = 'templates/project/AGENTS.submodule.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.ai/memory/README.md'
+        TemplatePath = 'templates/project/.ai/memory/README.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.ai/memory/project.md'
+        TemplatePath = 'templates/project/.ai/memory/project.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.ai/memory/log/README.md'
+        TemplatePath = 'templates/project/.ai/memory/log/README.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = 'docs/ideas/README.md'
+        TemplatePath = 'templates/project/docs/ideas/README.md'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/bug.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/bug.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/epic.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/epic.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/feature.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/feature.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/finding.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/finding.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/subfeature.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/subfeature.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/ISSUE_TEMPLATE/task.yml'
+        TemplatePath = '.github/ISSUE_TEMPLATE/task.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/PULL_REQUEST_TEMPLATE.md'
+        TemplatePath = '.github/PULL_REQUEST_TEMPLATE.md'
+    },
     [pscustomobject]@{
         ConsumerPath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
         TemplatePath = 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
@@ -37,6 +85,12 @@ $adoptionUpdaterAssets = @(
         TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
     }
 )
+$adoptionUpdaterAssets = @($adoptionAssets | Where-Object {
+    [string]$_.ConsumerPath -cin @(
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    )
+})
 $secretLockLabel = 'meandai:secret-reconciliation-lock'
 $tokenMappings = [ordered]@{
     'FG_PAT.txt' = 'MEANDAI_UPDATER_TOKEN'
@@ -126,6 +180,67 @@ function Get-NormalizedPath {
         [IO.Path]::DirectorySeparatorChar,
         [IO.Path]::AltDirectorySeparatorChar
     )
+}
+
+function Assert-ContainedManagedDestination {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$RelativePath
+    )
+
+    if ([IO.Path]::IsPathRooted($RelativePath)) {
+        throw "Managed destination '$RelativePath' must be relative to the repository root."
+    }
+    $segments = @($RelativePath -split '[\\/]')
+    if ($segments.Count -eq 0 -or
+        @($segments | Where-Object { $_ -ceq '' -or $_ -ceq '.' -or $_ -ceq '..' }).Count -gt 0) {
+        throw "Managed destination '$RelativePath' is not a canonical repository-relative path."
+    }
+
+    $rootPath = [IO.Path]::GetFullPath($Root)
+    $relativePlatformPath = $segments -join [IO.Path]::DirectorySeparatorChar
+    $destination = [IO.Path]::GetFullPath((Join-Path $rootPath $relativePlatformPath))
+    $comparison = if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        [StringComparison]::OrdinalIgnoreCase
+    }
+    else { [StringComparison]::Ordinal }
+    $rootPrefix = if ($rootPath.EndsWith([string][IO.Path]::DirectorySeparatorChar) -or
+        $rootPath.EndsWith([string][IO.Path]::AltDirectorySeparatorChar)) {
+        $rootPath
+    }
+    else { $rootPath + [IO.Path]::DirectorySeparatorChar }
+    if (-not $destination.StartsWith($rootPrefix, $comparison)) {
+        throw "Managed destination '$RelativePath' escapes the repository root."
+    }
+
+    $current = $rootPath
+    for ($index = 0; $index -lt $segments.Count; $index++) {
+        $current = Join-Path $current $segments[$index]
+        try {
+            $item = Get-Item -LiteralPath $current -Force -ErrorAction Stop
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            continue
+        }
+        catch {
+            throw "Managed destination '$RelativePath' could not be inspected safely: $($_.Exception.Message)"
+        }
+
+        $linkTypeProperty = $item.PSObject.Properties['LinkType']
+        $isLink = $null -ne $linkTypeProperty -and
+            -not [string]::IsNullOrEmpty([string]$linkTypeProperty.Value)
+        $isReparsePoint = ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0
+        if ($isLink -or $isReparsePoint) {
+            $component = @($segments[0..$index]) -join '/'
+            throw "Managed destination '$RelativePath' traverses linked or reparse-point path '$component'."
+        }
+        if ($index -lt ($segments.Count - 1) -and -not $item.PSIsContainer) {
+            $component = @($segments[0..$index]) -join '/'
+            throw "Managed destination '$RelativePath' traverses non-directory path '$component'."
+        }
+    }
+
+    return $destination
 }
 
 function Get-GitBlobSha {
@@ -311,6 +426,121 @@ function Assert-AdoptionUpdaterAssetsExact {
         if ($consumerEntry.Mode -cne '100644' -or $consumerEntry.Type -cne 'blob' -or
             $consumerEntry.Sha -cne $sourceSha) {
             throw "Consumer updater asset '$($asset.ConsumerPath)' does not match the exact protocol source."
+        }
+    }
+}
+
+function Test-ExactOrdinalPathSet {
+    param(
+        [Parameter(Mandatory)][object[]]$Actual,
+        [Parameter(Mandatory)][object[]]$Expected
+    )
+
+    if ($Actual.Count -ne $Expected.Count) {
+        return $false
+    }
+    $remaining = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($path in $Expected) {
+        if (-not $remaining.Add([string]$path)) {
+            return $false
+        }
+    }
+    foreach ($path in $Actual) {
+        if (-not $remaining.Remove([string]$path)) {
+            return $false
+        }
+    }
+    return $remaining.Count -eq 0
+}
+
+function Assert-ExactAdoptionProposal {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$ProposalHead,
+        [Parameter(Mandatory)][string]$CanonicalBaseHead,
+        [Parameter(Mandatory)][ValidateSet('Full', 'ManifestOnly')]
+        [string]$ProposalMode,
+        [Parameter(Mandatory)][string[]]$TargetPaths,
+        [Parameter(Mandatory)][string]$ProtocolSource,
+        [Parameter(Mandatory)][string]$ProtocolSha
+    )
+
+    if ($CanonicalBaseHead -cnotmatch '^[0-9a-f]{40}$' -or
+        $ProtocolSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'The exact adoption proposal received an invalid base or protocol commit.'
+    }
+    $proposalParent = Get-SingleCommitParent -Repository $Repository `
+        -Commit $ProposalHead
+    if ($proposalParent -cne $CanonicalBaseHead) {
+        throw 'The adoption proposal is not based on the canonical consumer head.'
+    }
+
+    $mappedTargetPaths = @('.gitmodules', '.ai/protocol') + @(
+        $adoptionAssets | ForEach-Object { [string]$_.ConsumerPath }
+    )
+    if (-not (Test-ExactOrdinalPathSet -Actual @($TargetPaths) `
+        -Expected $mappedTargetPaths)) {
+        throw 'The exact protocol target paths do not match the launcher asset mapping.'
+    }
+    $expectedChangedPaths = if ($ProposalMode -ceq 'Full') {
+        @($TargetPaths) + @($adoptionManifestPath)
+    }
+    else {
+        @($adoptionManifestPath)
+    }
+    Invoke-Git -Repository $Repository -Arguments @(
+        'diff', '--check', $CanonicalBaseHead, $ProposalHead, '--'
+    ) | Out-Null
+    $actualChangedPaths = @((Invoke-Git -Repository $Repository -Arguments @(
+        'diff', '--no-renames', '--name-only', '--diff-filter=ACMRTD',
+        $CanonicalBaseHead, $ProposalHead, '--'
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    if (-not (Test-ExactOrdinalPathSet -Actual $actualChangedPaths `
+        -Expected $expectedChangedPaths)) {
+        throw 'The adoption proposal does not contain the exact lifecycle change set.'
+    }
+
+    if ($ProposalMode -ceq 'ManifestOnly') {
+        return
+    }
+
+    $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $ProposalHead -Path '.ai/protocol'
+    if ($protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit' -or
+        $protocolEntry.Sha -cne $ProtocolSha) {
+        throw 'The exact adoption proposal protocol reference is not the pinned gitlink.'
+    }
+
+    $gitmodulesText = @(
+        '[submodule ".ai/protocol"]',
+        "`tpath = .ai/protocol",
+        "`turl = https://github.com/$ProtocolRepository.git",
+        ''
+    ) -join "`n"
+    $gitmodulesSha = Get-GitBlobSha -Bytes (
+        [Text.UTF8Encoding]::new($false).GetBytes($gitmodulesText)
+    )
+    $gitmodulesEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $ProposalHead -Path '.gitmodules'
+    if ($gitmodulesEntry.Mode -cne '100644' -or
+        $gitmodulesEntry.Type -cne 'blob' -or
+        $gitmodulesEntry.Sha -cne $gitmodulesSha) {
+        throw 'The exact adoption proposal submodule metadata is not canonical.'
+    }
+
+    foreach ($asset in $adoptionAssets) {
+        $sourceSha = Get-ExactProtocolSourceBlobSha `
+            -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
+            -TemplatePath ([string]$asset.TemplatePath)
+        $proposalEntry = Get-AdoptionTreeEntry -Repository $Repository `
+            -Commit $ProposalHead -Path ([string]$asset.ConsumerPath)
+        if ($proposalEntry.Mode -cne '100644' -or
+            $proposalEntry.Type -cne 'blob' -or
+            $proposalEntry.Sha -cne $sourceSha) {
+            throw "Adoption proposal asset '$($asset.ConsumerPath)' does not match the exact protocol source."
         }
     }
 }
@@ -506,7 +736,7 @@ function Get-CanonicalWorkflow {
     if ($ProtocolRepository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
         throw "ProtocolRepository '$ProtocolRepository' must use the owner/repository form."
     }
-    if ($ProtocolTag -cnotmatch '^v\d+\.\d+\.\d+$') {
+    if ($ProtocolTag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$') {
         throw 'ProtocolTag must use the vM.m.rev form.'
     }
 
@@ -1745,7 +1975,8 @@ function Get-ValidatedAdoptionManifest {
         [Parameter(Mandatory)]$PullRequest,
         [Parameter(Mandatory)][string]$ProtocolSource,
         [Parameter(Mandatory)][string]$ProposalRepository,
-        [Parameter(Mandatory)][string]$ProposalHead
+        [Parameter(Mandatory)][string]$ProposalHead,
+        [Parameter(Mandatory)][string]$CanonicalBaseHead
     )
 
     try {
@@ -1780,9 +2011,10 @@ function Get-ValidatedAdoptionManifest {
             throw 'The exact protocol capabilities contract does not export one path getter, resolver, and manifest validator.'
         }
         $targetPathGetter = $targetPathGetters[0]
+        $targetPaths = @(& $targetPathGetter)
         $contract = Get-ExpectedAdoptionManifestContract `
             -Repository $ProposalRepository -ProposalHead $ProposalHead `
-            -TargetPaths @(& $targetPathGetter)
+            -TargetPaths $targetPaths
         if ($null -eq $workflowBytes) {
             throw 'The independently verified canonical seed workflow bytes are unavailable.'
         }
@@ -1825,6 +2057,11 @@ function Get-ValidatedAdoptionManifest {
     if ($valid -isnot [bool] -or -not $valid) {
         throw 'The adoption manifest does not exactly match the independently derived protocol contract.'
     }
+    Assert-ExactAdoptionProposal -Repository $ProposalRepository `
+        -ProposalHead $ProposalHead -CanonicalBaseHead $CanonicalBaseHead `
+        -ProposalMode ([string]$plan.ProposalMode) -TargetPaths $targetPaths `
+        -ProtocolSource $ProtocolSource `
+        -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha)
     return $manifest
 }
 
@@ -2006,12 +2243,23 @@ function Complete-AdoptionWithLocalCodex {
         [Parameter(Mandatory)][string]$TargetRepository,
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$CanonicalBaseHead,
         [string]$ProtocolToken = ''
     )
 
     $branch = [string]$PullRequest.headRefName
     $expectedHead = [string]$PullRequest.headRefOid
     $expectedBody = [string]$PullRequest.body
+    $localBaseHead = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Output -join '').Trim())
+    $remoteBaseHead = Get-RemoteBranchHead -Repository $TargetRepository `
+        -Remote $RemoteName -Branch ([string]$PullRequest.baseRefName)
+    if ($CanonicalBaseHead -cnotmatch '^[0-9a-f]{40}$' -or
+        $localBaseHead -cne $CanonicalBaseHead -or
+        $remoteBaseHead -cne $CanonicalBaseHead) {
+        throw 'The canonical consumer base changed before local adoption validation.'
+    }
     $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository -Remote $RemoteName -Branch $branch
     if ($remoteHead -cne $expectedHead) {
         throw 'The pull-request head and live adoption branch differ before local execution.'
@@ -2083,9 +2331,36 @@ function Complete-AdoptionWithLocalCodex {
             $expectedBody = $restoredBody
         }
         if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
-            Assert-AdoptionProtocolReference -Repository $clonePath `
-                -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha)
             if ([string]$PullRequest.meAndAIMarker.phase -ceq 'Completed') {
+                if ($null -eq $protocolSource) {
+                    $protocolSource = Get-ProtocolSourceSnapshot -Token $ProtocolToken `
+                        -Commit ([string]$PullRequest.meAndAIMarker.protocolSha) `
+                        -Destination $temporaryRoot
+                }
+                $proposalHead = Get-SingleCommitParent -Repository $clonePath `
+                    -Commit $expectedHead
+                $proposalManifestText = @((Invoke-Git -Repository $clonePath `
+                    -Arguments @('show', "${proposalHead}:$adoptionManifestPath")).Output) `
+                    -join [Environment]::NewLine
+                if ([string]::IsNullOrWhiteSpace($proposalManifestText)) {
+                    throw 'The completed adoption parent does not contain its proposal manifest.'
+                }
+                $proposalManifestPath = Join-Path $temporaryRoot `
+                    'completed-proposal-manifest.json'
+                [IO.File]::WriteAllText(
+                    $proposalManifestPath,
+                    $proposalManifestText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+                [void](Get-ValidatedAdoptionManifest `
+                    -ManifestPath $proposalManifestPath -Repository $Repository `
+                    -PullRequest $PullRequest -ProtocolSource $protocolSource `
+                    -ProposalRepository $clonePath -ProposalHead $proposalHead `
+                    -CanonicalBaseHead $CanonicalBaseHead)
+                Assert-RecoverablePublishedAdoption -Repository $clonePath `
+                    -PreviousHead $proposalHead -PlannedHead $expectedHead `
+                    -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
+                    -ProtocolSource $protocolSource
                 Ensure-AdoptionLabels -Repository $Repository
                 $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
                     -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
@@ -2102,6 +2377,8 @@ function Complete-AdoptionWithLocalCodex {
                     Head = $expectedHead
                 }
             }
+            Assert-AdoptionProtocolReference -Repository $clonePath `
+                -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha)
             return [pscustomobject]@{
                 Ran = $false
                 Pushed = $false
@@ -2125,7 +2402,7 @@ function Complete-AdoptionWithLocalCodex {
         $manifest = Get-ValidatedAdoptionManifest -ManifestPath $manifestPath `
             -Repository $Repository -PullRequest $PullRequest `
             -ProtocolSource $protocolSource -ProposalRepository $clonePath `
-            -ProposalHead $expectedHead
+            -ProposalHead $expectedHead -CanonicalBaseHead $CanonicalBaseHead
         if ([string]$manifest.state -ceq 'BootstrapReady') {
             Assert-AdoptionProtocolReference -Repository $clonePath `
                 -ProtocolSha ([string]$manifest.protocolSha)
@@ -2453,8 +2730,8 @@ if ($null -eq $workflowBytes) {
     }
 }
 
-$workflowFullPath = Join-Path $target `
-    ($workflowTargetPath -replace '/', [IO.Path]::DirectorySeparatorChar)
+$workflowFullPath = Assert-ContainedManagedDestination `
+    -Root $target -RelativePath $workflowTargetPath
 if (Test-Path -LiteralPath $workflowFullPath) {
     if (-not (Test-Path -LiteralPath $workflowFullPath -PathType Leaf)) {
         throw "The existing seed workflow path '$workflowTargetPath' is not a regular file."
@@ -2619,7 +2896,7 @@ else {
         else {
             $completion = Complete-AdoptionWithLocalCodex -TargetRepository $target `
                 -Repository $repository -PullRequest $adoptionPullRequest `
-                -ProtocolToken $protocolToken
+                -CanonicalBaseHead $publishedHead -ProtocolToken $protocolToken
             if ($completion.Ran) {
                 Write-Host "Local Codex completed synchronously through $($completion.Runner)."
                 Write-Host "The validated adoption commit was pushed and the pull request is ready: $($adoptionPullRequest.url)"

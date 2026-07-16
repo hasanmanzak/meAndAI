@@ -15,6 +15,7 @@
 | [FEAT-0011](FEAT-0011-stability-closure/README.md) | End-to-end protocol stability closure | Complete | 0.8.1 |
 | [FEAT-0012](FEAT-0012-v082-correction/README.md) | Bounded v0.8.2 correctness correction and v0.8.3 verifier repair | Complete | 0.8.3 |
 | [FEAT-0013](FEAT-0013-v084-correction/README.md) | Bounded v0.8.4 trusted-adoption and evidence correction | Complete | 0.8.4 |
+| [FEAT-0014](FEAT-0014-v085-convergence/README.md) | Bounded v0.8.5 containment and observable-evidence correction | Ready for review | 0.8.5 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

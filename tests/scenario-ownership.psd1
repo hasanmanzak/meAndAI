@@ -10,7 +10,7 @@
                 'TEST-0018', 'TEST-0019', 'TEST-0020', 'TEST-0044',
                 'TEST-0047', 'TEST-0050', 'TEST-0056', 'TEST-0059',
                 'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076',
-                'TEST-0084', 'TEST-0085'
+                'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092'
             )
         }
         @{
@@ -21,7 +21,7 @@
                 'TEST-0013', 'TEST-0014', 'TEST-0015', 'TEST-0016',
                 'TEST-0017', 'TEST-0021', 'TEST-0022', 'TEST-0023',
                 'TEST-0024', 'TEST-0025', 'TEST-0026', 'TEST-0048',
-                'TEST-0058', 'TEST-0061', 'TEST-0072'
+                'TEST-0058', 'TEST-0061', 'TEST-0072', 'TEST-0088'
             )
         }
         @{
@@ -30,7 +30,8 @@
             TestIds = @(
                 'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
                 'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
-                'TEST-0068', 'TEST-0071', 'TEST-0077', 'TEST-0080'
+                'TEST-0068', 'TEST-0071', 'TEST-0077', 'TEST-0080',
+                'TEST-0093', 'TEST-0094', 'TEST-0095'
             )
         }
         @{
@@ -43,7 +44,8 @@
                 'TEST-0049', 'TEST-0051', 'TEST-0052', 'TEST-0053',
                 'TEST-0054', 'TEST-0055', 'TEST-0060', 'TEST-0063',
                 'TEST-0069', 'TEST-0070', 'TEST-0073', 'TEST-0078',
-                'TEST-0079', 'TEST-0081', 'TEST-0082'
+                'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
+                'TEST-0087', 'TEST-0089', 'TEST-0090'
             )
         }
         @{

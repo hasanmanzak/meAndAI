@@ -3,12 +3,23 @@ Set-StrictMode -Version Latest
 function ConvertTo-ProtocolVersionRecord {
     param([string]$Tag)
 
-    if ($Tag -cnotmatch '^v(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<revision>0|[1-9]\d*)$') {
+    if ($Tag -cnotmatch '^v(?<major>0|[1-9][0-9]*)\.(?<minor>0|[1-9][0-9]*)\.(?<revision>0|[1-9][0-9]*)$') {
         return $null
     }
 
     try {
-        $version = [version]('{0}.{1}.{2}' -f $Matches.major, $Matches.minor, $Matches.revision)
+        $major = [System.Numerics.BigInteger]::Parse(
+            [string]$Matches.major,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+        $minor = [System.Numerics.BigInteger]::Parse(
+            [string]$Matches.minor,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+        $revision = [System.Numerics.BigInteger]::Parse(
+            [string]$Matches.revision,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
     }
     catch {
         return $null
@@ -16,7 +27,9 @@ function ConvertTo-ProtocolVersionRecord {
 
     [pscustomobject]@{
         Tag = $Tag
-        Version = $version
+        Major = $major
+        Minor = $minor
+        Revision = $revision
     }
 }
 
@@ -230,20 +243,24 @@ function Resolve-MeAndAIProtocolUpdatePlan {
     $latestCompatible = $null
     $majorUpgradeAvailable = $false
     if ($records.Count -gt 0) {
-        $latestAvailable = @($records | Sort-Object Version | Select-Object -Last 1)[0]
+        $latestAvailable = @($records | Sort-Object Major, Minor, Revision | Select-Object -Last 1)[0]
     }
     if ($null -ne $currentRecord) {
         if (-not $seenTags.Contains($currentRecord.Tag)) {
             $diagnostics.Add("Current tag '$($currentRecord.Tag)' is absent from the release inventory.")
         }
-        $compatible = @($records | Where-Object { $_.Version.Major -eq $currentRecord.Version.Major } | Sort-Object Version)
+        $compatible = @($records | Where-Object {
+            $_.Major -eq $currentRecord.Major
+        } | Sort-Object Major, Minor, Revision)
         if ($compatible.Count -eq 0) {
-            $diagnostics.Add("No release exists for current major '$($currentRecord.Version.Major)'.")
+            $diagnostics.Add("No release exists for current major '$($currentRecord.Major)'.")
         }
         else {
             $latestCompatible = $compatible[-1]
         }
-        $majorUpgradeAvailable = @($records | Where-Object { $_.Version.Major -gt $currentRecord.Version.Major }).Count -gt 0
+        $majorUpgradeAvailable = @($records | Where-Object {
+            $_.Major -gt $currentRecord.Major
+        }).Count -gt 0
     }
 
     $candidateRecords = [System.Collections.Generic.List[object]]::new()
@@ -286,7 +303,7 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         if ($null -eq $targetRecord -or -not $seenTags.Contains($target)) {
             $diagnostics.Add("Candidate PR #$number targets an unknown release '$target'.")
         }
-        elseif ($null -ne $currentRecord -and $targetRecord.Version.Major -ne $currentRecord.Version.Major) {
+        elseif ($null -ne $currentRecord -and $targetRecord.Major -ne $currentRecord.Major) {
             $diagnostics.Add("Candidate PR #$number targets a different major '$target'.")
         }
         foreach ($problem in @(Get-MeAndAIProtocolCandidateProblems `
@@ -316,7 +333,9 @@ function Resolve-MeAndAIProtocolUpdatePlan {
     }
 
     $operations = [System.Collections.Generic.List[object]]::new()
-    $currentIsLatest = $currentRecord.Version -eq $latestCompatible.Version
+    $currentIsLatest = $currentRecord.Major -eq $latestCompatible.Major -and
+        $currentRecord.Minor -eq $latestCompatible.Minor -and
+        $currentRecord.Revision -eq $latestCompatible.Revision
     $latestCandidates = @($candidateRecords | Where-Object {
         [string]::Equals([string]$_.TargetTag, [string]$latestCompatible.Tag, [StringComparison]::Ordinal)
     })

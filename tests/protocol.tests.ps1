@@ -3,11 +3,113 @@ param([switch]$StructureOnly)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
 
 function Add-Failure {
     param([string]$Message)
     $failures.Add($Message)
+}
+
+function Compare-ExactScenarioIds {
+    param(
+        [Parameter(Mandatory)][object[]]$Expected,
+        [Parameter(Mandatory)][object[]]$Observed
+    )
+
+    $expectedIds = @($Expected | ForEach-Object { [string]$_ })
+    $observedIds = @($Observed | ForEach-Object { [string]$_ })
+    $expectedSet = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    $observedSet = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($testId in $expectedIds) {
+        if ($testId -cnotmatch '^TEST-[0-9]{4}$' -or -not $expectedSet.Add($testId)) {
+            return [pscustomobject]@{
+                Valid = $false
+                Message = "expected scenario set contains invalid or duplicate identity '$testId'"
+            }
+        }
+    }
+    foreach ($testId in $observedIds) {
+        if ($testId -cnotmatch '^TEST-[0-9]{4}$' -or -not $observedSet.Add($testId)) {
+            return [pscustomobject]@{
+                Valid = $false
+                Message = "observed scenario set contains invalid or duplicate identity '$testId'"
+            }
+        }
+    }
+    if ($expectedIds.Count -ne $observedIds.Count -or
+        -not $expectedSet.SetEquals($observedSet)) {
+        $missing = @($expectedIds | Where-Object { -not $observedSet.Contains($_) })
+        $unexpected = @($observedIds | Where-Object { -not $expectedSet.Contains($_) })
+        return [pscustomobject]@{
+            Valid = $false
+            Message = "scenario result mismatch; missing=[$($missing -join ', ')]; unexpected=[$($unexpected -join ', ')]"
+        }
+    }
+    return [pscustomobject]@{ Valid = $true; Message = '' }
+}
+
+function Read-ScenarioResultRecord {
+    param(
+        [Parameter(Mandatory)][object[]]$Output,
+        [Parameter(Mandatory)][string]$ExpectedOwner,
+        [Parameter(Mandatory)][object[]]$ExpectedTestIds
+    )
+
+    $lines = @($Output | ForEach-Object { [string]$_ })
+    $nonEmptyLines = @($lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $resultLines = @($nonEmptyLines | Where-Object {
+        $_.StartsWith('MEANDAI_SCENARIO_RESULTS=', [StringComparison]::Ordinal)
+    })
+    if ($resultLines.Count -ne 1) {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = "expected exactly one scenario result line, found $($resultLines.Count)"
+        }
+    }
+    if ($nonEmptyLines[-1] -cne $resultLines[0]) {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = 'scenario result line is not the final successful suite output'
+        }
+    }
+
+    try {
+        $json = $resultLines[0].Substring('MEANDAI_SCENARIO_RESULTS='.Length)
+        $record = $json | ConvertFrom-Json
+    }
+    catch {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = "scenario result JSON is invalid: $($_.Exception.Message)"
+        }
+    }
+    $properties = @($record.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($properties.Count -ne 3 -or
+        $properties -cnotcontains 'schema' -or
+        $properties -cnotcontains 'owner' -or
+        $properties -cnotcontains 'passed' -or
+        ($record.schema -isnot [int] -and $record.schema -isnot [long]) -or
+        [long]$record.schema -ne 1 -or
+        [string]$record.owner -cne $ExpectedOwner -or
+        $record.passed -isnot [array]) {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = 'scenario result record has the wrong schema, owner, or property types'
+        }
+    }
+
+    $comparison = Compare-ExactScenarioIds -Expected $ExpectedTestIds `
+        -Observed @($record.passed)
+    if (-not $comparison.Valid) {
+        return $comparison
+    }
+    return [pscustomobject]@{ Valid = $true; Message = '' }
 }
 
 function Assert-File {
@@ -121,6 +223,7 @@ $requiredFiles = @(
     'tests/fixtures/Invoke-MockCodex.cmd',
     'tests/fixtures/Invoke-MockCodex.sh',
     'tests/scenario-ownership.psd1',
+    'tests/MeAndAI.ScenarioEvidence.psm1',
     'tests/Verify-PostPublicationEvidence.ps1',
     'tests/post-publication-evidence.tests.ps1',
     '.github/workflows/protocol-tests.yml'
@@ -164,6 +267,7 @@ foreach ($pattern in $recordPatterns) {
         }
     }
 }
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0044'
 
 $testSuites = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') -File `
     -Filter '*.tests.ps1' | Where-Object {
@@ -337,6 +441,34 @@ foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
     }
 }
 
+$suppressedSourcePath = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-suppressed-scenario-$([guid]::NewGuid().ToString('N')).ps1"
+try {
+    [IO.File]::WriteAllText(
+        $suppressedSourcePath,
+        @"
+Add-Failure 'TEST-9000 executed assertion'
+`$scenarioResult = [ordered]@{
+    schema = 1
+    owner = 'tests/synthetic.tests.ps1'
+    passed = @('TEST-9000', 'TEST-9001')
+}
+"@,
+        [Text.UTF8Encoding]::new($false)
+    )
+    $suppressedSourceIds = @(Get-MeAndAISourceBoundScenarioIds `
+        -SourcePaths @($suppressedSourcePath))
+    $suppressedComparison = Compare-ExactScenarioIds `
+        -Expected @('TEST-9000', 'TEST-9001') -Observed $suppressedSourceIds
+    if ($suppressedComparison.Valid -or
+        -not $suppressedComparison.Message.Contains('missing=[TEST-9001]')) {
+        Add-Failure 'TEST-0091 hard-coded output survived a removed scenario assertion.'
+    }
+}
+finally {
+    Remove-Item -LiteralPath $suppressedSourcePath -Force -ErrorAction SilentlyContinue
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
@@ -349,9 +481,12 @@ function Test-CanonicalProtocolVersion {
     return $Value -cmatch '^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$'
 }
 
-foreach ($validVersion in @('0.0.0', '0.8.4', '1.0.0', '10.20.300')) {
+foreach ($validVersion in @(
+    '0.0.0', '0.8.4', '1.0.0', '10.20.300',
+    '92233720368547758081234567890.2147483648.999999999999999999999999'
+)) {
     if (-not (Test-CanonicalProtocolVersion -Value $validVersion)) {
-        Add-Failure "TEST-0085 canonical version fixture was rejected: '$validVersion'"
+        Add-Failure "TEST-0002/TEST-0088 canonical version fixture was rejected: '$validVersion'"
     }
 }
 foreach ($invalidVersion in @(
@@ -360,7 +495,43 @@ foreach ($invalidVersion in @(
     ([string][char]0x0661 + '.0.0'), ([string][char]0xFF11 + '.0.0')
 )) {
     if (Test-CanonicalProtocolVersion -Value $invalidVersion) {
-        Add-Failure "TEST-0085 noncanonical version fixture was accepted: '$invalidVersion'"
+        Add-Failure "TEST-0002/TEST-0088 noncanonical version fixture was accepted: '$invalidVersion'"
+    }
+}
+
+$v084Memory = Get-Content -LiteralPath (
+    Join-Path $root '.ai/memory/log/2026-07-16-v084-correction.md'
+) -Raw
+$v084Scenarios = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0013-v084-correction/test-cases.md'
+) -Raw
+$v084Feature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0013-v084-correction/README.md'
+) -Raw
+$protocolFeatureScenarios = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0001-common-development-protocol/test-cases.md'
+) -Raw
+$canonicalDisposition = 'nine `Blocking` findings, one `OptionalImprovement`, and one `ExternalOrLegacyFollowUp`'
+$normalizedV084Memory = [regex]::Replace($v084Memory, '\s+', ' ')
+$normalizedV084Scenarios = [regex]::Replace($v084Scenarios, '\s+', ' ')
+if (-not $normalizedV084Memory.Contains($canonicalDisposition) -or
+    -not $normalizedV084Scenarios.Contains("$canonicalDisposition remained")) {
+    Add-Failure 'TEST-0092 v0.8.4 durable records do not use the canonical finding disposition counts.'
+}
+if ($protocolFeatureScenarios -notmatch [regex]::Escape(
+    '| `TEST-0002` | `SUBF-0001` | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`.'
+)) {
+    Add-Failure 'TEST-0088/TEST-0092 TEST-0002 does not state the canonical ASCII/no-leading-zero grammar.'
+}
+foreach ($stableProjection in @(
+    '[#41](https://github.com/hasanmanzak/meAndAI/issues/41)',
+    '[#42](https://github.com/hasanmanzak/meAndAI/pull/42)',
+    '[DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)',
+    '[`FIND-0120` / #44](https://github.com/hasanmanzak/meAndAI/issues/44)',
+    '`ExternalOrLegacyFollowUp` / Open; maintainer owned'
+)) {
+    if (-not $v084Feature.Contains($stableProjection)) {
+        Add-Failure "TEST-0092 v0.8.4 canonical projection is missing '$stableProjection'."
     }
 }
 
@@ -481,6 +652,7 @@ foreach ($entry in $releaseMetadataChecks.GetEnumerator()) {
         }
     }
 }
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0056'
 
 $validatorSource = Get-Content -LiteralPath (Join-Path $root 'tests/protocol.tests.ps1') -Raw
 foreach ($requiredText in @(
@@ -601,6 +773,7 @@ if (@($bootstrapParseErrors).Count -gt 0 -or
     }).Count -ne 0) {
     Add-Failure 'TEST-0059 bootstrap exact-state responsibility seams are missing or invalid.'
 }
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0066'
 
 $protocolDecision = Get-Content -LiteralPath (
     Join-Path $root 'docs/decisions/DEC-0010-stable-automation-invariants.md'
@@ -791,6 +964,7 @@ $memoryTemplateFiles = @(Get-ChildItem -LiteralPath $memoryTemplateRoot -Recurse
 if ($memoryTemplateFiles.Count -lt 3) {
     Add-Failure 'TEST-0008 project-local memory template set is incomplete'
 }
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0047'
 
 $protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
 $featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
@@ -905,17 +1079,40 @@ if (-not $StructureOnly) {
     )
     $engine = (Get-Process -Id $PID).Path
     foreach ($suite in $testSuites) {
-        & $engine -NoProfile -ExecutionPolicy Bypass -File $suite.FullName
-        if ($LASTEXITCODE -ne 0) {
+        $suiteOutput = @(& $engine -NoProfile -ExecutionPolicy Bypass `
+            -File $suite.FullName 2>&1)
+        $suiteExitCode = $LASTEXITCODE
+        foreach ($line in $suiteOutput) {
+            Write-Host ([string]$line)
+        }
+        $owner = "tests/$($suite.Name)"
+        if ($suiteExitCode -ne 0) {
             Add-Failure "Child test suite failed: $($suite.Name)"
         }
         else {
-            [void]$completedSuiteOwners.Add("tests/$($suite.Name)")
+            $expectedTestIds = @($authorityByTestId.GetEnumerator() | Where-Object {
+                $_.Value.Evidence -ceq 'ExecutableSuite' -and
+                $_.Value.Owner -ceq $owner
+            } | ForEach-Object { [string]$_.Key } | Sort-Object)
+            $observedResult = Read-ScenarioResultRecord -Output $suiteOutput `
+                -ExpectedOwner $owner -ExpectedTestIds $expectedTestIds
+            if (-not $observedResult.Valid) {
+                Add-Failure "TEST-0091 suite '$owner' has invalid observed scenario evidence: $($observedResult.Message)."
+            }
+            else {
+                [void]$completedSuiteOwners.Add($owner)
+            }
         }
     }
 
-    if ($failures.Count -eq 0) {
+    try {
+        $protocolScenarioResult = New-MeAndAIScenarioResult `
+            -Owner 'tests/protocol.tests.ps1' -SourcePaths @($PSCommandPath) `
+            -AuthorityPath $scenarioAuthorityPath
         [void]$completedSuiteOwners.Add('tests/protocol.tests.ps1')
+    }
+    catch {
+        Add-Failure "TEST-0091 root suite has invalid source-bound scenario evidence: $($_.Exception.Message)"
     }
     $requiredSuiteOwners = @($authorityByTestId.Values | Where-Object {
         $_.Evidence -ceq 'ExecutableSuite'
@@ -938,4 +1135,5 @@ if ($StructureOnly) {
 }
 else {
     Write-Host 'All discovered protocol test suites passed.' -ForegroundColor Green
+    Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($protocolScenarioResult | ConvertTo-Json -Compress))
 }

@@ -3,6 +3,8 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $failures = [System.Collections.Generic.List[string]]::new()
 
@@ -123,6 +125,31 @@ Assert-Equal 'v0.10.0' $plan.LatestCompatibleTag 'TEST-0009 numeric tag ordering
 Assert-Equal 'CreateUpgrade' $plan.Operations[0].Kind 'TEST-0009 should create an upgrade'
 Assert-Equal 'v0.10.0' $plan.Operations[0].TargetTag 'TEST-0009 selected the wrong target'
 Assert-Equal 5 @($plan.IgnoredTags).Count 'TEST-0009 should report case-variant, noncanonical, malformed, or prerelease tags'
+
+$hugeMinor = '92233720368547758081234567890'
+$hugeRevision = '99999999999999999999999999999'
+$hugeCurrentTag = "v0.2147483648.$hugeRevision"
+$hugeLatestTag = "v0.$hugeMinor.0"
+$hugePlan = Invoke-Plan -CurrentTag $hugeCurrentTag -AvailableTags @(
+    $hugeCurrentTag,
+    'v0.2147483649.0',
+    $hugeLatestTag
+)
+Assert-Equal 'OpenUpgrade' $hugePlan.State `
+    'TEST-0088 unbounded canonical components should remain upgradable'
+Assert-Equal $hugeLatestTag $hugePlan.LatestCompatibleTag `
+    'TEST-0088 unbounded canonical components were not sorted numerically'
+Assert-Equal $hugeLatestTag $hugePlan.Operations[0].TargetTag `
+    'TEST-0088 unbounded numeric ordering selected the wrong target'
+foreach ($invalidTag in @(
+    'v01.0.0', 'v1.00.0', 'v1.0.00',
+    ('v' + [string][char]0x0661 + '.0.0'),
+    ('v' + [string][char]0xFF11 + '.0.0')
+)) {
+    if (Test-MeAndAIProtocolTag -Tag $invalidTag) {
+        Add-Failure "TEST-0088 noncanonical or Unicode-digit tag was accepted: '$invalidTag'"
+    }
+}
 
 $pendingLatest = New-Candidate -Number 20 -TargetTag 'v0.2.0'
 $plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') -Candidates @($pendingLatest)
@@ -299,3 +326,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host 'Protocol update tests passed for all declared scenarios in this suite.' -ForegroundColor Green
+$scenarioResult = New-MeAndAIScenarioResult `
+    -Owner 'tests/protocol-update.tests.ps1' `
+    -SourcePaths @($PSCommandPath, $adapterTestPath) `
+    -AuthorityPath $scenarioAuthorityPath
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
