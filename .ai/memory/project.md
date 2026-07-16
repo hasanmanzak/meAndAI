@@ -7,26 +7,33 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.5`. Exact publication state is authoritative
+- Current protocol version: `0.8.6`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
   [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: the bounded correction of `FIND-0123` through `FIND-0131`,
+- Current scope: the bounded correction of `FIND-0123` through `FIND-0132`,
   tracked by [FEAT-0014](../../docs/features/FEAT-0014-v085-convergence/README.md),
   [DEC-0014](../../docs/decisions/DEC-0014-contained-adoption-and-observable-evidence.md),
   and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: active [FEAT-0014](../../docs/features/FEAT-0014-v085-convergence/README.md)
-  correction. Its local implementation, bounded self-review, and complete
-  Windows PowerShell 5.1 suite passed on 2026-07-16; merge, immutable release,
-  hosted checks, and the single post-publication confirmation scan remain
-  pending and are owned by
+- Latest tracked work: the narrow v0.8.6 evidence correction for
+  [FEAT-0014](../../docs/features/FEAT-0014-v085-convergence/README.md).
+  Immutable v0.8.5 delivered the runtime correction but its first
+  post-publication preflight exposed `FIND-0132`: the release-target feature
+  state was not complete. The v0.8.6 branch adds the missing pre-publication
+  guard and keeps post-publication work outside Definition of Done. Its focused
+  and complete local suites passed on 2026-07-16. Review, immutable corrective
+  release, and the single fresh confirmation scan remain owned by
   [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
 - Open external follow-up: `FIND-0120` / `RISK-0076` is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Issue
   #41 remains the historical FEAT-0013 delivery and publication authority.
+- Historical v0.8.5 delivery: immutable release
+  [`v0.8.5`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.5)
+  targets merge commit `7c06dfad75ab7b327d46c7b8f8d7cb541bab3896`.
+  Its failed completion projection is retained as `FIND-0132`, not rewritten.
 - Historical v0.8.4 delivery: completed
   [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md) retains
   [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) as its delivery

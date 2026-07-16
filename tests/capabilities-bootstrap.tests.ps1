@@ -146,7 +146,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             operation = 'ai-capabilities-adoption'
             state = 'AdoptionReviewRequired'
             repository = 'owner/consumer'
-            targetTag = 'v0.8.5'
+            targetTag = 'v0.8.6'
             protocolSha = $protocolSha
             collisions = $expectedCollisions
             proposedPaths = $expectedProposedPaths
@@ -156,7 +156,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             param([Parameter(Mandatory)]$Manifest)
 
             return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
-                -Repository 'owner/consumer' -TargetTag 'v0.8.5' `
+                -Repository 'owner/consumer' -TargetTag 'v0.8.6' `
                 -ProtocolSha $protocolSha -ExpectedState 'AdoptionReviewRequired' `
                 -ExpectedCollisions $expectedCollisions
         }
@@ -211,7 +211,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.8.5',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.8.6',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',

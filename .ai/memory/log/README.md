@@ -5,15 +5,16 @@ and follow its canonical links.
 
 ## Current continuation
 
-The bounded v0.8.5 correction of `FIND-0123` through `FIND-0131` is ready for
-review in [FEAT-0014](../../../docs/features/FEAT-0014-v085-convergence/README.md)
-and the [v0.8.5 continuation](2026-07-16-v085-convergence.md). Its local
-implementation, self-review, and complete suite passed; merge, release, hosted
-checks, and the single post-publication confirmation scan remain owned by
+The narrow v0.8.6 publication-evidence correction for `FIND-0132` is tracked in
+[FEAT-0014](../../../docs/features/FEAT-0014-v085-convergence/README.md) and the
+[v0.8.6 continuation](2026-07-16-v086-publication-evidence.md). Immutable
+v0.8.5 remains historical evidence; review, corrective release, hosted checks,
+and the single fresh confirmation scan remain owned by
 [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
 
 ## History
 
+- [2026-07-16 - v0.8.6 publication-evidence correction](2026-07-16-v086-publication-evidence.md)
 - [2026-07-16 - Bounded v0.8.5 convergence](2026-07-16-v085-convergence.md)
 - [2026-07-16 - Bounded v0.8.4 correction](2026-07-16-v084-correction.md)
 - [2026-07-16 - Bounded v0.8.2 correction](2026-07-16-v082-correction.md)

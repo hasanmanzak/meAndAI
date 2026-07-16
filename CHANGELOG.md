@@ -3,6 +3,26 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.6 - 2026-07-16
+
+### Fixed
+
+- Keep post-publication work outside the pre-merge Definition of Done and
+  require every feature targeting the current release to be `Complete` before
+  publication.
+- Extend `TEST-0092` so the complete local gate rejects the exact projection
+  mismatch that made immutable v0.8.5 ineligible for `TEST-0065` evidence.
+- Advance current adoption pins to the corrective release without changing the
+  v0.8.5 runtime behavior or weakening the post-publication verifier.
+
+The v0.8.5 Release remains an immutable historical record. Its first
+post-publication preflight exposed `FIND-0132`; v0.8.6 closes that verified
+finding rather than rewriting or overstating the earlier release.
+
+Related work: [FEAT-0014](docs/features/FEAT-0014-v085-convergence/README.md),
+[DEC-0012](docs/decisions/DEC-0012-bounded-correction-and-external-release-evidence.md),
+and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
+
 ## 0.8.5 - 2026-07-16
 
 ### Fixed
