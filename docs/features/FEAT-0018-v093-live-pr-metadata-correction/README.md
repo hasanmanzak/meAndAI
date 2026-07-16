@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.3 |
 | Issue | [#53](https://github.com/hasanmanzak/meAndAI/issues/53) |
-| Pull request | Pending |
+| Pull request | [#54](https://github.com/hasanmanzak/meAndAI/pull/54) |
 | Decisions | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md), [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md), [DEC-0012](../../decisions/DEC-0012-bounded-correction-and-external-release-evidence.md) |
 | Tests | [TEST-0102](test-cases.md) |
 
@@ -141,6 +141,7 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 - Corrects the distributed `v0.9.2` artifact from [FEAT-0017](../FEAT-0017-v092-single-file-quick-adoption/README.md)
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53)
+- Delivery: [pull request #54](https://github.com/hasanmanzak/meAndAI/pull/54)
 - Consumer reproduction: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
 
 ## Definition of Done
@@ -150,7 +151,7 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 - [x] Fresh-diff review and the bounded project scan leave no unresolved
       `Blocking` finding.
 - [x] Version, changelog, guide, links, feature index, and project memory agree.
-- [ ] Issue and pull request link the canonical records and validation evidence.
+- [x] Issue and pull request link the canonical records and validation evidence.
 
 ## Post-merge publication gate
 
