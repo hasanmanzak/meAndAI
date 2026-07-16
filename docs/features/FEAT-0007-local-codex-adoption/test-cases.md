@@ -48,3 +48,6 @@ and the existing repository suites.
 | 2026-07-15 | BUG-0003 first complete run | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Failed after unaffected suites passed: `FIND-0075` found one escaped v0.7.2 workflow-source matcher in the quick-adoption mock |
 | 2026-07-15 | BUG-0003 confirmation working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: complete `TEST-0001` through `TEST-0051` in 143.7 seconds |
 | 2026-07-15 | PR #33 commit `c9ab023` | GitHub-hosted Ubuntu and Windows plus GitGuardian | [Protocol validation run 29435321023](https://github.com/hasanmanzak/meAndAI/actions/runs/29435321023) | Pass: Ubuntu, Windows, and secret scan |
+
+The later no-remote existing-repository scenario is owned by
+[FEAT-0016 and TEST-0100](../FEAT-0016-v091-quick-adoption-correction/test-cases.md).

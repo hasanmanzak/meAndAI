@@ -3,6 +3,23 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.1 - 2026-07-16
+
+### Fixed
+
+- Resolve an accessible derived GitHub repository before treating a no-remote,
+  no-head target as a new repository.
+- Connect only an existing empty repository, preserve its mapped repository
+  Actions secrets, and require a local token file only when its mapped secret
+  is absent.
+- Keep credential-history validation ahead of repository classification and
+  reject an existing non-empty derived repository before adding a local remote
+  or mutating secrets.
+
+Related work: [FEAT-0016 / BUG-0005](docs/features/FEAT-0016-v091-quick-adoption-correction/README.md),
+[TEST-0100](docs/features/FEAT-0016-v091-quick-adoption-correction/test-cases.md), and
+[issue #49](https://github.com/hasanmanzak/meAndAI/issues/49).
+
 ## 0.9.0 - 2026-07-16
 
 ### Added

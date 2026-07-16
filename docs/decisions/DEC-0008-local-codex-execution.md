@@ -4,7 +4,7 @@
 - Status: Accepted
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer maintainers
-- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md)
+- Related features: [FEAT-0007](../features/FEAT-0007-local-codex-adoption/README.md), [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md)
 - Related decisions: [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md), [DEC-0007](DEC-0007-local-quick-adoption-boundary.md)
 - Supersedes: [DEC-0007](DEC-0007-local-quick-adoption-boundary.md) only for the post-workflow Codex Cloud handoff
 

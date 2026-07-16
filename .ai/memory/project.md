@@ -7,30 +7,28 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.0`. Exact publication state is authoritative
+- Current protocol version: `0.9.1`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) after
+  [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: the event-triggered stability and consistency mandate tracked
-  by [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md),
-  [DEC-0015](../../docs/decisions/DEC-0015-event-triggered-stability-cycles.md),
-  and [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47).
+- Current scope: `BUG-0005` corrects no-remote quick-adoption identity
+  classification under [FEAT-0016](../../docs/features/FEAT-0016-v091-quick-adoption-correction/README.md)
+  and [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: FEAT-0015 consolidates the existing bounded review and
-  full-project scan controls into one persistent operating mandate. Material
-  development triggers the scan; explicit dependencies determine the ready
-  finding set; each correction receives focused evidence and fresh-diff
-  self-review; a zero-`Blocking` confirmation permits the converged final push;
-  and the repository then waits for new development or failed evidence. The
-  final push is not a tag or GitHub Release. Consumers receive the mandate only
-  through a reviewed exact pin, and consumer-owned instructions, memory,
-  records, and tests are not rewritten. The complete local suite, bounded
-  confirmation, and final structural verification passed on 2026-07-16;
-  exact branch-push evidence is in issue #47 and review is
-  [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48). Hosted
-  facts remain external until they exist.
+- Latest tracked work: BUG-0005 discovers the exact derived GitHub repository
+  before a no-head local target without `origin` is classified as new. An
+  accessible empty repository is connected only after canonical source
+  verification; repository secret names then make their mapped local files
+  optional. Missing-secret/missing-file and non-empty-repository paths remain
+  fail-closed. Focused evidence is `TEST-0100`; the complete local suite passed
+  all discovered scenarios in 473.8 seconds. Hosted facts remain pending until
+  they exist.
+- Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
+  established the event-triggered stability and consistency mandate through
+  [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
+  [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48).
 - Open external follow-up: `FIND-0120` / `RISK-0076` is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Issue
   #41 remains the historical FEAT-0013 delivery and publication authority.
@@ -114,6 +112,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   exact workflow and semantic-source retrieval uses the authenticated local
   `gh` identity; stored secret values remain unreadable. Missing secrets and
   new repositories still require their mapped local files.
+- `v0.9.1` extends that rule to an accessible existing empty GitHub repository
+  whose no-head local target has not yet connected `origin`; an absent derived
+  repository still requires both files before creation.
 - `v0.7.2` binds adoption proposals to canonical repository, base, actor, head,
   and marker evidence; validates exact protocol pins regardless of diff shape;
   rejects updater rename provenance; and moves adoption issues to review only

@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The event-triggered stability and consistency mandate is tracked in
-[FEAT-0015](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md),
-[DEC-0015](../../../docs/decisions/DEC-0015-event-triggered-stability-cycles.md),
-and the [v0.9.0 continuation](2026-07-16-stability-consistency-mandate.md).
-[Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) owns delivery and
+The no-remote quick-adoption correction is tracked as
+[FEAT-0016 / BUG-0005](../../../docs/features/FEAT-0016-v091-quick-adoption-correction/README.md),
+[`TEST-0100`](../../../docs/features/FEAT-0016-v091-quick-adoption-correction/test-cases.md),
+and the [v0.9.1 continuation](2026-07-16-no-origin-secret-reuse.md).
+[Issue #49](https://github.com/hasanmanzak/meAndAI/issues/49) owns delivery and
 future post-publication evidence. `FIND-0120` remains the separate open external
 follow-up in issue #44.
 
 ## History
 
+- [2026-07-16 - No-origin existing-secret reuse](2026-07-16-no-origin-secret-reuse.md)
 - [2026-07-16 - Stability and consistency mandate](2026-07-16-stability-consistency-mandate.md)
 - [2026-07-16 - v0.8.6 publication-evidence correction](2026-07-16-v086-publication-evidence.md)
 - [2026-07-16 - Bounded v0.8.5 convergence](2026-07-16-v085-convergence.md)

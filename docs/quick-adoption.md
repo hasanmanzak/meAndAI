@@ -79,18 +79,18 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Open PowerShell in the target directory and paste this single line. It verifies
-that `v0.9.0` is an exact published immutable GitHub Release before downloading
+that `v0.9.1` is an exact published immutable GitHub Release before downloading
 the launcher from its locked tag into the OS temp directory; it does not
 execute a moving `main` file.
 
 ```powershell
-$t='v0.9.0'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
+$t='v0.9.1'; $r=gh api -H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/releases/tags/$t" | ConvertFrom-Json; $d=[DateTimeOffset]::MinValue; if ([string]$r.tag_name -cne $t -or $r.draft -isnot [bool] -or $r.draft -or $r.prerelease -isnot [bool] -or $r.prerelease -or $r.immutable -isnot [bool] -or -not $r.immutable -or -not [DateTimeOffset]::TryParse([string]$r.published_at,[ref]$d)) { throw "Protocol release $t is not published and immutable." }; $p=Join-Path ([IO.Path]::GetTempPath()) "Invoke-MeAndAIQuickAdoption-$t.ps1"; gh api -H 'Accept: application/vnd.github.raw+json' -H 'X-GitHub-Api-Version: 2026-03-10' "repos/hasanmanzak/meAndAI/contents/scripts/Invoke-MeAndAIQuickAdoption.ps1?ref=$t" | Set-Content -LiteralPath $p -Encoding UTF8; & $p -TargetPath .
 ```
 
 The same command in a more readable form is:
 
 ```powershell
-$tag = 'v0.9.0'
+$tag = 'v0.9.1'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -117,8 +117,13 @@ validates the GitHub `origin`, preserves application content, commits only
 `.github/workflows/meandai-protocol-update.yml`, and pushes the default branch.
 
 For a directory without a local repository or `origin`, it initializes `main`,
-uses the active `gh` owner and directory name, and creates a private repository
-by default. Unrelated local files remain untracked and are not published. To
+uses the active `gh` owner and directory name, and first resolves that exact
+GitHub identity. If the repository already exists and is empty, the launcher
+connects it and applies the same repository-secret preservation rules as an
+already connected target. If it does not exist, the launcher creates a private
+repository by default and both local token files remain mandatory before that
+creation. An existing non-empty repository must be cloned or reconciled
+manually. Unrelated local files remain untracked and are not published. To
 override the inferred identity or visibility:
 
 ```powershell
