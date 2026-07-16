@@ -3,6 +3,7 @@
 - Work: [FEAT-0015](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
 - Decision: [DEC-0015](../../../docs/decisions/DEC-0015-event-triggered-stability-cycles.md)
 - Delivery and post-publication authority: [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47)
+- Review: [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48)
 - Target: `0.9.0`
 - Status: Local convergence complete; review publication and hosted evidence pending.
 

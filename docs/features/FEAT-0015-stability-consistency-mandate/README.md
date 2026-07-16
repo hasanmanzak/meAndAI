@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.0 |
 | Issue and post-publication authority | [#47](https://github.com/hasanmanzak/meAndAI/issues/47) |
-| Pull request | Pending |
+| Pull request | [#48](https://github.com/hasanmanzak/meAndAI/pull/48) |
 | Decisions | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md); [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
 | Tests | [TEST-0096 through TEST-0099](test-cases.md) |
 
@@ -224,10 +224,10 @@ not predict the commit that contains itself.
 
 | Field | Evidence |
 | --- | --- |
-| External evidence authority | [Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and the linked pull request |
+| External evidence authority | [Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47), its [push-evidence comment](https://github.com/hasanmanzak/meAndAI/issues/47#issuecomment-4993144105), and [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48) |
 | Local convergence eligibility | Passed on 2026-07-16: complete suite, bounded confirmation, and final relevant structural verification are clean |
 | Intended review branch | `agent/stability-consistency-mandate` |
-| Exact pushed commit and ref | Pending; written externally after the converged final push |
+| Exact pushed commit and ref | Maintained in the external evidence authority after each converged push; not mirrored into its own containing commit |
 
 ## Definition of Done
 
@@ -239,7 +239,7 @@ not predict the commit that contains itself.
       `Blocking` finding; other dispositions retain their required evidence.
 - [x] Documentation, links, version, changelog, and project memory are current
       for local convergence.
-- [ ] Issue, pull request, decision, and feature records are cross-linked.
+- [x] Issue, pull request, decision, and feature records are cross-linked.
 - [ ] Applicable hosted CI and review gates pass before merge.
 
 ## Post-merge protocol-version publication evidence

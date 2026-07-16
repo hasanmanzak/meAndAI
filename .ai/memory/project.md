@@ -28,7 +28,9 @@ Last verified: **2026-07-16**
   through a reviewed exact pin, and consumer-owned instructions, memory,
   records, and tests are not rewritten. The complete local suite, bounded
   confirmation, and final structural verification passed on 2026-07-16;
-  exact branch-push and hosted facts remain external until they exist.
+  exact branch-push evidence is in issue #47 and review is
+  [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48). Hosted
+  facts remain external until they exist.
 - Open external follow-up: `FIND-0120` / `RISK-0076` is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Issue
   #41 remains the historical FEAT-0013 delivery and publication authority.
