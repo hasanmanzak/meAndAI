@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.8.6**<br>
+Protocol version: **0.9.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -289,19 +289,72 @@ project at the highest practical detail. Sampling alone is not a project scan.
 State any inaccessible, generated, binary, external, or otherwise unreviewed
 scope explicitly.
 
-### Post-development convergence scan
+### Stability and consistency mandate
 
-After development is declared complete, perform a full-project scan under this
-section. Document every observation, assign its disposition, and order
-`Blocking` findings from highest to lowest priority before remediation, using
-severity, impact, and dependency order as inputs. Resolve the highest-priority
-`Blocking` findings first.
+This mandate applies recursively to this repository and prospectively to every
+consumer that adopts the protocol version containing it. It is an
+event-triggered delivery discipline, not a background agent, scheduler,
+scanner service, or continuous autonomous loop.
 
-After remediation, run the one budgeted confirmation scan. The completion
-condition is no unresolved `Blocking` finding. `AcceptedResidual`,
-`ExternalOrLegacyFollowUp`, and `OptionalImprovement` records remain visible
-under Gate 5 but are not unresolved actionable in-scope findings. A finding is
-not cleared or reclassified merely by relabeling it.
+#### Post-development convergence scan
+
+After development is declared complete, enter this mandate when repository
+content materially changed and perform the existing post-development
+full-project scan under this section. Material development includes feature,
+bug, refactor, review, test, documentation, governance, and consistency
+changes. The scan covers every applicable concern listed below and records its
+scope and exclusions. A repository in `Waiting` with no new material
+development or new failed evidence does not start another cycle; an unchanged
+tree is not a scan trigger.
+
+Document every observation and assign exactly one Gate 5 disposition. The
+local convergence condition is zero unresolved `Blocking`, not zero
+observations. `AcceptedResidual`, `ExternalOrLegacyFollowUp`, and
+`OptionalImprovement` records remain visible under their existing evidence
+contracts but do not enter the active remediation queue.
+
+Build that queue from explicit dependencies first. Dependencies determine the
+ready set. Within the ready set, order `Blocking` findings from highest to lowest priority
+using priority, severity, impact rank, and then stable identifier order.
+Priority uses `p0`, `p1`, `p2`, or `p3`, where `p0` is highest; severity and
+impact rank use `critical`, `high`, `medium`, `low`, or `info`. A
+dependency cycle, missing required authority, or unavailable required
+input stops the cycle as `Blocked`; it does not authorize an arbitrary order or
+a success claim.
+
+Resolve one `Blocking` finding at a time, except for the smallest explicitly
+recorded dependency-coherent group that cannot be changed safely in isolation.
+For each correction, provide the solution, focused evidence, and a fresh-diff
+self-review before starting the next independent queue item. A `Blocking`
+defect caused or exposed by the correction stays in the active queue: fix it in
+the current correction when coherent, or record its dependencies and priority
+before continuing. Debt introduced by the current change cannot be deferred as
+legacy or optional work.
+
+If the initial scan finds zero unresolved `Blocking`, that initial scan is the
+convergence evidence; do not spend a confirmation pass on an unchanged tree. A
+confirmation scan is required only after remediation changed the tree. When
+the remediation queue becomes empty, run that one budgeted confirmation scan.
+If it finds a new `Blocking` observation, add that observation to the queue and
+continue only while the declared finite budget remains. The completion
+condition is no unresolved `Blocking` finding. A finding is not cleared or
+reclassified merely by relabeling it.
+
+When the declared tests pass and the confirmation scan proves convergence,
+perform the **converged final push** of the review branch and enter `Waiting`.
+This is an ordinary Git push and does not create a tag or GitHub Release.
+Hosted CI or review evidence discovered after that push reopens the same cycle;
+after correction and renewed convergence, publish a corrected converged final
+push. Correctable new failed evidence reopens the active cycle and receives the
+same disposition, queue, correction, and review treatment. Failed evidence
+produces `Blocked` only when its required correction cannot be completed within
+the remaining authority and finite budget. Do not push a locally known
+non-converged tree merely to mark progress.
+Exact converged-push commit and ref evidence MUST be written to the issue or
+pull request after the push exists. A repository document records local push
+eligibility and MUST NOT predict the commit that contains itself.
+Protocol-version tags and GitHub Releases are separate post-merge distribution
+events governed by Gate 7 and Section 8.
 
 The cycle MUST remain bounded. Before the first pass, declare the scan scope,
 exclusions, and a finite validation budget; the default is one initial scan and
@@ -328,17 +381,21 @@ The scan MUST cover:
    risks to the extent relevant to the project; and
 8. uncommitted changes and repository hygiene without overwriting user work.
 
-Each finding is recorded as `FIND-NNNN` with classification, severity
-(`critical`, `high`, `medium`, `low`, or `info`), confidence, evidence,
-affected scope, impact, recommended action, status, and links to related issues,
-pull requests, features, decisions, tests, and documentation. Separate verified
-defects from risks and optional improvements.
+Each finding is recorded as `FIND-NNNN` with classification, disposition,
+severity (`critical`, `high`, `medium`, `low`, or `info`), confidence,
+dependencies (`FIND-NNNN` identifiers or explicit `None`), priority (`p0`,
+`p1`, `p2`, or `p3`, where `p0` is highest), impact rank (`critical`, `high`,
+`medium`, `low`, or `info`), evidence, affected scope, impact rationale,
+recommended action, status, and links to related issues, pull requests,
+features, decisions, tests, and documentation. Separate verified defects from
+risks and optional improvements.
 
 A compact finding register MAY declare shared scope, confidence, impact, and
 canonical evidence links once when they apply unambiguously to every listed
-row. Each row still records its identifier, classification, severity, specific
-evidence, action, and status. Do not split one coherent observation into
-multiple records merely to increase detail.
+row. Each row still records its identifier, classification, disposition,
+dependency, priority, severity, impact rank, specific evidence, action, and
+status. Do not split one coherent observation into multiple records merely to
+increase detail.
 
 ## 6. Documentation graph
 

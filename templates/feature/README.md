@@ -91,6 +91,16 @@ After development, the post-development full-project scan is mandatory. Record
 its declared scope, exclusions, finite validation budget, prioritized findings,
 remediation, and convergence or blocked outcome.
 
+Record mandate cycle evidence in the same review surface:
+
+- the material development trigger and scan entry;
+- the dependency-first ready set and priority order;
+- per-finding correction evidence and fresh-diff self-review;
+- any change-caused or change-exposed blocker returned to the active queue;
+- the confirmation result and converged final push, or the reason publication
+  stopped; and
+- the resulting waiting state or blocked state without an unchanged re-scan.
+
 ## Definition of Done
 
 - [ ] Acceptance criteria met.

@@ -29,6 +29,8 @@ consumers, boundaries, compatibility, dependencies, and duplication review.
 - Findings fixed:
 - Residual risks or linked findings:
 - Full-project scan scope and limitations, when required:
+- Converged final push evidence, or why push is pending:
+- Waiting or blocked outcome and re-entry trigger:
 
 ## Definition of Ready
 

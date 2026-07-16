@@ -7,31 +7,37 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.8.6`. Exact publication state is authoritative
+- Current protocol version: `0.9.0`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) after
+  [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: the bounded correction of `FIND-0123` through `FIND-0132`,
-  tracked by [FEAT-0014](../../docs/features/FEAT-0014-v085-convergence/README.md),
-  [DEC-0014](../../docs/decisions/DEC-0014-contained-adoption-and-observable-evidence.md),
-  and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
+- Current scope: the event-triggered stability and consistency mandate tracked
+  by [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md),
+  [DEC-0015](../../docs/decisions/DEC-0015-event-triggered-stability-cycles.md),
+  and [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the narrow v0.8.6 evidence correction for
-  [FEAT-0014](../../docs/features/FEAT-0014-v085-convergence/README.md).
-  Immutable v0.8.5 delivered the runtime correction but its first
-  post-publication preflight exposed `FIND-0132`: the release-target feature
-  state was not complete. The v0.8.6 branch adds the missing pre-publication
-  guard and keeps post-publication work outside Definition of Done. Its focused
-  and complete local suites passed on 2026-07-16; corrective review is
-  [pull request #46](https://github.com/hasanmanzak/meAndAI/pull/46).
-  Immutable corrective release and the single fresh confirmation scan remain
-  owned by
-  [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
+- Latest tracked work: FEAT-0015 consolidates the existing bounded review and
+  full-project scan controls into one persistent operating mandate. Material
+  development triggers the scan; explicit dependencies determine the ready
+  finding set; each correction receives focused evidence and fresh-diff
+  self-review; a zero-`Blocking` confirmation permits the converged final push;
+  and the repository then waits for new development or failed evidence. The
+  final push is not a tag or GitHub Release. Consumers receive the mandate only
+  through a reviewed exact pin, and consumer-owned instructions, memory,
+  records, and tests are not rewritten. The complete local suite, bounded
+  confirmation, and final structural verification passed on 2026-07-16;
+  exact branch-push evidence is in issue #47 and review is
+  [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48). Hosted
+  facts remain external until they exist.
 - Open external follow-up: `FIND-0120` / `RISK-0076` is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Issue
   #41 remains the historical FEAT-0013 delivery and publication authority.
+- Historical v0.8.6 delivery: immutable release
+  [`v0.8.6`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.6)
+  targets commit `a3d58a9cee00b9914c40adcd8e93dff53bed235a` and closed
+  `FIND-0132`; issue #43 remains its external publication authority.
 - Historical v0.8.5 delivery: immutable release
   [`v0.8.5`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.5)
   targets merge commit `7c06dfad75ab7b327d46c7b8f8d7cb541bab3896`.

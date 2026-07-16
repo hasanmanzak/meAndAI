@@ -1023,7 +1023,7 @@ if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
 foreach ($requiredText in @(
     'After development is declared complete',
     'highest to lowest priority',
-    'severity, impact, and',
+    'severity, impact rank, and',
     'no unresolved `Blocking` finding',
     'finite validation budget',
     'unchanged scan MUST NOT be repeated',
@@ -1032,6 +1032,200 @@ foreach ($requiredText in @(
 )) {
     if (-not $protocolContent.Contains($requiredText)) {
         Add-Failure "TEST-0019 post-development convergence contract is missing '$requiredText'"
+    }
+}
+
+$mandateFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0015-stability-consistency-mandate/README.md'
+) -Raw
+$mandateDecision = Get-Content -LiteralPath (
+    Join-Path $root 'docs/decisions/DEC-0015-event-triggered-stability-cycles.md'
+) -Raw
+$mandateTestCases = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0015-stability-consistency-mandate/test-cases.md'
+) -Raw
+$mandateSectionMatch = [regex]::Match(
+    $protocolContent,
+    '(?ms)^### Stability and consistency mandate\r?\n(?<body>.*?)(?=^#{1,3} [^\r\n]+|\z)'
+)
+if (-not $mandateSectionMatch.Success) {
+    Add-Failure 'TEST-0096 protocol has no bounded stability and consistency mandate section.'
+    $normalizedMandateContract = ''
+}
+else {
+    $normalizedMandateContract = [regex]::Replace(
+        $mandateSectionMatch.Groups['body'].Value, '\s+', ' '
+    )
+}
+foreach ($requiredText in @(
+    'material development',
+    'feature, bug, refactor, review, test, documentation, governance, and consistency',
+    'zero unresolved `Blocking`',
+    '`AcceptedResidual`',
+    '`ExternalOrLegacyFollowUp`',
+    '`OptionalImprovement`',
+    'do not enter the active remediation queue',
+    '`Waiting`',
+    'new material development',
+    'new failed evidence',
+    'Correctable new failed evidence reopens the active cycle',
+    'Failed evidence produces `Blocked` only when its required correction cannot be completed within the remaining authority and finite budget',
+    'unchanged tree',
+    'An unchanged scan MUST NOT be repeated',
+    'If the initial scan finds zero unresolved `Blocking`, that initial scan is the convergence evidence',
+    'A confirmation scan is required only after remediation changed the tree'
+)) {
+    if (-not $normalizedMandateContract.Contains($requiredText)) {
+        Add-Failure "TEST-0096 mandate lifecycle contract is missing '$requiredText'."
+    }
+}
+if (-not ([regex]::Replace($mandateDecision, '\s+', ' ')).Contains(
+    'Distribution of v0.9.0 MUST use the immutable GitHub Release required by Gate 7'
+)) {
+    Add-Failure 'TEST-0099 DEC-0015 makes the mandatory v0.9.0 distribution release optional or ambiguous.'
+}
+
+foreach ($requiredText in @(
+    'dependencies first',
+    'ready set',
+    'priority, severity, impact rank, and then stable identifier order',
+    'dependency cycle',
+    'A dependency cycle, missing required authority, or unavailable required input stops the cycle as `Blocked`',
+    '`Blocked`',
+    'smallest explicitly recorded dependency-coherent group'
+)) {
+    if (-not $normalizedMandateContract.Contains($requiredText)) {
+        Add-Failure "TEST-0097 dependency and priority contract is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'dependencies (`FIND-NNNN` identifiers or explicit `None`)',
+    'priority (`p0`, `p1`, `p2`, or `p3`, where `p0` is highest)',
+    'impact rank (`critical`, `high`, `medium`, `low`, or `info`)',
+    'dependency, priority, severity, impact rank'
+)) {
+    if (-not $normalizedMandateContract.Contains($requiredText)) {
+        Add-Failure "TEST-0097 canonical finding schema is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'id: dependencies',
+    'id: priority',
+    'id: impact_rank'
+)) {
+    if (-not $findingForm.Contains($requiredText)) {
+        Add-Failure "TEST-0097 finding form is missing '$requiredText'."
+    }
+}
+if ($findingForm.Contains('labels: ["type:finding", "priority:p2"]')) {
+    Add-Failure 'TEST-0097 finding form assigns a static priority that can contradict its recorded queue priority.'
+}
+
+foreach ($requiredText in @(
+    'one `Blocking` finding at a time',
+    'focused evidence',
+    'fresh-diff self-review',
+    'provide the solution, focused evidence, and a fresh-diff self-review before starting the next independent queue item',
+    'caused or exposed',
+    'active queue',
+    'fix it in the current correction when coherent, or record its dependencies and priority before continuing',
+    'cannot be deferred as legacy or optional work'
+)) {
+    if (-not $normalizedMandateContract.Contains($requiredText)) {
+        Add-Failure "TEST-0098 per-finding correction contract is missing '$requiredText'."
+    }
+}
+
+$normalizedMandatePublication = $normalizedMandateContract
+foreach ($requiredText in @(
+    'converged final push',
+    'ordinary Git push',
+    'does not create a tag or GitHub Release',
+    'Hosted CI or review evidence',
+    'reopens the same cycle',
+    'Exact converged-push commit and ref evidence MUST be written to the issue or pull request after the push exists',
+    'A repository document records local push eligibility and MUST NOT predict the commit that contains itself',
+    'Do not push a locally known non-converged tree'
+)) {
+    if (-not $normalizedMandatePublication.Contains($requiredText)) {
+        Add-Failure "TEST-0099 convergence-push and consumer contract is missing '$requiredText'."
+    }
+}
+$normalizedConsumerMandate = [regex]::Replace($adoption, '\s+', ' ')
+foreach ($requiredText in @(
+    'exact protocol pin',
+    'consumer-owned instructions, memory, features, decisions, and tests remain under consumer ownership'
+)) {
+    if (-not $normalizedConsumerMandate.Contains($requiredText)) {
+        Add-Failure "TEST-0099 consumer reachability contract is missing '$requiredText'."
+    }
+}
+$currentProtocolVersion = (Get-Content -LiteralPath (Join-Path $root 'VERSION') -Raw).Trim()
+$currentProtocolTag = "v$currentProtocolVersion"
+$expectedSubmodulePin = "[meAndAI $currentProtocolTag](https://github.com/hasanmanzak/meAndAI/blob/$currentProtocolTag/PROTOCOL.md)"
+if (-not $submoduleAdapter.Contains($expectedSubmodulePin) -or
+    -not $submoduleAdapter.Contains('.ai/protocol/PROTOCOL.md')) {
+    Add-Failure "TEST-0099 submodule adapter does not independently resolve exact pin $currentProtocolTag."
+}
+$expectedReferencePin = "   - ref: ``$currentProtocolTag``"
+if (-not $referenceAdapter.Contains($expectedReferencePin) -or
+    -not $referenceAdapter.Contains('entry point: `PROTOCOL.md`') -or
+    $referenceAdapter.Contains('.ai/protocol/PROTOCOL.md')) {
+    Add-Failure "TEST-0099 repository-reference adapter does not independently resolve exact pin $currentProtocolTag."
+}
+$updaterScript = Get-Content -LiteralPath (
+    Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+) -Raw
+$managedAssetBlock = [regex]::Match(
+    $updaterScript,
+    '(?ms)^\$ManagedUpdaterAssets = @\((?<body>.*?)^\)\r?\n\$ManagedPaths ='
+)
+$actualManagedAssets = if ($managedAssetBlock.Success) {
+    @([regex]::Matches(
+        $managedAssetBlock.Groups['body'].Value,
+        "(?m)^\s*ConsumerPath = '(?<path>[^']+)'$"
+    ) | ForEach-Object { $_.Groups['path'].Value })
+}
+else { @() }
+$expectedManagedAssets = @(
+    '.github/workflows/meandai-protocol-update.yml',
+    '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+    '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+)
+if (($actualManagedAssets -join '|') -cne ($expectedManagedAssets -join '|')) {
+    Add-Failure 'TEST-0099 updater managed assets exceed or omit the exact three consumer-owned automation files.'
+}
+foreach ($testId in @('TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099')) {
+    if (-not $mandateTestCases.Contains("``$testId``") -or
+        -not $mandateFeature.Contains("``$testId")) {
+        Add-Failure "TEST-0099 canonical FEAT-0015 records do not link $testId."
+    }
+}
+foreach ($requiredText in @(
+    '## Converged final push evidence',
+    'External evidence authority',
+    'Local convergence eligibility'
+)) {
+    if (-not $mandateFeature.Contains($requiredText)) {
+        Add-Failure "TEST-0099 FEAT-0015 push-evidence boundary is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'dependency-first',
+    'per-finding correction evidence',
+    'converged final push',
+    'waiting state'
+)) {
+    if (-not $featureTemplate.Contains($requiredText)) {
+        Add-Failure "TEST-0099 feature template is missing mandate evidence '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'Converged final push',
+    'Waiting or blocked outcome'
+)) {
+    if (-not $pullRequestTemplate.Contains($requiredText)) {
+        Add-Failure "TEST-0099 pull request template is missing mandate evidence '$requiredText'."
     }
 }
 
