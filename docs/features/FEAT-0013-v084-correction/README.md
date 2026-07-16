@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.8.4 |
 | Issue and post-publication authority | [#41](https://github.com/hasanmanzak/meAndAI/issues/41) |
-| Pull request | Pending |
+| Pull request | [#42](https://github.com/hasanmanzak/meAndAI/pull/42) |
 | Decision | [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
 | Tests | [TEST-0077 through TEST-0085](test-cases.md) |
 
@@ -155,7 +155,7 @@ post-publication evidence.
 - [x] Each slice has one fresh-diff self-review with no unresolved `Blocking`
       finding.
 - [x] One final relevant verification and the single confirmation scan pass.
-- [ ] Documentation, links, version, changelog, memory, issue, and pull request
+- [x] Documentation, links, version, changelog, memory, issue, and pull request
       are current.
 - [ ] Hosted CI and review gates pass before merge.
 - [ ] Exact release evidence is written after publication to issue #41 and the
