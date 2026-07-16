@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.2 |
 | Issue | [#51](https://github.com/hasanmanzak/meAndAI/issues/51) |
-| Pull request | Pending |
+| Pull request | [#52](https://github.com/hasanmanzak/meAndAI/pull/52) |
 | Decision | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) |
 | Tests | [TEST-0101](test-cases.md) |
 
@@ -120,6 +120,7 @@ owned by issue #51.
 - Governing decision: [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md)
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51)
+- Delivery: [pull request #52](https://github.com/hasanmanzak/meAndAI/pull/52)
 
 ## Definition of Done
 
@@ -128,7 +129,7 @@ owned by issue #51.
 - [x] Fresh-diff review and the bounded project scan leave no unresolved
       `Blocking` finding.
 - [x] Version, changelog, decisions, guide, links, and project memory agree.
-- [ ] Issue and pull request link the canonical records and validation evidence.
+- [x] Issue and pull request link the canonical records and validation evidence.
 
 ## Post-merge publication gate
 

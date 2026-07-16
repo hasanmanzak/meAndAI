@@ -4,6 +4,7 @@
 
 - Work item: [FEAT-0017](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md)
 - Tracking and post-publication authority: [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51)
+- Delivery review: [pull request #52](https://github.com/hasanmanzak/meAndAI/pull/52)
 - Test: [`TEST-0101`](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md)
 - Target version: `0.9.2`
 
