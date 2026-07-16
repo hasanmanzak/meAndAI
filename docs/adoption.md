@@ -54,11 +54,18 @@ through GitHub or `gh label delete ... --yes`, then rerun. The lock uses the
 local `gh` label authority already required by quick adoption and adds no PAT
 permission.
 
+The launcher reports phases as normal console lines and consumes semantic
+`codex exec --json` events incrementally as safe, bounded activity. Its final
+result file and repository validations remain the only publication authority.
+Cancellation terminates the owned Codex process tree before temporary-clone
+cleanup; a rerun resumes deterministic state and the existing recoverable
+publication transition.
+
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.9.4`, the only repository file required
+For a new submodule consumer on `v0.9.5`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.4/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.5/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -102,7 +109,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.9.4'
+$tag = 'v0.9.5'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -360,7 +367,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.9.4`
+- ref: `v0.9.5`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -405,11 +412,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.9.4`:
+before checkout; the current example then installs `v0.9.5`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.9.4
+git -C .ai/protocol checkout v0.9.5
 git add .ai/protocol
 ```
 

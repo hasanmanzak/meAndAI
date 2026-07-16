@@ -11,7 +11,7 @@ Terminal records remain in this index with their rationale and links.
 
 For a submodule consumer, create records from
 `.ai/protocol/templates/idea.md`; the pinned canonical source is the
-[meAndAI v0.9.4 idea template](https://github.com/hasanmanzak/meAndAI/blob/v0.9.4/templates/idea.md).
+[meAndAI v0.9.5 idea template](https://github.com/hasanmanzak/meAndAI/blob/v0.9.5/templates/idea.md).
 A repository-reference consumer resolves the same template from its configured
 immutable protocol ref. Allocate each new record as repository-local
 `IDEA-NNNN`. Promotion creates and links an `EPIC`, `FEAT`, `TASK`, or `DEC`

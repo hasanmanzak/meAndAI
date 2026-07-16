@@ -92,8 +92,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.4/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.9.4` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.5/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.9.5` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -105,7 +105,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.9.4` is an exact published immutable release
+launcher itself verifies that `v0.9.5` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -138,16 +138,16 @@ Codex gate blocks, do not delete or reset anything. Resolve the reported
 condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 If `v0.9.2` already created the deterministic draft but stopped with
-`BUG-0006`, download the corrected `v0.9.4` launcher asset and retain the
+`BUG-0006`, download the corrected `v0.9.5` launcher asset and retain the
 proposal's original protocol target while resuming:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -ProtocolTag v0.9.2
 ```
 
-Do not retarget the retained draft to `v0.9.4`. Complete and merge its original
+Do not retarget the retained draft to `v0.9.5`. Complete and merge its original
 adoption first; the installed consumer updater can then propose the ordinary
-reviewed `v0.9.4` upgrade.
+reviewed `v0.9.5` upgrade.
 
 ## Default execution order
 
@@ -170,7 +170,8 @@ created—and the seed commit is pushed, the launcher:
    semantic run.
 8. Runs [`codex exec`](https://learn.chatgpt.com/docs/non-interactive-mode)
    synchronously with an ephemeral `workspace-write` session, a 30-minute
-   default process limit, and spawned-command network access disabled.
+   default process limit, spawned-command network access disabled, and its
+   JSONL activity stream mapped to safe `Codex | ...` console lines.
 9. Requires an unchanged Git head, manifest removal, a valid non-empty diff,
    absent credential files, and an unchanged live remote branch.
 10. Creates the adoption completion commit, pushes it with an exact
@@ -191,6 +192,30 @@ consumer repository connection to hosted GitHub-agent execution is required.
 Local orchestration is not offline inference: the CLI sends its prompt and
 relevant repository context to its configured model service.
 
+## Stopping and resuming safely
+
+Pressing `Ctrl+C` during local Codex work stops the launcher. The launcher owns
+the Codex process tree, terminates it before process disposal, and then removes
+only its unpredictable `meandai-local-adoption-*` temporary root. Because the
+validated completion commit has not yet been pushed, the consumer checkout and
+live proposal head remain unchanged. The deterministic seed, repository
+secrets, lifecycle draft, labels, and adoption issue may already exist; they
+are intentional, idempotent state. Resolve any reported prerequisite and run
+the same command again.
+
+If interruption occurs after the exact completion push but before the adoption
+marker is finalized, the persisted `Publishing` intent binds the previous and
+planned heads. A rerun either restores the still-live previous proposal or
+validates and finalizes the planned head; any unrelated head blocks.
+
+Closing the terminal forcibly, terminating PowerShell, or losing host power can
+prevent the launcher's `finally` cleanup. On Windows, kill-on-close containment
+still terminates the contained Codex process tree when the launcher handle
+closes, but an unused directory under `%TEMP%\meandai-local-adoption-*` may
+remain. First confirm no launcher or Codex process is using it, then remove only
+that verified stale directory manually. Do not delete an ambiguous temporary
+root. This residue does not corrupt the target repository.
+
 For troubleshooting or a deliberately manual handoff:
 
 ```powershell
@@ -205,10 +230,11 @@ compatibility. The workflow wait is bounded by `-WorkflowTimeoutMinutes 15`
 (allowed range: 1 through 60). Local authentication and execution are bounded
 by `-CodexTimeoutMinutes 30` (allowed range: 1 through 120).
 `-CodexTimeoutSeconds` is an optional finer-grained override; zero preserves
-the minute setting. By default, a PowerShell progress display reports the
-actual launcher phases. Long local Codex work is shown as indeterminate elapsed
-time because it has no truthful completion percentage; `-NoProgress` disables
-the display without changing behavior. If a draft already
+the minute setting. By default, compact normal console lines report actual
+launcher phases, safe live Codex activity, and a bounded elapsed heartbeat when
+the CLI emits no new event. No host-managed progress overlay or invented Codex
+completion percentage is used. `-NoProgress` suppresses those lines without
+changing behavior. If a draft already
 lacks the manifest when inspected, the launcher does not rerun Codex or mark
 the draft ready; the maintainer must validate that prior change manually.
 

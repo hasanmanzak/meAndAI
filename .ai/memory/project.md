@@ -1,28 +1,28 @@
 # Project Snapshot
 
-Last verified: **2026-07-16**
+Last verified: **2026-07-17**
 
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.4`. Exact publication state is authoritative
+- Current protocol version: `0.9.5`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) after
+  [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0019](../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md)
-  corrects the launcher's native Windows sandbox carry-forward, empty-consumer
-  semantics, and phase progress; [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
+- Current scope: [FEAT-0020](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md)
+  replaces the Windows PowerShell progress overlay, streams safe local Codex
+  activity, and closes cancellation cleanup; [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: the source-only `Invoke-MeAndAIQuickAdoption.ps1`
-  performs a model-free workspace-write probe before local Codex, carries only
-  the verified native Windows sandbox mode, records unavailable empty-project
-  facts as `Not yet established`, and displays truthful phase progress.
-  `TEST-0103` and `TEST-0104` own the regression. The retained
+  keeps the model-free sandbox preflight, reports phases as ordinary console
+  lines, consumes `codex exec --json` incrementally through a safe activity
+  allowlist, and contains the semantic process tree before model work.
+  `TEST-0105` and `TEST-0106` own the regression. The retained
   [Derdini draft](https://github.com/hasanmanzak/Derdini/pull/1) remains the
   resumable consumer evidence; the launcher still never merges.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
@@ -123,6 +123,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   safely carries the verified sandbox implementation across isolated Codex
   configuration, distinguishes empty-project unknowns from adoption blockers,
   and makes launcher progress observable without inventing percentages.
+- `v0.9.5` replaces the host-managed progress overlay with normal lines,
+  presents bounded safe JSONL activity while local Codex runs, and terminates
+  the contained process tree before cancellation cleanup. Streamed output is
+  never readiness authority; interrupted publication retains DEC-0013 recovery.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,

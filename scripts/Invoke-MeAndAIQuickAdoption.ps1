@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.4',
+    [string]$ProtocolTag = 'v0.9.5',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -114,8 +114,57 @@ $adoptionLabels = @(
 )
 
 $script:QuickAdoptionProgressEnabled = -not $NoProgress
-$script:QuickAdoptionProgressId = 1901
-$script:QuickAdoptionChildProgressId = 1902
+$script:QuickAdoptionLastProgressKey = ''
+$script:QuickAdoptionLastChildKey = ''
+
+function ConvertTo-QuickAdoptionDisplayText {
+    param(
+        [AllowEmptyString()][string]$Value,
+        [ValidateRange(1, 1000)][int]$MaximumLength = 180
+    )
+
+    if ([string]::IsNullOrEmpty($Value)) {
+        return ''
+    }
+    $withoutAnsi = [regex]::Replace(
+        $Value,
+        "`e\[[0-?]*[ -/]*[@-~]",
+        ''
+    )
+    $singleLine = [regex]::Replace($withoutAnsi, '[\p{Cc}\p{Cf}]+', ' ')
+    $singleLine = [regex]::Replace($singleLine, '\s+', ' ').Trim()
+    if ($singleLine.Length -gt $MaximumLength) {
+        if ($MaximumLength -le 3) {
+            return $singleLine.Substring(0, $MaximumLength)
+        }
+        return $singleLine.Substring(0, $MaximumLength - 3) + '...'
+    }
+    return $singleLine
+}
+
+function Write-QuickAdoptionLine {
+    param(
+        [Parameter(Mandatory)][ValidateSet('Phase', 'Child')][string]$Channel,
+        [Parameter(Mandatory)][string]$Text
+    )
+
+    if (-not $script:QuickAdoptionProgressEnabled) {
+        return
+    }
+    $display = ConvertTo-QuickAdoptionDisplayText -Value $Text -MaximumLength 240
+    if (-not $display) {
+        return
+    }
+    $keyVariable = if ($Channel -ceq 'Phase') {
+        'QuickAdoptionLastProgressKey'
+    }
+    else { 'QuickAdoptionLastChildKey' }
+    if ((Get-Variable -Scope Script -Name $keyVariable -ValueOnly) -ceq $display) {
+        return
+    }
+    Set-Variable -Scope Script -Name $keyVariable -Value $display
+    Write-Host $display
+}
 
 function Set-QuickAdoptionProgress {
     param(
@@ -126,15 +175,12 @@ function Set-QuickAdoptionProgress {
     if (-not $script:QuickAdoptionProgressEnabled) {
         return
     }
-    try {
-        Write-Progress -Id $script:QuickAdoptionProgressId `
-            -Activity 'meAndAI quick adoption' -Status $Status `
-            -PercentComplete $PercentComplete
-    }
-    catch {
-        # Progress rendering must never alter the adoption result.
-        $script:QuickAdoptionProgressEnabled = $false
-    }
+    $width = 20
+    $filled = [int][Math]::Floor(($PercentComplete * $width) / 100.0)
+    $bar = ('#' * $filled) + ('-' * ($width - $filled))
+    $displayStatus = ConvertTo-QuickAdoptionDisplayText -Value $Status
+    Write-QuickAdoptionLine -Channel Phase `
+        -Text ('meAndAI [{0}] {1,3}% {2}' -f $bar, $PercentComplete, $displayStatus)
 }
 
 function Set-QuickAdoptionChildProgress {
@@ -146,41 +192,203 @@ function Set-QuickAdoptionChildProgress {
     if (-not $script:QuickAdoptionProgressEnabled) {
         return
     }
-    try {
-        Write-Progress -Id $script:QuickAdoptionChildProgressId -ParentId $script:QuickAdoptionProgressId -Activity $Activity -Status $Status -PercentComplete -1
+    $label = if ($Activity -ceq 'Running local Codex') {
+        'Codex'
     }
-    catch {
-        $script:QuickAdoptionProgressEnabled = $false
+    else {
+        ConvertTo-QuickAdoptionDisplayText -Value $Activity -MaximumLength 60
     }
+    $displayStatus = ConvertTo-QuickAdoptionDisplayText -Value $Status
+    Write-QuickAdoptionLine -Channel Child -Text "$label | $displayStatus"
 }
 
 function Complete-QuickAdoptionChildProgress {
-    if (-not $script:QuickAdoptionProgressEnabled) {
-        return
-    }
-    try {
-        Write-Progress -Id $script:QuickAdoptionChildProgressId `
-            -ParentId $script:QuickAdoptionProgressId -Activity 'Running local Codex' `
-            -Completed
-    }
-    catch {
-        $script:QuickAdoptionProgressEnabled = $false
-    }
+    $script:QuickAdoptionLastChildKey = ''
 }
 
 function Complete-QuickAdoptionProgress {
-    if (-not $script:QuickAdoptionProgressEnabled) {
+    $script:QuickAdoptionLastProgressKey = ''
+    $script:QuickAdoptionLastChildKey = ''
+}
+
+function Get-QuickAdoptionObjectProperty {
+    param(
+        $InputObject,
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    if ($null -eq $InputObject) {
+        return $null
+    }
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return $null
+    }
+    return $property.Value
+}
+
+function Get-QuickAdoptionCommandIdentity {
+    param([AllowEmptyString()][string]$Command)
+
+    $normalized = ConvertTo-QuickAdoptionDisplayText -Value $Command -MaximumLength 200
+    if (-not $normalized) {
+        return 'repository command'
+    }
+    $match = [regex]::Match(
+        $normalized,
+        '^(?:"(?<double>[^"]+)"|''(?<single>[^'']+)''|(?<plain>[^\s]+))'
+    )
+    if (-not $match.Success) {
+        return 'repository command'
+    }
+    $token = @(
+        $match.Groups['double'].Value,
+        $match.Groups['single'].Value,
+        $match.Groups['plain'].Value
+    ) | Where-Object { $_ } | Select-Object -First 1
+    if (-not $token) {
+        return 'repository command'
+    }
+    $identity = [IO.Path]::GetFileName([string]$token)
+    if ($identity -cnotmatch '^[A-Za-z0-9._+-]{1,64}$') {
+        return 'repository command'
+    }
+    return $identity
+}
+
+function Write-LocalCodexEvent {
+    param([AllowEmptyString()][string]$Line)
+
+    if (-not $script:QuickAdoptionProgressEnabled -or
+        [string]::IsNullOrWhiteSpace($Line)) {
         return
     }
     try {
-        Write-Progress -Id $script:QuickAdoptionChildProgressId `
-            -ParentId $script:QuickAdoptionProgressId -Activity 'Running local Codex' `
-            -Completed
-        Write-Progress -Id $script:QuickAdoptionProgressId `
-            -Activity 'meAndAI quick adoption' -Completed
+        $event = $Line | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        # The main operation has already determined success or failure.
+        Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+            -Status 'Received unstructured CLI output'
+        return
+    }
+
+    $eventType = [string](Get-QuickAdoptionObjectProperty `
+        -InputObject $event -Name 'type')
+    switch -CaseSensitive ($eventType) {
+        'thread.started' {
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status 'Session started'
+        }
+        'turn.started' {
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status 'Working'
+        }
+        'turn.completed' {
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status 'Completed'
+        }
+        'turn.failed' {
+            $errorValue = Get-QuickAdoptionObjectProperty -InputObject $event -Name 'error'
+            $message = if ($errorValue -is [string]) {
+                [string]$errorValue
+            }
+            else {
+                [string](Get-QuickAdoptionObjectProperty `
+                    -InputObject $errorValue -Name 'message')
+            }
+            $message = ConvertTo-QuickAdoptionDisplayText -Value $message
+            if (-not $message) { $message = 'Turn failed' }
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status "Failed: $message"
+        }
+        'error' {
+            $message = [string](Get-QuickAdoptionObjectProperty `
+                -InputObject $event -Name 'message')
+            $message = ConvertTo-QuickAdoptionDisplayText -Value $message
+            if (-not $message) { $message = 'CLI error' }
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status "Error: $message"
+        }
+        { @('item.started', 'item.updated', 'item.completed') -ccontains $_ } {
+            $item = Get-QuickAdoptionObjectProperty -InputObject $event -Name 'item'
+            $itemType = [string](Get-QuickAdoptionObjectProperty `
+                -InputObject $item -Name 'type')
+            switch -CaseSensitive ($itemType) {
+                'reasoning' {
+                    if ($eventType -ceq 'item.started') {
+                        Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                            -Status 'Analyzing repository'
+                    }
+                }
+                'command_execution' {
+                    if ($eventType -ceq 'item.started') {
+                        $command = [string](Get-QuickAdoptionObjectProperty `
+                            -InputObject $item -Name 'command')
+                        $identity = Get-QuickAdoptionCommandIdentity -Command $command
+                        Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                            -Status "Running command: $identity"
+                    }
+                }
+                'agent_message' {
+                    if ($eventType -ceq 'item.completed') {
+                        $message = [string](Get-QuickAdoptionObjectProperty `
+                            -InputObject $item -Name 'text')
+                        $message = ConvertTo-QuickAdoptionDisplayText `
+                            -Value $message -MaximumLength 220
+                        if ($message) {
+                            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                                -Status $message
+                        }
+                    }
+                }
+                'file_change' {
+                    if ($eventType -ceq 'item.completed') {
+                        $changes = @(Get-QuickAdoptionObjectProperty `
+                            -InputObject $item -Name 'changes')
+                        $paths = @($changes | ForEach-Object {
+                            [string](Get-QuickAdoptionObjectProperty `
+                                -InputObject $_ -Name 'path')
+                        } | Where-Object { $_ } | Select-Object -First 3)
+                        if ($paths.Count -eq 0) {
+                            $path = [string](Get-QuickAdoptionObjectProperty `
+                                -InputObject $item -Name 'path')
+                            if ($path) { $paths = @($path) }
+                        }
+                        $safePaths = @($paths | ForEach-Object {
+                            ConvertTo-QuickAdoptionDisplayText -Value $_ -MaximumLength 120
+                        })
+                        if ($safePaths.Count -eq 1) {
+                            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                                -Status "Changed file: $($safePaths[0])"
+                        }
+                        elseif ($safePaths.Count -gt 1) {
+                            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                                -Status "Changed files: $($safePaths -join ', ')"
+                        }
+                    }
+                }
+                'plan_update' {
+                    Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                        -Status 'Plan updated'
+                }
+                'mcp_tool_call' {
+                    if ($eventType -ceq 'item.started') {
+                        Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                            -Status 'Using configured tool'
+                    }
+                }
+                'web_search' {
+                    if ($eventType -ceq 'item.started') {
+                        Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                            -Status 'Searching documentation'
+                    }
+                }
+            }
+        }
+        default {
+            Set-QuickAdoptionChildProgress -Activity 'Running local Codex' `
+                -Status 'Received CLI event'
+        }
     }
 }
 
@@ -1802,6 +2010,225 @@ function Resolve-LocalCodexRunner {
     throw 'Codex CLI is not installed and npx is unavailable for the pinned temporary fallback.'
 }
 
+function New-ExternalProcessContainment {
+    param([Parameter(Mandatory)][Diagnostics.Process]$Process)
+
+    if ($env:OS -cne 'Windows_NT') {
+        return $null
+    }
+    $typeName = 'MeAndAI.QuickAdoption.ProcessJob'
+    if ($null -eq ($typeName -as [type])) {
+        try {
+            Add-Type -TypeDefinition @'
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace MeAndAI.QuickAdoption
+{
+    public sealed class ProcessJob : IDisposable
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        private struct BasicLimits
+        {
+            public long PerProcessUserTimeLimit;
+            public long PerJobUserTimeLimit;
+            public uint LimitFlags;
+            public UIntPtr MinimumWorkingSetSize;
+            public UIntPtr MaximumWorkingSetSize;
+            public uint ActiveProcessLimit;
+            public UIntPtr Affinity;
+            public uint PriorityClass;
+            public uint SchedulingClass;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct IoCounters
+        {
+            public ulong ReadOperationCount;
+            public ulong WriteOperationCount;
+            public ulong OtherOperationCount;
+            public ulong ReadTransferCount;
+            public ulong WriteTransferCount;
+            public ulong OtherTransferCount;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ExtendedLimits
+        {
+            public BasicLimits BasicLimitInformation;
+            public IoCounters IoInfo;
+            public UIntPtr ProcessMemoryLimit;
+            public UIntPtr JobMemoryLimit;
+            public UIntPtr PeakProcessMemoryUsed;
+            public UIntPtr PeakJobMemoryUsed;
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr CreateJobObject(IntPtr attributes, string name);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetInformationJobObject(
+            IntPtr job, int informationClass, IntPtr information, uint length);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+
+        [DllImport("kernel32.dll")]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        private IntPtr handle;
+
+        private ProcessJob(IntPtr jobHandle)
+        {
+            handle = jobHandle;
+        }
+
+        public static ProcessJob TryCreate(Process process)
+        {
+            const uint KillOnJobClose = 0x00002000;
+            const int ExtendedLimitInformation = 9;
+            IntPtr job = CreateJobObject(IntPtr.Zero, null);
+            if (job == IntPtr.Zero) return null;
+
+            ExtendedLimits limits = new ExtendedLimits();
+            limits.BasicLimitInformation.LimitFlags = KillOnJobClose;
+            int size = Marshal.SizeOf(typeof(ExtendedLimits));
+            IntPtr buffer = Marshal.AllocHGlobal(size);
+            try
+            {
+                Marshal.StructureToPtr(limits, buffer, false);
+                if (!SetInformationJobObject(job, ExtendedLimitInformation, buffer, (uint)size) ||
+                    !AssignProcessToJobObject(job, process.Handle))
+                {
+                    CloseHandle(job);
+                    return null;
+                }
+                return new ProcessJob(job);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
+
+        public void Dispose()
+        {
+            IntPtr owned = handle;
+            handle = IntPtr.Zero;
+            if (owned != IntPtr.Zero) CloseHandle(owned);
+        }
+    }
+}
+'@ -ErrorAction Stop
+        }
+        catch {
+            return $null
+        }
+    }
+    try {
+        return [MeAndAI.QuickAdoption.ProcessJob]::TryCreate($Process)
+    }
+    catch {
+        return $null
+    }
+}
+
+function Stop-ExternalProcessTree {
+    param([Parameter(Mandatory)][Diagnostics.Process]$Process)
+
+    try {
+        if ($Process.HasExited) {
+            return $true
+        }
+    }
+    catch {
+        return $false
+    }
+
+    $killTreeMethod = $Process.GetType().GetMethod(
+        'Kill',
+        [type[]]@([bool])
+    )
+    if ($null -ne $killTreeMethod) {
+        try {
+            [void]$killTreeMethod.Invoke($Process, [object[]]@($true))
+        }
+        catch { }
+    }
+    else {
+        $descendants = [System.Collections.Generic.List[Diagnostics.Process]]::new()
+        if ($env:OS -ceq 'Windows_NT') {
+            $searcher = $null
+            $records = $null
+            try {
+                $searcher = [System.Management.ManagementObjectSearcher]::new(
+                    'SELECT ProcessId, ParentProcessId FROM Win32_Process'
+                )
+                $records = $searcher.Get()
+                $childrenByParent = @{}
+                foreach ($record in $records) {
+                    $parentId = [int][uint32]$record.ParentProcessId
+                    $processId = [int][uint32]$record.ProcessId
+                    if (-not $childrenByParent.ContainsKey($parentId)) {
+                        $childrenByParent[$parentId] = `
+                            [System.Collections.Generic.List[int]]::new()
+                    }
+                    $childrenByParent[$parentId].Add($processId)
+                }
+                $pending = [System.Collections.Generic.Stack[int]]::new()
+                $visited = [System.Collections.Generic.HashSet[int]]::new()
+                $pending.Push($Process.Id)
+                [void]$visited.Add($Process.Id)
+                while ($pending.Count -gt 0) {
+                    $parentId = $pending.Pop()
+                    if (-not $childrenByParent.ContainsKey($parentId)) {
+                        continue
+                    }
+                    foreach ($childId in $childrenByParent[$parentId]) {
+                        if (-not $visited.Add($childId)) {
+                            continue
+                        }
+                        try {
+                            $child = [Diagnostics.Process]::GetProcessById($childId)
+                            $descendants.Add($child)
+                            $pending.Push($childId)
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+            finally {
+                if ($null -ne $records) { $records.Dispose() }
+                if ($null -ne $searcher) { $searcher.Dispose() }
+            }
+        }
+
+        try { $Process.Kill() } catch { }
+        for ($index = $descendants.Count - 1; $index -ge 0; $index--) {
+            try {
+                if (-not $descendants[$index].HasExited) {
+                    $descendants[$index].Kill()
+                }
+            }
+            catch { }
+        }
+        foreach ($descendant in $descendants) {
+            try { [void]$descendant.WaitForExit(5000) } catch { }
+            finally { $descendant.Dispose() }
+        }
+    }
+
+    try {
+        [void]$Process.WaitForExit(5000)
+        return $Process.HasExited
+    }
+    catch {
+        return $false
+    }
+}
+
 function Invoke-BoundedProcess {
     param(
         [Parameter(Mandatory)]$Runner,
@@ -1810,7 +2237,9 @@ function Invoke-BoundedProcess {
         [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$TimeoutMilliseconds,
         [Parameter(Mandatory)][string]$TimeoutDescription,
         [Parameter(Mandatory)][string]$Operation,
-        [string]$ProgressActivity = ''
+        [string]$ProgressActivity = '',
+        [scriptblock]$OutputLineHandler = $null,
+        [switch]$RequireProcessTreeContainment
     )
 
     $allArguments = @($Runner.PrefixArguments) + @($Arguments)
@@ -1836,11 +2265,21 @@ function Invoke-BoundedProcess {
 
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $startInfo
+    $processStarted = $false
+    $processContainment = $null
     try {
         if (-not $process.Start()) {
             throw "Unable to start $Operation."
         }
-        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $processStarted = $true
+        $processContainment = New-ExternalProcessContainment -Process $process
+        if ($RequireProcessTreeContainment -and $env:OS -ceq 'Windows_NT' -and
+            $null -eq $processContainment) {
+            [void](Stop-ExternalProcessTree -Process $process)
+            throw "Unable to establish kill-on-close process-tree containment for $Operation."
+        }
+        $stdoutLines = [System.Collections.Generic.List[string]]::new()
+        $stdoutReadTask = $process.StandardOutput.ReadLineAsync()
         $stderrTask = $process.StandardError.ReadToEndAsync()
         if ($StandardInput) {
             $process.StandardInput.Write($StandardInput)
@@ -1848,48 +2287,73 @@ function Invoke-BoundedProcess {
         $process.StandardInput.Close()
         $completed = $false
         $stopwatch = [Diagnostics.Stopwatch]::StartNew()
+        $nextHeartbeatMilliseconds = 15000
         while (-not $completed -and $stopwatch.ElapsedMilliseconds -lt $TimeoutMilliseconds) {
+            while ($null -ne $stdoutReadTask -and $stdoutReadTask.IsCompleted) {
+                $line = $stdoutReadTask.GetAwaiter().GetResult()
+                if ($null -eq $line) {
+                    $stdoutReadTask = $null
+                    break
+                }
+                $stdoutLines.Add([string]$line)
+                if ($null -ne $OutputLineHandler) {
+                    [void](& $OutputLineHandler ([string]$line))
+                }
+                $stdoutReadTask = $process.StandardOutput.ReadLineAsync()
+            }
             $remaining = [int][Math]::Max(
                 1,
-                [Math]::Min(1000, $TimeoutMilliseconds - $stopwatch.ElapsedMilliseconds)
+                [Math]::Min(200, $TimeoutMilliseconds - $stopwatch.ElapsedMilliseconds)
             )
             $completed = $process.WaitForExit($remaining)
-            if (-not $completed -and $ProgressActivity) {
+            if (-not $completed -and $ProgressActivity -and
+                $stopwatch.ElapsedMilliseconds -ge $nextHeartbeatMilliseconds) {
                 $elapsed = [Math]::Floor($stopwatch.Elapsed.TotalSeconds)
                 Set-QuickAdoptionChildProgress -Activity $ProgressActivity `
                     -Status "Elapsed: $elapsed second(s); limit: $TimeoutDescription"
+                $nextHeartbeatMilliseconds += 15000
             }
         }
         $stopwatch.Stop()
         if (-not $completed) {
-            try {
-                $process.Kill($true)
+            $terminationConfirmed = Stop-ExternalProcessTree -Process $process
+            if (-not $terminationConfirmed) {
+                throw "$Operation exceeded the $TimeoutDescription limit, and process-tree termination could not be confirmed."
             }
-            catch {
-                if (-not $process.HasExited) {
-                    if ($env:OS -eq 'Windows_NT') {
-                        try {
-                            & "$env:SystemRoot\System32\taskkill.exe" `
-                                /PID $process.Id /T /F 2>&1 | Out-Null
-                        }
-                        catch { }
-                    }
-                    else {
-                        try { $process.Kill() } catch { }
-                    }
-                }
-            }
-            [void]$process.WaitForExit(5000)
             throw "$Operation exceeded the $TimeoutDescription limit and was terminated."
         }
         $process.WaitForExit()
+        while ($null -ne $stdoutReadTask) {
+            $line = $stdoutReadTask.GetAwaiter().GetResult()
+            if ($null -eq $line) {
+                $stdoutReadTask = $null
+                break
+            }
+            $stdoutLines.Add([string]$line)
+            if ($null -ne $OutputLineHandler) {
+                [void](& $OutputLineHandler ([string]$line))
+            }
+            $stdoutReadTask = $process.StandardOutput.ReadLineAsync()
+        }
         return [pscustomobject]@{
             ExitCode = [int]$process.ExitCode
-            StdOut = [string]$stdoutTask.GetAwaiter().GetResult()
+            StdOut = [string](@($stdoutLines) -join [Environment]::NewLine)
             StdErr = [string]$stderrTask.GetAwaiter().GetResult()
         }
     }
     finally {
+        if ($null -ne $processContainment) {
+            try { $processContainment.Dispose() } catch { }
+            $processContainment = $null
+        }
+        if ($processStarted) {
+            $stillRunning = $false
+            try { $stillRunning = -not $process.HasExited } catch { }
+            if ($stillRunning -and
+                -not (Stop-ExternalProcessTree -Process $process)) {
+                Write-Warning "$Operation was interrupted, but child-process-tree termination could not be confirmed."
+            }
+        }
         if ($ProgressActivity) {
             Complete-QuickAdoptionChildProgress
         }
@@ -1903,6 +2367,65 @@ function Get-ProcessFailureDetail {
     $detail = (@($Result.StdOut, $Result.StdErr) -join [Environment]::NewLine).Trim()
     if ($detail.Length -gt 1200) {
         $detail = $detail.Substring(0, 1200) + '...'
+    }
+    return $detail
+}
+
+function Get-LocalCodexFailureDetail {
+    param([Parameter(Mandatory)]$Result)
+
+    $details = [System.Collections.Generic.List[string]]::new()
+    $seen = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($line in @([string]$Result.StdOut -split '\r?\n')) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+        try { $event = $line | ConvertFrom-Json -ErrorAction Stop }
+        catch { continue }
+        $eventType = [string](Get-QuickAdoptionObjectProperty `
+            -InputObject $event -Name 'type')
+        $message = ''
+        if ($eventType -ceq 'error') {
+            $message = [string](Get-QuickAdoptionObjectProperty `
+                -InputObject $event -Name 'message')
+        }
+        elseif ($eventType -ceq 'turn.failed') {
+            $errorValue = Get-QuickAdoptionObjectProperty -InputObject $event -Name 'error'
+            $message = if ($errorValue -is [string]) {
+                [string]$errorValue
+            }
+            else {
+                [string](Get-QuickAdoptionObjectProperty `
+                    -InputObject $errorValue -Name 'message')
+            }
+        }
+        elseif ($eventType -ceq 'item.completed') {
+            $item = Get-QuickAdoptionObjectProperty -InputObject $event -Name 'item'
+            if ([string](Get-QuickAdoptionObjectProperty `
+                -InputObject $item -Name 'type') -ceq 'agent_message') {
+                $message = [string](Get-QuickAdoptionObjectProperty `
+                    -InputObject $item -Name 'text')
+            }
+        }
+        $message = ConvertTo-QuickAdoptionDisplayText -Value $message -MaximumLength 300
+        if ($message -and $seen.Add($message)) {
+            $details.Add($message)
+        }
+    }
+
+    $stderr = ConvertTo-QuickAdoptionDisplayText `
+        -Value ([string]$Result.StdErr) -MaximumLength 600
+    if ($stderr -and $seen.Add($stderr)) {
+        $details.Add($stderr)
+    }
+    $detail = (@($details) -join ' | ').Trim()
+    if (-not $detail) {
+        return 'No structured error detail was emitted.'
+    }
+    if ($detail.Length -gt 1200) {
+        return $detail.Substring(0, 1197) + '...'
     }
     return $detail
 }
@@ -2076,6 +2599,7 @@ function Invoke-LocalCodexExec {
     }
     $arguments += @(
         '--cd', $WorkingDirectory,
+        '--json',
         '--output-last-message', $OutputPath,
         '-'
     )
@@ -2084,9 +2608,14 @@ function Invoke-LocalCodexExec {
         -StandardInput $Prompt -TimeoutMilliseconds $TimeoutMilliseconds `
         -TimeoutDescription $TimeoutDescription `
         -Operation 'Local Codex adoption execution' `
-        -ProgressActivity 'Running local Codex'
+        -ProgressActivity 'Running local Codex' `
+        -RequireProcessTreeContainment `
+        -OutputLineHandler {
+            param([string]$Line)
+            Write-LocalCodexEvent -Line $Line
+        }
     if ($result.ExitCode -ne 0) {
-        $detail = Get-ProcessFailureDetail -Result $result
+        $detail = Get-LocalCodexFailureDetail -Result $result
         throw "Local Codex exited with code $($result.ExitCode). $detail"
     }
 }
