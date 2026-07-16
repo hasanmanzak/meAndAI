@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature correction |
-| Status | Ready for review; publication pending |
-| Target version | 0.8.5 |
+| Status | Complete |
+| Target version | 0.8.6 |
 | Issue and post-publication authority | [#43](https://github.com/hasanmanzak/meAndAI/issues/43) |
-| Pull request | [#45](https://github.com/hasanmanzak/meAndAI/pull/45) |
-| Decision | [DEC-0014](../../decisions/DEC-0014-contained-adoption-and-observable-evidence.md) |
-| Tests | [TEST-0086 through TEST-0095](test-cases.md) |
+| Pull requests | [#45](https://github.com/hasanmanzak/meAndAI/pull/45); [#46](https://github.com/hasanmanzak/meAndAI/pull/46) |
+| Decisions | [DEC-0014](../../decisions/DEC-0014-contained-adoption-and-observable-evidence.md); [DEC-0012](../../decisions/DEC-0012-bounded-correction-and-external-release-evidence.md) |
+| Tests | [TEST-0065 and TEST-0086 through TEST-0095](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -29,6 +29,13 @@ boundary, one canonical version grammar, observable scenario evidence, and a
 consistent GitHub/documentation projection. It does not add a generalized
 validator, test framework, bootstrap layer, or another unchanged scan loop.
 
+The first post-publication preflight for immutable v0.8.5 then exposed
+`FIND-0132`: this feature still said publication was pending and mixed two
+post-publication checks into its pre-merge Definition of Done, while
+`TEST-0065` correctly requires the release-target feature to be `Complete`.
+The bounded v0.8.6 correction separates those lifecycle gates and adds the
+missing pre-publication regression guard; it does not change runtime behavior.
+
 ## Scope
 
 - Reject a managed destination when its lexical path escapes the workspace or
@@ -43,6 +50,8 @@ validator, test framework, bootstrap layer, or another unchanged scan loop.
   and explicit per-scenario execution results without introducing a framework.
 - Correct the v0.8.4 finding count and TEST-0002 wording, and reconcile issue
   #41, pull request #42, and the open `FIND-0120` follow-up projection.
+- Require current-release feature records to be complete before publication
+  and keep post-publication evidence outside their pre-merge Definition of Done.
 - Update active protocol pins, version, changelog, indexes, documentation, and
   project-local memory only as required by the implemented correction.
 
@@ -88,7 +97,7 @@ validator, test framework, bootstrap layer, or another unchanged scan loop.
 | `RISK-0077` | Path containment and credential ordering | A linked managed ancestor can redirect reads or writes outside the consumer before a later Git failure, including after a repository secret is created | Mitigated / launcher and bootstrap owners | Pre-side-effect lexical and ancestor containment gates; launcher `TEST-0086` and bootstrap `TEST-0093` passed |
 | `RISK-0078` | Completed-state trust | A marker-consistent but drifted or unqualified completed proposal can be retained or marked ready | Mitigated / adoption lifecycle owner | Exact proposal and completed-publication validation; launcher `TEST-0087` and bootstrap `TEST-0094` passed |
 | `RISK-0079` | False-green evidence | Missing variants, caller-derived mocks, or suite-level success can preserve green evidence after a scenario contract regresses | Mitigated / test owners | Launcher `TEST-0089` through `TEST-0091`, bootstrap `TEST-0095`, and exact source-bound scenario results passed |
-| `RISK-0080` | GitHub projection | Closed delivery records, stale status labels, missing canonical links, or an untracked external follow-up can conceal the real repository state | Reconciled / issue #44 retains the residual external risk | `TEST-0092` and the read-only GitHub review passed; `RISK-0076` remains separately open rather than falsely resolved |
+| `RISK-0080` | GitHub projection | Closed delivery records, stale status labels, release-target feature drift, missing canonical links, or an untracked external follow-up can conceal the real repository state | Reconciled / issue #44 retains the residual external risk | `TEST-0092` now rejects incomplete current-release projection before publication; `RISK-0076` remains separately open rather than falsely resolved |
 
 ## Baseline and finite validation budget
 
@@ -99,7 +108,7 @@ validator, test framework, bootstrap layer, or another unchanged scan loop.
 | Baseline suite | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` passed in 543.6 seconds; the green result did not invalidate these findings |
 | Baseline structure | All 15 tracked PowerShell files parsed; diff hygiene and local links were clean |
 | Initial disposition | All nine findings, `FIND-0123` through `FIND-0131`, are `Blocking` and open |
-| Correction budget | One correction pass across the three declared slices; one fresh-diff self-review and one complete suite; publish the review branch and pull request; then one fresh confirmation scan |
+| Correction budget | One correction pass across the three initial slices; the verified v0.8.5 publication blocker permits one narrow `SUBF-0036` correction, one fresh-diff review, one complete suite, publication, and one fresh confirmation scan |
 | Repeat rule | Repeat only for a verified actionable finding, changed evidence, or failed declared gate while budget remains; never repeat an unchanged scan |
 | Stop condition | Every acceptance criterion and declared test passes, no `Blocking` finding remains, external projections are reconciled, and any non-blocking condition retains its required authority |
 
@@ -110,6 +119,7 @@ validator, test framework, bootstrap layer, or another unchanged scan loop.
 | `SUBF-0033` | Contained runtime and exact completion boundaries | `FIND-0123` through `FIND-0125` | `TEST-0086` through `TEST-0088`, `TEST-0093`, `TEST-0094` | Implemented, self-reviewed, and passed |
 | `SUBF-0034` | Focused and observable evidence | `FIND-0126` through `FIND-0128` | `TEST-0089` through `TEST-0091`, `TEST-0095` | Implemented, self-reviewed, and passed |
 | `SUBF-0035` | Governance and publication projection | `FIND-0129` through `FIND-0131` | `TEST-0088`, `TEST-0092`, and external projection review | Reconciled, self-reviewed, and passed |
+| `SUBF-0036` | Pre-merge versus post-publication projection | `FIND-0132` | `TEST-0092`, `TEST-0065` | Implemented, self-reviewed, and passed locally |
 
 ## Acceptance criteria
 
@@ -129,6 +139,9 @@ validator, test framework, bootstrap layer, or another unchanged scan loop.
    contracts; issue #41 and PR #42 link FEAT-0013/DEC-0013 correctly, and open
    `FIND-0120` has a durable active finding record while `RISK-0076` remains
    external and unresolved.
+8. Every feature targeting the current protocol version is `Complete` before
+   publication, and its post-publication evidence remains in the separate
+   external gate required by DEC-0012.
 
 ## Frozen findings register
 
@@ -150,14 +163,22 @@ post-publication evidence.
 | `FIND-0130` | Governance defect - GitHub projection | Medium / High | Open `RISK-0076` has no active `type:finding` record; closed issue #41 retains `status:in-progress` and names a nonexistent DEC-0013 path; PR #42 omits canonical FEAT-0013 and DEC-0013 links. The external projection contradicts the canonical graph. | Reconcile stable issue/PR links and status, and create the durable open `FIND-0120` follow-up without claiming branch protection is resolved | `Resolved` / Verified 2026-07-16 | `SUBF-0035`, `RISK-0080`, `TEST-0092`, [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) |
 | `FIND-0131` | Documentation defect - version scenario wording | Low / High | Active [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md) says any three non-negative components are accepted, which is broader than the ASCII/no-leading-zero protocol grammar and the boundary evidence added by TEST-0085. | State the exact canonical grammar in TEST-0002 while retaining TEST-0085 as its boundary regression evidence | `Resolved` / Verified 2026-07-16 | `SUBF-0035`, `TEST-0088`, `TEST-0092` |
 
+## Confirmation-scan finding
+
+| ID | Classification | Severity / confidence | Evidence and impact | Required action | Disposition / status | Traceability |
+| --- | --- | --- | --- | --- | --- | --- |
+| `FIND-0132` | Governance defect - release-state projection | High / High | Immutable v0.8.5 contains `Ready for review; publication pending` for FEAT-0014 and places publication-dependent checks inside its pre-merge Definition of Done. `TEST-0065` therefore cannot verify that release even though its runtime and hosted gates passed. | Separate the lifecycle gates, mark the current release feature complete before publication, and make the complete local suite reject the mismatch before another release | `Resolved` / Verified locally 2026-07-16; external evidence pending | `SUBF-0036`, `RISK-0080`, `TEST-0092`, `TEST-0065`, [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) |
+
 ## Definition of Ready
 
 - [x] Stable ID, linked issue, intended outcome, frozen scope, and non-goals.
 - [x] Runtime, filesystem, credential, lifecycle, version, evidence, and GitHub
       projection contracts identified with compatibility boundaries.
 - [x] Four numbered risks and accepted DEC-0014 recorded.
-- [x] Nine findings mapped to three independently reviewable slices.
-- [x] Ten numbered test scenarios and their boundary-specific evidence owners defined.
+- [x] Nine initial findings and one verified confirmation finding mapped to four
+      independently reviewable slices.
+- [x] Ten feature-specific scenarios plus existing post-publication `TEST-0065`
+      and their evidence owners defined.
 - [x] Baseline suite, PowerShell parse, diff/link state, scan scope, finite budget,
       repeat rule, and stop condition recorded.
 - [x] At Gate 1, test code was absent and every new scenario demonstrated its
@@ -165,19 +186,21 @@ post-publication evidence.
 
 ## Definition of Done
 
-- [x] Acceptance criteria met and all nine findings resolved through evidence.
+- [x] Acceptance criteria met and all ten findings resolved through evidence.
 - [x] Mandatory test code and explicit scenario-result mapping implemented.
 - [x] Each slice received one focused fresh-diff self-review with no unresolved
       `Blocking` finding.
-- [x] One complete local suite passed within the declared correction budget.
-- [ ] The single fresh post-publication confirmation scan passes.
-- [ ] Documentation, links, version, changelog, memory, issue, and pull request
-      are current and externally verifiable.
-- [ ] Hosted CI and review gates pass before merge.
-- [ ] Exact release evidence is written after publication to issue #43 and the
-      GitHub Release; no release commit is predicted here.
+- [x] One complete local suite passed after the v0.8.6 correction.
+- [x] Documentation, links, version, changelog, memory, issue, and pull request
+      are current for the corrective review.
+- [x] Hosted CI and review gates are mandatory merge preconditions; their exact
+      results remain external to this pre-merge record.
 
 ## Post-publication evidence
+
+This gate is deliberately outside Definition of Done. The released feature is
+complete before publication; exact release facts remain `Pending` here and are
+written to issue #43 only after they exist.
 
 | Field | Evidence |
 | --- | --- |

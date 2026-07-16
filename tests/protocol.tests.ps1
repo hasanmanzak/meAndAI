@@ -613,11 +613,41 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
 
         $featureFiles = Get-ChildItem -LiteralPath (Join-Path $root 'docs/features') -Recurse -File -Filter 'README.md' |
             Where-Object { $_.Directory.Name -match '^FEAT-\d{4}-' }
+        $currentTargetFeatures = [System.Collections.Generic.List[string]]::new()
         foreach ($featureFile in $featureFiles) {
             $feature = Get-Content -LiteralPath $featureFile.FullName -Raw
-            if ($feature -notmatch '\| Target version \| \d+\.\d+\.\d+ \|') {
+            $featureMetadata = [regex]::Match(
+                $feature,
+                '(?ms)\A# [^\r\n]+\r?\n\r?\n(?<table>\| Field \| Value \|\r?\n\| --- \| --- \|\r?\n(?:\|[^\r\n]*\|\r?\n?)+)'
+            )
+            if (-not $featureMetadata.Success -or
+                $featureMetadata.Groups['table'].Value -notmatch
+                    '(?m)^\| Target version \| \d+\.\d+\.\d+ \|\s*$') {
                 Add-Failure "TEST-0006 invalid historical target version in $($featureFile.FullName)"
             }
+            $metadataTable = $featureMetadata.Groups['table'].Value
+            if ($metadataTable -match
+                ('(?m)^\| Target version \| {0} \|\s*$' -f [regex]::Escape($version))) {
+                $currentTargetFeatures.Add($featureFile.FullName)
+                if ($metadataTable -notmatch '(?m)^\| Status \| Complete \|\s*$') {
+                    Add-Failure "TEST-0092 current release feature is not complete before publication: $($featureFile.FullName)"
+                }
+
+                $definitionOfDone = [regex]::Match(
+                    $feature,
+                    '(?ms)^## Definition of Done\s*(?<body>.*?)(?=^## |\z)'
+                )
+                if (-not $definitionOfDone.Success) {
+                    Add-Failure "TEST-0092 current release feature has no Definition of Done: $($featureFile.FullName)"
+                }
+                elseif ($definitionOfDone.Groups['body'].Value -match
+                    '(?im)^- \[[ x]\].*(?:post-publication|release evidence)') {
+                    Add-Failure "TEST-0092 post-publication work is mixed into the pre-merge Definition of Done: $($featureFile.FullName)"
+                }
+            }
+        }
+        if ($currentTargetFeatures.Count -eq 0) {
+            Add-Failure "TEST-0092 no feature targets current protocol version $version."
         }
     }
 }
