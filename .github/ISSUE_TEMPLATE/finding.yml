@@ -1,7 +1,7 @@
 name: Review finding
 description: Record an evidence-backed audit or self-review observation.
 title: "[FIND-NNNN] "
-labels: ["type:finding", "priority:p2"]
+labels: ["type:finding"]
 body:
   - type: input
     id: work_id
@@ -59,6 +59,30 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: priority
+    attributes:
+      label: Queue priority
+      description: Select the queue priority; p0 is highest. Apply the matching repository label after triage.
+      options:
+        - p0
+        - p1
+        - p2
+        - p3
+    validations:
+      required: true
+  - type: dropdown
+    id: impact_rank
+    attributes:
+      label: Impact rank
+      options:
+        - critical
+        - high
+        - medium
+        - low
+        - info
+    validations:
+      required: true
+  - type: dropdown
     id: confidence
     attributes:
       label: Confidence
@@ -66,6 +90,14 @@ body:
         - high
         - medium
         - low
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Finding dependencies
+      description: List prerequisite FIND-NNNN identifiers, or write None.
+      placeholder: None
     validations:
       required: true
   - type: textarea
@@ -78,8 +110,8 @@ body:
   - type: textarea
     id: impact
     attributes:
-      label: Impact and recommended action
-      description: Explain why it matters and the smallest safe remediation.
+      label: Impact rationale and recommended action
+      description: Explain the impact rank, why it matters, and the smallest safe remediation.
     validations:
       required: true
   - type: textarea

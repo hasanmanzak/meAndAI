@@ -16,6 +16,7 @@
 | [DEC-0012](DEC-0012-bounded-correction-and-external-release-evidence.md) | Bound corrective delivery and keep release evidence external | Accepted | 2026-07-16 |
 | [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md) | Verify trusted adoption before mutation and preserve recoverable evidence | Accepted | 2026-07-16 |
 | [DEC-0014](DEC-0014-contained-adoption-and-observable-evidence.md) | Require contained adoption and observable evidence | Accepted | 2026-07-16 |
+| [DEC-0015](DEC-0015-event-triggered-stability-cycles.md) | Use event-triggered stability cycles with a convergence-gated push | Accepted | 2026-07-16 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

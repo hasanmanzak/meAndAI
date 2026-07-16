@@ -3,6 +3,27 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.0 - 2026-07-16
+
+### Added
+
+- Add one event-triggered stability and consistency mandate for this repository
+  and exact-pin consumers: scan after material development, preserve finding
+  dispositions, and enter a waiting state after zero-`Blocking` convergence.
+- Order remediation by explicit dependencies before priority, require focused
+  evidence and fresh-diff self-review for each finding or smallest inseparable
+  dependency group, and keep change-caused blockers in the active queue.
+- Define the mandate's terminal publication action as a converged final Git
+  push, explicitly separate from protocol tags and GitHub Releases, while
+  retaining bounded confirmation and blocked stop conditions.
+- Extend consumer adoption guidance, evidence templates, and structural
+  scenarios without adding a scanner, scheduler, recursive bootstrapper, or
+  consumer-owned file rewrite.
+
+Related work: [FEAT-0015](docs/features/FEAT-0015-stability-consistency-mandate/README.md),
+[DEC-0015](docs/decisions/DEC-0015-event-triggered-stability-cycles.md), and
+[issue #47](https://github.com/hasanmanzak/meAndAI/issues/47).
+
 ## 0.8.6 - 2026-07-16
 
 ### Fixed

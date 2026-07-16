@@ -5,15 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The narrow v0.8.6 publication-evidence correction for `FIND-0132` is tracked in
-[FEAT-0014](../../../docs/features/FEAT-0014-v085-convergence/README.md) and the
-[v0.8.6 continuation](2026-07-16-v086-publication-evidence.md). Immutable
-v0.8.5 remains historical evidence; review, corrective release, hosted checks,
-and the single fresh confirmation scan remain owned by
-[issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
+The event-triggered stability and consistency mandate is tracked in
+[FEAT-0015](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md),
+[DEC-0015](../../../docs/decisions/DEC-0015-event-triggered-stability-cycles.md),
+and the [v0.9.0 continuation](2026-07-16-stability-consistency-mandate.md).
+[Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) owns delivery and
+future post-publication evidence. `FIND-0120` remains the separate open external
+follow-up in issue #44.
 
 ## History
 
+- [2026-07-16 - Stability and consistency mandate](2026-07-16-stability-consistency-mandate.md)
 - [2026-07-16 - v0.8.6 publication-evidence correction](2026-07-16-v086-publication-evidence.md)
 - [2026-07-16 - Bounded v0.8.5 convergence](2026-07-16-v085-convergence.md)
 - [2026-07-16 - Bounded v0.8.4 correction](2026-07-16-v084-correction.md)

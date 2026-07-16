@@ -19,6 +19,24 @@ This boundary is defined by
 [DEC-0001](decisions/DEC-0001-portable-protocol-reference.md) and
 [DEC-0002](decisions/DEC-0002-project-local-memory.md).
 
+## Stability and consistency mandate
+
+A consumer receives the common stability and consistency mandate through its
+exact protocol pin. After a material development increment, the consumer uses
+the pinned protocol's one bounded full-project cycle: disposition observations,
+resolve dependency-ready `Blocking` findings in priority order with focused
+evidence and self-review, confirm convergence, push the converged review branch,
+and wait for new development or failed evidence. The converged push is not a
+tag or GitHub Release.
+
+The mandate remains common, while consumer-owned instructions, memory,
+features, decisions, and tests remain under consumer ownership. The generic
+submodule updater advances the protocol gitlink and its three managed updater
+assets only; it does not rewrite those project-owned records. A consumer pinned
+to an earlier release remains governed by that exact pin until its reviewed
+upgrade merges. Repository-reference consumers update their immutable ref
+manually or through their own reviewed provider adapter.
+
 For the shortest supported setup, follow the
 [quick adoption guide](quick-adoption.md). It creates or validates the GitHub
 repository, provisions the required secrets, publishes only the lifecycle
@@ -38,9 +56,9 @@ permission.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.8.6`, the only repository file required
+For a new submodule consumer on `v0.9.0`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.8.6/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -84,7 +102,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.8.6'
+$tag = 'v0.9.0'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -342,7 +360,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.8.6`
+- ref: `v0.9.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -387,11 +405,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.8.6`:
+before checkout; the current example then installs `v0.9.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.8.6
+git -C .ai/protocol checkout v0.9.0
 git add .ai/protocol
 ```
 
