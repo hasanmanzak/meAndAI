@@ -3,6 +3,25 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.4 - 2026-07-16
+
+### Fixed
+
+- Validate native Windows Codex workspace writes with a token-free sandbox
+  probe before semantic execution, and carry only the verified `elevated` or
+  `unelevated` mode across the isolated `--ignore-user-config` boundary.
+- Fall back from an unavailable elevated sandbox to the still-sandboxed
+  unelevated implementation, while blocking before a model call when neither
+  mode succeeds or a probe leaves residue.
+- Treat absent product facts in an empty consumer as `Not yet established`
+  instead of fabricating them or blocking structural protocol adoption.
+- Display truthful phase progress, indeterminate elapsed local-Codex work, and
+  deterministic cleanup, with `-NoProgress` available for noninteractive use.
+
+Related work: [FEAT-0019 / BUG-0007](docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md),
+[TEST-0103 and TEST-0104](docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md), and
+[issue #55](https://github.com/hasanmanzak/meAndAI/issues/55).
+
 ## 0.9.3 - 2026-07-16
 
 ### Fixed

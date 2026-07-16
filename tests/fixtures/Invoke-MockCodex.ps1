@@ -20,6 +20,48 @@ $mode = [Environment]::GetEnvironmentVariable('MEANDAI_TEST_CODEX_MODE')
 if (-not $mode) {
     $mode = 'Success'
 }
+if ($Arguments.Count -gt 0 -and $Arguments[0] -ceq 'sandbox') {
+    $sandboxMode = [Environment]::GetEnvironmentVariable(
+        'MEANDAI_TEST_CODEX_SANDBOX_MODE'
+    )
+    if (-not $sandboxMode) {
+        $sandboxMode = 'Success'
+    }
+    $argumentText = $Arguments -join "`n"
+    $selectedModeMatch = [regex]::Match(
+        $argumentText,
+        'windows\.sandbox=[\"''](?<mode>elevated|unelevated)[\"'']'
+    )
+    if (-not $selectedModeMatch.Success) {
+        [Console]::Error.WriteLine('Mock sandbox did not receive an explicit Windows mode.')
+        exit 1
+    }
+    $selectedMode = $selectedModeMatch.Groups['mode'].Value
+    if ($sandboxMode -ceq 'FailAll' -or
+        ($sandboxMode -ceq 'FailElevated' -and $selectedMode -ceq 'elevated')) {
+        [Console]::Error.WriteLine("Mock $selectedMode sandbox setup failed.")
+        exit 1
+    }
+    if ($sandboxMode -ceq 'Residue') {
+        $workingIndex = [Array]::IndexOf([object[]]$Arguments, '-C')
+        $probeMatch = [regex]::Match(
+            $argumentText,
+            '(?<name>\.meandai-codex-sandbox-probe-[0-9a-f]+\.tmp)'
+        )
+        if ($workingIndex -lt 0 -or $workingIndex + 1 -ge $Arguments.Count -or
+            -not $probeMatch.Success) {
+            [Console]::Error.WriteLine('Mock sandbox residue fixture is incomplete.')
+            exit 1
+        }
+        [IO.File]::WriteAllText(
+            (Join-Path $Arguments[$workingIndex + 1] $probeMatch.Groups['name'].Value),
+            'residue',
+            [Text.UTF8Encoding]::new($false)
+        )
+    }
+    [Console]::Out.WriteLine("Mock $selectedMode sandbox preflight completed.")
+    exit 0
+}
 if (($Arguments -join ' ') -eq 'login status') {
     if ($mode -ceq 'Unauthenticated') {
         [Console]::Error.WriteLine('Not logged in')
@@ -148,7 +190,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.9.3' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.9.4' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The live adoption PR metadata correction is tracked as
-[FEAT-0018](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md),
-[`TEST-0102`](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md),
-and the [v0.9.3 continuation](2026-07-16-v093-live-pr-metadata-correction.md).
-[Issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) owns delivery and
+The Windows sandbox and progress correction is tracked as
+[FEAT-0019](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md),
+[`TEST-0103` and `TEST-0104`](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md),
+and the [v0.9.4 continuation](2026-07-16-v094-windows-sandbox-progress.md).
+[Issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) owns delivery and
 future post-publication evidence. `FIND-0120` remains the separate open
 external follow-up in issue #44.
 
 ## History
 
+- [2026-07-16 - v0.9.4 Windows sandbox and progress correction](2026-07-16-v094-windows-sandbox-progress.md)
 - [2026-07-16 - v0.9.3 live PR metadata correction](2026-07-16-v093-live-pr-metadata-correction.md)
 - [2026-07-16 - Single-file quick adoption](2026-07-16-single-file-quick-adoption.md)
 - [2026-07-16 - No-origin existing-secret reuse](2026-07-16-no-origin-secret-reuse.md)

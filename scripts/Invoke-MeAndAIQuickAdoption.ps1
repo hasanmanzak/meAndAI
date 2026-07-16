@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.3',
+    [string]$ProtocolTag = 'v0.9.4',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -17,6 +17,7 @@ param(
     [switch]$SkipLifecycleDispatch,
     [Alias('SkipCodexDelegation')]
     [switch]$SkipLocalCodex,
+    [switch]$NoProgress,
     [string]$CodexCommand = '',
     [string]$TemporaryCodexVersion = '0.144.4'
 )
@@ -111,6 +112,77 @@ $adoptionLabels = @(
     [pscustomobject]@{ Name = 'status:in-progress'; Color = '1d76db'; Description = 'Implementation in progress' },
     [pscustomobject]@{ Name = 'status:needs-review'; Color = '5319e7'; Description = 'Ready for maintainer review' }
 )
+
+$script:QuickAdoptionProgressEnabled = -not $NoProgress
+$script:QuickAdoptionProgressId = 1901
+$script:QuickAdoptionChildProgressId = 1902
+
+function Set-QuickAdoptionProgress {
+    param(
+        [Parameter(Mandatory)][string]$Status,
+        [Parameter(Mandatory)][ValidateRange(0, 100)][int]$PercentComplete
+    )
+
+    if (-not $script:QuickAdoptionProgressEnabled) {
+        return
+    }
+    try {
+        Write-Progress -Id $script:QuickAdoptionProgressId `
+            -Activity 'meAndAI quick adoption' -Status $Status `
+            -PercentComplete $PercentComplete
+    }
+    catch {
+        # Progress rendering must never alter the adoption result.
+        $script:QuickAdoptionProgressEnabled = $false
+    }
+}
+
+function Set-QuickAdoptionChildProgress {
+    param(
+        [Parameter(Mandatory)][string]$Activity,
+        [Parameter(Mandatory)][string]$Status
+    )
+
+    if (-not $script:QuickAdoptionProgressEnabled) {
+        return
+    }
+    try {
+        Write-Progress -Id $script:QuickAdoptionChildProgressId -ParentId $script:QuickAdoptionProgressId -Activity $Activity -Status $Status -PercentComplete -1
+    }
+    catch {
+        $script:QuickAdoptionProgressEnabled = $false
+    }
+}
+
+function Complete-QuickAdoptionChildProgress {
+    if (-not $script:QuickAdoptionProgressEnabled) {
+        return
+    }
+    try {
+        Write-Progress -Id $script:QuickAdoptionChildProgressId `
+            -ParentId $script:QuickAdoptionProgressId -Activity 'Running local Codex' `
+            -Completed
+    }
+    catch {
+        $script:QuickAdoptionProgressEnabled = $false
+    }
+}
+
+function Complete-QuickAdoptionProgress {
+    if (-not $script:QuickAdoptionProgressEnabled) {
+        return
+    }
+    try {
+        Write-Progress -Id $script:QuickAdoptionChildProgressId `
+            -ParentId $script:QuickAdoptionProgressId -Activity 'Running local Codex' `
+            -Completed
+        Write-Progress -Id $script:QuickAdoptionProgressId `
+            -Activity 'meAndAI quick adoption' -Completed
+    }
+    catch {
+        # The main operation has already determined success or failure.
+    }
+}
 
 function Invoke-External {
     param(
@@ -1737,7 +1809,8 @@ function Invoke-BoundedProcess {
         [AllowEmptyString()][string]$StandardInput = '',
         [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$TimeoutMilliseconds,
         [Parameter(Mandatory)][string]$TimeoutDescription,
-        [Parameter(Mandatory)][string]$Operation
+        [Parameter(Mandatory)][string]$Operation,
+        [string]$ProgressActivity = ''
     )
 
     $allArguments = @($Runner.PrefixArguments) + @($Arguments)
@@ -1773,7 +1846,22 @@ function Invoke-BoundedProcess {
             $process.StandardInput.Write($StandardInput)
         }
         $process.StandardInput.Close()
-        if (-not $process.WaitForExit($TimeoutMilliseconds)) {
+        $completed = $false
+        $stopwatch = [Diagnostics.Stopwatch]::StartNew()
+        while (-not $completed -and $stopwatch.ElapsedMilliseconds -lt $TimeoutMilliseconds) {
+            $remaining = [int][Math]::Max(
+                1,
+                [Math]::Min(1000, $TimeoutMilliseconds - $stopwatch.ElapsedMilliseconds)
+            )
+            $completed = $process.WaitForExit($remaining)
+            if (-not $completed -and $ProgressActivity) {
+                $elapsed = [Math]::Floor($stopwatch.Elapsed.TotalSeconds)
+                Set-QuickAdoptionChildProgress -Activity $ProgressActivity `
+                    -Status "Elapsed: $elapsed second(s); limit: $TimeoutDescription"
+            }
+        }
+        $stopwatch.Stop()
+        if (-not $completed) {
             try {
                 $process.Kill($true)
             }
@@ -1802,6 +1890,9 @@ function Invoke-BoundedProcess {
         }
     }
     finally {
+        if ($ProgressActivity) {
+            Complete-QuickAdoptionChildProgress
+        }
         $process.Dispose()
     }
 }
@@ -1833,6 +1924,132 @@ function Assert-LocalCodexLogin {
     }
 }
 
+function Get-ConfiguredWindowsSandboxMode {
+    if ($env:OS -cne 'Windows_NT') {
+        return ''
+    }
+
+    $codexHome = [Environment]::GetEnvironmentVariable('CODEX_HOME', 'Process')
+    if ([string]::IsNullOrWhiteSpace($codexHome)) {
+        $userProfile = [Environment]::GetFolderPath(
+            [Environment+SpecialFolder]::UserProfile
+        )
+        $codexHome = Join-Path $userProfile '.codex'
+    }
+    $configPath = Join-Path $codexHome 'config.toml'
+    if (-not (Test-Path -LiteralPath $configPath -PathType Leaf)) {
+        return 'elevated'
+    }
+
+    $insideWindowsSection = $false
+    $values = [System.Collections.Generic.List[string]]::new()
+    foreach ($rawLine in [IO.File]::ReadAllLines($configPath)) {
+        $line = $rawLine.Trim()
+        if (-not $line -or $line.StartsWith('#', [StringComparison]::Ordinal)) {
+            continue
+        }
+        $section = [regex]::Match($line, '^\[(?<name>[^\]]+)\]\s*(?:#.*)?$')
+        if ($section.Success) {
+            $insideWindowsSection = $section.Groups['name'].Value.Trim() -ceq 'windows'
+            continue
+        }
+        if (-not $insideWindowsSection) {
+            continue
+        }
+        $sandbox = [regex]::Match(
+            $line,
+            '^sandbox\s*=\s*[\"''](?<value>[^\"'']+)[\"'']\s*(?:#.*)?$'
+        )
+        if ($sandbox.Success) {
+            $values.Add($sandbox.Groups['value'].Value)
+            continue
+        }
+        if ($line -match '^sandbox\s*=') {
+            throw "Codex config '$configPath' contains an invalid [windows].sandbox value."
+        }
+    }
+
+    if ($values.Count -eq 0) {
+        return 'elevated'
+    }
+    if ($values.Count -ne 1 -or $values[0] -cnotin @('elevated', 'unelevated')) {
+        throw "Codex config '$configPath' must contain at most one supported [windows].sandbox value."
+    }
+    return $values[0]
+}
+
+function Assert-LocalCodexWorkspaceWrite {
+    param(
+        [Parameter(Mandatory)]$Runner,
+        [Parameter(Mandatory)][string]$WorkingDirectory,
+        [Parameter(Mandatory)][int]$TimeoutMilliseconds
+    )
+
+    if ($env:OS -cne 'Windows_NT') {
+        return ''
+    }
+
+    $preferredMode = Get-ConfiguredWindowsSandboxMode
+    $candidateModes = if ($preferredMode -ceq 'elevated') {
+        @('elevated', 'unelevated')
+    }
+    else {
+        @('unelevated')
+    }
+    $probeTimeout = [int][Math]::Min($TimeoutMilliseconds, 60000)
+    $probeTimeoutDescription = "$([Math]::Ceiling($probeTimeout / 1000.0)) second(s)"
+    $failures = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($mode in $candidateModes) {
+        $probeName = ".meandai-codex-sandbox-probe-$([guid]::NewGuid().ToString('N')).tmp"
+        $probePath = Join-Path $WorkingDirectory $probeName
+        $probeScript = @(
+            '$ErrorActionPreference = ''Stop'''
+            '$probe = Join-Path (Get-Location).Path ''__MEANDAI_PROBE_NAME__'''
+            '[IO.File]::WriteAllText($probe, ''meandai-workspace-write-probe'', [Text.UTF8Encoding]::new($false))'
+            'if ([IO.File]::ReadAllText($probe) -cne ''meandai-workspace-write-probe'') { throw ''probe verification failed'' }'
+            '[IO.File]::Delete($probe)'
+        ) -join '; '
+        $probeScript = $probeScript.Replace('__MEANDAI_PROBE_NAME__', $probeName)
+        $result = $null
+        try {
+            $result = Invoke-BoundedProcess -Runner $Runner -Arguments @(
+                'sandbox', '--config', "windows.sandbox=`"$mode`"",
+                '-P', ':workspace', '-C', $WorkingDirectory,
+                'powershell.exe', '-NoProfile', '-NonInteractive',
+                '-Command', $probeScript
+            ) -TimeoutMilliseconds $probeTimeout `
+                -TimeoutDescription $probeTimeoutDescription `
+                -Operation "Local Codex $mode Windows sandbox workspace-write preflight"
+        }
+        catch {
+            $failures.Add("${mode}: $($_.Exception.Message)")
+        }
+
+        $residue = Test-Path -LiteralPath $probePath
+        if ($residue) {
+            Remove-Item -LiteralPath $probePath -Force -ErrorAction SilentlyContinue
+        }
+        if ($null -ne $result -and $result.ExitCode -eq 0 -and -not $residue) {
+            if ($mode -cne $preferredMode) {
+                Write-Warning "Local Codex '$preferredMode' Windows sandbox failed its token-free workspace-write preflight; using '$mode' for this run."
+            }
+            Write-Host "Local Codex sandbox preflight succeeded with Windows '$mode' mode."
+            return $mode
+        }
+        if ($null -ne $result) {
+            $detail = Get-ProcessFailureDetail -Result $result
+            if ($residue) {
+                $detail = "Sandbox left its probe file behind. $detail".Trim()
+            }
+            $failures.Add("${mode}: exit $($result.ExitCode). $detail".Trim())
+        }
+    }
+
+    $failureText = (@($failures) -join ' | ')
+    throw "Local Codex cannot write inside its native Windows workspace sandbox; semantic adoption was not started. Verify the Codex [windows].sandbox configuration or run Codex sandbox setup, then rerun. $failureText"
+}
+
 function Invoke-LocalCodexExec {
     param(
         [Parameter(Mandatory)]$Runner,
@@ -1840,7 +2057,8 @@ function Invoke-LocalCodexExec {
         [Parameter(Mandatory)][string]$Prompt,
         [Parameter(Mandatory)][string]$OutputPath,
         [Parameter(Mandatory)][int]$TimeoutMilliseconds,
-        [Parameter(Mandatory)][string]$TimeoutDescription
+        [Parameter(Mandatory)][string]$TimeoutDescription,
+        [string]$WindowsSandboxMode = ''
     )
 
     # codex exec receives the scoped prompt through stdin and is bounded by the launcher.
@@ -1851,7 +2069,12 @@ function Invoke-LocalCodexExec {
         '--sandbox', 'workspace-write',
         '--config', 'approval_policy="never"',
         '--config', 'sandbox_workspace_write.network_access=false',
-        '--config', 'shell_environment_policy.inherit="core"',
+        '--config', 'shell_environment_policy.inherit="core"'
+    )
+    if ($WindowsSandboxMode) {
+        $arguments += @('--config', "windows.sandbox=`"$WindowsSandboxMode`"")
+    }
+    $arguments += @(
         '--cd', $WorkingDirectory,
         '--output-last-message', $OutputPath,
         '-'
@@ -1860,7 +2083,8 @@ function Invoke-LocalCodexExec {
     $result = Invoke-BoundedProcess -Runner $Runner -Arguments $arguments `
         -StandardInput $Prompt -TimeoutMilliseconds $TimeoutMilliseconds `
         -TimeoutDescription $TimeoutDescription `
-        -Operation 'Local Codex adoption execution'
+        -Operation 'Local Codex adoption execution' `
+        -ProgressActivity 'Running local Codex'
     if ($result.ExitCode -ne 0) {
         $detail = Get-ProcessFailureDetail -Result $result
         throw "Local Codex exited with code $($result.ExitCode). $detail"
@@ -2215,11 +2439,14 @@ function Invoke-AdoptionCodexCompletion {
     Assert-LocalCodexLogin -Runner $runner `
         -TimeoutMilliseconds $timeoutMilliseconds `
         -TimeoutDescription $timeoutDescription
+    $windowsSandboxMode = Assert-LocalCodexWorkspaceWrite -Runner $runner `
+        -WorkingDirectory $ClonePath `
+        -TimeoutMilliseconds $timeoutMilliseconds
     $resultPath = Join-Path $TemporaryRoot 'codex-result.txt'
     $prompt = @"
 Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($PullRequest.number) in this isolated temporary clone.
 
-Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts; if required facts are unavailable, stop as blocked. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($Manifest.protocolSha); never substitute a moving ref.
+Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($Manifest.protocolSha); never substitute a moving ref.
 
 Secret provisioning is already complete: FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and MEANDAI_RO_FG_PAT.txt maps to MEANDAI_PROTOCOL_TOKEN. Those source files are intentionally absent. Do not search for, request, print, recreate, or modify credential values or repository secrets.
 
@@ -2232,7 +2459,8 @@ Your final response must start with MEANDAI_ADOPTION_READY only when the manifes
     Invoke-LocalCodexExec -Runner $runner -WorkingDirectory $ClonePath `
         -Prompt $prompt -OutputPath $resultPath `
         -TimeoutMilliseconds $timeoutMilliseconds `
-        -TimeoutDescription $timeoutDescription
+        -TimeoutDescription $timeoutDescription `
+        -WindowsSandboxMode $windowsSandboxMode
     if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) {
         throw 'Local Codex completed without a final result file.'
     }
@@ -2421,6 +2649,8 @@ function Complete-AdoptionWithLocalCodex {
         $codexCompletion = Invoke-AdoptionCodexCompletion -Repository $Repository `
             -PullRequest $PullRequest -Manifest $manifest -ProtocolSource $protocolSource `
             -ClonePath $clonePath -TemporaryRoot $temporaryRoot -AdoptionIssue $adoptionIssue
+        Set-QuickAdoptionProgress -Status 'Validating and publishing adoption' `
+            -PercentComplete 92
         $runner = $codexCompletion.Runner
         $result = [string]$codexCompletion.Result
 
@@ -2507,6 +2737,8 @@ function Complete-AdoptionWithLocalCodex {
     }
 }
 
+Set-QuickAdoptionProgress -Status 'Validating prerequisites' -PercentComplete 5
+try {
 foreach ($command in @('git', 'gh')) {
     if (-not (Get-Command $command -ErrorAction SilentlyContinue)) {
         throw "Required command '$command' is not available."
@@ -2519,6 +2751,8 @@ if (-not (Test-Path -LiteralPath $target -PathType Container)) {
 }
 
 Invoke-External -Command 'gh' -Arguments @('auth', 'status') | Out-Null
+
+Set-QuickAdoptionProgress -Status 'Inspecting repository state' -PercentComplete 15
 
 $inside = Invoke-Git -Repository $target -Arguments @('rev-parse', '--is-inside-work-tree') -AllowFailure
 if ($inside.ExitCode -eq 0 -and ((@($inside.Output) -join '').Trim() -eq 'true')) {
@@ -2563,6 +2797,9 @@ if ($hasRemote) {
 # classification. File presence is evaluated separately after identity tells
 # us whether the target repository can already own the mapped secrets.
 Assert-TokenFilesAreLocalOnly -Repository $target
+
+Set-QuickAdoptionProgress -Status 'Verifying immutable protocol release' `
+    -PercentComplete 30
 
 if (-not $hasRemote -and $hasHead) {
     throw "A repository with commits but no '$RemoteName' is outside the safe new-repository flow. Connect and reconcile it manually."
@@ -2814,6 +3051,8 @@ if (Test-Path -LiteralPath $workflowFullPath) {
     }
 }
 
+Set-QuickAdoptionProgress -Status 'Reconciling repository secrets' `
+    -PercentComplete 45
 $secretLock = Enter-RepositorySecretReconciliationLock -Repository $repository
 $secretOperationError = $null
 $secretLockCleanupError = $null
@@ -2878,6 +3117,8 @@ if ($null -ne $secretLockCleanupError) {
     throw $secretLockCleanupError
 }
 
+Set-QuickAdoptionProgress -Status 'Publishing canonical seed workflow' `
+    -PercentComplete 58
 [void](Write-CanonicalWorkflow -Path $workflowFullPath -Bytes $workflowBytes)
 
 Invoke-Git -Repository $target -Arguments @('add', '--', $workflowTargetPath) | Out-Null
@@ -2938,8 +3179,12 @@ else {
         Write-Host 'A launcher-owned completion transition already exists; lifecycle dispatch was not repeated.'
     }
     else {
+        Set-QuickAdoptionProgress -Status 'Waiting for lifecycle workflow' `
+            -PercentComplete 70
         $run = Invoke-LifecycleWorkflow -Repository $repository -Branch $defaultBranch -HeadSha $publishedHead
         Write-Host "Lifecycle workflow completed successfully: $($run.url)"
+        Set-QuickAdoptionProgress -Status 'Resolving adoption draft' `
+            -PercentComplete 78
         $adoptionPullRequestResults = @(Get-AdoptionPullRequest -Repository $repository `
             -BaseBranch $defaultBranch -ExpectedActor $authenticatedActor)
     }
@@ -2966,6 +3211,8 @@ else {
             Write-Host 'Local Codex execution was explicitly skipped; use the quick-guide prompt in an isolated checkout of this draft.'
         }
         else {
+            Set-QuickAdoptionProgress -Status 'Running local Codex' `
+                -PercentComplete 84
             $completion = Complete-AdoptionWithLocalCodex -TargetRepository $target `
                 -Repository $repository -PullRequest $adoptionPullRequest `
                 -CanonicalBaseHead $publishedHead -ProtocolToken $protocolToken
@@ -2986,4 +3233,9 @@ else {
     }
 }
 
+Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
 Write-Host 'The launcher never approves or merges the adoption pull request; the maintainer owns the final merge.'
+}
+finally {
+    Complete-QuickAdoptionProgress
+}

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.9.3**<br>
+Protocol version: **0.9.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -573,6 +573,16 @@ prompt, command arguments, output, or project memory. An installed CLI is
 preferred; a temporary fallback MUST be version-pinned and MUST NOT perform a
 global installation.
 
+On native Windows, the launcher MUST perform a token-free workspace-write
+probe through `codex sandbox` before any semantic model execution and MUST pass
+only the verified Windows sandbox mode to the isolated `codex exec` run. It
+MAY fall back from a failed `elevated` probe to `unelevated`, but it MUST report
+that fallback and MUST block when no supported mode can create, verify, and
+remove the probe file. It MUST NOT obtain write access by selecting a
+full-access or sandbox-bypass mode. Progress reporting MUST reflect actual
+launcher phases; work with no measurable completion fraction is indeterminate
+and the display MAY be suppressed without changing behavior.
+
 Before local semantic work, the launcher MUST idempotently reconcile the common
 Agile labels and one canonically marked, project-owned adoption issue through
 its authenticated GitHub boundary. Ownership requires exactly one parsed
@@ -592,6 +602,12 @@ completion provenance is unknown. Missing or ambiguous workflow runs, drafts,
 local CLI authentication, semantic results, or branch ownership MUST block or
 leave a clear manual handoff. Neither launcher nor agent may approve or merge
 the pull request.
+
+For a consumer with no application source or product documentation, unavailable
+product purpose, runtime/stack, architecture, build command, and product test
+command MUST be recorded as `Not yet established`. Their absence MUST NOT by
+itself block protocol adoption, and the agent MUST use structural adoption
+checks without inventing product facts or behavior.
 
 When completion spans a remote head update and a later ownership-marker or
 pull-request update, the launcher MUST persist exact pre-push intent that binds
