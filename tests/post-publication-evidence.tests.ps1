@@ -3,6 +3,8 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
 $verifierPath = Join-Path $root 'tests/Verify-PostPublicationEvidence.ps1'
 $failures = [System.Collections.Generic.List[string]]::new()
 $global:MeAndAIPostPublicationMode = 'Valid'
@@ -225,3 +227,7 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'Post-publication verifier tests passed without claiming published-state evidence.' `
     -ForegroundColor Green
+$scenarioResult = New-MeAndAIScenarioResult `
+    -Owner 'tests/post-publication-evidence.tests.ps1' `
+    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

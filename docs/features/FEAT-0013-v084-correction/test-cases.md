@@ -32,7 +32,7 @@ Implementations:
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
-| 2026-07-16 | Immutable v0.8.3 commit `7ec7f83c7190c3f064a3c572e7e30d29ea1e5454` | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Baseline passed in 273.3 seconds but did not prove TEST-0077 through TEST-0085; ten blocking findings and one external follow-up remained |
+| 2026-07-16 | Immutable v0.8.3 commit `7ec7f83c7190c3f064a3c572e7e30d29ea1e5454` | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Baseline passed in 273.3 seconds but did not prove TEST-0077 through TEST-0085; nine `Blocking` findings, one `OptionalImprovement`, and one `ExternalOrLegacyFollowUp` remained |
 | 2026-07-16 | FEAT-0013 working tree before the shared-path self-review correction | Windows PowerShell 5.1 outside the restricted Git signal-pipe sandbox | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Passed in 357.4 seconds; the later complete suite revalidated the shared-path correction |
 | 2026-07-16 | FEAT-0013 final working tree | Windows PowerShell 5.1 outside the restricted Git signal-pipe sandbox | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | All discovered suites passed in 352 seconds; no unresolved `Blocking` finding remained |
 | Pending | Merged v0.8.4 commit | GitHub Actions | Hosted CI and post-publication verifier | Pending; exact facts belong to issue #41 and the GitHub Release |

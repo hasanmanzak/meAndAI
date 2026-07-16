@@ -3,6 +3,28 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.8.5 - 2026-07-16
+
+### Fixed
+
+- Reject linked, reparse, or escaping managed-path ancestors before launcher
+  credential mutation or bootstrap filesystem writes, and apply one exact
+  completed-publication contract before proposal retention or readiness.
+- Use the protocol's unbounded ASCII/no-leading-zero version grammar at runtime,
+  execute every declared boundary variant, and require independently derived
+  workflow dispatch and run identity.
+- Make scenario ownership depend on observable per-scenario results rather than
+  suite exit alone, and reconcile finding counts, version wording, canonical
+  GitHub links, and the durable external follow-up projection.
+
+The unavailable private-repository `main` protection remains open as
+`RISK-0076` / `FIND-0120`; this correction tracks it separately and does not
+change repository visibility.
+
+Related work: [FEAT-0014](docs/features/FEAT-0014-v085-convergence/README.md),
+[DEC-0014](docs/decisions/DEC-0014-contained-adoption-and-observable-evidence.md),
+and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
+
 ## 0.8.4 - 2026-07-16
 
 ### Fixed

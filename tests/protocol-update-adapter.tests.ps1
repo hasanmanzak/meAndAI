@@ -332,6 +332,11 @@ function global:gh {
         if ($arguments -cnotcontains 'X-GitHub-Api-Version: 2026-03-10') {
             throw 'Immutable release lookup omitted the required GitHub API version.'
         }
+        if ($script:Scenario.ReleaseMode -ceq 'Missing') {
+            $global:LASTEXITCODE = 1
+            'HTTP 404: release not found'
+            return
+        }
         $release = [ordered]@{
             tag_name = if ($script:Scenario.ReleaseMode -ceq 'WrongTag') { 'v0.2.0' } else { 'v0.3.0' }
             draft = $script:Scenario.ReleaseMode -ceq 'Draft'
@@ -597,7 +602,7 @@ function Invoke-AdapterScenario {
         [bool]$ReservedOrphanBranchExists = $false,
         [bool]$ReservedNamespaceRace = $false,
         [int]$LeadingUnmanagedCount = 0,
-        [ValidateSet('Valid', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')]
+        [ValidateSet('Valid', 'Missing', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')]
         [string]$ReleaseMode = 'Valid',
         [ValidateSet('Lightweight', 'Annotated', 'Nested')]
         [string]$ReleaseTagMode = 'Lightweight',
@@ -855,11 +860,15 @@ if ($pendingLatest.Threw -or
     (Get-EventIndex $pendingLatest 'checkout-target-assets') -ge 0) {
     Add-Failure "TEST-0061 zero-operation latest proposal skipped release proof or mutated state: $($pendingLatest.Error)"
 }
-foreach ($releaseMode in @('Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')) {
+foreach ($releaseMode in @('Missing', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')) {
     $invalidRelease = Invoke-AdapterScenario -Name "release-$releaseMode" `
         -ReleaseMode $releaseMode
+    $expectedReleaseError = if ($releaseMode -ceq 'Missing') {
+        '*HTTP 404: release not found*'
+    }
+    else { '*published, non-prerelease, immutable GitHub Release*' }
     if (-not $invalidRelease.Threw -or
-        $invalidRelease.Error -notlike '*published, non-prerelease, immutable GitHub Release*') {
+        $invalidRelease.Error -notlike $expectedReleaseError) {
         Add-Failure "TEST-0056 $releaseMode target release did not fail closed: $($invalidRelease.Error)"
     }
     foreach ($forbiddenEvent in @(

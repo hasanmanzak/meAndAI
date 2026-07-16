@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.8.4',
+    [string]$TargetTag = 'v0.8.5',
     [string]$BranchPrefix = 'automation/meandai-capabilities-',
     [switch]$ValidateLocalUpdaterOnly
 )
@@ -97,6 +97,67 @@ function Invoke-Native {
         throw "$Command $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
     }
     return @($output)
+}
+
+function Assert-ContainedManagedDestination {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$RelativePath
+    )
+
+    if ([IO.Path]::IsPathRooted($RelativePath)) {
+        throw "Managed destination '$RelativePath' must be relative to the repository root."
+    }
+    $segments = @($RelativePath -split '[\\/]')
+    if ($segments.Count -eq 0 -or
+        @($segments | Where-Object { $_ -ceq '' -or $_ -ceq '.' -or $_ -ceq '..' }).Count -gt 0) {
+        throw "Managed destination '$RelativePath' is not a canonical repository-relative path."
+    }
+
+    $rootPath = [IO.Path]::GetFullPath($Root)
+    $relativePlatformPath = $segments -join [IO.Path]::DirectorySeparatorChar
+    $destination = [IO.Path]::GetFullPath((Join-Path $rootPath $relativePlatformPath))
+    $comparison = if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        [StringComparison]::OrdinalIgnoreCase
+    }
+    else { [StringComparison]::Ordinal }
+    $rootPrefix = if ($rootPath.EndsWith([string][IO.Path]::DirectorySeparatorChar) -or
+        $rootPath.EndsWith([string][IO.Path]::AltDirectorySeparatorChar)) {
+        $rootPath
+    }
+    else { $rootPath + [IO.Path]::DirectorySeparatorChar }
+    if (-not $destination.StartsWith($rootPrefix, $comparison)) {
+        throw "Managed destination '$RelativePath' escapes the repository root."
+    }
+
+    $current = $rootPath
+    for ($index = 0; $index -lt $segments.Count; $index++) {
+        $current = Join-Path $current $segments[$index]
+        try {
+            $item = Get-Item -LiteralPath $current -Force -ErrorAction Stop
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            continue
+        }
+        catch {
+            throw "Managed destination '$RelativePath' could not be inspected safely: $($_.Exception.Message)"
+        }
+
+        $linkTypeProperty = $item.PSObject.Properties['LinkType']
+        $isLink = $null -ne $linkTypeProperty -and
+            -not [string]::IsNullOrEmpty([string]$linkTypeProperty.Value)
+        $isReparsePoint = ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0
+        if ($isLink -or $isReparsePoint) {
+            $component = @($segments[0..$index]) -join '/'
+            throw "Managed destination '$RelativePath' traverses linked or reparse-point path '$component'."
+        }
+        if ($index -lt ($segments.Count - 1) -and -not $item.PSIsContainer) {
+            $component = @($segments[0..$index]) -join '/'
+            throw "Managed destination '$RelativePath' traverses non-directory path '$component'."
+        }
+    }
+
+    return $destination
 }
 
 function Test-ExactOrdinalSequence {
@@ -376,17 +437,20 @@ function Test-ExactAdoptionTree {
         [string]$BaseHead,
         [string]$TargetSha,
         [string]$ProposalMode,
-        [string]$SourcePath
+        [string]$SourcePath,
+        [switch]$SkipRemoteFetch
     )
 
-    Invoke-Native -Command 'git' -Arguments @(
-        'fetch', '--no-tags', 'origin', "refs/heads/$Branch"
-    ) | Out-Null
-    $fetchedHead = ((Invoke-Native -Command 'git' -Arguments @(
-        'rev-parse', 'FETCH_HEAD'
-    )) -join '').Trim()
-    if ($fetchedHead -cne $RemoteHead) {
-        return $false
+    if (-not $SkipRemoteFetch) {
+        Invoke-Native -Command 'git' -Arguments @(
+            'fetch', '--no-tags', 'origin', "refs/heads/$Branch"
+        ) | Out-Null
+        $fetchedHead = ((Invoke-Native -Command 'git' -Arguments @(
+            'rev-parse', 'FETCH_HEAD'
+        )) -join '').Trim()
+        if ($fetchedHead -cne $RemoteHead) {
+            return $false
+        }
     }
     $ancestry = (((Invoke-Native -Command 'git' -Arguments @(
         'rev-list', '--parents', '-n', '1', $RemoteHead
@@ -549,10 +613,14 @@ function Test-ExactCompletedAdoptionProposal {
         [string]$Repository,
         [string]$Branch,
         [string]$BaseBranch,
+        [string]$BaseHead,
         [string]$TargetTag,
         [string]$TargetSha,
         [string]$ExpectedActor,
         [string]$ExpectedState,
+        [string]$ProposalMode,
+        [string[]]$Collisions,
+        [string[]]$TargetPaths,
         [string]$SourcePath
     )
 
@@ -577,6 +645,49 @@ function Test-ExactCompletedAdoptionProposal {
     if ($fetchedHead -cne $RemoteHead) {
         return $false
     }
+
+    $ancestry = (((Invoke-Native -Command 'git' -Arguments @(
+        'rev-list', '--parents', '-n', '1', $RemoteHead
+    )) -join '').Trim() -split '\s+')
+    if ($ancestry.Count -ne 2 -or $ancestry[0] -cne $RemoteHead -or
+        $ancestry[1] -cnotmatch '^[0-9a-f]{40}$') {
+        return $false
+    }
+    $proposalHead = [string]$ancestry[1]
+    if (-not (Test-ExactAdoptionTree -RemoteHead $proposalHead -Branch $Branch `
+        -BaseHead $BaseHead -TargetSha $TargetSha -ProposalMode $ProposalMode `
+        -SourcePath $SourcePath -SkipRemoteFetch)) {
+        return $false
+    }
+    if (-not (Test-ExactAdoptionManifest -RemoteHead $proposalHead `
+        -Repository $Repository -TargetTag $TargetTag -TargetSha $TargetSha `
+        -ExpectedState $ExpectedState -Collisions $Collisions `
+        -TargetPaths $TargetPaths)) {
+        return $false
+    }
+
+    Invoke-Native -Command 'git' -Arguments @(
+        'diff', '--check', $proposalHead, $RemoteHead, '--'
+    ) | Out-Null
+    $completedChangedPaths = @(Invoke-Native -Command 'git' -Arguments @(
+        'diff', '--no-renames', '--name-only', '--diff-filter=ACMRTD',
+        $proposalHead, $RemoteHead, '--'
+    ) | ForEach-Object { [string]$_ })
+    if ($completedChangedPaths.Count -eq 0) {
+        return $false
+    }
+    $protectedPaths = @([string]$SeedWorkflow.ConsumerPath) + @(
+        'FG_PAT.txt', 'MEANDAI_RO_FG_PAT.txt'
+    )
+    if (@($protectedPaths | Where-Object {
+        $completedChangedPaths -ccontains $_
+    }).Count -gt 0 -or
+        @($completedChangedPaths | Where-Object {
+            $_ -clike "$ProtocolPath/*"
+        }).Count -gt 0) {
+        return $false
+    }
+
     $manifestEntry = Get-TreeEntry -RepositoryPath $workspace `
         -Commit $RemoteHead -Path $ManifestPath
     $protocolEntry = Get-TreeEntry -RepositoryPath $workspace `
@@ -595,6 +706,56 @@ function Test-ExactCompletedAdoptionProposal {
         $sourceSeed.Type -cne 'blob' -or
         $completedSeed.Sha -cne $sourceSeed.Sha) {
         return $false
+    }
+
+    foreach ($credentialPath in @('FG_PAT.txt', 'MEANDAI_RO_FG_PAT.txt')) {
+        $credentialEntry = Get-TreeEntry -RepositoryPath $workspace `
+            -Commit $RemoteHead -Path $credentialPath
+        if ($credentialEntry.Path) {
+            return $false
+        }
+    }
+    try {
+        $gitmodulesBlob = "${RemoteHead}:.gitmodules"
+        $protocolModulePath = @(Invoke-Native -Command 'git' -Arguments @(
+            'config', '--blob', $gitmodulesBlob, '--get-all',
+            "submodule.${ProtocolPath}.path"
+        ) | ForEach-Object { [string]$_ })
+        $protocolModuleUrl = @(Invoke-Native -Command 'git' -Arguments @(
+            'config', '--blob', $gitmodulesBlob, '--get-all',
+            "submodule.${ProtocolPath}.url"
+        ) | ForEach-Object { [string]$_ })
+        $protocolModuleEntries = @(Invoke-Native -Command 'git' -Arguments @(
+            'config', '--blob', $gitmodulesBlob, '--get-regexp',
+            ('^' + [regex]::Escape("submodule.$ProtocolPath."))
+        ) | ForEach-Object { [string]$_ })
+    }
+    catch {
+        return $false
+    }
+    if ($protocolModulePath.Count -ne 1 -or
+        $protocolModulePath[0] -cne $ProtocolPath -or
+        $protocolModuleUrl.Count -ne 1 -or
+        $protocolModuleUrl[0] -cne "https://github.com/$ProtocolRepository.git" -or
+        $protocolModuleEntries.Count -ne 2) {
+        return $false
+    }
+
+    if ($LocalUpdaterAssets.Count -ne 2) {
+        return $false
+    }
+    foreach ($asset in $LocalUpdaterAssets) {
+        $sourceEntry = Get-TreeEntry -RepositoryPath $SourcePath `
+            -Commit $TargetSha -Path ([string]$asset.TemplatePath)
+        $completedEntry = Get-TreeEntry -RepositoryPath $workspace `
+            -Commit $RemoteHead -Path ([string]$asset.ConsumerPath)
+        if ($sourceEntry.Mode -cne '100644' -or
+            $sourceEntry.Type -cne 'blob' -or
+            $completedEntry.Mode -cne $sourceEntry.Mode -or
+            $completedEntry.Type -cne $sourceEntry.Type -or
+            $completedEntry.Sha -cne $sourceEntry.Sha) {
+            return $false
+        }
     }
     return Test-ExactAdoptionContinuity -PullRequest $pullRequest `
         -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch
@@ -627,6 +788,9 @@ function Assert-StagedProposal {
         [string]$TargetSha
     )
 
+    Invoke-Native -Command 'git' -Arguments @(
+        'diff', '--cached', '--check'
+    ) | Out-Null
     $stagedPaths = @(Invoke-Native -Command 'git' -Arguments @(
         'diff', '--cached', '--no-renames', '--name-only'
     ))
@@ -847,9 +1011,11 @@ $existingProposalValid = if ($proposalContract.State -cin @(
     else {
         Test-ExactCompletedAdoptionProposal -PullRequests $pullRequests `
             -RemoteHead $remoteBranchHead -Repository $env:GITHUB_REPOSITORY `
-            -Branch $branch -BaseBranch $env:DEFAULT_BRANCH `
+            -Branch $branch -BaseBranch $env:DEFAULT_BRANCH -BaseHead $baseHead `
             -TargetTag $TargetTag -TargetSha $targetSha -ExpectedActor $actor `
             -ExpectedState ([string]$proposalContract.State) `
+            -ProposalMode ([string]$proposalContract.ProposalMode) `
+            -Collisions @($collisions) -TargetPaths $targetPaths `
             -SourcePath $sourcePath
     }
 }
@@ -902,6 +1068,20 @@ foreach ($asset in $AdoptionAssets) {
     }
 }
 
+$managedWritePaths = if ([string]$plan.ProposalMode -ceq 'Full') {
+    @($targetPaths) + @($ManifestPath)
+}
+elseif ([string]$plan.ProposalMode -ceq 'ManifestOnly') {
+    @($ManifestPath)
+}
+else {
+    throw "Unsupported adoption proposal mode '$($plan.ProposalMode)'."
+}
+foreach ($managedWritePath in $managedWritePaths) {
+    [void](Assert-ContainedManagedDestination `
+        -Root $workspace -RelativePath ([string]$managedWritePath))
+}
+
 Invoke-Native -Command 'git' -Arguments @('switch', '-c', $branch) | Out-Null
 $stagedPaths = [System.Collections.Generic.List[string]]::new()
 if ($plan.State -ceq 'BootstrapReady') {
@@ -941,7 +1121,7 @@ $manifest = [ordered]@{
     proposedPaths = $proposedPaths
     requiredTasks = $RequiredTasks
 }
-$manifestText = ($manifest | ConvertTo-Json -Depth 5) + "`n"
+$manifestText = ($manifest | ConvertTo-Json -Depth 5 -Compress) + "`n"
 Write-Utf8NoBom -Path (Join-Path $workspace $ManifestPath) -Content $manifestText
 $stagedPaths.Add($ManifestPath)
 

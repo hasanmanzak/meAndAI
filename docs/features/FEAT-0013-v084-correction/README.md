@@ -5,7 +5,8 @@
 | Classification | Feature correction |
 | Status | Complete |
 | Target version | 0.8.4 |
-| Issue and post-publication authority | [#41](https://github.com/hasanmanzak/meAndAI/issues/41) |
+| Historical delivery and post-publication authority | [#41](https://github.com/hasanmanzak/meAndAI/issues/41) |
+| Open external follow-up | [`FIND-0120` / #44](https://github.com/hasanmanzak/meAndAI/issues/44) |
 | Pull request | [#42](https://github.com/hasanmanzak/meAndAI/pull/42) |
 | Decision | [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
 | Tests | [TEST-0077 through TEST-0085](test-cases.md) |
@@ -76,7 +77,7 @@ add another bootstrapper, validator layer, service, or scan loop.
 | `RISK-0073` | Credential side effect | A rejected seed can still leave a secret write behind | Mitigated / launcher owner | Read-only seed preflight before lock or secrets and `TEST-0078` |
 | `RISK-0074` | Interrupted state transition | Push can succeed before the completion marker records the new head | Mitigated / launcher owner | Recoverable intent state and `TEST-0079` |
 | `RISK-0075` | Evidence integrity | Weak manifest checks, overstated fixtures, or first-page-only evidence can produce false closure | Mitigated / test and release owners | `TEST-0080` through `TEST-0083` |
-| `RISK-0076` | External repository control | The private repository's `main` branch is not protected under the current GitHub capability | Open `ExternalOrLegacyFollowUp` / maintainer | On 2026-07-16 the repository API reported `protected=false`; branch-protection and ruleset APIs returned HTTP 403 with the private-plan/public-repository limitation. Review when the repository becomes public or the account gains a plan that supports the control; do not change visibility as part of this feature. |
+| `RISK-0076` | External repository control | The private repository's `main` branch is not protected under the current GitHub capability | Open `ExternalOrLegacyFollowUp` / maintainer | Tracked by [`FIND-0120` / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). On 2026-07-16 the repository API reported `protected=false`; branch-protection and ruleset APIs returned HTTP 403 with the private-plan/public-repository limitation. Review when the repository becomes public or the account gains a plan that supports the control; do not change visibility as part of this feature. |
 
 ## Declared scan boundary and finite budget
 
@@ -119,7 +120,9 @@ add another bootstrapper, validator layer, service, or scan loop.
    defect/risk/improvement classification separately.
 9. Executable version tests cover valid and invalid `M.m.rev` boundaries.
 10. Completed feature scenario documents describe implemented evidence, while
-    `RISK-0076` remains visible with its owner and review condition.
+    `RISK-0076` remains visible with its owner, open
+    [`FIND-0120` follow-up](https://github.com/hasanmanzak/meAndAI/issues/44),
+    and review condition.
 
 ## Findings register
 
@@ -138,7 +141,7 @@ post-publication evidence.
 | `FIND-0117` | Verified defect - external evidence | Medium / High | The verifier requested only the first 100 issue comments, while its mock allowed issue-body evidence; valid later-page evidence could be missed and body text could falsely satisfy closure | Traverse bounded pagination and prove comment-only page-two evidence | `Blocking` / Resolved | `SUBF-0031`, `TEST-0083`, [verifier](../../../tests/Verify-PostPublicationEvidence.ps1) |
 | `FIND-0118` | Verified governance defect | Medium / High | FEAT-0012 still showed its PR as pending after PRs #39 and #40 merged, and external records linked deleted work branches instead of stable main/commit content | Link both merged PRs and repair external links to stable authorities | `Blocking` / Resolved | `SUBF-0031`, `TEST-0085`, [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
 | `FIND-0119` | Verified governance defect - taxonomy | Medium / High | The finding issue form offered defect/risk/improvement values as disposition choices, contradicting the four mutually exclusive protocol dispositions | Separate classification from the exact four dispositions | `Blocking` / Resolved | `SUBF-0031`, `TEST-0084`, [finding form](../../../.github/ISSUE_TEMPLATE/finding.yml) |
-| `FIND-0120` | External repository risk | Medium / High | Live API evidence on 2026-07-16 reported unprotected `main`; protection/ruleset APIs returned HTTP 403 under the current private-repository capability | Retain owner and review when public or supported plan becomes available | `ExternalOrLegacyFollowUp` / Open; maintainer owned | `SUBF-0032`, `RISK-0076`, [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) |
+| `FIND-0120` | External repository risk | Medium / High | Live API evidence on 2026-07-16 reported unprotected `main`; protection/ruleset APIs returned HTTP 403 under the current private-repository capability | Retain owner and review when public or supported plan becomes available | `ExternalOrLegacyFollowUp` / Open; maintainer owned | `SUBF-0032`, `RISK-0076`, [open finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44); historical delivery authority remains [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) |
 | `FIND-0121` | Verified evidence defect - version grammar | Low / High | The repository validator tested only the current literal version and had no valid/invalid grammar table | Add canonical boundary cases, including leading-zero and non-ASCII/shape failures | `Blocking` / Resolved | `SUBF-0031`, `TEST-0085`, [protocol](../../../PROTOCOL.md#8-versioning) |
 | `FIND-0122` | Documentation clarity | Low / High | Completed FEAT-0005, FEAT-0006, FEAT-0008, and FEAT-0012 scenario records still called their evidence planned | Use implemented-evidence wording without changing historical outcomes | `OptionalImprovement` / Completed | `SUBF-0032`, `TEST-0085` |
 

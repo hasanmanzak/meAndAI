@@ -3,6 +3,8 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
@@ -144,7 +146,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             operation = 'ai-capabilities-adoption'
             state = 'AdoptionReviewRequired'
             repository = 'owner/consumer'
-            targetTag = 'v0.8.4'
+            targetTag = 'v0.8.5'
             protocolSha = $protocolSha
             collisions = $expectedCollisions
             proposedPaths = $expectedProposedPaths
@@ -154,7 +156,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             param([Parameter(Mandatory)]$Manifest)
 
             return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
-                -Repository 'owner/consumer' -TargetTag 'v0.8.4' `
+                -Repository 'owner/consumer' -TargetTag 'v0.8.5' `
                 -ProtocolSha $protocolSha -ExpectedState 'AdoptionReviewRequired' `
                 -ExpectedCollisions $expectedCollisions
         }
@@ -179,6 +181,24 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $wrongCollisions = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
         $wrongCollisions.collisions = @('docs/ideas/README.md')
         $invalidManifests['wrong collision inventory'] = $wrongCollisions
+        $invalidManifests['array root type'] = [object[]]@(
+            $validManifest,
+            $validManifest
+        )
+        foreach ($identityVariant in @(
+            @{ Name = 'repository identity'; Property = 'repository'; Value = 'other/consumer' },
+            @{ Name = 'target-tag identity'; Property = 'targetTag'; Value = 'v0.8.4' },
+            @{ Name = 'protocol-SHA identity'; Property = 'protocolSha'; Value = ('b' * 40) },
+            @{ Name = 'state identity'; Property = 'state'; Value = 'BootstrapReady' },
+            @{ Name = 'operation identity'; Property = 'operation'; Value = 'other-operation' },
+            @{ Name = 'schema value'; Property = 'schema'; Value = 2 },
+            @{ Name = 'schema type'; Property = 'schema'; Value = '1' },
+            @{ Name = 'collision property type'; Property = 'collisions'; Value = 'AGENTS.md' }
+        )) {
+            $variant = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+            $variant.($identityVariant.Property) = $identityVariant.Value
+            $invalidManifests[$identityVariant.Name] = $variant
+        }
 
         foreach ($entry in $invalidManifests.GetEnumerator()) {
             if (Test-ManifestFixture -Manifest $entry.Value) {
@@ -191,7 +211,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.8.4',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.8.5',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',
@@ -308,3 +328,8 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in this suite.' -ForegroundColor Green
+$scenarioResult = New-MeAndAIScenarioResult `
+    -Owner 'tests/capabilities-bootstrap.tests.ps1' `
+    -SourcePaths @($PSCommandPath, $adapterTestPath) `
+    -AuthorityPath $scenarioAuthorityPath
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

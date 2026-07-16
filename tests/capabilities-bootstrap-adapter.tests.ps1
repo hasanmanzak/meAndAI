@@ -80,6 +80,20 @@ function Copy-SourceFixture {
     }
 }
 
+function New-TestDirectoryLink {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Target
+    )
+
+    if ($env:OS -eq 'Windows_NT') {
+        New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
+    }
+    else {
+        New-Item -ItemType SymbolicLink -Path $Path -Target $Target | Out-Null
+    }
+}
+
 function global:gh {
     $arguments = @($args | ForEach-Object { [string]$_ })
     $global:LASTEXITCODE = 0
@@ -165,10 +179,12 @@ function New-BootstrapFixture {
         [string]$Name,
         [bool]$AddApplicationFile = $false,
         [bool]$AddAgentsCollision = $false,
+        [bool]$AddAgentsCaseVariantCollision = $false,
         [bool]$AddIdeasCollision = $false,
         [bool]$AddManifestCollision = $false,
         [bool]$AddRenameSource = $false,
-        [bool]$DriftSeedWorkflow = $false
+        [bool]$DriftSeedWorkflow = $false,
+        [bool]$AddLinkedManagedAncestor = $false
     )
 
     $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-capabilities-$Name-$([guid]::NewGuid().ToString('N'))"
@@ -200,9 +216,14 @@ function New-BootstrapFixture {
         New-Item -ItemType Directory -Force (Split-Path -Parent $appPath) | Out-Null
         [IO.File]::WriteAllText($appPath, "consumer application`n")
     }
-    if ($AddAgentsCollision) {
-        [IO.File]::WriteAllText((Join-Path $consumer 'AGENTS.md'), "consumer-owned instructions`n")
+    if ($AddAgentsCollision -or $AddAgentsCaseVariantCollision) {
+        $agentsName = if ($AddAgentsCaseVariantCollision) { 'agents.md' } else { 'AGENTS.md' }
+        [IO.File]::WriteAllText(
+            (Join-Path $consumer $agentsName),
+            "consumer-owned instructions`n"
+        )
     }
+
     if ($AddIdeasCollision) {
         $ideasPath = Join-Path $consumer 'docs/ideas/README.md'
         New-Item -ItemType Directory -Force (Split-Path -Parent $ideasPath) | Out-Null
@@ -216,6 +237,17 @@ function New-BootstrapFixture {
     if ($AddRenameSource) {
         Copy-Item -LiteralPath (Join-Path $root 'templates/project/AGENTS.submodule.md') `
             -Destination (Join-Path $consumer 'legacy-agents.md')
+    }
+    $externalManaged = ''
+    if ($AddLinkedManagedAncestor) {
+        $externalManaged = Join-Path $tempRoot 'external-managed'
+        New-Item -ItemType Directory -Path $externalManaged -Force | Out-Null
+        [IO.File]::WriteAllText(
+            (Join-Path $externalManaged 'sentinel.txt'),
+            "external sentinel`n"
+        )
+        New-TestDirectoryLink -Path (Join-Path $consumer '.ai') `
+            -Target $externalManaged
     }
     Invoke-Git -Repository $consumer -Arguments @('add', '.') | Out-Null
     Invoke-Git -Repository $consumer -Arguments @('commit', '-m', 'Seed consumer') | Out-Null
@@ -237,6 +269,7 @@ function New-BootstrapFixture {
         Consumer = $consumer
         Remote = $remote
         Source = $source
+        ExternalManaged = $externalManaged
     }
 }
 
@@ -337,21 +370,74 @@ try {
         Add-Failure "TEST-0077 exact local updater did not pass source-only preflight without mutation: $($result.Error)"
     }
 
-    [IO.File]::WriteAllText(
-        (Join-Path $trustedUpdater.Consumer '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'),
-        "# tampered local updater`n"
+    foreach ($assetName in @(
+        'MeAndAI.ProtocolUpdate.psm1',
+        'Invoke-MeAndAIProtocolUpdate.ps1'
+    )) {
+        foreach ($assetState in @('Missing', 'Drifted')) {
+            $global:PullRequestExists = $false
+            $global:PullRequestCreateCalls = 0
+            $fixtureName = (($assetName -replace '[^A-Za-z0-9]', '-').ToLowerInvariant())
+            $assetFixture = New-BootstrapFixture `
+                -Name "updater-$fixtureName-$($assetState.ToLowerInvariant())"
+            Install-CompleteLocalUpdaterFixture -Fixture $assetFixture
+            $relativeAssetPath = ".github/scripts/$assetName"
+            $assetPath = Join-Path $assetFixture.Consumer `
+                ($relativeAssetPath -replace '/', [IO.Path]::DirectorySeparatorChar)
+            if ($assetState -ceq 'Missing') {
+                Invoke-Git -Repository $assetFixture.Consumer -Arguments @(
+                    'rm', '--', $relativeAssetPath
+                ) | Out-Null
+            }
+            else {
+                [IO.File]::WriteAllText($assetPath, "# drifted updater asset`n")
+                Invoke-Git -Repository $assetFixture.Consumer -Arguments @(
+                    'add', '--', $relativeAssetPath
+                ) | Out-Null
+            }
+            Invoke-Git -Repository $assetFixture.Consumer -Arguments @(
+                'commit', '-m', "$assetState local updater asset $assetName"
+            ) | Out-Null
+            Invoke-Git -Repository $assetFixture.Consumer -Arguments @(
+                'push', 'origin', 'main'
+            ) | Out-Null
+            $headBeforeValidation = (@(Invoke-Git -Repository $assetFixture.Consumer `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+            $result = Invoke-BootstrapFixture -Fixture $assetFixture `
+                -ValidateLocalUpdaterOnly
+            $headAfterValidation = (@(Invoke-Git -Repository $assetFixture.Consumer `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+            if (-not $result.Threw -or
+                $result.Error -notlike '*local updater*match*pinned release*' -or
+                $global:PullRequestCreateCalls -ne 0 -or
+                $headAfterValidation -cne $headBeforeValidation) {
+                Add-Failure "TEST-0077/TEST-0095 $assetState asset '$assetName' was not rejected without mutation: $($result.Error)"
+            }
+        }
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $linkedAncestor = New-BootstrapFixture -Name 'linked-ancestor' `
+        -AddLinkedManagedAncestor $true
+    $externalBefore = @(
+        Get-ChildItem -LiteralPath $linkedAncestor.ExternalManaged -Recurse -File |
+            ForEach-Object {
+                "$($_.FullName.Substring($linkedAncestor.ExternalManaged.Length + 1))=$([IO.File]::ReadAllText($_.FullName))"
+            }
     )
-    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @(
-        'add', '--', '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
-    ) | Out-Null
-    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @(
-        'commit', '-m', 'Tamper local updater fixture'
-    ) | Out-Null
-    Invoke-Git -Repository $trustedUpdater.Consumer -Arguments @('push', 'origin', 'main') | Out-Null
-    $result = Invoke-BootstrapFixture -Fixture $trustedUpdater -ValidateLocalUpdaterOnly
-    if (-not $result.Threw -or $result.Error -notlike '*local updater*match*pinned release*' -or
-        $global:PullRequestCreateCalls -ne 0) {
-        Add-Failure "TEST-0077 modified local updater was not rejected by source-only preflight: $($result.Error)"
+    $result = Invoke-BootstrapFixture -Fixture $linkedAncestor
+    $externalAfter = @(
+        Get-ChildItem -LiteralPath $linkedAncestor.ExternalManaged -Recurse -File |
+            ForEach-Object {
+                "$($_.FullName.Substring($linkedAncestor.ExternalManaged.Length + 1))=$([IO.File]::ReadAllText($_.FullName))"
+            }
+    )
+    if (-not $result.Threw -or
+        $result.Error -notlike '*traverses linked or reparse-point path*' -or
+        $global:PullRequestCreateCalls -ne 0 -or
+        ($externalBefore -join "`n") -cne ($externalAfter -join "`n")) {
+        Add-Failure "TEST-0093 bootstrap did not block a linked managed ancestor before external mutation: $($result.Error)"
     }
 
     $global:PullRequestExists = $false
@@ -359,7 +445,7 @@ try {
     $empty = New-BootstrapFixture -Name 'empty'
     $result = Invoke-BootstrapFixture -Fixture $empty
     if ($result.Threw) {
-        Add-Failure "TEST-0028 collision-free bootstrap failed: $($result.Error)"
+        Add-Failure "TEST-0028/TEST-0093 ordinary contained bootstrap failed: $($result.Error)"
     }
     else {
         $paths = @(Get-RemoteChangedPaths -Fixture $empty | Sort-Object)
@@ -446,6 +532,190 @@ try {
             [string]$global:ExistingPullRequestBody -cne "<!-- meandai-capabilities-adoption:$completedMarker -->") {
             Add-Failure "TEST-0071 exact completed non-draft proposal was not retained without mutation: $($result.Error)"
         }
+
+        if (-not $result.Threw) {
+            $canonicalCompletedBody = [string]$global:ExistingPullRequestBody
+            foreach ($completedVariant in @(
+                'Parent', 'ProposalTree', 'CheckedChangeSet', 'Credential',
+                'ProtectedWorkflow', 'Protocol', 'UpdaterModule', 'UpdaterAdapter',
+                'Manifest'
+            )) {
+                $variantRoot = Join-Path $empty.Root `
+                    "completed-$($completedVariant.ToLowerInvariant())-$([guid]::NewGuid().ToString('N'))"
+                $variantClone = Join-Path $variantRoot 'clone'
+                New-Item -ItemType Directory -Path $variantRoot -Force | Out-Null
+                Invoke-Git -Repository $variantRoot -Arguments @(
+                    'clone', $empty.Remote, $variantClone
+                ) | Out-Null
+                Invoke-Git -Repository $variantClone -Arguments @(
+                    'config', 'user.name', 'Fixture'
+                ) | Out-Null
+                Invoke-Git -Repository $variantClone -Arguments @(
+                    'config', 'user.email', 'fixture@example.invalid'
+                ) | Out-Null
+                Invoke-Git -Repository $variantClone -Arguments @(
+                    'switch', $completedBranch
+                ) | Out-Null
+                $proposalHead = (@(Invoke-Git -Repository $variantClone -Arguments @(
+                    'rev-parse', "$completedHead^"
+                )))[0]
+                switch ($completedVariant) {
+                    'Parent' {
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--allow-empty', '-m', 'Drift completed parent'
+                        ) | Out-Null
+                    }
+                    'ProposalTree' {
+                        $canonicalCompletedTree = (@(Invoke-Git `
+                            -Repository $variantClone -Arguments @(
+                                'rev-parse', "$completedHead`^{tree}"
+                            )))[0]
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'switch', '--detach', $proposalHead
+                        ) | Out-Null
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone 'unexpected-proposal.txt'),
+                            "unexpected proposal tree drift`n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', 'unexpected-proposal.txt'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                        $rewrittenProposalHead = (@(Invoke-Git `
+                            -Repository $variantClone -Arguments @(
+                                'rev-parse', 'HEAD'
+                            )))[0]
+                        $rewrittenCompletedHead = (@(Invoke-Git `
+                            -Repository $variantClone -Arguments @(
+                                'commit-tree', $canonicalCompletedTree,
+                                '-p', $rewrittenProposalHead,
+                                '-m', 'Complete rewritten proposal fixture'
+                            )))[0]
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'switch', '-C', $completedBranch, $rewrittenCompletedHead
+                        ) | Out-Null
+                    }
+                    'CheckedChangeSet' {
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone 'completion-whitespace.txt'),
+                            "checked change-set drift   `n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', 'completion-whitespace.txt'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'Credential' {
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone 'FG_PAT.txt'),
+                            "credential-path-drift`n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', 'FG_PAT.txt'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'ProtectedWorkflow' {
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone '.github/workflows/meandai-protocol-update.yml'),
+                            "name: protected drift`n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', '.github/workflows/meandai-protocol-update.yml'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'Protocol' {
+                        $wrongProtocolSha = (@(Invoke-Git -Repository $variantClone -Arguments @(
+                            'rev-parse', 'origin/main'
+                        )))[0]
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'update-index', '--add', '--cacheinfo',
+                            "160000,$wrongProtocolSha,.ai/protocol"
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'UpdaterModule' {
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone '.github/scripts/MeAndAI.ProtocolUpdate.psm1'),
+                            "# completed updater module drift`n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'UpdaterAdapter' {
+                        [IO.File]::WriteAllText(
+                            (Join-Path $variantClone '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'),
+                            "# completed updater adapter drift`n"
+                        )
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'add', '--', '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                    'Manifest' {
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'checkout', $proposalHead, '--',
+                            '.ai/adoption/meandai-capabilities.json'
+                        ) | Out-Null
+                        Invoke-Git -Repository $variantClone -Arguments @(
+                            'commit', '--amend', '--no-edit'
+                        ) | Out-Null
+                    }
+                }
+                Invoke-Git -Repository $variantClone -Arguments @(
+                    'push', '--force', 'origin', $completedBranch
+                ) | Out-Null
+                $variantHead = (@(Invoke-Git -Repository $variantClone -Arguments @(
+                    'rev-parse', 'HEAD'
+                )))[0]
+                $variantMarker = [ordered]@{
+                    schema = 3
+                    phase = 'Completed'
+                    state = 'BootstrapReady'
+                    target = 'v0.5.0'
+                    protocolSha = $completedProtocolSha
+                    head = $variantHead
+                    repository = 'owner/consumer'
+                    actor = 'owner'
+                } | ConvertTo-Json -Compress
+                $global:ExistingPullRequestHead = $variantHead
+                $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$variantMarker -->"
+                $global:ExistingPullRequestIsDraft = $false
+                $createCallsBeforeVariant = $global:PullRequestCreateCalls
+                $variantResult = Invoke-BootstrapFixture -Fixture $empty
+                $remoteAfterVariant = (@(Invoke-Git -Repository $empty.Consumer -Arguments @(
+                    'ls-remote', '--heads', 'origin', "refs/heads/$completedBranch"
+                )))[0]
+                if (-not $variantResult.Threw -or
+                    $global:PullRequestCreateCalls -ne $createCallsBeforeVariant -or
+                    $remoteAfterVariant -cnotmatch "^$variantHead\s") {
+                    Add-Failure "TEST-0094 bootstrap retained drifted Completed variant '$completedVariant': $($variantResult.Error)"
+                }
+                Invoke-Git -Repository $variantClone -Arguments @(
+                    'push', '--force', 'origin',
+                    "$completedHead`:refs/heads/$completedBranch"
+                ) | Out-Null
+                $global:ExistingPullRequestHead = $completedHead
+                $global:ExistingPullRequestBody = $canonicalCompletedBody
+            }
+        }
     }
 
     $global:PullRequestExists = $false
@@ -522,6 +792,30 @@ try {
         )) -join "`n"
         if ($agents -cne 'consumer-owned instructions') {
             Add-Failure 'TEST-0030 collision proposal overwrote consumer AGENTS.md.'
+        }
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $caseCollision = New-BootstrapFixture -Name 'case-collision' `
+        -AddAgentsCaseVariantCollision $true
+    $result = Invoke-BootstrapFixture -Fixture $caseCollision
+    if ($result.Threw) {
+        Add-Failure "TEST-0030/TEST-0095 case-variant collision handoff failed: $($result.Error)"
+    }
+    else {
+        $paths = @(Get-RemoteChangedPaths -Fixture $caseCollision)
+        $manifest = (Invoke-Git -Repository $caseCollision.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:.ai/adoption/meandai-capabilities.json'
+        )) -join "`n" | ConvertFrom-Json
+        $caseAgents = (Invoke-Git -Repository $caseCollision.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:agents.md'
+        )) -join "`n"
+        if ($paths.Count -ne 1 -or
+            [string]$paths[0] -cne '.ai/adoption/meandai-capabilities.json' -or
+            @($manifest.collisions) -cnotcontains 'agents.md' -or
+            $caseAgents -cne 'consumer-owned instructions') {
+            Add-Failure 'TEST-0030/TEST-0095 case-variant collision was not preserved as a manifest-only proposal.'
         }
     }
 
