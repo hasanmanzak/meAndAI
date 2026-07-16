@@ -7,25 +7,26 @@ Last verified: **2026-07-16**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.1`. Exact publication state is authoritative
+- Current protocol version: `0.9.2`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49) after
+  [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: `BUG-0005` corrects no-remote quick-adoption identity
-  classification under [FEAT-0016](../../docs/features/FEAT-0016-v091-quick-adoption-correction/README.md)
-  and [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49).
+- Current scope: [FEAT-0017](../../docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md)
+  replaces the inline quick-adoption command stack with one reusable launcher
+  release asset and one local script invocation; [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51)
+  owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: BUG-0005 discovers the exact derived GitHub repository
-  before a no-head local target without `origin` is classified as new. An
-  accessible empty repository is connected only after canonical source
-  verification; repository secret names then make their mapped local files
-  optional. Missing-secret/missing-file and non-empty-repository paths remain
-  fail-closed. Focused evidence is `TEST-0100`; the complete local suite passed
-  all discovered scenarios in 473.8 seconds. Review is
-  [pull request #50](https://github.com/hasanmanzak/meAndAI/pull/50); hosted
-  facts remain pending until they exist.
+- Latest tracked work: the existing source-only
+  `Invoke-MeAndAIQuickAdoption.ps1` remains the sole launcher implementation
+  and will be uploaded unchanged in role as the immutable `v0.9.2` release
+  asset. The guide stores it outside consumer repositories and runs one
+  explicit `-File` command from the target. `TEST-0101` owns this distribution
+  boundary; no wrapper, installer framework, moving source, or pipe-to-shell
+  path is introduced. The confirmation suite passed all discovered scenarios
+  in 460 seconds after the guide retained its established release-verification
+  terms.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -116,6 +117,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.9.1` extends that rule to an accessible existing empty GitHub repository
   whose no-head local target has not yet connected `origin`; an absent derived
   repository still requires both files before creation.
+- `v0.9.2` distributes that same reviewed launcher as one immutable-release
+  asset and reduces normal user execution to one local script command. The
+  launcher stays outside consumer repositories and retains its release,
+  source, credential, lifecycle, Codex, and merge boundaries.
 - `v0.7.2` binds adoption proposals to canonical repository, base, actor, head,
   and marker evidence; validates exact protocol pins regardless of diff shape;
   rejects updater rename provenance; and moves adoption issues to review only

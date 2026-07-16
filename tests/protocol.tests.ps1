@@ -1173,6 +1173,71 @@ if (-not $referenceAdapter.Contains($expectedReferencePin) -or
     $referenceAdapter.Contains('.ai/protocol/PROTOCOL.md')) {
     Add-Failure "TEST-0099 repository-reference adapter does not independently resolve exact pin $currentProtocolTag."
 }
+
+$quickAdoptionGuide = Get-Content -LiteralPath (
+    Join-Path $root 'docs/quick-adoption.md'
+) -Raw
+$quickCommandMatch = [regex]::Match(
+    $quickAdoptionGuide,
+    '(?ms)^## Quick command\s+(?<body>.*?)(?=^## )'
+)
+$singleFileFeature = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md'
+) -Raw
+$singleFileScenarios = Get-Content -LiteralPath (
+    Join-Path $root 'docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md'
+) -Raw
+$launcherSource = Get-Content -LiteralPath (
+    Join-Path $root 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
+) -Raw
+$quickAdoptionScripts = @(Get-ChildItem -LiteralPath (Join-Path $root 'scripts') `
+    -Filter '*QuickAdoption*.ps1' -File)
+$expectedAssetUrl = "https://github.com/hasanmanzak/meAndAI/releases/download/$currentProtocolTag/Invoke-MeAndAIQuickAdoption.ps1"
+$expectedInvocation = 'powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath .'
+if (-not $quickCommandMatch.Success) {
+    Add-Failure 'TEST-0101 quick guide has no bounded Quick command section.'
+}
+else {
+    $quickCommand = $quickCommandMatch.Groups['body'].Value
+    $invocations = @([regex]::Matches(
+        $quickCommand,
+        '(?im)^\s*powershell\s+-NoProfile\s+-ExecutionPolicy\s+Bypass\s+-File\s+[^\r\n]*Invoke-MeAndAIQuickAdoption\.ps1[^\r\n]*$'
+    ))
+    if (-not $quickCommand.Contains($expectedAssetUrl) -or
+        -not $quickCommand.Contains($expectedInvocation) -or
+        $invocations.Count -ne 1 -or
+        -not ([regex]::Replace($quickCommand, '\s+', ' ')).Contains(
+            'outside the consumer repository'
+        )) {
+        Add-Failure 'TEST-0101 quick guide does not expose one exact immutable-release asset and one outside-target script invocation.'
+    }
+    foreach ($forbidden in @(
+        'gh api', 'ConvertFrom-Json', 'Set-Content', 'Invoke-Expression',
+        'Invoke-WebRequest', '| powershell', '| pwsh', '$launcher =', '$t='
+    )) {
+        if ($quickCommand.IndexOf($forbidden, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            Add-Failure "TEST-0101 quick command retains forbidden inline bootstrap text '$forbidden'."
+        }
+    }
+}
+if (-not $launcherSource.Contains("[string]`$ProtocolTag = '$currentProtocolTag'") -or
+    -not $launcherSource.Contains('Get-ValidatedImmutableProtocolRelease') -or
+    -not $launcherSource.Contains('published immutable GitHub Release')) {
+    Add-Failure 'TEST-0101 canonical launcher is not pinned to the current immutable-release validation contract.'
+}
+if ($quickAdoptionScripts.Count -ne 1 -or
+    $quickAdoptionScripts[0].Name -cne 'Invoke-MeAndAIQuickAdoption.ps1') {
+    Add-Failure 'TEST-0101 quick adoption has more than the one canonical launcher script.'
+}
+foreach ($requiredText in @(
+    '`TEST-0101`', '`Invoke-MeAndAIQuickAdoption.ps1` release asset',
+    'No second bootstrap script', 'issue #51'
+)) {
+    if (-not $singleFileFeature.Contains($requiredText) -and
+        -not $singleFileScenarios.Contains($requiredText)) {
+        Add-Failure "TEST-0101 canonical FEAT-0017 records are missing '$requiredText'."
+    }
+}
 $updaterScript = Get-Content -LiteralPath (
     Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 ) -Raw

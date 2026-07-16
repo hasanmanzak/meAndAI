@@ -18,6 +18,7 @@
 | [FEAT-0014](FEAT-0014-v085-convergence/README.md) | Bounded containment and observable-evidence correction | Complete; publication evidence external | 0.8.6 |
 | [FEAT-0015](FEAT-0015-stability-consistency-mandate/README.md) | Stability and consistency mandate | Complete | 0.9.0 |
 | [FEAT-0016](FEAT-0016-v091-quick-adoption-correction/README.md) | v0.9.1 quick-adoption existing-repository correction | Complete | 0.9.1 |
+| [FEAT-0017](FEAT-0017-v092-single-file-quick-adoption/README.md) | v0.9.2 single-file quick-adoption distribution | Complete | 0.9.2 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
