@@ -6,7 +6,7 @@
 | Status | Ready for review; publication pending |
 | Target version | 0.8.5 |
 | Issue and post-publication authority | [#43](https://github.com/hasanmanzak/meAndAI/issues/43) |
-| Pull request | Pending |
+| Pull request | [#45](https://github.com/hasanmanzak/meAndAI/pull/45) |
 | Decision | [DEC-0014](../../decisions/DEC-0014-contained-adoption-and-observable-evidence.md) |
 | Tests | [TEST-0086 through TEST-0095](test-cases.md) |
 

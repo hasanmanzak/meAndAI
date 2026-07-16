@@ -3,6 +3,7 @@
 - Work: [FEAT-0014](../../../docs/features/FEAT-0014-v085-convergence/README.md)
 - Decision: [DEC-0014](../../../docs/decisions/DEC-0014-contained-adoption-and-observable-evidence.md)
 - Delivery and post-publication authority: [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43)
+- Review: [pull request #45](https://github.com/hasanmanzak/meAndAI/pull/45)
 - Open external follow-up: [`FIND-0120` / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44)
 - Target: `0.8.5`
 - Status: Ready for review. Merge, immutable release, hosted checks, and the
