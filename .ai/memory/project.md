@@ -23,8 +23,9 @@ Last verified: **2026-07-16**
   verification; repository secret names then make their mapped local files
   optional. Missing-secret/missing-file and non-empty-repository paths remain
   fail-closed. Focused evidence is `TEST-0100`; the complete local suite passed
-  all discovered scenarios in 473.8 seconds. Hosted facts remain pending until
-  they exist.
+  all discovered scenarios in 473.8 seconds. Review is
+  [pull request #50](https://github.com/hasanmanzak/meAndAI/pull/50); hosted
+  facts remain pending until they exist.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and

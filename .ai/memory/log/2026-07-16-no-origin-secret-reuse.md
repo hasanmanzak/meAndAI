@@ -4,6 +4,7 @@
 - Feature: [FEAT-0016](../../../docs/features/FEAT-0016-v091-quick-adoption-correction/README.md)
 - Test: [`TEST-0100`](../../../docs/features/FEAT-0016-v091-quick-adoption-correction/test-cases.md)
 - Issue: [#49](https://github.com/hasanmanzak/meAndAI/issues/49)
+- Pull request: [#50](https://github.com/hasanmanzak/meAndAI/pull/50)
 - Target version: `0.9.1`
 
 The launcher previously required both local token files whenever the selected
@@ -23,6 +24,6 @@ Focused `TEST-0100` and all existing quick-adoption scenarios passed locally in
 351.3 seconds after the bounded red/green and review corrections. The first
 complete run exposed and corrected three escaped legacy pin matchers; the
 confirmation then passed every discovered suite in 473.8 seconds and reported
-`TEST-0100` through machine-readable scenario evidence. Pull-request, merge,
-hosted-check, and immutable-release facts remain pending until they exist and
-are authoritative in issue #49.
+`TEST-0100` through machine-readable scenario evidence. Pull request #50 owns
+review; merge, hosted-check, and immutable-release facts remain pending until
+they exist and are authoritative in issue #49.

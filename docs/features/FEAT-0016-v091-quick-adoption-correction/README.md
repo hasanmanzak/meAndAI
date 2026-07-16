@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.1 |
 | Issue | [#49](https://github.com/hasanmanzak/meAndAI/issues/49) |
-| Pull request | Pending |
+| Pull request | [#50](https://github.com/hasanmanzak/meAndAI/pull/50) |
 | Decision | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) |
 | Tests | [TEST-0100](test-cases.md) |
 
@@ -111,6 +111,7 @@ repository gate passed all discovered suites in 473.8 seconds and reported
 - Local Codex decision: [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
 - Guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and publication authority: [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49)
+- Delivery: [pull request #50](https://github.com/hasanmanzak/meAndAI/pull/50)
 
 ## Definition of Done
 
