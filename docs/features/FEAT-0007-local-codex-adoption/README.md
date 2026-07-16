@@ -473,3 +473,10 @@ historical annotated tag remains a release record without an external lock.
 | Release identifier | [`v0.7.3`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3), tag object `2f74f1f4b28bd63bb04a1b9f9f30b1603d0b164e` |
 | Target commit | [`45afd8c15c155fb3f7cb0e5abb4876a3d44b27af`](https://github.com/hasanmanzak/meAndAI/commit/45afd8c15c155fb3f7cb0e5abb4876a3d44b27af) |
 | Verification evidence | Local annotated-tag dereference and remote `refs/tags/v0.7.3` publication verified on 2026-07-15 |
+
+## Later correction
+
+The v0.9.1 no-remote existing-repository case is owned by
+[FEAT-0016](../FEAT-0016-v091-quick-adoption-correction/README.md) and
+`BUG-0005`; this historical feature retains its original v0.6.1 target and
+v0.7.x correction evidence.

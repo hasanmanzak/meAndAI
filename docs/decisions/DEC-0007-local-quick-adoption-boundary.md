@@ -4,7 +4,7 @@
 - Status: Superseded in part by [DEC-0008](DEC-0008-local-codex-execution.md)
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer administrators
-- Related features: [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md)
+- Related features: [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md)
 - Related decisions: [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md)
 
 ## Context
@@ -49,10 +49,14 @@ For an existing repository, the root must equal the selected directory, the
 working tree must be clean apart from an exact seed candidate, `origin` must
 resolve to GitHub, the current branch must be the GitHub default branch, and
 the local head must equal the observed remote head before the seed commit. For
-a directory with no own repository, the launcher initializes `main`; if
-`origin` is absent it creates `<owner>/<directory-name>` as private by default
-through the authenticated GitHub CLI. It stages and commits only the workflow,
-so unrelated local files remain unpublished.
+a directory with no own repository, the launcher initializes `main`. If
+`origin` is absent, it resolves the exact requested
+`<owner>/<repository-name>` through the authenticated GitHub CLI. An accessible
+existing repository is connected automatically only when it has no branch
+history; a non-empty repository blocks for manual clone or reconciliation. If
+the repository does not exist, the launcher creates it as private by default.
+It stages and commits only the workflow, so unrelated local files remain
+unpublished.
 
 The launcher configures both secrets before pushing the workflow. After that
 publication succeeds, its default continuation dispatches the lifecycle,

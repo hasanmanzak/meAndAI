@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.0',
+    [string]$ProtocolTag = 'v0.9.1',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -606,10 +606,7 @@ function Add-LocalTokenExcludes {
 }
 
 function Assert-TokenFilesAreLocalOnly {
-    param(
-        [Parameter(Mandatory)][string]$Repository,
-        [string[]]$RequiredFileNames = @()
-    )
+    param([Parameter(Mandatory)][string]$Repository)
 
     $head = Invoke-Git -Repository $Repository -Arguments @(
         'rev-parse', '--verify', 'HEAD'
@@ -629,9 +626,6 @@ function Assert-TokenFilesAreLocalOnly {
     }
 
     foreach ($name in $tokenMappings.Keys) {
-        $path = Join-Path $Repository $name
-        $exists = Test-Path -LiteralPath $path -PathType Leaf
-
         $tracked = Invoke-Git -Repository $Repository -Arguments @(
             'ls-files', '--error-unmatch', '--', $name
         ) -AllowFailure
@@ -651,9 +645,6 @@ function Assert-TokenFilesAreLocalOnly {
             }
         }
 
-        if (-not $exists -and $RequiredFileNames -ccontains $name) {
-            throw "Required local credential file '$name' is missing from the target root."
-        }
     }
 }
 
@@ -2536,6 +2527,13 @@ $remoteResult = Invoke-Git -Repository $target -Arguments @(
 $hasRemote = $remoteResult.ExitCode -eq 0
 $remoteSlug = ''
 $remoteIsEmpty = $false
+$discoveredExistingRepository = $false
+$discoveredRemoteUrl = ''
+$candidateRepository = ''
+$protocolToken = $null
+$workflowBytes = $null
+$protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
+$protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
 
 if ($hasRemote) {
     $remoteUrl = ((@($remoteResult.Output) -join '').Trim())
@@ -2546,16 +2544,91 @@ if ($hasRemote) {
     $remoteIsEmpty = -not ((@($remoteHeads.Output) -join '').Trim())
 }
 
-$requiredTokenFiles = if ($hasRemote) {
+# Credential exposure checks are unconditional and precede repository-state
+# classification. File presence is evaluated separately after identity tells
+# us whether the target repository can already own the mapped secrets.
+Assert-TokenFilesAreLocalOnly -Repository $target
+
+if (-not $hasRemote -and $hasHead) {
+    throw "A repository with commits but no '$RemoteName' is outside the safe new-repository flow. Connect and reconcile it manually."
+}
+
+if (-not $hasRemote) {
+    if (-not $Owner) {
+        $ownerResult = Invoke-External -Command 'gh' -Arguments @('api', 'user', '--jq', '.login')
+        $Owner = ((@($ownerResult.Output) -join '').Trim())
+    }
+    if (-not $RepositoryName) {
+        $RepositoryName = Split-Path -Leaf $target
+    }
+    if ($Owner -cnotmatch '^[A-Za-z0-9_.-]+$' -or
+        $RepositoryName -cnotmatch '^[A-Za-z0-9_.-]+$' -or
+        $RepositoryName -in @('.', '..')) {
+        throw 'Owner and RepositoryName must be valid unambiguous GitHub slugs.'
+    }
+
+    $candidateRepository = "$Owner/$RepositoryName"
+    $candidateView = Invoke-External -Command 'gh' -Arguments @(
+        'repo', 'view', $candidateRepository, '--json', 'nameWithOwner,defaultBranchRef'
+    ) -AllowFailure
+    if ($candidateView.ExitCode -eq 0) {
+        try {
+            $candidateInfo = ((@($candidateView.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
+        }
+        catch {
+            throw 'GitHub CLI returned invalid repository metadata for the derived repository.'
+        }
+        if ($null -eq $candidateInfo -or
+            $null -eq $candidateInfo.PSObject.Properties['nameWithOwner']) {
+            throw 'GitHub CLI returned incomplete repository metadata for the derived repository.'
+        }
+        $candidateCanonicalName = [string]$candidateInfo.nameWithOwner
+        if (-not $candidateCanonicalName.Equals(
+            $candidateRepository, [StringComparison]::OrdinalIgnoreCase
+        )) {
+            throw 'The derived GitHub repository identity is ambiguous.'
+        }
+
+        $discoveredRemoteUrl = "https://github.com/$candidateCanonicalName.git"
+        $candidateHeads = Invoke-Git -Repository $target -Arguments @(
+            'ls-remote', '--heads', $discoveredRemoteUrl
+        )
+        if ((@($candidateHeads.Output) -join '').Trim()) {
+            throw 'The derived GitHub repository already contains history; clone or reconcile it manually.'
+        }
+        $remoteSlug = $candidateCanonicalName
+        $remoteIsEmpty = $true
+        $discoveredExistingRepository = $true
+    }
+}
+
+$requiredTokenFiles = if ($hasRemote -or $discoveredExistingRepository) {
     @()
 }
 else {
     @($tokenMappings.Keys)
 }
-Assert-TokenFilesAreLocalOnly -Repository $target -RequiredFileNames $requiredTokenFiles
+foreach ($requiredTokenFile in $requiredTokenFiles) {
+    if (-not (Test-Path -LiteralPath (Join-Path $target $requiredTokenFile) -PathType Leaf)) {
+        throw "Required local credential file '$requiredTokenFile' is missing from the target root."
+    }
+}
 
-if (-not $hasRemote -and $hasHead) {
-    throw "A repository with commits but no '$RemoteName' is outside the safe new-repository flow. Connect and reconcile it manually."
+if ($discoveredExistingRepository) {
+    # Verify executable source before mutating the local remote configuration.
+    # The repository secret value remains unreadable; authenticated gh is the
+    # existing file-free source fallback when the local read token is absent.
+    if ($protocolTokenFileExists) {
+        $protocolToken = Read-LocalToken -Path $protocolTokenPath
+        $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
+    }
+    else {
+        $workflowBytes = Get-CanonicalWorkflow
+    }
+    Invoke-Git -Repository $target -Arguments @(
+        'remote', 'add', $RemoteName, $discoveredRemoteUrl
+    ) | Out-Null
+    $hasRemote = $true
 }
 if ($hasRemote -and -not $remoteIsEmpty -and -not $hasHead) {
     throw 'The connected remote contains history but the local repository has no commit; clone or reconcile it manually.'
@@ -2609,8 +2682,6 @@ else {
     }
 }
 
-$protocolToken = $null
-$workflowBytes = $null
 if (-not $hasRemote) {
     $protocolToken = Read-LocalToken -Path (Join-Path $target 'MEANDAI_RO_FG_PAT.txt')
     $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
@@ -2668,19 +2739,7 @@ if ($hasRemote) {
     }
 }
 else {
-    if (-not $Owner) {
-        $ownerResult = Invoke-External -Command 'gh' -Arguments @('api', 'user', '--jq', '.login')
-        $Owner = ((@($ownerResult.Output) -join '').Trim())
-    }
-    if (-not $RepositoryName) {
-        $RepositoryName = Split-Path -Leaf $target
-    }
-    if ($Owner -cnotmatch '^[A-Za-z0-9_.-]+$' -or
-        $RepositoryName -cnotmatch '^[A-Za-z0-9_.-]+$' -or
-        $RepositoryName -in @('.', '..')) {
-        throw 'Owner and RepositoryName must be valid unambiguous GitHub slugs.'
-    }
-    $repository = "$Owner/$RepositoryName"
+    $repository = $candidateRepository
     $defaultBranch = 'main'
 
     $visibilityArgument = switch ($Visibility) {
@@ -2714,8 +2773,6 @@ if ($emailResult.ExitCode -ne 0 -or -not ((@($emailResult.Output) -join '').Trim
     ) | Out-Null
 }
 
-$protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
-$protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
 if ($null -eq $workflowBytes) {
     # Executable source authority is verified before the temporary lock label
     # performs the first repository mutation. Prefer the local read-only token
