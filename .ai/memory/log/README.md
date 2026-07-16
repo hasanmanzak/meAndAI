@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-Single-file quick-adoption distribution is tracked as
-[FEAT-0017](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md),
-[`TEST-0101`](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md),
-and the [v0.9.2 continuation](2026-07-16-single-file-quick-adoption.md).
-[Issue #51](https://github.com/hasanmanzak/meAndAI/issues/51) owns delivery and
-future post-publication asset evidence. `FIND-0120` remains the separate open
+The live adoption PR metadata correction is tracked as
+[FEAT-0018](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md),
+[`TEST-0102`](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md),
+and the [v0.9.3 continuation](2026-07-16-v093-live-pr-metadata-correction.md).
+[Issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) owns delivery and
+future post-publication evidence. `FIND-0120` remains the separate open
 external follow-up in issue #44.
 
 ## History
 
+- [2026-07-16 - v0.9.3 live PR metadata correction](2026-07-16-v093-live-pr-metadata-correction.md)
 - [2026-07-16 - Single-file quick adoption](2026-07-16-single-file-quick-adoption.md)
 - [2026-07-16 - No-origin existing-secret reuse](2026-07-16-no-origin-secret-reuse.md)
 - [2026-07-16 - Stability and consistency mandate](2026-07-16-stability-consistency-mandate.md)

@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.2',
+    [string]$ProtocolTag = 'v0.9.3',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -1052,7 +1052,8 @@ function Get-ValidatedAdoptionMarker {
 
     $requiredProperties = @(
         'number', 'url', 'isDraft', 'state', 'baseRefName', 'headRefName',
-        'headRefOid', 'headRepository', 'author', 'body'
+        'headRefOid', 'headRepository', 'headRepositoryOwner',
+        'isCrossRepository', 'author', 'body'
     )
     foreach ($property in $requiredProperties) {
         if ($null -eq $PullRequest.PSObject.Properties[$property]) {
@@ -1066,9 +1067,23 @@ function Get-ValidatedAdoptionMarker {
         $PullRequest.isDraft -isnot [bool]) {
         throw 'The deterministic adoption pull request has invalid lifecycle metadata.'
     }
-    if ($null -eq $PullRequest.headRepository -or
-        $null -eq $PullRequest.headRepository.PSObject.Properties['nameWithOwner'] -or
-        -not ([string]$PullRequest.headRepository.nameWithOwner).Equals(
+    $headRepositoryNameProperty = if ($null -ne $PullRequest.headRepository) {
+        $PullRequest.headRepository.PSObject.Properties['name']
+    }
+    else { $null }
+    $headRepositoryOwnerLoginProperty = if ($null -ne $PullRequest.headRepositoryOwner) {
+        $PullRequest.headRepositoryOwner.PSObject.Properties['login']
+    }
+    else { $null }
+    if ($PullRequest.isCrossRepository -isnot [bool] -or
+        [bool]$PullRequest.isCrossRepository -or
+        $null -eq $headRepositoryNameProperty -or
+        $headRepositoryNameProperty.Value -isnot [string] -or
+        [string]::IsNullOrWhiteSpace([string]$headRepositoryNameProperty.Value) -or
+        $null -eq $headRepositoryOwnerLoginProperty -or
+        $headRepositoryOwnerLoginProperty.Value -isnot [string] -or
+        [string]::IsNullOrWhiteSpace([string]$headRepositoryOwnerLoginProperty.Value) -or
+        -not ("$($headRepositoryOwnerLoginProperty.Value)/$($headRepositoryNameProperty.Value)").Equals(
             $Repository, [StringComparison]::OrdinalIgnoreCase
         )) {
         throw 'The deterministic adoption pull request does not originate in the target repository.'
@@ -1192,7 +1207,7 @@ function Get-AdoptionPullRequest {
         $list = Invoke-External -Command 'gh' -Arguments @(
             'pr', 'list', '--repo', $Repository, '--state', 'open', '--head', $branch,
             '--limit', '10', '--json',
-            'number,url,isDraft,state,baseRefName,headRefName,headRefOid,headRepository,author,body'
+            'number,url,isDraft,state,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,isCrossRepository,author,body'
         )
         try {
             $pullRequests = @(((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json))
