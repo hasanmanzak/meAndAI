@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.5 |
 | Issue | [#57](https://github.com/hasanmanzak/meAndAI/issues/57) |
-| Pull request | Pending |
+| Pull request | [#58](https://github.com/hasanmanzak/meAndAI/pull/58) |
 | Decisions | [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
 | Tests | [TEST-0105 and TEST-0106](test-cases.md) |
 
@@ -133,6 +133,7 @@ or additional validation framework is introduced.
 - Governing interruption recovery: [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57)
+- Delivery pull request: [#58](https://github.com/hasanmanzak/meAndAI/pull/58)
 - Consumer evidence: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
 
 ## Self-review and completion
@@ -162,7 +163,7 @@ remaining `Blocking` observation and was not repeated unchanged.
       `Blocking` finding.
 - [x] Version, changelog, guide, decisions, links, feature index, and project
       memory agree.
-- [ ] Issue and pull request link canonical records and validation evidence.
+- [x] Issue and pull request link canonical records and validation evidence.
 
 ## Post-merge publication gate
 

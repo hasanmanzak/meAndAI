@@ -22,9 +22,10 @@
 - The completed reviewed working tree passed the complete repository suite in
   517.2 seconds, including all 34 existing quick-adoption scenarios,
   `TEST-0105`, `TEST-0106`, and scenario-ownership gates.
-- Pull-request, merge, immutable-release, and hosted-check evidence remain
-  pending and belong in the feature record and issue #57 when those facts
-  exist.
+- [Pull request #58](https://github.com/hasanmanzak/meAndAI/pull/58) owns the
+  review branch and links the canonical feature, tests, decisions, and issue.
+  Merge, immutable-release, and hosted-check evidence remain pending and belong
+  in issue #57 when those facts exist.
 
 ## Continuation
 
