@@ -21,7 +21,8 @@
 | [FEAT-0017](FEAT-0017-v092-single-file-quick-adoption/README.md) | v0.9.2 single-file quick-adoption distribution | Complete | 0.9.2 |
 | [FEAT-0018](FEAT-0018-v093-live-pr-metadata-correction/README.md) | v0.9.3 live adoption PR metadata correction | Complete | 0.9.3 |
 | [FEAT-0019](FEAT-0019-v094-sandbox-progress-correction/README.md) | v0.9.4 Windows sandbox and progress correction | Complete | 0.9.4 |
-| [FEAT-0020](FEAT-0020-v095-streamed-codex-cancellation/README.md) | v0.9.5 streamed Codex activity and safe cancellation | Ready | 0.9.5 |
+| [FEAT-0020](FEAT-0020-v095-streamed-codex-cancellation/README.md) | v0.9.5 streamed Codex activity and safe cancellation | Complete | 0.9.5 |
+| [FEAT-0021](FEAT-0021-v096-github-cli-prerequisite/README.md) | v0.9.6 GitHub CLI prerequisite gate | Complete | 0.9.6 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

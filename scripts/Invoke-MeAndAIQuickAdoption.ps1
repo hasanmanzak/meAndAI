@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.5',
+    [string]$ProtocolTag = 'v0.9.6',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -25,6 +25,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+$minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
@@ -439,6 +440,60 @@ function Invoke-External {
     return [pscustomobject]@{
         ExitCode = [int]$exitCode
         Output = @($output)
+    }
+}
+
+function Compare-CanonicalDecimalComponent {
+    param(
+        [Parameter(Mandatory)][string]$Left,
+        [Parameter(Mandatory)][string]$Right
+    )
+
+    if ($Left.Length -ne $Right.Length) {
+        return [Math]::Sign($Left.Length - $Right.Length)
+    }
+    return [Math]::Sign([string]::CompareOrdinal($Left, $Right))
+}
+
+function Assert-MinimumGitHubCliVersion {
+    $versionResult = Invoke-External -Command 'gh' -Arguments @('--version')
+    $versionPattern = '\Agh version (?<major>0|[1-9][0-9]*)\.(?<minor>0|[1-9][0-9]*)\.(?<revision>0|[1-9][0-9]*)(?: \([^()\r\n]+\))?\z'
+    $parsedVersions = [System.Collections.Generic.List[object]]::new()
+    foreach ($outputLine in @($versionResult.Output)) {
+        $match = [regex]::Match(
+            [string]$outputLine,
+            $versionPattern,
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        if ($match.Success) {
+            [void]$parsedVersions.Add([pscustomobject]@{
+                Text = "$($match.Groups['major'].Value).$($match.Groups['minor'].Value).$($match.Groups['revision'].Value)"
+                Parts = @(
+                    $match.Groups['major'].Value,
+                    $match.Groups['minor'].Value,
+                    $match.Groups['revision'].Value
+                )
+            })
+        }
+    }
+
+    $upgradeGuidance = 'Upgrade GitHub CLI before rerunning quick adoption: https://cli.github.com/'
+    if ($parsedVersions.Count -ne 1) {
+        throw "Unable to determine a single canonical GitHub CLI version. GitHub CLI $minimumGitHubCliVersion or newer is required. $upgradeGuidance"
+    }
+
+    $detected = $parsedVersions[0]
+    $minimumParts = @($minimumGitHubCliVersion.Split('.'))
+    for ($index = 0; $index -lt $minimumParts.Count; $index++) {
+        $comparison = Compare-CanonicalDecimalComponent `
+            -Left ([string]$detected.Parts[$index]) `
+            -Right ([string]$minimumParts[$index])
+        if ($comparison -lt 0) {
+            throw "GitHub CLI $minimumGitHubCliVersion or newer is required; detected $($detected.Text). $upgradeGuidance"
+        }
+        if ($comparison -gt 0) {
+            return
+        }
     }
 }
 
@@ -3273,6 +3328,7 @@ foreach ($command in @('git', 'gh')) {
         throw "Required command '$command' is not available."
     }
 }
+Assert-MinimumGitHubCliVersion
 
 $target = Get-NormalizedPath -Path $TargetPath
 if (-not (Test-Path -LiteralPath $target -PathType Container)) {
