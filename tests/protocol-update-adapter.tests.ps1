@@ -53,6 +53,43 @@ function ConvertTo-TestPullJson {
     } | ConvertTo-Json -Depth 6 -Compress
 }
 
+function New-TestProtocolUpdateIssue {
+    param(
+        [int]$Number,
+        [string]$TargetTag,
+        [string]$ProtocolSha,
+        [string]$Branch,
+        [int]$PullRequestNumber,
+        [string]$HeadSha,
+        [string]$State = 'open'
+    )
+    $markerJson = [ordered]@{
+        schema = 1; target = $TargetTag; protocolSha = $ProtocolSha
+        repository = 'owner/consumer'
+    } | ConvertTo-Json -Compress
+    $body = @(
+        "<!-- meandai-protocol-update-issue:$markerJson -->",
+        '## Managed protocol update tracking', '',
+        "- Target release: ``$TargetTag``",
+        "- Protocol commit: ``$ProtocolSha``",
+        "- Deterministic branch: ``$Branch``", '',
+        'This issue is the canonical same-repository work record for the managed protocol proposal.',
+        'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
+    ) -join [Environment]::NewLine
+    [pscustomobject]@{
+        number = $Number; title = "Track meAndAI protocol update to $TargetTag"
+        body = $body; state = $State
+        labels = @(
+            [pscustomobject]@{ name = 'type:task' },
+            [pscustomobject]@{ name = 'priority:p1' },
+            [pscustomobject]@{ name = 'status:needs-review' }
+        )
+        comments = [System.Collections.Generic.List[object]]@(
+            [pscustomobject]@{ body = "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->`nManaged protocol proposal: #$PullRequestNumber" }
+        )
+    }
+}
+
 function global:git {
 
     $script:Scenario = $global:MeAndAITestScenario
@@ -319,6 +356,115 @@ function global:gh {
         }
         '{}'
         return
+    }
+    $isIssueAuthorityEndpoint = $endpoint -eq 'repos/owner/consumer/labels' -or
+        $endpoint -eq 'repos/owner/consumer/labels?per_page=100' -or
+        $endpoint -eq 'repos/owner/consumer/issues' -or
+        $endpoint -eq 'repos/owner/consumer/issues?state=all&per_page=100' -or
+        $endpoint -match '^repos/owner/consumer/issues/[0-9]+(?:/.*)?$'
+    if ($isIssueAuthorityEndpoint) {
+        if ($env:GH_TOKEN -cne 'issue-write-token') {
+            throw 'Consumer issue lifecycle used the wrong credential.'
+        }
+        if ($endpoint -eq 'repos/owner/consumer/labels?per_page=100') {
+            foreach ($name in $script:Scenario.RepositoryLabels) {
+                ConvertTo-TestBase64Json ([pscustomobject]@{ name = $name })
+            }
+            return
+        }
+        if ($endpoint -eq 'repos/owner/consumer/labels' -and $method -eq 'POST') {
+            $nameArgument = @($arguments | Where-Object { $_ -like 'name=*' })[0]
+            $name = $nameArgument.Substring('name='.Length)
+            if ($script:Scenario.RepositoryLabels -notcontains $name) {
+                $script:Scenario.RepositoryLabels.Add($name)
+            }
+            Add-ScenarioEvent "create-label-$name"
+            [pscustomobject]@{ name = $name } | ConvertTo-Json -Compress
+            return
+        }
+        if ($endpoint -eq 'repos/owner/consumer/issues?state=all&per_page=100') {
+            foreach ($issue in $script:Scenario.Issues) {
+                ConvertTo-TestBase64Json $issue
+            }
+            return
+        }
+        if ($endpoint -eq 'repos/owner/consumer/issues' -and $method -eq 'POST') {
+            $title = (@($arguments | Where-Object { $_ -like 'title=*' })[0]).Substring('title='.Length)
+            $body = (@($arguments | Where-Object { $_ -like 'body=*' })[0]).Substring('body='.Length)
+            $issue = [pscustomobject]@{
+                number = 130; title = $title; body = $body; state = 'open'
+                labels = @(
+                    [pscustomobject]@{ name = 'type:task' },
+                    [pscustomobject]@{ name = 'priority:p1' },
+                    [pscustomobject]@{ name = 'status:needs-review' }
+                )
+                comments = [System.Collections.Generic.List[object]]::new()
+            }
+            $script:Scenario.Issues.Add($issue)
+            Add-ScenarioEvent 'create-update-issue'
+            $issue | ConvertTo-Json -Depth 6 -Compress
+            return
+        }
+        if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)$') {
+            $number = [int]$Matches.number
+            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })
+            if ($issue.Count -ne 1) { throw "Mock issue #$number is not exact." }
+            $issue = $issue[0]
+            if ($method -eq 'PATCH') {
+                if ($arguments -contains 'state=closed') {
+                    $issue.state = 'closed'
+                    Add-ScenarioEvent "close-update-issue-$number"
+                }
+                elseif ($arguments -contains 'state=open') {
+                    $issue.state = 'open'
+                    Add-ScenarioEvent "reopen-update-issue-$number"
+                }
+            }
+            $issue | ConvertTo-Json -Depth 6 -Compress
+            return
+        }
+        if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)/labels$' -and
+            $method -eq 'POST') {
+            $number = [int]$Matches.number
+            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
+            foreach ($argument in @($arguments | Where-Object {
+                ([string]$_).StartsWith('labels[]=', [StringComparison]::Ordinal)
+            })) {
+                $name = $argument.Substring('labels[]='.Length)
+                if (@($issue.labels | Where-Object { [string]$_.name -ceq $name }).Count -eq 0) {
+                    $issue.labels += [pscustomobject]@{ name = $name }
+                }
+            }
+            '{}'
+            return
+        }
+        if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)/labels/.+$' -and
+            $method -eq 'DELETE') {
+            $number = [int]$Matches.number
+            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
+            $encoded = $endpoint.Substring($endpoint.LastIndexOf('/') + 1)
+            $label = [Uri]::UnescapeDataString($encoded)
+            $issue.labels = @($issue.labels | Where-Object { [string]$_.name -cne $label })
+            Add-ScenarioEvent "remove-issue-label-$number-$label"
+            return
+        }
+        if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)/comments\?per_page=100$') {
+            $number = [int]$Matches.number
+            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
+            foreach ($comment in $issue.comments) { ConvertTo-TestBase64Json $comment }
+            return
+        }
+        if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)/comments$' -and
+            $method -eq 'POST') {
+            $number = [int]$Matches.number
+            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
+            $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
+            $issue.comments.Add([pscustomobject]@{ body = $bodyArgument.Substring('body='.Length) })
+            Add-ScenarioEvent "comment-update-issue-$number"
+            '{}'
+            return
+        }
+        throw "Unexpected fake issue-authority call: $($arguments -join ' ')"
     }
     $protocolEndpoint = $endpoint -like 'repos/hasanmanzak/meAndAI/*'
     if ($protocolEndpoint -and $env:GH_TOKEN -cne 'protocol-read-token') {
@@ -599,6 +745,7 @@ function Invoke-AdapterScenario {
         [bool]$DriftCurrentAsset = $false,
         [bool]$WrongStagedAssetBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
+        [bool]$MissingManagedLabels = $false,
         [bool]$ReservedOrphanBranchExists = $false,
         [bool]$ReservedNamespaceRace = $false,
         [int]$LeadingUnmanagedCount = 0,
@@ -649,11 +796,14 @@ function Invoke-AdapterScenario {
         } | ConvertTo-Json -Compress
         $oldBody = "<!-- meandai-protocol-update:$nonCanonicalMarker -->"
     }
+    $oldBody += [Environment]::NewLine + [Environment]::NewLine + 'Tracking issue: #121'
     $newMarker = [ordered]@{
         schema = 1; target = 'v0.3.0'; protocolSha = '3' * 40
         head = 'b' * 40; repository = 'owner/consumer'
     } | ConvertTo-Json -Compress
-    $initialNewBody = if ($ExistingReplacement) { "<!-- meandai-protocol-update:$newMarker -->" } else { '' }
+    $initialNewBody = if ($ExistingReplacement) {
+        "<!-- meandai-protocol-update:$newMarker -->`n`nTracking issue: #130"
+    } else { '' }
     $currentWorkflowBlob = '1' * 40
     $currentModuleBlob = '2' * 40
     $currentAdapterBlob = '3' * 40
@@ -678,10 +828,28 @@ function Invoke-AdapterScenario {
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/workflows/meandai-protocol-update.yml"] = $targetWorkflowBlob
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $targetAdapterBlob
+    $issues = [System.Collections.Generic.List[object]]::new()
+    if ($OldCandidateExists) {
+        $issues.Add((New-TestProtocolUpdateIssue -Number 121 -TargetTag 'v0.2.0' `
+            -ProtocolSha ('2' * 40) -Branch 'automation/meandai-protocol-v0.2.0' `
+            -PullRequestNumber 21 -HeadSha $oldHead))
+    }
+    if ($ExistingReplacement) {
+        $issues.Add((New-TestProtocolUpdateIssue -Number 130 -TargetTag 'v0.3.0' `
+            -ProtocolSha ('3' * 40) -Branch 'automation/meandai-protocol-v0.3.0' `
+            -PullRequestNumber 30 -HeadSha ('b' * 40)))
+    }
     $script:Scenario = [pscustomobject]@{
         Name = $Name
         Events = [System.Collections.Generic.List[string]]::new()
         GhCalls = [System.Collections.Generic.List[object]]::new()
+        Issues = $issues
+        RepositoryLabels = [System.Collections.Generic.List[string]]@($(if ($MissingManagedLabels) {
+            @()
+        } else {
+            @('type:task', 'priority:p1', 'status:in-progress',
+              'status:needs-review', 'status:blocked')
+        }))
         CurrentProtocolSha = '1' * 40
         MiddleProtocolSha = '2' * 40
         TargetProtocolSha = '3' * 40
@@ -756,7 +924,7 @@ function Invoke-AdapterScenario {
     $savedEnvironment = @{}
     foreach ($nameKey in @(
         'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
-        'PROTOCOL_TOKEN', 'GITHUB_STEP_SUMMARY'
+        'PROTOCOL_TOKEN', 'ISSUE_TOKEN', 'GITHUB_STEP_SUMMARY'
     )) {
         $savedEnvironment[$nameKey] = [Environment]::GetEnvironmentVariable($nameKey)
     }
@@ -768,6 +936,7 @@ function Invoke-AdapterScenario {
         $env:DEFAULT_BRANCH = 'main'
         $env:GH_TOKEN = if ($MissingUpdaterToken) { $null } else { 'updater-write-token' }
         $env:PROTOCOL_TOKEN = if ($MissingProtocolToken) { $null } else { 'protocol-read-token' }
+        $env:ISSUE_TOKEN = 'issue-write-token'
         $env:GITHUB_STEP_SUMMARY = $null
         & (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     }
@@ -795,6 +964,30 @@ $success = Invoke-AdapterScenario -Name 'success'
 if ($success.Threw) {
     Add-Failure "TEST-0011 replacement scenario failed: $($success.Error)"
 }
+$successOldIssue = @($success.Issues | Where-Object { [int]$_.number -eq 121 })
+$successNewIssue = @($success.Issues | Where-Object { [int]$_.number -eq 130 })
+if ($successOldIssue.Count -ne 1 -or [string]$successOldIssue[0].state -cne 'closed' -or
+    $successNewIssue.Count -ne 1 -or [string]$successNewIssue[0].state -cne 'open' -or
+    $success.NewBody -cnotmatch '(?m)^Tracking issue: #130$' -or
+    $success.NewBody.Contains('Tracking issue: #REQUIRED') -or
+    @($successNewIssue[0].comments | Where-Object {
+        ([string]$_.body).StartsWith(
+            "<!-- meandai-protocol-update-proposal:pr-30`:head-$('b' * 40) -->",
+            [StringComparison]::Ordinal
+        )
+    }).Count -ne 1 -or
+    (Get-EventIndex $success 'close-update-issue-121') -le
+        (Get-EventIndex $success 'delete-old-branch')) {
+    Add-Failure 'TEST-0111 automatic issue/link/supersession lifecycle did not converge in branch-first order.'
+}
+$missingLabels = Invoke-AdapterScenario -Name 'missing-managed-labels' `
+    -MissingManagedLabels $true
+if ($missingLabels.Threw -or @(
+    'type:task', 'priority:p1', 'status:in-progress', 'status:needs-review', 'status:blocked' |
+        Where-Object { $missingLabels.RepositoryLabels -cnotcontains $_ }
+).Count -ne 0) {
+    Add-Failure "TEST-0111 missing Agile labels were not created without blocking the managed proposal: $($missingLabels.Error)"
+}
 foreach ($event in @('checkout-target-assets', 'stage-target-assets')) {
     if ((Get-EventIndex $success $event) -lt 0 -or
         (Get-EventIndex $success $event) -gt (Get-EventIndex $success 'push-new')) {
@@ -814,12 +1007,20 @@ $protocolCalls = @($success.GhCalls | Where-Object {
         [string]$_ -like 'repos/hasanmanzak/meAndAI/*'
     }).Count -gt 0
 })
+$issueCalls = @($success.GhCalls | Where-Object {
+    @($_.Arguments | Where-Object {
+        ([string]$_ -like 'repos/owner/consumer/issues*' -or
+         [string]$_ -like 'repos/owner/consumer/labels*') -and
+        [string]$_ -cne 'repos/owner/consumer/issues/21/comments'
+    }).Count -gt 0
+})
 $consumerCalls = @($success.GhCalls | Where-Object {
     @($_.Arguments | Where-Object {
         [string]$_ -like 'repos/hasanmanzak/meAndAI/*'
-    }).Count -eq 0
+    }).Count -eq 0 -and $_ -notin $issueCalls
 })
 if (@($protocolCalls | Where-Object { $_.Token -cne 'protocol-read-token' }).Count -ne 0 -or
+    @($issueCalls | Where-Object { $_.Token -cne 'issue-write-token' }).Count -ne 0 -or
     @($consumerCalls | Where-Object { $_.Token -cne 'updater-write-token' }).Count -ne 0) {
     Add-Failure 'TEST-0061 protocol-read and consumer-write credentials crossed authority boundaries.'
 }
@@ -857,7 +1058,9 @@ $pendingLatest = Invoke-AdapterScenario -Name 'pending-latest' `
     -ExistingReplacement $true -OldCandidateExists $false -OldBranchExists $false
 if ($pendingLatest.Threw -or
     (Get-EventIndex $pendingLatest 'verify-release-tag-ref') -lt 0 -or
-    (Get-EventIndex $pendingLatest 'checkout-target-assets') -ge 0) {
+    (Get-EventIndex $pendingLatest 'checkout-target-assets') -ge 0 -or
+    (Get-EventIndex $pendingLatest 'create-update-issue') -ge 0 -or
+    @($pendingLatest.Issues | Where-Object { [int]$_.number -eq 130 }).Count -ne 1) {
     Add-Failure "TEST-0061 zero-operation latest proposal skipped release proof or mutated state: $($pendingLatest.Error)"
 }
 foreach ($releaseMode in @('Missing', 'Mutable', 'Draft', 'Prerelease', 'Unpublished', 'WrongTag')) {
@@ -1205,6 +1408,28 @@ foreach ($forbiddenEvent in @(
     if ((Get-EventIndex $wrongCaseSubmodulePath $forbiddenEvent) -ge 0) {
         Add-Failure "TEST-0058 case-variant protocol path reached '$forbiddenEvent'."
     }
+}
+
+foreach ($requiredLifecycleText in @(
+    'meandai-protocol-update-issue:',
+    'Ensure-ProtocolUpdateIssue',
+    'Set-ProtocolUpdateIssuePullRequestLink',
+    'Complete-SupersededProtocolUpdateIssue',
+    'ISSUE_TOKEN',
+    'Tracking issue: #$($updateIssue.Number)'
+)) {
+    if (-not $adapterContent.Contains($requiredLifecycleText)) {
+        Add-Failure "TEST-0111 adapter lacks automatic update lifecycle contract '$requiredLifecycleText'."
+    }
+}
+if ($adapterContent.Contains('Update the consumer project memory pinned-version fact') -or
+    $adapterContent.Contains('Create or link the tracked issue')) {
+    Add-Failure 'TEST-0111 adapter still delegates managed issue or derived pin reconciliation to the maintainer.'
+}
+$workflowContent = Get-Content -LiteralPath $workflowSource -Raw
+if (-not $workflowContent.Contains('ISSUE_TOKEN: ${{ github.token }}') -or
+    -not $workflowContent.Contains('issues: write')) {
+    Add-Failure 'TEST-0111 proposal workflow does not grant the job-scoped token its narrow issue authority.'
 }
 
 Remove-Item Function:\git -ErrorAction SilentlyContinue

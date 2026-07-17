@@ -12,7 +12,7 @@
                 'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076',
                 'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092',
                 'TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099',
-                'TEST-0101'
+                'TEST-0101', 'TEST-0114'
             )
         }
         @{
@@ -23,7 +23,8 @@
                 'TEST-0013', 'TEST-0014', 'TEST-0015', 'TEST-0016',
                 'TEST-0017', 'TEST-0021', 'TEST-0022', 'TEST-0023',
                 'TEST-0024', 'TEST-0025', 'TEST-0026', 'TEST-0048',
-                'TEST-0058', 'TEST-0061', 'TEST-0072', 'TEST-0088'
+                'TEST-0058', 'TEST-0061', 'TEST-0072', 'TEST-0088',
+                'TEST-0111'
             )
         }
         @{
@@ -48,7 +49,8 @@
                 'TEST-0069', 'TEST-0070', 'TEST-0073', 'TEST-0078',
                 'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
-                'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107'
+                'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
+                'TEST-0113'
             )
         }
         @{
@@ -64,7 +66,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/managed-merge-finalization.tests.ps1'
-            TestIds = @('TEST-0108', 'TEST-0109', 'TEST-0110')
+            TestIds = @('TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112')
         }
         @{
             Evidence = 'ExecutableSuite'

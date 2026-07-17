@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.7/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.9.7` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.0/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.10.0` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.9.7` is an exact published immutable release
+launcher itself verifies that `v0.10.0` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -192,6 +192,38 @@ architecture, build command, and product test command are recorded as
 and Codex must not invent values; adoption validation remains structural until
 the project establishes those facts.
 
+The resulting consumer records and structural tests treat the `.ai/protocol`
+gitlink plus the `VERSION` inside that exact checkout as the sole current pin
+authority. They link to or read those sources dynamically and do not copy the
+adoption tag or commit as a live memory, decision, documentation, or test
+constant. A dated adoption entry may retain the exact initial values as
+historical evidence. This boundary lets later compatible updates finish in the
+managed update pull request without a second consumer-owned reconciliation.
+
+### Re-running the launcher
+
+The latest launcher classifies a connected non-empty repository before secret
+or repository mutation. A repository with no adoption footprint follows the
+initial-adoption flow. A complete installation must prove the exact gitlink,
+canonical `.gitmodules`, absence of the transient manifest, one installed
+bootstrap tag whose immutable release maps to that gitlink, and workflow/module/
+adapter blobs identical to that installed release.
+
+- If the installed and requested tags are equal, the launcher preserves both
+  existing secret names, creates only missing secrets, and exits successfully
+  without workflow dispatch, Git publication, pull-request resolution, or
+  Codex.
+- If the installed tag is older in the same major, the launcher preserves the
+  installed seed, reconciles only missing secrets, dispatches that installed
+  updater with correlation evidence, waits for its result, and never enters
+  adoption/Codex handling. The reviewed update installs the newer lifecycle.
+- A partial or drifted footprint, a newer installed tag, or a major-version
+  boundary fails before secret or repository mutation. The launcher never
+  downgrades and never overwrites an installed updater seed.
+
+An in-flight seed-only adoption is still initial adoption and can resume only
+with its original protocol tag; a different requested seed remains a collision.
+
 The CLI process reuses the maintainer's saved local Codex authentication. No
 consumer repository connection to hosted GitHub-agent execution is required.
 Local orchestration is not offline inference: the CLI sends its prompt and
@@ -207,24 +239,26 @@ reuses the branch, and the live head still matches. It then lease-deletes only
 that deterministic branch, records one issue evidence marker, removes transient
 meAndAI status labels, and closes the issue as completed.
 
-GitHub does not replay an event that occurred while this route was being
-installed, and a merge performed with `GITHUB_TOKEN` may not create another
-workflow event. For the first merge that installs `v0.9.7`, a missed event, or
-a partial finalization, run the same route explicitly after confirming the PR
-is merged:
+GitHub does not replay an event that occurred while a route was absent, and a
+merge performed with `GITHUB_TOKEN` may not create another workflow event. The
+`v0.10.0` workflow therefore also runs bounded recovery on the installing
+default-branch push, the schedule, and ordinary manual dispatch. It repairs only
+an exact legacy installing update, then uses the normal finalizer. For a missed
+or failed recovery, run the same route explicitly after confirming the PR is
+merged:
 
 ```powershell
 gh workflow run meandai-protocol-update.yml --repo <owner>/<repo> -f finalize_pull_request=<merged-pr-number>
 ```
 
-The recovery dispatch is idempotent when the exact branch is already absent and
+The recovery routes are idempotent when the exact branch is already absent and
 the issue already contains the matching finalization evidence. It fails closed
 for a moved/reused branch, a merge no longer on the default branch, a malformed
-or missing tracking line, or an issue closed without that evidence. Do not use
+ambiguous tracking line, or an issue closed without that evidence. Do not use
 `Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
-would close the issue before branch convergence. Older consumer pins do not
-gain this behavior until their reviewed update installs the `v0.9.7` workflow
-and adapter.
+would close the issue before branch convergence. Older consumer pins gain the
+behavior when their reviewed update installs the `v0.10.0` workflow and adapter;
+the installing update itself is covered only by the bounded legacy bridge.
 
 ## Stopping and resuming safely
 
@@ -316,6 +350,11 @@ by the launcher, every applicable AGENTS.md, and existing project files. Resolve
 collisions semantically; create or reconcile feature and decision records,
 local memory, tests, evidence, and clickable links. Reference the project-owned
 adoption issue already created by the launcher. Do not invent project facts.
+Treat the .ai/protocol gitlink and its VERSION as the sole current protocol-pin
+authority. Consumer-owned instructions, memory, decisions, features, indexes,
+and tests must resolve that identity dynamically; do not embed the adoption tag
+or commit as a live current-pin fact. Exact values may appear only in a dated
+historical adoption record that does not claim current authority.
 For an empty consumer, record unavailable product purpose, runtime/stack,
 architecture, build command, and product test command as Not yet established;
 their absence is not a blocker to protocol adoption. Use structural checks and

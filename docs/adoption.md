@@ -32,10 +32,14 @@ tag or GitHub Release.
 The mandate remains common, while consumer-owned instructions, memory,
 features, decisions, and tests remain under consumer ownership. The generic
 submodule updater advances the protocol gitlink and its three managed updater
-assets only; it does not rewrite those project-owned records. A consumer pinned
-to an earlier release remains governed by that exact pin until its reviewed
-upgrade merges. Repository-reference consumers update their immutable ref
-manually or through their own reviewed provider adapter.
+assets only; it does not rewrite those project-owned records. The consumer's
+`.ai/protocol` gitlink and the `VERSION` inside that exact checkout are the sole
+current commit and version authorities. Consumer-owned records and tests read
+them dynamically instead of copying a live tag or SHA. A consumer pinned to an
+earlier release remains governed by that exact pin until its reviewed upgrade
+merges. Repository-reference consumers apply the same single-authority rule to
+their configured immutable ref and update it manually or through their own
+reviewed provider adapter.
 
 For the shortest supported setup, follow the
 [quick adoption guide](quick-adoption.md). It creates or validates the GitHub
@@ -63,9 +67,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.9.7`, the only repository file required
+For a new submodule consumer on `v0.10.0`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.7/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -109,7 +113,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.9.7'
+$tag = 'v0.10.0'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -171,10 +175,18 @@ creates individual idea records and the compatible updater never manages
 consumer-owned `docs/ideas` content. An existing consumer may create the index
 and later records from its pinned templates without migrating its updater.
 
+Copied or semantically created instructions, memory, decisions, features,
+indexes, and tests MUST refer to the live submodule gitlink and its `VERSION`
+rather than copy the adoption tag or commit as a current fact. Exact values may
+remain in a dated adoption or update record as historical event evidence. They
+do not become fields that must be rewritten after every compatible update.
+
 The repository's `.github/ISSUE_TEMPLATE/config.yml` is deliberately excluded:
 its contact link describes this protocol repository and follows its current
 `main`. Create a consumer-owned configuration whose links point to the
-consumer's documentation or to the exact pinned protocol tag.
+consumer's documentation or the stable
+[protocol repository](https://github.com/hasanmanzak/meAndAI), not to a copied
+current-version literal.
 
 
 Submodule consumers also materialize these submodule-only automation assets:
@@ -270,7 +282,7 @@ remains valid protocol usage, but it uses the manual reviewed update process
 because the generic updater cannot infer its current major unambiguously.
 Before enabling the updater:
 
-1. Create a fine-grained PAT named `meAndAI Updater - <repo>`. Select only the
+1. Create a fine-grained PAT named `meAndAI Protocol Update Token`. Select only the
    consumer repository and grant `Contents: read and write`, `Pull requests:
    read and write`, and `Workflows: read and write`; `Metadata: read` is
    implicit. Store it as the repository Actions secret
@@ -291,11 +303,14 @@ when automation must be independent of a human identity or centrally governed
 across multiple owners.
 
 The schedule and ordinary manual dispatch provide eventual update detection,
-not an immediate release notification. Their proposal job keeps
-`GITHUB_TOKEN` read-only and uses the fine-grained PAT only for consumer
-checkout, branch push, and pull-request operations. A separate post-merge job
-uses a job-scoped `GITHUB_TOKEN` with only `contents: write`, `pull-requests:
-read`, and `issues: write` to finalize an already merged exact managed proposal.
+not an immediate release notification. Their proposal job gives the job-scoped
+`GITHUB_TOKEN` only `issues: write` (plus the required read access) for labels,
+the canonical work item, and its backlinks. The fine-grained PAT remains the
+separate authority for consumer checkout, branch push, pull-request creation,
+and workflow replacement. A post-merge job uses its job-scoped `GITHUB_TOKEN`
+with only `contents: write`, `pull-requests: write`, and `issues: write` to
+repair a narrowly qualified installing legacy proposal when needed and finalize
+an already merged exact managed proposal.
 Consumer Actions policies still govern resulting workflow runs. See GitHub's documentation for
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
 and [fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
@@ -315,9 +330,10 @@ Its state rules are:
 
 | Observed state | Result |
 | --- | --- |
-| Consumer already pins the latest compatible tag | No change |
-| One valid managed pull request already targets the latest tag | Keep it; no duplicate pull request |
-| An older valid managed pull request is open and a newer compatible tag exists | Create and fully verify the newer replacement first; revalidate both proposals before each cleanup, then close the old PR and delete only its expected branch head; try to reopen the old PR if paired cleanup fails |
+| Consumer already pins the latest compatible tag | Recover any exact retained merged branch, then make no update change |
+| No valid managed pull request targets the latest tag | Create or reuse its canonical issue and missing Agile labels, then create the exact deterministic branch and draft pull request with one real tracking line and issue backlink |
+| One valid managed pull request already targets the latest tag | Keep its exact issue, branch, and pull request; create no duplicate |
+| An older valid managed pull request is open and a newer compatible tag exists | Create and fully verify the newer issue, replacement branch, and draft first; revalidate both proposals before each cleanup, then close the old PR, delete only its expected branch head, and close only its exact issue as not planned; try to reopen the old PR if paired branch cleanup fails |
 | Ownership, canonical marker, planned head, protocol commit, gitlink mode, expected managed path/blob set, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
 | A higher major exists | Report that explicit migration is required; do not propose it automatically |
 
@@ -327,21 +343,31 @@ all current copies must equal the pinned templates; customization stops for
 manual review. The running job continues with its already loaded updater code,
 and a merged proposal supplies the updater used by the next run. Consumer
 memory, root instructions, feature records, decisions, tests, and other files
-are not rewritten. Maintainers still apply the project's normal DoR, DoD, CI,
-and review gates. Before making a managed update ready or merging it, the
-maintainer MUST add exactly one `Tracking issue: #N` body line naming a real
-same-repository issue. `Closes`, `Fixes`, and `Resolves` references are not used:
-the finalizer closes the issue only after exact branch deletion succeeds.
+are not rewritten. Because those records resolve the current identity from the
+gitlink and its `VERSION`, a routine compatible update needs no separate
+consumer-owned reconciliation pull request. Maintainers still apply the
+project's normal DoR, DoD, CI, and review gates. The workflow creates or reuses
+one target/SHA/repository-marker-owned issue, creates only missing standard
+labels, writes exactly one real `Tracking issue: #N` line into the draft, and
+adds the exact pull-request/head backlink. The maintainer does not prepare that
+tracking state. `Closes`, `Fixes`, and `Resolves` references are not used: the
+finalizer closes the issue only after exact branch deletion succeeds.
 
 After merge, the `pull_request.closed` route validates the fresh API head,
-marker, current default-branch containment, changed paths, issue, branch reuse,
-and live ref. It lease-deletes only the unchanged deterministic branch, records
-one issue evidence marker, removes transient meAndAI status labels, and closes
-the issue. If the installing `v0.9.7` merge misses the new route, or GitHub
-suppresses the event because a `GITHUB_TOKEN` performed the merge, run the
-workflow manually with `finalize_pull_request` set to that merged PR number.
-The same idempotent recovery route completes partial finalization; it does not
-approve or merge work.
+marker, current default-branch containment, changed paths, canonical issue and
+backlink, branch reuse, and live ref. It lease-deletes only the unchanged
+deterministic branch, records one issue evidence marker, removes transient
+meAndAI status labels, and closes the issue. A default-branch `push`, schedule,
+or ordinary manual dispatch also checks the bounded retained-branch recovery
+route before update discovery. This lets the first merge that installs the
+`v0.10.0` lifecycle repair only an exact legacy update with an absent or exact
+`#REQUIRED` tracking line, create its canonical issue, patch the merged pull
+request, and enter the same finalizer. Foreign, partial, moved, unexpected-path,
+or ambiguous state fails before mutation.
+
+If an event or recovery run still fails, rerun the workflow manually with
+`finalize_pull_request` set to that merged PR number. The same idempotent route
+completes partial finalization; it does not approve or merge work.
 
 The evolved contract is recorded in
 [FEAT-0004](features/FEAT-0004-self-updating-consumer-updater/README.md) and
@@ -384,7 +410,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.9.7`
+- ref: `v0.10.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -424,16 +450,19 @@ condition.
 3. Review incompatible or newly mandatory rules.
 4. Update the submodule or reference to a specific tag.
 5. Run the consuming project's tests and documentation-link checks.
-6. Update the pinned version in project memory and merge through a pull request.
+6. Merge through a pull request. Do not create a consumer-owned reconciliation
+   change merely to restate the live tag or commit; change those records only
+   when an independently required project-specific migration changes their
+   meaning.
 
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.9.7`:
+before checkout; the current example then installs `v0.10.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.9.7
+git -C .ai/protocol checkout v0.10.0
 git add .ai/protocol
 ```
 
@@ -445,17 +474,21 @@ canonical tag. If one exists, the workflow opens a deterministic draft branch
 and pull request for the exact target. The same proposal contains the protocol
 gitlink plus only those canonical updater assets whose target-release blobs
 differ. The maintainer reviews and merges it through the consuming project's
-ordinary gates.
+ordinary gates. Once merged and finalized, the compatible update is complete;
+there is no routine follow-up pull request for memory, decisions, indexes, or
+tests solely to copy the new pin.
 
 If another release appears before merge, the newer proposal supersedes the
 older one. Supersession is replacement-first and compensated, not a distributed
-transaction: the workflow creates and fully verifies the new branch and draft
-pull request, then revalidates both proposals immediately before each old
+transaction: the workflow creates and fully verifies the new issue, branch, and
+draft pull request, then revalidates both proposals immediately before each old
 cleanup. It closes the old pull request and deletes only the exact expected
-branch head with a Git lease. If paired branch cleanup fails or the ref
-disappears, it tries to reopen the old pull request and reports manual recovery
-when compensation cannot restore the prior review state. The workflow never
-intentionally deletes a changed or ambiguously owned branch.
+branch head with a Git lease. Only after that convergence does it record
+supersession and close the old issue as not planned. If paired branch cleanup
+fails or the ref disappears, it tries to reopen the old pull request and leaves
+the issue open; it reports manual recovery when compensation cannot restore the
+prior review state. The workflow never intentionally deletes or closes changed
+or ambiguously owned work.
 
 ### Interrupted-run recovery
 

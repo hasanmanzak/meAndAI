@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.9.7**<br>
+Protocol version: **0.10.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -462,8 +462,24 @@ Every released version updates `VERSION`, relevant current-release metadata,
 and `CHANGELOG.md`. Historical feature target versions remain unchanged.
 Consumers SHOULD pin the tag of a verified immutable release or an explicitly
 reviewed commit, never an unqualified moving branch. A consuming project
-versions its own product independently and records the pinned common-protocol
-version in its project memory.
+versions its own product independently.
+
+For a Git submodule consumer, the sole current protocol-pin authority is the
+`.ai/protocol` `160000` gitlink in the consumer revision together with the
+`VERSION` file inside that exact checkout: the gitlink supplies the commit and
+`VERSION` supplies its canonical `M.m.rev` identity. Root instructions,
+project memory, decisions, feature records, indexes, tests, and other
+consumer-owned records MUST resolve the current identity from those sources;
+they MUST NOT duplicate a literal tag or commit as a separately maintained
+current-pin fact. A repository-reference consumer applies the same rule to its
+provider's configured immutable-ref authority.
+
+An exact tag or commit MAY remain in a dated adoption or update record, issue,
+pull request, or test-run entry as historical event evidence. Such evidence
+MUST identify the event and date and MUST NOT claim to be the consumer's live
+pin authority. A routine compatible update therefore requires no separate
+consumer-owned memory, decision, documentation, or test reconciliation merely
+to restate the new tag or commit.
 
 ### Consumer update proposals
 
@@ -508,7 +524,9 @@ into the consumer.
 A transient adoption manifest MUST be validated before it enters an agent
 prompt. Validation includes the exact canonical property inventory, repository
 and release identity, proposed-path and collision sets, and required-task set;
-accepting only a subset of identity fields is insufficient.
+accepting only a subset of identity fields is insufficient. Its tag and commit
+are transition evidence, not permission to copy a separately maintained live
+pin fact into consumer-owned records.
 
 #### Local quick-adoption launcher
 
@@ -610,7 +628,10 @@ malformed markers MUST block. The local agent MUST receive that issue reference,
 run under a finite timeout with spawned-command network disabled,
 resolve the transient manifest, complete the repository-local records and
 tests, apply bounded review gates, and leave every GitHub mutation and Git
-publication operation to the launcher. Before publication, the launcher MUST
+publication operation to the launcher. Those records and tests MUST resolve
+the current protocol identity through the integration authority defined in
+Section 8 rather than embedding the adoption tag or commit as a live fact.
+Before publication, the launcher MUST
 verify the unchanged draft head, manifest removal, credential-file absence, a
 valid reviewable change set, and an unchanged live remote branch. It MAY then
 create one completion commit, push it only with an exact expected-head lease,
@@ -650,6 +671,19 @@ A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
 self-reconciling, consumer-owned update workflow supplied by the pinned
 protocol, or record a decision that defines an equivalent reviewed update
 control for its platform.
+
+Re-running the current quick-adoption launcher against a connected non-empty
+consumer MUST classify committed repository evidence before secret or
+repository mutation. No adoption footprint follows initial adoption. A complete
+installation requires the exact protocol gitlink, canonical submodule metadata,
+no transient manifest, one immutable installed release matching the gitlink,
+and workflow/module/adapter blobs equal to that release. An equal requested tag
+is an idempotent no-op after missing-secret reconciliation. An older same-major
+tag dispatches the verified installed updater without overwriting its seed or
+running adoption/Codex work. Partial, drifted, newer, or cross-major state MUST
+fail before mutation. A seed-only in-flight adoption MAY resume only through its
+original exact seed.
+
 The updater MUST:
 
 - consider only canonical lowercase `vM.m.rev` tags with no leading zeros and
@@ -661,7 +695,8 @@ The updater MUST:
 - open a draft pull request and never merge it automatically;
 - maintain at most one unambiguous, automation-owned update pull request;
 - create and verify a newer replacement before closing an older superseded pull
-  request and deleting its branch;
+  request and deleting its branch, then close only its exact tracking issue as
+  not planned after branch convergence;
 - stop without cleanup when ownership, metadata, changed paths, branch content,
   authentication, or replacement verification is ambiguous;
 - require exactly one canonical case-sensitive ownership marker and bind it to
@@ -686,7 +721,12 @@ The updater MUST:
 - use a consumer-repository-scoped write credential with explicit Contents,
   Pull requests, and Workflows permissions while keeping any private-source read
   credential separate; scheduled proposal creation and updater self-update MUST
-  NOT use `GITHUB_TOKEN` write authority;
+  NOT use `GITHUB_TOKEN` for contents, pull-request, or workflow writes;
+- use the proposal job's repository-scoped `GITHUB_TOKEN` only for `issues:
+  write`: create missing standard Agile labels without overwriting existing
+  definitions, create or reuse exactly one canonical target/SHA/repository-owned
+  update issue, place its real tracking line in the initial draft, and record an
+  exact pull-request/head backlink;
 - bind each managed adoption or update proposal to exactly one same-repository
   issue through one canonical, non-closing `Tracking issue: #N` body line before
   maintainer merge; native closing keywords are forbidden because issue closure
@@ -698,14 +738,25 @@ The updater MUST:
   branch with an expected-head lease before recording evidence, removing
   transient status labels, and closing the issue;
 - scope the post-merge finalization job's `GITHUB_TOKEN` to `contents: write`,
-  `pull-requests: read`, and `issues: write`; this exception MUST NOT grant the
-  proposal job or another workflow consumer mutation authority;
+  `pull-requests: write`, and `issues: write`; pull-request write authority is
+  limited to repairing the missing or exact `#REQUIRED` tracking line of one
+  otherwise fully qualified installing legacy update, and this exception MUST
+  NOT grant contents/pull-request/workflow authority to the proposal job;
 - provide an explicit pull-request-number recovery dispatch that is idempotent
   for an already absent exact branch and an issue already closed with the exact
-  finalization marker; a missed event, an installing updater merge, or an event
-  suppressed after a `GITHUB_TOKEN`-authored merge MUST use this same route;
+  finalization marker; before update discovery, default-branch push, schedule,
+  and ordinary dispatch MUST also recover retained exact merged branches through
+  this route;
+- repair an installing legacy update only after proving its same-repository
+  merge, canonical marker/branch/head/base, current default containment, current
+  gitlink, allowed path set, immutable target release and exact changed updater
+  blobs; every foreign, partial, moved, malformed, or ambiguous near-match MUST
+  fail before issue or pull-request mutation;
 - never rewrite project memory, root instructions, domain records, feature or
-  decision records, tests, or other consumer-owned files; and
+  decision records, tests, or other consumer-owned files; those artifacts MUST
+  already be version-independent under the current-pin authority above, so a
+  routine compatible update does not require a second reconciliation change;
+  and
 - keep credentials outside repository content, project memory, logs, and pull
   request bodies.
 
@@ -731,6 +782,8 @@ Memory MUST:
 - distinguish verified facts, decisions, assumptions, and unresolved questions;
 - link to canonical features, decisions, issues, pull requests, and evidence;
 - include dates or versions for facts that can become stale;
+- resolve the current common-protocol identity from the configured integration
+  authority and never duplicate its live tag or commit as a memory fact;
 - be updated with the feature that changes the remembered fact;
 - record corrections instead of silently preserving contradicted guidance; and
 - exclude secrets, credentials, personal data without a project need, raw chat

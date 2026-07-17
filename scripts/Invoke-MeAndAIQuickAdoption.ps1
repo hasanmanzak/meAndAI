@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.7',
+    [string]$ProtocolTag = 'v0.10.0',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -93,6 +93,12 @@ $adoptionUpdaterAssets = @($adoptionAssets | Where-Object {
         '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
     )
 })
+$managedUpdaterAssets = @(
+    [pscustomobject]@{
+        ConsumerPath = $workflowTargetPath
+        TemplatePath = $workflowSourcePath
+    }
+) + @($adoptionUpdaterAssets)
 $secretLockLabel = 'meandai:secret-reconciliation-lock'
 $tokenMappings = [ordered]@{
     'FG_PAT.txt' = 'MEANDAI_UPDATER_TOKEN'
@@ -117,6 +123,12 @@ $adoptionLabels = @(
 $script:QuickAdoptionProgressEnabled = -not $NoProgress
 $script:QuickAdoptionLastProgressKey = ''
 $script:QuickAdoptionLastChildKey = ''
+$script:ValidatedProtocolReleases = [System.Collections.Generic.Dictionary[string, object]]::new(
+    [StringComparer]::Ordinal
+)
+$script:CanonicalProtocolAssets = [System.Collections.Generic.Dictionary[string, object]]::new(
+    [StringComparer]::Ordinal
+)
 
 function ConvertTo-QuickAdoptionDisplayText {
     param(
@@ -1014,9 +1026,19 @@ function Invoke-GitHubApi {
 }
 
 function Get-ValidatedImmutableProtocolRelease {
-    param([string]$ProtocolToken = '')
+    param(
+        [string]$ProtocolToken = '',
+        [string]$Tag = $ProtocolTag
+    )
 
-    $escapedTag = [Uri]::EscapeDataString($ProtocolTag)
+    if ($Tag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$') {
+        throw "Protocol tag '$Tag' must use the canonical vM.m.rev form."
+    }
+    if ($script:ValidatedProtocolReleases.ContainsKey($Tag)) {
+        return $script:ValidatedProtocolReleases[$Tag]
+    }
+
+    $escapedTag = [Uri]::EscapeDataString($Tag)
     $endpoint = "repos/$ProtocolRepository/releases/tags/$escapedTag"
     if ($ProtocolToken) {
         $release = Invoke-GitHubApi `
@@ -1034,7 +1056,7 @@ function Get-ValidatedImmutableProtocolRelease {
                 ConvertFrom-Json)
         }
         catch {
-            throw "Unable to verify the published immutable GitHub Release '$ProtocolTag' through the authenticated local GitHub CLI."
+            throw "Unable to verify the published immutable GitHub Release '$Tag' through the authenticated local GitHub CLI."
         }
     }
 
@@ -1045,36 +1067,76 @@ function Get-ValidatedImmutableProtocolRelease {
         }
     }
     $publishedAt = [DateTimeOffset]::MinValue
-    if ([string]$release.tag_name -cne $ProtocolTag -or
+    if ([string]$release.tag_name -cne $Tag -or
         $release.draft -isnot [bool] -or $release.draft -or
         $release.prerelease -isnot [bool] -or $release.prerelease -or
         $release.immutable -isnot [bool] -or -not $release.immutable -or
         -not [DateTimeOffset]::TryParse([string]$release.published_at, [ref]$publishedAt)) {
-        throw "Protocol source '$ProtocolTag' is not an exact published immutable GitHub Release."
+        throw "Protocol source '$Tag' is not an exact published immutable GitHub Release."
     }
 
-    return $release
+    $commitEndpoint = "repos/$ProtocolRepository/commits/$escapedTag"
+    if ($ProtocolToken) {
+        $commit = Invoke-GitHubApi `
+            -Uri "https://api.github.com/$commitEndpoint" -Token $ProtocolToken
+    }
+    else {
+        try {
+            $commitResult = Invoke-External -Command 'gh' -Arguments @(
+                'api',
+                '-H', 'Accept: application/vnd.github+json',
+                '-H', 'X-GitHub-Api-Version: 2026-03-10',
+                $commitEndpoint
+            )
+            $commit = ((@($commitResult.Output) -join [Environment]::NewLine) |
+                ConvertFrom-Json)
+        }
+        catch {
+            throw "Unable to resolve immutable protocol release '$Tag' to one commit through the authenticated local GitHub CLI."
+        }
+    }
+    if ($null -eq $commit -or $null -eq $commit.PSObject.Properties['sha'] -or
+        [string]$commit.sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Immutable protocol release '$Tag' did not resolve to one canonical commit."
+    }
+
+    $evidence = [pscustomobject]@{
+        Tag = $Tag
+        CommitSha = [string]$commit.sha
+        Release = $release
+    }
+    $script:ValidatedProtocolReleases.Add($Tag, $evidence)
+    return $evidence
 }
 
-function Get-CanonicalWorkflow {
-    param([string]$ProtocolToken = '')
+function Get-CanonicalProtocolAsset {
+    param(
+        [Parameter(Mandatory)][string]$Tag,
+        [Parameter(Mandatory)][string]$TemplatePath,
+        [string]$ProtocolToken = ''
+    )
 
     if ($ProtocolRepository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
         throw "ProtocolRepository '$ProtocolRepository' must use the owner/repository form."
     }
-    if ($ProtocolTag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$') {
-        throw 'ProtocolTag must use the vM.m.rev form.'
+    if ($TemplatePath -cnotmatch '^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$') {
+        throw "Protocol asset path '$TemplatePath' is not canonical."
     }
 
-    [void](Get-ValidatedImmutableProtocolRelease -ProtocolToken $ProtocolToken)
+    [void](Get-ValidatedImmutableProtocolRelease `
+        -ProtocolToken $ProtocolToken -Tag $Tag)
+    $cacheKey = "$Tag`n$TemplatePath"
+    if ($script:CanonicalProtocolAssets.ContainsKey($cacheKey)) {
+        return $script:CanonicalProtocolAssets[$cacheKey]
+    }
 
-    $escapedRef = [Uri]::EscapeDataString($ProtocolTag)
-    $uri = "https://api.github.com/repos/$ProtocolRepository/contents/$workflowSourcePath`?ref=$escapedRef"
+    $escapedRef = [Uri]::EscapeDataString($Tag)
+    $uri = "https://api.github.com/repos/$ProtocolRepository/contents/$TemplatePath`?ref=$escapedRef"
     if ($ProtocolToken) {
         $response = Invoke-GitHubApi -Uri $uri -Token $ProtocolToken
     }
     else {
-        $endpoint = "repos/$ProtocolRepository/contents/$workflowSourcePath`?ref=$escapedRef"
+        $endpoint = "repos/$ProtocolRepository/contents/$TemplatePath`?ref=$escapedRef"
         try {
             $result = Invoke-External -Command 'gh' -Arguments @(
                 'api',
@@ -1085,24 +1147,219 @@ function Get-CanonicalWorkflow {
             $response = ((@($result.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
         }
         catch {
-            throw "Unable to retrieve the canonical workflow through the authenticated local GitHub CLI. Verify local gh access to '$ProtocolRepository', then rerun."
+            throw "Unable to retrieve canonical protocol asset '$TemplatePath' at '$Tag' through the authenticated local GitHub CLI. Verify local gh access to '$ProtocolRepository', then rerun."
         }
     }
     if ($response.encoding -cne 'base64' -or -not $response.content -or -not $response.sha) {
-        throw 'The canonical workflow response is incomplete or uses an unsupported encoding.'
+        throw "Canonical protocol asset '$TemplatePath' is incomplete or uses an unsupported encoding."
     }
 
     try {
         $bytes = [Convert]::FromBase64String(([string]$response.content))
     }
     catch {
-        throw 'The canonical workflow response contains invalid base64 content.'
+        throw "Canonical protocol asset '$TemplatePath' contains invalid base64 content."
     }
     $actualSha = Get-GitBlobSha -Bytes $bytes
     if ($actualSha -cne ([string]$response.sha).ToLowerInvariant()) {
-        throw 'The canonical workflow Git blob verification failed.'
+        throw "Canonical protocol asset '$TemplatePath' failed Git blob verification."
     }
-    return $bytes
+    $asset = [pscustomobject]@{
+        Tag = $Tag
+        TemplatePath = $TemplatePath
+        Bytes = [byte[]]$bytes
+        Sha = $actualSha
+    }
+    $script:CanonicalProtocolAssets.Add($cacheKey, $asset)
+    return $asset
+}
+
+function Get-CanonicalWorkflow {
+    param([string]$ProtocolToken = '')
+
+    $asset = Get-CanonicalProtocolAsset -Tag $ProtocolTag `
+        -TemplatePath $workflowSourcePath -ProtocolToken $ProtocolToken
+    return [byte[]]$asset.Bytes
+}
+
+function ConvertTo-CanonicalProtocolVersionRecord {
+    param([Parameter(Mandatory)][string]$Tag)
+
+    $match = [regex]::Match(
+        $Tag,
+        '^v(?<major>0|[1-9][0-9]*)\.(?<minor>0|[1-9][0-9]*)\.(?<revision>0|[1-9][0-9]*)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $match.Success) {
+        throw "Protocol tag '$Tag' must use the canonical vM.m.rev form."
+    }
+    return [pscustomobject]@{
+        Tag = $Tag
+        Parts = @(
+            [string]$match.Groups['major'].Value,
+            [string]$match.Groups['minor'].Value,
+            [string]$match.Groups['revision'].Value
+        )
+    }
+}
+
+function Compare-CanonicalProtocolVersion {
+    param(
+        [Parameter(Mandatory)]$Left,
+        [Parameter(Mandatory)]$Right
+    )
+
+    for ($index = 0; $index -lt 3; $index++) {
+        $comparison = Compare-CanonicalDecimalComponent `
+            -Left ([string]$Left.Parts[$index]) `
+            -Right ([string]$Right.Parts[$index])
+        if ($comparison -ne 0) {
+            return $comparison
+        }
+    }
+    return 0
+}
+
+function Assert-CanonicalProtocolSubmoduleMetadata {
+    param([Parameter(Mandatory)][string]$Repository)
+
+    $pathResult = Invoke-Git -Repository $Repository -Arguments @(
+        'config', '-f', '.gitmodules', '--get-regexp', '^submodule\..*\.path$'
+    ) -AllowFailure
+    if ($pathResult.ExitCode -ne 0) {
+        throw "Installed protocol metadata has no canonical '$('.ai/protocol')' entry."
+    }
+    $matches = @($pathResult.Output | Where-Object {
+        [string]$_ -match '^submodule\.\.ai/protocol\.path\s+\.ai/protocol$'
+    })
+    if ($matches.Count -ne 1) {
+        throw "Installed protocol metadata must contain one canonical '.ai/protocol' path entry."
+    }
+    $urlResult = Invoke-Git -Repository $Repository -Arguments @(
+        'config', '-f', '.gitmodules', '--get-all', 'submodule..ai/protocol.url'
+    ) -AllowFailure
+    $urls = @($urlResult.Output | Where-Object { $_ })
+    $expectedUrl = "https://github.com/$ProtocolRepository.git"
+    if ($urlResult.ExitCode -ne 0 -or $urls.Count -ne 1 -or
+        [string]$urls[0] -cne $expectedUrl) {
+        throw "Installed protocol metadata must use canonical URL '$expectedUrl'."
+    }
+}
+
+function Get-ExistingAdoptionRoute {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [string]$HeadSha = '',
+        [string]$ProtocolToken = ''
+    )
+
+    if (-not $HeadSha) {
+        return [pscustomobject]@{
+            State = 'InitialAdoption'; InstalledTag = ''; InstalledProtocolSha = ''
+        }
+    }
+    if ($HeadSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Existing adoption routing received an invalid default-branch head.'
+    }
+
+    $manifestEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $HeadSha -Path $adoptionManifestPath
+    if ($manifestEntry.Path) {
+        throw 'The transient adoption manifest exists on the default branch; managed routing is ambiguous.'
+    }
+    $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $HeadSha -Path '.ai/protocol'
+    if (-not $protocolEntry.Path) {
+        $partialManagedPaths = @('.gitmodules') + @($adoptionUpdaterAssets | ForEach-Object {
+            [string]$_.ConsumerPath
+        })
+        foreach ($partialManagedPath in $partialManagedPaths) {
+            $partialManagedEntry = Get-AdoptionTreeEntry -Repository $Repository `
+                -Commit $HeadSha -Path $partialManagedPath
+            if ($partialManagedEntry.Path) {
+                throw "Managed adoption footprint '$partialManagedPath' exists without the protocol gitlink."
+            }
+        }
+        return [pscustomobject]@{
+            State = 'InitialAdoption'; InstalledTag = ''; InstalledProtocolSha = ''
+        }
+    }
+    if ($protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit' -or
+        $protocolEntry.Sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Existing '.ai/protocol' is not one canonical protocol gitlink."
+    }
+
+    $workingChanges = @((Invoke-Git -Repository $Repository -Arguments @(
+        'status', '--porcelain=v1', '--untracked-files=all'
+    )).Output | Where-Object { $_ })
+    if ($workingChanges.Count -ne 0) {
+        throw 'A completed adoption must be clean before current/update routing.'
+    }
+    $gitmodulesEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $HeadSha -Path '.gitmodules'
+    if ($gitmodulesEntry.Mode -cne '100644' -or $gitmodulesEntry.Type -cne 'blob') {
+        throw "Installed protocol gitlink has no canonical '.gitmodules' blob."
+    }
+    Assert-CanonicalProtocolSubmoduleMetadata -Repository $Repository
+
+    foreach ($asset in $managedUpdaterAssets) {
+        $consumerEntry = Get-AdoptionTreeEntry -Repository $Repository `
+            -Commit $HeadSha -Path ([string]$asset.ConsumerPath)
+        if ($consumerEntry.Mode -cne '100644' -or $consumerEntry.Type -cne 'blob') {
+            throw "Installed updater asset '$($asset.ConsumerPath)' is absent or partial."
+        }
+    }
+
+    $workflowText = (@(Invoke-Git -Repository $Repository -Arguments @(
+        'show', "${HeadSha}:$workflowTargetPath"
+    )).Output -join "`n")
+    $declarations = [regex]::Matches(
+        $workflowText,
+        '(?m)^[ \t]*BOOTSTRAP_PROTOCOL_TAG[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $canonicalDeclarations = [regex]::Matches(
+        $workflowText,
+        '(?m)^  BOOTSTRAP_PROTOCOL_TAG: (?<tag>v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($declarations.Count -ne 1 -or $canonicalDeclarations.Count -ne 1) {
+        throw 'Installed updater workflow has no single canonical bootstrap protocol tag.'
+    }
+    $installedTag = [string]$canonicalDeclarations[0].Groups['tag'].Value
+    $installedVersion = ConvertTo-CanonicalProtocolVersionRecord -Tag $installedTag
+    $targetVersion = ConvertTo-CanonicalProtocolVersionRecord -Tag $ProtocolTag
+    if ([string]$installedVersion.Parts[0] -cne [string]$targetVersion.Parts[0]) {
+        throw "Installed protocol '$installedTag' and requested '$ProtocolTag' cross a major-version boundary; use a reviewed migration."
+    }
+
+    $installedRelease = Get-ValidatedImmutableProtocolRelease `
+        -ProtocolToken $ProtocolToken -Tag $installedTag
+    if ([string]$installedRelease.CommitSha -cne [string]$protocolEntry.Sha) {
+        throw "Installed protocol gitlink does not match immutable release '$installedTag'."
+    }
+    foreach ($asset in $managedUpdaterAssets) {
+        $sourceAsset = Get-CanonicalProtocolAsset -Tag $installedTag `
+            -TemplatePath ([string]$asset.TemplatePath) `
+            -ProtocolToken $ProtocolToken
+        $consumerEntry = Get-AdoptionTreeEntry -Repository $Repository `
+            -Commit $HeadSha -Path ([string]$asset.ConsumerPath)
+        if ([string]$consumerEntry.Sha -cne [string]$sourceAsset.Sha) {
+            throw "Installed updater asset '$($asset.ConsumerPath)' drifted from immutable release '$installedTag'."
+        }
+    }
+
+    $comparison = Compare-CanonicalProtocolVersion `
+        -Left $installedVersion -Right $targetVersion
+    if ($comparison -gt 0) {
+        throw "Installed protocol '$installedTag' is newer than requested launcher target '$ProtocolTag'; downgrade is prohibited."
+    }
+    return [pscustomobject]@{
+        State = if ($comparison -eq 0) { 'AlreadyCurrent' } else { 'CompatibleUpdate' }
+        InstalledTag = $installedTag
+        InstalledProtocolSha = [string]$protocolEntry.Sha
+    }
 }
 
 function Set-RepositorySecret {
@@ -3693,18 +3950,6 @@ else {
     $remoteIsEmpty = $true
 }
 
-$repositoryOwner = $repository.Split('/')[0]
-$nameResult = Invoke-Git -Repository $target -Arguments @('config', 'user.name') -AllowFailure
-if ($nameResult.ExitCode -ne 0 -or -not ((@($nameResult.Output) -join '').Trim())) {
-    Invoke-Git -Repository $target -Arguments @('config', 'user.name', $repositoryOwner) | Out-Null
-}
-$emailResult = Invoke-Git -Repository $target -Arguments @('config', 'user.email') -AllowFailure
-if ($emailResult.ExitCode -ne 0 -or -not ((@($emailResult.Output) -join '').Trim())) {
-    Invoke-Git -Repository $target -Arguments @(
-        'config', 'user.email', "$repositoryOwner@users.noreply.github.com"
-    ) | Out-Null
-}
-
 if ($null -eq $workflowBytes) {
     # Executable source authority is verified before the temporary lock label
     # performs the first repository mutation. Prefer the local read-only token
@@ -3719,9 +3964,40 @@ if ($null -eq $workflowBytes) {
     }
 }
 
+$routingHeadResult = Invoke-Git -Repository $target -Arguments @(
+    'rev-parse', '--verify', 'HEAD'
+) -AllowFailure
+$routingHead = if ($routingHeadResult.ExitCode -eq 0) {
+    ((@($routingHeadResult.Output) -join '').Trim())
+}
+else { '' }
+$existingAdoptionRoute = Get-ExistingAdoptionRoute -Repository $target `
+    -HeadSha $routingHead -ProtocolToken $protocolToken
+
+if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
+    $repositoryOwner = $repository.Split('/')[0]
+    $nameResult = Invoke-Git -Repository $target `
+        -Arguments @('config', 'user.name') -AllowFailure
+    if ($nameResult.ExitCode -ne 0 -or
+        -not ((@($nameResult.Output) -join '').Trim())) {
+        Invoke-Git -Repository $target -Arguments @(
+            'config', 'user.name', $repositoryOwner
+        ) | Out-Null
+    }
+    $emailResult = Invoke-Git -Repository $target `
+        -Arguments @('config', 'user.email') -AllowFailure
+    if ($emailResult.ExitCode -ne 0 -or
+        -not ((@($emailResult.Output) -join '').Trim())) {
+        Invoke-Git -Repository $target -Arguments @(
+            'config', 'user.email', "$repositoryOwner@users.noreply.github.com"
+        ) | Out-Null
+    }
+}
+
 $workflowFullPath = Assert-ContainedManagedDestination `
     -Root $target -RelativePath $workflowTargetPath
-if (Test-Path -LiteralPath $workflowFullPath) {
+if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption' -and
+    (Test-Path -LiteralPath $workflowFullPath)) {
     if (-not (Test-Path -LiteralPath $workflowFullPath -PathType Leaf)) {
         throw "The existing seed workflow path '$workflowTargetPath' is not a regular file."
     }
@@ -3795,6 +4071,31 @@ if ($null -ne $secretOperationError) {
 }
 if ($null -ne $secretLockCleanupError) {
     throw $secretLockCleanupError
+}
+
+if ([string]$existingAdoptionRoute.State -ceq 'AlreadyCurrent') {
+    Write-Host "The completed meAndAI adoption is already current at $($existingAdoptionRoute.InstalledTag)."
+    Write-Host 'The installed updater seed was preserved; no workflow dispatch, Git publication, pull-request resolution, or local Codex execution was required.'
+    Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+    return
+}
+if ([string]$existingAdoptionRoute.State -ceq 'CompatibleUpdate') {
+    Write-Host "The completed meAndAI adoption at $($existingAdoptionRoute.InstalledTag) is older than requested target $ProtocolTag."
+    Write-Host 'The installed updater seed was preserved; the launcher will not overwrite managed updater assets.'
+    if ($SkipLifecycleDispatch) {
+        Write-Host 'Installed updater dispatch was explicitly skipped.'
+        Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+        return
+    }
+    Set-QuickAdoptionProgress -Status 'Waiting for installed updater workflow' `
+        -PercentComplete 70
+    Write-Host "Dispatching installed updater at $($existingAdoptionRoute.InstalledTag)."
+    $updateRun = Invoke-LifecycleWorkflow -Repository $repository `
+        -Branch $defaultBranch -HeadSha $routingHead
+    Write-Host "Installed updater workflow completed successfully: $($updateRun.url)"
+    Write-Host 'Review and merge the managed update pull request; adoption Codex execution was not started.'
+    Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+    return
 }
 
 Set-QuickAdoptionProgress -Status 'Publishing canonical seed workflow' `
