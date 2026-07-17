@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.9.6**<br>
+Protocol version: **0.9.7**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -685,7 +685,25 @@ The updater MUST:
   target-different canonical workflow and updater scripts;
 - use a consumer-repository-scoped write credential with explicit Contents,
   Pull requests, and Workflows permissions while keeping any private-source read
-  credential separate and the workflow `GITHUB_TOKEN` read-only;
+  credential separate; scheduled proposal creation and updater self-update MUST
+  NOT use `GITHUB_TOKEN` write authority;
+- bind each managed adoption or update proposal to exactly one same-repository
+  issue through one canonical, non-closing `Tracking issue: #N` body line before
+  maintainer merge; native closing keywords are forbidden because issue closure
+  must follow verified branch convergence;
+- react to an exact merged, same-repository managed proposal through the
+  consumer workflow, revalidate the live pull request, current default branch
+  containment, canonical marker, changed paths, tracking issue, open-PR branch
+  reuse, API head, and live ref, then delete only the unchanged deterministic
+  branch with an expected-head lease before recording evidence, removing
+  transient status labels, and closing the issue;
+- scope the post-merge finalization job's `GITHUB_TOKEN` to `contents: write`,
+  `pull-requests: read`, and `issues: write`; this exception MUST NOT grant the
+  proposal job or another workflow consumer mutation authority;
+- provide an explicit pull-request-number recovery dispatch that is idempotent
+  for an already absent exact branch and an issue already closed with the exact
+  finalization marker; a missed event, an installing updater merge, or an event
+  suppressed after a `GITHUB_TOKEN`-authored merge MUST use this same route;
 - never rewrite project memory, root instructions, domain records, feature or
   decision records, tests, or other consumer-owned files; and
 - keep credentials outside repository content, project memory, logs, and pull

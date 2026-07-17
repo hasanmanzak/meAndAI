@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.9.6',
+    [string]$ProtocolTag = 'v0.9.7',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -1580,13 +1580,85 @@ function Get-AdoptionPullRequest {
     return $null
 }
 
+function Get-AdoptionPullRequestTrackingBody {
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$IssueNumber
+    )
+
+    $trackingLine = "Tracking issue: #$IssueNumber"
+    $trackingStarts = [regex]::Matches(
+        $Body, '^[ \t]*Tracking[ \t]+issue[ \t]*:',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+            [Text.RegularExpressions.RegexOptions]::Multiline -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $exactTrackingLines = [regex]::Matches(
+        $Body, "^$([regex]::Escape($trackingLine))`r?$",
+        [Text.RegularExpressions.RegexOptions]::Multiline -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $closingReference = [regex]::Matches(
+        $Body,
+        '\b(?:close(?:s|d)?|fix(?:es|ed)?|resolve(?:s|d)?)\b[^\r\n]*#[1-9][0-9]*\b',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($closingReference.Count -ne 0) {
+        throw 'The adoption pull request contains a native issue-closing reference.'
+    }
+    if ($trackingStarts.Count -eq 1 -and $exactTrackingLines.Count -eq 1) {
+        return [pscustomobject]@{ Body = $Body; Changed = $false }
+    }
+    if ($trackingStarts.Count -ne 0 -or $exactTrackingLines.Count -ne 0) {
+        throw 'The adoption pull request contains duplicate or conflicting tracking-issue lines.'
+    }
+
+    $separator = if ([string]::IsNullOrEmpty($Body) -or
+        $Body.EndsWith("`r`n`r`n", [StringComparison]::Ordinal) -or
+        $Body.EndsWith("`n`n", [StringComparison]::Ordinal)) {
+        ''
+    }
+    elseif ($Body.EndsWith("`n", [StringComparison]::Ordinal)) {
+        [Environment]::NewLine
+    }
+    else {
+        [Environment]::NewLine + [Environment]::NewLine
+    }
+    return [pscustomobject]@{
+        Body = $Body + $separator + $trackingLine
+        Changed = $true
+    }
+}
+
+function Set-AdoptionPullRequestBody {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][string]$TemporaryDirectory,
+        [Parameter(Mandatory)][string]$FileName
+    )
+
+    $bodyPath = Join-Path $TemporaryDirectory $FileName
+    [IO.File]::WriteAllText(
+        $bodyPath, $Body, [Text.UTF8Encoding]::new($false)
+    )
+    Invoke-External -Command 'gh' -Arguments @(
+        'pr', 'edit', [string]$PullRequest.number, '--repo', $Repository,
+        '--body-file', $bodyPath
+    ) | Out-Null
+    return $Body
+}
+
 function Set-AdoptionPullRequestMarkerBody {
     param(
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)]$PullRequest,
         [Parameter(Mandatory)][string]$MarkerJson,
         [Parameter(Mandatory)][string]$TemporaryDirectory,
-        [Parameter(Mandatory)][string]$FileName
+        [Parameter(Mandatory)][string]$FileName,
+        [ValidateRange(0, 2147483647)][int]$TrackingIssueNumber = 0
     )
 
     $body = [string]$PullRequest.body
@@ -1601,15 +1673,14 @@ function Set-AdoptionPullRequestMarkerBody {
     $replacement = "<!-- meandai-capabilities-adoption:$MarkerJson -->"
     $updatedBody = $body.Substring(0, $match.Index) + $replacement +
         $body.Substring($match.Index + $match.Length)
-    $bodyPath = Join-Path $TemporaryDirectory $FileName
-    [IO.File]::WriteAllText(
-        $bodyPath, $updatedBody, [Text.UTF8Encoding]::new($false)
-    )
-    Invoke-External -Command 'gh' -Arguments @(
-        'pr', 'edit', [string]$PullRequest.number, '--repo', $Repository,
-        '--body-file', $bodyPath
-    ) | Out-Null
-    return $updatedBody
+    if ($TrackingIssueNumber -gt 0) {
+        $tracking = Get-AdoptionPullRequestTrackingBody -Body $updatedBody `
+            -IssueNumber $TrackingIssueNumber
+        $updatedBody = [string]$tracking.Body
+    }
+    return Set-AdoptionPullRequestBody -Repository $Repository `
+        -PullRequest $PullRequest -Body $updatedBody `
+        -TemporaryDirectory $TemporaryDirectory -FileName $FileName
 }
 
 function Set-AdoptionPullRequestPublishingMarker {
@@ -1676,7 +1747,8 @@ function Set-AdoptionPullRequestCompletedMarker {
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)]$PullRequest,
         [Parameter(Mandatory)][string]$PublishedHead,
-        [Parameter(Mandatory)][string]$TemporaryDirectory
+        [Parameter(Mandatory)][string]$TemporaryDirectory,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$IssueNumber
     )
 
     if ($PublishedHead -cnotmatch '^[0-9a-f]{40}$') {
@@ -1695,7 +1767,8 @@ function Set-AdoptionPullRequestCompletedMarker {
     } | ConvertTo-Json -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $completedMarker `
-        -TemporaryDirectory $TemporaryDirectory -FileName 'completed-adoption-pr.md'
+        -TemporaryDirectory $TemporaryDirectory -FileName 'completed-adoption-pr.md' `
+        -TrackingIssueNumber $IssueNumber
 }
 
 function Get-RevalidatedAdoptionPullRequest {
@@ -1727,6 +1800,16 @@ function Complete-AdoptionReviewTransition {
         [switch]$PersistCompletedMarker
     )
 
+    $issueNumberProperty = if ($null -ne $Issue) {
+        $Issue.PSObject.Properties['number']
+    }
+    else { $null }
+    if ($null -eq $issueNumberProperty -or
+        [string]$issueNumberProperty.Value -cnotmatch '^[1-9][0-9]*$' -or
+        [long]$issueNumberProperty.Value -gt [int]::MaxValue) {
+        throw 'The canonical adoption issue has invalid identity metadata.'
+    }
+    $issueNumber = [int]$issueNumberProperty.Value
     $body = [string]$PullRequest.body
     $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
         -OriginalPullRequest $PullRequest -LiveHead $PublishedHead `
@@ -1738,10 +1821,22 @@ function Complete-AdoptionReviewTransition {
         }
         $body = Set-AdoptionPullRequestCompletedMarker -Repository $Repository `
             -PullRequest $current -PublishedHead $PublishedHead `
-            -TemporaryDirectory $TemporaryDirectory
+            -TemporaryDirectory $TemporaryDirectory -IssueNumber $issueNumber
         $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
             -OriginalPullRequest $current -LiveHead $PublishedHead `
             -MarkerHead $PublishedHead -Body $body -Draft $true
+    }
+    $tracking = Get-AdoptionPullRequestTrackingBody -Body $body `
+        -IssueNumber $issueNumber
+    if ([bool]$tracking.Changed) {
+        $body = Set-AdoptionPullRequestBody -Repository $Repository `
+            -PullRequest $current -Body ([string]$tracking.Body) `
+            -TemporaryDirectory $TemporaryDirectory `
+            -FileName 'tracked-adoption-pr.md'
+        $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
+            -OriginalPullRequest $current -LiveHead $PublishedHead `
+            -MarkerHead $PublishedHead -Body $body `
+            -Draft ([bool]$current.isDraft)
     }
     if ([bool]$current.isDraft) {
         Invoke-External -Command 'gh' -Arguments @(

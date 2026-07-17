@@ -63,9 +63,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.9.6`, the only repository file required
+For a new submodule consumer on `v0.9.7`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.6/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.9.7/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -109,7 +109,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.9.6'
+$tag = 'v0.9.7'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -290,11 +290,13 @@ proposal; actor rotation intentionally fails closed. Reconsider a GitHub App
 when automation must be independent of a human identity or centrally governed
 across multiple owners.
 
-The schedule and manual dispatch provide eventual detection, not an immediate
-release notification. The workflow keeps its own `GITHUB_TOKEN` read-only and
-uses the fine-grained PAT only for consumer checkout, branch push, and pull
-request operations. Consumer Actions policies still govern resulting workflow
-runs. See GitHub's documentation for
+The schedule and ordinary manual dispatch provide eventual update detection,
+not an immediate release notification. Their proposal job keeps
+`GITHUB_TOKEN` read-only and uses the fine-grained PAT only for consumer
+checkout, branch push, and pull-request operations. A separate post-merge job
+uses a job-scoped `GITHUB_TOKEN` with only `contents: write`, `pull-requests:
+read`, and `issues: write` to finalize an already merged exact managed proposal.
+Consumer Actions policies still govern resulting workflow runs. See GitHub's documentation for
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
 and [fine-grained PATs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
 
@@ -326,7 +328,22 @@ manual review. The running job continues with its already loaded updater code,
 and a merged proposal supplies the updater used by the next run. Consumer
 memory, root instructions, feature records, decisions, tests, and other files
 are not rewritten. Maintainers still apply the project's normal DoR, DoD, CI,
-and review gates. The evolved contract is recorded in
+and review gates. Before making a managed update ready or merging it, the
+maintainer MUST add exactly one `Tracking issue: #N` body line naming a real
+same-repository issue. `Closes`, `Fixes`, and `Resolves` references are not used:
+the finalizer closes the issue only after exact branch deletion succeeds.
+
+After merge, the `pull_request.closed` route validates the fresh API head,
+marker, current default-branch containment, changed paths, issue, branch reuse,
+and live ref. It lease-deletes only the unchanged deterministic branch, records
+one issue evidence marker, removes transient meAndAI status labels, and closes
+the issue. If the installing `v0.9.7` merge misses the new route, or GitHub
+suppresses the event because a `GITHUB_TOKEN` performed the merge, run the
+workflow manually with `finalize_pull_request` set to that merged PR number.
+The same idempotent recovery route completes partial finalization; it does not
+approve or merge work.
+
+The evolved contract is recorded in
 [FEAT-0004](features/FEAT-0004-self-updating-consumer-updater/README.md) and
 [DEC-0005](decisions/DEC-0005-consumer-scoped-fine-grained-pat.md), preserving
 the supersession rules in
@@ -367,7 +384,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.9.6`
+- ref: `v0.9.7`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -412,11 +429,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.9.6`:
+before checkout; the current example then installs `v0.9.7`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.9.6
+git -C .ai/protocol checkout v0.9.7
 git add .ai/protocol
 ```
 

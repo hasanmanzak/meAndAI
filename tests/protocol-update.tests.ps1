@@ -276,9 +276,22 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 workflow is missing '$required'"
         }
     }
-    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'issues: write', 'contents: write', 'pull-requests: write', 'GH_TOKEN: ${{ github.token }}', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
+    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'pull-requests: write', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
         if ($workflow.Contains($forbidden)) {
             Add-Failure "TEST-0017 workflow contains forbidden behavior '$forbidden'"
+        }
+    }
+    $proposalJobStart = $workflow.IndexOf('  propose-update:', [StringComparison]::Ordinal)
+    $finalizerJobStart = $workflow.IndexOf('  finalize-managed-merge:', [StringComparison]::Ordinal)
+    $proposalJob = if ($proposalJobStart -ge 0 -and $finalizerJobStart -gt $proposalJobStart) {
+        $workflow.Substring($proposalJobStart, $finalizerJobStart - $proposalJobStart)
+    }
+    else { '' }
+    foreach ($forbidden in @(
+        'issues: write', 'contents: write', 'GH_TOKEN: ${{ github.token }}'
+    )) {
+        if (-not $proposalJob -or $proposalJob.Contains($forbidden)) {
+            Add-Failure "TEST-0017 proposal job contains finalizer-only authority '$forbidden'"
         }
     }
     foreach ($forbidden in @('Invoke-Native', 'Invoke-RestMethod', 'Invoke-WebRequest')) {
