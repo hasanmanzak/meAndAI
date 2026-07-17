@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-Parallel Windows validation and immutable fixture reuse are tracked as
-[FEAT-0024](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md),
-[`TEST-0115` and `TEST-0116`](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md),
-and the [v0.10.1 continuation](2026-07-17-v0101-parallel-windows-validation.md).
-[Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) owns delivery and
+Balanced Windows integrity validation and isolated publication verification are
+tracked as [FEAT-0025](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md),
+[`TEST-0117` and `TEST-0118`](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md),
+and the [v0.10.2 continuation](2026-07-17-v0102-balanced-windows-validation.md).
+[Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) owns delivery and
 future post-publication evidence. `FIND-0120` remains the separate open
 external follow-up in issue #44.
 
 ## History
 
+- [2026-07-17 - v0.10.2 balanced Windows validation](2026-07-17-v0102-balanced-windows-validation.md)
 - [2026-07-17 - v0.10.1 parallel Windows validation](2026-07-17-v0101-parallel-windows-validation.md)
 - [2026-07-17 - v0.10.0 idempotent consumer lifecycle](2026-07-17-v0100-idempotent-consumer-lifecycle.md)
 - [2026-07-17 - v0.9.7 managed merge finalization](2026-07-17-v097-managed-merge-finalization.md)

@@ -791,19 +791,29 @@ $quickParameterNames = @($quickAst.ParamBlock.Parameters | ForEach-Object {
 })
 if ($validatorParseErrors.Count -ne 0 -or
     $validatorParameterNames -cnotcontains 'ExecutionProfile') {
-    Add-Failure 'TEST-0115 root validation lacks its constrained execution-profile contract.'
+    Add-Failure 'TEST-0115/TEST-0117 root validation lacks its constrained execution-profile contract.'
 }
 if ($quickParseErrors.Count -ne 0 -or $quickParameterNames -cnotcontains 'Shard') {
-    Add-Failure 'TEST-0115 quick-adoption validation lacks its explicit shard contract.'
+    Add-Failure 'TEST-0117 quick-adoption validation lacks its explicit shard contract.'
 }
-foreach ($shardName in @(
-    'ContractsPreflight', 'AdoptionLifecycle',
-    'IntegrityFailures', 'RepositoryRoutes'
-)) {
+$expectedQuickAdoptionShards = @(
+    'ContractsPreflight',
+    'AdoptionLifecycle',
+    'IntegrityCompletedGraph',
+    'IntegrityManifestIssue',
+    'IntegrityCodexFailure',
+    'IntegrityMetadataCredential',
+    'RepositoryRoutes'
+)
+foreach ($shardName in $expectedQuickAdoptionShards) {
     if (-not $ciWorkflow.Contains("- $shardName") -or
         -not $quickAdoptionSuiteSource.Contains("'$shardName'")) {
-        Add-Failure "TEST-0115 Windows compatibility shard '$shardName' is not defined end to end."
+        Add-Failure "TEST-0117 Windows compatibility shard '$shardName' is not defined end to end."
     }
+}
+if ($ciWorkflow.Contains('- IntegrityFailures') -or
+    $quickAdoptionSuiteSource.Contains("'IntegrityFailures'")) {
+    Add-Failure 'TEST-0117 legacy monolithic IntegrityFailures routing is still active.'
 }
 foreach ($requiredWorkflowText in @(
     'linux-validation:',
@@ -817,7 +827,7 @@ foreach ($requiredWorkflowText in @(
     '- windows-quick-adoption'
 )) {
     if (-not $ciWorkflow.Contains($requiredWorkflowText)) {
-        Add-Failure "TEST-0115 sharded workflow is missing '$requiredWorkflowText'."
+        Add-Failure "TEST-0117 sharded workflow is missing '$requiredWorkflowText'."
     }
 }
 foreach ($requiredSuiteText in @(
@@ -825,8 +835,23 @@ foreach ($requiredSuiteText in @(
     "if (`$Shard -ceq 'All')"
 )) {
     if (-not $quickAdoptionSuiteSource.Contains($requiredSuiteText)) {
-        Add-Failure "TEST-0115 quick-adoption suite is missing '$requiredSuiteText'."
+        Add-Failure "TEST-0117 quick-adoption suite is missing '$requiredSuiteText'."
     }
+}
+$normalValidationGuard = "if: `${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}"
+if ([regex]::Matches(
+    $ciWorkflow,
+    [regex]::Escape($normalValidationGuard)
+).Count -ne 3) {
+    Add-Failure 'TEST-0118 Linux, Windows base, and Windows shard jobs do not share the exact release-only inverse guard.'
+}
+$aggregateValidationGuard = "if: `${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}"
+if (-not $ciWorkflow.Contains($aggregateValidationGuard)) {
+    Add-Failure 'TEST-0118 the aggregate Windows job can run during release-only verification.'
+}
+$postPublicationGuard = "if: github.event_name == 'workflow_dispatch' && inputs.verify_post_publication"
+if (-not $ciWorkflow.Contains($postPublicationGuard)) {
+    Add-Failure 'TEST-0118 the post-publication verifier lacks its positive release-only guard.'
 }
 $quickFunctionNames = @($quickAst.FindAll({
     param($node)
