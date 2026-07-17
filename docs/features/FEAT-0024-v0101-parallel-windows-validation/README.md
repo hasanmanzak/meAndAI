@@ -139,7 +139,7 @@ evidence before final validation.
 
 - [x] Acceptance criteria and `TEST-0115` / `TEST-0116` pass.
 - [x] Existing complete local suite passes.
-- [ ] Hosted Linux and Windows compatibility checks pass.
+- [x] Hosted Linux and Windows compatibility checks pass.
 - [x] Both subfeature reviews and the bounded completion scan have no unresolved
       `Blocking` finding.
 - [x] Documentation, links, changelog, version, and project memory agree.

@@ -23,7 +23,7 @@
 | 2026-07-17 | Focused green working tree | Windows PowerShell 5.1 | `tests/quick-adoption.tests.ps1 -Shard RepositoryRoutes` | Passed in 39.7 seconds. |
 | 2026-07-17 | Final working tree | Windows PowerShell 5.1 | `tests/protocol.tests.ps1 -ExecutionProfile WindowsBase` | Passed in 162.3 seconds; every non-delegated Windows suite emitted valid evidence. |
 | 2026-07-17 | Final working tree | Windows PowerShell 5.1 | `tests/protocol.tests.ps1` | Passed in 507.6 seconds; all discovered suites and canonical scenarios through `TEST-0116` passed. |
+| 2026-07-17 | Pull request #66 at `82ccaaa` | GitHub-hosted Ubuntu and Windows | [Protocol validation run 29573099890](https://github.com/hasanmanzak/meAndAI/actions/runs/29573099890) | Passed: Linux full 158 seconds; Windows base 151 seconds; shard jobs 23, 75, 326, and 47 seconds; aggregate check passed. The Windows critical path was 326 seconds versus the 558-second baseline. |
 
-Final local, hosted, and post-publication evidence is recorded after each fact
-exists through the feature record, pull request, and issue #65. Durations are
-observations and never pass/fail thresholds.
+Post-publication evidence is recorded after each fact exists through issue #65.
+Durations are observations and never pass/fail thresholds.

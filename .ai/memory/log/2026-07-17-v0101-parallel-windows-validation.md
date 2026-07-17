@@ -25,7 +25,11 @@
   archive path to every reset without sharing consumer state.
 - The Windows base profile passed in 162.3 seconds, and the single final local
   full suite passed every canonical scenario through `TEST-0116` in 507.6
-  seconds. Hosted runner durations remain external evidence owned by issue #65.
+  seconds.
+- Pull-request run 29573099890 passed: Linux full 158 seconds, Windows base 151
+  seconds, and the four Windows shard jobs 23, 75, 326, and 47 seconds. The
+  Windows critical path was 326 seconds versus the 558-second baseline; this is
+  an observation, not a timing gate. Issue #65 owns later publication evidence.
 
 ## Continuation
 
