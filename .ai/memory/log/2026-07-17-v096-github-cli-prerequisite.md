@@ -26,13 +26,15 @@
 - The final complete repository suite passed in 535.1 seconds, including all
   discovered child suites, all 35 quick-adoption scenarios, `TEST-0107`, and
   streaming `TEST-0105`/`TEST-0106`.
-- Pull-request, merge, immutable-release, and hosted-check evidence remain
+- [Pull request #60](https://github.com/hasanmanzak/meAndAI/pull/60) owns the
+  review branch and links the feature, tests, decision, issue, findings, and
+  local evidence. Merge, immutable-release, and hosted-check evidence remain
   pending until those facts exist.
 
 ## Continuation
 
-Publish the converged review branch and open its linked pull request. Fix only
-new failed evidence; do not repeat the unchanged local suite. The retained
+Wait for hosted checks and maintainer review on PR #60. Fix only new failed
+evidence; do not repeat the unchanged local suite. The retained
 [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1) continues to
 target `v0.9.2`; it must not be retargeted while resuming with the newer
 launcher.

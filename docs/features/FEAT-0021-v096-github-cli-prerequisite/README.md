@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.6 |
 | Issue | [#59](https://github.com/hasanmanzak/meAndAI/issues/59) |
-| Pull request | Pending |
+| Pull request | [#60](https://github.com/hasanmanzak/meAndAI/pull/60) |
 | Decision | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) |
 | Tests | [TEST-0107](test-cases.md) |
 
@@ -144,7 +144,7 @@ behavior change or duplicated test path.
       `Blocking` finding.
 - [x] Version, changelog, guide, decision links, feature index, and project
       memory agree.
-- [ ] Issue and pull request link canonical records and validation evidence.
+- [x] Issue and pull request link canonical records and validation evidence.
 
 ## Post-merge publication gate
 
