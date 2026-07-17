@@ -39,6 +39,7 @@ permissions:
 jobs:
   linux-validation:
     name: Validate on ubuntu-latest
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -78,6 +79,7 @@ jobs:
 
   windows-base:
     name: Windows base validation
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -91,13 +93,17 @@ jobs:
 
   windows-quick-adoption:
     name: Windows quick adoption (${{ matrix.shard }})
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
     strategy:
       fail-fast: false
       matrix:
         shard:
           - ContractsPreflight
           - AdoptionLifecycle
-          - IntegrityFailures
+          - IntegrityCompletedGraph
+          - IntegrityManifestIssue
+          - IntegrityCodexFailure
+          - IntegrityMetadataCredential
           - RepositoryRoutes
     runs-on: windows-latest
     timeout-minutes: 20
@@ -112,7 +118,7 @@ jobs:
 
   windows-validation:
     name: Validate on windows-latest
-    if: always()
+    if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
     needs:
       - windows-base
       - windows-quick-adoption

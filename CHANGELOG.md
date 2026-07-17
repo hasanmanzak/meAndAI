@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.10.2 - 2026-07-17
+
+### Changed
+
+- Replace the overloaded Windows `IntegrityFailures` compatibility shard with
+  four semantic shards that initialize independent mutable baselines while
+  preserving canonical `Shard=All` order and evidence.
+- Keep the existing aggregate Windows check identity and require its base job
+  plus all seven compatibility matrix children.
+- Make an explicit post-publication verification dispatch skip the ordinary
+  Linux and Windows validation matrix and run only the read-only verifier.
+
+Related work: [FEAT-0025](docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md),
+[TEST-0117 and TEST-0118](docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md),
+and [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67).
+
 ## 0.10.1 - 2026-07-17
 
 ### Changed

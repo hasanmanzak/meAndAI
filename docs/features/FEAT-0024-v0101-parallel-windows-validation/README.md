@@ -113,6 +113,7 @@ Compare hosted durations with run 29568159757 without making duration a gate.
 
 ## Relationships
 
+- Successor shard layout: [FEAT-0025](../FEAT-0025-v0102-balanced-windows-validation/README.md)
 - Launcher capability: [FEAT-0006](../FEAT-0006-quick-adoption-launcher/README.md)
 - Single-file distribution: [FEAT-0017](../FEAT-0017-v092-single-file-quick-adoption/README.md)
 - Tracking and post-publication authority: [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65)
