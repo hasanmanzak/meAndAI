@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.0/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.10.0` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.1/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.10.1` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.10.0` is an exact published immutable release
+launcher itself verifies that `v0.10.1` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -241,7 +241,7 @@ meAndAI status labels, and closes the issue as completed.
 
 GitHub does not replay an event that occurred while a route was absent, and a
 merge performed with `GITHUB_TOKEN` may not create another workflow event. The
-`v0.10.0` workflow therefore also runs bounded recovery on the installing
+`v0.10.1` workflow therefore also runs bounded recovery on the installing
 default-branch push, the schedule, and ordinary manual dispatch. It repairs only
 an exact legacy installing update, then uses the normal finalizer. For a missed
 or failed recovery, run the same route explicitly after confirming the PR is
@@ -257,7 +257,7 @@ for a moved/reused branch, a merge no longer on the default branch, a malformed
 ambiguous tracking line, or an issue closed without that evidence. Do not use
 `Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
 would close the issue before branch convergence. Older consumer pins gain the
-behavior when their reviewed update installs the `v0.10.0` workflow and adapter;
+behavior when their reviewed update installs the `v0.10.1` workflow and adapter;
 the installing update itself is covered only by the bounded legacy bridge.
 
 ## Stopping and resuming safely

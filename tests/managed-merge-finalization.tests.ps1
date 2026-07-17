@@ -37,7 +37,7 @@ function New-FinalizationScenario {
 
     $head = 'a' * 40
     $protocolSha = 'b' * 40
-    $target = 'v0.10.0'
+    $target = 'v0.10.1'
     $branch = switch ($Kind) {
         'Adoption' { "automation/meandai-capabilities-$target" }
         'Update' { "automation/meandai-protocol-$target" }
@@ -206,14 +206,14 @@ function global:gh {
         if ($env:GH_TOKEN -cne 'test-protocol-token') {
             throw 'Legacy release evidence crossed the protocol credential boundary.'
         }
-        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/releases/tags/v0.10.0') {
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/releases/tags/v0.10.1') {
             [ordered]@{
-                tag_name = 'v0.10.0'; draft = $false; prerelease = $false
+                tag_name = 'v0.10.1'; draft = $false; prerelease = $false
                 immutable = $true; published_at = '2026-07-17T00:00:00Z'
             } | ConvertTo-Json -Compress
             return
         }
-        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.10.0') {
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.10.1') {
             [ordered]@{
                 object = [ordered]@{
                     type = 'commit'

@@ -3,6 +3,23 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.10.1 - 2026-07-17
+
+### Changed
+
+- Keep the full Linux protocol suite as canonical executable scenario evidence
+  while running Windows PowerShell 5.1 compatibility as one base job and four
+  parallel quick-adoption shards behind the existing aggregate check name.
+- Build the synthetic four-tag protocol repository and exact release archive
+  once per quick-adoption process, reuse only that fingerprinted immutable
+  fixture, and keep consumer repositories and mutable mock state isolated.
+- Make partial shards emit compatibility-only results so they cannot claim the
+  full canonical `TEST-*` scenario set.
+
+Related work: [FEAT-0024](docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md),
+[TEST-0115 and TEST-0116](docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md),
+and [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65).
+
 ## 0.10.0 - 2026-07-17
 
 ### Added

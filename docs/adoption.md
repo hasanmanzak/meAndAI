@@ -67,9 +67,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.10.0`, the only repository file required
+For a new submodule consumer on `v0.10.1`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.1/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -113,7 +113,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.10.0'
+$tag = 'v0.10.1'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -360,7 +360,7 @@ deterministic branch, records one issue evidence marker, removes transient
 meAndAI status labels, and closes the issue. A default-branch `push`, schedule,
 or ordinary manual dispatch also checks the bounded retained-branch recovery
 route before update discovery. This lets the first merge that installs the
-`v0.10.0` lifecycle repair only an exact legacy update with an absent or exact
+`v0.10.1` lifecycle repair only an exact legacy update with an absent or exact
 `#REQUIRED` tracking line, create its canonical issue, patch the merged pull
 request, and enter the same finalizer. Foreign, partial, moved, unexpected-path,
 or ambiguous state fails before mutation.
@@ -410,7 +410,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.10.0`
+- ref: `v0.10.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -458,11 +458,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.10.0`:
+before checkout; the current example then installs `v0.10.1`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.10.0
+git -C .ai/protocol checkout v0.10.1
 git add .ai/protocol
 ```
 
