@@ -7,24 +7,24 @@ Last verified: **2026-07-17**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.6`. Exact publication state is authoritative
+- Current protocol version: `0.9.7`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) after
+  [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0021](../../docs/features/FEAT-0021-v096-github-cli-prerequisite/README.md)
-  requires GitHub CLI `2.82.1` or newer before quick-adoption authentication or
-  mutation; [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) owns
-  delivery and future publication evidence.
+- Current scope: [FEAT-0022](../../docs/features/FEAT-0022-v097-managed-merge-finalization/README.md)
+  finalizes an exact managed consumer merge through the installed workflow only
+  after branch identity, default-branch containment, changed paths, and one
+  canonical tracking issue are proven; [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61)
+  owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the source-only `Invoke-MeAndAIQuickAdoption.ps1`
-  parses exactly one canonical GitHub CLI version, compares unbounded decimal
-  components numerically, and fails closed before authentication or mutation
-  when the client is older than `2.82.1` or its version is ambiguous.
-  `TEST-0107` owns the regression. The retained
-  [Derdini draft](https://github.com/hasanmanzak/Derdini/pull/1) remains the
-  resumable consumer evidence; the launcher still never merges.
+- Latest tracked work: the consumer workflow has an event/recovery finalizer;
+  the existing updater adapter owns exact merged-PR validation, branch lease
+  deletion, evidence, label cleanup, and issue closure. The launcher adds one
+  non-closing canonical tracking line before adoption readiness. `TEST-0108`
+  through `TEST-0110` own the regression; Derdini cleanup is explicitly outside
+  this feature and another empty consumer will provide later adoption evidence.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -130,6 +130,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.9.6` adds an initial GitHub CLI `2.82.1` compatibility gate with strict,
   unbounded decimal-component comparison. Older, malformed, leading-zero, or
   ambiguous version output blocks before authentication or state mutation.
+- `v0.9.7` adds consumer-owned managed merge finalization after maintainer
+  merge. It uses one non-closing tracking line, current-default containment,
+  open-branch-reuse and exact-head checks, a leased branch deletion, and an
+  idempotent manual recovery route before issue completion.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,

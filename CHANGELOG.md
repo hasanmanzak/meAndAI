@@ -3,6 +3,26 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.7 - 2026-07-17
+
+### Fixed
+
+- Finalize an exact merged adoption or protocol-update proposal in the consumer
+  workflow without expanding merge authority: lease-delete only its unchanged
+  deterministic branch, then record evidence, remove transient status labels,
+  and close its canonical tracking issue.
+- Bind managed proposals to one non-closing `Tracking issue: #N` line and reject
+  missing, duplicate, malformed, native-closing, cross-repository, reused,
+  moved, or no-longer-contained merge state before mutation.
+- Add an idempotent pull-request-number recovery dispatch for installing merges,
+  suppressed events, and partial post-merge issue reconciliation while keeping
+  schedule/update discovery on the existing consumer-scoped updater PAT.
+
+Related work: [FEAT-0022 / BUG-0010](docs/features/FEAT-0022-v097-managed-merge-finalization/README.md),
+[TEST-0108 through TEST-0110](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md),
+[DEC-0016](docs/decisions/DEC-0016-managed-post-merge-finalization.md), and
+[issue #61](https://github.com/hasanmanzak/meAndAI/issues/61).
+
 ## 0.9.6 - 2026-07-17
 
 ### Fixed

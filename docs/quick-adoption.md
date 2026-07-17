@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.6/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.9.6` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.7/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.9.7` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.9.6` is an exact published immutable release
+launcher itself verifies that `v0.9.7` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -141,16 +141,16 @@ Codex gate blocks, do not delete or reset anything. Resolve the reported
 condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 If `v0.9.2` already created the deterministic draft but stopped with
-`BUG-0006`, download the corrected `v0.9.6` launcher asset and retain the
+`BUG-0006`, download the corrected `v0.9.7` launcher asset and retain the
 proposal's original protocol target while resuming:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -ProtocolTag v0.9.2
 ```
 
-Do not retarget the retained draft to `v0.9.6`. Complete and merge its original
+Do not retarget the retained draft to `v0.9.7`. Complete and merge its original
 adoption first; the installed consumer updater can then propose the ordinary
-reviewed `v0.9.6` upgrade.
+reviewed `v0.9.7` upgrade.
 
 ## Default execution order
 
@@ -178,7 +178,9 @@ created—and the seed commit is pushed, the launcher:
 9. Requires an unchanged Git head, manifest removal, a valid non-empty diff,
    absent credential files, and an unchanged live remote branch.
 10. Creates the adoption completion commit, pushes it with an exact
-   `--force-with-lease`, and marks the pull request ready without merging it.
+   `--force-with-lease`, binds the canonical issue through exactly one
+   non-closing `Tracking issue: #N` body line, and marks the pull request ready
+   without merging it.
 
 An empty consumer receives a deterministic bootstrap proposal. A populated
 consumer with target collisions receives
@@ -194,6 +196,35 @@ The CLI process reuses the maintainer's saved local Codex authentication. No
 consumer repository connection to hosted GitHub-agent execution is required.
 Local orchestration is not offline inference: the CLI sends its prompt and
 relevant repository context to its configured model service.
+
+## After maintainer merge
+
+The consumer workflow, not the launcher or Codex, owns managed post-merge
+cleanup. A qualifying same-repository `pull_request.closed` event invokes the
+installed finalizer. It proves that the merge is still contained in the current
+default branch, the marker and tracking issue are exact, no open pull request
+reuses the branch, and the live head still matches. It then lease-deletes only
+that deterministic branch, records one issue evidence marker, removes transient
+meAndAI status labels, and closes the issue as completed.
+
+GitHub does not replay an event that occurred while this route was being
+installed, and a merge performed with `GITHUB_TOKEN` may not create another
+workflow event. For the first merge that installs `v0.9.7`, a missed event, or
+a partial finalization, run the same route explicitly after confirming the PR
+is merged:
+
+```powershell
+gh workflow run meandai-protocol-update.yml --repo <owner>/<repo> -f finalize_pull_request=<merged-pr-number>
+```
+
+The recovery dispatch is idempotent when the exact branch is already absent and
+the issue already contains the matching finalization evidence. It fails closed
+for a moved/reused branch, a merge no longer on the default branch, a malformed
+or missing tracking line, or an issue closed without that evidence. Do not use
+`Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
+would close the issue before branch convergence. Older consumer pins do not
+gain this behavior until their reviewed update installs the `v0.9.7` workflow
+and adapter.
 
 ## Stopping and resuming safely
 

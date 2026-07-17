@@ -3,7 +3,9 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$BranchPrefix = 'automation/meandai-protocol-'
+    [string]$BranchPrefix = 'automation/meandai-protocol-',
+    [switch]$FinalizeMergedPullRequest,
+    [int]$PullRequestNumber = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -684,6 +686,463 @@ function Assert-ManagedPullRequestSafe {
     }
 }
 
+function Get-CanonicalAdoptionMarker {
+    param([string]$Body)
+
+    $empty = [pscustomobject]@{
+        Schema = 0; Phase = ''; State = ''; Target = ''; ProtocolSha = ''
+        Head = ''; Repository = ''; Actor = ''; CanonicalLine = ''
+    }
+    if ([string]::IsNullOrWhiteSpace($Body)) {
+        return $empty
+    }
+    $markerPrefix = '<!-- meandai-capabilities-adoption:'
+    $prefixCount = 0
+    $searchIndex = 0
+    while ($searchIndex -lt $Body.Length) {
+        $foundIndex = $Body.IndexOf(
+            $markerPrefix, $searchIndex, [StringComparison]::OrdinalIgnoreCase
+        )
+        if ($foundIndex -lt 0) {
+            break
+        }
+        $prefixCount++
+        $searchIndex = $foundIndex + $markerPrefix.Length
+    }
+    if ($prefixCount -ne 1) {
+        return $empty
+    }
+    $matches = [regex]::Matches(
+        $Body,
+        '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]+\}) -->',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($matches.Count -ne 1) {
+        return $empty
+    }
+    try {
+        $json = [string]$matches[0].Groups['json'].Value
+        $marker = $json | ConvertFrom-Json
+        $expectedNames = @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'repository', 'actor'
+        )
+        $properties = @($marker.PSObject.Properties)
+        if ($properties.Count -ne $expectedNames.Count) {
+            return $empty
+        }
+        for ($index = 0; $index -lt $expectedNames.Count; $index++) {
+            if (-not [string]::Equals(
+                [string]$properties[$index].Name,
+                [string]$expectedNames[$index],
+                [StringComparison]::Ordinal
+            )) {
+                return $empty
+            }
+        }
+        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long]) -or
+            [long]$marker.schema -ne 3 -or
+            $marker.phase -isnot [string] -or
+            [string]$marker.phase -cne 'Completed' -or
+            $marker.state -isnot [string] -or
+            [string]::IsNullOrWhiteSpace([string]$marker.state) -or
+            $marker.target -isnot [string] -or
+            $marker.protocolSha -isnot [string] -or
+            $marker.head -isnot [string] -or
+            $marker.repository -isnot [string] -or
+            $marker.actor -isnot [string] -or
+            [string]::IsNullOrWhiteSpace([string]$marker.actor)) {
+            return $empty
+        }
+        $canonicalJson = [ordered]@{
+            schema = 3
+            phase = 'Completed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = [string]$marker.head
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        } | ConvertTo-Json -Compress
+        if ($json -cne $canonicalJson) {
+            return $empty
+        }
+        return [pscustomobject]@{
+            Schema = 3
+            Phase = 'Completed'
+            State = [string]$marker.state
+            Target = [string]$marker.target
+            ProtocolSha = [string]$marker.protocolSha
+            Head = [string]$marker.head
+            Repository = [string]$marker.repository
+            Actor = [string]$marker.actor
+            CanonicalLine = "<!-- meandai-capabilities-adoption:$canonicalJson -->"
+        }
+    }
+    catch {
+        return $empty
+    }
+}
+
+function Get-CanonicalTrackingIssueNumber {
+    param([string]$Body)
+
+    $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
+    $candidateLines = [regex]::Matches(
+        $normalized,
+        '(?im)^tracking[ \t]+issue[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $matches = [regex]::Matches(
+        $normalized,
+        '(?m)^Tracking issue: #(?<number>[1-9][0-9]*)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($candidateLines.Count -ne 1 -or $matches.Count -ne 1 -or
+        [string]$candidateLines[0].Value -cne [string]$matches[0].Value) {
+        throw 'Managed pull request must contain exactly one canonical Tracking issue: #N line.'
+    }
+    if ([regex]::IsMatch(
+        $normalized,
+        '(?im)(?:^|\s)(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#\d+\b',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )) {
+        throw 'Managed pull request must not use a native issue-closing keyword before post-merge finalization.'
+    }
+    $number = 0
+    if (-not [int]::TryParse(
+        [string]$matches[0].Groups['number'].Value, [ref]$number
+    ) -or $number -lt 1) {
+        throw 'Managed pull request tracking issue number is outside the supported range.'
+    }
+    return $number
+}
+
+function Get-FinalizationIssueEvidence {
+    param(
+        [object[]]$Comments,
+        [string]$ExpectedMarker
+    )
+
+    $managed = @($Comments | Where-Object {
+        $bodyProperty = if ($null -ne $_) { $_.PSObject.Properties['body'] } else { $null }
+        $null -ne $bodyProperty -and
+            ([string]$bodyProperty.Value).StartsWith(
+                '<!-- meandai-managed-merge-finalization:',
+                [StringComparison]::Ordinal
+            )
+    })
+    $exact = @($managed | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $ExpectedMarker
+    })
+    if ($managed.Count -ne $exact.Count -or $exact.Count -gt 1) {
+        throw 'Tracking issue has ambiguous managed merge finalization evidence.'
+    }
+    return [pscustomobject]@{ Exists = $exact.Count -eq 1 }
+}
+
+function Get-ManagedMergedPullRequestState {
+    param(
+        [string]$Repository,
+        [string]$DefaultBranch,
+        [int]$Number
+    )
+
+    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    if ($null -eq $pull -or [int]$pull.number -ne $Number) {
+        throw "Pull request #$Number could not be resolved exactly."
+    }
+    $body = [string]$pull.body
+    $headRef = [string]$pull.head.ref
+    $adoptionPrefix = 'automation/meandai-capabilities-'
+    $hasReservedBranch = $headRef.StartsWith(
+        $adoptionPrefix, [StringComparison]::Ordinal
+    ) -or $headRef.StartsWith($BranchPrefix, [StringComparison]::Ordinal)
+    $hasMarkerSignal = $body.IndexOf(
+        '<!-- meandai-capabilities-adoption:',
+        [StringComparison]::OrdinalIgnoreCase
+    ) -ge 0 -or $body.IndexOf(
+        '<!-- meandai-protocol-update:',
+        [StringComparison]::OrdinalIgnoreCase
+    ) -ge 0
+    if (-not $hasReservedBranch -and -not $hasMarkerSignal) {
+        return [pscustomobject]@{ Managed = $false; PullRequest = $pull }
+    }
+
+    $normalizedBody = $body.Replace("`r`n", "`n").Replace("`r", "`n")
+    $firstLine = $normalizedBody.Split("`n")[0]
+    $adoptionMarker = Get-CanonicalAdoptionMarker -Body $body
+    $updateMarker = Get-ProtocolMarker -Body $body
+    $kind = ''
+    $marker = $null
+    $canonicalLine = ''
+    if ($adoptionMarker.Schema -eq 3) {
+        $kind = 'Adoption'
+        $marker = $adoptionMarker
+        $canonicalLine = [string]$adoptionMarker.CanonicalLine
+    }
+    elseif ($updateMarker.Schema -eq 1) {
+        $kind = 'Update'
+        $marker = $updateMarker
+        $canonicalJson = [ordered]@{
+            schema = 1
+            target = [string]$updateMarker.Target
+            protocolSha = [string]$updateMarker.ProtocolSha
+            head = [string]$updateMarker.Head
+            repository = [string]$updateMarker.Repository
+        } | ConvertTo-Json -Compress
+        $canonicalLine = "<!-- meandai-protocol-update:$canonicalJson -->"
+    }
+    else {
+        throw "Managed-looking pull request #$Number has no single canonical ownership marker."
+    }
+    if ($firstLine -cne $canonicalLine) {
+        throw "Managed pull request #$Number ownership marker is not its exact first line."
+    }
+
+    $expectedPrefix = if ($kind -ceq 'Adoption') {
+        $adoptionPrefix
+    }
+    else { $BranchPrefix }
+    $target = [string]$marker.Target
+    if ($target -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
+        $headRef -cne "$expectedPrefix$target" -or
+        [string]$marker.Repository -cne $Repository -or
+        [string]$marker.ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+        [string]$marker.Head -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Managed pull request #$Number marker, target, or deterministic branch is invalid."
+    }
+    if ([string]$pull.state -cne 'closed' -or
+        $pull.merged -isnot [bool] -or -not [bool]$pull.merged -or
+        [string]::IsNullOrWhiteSpace([string]$pull.merged_at) -or
+        [string]$pull.base.ref -cne $DefaultBranch -or
+        $null -eq $pull.head.repo -or
+        [string]$pull.head.repo.full_name -cne $Repository -or
+        [string]$pull.head.sha -cne [string]$marker.Head -or
+        [string]$pull.merge_commit_sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Managed pull request #$Number is not an exact same-repository merge into the current default branch."
+    }
+    if ($kind -ceq 'Adoption' -and
+        [string]$pull.user.login -cne [string]$marker.Actor) {
+        throw "Managed adoption pull request #$Number author does not match its canonical actor."
+    }
+
+    $trackingIssueNumber = Get-CanonicalTrackingIssueNumber -Body $body
+    $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$Number/files?per_page=100")
+    $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
+    if ($changedPaths.Count -eq 0 -or $changedPaths -cnotcontains $ProtocolPath) {
+        throw "Managed pull request #$Number does not contain the protocol dependency path."
+    }
+    if ($kind -ceq 'Update') {
+        foreach ($path in $changedPaths) {
+            if ($path -cnotin $ManagedPaths) {
+                throw "Managed update pull request #$Number changed unexpected path '$path'."
+            }
+        }
+    }
+    else {
+        foreach ($forbiddenPath in @(
+            '.ai/adoption/meandai-capabilities.json', 'FG_PAT.txt',
+            'MEANDAI_RO_FG_PAT.txt'
+        )) {
+            if ($changedPaths -ccontains $forbiddenPath) {
+                throw "Managed adoption pull request #$Number contains forbidden transient path '$forbiddenPath'."
+            }
+        }
+    }
+
+    $repositoryRecord = Invoke-GhJson -Arguments @('api', "repos/$Repository")
+    if ([string]$repositoryRecord.full_name -cne $Repository -or
+        [string]$repositoryRecord.default_branch -cne $DefaultBranch) {
+        throw 'Consumer default branch changed; explicit maintainer review is required.'
+    }
+    $defaultRef = Invoke-GhJson -Arguments @(
+        'api', "repos/$Repository/git/ref/heads/$DefaultBranch"
+    )
+    $defaultHead = [string]$defaultRef.object.sha
+    if ([string]$defaultRef.ref -cne "refs/heads/$DefaultBranch" -or
+        [string]$defaultRef.object.type -cne 'commit' -or
+        $defaultHead -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Consumer default branch head could not be resolved exactly.'
+    }
+    $comparison = Invoke-GhJson -Arguments @(
+        'api', "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
+    )
+    if ([string]$comparison.status -cnotin @('identical', 'ahead')) {
+        throw "Managed pull request #$Number merge is no longer contained in the current default branch."
+    }
+
+    $issue = $null
+    if ($kind -ceq 'Adoption') {
+        $issueMarker = "<!-- meandai-local-adoption:$target`:pr-$Number -->"
+        $issueTitle = "Track meAndAI AI capabilities adoption from $target"
+        $matches = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/issues?state=all&per_page=100" |
+            Where-Object {
+                $null -eq $_.PSObject.Properties['pull_request'] -and
+                [int]$_.number -eq $trackingIssueNumber -and
+                [string]$_.title -ceq $issueTitle -and
+                ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $issueMarker
+            })
+        if ($matches.Count -ne 1) {
+            throw "Managed adoption pull request #$Number has no single canonical tracking issue."
+        }
+        $issue = $matches[0]
+    }
+    else {
+        $issue = Invoke-GhJson -Arguments @(
+            'api', "repos/$Repository/issues/$trackingIssueNumber"
+        )
+        if ($null -eq $issue -or [int]$issue.number -ne $trackingIssueNumber -or
+            $null -ne $issue.PSObject.Properties['pull_request']) {
+            throw "Managed update pull request #$Number tracking reference is not one same-repository issue."
+        }
+    }
+
+    $comments = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/issues/$trackingIssueNumber/comments?per_page=100"
+    ))
+    $evidenceMarker = "<!-- meandai-managed-merge-finalization:pr-$Number`:head-$([string]$marker.Head) -->"
+    $evidence = Get-FinalizationIssueEvidence -Comments $comments `
+        -ExpectedMarker $evidenceMarker
+    $branchHead = Get-RemoteBranchHead -Branch $headRef
+    if ([string]$issue.state -cnotin @('open', 'closed')) {
+        throw "Managed tracking issue #$trackingIssueNumber has an invalid state."
+    }
+    if ([string]$issue.state -ceq 'closed' -and -not $evidence.Exists) {
+        throw "Managed tracking issue #$trackingIssueNumber closed without exact finalization evidence."
+    }
+    if ($evidence.Exists -and $null -ne $branchHead) {
+        throw "Managed branch '$headRef' exists after issue finalization evidence was recorded."
+    }
+
+    $owner = $Repository.Split('/')[0]
+    $openReuse = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/pulls?state=open&head=$owner`:$headRef&per_page=100"
+    ))
+    if ($openReuse.Count -ne 0) {
+        throw "Managed branch '$headRef' is reused by an open pull request."
+    }
+
+    return [pscustomobject]@{
+        Managed = $true
+        Kind = $kind
+        PullRequest = $pull
+        Branch = $headRef
+        Head = [string]$marker.Head
+        BranchHead = $branchHead
+        Issue = $issue
+        IssueNumber = $trackingIssueNumber
+        EvidenceMarker = $evidenceMarker
+        EvidenceExists = [bool]$evidence.Exists
+    }
+}
+
+function Invoke-ManagedMergedPullRequestFinalization {
+    param([int]$Number)
+
+    if ($Number -lt 1) {
+        throw 'FinalizeMergedPullRequest requires a positive PullRequestNumber.'
+    }
+    foreach ($name in @('GITHUB_REPOSITORY', 'DEFAULT_BRANCH', 'GH_TOKEN')) {
+        if (-not [Environment]::GetEnvironmentVariable($name)) {
+            throw "Required finalization environment '$name' is missing."
+        }
+    }
+    $repository = [string]$env:GITHUB_REPOSITORY
+    if ($repository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
+        throw 'GITHUB_REPOSITORY is not a canonical owner/repository identity.'
+    }
+    $defaultBranch = [string]$env:DEFAULT_BRANCH
+    $state = Get-ManagedMergedPullRequestState -Repository $repository `
+        -DefaultBranch $defaultBranch -Number $Number
+    if (-not [bool]$state.Managed) {
+        Write-Host "Pull request #$Number is not meAndAI-managed; no finalization was required."
+        return
+    }
+
+    $fresh = Get-ManagedMergedPullRequestState -Repository $repository `
+        -DefaultBranch $defaultBranch -Number $Number
+    foreach ($property in @('Kind', 'Branch', 'Head', 'IssueNumber', 'EvidenceMarker')) {
+        if ([string]$fresh.$property -cne [string]$state.$property) {
+            throw "Managed pull request #$Number changed before finalization mutation."
+        }
+    }
+    if ($null -ne $fresh.BranchHead) {
+        if ([string]$fresh.BranchHead -cne [string]$fresh.Head) {
+            throw "Managed branch '$($fresh.Branch)' moved before finalization."
+        }
+        Remove-RemoteBranch -Branch ([string]$fresh.Branch) `
+            -ExpectedHeadSha ([string]$fresh.Head)
+        if ($null -ne (Get-RemoteBranchHead -Branch ([string]$fresh.Branch))) {
+            throw "Managed branch '$($fresh.Branch)' still exists after exact-head deletion."
+        }
+    }
+
+    $afterBranch = Get-ManagedMergedPullRequestState -Repository $repository `
+        -DefaultBranch $defaultBranch -Number $Number
+    if ($null -ne $afterBranch.BranchHead -or
+        [int]$afterBranch.IssueNumber -ne [int]$fresh.IssueNumber) {
+        throw "Managed pull request #$Number did not remain stable after branch convergence."
+    }
+
+    if (-not [bool]$afterBranch.EvidenceExists) {
+        $comment = @(
+            [string]$afterBranch.EvidenceMarker,
+            "Finalized managed $($afterBranch.Kind.ToLowerInvariant()) merge #$Number at head ``$($afterBranch.Head)``.",
+            "The deterministic branch ``$($afterBranch.Branch)`` is absent and the tracking issue can close as completed."
+        ) -join [Environment]::NewLine
+        Invoke-Native -Command 'gh' -Arguments @(
+            'api', '--method', 'POST',
+            "repos/$repository/issues/$($afterBranch.IssueNumber)/comments",
+            '-f', "body=$comment"
+        ) | Out-Null
+    }
+
+    $liveIssue = Invoke-GhJson -Arguments @(
+        'api', "repos/$repository/issues/$($afterBranch.IssueNumber)"
+    )
+    $labels = @($liveIssue.labels | ForEach-Object { [string]$_.name })
+    foreach ($label in @(
+        'status:in-progress', 'status:needs-review', 'status:blocked'
+    )) {
+        if ($labels -ccontains $label) {
+            $escaped = [Uri]::EscapeDataString($label)
+            Invoke-Native -Command 'gh' -Arguments @(
+                'api', '--method', 'DELETE',
+                "repos/$repository/issues/$($afterBranch.IssueNumber)/labels/$escaped"
+            ) | Out-Null
+        }
+    }
+    if ([string]$liveIssue.state -ceq 'open') {
+        Invoke-Native -Command 'gh' -Arguments @(
+            'api', '--method', 'PATCH',
+            "repos/$repository/issues/$($afterBranch.IssueNumber)",
+            '-f', 'state=closed', '-f', 'state_reason=completed'
+        ) | Out-Null
+    }
+
+    $complete = Get-ManagedMergedPullRequestState -Repository $repository `
+        -DefaultBranch $defaultBranch -Number $Number
+    $remainingTransient = @($complete.Issue.labels | ForEach-Object {
+        [string]$_.name
+    } | Where-Object { $_ -cin @(
+        'status:in-progress', 'status:needs-review', 'status:blocked'
+    ) })
+    if ($null -ne $complete.BranchHead -or
+        -not [bool]$complete.EvidenceExists -or
+        [string]$complete.Issue.state -cne 'closed' -or
+        $remainingTransient.Count -ne 0) {
+        throw "Managed pull request #$Number finalization postcondition failed."
+    }
+    Add-RunSummary "Managed merge #$Number finalized at ``$($complete.Head)``; exact branch absent and issue #$($complete.IssueNumber) closed."
+    Write-Host "Managed merge #$Number finalized; issue #$($complete.IssueNumber) closed and exact branch absent."
+}
+
+if ($FinalizeMergedPullRequest) {
+    Invoke-ManagedMergedPullRequestFinalization -Number $PullRequestNumber
+    return
+}
+
 foreach ($name in @(
     'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
     'PROTOCOL_TOKEN'
@@ -995,12 +1454,13 @@ if ($create.Count -eq 1) {
             "- Protocol commit: ``$targetSha``", "- Supersedes: $supersedes", '',
             'This draft is review-only and will never merge itself.', '',
             '## Maintainer gates', '',
-            '- [ ] Create or link the tracked issue and allocate its stable work ID.',
+            '- [ ] Create or link the tracked issue, allocate its stable work ID, and replace the placeholder below with exactly `Tracking issue: #N`.',
             '- [ ] Read every intervening meAndAI changelog entry.',
             '- [ ] Review incompatible or newly mandatory rules.',
             '- [ ] Review the managed updater asset changes included in this proposal.',
             '- [ ] Update the consumer project memory pinned-version fact.',
-            '- [ ] Run project tests and complete DoR/DoD review.'
+            '- [ ] Run project tests and complete DoR/DoD review.', '',
+            'Tracking issue: #REQUIRED'
         ) -join [Environment]::NewLine
         $url = (Invoke-Native -Command 'gh' -Arguments @(
             'pr', 'create', '--draft', '--base', $env:DEFAULT_BRANCH,

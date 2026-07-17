@@ -146,7 +146,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             operation = 'ai-capabilities-adoption'
             state = 'AdoptionReviewRequired'
             repository = 'owner/consumer'
-            targetTag = 'v0.9.6'
+            targetTag = 'v0.9.7'
             protocolSha = $protocolSha
             collisions = $expectedCollisions
             proposedPaths = $expectedProposedPaths
@@ -156,7 +156,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             param([Parameter(Mandatory)]$Manifest)
 
             return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
-                -Repository 'owner/consumer' -TargetTag 'v0.9.6' `
+                -Repository 'owner/consumer' -TargetTag 'v0.9.7' `
                 -ProtocolSha $protocolSha -ExpectedState 'AdoptionReviewRequired' `
                 -ExpectedCollisions $expectedCollisions
         }
@@ -211,7 +211,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.9.6',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.9.7',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',
@@ -231,10 +231,18 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
             Add-Failure "TEST-0027 workflow is missing '$required'"
         }
     }
-    foreach ($forbidden in @('pull_request_target:', 'issues: write', 'gh pr merge', 'actions/checkout@v')) {
+    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'actions/checkout@v')) {
         if ($workflow.Contains($forbidden)) {
             Add-Failure "TEST-0032 workflow contains forbidden behavior '$forbidden'"
         }
+    }
+    $proposalJobStart = $workflow.IndexOf('  propose-update:', [StringComparison]::Ordinal)
+    $finalizerJobStart = $workflow.IndexOf('  finalize-managed-merge:', [StringComparison]::Ordinal)
+    if ($proposalJobStart -lt 0 -or $finalizerJobStart -le $proposalJobStart -or
+        $workflow.Substring(
+            $proposalJobStart, $finalizerJobStart - $proposalJobStart
+        ).Contains('issues: write')) {
+        Add-Failure 'TEST-0032 issue write permission must remain isolated to managed merge finalization.'
     }
     $trustedPreflightIndex = $workflow.IndexOf('-ValidateLocalUpdaterOnly', [StringComparison]::Ordinal)
     $localUpdaterInvocationIndex = $workflow.IndexOf('& "./$adapterPath"', [StringComparison]::Ordinal)

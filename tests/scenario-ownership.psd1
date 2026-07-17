@@ -63,6 +63,11 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/managed-merge-finalization.tests.ps1'
+            TestIds = @('TEST-0108', 'TEST-0109', 'TEST-0110')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/idea-incubation.tests.ps1'
             TestIds = @('TEST-0043')
         }

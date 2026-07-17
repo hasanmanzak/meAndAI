@@ -5,16 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The GitHub CLI prerequisite correction is tracked as
-[FEAT-0021](../../../docs/features/FEAT-0021-v096-github-cli-prerequisite/README.md),
-[`TEST-0107`](../../../docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md),
-and the [v0.9.6 continuation](2026-07-17-v096-github-cli-prerequisite.md).
-[Issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) owns delivery and
+Managed consumer post-merge finalization is tracked as
+[FEAT-0022](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/README.md),
+[`TEST-0108` through `TEST-0110`](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md),
+and the [v0.9.7 continuation](2026-07-17-v097-managed-merge-finalization.md).
+[Issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) owns delivery and
 future post-publication evidence. `FIND-0120` remains the separate open
 external follow-up in issue #44.
 
 ## History
 
+- [2026-07-17 - v0.9.7 managed merge finalization](2026-07-17-v097-managed-merge-finalization.md)
 - [2026-07-17 - v0.9.6 GitHub CLI prerequisite gate](2026-07-17-v096-github-cli-prerequisite.md)
 - [2026-07-17 - v0.9.5 streamed Codex activity and cancellation cleanup](2026-07-17-v095-streamed-codex-cancellation.md)
 - [2026-07-16 - v0.9.4 Windows sandbox and progress correction](2026-07-16-v094-windows-sandbox-progress.md)

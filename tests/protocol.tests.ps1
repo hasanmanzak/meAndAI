@@ -586,6 +586,27 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
             Add-Failure 'TEST-0006 adoption guide is missing the current protocol reference'
         }
 
+        foreach ($fixtureRoot in @('scripts', 'templates/project', 'tests')) {
+            $absoluteFixtureRoot = Join-Path $root $fixtureRoot
+            foreach ($file in @(Get-ChildItem -LiteralPath $absoluteFixtureRoot `
+                -Recurse -File | Where-Object {
+                    $_.Extension -cin @('.ps1', '.psm1', '.psd1', '.yml', '.yaml')
+                })) {
+                $relativePath = $file.FullName.Substring($root.Length + 1)
+                $content = Get-Content -LiteralPath $file.FullName -Raw
+                $escapedReferences = [regex]::Matches(
+                    $content, 'v\d+\\\.\d+\\\.\d+'
+                )
+                foreach ($escapedReference in $escapedReferences) {
+                    $normalizedReference = [string]$escapedReference.Value -replace '\\', ''
+                    if ($normalizedReference -cne $currentReference) {
+                        Add-Failure "TEST-0006 stale escaped protocol reference in $relativePath"
+                        break
+                    }
+                }
+            }
+        }
+
         $projectTemplateRoot = Join-Path $root 'templates/project'
         foreach ($file in @(Get-ChildItem -LiteralPath $projectTemplateRoot -Recurse -File)) {
             $relativePath = $file.FullName.Substring($root.Length + 1)

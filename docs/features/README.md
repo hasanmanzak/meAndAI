@@ -23,6 +23,7 @@
 | [FEAT-0019](FEAT-0019-v094-sandbox-progress-correction/README.md) | v0.9.4 Windows sandbox and progress correction | Complete | 0.9.4 |
 | [FEAT-0020](FEAT-0020-v095-streamed-codex-cancellation/README.md) | v0.9.5 streamed Codex activity and safe cancellation | Complete | 0.9.5 |
 | [FEAT-0021](FEAT-0021-v096-github-cli-prerequisite/README.md) | v0.9.6 GitHub CLI prerequisite gate | Complete | 0.9.6 |
+| [FEAT-0022](FEAT-0022-v097-managed-merge-finalization/README.md) | v0.9.7 managed consumer merge finalization | Complete | 0.9.7 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
