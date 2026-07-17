@@ -21,6 +21,14 @@
 - Expected-red structure evidence failed only the intended new shard and event
   contracts. The corrected structure and all four focused PowerShell 5.1
   shards passed in 40.4, 81.2, 105.8, and 76.5 seconds.
+- The complete local run passed every executable test body, then caught a stale
+  `TEST-0115` source anchor in final evidence aggregation. The binding was
+  corrected to the superseding layout assertion and the production evidence
+  builder directly returned the complete root set.
+- Pull-request run [29576425693](https://github.com/hasanmanzak/meAndAI/actions/runs/29576425693)
+  passed: Linux full 153 seconds, Windows base 160, and the four new integrity
+  children 53, 96, 103, and 103 seconds. The hosted Windows critical path was
+  160 seconds versus the prior 326-second observation.
 - Durations are observations, not gates. Issue #67 owns hosted ordinary-CI,
   immutable-release, exact merge, branch deletion, and post-publication proof.
 

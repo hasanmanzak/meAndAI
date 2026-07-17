@@ -2,8 +2,8 @@
 
 | ID | Owner | Scenario | Expected result | Type | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0117` | `SUBF-0044` | Inspect and execute the exact seven-name Windows matrix, four semantic integrity partial modes, independent partial baselines, `Shard=All`, compatibility result boundary, and aggregate dependencies; vary a legacy or unknown shard name. | Every prior integrity case has one partial route; partial modes are isolated and compatibility-only; legacy/unknown names fail closed; `Shard=All` remains canonical and ordered. | Structure / integration / isolation / negative | Local passed; hosted pending | Structure validation; PowerShell 5.1 partial runs passed in 40.4, 81.2, 105.8, and 76.5 seconds; complete suite pending |
-| `TEST-0118` | `SUBF-0045` | Evaluate pull request, push, ordinary manual dispatch, and `verify_post_publication=true` routing for normal jobs, aggregate behavior, and the dedicated verifier. | Ordinary events retain recurring validation; the explicit release dispatch skips the normal matrix and aggregate and runs only the independent verifier. | Structure / event routing / negative | Local passed; hosted pending | Exact workflow guard assertions passed; hosted release-only dispatch pending |
+| `TEST-0117` | `SUBF-0044` | Inspect and execute the exact seven-name Windows matrix, four semantic integrity partial modes, independent partial baselines, `Shard=All`, compatibility result boundary, and aggregate dependencies; vary a legacy or unknown shard name. | Every prior integrity case has one partial route; partial modes are isolated and compatibility-only; legacy/unknown names fail closed; `Shard=All` remains canonical and ordered. | Structure / integration / isolation / negative | Passed | Structure validation; PowerShell 5.1 partial runs passed in 40.4, 81.2, 105.8, and 76.5 seconds; hosted run 29576425693 passed Linux full, Windows base, every child, and aggregate |
+| `TEST-0118` | `SUBF-0045` | Evaluate pull request, push, ordinary manual dispatch, and `verify_post_publication=true` routing for normal jobs, aggregate behavior, and the dedicated verifier. | Ordinary events retain recurring validation; the explicit release dispatch skips the normal matrix and aggregate and runs only the independent verifier. | Structure / event routing / negative | Passed | Exact workflow guard assertions passed; PR run 29576425693 ran ordinary jobs and skipped the release verifier as required; release-only publication proof remains in issue #67 |
 
 ## Baseline
 
@@ -31,3 +31,11 @@
 - Focused green: structure validation and all four new Windows PowerShell 5.1
   compatibility shards passed. Their observed durations were 40.4, 81.2,
   105.8, and 76.5 seconds; timing is not a pass/fail gate.
+- Complete local evidence: every executable test body passed. Final aggregation
+  exposed a stale `TEST-0115` source anchor; the assertion was rebound to the
+  superseding layout contract and the production evidence builder then returned
+  the complete canonical root set.
+- Hosted green: [run 29576425693](https://github.com/hasanmanzak/meAndAI/actions/runs/29576425693)
+  passed in ordinary PR mode. Linux full took 153 seconds, Windows base 160,
+  and the four integrity children 53, 96, 103, and 103 seconds. The Windows
+  critical path fell from 326 to 160 seconds; timing remains observational.

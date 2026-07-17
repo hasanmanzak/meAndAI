@@ -121,18 +121,23 @@ into launcher production behavior, shared mutable fixtures, timing gates, or a
 general test scheduler.
 
 No unresolved in-scope `Blocking` finding remains. Structure validation and all
-four new PowerShell 5.1 partial modes passed; the complete local suite and
-hosted evidence are the remaining delivery gates recorded below.
+four new PowerShell 5.1 partial modes passed. The complete local run executed
+every test body successfully, then exposed one stale scenario-evidence anchor;
+that static binding was corrected and directly revalidated. Hosted run
+[29576425693](https://github.com/hasanmanzak/meAndAI/actions/runs/29576425693)
+then passed the canonical full suite, Windows base, all seven compatibility
+children, and the stable aggregate.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria and `TEST-0117` / `TEST-0118` pass.
-- [ ] Focused and complete local suites pass.
-- [ ] Hosted ordinary validation passes.
-- [ ] Both subfeature reviews and the bounded completion scan have no unresolved
+- [x] Acceptance criteria and `TEST-0117` / `TEST-0118` pass.
+- [x] Focused local shards, complete test bodies, corrected root evidence, and
+      the hosted canonical full suite pass.
+- [x] Hosted ordinary validation passes.
+- [x] Both subfeature reviews and the bounded completion scan have no unresolved
       `Blocking` finding.
-- [ ] Documentation, links, version, changelog, and project memory agree.
-- [ ] Issue and pull request link the canonical records and evidence.
+- [x] Documentation, links, version, changelog, and project memory agree.
+- [x] Issue and pull request link the canonical records and evidence.
 
 ## Post-merge publication gate
 
