@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.9.7 |
 | Issue | [#61](https://github.com/hasanmanzak/meAndAI/issues/61) |
-| Pull request | Pending |
+| Pull request | [#62](https://github.com/hasanmanzak/meAndAI/pull/62) |
 | Decision | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -102,6 +102,7 @@ manual dispatch reconciles an exact missed event idempotently.
 - Local completion boundary: [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
 - Qualified evidence and recovery: [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) and [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)
 - Tracking: [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61)
+- Delivery: [pull request #62](https://github.com/hasanmanzak/meAndAI/pull/62)
 
 ## Definition of Ready
 

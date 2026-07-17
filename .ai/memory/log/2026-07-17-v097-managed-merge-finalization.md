@@ -5,6 +5,7 @@
 - Feature: [FEAT-0022](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/README.md)
 - Decision: [DEC-0016](../../../docs/decisions/DEC-0016-managed-post-merge-finalization.md)
 - Tracking: [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61)
+- Delivery: [pull request #62](https://github.com/hasanmanzak/meAndAI/pull/62)
 - Tests: [`TEST-0108` through `TEST-0110`](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md)
 
 ## Durable handoff
