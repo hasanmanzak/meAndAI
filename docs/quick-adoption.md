@@ -22,7 +22,10 @@ copy-pasted command stack.
 
 ## Prerequisites
 
-- PowerShell 5.1 or newer, `git`, and GitHub CLI (`gh`).
+- PowerShell 5.1 or newer, `git`, and GitHub CLI (`gh`) version `2.82.1` or
+  newer. The launcher validates this minimum immediately after command
+  discovery and blocks before authentication or any local or remote mutation
+  when the version is older or cannot be parsed unambiguously.
 - `gh auth status` succeeds for an account allowed to create the target
   repository when needed, set its Actions secrets, and maintain its adoption
   labels and issue. When the existing protocol secret is reused without its
@@ -92,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.5/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.9.5` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.9.6/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.9.6` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -105,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.9.5` is an exact published immutable release
+launcher itself verifies that `v0.9.6` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -138,16 +141,16 @@ Codex gate blocks, do not delete or reset anything. Resolve the reported
 condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 If `v0.9.2` already created the deterministic draft but stopped with
-`BUG-0006`, download the corrected `v0.9.5` launcher asset and retain the
+`BUG-0006`, download the corrected `v0.9.6` launcher asset and retain the
 proposal's original protocol target while resuming:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -ProtocolTag v0.9.2
 ```
 
-Do not retarget the retained draft to `v0.9.5`. Complete and merge its original
+Do not retarget the retained draft to `v0.9.6`. Complete and merge its original
 adoption first; the installed consumer updater can then propose the ordinary
-reviewed `v0.9.5` upgrade.
+reviewed `v0.9.6` upgrade.
 
 ## Default execution order
 

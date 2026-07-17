@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.9.5**<br>
+Protocol version: **0.9.6**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -523,6 +523,14 @@ MUST be clean, on their synchronized GitHub default branch, and preserve all
 consumer-owned content. A new directory MAY be initialized and connected to a
 new private repository by default, but unrelated local files MUST remain
 unpublished.
+
+The launcher MUST require GitHub CLI `2.82.1` or newer immediately after
+command discovery and before authentication, repository initialization,
+credential inspection, or any remote action. It MUST accept exactly one
+canonical ASCII `M.m.rev` version line, compare decimal components numerically
+without a fixed integer ceiling, and fail closed with actionable official
+upgrade guidance when the output is missing, malformed, ambiguous, or older
+than the minimum.
 
 Before the launcher acquires the secret-reconciliation lock or creates a
 repository secret, any existing seed-workflow path MUST be a regular file whose

@@ -4,7 +4,7 @@
 - Status: Superseded in part by [DEC-0008](DEC-0008-local-codex-execution.md)
 - Date: 2026-07-15
 - Decision owners: meAndAI maintainers and consumer administrators
-- Related features: [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md)
+- Related features: [FEAT-0006](../features/FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md), [FEAT-0016](../features/FEAT-0016-v091-quick-adoption-correction/README.md), [FEAT-0021](../features/FEAT-0021-v096-github-cli-prerequisite/README.md)
 - Related decisions: [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md)
 
 ## Context

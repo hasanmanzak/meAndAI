@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.9.6 - 2026-07-17
+
+### Fixed
+
+- Require GitHub CLI `2.82.1` or newer at the quick-adoption launcher's first
+  prerequisite boundary, before authentication or any local or remote mutation.
+- Parse exactly one canonical ASCII version line and compare unbounded decimal
+  components numerically, rejecting malformed, ambiguous, leading-zero, and
+  incompatible output with official upgrade guidance.
+- Cover the exact floor, older client, later client, multi-digit component, and
+  fail-closed side-effect ordering in the existing quick-adoption suite.
+
+Related work: [FEAT-0021 / BUG-0009](docs/features/FEAT-0021-v096-github-cli-prerequisite/README.md),
+[TEST-0107](docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md), and
+[issue #59](https://github.com/hasanmanzak/meAndAI/issues/59).
+
 ## 0.9.5 - 2026-07-17
 
 ### Fixed
