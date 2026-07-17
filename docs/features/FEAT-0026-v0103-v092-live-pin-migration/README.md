@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.10.3 |
 | Issue | [#69](https://github.com/hasanmanzak/meAndAI/issues/69) |
-| Pull request | Pending |
+| Pull request | [#70](https://github.com/hasanmanzak/meAndAI/pull/70) |
 | Decision | [DEC-0018](../../decisions/DEC-0018-bounded-v092-live-pin-migration.md) |
 | Tests | [TEST-0119 and TEST-0120](test-cases.md) |
 
@@ -112,6 +112,7 @@ post-publication verifier.
 - Version-neutral authority contract being corrected: [FEAT-0023](../FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) / [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md)
 - Bounded compatibility decision: [DEC-0018](../../decisions/DEC-0018-bounded-v092-live-pin-migration.md)
 - Tracking: [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69)
+- Delivery: [pull request #70](https://github.com/hasanmanzak/meAndAI/pull/70)
 
 ## Self-review
 
