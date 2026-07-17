@@ -30,16 +30,19 @@ and wait for new development or failed evidence. The converged push is not a
 tag or GitHub Release.
 
 The mandate remains common, while consumer-owned instructions, memory,
-features, decisions, and tests remain under consumer ownership. The generic
-submodule updater advances the protocol gitlink and its three managed updater
-assets only; it does not rewrite those project-owned records. The consumer's
+features, decisions, and tests remain under consumer ownership. The consumer's
 `.ai/protocol` gitlink and the `VERSION` inside that exact checkout are the sole
 current commit and version authorities. Consumer-owned records and tests read
-them dynamically instead of copying a live tag or SHA. A consumer pinned to an
-earlier release remains governed by that exact pin until its reviewed upgrade
-merges. Repository-reference consumers apply the same single-authority rule to
-their configured immutable ref and update it manually or through their own
-reviewed provider adapter.
+them dynamically instead of copying a live tag or SHA. The generic submodule
+updater normally advances that gitlink and its three managed updater assets. A
+compatible immutable release may also declare an exact, deterministic
+consumer-state transition; only the catalog-declared paths and
+`.ai/meandai-update-state.json` ledger then join that proposal. This temporary
+authority does not make consumer files permanently updater-owned. A consumer
+pinned to an earlier release remains governed by that exact pin until its
+reviewed upgrade merges. Repository-reference consumers apply the same
+single-authority rule to their configured immutable ref and update it manually
+or through their own reviewed provider adapter.
 
 For the shortest supported setup, follow the
 [quick adoption guide](quick-adoption.md). It creates or validates the GitHub
@@ -84,7 +87,7 @@ deterministic path.
 
 | State | Proposal and next owner |
 | --- | --- |
-| `BootstrapReady` | No target collides. One deterministic draft adds `.gitmodules`, the `.ai/protocol` gitlink, `AGENTS.md`, the memory skeleton, issue/PR templates, local updater scripts, and `.ai/adoption/meandai-capabilities.json`. |
+| `BootstrapReady` | No target collides. One deterministic draft adds `.gitmodules`, the `.ai/protocol` gitlink, `AGENTS.md`, the memory skeleton, issue/PR templates, local updater scripts, a fully satisfied `.ai/meandai-update-state.json` baseline, and `.ai/adoption/meandai-capabilities.json`. |
 | `AdoptionReviewRequired` | At least one target collides. The draft adds only `.ai/adoption/meandai-capabilities.json`, listing the exact paths that need semantic review. No consumer target is overwritten. |
 | `PendingAdoption` | The deterministic branch and one draft already exist. Later runs retain them and create nothing else. |
 | `Update` | Adoption is complete, so the reviewed consumer-owned updater performs same-major update discovery and supersession. |
@@ -96,17 +99,18 @@ labels and one marked adoption issue before invoking local Codex with spawned
 network access disabled. In a manual path, the maintainer must create or verify
 those GitHub records. The semantic actor must reconcile collisions, create
 project-owned feature and decision records, tailor local memory, add and run
-project tests, repair links, and remove the manifest before marking the pull
-request ready or merging it. A full `BootstrapReady` proposal still contains the manifest
-because deterministic file installation is not evidence that the
-project-specific work is complete.
+project tests, ensure the target catalog is recorded as the fully satisfied
+`.ai/meandai-update-state.json` baseline, repair links, and remove the manifest
+before marking the pull request ready or merging it. A full `BootstrapReady`
+proposal still contains the manifest because deterministic file installation
+is not evidence that the project-specific work is complete.
 
 `MeAndAI.CapabilitiesBootstrap.psm1` and
 `Invoke-MeAndAICapabilitiesBootstrap.ps1` are source-only launch assets. They
 run from the pinned protocol checkout and are not copied to the consumer. Once
 the reviewed adoption draft merges, future compatible releases update the
-protocol gitlink and the three consumer-owned updater assets through the same
-workflow.
+protocol gitlink, target-different updater assets, and any exact
+catalog-declared consumer transition through the same workflow.
 
 ## Recommended: pinned Git submodule
 
@@ -169,6 +173,7 @@ following source-to-target mapping from the pinned protocol ref:
 | `.github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` |
 | `templates/feature/` | A new `docs/features/FEAT-NNNN-*/` record |
 | `templates/decision.md` | A new `docs/decisions/DEC-NNNN-*.md` record |
+| Validated target `migrations/index.json` and definition blobs | Generated `.ai/meandai-update-state.json` satisfied baseline; never copied from another consumer |
 
 The idea index is an absent-only initial-adoption target. Automation never
 creates individual idea records and the compatible updater never manages
@@ -181,12 +186,14 @@ rather than copy the adoption tag or commit as a current fact. Exact values may
 remain in a dated adoption or update record as historical event evidence. They
 do not become fields that must be rewritten after every compatible update.
 
-Consumers already created by the v0.9.2 adoption path may carry the earlier
-live-literal shape. Use the exact one-time procedure in
-[the quick-adoption guide](quick-adoption.md#one-time-v092-live-pin-migration)
-before the ordinary installed-updater route. A later release cannot inject
-those consumer-owned changes into the first proposal created by immutable
-v0.9.2 code; unknown or partially migrated shapes require explicit review.
+A consumer created before the migration engine may have no ledger and may carry
+derived state that a later release needs to reconcile. Do not select a manual
+repair from the consumer's installed tag. Run the ordinary installed updater.
+Its immutable code first proposes only the core update it can prove. After that
+proposal merges, the newly installed workflow automatically opens one
+same-target reconciliation proposal from the target release's state-based
+catalog. Review and merge that proposal normally. Customized, partial, mixed,
+or unknown state blocks for explicit maintainer review instead of being guessed.
 
 The repository's `.github/ISSUE_TEMPLATE/config.yml` is deliberately excluded:
 its contact link describes this protocol repository and follows its current
@@ -255,6 +262,11 @@ foreach ($copy in $copies) {
     Copy-Item -LiteralPath $copy.Source -Destination $copy.Target
 }
 ```
+
+Manual adoption is not complete until the pinned source-only bootstrap validates
+the target migration catalog and creates
+`.ai/meandai-update-state.json` with that complete catalog marked satisfied.
+Do not copy a ledger from another consumer or hand-edit definition blobs.
 
 The copy above remains the manual adoption alternative. Starting with `v0.5.0`,
 the exact seed workflow can install the absent deterministic assets through the
@@ -332,33 +344,42 @@ is required before the reviewed update merges.
 The updater identifies the highest numeric canonical tag in the current major,
 requires its exact published immutable-release metadata before target checkout
 or mutation, and uses a draft pull request as the review gate. It never
-approves or merges a pull request.
+approves or merges a pull request. For a release with consumer migrations, it
+also verifies the immutable ordered catalog and definition blobs, the
+consumer's exact satisfied-prefix ledger, and the complete deterministic plan.
 Its state rules are:
 
 | Observed state | Result |
 | --- | --- |
-| Consumer already pins the latest compatible tag | Recover any exact retained merged branch, then make no update change |
-| No valid managed pull request targets the latest tag | Create or reuse its canonical issue and missing Agile labels, then create the exact deterministic branch and draft pull request with one real tracking line and issue backlink |
+| Consumer already pins the latest compatible tag and its ledger satisfies that target catalog | Recover any exact retained merged branch, then make no update change |
+| Consumer already pins the latest compatible tag but a pre-engine handoff left its target catalog unsatisfied | Create or reuse the canonical issue and automatically open one same-target reconciliation draft containing only the exact catalog-derived changes and resulting ledger |
+| No valid managed pull request targets the latest tag and the installed updater supports migrations | Create or reuse its canonical issue and missing Agile labels, then create one deterministic draft containing the target gitlink, target-different updater assets, exact required migration outputs, and resulting ledger |
+| No valid managed pull request targets the latest tag and the installed updater predates the migration engine | Let the immutable installed updater create its ordinary core update. After maintainer merge and finalization, the newly installed workflow automatically opens the same-target reconciliation draft |
 | One valid managed pull request already targets the latest tag | Keep its exact issue, branch, and pull request; create no duplicate |
-| An older valid managed pull request is open and a newer compatible tag exists | Create and fully verify the newer issue, replacement branch, and draft first; revalidate both proposals before each cleanup, then close the old PR, delete only its expected branch head, and close only its exact issue as not planned; try to reopen the old PR if paired branch cleanup fails |
-| Ownership, canonical marker, planned head, protocol commit, gitlink mode, expected managed path/blob set, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
+| An older valid managed pull request is open and a newer compatible tag exists | Recompute the complete transition from the unchanged default branch, create and fully verify the newer issue, replacement branch, and draft first, then revalidate and clean only the exact older owned pull request, branch, and issue |
+| Catalog, ledger, repository state, ownership marker, plan digest, planned head, protocol commit, gitlink mode, expected managed path/blob set, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
 | A higher major exists | Report that explicit migration is required; do not propose it automatically |
 
-Managed update pull requests change the `.ai/protocol` gitlink and only the
-target-different subset of the three canonical updater assets. Before mutation,
-all current copies must equal the pinned templates; customization stops for
-manual review. The running job continues with its already loaded updater code,
-and a merged proposal supplies the updater used by the next run. Consumer
-memory, root instructions, feature records, decisions, tests, and other files
-are not rewritten. Because those records resolve the current identity from the
-gitlink and its `VERSION`, a routine compatible update needs no separate
-consumer-owned reconciliation pull request. Maintainers still apply the
-project's normal DoR, DoD, CI, and review gates. The workflow creates or reuses
-one target/SHA/repository-marker-owned issue, creates only missing standard
-labels, writes exactly one real `Tracking issue: #N` line into the draft, and
-adds the exact pull-request/head backlink. The maintainer does not prepare that
-tracking state. `Closes`, `Fixes`, and `Resolves` references are not used: the
-finalizer closes the issue only after exact branch deletion succeeds.
+Managed update pull requests always use an exact proposal-specific path set.
+For an engine-era transition that set contains the `.ai/protocol` gitlink, only
+the target-different subset of the three canonical updater assets, exact paths
+changed by the catalog suffix, and `.ai/meandai-update-state.json`. Before
+mutation, all current updater copies, catalog entries, ledger entries, and
+migration input bytes must match their declared state. Custom, partial, mixed,
+or drifted state stops for manual review. A fresh adoption writes a ledger that
+already satisfies the target catalog, so it does not replay historical
+migrations.
+
+Consumer memory, root instructions, feature records, decisions, tests, and
+other files are never rewritten merely to copy a live tag or commit. They may
+change only when an immutable migration definition names their exact path and
+deterministic state. Maintainers still apply the project's normal DoR, DoD, CI,
+and review gates. The workflow creates or reuses one target/SHA/repository-
+marker-owned issue, creates only missing standard labels, writes exactly one
+real `Tracking issue: #N` line into the draft, and adds the exact pull-request/
+head backlink. The maintainer does not prepare that tracking state. `Closes`,
+`Fixes`, and `Resolves` references are not used: the finalizer closes the issue
+only after exact branch deletion succeeds.
 
 After merge, the `pull_request.closed` route validates the fresh API head,
 marker, current default-branch containment, changed paths, canonical issue and
@@ -366,11 +387,12 @@ backlink, branch reuse, and live ref. It lease-deletes only the unchanged
 deterministic branch, records one issue evidence marker, removes transient
 meAndAI status labels, and closes the issue. A default-branch `push`, schedule,
 or ordinary manual dispatch also checks the bounded retained-branch recovery
-route before update discovery. This lets the first merge that installs the
-`v0.10.3` lifecycle repair only an exact legacy update with an absent or exact
-`#REQUIRED` tracking line, create its canonical issue, patch the merged pull
-request, and enter the same finalizer. Foreign, partial, moved, unexpected-path,
-or ambiguous state fails before mutation.
+route before update discovery. After a pre-engine core update merges, this same
+event chain runs the newly installed updater; if the target catalog is still
+unsatisfied, it opens the automatically tracked same-target reconciliation
+draft. After that draft merges, finalization performs the same branch-first,
+issue-last cleanup and the next discovery is a no-op. Foreign, partial, moved,
+unexpected-path, or ambiguous state fails before mutation.
 
 If an event or recovery run still fails, rerun the workflow manually with
 `finalize_pull_request` set to that merged PR number. The same idempotent route
@@ -458,9 +480,9 @@ condition.
 4. Update the submodule or reference to a specific tag.
 5. Run the consuming project's tests and documentation-link checks.
 6. Merge through a pull request. Do not create a consumer-owned reconciliation
-   change merely to restate the live tag or commit; change those records only
-   when an independently required project-specific migration changes their
-   meaning.
+   change merely to restate the live tag or commit. Apply only independently
+   required project changes or exact migrations declared by the immutable
+   target catalog.
 
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
@@ -477,13 +499,19 @@ git add .ai/protocol
 
 After the workflow and scripts are committed on the consumer's default branch,
 the daily schedule or `workflow_dispatch` checks for a newer compatible
-canonical tag. If one exists, the workflow opens a deterministic draft branch
-and pull request for the exact target. The same proposal contains the protocol
-gitlink plus only those canonical updater assets whose target-release blobs
-differ. The maintainer reviews and merges it through the consuming project's
-ordinary gates. Once merged and finalized, the compatible update is complete;
-there is no routine follow-up pull request for memory, decisions, indexes, or
-tests solely to copy the new pin.
+canonical tag. If one exists, an engine-era workflow opens a deterministic
+draft branch and pull request containing the target gitlink, only updater assets
+whose target-release blobs differ, exact catalog-derived consumer changes, and
+the resulting ledger. The maintainer reviews and merges that single transition
+through the consuming project's ordinary gates.
+
+An immutable workflow from before the migration engine can propose only its
+ordinary core update. After the maintainer merges it, the newly installed
+workflow automatically opens one same-target reconciliation draft when the
+target catalog is still unsatisfied. Merge and finalization clean that proposal
+through the normal branch-first, issue-last lifecycle. This one-time capability
+handoff is not keyed to a source version. There is no follow-up pull request
+solely to copy a new live pin into memory, decisions, indexes, or tests.
 
 If another release appears before merge, the newer proposal supersedes the
 older one. Supersession is replacement-first and compensated, not a distributed
@@ -507,10 +535,13 @@ overwriting it. Disable or wait for update runs before recovery, then:
 1. read the actual consumer default branch and capture the exact remote branch
    SHA;
 2. verify that no open or closed pull request owns the branch;
-3. fetch that SHA and verify its changes are exactly `.ai/protocol` plus the
-   target-different subset of the three canonical updater assets;
-4. verify the gitlink resolves to the intended canonical protocol tag and every
-   changed updater blob/mode equals that tag's template; and
+3. fetch that SHA and derive its exact expected path set from the proposal kind:
+   a core update uses `.ai/protocol` plus target-different updater assets, while
+   an engine-era update or reconciliation also uses only its catalog-derived
+   consumer paths and ledger;
+4. verify the gitlink when present, every changed updater blob/mode, every
+   migration output, ledger, and proposal-plan digest against the immutable
+   target release; and
 5. delete only that exact branch SHA with an expected-head lease.
 
 After substituting the real branch, tag, and verified SHA, inspect these

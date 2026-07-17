@@ -29,6 +29,16 @@ templates. Each consuming project owns its domain decisions, feature records,
 test evidence, and AI memory. Those project-specific records must not be stored
 inside the protocol submodule.
 
+Compatible releases may declare deterministic consumer-state transitions in
+the immutable, append-only [migration catalog](migrations/index.json). The
+consumer's `.ai/meandai-update-state.json` ledger records satisfied definition
+blobs without becoming another protocol pin. An updater that already supports
+the catalog includes required migrations in the ordinary reviewed update draft;
+an older immutable updater first installs the capability, after which the new
+workflow automatically opens one same-target reconciliation draft. Both paths
+fail closed for customized, partial, or otherwise ambiguous state and still
+leave the final merge to the consumer maintainer.
+
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings
 with per-finding self-review, pushes only after local convergence, and then

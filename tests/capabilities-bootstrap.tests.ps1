@@ -108,7 +108,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $protocolSha = ('a' * 40) -join ''
         $expectedCollisions = @('AGENTS.md')
         $expectedTargetPaths = @(
-            '.gitmodules', '.ai/protocol', 'AGENTS.md',
+            '.gitmodules', '.ai/protocol', '.ai/meandai-update-state.json', 'AGENTS.md',
             '.ai/memory/README.md', '.ai/memory/project.md',
             '.ai/memory/log/README.md', 'docs/ideas/README.md',
             '.github/ISSUE_TEMPLATE/bug.yml',

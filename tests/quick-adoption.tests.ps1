@@ -58,7 +58,8 @@ $canonicalManagedUpdaterAssets = @(
     )
 })
 $canonicalAdoptionProposedPaths = @(
-    $workflowRelativePath, '.gitmodules', '.ai/protocol'
+    $workflowRelativePath, '.gitmodules', '.ai/protocol',
+    '.ai/meandai-update-state.json'
 ) + @($canonicalAdoptionAssets | ForEach-Object { [string]$_.ConsumerPath })
 $canonicalAdoptionRequiredTasks = @(
     'Create or reconcile the repository labels required by the protocol.',
@@ -178,8 +179,12 @@ function Copy-CanonicalProtocolFixture {
     )
     $capabilitiesModulePath = 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
     foreach ($templatePath in @(
+        '.gitattributes',
         $capabilitiesModulePath,
-        'templates/project/.github/workflows/meandai-protocol-update.yml'
+        'templates/project/.github/workflows/meandai-protocol-update.yml',
+        'scripts/MeAndAI.ConsumerMigrations.psm1',
+        'migrations/index.json',
+        'migrations/MIG-0001.json'
     ) + @(
         $canonicalAdoptionAssets | ForEach-Object { [string]$_.TemplatePath }
     )) {
@@ -206,6 +211,29 @@ function Get-GitBlobSha {
     }
     finally {
         $sha.Dispose()
+    }
+}
+
+function Get-MockConsumerMigrationBaseline {
+    $modulePath = Join-Path $global:QuickAdoptionProtocolRepository `
+        'scripts/MeAndAI.ConsumerMigrations.psm1'
+    $indexPath = Join-Path $global:QuickAdoptionProtocolRepository `
+        'migrations/index.json'
+    $module = @(Import-Module $modulePath -Force -PassThru)
+    if ($module.Count -ne 1) {
+        throw 'Mock consumer migration module could not be imported exactly once.'
+    }
+    try {
+        $catalog = & $module[0].ExportedCommands[
+            'Import-MeAndAIConsumerMigrationCatalog'
+        ] -IndexPath $indexPath
+        return & $module[0].ExportedCommands[
+            'New-MeAndAIConsumerMigrationBaseline'
+        ] -Catalog $catalog
+    }
+    finally {
+        Remove-Module -Name ([string]$module[0].Name) -Force `
+            -ErrorAction SilentlyContinue
     }
 }
 
@@ -832,9 +860,16 @@ function Publish-MockAdoptionBranch {
                 -Force | Out-Null
             Copy-Item -LiteralPath $sourcePath -Destination $destinationPath
         }
+        $migrationBaseline = Get-MockConsumerMigrationBaseline
+        $ledgerPath = Join-Path $clone ([string]$migrationBaseline.Path)
+        New-Item -ItemType Directory -Path (Split-Path -Parent $ledgerPath) `
+            -Force | Out-Null
+        [IO.File]::WriteAllBytes(
+            $ledgerPath, [byte[]]$migrationBaseline.Bytes
+        )
         $proposalPaths = @('.gitmodules', '.ai/adoption/meandai-capabilities.json') + @(
             $canonicalAdoptionAssets | ForEach-Object { [string]$_.ConsumerPath }
-        )
+        ) + @([string]$migrationBaseline.Path)
         Invoke-TestGit -Repository $clone `
             -Arguments (@('add', '--') + $proposalPaths) | Out-Null
     }

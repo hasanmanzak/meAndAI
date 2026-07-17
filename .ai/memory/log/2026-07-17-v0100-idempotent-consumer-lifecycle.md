@@ -17,6 +17,10 @@
   the sole live pin. Consumer-owned records resolve them dynamically.
 - One bounded bridge repairs only an immutable-release-verified installing
   update from the legacy workflow; this is not a general migration framework.
+- This release's prospective template rule did not prove every older consumer
+  shape. [FEAT-0026](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
+  later defines release-declared, state-based migrations and the generic
+  pre-engine capability handoff without changing FEAT-0023's historical scope.
 
 ## Verification authority
 
@@ -31,6 +35,6 @@
 ## Resume rule
 
 If delivery is still open, continue from issue #63 and the FEAT-0023 DoD. Do
-not add a second consumer reconciliation step or expand the legacy bridge. If
-publication is complete, treat the immutable v0.10.0 release plus issue #63 as
-the external authority and begin new work under a new tracked feature.
+not expand its legacy finalization bridge. If publication is complete, treat
+the immutable v0.10.0 release plus issue #63 as the external authority; generic
+consumer-state transition work belongs to FEAT-0026 and DEC-0018.

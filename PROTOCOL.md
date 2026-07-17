@@ -55,6 +55,7 @@ domain identifier.
 | `IDEA-NNNN` | Idea | Durable possibility not yet authorized as work |
 | `DEC-NNNN` | Decision | Architectural or process decision |
 | `TEST-NNNN` | Test scenario | Verifiable behavior or quality condition |
+| `MIG-NNNN` | Migration | Immutable declarative consumer-state transition |
 | `RISK-NNNN` | Risk | Explicit uncertainty with impact and response |
 
 Numbers are repository-local, four digits, monotonically allocated per class,
@@ -481,15 +482,34 @@ pin authority. A routine compatible update therefore requires no separate
 consumer-owned memory, decision, documentation, or test reconciliation merely
 to restate the new tag or commit.
 
-A consumer created before this sole-authority rule MAY require one explicit,
-reviewed compatibility migration. That migration MUST prove the exact installed
-release and recognized legacy shape, replace only the bounded current-authority
-fragments, preserve historical evidence, and fail before writing on partial or
-unknown state. A target release MUST NOT claim that its new updater code can
-change the first proposal created by an older immutable updater: the new code
-does not execute until that proposal merges. This exception MUST remain local
-and one-time; it does not grant the recurring updater general write authority
-over consumer-owned files.
+When a compatible release requires deterministic changes to consumer-owned
+derived state, that transition MUST be declared by the immutable target release
+through an ordered, append-only migration catalog. Each definition has a stable
+`MIG-NNNN` identity, immutable Git-blob identity, exact path authority, and
+deterministic legacy and satisfied states. Applicability is derived from actual
+repository state, not from a hardcoded source tag. Arbitrary scripts, AI-driven
+rewrites, unrestricted search-and-replace, and permanent updater ownership of
+consumer files are prohibited.
+
+The consumer records satisfied definitions in
+`.ai/meandai-update-state.json`. That ledger is automation evidence, not a
+second protocol pin. Its ordered IDs and definition blobs MUST be an exact
+prefix of the target catalog. A fresh adoption records the complete target
+catalog as its satisfied baseline. Missing, duplicate, reordered, changed,
+partial, mixed, customized, linked, escaping, or otherwise ambiguous state
+MUST fail closed before remote mutation.
+
+An updater that already implements this migration contract MUST include the
+protocol gitlink, target-different updater assets, exact catalog-derived
+consumer changes, and resulting ledger in one reviewed managed proposal. An
+immutable updater installed before the contract cannot execute target-defined
+migrations while creating its first proposal. It MUST first create only the
+ordinary core update it can prove; after that merge, the newly installed
+workflow MUST automatically discover the unsatisfied target catalog and open
+one same-target reconciliation proposal. After that capability handoff merges,
+later compatible transitions use the ordinary one-proposal path. This split is
+capability-based and MUST NOT be implemented as a source-version-specific
+switch.
 
 ### Consumer update proposals
 
@@ -512,7 +532,8 @@ Deterministic adoption discovery classifies declared target paths, not the
 presence of unrelated application code. When every target is absent except an
 exact seed workflow, automation MAY open a draft containing the protocol
 gitlink, canonical project adapter, memory skeleton, repository templates,
-local updater scripts, and the transient handoff manifest at
+local updater scripts, the satisfied migration-ledger baseline, and the
+transient handoff manifest at
 `.ai/adoption/meandai-capabilities.json`. When any target collides, the draft
 MUST contain only that manifest and MUST preserve every existing target. The
 workflow MUST NOT imply that an AI agent is running; an explicitly invoked
@@ -726,8 +747,17 @@ The updater MUST:
   checking only the currently selected target branch is insufficient, and an
   ambiguous older orphan MUST block;
 - verify that all current managed updater copies equal the pinned release before
-  mutation, then update the deterministic protocol pointer plus only the
-  target-different canonical workflow and updater scripts;
+  mutation, validate the target's immutable append-only migration catalog and
+  the consumer's exact satisfied-prefix ledger, then update the deterministic
+  protocol pointer, only the target-different canonical workflow and updater
+  scripts, exact catalog-derived consumer paths, and resulting ledger;
+- compute every migration output and its complete managed path set before the
+  first write, bind the proposal marker and candidate validation to the exact
+  catalog, definition blobs, output blobs, ledger, and plan digest, and reject
+  unknown or partial state before branch, issue, or pull-request mutation;
+- when the current gitlink already equals the target but a pre-engine consumer
+  has no satisfied ledger, open one automatically tracked same-target
+  reconciliation proposal; after its merge, repeated discovery MUST be a no-op;
 - use a consumer-repository-scoped write credential with explicit Contents,
   Pull requests, and Workflows permissions while keeping any private-source read
   credential separate; scheduled proposal creation and updater self-update MUST
@@ -763,9 +793,10 @@ The updater MUST:
   blobs; every foreign, partial, moved, malformed, or ambiguous near-match MUST
   fail before issue or pull-request mutation;
 - never rewrite project memory, root instructions, domain records, feature or
-  decision records, tests, or other consumer-owned files; those artifacts MUST
-  already be version-independent under the current-pin authority above, so a
-  routine compatible update does not require a second reconciliation change;
+  decision records, tests, or other consumer-owned files merely to restate the
+  live protocol pin; the only exception is an exact path and deterministic
+  transformation declared by the immutable migration catalog and validated
+  against the consumer ledger and actual bytes;
   and
 - keep credentials outside repository content, project memory, logs, and pull
   request bodies.

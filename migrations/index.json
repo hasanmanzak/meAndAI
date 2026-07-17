@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "migrations": [
+    {
+      "id": "MIG-0001",
+      "introducedIn": "v0.10.3",
+      "definition": "MIG-0001.json"
+    }
+  ]
+}

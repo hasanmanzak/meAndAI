@@ -63,6 +63,9 @@ function Copy-SourceFixture {
         'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
         'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1',
         'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1',
+        'scripts/MeAndAI.ConsumerMigrations.psm1',
+        'migrations/index.json',
+        'migrations/MIG-0001.json',
         '.github/PULL_REQUEST_TEMPLATE.md',
         '.github/ISSUE_TEMPLATE/bug.yml',
         '.github/ISSUE_TEMPLATE/epic.yml',
@@ -442,6 +445,61 @@ try {
 
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
+    $missingMigrationModule = New-BootstrapFixture -Name 'missing-migration-module'
+    Invoke-Git -Repository $missingMigrationModule.Source -Arguments @(
+        'rm', '--', 'scripts/MeAndAI.ConsumerMigrations.psm1'
+    ) | Out-Null
+    Invoke-Git -Repository $missingMigrationModule.Source -Arguments @(
+        'commit', '-m', 'Remove consumer migration module'
+    ) | Out-Null
+    Invoke-Git -Repository $missingMigrationModule.Source -Arguments @(
+        'tag', '-f', 'v0.5.0'
+    ) | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $missingMigrationModule
+    $unexpectedMigrationModuleBranch = @(Invoke-Git `
+        -Repository $missingMigrationModule.Consumer -Arguments @(
+            'ls-remote', '--heads', 'origin',
+            'refs/heads/automation/meandai-capabilities-v0.5.0'
+        ))
+    if (-not $result.Threw -or
+        $result.Error -notlike '*missing consumer migration module*' -or
+        $global:PullRequestCreateCalls -ne 0 -or
+        $unexpectedMigrationModuleBranch.Count -ne 0) {
+        Add-Failure "TEST-0028 full adoption did not fail closed on a missing migration module: $($result.Error)"
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $invalidMigrationCatalog = New-BootstrapFixture -Name 'invalid-migration-catalog'
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidMigrationCatalog.Source 'migrations/index.json'),
+        "{`"schema`":99,`"migrations`":[]}`n",
+        [Text.UTF8Encoding]::new($false)
+    )
+    Invoke-Git -Repository $invalidMigrationCatalog.Source -Arguments @(
+        'add', '--', 'migrations/index.json'
+    ) | Out-Null
+    Invoke-Git -Repository $invalidMigrationCatalog.Source -Arguments @(
+        'commit', '-m', 'Invalidate consumer migration catalog'
+    ) | Out-Null
+    Invoke-Git -Repository $invalidMigrationCatalog.Source -Arguments @(
+        'tag', '-f', 'v0.5.0'
+    ) | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $invalidMigrationCatalog
+    $unexpectedMigrationCatalogBranch = @(Invoke-Git `
+        -Repository $invalidMigrationCatalog.Consumer -Arguments @(
+            'ls-remote', '--heads', 'origin',
+            'refs/heads/automation/meandai-capabilities-v0.5.0'
+        ))
+    if (-not $result.Threw -or
+        $result.Error -notlike '*migration catalog index*unsupported schema*' -or
+        $global:PullRequestCreateCalls -ne 0 -or
+        $unexpectedMigrationCatalogBranch.Count -ne 0) {
+        Add-Failure "TEST-0028 full adoption did not fail closed on an invalid migration catalog: $($result.Error)"
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
     $empty = New-BootstrapFixture -Name 'empty'
     $result = Invoke-BootstrapFixture -Fixture $empty
     if ($result.Threw) {
@@ -451,7 +509,8 @@ try {
         $paths = @(Get-RemoteChangedPaths -Fixture $empty | Sort-Object)
         $expectedPaths = @(
             '.ai/adoption/meandai-capabilities.json', '.ai/memory/log/README.md',
-            '.ai/memory/project.md', '.ai/memory/README.md', '.ai/protocol',
+            '.ai/meandai-update-state.json', '.ai/memory/project.md',
+            '.ai/memory/README.md', '.ai/protocol',
             '.github/ISSUE_TEMPLATE/bug.yml', '.github/ISSUE_TEMPLATE/epic.yml',
             '.github/ISSUE_TEMPLATE/feature.yml', '.github/ISSUE_TEMPLATE/finding.yml',
             '.github/ISSUE_TEMPLATE/subfeature.yml', '.github/ISSUE_TEMPLATE/task.yml',
@@ -468,6 +527,25 @@ try {
         )) -join ''
         if ($protocolEntry -notmatch '^160000 commit [0-9a-f]{40}\t\.ai/protocol$') {
             Add-Failure 'TEST-0028 bootstrap proposal does not contain a protocol gitlink.'
+        }
+        $ledger = (Invoke-Git -Repository $empty.Consumer -Arguments @(
+            'show', 'FETCH_HEAD:.ai/meandai-update-state.json'
+        )) -join "`n" | ConvertFrom-Json
+        $definitionEntry = (Invoke-Git -Repository $empty.Source -Arguments @(
+            'ls-tree', 'v0.5.0', '--', 'migrations/MIG-0001.json'
+        )) -join ''
+        $definitionBlob = if ($definitionEntry -match `
+            '^100644 blob (?<sha>[0-9a-f]{40})\tmigrations/MIG-0001\.json$') {
+            [string]$Matches.sha
+        }
+        else { '' }
+        if (($ledger.schema -isnot [int] -and $ledger.schema -isnot [long]) -or
+            [long]$ledger.schema -ne 1 -or
+            $ledger.satisfied -isnot [array] -or
+            @($ledger.satisfied).Count -ne 1 -or
+            [string]$ledger.satisfied[0].id -cne 'MIG-0001' -or
+            [string]$ledger.satisfied[0].definitionBlob -cne $definitionBlob) {
+            Add-Failure 'TEST-0028 full adoption did not create the exact target-catalog migration baseline.'
         }
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or

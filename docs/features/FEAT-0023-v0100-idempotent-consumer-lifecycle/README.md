@@ -35,8 +35,10 @@ routes a complete older same-major installation through its installed updater.
 
 The protocol submodule gitlink and `.ai/protocol/VERSION` become the sole live
 pin authority. Consumer-owned records and tests resolve that authority
-dynamically and do not need a second reconciliation pull request after a normal
-protocol update.
+dynamically and do not need a second reconciliation pull request merely to copy
+the new pin. This prospective rule did not prove that every older consumer
+already had the required shape; [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
+owns generic transition reconciliation for release-declared derived state.
 
 ## Scope
 
@@ -95,7 +97,7 @@ protocol update.
 | `RISK-0102` | Identity / traceability | Automation reuses or closes an unrelated issue | Mitigated / consumer workflow | Repository-bound first-line issue marker, exact target/SHA identity, backlink checks, and passing `TEST-0111` |
 | `RISK-0103` | Compatibility | A legacy installing update cannot enter managed finalization safely | Mitigated / consumer workflow | One bounded bridge requiring merged same-repository proposal, marker/head/base/path/gitlink proof, and passing `TEST-0112` |
 | `RISK-0104` | State classification | Repeat adoption overwrites a seed or dispatches from drifted state | Mitigated / quick launcher | Complete-footprint classifier, installed-release blob verification, no-downgrade/cross-major rejection, and passing `TEST-0113` |
-| `RISK-0105` | Consistency | Consumer-owned files retain a stale second protocol pin | Corrected prospectively / templates and root validation; historical v0.9.2 gap tracked by [FEAT-0026](../FEAT-0026-v0103-v092-live-pin-migration/README.md) | Sole-authority rule and version-neutral templates remain covered by `TEST-0114`; real historical migration and negative evidence are `TEST-0119` / `TEST-0120` |
+| `RISK-0105` | Consistency | Consumer-owned files retain a stale second protocol pin | Corrected prospectively / templates and root validation; transition reconciliation gap tracked by [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | Sole-authority rule and version-neutral templates remain covered by `TEST-0114`; Derdini is the `MIG-0001` regression under `TEST-0119`, while generic transition and handoff evidence are `TEST-0120` through `TEST-0122` |
 
 ## Decomposition and subfeature gates
 
@@ -141,8 +143,9 @@ protocol update.
    updater for an older same-major complete installation, and fails before
    mutation for partial, drifted, newer, or cross-major state.
 6. Consumer-owned memory, tests, and reusable docs derive the live version from
-   `.ai/protocol/VERSION`; a normal compatible update requires no separate
-   consumer-owned reconciliation change.
+   `.ai/protocol/VERSION`; a compatible update requires no separate change
+   solely to restate the pin. Any independently required derived-state change
+   follows the release-declared migration contract in FEAT-0026.
 7. Focused scenarios and the complete protocol suite pass with documentation,
    version, changelog, memory, and the publication handoff aligned.
 

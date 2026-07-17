@@ -27,7 +27,7 @@
 | [FEAT-0023](FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) | v0.10.0 idempotent consumer lifecycle reconciliation | Complete | 0.10.0 |
 | [FEAT-0024](FEAT-0024-v0101-parallel-windows-validation/README.md) | v0.10.1 parallel Windows validation and immutable test fixtures | Complete | 0.10.1 |
 | [FEAT-0025](FEAT-0025-v0102-balanced-windows-validation/README.md) | v0.10.2 balanced Windows integrity validation and isolated publication verification | Complete | 0.10.2 |
-| [FEAT-0026](FEAT-0026-v0103-v092-live-pin-migration/README.md) | v0.10.3 bounded v0.9.2 consumer live-pin migration | In progress | 0.10.3 |
+| [FEAT-0026](FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | v0.10.3 generic consumer transition reconciliation | Complete | 0.10.3 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

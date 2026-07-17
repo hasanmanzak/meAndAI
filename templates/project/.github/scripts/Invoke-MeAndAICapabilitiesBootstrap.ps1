@@ -80,6 +80,9 @@ $LocalUpdaterAssets = @($AdoptionAssets | Where-Object {
     )
 })
 $ManifestPath = '.ai/adoption/meandai-capabilities.json'
+$ConsumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$ConsumerMigrationIndexPath = 'migrations/index.json'
+$ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 
 function Invoke-Native {
     param([string]$Command, [string[]]$Arguments)
@@ -204,6 +207,84 @@ function Get-TreeEntry {
         Sha = [string]$match.Groups['sha'].Value
         Path = [string]$match.Groups['path'].Value
     }
+}
+
+function Get-WorkingTreeBlobSha {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    $sha = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $RepositoryPath, 'hash-object', '--no-filters', '--', $Path
+    )) -join '').Trim()
+    if ($sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Unable to resolve the working-tree blob for '$Path'."
+    }
+    return $sha
+}
+
+function Import-PinnedConsumerMigrationBaseline {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$TargetSha
+    )
+
+    $moduleEntry = Get-TreeEntry -RepositoryPath $SourcePath `
+        -Commit $TargetSha -Path $ConsumerMigrationModulePath
+    $indexEntry = Get-TreeEntry -RepositoryPath $SourcePath `
+        -Commit $TargetSha -Path $ConsumerMigrationIndexPath
+    if ($moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob') {
+        throw "Pinned release is missing consumer migration module '$ConsumerMigrationModulePath'."
+    }
+    if ($indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob') {
+        throw "Pinned release is missing consumer migration catalog '$ConsumerMigrationIndexPath'."
+    }
+    if ((Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
+        -Path $ConsumerMigrationModulePath) -cne $moduleEntry.Sha -or
+        (Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
+        -Path $ConsumerMigrationIndexPath) -cne $indexEntry.Sha) {
+        throw 'Pinned consumer migration module or catalog differs from the immutable target release.'
+    }
+
+    $moduleFile = Join-Path $SourcePath `
+        ($ConsumerMigrationModulePath -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $indexFile = Join-Path $SourcePath `
+        ($ConsumerMigrationIndexPath -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $module = @(Import-Module $moduleFile -Force -PassThru)
+    if ($module.Count -ne 1) {
+        throw 'Pinned consumer migration module could not be imported exactly once.'
+    }
+    $importCatalog = $module[0].ExportedCommands['Import-MeAndAIConsumerMigrationCatalog']
+    $newBaseline = $module[0].ExportedCommands['New-MeAndAIConsumerMigrationBaseline']
+    if ($null -eq $importCatalog -or $null -eq $newBaseline) {
+        throw 'Pinned consumer migration module does not expose the required adoption contract.'
+    }
+
+    $catalog = & $importCatalog -IndexPath $indexFile
+    if ([string]$catalog.IndexBlob -cne [string]$indexEntry.Sha) {
+        throw 'Pinned consumer migration catalog differs from the immutable target release.'
+    }
+    foreach ($migration in @($catalog.Migrations)) {
+        $definitionPath = "migrations/$([string]$migration.Definition)"
+        $definitionEntry = Get-TreeEntry -RepositoryPath $SourcePath `
+            -Commit $TargetSha -Path $definitionPath
+        if ($definitionEntry.Mode -cne '100644' -or
+            $definitionEntry.Type -cne 'blob' -or
+            [string]$definitionEntry.Sha -cne [string]$migration.DefinitionBlob -or
+            (Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
+                -Path $definitionPath) -cne [string]$definitionEntry.Sha) {
+            throw "Pinned consumer migration definition '$definitionPath' differs from the immutable target release."
+        }
+    }
+
+    $baseline = & $newBaseline -Catalog $catalog
+    if ([string]$baseline.Path -cne $ConsumerMigrationLedgerPath -or
+        $baseline.Bytes -isnot [byte[]] -or
+        [string]$baseline.Blob -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Pinned consumer migration module produced an invalid adoption baseline.'
+    }
+    return $baseline
 }
 
 function Get-StagedEntry {
@@ -438,6 +519,7 @@ function Test-ExactAdoptionTree {
         [string]$TargetSha,
         [string]$ProposalMode,
         [string]$SourcePath,
+        [Parameter(Mandatory)]$MigrationBaseline,
         [switch]$SkipRemoteFetch
     )
 
@@ -464,7 +546,7 @@ function Test-ExactAdoptionTree {
     $expectedChangedPaths = if ($ProposalMode -ceq 'Full') {
         @('.gitmodules', $ProtocolPath) + @($AdoptionAssets | ForEach-Object {
             [string]$_.ConsumerPath
-        }) + @($ManifestPath)
+        }) + @([string]$MigrationBaseline.Path, $ManifestPath)
     }
     elseif ($ProposalMode -ceq 'ManifestOnly') {
         @($ManifestPath)
@@ -511,6 +593,13 @@ function Test-ExactAdoptionTree {
                 $proposalEntry.Sha -cne $sourceEntry.Sha) {
                 return $false
             }
+        }
+        $ledgerEntry = Get-TreeEntry -RepositoryPath $env:GITHUB_WORKSPACE `
+            -Commit $RemoteHead -Path ([string]$MigrationBaseline.Path)
+        if ($ledgerEntry.Mode -cne '100644' -or
+            $ledgerEntry.Type -cne 'blob' -or
+            $ledgerEntry.Sha -cne [string]$MigrationBaseline.Blob) {
+            return $false
         }
     }
 
@@ -578,7 +667,8 @@ function Test-ExactAdoptionProposal {
         [string]$ProposalMode,
         [string[]]$Collisions,
         [string[]]$TargetPaths,
-        [string]$SourcePath
+        [string]$SourcePath,
+        [Parameter(Mandatory)]$MigrationBaseline
     )
 
     if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
@@ -593,7 +683,7 @@ function Test-ExactAdoptionProposal {
     }
     if (-not (Test-ExactAdoptionTree -RemoteHead $RemoteHead -Branch $Branch `
         -BaseHead $BaseHead -TargetSha $TargetSha -ProposalMode $ProposalMode `
-        -SourcePath $SourcePath)) {
+        -SourcePath $SourcePath -MigrationBaseline $MigrationBaseline)) {
         return $false
     }
     if (-not (Test-ExactAdoptionManifest -RemoteHead $RemoteHead `
@@ -621,7 +711,8 @@ function Test-ExactCompletedAdoptionProposal {
         [string]$ProposalMode,
         [string[]]$Collisions,
         [string[]]$TargetPaths,
-        [string]$SourcePath
+        [string]$SourcePath,
+        [Parameter(Mandatory)]$MigrationBaseline
     )
 
     if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
@@ -656,7 +747,8 @@ function Test-ExactCompletedAdoptionProposal {
     $proposalHead = [string]$ancestry[1]
     if (-not (Test-ExactAdoptionTree -RemoteHead $proposalHead -Branch $Branch `
         -BaseHead $BaseHead -TargetSha $TargetSha -ProposalMode $ProposalMode `
-        -SourcePath $SourcePath -SkipRemoteFetch)) {
+        -SourcePath $SourcePath -MigrationBaseline $MigrationBaseline `
+        -SkipRemoteFetch)) {
         return $false
     }
     if (-not (Test-ExactAdoptionManifest -RemoteHead $proposalHead `
@@ -677,7 +769,7 @@ function Test-ExactCompletedAdoptionProposal {
         return $false
     }
     $protectedPaths = @([string]$SeedWorkflow.ConsumerPath) + @(
-        'FG_PAT.txt', 'MEANDAI_RO_FG_PAT.txt'
+        [string]$MigrationBaseline.Path, 'FG_PAT.txt', 'MEANDAI_RO_FG_PAT.txt'
     )
     if (@($protectedPaths | Where-Object {
         $completedChangedPaths -ccontains $_
@@ -694,6 +786,8 @@ function Test-ExactCompletedAdoptionProposal {
         -Commit $RemoteHead -Path $ProtocolPath
     $completedSeed = Get-TreeEntry -RepositoryPath $workspace `
         -Commit $RemoteHead -Path ([string]$SeedWorkflow.ConsumerPath)
+    $completedLedger = Get-TreeEntry -RepositoryPath $workspace `
+        -Commit $RemoteHead -Path ([string]$MigrationBaseline.Path)
     $sourceSeed = Get-TreeEntry -RepositoryPath $SourcePath `
         -Commit $TargetSha -Path ([string]$SeedWorkflow.TemplatePath)
     if ($manifestEntry.Path -or
@@ -704,7 +798,10 @@ function Test-ExactCompletedAdoptionProposal {
         $completedSeed.Type -cne 'blob' -or
         $sourceSeed.Mode -cne '100644' -or
         $sourceSeed.Type -cne 'blob' -or
-        $completedSeed.Sha -cne $sourceSeed.Sha) {
+        $completedSeed.Sha -cne $sourceSeed.Sha -or
+        $completedLedger.Mode -cne '100644' -or
+        $completedLedger.Type -cne 'blob' -or
+        $completedLedger.Sha -cne [string]$MigrationBaseline.Blob) {
         return $false
     }
 
@@ -785,7 +882,8 @@ function Assert-StagedProposal {
         [string[]]$ExpectedPaths,
         [string]$ProposalMode,
         [string]$SourcePath,
-        [string]$TargetSha
+        [string]$TargetSha,
+        [Parameter(Mandatory)]$MigrationBaseline
     )
 
     Invoke-Native -Command 'git' -Arguments @(
@@ -818,6 +916,11 @@ function Assert-StagedProposal {
             throw "Staged adoption asset '$($asset.ConsumerPath)' does not match the pinned release."
         }
     }
+    $ledgerEntry = Get-StagedEntry -Path ([string]$MigrationBaseline.Path)
+    if ($ledgerEntry.Mode -cne '100644' -or
+        $ledgerEntry.Sha -cne [string]$MigrationBaseline.Blob) {
+        throw 'Staged consumer migration ledger does not match the pinned release baseline.'
+    }
 }
 
 foreach ($name in @('GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN')) {
@@ -842,7 +945,9 @@ Import-Module $lifecycleModulePath -Force
 $RequiredTasks = @(Get-MeAndAIRequiredAdoptionTasks)
 $targetPaths = @(Get-MeAndAIAdoptionTargetPaths)
 $proposedPaths = @(Get-MeAndAIAdoptionProposedPaths)
-$mappedTargetPaths = @('.gitmodules', $ProtocolPath) + @($AdoptionAssets | ForEach-Object {
+$mappedTargetPaths = @(
+    '.gitmodules', $ProtocolPath, $ConsumerMigrationLedgerPath
+) + @($AdoptionAssets | ForEach-Object {
     [string]$_.ConsumerPath
 })
 if (-not (Test-ExactOrdinalSequence -Actual $mappedTargetPaths -Expected $targetPaths) -or
@@ -865,6 +970,8 @@ $sourceHead = ((Invoke-Native -Command 'git' -Arguments @(
 if ($targetSha -notmatch '^[0-9a-f]{40}$' -or $sourceHead -cne $targetSha) {
     throw "Pinned protocol source does not exactly match '$TargetTag'; manual review is required."
 }
+$migrationBaseline = Import-PinnedConsumerMigrationBaseline `
+    -SourcePath $sourcePath -TargetSha $targetSha
 $baseHead = ((Invoke-Native -Command 'git' -Arguments @(
     'rev-parse', 'HEAD'
 )) -join '').Trim()
@@ -1004,7 +1111,8 @@ $existingProposalValid = if ($proposalContract.State -cin @(
         -TargetTag $TargetTag -TargetSha $targetSha -ExpectedActor $actor `
         -ExpectedState ([string]$proposalContract.State) `
         -ProposalMode ([string]$proposalContract.ProposalMode) `
-        -Collisions @($collisions) -TargetPaths $targetPaths -SourcePath $sourcePath
+        -Collisions @($collisions) -TargetPaths $targetPaths `
+        -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
     if ($proposedValid) {
         $true
     }
@@ -1016,7 +1124,7 @@ $existingProposalValid = if ($proposalContract.State -cin @(
             -ExpectedState ([string]$proposalContract.State) `
             -ProposalMode ([string]$proposalContract.ProposalMode) `
             -Collisions @($collisions) -TargetPaths $targetPaths `
-            -SourcePath $sourcePath
+            -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
     }
 }
 else { $false }
@@ -1108,6 +1216,12 @@ if ($plan.State -ceq 'BootstrapReady') {
         Copy-Item -LiteralPath $sourceFile -Destination $targetFile
         $stagedPaths.Add([string]$asset.ConsumerPath)
     }
+    $ledgerFile = Join-Path $workspace `
+        (([string]$migrationBaseline.Path) -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $ledgerParent = Split-Path -Parent $ledgerFile
+    New-Item -ItemType Directory -Force $ledgerParent | Out-Null
+    [IO.File]::WriteAllBytes($ledgerFile, [byte[]]$migrationBaseline.Bytes)
+    $stagedPaths.Add([string]$migrationBaseline.Path)
 }
 
 $manifest = [ordered]@{
@@ -1129,7 +1243,8 @@ $addPaths = @($stagedPaths | Where-Object { $_ -cne $ProtocolPath })
 Invoke-Native -Command 'git' -Arguments (@('add', '--') + $addPaths) | Out-Null
 Assert-StagedProposal -ExpectedPaths @($stagedPaths) `
     -ProposalMode ([string]$plan.ProposalMode) `
-    -SourcePath $sourcePath -TargetSha $targetSha
+    -SourcePath $sourcePath -TargetSha $targetSha `
+    -MigrationBaseline $migrationBaseline
 
 Invoke-Native -Command 'git' -Arguments @(
     'config', 'user.name', 'github-actions[bot]'
@@ -1198,7 +1313,7 @@ $publishedProposalValid = Test-ExactAdoptionProposal `
     -ExpectedState ([string]$plan.State) `
     -ProposalMode ([string]$plan.ProposalMode) `
     -Collisions @($plan.Collisions) -TargetPaths $targetPaths `
-    -SourcePath $sourcePath
+    -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
 if (-not $publishedProposalValid -or
     $publishedPullRequests.Count -ne 1 -or
     [string]$publishedPullRequests[0].url -cne $url) {

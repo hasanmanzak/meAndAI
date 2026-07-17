@@ -29,6 +29,11 @@ $ManagedUpdaterAssets = @(
 $ManagedPaths = @($ProtocolPath) + @($ManagedUpdaterAssets | ForEach-Object {
     [string]$_.ConsumerPath
 })
+$ConsumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$ConsumerMigrationIndexPath = 'migrations/index.json'
+$ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
+$MigrationBranchSuffix = '-migrations'
+$script:ConsumerMigrationPlansByTag = @{}
 $ManagedUpdateLabels = @(
     [pscustomobject]@{ Name = 'type:task'; Color = 'd4c5f9'; Description = 'Implementation or maintenance task' },
     [pscustomobject]@{ Name = 'priority:p1'; Color = 'd93f0b'; Description = 'High priority' },
@@ -283,6 +288,299 @@ function Get-StagedTreeEntry {
     }
 }
 
+function Get-OrdinalUniquePaths {
+    param([AllowEmptyCollection()][object[]]$Paths)
+
+    $seen = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    $values = [System.Collections.Generic.List[string]]::new()
+    foreach ($value in @($Paths)) {
+        $path = [string]$value
+        if ([string]::IsNullOrWhiteSpace($path) -or -not $seen.Add($path)) {
+            throw "Migration path set contains an empty or duplicate path '$path'."
+        }
+        $values.Add($path)
+    }
+    $result = $values.ToArray()
+    [Array]::Sort($result, [StringComparer]::Ordinal)
+    return $result
+}
+
+function Get-Sha256Text {
+    param([Parameter(Mandatory)][string]$Text)
+
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Text)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($algorithm.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant()
+    }
+    finally {
+        $algorithm.Dispose()
+    }
+}
+
+function Get-MigrationPathSetSha256 {
+    param([AllowEmptyCollection()][object[]]$Paths)
+
+    $ordered = @(Get-OrdinalUniquePaths -Paths $Paths)
+    return Get-Sha256Text -Text (($ordered -join "`n") + "`n")
+}
+
+function Test-ExactOrdinalPathSet {
+    param(
+        [AllowEmptyCollection()][object[]]$Actual,
+        [AllowEmptyCollection()][object[]]$Expected
+    )
+
+    try {
+        $actualPaths = @(Get-OrdinalUniquePaths -Paths $Actual)
+        $expectedPaths = @(Get-OrdinalUniquePaths -Paths $Expected)
+    }
+    catch {
+        return $false
+    }
+    if ($actualPaths.Count -ne $expectedPaths.Count) {
+        return $false
+    }
+    for ($index = 0; $index -lt $actualPaths.Count; $index++) {
+        if ([string]$actualPaths[$index] -cne [string]$expectedPaths[$index]) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Assert-ContainedMigrationDestination {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$RelativePath
+    )
+
+    if ([IO.Path]::IsPathRooted($RelativePath) -or
+        $RelativePath -match '(^|/|\\)\.\.($|/|\\)' -or
+        $RelativePath.Contains('\') -or $RelativePath.StartsWith('./')) {
+        throw "Consumer migration path '$RelativePath' is not canonical."
+    }
+    $rootFull = [IO.Path]::GetFullPath($Root).TrimEnd(
+        [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+    )
+    $full = [IO.Path]::GetFullPath((Join-Path $rootFull `
+        ($RelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)))
+    $prefix = $rootFull + [IO.Path]::DirectorySeparatorChar
+    if (-not $full.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Consumer migration path '$RelativePath' escapes the repository root."
+    }
+    $relativeParts = $RelativePath.Split('/')
+    $cursor = $rootFull
+    for ($index = 0; $index -lt $relativeParts.Count - 1; $index++) {
+        $cursor = Join-Path $cursor $relativeParts[$index]
+        if (-not (Test-Path -LiteralPath $cursor)) { continue }
+        $item = Get-Item -LiteralPath $cursor -Force
+        if (-not $item.PSIsContainer -or
+            ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            throw "Consumer migration path '$RelativePath' traverses a linked or non-directory component."
+        }
+    }
+    if (Test-Path -LiteralPath $full) {
+        $leaf = Get-Item -LiteralPath $full -Force
+        if ($leaf.PSIsContainer -or
+            ($leaf.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            throw "Consumer migration path '$RelativePath' resolves to a linked or non-file destination."
+        }
+    }
+    return $full
+}
+
+function Import-ConsumerMigrationCatalogAtCommit {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $indexEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+        -Commit $Commit -Path $ConsumerMigrationIndexPath
+    if (-not $indexEntry.Path) {
+        return $null
+    }
+    $moduleEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+        -Commit $Commit -Path $ConsumerMigrationModulePath
+    if ($indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob' -or
+        $moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob') {
+        throw 'Consumer migration capability is partial or not stored as regular immutable blobs.'
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $SourcePath, 'checkout', '--detach', $Commit
+    ) | Out-Null
+    $indexFile = Join-Path $SourcePath `
+        ($ConsumerMigrationIndexPath -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $catalog = Import-MeAndAIConsumerMigrationCatalog -IndexPath $indexFile
+    if ([string]$catalog.IndexBlob -cne [string]$indexEntry.Sha) {
+        throw 'Consumer migration index bytes do not match the immutable target tree.'
+    }
+    foreach ($migration in @($catalog.Migrations)) {
+        $definitionPath = "migrations/$([string]$migration.Definition)"
+        $entry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+            -Commit $Commit -Path $definitionPath
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cne [string]$migration.DefinitionBlob) {
+            throw "Consumer migration '$([string]$migration.Id)' does not match its immutable definition blob."
+        }
+    }
+    return $catalog
+}
+
+function New-EmptyConsumerMigrationPlan {
+    return [pscustomobject]@{
+        Schema = 1
+        State = 'Satisfied'
+        LedgerWasMissing = $true
+        Migrations = @()
+        Paths = @()
+        Ledger = [pscustomobject]@{
+            Path = $ConsumerMigrationLedgerPath
+            OriginalBlob = ''
+            ResultBlob = ''
+            Changed = $false
+            ResultBytes = [byte[]]::new(0)
+        }
+        ExpectedChangedPaths = @()
+        PlanSha256 = Get-Sha256Text -Text "schema=1`nno-catalog=1`n"
+    }
+}
+
+function Get-ConsumerMigrationPlanForBase {
+    param(
+        [AllowNull()]$Catalog,
+        [Parameter(Mandatory)][string]$BaseCommit,
+        [Parameter(Mandatory)][string]$Workspace
+    )
+
+    $ledgerEntry = Get-LocalTreeEntry -Commit $BaseCommit `
+        -Path $ConsumerMigrationLedgerPath
+    $ledgerPath = Assert-ContainedMigrationDestination -Root $Workspace `
+        -RelativePath $ConsumerMigrationLedgerPath
+    $ledgerBytes = $null
+    if ($ledgerEntry.Path) {
+        if ($ledgerEntry.Mode -cne '100644' -or $ledgerEntry.Type -cne 'blob' -or
+            -not (Test-Path -LiteralPath $ledgerPath -PathType Leaf)) {
+            throw 'Consumer migration ledger is not one regular tracked file.'
+        }
+        $ledgerBytes = [IO.File]::ReadAllBytes($ledgerPath)
+    }
+    elseif (Test-Path -LiteralPath $ledgerPath) {
+        throw 'Consumer migration ledger exists outside the committed base tree.'
+    }
+    if ($null -eq $Catalog) {
+        if ($null -ne $ledgerBytes) {
+            throw 'Consumer migration ledger exists but the installed protocol has no migration catalog.'
+        }
+        return New-EmptyConsumerMigrationPlan
+    }
+
+    $requiredPaths = @(Get-MeAndAIConsumerMigrationRequiredPaths `
+        -Catalog $Catalog -LedgerBytes $ledgerBytes)
+    $files = [System.Collections.Generic.List[object]]::new()
+    foreach ($path in $requiredPaths) {
+        $entry = Get-LocalTreeEntry -Commit $BaseCommit -Path $path
+        $fullPath = Assert-ContainedMigrationDestination -Root $Workspace `
+            -RelativePath $path
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            -not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+            throw "Consumer migration input '$path' is not one regular tracked file."
+        }
+        $files.Add([pscustomobject]@{
+            Path = $path
+            Bytes = [IO.File]::ReadAllBytes($fullPath)
+        })
+    }
+    $plan = Resolve-MeAndAIConsumerMigrationPlan -Catalog $Catalog `
+        -Files @($files) -LedgerBytes $ledgerBytes
+    foreach ($pathResult in @($plan.Paths)) {
+        $entry = Get-LocalTreeEntry -Commit $BaseCommit `
+            -Path ([string]$pathResult.Path)
+        if ([string]$entry.Sha -cne [string]$pathResult.OriginalBlob) {
+            throw "Consumer migration input '$([string]$pathResult.Path)' bytes differ from the committed base blob."
+        }
+    }
+    if ($ledgerEntry.Path -and
+        [string]$ledgerEntry.Sha -cne [string]$plan.Ledger.OriginalBlob) {
+        throw 'Consumer migration ledger bytes differ from the committed base blob.'
+    }
+    return $plan
+}
+
+function Apply-ConsumerMigrationPlan {
+    param(
+        [Parameter(Mandatory)]$Plan,
+        [Parameter(Mandatory)][string]$Workspace
+    )
+
+    $writes = [System.Collections.Generic.List[object]]::new()
+    foreach ($pathResult in @($Plan.Paths | Where-Object { [bool]$_.Changed })) {
+        $fullPath = Assert-ContainedMigrationDestination -Root $Workspace `
+            -RelativePath ([string]$pathResult.Path)
+        $writes.Add([pscustomobject]@{
+            Path = $fullPath
+            Existed = $true
+            OriginalBytes = [byte[]]$pathResult.OriginalBytes
+            ResultBytes = [byte[]]$pathResult.ResultBytes
+        })
+    }
+    if ([bool]$Plan.Ledger.Changed) {
+        $ledgerPath = Assert-ContainedMigrationDestination -Root $Workspace `
+            -RelativePath ([string]$Plan.Ledger.Path)
+        $writes.Add([pscustomobject]@{
+            Path = $ledgerPath
+            Existed = -not [string]::IsNullOrEmpty([string]$Plan.Ledger.OriginalBlob)
+            OriginalBytes = if ([string]::IsNullOrEmpty(
+                [string]$Plan.Ledger.OriginalBlob
+            )) { $null } else { [byte[]]$Plan.Ledger.OriginalBytes }
+            ResultBytes = [byte[]]$Plan.Ledger.ResultBytes
+        })
+    }
+
+    $completed = [System.Collections.Generic.List[object]]::new()
+    try {
+        foreach ($write in $writes) {
+            $completed.Add($write)
+            $parent = Split-Path -Parent ([string]$write.Path)
+            if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+                New-Item -ItemType Directory -Path $parent -Force | Out-Null
+            }
+            [IO.File]::WriteAllBytes(
+                [string]$write.Path, [byte[]]$write.ResultBytes
+            )
+        }
+    }
+    catch {
+        $writeError = $_.Exception
+        $rollbackErrors = [System.Collections.Generic.List[string]]::new()
+        for ($index = $completed.Count - 1; $index -ge 0; $index--) {
+            $write = $completed[$index]
+            try {
+                if ([bool]$write.Existed) {
+                    [IO.File]::WriteAllBytes(
+                        [string]$write.Path, [byte[]]$write.OriginalBytes
+                    )
+                }
+                elseif (Test-Path -LiteralPath ([string]$write.Path)) {
+                    Remove-Item -LiteralPath ([string]$write.Path) -Force
+                }
+            }
+            catch {
+                $rollbackErrors.Add(
+                    "$([string]$write.Path): $($_.Exception.Message)"
+                )
+            }
+        }
+        if ($rollbackErrors.Count -ne 0) {
+            throw "Consumer migration write failed and rollback was incomplete: $($writeError.Message). Rollback: $($rollbackErrors -join '; ')"
+        }
+        throw $writeError
+    }
+}
+
 function Assert-CurrentManagedAssets {
     param(
         [string]$BaseCommit,
@@ -315,32 +613,42 @@ function Get-ExpectedManagedPaths {
         [string]$TargetProtocolSha,
         [string]$SourcePath,
         [string]$ProtocolPath,
-        [object[]]$Assets
+        [object[]]$Assets,
+        [AllowNull()]$MigrationPlan = $null,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update'
     )
 
     $paths = [System.Collections.Generic.List[string]]::new()
-    $paths.Add($ProtocolPath)
-    foreach ($asset in $Assets) {
-        $consumerEntry = Get-LocalTreeEntry -Commit $BaseCommit `
-            -Path ([string]$asset.ConsumerPath)
-        $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
-            -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
-        if ($consumerEntry.Mode -cne '100644' -or
-            $consumerEntry.Type -cne 'blob' -or
-            $consumerEntry.Sha -notmatch '^[0-9a-f]{40}$') {
-            throw "Managed consumer asset '$($asset.ConsumerPath)' is missing or invalid."
-        }
-        if ($targetEntry.Mode -cne '100644' -or
-            $targetEntry.Type -cne 'blob' -or
-            $targetEntry.Sha -notmatch '^[0-9a-f]{40}$') {
-            throw "Target release is missing canonical updater template '$($asset.TemplatePath)'."
-        }
-        if ($consumerEntry.Mode -cne $targetEntry.Mode -or
-            $consumerEntry.Sha -cne $targetEntry.Sha) {
-            $paths.Add([string]$asset.ConsumerPath)
+    if ($ProposalKind -ceq 'Update') {
+        $paths.Add($ProtocolPath)
+        foreach ($asset in $Assets) {
+            $consumerEntry = Get-LocalTreeEntry -Commit $BaseCommit `
+                -Path ([string]$asset.ConsumerPath)
+            $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+                -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+            if ($consumerEntry.Mode -cne '100644' -or
+                $consumerEntry.Type -cne 'blob' -or
+                $consumerEntry.Sha -notmatch '^[0-9a-f]{40}$') {
+                throw "Managed consumer asset '$($asset.ConsumerPath)' is missing or invalid."
+            }
+            if ($targetEntry.Mode -cne '100644' -or
+                $targetEntry.Type -cne 'blob' -or
+                $targetEntry.Sha -notmatch '^[0-9a-f]{40}$') {
+                throw "Target release is missing canonical updater template '$($asset.TemplatePath)'."
+            }
+            if ($consumerEntry.Mode -cne $targetEntry.Mode -or
+                $consumerEntry.Sha -cne $targetEntry.Sha) {
+                $paths.Add([string]$asset.ConsumerPath)
+            }
         }
     }
-    return @($paths)
+    if ($null -ne $MigrationPlan) {
+        foreach ($path in @($MigrationPlan.ExpectedChangedPaths)) {
+            $paths.Add([string]$path)
+        }
+    }
+    return @(Get-OrdinalUniquePaths -Paths @($paths))
 }
 
 function Assert-StagedManagedUpdate {
@@ -349,7 +657,10 @@ function Assert-StagedManagedUpdate {
         [string]$TargetProtocolSha,
         [string]$SourcePath,
         [string]$ProtocolPath,
-        [object[]]$Assets
+        [object[]]$Assets,
+        [AllowNull()]$MigrationPlan = $null,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update'
     )
 
     $stagedPaths = @(Invoke-Native -Command 'git' -Arguments @(
@@ -360,23 +671,40 @@ function Assert-StagedManagedUpdate {
         throw "Upgrade staging does not match the expected managed paths: $($stagedPaths -join ', ')."
     }
 
-    $protocolEntry = Get-StagedTreeEntry -Path $ProtocolPath
-    if ($protocolEntry.Mode -cne '160000' -or
-        $protocolEntry.Sha -cne $TargetProtocolSha) {
-        throw "Staged protocol gitlink does not match target commit '$TargetProtocolSha'."
-    }
-    foreach ($asset in $Assets) {
-        if ([string]$asset.ConsumerPath -cnotin $ExpectedPaths) {
-            continue
+    if ($ProposalKind -ceq 'Update') {
+        $protocolEntry = Get-StagedTreeEntry -Path $ProtocolPath
+        if ($protocolEntry.Mode -cne '160000' -or
+            $protocolEntry.Sha -cne $TargetProtocolSha) {
+            throw "Staged protocol gitlink does not match target commit '$TargetProtocolSha'."
         }
-        $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
-            -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
-        $stagedEntry = Get-StagedTreeEntry -Path ([string]$asset.ConsumerPath)
-        if ($targetEntry.Mode -cne '100644' -or
-            $targetEntry.Type -cne 'blob' -or
-            $stagedEntry.Mode -cne $targetEntry.Mode -or
-            $stagedEntry.Sha -cne $targetEntry.Sha) {
-            throw "Staged updater asset '$($asset.ConsumerPath)' does not match the target release blob."
+        foreach ($asset in $Assets) {
+            if ([string]$asset.ConsumerPath -cnotin $ExpectedPaths) {
+                continue
+            }
+            $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+                -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+            $stagedEntry = Get-StagedTreeEntry -Path ([string]$asset.ConsumerPath)
+            if ($targetEntry.Mode -cne '100644' -or
+                $targetEntry.Type -cne 'blob' -or
+                $stagedEntry.Mode -cne $targetEntry.Mode -or
+                $stagedEntry.Sha -cne $targetEntry.Sha) {
+                throw "Staged updater asset '$($asset.ConsumerPath)' does not match the target release blob."
+            }
+        }
+    }
+    if ($null -eq $MigrationPlan) { return }
+    foreach ($pathResult in @($MigrationPlan.Paths | Where-Object { [bool]$_.Changed })) {
+        $entry = Get-StagedTreeEntry -Path ([string]$pathResult.Path)
+        if ($entry.Mode -cne '100644' -or
+            [string]$entry.Sha -cne [string]$pathResult.ResultBlob) {
+            throw "Staged migration result '$([string]$pathResult.Path)' does not match its deterministic plan."
+        }
+    }
+    if ([bool]$MigrationPlan.Ledger.Changed) {
+        $entry = Get-StagedTreeEntry -Path ([string]$MigrationPlan.Ledger.Path)
+        if ($entry.Mode -cne '100644' -or
+            [string]$entry.Sha -cne [string]$MigrationPlan.Ledger.ResultBlob) {
+            throw 'Staged consumer migration ledger does not match its deterministic plan.'
         }
     }
 }
@@ -392,7 +720,8 @@ function Get-ProtocolMarker {
     param([string]$Body)
 
     $empty = [pscustomobject]@{
-        Schema = 0; Target = ''; ProtocolSha = ''; Head = ''; Repository = ''
+        Schema = 0; Kind = ''; Target = ''; ProtocolSha = ''
+        MigrationPlanSha = ''; PathsSha = ''; Head = ''; Repository = ''
     }
     if (-not $Body) {
         return $empty
@@ -425,7 +754,20 @@ function Get-ProtocolMarker {
     try {
         $json = $match.Groups['json'].Value
         $marker = $json | ConvertFrom-Json
-        $expectedNames = @('schema', 'target', 'protocolSha', 'head', 'repository')
+        if ($marker.schema -isnot [int] -and $marker.schema -isnot [long]) {
+            return $empty
+        }
+        $schema = [long]$marker.schema
+        $expectedNames = if ($schema -eq 1) {
+            @('schema', 'target', 'protocolSha', 'head', 'repository')
+        }
+        elseif ($schema -eq 2) {
+            @(
+                'schema', 'kind', 'target', 'protocolSha',
+                'migrationPlanSha', 'pathsSha', 'head', 'repository'
+            )
+        }
+        else { return $empty }
         $properties = @($marker.PSObject.Properties)
         if ($properties.Count -ne $expectedNames.Count) {
             return $empty
@@ -439,29 +781,61 @@ function Get-ProtocolMarker {
                 return $empty
             }
         }
-        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long]) -or
-            [long]$marker.schema -ne 1 -or
-            $marker.target -isnot [string] -or
+        if ($marker.target -isnot [string] -or
             $marker.protocolSha -isnot [string] -or
             $marker.head -isnot [string] -or
             $marker.repository -isnot [string]) {
             return $empty
         }
-        $canonicalJson = [ordered]@{
-            schema = 1
-            target = [string]$marker.target
-            protocolSha = [string]$marker.protocolSha
-            head = [string]$marker.head
-            repository = [string]$marker.repository
-        } | ConvertTo-Json -Compress
+        $kind = 'Update'
+        $migrationPlanSha = ''
+        $pathsSha = ''
+        $canonical = if ($schema -eq 1) {
+            [ordered]@{
+                schema = 1
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                repository = [string]$marker.repository
+            }
+        }
+        else {
+            if ($marker.kind -isnot [string] -or
+                [string]$marker.kind -cnotin @('update', 'migration-reconciliation') -or
+                $marker.migrationPlanSha -isnot [string] -or
+                [string]$marker.migrationPlanSha -cnotmatch '^[0-9a-f]{64}$' -or
+                $marker.pathsSha -isnot [string] -or
+                [string]$marker.pathsSha -cnotmatch '^[0-9a-f]{64}$') {
+                return $empty
+            }
+            $kind = if ([string]$marker.kind -ceq 'update') {
+                'Update'
+            } else { 'MigrationReconciliation' }
+            $migrationPlanSha = [string]$marker.migrationPlanSha
+            $pathsSha = [string]$marker.pathsSha
+            [ordered]@{
+                schema = 2
+                kind = [string]$marker.kind
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                migrationPlanSha = $migrationPlanSha
+                pathsSha = $pathsSha
+                head = [string]$marker.head
+                repository = [string]$marker.repository
+            }
+        }
+        $canonicalJson = $canonical | ConvertTo-Json -Compress
         if ($json -cne $canonicalJson) {
             return $empty
         }
         [pscustomobject]@{
-            Schema = 1
+            Schema = [int]$schema
+            Kind = $kind
             Target = [string]$marker.target
             Head = [string]$marker.head
             ProtocolSha = [string]$marker.protocolSha
+            MigrationPlanSha = $migrationPlanSha
+            PathsSha = $pathsSha
             Repository = [string]$marker.repository
         }
     }
@@ -474,7 +848,8 @@ function Get-ManagedUpdateIssueMarker {
     param([string]$Body)
 
     $empty = [pscustomobject]@{
-        Schema = 0; Target = ''; ProtocolSha = ''; Repository = ''; CanonicalLine = ''
+        Schema = 0; Kind = ''; Target = ''; ProtocolSha = ''
+        MigrationPlanSha = ''; Repository = ''; CanonicalLine = ''
     }
     if (-not $Body) { return $empty }
     $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
@@ -500,30 +875,71 @@ function Get-ManagedUpdateIssueMarker {
     try {
         $json = [string]$matches[0].Groups['json'].Value
         $marker = $json | ConvertFrom-Json
+        if ($marker.schema -isnot [int] -and $marker.schema -isnot [long]) {
+            throw 'schema'
+        }
+        $schema = [long]$marker.schema
         $properties = @($marker.PSObject.Properties)
-        $expectedNames = @('schema', 'target', 'protocolSha', 'repository')
+        $expectedNames = if ($schema -eq 1) {
+            @('schema', 'target', 'protocolSha', 'repository')
+        }
+        elseif ($schema -eq 2) {
+            @(
+                'schema', 'kind', 'target', 'protocolSha',
+                'migrationPlanSha', 'repository'
+            )
+        }
+        else { throw 'schema' }
         if ($properties.Count -ne $expectedNames.Count) { throw 'shape' }
         for ($index = 0; $index -lt $expectedNames.Count; $index++) {
             if ([string]$properties[$index].Name -cne $expectedNames[$index]) { throw 'shape' }
         }
-        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long]) -or
-            [long]$marker.schema -ne 1 -or
-            $marker.target -isnot [string] -or
+        if ($marker.target -isnot [string] -or
             $marker.protocolSha -isnot [string] -or
             $marker.repository -isnot [string]) {
             throw 'type'
         }
-        $canonicalJson = [ordered]@{
-            schema = 1
-            target = [string]$marker.target
-            protocolSha = [string]$marker.protocolSha
-            repository = [string]$marker.repository
-        } | ConvertTo-Json -Compress
+        $kind = 'Update'
+        $migrationPlanSha = ''
+        $canonical = if ($schema -eq 1) {
+            [ordered]@{
+                schema = 1
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                repository = [string]$marker.repository
+            }
+        }
+        else {
+            if ($marker.kind -isnot [string] -or
+                [string]$marker.kind -cnotin @(
+                    'update', 'migration-reconciliation'
+                ) -or
+                $marker.migrationPlanSha -isnot [string] -or
+                [string]$marker.migrationPlanSha -cnotmatch '^[0-9a-f]{64}$') {
+                throw 'type'
+            }
+            $kind = if ([string]$marker.kind -ceq 'update') {
+                'Update'
+            }
+            else { 'MigrationReconciliation' }
+            $migrationPlanSha = [string]$marker.migrationPlanSha
+            [ordered]@{
+                schema = 2
+                kind = [string]$marker.kind
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                migrationPlanSha = $migrationPlanSha
+                repository = [string]$marker.repository
+            }
+        }
+        $canonicalJson = $canonical | ConvertTo-Json -Compress
         if ($json -cne $canonicalJson) { throw 'canonical' }
         return [pscustomobject]@{
-            Schema = 1
+            Schema = [int]$schema
+            Kind = $kind
             Target = [string]$marker.target
             ProtocolSha = [string]$marker.protocolSha
+            MigrationPlanSha = $migrationPlanSha
             Repository = [string]$marker.repository
             CanonicalLine = "<!-- meandai-protocol-update-issue:$canonicalJson -->"
         }
@@ -538,24 +954,67 @@ function Get-ManagedUpdateIssueContract {
         [string]$Repository,
         [string]$TargetTag,
         [string]$ProtocolSha,
-        [string]$Branch
+        [string]$Branch,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update',
+        [string]$MigrationPlanSha = ''
     )
 
-    $markerJson = [ordered]@{
-        schema = 1; target = $TargetTag; protocolSha = $ProtocolSha
-        repository = $Repository
-    } | ConvertTo-Json -Compress
+    $useSchema2 = -not [string]::IsNullOrEmpty($MigrationPlanSha)
+    if ($useSchema2 -and $MigrationPlanSha -cnotmatch '^[0-9a-f]{64}$') {
+        throw 'A managed proposal requires one lowercase migration plan SHA-256.'
+    }
+    if (-not $useSchema2 -and $ProposalKind -cne 'Update') {
+        throw 'Migration reconciliation requires a deterministic migration plan.'
+    }
+    $markerObject = if ($useSchema2) {
+        [ordered]@{
+            schema = 2
+            kind = if ($ProposalKind -ceq 'Update') {
+                'update'
+            } else { 'migration-reconciliation' }
+            target = $TargetTag
+            protocolSha = $ProtocolSha
+            migrationPlanSha = $MigrationPlanSha
+            repository = $Repository
+        }
+    }
+    else {
+        [ordered]@{
+            schema = 1; target = $TargetTag; protocolSha = $ProtocolSha
+            repository = $Repository
+        }
+    }
+    $markerJson = $markerObject | ConvertTo-Json -Compress
     $marker = "<!-- meandai-protocol-update-issue:$markerJson -->"
-    $title = "Track meAndAI protocol update to $TargetTag"
-    $body = @(
+    $title = if ($ProposalKind -ceq 'Update') {
+        "Track meAndAI protocol update to $TargetTag"
+    }
+    else { "Track meAndAI consumer reconciliation for $TargetTag" }
+    $heading = if ($ProposalKind -ceq 'Update') {
+        '## Managed protocol update tracking'
+    }
+    else { '## Managed consumer reconciliation tracking' }
+    $bodyLines = [System.Collections.Generic.List[string]]::new()
+    foreach ($line in @(
         $marker,
-        '## Managed protocol update tracking', '',
+        $heading, '',
         "- Target release: ``$TargetTag``",
-        "- Protocol commit: ``$ProtocolSha``",
+        "- Protocol commit: ``$ProtocolSha``"
+    )) {
+        $bodyLines.Add([string]$line)
+    }
+    if ($useSchema2) {
+        $bodyLines.Add("- Migration plan: ``$MigrationPlanSha``")
+    }
+    foreach ($line in @(
         "- Deterministic branch: ``$Branch``", '',
         'This issue is the canonical same-repository work record for the managed protocol proposal.',
         'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
-    ) -join [Environment]::NewLine
+    )) {
+        $bodyLines.Add([string]$line)
+    }
+    $body = $bodyLines -join [Environment]::NewLine
     [pscustomobject]@{ Marker = $marker; Title = $title; Body = $body }
 }
 
@@ -597,19 +1056,21 @@ function Ensure-ProtocolUpdateIssue {
         [string]$Repository,
         [string]$TargetTag,
         [string]$ProtocolSha,
-        [string]$Branch
+        [string]$Branch,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update',
+        [string]$MigrationPlanSha = ''
     )
 
     Ensure-ManagedUpdateLabels -Repository $Repository
     $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
-        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch
+        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch `
+        -ProposalKind $ProposalKind -MigrationPlanSha $MigrationPlanSha
     $matches = [System.Collections.Generic.List[object]]::new()
     foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
         $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
         if ($marker.Schema -eq 0) { continue }
-        if ($marker.Target -ceq $TargetTag -and
-            $marker.ProtocolSha -ceq $ProtocolSha -and
-            $marker.Repository -ceq $Repository) {
+        if ($marker.CanonicalLine -ceq $contract.Marker) {
             $normalizedBody = ([string]$issue.body).Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
             $normalizedExpected = $contract.Body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
             if ([string]$issue.title -cne $contract.Title -or
@@ -633,9 +1094,7 @@ function Ensure-ProtocolUpdateIssue {
         ) | Out-Null
         foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
             $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
-            if ($marker.Schema -eq 1 -and $marker.Target -ceq $TargetTag -and
-                $marker.ProtocolSha -ceq $ProtocolSha -and
-                $marker.Repository -ceq $Repository) {
+            if ($marker.CanonicalLine -ceq $contract.Marker) {
                 $matches.Add($issue)
             }
         }
@@ -716,6 +1175,9 @@ function Get-ValidatedManagedUpdateIssue {
         [string]$HeadSha,
         [string]$Branch,
         [string]$PullRequestBody,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update',
+        [string]$MigrationPlanSha = '',
         [bool]$RequireOpen = $true
     )
 
@@ -728,11 +1190,12 @@ function Get-ValidatedManagedUpdateIssue {
         throw "Managed update pull request #$PullRequestNumber tracking reference is not one same-repository issue."
     }
     $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
-        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch
+        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch `
+        -ProposalKind $ProposalKind -MigrationPlanSha $MigrationPlanSha
     $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
     $normalizedBody = ([string]$issue.body).Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
     $normalizedExpected = $contract.Body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
-    if ($marker.Schema -ne 1 -or $marker.CanonicalLine -cne $contract.Marker -or
+    if ($marker.CanonicalLine -cne $contract.Marker -or
         [string]$issue.title -cne $contract.Title -or
         $normalizedBody -cne $normalizedExpected -or
         [string]$issue.state -cnotin @('open', 'closed') -or
@@ -906,6 +1369,289 @@ function Get-RepositoryTreeEntry {
     return $empty
 }
 
+function Get-RepositoryBlobBytes {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$BlobSha,
+        [AllowNull()][string]$Token = $null
+    )
+
+    if ($BlobSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Repository blob identity '$BlobSha' is not canonical."
+    }
+    $arguments = @('api', "repos/$Repository/git/blobs/$BlobSha")
+    $blob = if ($PSBoundParameters.ContainsKey('Token')) {
+        Invoke-GhJson -Arguments $arguments -Token $Token
+    }
+    else { Invoke-GhJson -Arguments $arguments }
+    if ($null -eq $blob -or [string]$blob.sha -cne $BlobSha -or
+        [string]$blob.encoding -cne 'base64' -or
+        $null -eq $blob.PSObject.Properties['size'] -or
+        [long]$blob.size -lt 0) {
+        throw "Repository blob '$BlobSha' has invalid immutable metadata."
+    }
+    try {
+        $encoded = ([string]$blob.content) -replace '[\r\n]', ''
+        $bytes = [Convert]::FromBase64String($encoded)
+    }
+    catch {
+        throw "Repository blob '$BlobSha' is not valid base64 content."
+    }
+    if ($bytes.LongLength -ne [long]$blob.size) {
+        throw "Repository blob '$BlobSha' size does not match its immutable metadata."
+    }
+    return ,$bytes
+}
+
+function Get-RemoteConsumerMigrationPlan {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$BaseCommit,
+        [Parameter(Mandatory)][string]$TargetProtocolSha,
+        [Parameter(Mandatory)][string]$ProtocolToken
+    )
+
+    if ($BaseCommit -cnotmatch '^[0-9a-f]{40}$' -or
+        $TargetProtocolSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Remote consumer migration planning requires canonical base and target commits.'
+    }
+    $moduleEntry = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
+        -HeadSha $TargetProtocolSha -Path $ConsumerMigrationModulePath `
+        -Token $ProtocolToken
+    $indexEntry = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
+        -HeadSha $TargetProtocolSha -Path $ConsumerMigrationIndexPath `
+        -Token $ProtocolToken
+    if ($moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob' -or
+        $indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob') {
+        throw 'Immutable target release lacks one regular migration engine and catalog index.'
+    }
+
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) (
+        "meandai-finalizer-migrations-$([guid]::NewGuid().ToString('N'))"
+    )
+    $loadedModule = $null
+    try {
+        $scriptsRoot = Join-Path $temporaryRoot 'scripts'
+        $catalogRoot = Join-Path $temporaryRoot 'migrations'
+        New-Item -ItemType Directory -Path $scriptsRoot, $catalogRoot -Force | Out-Null
+        $moduleBytes = Get-RepositoryBlobBytes -Repository $ProtocolRepository `
+            -BlobSha ([string]$moduleEntry.Sha) -Token $ProtocolToken
+        $indexBytes = Get-RepositoryBlobBytes -Repository $ProtocolRepository `
+            -BlobSha ([string]$indexEntry.Sha) -Token $ProtocolToken
+        $moduleFile = Join-Path $scriptsRoot 'MeAndAI.ConsumerMigrations.psm1'
+        $indexFile = Join-Path $catalogRoot 'index.json'
+        [IO.File]::WriteAllBytes($moduleFile, [byte[]]$moduleBytes)
+        [IO.File]::WriteAllBytes($indexFile, [byte[]]$indexBytes)
+
+        try {
+            $indexText = [Text.UTF8Encoding]::new($false, $true).GetString(
+                [byte[]]$indexBytes
+            )
+            $routingIndex = $indexText | ConvertFrom-Json
+        }
+        catch {
+            throw 'Immutable target migration catalog index cannot be routed as strict UTF-8 JSON.'
+        }
+        if ($routingIndex.migrations -isnot [Array]) {
+            throw 'Immutable target migration catalog index has no migration array.'
+        }
+        $definitionNames = [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+        foreach ($entry in @($routingIndex.migrations)) {
+            $id = [string]$entry.id
+            $definition = [string]$entry.definition
+            if ($id -cnotmatch '^MIG-[0-9]{4}$' -or
+                $definition -cne "$id.json" -or
+                -not $definitionNames.Add($definition)) {
+                throw 'Immutable target migration catalog index contains an unsafe definition route.'
+            }
+            $definitionPath = "migrations/$definition"
+            $definitionEntry = Get-RepositoryTreeEntry `
+                -Repository $ProtocolRepository -HeadSha $TargetProtocolSha `
+                -Path $definitionPath -Token $ProtocolToken
+            if ($definitionEntry.Mode -cne '100644' -or
+                $definitionEntry.Type -cne 'blob') {
+                throw "Immutable target migration definition '$definition' is not one regular blob."
+            }
+            $definitionBytes = Get-RepositoryBlobBytes `
+                -Repository $ProtocolRepository -BlobSha ([string]$definitionEntry.Sha) `
+                -Token $ProtocolToken
+            [IO.File]::WriteAllBytes(
+                (Join-Path $catalogRoot $definition), [byte[]]$definitionBytes
+            )
+        }
+
+        $loadedModule = Import-Module $moduleFile -Force -PassThru
+        $catalog = Import-MeAndAIConsumerMigrationCatalog -IndexPath $indexFile
+        if ([string]$catalog.IndexBlob -cne [string]$indexEntry.Sha) {
+            throw 'Imported target migration catalog differs from its immutable tree blob.'
+        }
+        foreach ($migration in @($catalog.Migrations)) {
+            $definitionEntry = Get-RepositoryTreeEntry `
+                -Repository $ProtocolRepository -HeadSha $TargetProtocolSha `
+                -Path "migrations/$([string]$migration.Definition)" `
+                -Token $ProtocolToken
+            if ($definitionEntry.Mode -cne '100644' -or
+                $definitionEntry.Type -cne 'blob' -or
+                [string]$definitionEntry.Sha -cne [string]$migration.DefinitionBlob) {
+                throw "Imported target migration '$([string]$migration.Id)' differs from its immutable tree blob."
+            }
+        }
+
+        $ledgerEntry = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha $BaseCommit -Path $ConsumerMigrationLedgerPath
+        $ledgerBytes = $null
+        if ($ledgerEntry.Mode -or $ledgerEntry.Type -or $ledgerEntry.Sha) {
+            if ($ledgerEntry.Mode -cne '100644' -or $ledgerEntry.Type -cne 'blob') {
+                throw 'Pull-request base migration ledger is not one regular blob.'
+            }
+            $ledgerBytes = Get-RepositoryBlobBytes -Repository $Repository `
+                -BlobSha ([string]$ledgerEntry.Sha)
+        }
+        $requiredPaths = @(Get-MeAndAIConsumerMigrationRequiredPaths `
+            -Catalog $catalog -LedgerBytes $ledgerBytes)
+        $files = [System.Collections.Generic.List[object]]::new()
+        $baseEntries = @{}
+        foreach ($path in $requiredPaths) {
+            $entry = Get-RepositoryTreeEntry -Repository $Repository `
+                -HeadSha $BaseCommit -Path $path
+            if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob') {
+                throw "Pull-request base migration input '$path' is not one regular blob."
+            }
+            $bytes = Get-RepositoryBlobBytes -Repository $Repository `
+                -BlobSha ([string]$entry.Sha)
+            $files.Add([pscustomobject]@{ Path = $path; Bytes = [byte[]]$bytes })
+            $baseEntries[$path] = $entry
+        }
+        $plan = Resolve-MeAndAIConsumerMigrationPlan -Catalog $catalog `
+            -Files @($files) -LedgerBytes $ledgerBytes
+        foreach ($pathResult in @($plan.Paths)) {
+            if ([string]$baseEntries[[string]$pathResult.Path].Sha -cne
+                [string]$pathResult.OriginalBlob) {
+                throw "Remote migration input '$([string]$pathResult.Path)' differs from its base blob."
+            }
+        }
+        if ($null -ne $ledgerBytes -and
+            [string]$ledgerEntry.Sha -cne [string]$plan.Ledger.OriginalBlob) {
+            throw 'Remote migration ledger differs from its base blob.'
+        }
+        return $plan
+    }
+    finally {
+        if ($null -ne $loadedModule) {
+            Remove-Module -ModuleInfo $loadedModule -Force -ErrorAction SilentlyContinue
+        }
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            $resolvedTemporaryRoot = [IO.Path]::GetFullPath($temporaryRoot)
+            $temporaryPrefix = [IO.Path]::GetFullPath(
+                [IO.Path]::GetTempPath()
+            ).TrimEnd([IO.Path]::DirectorySeparatorChar) +
+                [IO.Path]::DirectorySeparatorChar
+            if (-not $resolvedTemporaryRoot.StartsWith(
+                $temporaryPrefix, [StringComparison]::OrdinalIgnoreCase
+            )) {
+                throw 'Remote migration temporary workspace escaped the system temporary directory.'
+            }
+            Remove-Item -LiteralPath $resolvedTemporaryRoot -Recurse -Force
+        }
+    }
+}
+
+function Assert-Schema2MergedProtocolEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)]$Marker,
+        [Parameter(Mandatory)][ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$Kind,
+        [Parameter(Mandatory)][string[]]$ChangedPaths
+    )
+
+    $release = Get-ImmutableProtocolReleaseEvidence `
+        -Repository $ProtocolRepository -Tag ([string]$Marker.Target) `
+        -ProtocolToken ([string]$env:PROTOCOL_TOKEN)
+    if ([string]$release.CommitSha -cne [string]$Marker.ProtocolSha) {
+        throw 'Schema-2 proposal marker does not match its immutable target release.'
+    }
+    $baseCommit = [string]$PullRequest.base.sha
+    if ($baseCommit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Schema-2 proposal has no canonical pull-request base commit.'
+    }
+    $targetSha = [string]$release.CommitSha
+    $plan = Get-RemoteConsumerMigrationPlan -Repository $Repository `
+        -BaseCommit $baseCommit -TargetProtocolSha $targetSha `
+        -ProtocolToken ([string]$env:PROTOCOL_TOKEN)
+    $baseProtocol = Get-RepositoryTreeEntry -Repository $Repository `
+        -HeadSha $baseCommit -Path $ProtocolPath
+    $headProtocol = Get-RepositoryTreeEntry -Repository $Repository `
+        -HeadSha ([string]$Marker.Head) -Path $ProtocolPath
+    if ($baseProtocol.Mode -cne '160000' -or $baseProtocol.Type -cne 'commit' -or
+        $headProtocol.Mode -cne '160000' -or $headProtocol.Type -cne 'commit' -or
+        [string]$headProtocol.Sha -cne $targetSha) {
+        throw 'Schema-2 proposal protocol gitlink evidence is invalid.'
+    }
+
+    $expectedPaths = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in @($plan.ExpectedChangedPaths)) {
+        $expectedPaths.Add([string]$path)
+    }
+    if ($Kind -ceq 'Update') {
+        if ([string]$baseProtocol.Sha -ceq $targetSha) {
+            throw 'Schema-2 update base already contains the target protocol.'
+        }
+        $lineage = Invoke-GhJson -Token ([string]$env:PROTOCOL_TOKEN) `
+            -Arguments @(
+                'api',
+                "repos/$ProtocolRepository/compare/$([string]$baseProtocol.Sha)...$targetSha"
+            )
+        if ([string]$lineage.status -cne 'ahead') {
+            throw 'Schema-2 update target is not a descendant of the base protocol commit.'
+        }
+        $expectedPaths.Add($ProtocolPath)
+    }
+    elseif ([string]$baseProtocol.Sha -cne $targetSha) {
+        throw 'Schema-2 migration reconciliation base is not already pinned to its target protocol.'
+    }
+
+    foreach ($asset in $ManagedUpdaterAssets) {
+        $targetEntry = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
+            -HeadSha $targetSha -Path ([string]$asset.TemplatePath) `
+            -Token ([string]$env:PROTOCOL_TOKEN)
+        $baseEntry = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha $baseCommit -Path ([string]$asset.ConsumerPath)
+        $headEntry = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha ([string]$Marker.Head) -Path ([string]$asset.ConsumerPath)
+        if ($targetEntry.Mode -cne '100644' -or $targetEntry.Type -cne 'blob' -or
+            $baseEntry.Mode -cne '100644' -or $baseEntry.Type -cne 'blob' -or
+            $headEntry.Mode -cne '100644' -or $headEntry.Type -cne 'blob' -or
+            [string]$headEntry.Sha -cne [string]$targetEntry.Sha) {
+            throw "Schema-2 proposal updater asset '$([string]$asset.ConsumerPath)' is not the immutable target blob."
+        }
+        if ([string]$baseEntry.Sha -cne [string]$targetEntry.Sha) {
+            if ($Kind -cne 'Update') {
+                throw "Schema-2 migration reconciliation has stale base updater asset '$([string]$asset.ConsumerPath)'."
+            }
+            $expectedPaths.Add([string]$asset.ConsumerPath)
+        }
+    }
+
+    $expected = @(Get-OrdinalUniquePaths -Paths @($expectedPaths))
+    if (-not (Test-ExactOrdinalPathSet `
+        -Actual $ChangedPaths -Expected $expected)) {
+        throw 'Schema-2 proposal changed paths differ from the independently computed plan.'
+    }
+    if ([string]$Marker.MigrationPlanSha -cne [string]$plan.PlanSha256 -or
+        [string]$Marker.PathsSha -cne
+            (Get-MigrationPathSetSha256 -Paths $expected)) {
+        throw 'Schema-2 proposal marker differs from the independently computed plan.'
+    }
+    if (-not (Test-ConsumerMigrationEntriesMatchTarget `
+        -Repository $Repository -HeadSha ([string]$Marker.Head) -Plan $plan)) {
+        throw 'Schema-2 proposal migration output or ledger differs from the independently computed plan.'
+    }
+}
+
 function Test-ManagedAssetEntriesMatchTarget {
     param(
         [string]$Repository,
@@ -935,6 +1681,32 @@ function Test-ManagedAssetEntriesMatchTarget {
     return $true
 }
 
+function Test-ConsumerMigrationEntriesMatchTarget {
+    param(
+        [string]$Repository,
+        [string]$HeadSha,
+        [Parameter(Mandatory)]$Plan
+    )
+
+    foreach ($pathResult in @($Plan.Paths | Where-Object { [bool]$_.Changed })) {
+        $entry = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha $HeadSha -Path ([string]$pathResult.Path)
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cne [string]$pathResult.ResultBlob) {
+            return $false
+        }
+    }
+    if ([bool]$Plan.Ledger.Changed) {
+        $entry = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha $HeadSha -Path ([string]$Plan.Ledger.Path)
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cne [string]$Plan.Ledger.ResultBlob) {
+            return $false
+        }
+    }
+    return $true
+}
+
 function Assert-ManagedPullRequestSafe {
     param(
         [string]$Repository,
@@ -951,6 +1723,14 @@ function Assert-ManagedPullRequestSafe {
     )
 
     $number = [int]$Operation.PullRequestNumber
+    $proposalKind = if ($null -ne $Operation.PSObject.Properties['ProposalKind']) {
+        [string]$Operation.ProposalKind
+    }
+    else { 'Update' }
+    $migrationPlan = $script:ConsumerMigrationPlansByTag[[string]$Operation.TargetTag]
+    if ($null -eq $migrationPlan) {
+        throw "Managed PR #$number has no deterministic consumer migration plan."
+    }
     $details = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$number")
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$number/files?per_page=100")
     $marker = Get-ProtocolMarker ([string]$details.body)
@@ -960,12 +1740,26 @@ function Assert-ManagedPullRequestSafe {
     $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
     $expectedChangedPaths = @(Get-ExpectedManagedPaths -BaseCommit $BaseCommit `
         -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
-        -SourcePath $SourcePath -ProtocolPath $ProtocolPath -Assets $ManagedAssets)
-    $managedAssetsMatch = Test-ManagedAssetEntriesMatchTarget `
+        -SourcePath $SourcePath -ProtocolPath $ProtocolPath -Assets $ManagedAssets `
+        -MigrationPlan $migrationPlan -ProposalKind $proposalKind)
+    $managedAssetsMatch = if ($proposalKind -ceq 'Update') {
+        Test-ManagedAssetEntriesMatchTarget `
+            -Repository $Repository -HeadSha ([string]$details.head.sha) `
+            -ExpectedPaths $expectedChangedPaths `
+            -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+            -SourcePath $SourcePath -Assets $ManagedAssets
+    }
+    else { $true }
+    $migrationEntriesMatch = Test-ConsumerMigrationEntriesMatchTarget `
         -Repository $Repository -HeadSha ([string]$details.head.sha) `
-        -ExpectedPaths $expectedChangedPaths `
-        -TargetProtocolSha ([string]$Operation.ExpectedProtocolSha) `
-        -SourcePath $SourcePath -Assets $ManagedAssets
+        -Plan $migrationPlan
+    $expectedPathsSha = Get-MigrationPathSetSha256 -Paths $expectedChangedPaths
+    $migrationMarkerValid = if ($marker.Schema -eq 2) {
+        [string]$marker.Kind -ceq $proposalKind -and
+        [string]$marker.MigrationPlanSha -ceq [string]$migrationPlan.PlanSha256 -and
+        [string]$marker.PathsSha -ceq $expectedPathsSha
+    }
+    else { $marker.Schema -eq 1 -and $proposalKind -ceq 'Update' }
     $state = [string]$details.state
     $candidate = [pscustomobject]@{
         PullRequestState = if ($state) {
@@ -978,6 +1772,7 @@ function Assert-ManagedPullRequestSafe {
         ApiHeadSha = [string]$details.head.sha
         ObservedHeadSha = if ($null -ne $remoteHead) { [string]$remoteHead } else { '' }
         MarkerSchema = $marker.Schema
+        Kind = $proposalKind
         MarkerTargetTag = $marker.Target
         MarkerProtocolSha = $marker.ProtocolSha
         MarkerHeadSha = $marker.Head
@@ -992,7 +1787,13 @@ function Assert-ManagedPullRequestSafe {
         AuthorLogin = [string]$details.user.login
         ChangedPaths = $changedPaths
         ExpectedChangedPaths = $expectedChangedPaths
+        AllowedExpectedPaths = @($ManagedPaths + @($migrationPlan.ExpectedChangedPaths) |
+            Sort-Object -Unique)
         ManagedAssetEntriesMatchTarget = $managedAssetsMatch
+        MigrationPlanSha = if ($marker.Schema -eq 2) {
+            [string]$migrationPlan.PlanSha256
+        } else { '' }
+        MigrationPlanValid = $migrationMarkerValid -and $migrationEntriesMatch
     }
     $context = [pscustomobject]@{
         Repository = $Repository; DefaultBranch = [string]$env:DEFAULT_BRANCH
@@ -1012,7 +1813,12 @@ function Assert-ManagedPullRequestSafe {
         -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
         -HeadSha ([string]$Operation.ExpectedHeadSha) `
         -Branch ([string]$Operation.Branch) `
-        -PullRequestBody ([string]$details.body) -RequireOpen $true | Out-Null
+        -PullRequestBody ([string]$details.body) `
+        -ProposalKind $proposalKind `
+        -MigrationPlanSha $(if ($marker.Schema -eq 2) {
+            [string]$migrationPlan.PlanSha256
+        } else { '' }) `
+        -RequireOpen $true | Out-Null
 }
 
 function Get-CanonicalAdoptionMarker {
@@ -1370,16 +2176,33 @@ function Get-ManagedMergedPullRequestState {
         $marker = $adoptionMarker
         $canonicalLine = [string]$adoptionMarker.CanonicalLine
     }
-    elseif ($updateMarker.Schema -eq 1) {
-        $kind = 'Update'
+    elseif ($updateMarker.Schema -in @(1, 2)) {
+        $kind = [string]$updateMarker.Kind
         $marker = $updateMarker
-        $canonicalJson = [ordered]@{
-            schema = 1
-            target = [string]$updateMarker.Target
-            protocolSha = [string]$updateMarker.ProtocolSha
-            head = [string]$updateMarker.Head
-            repository = [string]$updateMarker.Repository
-        } | ConvertTo-Json -Compress
+        $canonicalObject = if ($updateMarker.Schema -eq 1) {
+            [ordered]@{
+                schema = 1
+                target = [string]$updateMarker.Target
+                protocolSha = [string]$updateMarker.ProtocolSha
+                head = [string]$updateMarker.Head
+                repository = [string]$updateMarker.Repository
+            }
+        }
+        else {
+            [ordered]@{
+                schema = 2
+                kind = if ([string]$updateMarker.Kind -ceq 'Update') {
+                    'update'
+                } else { 'migration-reconciliation' }
+                target = [string]$updateMarker.Target
+                protocolSha = [string]$updateMarker.ProtocolSha
+                migrationPlanSha = [string]$updateMarker.MigrationPlanSha
+                pathsSha = [string]$updateMarker.PathsSha
+                head = [string]$updateMarker.Head
+                repository = [string]$updateMarker.Repository
+            }
+        }
+        $canonicalJson = $canonicalObject | ConvertTo-Json -Compress
         $canonicalLine = "<!-- meandai-protocol-update:$canonicalJson -->"
     }
     else {
@@ -1389,13 +2212,16 @@ function Get-ManagedMergedPullRequestState {
         throw "Managed pull request #$Number ownership marker is not its exact first line."
     }
 
-    $expectedPrefix = if ($kind -ceq 'Adoption') {
-        $adoptionPrefix
-    }
-    else { $BranchPrefix }
     $target = [string]$marker.Target
+    $expectedBranch = if ($kind -ceq 'Adoption') {
+        "$adoptionPrefix$target"
+    }
+    elseif ($kind -ceq 'MigrationReconciliation') {
+        "$BranchPrefix$target$MigrationBranchSuffix"
+    }
+    else { "$BranchPrefix$target" }
     if ($target -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
-        $headRef -cne "$expectedPrefix$target" -or
+        $headRef -cne $expectedBranch -or
         [string]$marker.Repository -cne $Repository -or
         [string]$marker.ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
         [string]$marker.Head -cnotmatch '^[0-9a-f]{40}$') {
@@ -1419,13 +2245,32 @@ function Get-ManagedMergedPullRequestState {
     $trackingIssueNumber = Get-CanonicalTrackingIssueNumber -Body $body
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$Number/files?per_page=100")
     $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
-    if ($changedPaths.Count -eq 0 -or $changedPaths -cnotcontains $ProtocolPath) {
-        throw "Managed pull request #$Number does not contain the protocol dependency path."
+    if ($changedPaths.Count -eq 0) {
+        throw "Managed pull request #$Number has no changed paths."
     }
-    if ($kind -ceq 'Update') {
+    if ($kind -cin @('Adoption', 'Update') -and
+        $changedPaths -cnotcontains $ProtocolPath) {
+        throw "Managed $($kind.ToLowerInvariant()) pull request #$Number does not contain the protocol dependency path."
+    }
+    if ($kind -ceq 'MigrationReconciliation' -and
+        ($changedPaths -ccontains $ProtocolPath -or
+         $changedPaths -cnotcontains $ConsumerMigrationLedgerPath)) {
+        throw "Managed migration pull request #$Number has an invalid protocol or ledger path contract."
+    }
+    if ($kind -ceq 'Update' -and $updateMarker.Schema -eq 1) {
         foreach ($path in $changedPaths) {
             if ($path -cnotin $ManagedPaths) {
                 throw "Managed update pull request #$Number changed unexpected path '$path'."
+            }
+        }
+    }
+    elseif ($kind -ceq 'Adoption') {
+        foreach ($forbiddenPath in @(
+            '.ai/adoption/meandai-capabilities.json', 'FG_PAT.txt',
+            'MEANDAI_RO_FG_PAT.txt'
+        )) {
+            if ($changedPaths -ccontains $forbiddenPath) {
+                throw "Managed adoption pull request #$Number contains forbidden transient path '$forbiddenPath'."
             }
         }
     }
@@ -1435,9 +2280,16 @@ function Get-ManagedMergedPullRequestState {
             'MEANDAI_RO_FG_PAT.txt'
         )) {
             if ($changedPaths -ccontains $forbiddenPath) {
-                throw "Managed adoption pull request #$Number contains forbidden transient path '$forbiddenPath'."
+                throw "Managed protocol pull request #$Number contains forbidden path '$forbiddenPath'."
             }
         }
+        if ([string]$updateMarker.PathsSha -cne
+            (Get-MigrationPathSetSha256 -Paths $changedPaths)) {
+            throw "Managed protocol pull request #$Number changed-path evidence is invalid."
+        }
+        Assert-Schema2MergedProtocolEvidence -Repository $Repository `
+            -PullRequest $pull -Marker $updateMarker -Kind $kind `
+            -ChangedPaths $changedPaths
     }
 
     $repositoryRecord = Invoke-GhJson -Arguments @('api', "repos/$Repository")
@@ -1481,7 +2333,12 @@ function Get-ManagedMergedPullRequestState {
         $issue = Get-ValidatedManagedUpdateIssue -Repository $Repository `
             -PullRequestNumber $Number -TargetTag $target `
             -ProtocolSha ([string]$marker.ProtocolSha) -HeadSha ([string]$marker.Head) `
-            -Branch $headRef -PullRequestBody $body -RequireOpen $false
+            -Branch $headRef -PullRequestBody $body `
+            -ProposalKind $kind `
+            -MigrationPlanSha $(if ($updateMarker.Schema -eq 2) {
+                [string]$updateMarker.MigrationPlanSha
+            } else { '' }) `
+            -RequireOpen $false
     }
 
     $comments = @(Invoke-GhPagedJson -Endpoint (
@@ -1677,7 +2534,14 @@ function Complete-SupersededProtocolUpdateIssue {
         -PullRequestNumber $pullNumber -TargetTag ([string]$Operation.TargetTag) `
         -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
         -HeadSha ([string]$Operation.ExpectedHeadSha) -Branch ([string]$Operation.Branch) `
-        -PullRequestBody ([string]$pull.body) -RequireOpen $true
+        -PullRequestBody ([string]$pull.body) `
+        -ProposalKind $(if ($null -ne $Operation.PSObject.Properties['ProposalKind']) {
+            [string]$Operation.ProposalKind
+        } else { 'Update' }) `
+        -MigrationPlanSha $(if ($null -ne $Operation.PSObject.Properties['MigrationPlanSha']) {
+            [string]$Operation.MigrationPlanSha
+        } else { '' }) `
+        -RequireOpen $true
     $replacementIdentity = if ($ReplacementPullRequestNumber -gt 0) {
         "replacement-pr-$ReplacementPullRequestNumber"
     }
@@ -1756,6 +2620,8 @@ $workspace = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
 Set-Location -LiteralPath $workspace
 $modulePath = Join-Path $workspace '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $sourcePath = [IO.Path]::GetFullPath((Join-Path $workspace $ProtocolSourcePath))
+$consumerMigrationModule = Join-Path $sourcePath `
+    ($ConsumerMigrationModulePath -replace '/', [IO.Path]::DirectorySeparatorChar)
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
     throw "Pure resolver is missing: $modulePath"
 }
@@ -1763,6 +2629,10 @@ if (-not (Test-Path -LiteralPath (Join-Path $sourcePath '.git'))) {
     throw "Pinned protocol source checkout is missing: $sourcePath"
 }
 Import-Module $modulePath -Force
+if (-not (Test-Path -LiteralPath $consumerMigrationModule -PathType Leaf)) {
+    throw 'Installed updater declares consumer-migration capability but its pinned protocol source lacks the pure migration engine.'
+}
+Import-Module $consumerMigrationModule -Force
 $TrustedActor = Get-AuthenticatedUpdaterActor
 
 $submodulePaths = @(Invoke-Native -Command 'git' -Arguments @(
@@ -1827,6 +2697,57 @@ Assert-CurrentManagedAssets -BaseCommit $baseHeadSha `
     -CurrentProtocolSha $currentProtocolSha -SourcePath $sourcePath `
     -Assets $ManagedUpdaterAssets
 
+$currentCatalog = Import-ConsumerMigrationCatalogAtCommit `
+    -SourcePath $sourcePath -Commit $currentProtocolSha
+if ($null -eq $currentCatalog) {
+    throw 'Installed updater declares consumer-migration capability but the current immutable protocol release has no catalog.'
+}
+$currentMigrationPlan = Get-ConsumerMigrationPlanForBase `
+    -Catalog $currentCatalog -BaseCommit $baseHeadSha -Workspace $workspace
+$script:ConsumerMigrationPlansByTag[$currentTag] = $currentMigrationPlan
+$migrationManagedPaths = [System.Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::Ordinal
+)
+[void]$migrationManagedPaths.Add($ConsumerMigrationLedgerPath)
+foreach ($migration in @($currentCatalog.Migrations)) {
+    foreach ($operation in @($migration.Operations)) {
+        [void]$migrationManagedPaths.Add([string]$operation.Path)
+    }
+}
+
+$orderedCompatibleTags = @(Get-MeAndAICompatibleProtocolTagsInOrder `
+    -Tags $availableTags -CurrentTag $currentTag)
+$previousCatalog = $currentCatalog
+foreach ($tag in $orderedCompatibleTags) {
+    if ($tag -ceq $currentTag) {
+        continue
+    }
+    $targetShaForCatalog = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourcePath, 'rev-list', '-n', '1', $tag
+    )) -join '').Trim()
+    & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetShaForCatalog
+    if ($LASTEXITCODE -ne 0) { continue }
+    $targetCatalog = Import-ConsumerMigrationCatalogAtCommit `
+        -SourcePath $sourcePath -Commit $targetShaForCatalog
+    if ($null -eq $targetCatalog) {
+        throw "Descendant protocol release '$tag' removed the consumer migration catalog."
+    }
+    Assert-MeAndAIConsumerMigrationCatalogChain `
+        -Catalogs @($previousCatalog, $targetCatalog)
+    $targetPlan = Get-ConsumerMigrationPlanForBase `
+        -Catalog $targetCatalog -BaseCommit $baseHeadSha -Workspace $workspace
+    $script:ConsumerMigrationPlansByTag[$tag] = $targetPlan
+    foreach ($migration in @($targetCatalog.Migrations)) {
+        foreach ($operation in @($migration.Operations)) {
+            [void]$migrationManagedPaths.Add([string]$operation.Path)
+        }
+    }
+    $previousCatalog = $targetCatalog
+}
+$ManagedPaths = @(Get-OrdinalUniquePaths -Paths @(
+    @($ManagedPaths) + @($migrationManagedPaths)
+))
+
 $repository = $env:GITHUB_REPOSITORY
 $pulls = @(Invoke-GhPagedJson -Endpoint "repos/$repository/pulls?state=open&per_page=100")
 $candidates = [System.Collections.Generic.List[object]]::new()
@@ -1848,10 +2769,17 @@ foreach ($pull in $pulls) {
     $marker = Get-ProtocolMarker ([string]$details.body)
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$repository/pulls/$($pull.number)/files?per_page=100")
     $headRef = [string]$details.head.ref
-    $target = if ($headRef.StartsWith($BranchPrefix, [StringComparison]::Ordinal)) {
+    $branchTail = if ($headRef.StartsWith($BranchPrefix, [StringComparison]::Ordinal)) {
         $headRef.Substring($BranchPrefix.Length)
-    }
-    else { '' }
+    } else { '' }
+    $proposalKind = if ($branchTail.EndsWith(
+        $MigrationBranchSuffix, [StringComparison]::Ordinal
+    )) {
+        'MigrationReconciliation'
+    } else { 'Update' }
+    $target = if ($proposalKind -ceq 'MigrationReconciliation') {
+        $branchTail.Substring(0, $branchTail.Length - $MigrationBranchSuffix.Length)
+    } else { $branchTail }
     $expectedProtocolSha = ''
     if ((Test-MeAndAIProtocolTag -Tag $target) -and $availableTags -ccontains $target) {
         $expectedProtocolSha = ((Invoke-Native -Command 'git' -Arguments @(
@@ -1863,22 +2791,36 @@ foreach ($pull in $pulls) {
     $observedRemoteHead = Get-RemoteBranchHead -Branch ([string]$details.head.ref)
     $expectedChangedPaths = @($ProtocolPath)
     $managedAssetsMatchTarget = $false
+    $migrationPlan = if ($script:ConsumerMigrationPlansByTag.ContainsKey($target)) {
+        $script:ConsumerMigrationPlansByTag[$target]
+    } else { New-EmptyConsumerMigrationPlan }
+    $migrationEntriesMatchTarget = $false
     if ($expectedProtocolSha -match '^[0-9a-f]{40}$') {
         $expectedChangedPaths = @(Get-ExpectedManagedPaths `
             -BaseCommit $baseHeadSha -TargetProtocolSha $expectedProtocolSha `
             -SourcePath $sourcePath -ProtocolPath $ProtocolPath `
-            -Assets $ManagedUpdaterAssets)
-        $managedAssetsMatchTarget = Test-ManagedAssetEntriesMatchTarget `
+            -Assets $ManagedUpdaterAssets -MigrationPlan $migrationPlan `
+            -ProposalKind $proposalKind)
+        $managedAssetsMatchTarget = if ($proposalKind -ceq 'Update') {
+            Test-ManagedAssetEntriesMatchTarget `
+                -Repository $repository -HeadSha ([string]$details.head.sha) `
+                -ExpectedPaths $expectedChangedPaths `
+                -TargetProtocolSha $expectedProtocolSha -SourcePath $sourcePath `
+                -Assets $ManagedUpdaterAssets
+        } else { $true }
+        $migrationEntriesMatchTarget = Test-ConsumerMigrationEntriesMatchTarget `
             -Repository $repository -HeadSha ([string]$details.head.sha) `
-            -ExpectedPaths $expectedChangedPaths `
-            -TargetProtocolSha $expectedProtocolSha -SourcePath $sourcePath `
-            -Assets $ManagedUpdaterAssets
+            -Plan $migrationPlan
     }
-    if ($marker.Schema -eq 1 -and $expectedProtocolSha -match '^[0-9a-f]{40}$') {
+    if ($marker.Schema -in @(1, 2) -and $expectedProtocolSha -match '^[0-9a-f]{40}$') {
         Get-ValidatedManagedUpdateIssue -Repository $repository `
             -PullRequestNumber ([int]$details.number) -TargetTag $target `
             -ProtocolSha $expectedProtocolSha -HeadSha ([string]$details.head.sha) `
             -Branch $headRef -PullRequestBody ([string]$details.body) `
+            -ProposalKind $proposalKind `
+            -MigrationPlanSha $(if ($marker.Schema -eq 2) {
+                [string]$migrationPlan.PlanSha256
+            } else { '' }) `
             -RequireOpen $true | Out-Null
     }
     $candidates.Add([pscustomobject]@{
@@ -1891,6 +2833,7 @@ foreach ($pull in $pulls) {
         ApiHeadSha = [string]$details.head.sha
         ObservedHeadSha = if ($null -ne $observedRemoteHead) { [string]$observedRemoteHead } else { '' }
         MarkerSchema = $marker.Schema
+        Kind = $proposalKind
         MarkerTargetTag = $marker.Target
         MarkerProtocolSha = $marker.ProtocolSha
         MarkerHeadSha = $marker.Head
@@ -1904,7 +2847,17 @@ foreach ($pull in $pulls) {
         AuthorLogin = [string]$details.user.login
         ChangedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
         ExpectedChangedPaths = $expectedChangedPaths
+        AllowedExpectedPaths = @($ManagedPaths)
         ManagedAssetEntriesMatchTarget = $managedAssetsMatchTarget
+        MigrationPlanSha = if ($marker.Schema -eq 2) {
+            [string]$migrationPlan.PlanSha256
+        } else { '' }
+        MigrationPlanValid = $migrationEntriesMatchTarget -and
+            (($marker.Schema -eq 1 -and $proposalKind -ceq 'Update') -or
+             ($marker.Schema -eq 2 -and [string]$marker.Kind -ceq $proposalKind -and
+              [string]$marker.MigrationPlanSha -ceq [string]$migrationPlan.PlanSha256 -and
+              [string]$marker.PathsSha -ceq
+                (Get-MigrationPathSetSha256 -Paths $expectedChangedPaths)))
     })
 }
 
@@ -1942,6 +2895,9 @@ $snapshot = [pscustomobject]@{
     ProtocolPath = $ProtocolPath
     ManagedPaths = $ManagedPaths
     TrustedActor = $TrustedActor
+    MigrationRequired = [string]$currentMigrationPlan.State -ceq 'ChangesRequired'
+    CurrentMigrationPlanSha = [string]$currentMigrationPlan.PlanSha256
+    MigrationBranchSuffix = $MigrationBranchSuffix
     Candidates = @($candidates)
 }
 $plan = Resolve-MeAndAIProtocolUpdatePlan -Snapshot $snapshot
@@ -1954,7 +2910,8 @@ if ($plan.State -eq 'MajorUpgradeRequired') {
     throw "A new protocol major '$($plan.LatestAvailableTag)' requires a manual migration."
 }
 $releaseEvidence = $null
-if ([string]$plan.LatestCompatibleTag -cne [string]$plan.CurrentTag) {
+if ([string]$plan.LatestCompatibleTag -cne [string]$plan.CurrentTag -or
+    [string]$currentMigrationPlan.State -ceq 'ChangesRequired') {
     $releaseEvidence = Get-ImmutableProtocolReleaseEvidence `
         -Repository $ProtocolRepository `
         -Tag ([string]$plan.LatestCompatibleTag) `
@@ -1971,7 +2928,9 @@ if (@($plan.Operations).Count -eq 0) {
     exit 0
 }
 
-$create = @($plan.Operations | Where-Object Kind -eq 'CreateUpgrade')
+$create = @($plan.Operations | Where-Object {
+    $_.Kind -cin @('CreateUpgrade', 'CreateMigration')
+})
 if ($create.Count -gt 1) {
     throw 'Resolver produced more than one replacement creation.'
 }
@@ -1987,22 +2946,39 @@ if ($create.Count -eq 1) {
         throw "Resolver target '$targetTag' lacks matching immutable release evidence."
     }
     $targetSha = [string]$releaseEvidence.CommitSha
-    & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetSha
-    if ($LASTEXITCODE -ne 0) {
-        throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."
+    $proposalKind = if ($null -ne $create[0].PSObject.Properties['ProposalKind']) {
+        [string]$create[0].ProposalKind
+    }
+    elseif ([string]$create[0].Kind -ceq 'CreateMigration') {
+        'MigrationReconciliation'
+    }
+    else { 'Update' }
+    $migrationPlan = $script:ConsumerMigrationPlansByTag[$targetTag]
+    if ($null -eq $migrationPlan -or
+        [string]$migrationPlan.PlanSha256 -cnotmatch '^[0-9a-f]{64}$') {
+        throw "Resolver target '$targetTag' lacks one deterministic consumer migration plan."
+    }
+    if ($proposalKind -ceq 'Update') {
+        & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetSha
+        if ($LASTEXITCODE -ne 0) {
+            throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."
+        }
     }
     $expectedManagedPaths = @(Get-ExpectedManagedPaths `
         -BaseCommit $baseHeadSha -TargetProtocolSha $targetSha `
         -SourcePath $sourcePath -ProtocolPath $ProtocolPath `
-        -Assets $ManagedUpdaterAssets)
-    Invoke-Native -Command 'git' -Arguments @(
-        '-C', $sourcePath, 'checkout', '--detach', $targetSha
-    ) | Out-Null
-    foreach ($asset in $ManagedUpdaterAssets) {
-        $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
-        $templateFile = Join-Path $sourcePath $relativeTemplatePath
-        if (-not (Test-Path -LiteralPath $templateFile -PathType Leaf)) {
-            throw "Target release checkout is missing updater template '$($asset.TemplatePath)'."
+        -Assets $ManagedUpdaterAssets -MigrationPlan $migrationPlan `
+        -ProposalKind $proposalKind)
+    if ($proposalKind -ceq 'Update') {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $sourcePath, 'checkout', '--detach', $targetSha
+        ) | Out-Null
+        foreach ($asset in $ManagedUpdaterAssets) {
+            $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
+            $templateFile = Join-Path $sourcePath $relativeTemplatePath
+            if (-not (Test-Path -LiteralPath $templateFile -PathType Leaf)) {
+                throw "Target release checkout is missing updater template '$($asset.TemplatePath)'."
+            }
         }
     }
 
@@ -2012,28 +2988,47 @@ if ($create.Count -eq 1) {
     }
 
     Invoke-Native -Command 'git' -Arguments @('switch', '-c', $createdBranch) | Out-Null
-    Invoke-Native -Command 'git' -Arguments @('update-index', '--add', '--cacheinfo', "160000,$targetSha,$ProtocolPath") | Out-Null
-    foreach ($asset in $ManagedUpdaterAssets) {
-        $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
-        $relativeConsumerPath = [string]$asset.ConsumerPath -replace '/', [IO.Path]::DirectorySeparatorChar
-        Copy-Item -LiteralPath (Join-Path $sourcePath $relativeTemplatePath) `
-            -Destination (Join-Path $workspace $relativeConsumerPath) -Force
+    if ($proposalKind -ceq 'Update') {
+        Invoke-Native -Command 'git' -Arguments @(
+            'update-index', '--add', '--cacheinfo',
+            "160000,$targetSha,$ProtocolPath"
+        ) | Out-Null
+        foreach ($asset in $ManagedUpdaterAssets) {
+            if ([string]$asset.ConsumerPath -cnotin $expectedManagedPaths) {
+                continue
+            }
+            $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
+            $relativeConsumerPath = [string]$asset.ConsumerPath -replace '/', [IO.Path]::DirectorySeparatorChar
+            Copy-Item -LiteralPath (Join-Path $sourcePath $relativeTemplatePath) `
+                -Destination (Join-Path $workspace $relativeConsumerPath) -Force
+        }
     }
-    $addArguments = @('add', '--') + @($ManagedUpdaterAssets | ForEach-Object {
-        [string]$_.ConsumerPath
-    })
-    Invoke-Native -Command 'git' -Arguments $addArguments | Out-Null
+    Apply-ConsumerMigrationPlan -Plan $migrationPlan -Workspace $workspace
+    $addPaths = @($expectedManagedPaths | Where-Object { $_ -cne $ProtocolPath })
+    if ($addPaths.Count -ne 0) {
+        Invoke-Native -Command 'git' -Arguments (@('add', '--') + $addPaths) |
+            Out-Null
+    }
     Assert-StagedManagedUpdate -ExpectedPaths $expectedManagedPaths `
         -TargetProtocolSha $targetSha -SourcePath $sourcePath `
-        -ProtocolPath $ProtocolPath -Assets $ManagedUpdaterAssets
+        -ProtocolPath $ProtocolPath -Assets $ManagedUpdaterAssets `
+        -MigrationPlan $migrationPlan -ProposalKind $proposalKind
 
     Invoke-Native -Command 'git' -Arguments @('config', 'user.name', 'github-actions[bot]') | Out-Null
     Invoke-Native -Command 'git' -Arguments @('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com') | Out-Null
-    Invoke-Native -Command 'git' -Arguments @('commit', '-m', "Upgrade common protocol to $targetTag") | Out-Null
+    $commitMessage = if ($proposalKind -ceq 'Update') {
+        "Upgrade common protocol to $targetTag"
+    }
+    else { "Reconcile consumer state for $targetTag" }
+    Invoke-Native -Command 'git' -Arguments @(
+        'commit', '-m', $commitMessage
+    ) | Out-Null
     $headSha = ((Invoke-Native -Command 'git' -Arguments @('rev-parse', 'HEAD')) -join '').Trim()
 
     $updateIssue = Ensure-ProtocolUpdateIssue -Repository $repository `
-        -TargetTag $targetTag -ProtocolSha $targetSha -Branch $createdBranch
+        -TargetTag $targetTag -ProtocolSha $targetSha -Branch $createdBranch `
+        -ProposalKind $proposalKind `
+        -MigrationPlanSha ([string]$migrationPlan.PlanSha256)
 
     $pushSucceeded = $false
     $marker = ''
@@ -2050,29 +3045,56 @@ if ($create.Count -eq 1) {
             'origin', "$createdBranch`:$createdRef"
         ) | Out-Null
         $pushSucceeded = $true
+        $markerKind = if ($proposalKind -ceq 'Update') {
+            'update'
+        }
+        else { 'migration-reconciliation' }
         $marker = [ordered]@{
-            schema = 1; target = $targetTag; protocolSha = $targetSha
-            head = $headSha; repository = $repository
+            schema = 2
+            kind = $markerKind
+            target = $targetTag
+            protocolSha = $targetSha
+            migrationPlanSha = [string]$migrationPlan.PlanSha256
+            pathsSha = Get-MigrationPathSetSha256 -Paths $expectedManagedPaths
+            head = $headSha
+            repository = $repository
         } | ConvertTo-Json -Compress
         $supersededNumbers = @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest' |
             ForEach-Object { "#$($_.PullRequestNumber)" })
         $supersedes = if ($supersededNumbers.Count -gt 0) { $supersededNumbers -join ', ' } else { 'none' }
-        $body = @(
+        $proposalHeading = if ($proposalKind -ceq 'Update') {
+            '## Automated protocol dependency update'
+        }
+        else { '## Automated consumer-state reconciliation' }
+        $proposalTitle = if ($proposalKind -ceq 'Update') {
+            "Upgrade common protocol to $targetTag"
+        }
+        else { "Reconcile consumer state for $targetTag" }
+        $bodyLines = [System.Collections.Generic.List[string]]::new()
+        foreach ($line in @(
             "<!-- meandai-protocol-update:$marker -->",
-            '## Automated protocol dependency update', '',
-            "- Current pin: ``$currentTag``", "- Proposed pin: ``$targetTag``",
-            "- Protocol commit: ``$targetSha``", "- Supersedes: $supersedes", '',
+            $proposalHeading, '',
+            "- Installed pin: ``$currentTag``",
+            "- Target release: ``$targetTag``",
+            "- Protocol commit: ``$targetSha``",
+            "- Migration plan: ``$([string]$migrationPlan.PlanSha256)``",
+            "- Managed paths: ``$($expectedManagedPaths -join ', ')``",
+            "- Supersedes: $supersedes", '',
             'This draft is review-only and will never merge itself.', '',
             '## Maintainer gates', '',
             '- [ ] Read every intervening meAndAI changelog entry.',
             '- [ ] Review incompatible or newly mandatory rules.',
-            '- [ ] Review the managed updater asset changes included in this proposal.',
+            '- [ ] Review every catalog-declared consumer migration in this proposal.',
+            '- [ ] Review the managed updater asset changes when present.',
             '- [ ] Run project tests and complete DoR/DoD review.', '',
             "Tracking issue: #$($updateIssue.Number)"
-        ) -join [Environment]::NewLine
+        )) {
+            $bodyLines.Add([string]$line)
+        }
+        $body = $bodyLines -join [Environment]::NewLine
         $url = (Invoke-Native -Command 'gh' -Arguments @(
             'pr', 'create', '--draft', '--base', $env:DEFAULT_BRANCH,
-            '--head', $createdBranch, '--title', "Upgrade common protocol to $targetTag",
+            '--head', $createdBranch, '--title', $proposalTitle,
             '--body', $body
         ) | Select-Object -Last 1).Trim()
         $urlMatch = [regex]::Match($url, '/pull/(?<number>\d+)/?$')
@@ -2086,6 +3108,8 @@ if ($create.Count -eq 1) {
             ExpectedHeadSha = $headSha
             TargetTag = $targetTag
             ExpectedProtocolSha = $targetSha
+            ProposalKind = $proposalKind
+            MigrationPlanSha = [string]$migrationPlan.PlanSha256
         }
         Set-ProtocolUpdateIssuePullRequestLink -Repository $repository `
             -IssueNumber ([int]$updateIssue.number) `
@@ -2170,8 +3194,19 @@ if ($plan.State -eq 'Supersede') {
         $replacementOperation = $createdOperation
     }
     else {
+        $replacementProposalKind = if (
+            [string]$plan.CurrentTag -ceq [string]$plan.LatestCompatibleTag -and
+            [bool]$snapshot.MigrationRequired
+        ) {
+            'MigrationReconciliation'
+        }
+        else { 'Update' }
         $existingReplacements = @($candidates | Where-Object {
-            $_.TargetTag -eq $plan.LatestCompatibleTag
+            [string]$_.TargetTag -ceq [string]$plan.LatestCompatibleTag -and
+            [string]$_.Kind -ceq $replacementProposalKind -and
+            ($replacementProposalKind -ceq 'Update' -or
+                [string]$_.MigrationPlanSha -ceq
+                    [string]$snapshot.CurrentMigrationPlanSha)
         })
         if ($existingReplacements.Count -ne 1) {
             throw 'Unable to identify exactly one verified replacement PR before cleanup.'
@@ -2184,6 +3219,8 @@ if ($plan.State -eq 'Supersede') {
             ExpectedHeadSha = [string]$replacement.ObservedHeadSha
             TargetTag = [string]$replacement.TargetTag
             ExpectedProtocolSha = [string]$replacement.ExpectedProtocolSha
+            ProposalKind = [string]$replacement.Kind
+            MigrationPlanSha = [string]$replacement.MigrationPlanSha
         }
     }
 }

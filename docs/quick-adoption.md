@@ -197,8 +197,10 @@ gitlink plus the `VERSION` inside that exact checkout as the sole current pin
 authority. They link to or read those sources dynamically and do not copy the
 adoption tag or commit as a live memory, decision, documentation, or test
 constant. A dated adoption entry may retain the exact initial values as
-historical evidence. This boundary lets later compatible updates finish in the
-managed update pull request without a second consumer-owned reconciliation.
+historical evidence. Initial adoption also writes
+`.ai/meandai-update-state.json` with the target release's complete migration
+catalog recorded as satisfied, so a new consumer does not replay historical
+transitions.
 
 ### Re-running the launcher
 
@@ -216,37 +218,37 @@ adapter blobs identical to that installed release.
 - If the installed tag is older in the same major, the launcher preserves the
   installed seed, reconciles only missing secrets, dispatches that installed
   updater with correlation evidence, waits for its result, and never enters
-  adoption/Codex handling. The reviewed update installs the newer lifecycle.
+  adoption/Codex handling. An engine-era updater includes required catalog
+  migrations in the managed update draft. A pre-engine updater first installs
+  the newer lifecycle; after that merge, the new workflow automatically opens
+  one same-target reconciliation draft if its catalog remains unsatisfied.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
 
-### One-time v0.9.2 live-pin migration
+### Transition migrations
 
-An adoption completed from v0.9.2 may contain consumer-owned instructions,
-memory, indexes, a live decision, and a verifier that repeat the adoption tag
-or commit as the current protocol identity. A later release cannot add those
-paths to the first v0.9.2 updater proposal: that proposal is created by the
-immutable installed v0.9.2 code, before the target updater code can execute.
+Do not choose or run a migration mode based on the consumer's installed tag.
+Migration applicability comes from the target release's immutable, append-only
+catalog, the consumer ledger, and exact repository bytes.
 
-Download the v0.10.3 launcher and run its explicit compatibility mode against
-the still-installed v0.9.2 identity:
+For a consumer whose installed updater already supports that contract, the
+ordinary managed update draft contains the target gitlink, target-different
+updater assets, exact catalog-derived consumer changes, and resulting ledger.
+Only one maintainer merge is required.
 
-```powershell
-gh release download v0.10.3 --repo hasanmanzak/meAndAI --pattern Invoke-MeAndAIQuickAdoption.ps1 --dir . --clobber
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Invoke-MeAndAIQuickAdoption.ps1 -TargetPath . -ProtocolTag v0.9.2 -MigrateV092LivePins
-```
+For a consumer whose immutable updater predates the engine, the first managed
+draft can contain only the core update that old code knows how to prove. Merge
+it normally. The newly installed workflow then automatically creates one
+same-target reconciliation draft and tracking issue. Review and merge that
+draft; finalization deletes its exact owned branch and closes its issue. Later
+compatible transitions use the one-draft path. If the follow-up event was
+suppressed, run the installed workflow manually; do not add a launcher flag or
+hand-edit the ledger.
 
-The mode requires the exact immutable v0.9.2 gitlink and updater assets. It
-accepts only the recognized all-legacy or all-neutral eight-file state, changes
-only the known current-authority fragments, preserves unrelated content and
-historical evidence, and stops before secret reconciliation, workflow dispatch,
-commit, push, issue, pull request, or merge. Review and merge that local diff
-through the consumer repository's normal protocol. Then return to the default
-branch and rerun the launcher without `-MigrateV092LivePins`, targeting the
-latest compatible release. The installed updater resumes the ordinary managed
-issue/PR/update lifecycle; later compatible updates need no consumer-owned
-version reconciliation.
+Exact already-satisfied state is idempotent. Customized, partial, mixed,
+drifted, linked, or otherwise ambiguous state fails closed before remote
+mutation and requires explicit maintainer review.
 
 An in-flight seed-only adoption is still initial adoption and can resume only
 with its original protocol tag; a different requested seed remains a collision.
@@ -284,8 +286,10 @@ for a moved/reused branch, a merge no longer on the default branch, a malformed
 ambiguous tracking line, or an issue closed without that evidence. Do not use
 `Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
 would close the issue before branch convergence. Older consumer pins gain the
-behavior when their reviewed update installs the `v0.10.3` workflow and adapter;
-the installing update itself is covered only by the bounded legacy bridge.
+behavior when their reviewed update installs the current workflow and adapter.
+If that immutable installing updater predates transition migrations, the new
+workflow performs the generic same-target reconciliation handoff described
+above; no source-version-specific bridge is selected.
 
 ## Stopping and resuming safely
 

@@ -7,19 +7,28 @@ This project uses the `M.m.rev` version format defined in the
 
 ### Fixed
 
-- Add an explicit, exact-identity `-MigrateV092LivePins` launcher mode for the
-  recognized eight-file v0.9.2 consumer shape, with all-legacy/all-neutral
-  classification, byte-preserving writes, rollback, and zero-write rejection.
-- Stop the compatibility mode before secret reconciliation, workflow dispatch,
-  Git publication, or GitHub record mutation; ordinary managed updates resume
-  only after the reviewed consumer migration merges.
-- Add the missing sole-live-pin rule to the executable local-Codex adoption
-  prompt and replace TEST-0114's historical-fixture overclaim with executable
-  TEST-0119 and TEST-0120 coverage.
+- Replace the source-version-specific repair with an immutable, append-only
+  migration catalog, a pure state-based planner, and an exact consumer ledger
+  that binds satisfied migration IDs to definition blobs.
+- Include required catalog-derived consumer changes and the resulting ledger in
+  the ordinary managed update proposal when the installed updater supports the
+  engine; reject partial, customized, drifted, or ambiguous state before remote
+  mutation.
+- Handle immutable pre-engine consumers through a capability-based handoff: the
+  old updater first installs the target engine, then the new workflow
+  automatically opens one same-target reconciliation proposal. Fresh adoption
+  starts with the target catalog recorded as satisfied.
+- Preserve the sole-live-pin adoption rule and represent the Derdini regression
+  as `MIG-0001` data rather than a tag-named launcher switch.
+- Validate every compatible intermediate release catalog cumulatively so a
+  skipped migration cannot be removed or rewritten by a later target.
+- Recompute schema-2 merge evidence from immutable target and pull-request base
+  blobs before cleanup, and reject linked migration leaf destinations before
+  the first write.
 
-Related work: [FEAT-0026](docs/features/FEAT-0026-v0103-v092-live-pin-migration/README.md),
-[DEC-0018](docs/decisions/DEC-0018-bounded-v092-live-pin-migration.md),
-[TEST-0119 and TEST-0120](docs/features/FEAT-0026-v0103-v092-live-pin-migration/test-cases.md),
+Related work: [FEAT-0026](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md),
+[DEC-0018](docs/decisions/DEC-0018-release-declared-consumer-migrations.md),
+[TEST-0119 through TEST-0122](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md),
 and [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69).
 
 ## 0.10.2 - 2026-07-17

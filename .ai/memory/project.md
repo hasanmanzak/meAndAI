@@ -11,18 +11,23 @@ Last verified: **2026-07-17**
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
   [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0026](../../docs/features/FEAT-0026-v0103-v092-live-pin-migration/README.md)
-  repairs the recognized v0.9.2 consumer live-pin shape through an explicit,
-  exact, local migration and strengthens the prospective adoption prompt;
+- Current scope: [FEAT-0026](../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
+  adds release-declared, state-based consumer migrations, an exact satisfied
+  ledger, one-draft engine-era updates, and a truthful pre-engine capability
+  handoff; the Derdini live-pin defect is `MIG-0001` data rather than a
+  version-specific code path;
   [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) owns delivery
   and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: `-MigrateV092LivePins` accepts only the exact recognized
-  all-legacy or all-neutral eight-file state after immutable v0.9.2 install
-  proof, stops before GitHub mutation, and preserves historical evidence.
-  `TEST-0119` and `TEST-0120` own the regression.
+- Latest tracked work: `migrations/index.json` orders immutable migration
+  definitions, `.ai/meandai-update-state.json` records exact satisfied
+  definition blobs, and the pure migration engine plans from repository state
+  instead of an installed tag. `TEST-0119` through `TEST-0122` own the Derdini
+  regression, fail-closed engine, single-draft transition, and pre-engine
+  handoff. Fresh adoption writes a fully satisfied target-catalog baseline;
+  custom, partial, mixed, and drifted states fail closed.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -144,10 +149,20 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.10.2` replaces the overloaded integrity shard with four semantic,
   independently initialized compatibility shards and keeps release-only
   verification outside the ordinary validation matrix.
-- `v0.10.3` corrects the unexercised historical part of the sole-live-pin
-  contract. Its explicit local launcher mode migrates only the recognized
-  v0.9.2 consumer shape; unknown or partial states fail closed, and ordinary
-  recurring updater authority remains unchanged.
+- `v0.10.3` targets generic consumer transition reconciliation. An immutable,
+  append-only release catalog and exact consumer ledger let an engine-era
+  updater include required consumer-state changes in the same reviewed draft
+  as the protocol pin and updater assets. A pre-engine updater first installs
+  that capability through its ordinary immutable path, after which the new
+  engine opens one same-target reconciliation draft and the normal finalizer
+  cleans its branch and issue after maintainer merge. Fresh adoption records
+  the catalog as satisfied. `MIG-0001` captures the Derdini live-pin shape
+  without a source-version switch.
+- Compatible catalogs are checked as a complete numeric descendant chain, not
+  only as a current-to-latest pair. Schema-2 finalization independently
+  rebuilds the target plan from immutable release and pull-request base blobs;
+  exact head outputs, ledger, updater assets, and gitlink must match before
+  branch/issue cleanup. Migration leaf links/reparse points fail before writes.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,
