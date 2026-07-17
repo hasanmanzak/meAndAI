@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.10.2**
+Current protocol version: **0.10.3**
 
-For v0.10.2, publication authority is the repository's
+For v0.10.3, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface and
-[issue #67](https://github.com/hasanmanzak/meAndAI/issues/67); this file does
+[issue #69](https://github.com/hasanmanzak/meAndAI/issues/69); this file does
 not assert a pre-merge release state.
 
 ## Start here
@@ -28,6 +28,16 @@ The common protocol owns delivery rules, quality gates, identifiers, and
 templates. Each consuming project owns its domain decisions, feature records,
 test evidence, and AI memory. Those project-specific records must not be stored
 inside the protocol submodule.
+
+Compatible releases may declare deterministic consumer-state transitions in
+the immutable, append-only [migration catalog](migrations/index.json). The
+consumer's `.ai/meandai-update-state.json` ledger records satisfied definition
+blobs without becoming another protocol pin. An updater that already supports
+the catalog includes required migrations in the ordinary reviewed update draft;
+an older immutable updater first installs the capability, after which the new
+workflow automatically opens one same-target reconciliation draft. Both paths
+fail closed for customized, partial, or otherwise ambiguous state and still
+leave the final merge to the consumer maintainer.
 
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings

@@ -6,6 +6,13 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $workflowSource = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
+$consumerMigrationModuleSource = Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$consumerMigrationIndexSource = Join-Path $root 'migrations/index.json'
+Import-Module $consumerMigrationModuleSource -Force
+$consumerMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
+    -IndexPath $consumerMigrationIndexSource
+$consumerMigrationBaseline = New-MeAndAIConsumerMigrationBaseline `
+    -Catalog $consumerMigrationCatalog
 $adapterContent = Get-Content -LiteralPath $adapterSource -Raw
 $failures = [System.Collections.Generic.List[string]]::new()
 $script:Scenario = $null
@@ -13,6 +20,108 @@ $script:Scenario = $null
 function Add-Failure {
     param([string]$Message)
     $failures.Add($Message)
+}
+
+function Get-AdapterFunctionDefinition {
+    param([Parameter(Mandatory)][string]$Name)
+
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [Management.Automation.Language.Parser]::ParseFile(
+        $adapterSource, [ref]$tokens, [ref]$parseErrors
+    )
+    if (@($parseErrors).Count -ne 0) {
+        throw "Cannot load focused adapter function '$Name' because the adapter does not parse."
+    }
+    $matches = @($ast.FindAll({
+        param($node)
+        $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+            [string]$node.Name -ceq $Name
+    }, $true))
+    if ($matches.Count -ne 1) {
+        throw "Expected one adapter function '$Name', found $($matches.Count)."
+    }
+    return [string]$matches[0].Extent.Text
+}
+
+# Load only the exact production helpers under test. Dot-sourcing the complete
+# updater would execute its GitHub lifecycle, while copying their logic here
+# would let the test drift away from production.
+. ([scriptblock]::Create((Get-AdapterFunctionDefinition `
+    -Name 'Assert-ContainedMigrationDestination')))
+. ([scriptblock]::Create((Get-AdapterFunctionDefinition `
+    -Name 'Apply-ConsumerMigrationPlan')))
+
+$destinationGuardRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-migration-leaf-guard-$([guid]::NewGuid().ToString('N'))"
+try {
+    $consumerRoot = Join-Path $destinationGuardRoot 'consumer'
+    $outsideRoot = Join-Path $destinationGuardRoot 'outside'
+    [IO.Directory]::CreateDirectory($consumerRoot) | Out-Null
+    [IO.Directory]::CreateDirectory($outsideRoot) | Out-Null
+
+    $safePath = Join-Path $consumerRoot 'safe.txt'
+    $safeBefore = [Text.UTF8Encoding]::new($false).GetBytes('safe-before')
+    [IO.File]::WriteAllBytes($safePath, $safeBefore)
+    $outsideSentinelPath = Join-Path $outsideRoot 'sentinel.txt'
+    $outsideBefore = [Text.UTF8Encoding]::new($false).GetBytes('outside-before')
+    [IO.File]::WriteAllBytes($outsideSentinelPath, $outsideBefore)
+
+    $linkedLeaf = Join-Path $consumerRoot 'linked.txt'
+    $linkedLeafType = if ([Environment]::OSVersion.Platform -eq
+        [PlatformID]::Win32NT) { 'Junction' } else { 'SymbolicLink' }
+    New-Item -ItemType $linkedLeafType -Path $linkedLeaf `
+        -Target $outsideRoot | Out-Null
+    $linkedItem = Get-Item -LiteralPath $linkedLeaf -Force
+    if (-not ($linkedItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+        Add-Failure 'TEST-0120 leaf-guard fixture is not a reparse point.'
+    }
+
+    $guardPlan = [pscustomobject]@{
+        Paths = @(
+            [pscustomobject]@{
+                Path = 'safe.txt'; Changed = $true
+                OriginalBytes = [byte[]]$safeBefore.Clone()
+                ResultBytes = [Text.UTF8Encoding]::new($false).GetBytes('safe-after')
+            },
+            [pscustomobject]@{
+                Path = 'linked.txt'; Changed = $true
+                OriginalBytes = [byte[]]::new(0)
+                ResultBytes = [Text.UTF8Encoding]::new($false).GetBytes('outside-write')
+            }
+        )
+        Ledger = [pscustomobject]@{
+            Path = '.ai/meandai-update-state.json'; Changed = $false
+            OriginalBlob = ''; OriginalBytes = $null
+            ResultBytes = [byte[]]::new(0)
+        }
+    }
+    $guardError = ''
+    try {
+        Apply-ConsumerMigrationPlan -Plan $guardPlan -Workspace $consumerRoot
+    }
+    catch {
+        $guardError = $_.Exception.Message
+    }
+    if ($guardError -notlike '*linked or non-file destination*') {
+        Add-Failure "TEST-0120 linked migration leaf did not fail during destination preflight: $guardError"
+    }
+    if ([Convert]::ToBase64String([IO.File]::ReadAllBytes($safePath)) -cne
+        [Convert]::ToBase64String($safeBefore)) {
+        Add-Failure 'TEST-0120 linked-leaf rejection did not preserve the preceding migration file.'
+    }
+    if ([Convert]::ToBase64String([IO.File]::ReadAllBytes($outsideSentinelPath)) -cne
+        [Convert]::ToBase64String($outsideBefore)) {
+        Add-Failure 'TEST-0120 linked-leaf rejection wrote outside the consumer root.'
+    }
+}
+catch {
+    Add-Failure "TEST-0120 linked-leaf fixture failed: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $destinationGuardRoot) {
+        Remove-Item -LiteralPath $destinationGuardRoot -Recurse -Force
+    }
 }
 
 function Add-ScenarioEvent {
@@ -137,7 +246,7 @@ function global:git {
     }
     if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'rev-list') {
         switch ($arguments[-1]) {
-            'v0.1.0' { $script:Scenario.CurrentProtocolSha }
+            'v0.1.0' { $script:Scenario.FirstProtocolSha }
             'v0.2.0' {
                 if ($script:Scenario.AliasCurrentTag) { $script:Scenario.CurrentProtocolSha }
                 else { $script:Scenario.MiddleProtocolSha }
@@ -152,7 +261,12 @@ function global:git {
         return
     }
     if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'checkout') {
-        Add-ScenarioEvent 'checkout-target-assets'
+        if ($script:Scenario.Events -contains 'verify-immutable-release') {
+            Add-ScenarioEvent 'checkout-target-assets'
+        }
+        else {
+            Add-ScenarioEvent 'checkout-migration-catalog'
+        }
         return
     }
     if ($arguments[0] -eq 'ls-remote') {
@@ -572,9 +686,22 @@ function global:gh {
         return
     }
     if ($endpoint -like 'repos/owner/consumer/git/commits/*') {
-        $rootTreeSha = if ($endpoint -like "*$($script:Scenario.NewHead)") { 'c' * 40 } else { 'd' * 40 }
+        $rootTreeSha = if ($endpoint -like "*$($script:Scenario.NewHead)") {
+            if ($script:Scenario.NewRootTreeSha) {
+                [string]$script:Scenario.NewRootTreeSha
+            }
+            else { 'c' * 40 }
+        }
+        else { 'd' * 40 }
         [pscustomobject]@{ tree = [pscustomobject]@{ sha = $rootTreeSha } } |
             ConvertTo-Json -Depth 3 -Compress
+        return
+    }
+    if ($endpoint -match '^repos/owner/consumer/git/trees/(?<sha>[0-9a-f]{40})$' -and
+        $script:Scenario.RemoteTrees.ContainsKey([string]$Matches.sha)) {
+        [pscustomobject]@{
+            tree = @($script:Scenario.RemoteTrees[[string]$Matches.sha])
+        } | ConvertTo-Json -Depth 5 -Compress
         return
     }
     if ($endpoint -eq "repos/owner/consumer/git/trees/$('c' * 40)") {
@@ -754,6 +881,8 @@ function Invoke-AdapterScenario {
         [ValidateSet('Lightweight', 'Annotated', 'Nested')]
         [string]$ReleaseTagMode = 'Lightweight',
         [bool]$MismatchedReleaseCommit = $false,
+        [bool]$MigrationRequired = $false,
+        [bool]$MigrationWithUpgrade = $false,
         [ValidateSet('None', 'InventoryRename', 'RevalidationRename')]
         [string]$RenameMode = 'None'
     )
@@ -764,14 +893,59 @@ function Invoke-AdapterScenario {
     $sourceGitPath = Join-Path $tempRoot '.meandai-update-source/.git'
     $sourceScriptsPath = Join-Path $tempRoot '.meandai-update-source/templates/project/.github/scripts'
     $sourceWorkflowsPath = Join-Path $tempRoot '.meandai-update-source/templates/project/.github/workflows'
+    $sourceMigrationModulePath = Join-Path $tempRoot '.meandai-update-source/scripts'
+    $sourceMigrationsPath = Join-Path $tempRoot '.meandai-update-source/migrations'
+    $consumerStatePath = Join-Path $tempRoot '.ai'
     New-Item -ItemType Directory -Force $scriptsPath, $workflowsPath, $sourceGitPath, `
-        $sourceScriptsPath, $sourceWorkflowsPath | Out-Null
+        $sourceScriptsPath, $sourceWorkflowsPath, $sourceMigrationModulePath, `
+        $sourceMigrationsPath, $consumerStatePath | Out-Null
     Copy-Item -LiteralPath $moduleSource -Destination (Join-Path $scriptsPath 'MeAndAI.ProtocolUpdate.psm1')
     Copy-Item -LiteralPath $adapterSource -Destination (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     Copy-Item -LiteralPath $workflowSource -Destination (Join-Path $workflowsPath 'meandai-protocol-update.yml')
     Copy-Item -LiteralPath $moduleSource -Destination (Join-Path $sourceScriptsPath 'MeAndAI.ProtocolUpdate.psm1')
     Copy-Item -LiteralPath $adapterSource -Destination (Join-Path $sourceScriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     Copy-Item -LiteralPath $workflowSource -Destination (Join-Path $sourceWorkflowsPath 'meandai-protocol-update.yml')
+    Copy-Item -LiteralPath $consumerMigrationModuleSource -Destination (
+        Join-Path $sourceMigrationModulePath 'MeAndAI.ConsumerMigrations.psm1'
+    )
+    Copy-Item -LiteralPath $consumerMigrationIndexSource -Destination (
+        Join-Path $sourceMigrationsPath 'index.json'
+    )
+    foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+        Copy-Item -LiteralPath (Join-Path (Split-Path -Parent $consumerMigrationIndexSource) `
+            ([string]$migration.Definition)) -Destination (
+            Join-Path $sourceMigrationsPath ([string]$migration.Definition)
+        )
+    }
+    $migrationPlan = $null
+    if ($MigrationRequired) {
+        $migrationFiles = [System.Collections.Generic.List[object]]::new()
+        foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+            foreach ($operation in @($migration.Operations)) {
+                $bytes = [Text.UTF8Encoding]::new($false).GetBytes(
+                    "fixture prefix`n$([string]$operation.Before)`nfixture suffix`n"
+                )
+                $relative = ([string]$operation.Path) -replace '/', `
+                    [IO.Path]::DirectorySeparatorChar
+                $destination = Join-Path $tempRoot $relative
+                $parent = Split-Path -Parent $destination
+                New-Item -ItemType Directory -Path $parent -Force | Out-Null
+                [IO.File]::WriteAllBytes($destination, $bytes)
+                $migrationFiles.Add([pscustomobject]@{
+                    Path = [string]$operation.Path
+                    Bytes = [byte[]]$bytes
+                })
+            }
+        }
+        $migrationPlan = Resolve-MeAndAIConsumerMigrationPlan `
+            -Catalog $consumerMigrationCatalog -Files @($migrationFiles)
+    }
+    else {
+        [IO.File]::WriteAllBytes(
+            (Join-Path $consumerStatePath 'meandai-update-state.json'),
+            [byte[]]$consumerMigrationBaseline.Bytes
+        )
+    }
 
     $oldHead = 'a' * 40
     $oldMarker = [ordered]@{
@@ -819,15 +993,120 @@ function Invoke-AdapterScenario {
         '.github/scripts/MeAndAI.ProtocolUpdate.psm1' = $currentModuleBlob
         '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1' = $targetAdapterBlob
     }
+    if ($MigrationRequired) {
+        if (-not $MigrationWithUpgrade) {
+        $consumerTreeEntries['.github/workflows/meandai-protocol-update.yml'] = `
+            $targetWorkflowBlob
+        $consumerTreeEntries['.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'] = `
+            $targetAdapterBlob
+        }
+        foreach ($pathResult in @($migrationPlan.Paths)) {
+            $consumerTreeEntries[[string]$pathResult.Path] = `
+                [string]$pathResult.OriginalBlob
+            $targetConsumerBlobs[[string]$pathResult.Path] = `
+                [string]$pathResult.ResultBlob
+        }
+        $targetConsumerBlobs[[string]$migrationPlan.Ledger.Path] = `
+            [string]$migrationPlan.Ledger.ResultBlob
+    }
+    else {
+        $consumerTreeEntries['.ai/meandai-update-state.json'] = `
+            [string]$consumerMigrationBaseline.Blob
+    }
     $sourceTreeEntries = @{}
     foreach ($sha in @(('1' * 40), ('2' * 40))) {
         $sourceTreeEntries["$sha|templates/project/.github/workflows/meandai-protocol-update.yml"] = $currentWorkflowBlob
         $sourceTreeEntries["$sha|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
         $sourceTreeEntries["$sha|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $currentAdapterBlob
+        $sourceTreeEntries["$sha|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+        $sourceTreeEntries["$sha|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
+        foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+            $sourceTreeEntries["$sha|migrations/$([string]$migration.Definition)"] = `
+                [string]$migration.DefinitionBlob
+        }
     }
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/workflows/meandai-protocol-update.yml"] = $targetWorkflowBlob
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $targetAdapterBlob
+    $sourceTreeEntries["$('3' * 40)|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+    $sourceTreeEntries["$('3' * 40)|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
+    foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+        $sourceTreeEntries["$('3' * 40)|migrations/$([string]$migration.Definition)"] = `
+            [string]$migration.DefinitionBlob
+    }
+    $sourceTreeEntries["$('6' * 40)|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+    $sourceTreeEntries["$('6' * 40)|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
+    foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+        $sourceTreeEntries["$('6' * 40)|migrations/$([string]$migration.Definition)"] = `
+            [string]$migration.DefinitionBlob
+    }
+    $newRootTreeSha = ''
+    $remoteTrees = @{}
+    if ($MigrationRequired) {
+        $newRootTreeSha = 'c1' * 20
+        $aiTreeSha = 'c2' * 20
+        $memoryTreeSha = 'c3' * 20
+        $docsTreeSha = 'c4' * 20
+        $ideasTreeSha = 'c5' * 20
+        $featuresTreeSha = 'c6' * 20
+        $decisionsTreeSha = 'c7' * 20
+        $testsTreeSha = 'c8' * 20
+        $remoteTrees[$newRootTreeSha] = @(
+            [pscustomobject]@{ path = '.ai'; mode = '040000'; type = 'tree'; sha = $aiTreeSha },
+            [pscustomobject]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '6' * 40 },
+            [pscustomobject]@{ path = 'AGENTS.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['AGENTS.md'] },
+            [pscustomobject]@{ path = 'docs'; mode = '040000'; type = 'tree'; sha = $docsTreeSha },
+            [pscustomobject]@{ path = 'tests'; mode = '040000'; type = 'tree'; sha = $testsTreeSha }
+        )
+        $remoteTrees[$aiTreeSha] = @(
+            [pscustomobject]@{ path = 'protocol'; mode = '160000'; type = 'commit'; sha = '3' * 40 },
+            [pscustomobject]@{ path = 'meandai-update-state.json'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['.ai/meandai-update-state.json'] },
+            [pscustomobject]@{ path = 'memory'; mode = '040000'; type = 'tree'; sha = $memoryTreeSha }
+        )
+        $remoteTrees[$memoryTreeSha] = @(
+            [pscustomobject]@{ path = 'README.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['.ai/memory/README.md'] },
+            [pscustomobject]@{ path = 'project.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['.ai/memory/project.md'] }
+        )
+        $remoteTrees[$docsTreeSha] = @(
+            [pscustomobject]@{ path = 'ideas'; mode = '040000'; type = 'tree'; sha = $ideasTreeSha },
+            [pscustomobject]@{ path = 'features'; mode = '040000'; type = 'tree'; sha = $featuresTreeSha },
+            [pscustomobject]@{ path = 'decisions'; mode = '040000'; type = 'tree'; sha = $decisionsTreeSha }
+        )
+        $remoteTrees[$ideasTreeSha] = @(
+            [pscustomobject]@{ path = 'README.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['docs/ideas/README.md'] }
+        )
+        $remoteTrees[$featuresTreeSha] = @(
+            [pscustomobject]@{ path = 'README.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['docs/features/README.md'] }
+        )
+        $remoteTrees[$decisionsTreeSha] = @(
+            [pscustomobject]@{ path = 'README.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['docs/decisions/README.md'] },
+            [pscustomobject]@{ path = 'DEC-0001-pinned-meandai-submodule.md'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['docs/decisions/DEC-0001-pinned-meandai-submodule.md'] }
+        )
+        $remoteTrees[$testsTreeSha] = @(
+            [pscustomobject]@{ path = 'Verify-MeAndAIAdoption.ps1'; mode = '100644'; type = 'blob'; sha = $targetConsumerBlobs['tests/Verify-MeAndAIAdoption.ps1'] }
+        )
+    }
+    $expectedStagedPaths = if ($MigrationRequired) {
+        [string[]]$paths = @($migrationPlan.ExpectedChangedPaths)
+        if ($MigrationWithUpgrade) {
+            $paths = [string[]]@(
+                $paths + @(
+                    '.ai/protocol',
+                    '.github/workflows/meandai-protocol-update.yml',
+                    '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+                )
+            )
+        }
+        [Array]::Sort($paths, [StringComparer]::Ordinal)
+        $paths
+    }
+    else {
+        @(
+            '.ai/protocol',
+            '.github/workflows/meandai-protocol-update.yml',
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        )
+    }
     $issues = [System.Collections.Generic.List[object]]::new()
     if ($OldCandidateExists) {
         $issues.Add((New-TestProtocolUpdateIssue -Number 121 -TargetTag 'v0.2.0' `
@@ -850,7 +1129,11 @@ function Invoke-AdapterScenario {
             @('type:task', 'priority:p1', 'status:in-progress',
               'status:needs-review', 'status:blocked')
         }))
-        CurrentProtocolSha = '1' * 40
+        FirstProtocolSha = '1' * 40
+        CurrentProtocolSha = if ($MigrationRequired -and -not $MigrationWithUpgrade) {
+            '3' * 40
+        }
+        else { '1' * 40 }
         MiddleProtocolSha = '2' * 40
         TargetProtocolSha = '3' * 40
         LocalTargetProtocolSha = if ($MismatchedReleaseCommit) { '6' * 40 } else { '3' * 40 }
@@ -869,15 +1152,20 @@ function Invoke-AdapterScenario {
         ConsumerTreeEntries = $consumerTreeEntries
         TargetConsumerBlobs = $targetConsumerBlobs
         SourceTreeEntries = $sourceTreeEntries
-        ExpectedStagedPaths = @(
-            '.ai/protocol',
-            '.github/workflows/meandai-protocol-update.yml',
-            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
-        )
+        ExpectedStagedPaths = @($expectedStagedPaths)
+        MigrationPlanSha = if ($MigrationRequired) {
+            [string]$migrationPlan.PlanSha256
+        }
+        else { '' }
+        NewRootTreeSha = $newRootTreeSha
+        RemoteTrees = $remoteTrees
         OldBranchExists = $OldBranchExists
         NewBranchExists = $ExistingReplacement
         OldBranch = 'automation/meandai-protocol-v0.2.0'
-        NewBranch = 'automation/meandai-protocol-v0.3.0'
+        NewBranch = if ($MigrationRequired -and -not $MigrationWithUpgrade) {
+            'automation/meandai-protocol-v0.3.0-migrations'
+        }
+        else { 'automation/meandai-protocol-v0.3.0' }
         ReservedOrphanBranch = 'automation/meandai-protocol-v0.2.5'
         ReservedOrphanHead = '7' * 40
         ReservedOrphanBranchExists = $ReservedOrphanBranchExists
@@ -979,6 +1267,38 @@ if ($successOldIssue.Count -ne 1 -or [string]$successOldIssue[0].state -cne 'clo
     (Get-EventIndex $success 'close-update-issue-121') -le
         (Get-EventIndex $success 'delete-old-branch')) {
     Add-Failure 'TEST-0111 automatic issue/link/supersession lifecycle did not converge in branch-first order.'
+}
+$engineEraMigration = Invoke-AdapterScenario -Name 'generic-update-with-migration' `
+    -MigrationRequired $true -MigrationWithUpgrade $true `
+    -OldCandidateExists $false -OldBranchExists $false
+if ($engineEraMigration.Threw -or
+    [string]$engineEraMigration.NewBranch -cne `
+        'automation/meandai-protocol-v0.3.0' -or
+    $engineEraMigration.ExpectedStagedPaths -cnotcontains '.ai/protocol' -or
+    $engineEraMigration.ExpectedStagedPaths -cnotcontains `
+        '.ai/meandai-update-state.json' -or
+    $engineEraMigration.ExpectedStagedPaths -cnotcontains 'AGENTS.md' -or
+    $engineEraMigration.NewBody -cnotmatch '"kind":"update"' -or
+    (Get-EventIndex $engineEraMigration 'create-new-pr') -lt 0) {
+    Add-Failure "TEST-0121 engine-era compatible update did not publish one exact protocol-plus-migration draft: $($engineEraMigration.Error)"
+}
+$legacyHandoff = Invoke-AdapterScenario -Name 'generic-legacy-handoff' `
+    -MigrationRequired $true -OldCandidateExists $false -OldBranchExists $false
+$handoffIssue = @($legacyHandoff.Issues | Where-Object { [int]$_.number -eq 130 })
+if ($legacyHandoff.Threw -or
+    [string]$legacyHandoff.NewBranch -cne `
+        'automation/meandai-protocol-v0.3.0-migrations' -or
+    $legacyHandoff.ExpectedStagedPaths -ccontains '.ai/protocol' -or
+    $legacyHandoff.ExpectedStagedPaths -cnotcontains '.ai/meandai-update-state.json' -or
+    $legacyHandoff.NewBody -cnotmatch '"kind":"migration-reconciliation"' -or
+    -not $legacyHandoff.NewBody.Contains(
+        '"migrationPlanSha":"' + [string]$legacyHandoff.MigrationPlanSha + '"'
+    ) -or
+    $handoffIssue.Count -ne 1 -or
+    [string]$handoffIssue[0].title -cne `
+        'Track meAndAI consumer reconciliation for v0.3.0' -or
+    (Get-EventIndex $legacyHandoff 'create-new-pr') -lt 0) {
+    Add-Failure "TEST-0122 generic missing-ledger handoff did not create one exact same-target reconciliation draft: $($legacyHandoff.Error)"
 }
 $missingLabels = Invoke-AdapterScenario -Name 'missing-managed-labels' `
     -MissingManagedLabels $true

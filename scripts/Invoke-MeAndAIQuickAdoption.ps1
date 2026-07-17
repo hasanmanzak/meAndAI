@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.10.2',
+    [string]$ProtocolTag = 'v0.10.3',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -29,6 +29,9 @@ $minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
+$consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$consumerMigrationIndexPath = 'migrations/index.json'
+$consumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 $adoptionAssets = @(
     [pscustomobject]@{
         ConsumerPath = 'AGENTS.md'
@@ -747,6 +750,65 @@ function Get-ExactProtocolSourceBlobSha {
     return Get-GitBlobSha -Bytes ([IO.File]::ReadAllBytes($sourcePath))
 }
 
+function Get-ExactConsumerMigrationBaseline {
+    param(
+        [Parameter(Mandatory)][string]$ProtocolSource,
+        [Parameter(Mandatory)][string]$ProtocolSha
+    )
+
+    $moduleSha = Get-ExactProtocolSourceBlobSha `
+        -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
+        -TemplatePath $consumerMigrationModulePath
+    $indexSha = Get-ExactProtocolSourceBlobSha `
+        -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
+        -TemplatePath $consumerMigrationIndexPath
+    $modulePath = Join-Path $ProtocolSource `
+        ($consumerMigrationModulePath -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $indexPath = Join-Path $ProtocolSource `
+        ($consumerMigrationIndexPath -replace '/', [IO.Path]::DirectorySeparatorChar)
+    $modules = @(Import-Module -Name $modulePath -Force -PassThru)
+    if ($modules.Count -ne 1) {
+        throw 'The exact protocol consumer migration module could not be loaded unambiguously.'
+    }
+    $module = $modules[0]
+    try {
+        $importCatalog = $module.ExportedCommands[
+            'Import-MeAndAIConsumerMigrationCatalog'
+        ]
+        $newBaseline = $module.ExportedCommands[
+            'New-MeAndAIConsumerMigrationBaseline'
+        ]
+        if ($null -eq $importCatalog -or $null -eq $newBaseline) {
+            throw 'The exact protocol consumer migration module lacks its baseline contract.'
+        }
+        $catalog = & $importCatalog -IndexPath $indexPath
+        if ([string]$catalog.IndexBlob -cne $indexSha -or
+            $moduleSha -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'The exact protocol consumer migration catalog or module is not immutable.'
+        }
+        foreach ($migration in @($catalog.Migrations)) {
+            $definitionPath = "migrations/$([string]$migration.Definition)"
+            $definitionSha = Get-ExactProtocolSourceBlobSha `
+                -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
+                -TemplatePath $definitionPath
+            if ($definitionSha -cne [string]$migration.DefinitionBlob) {
+                throw "Consumer migration definition '$definitionPath' differs from the exact protocol source."
+            }
+        }
+        $baseline = & $newBaseline -Catalog $catalog
+        if ([string]$baseline.Path -cne $consumerMigrationLedgerPath -or
+            $baseline.Bytes -isnot [byte[]] -or
+            [string]$baseline.Blob -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'The exact protocol produced an invalid consumer migration baseline.'
+        }
+        return $baseline
+    }
+    finally {
+        Remove-Module -Name ([string]$module.Name) -Force `
+            -ErrorAction SilentlyContinue
+    }
+}
+
 function Assert-AdoptionUpdaterAssetsExact {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -824,7 +886,9 @@ function Assert-ExactAdoptionProposal {
         throw 'The adoption proposal is not based on the canonical consumer head.'
     }
 
-    $mappedTargetPaths = @('.gitmodules', '.ai/protocol') + @(
+    $mappedTargetPaths = @(
+        '.gitmodules', '.ai/protocol', $consumerMigrationLedgerPath
+    ) + @(
         $adoptionAssets | ForEach-Object { [string]$_.ConsumerPath }
     )
     if (-not (Test-ExactOrdinalPathSet -Actual @($TargetPaths) `
@@ -889,6 +953,15 @@ function Assert-ExactAdoptionProposal {
             $proposalEntry.Sha -cne $sourceSha) {
             throw "Adoption proposal asset '$($asset.ConsumerPath)' does not match the exact protocol source."
         }
+    }
+    $migrationBaseline = Get-ExactConsumerMigrationBaseline `
+        -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha
+    $ledgerEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $ProposalHead -Path $consumerMigrationLedgerPath
+    if ($ledgerEntry.Mode -cne '100644' -or
+        $ledgerEntry.Type -cne 'blob' -or
+        $ledgerEntry.Sha -cne [string]$migrationBaseline.Blob) {
+        throw 'The adoption proposal consumer migration ledger is not the exact target baseline.'
     }
 }
 
@@ -3248,7 +3321,9 @@ function Get-ValidatedAdoptionChangeSet {
     if ($changedPaths.Count -eq 0) {
         throw 'Local Codex produced no reviewable adoption change.'
     }
-    foreach ($forbiddenPath in @($workflowTargetPath) + @($tokenMappings.Keys)) {
+    foreach ($forbiddenPath in @(
+        $workflowTargetPath, $consumerMigrationLedgerPath
+    ) + @($tokenMappings.Keys)) {
         $protectedDiff = Invoke-Git -Repository $Repository -Arguments @(
             'diff', '--cached', '--quiet', '--exit-code', '--', $forbiddenPath
         ) -AllowFailure
@@ -3383,6 +3458,8 @@ function Invoke-AdoptionCodexCompletion {
 Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($PullRequest.number) in this isolated temporary clone.
 
 Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($Manifest.protocolSha); never substitute a moving ref.
+
+Treat the .ai/protocol gitlink and the VERSION inside that exact checkout as the sole live protocol identity. Consumer-owned instructions, memory, decisions, features, indexes, and tests must resolve the current identity from those sources and must not embed a literal current tag or commit. Exact values may appear only as dated historical event evidence.
 
 Secret provisioning is already complete: FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and MEANDAI_RO_FG_PAT.txt maps to MEANDAI_PROTOCOL_TOKEN. Those source files are intentionally absent. Do not search for, request, print, recreate, or modify credential values or repository secrets.
 
@@ -3861,10 +3938,10 @@ else {
     $status = Invoke-Git -Repository $target -Arguments @(
         'status', '--porcelain=v1', '--untracked-files=all'
     )
-    foreach ($line in @($status.Output)) {
-        if (-not $line) {
-            continue
-        }
+    $statusLines = @($status.Output | Where-Object { $_ } | ForEach-Object {
+        [string]$_
+    })
+    foreach ($line in $statusLines) {
         if ($line.Length -lt 4 -or $line.Substring(3) -cne $workflowTargetPath) {
             throw 'The connected repository must be clean apart from the exact seed workflow candidate.'
         }

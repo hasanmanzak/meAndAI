@@ -5,7 +5,18 @@
 | `TEST-0111` | `SUBF-0039` | Discover an update with no prepared issue, repeat discovery, supersede it with a newer immutable target, then merge the replacement. | Exactly one marker-owned issue per target is created or reused; the pull request has one exact tracking line and backlink; supersession and merge close only their owned issue after branch convergence. | Integration / state transition | Passed | Mock GitHub CLI and Git fixture |
 | `TEST-0112` | `SUBF-0040` | Present a merged installing update from a legacy workflow with missing or placeholder tracking evidence, then vary repository, marker, head, base, paths, gitlink, and ambiguity. | The one exact qualified proposal is repaired and finalized idempotently; every foreign, partial, moved, or ambiguous state fails before mutation. | Integration / compatibility / negative | Passed | Mock GitHub CLI and Git fixture |
 | `TEST-0113` | `SUBF-0040` | Re-run the latest launcher for an unadopted repository, current complete installation, older same-major complete installation, partial/drifted installation, newer installation, and cross-major installation. | Initial adoption remains unchanged; current is a successful no-op; older same-major dispatches the installed updater without rewriting the seed; every unsupported state fails before secrets or managed repository-content mutation. | Integration / routing / negative | Passed | Temporary repositories and mock GitHub CLI fixture |
-| `TEST-0114` | `SUBF-0041` | Validate reusable consumer templates, prompt requirements, and synthetic consumer tests across two same-major protocol gitlinks. | The gitlink and `.ai/protocol/VERSION` are the only live pin; consumer-owned bytes and test logic remain valid without version/SHA edits. | Structural / compatibility | Passed | Repository and synthetic-consumer fixture |
+| `TEST-0114` | `SUBF-0041` | Validate the prospective reusable consumer templates and common-protocol authority rule. | Current templates use the gitlink and `.ai/protocol/VERSION` as the only live pin and contain no literal current tag/SHA. | Structural / prospective compatibility | Passed; historical-fixture overclaim is owned by [MIG-0001 / TEST-0119](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md) | Repository structure |
+
+## Correction recorded 2026-07-17
+
+The original TEST-0114 description claimed a synthetic consumer across two
+same-major gitlinks. Its executable assertions inspected only five current
+templates and the protocol wording; they did not instantiate a real consumer
+shape created before the prospective rule. [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
+defines release-declared transition reconciliation; Derdini supplies the
+`MIG-0001` regression under `TEST-0119`. The prospective template assertions
+remain valid, while `TEST-0120` through `TEST-0122` own the generic engine,
+single-draft, and immutable legacy-handoff evidence.
 
 ## Required coverage
 

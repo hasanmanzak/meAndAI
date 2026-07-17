@@ -108,7 +108,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $protocolSha = ('a' * 40) -join ''
         $expectedCollisions = @('AGENTS.md')
         $expectedTargetPaths = @(
-            '.gitmodules', '.ai/protocol', 'AGENTS.md',
+            '.gitmodules', '.ai/protocol', '.ai/meandai-update-state.json', 'AGENTS.md',
             '.ai/memory/README.md', '.ai/memory/project.md',
             '.ai/memory/log/README.md', 'docs/ideas/README.md',
             '.github/ISSUE_TEMPLATE/bug.yml',
@@ -211,7 +211,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.10.2',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.10.3',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',

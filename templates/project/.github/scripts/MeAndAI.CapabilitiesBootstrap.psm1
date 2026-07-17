@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 $script:MeAndAIAdoptionTargetPaths = @(
-    '.gitmodules', '.ai/protocol', 'AGENTS.md',
+    '.gitmodules', '.ai/protocol', '.ai/meandai-update-state.json', 'AGENTS.md',
     '.ai/memory/README.md', '.ai/memory/project.md',
     '.ai/memory/log/README.md', 'docs/ideas/README.md',
     '.github/ISSUE_TEMPLATE/bug.yml',

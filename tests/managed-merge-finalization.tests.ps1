@@ -7,7 +7,25 @@ $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAI
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
+
+$testManagedAssets = @(
+    [pscustomobject]@{
+        ConsumerPath = '.github/workflows/meandai-protocol-update.yml'
+        TemplatePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+        TemplatePath = 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+    },
+    [pscustomobject]@{
+        ConsumerPath = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    }
+)
+$testMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
+    -IndexPath (Join-Path $root 'migrations/index.json')
 
 function Add-Failure {
     param([string]$Message)
@@ -25,22 +43,373 @@ function Add-FinalizationEvent {
     $global:MeAndAIFinalizationScenario.Events.Add($Event)
 }
 
+function Get-TestPathSetSha256 {
+    param([string[]]$Paths)
+
+    $ordered = [string[]]@($Paths)
+    [Array]::Sort($ordered, [StringComparer]::Ordinal)
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        (($ordered -join "`n") + "`n")
+    )
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($algorithm.ComputeHash($bytes))).Replace(
+            '-', ''
+        ).ToLowerInvariant()
+    }
+    finally {
+        $algorithm.Dispose()
+    }
+}
+
+function Get-TestSha1 {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    $algorithm = [Security.Cryptography.SHA1]::Create()
+    try {
+        return -join @($algorithm.ComputeHash($Bytes) | ForEach-Object {
+            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
+        })
+    }
+    finally {
+        $algorithm.Dispose()
+    }
+}
+
+function Get-TestGitBlobSha {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+    $payload = [byte[]]::new($header.Length + $Bytes.Length)
+    [Array]::Copy($header, 0, $payload, 0, $header.Length)
+    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
+    return Get-TestSha1 -Bytes $payload
+}
+
+function Get-TestSha1Text {
+    param([Parameter(Mandatory)][string]$Text)
+
+    return Get-TestSha1 -Bytes ([Text.UTF8Encoding]::new($false).GetBytes($Text))
+}
+
+function New-TestGitGraph {
+    [pscustomobject]@{
+        Commits = @{}
+        Trees = @{}
+        Blobs = @{}
+    }
+}
+
+function Add-TestGitCommit {
+    param(
+        [Parameter(Mandatory)]$Graph,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Entries
+    )
+
+    $files = [System.Collections.Generic.List[object]]::new()
+    $directories = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    [void]$directories.Add('')
+    foreach ($entry in @($Entries)) {
+        $path = [string]$entry.Path
+        if ([string]::IsNullOrWhiteSpace($path) -or $path.Contains('\') -or
+            $path.StartsWith('/') -or $path.EndsWith('/')) {
+            throw "Test Git entry path '$path' is not canonical."
+        }
+        $slash = $path.LastIndexOf('/')
+        $directory = if ($slash -ge 0) { $path.Substring(0, $slash) } else { '' }
+        $name = if ($slash -ge 0) { $path.Substring($slash + 1) } else { $path }
+        $cursor = $directory
+        while ($cursor) {
+            [void]$directories.Add($cursor)
+            $parentSlash = $cursor.LastIndexOf('/')
+            $cursor = if ($parentSlash -ge 0) {
+                $cursor.Substring(0, $parentSlash)
+            }
+            else { '' }
+        }
+
+        if ([string]$entry.Mode -ceq '160000') {
+            $sha = [string]$entry.Sha
+            if ($sha -cnotmatch '^[0-9a-f]{40}$') {
+                throw "Test gitlink '$path' has an invalid commit identity."
+            }
+            $files.Add([pscustomobject]@{
+                Directory = $directory; Name = $name; Path = $path
+                Mode = '160000'; Type = 'commit'; Sha = $sha
+            })
+            continue
+        }
+
+        $bytes = [byte[]]$entry.Bytes
+        $sha = Get-TestGitBlobSha -Bytes $bytes
+        if ($Graph.Blobs.ContainsKey($sha)) {
+            $existing = [byte[]]$Graph.Blobs[$sha]
+            if ($existing.Length -ne $bytes.Length) {
+                throw "Test blob collision at '$path'."
+            }
+        }
+        else {
+            $Graph.Blobs[$sha] = $bytes
+        }
+        $files.Add([pscustomobject]@{
+            Directory = $directory; Name = $name; Path = $path
+            Mode = '100644'; Type = 'blob'; Sha = $sha
+        })
+    }
+
+    $treeByDirectory = @{}
+    $orderedDirectories = @($directories) | Sort-Object {
+        if ($_ -eq '') { 0 } else { @($_.Split('/')).Count }
+    } -Descending
+    foreach ($directory in $orderedDirectories) {
+        $treeEntries = [System.Collections.Generic.List[object]]::new()
+        foreach ($file in @($files | Where-Object {
+            [string]$_.Directory -ceq [string]$directory
+        })) {
+            $treeEntries.Add([ordered]@{
+                path = [string]$file.Name
+                mode = [string]$file.Mode
+                type = [string]$file.Type
+                sha = [string]$file.Sha
+            })
+        }
+        foreach ($child in @($directories | Where-Object {
+            if ($_ -eq '') { return $false }
+            $lastSlash = $_.LastIndexOf('/')
+            $parent = if ($lastSlash -ge 0) { $_.Substring(0, $lastSlash) } else { '' }
+            $parent -ceq $directory
+        })) {
+            $childSlash = $child.LastIndexOf('/')
+            $childName = if ($childSlash -ge 0) {
+                $child.Substring($childSlash + 1)
+            }
+            else { $child }
+            $treeEntries.Add([ordered]@{
+                path = $childName; mode = '040000'; type = 'tree'
+                sha = [string]$treeByDirectory[$child]
+            })
+        }
+        $orderedEntries = @($treeEntries | Sort-Object { [string]$_.path })
+        $identity = ($orderedEntries | ForEach-Object {
+            "$($_.mode)|$($_.type)|$($_.sha)|$($_.path)"
+        }) -join "`n"
+        $treeSha = Get-TestSha1Text -Text (
+            "test-tree|$Commit|$directory`n$identity`n"
+        )
+        $Graph.Trees[$treeSha] = $orderedEntries
+        $treeByDirectory[$directory] = $treeSha
+    }
+    $Graph.Commits[$Commit] = [string]$treeByDirectory['']
+}
+
+function New-TestBlobEntry {
+    param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][byte[]]$Bytes)
+
+    [pscustomobject]@{ Path = $Path; Mode = '100644'; Bytes = $Bytes }
+}
+
+function New-TestGitlinkEntry {
+    param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Sha)
+
+    [pscustomobject]@{ Path = $Path; Mode = '160000'; Sha = $Sha }
+}
+
+function New-TestMigrationFixture {
+    param([Parameter(Mandatory)][bool]$LedgerExists)
+
+    Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
+    $pathText = [System.Collections.Generic.Dictionary[string,string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($migration in @($testMigrationCatalog.Migrations)) {
+        foreach ($operation in @($migration.Operations)) {
+            $path = [string]$operation.Path
+            $prefix = if ($pathText.ContainsKey($path)) {
+                [string]$pathText[$path] + "`nfixture-boundary`n"
+            }
+            else { '' }
+            $pathText[$path] = $prefix + [string]$operation.Before + "`n"
+        }
+    }
+    $files = @($pathText.Keys | Sort-Object | ForEach-Object {
+        [pscustomobject]@{
+            Path = [string]$_
+            Bytes = [Text.UTF8Encoding]::new($false).GetBytes(
+                [string]$pathText[[string]$_]
+            )
+        }
+    })
+    $ledgerBytes = if ($LedgerExists) {
+        [Text.UTF8Encoding]::new($false).GetBytes(
+            "{`"schema`":1,`"satisfied`":[]}`n"
+        )
+    }
+    else { $null }
+    $plan = Resolve-MeAndAIConsumerMigrationPlan `
+        -Catalog $testMigrationCatalog -Files $files -LedgerBytes $ledgerBytes
+    [pscustomobject]@{
+        Files = $files
+        LedgerBytes = $ledgerBytes
+        Plan = $plan
+    }
+}
+
+function Get-TestTargetProtocolEntries {
+    $entries = [System.Collections.Generic.List[object]]::new()
+    foreach ($path in @(
+        'migrations/index.json',
+        'scripts/MeAndAI.ConsumerMigrations.psm1'
+    ) + @($testMigrationCatalog.Migrations | ForEach-Object {
+        "migrations/$([string]$_.Definition)"
+    }) + @($testManagedAssets | ForEach-Object { [string]$_.TemplatePath })) {
+        $fullPath = Join-Path $root ($path -replace '/', [IO.Path]::DirectorySeparatorChar)
+        $entries.Add((New-TestBlobEntry -Path $path -Bytes ([IO.File]::ReadAllBytes($fullPath))))
+    }
+    return @($entries)
+}
+
+function Get-TestTargetManagedConsumerEntries {
+    $entries = [System.Collections.Generic.List[object]]::new()
+    foreach ($asset in $testManagedAssets) {
+        $template = Join-Path $root (
+            ([string]$asset.TemplatePath) -replace '/', [IO.Path]::DirectorySeparatorChar
+        )
+        $entries.Add((New-TestBlobEntry -Path ([string]$asset.ConsumerPath) `
+            -Bytes ([IO.File]::ReadAllBytes($template))))
+    }
+    return @($entries)
+}
+
 function New-FinalizationScenario {
     param(
-        [ValidateSet('Adoption', 'Update', 'Normal')]
+        [ValidateSet('Adoption', 'Update', 'MigrationReconciliation', 'Normal')]
         [string]$Kind = 'Adoption',
         [ValidateSet('Canonical', 'Absent', 'Placeholder')]
         [string]$TrackingMode = 'Canonical',
+        [ValidateSet(1, 2)]
+        [int]$UpdateSchema = 1,
         [bool]$InvalidLegacyRelease = $false,
-        [bool]$WrongLegacyAssetBlob = $false
+        [bool]$WrongLegacyAssetBlob = $false,
+        [bool]$FabricatedSchema2Output = $false
     )
 
     $head = 'a' * 40
     $protocolSha = 'b' * 40
-    $target = 'v0.10.2'
+    $base = '6' * 40
+    $mergeCommit = 'd' * 40
+    $defaultHead = 'e' * 40
+    $target = 'v0.10.3'
+    $isSchema2 = $Kind -ceq 'MigrationReconciliation' -or
+        ($Kind -ceq 'Update' -and $UpdateSchema -eq 2)
+    $fixture = if ($isSchema2) {
+        New-TestMigrationFixture -LedgerExists ($Kind -ceq 'Update')
+    }
+    else { $null }
+    $migrationPlanSha = if ($isSchema2) {
+        [string]$fixture.Plan.PlanSha256
+    }
+    else { '' }
+
+    $protocolGraph = New-TestGitGraph
+    Add-TestGitCommit -Graph $protocolGraph -Commit $protocolSha `
+        -Entries (Get-TestTargetProtocolEntries)
+
+    $targetManagedEntries = @(Get-TestTargetManagedConsumerEntries)
+    $baseEntries = [System.Collections.Generic.List[object]]::new()
+    $headEntries = [System.Collections.Generic.List[object]]::new()
+    $changedPaths = [System.Collections.Generic.List[string]]::new()
+    if ($isSchema2) {
+        $baseEntries.Add((New-TestGitlinkEntry -Path '.ai/protocol' `
+            -Sha $(if ($Kind -ceq 'Update') { '1' * 40 } else { $protocolSha })))
+        $headEntries.Add((New-TestGitlinkEntry -Path '.ai/protocol' -Sha $protocolSha))
+        foreach ($entry in $targetManagedEntries) {
+            $headEntries.Add($entry)
+            if ($Kind -ceq 'Update') {
+                $baseEntries.Add((New-TestBlobEntry -Path ([string]$entry.Path) `
+                    -Bytes ([Text.UTF8Encoding]::new($false).GetBytes(
+                        "pre-target:$([string]$entry.Path)`n"
+                    ))))
+                $changedPaths.Add([string]$entry.Path)
+            }
+            else {
+                $baseEntries.Add($entry)
+            }
+        }
+        if ($Kind -ceq 'Update') {
+            $changedPaths.Add('.ai/protocol')
+        }
+        foreach ($file in @($fixture.Files)) {
+            $baseEntries.Add((New-TestBlobEntry -Path ([string]$file.Path) `
+                -Bytes ([byte[]]$file.Bytes)))
+        }
+        if ($null -ne $fixture.LedgerBytes) {
+            $baseEntries.Add((New-TestBlobEntry `
+                -Path '.ai/meandai-update-state.json' `
+                -Bytes ([byte[]]$fixture.LedgerBytes)))
+        }
+        foreach ($pathResult in @($fixture.Plan.Paths)) {
+            $resultBytes = [byte[]]$pathResult.ResultBytes
+            if ($FabricatedSchema2Output -and
+                [string]$pathResult.Path -ceq 'AGENTS.md') {
+                $resultBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+                    "fabricated-output-with-valid-marker-and-path-set`n"
+                )
+            }
+            $headEntries.Add((New-TestBlobEntry -Path ([string]$pathResult.Path) `
+                -Bytes $resultBytes))
+        }
+        $headEntries.Add((New-TestBlobEntry `
+            -Path ([string]$fixture.Plan.Ledger.Path) `
+            -Bytes ([byte[]]$fixture.Plan.Ledger.ResultBytes)))
+        foreach ($path in @($fixture.Plan.ExpectedChangedPaths)) {
+            $changedPaths.Add([string]$path)
+        }
+    }
+    elseif ($Kind -ceq 'Update') {
+        $baseEntries.Add((New-TestGitlinkEntry -Path '.ai/protocol' -Sha ('1' * 40)))
+        $headEntries.Add((New-TestGitlinkEntry -Path '.ai/protocol' -Sha $protocolSha))
+        $adapterAsset = @($targetManagedEntries | Where-Object {
+            [string]$_.Path -ceq '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        })[0]
+        $adapterBytes = if ($WrongLegacyAssetBlob) {
+            [Text.UTF8Encoding]::new($false).GetBytes("wrong-legacy-adapter`n")
+        }
+        else { [byte[]]$adapterAsset.Bytes }
+        $headEntries.Add((New-TestBlobEntry -Path ([string]$adapterAsset.Path) `
+            -Bytes $adapterBytes))
+        $baseEntries.Add((New-TestBlobEntry -Path ([string]$adapterAsset.Path) `
+            -Bytes ([Text.UTF8Encoding]::new($false).GetBytes("old-adapter`n"))))
+        $changedPaths.Add('.ai/protocol')
+        $changedPaths.Add([string]$adapterAsset.Path)
+    }
+    elseif ($Kind -ceq 'Adoption') {
+        $headEntries.Add((New-TestGitlinkEntry -Path '.ai/protocol' -Sha $protocolSha))
+        $headEntries.Add((New-TestBlobEntry -Path 'AGENTS.md' `
+            -Bytes ([Text.UTF8Encoding]::new($false).GetBytes("# Consumer instructions`n"))))
+        $changedPaths.Add('.ai/protocol')
+        $changedPaths.Add('AGENTS.md')
+    }
+    else {
+        $headEntries.Add((New-TestBlobEntry -Path 'README.md' `
+            -Bytes ([Text.UTF8Encoding]::new($false).GetBytes("# Ordinary`n"))))
+        $changedPaths.Add('README.md')
+    }
+
+    $consumerGraph = New-TestGitGraph
+    Add-TestGitCommit -Graph $consumerGraph -Commit $base -Entries @($baseEntries)
+    Add-TestGitCommit -Graph $consumerGraph -Commit $head -Entries @($headEntries)
+    Add-TestGitCommit -Graph $consumerGraph -Commit $mergeCommit -Entries @($headEntries)
+    Add-TestGitCommit -Graph $consumerGraph -Commit $defaultHead -Entries @($headEntries)
+
     $branch = switch ($Kind) {
         'Adoption' { "automation/meandai-capabilities-$target" }
         'Update' { "automation/meandai-protocol-$target" }
+        'MigrationReconciliation' {
+            "automation/meandai-protocol-$target-migrations"
+        }
         default { 'feature/ordinary-change' }
     }
     $marker = switch ($Kind) {
@@ -52,8 +421,27 @@ function New-FinalizationScenario {
             } | ConvertTo-Json -Compress
         }
         'Update' {
+            if ($isSchema2) {
+                [ordered]@{
+                    schema = 2; kind = 'update'; target = $target
+                    protocolSha = $protocolSha
+                    migrationPlanSha = $migrationPlanSha
+                    pathsSha = Get-TestPathSetSha256 -Paths @($changedPaths)
+                    head = $head; repository = 'owner/consumer'
+                } | ConvertTo-Json -Compress
+            }
+            else {
+                [ordered]@{
+                    schema = 1; target = $target; protocolSha = $protocolSha
+                    head = $head; repository = 'owner/consumer'
+                } | ConvertTo-Json -Compress
+            }
+        }
+        'MigrationReconciliation' {
             [ordered]@{
-                schema = 1; target = $target; protocolSha = $protocolSha
+                schema = 2; kind = 'migration-reconciliation'; target = $target
+                protocolSha = $protocolSha; migrationPlanSha = $migrationPlanSha
+                pathsSha = Get-TestPathSetSha256 -Paths @($changedPaths)
                 head = $head; repository = 'owner/consumer'
             } | ConvertTo-Json -Compress
         }
@@ -69,43 +457,60 @@ function New-FinalizationScenario {
             }
             "<!-- meandai-protocol-update:$marker -->`n## Update$tracking"
         }
+        'MigrationReconciliation' {
+            "<!-- meandai-protocol-update:$marker -->`n## Reconciliation`n`nTracking issue: #9"
+        }
         default { '## Ordinary pull request' }
     }
-    $changedFiles = switch ($Kind) {
-        'Adoption' {
-            @(
-                [pscustomobject]@{ filename = '.ai/protocol'; status = 'added' },
-                [pscustomobject]@{ filename = 'AGENTS.md'; status = 'added' }
-            )
+    $changedFiles = @($changedPaths | ForEach-Object {
+        [pscustomobject]@{
+            filename = [string]$_
+            status = if ($_ -ceq '.ai/meandai-update-state.json' -and
+                ($Kind -ceq 'MigrationReconciliation')) { 'added' } else { 'modified' }
         }
-        'Update' {
-            @(
-                [pscustomobject]@{ filename = '.ai/protocol'; status = 'modified' },
-                [pscustomobject]@{
-                    filename = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
-                    status = 'modified'
-                }
-            )
-        }
-        default { @([pscustomobject]@{ filename = 'README.md'; status = 'modified' }) }
-    }
+    })
     $issueBody = if ($Kind -ceq 'Adoption') {
         "<!-- meandai-local-adoption:$target`:pr-42 -->`n## AI capabilities adoption tracking"
     }
     else {
-        $issueMarker = [ordered]@{
-            schema = 1; target = $target; protocolSha = $protocolSha
-            repository = 'owner/consumer'
-        } | ConvertTo-Json -Compress
-        @(
+        $isMigration = $Kind -ceq 'MigrationReconciliation'
+        $issueMarker = if ($isSchema2) {
+            [ordered]@{
+                schema = 2
+                kind = if ($isMigration) { 'migration-reconciliation' } else { 'update' }
+                target = $target
+                protocolSha = $protocolSha; migrationPlanSha = $migrationPlanSha
+                repository = 'owner/consumer'
+            } | ConvertTo-Json -Compress
+        }
+        else {
+            [ordered]@{
+                schema = 1; target = $target; protocolSha = $protocolSha
+                repository = 'owner/consumer'
+            } | ConvertTo-Json -Compress
+        }
+        $issueLines = [System.Collections.Generic.List[string]]::new()
+        foreach ($line in @(
             "<!-- meandai-protocol-update-issue:$issueMarker -->",
-            '## Managed protocol update tracking', '',
+            $(if ($isMigration) {
+                '## Managed consumer reconciliation tracking'
+            } else { '## Managed protocol update tracking' }), '',
             "- Target release: ``$target``",
-            "- Protocol commit: ``$protocolSha``",
+            "- Protocol commit: ``$protocolSha``"
+        )) {
+            $issueLines.Add([string]$line)
+        }
+        if ($isSchema2) {
+            $issueLines.Add("- Migration plan: ``$migrationPlanSha``")
+        }
+        foreach ($line in @(
             "- Deterministic branch: ``$branch``", '',
             'This issue is the canonical same-repository work record for the managed protocol proposal.',
             'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
-        ) -join [Environment]::NewLine
+        )) {
+            $issueLines.Add([string]$line)
+        }
+        $issueLines -join [Environment]::NewLine
     }
     [pscustomobject]@{
         Kind = $Kind
@@ -115,12 +520,13 @@ function New-FinalizationScenario {
         PullRequestState = 'closed'
         Merged = $true
         BaseBranch = 'main'
+        BaseHead = $base
         HeadRepository = 'owner/consumer'
         HeadAuthor = 'updater-owner'
         Branch = $branch
         ExpectedHead = $head
-        MergeCommitSha = 'd' * 40
-        DefaultHead = 'e' * 40
+        MergeCommitSha = $mergeCommit
+        DefaultHead = $defaultHead
         CompareStatus = 'ahead'
         LiveHead = $head
         BranchExists = $Kind -cne 'Normal'
@@ -131,7 +537,11 @@ function New-FinalizationScenario {
         IssueNumber = 9
         IssueTitle = if ($Kind -ceq 'Adoption') {
             "Track meAndAI AI capabilities adoption from $target"
-        } else { "Track meAndAI protocol update to $target" }
+        }
+        elseif ($Kind -ceq 'MigrationReconciliation') {
+            "Track meAndAI consumer reconciliation for $target"
+        }
+        else { "Track meAndAI protocol update to $target" }
         IssueBody = $issueBody
         IssueState = 'open'
         IssueIsPullRequest = $false
@@ -142,9 +552,15 @@ function New-FinalizationScenario {
         IssueExists = $Kind -cne 'Update' -or $TrackingMode -ceq 'Canonical'
         OpenBranchReuseCount = 0
         ExistingEvidenceComments = 0
-        ProposalEvidenceComments = if ($Kind -ceq 'Update' -and $TrackingMode -ceq 'Canonical') { 1 } else { 0 }
+        ProposalEvidenceComments = if ($Kind -cin @(
+            'Update', 'MigrationReconciliation'
+        ) -and $TrackingMode -ceq 'Canonical') { 1 } else { 0 }
         InvalidLegacyRelease = $InvalidLegacyRelease
         WrongLegacyAssetBlob = $WrongLegacyAssetBlob
+        IsSchema2 = $isSchema2
+        MigrationPlan = if ($isSchema2) { $fixture.Plan } else { $null }
+        ProtocolGraph = $protocolGraph
+        ConsumerGraph = $consumerGraph
         Events = [System.Collections.Generic.List[string]]::new()
     }
 }
@@ -206,14 +622,14 @@ function global:gh {
         if ($env:GH_TOKEN -cne 'test-protocol-token') {
             throw 'Legacy release evidence crossed the protocol credential boundary.'
         }
-        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/releases/tags/v0.10.2') {
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/releases/tags/v0.10.3') {
             [ordered]@{
-                tag_name = 'v0.10.2'; draft = $false; prerelease = $false
+                tag_name = 'v0.10.3'; draft = $false; prerelease = $false
                 immutable = $true; published_at = '2026-07-17T00:00:00Z'
             } | ConvertTo-Json -Compress
             return
         }
-        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.10.2') {
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.10.3') {
             [ordered]@{
                 object = [ordered]@{
                     type = 'commit'
@@ -222,24 +638,36 @@ function global:gh {
             } | ConvertTo-Json -Depth 4 -Compress
             return
         }
-        if ($endpoint -ceq "repos/hasanmanzak/meAndAI/git/commits/$('b' * 40)") {
-            [ordered]@{ tree = [ordered]@{ sha = '2' * 40 } } |
-                ConvertTo-Json -Depth 4 -Compress
+        if ($endpoint -ceq "repos/hasanmanzak/meAndAI/compare/$('1' * 40)...$('b' * 40)") {
+            [ordered]@{ status = 'ahead' } | ConvertTo-Json -Compress
             return
         }
-        $protocolTrees = @{
-            ('2' * 40) = [ordered]@{ path = 'templates'; mode = '040000'; type = 'tree'; sha = '3' * 40 }
-            ('3' * 40) = [ordered]@{ path = 'project'; mode = '040000'; type = 'tree'; sha = '4' * 40 }
-            ('4' * 40) = [ordered]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '5' * 40 }
-            ('5' * 40) = [ordered]@{ path = 'scripts'; mode = '040000'; type = 'tree'; sha = '6' * 40 }
-            ('6' * 40) = [ordered]@{ path = 'Invoke-MeAndAIProtocolUpdate.ps1'; mode = '100644'; type = 'blob'; sha = '7' * 40 }
+        if ($endpoint -match '^repos/hasanmanzak/meAndAI/git/commits/(?<sha>[0-9a-f]{40})$' -and
+            $scenario.ProtocolGraph.Commits.ContainsKey([string]$Matches.sha)) {
+            [ordered]@{
+                tree = [ordered]@{
+                    sha = [string]$scenario.ProtocolGraph.Commits[[string]$Matches.sha]
+                }
+            } | ConvertTo-Json -Depth 4 -Compress
+            return
         }
-        foreach ($entry in $protocolTrees.GetEnumerator()) {
-            if ($endpoint -ceq "repos/hasanmanzak/meAndAI/git/trees/$($entry.Key)") {
-                [ordered]@{ tree = @($entry.Value) } |
-                    ConvertTo-Json -Depth 5 -Compress
-                return
-            }
+        if ($endpoint -match '^repos/hasanmanzak/meAndAI/git/trees/(?<sha>[0-9a-f]{40})$' -and
+            $scenario.ProtocolGraph.Trees.ContainsKey([string]$Matches.sha)) {
+            [ordered]@{
+                tree = @($scenario.ProtocolGraph.Trees[[string]$Matches.sha])
+            } | ConvertTo-Json -Depth 6 -Compress
+            return
+        }
+        if ($endpoint -match '^repos/hasanmanzak/meAndAI/git/blobs/(?<sha>[0-9a-f]{40})$' -and
+            $scenario.ProtocolGraph.Blobs.ContainsKey([string]$Matches.sha)) {
+            $bytes = [byte[]]$scenario.ProtocolGraph.Blobs[[string]$Matches.sha]
+            [ordered]@{
+                sha = [string]$Matches.sha
+                encoding = 'base64'
+                size = $bytes.Length
+                content = [Convert]::ToBase64String($bytes)
+            } | ConvertTo-Json -Compress
+            return
         }
         throw "Unexpected fake protocol API command: $($arguments -join ' ')"
     }
@@ -263,7 +691,11 @@ function global:gh {
                 sha = $scenario.ExpectedHead
                 repo = [ordered]@{ full_name = $scenario.HeadRepository }
             }
-            base = [ordered]@{ ref = $scenario.BaseBranch }
+            base = [ordered]@{
+                ref = $scenario.BaseBranch
+                sha = $scenario.BaseHead
+                repo = [ordered]@{ full_name = $scenario.Repository }
+            }
         } | ConvertTo-Json -Depth 8 -Compress
         return
     }
@@ -283,47 +715,31 @@ function global:gh {
         } | ConvertTo-Json -Depth 5 -Compress
         return
     }
-    if ($endpoint -ceq "repos/owner/consumer/git/commits/$($scenario.ExpectedHead)") {
-        [ordered]@{ tree = [ordered]@{ sha = '8' * 40 } } |
-            ConvertTo-Json -Depth 4 -Compress
-        return
-    }
-    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('8' * 40)") {
+    if ($endpoint -match '^repos/owner/consumer/git/commits/(?<sha>[0-9a-f]{40})$' -and
+        $scenario.ConsumerGraph.Commits.ContainsKey([string]$Matches.sha)) {
         [ordered]@{
-            tree = @([ordered]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '9' * 40 })
-        } | ConvertTo-Json -Depth 5 -Compress
+            tree = [ordered]@{
+                sha = [string]$scenario.ConsumerGraph.Commits[[string]$Matches.sha]
+            }
+        } | ConvertTo-Json -Depth 4 -Compress
         return
     }
-    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('9' * 40)") {
+    if ($endpoint -match '^repos/owner/consumer/git/trees/(?<sha>[0-9a-f]{40})$' -and
+        $scenario.ConsumerGraph.Trees.ContainsKey([string]$Matches.sha)) {
         [ordered]@{
-            tree = @([ordered]@{ path = 'scripts'; mode = '040000'; type = 'tree'; sha = '0' * 40 })
-        } | ConvertTo-Json -Depth 5 -Compress
+            tree = @($scenario.ConsumerGraph.Trees[[string]$Matches.sha])
+        } | ConvertTo-Json -Depth 6 -Compress
         return
     }
-    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('0' * 40)") {
+    if ($endpoint -match '^repos/owner/consumer/git/blobs/(?<sha>[0-9a-f]{40})$' -and
+        $scenario.ConsumerGraph.Blobs.ContainsKey([string]$Matches.sha)) {
+        $bytes = [byte[]]$scenario.ConsumerGraph.Blobs[[string]$Matches.sha]
         [ordered]@{
-            tree = @([ordered]@{
-                path = 'Invoke-MeAndAIProtocolUpdate.ps1'; mode = '100644'; type = 'blob'
-                sha = if ($scenario.WrongLegacyAssetBlob) { 'c' * 40 } else { '7' * 40 }
-            })
-        } | ConvertTo-Json -Depth 5 -Compress
-        return
-    }
-    if ($endpoint -ceq "repos/owner/consumer/git/commits/$($scenario.DefaultHead)") {
-        [ordered]@{ tree = [ordered]@{ sha = 'f' * 40 } } |
-            ConvertTo-Json -Depth 4 -Compress
-        return
-    }
-    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('f' * 40)") {
-        [ordered]@{
-            tree = @([ordered]@{ path = '.ai'; mode = '040000'; type = 'tree'; sha = '1' * 40 })
-        } | ConvertTo-Json -Depth 5 -Compress
-        return
-    }
-    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('1' * 40)") {
-        [ordered]@{
-            tree = @([ordered]@{ path = 'protocol'; mode = '160000'; type = 'commit'; sha = 'b' * 40 })
-        } | ConvertTo-Json -Depth 5 -Compress
+            sha = [string]$Matches.sha
+            encoding = 'base64'
+            size = $bytes.Length
+            content = [Convert]::ToBase64String($bytes)
+        } | ConvertTo-Json -Compress
         return
     }
     if ($endpoint -ceq "repos/owner/consumer/compare/$($scenario.MergeCommitSha)...$($scenario.DefaultHead)") {
@@ -559,6 +975,36 @@ try {
         Add-Failure "TEST-0109 exact update merge did not converge through its tracking issue: $($update.Error)"
     }
 
+    $schema2Update = Invoke-FinalizationScenario -Scenario (
+        New-FinalizationScenario -Kind Update -UpdateSchema 2
+    )
+    if ($schema2Update.Threw -or $schema2Update.Scenario.BranchExists -or
+        $schema2Update.Scenario.ExistingEvidenceComments -ne 1 -or
+        $schema2Update.Scenario.IssueLabels -contains 'status:needs-review' -or
+        $schema2Update.Scenario.IssueState -cne 'closed' -or
+        $schema2Update.Scenario.ChangedFiles.filename -cnotcontains '.ai/protocol' -or
+        $schema2Update.Scenario.ChangedFiles.filename -cnotcontains
+            '.ai/meandai-update-state.json' -or
+        @($schema2Update.Scenario.Events | Where-Object {
+            $_ -ceq 'delete-branch'
+        }).Count -ne 1) {
+        Add-Failure "TEST-0121 exact schema-2 update did not independently verify and finalize its immutable target plan: $($schema2Update.Error)"
+    }
+
+    $migration = Invoke-FinalizationScenario -Scenario (
+        New-FinalizationScenario -Kind MigrationReconciliation
+    )
+    if ($migration.Threw -or $migration.Scenario.BranchExists -or
+        $migration.Scenario.ExistingEvidenceComments -ne 1 -or
+        $migration.Scenario.IssueLabels -contains 'status:needs-review' -or
+        $migration.Scenario.IssueState -cne 'closed' -or
+        $migration.Scenario.ChangedFiles.filename -ccontains '.ai/protocol' -or
+        @($migration.Scenario.Events | Where-Object {
+            $_ -ceq 'delete-branch'
+        }).Count -ne 1) {
+        Add-Failure "TEST-0122 exact schema-2 same-target migration merge did not finalize its suffixed branch and issue: $($migration.Error)"
+    }
+
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($requiredText in @(
         'pull_request:', 'types: [closed]', 'finalize_pull_request:',
@@ -672,6 +1118,14 @@ try {
     }
     $negativeScenarios.Add([pscustomobject]@{ Name = 'unexpected update path'; Scenario = $unexpectedUpdatePath })
 
+    $fabricatedSchema2Output = New-FinalizationScenario -Kind Update `
+        -UpdateSchema 2 -FabricatedSchema2Output $true
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'fabricated internally consistent schema-2 output'
+        Scenario = $fabricatedSchema2Output
+        ExpectedError = 'Schema-2 proposal migration output or ledger differs from the independently computed plan.'
+    })
+
     $renamedPath = New-FinalizationScenario -Kind Update
     $renamedPath.ChangedFiles[0] = [pscustomobject]@{
         filename = '.ai/protocol'; previous_filename = '.ai/old-protocol'
@@ -695,6 +1149,11 @@ try {
         $result = Invoke-FinalizationScenario -Scenario $negative.Scenario
         if (-not $result.Threw) {
             Add-Failure "TEST-0110 $($negative.Name) did not fail closed."
+        }
+        $expectedErrorProperty = $negative.PSObject.Properties['ExpectedError']
+        if ($null -ne $expectedErrorProperty -and
+            [string]$result.Error -cnotlike "*$([string]$expectedErrorProperty.Value)*") {
+            Add-Failure "TEST-0121 $($negative.Name) did not fail on independent schema-2 evidence: $($result.Error)"
         }
         Test-NoFinalizationMutation -Result $result -Name $negative.Name
     }

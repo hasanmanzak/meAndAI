@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.2/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.10.2` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.3/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.10.3` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.10.2` is an exact published immutable release
+launcher itself verifies that `v0.10.3` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -197,8 +197,10 @@ gitlink plus the `VERSION` inside that exact checkout as the sole current pin
 authority. They link to or read those sources dynamically and do not copy the
 adoption tag or commit as a live memory, decision, documentation, or test
 constant. A dated adoption entry may retain the exact initial values as
-historical evidence. This boundary lets later compatible updates finish in the
-managed update pull request without a second consumer-owned reconciliation.
+historical evidence. Initial adoption also writes
+`.ai/meandai-update-state.json` with the target release's complete migration
+catalog recorded as satisfied, so a new consumer does not replay historical
+transitions.
 
 ### Re-running the launcher
 
@@ -216,10 +218,37 @@ adapter blobs identical to that installed release.
 - If the installed tag is older in the same major, the launcher preserves the
   installed seed, reconciles only missing secrets, dispatches that installed
   updater with correlation evidence, waits for its result, and never enters
-  adoption/Codex handling. The reviewed update installs the newer lifecycle.
+  adoption/Codex handling. An engine-era updater includes required catalog
+  migrations in the managed update draft. A pre-engine updater first installs
+  the newer lifecycle; after that merge, the new workflow automatically opens
+  one same-target reconciliation draft if its catalog remains unsatisfied.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
+
+### Transition migrations
+
+Do not choose or run a migration mode based on the consumer's installed tag.
+Migration applicability comes from the target release's immutable, append-only
+catalog, the consumer ledger, and exact repository bytes.
+
+For a consumer whose installed updater already supports that contract, the
+ordinary managed update draft contains the target gitlink, target-different
+updater assets, exact catalog-derived consumer changes, and resulting ledger.
+Only one maintainer merge is required.
+
+For a consumer whose immutable updater predates the engine, the first managed
+draft can contain only the core update that old code knows how to prove. Merge
+it normally. The newly installed workflow then automatically creates one
+same-target reconciliation draft and tracking issue. Review and merge that
+draft; finalization deletes its exact owned branch and closes its issue. Later
+compatible transitions use the one-draft path. If the follow-up event was
+suppressed, run the installed workflow manually; do not add a launcher flag or
+hand-edit the ledger.
+
+Exact already-satisfied state is idempotent. Customized, partial, mixed,
+drifted, linked, or otherwise ambiguous state fails closed before remote
+mutation and requires explicit maintainer review.
 
 An in-flight seed-only adoption is still initial adoption and can resume only
 with its original protocol tag; a different requested seed remains a collision.
@@ -241,7 +270,7 @@ meAndAI status labels, and closes the issue as completed.
 
 GitHub does not replay an event that occurred while a route was absent, and a
 merge performed with `GITHUB_TOKEN` may not create another workflow event. The
-`v0.10.2` workflow therefore also runs bounded recovery on the installing
+`v0.10.3` workflow therefore also runs bounded recovery on the installing
 default-branch push, the schedule, and ordinary manual dispatch. It repairs only
 an exact legacy installing update, then uses the normal finalizer. For a missed
 or failed recovery, run the same route explicitly after confirming the PR is
@@ -257,8 +286,10 @@ for a moved/reused branch, a merge no longer on the default branch, a malformed
 ambiguous tracking line, or an issue closed without that evidence. Do not use
 `Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
 would close the issue before branch convergence. Older consumer pins gain the
-behavior when their reviewed update installs the `v0.10.2` workflow and adapter;
-the installing update itself is covered only by the bounded legacy bridge.
+behavior when their reviewed update installs the current workflow and adapter.
+If that immutable installing updater predates transition migrations, the new
+workflow performs the generic same-target reconciliation handoff described
+above; no source-version-specific bridge is selected.
 
 ## Stopping and resuming safely
 

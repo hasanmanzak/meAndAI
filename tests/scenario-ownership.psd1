@@ -25,7 +25,7 @@
                 'TEST-0017', 'TEST-0021', 'TEST-0022', 'TEST-0023',
                 'TEST-0024', 'TEST-0025', 'TEST-0026', 'TEST-0048',
                 'TEST-0058', 'TEST-0061', 'TEST-0072', 'TEST-0088',
-                'TEST-0111'
+                'TEST-0111', 'TEST-0121', 'TEST-0122'
             )
         }
         @{
@@ -58,6 +58,11 @@
             Evidence = 'ExecutableSuite'
             Owner = 'tests/quick-adoption-streaming.tests.ps1'
             TestIds = @('TEST-0105', 'TEST-0106')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/consumer-migrations.tests.ps1'
+            TestIds = @('TEST-0119', 'TEST-0120')
         }
         @{
             Evidence = 'ExecutableSuite'

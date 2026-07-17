@@ -5,16 +5,18 @@ and follow its canonical links.
 
 ## Current continuation
 
-Balanced Windows integrity validation and isolated publication verification are
-tracked as [FEAT-0025](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md),
-[`TEST-0117` and `TEST-0118`](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md),
-and the [v0.10.2 continuation](2026-07-17-v0102-balanced-windows-validation.md).
-[Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) owns delivery and
-future post-publication evidence. `FIND-0120` remains the separate open
-external follow-up in issue #44.
+Generic consumer transition reconciliation is tracked as
+[FEAT-0026](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md),
+[DEC-0018](../../../docs/decisions/DEC-0018-release-declared-consumer-migrations.md),
+[`TEST-0119` through `TEST-0122`](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md),
+and the [v0.10.3 continuation](2026-07-17-v0103-generic-consumer-transition-reconciliation.md).
+[Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) owns delivery and
+future post-publication evidence. `FIND-0120` remains the separate open external
+follow-up in issue #44.
 
 ## History
 
+- [2026-07-17 - v0.10.3 generic consumer transition reconciliation](2026-07-17-v0103-generic-consumer-transition-reconciliation.md)
 - [2026-07-17 - v0.10.2 balanced Windows validation](2026-07-17-v0102-balanced-windows-validation.md)
 - [2026-07-17 - v0.10.1 parallel Windows validation](2026-07-17-v0101-parallel-windows-validation.md)
 - [2026-07-17 - v0.10.0 idempotent consumer lifecycle](2026-07-17-v0100-idempotent-consumer-lifecycle.md)

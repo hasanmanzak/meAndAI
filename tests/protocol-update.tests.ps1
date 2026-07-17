@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$PureResolverOnly)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -40,6 +40,11 @@ function New-Candidate {
         [string[]]$ChangedPaths = @('.ai/protocol'),
         [string[]]$ExpectedChangedPaths = $null,
         [bool]$ManagedAssetEntriesMatchTarget = $true,
+        [string]$Kind = 'Update',
+        [string]$MigrationPlanSha = '',
+        [bool]$MigrationPlanValid = $true,
+        [string[]]$AllowedExpectedPaths = $null,
+        [string]$MigrationBranchSuffix = '-migrations',
         [int]$MarkerSchema = 1,
         [bool]$BranchExists = $true,
         [string]$ProtocolSha = ('2' * 40),
@@ -62,11 +67,24 @@ function New-Candidate {
         $ExpectedChangedPaths = @($ChangedPaths)
     }
 
-    [pscustomobject]@{
+    $kindWasSupplied = $PSBoundParameters.ContainsKey('Kind')
+    $isMigration = $Kind -ceq 'MigrationReconciliation'
+    if ($isMigration -and -not $MigrationPlanSha) {
+        $MigrationPlanSha = '3' * 64
+    }
+    if ($isMigration -and $null -eq $AllowedExpectedPaths) {
+        $AllowedExpectedPaths = @($ExpectedChangedPaths)
+    }
+    $headRef = if ($isMigration) {
+        "automation/meandai-protocol-$TargetTag$MigrationBranchSuffix"
+    }
+    else { "automation/meandai-protocol-$TargetTag" }
+
+    $candidate = [pscustomobject]@{
         PullRequestNumber = $Number
         PullRequestState = 'Open'
         TargetTag = $TargetTag
-        HeadRef = "automation/meandai-protocol-$TargetTag"
+        HeadRef = $headRef
         BranchExists = $BranchExists
         ExpectedHeadSha = $MarkerHeadSha
         ApiHeadSha = $ApiHeadSha
@@ -87,13 +105,32 @@ function New-Candidate {
         ExpectedChangedPaths = @($ExpectedChangedPaths)
         ManagedAssetEntriesMatchTarget = $ManagedAssetEntriesMatchTarget
     }
+    if ($kindWasSupplied) {
+        $candidate | Add-Member -NotePropertyName Kind -NotePropertyValue $Kind
+    }
+    if ($isMigration -or $PSBoundParameters.ContainsKey('MigrationPlanSha')) {
+        $candidate | Add-Member -NotePropertyName MigrationPlanSha `
+            -NotePropertyValue $MigrationPlanSha
+    }
+    if ($isMigration -or $PSBoundParameters.ContainsKey('MigrationPlanValid')) {
+        $candidate | Add-Member -NotePropertyName MigrationPlanValid `
+            -NotePropertyValue $MigrationPlanValid
+    }
+    if ($isMigration -or $PSBoundParameters.ContainsKey('AllowedExpectedPaths')) {
+        $candidate | Add-Member -NotePropertyName AllowedExpectedPaths `
+            -NotePropertyValue @($AllowedExpectedPaths)
+    }
+    return $candidate
 }
 
 function Invoke-Plan {
     param(
         [string]$CurrentTag,
         [string[]]$AvailableTags,
-        [object[]]$Candidates = @()
+        [object[]]$Candidates = @(),
+        [bool]$MigrationRequired = $false,
+        [string]$CurrentMigrationPlanSha = '',
+        [string]$MigrationBranchSuffix = '-migrations'
     )
 
     $snapshot = [pscustomobject]@{
@@ -114,6 +151,19 @@ function Invoke-Plan {
         Candidates = @($Candidates)
     }
 
+    if ($PSBoundParameters.ContainsKey('MigrationRequired')) {
+        $snapshot | Add-Member -NotePropertyName MigrationRequired `
+            -NotePropertyValue $MigrationRequired
+    }
+    if ($PSBoundParameters.ContainsKey('CurrentMigrationPlanSha')) {
+        $snapshot | Add-Member -NotePropertyName CurrentMigrationPlanSha `
+            -NotePropertyValue $CurrentMigrationPlanSha
+    }
+    if ($PSBoundParameters.ContainsKey('MigrationBranchSuffix')) {
+        $snapshot | Add-Member -NotePropertyName MigrationBranchSuffix `
+            -NotePropertyValue $MigrationBranchSuffix
+    }
+
     Resolve-MeAndAIProtocolUpdatePlan -Snapshot $snapshot
 }
 
@@ -125,6 +175,13 @@ Assert-Equal 'v0.10.0' $plan.LatestCompatibleTag 'TEST-0009 numeric tag ordering
 Assert-Equal 'CreateUpgrade' $plan.Operations[0].Kind 'TEST-0009 should create an upgrade'
 Assert-Equal 'v0.10.0' $plan.Operations[0].TargetTag 'TEST-0009 selected the wrong target'
 Assert-Equal 5 @($plan.IgnoredTags).Count 'TEST-0009 should report case-variant, noncanonical, malformed, or prerelease tags'
+
+$compatibleCatalogOrder = @(Get-MeAndAICompatibleProtocolTagsInOrder `
+    -CurrentTag 'v0.10.3' `
+    -Tags @('v0.11.0', 'v0.10.5', 'v1.0.0', 'v0.10.3', 'v0.10.4', 'v0.10.4-beta.1'))
+Assert-Equal 'v0.10.3,v0.10.4,v0.10.5,v0.11.0' `
+    ($compatibleCatalogOrder -join ',') `
+    'TEST-0121 compatible catalogs must be visited in numeric release order so skipped intermediates remain part of the validation chain'
 
 $hugeMinor = '92233720368547758081234567890'
 $hugeRevision = '99999999999999999999999999999'
@@ -250,9 +307,173 @@ $plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') -C
 Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0015 case-only branch changes must block'
 Assert-Equal 0 @($plan.Operations).Count 'TEST-0015 case-only branch changes must remain untouched'
 
+$migrationPlanSha = '4' * 64
+$migrationPaths = @('.ai/meandai-update-state.json', 'AGENTS.md')
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -MigrationRequired $true -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'OpenMigration' $plan.State `
+    'TEST-0121 a current consumer with an unsatisfied plan should open migration reconciliation'
+Assert-Equal 'CreateMigration' $plan.Operations[0].Kind `
+    'TEST-0121 should create a migration operation'
+Assert-Equal 'MigrationReconciliation' $plan.Operations[0].ProposalKind `
+    'TEST-0121 migration creation should carry proposal kind'
+Assert-Equal 'automation/meandai-protocol-v0.2.0-migrations' $plan.Operations[0].Branch `
+    'TEST-0121 migration branch should use the deterministic suffix'
+Assert-Equal $migrationPlanSha $plan.Operations[0].MigrationPlanSha `
+    'TEST-0121 migration creation should carry the exact plan SHA'
+
+$pendingMigration = New-Candidate -Number 40 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($pendingMigration) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'PendingMigration' $plan.State `
+    'TEST-0121 an exact migration candidate should remain pending'
+Assert-Equal 0 @($plan.Operations).Count `
+    'TEST-0121 an exact migration candidate should be idempotent'
+
+$customSuffixMigration = New-Candidate -Number 41 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths -MigrationBranchSuffix '-consumer-migrations'
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($customSuffixMigration) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha `
+    -MigrationBranchSuffix '-consumer-migrations'
+Assert-Equal 'PendingMigration' $plan.State `
+    'TEST-0121 a supplied canonical migration branch suffix should be honored'
+
+$outsideMigrationPath = New-Candidate -Number 42 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths @('.ai/meandai-update-state.json')
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($outsideMigrationPath) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 a migration path outside its dynamic allowed set must block'
+
+$invalidMigrationPlan = New-Candidate -Number 43 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -MigrationPlanValid $false -ChangedPaths $migrationPaths `
+    -ExpectedChangedPaths $migrationPaths -AllowedExpectedPaths $migrationPaths
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($invalidMigrationPlan) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 invalid immutable migration evidence must block'
+
+$typedInvalidMigrationPlan = New-Candidate -Number 49 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths
+$typedInvalidMigrationPlan.MigrationPlanValid = 'false'
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($typedInvalidMigrationPlan) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 non-Boolean migration validity must fail closed'
+
+$wrongCurrentPlan = New-Candidate -Number 44 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha ('5' * 64) `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($wrongCurrentPlan) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 a same-target candidate with another plan must block rather than reuse its branch'
+
+$pendingLegacyMigration = New-Candidate -Number 45 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' `
+    -AvailableTags @('v0.2.0', 'v0.3.0') `
+    -Candidates @($pendingLegacyMigration) -MigrationRequired $true `
+    -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'Supersede' $plan.State `
+    'TEST-0122 a newer protocol target should supersede pending migration work'
+Assert-Equal 'CreateUpgrade,ClosePullRequest,DeleteBranch' `
+    (@($plan.Operations.Kind) -join ',') `
+    'TEST-0122 migration supersession must remain replacement-first'
+Assert-Equal 'Update' $plan.Operations[0].ProposalKind `
+    'TEST-0122 replacement should be an update proposal'
+Assert-Equal 'MigrationReconciliation' $plan.Operations[1].ProposalKind `
+    'TEST-0122 cleanup should retain the superseded proposal kind'
+Assert-Equal $migrationPlanSha $plan.Operations[1].MigrationPlanSha `
+    'TEST-0122 cleanup should retain the superseded migration plan SHA'
+
+$latestUpdate = New-Candidate -Number 46 -TargetTag 'v0.3.0' `
+    -MarkerHeadSha ('6' * 40)
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' `
+    -AvailableTags @('v0.2.0', 'v0.3.0') `
+    -Candidates @($pendingLegacyMigration, $latestUpdate) `
+    -MigrationRequired $true -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'Supersede' $plan.State `
+    'TEST-0122 existing latest update should be retained while migration work is retired'
+Assert-Equal 'ClosePullRequest,DeleteBranch' (@($plan.Operations.Kind) -join ',') `
+    'TEST-0122 should not duplicate an existing latest update'
+Assert-Equal 45 $plan.Operations[0].PullRequestNumber `
+    'TEST-0122 only the pending migration should be retired'
+
+$staleMigration = New-Candidate -Number 47 -TargetTag 'v0.2.0' `
+    -Kind 'MigrationReconciliation' -MigrationPlanSha $migrationPlanSha `
+    -MarkerSchema 2 `
+    -ChangedPaths $migrationPaths -ExpectedChangedPaths $migrationPaths `
+    -AllowedExpectedPaths $migrationPaths
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($staleMigration)
+Assert-Equal 'CleanupStale' $plan.State `
+    'TEST-0122 a satisfied default branch should clean a stale migration candidate'
+Assert-Equal 'MigrationReconciliation' $plan.Operations[0].ProposalKind `
+    'TEST-0122 stale migration cleanup should retain proposal identity'
+
+$sameTargetUpdate = New-Candidate -Number 48 -TargetTag 'v0.2.0' `
+    -MarkerHeadSha ('7' * 40)
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -Candidates @($sameTargetUpdate, $pendingMigration) `
+    -MigrationRequired $true -CurrentMigrationPlanSha $migrationPlanSha
+Assert-Equal 'Supersede' $plan.State `
+    'TEST-0121 update and migration candidates at one target are distinct proposal identities'
+Assert-Equal 'ClosePullRequest,DeleteBranch' (@($plan.Operations.Kind) -join ',') `
+    'TEST-0121 exact migration should remain while stale update state is cleaned'
+Assert-Equal 48 $plan.Operations[0].PullRequestNumber `
+    'TEST-0121 cleanup should select only the stale update candidate'
+
+$invalidKind = New-Candidate -Number 50 -TargetTag 'v0.2.0' -Kind 'Migration'
+$plan = Invoke-Plan -CurrentTag 'v0.1.0' -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -Candidates @($invalidKind)
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 unsupported proposal kinds must fail closed'
+
+$plan = Invoke-Plan -CurrentTag 'v0.2.0' -AvailableTags @('v0.2.0') `
+    -MigrationRequired $true -CurrentMigrationPlanSha ('A' * 64)
+Assert-Equal 'BlockedManualReview' $plan.State `
+    'TEST-0121 migration plan SHA must be canonical lowercase SHA-256'
+
 $majorPlan = Invoke-Plan -CurrentTag 'v0.3.0' -AvailableTags @('v0.3.0', 'v1.0.0')
 Assert-Equal 'MajorUpgradeRequired' $majorPlan.State 'TEST-0016 incompatible major releases require manual migration'
 Assert-Equal 0 @($majorPlan.Operations).Count 'TEST-0016 major releases must not create an automatic PR'
+
+if ($PureResolverOnly) {
+    if ($failures.Count -gt 0) {
+        Write-Host "Pure protocol update resolver tests failed with $($failures.Count) problem(s):" -ForegroundColor Red
+        $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
+        exit 1
+    }
+    Write-Host 'Pure protocol update resolver tests passed.' -ForegroundColor Green
+    return
+}
 
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
