@@ -67,9 +67,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.10.2`, the only repository file required
+For a new submodule consumer on `v0.10.3`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.2/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.3/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -113,7 +113,7 @@ workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.10.2'
+$tag = 'v0.10.3'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -180,6 +180,13 @@ indexes, and tests MUST refer to the live submodule gitlink and its `VERSION`
 rather than copy the adoption tag or commit as a current fact. Exact values may
 remain in a dated adoption or update record as historical event evidence. They
 do not become fields that must be rewritten after every compatible update.
+
+Consumers already created by the v0.9.2 adoption path may carry the earlier
+live-literal shape. Use the exact one-time procedure in
+[the quick-adoption guide](quick-adoption.md#one-time-v092-live-pin-migration)
+before the ordinary installed-updater route. A later release cannot inject
+those consumer-owned changes into the first proposal created by immutable
+v0.9.2 code; unknown or partially migrated shapes require explicit review.
 
 The repository's `.github/ISSUE_TEMPLATE/config.yml` is deliberately excluded:
 its contact link describes this protocol repository and follows its current
@@ -360,7 +367,7 @@ deterministic branch, records one issue evidence marker, removes transient
 meAndAI status labels, and closes the issue. A default-branch `push`, schedule,
 or ordinary manual dispatch also checks the bounded retained-branch recovery
 route before update discovery. This lets the first merge that installs the
-`v0.10.2` lifecycle repair only an exact legacy update with an absent or exact
+`v0.10.3` lifecycle repair only an exact legacy update with an absent or exact
 `#REQUIRED` tracking line, create its canonical issue, patch the merged pull
 request, and enter the same finalizer. Foreign, partial, moved, unexpected-path,
 or ambiguous state fails before mutation.
@@ -410,7 +417,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.10.2`
+- ref: `v0.10.3`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -458,11 +465,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.10.2`:
+before checkout; the current example then installs `v0.10.3`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.10.2
+git -C .ai/protocol checkout v0.10.3
 git add .ai/protocol
 ```
 

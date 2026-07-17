@@ -95,7 +95,7 @@ protocol update.
 | `RISK-0102` | Identity / traceability | Automation reuses or closes an unrelated issue | Mitigated / consumer workflow | Repository-bound first-line issue marker, exact target/SHA identity, backlink checks, and passing `TEST-0111` |
 | `RISK-0103` | Compatibility | A legacy installing update cannot enter managed finalization safely | Mitigated / consumer workflow | One bounded bridge requiring merged same-repository proposal, marker/head/base/path/gitlink proof, and passing `TEST-0112` |
 | `RISK-0104` | State classification | Repeat adoption overwrites a seed or dispatches from drifted state | Mitigated / quick launcher | Complete-footprint classifier, installed-release blob verification, no-downgrade/cross-major rejection, and passing `TEST-0113` |
-| `RISK-0105` | Consistency | Consumer-owned files retain a stale second protocol pin | Mitigated / templates and root validation | Sole-authority rule, version-neutral templates, synthetic consumer validation, and passing `TEST-0114` |
+| `RISK-0105` | Consistency | Consumer-owned files retain a stale second protocol pin | Corrected prospectively / templates and root validation; historical v0.9.2 gap tracked by [FEAT-0026](../FEAT-0026-v0103-v092-live-pin-migration/README.md) | Sole-authority rule and version-neutral templates remain covered by `TEST-0114`; real historical migration and negative evidence are `TEST-0119` / `TEST-0120` |
 
 ## Decomposition and subfeature gates
 

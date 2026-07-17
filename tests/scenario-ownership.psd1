@@ -61,6 +61,11 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/v092-live-pin-migration.tests.ps1'
+            TestIds = @('TEST-0119', 'TEST-0120')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/post-publication-evidence.tests.ps1'
             TestIds = @('TEST-0083')
         }

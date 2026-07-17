@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.10.2**<br>
+Protocol version: **0.10.3**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -480,6 +480,16 @@ MUST identify the event and date and MUST NOT claim to be the consumer's live
 pin authority. A routine compatible update therefore requires no separate
 consumer-owned memory, decision, documentation, or test reconciliation merely
 to restate the new tag or commit.
+
+A consumer created before this sole-authority rule MAY require one explicit,
+reviewed compatibility migration. That migration MUST prove the exact installed
+release and recognized legacy shape, replace only the bounded current-authority
+fragments, preserve historical evidence, and fail before writing on partial or
+unknown state. A target release MUST NOT claim that its new updater code can
+change the first proposal created by an older immutable updater: the new code
+does not execute until that proposal merges. This exception MUST remain local
+and one-time; it does not grant the recurring updater general write authority
+over consumer-owned files.
 
 ### Consumer update proposals
 

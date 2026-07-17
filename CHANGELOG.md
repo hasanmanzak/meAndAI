@@ -3,6 +3,25 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.10.3 - 2026-07-17
+
+### Fixed
+
+- Add an explicit, exact-identity `-MigrateV092LivePins` launcher mode for the
+  recognized eight-file v0.9.2 consumer shape, with all-legacy/all-neutral
+  classification, byte-preserving writes, rollback, and zero-write rejection.
+- Stop the compatibility mode before secret reconciliation, workflow dispatch,
+  Git publication, or GitHub record mutation; ordinary managed updates resume
+  only after the reviewed consumer migration merges.
+- Add the missing sole-live-pin rule to the executable local-Codex adoption
+  prompt and replace TEST-0114's historical-fixture overclaim with executable
+  TEST-0119 and TEST-0120 coverage.
+
+Related work: [FEAT-0026](docs/features/FEAT-0026-v0103-v092-live-pin-migration/README.md),
+[DEC-0018](docs/decisions/DEC-0018-bounded-v092-live-pin-migration.md),
+[TEST-0119 and TEST-0120](docs/features/FEAT-0026-v0103-v092-live-pin-migration/test-cases.md),
+and [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69).
+
 ## 0.10.2 - 2026-07-17
 
 ### Changed

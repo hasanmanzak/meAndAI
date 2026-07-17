@@ -7,22 +7,22 @@ Last verified: **2026-07-17**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.10.2`. Exact publication state is authoritative
+- Current protocol version: `0.10.3`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) after
+  [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0025](../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md)
-  balances the former monolithic integrity shard across four independent
-  Windows PowerShell 5.1 jobs and isolates the release-only verifier from the
-  ordinary validation matrix; [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67)
-  owns delivery and future publication evidence.
+- Current scope: [FEAT-0026](../../docs/features/FEAT-0026-v0103-v092-live-pin-migration/README.md)
+  repairs the recognized v0.9.2 consumer live-pin shape through an explicit,
+  exact, local migration and strengthens the prospective adoption prompt;
+  [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) owns delivery
+  and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the Windows aggregate retains its stable name while four
-  semantic integrity shards replace one overloaded child. Explicit
-  post-publication dispatch skips ordinary validation and runs only the
-  read-only verifier. `TEST-0117` and `TEST-0118` own the regression.
+- Latest tracked work: `-MigrateV092LivePins` accepts only the exact recognized
+  all-legacy or all-neutral eight-file state after immutable v0.9.2 install
+  proof, stops before GitHub mutation, and preserves historical evidence.
+  `TEST-0119` and `TEST-0120` own the regression.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -144,6 +144,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.10.2` replaces the overloaded integrity shard with four semantic,
   independently initialized compatibility shards and keeps release-only
   verification outside the ordinary validation matrix.
+- `v0.10.3` corrects the unexercised historical part of the sole-live-pin
+  contract. Its explicit local launcher mode migrates only the recognized
+  v0.9.2 consumer shape; unknown or partial states fail closed, and ordinary
+  recurring updater authority remains unchanged.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,

@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.10.2',
+    [string]$ProtocolTag = 'v0.10.3',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -15,6 +15,7 @@ param(
     [ValidateRange(0, 7200)]
     [int]$CodexTimeoutSeconds = 0,
     [switch]$SkipLifecycleDispatch,
+    [switch]$MigrateV092LivePins,
     [Alias('SkipCodexDelegation')]
     [switch]$SkipLocalCodex,
     [switch]$NoProgress,
@@ -621,6 +622,390 @@ function Test-ByteArrayEqual {
         }
     }
     return $true
+}
+
+function Get-OrdinalOccurrenceCount {
+    param(
+        [Parameter(Mandatory)][string]$Text,
+        [Parameter(Mandatory)][string]$Value
+    )
+
+    if ($Value.Length -eq 0) {
+        throw 'A v0.9.2 migration fragment cannot be empty.'
+    }
+    $count = 0
+    $offset = 0
+    while ($offset -le ($Text.Length - $Value.Length)) {
+        $index = $Text.IndexOf($Value, $offset, [StringComparison]::Ordinal)
+        if ($index -lt 0) {
+            break
+        }
+        $count++
+        $offset = $index + $Value.Length
+    }
+    return $count
+}
+
+function Get-V092LivePinMigrationDefinitions {
+    $legacySha = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+    $definitions = @(
+        [pscustomobject]@{
+            Path = 'AGENTS.md'
+            Legacy = @'
+2. Read the local common protocol at `.ai/protocol/PROTOCOL.md`, pinned from
+   [meAndAI v0.9.2](https://github.com/hasanmanzak/meAndAI/blob/v0.9.2/PROTOCOL.md).
+'@
+            Neutral = @'
+2. Read the [local common protocol](.ai/protocol/PROTOCOL.md) from the pinned
+   `.ai/protocol` gitlink. Resolve its current version from
+   [the checkout's `VERSION`](.ai/protocol/VERSION); do not duplicate a literal
+   current tag or commit in consumer-owned instructions or records.
+'@
+        }
+        [pscustomobject]@{
+            Path = '.ai/memory/README.md'
+            Legacy = 'Pinned common protocol: **0.9.2**'
+            Neutral = @'
+The common-protocol authority is the repository's `.ai/protocol` gitlink and
+the `VERSION` inside that exact checkout. Do not copy either value into memory
+as a separately maintained live fact.
+'@
+        }
+        [pscustomobject]@{
+            Path = '.ai/memory/project.md'
+            Legacy = "- Pinned common protocol: [meAndAI 0.9.2 at ``$legacySha``](https://github.com/hasanmanzak/meAndAI/tree/$legacySha)"
+            Neutral = @'
+- Common protocol integration authority: the `.ai/protocol` gitlink supplies
+  the current commit and the `VERSION` inside that exact checkout supplies its
+  canonical version. Do not copy a live tag or SHA.
+'@
+        }
+        [pscustomobject]@{
+            Path = 'docs/ideas/README.md'
+            Legacy = @'
+For a submodule consumer, create records from
+`.ai/protocol/templates/idea.md`; the pinned canonical source is the
+[meAndAI v0.9.2 idea template](https://github.com/hasanmanzak/meAndAI/blob/v0.9.2/templates/idea.md).
+'@
+            Neutral = @'
+For a submodule consumer, create records from the
+[pinned canonical idea template](../../.ai/protocol/templates/idea.md). The
+consumer's gitlink selects its exact version; do not copy that tag or commit
+into this index as a live fact.
+'@
+        }
+        [pscustomobject]@{
+            Path = 'docs/features/README.md'
+            Legacy = @"
+Create future feature records from the pinned protocol's
+[feature template](https://github.com/hasanmanzak/meAndAI/blob/$legacySha/templates/feature/README.md).
+"@
+            Neutral = @'
+Create future feature records from the pinned protocol's
+[feature template](../../.ai/protocol/templates/feature/README.md). The
+consumer gitlink and its checked-out `VERSION` select the current identity.
+'@
+        }
+        [pscustomobject]@{
+            Path = 'docs/decisions/README.md'
+            Legacy = @"
+Create future decision records from the pinned protocol's
+[decision template](https://github.com/hasanmanzak/meAndAI/blob/$legacySha/templates/decision.md).
+"@
+            Neutral = @'
+Create future decision records from the pinned protocol's
+[decision template](../../.ai/protocol/templates/decision.md). The consumer
+gitlink and its checked-out `VERSION` select the current identity.
+'@
+        }
+        [pscustomobject]@{
+            Path = 'docs/decisions/DEC-0001-pinned-meandai-submodule.md'
+            Legacy = @"
+Reference ``hasanmanzak/meAndAI`` at exactly
+``$legacySha`` as the ``.ai/protocol`` Git
+submodule. Keep consumer memory, feature and decision records, tests, and
+tracking templates outside that submodule. Use the installed, consumer-owned
+lifecycle workflow for reviewed compatible update proposals.
+"@
+            Neutral = @'
+Reference `hasanmanzak/meAndAI` through the `.ai/protocol` Git submodule. In
+each consumer revision, the `160000` gitlink supplies the exact protocol commit
+and the `VERSION` file inside that checkout supplies its canonical version.
+Keep consumer memory, feature and decision records, tests, and tracking
+templates outside that submodule. Use the installed, consumer-owned lifecycle
+workflow for reviewed compatible update proposals.
+'@
+        }
+        [pscustomobject]@{
+            Path = 'tests/Verify-MeAndAIAdoption.ps1'
+            Legacy = @"
+`$expectedSha = '$legacySha'
+`$failures = [System.Collections.Generic.List[string]]::new()
+
+function Assert-True([bool]`$Condition, [string]`$Message) {
+    if (-not `$Condition) { `$failures.Add(`$Message) }
+}
+
+`$stage = & git -C `$root ls-files --stage -- .ai/protocol
+Assert-True (`$LASTEXITCODE -eq 0) 'TEST-0001: git index inspection failed.'
+Assert-True (`$stage -match "^160000 `$expectedSha 0\s+\.ai/protocol`$") 'TEST-0001: protocol gitlink mode or commit differs.'
+"@
+            Neutral = @'
+$failures = [System.Collections.Generic.List[string]]::new()
+
+function Assert-True([bool]$Condition, [string]$Message) {
+    if (-not $Condition) { $failures.Add($Message) }
+}
+
+$stage = & git -C $root ls-files --stage -- .ai/protocol
+Assert-True ($LASTEXITCODE -eq 0) 'TEST-0001: git index inspection failed.'
+$stageMatch = [regex]::Match(
+    (@($stage) -join "`n"),
+    '^160000 (?<sha>[0-9a-f]{40}) 0\s+\.ai/protocol$',
+    [Text.RegularExpressions.RegexOptions]::CultureInvariant
+)
+Assert-True $stageMatch.Success 'TEST-0001: protocol gitlink mode or commit differs.'
+$protocolSha = if ($stageMatch.Success) {
+    [string]$stageMatch.Groups['sha'].Value
+}
+else { '' }
+
+$protocolVersionPath = Join-Path $root '.ai/protocol/VERSION'
+$protocolVersionExists = Test-Path -LiteralPath $protocolVersionPath -PathType Leaf
+Assert-True $protocolVersionExists 'TEST-0001: protocol VERSION is missing.'
+if ($protocolVersionExists) {
+    $protocolVersion = [IO.File]::ReadAllText($protocolVersionPath).Trim()
+    Assert-True ($protocolVersion -match '^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$') 'TEST-0001: protocol VERSION is not canonical M.m.rev.'
+}
+
+$protocolCheckout = Join-Path $root '.ai/protocol'
+if (Test-Path -LiteralPath $protocolCheckout -PathType Container) {
+    $protocolHead = & git -C $protocolCheckout rev-parse HEAD
+    Assert-True ($LASTEXITCODE -eq 0) 'TEST-0001: initialized protocol checkout could not be inspected.'
+    if ($LASTEXITCODE -eq 0 -and $protocolSha) {
+        Assert-True (((@($protocolHead) -join '').Trim()) -ceq $protocolSha) 'TEST-0001: initialized protocol checkout differs from the gitlink.'
+    }
+}
+'@
+        }
+    )
+
+    foreach ($definition in $definitions) {
+        $definition.Legacy = ([string]$definition.Legacy).TrimEnd("`r", "`n").Replace("`r`n", "`n").Replace("`r", "`n")
+        $definition.Neutral = ([string]$definition.Neutral).TrimEnd("`r", "`n").Replace("`r`n", "`n").Replace("`r", "`n")
+    }
+    return $definitions
+}
+
+function Test-V092MigrationWorkingTreeStatus {
+    param([AllowEmptyCollection()][string[]]$StatusLines)
+
+    $allowedPaths = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($definition in @(Get-V092LivePinMigrationDefinitions)) {
+        [void]$allowedPaths.Add([string]$definition.Path)
+    }
+    $observedPaths = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($line in @($StatusLines | Where-Object { $_ })) {
+        $match = [regex]::Match(
+            [string]$line,
+            '^ M (?<path>.+)$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        if (-not $match.Success) {
+            return $false
+        }
+        $path = [string]$match.Groups['path'].Value
+        if (-not $allowedPaths.Contains($path) -or -not $observedPaths.Add($path)) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function ConvertFrom-V092MigrationUtf8Bytes {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][byte[]]$Bytes
+    )
+
+    $hasBom = $Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and
+        $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF
+    $offset = if ($hasBom) { 3 } else { 0 }
+    $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+    try {
+        $text = $strictUtf8.GetString($Bytes, $offset, $Bytes.Length - $offset)
+    }
+    catch {
+        throw "v0.9.2 migration path '$Path' is not strict UTF-8."
+    }
+    $withoutCrLf = $text.Replace("`r`n", '')
+    if ($withoutCrLf.Contains("`r")) {
+        throw "v0.9.2 migration path '$Path' uses unsupported or mixed line endings."
+    }
+    $hasCrLf = $text.Contains("`r`n")
+    if ($hasCrLf -and $withoutCrLf.Contains("`n")) {
+        throw "v0.9.2 migration path '$Path' uses mixed line endings."
+    }
+    return [pscustomobject]@{
+        HasBom = $hasBom
+        NewLine = if ($hasCrLf) { "`r`n" } else { "`n" }
+        NormalizedText = $text.Replace("`r`n", "`n")
+    }
+}
+
+function ConvertTo-V092MigrationUtf8Bytes {
+    param(
+        [Parameter(Mandatory)][string]$NormalizedText,
+        [Parameter(Mandatory)][ValidateSet("`n", "`r`n")][string]$NewLine,
+        [Parameter(Mandatory)][bool]$HasBom
+    )
+
+    $text = if ($NewLine -ceq "`n") {
+        $NormalizedText
+    }
+    else { $NormalizedText.Replace("`n", "`r`n") }
+    $encoding = [Text.UTF8Encoding]::new($false, $true)
+    $body = $encoding.GetBytes($text)
+    if (-not $HasBom) {
+        return $body
+    }
+    $preamble = [byte[]](0xEF, 0xBB, 0xBF)
+    $bytes = [byte[]]::new($preamble.Length + $body.Length)
+    [Array]::Copy($preamble, 0, $bytes, 0, $preamble.Length)
+    [Array]::Copy($body, 0, $bytes, $preamble.Length, $body.Length)
+    return $bytes
+}
+
+function Invoke-V092LivePinMigration {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)]$ExistingRoute
+    )
+
+    $legacySha = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+    if ([string]$ExistingRoute.State -cnotin @('AlreadyCurrent', 'CompatibleUpdate') -or
+        [string]$ExistingRoute.InstalledTag -cne 'v0.9.2' -or
+        [string]$ExistingRoute.InstalledProtocolSha -cne $legacySha) {
+        throw '-MigrateV092LivePins requires an exact immutable v0.9.2 completed installation.'
+    }
+
+    $preexistingStatus = @((Invoke-Git -Repository $Repository -Arguments @(
+        'status', '--porcelain=v1', '--untracked-files=all'
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    if (-not (Test-V092MigrationWorkingTreeStatus -StatusLines $preexistingStatus)) {
+        throw 'The v0.9.2 migration requires a clean tree or only its own unstaged recognized paths.'
+    }
+
+    $plans = [System.Collections.Generic.List[object]]::new()
+    foreach ($definition in @(Get-V092LivePinMigrationDefinitions)) {
+        $entry = Get-AdoptionTreeEntry -Repository $Repository `
+            -Commit $HeadSha -Path ([string]$definition.Path)
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob') {
+            throw "v0.9.2 migration path '$($definition.Path)' is absent or is not one regular tracked file."
+        }
+        $fullPath = Assert-ContainedManagedDestination -Root $Repository `
+            -RelativePath ([string]$definition.Path)
+        if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+            throw "v0.9.2 migration path '$($definition.Path)' is not one regular working-tree file."
+        }
+        $originalBytes = [IO.File]::ReadAllBytes($fullPath)
+        $decoded = ConvertFrom-V092MigrationUtf8Bytes `
+            -Path ([string]$definition.Path) -Bytes $originalBytes
+        $legacyCount = Get-OrdinalOccurrenceCount `
+            -Text $decoded.NormalizedText -Value ([string]$definition.Legacy)
+        $neutralCount = Get-OrdinalOccurrenceCount `
+            -Text $decoded.NormalizedText -Value ([string]$definition.Neutral)
+        $state = if ($legacyCount -eq 1 -and $neutralCount -eq 0) {
+            'Legacy'
+        }
+        elseif ($legacyCount -eq 0 -and $neutralCount -eq 1) {
+            'Neutral'
+        }
+        else {
+            throw "v0.9.2 migration path '$($definition.Path)' is unsupported: expected exactly one legacy or one neutral fragment, found legacy=$legacyCount neutral=$neutralCount. No file was changed."
+        }
+        $normalizedTarget = if ($state -ceq 'Legacy') {
+            $decoded.NormalizedText.Replace(
+                [string]$definition.Legacy,
+                [string]$definition.Neutral
+            )
+        }
+        else { $decoded.NormalizedText }
+        $targetBytes = ConvertTo-V092MigrationUtf8Bytes `
+            -NormalizedText $normalizedTarget -NewLine $decoded.NewLine `
+            -HasBom ([bool]$decoded.HasBom)
+        $plans.Add([pscustomobject]@{
+            Path = [string]$definition.Path
+            FullPath = $fullPath
+            State = $state
+            OriginalBytes = $originalBytes
+            TargetBytes = $targetBytes
+        })
+    }
+
+    $legacyPlans = @($plans | Where-Object State -ceq 'Legacy')
+    $neutralPlans = @($plans | Where-Object State -ceq 'Neutral')
+    if ($legacyPlans.Count -eq 0 -and $neutralPlans.Count -eq $plans.Count) {
+        Write-Host 'The recognized v0.9.2 consumer live-pin migration is already complete; no file changed.'
+        return [pscustomobject]@{ Changed = $false; Paths = @() }
+    }
+    if ($legacyPlans.Count -ne $plans.Count -or $neutralPlans.Count -ne 0) {
+        throw 'The v0.9.2 live-pin migration is partial. No file was changed; review the mixed legacy/neutral state explicitly.'
+    }
+    if ($preexistingStatus.Count -ne 0) {
+        throw 'The v0.9.2 legacy migration requires a clean working tree. No file was changed.'
+    }
+
+    $written = [System.Collections.Generic.List[object]]::new()
+    try {
+        foreach ($plan in $plans) {
+            $written.Add($plan)
+            [IO.File]::WriteAllBytes([string]$plan.FullPath, [byte[]]$plan.TargetBytes)
+            $observed = [IO.File]::ReadAllBytes([string]$plan.FullPath)
+            if (-not (Test-ByteArrayEqual -Left $observed -Right ([byte[]]$plan.TargetBytes))) {
+                throw "v0.9.2 migration write verification failed for '$($plan.Path)'."
+            }
+        }
+
+        $changedPaths = @((Invoke-Git -Repository $Repository -Arguments @(
+            'diff', '--name-only', '--diff-filter=M', '--'
+        )).Output | ForEach-Object { [string]$_ })
+        $expectedPaths = @($plans | ForEach-Object { [string]$_.Path })
+        if (-not (Test-ExactOrdinalPathSet -Actual $changedPaths -Expected $expectedPaths)) {
+            throw 'v0.9.2 migration produced an unexpected working-tree path set.'
+        }
+    }
+    catch {
+        $writeError = $_.Exception.Message
+        $rollbackErrors = [System.Collections.Generic.List[string]]::new()
+        for ($rollbackIndex = $written.Count - 1; $rollbackIndex -ge 0; $rollbackIndex--) {
+            $plan = $written[$rollbackIndex]
+            try {
+                $currentBytes = [IO.File]::ReadAllBytes([string]$plan.FullPath)
+                if (-not (Test-ByteArrayEqual `
+                    -Left $currentBytes -Right ([byte[]]$plan.OriginalBytes))) {
+                    [IO.File]::WriteAllBytes(
+                        [string]$plan.FullPath,
+                        [byte[]]$plan.OriginalBytes
+                    )
+                }
+            }
+            catch {
+                $rollbackErrors.Add("$($plan.Path): $($_.Exception.Message)")
+            }
+        }
+        if ($rollbackErrors.Count -gt 0) {
+            throw "v0.9.2 migration failed and rollback was incomplete. Original error: $writeError. Rollback errors: $($rollbackErrors -join '; ')"
+        }
+        throw "v0.9.2 migration failed; all written files were restored. $writeError"
+    }
+
+    return [pscustomobject]@{ Changed = $true; Paths = $expectedPaths }
 }
 
 function Get-AdoptionTreeEntry {
@@ -1250,7 +1635,8 @@ function Get-ExistingAdoptionRoute {
     param(
         [Parameter(Mandatory)][string]$Repository,
         [string]$HeadSha = '',
-        [string]$ProtocolToken = ''
+        [string]$ProtocolToken = '',
+        [switch]$AllowV092MigrationWorkingTree
     )
 
     if (-not $HeadSha) {
@@ -1293,7 +1679,10 @@ function Get-ExistingAdoptionRoute {
     $workingChanges = @((Invoke-Git -Repository $Repository -Arguments @(
         'status', '--porcelain=v1', '--untracked-files=all'
     )).Output | Where-Object { $_ })
-    if ($workingChanges.Count -ne 0) {
+    if ($workingChanges.Count -ne 0 -and -not (
+        $AllowV092MigrationWorkingTree -and
+        (Test-V092MigrationWorkingTreeStatus -StatusLines $workingChanges)
+    )) {
         throw 'A completed adoption must be clean before current/update routing.'
     }
     $gitmodulesEntry = Get-AdoptionTreeEntry -Repository $Repository `
@@ -3384,6 +3773,8 @@ Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($P
 
 Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($Manifest.protocolSha); never substitute a moving ref.
 
+Treat the .ai/protocol gitlink and the VERSION inside that exact checkout as the sole live protocol identity. Consumer-owned instructions, memory, decisions, features, indexes, and tests must resolve the current identity from those sources and must not embed a literal current tag or commit. Exact values may appear only as dated historical event evidence.
+
 Secret provisioning is already complete: FG_PAT.txt maps to MEANDAI_UPDATER_TOKEN and MEANDAI_RO_FG_PAT.txt maps to MEANDAI_PROTOCOL_TOKEN. Those source files are intentionally absent. Do not search for, request, print, recreate, or modify credential values or repository secrets.
 
 Work only in this clone. Spawned-command network access is disabled: do not invoke gh, GitHub APIs, remote Git operations, or any other external service. Preserve any existing pinned protocol gitlink and do not change the lifecycle workflow. Do not commit, push, approve, mark the pull request ready, merge, close, delete, or alter branches. The launcher owns GitHub records and Git publication; the maintainer owns merge.
@@ -3687,6 +4078,33 @@ if (-not (Test-Path -LiteralPath $target -PathType Container)) {
     throw "TargetPath must identify an existing directory: $target"
 }
 
+if ($MigrateV092LivePins) {
+    $migrationInside = Invoke-Git -Repository $target `
+        -Arguments @('rev-parse', '--is-inside-work-tree') -AllowFailure
+    if ($migrationInside.ExitCode -ne 0 -or
+        ((@($migrationInside.Output) -join '').Trim()) -cne 'true') {
+        throw '-MigrateV092LivePins requires an existing connected Git repository; no repository was initialized.'
+    }
+    $migrationRoot = Get-NormalizedPath -Path ((@(Invoke-Git `
+        -Repository $target -Arguments @('rev-parse', '--show-toplevel')).Output -join '').Trim())
+    if (-not $migrationRoot.Equals($target, [StringComparison]::OrdinalIgnoreCase)) {
+        throw '-MigrateV092LivePins requires TargetPath to be the exact repository root.'
+    }
+    $migrationHead = Invoke-Git -Repository $target `
+        -Arguments @('rev-parse', '--verify', 'HEAD') -AllowFailure
+    if ($migrationHead.ExitCode -ne 0 -or
+        ((@($migrationHead.Output) -join '').Trim()) -cnotmatch '^[0-9a-f]{40}$') {
+        throw '-MigrateV092LivePins requires an existing committed consumer baseline.'
+    }
+    $migrationRemote = Invoke-Git -Repository $target -Arguments @(
+        'config', '--get', "remote.$RemoteName.url"
+    ) -AllowFailure
+    if ($migrationRemote.ExitCode -ne 0 -or
+        -not ((@($migrationRemote.Output) -join '').Trim())) {
+        throw "-MigrateV092LivePins requires an existing '$RemoteName' connection; no remote was created."
+    }
+}
+
 Invoke-External -Command 'gh' -Arguments @('auth', 'status') | Out-Null
 
 Set-QuickAdoptionProgress -Status 'Inspecting repository state' -PercentComplete 15
@@ -3703,7 +4121,9 @@ else {
     Invoke-External -Command 'git' -Arguments @('init', '-b', 'main', $target) | Out-Null
 }
 
-Add-LocalTokenExcludes -Repository $target
+if (-not $MigrateV092LivePins) {
+    Add-LocalTokenExcludes -Repository $target
+}
 
 $headResult = Invoke-Git -Repository $target -Arguments @('rev-parse', '--verify', 'HEAD') -AllowFailure
 $hasHead = $headResult.ExitCode -eq 0
@@ -3728,6 +4148,9 @@ if ($hasRemote) {
         'ls-remote', '--heads', $RemoteName
     )
     $remoteIsEmpty = -not ((@($remoteHeads.Output) -join '').Trim())
+    if ($MigrateV092LivePins -and $remoteIsEmpty) {
+        throw '-MigrateV092LivePins requires a non-empty connected consumer remote.'
+    }
 }
 
 # Credential exposure checks are unconditional and precede repository-state
@@ -3861,12 +4284,17 @@ else {
     $status = Invoke-Git -Repository $target -Arguments @(
         'status', '--porcelain=v1', '--untracked-files=all'
     )
-    foreach ($line in @($status.Output)) {
-        if (-not $line) {
-            continue
-        }
-        if ($line.Length -lt 4 -or $line.Substring(3) -cne $workflowTargetPath) {
-            throw 'The connected repository must be clean apart from the exact seed workflow candidate.'
+    $statusLines = @($status.Output | Where-Object { $_ } | ForEach-Object {
+        [string]$_
+    })
+    if (-not (
+        $MigrateV092LivePins -and
+        (Test-V092MigrationWorkingTreeStatus -StatusLines $statusLines)
+    )) {
+        foreach ($line in $statusLines) {
+            if ($line.Length -lt 4 -or $line.Substring(3) -cne $workflowTargetPath) {
+                throw 'The connected repository must be clean apart from the exact seed workflow candidate.'
+            }
         }
     }
 }
@@ -3972,7 +4400,21 @@ $routingHead = if ($routingHeadResult.ExitCode -eq 0) {
 }
 else { '' }
 $existingAdoptionRoute = Get-ExistingAdoptionRoute -Repository $target `
-    -HeadSha $routingHead -ProtocolToken $protocolToken
+    -HeadSha $routingHead -ProtocolToken $protocolToken `
+    -AllowV092MigrationWorkingTree:$MigrateV092LivePins
+
+if ($MigrateV092LivePins) {
+    Set-QuickAdoptionProgress -Status 'Migrating recognized v0.9.2 live pins' `
+        -PercentComplete 45
+    $migration = Invoke-V092LivePinMigration -Repository $target `
+        -HeadSha $routingHead -ExistingRoute $existingAdoptionRoute
+    if ($migration.Changed) {
+        Write-Host "Migrated exactly $(@($migration.Paths).Count) recognized consumer live-pin paths."
+        Write-Host 'Review the local diff and deliver it through the consumer repository protocol. After that change merges, rerun this launcher without -MigrateV092LivePins to dispatch the ordinary managed update.'
+    }
+    Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+    return
+}
 
 if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
     $repositoryOwner = $repository.Split('/')[0]

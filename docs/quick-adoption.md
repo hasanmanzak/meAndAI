@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.2/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.10.2` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.3/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.10.3` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.10.2` is an exact published immutable release
+launcher itself verifies that `v0.10.3` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -221,6 +221,33 @@ adapter blobs identical to that installed release.
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
 
+### One-time v0.9.2 live-pin migration
+
+An adoption completed from v0.9.2 may contain consumer-owned instructions,
+memory, indexes, a live decision, and a verifier that repeat the adoption tag
+or commit as the current protocol identity. A later release cannot add those
+paths to the first v0.9.2 updater proposal: that proposal is created by the
+immutable installed v0.9.2 code, before the target updater code can execute.
+
+Download the v0.10.3 launcher and run its explicit compatibility mode against
+the still-installed v0.9.2 identity:
+
+```powershell
+gh release download v0.10.3 --repo hasanmanzak/meAndAI --pattern Invoke-MeAndAIQuickAdoption.ps1 --dir . --clobber
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Invoke-MeAndAIQuickAdoption.ps1 -TargetPath . -ProtocolTag v0.9.2 -MigrateV092LivePins
+```
+
+The mode requires the exact immutable v0.9.2 gitlink and updater assets. It
+accepts only the recognized all-legacy or all-neutral eight-file state, changes
+only the known current-authority fragments, preserves unrelated content and
+historical evidence, and stops before secret reconciliation, workflow dispatch,
+commit, push, issue, pull request, or merge. Review and merge that local diff
+through the consumer repository's normal protocol. Then return to the default
+branch and rerun the launcher without `-MigrateV092LivePins`, targeting the
+latest compatible release. The installed updater resumes the ordinary managed
+issue/PR/update lifecycle; later compatible updates need no consumer-owned
+version reconciliation.
+
 An in-flight seed-only adoption is still initial adoption and can resume only
 with its original protocol tag; a different requested seed remains a collision.
 
@@ -241,7 +268,7 @@ meAndAI status labels, and closes the issue as completed.
 
 GitHub does not replay an event that occurred while a route was absent, and a
 merge performed with `GITHUB_TOKEN` may not create another workflow event. The
-`v0.10.2` workflow therefore also runs bounded recovery on the installing
+`v0.10.3` workflow therefore also runs bounded recovery on the installing
 default-branch push, the schedule, and ordinary manual dispatch. It repairs only
 an exact legacy installing update, then uses the normal finalizer. For a missed
 or failed recovery, run the same route explicitly after confirming the PR is
@@ -257,7 +284,7 @@ for a moved/reused branch, a merge no longer on the default branch, a malformed
 ambiguous tracking line, or an issue closed without that evidence. Do not use
 `Closes`, `Fixes`, or `Resolves` in a managed adoption/update PR; those keywords
 would close the issue before branch convergence. Older consumer pins gain the
-behavior when their reviewed update installs the `v0.10.2` workflow and adapter;
+behavior when their reviewed update installs the `v0.10.3` workflow and adapter;
 the installing update itself is covered only by the bounded legacy bridge.
 
 ## Stopping and resuming safely
