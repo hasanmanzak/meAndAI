@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.10.1 |
 | Issue | [#65](https://github.com/hasanmanzak/meAndAI/issues/65) |
-| Pull request | Pending |
+| Pull request | [#66](https://github.com/hasanmanzak/meAndAI/pull/66) |
 | Related decisions | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md), [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
 | Tests | [TEST-0115 and TEST-0116](test-cases.md) |
 
@@ -116,6 +116,7 @@ Compare hosted durations with run 29568159757 without making duration a gate.
 - Launcher capability: [FEAT-0006](../FEAT-0006-quick-adoption-launcher/README.md)
 - Single-file distribution: [FEAT-0017](../FEAT-0017-v092-single-file-quick-adoption/README.md)
 - Tracking and post-publication authority: [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65)
+- Delivery: [pull request #66](https://github.com/hasanmanzak/meAndAI/pull/66)
 
 ## Self-review
 
@@ -142,7 +143,7 @@ evidence before final validation.
 - [x] Both subfeature reviews and the bounded completion scan have no unresolved
       `Blocking` finding.
 - [x] Documentation, links, changelog, version, and project memory agree.
-- [ ] Issue and pull request link the canonical records and evidence.
+- [x] Issue and pull request link the canonical records and evidence.
 
 ## Post-merge publication gate
 
