@@ -12,7 +12,7 @@
                 'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076',
                 'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092',
                 'TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099',
-                'TEST-0101', 'TEST-0114'
+                'TEST-0101', 'TEST-0114', 'TEST-0115'
             )
         }
         @{
@@ -50,7 +50,7 @@
                 'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
-                'TEST-0113'
+                'TEST-0113', 'TEST-0116'
             )
         }
         @{

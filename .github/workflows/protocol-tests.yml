@@ -37,15 +37,9 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate on ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-          - os: windows-latest
-    runs-on: ${{ matrix.os }}
+  linux-validation:
+    name: Validate on ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Check out repository
@@ -53,7 +47,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Install checksummed actionlint v1.7.12
-        if: runner.os == 'Linux'
         shell: bash
         env:
           ACTIONLINT_VERSION: 1.7.12
@@ -71,24 +64,69 @@ jobs:
           "$binary" -version
           printf 'ACTIONLINT=%s\n' "$binary" >> "$GITHUB_ENV"
       - name: Run actionlint semantic workflow validation
-        if: runner.os == 'Linux'
         shell: bash
         run: >-
           "$ACTIONLINT" -shellcheck= -pyflakes=
           .github/workflows/protocol-tests.yml
           templates/project/.github/workflows/meandai-protocol-update.yml
       - name: Parse consumer workflow YAML
-        if: runner.os == 'Linux'
         shell: bash
         run: ruby -e "require 'yaml'; YAML.load_file('templates/project/.github/workflows/meandai-protocol-update.yml')"
       - name: Run protocol validation on PowerShell 7
-        if: runner.os == 'Linux'
         shell: pwsh
         run: ./tests/protocol.tests.ps1
+
+  windows-base:
+    name: Windows base validation
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
       - name: Run protocol validation on Windows PowerShell 5.1
-        if: runner.os == 'Windows'
         shell: powershell
-        run: ./tests/protocol.tests.ps1
+        run: ./tests/protocol.tests.ps1 -ExecutionProfile WindowsBase
+
+  windows-quick-adoption:
+    name: Windows quick adoption (${{ matrix.shard }})
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - ContractsPreflight
+          - AdoptionLifecycle
+          - IntegrityFailures
+          - RepositoryRoutes
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Run quick-adoption compatibility shard on Windows PowerShell 5.1
+        shell: powershell
+        run: ./tests/quick-adoption.tests.ps1 -Shard '${{ matrix.shard }}'
+
+  windows-validation:
+    name: Validate on windows-latest
+    if: always()
+    needs:
+      - windows-base
+      - windows-quick-adoption
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every Windows compatibility shard
+        shell: bash
+        env:
+          WINDOWS_BASE_RESULT: ${{ needs.windows-base.result }}
+          WINDOWS_QUICK_RESULT: ${{ needs.windows-quick-adoption.result }}
+        run: |
+          test "$WINDOWS_BASE_RESULT" = success
+          test "$WINDOWS_QUICK_RESULT" = success
 
   post-publication:
     name: Verify published release evidence

@@ -25,6 +25,7 @@
 | [FEAT-0021](FEAT-0021-v096-github-cli-prerequisite/README.md) | v0.9.6 GitHub CLI prerequisite gate | Complete | 0.9.6 |
 | [FEAT-0022](FEAT-0022-v097-managed-merge-finalization/README.md) | v0.9.7 managed consumer merge finalization | Complete | 0.9.7 |
 | [FEAT-0023](FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) | v0.10.0 idempotent consumer lifecycle reconciliation | Complete | 0.10.0 |
+| [FEAT-0024](FEAT-0024-v0101-parallel-windows-validation/README.md) | v0.10.1 parallel Windows validation and immutable test fixtures | Complete | 0.10.1 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

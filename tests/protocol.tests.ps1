@@ -1,7 +1,14 @@
 [CmdletBinding()]
-param([switch]$StructureOnly)
+param(
+    [switch]$StructureOnly,
+    [ValidateSet('Full', 'WindowsBase')]
+    [string]$ExecutionProfile = 'Full'
+)
 
 $ErrorActionPreference = 'Stop'
+if ($StructureOnly -and $ExecutionProfile -cne 'Full') {
+    throw 'StructureOnly cannot be combined with a partial execution profile.'
+}
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
@@ -748,9 +755,9 @@ if (-not $ciWorkflow.Contains('timeout-minutes:')) {
     Add-Failure 'TEST-0059 repository CI has no explicit job timeout.'
 }
 foreach ($requiredText in @(
-    'persist-credentials: false', 'os: ubuntu-latest', 'shell: pwsh',
-    'os: windows-latest', 'shell: powershell', 'Parse consumer workflow YAML',
-    "require 'yaml'", "if: runner.os == 'Linux'", "if: runner.os == 'Windows'"
+    'persist-credentials: false', 'runs-on: ubuntu-latest', 'shell: pwsh',
+    'runs-on: windows-latest', 'shell: powershell',
+    'Parse consumer workflow YAML', "require 'yaml'"
 )) {
     if (-not $ciWorkflow.Contains($requiredText)) {
         Add-Failure "TEST-0067 repository CI compatibility contract is missing '$requiredText'"
@@ -758,6 +765,81 @@ foreach ($requiredText in @(
 }
 if ($ciWorkflow.Contains('shell: ${{ matrix.shell }}')) {
     Add-Failure 'TEST-0067 repository CI uses matrix context where the shell field does not permit it.'
+}
+
+$quickAdoptionSuitePath = Join-Path $root 'tests/quick-adoption.tests.ps1'
+$quickAdoptionSuiteSource = Get-Content -LiteralPath $quickAdoptionSuitePath -Raw
+$validatorTokens = $null
+$validatorParseErrors = $null
+$validatorAst = [Management.Automation.Language.Parser]::ParseFile(
+    $PSCommandPath,
+    [ref]$validatorTokens,
+    [ref]$validatorParseErrors
+)
+$quickTokens = $null
+$quickParseErrors = $null
+$quickAst = [Management.Automation.Language.Parser]::ParseFile(
+    $quickAdoptionSuitePath,
+    [ref]$quickTokens,
+    [ref]$quickParseErrors
+)
+$validatorParameterNames = @($validatorAst.ParamBlock.Parameters | ForEach-Object {
+    $_.Name.VariablePath.UserPath
+})
+$quickParameterNames = @($quickAst.ParamBlock.Parameters | ForEach-Object {
+    $_.Name.VariablePath.UserPath
+})
+if ($validatorParseErrors.Count -ne 0 -or
+    $validatorParameterNames -cnotcontains 'ExecutionProfile') {
+    Add-Failure 'TEST-0115 root validation lacks its constrained execution-profile contract.'
+}
+if ($quickParseErrors.Count -ne 0 -or $quickParameterNames -cnotcontains 'Shard') {
+    Add-Failure 'TEST-0115 quick-adoption validation lacks its explicit shard contract.'
+}
+foreach ($shardName in @(
+    'ContractsPreflight', 'AdoptionLifecycle',
+    'IntegrityFailures', 'RepositoryRoutes'
+)) {
+    if (-not $ciWorkflow.Contains("- $shardName") -or
+        -not $quickAdoptionSuiteSource.Contains("'$shardName'")) {
+        Add-Failure "TEST-0115 Windows compatibility shard '$shardName' is not defined end to end."
+    }
+}
+foreach ($requiredWorkflowText in @(
+    'linux-validation:',
+    'windows-base:',
+    'windows-quick-adoption:',
+    'windows-validation:',
+    'name: Validate on windows-latest',
+    'ExecutionProfile WindowsBase',
+    'needs:',
+    '- windows-base',
+    '- windows-quick-adoption'
+)) {
+    if (-not $ciWorkflow.Contains($requiredWorkflowText)) {
+        Add-Failure "TEST-0115 sharded workflow is missing '$requiredWorkflowText'."
+    }
+}
+foreach ($requiredSuiteText in @(
+    'MEANDAI_COMPATIBILITY_SHARD_RESULT=',
+    "if (`$Shard -ceq 'All')"
+)) {
+    if (-not $quickAdoptionSuiteSource.Contains($requiredSuiteText)) {
+        Add-Failure "TEST-0115 quick-adoption suite is missing '$requiredSuiteText'."
+    }
+}
+$quickFunctionNames = @($quickAst.FindAll({
+    param($node)
+    $node -is [Management.Automation.Language.FunctionDefinitionAst]
+}, $true) | ForEach-Object { $_.Name })
+foreach ($fixtureFunction in @(
+    'Initialize-QuickAdoptionImmutableFixture',
+    'Assert-QuickAdoptionImmutableFixture',
+    'Copy-QuickAdoptionReleaseArchive'
+)) {
+    if ($quickFunctionNames -cnotcontains $fixtureFunction) {
+        Add-Failure "TEST-0116 quick-adoption suite is missing fixture function '$fixtureFunction'."
+    }
 }
 foreach ($requiredText in @(
     'Install checksummed actionlint v1.7.12',
@@ -1451,7 +1533,15 @@ if (-not $StructureOnly) {
         [System.StringComparer]::Ordinal
     )
     $engine = (Get-Process -Id $PID).Path
-    foreach ($suite in $testSuites) {
+    $executionSuites = if ($ExecutionProfile -ceq 'WindowsBase') {
+        @($testSuites | Where-Object {
+            $_.Name -cne 'quick-adoption.tests.ps1'
+        })
+    }
+    else {
+        @($testSuites)
+    }
+    foreach ($suite in $executionSuites) {
         $suiteOutput = @(& $engine -NoProfile -ExecutionPolicy Bypass `
             -File $suite.FullName 2>&1)
         $suiteExitCode = $LASTEXITCODE
@@ -1488,7 +1578,9 @@ if (-not $StructureOnly) {
         Add-Failure "TEST-0091 root suite has invalid source-bound scenario evidence: $($_.Exception.Message)"
     }
     $requiredSuiteOwners = @($authorityByTestId.Values | Where-Object {
-        $_.Evidence -ceq 'ExecutableSuite'
+        $_.Evidence -ceq 'ExecutableSuite' -and
+        ($ExecutionProfile -cne 'WindowsBase' -or
+            $_.Owner -cne 'tests/quick-adoption.tests.ps1')
     } | ForEach-Object { $_.Owner } | Sort-Object -Unique)
     foreach ($owner in $requiredSuiteOwners) {
         if (-not $completedSuiteOwners.Contains($owner)) {
@@ -1507,6 +1599,19 @@ if ($StructureOnly) {
     Write-Host 'Protocol structure validation passed for all discovered contracts.' -ForegroundColor Green
 }
 else {
-    Write-Host 'All discovered protocol test suites passed.' -ForegroundColor Green
-    Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($protocolScenarioResult | ConvertTo-Json -Compress))
+    if ($ExecutionProfile -ceq 'Full') {
+        Write-Host 'All discovered protocol test suites passed.' -ForegroundColor Green
+        Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($protocolScenarioResult | ConvertTo-Json -Compress))
+    }
+    else {
+        Write-Host 'Windows base compatibility profile passed.' -ForegroundColor Green
+        $compatibilityResult = [ordered]@{
+            schema = 1
+            suite = 'tests/protocol.tests.ps1'
+            shard = 'WindowsBase'
+            passed = $true
+        }
+        Write-Host ('MEANDAI_COMPATIBILITY_SHARD_RESULT=' +
+            ($compatibilityResult | ConvertTo-Json -Compress))
+    }
 }

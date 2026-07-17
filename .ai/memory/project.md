@@ -7,24 +7,23 @@ Last verified: **2026-07-17**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.10.0`. Exact publication state is authoritative
+- Current protocol version: `0.10.1`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) after
+  [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0023](../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)
-  makes issue/label/backlink creation part of scheduled update discovery,
-  routes repeated adoption from repository-owned evidence, and removes a second
-  live consumer pin; [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63)
+- Current scope: [FEAT-0024](../../docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md)
+  keeps canonical full-suite evidence on Linux, splits Windows PowerShell 5.1
+  compatibility into bounded parallel shards, and reuses one fingerprinted
+  immutable protocol fixture per process; [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the consumer updater creates/reuses its target-owned
-  issue and Agile labels, writes exact issue/PR links, and converges the issue
-  only after its exact branch. The launcher treats current adoption as a no-op,
-  routes a complete older same-major installation through its installed
-  updater, and rejects unsafe states before mutation. `TEST-0111` through
-  `TEST-0114` own the regression.
+- Latest tracked work: Windows validation retains the existing aggregate check
+  while a base job and four quick-adoption compatibility shards run in
+  parallel. Partial shards cannot claim canonical scenario completion; one
+  immutable protocol repository/archive is reused only inside its process.
+  `TEST-0115` and `TEST-0116` own the regression.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -139,6 +138,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   installed-updater dispatch, establishes one live gitlink/`VERSION` pin, and
   supplies a bounded verified bridge for the update that installs this
   lifecycle over a legacy workflow.
+- `v0.10.1` reduces Windows validation critical-path time without narrowing
+  PowerShell 5.1 coverage: Linux retains canonical full-suite evidence, Windows
+  uses four compatibility shards, and repeated mock resets reuse only one
+  fingerprinted immutable protocol fixture and archive per process.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,
