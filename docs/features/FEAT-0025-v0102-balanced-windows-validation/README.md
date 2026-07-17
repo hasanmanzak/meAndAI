@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.10.2 |
 | Issue | [#67](https://github.com/hasanmanzak/meAndAI/issues/67) |
-| Pull request | Pending |
+| Pull request | [#68](https://github.com/hasanmanzak/meAndAI/pull/68) |
 | Related decisions | [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
 | Tests | [TEST-0117 and TEST-0118](test-cases.md) |
 
@@ -110,6 +110,7 @@ Durations are observations, never pass/fail gates.
 - Launcher capability: [FEAT-0006](../FEAT-0006-quick-adoption-launcher/README.md)
 - Stable automation invariants: [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md)
 - Tracking and post-publication authority: [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67)
+- Delivery: [pull request #68](https://github.com/hasanmanzak/meAndAI/pull/68)
 
 ## Self-review
 
