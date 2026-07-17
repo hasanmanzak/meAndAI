@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.10.0 |
 | Issue | [#63](https://github.com/hasanmanzak/meAndAI/issues/63) |
-| Pull request | Pending publication |
+| Pull request | [#64](https://github.com/hasanmanzak/meAndAI/pull/64) |
 | Decision | [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
