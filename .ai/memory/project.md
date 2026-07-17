@@ -7,24 +7,24 @@ Last verified: **2026-07-17**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.9.7`. Exact publication state is authoritative
+- Current protocol version: `0.10.0`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) after
+  [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0022](../../docs/features/FEAT-0022-v097-managed-merge-finalization/README.md)
-  finalizes an exact managed consumer merge through the installed workflow only
-  after branch identity, default-branch containment, changed paths, and one
-  canonical tracking issue are proven; [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61)
+- Current scope: [FEAT-0023](../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)
+  makes issue/label/backlink creation part of scheduled update discovery,
+  routes repeated adoption from repository-owned evidence, and removes a second
+  live consumer pin; [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the consumer workflow has an event/recovery finalizer;
-  the existing updater adapter owns exact merged-PR validation, branch lease
-  deletion, evidence, label cleanup, and issue closure. The launcher adds one
-  non-closing canonical tracking line before adoption readiness. `TEST-0108`
-  through `TEST-0110` own the regression; Derdini cleanup is explicitly outside
-  this feature and another empty consumer will provide later adoption evidence.
+- Latest tracked work: the consumer updater creates/reuses its target-owned
+  issue and Agile labels, writes exact issue/PR links, and converges the issue
+  only after its exact branch. The launcher treats current adoption as a no-op,
+  routes a complete older same-major installation through its installed
+  updater, and rejects unsafe states before mutation. `TEST-0111` through
+  `TEST-0114` own the regression.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -134,6 +134,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   merge. It uses one non-closing tracking line, current-default containment,
   open-branch-reuse and exact-head checks, a leased branch deletion, and an
   idempotent manual recovery route before issue completion.
+- `v0.10.0` completes the managed proposal lifecycle by creating/reusing its
+  exact issue and labels, makes repeat adoption current/no-op or compatible
+  installed-updater dispatch, establishes one live gitlink/`VERSION` pin, and
+  supplies a bounded verified bridge for the update that installs this
+  lifecycle over a legacy workflow.
 - `v0.9.2` distributes that same reviewed launcher as one immutable-release
   asset and reduces normal user execution to one local script command. The
   launcher stays outside consumer repositories and retains its release,

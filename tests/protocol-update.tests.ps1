@@ -276,7 +276,7 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 workflow is missing '$required'"
         }
     }
-    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'pull-requests: write', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
+    foreach ($forbidden in @('pull_request_target:', 'gh pr merge', 'MEANDAI_PROTOCOL_TOKEN: gh', 'actions/checkout@v')) {
         if ($workflow.Contains($forbidden)) {
             Add-Failure "TEST-0017 workflow contains forbidden behavior '$forbidden'"
         }
@@ -287,11 +287,14 @@ if ($failures.Count -eq 0) {
         $workflow.Substring($proposalJobStart, $finalizerJobStart - $proposalJobStart)
     }
     else { '' }
-    foreach ($forbidden in @(
-        'issues: write', 'contents: write', 'GH_TOKEN: ${{ github.token }}'
-    )) {
+    foreach ($forbidden in @('contents: write', 'GH_TOKEN: ${{ github.token }}')) {
         if (-not $proposalJob -or $proposalJob.Contains($forbidden)) {
             Add-Failure "TEST-0017 proposal job contains finalizer-only authority '$forbidden'"
+        }
+    }
+    foreach ($required in @('issues: write', 'ISSUE_TOKEN: ${{ github.token }}')) {
+        if (-not $proposalJob.Contains($required)) {
+            Add-Failure "TEST-0111 proposal job is missing narrow issue authority '$required'"
         }
     }
     foreach ($forbidden in @('Invoke-Native', 'Invoke-RestMethod', 'Invoke-WebRequest')) {
@@ -314,7 +317,7 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 adapter is missing '$required'"
         }
     }
-    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_UPDATER_TOKEN', 'meAndAI Updater - <repo>', 'MEANDAI_PROTOCOL_TOKEN', 'v0.4.0', 'one-time', 'collision', 'submodule-only', '$defaultBranch', '$targetTag', 'git ls-tree', '160000 -> 160000')) {
+    foreach ($required in @('templates/project/.github/workflows/meandai-protocol-update.yml', '.github/workflows/meandai-protocol-update.yml', 'MEANDAI_UPDATER_TOKEN', 'meAndAI Protocol Update Token', 'MEANDAI_PROTOCOL_TOKEN', 'v0.4.0', 'one-time', 'collision', 'submodule-only', '$defaultBranch', '$targetTag', 'git ls-tree', '160000 -> 160000')) {
         if (-not $adoption.Contains($required)) {
             Add-Failure "TEST-0017 adoption guidance is missing '$required'"
         }

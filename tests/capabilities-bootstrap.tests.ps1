@@ -211,7 +211,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.9.7',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.10.0',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'Verify immutable protocol release',
@@ -239,10 +239,13 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $proposalJobStart = $workflow.IndexOf('  propose-update:', [StringComparison]::Ordinal)
     $finalizerJobStart = $workflow.IndexOf('  finalize-managed-merge:', [StringComparison]::Ordinal)
     if ($proposalJobStart -lt 0 -or $finalizerJobStart -le $proposalJobStart -or
-        $workflow.Substring(
+        -not $workflow.Substring(
             $proposalJobStart, $finalizerJobStart - $proposalJobStart
-        ).Contains('issues: write')) {
-        Add-Failure 'TEST-0032 issue write permission must remain isolated to managed merge finalization.'
+        ).Contains('issues: write') -or
+        -not $workflow.Substring(
+            $proposalJobStart, $finalizerJobStart - $proposalJobStart
+        ).Contains('ISSUE_TOKEN: ${{ github.token }}')) {
+        Add-Failure 'TEST-0111 proposal issue authority is not isolated to the job-scoped token.'
     }
     $trustedPreflightIndex = $workflow.IndexOf('-ValidateLocalUpdaterOnly', [StringComparison]::Ordinal)
     $localUpdaterInvocationIndex = $workflow.IndexOf('& "./$adapterPath"', [StringComparison]::Ordinal)

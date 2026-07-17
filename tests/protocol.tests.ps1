@@ -469,6 +469,32 @@ finally {
     Remove-Item -LiteralPath $suppressedSourcePath -Force -ErrorAction SilentlyContinue
 }
 
+$versionNeutralConsumerFiles = @(
+    'templates/project/.ai/memory/README.md',
+    'templates/project/.ai/memory/project.md',
+    'templates/project/AGENTS.submodule.md',
+    'templates/project/docs/ideas/README.md',
+    'templates/project/AGENTS.repository-reference.md'
+)
+foreach ($relativePath in $versionNeutralConsumerFiles) {
+    $fullPath = Join-Path $root $relativePath
+    if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+        Add-Failure "TEST-0114 version-neutral consumer template is missing: $relativePath."
+        continue
+    }
+    $templateContent = Get-Content -LiteralPath $fullPath -Raw
+    if ($templateContent -match '(?i)pinned common protocol\s*:' -or
+        $templateContent -match 'https://github\.com/hasanmanzak/meAndAI/(?:blob|tree)/v[0-9]+\.[0-9]+\.[0-9]+' -or
+        $templateContent -match '(?im)^\s*(?:current protocol|immutable ref)\s*:\s*`?v[0-9]+\.[0-9]+\.[0-9]+') {
+        Add-Failure "TEST-0114 consumer template retains a second live protocol pin: $relativePath."
+    }
+}
+if (-not (Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw).Contains(
+    'sole current protocol-pin authority'
+)) {
+    Add-Failure 'TEST-0114 protocol does not define one live consumer pin authority.'
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
     $failures | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
@@ -852,6 +878,20 @@ else {
 
 foreach ($file in $markdownFiles) {
     $markdown = Get-Content -LiteralPath $file.FullName -Raw
+    $display = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
+    $isConsumerTemplate = $display.StartsWith(
+        'templates/project/', [StringComparison]::Ordinal
+    )
+    $consumerTemplateDestination = ''
+    if ($isConsumerTemplate) {
+        $templateRelative = $display.Substring('templates/project/'.Length)
+        $consumerTemplateDestination = if ($templateRelative -cin @(
+            'AGENTS.submodule.md', 'AGENTS.repository-reference.md'
+        )) {
+            'AGENTS.md'
+        }
+        else { $templateRelative }
+    }
     foreach ($match in [regex]::Matches($markdown, '(?<!!)\[[^\]]+\]\((?<target>[^)]+)\)')) {
         $target = $match.Groups['target'].Value.Trim().Trim('<', '>')
         if ($target -match '^(https?://|mailto:)' -or $target.StartsWith('{{')) {
@@ -864,17 +904,34 @@ foreach ($file in $markdownFiles) {
         $targetFile = $file.FullName
 
         if ($relativeTarget) {
-            $targetFile = [System.IO.Path]::GetFullPath(
-                (Join-Path $file.DirectoryName ($relativeTarget -replace '/', [System.IO.Path]::DirectorySeparatorChar))
-            )
+            if ($isConsumerTemplate) {
+                $consumerDirectory = Split-Path -Parent (Join-Path $root `
+                    ($consumerTemplateDestination -replace '/', [IO.Path]::DirectorySeparatorChar))
+                $consumerTarget = [IO.Path]::GetFullPath((Join-Path $consumerDirectory `
+                    ($relativeTarget -replace '/', [IO.Path]::DirectorySeparatorChar)))
+                $consumerRelative = $consumerTarget.Substring($root.Length + 1).Replace('\', '/')
+                if ($consumerRelative.StartsWith(
+                    '.ai/protocol/', [StringComparison]::Ordinal
+                )) {
+                    $targetFile = Join-Path $root `
+                        $consumerRelative.Substring('.ai/protocol/'.Length)
+                }
+                else {
+                    $targetFile = Join-Path (Join-Path $root 'templates/project') `
+                        ($consumerRelative -replace '/', [IO.Path]::DirectorySeparatorChar)
+                }
+            }
+            else {
+                $targetFile = [System.IO.Path]::GetFullPath(
+                    (Join-Path $file.DirectoryName ($relativeTarget -replace '/', [System.IO.Path]::DirectorySeparatorChar))
+                )
+            }
             $rootPrefix = $root.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
             if (-not $targetFile.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-                $display = $file.FullName.Substring($root.Length + 1)
                 Add-Failure "TEST-0003 local link escapes repository in $display -> $target"
                 continue
             }
             if (-not (Test-Path -LiteralPath $targetFile)) {
-                $display = $file.FullName.Substring($root.Length + 1)
                 Add-Failure "TEST-0003 broken local link in $display -> $target"
                 continue
             }
@@ -885,7 +942,6 @@ foreach ($file in $markdownFiles) {
             $targetMarkdown = Get-Content -LiteralPath $targetFile -Raw
             $anchors = Get-MarkdownAnchors $targetMarkdown
             if (-not $anchors.Contains($fragment)) {
-                $display = $file.FullName.Substring($root.Length + 1)
                 Add-Failure "TEST-0003 missing anchor in $display -> $target"
             }
         }
@@ -1183,16 +1239,23 @@ foreach ($requiredText in @(
 }
 $currentProtocolVersion = (Get-Content -LiteralPath (Join-Path $root 'VERSION') -Raw).Trim()
 $currentProtocolTag = "v$currentProtocolVersion"
-$expectedSubmodulePin = "[meAndAI $currentProtocolTag](https://github.com/hasanmanzak/meAndAI/blob/$currentProtocolTag/PROTOCOL.md)"
-if (-not $submoduleAdapter.Contains($expectedSubmodulePin) -or
-    -not $submoduleAdapter.Contains('.ai/protocol/PROTOCOL.md')) {
-    Add-Failure "TEST-0099 submodule adapter does not independently resolve exact pin $currentProtocolTag."
+$submoduleLivePinSignals = @(
+    '[local common protocol](.ai/protocol/PROTOCOL.md)',
+    "[the checkout's ``VERSION``](.ai/protocol/VERSION)",
+    'do not duplicate a literal'
+)
+if (@($submoduleLivePinSignals | Where-Object {
+    -not $submoduleAdapter.Contains($_)
+}).Count -ne 0 -or $submoduleAdapter -match 'v\d+\.\d+\.\d+') {
+    Add-Failure 'TEST-0099 submodule adapter does not resolve the live pin from its gitlink and VERSION authority.'
 }
-$expectedReferencePin = "   - ref: ``$currentProtocolTag``"
-if (-not $referenceAdapter.Contains($expectedReferencePin) -or
+if (-not $referenceAdapter.Contains(
+        'immutable ref: resolve from the repository-owned provider configuration'
+    ) -or
     -not $referenceAdapter.Contains('entry point: `PROTOCOL.md`') -or
-    $referenceAdapter.Contains('.ai/protocol/PROTOCOL.md')) {
-    Add-Failure "TEST-0099 repository-reference adapter does not independently resolve exact pin $currentProtocolTag."
+    $referenceAdapter.Contains('.ai/protocol/PROTOCOL.md') -or
+    $referenceAdapter -match 'ref:\s*`?v\d+\.\d+\.\d+') {
+    Add-Failure 'TEST-0099 repository-reference adapter duplicates or bypasses its configured immutable-ref authority.'
 }
 
 $quickAdoptionGuide = Get-Content -LiteralPath (

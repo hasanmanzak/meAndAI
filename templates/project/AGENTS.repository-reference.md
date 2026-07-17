@@ -4,8 +4,10 @@ These instructions apply to the consuming repository.
 
 1. Resolve and read the common protocol through the configured repository
    reference provider before planning or editing:
-   - repository: `https://github.com/hasanmanzak/meAndAI`
-   - ref: `v0.9.7`
+   - repository: [meAndAI](https://github.com/hasanmanzak/meAndAI)
+   - immutable ref: resolve from the repository-owned provider configuration;
+     that configuration is the sole current pin authority, so do not duplicate
+     its literal tag or commit here
    - entry point: `PROTOCOL.md`
 2. Read this project's local `.ai/memory/README.md`.
 3. Read the relevant project-owned feature and decision documents before work.

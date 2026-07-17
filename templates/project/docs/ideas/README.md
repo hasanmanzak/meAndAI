@@ -9,9 +9,10 @@ They are not work items and do not satisfy Definition of Ready.
 Allowed statuses are `Exploring`, `Parked`, `Promoted`, and `Rejected`.
 Terminal records remain in this index with their rationale and links.
 
-For a submodule consumer, create records from
-`.ai/protocol/templates/idea.md`; the pinned canonical source is the
-[meAndAI v0.9.7 idea template](https://github.com/hasanmanzak/meAndAI/blob/v0.9.7/templates/idea.md).
+For a submodule consumer, create records from the
+[pinned canonical idea template](../../.ai/protocol/templates/idea.md). The
+consumer's gitlink selects its exact version; do not copy that tag or commit
+into this index as a live fact.
 A repository-reference consumer resolves the same template from its configured
 immutable protocol ref. Allocate each new record as repository-local
 `IDEA-NNNN`. Promotion creates and links an `EPIC`, `FEAT`, `TASK`, or `DEC`

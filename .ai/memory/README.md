@@ -2,11 +2,11 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-17**<br>
-Protocol version: **0.9.7**
+Protocol version: **0.10.0**
 
-Exact v0.9.7 publication state will be authoritative only in
+Exact v0.10.0 publication state will be authoritative only in
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-[issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) after
+[issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) after
 publication; it is not predicted or projected into this pre-merge memory file.
 
 This directory is the portable, curated handoff between the maintainer and AI

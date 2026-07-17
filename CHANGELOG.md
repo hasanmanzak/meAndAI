@@ -3,6 +3,34 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.10.0 - 2026-07-17
+
+### Added
+
+- Let scheduled and manual consumer update discovery create or reuse the exact
+  target-owned issue, create only missing Agile labels, link the issue and
+  draft pull request, and carry one real `Tracking issue: #N` line without
+  maintainer preparation.
+- Classify repeated quick-adoption runs before mutation: current installations
+  are no-ops after missing-secret reconciliation, and complete older same-major
+  installations dispatch their preserved installed updater.
+
+### Changed
+
+- Make the protocol gitlink and its checked-out `.ai/protocol/VERSION` the sole
+  live consumer pin authority, so a routine compatible update does not require
+  a separate consumer-owned version-copy reconciliation.
+- Close superseded or merged update work only after the exact owned branch has
+  converged, and add one bounded, immutable-release-verified bridge for a
+  qualifying update that installs the v0.10.0 finalizer over a legacy workflow.
+- Reject partial, drifted, newer, cross-major, foreign, moved, reused, or
+  ambiguous adoption/update state before the corresponding mutation boundary.
+
+Related work: [FEAT-0023 / BUG-0011](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md),
+[TEST-0111 through TEST-0114](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md),
+[DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md), and
+[issue #63](https://github.com/hasanmanzak/meAndAI/issues/63).
+
 ## 0.9.7 - 2026-07-17
 
 ### Fixed

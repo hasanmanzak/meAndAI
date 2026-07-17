@@ -8,7 +8,10 @@ Last verified: **YYYY-MM-DD**
 - Purpose:
 - Runtime and stack:
 - Default branch:
-- Pinned common protocol:
+- Common protocol integration authority: for the recommended submodule, use the
+  `.ai/protocol` gitlink for the current commit and `.ai/protocol/VERSION` for
+  the current version; for a repository reference, link the configured
+  immutable-ref authority instead. Do not copy a live tag or SHA.
 - Build command:
 - Test command:
 

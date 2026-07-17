@@ -28,12 +28,16 @@ function Add-FinalizationEvent {
 function New-FinalizationScenario {
     param(
         [ValidateSet('Adoption', 'Update', 'Normal')]
-        [string]$Kind = 'Adoption'
+        [string]$Kind = 'Adoption',
+        [ValidateSet('Canonical', 'Absent', 'Placeholder')]
+        [string]$TrackingMode = 'Canonical',
+        [bool]$InvalidLegacyRelease = $false,
+        [bool]$WrongLegacyAssetBlob = $false
     )
 
     $head = 'a' * 40
     $protocolSha = 'b' * 40
-    $target = 'v0.9.7'
+    $target = 'v0.10.0'
     $branch = switch ($Kind) {
         'Adoption' { "automation/meandai-capabilities-$target" }
         'Update' { "automation/meandai-protocol-$target" }
@@ -57,7 +61,14 @@ function New-FinalizationScenario {
     }
     $body = switch ($Kind) {
         'Adoption' { "<!-- meandai-capabilities-adoption:$marker -->`n## Adoption`n`nTracking issue: #9" }
-        'Update' { "<!-- meandai-protocol-update:$marker -->`n## Update`n`nTracking issue: #9" }
+        'Update' {
+            $tracking = switch ($TrackingMode) {
+                'Canonical' { "`n`nTracking issue: #9" }
+                'Placeholder' { "`n`nTracking issue: #REQUIRED" }
+                default { '' }
+            }
+            "<!-- meandai-protocol-update:$marker -->`n## Update$tracking"
+        }
         default { '## Ordinary pull request' }
     }
     $changedFiles = switch ($Kind) {
@@ -81,7 +92,21 @@ function New-FinalizationScenario {
     $issueBody = if ($Kind -ceq 'Adoption') {
         "<!-- meandai-local-adoption:$target`:pr-42 -->`n## AI capabilities adoption tracking"
     }
-    else { '## Project-owned protocol update tracking' }
+    else {
+        $issueMarker = [ordered]@{
+            schema = 1; target = $target; protocolSha = $protocolSha
+            repository = 'owner/consumer'
+        } | ConvertTo-Json -Compress
+        @(
+            "<!-- meandai-protocol-update-issue:$issueMarker -->",
+            '## Managed protocol update tracking', '',
+            "- Target release: ``$target``",
+            "- Protocol commit: ``$protocolSha``",
+            "- Deterministic branch: ``$branch``", '',
+            'This issue is the canonical same-repository work record for the managed protocol proposal.',
+            'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
+        ) -join [Environment]::NewLine
+    }
     [pscustomobject]@{
         Kind = $Kind
         Repository = 'owner/consumer'
@@ -106,16 +131,20 @@ function New-FinalizationScenario {
         IssueNumber = 9
         IssueTitle = if ($Kind -ceq 'Adoption') {
             "Track meAndAI AI capabilities adoption from $target"
-        } else { 'TASK-0042 - Review protocol update' }
+        } else { "Track meAndAI protocol update to $target" }
         IssueBody = $issueBody
         IssueState = 'open'
         IssueIsPullRequest = $false
         IssueLabels = [System.Collections.Generic.List[string]]::new(
-            [string[]]@('type:feature', 'priority:p1', 'status:needs-review')
+            [string[]]@($(if ($Kind -ceq 'Adoption') { 'type:feature' } else { 'type:task' }), 'priority:p1', 'status:needs-review')
         )
         AdoptionIssueCount = if ($Kind -ceq 'Adoption') { 1 } else { 0 }
+        IssueExists = $Kind -cne 'Update' -or $TrackingMode -ceq 'Canonical'
         OpenBranchReuseCount = 0
         ExistingEvidenceComments = 0
+        ProposalEvidenceComments = if ($Kind -ceq 'Update' -and $TrackingMode -ceq 'Canonical') { 1 } else { 0 }
+        InvalidLegacyRelease = $InvalidLegacyRelease
+        WrongLegacyAssetBlob = $WrongLegacyAssetBlob
         Events = [System.Collections.Generic.List[string]]::new()
     }
 }
@@ -173,7 +202,53 @@ function global:gh {
     if ($methodIndex -ge 0) {
         $method = [string]$arguments[$methodIndex + 1]
     }
+    if ($endpoint -like 'repos/hasanmanzak/meAndAI/*') {
+        if ($env:GH_TOKEN -cne 'test-protocol-token') {
+            throw 'Legacy release evidence crossed the protocol credential boundary.'
+        }
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/releases/tags/v0.10.0') {
+            [ordered]@{
+                tag_name = 'v0.10.0'; draft = $false; prerelease = $false
+                immutable = $true; published_at = '2026-07-17T00:00:00Z'
+            } | ConvertTo-Json -Compress
+            return
+        }
+        if ($endpoint -ceq 'repos/hasanmanzak/meAndAI/git/ref/tags/v0.10.0') {
+            [ordered]@{
+                object = [ordered]@{
+                    type = 'commit'
+                    sha = if ($scenario.InvalidLegacyRelease) { 'c' * 40 } else { 'b' * 40 }
+                }
+            } | ConvertTo-Json -Depth 4 -Compress
+            return
+        }
+        if ($endpoint -ceq "repos/hasanmanzak/meAndAI/git/commits/$('b' * 40)") {
+            [ordered]@{ tree = [ordered]@{ sha = '2' * 40 } } |
+                ConvertTo-Json -Depth 4 -Compress
+            return
+        }
+        $protocolTrees = @{
+            ('2' * 40) = [ordered]@{ path = 'templates'; mode = '040000'; type = 'tree'; sha = '3' * 40 }
+            ('3' * 40) = [ordered]@{ path = 'project'; mode = '040000'; type = 'tree'; sha = '4' * 40 }
+            ('4' * 40) = [ordered]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '5' * 40 }
+            ('5' * 40) = [ordered]@{ path = 'scripts'; mode = '040000'; type = 'tree'; sha = '6' * 40 }
+            ('6' * 40) = [ordered]@{ path = 'Invoke-MeAndAIProtocolUpdate.ps1'; mode = '100644'; type = 'blob'; sha = '7' * 40 }
+        }
+        foreach ($entry in $protocolTrees.GetEnumerator()) {
+            if ($endpoint -ceq "repos/hasanmanzak/meAndAI/git/trees/$($entry.Key)") {
+                [ordered]@{ tree = @($entry.Value) } |
+                    ConvertTo-Json -Depth 5 -Compress
+                return
+            }
+        }
+        throw "Unexpected fake protocol API command: $($arguments -join ' ')"
+    }
     if ($endpoint -ceq 'repos/owner/consumer/pulls/42') {
+        if ($method -ceq 'PATCH') {
+            $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
+            $scenario.Body = $bodyArgument.Substring('body='.Length)
+            Add-FinalizationEvent 'repair-tracking-line'
+        }
         Add-FinalizationEvent 'read-pull-request'
         [ordered]@{
             number = 42
@@ -208,6 +283,49 @@ function global:gh {
         } | ConvertTo-Json -Depth 5 -Compress
         return
     }
+    if ($endpoint -ceq "repos/owner/consumer/git/commits/$($scenario.ExpectedHead)") {
+        [ordered]@{ tree = [ordered]@{ sha = '8' * 40 } } |
+            ConvertTo-Json -Depth 4 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('8' * 40)") {
+        [ordered]@{
+            tree = @([ordered]@{ path = '.github'; mode = '040000'; type = 'tree'; sha = '9' * 40 })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('9' * 40)") {
+        [ordered]@{
+            tree = @([ordered]@{ path = 'scripts'; mode = '040000'; type = 'tree'; sha = '0' * 40 })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('0' * 40)") {
+        [ordered]@{
+            tree = @([ordered]@{
+                path = 'Invoke-MeAndAIProtocolUpdate.ps1'; mode = '100644'; type = 'blob'
+                sha = if ($scenario.WrongLegacyAssetBlob) { 'c' * 40 } else { '7' * 40 }
+            })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/commits/$($scenario.DefaultHead)") {
+        [ordered]@{ tree = [ordered]@{ sha = 'f' * 40 } } |
+            ConvertTo-Json -Depth 4 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('f' * 40)") {
+        [ordered]@{
+            tree = @([ordered]@{ path = '.ai'; mode = '040000'; type = 'tree'; sha = '1' * 40 })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
+    if ($endpoint -ceq "repos/owner/consumer/git/trees/$('1' * 40)") {
+        [ordered]@{
+            tree = @([ordered]@{ path = 'protocol'; mode = '160000'; type = 'commit'; sha = 'b' * 40 })
+        } | ConvertTo-Json -Depth 5 -Compress
+        return
+    }
     if ($endpoint -ceq "repos/owner/consumer/compare/$($scenario.MergeCommitSha)...$($scenario.DefaultHead)") {
         Add-FinalizationEvent 'verify-merge-containment'
         [ordered]@{ status = $scenario.CompareStatus } |
@@ -221,9 +339,35 @@ function global:gh {
         }
         return
     }
+    if ($endpoint -ceq 'repos/owner/consumer/labels?per_page=100') {
+        foreach ($name in @(
+            'type:task', 'priority:p1', 'status:in-progress',
+            'status:needs-review', 'status:blocked'
+        )) {
+            ConvertTo-TestBase64Json ([pscustomobject]@{ name = $name })
+        }
+        return
+    }
+    if ($endpoint -ceq 'repos/owner/consumer/issues' -and $method -ceq 'POST') {
+        $titleArgument = @($arguments | Where-Object { $_ -like 'title=*' })[0]
+        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
+        $scenario.IssueTitle = $titleArgument.Substring('title='.Length)
+        $scenario.IssueBody = $bodyArgument.Substring('body='.Length)
+        $scenario.IssueState = 'open'
+        $scenario.IssueExists = $true
+        $scenario.IssueLabels = [System.Collections.Generic.List[string]]::new(
+            [string[]]@('type:task', 'priority:p1', 'status:needs-review')
+        )
+        Add-FinalizationEvent 'create-update-issue'
+        [ordered]@{ number = $scenario.IssueNumber } | ConvertTo-Json -Compress
+        return
+    }
     if ($endpoint -ceq 'repos/owner/consumer/issues?state=all&per_page=100') {
         Add-FinalizationEvent 'inventory-adoption-issues'
-        for ($index = 0; $index -lt $scenario.AdoptionIssueCount; $index++) {
+        $count = if ($scenario.Kind -ceq 'Adoption') {
+            $scenario.AdoptionIssueCount
+        } elseif ($scenario.IssueExists) { 1 } else { 0 }
+        for ($index = 0; $index -lt $count; $index++) {
             $issueRecord = [pscustomobject]@{
                 number = $scenario.IssueNumber
                 title = $scenario.IssueTitle
@@ -255,6 +399,19 @@ function global:gh {
         }
         return
     }
+    if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/labels" -and
+        $method -ceq 'POST') {
+        foreach ($argument in @($arguments | Where-Object {
+            ([string]$_).StartsWith('labels[]=', [StringComparison]::Ordinal)
+        })) {
+            $label = $argument.Substring('labels[]='.Length)
+            if ($scenario.IssueLabels -cnotcontains $label) {
+                $scenario.IssueLabels.Add($label)
+            }
+        }
+        '{}'
+        return
+    }
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)") {
         if ($method -ceq 'PATCH') {
             $scenario.IssueState = 'closed'
@@ -282,6 +439,11 @@ function global:gh {
     }
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/comments?per_page=100") {
         Add-FinalizationEvent 'read-issue-comments'
+        for ($index = 0; $index -lt $scenario.ProposalEvidenceComments; $index++) {
+            ConvertTo-TestBase64Json ([pscustomobject]@{
+                body = "<!-- meandai-protocol-update-proposal:pr-42:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: #42"
+            })
+        }
         for ($index = 0; $index -lt $scenario.ExistingEvidenceComments; $index++) {
             ConvertTo-TestBase64Json ([pscustomobject]@{
                 body = "<!-- meandai-managed-merge-finalization:pr-42:head-$($scenario.ExpectedHead) -->`nExisting evidence"
@@ -291,8 +453,18 @@ function global:gh {
     }
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/comments" -and
         $method -ceq 'POST') {
-        $scenario.ExistingEvidenceComments = 1
-        Add-FinalizationEvent 'comment-issue'
+        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
+        $body = $bodyArgument.Substring('body='.Length)
+        if ($body.StartsWith(
+            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
+        )) {
+            $scenario.ProposalEvidenceComments = 1
+            Add-FinalizationEvent 'comment-proposal-link'
+        }
+        else {
+            $scenario.ExistingEvidenceComments = 1
+            Add-FinalizationEvent 'comment-issue'
+        }
         '{}'
         return
     }
@@ -314,10 +486,14 @@ function Invoke-FinalizationScenario {
     $previousRepository = $env:GITHUB_REPOSITORY
     $previousDefaultBranch = $env:DEFAULT_BRANCH
     $previousToken = $env:GH_TOKEN
+    $previousIssueToken = $env:ISSUE_TOKEN
+    $previousProtocolToken = $env:PROTOCOL_TOKEN
     try {
         $env:GITHUB_REPOSITORY = $Scenario.Repository
         $env:DEFAULT_BRANCH = $Scenario.DefaultBranch
         $env:GH_TOKEN = 'test-finalizer-token'
+        $env:ISSUE_TOKEN = 'test-finalizer-token'
+        $env:PROTOCOL_TOKEN = 'test-protocol-token'
         & $adapterPath -FinalizeMergedPullRequest `
             -PullRequestNumber $Scenario.PullRequestNumber
         [pscustomobject]@{ Threw = $false; Error = ''; Scenario = $Scenario }
@@ -333,6 +509,8 @@ function Invoke-FinalizationScenario {
         $env:GITHUB_REPOSITORY = $previousRepository
         $env:DEFAULT_BRANCH = $previousDefaultBranch
         $env:GH_TOKEN = $previousToken
+        $env:ISSUE_TOKEN = $previousIssueToken
+        $env:PROTOCOL_TOKEN = $previousProtocolToken
     }
 }
 
@@ -384,8 +562,9 @@ try {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($requiredText in @(
         'pull_request:', 'types: [closed]', 'finalize_pull_request:',
-        'finalize-managed-merge:', 'pull-requests: read', 'issues: write',
-        'contents: write', '-FinalizeMergedPullRequest', '-PullRequestNumber'
+        'finalize-managed-merge:', 'pull-requests: write', 'issues: write',
+        'contents: write', '-FinalizeMergedPullRequest', '-PullRequestNumber',
+        '-RecoverMergedPullRequests'
     )) {
         if (-not $workflow.Contains($requiredText)) {
             Add-Failure "TEST-0109 consumer workflow is missing '$requiredText'."
@@ -393,7 +572,7 @@ try {
     }
     if (-not $workflow.Contains("github.event.pull_request.merged == true") -or
         -not $workflow.Contains("inputs.finalize_pull_request == ''") -or
-        -not $workflow.Contains("inputs.finalize_pull_request != ''")) {
+        -not $workflow.Contains('needs: finalize-managed-merge')) {
         Add-Failure 'TEST-0109 consumer workflow does not separate update discovery from event/recovery finalization.'
     }
 
@@ -402,6 +581,46 @@ try {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
     }
     Test-NoFinalizationMutation -Result $normal -Name 'ordinary pull request'
+
+    foreach ($legacyMode in @('Absent', 'Placeholder')) {
+        $legacy = Invoke-FinalizationScenario -Scenario (
+            New-FinalizationScenario -Kind Update -TrackingMode $legacyMode
+        )
+        if ($legacy.Threw -or $legacy.Scenario.BranchExists -or
+            $legacy.Scenario.IssueState -cne 'closed' -or
+            $legacy.Scenario.Body -cnotmatch '(?m)^Tracking issue: #9$' -or
+            @($legacy.Scenario.Events | Where-Object {
+                $_ -ceq 'create-update-issue'
+            }).Count -ne 1 -or
+            [array]::IndexOf(@($legacy.Scenario.Events), 'repair-tracking-line') -gt
+                [array]::IndexOf(@($legacy.Scenario.Events), 'delete-branch')) {
+            Add-Failure "TEST-0112 legacy installing-update mode '$legacyMode' did not repair and finalize exactly: $($legacy.Error)"
+        }
+    }
+    $legacyEvidenceNegatives = @(
+        [pscustomobject]@{
+            Name = 'immutable release mismatch'
+            Scenario = New-FinalizationScenario -Kind Update -TrackingMode Absent `
+                -InvalidLegacyRelease $true
+        },
+        [pscustomobject]@{
+            Name = 'target updater blob mismatch'
+            Scenario = New-FinalizationScenario -Kind Update -TrackingMode Placeholder `
+                -WrongLegacyAssetBlob $true
+        }
+    )
+    foreach ($negative in $legacyEvidenceNegatives) {
+        $result = Invoke-FinalizationScenario -Scenario $negative.Scenario
+        $mutations = @($result.Scenario.Events | Where-Object {
+            $_ -cin @(
+                'create-update-issue', 'repair-tracking-line', 'delete-branch',
+                'comment-issue', 'close-issue'
+            )
+        })
+        if (-not $result.Threw -or $mutations.Count -ne 0) {
+            Add-Failure "TEST-0112 $($negative.Name) did not fail before legacy tracking mutation."
+        }
+    }
 
     $negativeScenarios = [System.Collections.Generic.List[object]]::new()
 
@@ -484,6 +703,23 @@ finally {
     Remove-Item Function:\global:git -ErrorAction SilentlyContinue
     Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIFinalizationScenario -Scope Global -ErrorAction SilentlyContinue
+}
+
+$adapterLifecycleSource = Get-Content -LiteralPath $adapterPath -Raw
+foreach ($requiredLegacyText in @(
+    'Repair-LegacyInstallingUpdateTracking',
+    'Invoke-LegacyInstallingUpdateRecovery',
+    'Tracking issue: #REQUIRED',
+    'meandai-protocol-update-issue:'
+)) {
+    if (-not $adapterLifecycleSource.Contains($requiredLegacyText)) {
+        Add-Failure "TEST-0112 managed finalizer lacks bounded legacy transition '$requiredLegacyText'."
+    }
+}
+if (-not $workflow.Contains('push:') -or
+    -not $workflow.Contains("github.event_name == 'push'") -or
+    -not $workflow.Contains('pull-requests: write')) {
+    Add-Failure 'TEST-0112 consumer workflow cannot recover an installing legacy update on its default-branch merge.'
 }
 
 if ($failures.Count -gt 0) {

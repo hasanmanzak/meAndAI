@@ -34,6 +34,17 @@ $canonicalAdoptionAssets = @(
     [pscustomobject]@{ ConsumerPath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'; TemplatePath = 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1' },
     [pscustomobject]@{ ConsumerPath = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'; TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1' }
 )
+$canonicalManagedUpdaterAssets = @(
+    [pscustomobject]@{
+        ConsumerPath = $workflowRelativePath
+        TemplatePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
+    }
+) + @($canonicalAdoptionAssets | Where-Object {
+    [string]$_.ConsumerPath -cin @(
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+    )
+})
 $canonicalAdoptionProposedPaths = @(
     $workflowRelativePath, '.gitmodules', '.ai/protocol'
 ) + @($canonicalAdoptionAssets | ForEach-Object { [string]$_.ConsumerPath })
@@ -143,11 +154,14 @@ function Copy-CanonicalProtocolFixture {
     )
     [IO.File]::WriteAllText(
         (Join-Path $Destination 'VERSION'),
-        '0.9.7',
+        '0.10.0',
         [Text.UTF8Encoding]::new($false)
     )
     $capabilitiesModulePath = 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
-    foreach ($templatePath in @($capabilitiesModulePath) + @(
+    foreach ($templatePath in @(
+        $capabilitiesModulePath,
+        'templates/project/.github/workflows/meandai-protocol-update.yml'
+    ) + @(
         $canonicalAdoptionAssets | ForEach-Object { [string]$_.TemplatePath }
     )) {
         $sourcePath = Join-Path $root `
@@ -173,6 +187,21 @@ function Get-GitBlobSha {
     }
     finally {
         $sha.Dispose()
+    }
+}
+
+function Save-MockProtocolAssetSnapshot {
+    param([Parameter(Mandatory)][string]$Tag)
+
+    foreach ($asset in $canonicalManagedUpdaterAssets) {
+        $path = Join-Path $global:QuickAdoptionProtocolRepository `
+            (([string]$asset.TemplatePath) -replace '/', [IO.Path]::DirectorySeparatorChar)
+        $bytes = [IO.File]::ReadAllBytes($path)
+        $global:QuickAdoptionProtocolAssetBytes["$Tag`n$($asset.TemplatePath)"] = `
+            [pscustomobject]@{
+                Bytes = $bytes
+                Sha = Get-GitBlobSha -Bytes $bytes
+            }
     }
 }
 
@@ -223,6 +252,7 @@ function Reset-Mocks {
     $global:QuickAdoptionRemotePath = ''
     $global:QuickAdoptionRunListCalls = 0
     $global:QuickAdoptionWorkflowDispatched = $false
+    $global:QuickAdoptionPublishAdoptionProposal = $true
     $global:QuickAdoptionRunMode = 'Single'
     $global:QuickAdoptionCorrelationId = ''
     $global:QuickAdoptionExpectedPublishedHead = ''
@@ -246,6 +276,12 @@ function Reset-Mocks {
     $global:QuickAdoptionEvents = [System.Collections.Generic.List[string]]::new()
     $global:QuickAdoptionWorkflowBytes = [IO.File]::ReadAllBytes($workflowPath)
     $global:QuickAdoptionWorkflowSha = Get-GitBlobSha -Bytes $global:QuickAdoptionWorkflowBytes
+    $global:QuickAdoptionProtocolAssetBytes = [System.Collections.Generic.Dictionary[string, object]]::new(
+        [StringComparer]::Ordinal
+    )
+    $global:QuickAdoptionProtocolReleaseCommits = [System.Collections.Generic.Dictionary[string, string]]::new(
+        [StringComparer]::Ordinal
+    )
     $protocolFixtureRoot = New-TempRoot -Name 'protocol-repository'
     $global:QuickAdoptionProtocolRepository = Join-Path $protocolFixtureRoot 'source'
     New-Item -ItemType Directory -Path $global:QuickAdoptionProtocolRepository -Force | Out-Null
@@ -256,17 +292,182 @@ function Reset-Mocks {
     Set-TestGitIdentity -Repository $global:QuickAdoptionProtocolRepository
     Copy-CanonicalProtocolFixture `
         -Destination $global:QuickAdoptionProtocolRepository
+    $fixtureWorkflowPath = Join-Path $global:QuickAdoptionProtocolRepository `
+        'templates/project/.github/workflows/meandai-protocol-update.yml'
+    $legacyWorkflow = [IO.File]::ReadAllText($fixtureWorkflowPath).Replace(
+        'BOOTSTRAP_PROTOCOL_TAG: v0.10.0',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.9.2'
+    )
+    [IO.File]::WriteAllText(
+        $fixtureWorkflowPath, $legacyWorkflow, [Text.UTF8Encoding]::new($false)
+    )
+    [IO.File]::WriteAllText(
+        (Join-Path $global:QuickAdoptionProtocolRepository 'VERSION'),
+        '0.9.2',
+        [Text.UTF8Encoding]::new($false)
+    )
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
         'add', '--', '.'
     ) | Out-Null
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
-        'commit', '-m', 'Create mock protocol release'
+        'commit', '-m', 'Create mock legacy protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
-        'tag', 'v0.9.7'
+        'tag', 'v0.9.2'
+    ) | Out-Null
+    $global:QuickAdoptionProtocolLegacySha = (@(Invoke-TestGit `
+        -Repository $global:QuickAdoptionProtocolRepository -Arguments @('rev-parse', 'HEAD')))[0]
+    $global:QuickAdoptionProtocolReleaseCommits['v0.9.2'] = `
+        $global:QuickAdoptionProtocolLegacySha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.9.2'
+
+    Copy-CanonicalProtocolFixture `
+        -Destination $global:QuickAdoptionProtocolRepository
+    Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+        'add', '--', '.'
+    ) | Out-Null
+    Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+        'commit', '-m', 'Create mock current protocol release'
+    ) | Out-Null
+    Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+        'tag', 'v0.10.0'
     ) | Out-Null
     $global:QuickAdoptionProtocolSha = (@(Invoke-TestGit `
         -Repository $global:QuickAdoptionProtocolRepository -Arguments @('rev-parse', 'HEAD')))[0]
+    $global:QuickAdoptionProtocolReleaseCommits['v0.10.0'] = $global:QuickAdoptionProtocolSha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.10.0'
+
+    Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+        'switch', '--detach'
+    ) | Out-Null
+    foreach ($futureTag in @('v0.10.1', 'v1.0.0')) {
+        $futureVersion = $futureTag.Substring(1)
+        $futureWorkflow = [IO.File]::ReadAllText($workflowPath).Replace(
+            'BOOTSTRAP_PROTOCOL_TAG: v0.10.0',
+            "BOOTSTRAP_PROTOCOL_TAG: $futureTag"
+        )
+        [IO.File]::WriteAllText(
+            $fixtureWorkflowPath, $futureWorkflow, [Text.UTF8Encoding]::new($false)
+        )
+        [IO.File]::WriteAllText(
+            (Join-Path $global:QuickAdoptionProtocolRepository 'VERSION'),
+            $futureVersion,
+            [Text.UTF8Encoding]::new($false)
+        )
+        Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+            'add', '--', '.'
+        ) | Out-Null
+        Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+            'commit', '-m', "Create mock $futureTag protocol release"
+        ) | Out-Null
+        Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+            'tag', $futureTag
+        ) | Out-Null
+        $futureSha = (@(Invoke-TestGit `
+            -Repository $global:QuickAdoptionProtocolRepository `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+        $global:QuickAdoptionProtocolReleaseCommits[$futureTag] = $futureSha
+        Save-MockProtocolAssetSnapshot -Tag $futureTag
+    }
+    Invoke-TestGit -Repository $global:QuickAdoptionProtocolRepository -Arguments @(
+        'switch', 'main'
+    ) | Out-Null
+}
+
+function New-MockConnectedManagedConsumer {
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][string]$InstalledTag
+    )
+
+    if (-not $global:QuickAdoptionProtocolReleaseCommits.ContainsKey($InstalledTag)) {
+        throw "Mock managed consumer requested unknown release '$InstalledTag'."
+    }
+    $rootPath = New-TempRoot -Name $Name
+    $repositoryPath = Join-Path $rootPath 'consumer'
+    $remotePath = Join-Path $rootPath 'consumer.git'
+    New-Item -ItemType Directory -Path $repositoryPath -Force | Out-Null
+    & git init --bare $remotePath 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to initialize the mock managed-consumer remote.'
+    }
+    & git init -b main $repositoryPath 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unable to initialize the mock managed consumer.'
+    }
+    Set-TestGitIdentity -Repository $repositoryPath
+    $slug = "test-owner/$Name"
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'config', "url.$($remotePath.Replace('\\', '/')).insteadOf",
+        "https://github.com/$slug.git"
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'remote', 'add', 'origin', "https://github.com/$slug.git"
+    ) | Out-Null
+
+    [IO.File]::WriteAllText(
+        (Join-Path $repositoryPath 'app.txt'),
+        "managed consumer`n",
+        [Text.UTF8Encoding]::new($false)
+    )
+    [IO.File]::WriteAllText(
+        (Join-Path $repositoryPath '.gitmodules'),
+        "[submodule `".ai/protocol`"]`n`tpath = .ai/protocol`n`turl = https://github.com/hasanmanzak/meAndAI.git`n",
+        [Text.UTF8Encoding]::new($false)
+    )
+    foreach ($asset in $canonicalManagedUpdaterAssets) {
+        $key = "$InstalledTag`n$($asset.TemplatePath)"
+        $snapshot = $global:QuickAdoptionProtocolAssetBytes[$key]
+        if ($null -eq $snapshot) {
+            throw "Mock managed asset snapshot is missing for '$key'."
+        }
+        $destination = Join-Path $repositoryPath `
+            (([string]$asset.ConsumerPath) -replace '/', [IO.Path]::DirectorySeparatorChar)
+        New-Item -ItemType Directory -Path (Split-Path -Parent $destination) `
+            -Force | Out-Null
+        [IO.File]::WriteAllBytes($destination, [byte[]]$snapshot.Bytes)
+    }
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'add', '--', 'app.txt', '.gitmodules'
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments `
+        (@('add', '--') + @($canonicalManagedUpdaterAssets | ForEach-Object {
+            [string]$_.ConsumerPath
+        })) | Out-Null
+    $protocolSha = $global:QuickAdoptionProtocolReleaseCommits[$InstalledTag]
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'update-index', '--add', '--cacheinfo', "160000,$protocolSha,.ai/protocol"
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'commit', '-m', "Install managed adoption at $InstalledTag"
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'push', '-u', 'origin', 'main'
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        'config', 'submodule..ai/protocol.url',
+        $global:QuickAdoptionProtocolRepository.Replace('\\', '/')
+    ) | Out-Null
+    Invoke-TestGit -Repository $repositoryPath -Arguments @(
+        '-c', 'protocol.file.allow=always',
+        'submodule', 'update', '--init', '--', '.ai/protocol'
+    ) | Out-Null
+
+    $global:QuickAdoptionRepoName = $slug
+    $global:QuickAdoptionTargetPath = $repositoryPath
+    $global:QuickAdoptionRemotePath = $remotePath
+    $global:QuickAdoptionDefaultBranch = 'main'
+    $global:QuickAdoptionExistingSecrets.Clear()
+    $global:QuickAdoptionExistingSecrets.Add('MEANDAI_UPDATER_TOKEN')
+    $global:QuickAdoptionExistingSecrets.Add('MEANDAI_PROTOCOL_TOKEN')
+    $global:QuickAdoptionPublishAdoptionProposal = $false
+    return [pscustomobject]@{
+        Repository = $repositoryPath
+        Remote = $remotePath
+        Slug = $slug
+        Head = (@(Invoke-TestGit -Repository $repositoryPath `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+    }
 }
 
 function Initialize-MockAdoptionPullRequestBody {
@@ -282,7 +483,7 @@ function Initialize-MockAdoptionPullRequestBody {
     $marker = [ordered]@{
         schema = 2
         state = $proposalState
-        target = 'v0.9.7'
+        target = 'v0.10.0'
         protocolSha = $global:QuickAdoptionProtocolSha
         head = $global:QuickAdoptionPrHead
         repository = $global:QuickAdoptionRepoName
@@ -317,7 +518,7 @@ function Get-MockCodexSandboxCalls {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.9.7'
+    $branch = 'automation/meandai-capabilities-v0.10.0'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -355,7 +556,7 @@ function Publish-MockAdoptionBranch {
         operation = 'ai-capabilities-adoption'
         state = if ($manifestOnly) { 'AdoptionReviewRequired' } else { 'BootstrapReady' }
         repository = $global:QuickAdoptionRepoName
-        targetTag = 'v0.9.7'
+        targetTag = 'v0.10.0'
         protocolSha = $global:QuickAdoptionProtocolSha
         collisions = $manifestCollisions
         proposedPaths = $canonicalAdoptionProposedPaths
@@ -434,7 +635,7 @@ function Publish-MockAdoptionBranch {
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.9.7'
+    $branch = 'automation/meandai-capabilities-v0.10.0'
     Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
         'push', 'origin', '--delete', $branch
     ) | Out-Null
@@ -485,13 +686,14 @@ function global:Invoke-RestMethod {
         CredentialBoundary = $credentialBoundary
     })
 
-    if ($Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.9\.7$') {
+    if ($Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
+        $tag = [string]$Matches.tag
         if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
             throw 'Mock release is missing.'
         }
         return [pscustomobject]@{
             id = 73
-            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.9.7' }
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { $tag }
             draft = $false
             prerelease = $false
             immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
@@ -499,11 +701,26 @@ function global:Invoke-RestMethod {
         }
     }
 
-    if ($Uri -match '/contents/templates/project/\.github/workflows/meandai-protocol-update\.yml\?ref=v0\.9\.7$') {
+    if ($Uri -match '/repos/hasanmanzak/meAndAI/commits/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
+        $tag = [string]$Matches.tag
+        if (-not $global:QuickAdoptionProtocolReleaseCommits.ContainsKey($tag)) {
+            throw "Mock protocol commit is missing for '$tag'."
+        }
+        return [pscustomobject]@{ sha = $global:QuickAdoptionProtocolReleaseCommits[$tag] }
+    }
+
+    if ($Uri -match '/contents/(?<path>.+)\?ref=(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
+        $tag = [string]$Matches.tag
+        $templatePath = [string]$Matches.path
+        $key = "$tag`n$templatePath"
+        if (-not $global:QuickAdoptionProtocolAssetBytes.ContainsKey($key)) {
+            throw "Mock protocol asset is missing for '${tag}:$templatePath'."
+        }
+        $asset = $global:QuickAdoptionProtocolAssetBytes[$key]
         return [pscustomobject]@{
-            content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
+            content = [Convert]::ToBase64String([byte[]]$asset.Bytes)
             encoding = 'base64'
-            sha = $global:QuickAdoptionWorkflowSha
+            sha = [string]$asset.Sha
         }
     }
 
@@ -535,20 +752,19 @@ function global:Invoke-WebRequest {
         [string]$Headers['User-Agent'] -cne 'meAndAI-quick-adoption') {
         throw 'TEST-0073 protocol archive download used invalid authorization or API-version headers.'
     }
-    $archiveRoot = New-TempRoot -Name 'protocol-source'
-    $sourceRoot = Join-Path $archiveRoot 'openai-mock-protocol'
-    New-Item -ItemType Directory -Path $sourceRoot -Force | Out-Null
-    Copy-CanonicalProtocolFixture -Destination $sourceRoot
-    # Compress-Archive omits dot-prefixed directories on non-Windows hosts,
-    # which would silently drop the canonical templates/project/.github tree.
-    # The .NET ZIP API preserves that exact fixture inventory on every runner.
+    # Archive the immutable synthetic release instead of re-reading the live
+    # worktree, which may be changing while this integration suite is running.
     if (-not ('System.IO.Compression.ZipFile' -as [type])) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
     }
     if (Test-Path -LiteralPath $OutFile) {
         [IO.File]::Delete($OutFile)
     }
-    [IO.Compression.ZipFile]::CreateFromDirectory($archiveRoot, $OutFile)
+    & git -C $global:QuickAdoptionProtocolRepository archive --format=zip `
+        --prefix=openai-mock-protocol/ -o $OutFile v0.10.0
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $OutFile -PathType Leaf)) {
+        throw 'Unable to archive the immutable mock protocol release.'
+    }
     $archive = [IO.Compression.ZipFile]::OpenRead($OutFile)
     try {
         $capabilitiesEntry = @($archive.Entries | Where-Object {
@@ -633,8 +849,6 @@ function global:gh {
     if ($joined -eq 'api user --jq .login') {
         return $global:QuickAdoptionOwner
     }
-    $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.9.7'
-    $protocolReleaseEndpoint = 'repos/hasanmanzak/meAndAI/releases/tags/v0.9.7'
     $secretLockEndpoint = "repos/$($global:QuickAdoptionRepoName)/labels/meandai%3Asecret-reconciliation-lock"
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
         $Arguments -contains $secretLockEndpoint) {
@@ -661,28 +875,52 @@ function global:gh {
         }
         return ($record | ConvertTo-Json -Compress)
     }
-    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
-        $Arguments -contains $protocolReleaseEndpoint) {
+    $apiEndpoint = @(if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api') {
+        $Arguments | Where-Object {
+            [string]$_ -like 'repos/hasanmanzak/meAndAI/*'
+        } | Select-Object -Last 1
+    }
+    else { })
+    if ($apiEndpoint.Count -eq 1 -and
+        [string]$apiEndpoint[0] -match '^repos/hasanmanzak/meAndAI/releases/tags/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
         Assert-MockGhApiHeaders -Arguments $Arguments
+        $tag = [string]$Matches.tag
         if ($global:QuickAdoptionReleaseMode -ceq 'Missing') {
             throw 'Mock release is missing.'
         }
         return (@{
             id = 73
-            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { 'v0.9.7' }
+            tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { $tag }
             draft = $false
             prerelease = $false
             immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
             published_at = '2026-07-15T00:00:00Z'
         } | ConvertTo-Json -Compress)
     }
-    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'api' -and
-        $Arguments -contains $protocolSourceEndpoint) {
+    if ($apiEndpoint.Count -eq 1 -and
+        [string]$apiEndpoint[0] -match '^repos/hasanmanzak/meAndAI/commits/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
         Assert-MockGhApiHeaders -Arguments $Arguments
+        $tag = [string]$Matches.tag
+        if (-not $global:QuickAdoptionProtocolReleaseCommits.ContainsKey($tag)) {
+            throw "Mock protocol commit is missing for '$tag'."
+        }
+        return (@{ sha = $global:QuickAdoptionProtocolReleaseCommits[$tag] } |
+            ConvertTo-Json -Compress)
+    }
+    if ($apiEndpoint.Count -eq 1 -and
+        [string]$apiEndpoint[0] -match '^repos/hasanmanzak/meAndAI/contents/(?<path>.+)\?ref=(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
+        Assert-MockGhApiHeaders -Arguments $Arguments
+        $tag = [string]$Matches.tag
+        $templatePath = [string]$Matches.path
+        $key = "$tag`n$templatePath"
+        if (-not $global:QuickAdoptionProtocolAssetBytes.ContainsKey($key)) {
+            throw "Mock protocol asset is missing for '${tag}:$templatePath'."
+        }
+        $asset = $global:QuickAdoptionProtocolAssetBytes[$key]
         return (@{
-            content = [Convert]::ToBase64String($global:QuickAdoptionWorkflowBytes)
+            content = [Convert]::ToBase64String([byte[]]$asset.Bytes)
             encoding = 'base64'
-            sha = $global:QuickAdoptionWorkflowSha
+            sha = [string]$asset.Sha
         } | ConvertTo-Json -Compress)
     }
     if ($Arguments.Count -ge 4 -and $Arguments[0] -eq 'repo' -and
@@ -793,7 +1031,7 @@ function global:gh {
         $createdIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.9.7'
+            title = 'Track meAndAI AI capabilities adoption from v0.10.0'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
         }
@@ -803,7 +1041,7 @@ function global:gh {
             $global:QuickAdoptionIssues.Add([pscustomobject]@{
                 number = 83
                 url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/83"
-                title = 'Track meAndAI AI capabilities adoption from v0.9.7'
+                title = 'Track meAndAI AI capabilities adoption from v0.10.0'
                 body = $createdIssue.body
                 state = 'OPEN'
             })
@@ -909,7 +1147,9 @@ function global:gh {
             Head = $independentHead
         }
         $global:QuickAdoptionWorkflowDispatched = $true
-        Publish-MockAdoptionBranch
+        if ($global:QuickAdoptionPublishAdoptionProposal) {
+            Publish-MockAdoptionBranch
+        }
         return
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'workflow' -and $Arguments[1] -eq 'view') {
@@ -1048,7 +1288,7 @@ function global:gh {
             isDraft = $global:QuickAdoptionPrDraft
             state = $global:QuickAdoptionPrState
             baseRefName = $global:QuickAdoptionDefaultBranch
-            headRefName = 'automation/meandai-capabilities-v0.9.7'
+            headRefName = 'automation/meandai-capabilities-v0.10.0'
             headRefOid = $global:QuickAdoptionPrHead
             headRepository = [ordered]@{
                 id = 'R_mock_consumer'
@@ -1084,7 +1324,7 @@ function global:gh {
                 $badMarker = [ordered]@{
                     schema = 2
                     state = $proposalState
-                    target = 'v0.9.7'
+                    target = 'v0.10.0'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = ('0' * 40)
                     repository = $global:QuickAdoptionRepoName
@@ -1158,7 +1398,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.9.7',
+            'v0.10.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -1295,7 +1535,7 @@ try {
 
     if (Test-Path -LiteralPath $mockCodexScriptPath -PathType Leaf) {
         $mockCodex = Get-Content -LiteralPath $mockCodexScriptPath -Raw
-        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.9.7')) {
+        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.10.0')) {
             Add-Failure 'TEST-0059 mock Codex remote-race fixture is not pinned to the current adoption branch.'
         }
         if (-not $mockCodex.Contains('$Arguments[0] -ceq ''sandbox''') -or
@@ -1326,7 +1566,7 @@ try {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.9.7',
+            'v0.10.0',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -1563,7 +1803,7 @@ try {
                 $releaseBlocked = $true
             }
             $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
-                $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.9\.7$'
+                $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.10\.0$'
             })
             $prematureMutations = @($global:QuickAdoptionGhCalls | Where-Object {
                 $_.Arguments.Count -ge 2 -and
@@ -1937,7 +2177,7 @@ try {
             [Environment]::GetEnvironmentVariable('GH_HOST', 'Process') -cne 'ghe.example.invalid') {
             Add-Failure 'TEST-0060 launcher GitHub operations were redirected by caller GH_HOST or did not restore it.'
         }
-        $canonicalIssueMarker = '<!-- meandai-local-adoption:v0.9.7:pr-42 -->'
+        $canonicalIssueMarker = '<!-- meandai-local-adoption:v0.10.0:pr-42 -->'
         $openMarkedIssues = @($global:QuickAdoptionIssues | Where-Object {
             [string]$_.state -ceq 'OPEN' -and
             [regex]::IsMatch(
@@ -2096,7 +2336,7 @@ try {
         $global:QuickAdoptionSecretLockMode = 'Normal'
         $global:QuickAdoptionSecretLockViewCalls = 0
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.10.0'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/ai-adoption.md') {
@@ -2144,7 +2384,7 @@ try {
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.9.7'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.10.0'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
@@ -2178,7 +2418,7 @@ try {
         }
         $interruptedRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         $codexCountAfterInterruptedCompletion = @(Get-MockCodexCalls).Count
         if (-not $interruptedCompletionBlocked -or
@@ -2198,7 +2438,7 @@ try {
         }
         $recoveredRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         if ($interruptedRecoveryThrew -or
             $recoveredRemoteHead -cne $interruptedRemoteHead -or
@@ -2225,7 +2465,7 @@ try {
         }
         $postReadyHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         $codexCountAfterPostReadyFailure = @(Get-MockCodexCalls).Count
         $bodyEditsAfterPostReadyFailure = $global:QuickAdoptionPrBodyEditCalls
@@ -2249,7 +2489,7 @@ try {
         }
         $postReadyRecoveredHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         if ($postReadyRecoveryThrew -or
             $postReadyRecoveredHead -cne $postReadyHead -or
@@ -2260,7 +2500,7 @@ try {
             Add-Failure "TEST-0052/TEST-0087/TEST-0089 rerun after readiness did not retain the exact Completed proposal and reconcile the issue without Codex or a new commit: error='$postReadyRecoveryError'; head=$postReadyHead->$postReadyRecoveredHead; readyCalls=$($global:QuickAdoptionPrReadyCalls); issueLabels=$($global:QuickAdoptionIssueLabels -join ',')."
         }
 
-        $completedBranch = 'automation/meandai-capabilities-v0.9.7'
+        $completedBranch = 'automation/meandai-capabilities-v0.10.0'
         $canonicalCompletedHead = $postReadyRecoveredHead
         $canonicalCompletedBody = [string]$global:QuickAdoptionPrBody
         foreach ($completedVariant in @(
@@ -2411,7 +2651,7 @@ try {
                 schema = 3
                 phase = 'Completed'
                 state = 'BootstrapReady'
-                target = 'v0.9.7'
+                target = 'v0.10.0'
                 protocolSha = $global:QuickAdoptionProtocolSha
                 head = $variantHead
                 repository = 'test-owner/consumer'
@@ -2488,7 +2728,7 @@ try {
             $markerVariants = [ordered]@{
                 malformed = $canonicalOwnedBody.Replace(
                     $canonicalIssueMarker,
-                    '<!-- meandai-local-adoption:v0.9.7:pr-42 --'
+                    '<!-- meandai-local-adoption:v0.10.0:pr-42 --'
                 )
                 duplicate = "$canonicalOwnedBody`n$canonicalIssueMarker"
             }
@@ -2657,7 +2897,7 @@ try {
                 Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.9.7'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.10.0'
             ))
             if ($negativePaths -contains 'docs/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
@@ -2671,7 +2911,7 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Sleep'
         $timeoutRemoteHeadBefore = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         $timeoutTempRootsBefore = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -2688,7 +2928,7 @@ try {
         }
         $timeoutRemoteHeadAfter = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'refs/heads/automation/meandai-capabilities-v0.10.0'
         )))[0].Split("`t")[0]
         $timeoutTempRootsAfter = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -2770,10 +3010,10 @@ try {
             $collisionCompleted = $false
         }
         $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.9.7', '--', '.ai/protocol'
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.10.0', '--', '.ai/protocol'
         )))
         $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.9.7'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.10.0'
         ))
         $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
         if (-not $collisionCompleted -or $global:QuickAdoptionPrReadyCalls -ne 1 -or
@@ -3058,6 +3298,158 @@ try {
         if ($newStatus.Count -ne 1 -or $newStatus[0] -notmatch '^\?\? src/') {
             Add-Failure "TEST-0035 unrelated local content was not preserved as untracked: $($newStatus -join ', ')"
         }
+
+        Reset-Mocks
+        $currentConsumer = New-MockConnectedManagedConsumer `
+            -Name 'managed-current' -InstalledTag 'v0.10.0'
+        $currentCodexCallsBefore = @(Get-MockCodexCalls).Count
+        $currentError = ''
+        try {
+            & $launcherPath -TargetPath $currentConsumer.Repository `
+                -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $currentError = $_.Exception.Message
+        }
+        $currentHeadAfter = (@(Invoke-TestGit -Repository $currentConsumer.Repository `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+        $currentRemoteHeadAfter = (@(Invoke-TestGit -Repository $currentConsumer.Repository `
+            -Arguments @('rev-parse', 'origin/main')))[0]
+        $currentDispatches = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'workflow' -and
+            $_.Arguments[1] -ceq 'run'
+        })
+        $currentPrLookups = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'pr' -and
+            $_.Arguments[1] -ceq 'list'
+        })
+        if ($currentError -or $currentHeadAfter -cne $currentConsumer.Head -or
+            $currentRemoteHeadAfter -cne $currentConsumer.Head -or
+            $currentDispatches.Count -ne 0 -or $currentPrLookups.Count -ne 0 -or
+            $global:QuickAdoptionSecrets.Count -ne 0 -or
+            @(Get-MockCodexCalls).Count -ne $currentCodexCallsBefore) {
+            Add-Failure "TEST-0113 exact current adoption was not a Git/workflow/Codex no-op after secret-name reconciliation: $currentError"
+        }
+
+        Reset-Mocks
+        $legacyConsumer = New-MockConnectedManagedConsumer `
+            -Name 'managed-legacy' -InstalledTag 'v0.9.2'
+        $legacyWorkflowPath = Join-Path $legacyConsumer.Repository $workflowRelativePath
+        $legacyWorkflowShaBefore = Get-GitBlobSha `
+            -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
+        $legacyCodexCallsBefore = @(Get-MockCodexCalls).Count
+        $legacyError = ''
+        try {
+            & $launcherPath -TargetPath $legacyConsumer.Repository `
+                -CodexCommand $mockCodexPath | Out-Null
+        }
+        catch {
+            $legacyError = $_.Exception.Message
+        }
+        $legacyWorkflowShaAfter = Get-GitBlobSha `
+            -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
+        $legacyHeadAfter = (@(Invoke-TestGit -Repository $legacyConsumer.Repository `
+            -Arguments @('rev-parse', 'HEAD')))[0]
+        $legacyDispatches = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'workflow' -and
+            $_.Arguments[1] -ceq 'run'
+        })
+        $legacyPrLookups = @($global:QuickAdoptionGhCalls | Where-Object {
+            $_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'pr' -and
+            $_.Arguments[1] -ceq 'list'
+        })
+        if ($legacyError -or $legacyHeadAfter -cne $legacyConsumer.Head -or
+            $legacyWorkflowShaAfter -cne $legacyWorkflowShaBefore -or
+            $legacyDispatches.Count -ne 1 -or -not $global:QuickAdoptionWorkflowDispatched -or
+            $legacyPrLookups.Count -ne 0 -or $global:QuickAdoptionSecrets.Count -ne 0 -or
+            @(Get-MockCodexCalls).Count -ne $legacyCodexCallsBefore) {
+            Add-Failure "TEST-0113 exact older same-major adoption did not dispatch only its preserved installed updater: $legacyError"
+        }
+
+        foreach ($blockedRoute in @(
+            [pscustomobject]@{ Name = 'manifest'; InstalledTag = 'v0.10.0'; TargetTag = 'v0.10.0'; Mutation = 'Manifest' },
+            [pscustomobject]@{ Name = 'partial'; InstalledTag = 'v0.10.0'; TargetTag = 'v0.10.0'; Mutation = 'Partial' },
+            [pscustomobject]@{ Name = 'missing-gitlink'; InstalledTag = 'v0.10.0'; TargetTag = 'v0.10.0'; Mutation = 'MissingGitlink' },
+            [pscustomobject]@{ Name = 'drift'; InstalledTag = 'v0.10.0'; TargetTag = 'v0.10.0'; Mutation = 'Drift' },
+            [pscustomobject]@{ Name = 'newer'; InstalledTag = 'v0.10.1'; TargetTag = 'v0.10.0'; Mutation = 'None' },
+            [pscustomobject]@{ Name = 'cross-major'; InstalledTag = 'v0.10.0'; TargetTag = 'v1.0.0'; Mutation = 'None' }
+        )) {
+            Reset-Mocks
+            $blockedConsumer = New-MockConnectedManagedConsumer `
+                -Name "managed-$($blockedRoute.Name)" `
+                -InstalledTag ([string]$blockedRoute.InstalledTag)
+            switch -CaseSensitive ([string]$blockedRoute.Mutation) {
+                'Manifest' {
+                    $manifestPath = Join-Path $blockedConsumer.Repository `
+                        '.ai/adoption/meandai-capabilities.json'
+                    New-Item -ItemType Directory -Path (Split-Path -Parent $manifestPath) `
+                        -Force | Out-Null
+                    [IO.File]::WriteAllText(
+                        $manifestPath, "{}`n", [Text.UTF8Encoding]::new($false)
+                    )
+                    Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                        'add', '--', '.ai/adoption/meandai-capabilities.json'
+                    ) | Out-Null
+                }
+                'Partial' {
+                    Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                        'rm', '--', '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+                    ) | Out-Null
+                }
+                'MissingGitlink' {
+                    Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                        'update-index', '--force-remove', '--', '.ai/protocol'
+                    ) | Out-Null
+                    Remove-Item -LiteralPath (Join-Path $blockedConsumer.Repository '.ai/protocol') `
+                        -Recurse -Force
+                }
+                'Drift' {
+                    [IO.File]::AppendAllText(
+                        (Join-Path $blockedConsumer.Repository `
+                            '.github/scripts/MeAndAI.ProtocolUpdate.psm1'),
+                        "`n# committed drift`n",
+                        [Text.UTF8Encoding]::new($false)
+                    )
+                    Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                        'add', '--', '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+                    ) | Out-Null
+                }
+            }
+            if ([string]$blockedRoute.Mutation -cne 'None') {
+                Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                    'commit', '-m', "Create $($blockedRoute.Name) routing fixture"
+                ) | Out-Null
+                Invoke-TestGit -Repository $blockedConsumer.Repository -Arguments @(
+                    'push', 'origin', 'main'
+                ) | Out-Null
+            }
+            $blockedError = ''
+            try {
+                & $launcherPath -TargetPath $blockedConsumer.Repository `
+                    -ProtocolTag ([string]$blockedRoute.TargetTag) `
+                    -CodexCommand $mockCodexPath | Out-Null
+            }
+            catch {
+                $blockedError = $_.Exception.Message
+            }
+            $blockedMutations = @($global:QuickAdoptionGhCalls | Where-Object {
+                ($_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'secret' -and
+                 $_.Arguments[1] -ceq 'set') -or
+                ($_.Arguments.Count -ge 2 -and $_.Arguments[0] -ceq 'workflow' -and
+                 $_.Arguments[1] -ceq 'run') -or
+                ($_.Arguments.Count -ge 3 -and $_.Arguments[0] -ceq 'label' -and
+                 $_.Arguments[1] -ceq 'create')
+            })
+            $wrongMissingGitlinkGate = (
+                [string]$blockedRoute.Mutation -ceq 'MissingGitlink' -and
+                $blockedError -cnotlike '*exists without the protocol gitlink*'
+            )
+            if (-not $blockedError -or $blockedMutations.Count -ne 0 -or
+                $wrongMissingGitlinkGate) {
+                Add-Failure "TEST-0113 $($blockedRoute.Name) completed-adoption state did not fail before secret/repository workflow mutation: $blockedError"
+            }
+        }
+        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0113'
     }
 }
 catch {
@@ -3080,6 +3472,18 @@ finally {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction SilentlyContinue
         }
+    }
+}
+
+foreach ($requiredRepeatRouteText in @(
+    'Get-ExistingAdoptionRoute',
+    'AlreadyCurrent',
+    'CompatibleUpdate',
+    'Dispatching installed updater',
+    'The installed updater seed was preserved'
+)) {
+    if (-not $launcher.Contains($requiredRepeatRouteText)) {
+        Add-Failure "TEST-0113 launcher lacks repeat-adoption route '$requiredRepeatRouteText'."
     }
 }
 

@@ -5,6 +5,7 @@ param(
     [string]$ProtocolSourcePath = '.meandai-update-source',
     [string]$BranchPrefix = 'automation/meandai-protocol-',
     [switch]$FinalizeMergedPullRequest,
+    [switch]$RecoverMergedPullRequests,
     [int]$PullRequestNumber = 0
 )
 
@@ -28,6 +29,13 @@ $ManagedUpdaterAssets = @(
 $ManagedPaths = @($ProtocolPath) + @($ManagedUpdaterAssets | ForEach-Object {
     [string]$_.ConsumerPath
 })
+$ManagedUpdateLabels = @(
+    [pscustomobject]@{ Name = 'type:task'; Color = 'd4c5f9'; Description = 'Implementation or maintenance task' },
+    [pscustomobject]@{ Name = 'priority:p1'; Color = 'd93f0b'; Description = 'High priority' },
+    [pscustomobject]@{ Name = 'status:in-progress'; Color = '1d76db'; Description = 'Implementation in progress' },
+    [pscustomobject]@{ Name = 'status:needs-review'; Color = '5319e7'; Description = 'Ready for maintainer review' },
+    [pscustomobject]@{ Name = 'status:blocked'; Color = 'b60205'; Description = 'Blocked by an unresolved dependency' }
+)
 
 function Invoke-Native {
     param([string]$Command, [string[]]$Arguments)
@@ -64,11 +72,25 @@ function Invoke-GhJson {
 }
 
 function Invoke-GhPagedJson {
-    param([string]$Endpoint)
+    param(
+        [string]$Endpoint,
+        [AllowNull()][string]$Token = $null
+    )
 
-    $encodedItems = @(Invoke-Native -Command 'gh' -Arguments @(
-        'api', '--paginate', '--jq', '.[] | @base64', $Endpoint
-    ))
+    $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
+    try {
+        if ($PSBoundParameters.ContainsKey('Token')) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
+        }
+        $encodedItems = @(Invoke-Native -Command 'gh' -Arguments @(
+            'api', '--paginate', '--jq', '.[] | @base64', $Endpoint
+        ))
+    }
+    finally {
+        if ($PSBoundParameters.ContainsKey('Token')) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
+        }
+    }
     foreach ($encodedItem in $encodedItems) {
         $json = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(([string]$encodedItem).Trim()))
         $json | ConvertFrom-Json
@@ -82,7 +104,7 @@ function Get-ImmutableProtocolReleaseEvidence {
         [string]$ProtocolToken
     )
 
-    if (-not (Test-MeAndAIProtocolTag -Tag $Tag)) {
+    if ($Tag -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') {
         throw "Selected protocol target '$Tag' is not a canonical release tag."
     }
     $release = Invoke-GhJson -Token $ProtocolToken -Arguments @(
@@ -448,6 +470,298 @@ function Get-ProtocolMarker {
     }
 }
 
+function Get-ManagedUpdateIssueMarker {
+    param([string]$Body)
+
+    $empty = [pscustomobject]@{
+        Schema = 0; Target = ''; ProtocolSha = ''; Repository = ''; CanonicalLine = ''
+    }
+    if (-not $Body) { return $empty }
+    $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
+    $prefix = '<!-- meandai-protocol-update-issue:'
+    if (-not $normalized.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+        return $empty
+    }
+    $signals = [regex]::Matches(
+        $normalized, [regex]::Escape($prefix),
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($signals.Count -eq 0) { return $empty }
+    $matches = [regex]::Matches(
+        $normalized,
+        '(?m)^<!-- meandai-protocol-update-issue:(?<json>\{[^\r\n]+\}) -->$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($signals.Count -ne 1 -or $matches.Count -ne 1 -or
+        $matches[0].Index -ne 0) {
+        throw 'A managed protocol-update issue contains a malformed ownership marker.'
+    }
+    try {
+        $json = [string]$matches[0].Groups['json'].Value
+        $marker = $json | ConvertFrom-Json
+        $properties = @($marker.PSObject.Properties)
+        $expectedNames = @('schema', 'target', 'protocolSha', 'repository')
+        if ($properties.Count -ne $expectedNames.Count) { throw 'shape' }
+        for ($index = 0; $index -lt $expectedNames.Count; $index++) {
+            if ([string]$properties[$index].Name -cne $expectedNames[$index]) { throw 'shape' }
+        }
+        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long]) -or
+            [long]$marker.schema -ne 1 -or
+            $marker.target -isnot [string] -or
+            $marker.protocolSha -isnot [string] -or
+            $marker.repository -isnot [string]) {
+            throw 'type'
+        }
+        $canonicalJson = [ordered]@{
+            schema = 1
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            repository = [string]$marker.repository
+        } | ConvertTo-Json -Compress
+        if ($json -cne $canonicalJson) { throw 'canonical' }
+        return [pscustomobject]@{
+            Schema = 1
+            Target = [string]$marker.target
+            ProtocolSha = [string]$marker.protocolSha
+            Repository = [string]$marker.repository
+            CanonicalLine = "<!-- meandai-protocol-update-issue:$canonicalJson -->"
+        }
+    }
+    catch {
+        throw 'A managed protocol-update issue contains a malformed ownership marker.'
+    }
+}
+
+function Get-ManagedUpdateIssueContract {
+    param(
+        [string]$Repository,
+        [string]$TargetTag,
+        [string]$ProtocolSha,
+        [string]$Branch
+    )
+
+    $markerJson = [ordered]@{
+        schema = 1; target = $TargetTag; protocolSha = $ProtocolSha
+        repository = $Repository
+    } | ConvertTo-Json -Compress
+    $marker = "<!-- meandai-protocol-update-issue:$markerJson -->"
+    $title = "Track meAndAI protocol update to $TargetTag"
+    $body = @(
+        $marker,
+        '## Managed protocol update tracking', '',
+        "- Target release: ``$TargetTag``",
+        "- Protocol commit: ``$ProtocolSha``",
+        "- Deterministic branch: ``$Branch``", '',
+        'This issue is the canonical same-repository work record for the managed protocol proposal.',
+        'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
+    ) -join [Environment]::NewLine
+    [pscustomobject]@{ Marker = $marker; Title = $title; Body = $body }
+}
+
+function Ensure-ManagedUpdateLabels {
+    param([string]$Repository)
+
+    $token = [string]$env:ISSUE_TOKEN
+    if (-not $token) { throw "Required workflow environment 'ISSUE_TOKEN' is missing." }
+    $existing = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/labels?per_page=100" -Token $token)
+    $names = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($label in $existing) {
+        if ($null -eq $label -or [string]::IsNullOrWhiteSpace([string]$label.name)) {
+            throw 'Repository label inventory contains an invalid record.'
+        }
+        [void]$names.Add([string]$label.name)
+    }
+    foreach ($label in $ManagedUpdateLabels) {
+        if ($names.Contains([string]$label.Name)) { continue }
+        Invoke-GhJson -Token $token -Arguments @(
+            'api', '--method', 'POST', "repos/$Repository/labels",
+            '-f', "name=$($label.Name)", '-f', "color=$($label.Color)",
+            '-f', "description=$($label.Description)"
+        ) | Out-Null
+        [void]$names.Add([string]$label.Name)
+    }
+}
+
+function Get-ManagedUpdateIssueInventory {
+    param([string]$Repository)
+
+    $token = [string]$env:ISSUE_TOKEN
+    if (-not $token) { throw "Required workflow environment 'ISSUE_TOKEN' is missing." }
+    @(Invoke-GhPagedJson -Endpoint "repos/$Repository/issues?state=all&per_page=100" -Token $token |
+        Where-Object { $null -eq $_.PSObject.Properties['pull_request'] })
+}
+
+function Ensure-ProtocolUpdateIssue {
+    param(
+        [string]$Repository,
+        [string]$TargetTag,
+        [string]$ProtocolSha,
+        [string]$Branch
+    )
+
+    Ensure-ManagedUpdateLabels -Repository $Repository
+    $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
+        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch
+    $matches = [System.Collections.Generic.List[object]]::new()
+    foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
+        $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
+        if ($marker.Schema -eq 0) { continue }
+        if ($marker.Target -ceq $TargetTag -and
+            $marker.ProtocolSha -ceq $ProtocolSha -and
+            $marker.Repository -ceq $Repository) {
+            $normalizedBody = ([string]$issue.body).Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+            $normalizedExpected = $contract.Body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+            if ([string]$issue.title -cne $contract.Title -or
+                $normalizedBody -cne $normalizedExpected -or
+                [string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
+                [string]$issue.state -cnotin @('open', 'closed')) {
+                throw 'A canonically marked protocol-update issue has drifted from its exact owned record.'
+            }
+            $matches.Add($issue)
+        }
+    }
+    if ($matches.Count -gt 1) {
+        throw 'More than one canonical protocol-update issue exists for the same immutable target.'
+    }
+    if ($matches.Count -eq 0) {
+        Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+            'api', '--method', 'POST', "repos/$Repository/issues",
+            '-f', "title=$($contract.Title)", '-f', "body=$($contract.Body)",
+            '-f', 'labels[]=type:task', '-f', 'labels[]=priority:p1',
+            '-f', 'labels[]=status:needs-review'
+        ) | Out-Null
+        foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
+            $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
+            if ($marker.Schema -eq 1 -and $marker.Target -ceq $TargetTag -and
+                $marker.ProtocolSha -ceq $ProtocolSha -and
+                $marker.Repository -ceq $Repository) {
+                $matches.Add($issue)
+            }
+        }
+        if ($matches.Count -ne 1) {
+            throw 'The canonical protocol-update issue did not converge after creation.'
+        }
+    }
+    $canonical = $matches[0]
+    if ([string]$canonical.state -ceq 'closed') {
+        Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+            'api', '--method', 'PATCH', "repos/$Repository/issues/$($canonical.number)",
+            '-f', 'state=open'
+        ) | Out-Null
+    }
+    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', '--method', 'POST', "repos/$Repository/issues/$($canonical.number)/labels",
+        '-f', 'labels[]=type:task', '-f', 'labels[]=priority:p1',
+        '-f', 'labels[]=status:needs-review'
+    ) | Out-Null
+    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', "repos/$Repository/issues/$($canonical.number)"
+    )
+}
+
+function Get-ManagedUpdateProposalEvidenceMarker {
+    param([int]$PullRequestNumber, [string]$HeadSha)
+    "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->"
+}
+
+function Set-ProtocolUpdateIssuePullRequestLink {
+    param(
+        [string]$Repository,
+        [int]$IssueNumber,
+        [int]$PullRequestNumber,
+        [string]$HeadSha
+    )
+
+    $token = [string]$env:ISSUE_TOKEN
+    $marker = Get-ManagedUpdateProposalEvidenceMarker `
+        -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
+    $comments = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/issues/$IssueNumber/comments?per_page=100"
+    ) -Token $token)
+    $managed = @($comments | Where-Object {
+        ([string]$_.body).StartsWith(
+            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
+        )
+    })
+    $exact = @($managed | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $marker
+    })
+    $malformed = @($managed | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -cnotmatch
+            '^<!-- meandai-protocol-update-proposal:pr-[1-9][0-9]*:head-[0-9a-f]{40} -->$'
+    })
+    if ($malformed.Count -ne 0 -or $exact.Count -gt 1) {
+        throw 'The managed protocol-update issue has ambiguous proposal-link evidence.'
+    }
+    if ($exact.Count -eq 0) {
+        $body = @(
+            $marker,
+            "Managed protocol proposal: #$PullRequestNumber",
+            "Exact proposal head: ``$HeadSha``"
+        ) -join [Environment]::NewLine
+        Invoke-GhJson -Token $token -Arguments @(
+            'api', '--method', 'POST',
+            "repos/$Repository/issues/$IssueNumber/comments", '-f', "body=$body"
+        ) | Out-Null
+    }
+}
+
+function Get-ValidatedManagedUpdateIssue {
+    param(
+        [string]$Repository,
+        [int]$PullRequestNumber,
+        [string]$TargetTag,
+        [string]$ProtocolSha,
+        [string]$HeadSha,
+        [string]$Branch,
+        [string]$PullRequestBody,
+        [bool]$RequireOpen = $true
+    )
+
+    $issueNumber = Get-CanonicalTrackingIssueNumber -Body $PullRequestBody
+    $issue = Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', "repos/$Repository/issues/$issueNumber"
+    )
+    if ($null -eq $issue -or [int]$issue.number -ne $issueNumber -or
+        $null -ne $issue.PSObject.Properties['pull_request']) {
+        throw "Managed update pull request #$PullRequestNumber tracking reference is not one same-repository issue."
+    }
+    $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
+        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch
+    $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
+    $normalizedBody = ([string]$issue.body).Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    $normalizedExpected = $contract.Body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    if ($marker.Schema -ne 1 -or $marker.CanonicalLine -cne $contract.Marker -or
+        [string]$issue.title -cne $contract.Title -or
+        $normalizedBody -cne $normalizedExpected -or
+        [string]$issue.state -cnotin @('open', 'closed') -or
+        ($RequireOpen -and [string]$issue.state -cne 'open')) {
+        throw "Managed update pull request #$PullRequestNumber has no exact canonical tracking issue."
+    }
+    $evidenceMarker = Get-ManagedUpdateProposalEvidenceMarker `
+        -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
+    $comments = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/issues/$issueNumber/comments?per_page=100"
+    ) -Token ([string]$env:ISSUE_TOKEN))
+    $managedEvidence = @($comments | Where-Object {
+        ([string]$_.body).StartsWith(
+            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
+        )
+    })
+    $exactEvidence = @($managedEvidence | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $evidenceMarker
+    })
+    $malformedEvidence = @($managedEvidence | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -cnotmatch
+            '^<!-- meandai-protocol-update-proposal:pr-[1-9][0-9]*:head-[0-9a-f]{40} -->$'
+    })
+    if ($malformedEvidence.Count -ne 0 -or $exactEvidence.Count -ne 1) {
+        throw "Managed update pull request #$PullRequestNumber has no exact issue-to-proposal backlink."
+    }
+    $issue
+}
+
 function Remove-RemoteBranch {
     param([string]$Branch, [string]$ExpectedHeadSha)
 
@@ -541,7 +855,12 @@ function Test-ExactRemoteBranchInventory {
 }
 
 function Get-RepositoryTreeEntry {
-    param([string]$Repository, [string]$HeadSha, [string]$Path)
+    param(
+        [string]$Repository,
+        [string]$HeadSha,
+        [string]$Path,
+        [AllowNull()][string]$Token = $null
+    )
 
     $empty = [pscustomobject]@{ Mode = ''; Type = ''; Sha = '' }
     $segments = @($Path.Split('/', [StringSplitOptions]::RemoveEmptyEntries))
@@ -549,16 +868,20 @@ function Get-RepositoryTreeEntry {
         return $empty
     }
 
-    $commit = Invoke-GhJson -Arguments @(
-        'api', "repos/$Repository/git/commits/$HeadSha"
-    )
+    $commitArguments = @('api', "repos/$Repository/git/commits/$HeadSha")
+    $commit = if ($PSBoundParameters.ContainsKey('Token')) {
+        Invoke-GhJson -Arguments $commitArguments -Token $Token
+    } else { Invoke-GhJson -Arguments $commitArguments }
     $treeSha = [string]$commit.tree.sha
     if ($treeSha -notmatch '^[0-9a-f]{40}$') {
         return $empty
     }
 
     for ($index = 0; $index -lt $segments.Count; $index++) {
-        $tree = Invoke-GhJson -Arguments @('api', "repos/$Repository/git/trees/$treeSha")
+        $treeArguments = @('api', "repos/$Repository/git/trees/$treeSha")
+        $tree = if ($PSBoundParameters.ContainsKey('Token')) {
+            Invoke-GhJson -Arguments $treeArguments -Token $Token
+        } else { Invoke-GhJson -Arguments $treeArguments }
         $matches = @($tree.tree | Where-Object {
             [string]::Equals([string]$_.path, [string]$segments[$index], [StringComparison]::Ordinal)
         })
@@ -684,6 +1007,12 @@ function Assert-ManagedPullRequestSafe {
     if ($problems.Count -gt 0) {
         throw "Managed PR #$number changed after planning: $($problems -join '; ')."
     }
+    Get-ValidatedManagedUpdateIssue -Repository $Repository `
+        -PullRequestNumber $number -TargetTag ([string]$Operation.TargetTag) `
+        -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+        -HeadSha ([string]$Operation.ExpectedHeadSha) `
+        -Branch ([string]$Operation.Branch) `
+        -PullRequestBody ([string]$details.body) -RequireOpen $true | Out-Null
 }
 
 function Get-CanonicalAdoptionMarker {
@@ -841,6 +1170,166 @@ function Get-FinalizationIssueEvidence {
     return [pscustomobject]@{ Exists = $exact.Count -eq 1 }
 }
 
+function Repair-LegacyInstallingUpdateTracking {
+    param(
+        [string]$Repository,
+        [string]$DefaultBranch,
+        [int]$Number
+    )
+
+    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    if ($null -eq $pull -or [int]$pull.number -ne $Number) {
+        throw "Pull request #$Number could not be resolved exactly."
+    }
+    $body = [string]$pull.body
+    $normalized = $body.Replace("`r`n", "`n").Replace("`r", "`n")
+    $candidateLines = [regex]::Matches(
+        $normalized, '(?im)^tracking[ \t]+issue[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $canonical = [regex]::Matches(
+        $normalized, '(?m)^Tracking issue: #[1-9][0-9]*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($candidateLines.Count -eq 1 -and $canonical.Count -eq 1 -and
+        [string]$candidateLines[0].Value -ceq [string]$canonical[0].Value) {
+        return
+    }
+
+    $headRef = [string]$pull.head.ref
+    $hasUpdateSignal = $headRef.StartsWith($BranchPrefix, [StringComparison]::Ordinal) -or
+        $body.IndexOf(
+            '<!-- meandai-protocol-update:', [StringComparison]::OrdinalIgnoreCase
+        ) -ge 0
+    $hasAdoptionSignal = $headRef.StartsWith(
+        'automation/meandai-capabilities-', [StringComparison]::Ordinal
+    ) -or $body.IndexOf(
+        '<!-- meandai-capabilities-adoption:', [StringComparison]::OrdinalIgnoreCase
+    ) -ge 0
+    if (-not $hasUpdateSignal -or $hasAdoptionSignal) { return }
+
+    $legacyPlaceholder = $candidateLines.Count -eq 1 -and
+        [string]$candidateLines[0].Value -ceq 'Tracking issue: #REQUIRED'
+    if (($candidateLines.Count -ne 0 -and -not $legacyPlaceholder) -or
+        [regex]::IsMatch(
+            $normalized,
+            '(?im)(?:^|\s)(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#\d+\b',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )) {
+        throw "Managed installing update #$Number has an ambiguous tracking reference."
+    }
+
+    $marker = Get-ProtocolMarker -Body $body
+    $firstLine = $normalized.Split("`n")[0]
+    $markerJson = [ordered]@{
+        schema = 1; target = [string]$marker.Target
+        protocolSha = [string]$marker.ProtocolSha; head = [string]$marker.Head
+        repository = [string]$marker.Repository
+    } | ConvertTo-Json -Compress
+    $canonicalLine = "<!-- meandai-protocol-update:$markerJson -->"
+    $branch = [string]$pull.head.ref
+    if ($marker.Schema -ne 1 -or $firstLine -cne $canonicalLine -or
+        [string]$marker.Target -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
+        $branch -cne "$BranchPrefix$([string]$marker.Target)" -or
+        [string]$marker.Repository -cne $Repository -or
+        [string]$pull.state -cne 'closed' -or
+        $pull.merged -isnot [bool] -or -not [bool]$pull.merged -or
+        [string]::IsNullOrWhiteSpace([string]$pull.merged_at) -or
+        [string]$pull.base.ref -cne $DefaultBranch -or
+        $null -eq $pull.head.repo -or
+        [string]$pull.head.repo.full_name -cne $Repository -or
+        [string]$pull.head.sha -cne [string]$marker.Head -or
+        [string]$pull.merge_commit_sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Managed installing update #$Number does not satisfy the exact legacy-repair identity."
+    }
+    $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$Number/files?per_page=100")
+    $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
+    if ($changedPaths.Count -eq 0 -or $changedPaths -cnotcontains $ProtocolPath) {
+        throw "Managed installing update #$Number has no protocol dependency change."
+    }
+    foreach ($path in $changedPaths) {
+        if ($path -cnotin $ManagedPaths) {
+            throw "Managed installing update #$Number changed unexpected path '$path'."
+        }
+    }
+    $releaseEvidence = Get-ImmutableProtocolReleaseEvidence `
+        -Repository $ProtocolRepository -Tag ([string]$marker.Target) `
+        -ProtocolToken ([string]$env:PROTOCOL_TOKEN)
+    if ([string]$releaseEvidence.CommitSha -cne [string]$marker.ProtocolSha) {
+        throw "Managed installing update #$Number target marker does not match its immutable release commit."
+    }
+    foreach ($asset in $ManagedUpdaterAssets) {
+        if ([string]$asset.ConsumerPath -cnotin $changedPaths) { continue }
+        $expected = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
+            -HeadSha ([string]$releaseEvidence.CommitSha) `
+            -Path ([string]$asset.TemplatePath) -Token ([string]$env:PROTOCOL_TOKEN)
+        $observed = Get-RepositoryTreeEntry -Repository $Repository `
+            -HeadSha ([string]$marker.Head) -Path ([string]$asset.ConsumerPath)
+        if ($expected.Mode -cne '100644' -or $expected.Type -cne 'blob' -or
+            $observed.Mode -cne $expected.Mode -or
+            $observed.Type -cne $expected.Type -or
+            $observed.Sha -cne $expected.Sha) {
+            throw "Managed installing update #$Number updater asset '$($asset.ConsumerPath)' does not match the immutable target release template."
+        }
+    }
+    $repositoryRecord = Invoke-GhJson -Arguments @('api', "repos/$Repository")
+    $defaultRef = Invoke-GhJson -Arguments @(
+        'api', "repos/$Repository/git/ref/heads/$DefaultBranch"
+    )
+    $defaultHead = [string]$defaultRef.object.sha
+    $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
+        -HeadSha $defaultHead -Path $ProtocolPath
+    $comparison = Invoke-GhJson -Arguments @(
+        'api', "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
+    )
+    if ([string]$repositoryRecord.full_name -cne $Repository -or
+        [string]$repositoryRecord.default_branch -cne $DefaultBranch -or
+        [string]$defaultRef.ref -cne "refs/heads/$DefaultBranch" -or
+        [string]$defaultRef.object.type -cne 'commit' -or
+        $defaultHead -cnotmatch '^[0-9a-f]{40}$' -or
+        $protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Sha -cne [string]$marker.ProtocolSha -or
+        [string]$comparison.status -cnotin @('identical', 'ahead')) {
+        throw "Managed installing update #$Number is not the updater installed on the current default branch."
+    }
+    $branchHead = Get-RemoteBranchHead -Branch $branch
+    if ($null -ne $branchHead -and [string]$branchHead -cne [string]$marker.Head) {
+        throw "Managed installing update #$Number branch moved before tracking repair."
+    }
+    $owner = $Repository.Split('/')[0]
+    $openReuse = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/pulls?state=open&head=$owner`:$branch&per_page=100"
+    ))
+    if ($openReuse.Count -ne 0) {
+        throw "Managed installing update #$Number branch is reused by an open pull request."
+    }
+
+    $issue = Ensure-ProtocolUpdateIssue -Repository $Repository `
+        -TargetTag ([string]$marker.Target) -ProtocolSha ([string]$marker.ProtocolSha) `
+        -Branch $branch
+    Set-ProtocolUpdateIssuePullRequestLink -Repository $Repository `
+        -IssueNumber ([int]$issue.number) -PullRequestNumber $Number `
+        -HeadSha ([string]$marker.Head)
+    $trackingLine = "Tracking issue: #$([int]$issue.number)"
+    $repairedBody = if ($legacyPlaceholder) {
+        $normalized.Substring(0, $candidateLines[0].Index) + $trackingLine +
+            $normalized.Substring($candidateLines[0].Index + $candidateLines[0].Length)
+    }
+    else {
+        $normalized.TrimEnd([char[]]"`n") + [Environment]::NewLine +
+            [Environment]::NewLine + $trackingLine
+    }
+    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', '--method', 'PATCH', "repos/$Repository/pulls/$Number",
+        '-f', "body=$repairedBody"
+    ) | Out-Null
+    $repaired = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    if ((Get-CanonicalTrackingIssueNumber -Body ([string]$repaired.body)) -ne
+        [int]$issue.number) {
+        throw "Managed installing update #$Number tracking repair did not converge."
+    }
+}
+
 function Get-ManagedMergedPullRequestState {
     param(
         [string]$Repository,
@@ -989,13 +1478,10 @@ function Get-ManagedMergedPullRequestState {
         $issue = $matches[0]
     }
     else {
-        $issue = Invoke-GhJson -Arguments @(
-            'api', "repos/$Repository/issues/$trackingIssueNumber"
-        )
-        if ($null -eq $issue -or [int]$issue.number -ne $trackingIssueNumber -or
-            $null -ne $issue.PSObject.Properties['pull_request']) {
-            throw "Managed update pull request #$Number tracking reference is not one same-repository issue."
-        }
+        $issue = Get-ValidatedManagedUpdateIssue -Repository $Repository `
+            -PullRequestNumber $Number -TargetTag $target `
+            -ProtocolSha ([string]$marker.ProtocolSha) -HeadSha ([string]$marker.Head) `
+            -Branch $headRef -PullRequestBody $body -RequireOpen $false
     }
 
     $comments = @(Invoke-GhPagedJson -Endpoint (
@@ -1043,7 +1529,10 @@ function Invoke-ManagedMergedPullRequestFinalization {
     if ($Number -lt 1) {
         throw 'FinalizeMergedPullRequest requires a positive PullRequestNumber.'
     }
-    foreach ($name in @('GITHUB_REPOSITORY', 'DEFAULT_BRANCH', 'GH_TOKEN')) {
+    foreach ($name in @(
+        'GITHUB_REPOSITORY', 'DEFAULT_BRANCH', 'GH_TOKEN', 'ISSUE_TOKEN',
+        'PROTOCOL_TOKEN'
+    )) {
         if (-not [Environment]::GetEnvironmentVariable($name)) {
             throw "Required finalization environment '$name' is missing."
         }
@@ -1053,6 +1542,8 @@ function Invoke-ManagedMergedPullRequestFinalization {
         throw 'GITHUB_REPOSITORY is not a canonical owner/repository identity.'
     }
     $defaultBranch = [string]$env:DEFAULT_BRANCH
+    Repair-LegacyInstallingUpdateTracking -Repository $repository `
+        -DefaultBranch $defaultBranch -Number $Number
     $state = Get-ManagedMergedPullRequestState -Repository $repository `
         -DefaultBranch $defaultBranch -Number $Number
     if (-not [bool]$state.Managed) {
@@ -1138,14 +1629,123 @@ function Invoke-ManagedMergedPullRequestFinalization {
     Write-Host "Managed merge #$Number finalized; issue #$($complete.IssueNumber) closed and exact branch absent."
 }
 
+function Invoke-LegacyInstallingUpdateRecovery {
+    foreach ($name in @(
+        'GITHUB_REPOSITORY', 'DEFAULT_BRANCH', 'GH_TOKEN', 'ISSUE_TOKEN',
+        'PROTOCOL_TOKEN'
+    )) {
+        if (-not [Environment]::GetEnvironmentVariable($name)) {
+            throw "Required finalization environment '$name' is missing."
+        }
+    }
+    $repository = [string]$env:GITHUB_REPOSITORY
+    if ($repository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
+        throw 'GITHUB_REPOSITORY is not a canonical owner/repository identity.'
+    }
+    $owner = $repository.Split('/')[0]
+    $branches = @(
+        @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix) +
+        @(Get-RemoteBranchesByPrefix -Prefix 'automation/meandai-capabilities-') |
+            Sort-Object Name -Unique
+    )
+    $recovered = 0
+    foreach ($branchRecord in $branches) {
+        $branch = [string]$branchRecord.Name
+        $closed = @(Invoke-GhPagedJson -Endpoint (
+            "repos/$repository/pulls?state=closed&head=$owner`:$branch&per_page=100"
+        ))
+        if ($closed.Count -eq 0) { continue }
+        if ($closed.Count -ne 1 -or [string]$closed[0].head.ref -cne $branch) {
+            throw "Reserved managed branch '$branch' has ambiguous closed pull-request ownership."
+        }
+        Invoke-ManagedMergedPullRequestFinalization -Number ([int]$closed[0].number)
+        $recovered++
+    }
+    Write-Host "Managed merge recovery completed; finalized $recovered exact retained branch(es)."
+}
+
+function Complete-SupersededProtocolUpdateIssue {
+    param(
+        [string]$Repository,
+        $Operation,
+        [int]$ReplacementPullRequestNumber = 0
+    )
+
+    $pullNumber = [int]$Operation.PullRequestNumber
+    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$pullNumber")
+    $issue = Get-ValidatedManagedUpdateIssue -Repository $Repository `
+        -PullRequestNumber $pullNumber -TargetTag ([string]$Operation.TargetTag) `
+        -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+        -HeadSha ([string]$Operation.ExpectedHeadSha) -Branch ([string]$Operation.Branch) `
+        -PullRequestBody ([string]$pull.body) -RequireOpen $true
+    $replacementIdentity = if ($ReplacementPullRequestNumber -gt 0) {
+        "replacement-pr-$ReplacementPullRequestNumber"
+    }
+    else { 'default-branch-current' }
+    $marker = "<!-- meandai-protocol-update-supersession:pr-$pullNumber`:head-$([string]$Operation.ExpectedHeadSha)`:$replacementIdentity -->"
+    $comments = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/issues/$([int]$issue.number)/comments?per_page=100"
+    ) -Token ([string]$env:ISSUE_TOKEN))
+    $managed = @($comments | Where-Object {
+        ([string]$_.body).StartsWith(
+            '<!-- meandai-protocol-update-supersession:', [StringComparison]::Ordinal
+        )
+    })
+    $exact = @($managed | Where-Object {
+        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $marker
+    })
+    if ($managed.Count -ne $exact.Count -or $exact.Count -gt 1) {
+        throw "Managed update issue #$([int]$issue.number) has ambiguous supersession evidence."
+    }
+    if ($exact.Count -eq 0) {
+        $body = @(
+            $marker,
+            "Managed protocol proposal #$pullNumber was superseded after its exact branch was removed.",
+            $(if ($ReplacementPullRequestNumber -gt 0) {
+                "Verified replacement proposal: #$ReplacementPullRequestNumber"
+            } else { 'The consumer default branch already contains the target protocol.' })
+        ) -join [Environment]::NewLine
+        Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+            'api', '--method', 'POST',
+            "repos/$Repository/issues/$([int]$issue.number)/comments", '-f', "body=$body"
+        ) | Out-Null
+    }
+    $labels = @($issue.labels | ForEach-Object { [string]$_.name })
+    foreach ($label in @('status:in-progress', 'status:needs-review', 'status:blocked')) {
+        if ($labels -ccontains $label) {
+            Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+                'api', '--method', 'DELETE',
+                "repos/$Repository/issues/$([int]$issue.number)/labels/$([Uri]::EscapeDataString($label))"
+            ) | Out-Null
+        }
+    }
+    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', '--method', 'PATCH', "repos/$Repository/issues/$([int]$issue.number)",
+        '-f', 'state=closed', '-f', 'state_reason=not_planned'
+    ) | Out-Null
+    $closed = Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
+        'api', "repos/$Repository/issues/$([int]$issue.number)"
+    )
+    if ([string]$closed.state -cne 'closed') {
+        throw "Superseded managed update issue #$([int]$issue.number) did not close."
+    }
+}
+
+if ($FinalizeMergedPullRequest -and $RecoverMergedPullRequests) {
+    throw 'Finalization and merged-branch recovery modes are mutually exclusive.'
+}
 if ($FinalizeMergedPullRequest) {
     Invoke-ManagedMergedPullRequestFinalization -Number $PullRequestNumber
+    return
+}
+if ($RecoverMergedPullRequests) {
+    Invoke-LegacyInstallingUpdateRecovery
     return
 }
 
 foreach ($name in @(
     'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
-    'PROTOCOL_TOKEN'
+    'PROTOCOL_TOKEN', 'ISSUE_TOKEN'
 )) {
     if (-not [Environment]::GetEnvironmentVariable($name)) {
         throw "Required workflow environment '$name' is missing."
@@ -1273,6 +1873,13 @@ foreach ($pull in $pulls) {
             -ExpectedPaths $expectedChangedPaths `
             -TargetProtocolSha $expectedProtocolSha -SourcePath $sourcePath `
             -Assets $ManagedUpdaterAssets
+    }
+    if ($marker.Schema -eq 1 -and $expectedProtocolSha -match '^[0-9a-f]{40}$') {
+        Get-ValidatedManagedUpdateIssue -Repository $repository `
+            -PullRequestNumber ([int]$details.number) -TargetTag $target `
+            -ProtocolSha $expectedProtocolSha -HeadSha ([string]$details.head.sha) `
+            -Branch $headRef -PullRequestBody ([string]$details.body) `
+            -RequireOpen $true | Out-Null
     }
     $candidates.Add([pscustomobject]@{
         PullRequestNumber = [int]$details.number
@@ -1425,6 +2032,9 @@ if ($create.Count -eq 1) {
     Invoke-Native -Command 'git' -Arguments @('commit', '-m', "Upgrade common protocol to $targetTag") | Out-Null
     $headSha = ((Invoke-Native -Command 'git' -Arguments @('rev-parse', 'HEAD')) -join '').Trim()
 
+    $updateIssue = Ensure-ProtocolUpdateIssue -Repository $repository `
+        -TargetTag $targetTag -ProtocolSha $targetSha -Branch $createdBranch
+
     $pushSucceeded = $false
     $marker = ''
     try {
@@ -1454,13 +2064,11 @@ if ($create.Count -eq 1) {
             "- Protocol commit: ``$targetSha``", "- Supersedes: $supersedes", '',
             'This draft is review-only and will never merge itself.', '',
             '## Maintainer gates', '',
-            '- [ ] Create or link the tracked issue, allocate its stable work ID, and replace the placeholder below with exactly `Tracking issue: #N`.',
             '- [ ] Read every intervening meAndAI changelog entry.',
             '- [ ] Review incompatible or newly mandatory rules.',
             '- [ ] Review the managed updater asset changes included in this proposal.',
-            '- [ ] Update the consumer project memory pinned-version fact.',
             '- [ ] Run project tests and complete DoR/DoD review.', '',
-            'Tracking issue: #REQUIRED'
+            "Tracking issue: #$($updateIssue.Number)"
         ) -join [Environment]::NewLine
         $url = (Invoke-Native -Command 'gh' -Arguments @(
             'pr', 'create', '--draft', '--base', $env:DEFAULT_BRANCH,
@@ -1479,6 +2087,9 @@ if ($create.Count -eq 1) {
             TargetTag = $targetTag
             ExpectedProtocolSha = $targetSha
         }
+        Set-ProtocolUpdateIssuePullRequestLink -Repository $repository `
+            -IssueNumber ([int]$updateIssue.number) `
+            -PullRequestNumber ([int]$createdPullRequest.number) -HeadSha $headSha
         Assert-ManagedPullRequestSafe -Repository $repository -Operation $createdOperation `
             -ProtocolPath $ProtocolPath -TrustedActor $TrustedActor `
             -SourcePath $sourcePath -BaseCommit $baseHeadSha `
@@ -1650,6 +2261,11 @@ foreach ($operation in $closeOperations) {
         }
         throw "Branch cleanup failed for PR #$($operation.PullRequestNumber); the PR was reopened and the branch preserved. $cleanupError"
     }
+    Complete-SupersededProtocolUpdateIssue -Repository $repository `
+        -Operation $operation `
+        -ReplacementPullRequestNumber $(if ($null -ne $replacementPullRequestNumber) {
+            [int]$replacementPullRequestNumber
+        } else { 0 })
     $comment = if ($null -ne $replacementPullRequestNumber) {
         "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
     }
