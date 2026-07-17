@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.10.3 |
 | Issue | [#69](https://github.com/hasanmanzak/meAndAI/issues/69) |
-| Pull request | [#70](https://github.com/hasanmanzak/meAndAI/pull/70) |
+| Pull request | [#71](https://github.com/hasanmanzak/meAndAI/pull/71) |
 | Decision | [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md) |
 | Tests | [TEST-0119 through TEST-0122](test-cases.md) |
 
@@ -198,7 +198,7 @@ failures before one complete repository validation run.
 - Managed finalization: [FEAT-0022](../FEAT-0022-v097-managed-merge-finalization/README.md) / [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md)
 - Generic migration decision: [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md)
 - Tracking: [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69)
-- Delivery draft: [pull request #70](https://github.com/hasanmanzak/meAndAI/pull/70)
+- Delivery draft: [pull request #71](https://github.com/hasanmanzak/meAndAI/pull/71)
 
 ## Self-review state
 

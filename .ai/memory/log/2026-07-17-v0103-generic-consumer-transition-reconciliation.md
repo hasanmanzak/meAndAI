@@ -58,6 +58,10 @@
   schema-2 merge-finalization recomputation.
 - The complete local Windows PowerShell 5.1 suite passed in 531.5 seconds with
   every discovered child suite and root scenario aggregation green.
+- [Draft PR #71](https://github.com/hasanmanzak/meAndAI/pull/71) on
+  `codex/bug-0012-generic-consumer-transitions` owns delivery. GitHub closed
+  superseded draft #70 when its obsolete version-specific branch was renamed;
+  the old remote branch no longer exists.
 - Hosted and post-publication evidence remain separate external gates.
 
 ## Continuation
