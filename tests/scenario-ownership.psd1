@@ -12,8 +12,7 @@
                 'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076',
                 'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092',
                 'TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099',
-                'TEST-0101', 'TEST-0114', 'TEST-0115', 'TEST-0117',
-                'TEST-0118'
+                'TEST-0101', 'TEST-0114', 'TEST-0118'
             )
         }
         @{
@@ -66,6 +65,11 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/windows-validation-profile.tests.ps1'
+            TestIds = @('TEST-0123')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/post-publication-evidence.tests.ps1'
             TestIds = @('TEST-0083')
         }
@@ -82,7 +86,7 @@
         @{
             Evidence = 'GitHubActionsSemantic'
             Owner = '.github/workflows/protocol-tests.yml'
-            TestIds = @('TEST-0067', 'TEST-0075')
+            TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124')
         }
         @{
             Evidence = 'ExternalPostPublication'
@@ -93,6 +97,16 @@
             Evidence = 'HistoricalSuperseded'
             Owner = 'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md'
             TestIds = @('TEST-0037')
+        }
+        @{
+            Evidence = 'HistoricalSuperseded'
+            Owner = 'docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md'
+            TestIds = @('TEST-0115')
+        }
+        @{
+            Evidence = 'HistoricalSuperseded'
+            Owner = 'docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md'
+            TestIds = @('TEST-0117')
         }
     )
 }

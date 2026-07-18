@@ -95,8 +95,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.3/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.10.3` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.4/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.10.4` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +108,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.10.3` is an exact published immutable release
+launcher itself verifies that `v0.10.4` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -270,7 +270,7 @@ meAndAI status labels, and closes the issue as completed.
 
 GitHub does not replay an event that occurred while a route was absent, and a
 merge performed with `GITHUB_TOKEN` may not create another workflow event. The
-`v0.10.3` workflow therefore also runs bounded recovery on the installing
+installed workflow therefore also runs bounded recovery on an installing
 default-branch push, the schedule, and ordinary manual dispatch. It repairs only
 an exact legacy installing update, then uses the normal finalizer. For a missed
 or failed recovery, run the same route explicitly after confirming the PR is

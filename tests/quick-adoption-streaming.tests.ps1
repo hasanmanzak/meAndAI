@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('All', 'WindowsNative')]
+    [string]$Shard = 'All'
+)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -8,6 +11,10 @@ $fixturePath = Join-Path $root 'tests/fixtures/Invoke-MockCodexEventProcess.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
+
+if ($Shard -ceq 'WindowsNative' -and $env:OS -cne 'Windows_NT') {
+    throw 'WindowsNative streaming compatibility requires Windows.'
+}
 
 function Add-Failure {
     param([Parameter(Mandatory)][string]$Message)
@@ -322,10 +329,25 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Quick-adoption streaming tests passed for TEST-0105 and TEST-0106.' `
-    -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/quick-adoption-streaming.tests.ps1' `
-    -SourcePaths @($PSCommandPath, $fixturePath) `
-    -AuthorityPath $scenarioAuthorityPath
-Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
+if ($Shard -ceq 'All') {
+    Write-Host 'Quick-adoption streaming tests passed for TEST-0105 and TEST-0106.' `
+        -ForegroundColor Green
+    $scenarioResult = New-MeAndAIScenarioResult `
+        -Owner 'tests/quick-adoption-streaming.tests.ps1' `
+        -SourcePaths @($PSCommandPath, $fixturePath) `
+        -AuthorityPath $scenarioAuthorityPath
+    Write-Host ('MEANDAI_SCENARIO_RESULTS=' +
+        ($scenarioResult | ConvertTo-Json -Compress))
+}
+else {
+    Write-Host 'Quick-adoption Windows-native streaming compatibility passed.' `
+        -ForegroundColor Green
+    $compatibilityResult = [ordered]@{
+        schema = 1
+        suite = 'tests/quick-adoption-streaming.tests.ps1'
+        shard = 'WindowsNative'
+        passed = $true
+    }
+    Write-Host ('MEANDAI_COMPATIBILITY_SHARD_RESULT=' +
+        ($compatibilityResult | ConvertTo-Json -Compress))
+}

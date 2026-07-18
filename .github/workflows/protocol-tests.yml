@@ -2,6 +2,7 @@ name: Protocol validation
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - main
@@ -35,6 +36,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ format('{0}-{1}', github.workflow, github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('{0}-{1}', github.event_name, github.run_id)) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   linux-validation:
@@ -77,62 +82,43 @@ jobs:
         shell: pwsh
         run: ./tests/protocol.tests.ps1
 
-  windows-base:
-    name: Windows base validation
-    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
-    runs-on: windows-latest
-    timeout-minutes: 20
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - name: Run protocol validation on Windows PowerShell 5.1
-        shell: powershell
-        run: ./tests/protocol.tests.ps1 -ExecutionProfile WindowsBase
-
-  windows-quick-adoption:
-    name: Windows quick adoption (${{ matrix.shard }})
-    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
-    strategy:
-      fail-fast: false
-      matrix:
-        shard:
-          - ContractsPreflight
-          - AdoptionLifecycle
-          - IntegrityCompletedGraph
-          - IntegrityManifestIssue
-          - IntegrityCodexFailure
-          - IntegrityMetadataCredential
-          - RepositoryRoutes
-    runs-on: windows-latest
-    timeout-minutes: 20
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - name: Run quick-adoption compatibility shard on Windows PowerShell 5.1
-        shell: powershell
-        run: ./tests/quick-adoption.tests.ps1 -Shard '${{ matrix.shard }}'
-
   windows-validation:
     name: Validate on windows-latest
-    if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
-    needs:
-      - windows-base
-      - windows-quick-adoption
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}
+    runs-on: windows-latest
+    timeout-minutes: 20
     steps:
-      - name: Require every Windows compatibility shard
-        shell: bash
+      - name: Check out repository and comparison commits
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select fail-safe Windows validation profile
+        id: windows-profile
+        shell: powershell
         env:
-          WINDOWS_BASE_RESULT: ${{ needs.windows-base.result }}
-          WINDOWS_QUICK_RESULT: ${{ needs.windows-quick-adoption.result }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_COMMIT: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          HEAD_COMMIT: ${{ github.event.pull_request.head.sha || github.event.after || github.sha }}
         run: |
-          test "$WINDOWS_BASE_RESULT" = success
-          test "$WINDOWS_QUICK_RESULT" = success
+          $profile = @(
+            ./tests/Select-WindowsValidationProfile.ps1 `
+              -EventName $env:EVENT_NAME `
+              -BaseCommit $env:BASE_COMMIT `
+              -HeadCommit $env:HEAD_COMMIT
+          )
+          if ($profile.Count -ne 1 -or
+              $profile[0] -cnotin @('Full', 'WindowsNative')) {
+            throw 'Windows validation profile selection returned invalid evidence.'
+          }
+          "profile=$($profile[0])" | Out-File `
+            -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Selected Windows validation profile: $($profile[0])"
+      - name: Run selected validation on Windows PowerShell 5.1
+        shell: powershell
+        run: >-
+          ./tests/protocol.tests.ps1
+          -ExecutionProfile '${{ steps.windows-profile.outputs.profile }}'
 
   post-publication:
     name: Verify published release evidence

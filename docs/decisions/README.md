@@ -20,6 +20,7 @@
 | [DEC-0016](DEC-0016-managed-post-merge-finalization.md) | Finalize exact managed merges in the consumer workflow | Accepted | 2026-07-17 |
 | [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md) | Reconcile consumer lifecycle from repository-owned evidence | Accepted | 2026-07-17 |
 | [DEC-0018](DEC-0018-release-declared-consumer-migrations.md) | Use release-declared consumer migrations for protocol transitions | Accepted | 2026-07-17 |
+| [DEC-0019](DEC-0019-hosted-runner-efficiency.md) | Minimize hosted runner consumption without weakening evidence | Accepted | 2026-07-18 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

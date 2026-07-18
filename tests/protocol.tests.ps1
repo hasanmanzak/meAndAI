@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$StructureOnly,
-    [ValidateSet('Full', 'WindowsBase')]
+    [ValidateSet('Full', 'WindowsNative')]
     [string]$ExecutionProfile = 'Full'
 )
 
@@ -115,6 +115,62 @@ function Read-ScenarioResultRecord {
         -Observed @($record.passed)
     if (-not $comparison.Valid) {
         return $comparison
+    }
+    return [pscustomobject]@{ Valid = $true; Message = '' }
+}
+
+function Read-CompatibilityShardResultRecord {
+    param(
+        [Parameter(Mandatory)][object[]]$Output,
+        [Parameter(Mandatory)][string]$ExpectedSuite,
+        [Parameter(Mandatory)][string]$ExpectedShard
+    )
+
+    $lines = @($Output | ForEach-Object { [string]$_ })
+    $nonEmptyLines = @($lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    $canonicalLines = @($nonEmptyLines | Where-Object {
+        $_.StartsWith('MEANDAI_SCENARIO_RESULTS=', [StringComparison]::Ordinal)
+    })
+    $resultLines = @($nonEmptyLines | Where-Object {
+        $_.StartsWith(
+            'MEANDAI_COMPATIBILITY_SHARD_RESULT=',
+            [StringComparison]::Ordinal
+        )
+    })
+    if ($canonicalLines.Count -ne 0 -or $resultLines.Count -ne 1 -or
+        $nonEmptyLines[-1] -cne $resultLines[0]) {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = 'partial execution must end with exactly one compatibility result and no canonical scenario result'
+        }
+    }
+    try {
+        $json = $resultLines[0].Substring(
+            'MEANDAI_COMPATIBILITY_SHARD_RESULT='.Length
+        )
+        $record = $json | ConvertFrom-Json
+    }
+    catch {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = "compatibility result JSON is invalid: $($_.Exception.Message)"
+        }
+    }
+    $properties = @($record.PSObject.Properties | ForEach-Object { $_.Name })
+    if ($properties.Count -ne 4 -or
+        $properties -cnotcontains 'schema' -or
+        $properties -cnotcontains 'suite' -or
+        $properties -cnotcontains 'shard' -or
+        $properties -cnotcontains 'passed' -or
+        ($record.schema -isnot [int] -and $record.schema -isnot [long]) -or
+        [long]$record.schema -ne 1 -or
+        [string]$record.suite -cne $ExpectedSuite -or
+        [string]$record.shard -cne $ExpectedShard -or
+        $record.passed -isnot [bool] -or -not [bool]$record.passed) {
+        return [pscustomobject]@{
+            Valid = $false
+            Message = 'compatibility result has the wrong schema, identity, or success value'
+        }
     }
     return [pscustomobject]@{ Valid = $true; Message = '' }
 }
@@ -766,9 +822,28 @@ foreach ($requiredText in @(
 if ($ciWorkflow.Contains('shell: ${{ matrix.shell }}')) {
     Add-Failure 'TEST-0067 repository CI uses matrix context where the shell field does not permit it.'
 }
+$protocolMandateSource = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
+$normalizedProtocolMandateSource = [regex]::Replace($protocolMandateSource, '\s+', ' ')
+foreach ($requiredMandateText in @(
+    'MUST minimize total hosted runner consumption',
+    'MUST NOT create redundant job, matrix, setup, checkout, or fan-in load',
+    'newer run wholly supersedes the same pull request',
+    'wall-clock latency alone is not runner-efficiency evidence'
+)) {
+    if (-not $normalizedProtocolMandateSource.Contains($requiredMandateText)) {
+        Add-Failure "TEST-0124 hosted runner-efficiency mandate is missing '$requiredMandateText'."
+    }
+}
 
 $quickAdoptionSuitePath = Join-Path $root 'tests/quick-adoption.tests.ps1'
 $quickAdoptionSuiteSource = Get-Content -LiteralPath $quickAdoptionSuitePath -Raw
+$streamingSuitePath = Join-Path $root 'tests/quick-adoption-streaming.tests.ps1'
+$streamingSuiteSource = Get-Content -LiteralPath $streamingSuitePath -Raw
+$selectorPath = Join-Path $root 'tests/Select-WindowsValidationProfile.ps1'
+$selectorSource = if (Test-Path -LiteralPath $selectorPath -PathType Leaf) {
+    Get-Content -LiteralPath $selectorPath -Raw
+}
+else { '' }
 $validatorTokens = $null
 $validatorParseErrors = $null
 $validatorAst = [Management.Automation.Language.Parser]::ParseFile(
@@ -791,12 +866,12 @@ $quickParameterNames = @($quickAst.ParamBlock.Parameters | ForEach-Object {
 })
 if ($validatorParseErrors.Count -ne 0 -or
     $validatorParameterNames -cnotcontains 'ExecutionProfile') {
-    Add-Failure 'TEST-0115/TEST-0117 root validation lacks its constrained execution-profile contract.'
+    Add-Failure 'TEST-0124 root validation lacks its constrained execution-profile contract.'
 }
 if ($quickParseErrors.Count -ne 0 -or $quickParameterNames -cnotcontains 'Shard') {
-    Add-Failure 'TEST-0117 quick-adoption validation lacks its explicit shard contract.'
+    Add-Failure 'TEST-0124 quick-adoption validation lacks its explicit shard contract.'
 }
-$expectedQuickAdoptionShards = @(
+$diagnosticQuickAdoptionShards = @(
     'ContractsPreflight',
     'AdoptionLifecycle',
     'IntegrityCompletedGraph',
@@ -805,49 +880,97 @@ $expectedQuickAdoptionShards = @(
     'IntegrityMetadataCredential',
     'RepositoryRoutes'
 )
-foreach ($shardName in $expectedQuickAdoptionShards) {
-    if (-not $ciWorkflow.Contains("- $shardName") -or
-        -not $quickAdoptionSuiteSource.Contains("'$shardName'")) {
-        Add-Failure "TEST-0117 Windows compatibility shard '$shardName' is not defined end to end."
+foreach ($shardName in $diagnosticQuickAdoptionShards) {
+    if (-not $quickAdoptionSuiteSource.Contains("'$shardName'")) {
+        Add-Failure "TEST-0124 local diagnostic shard '$shardName' is no longer available."
     }
 }
 if ($ciWorkflow.Contains('- IntegrityFailures') -or
     $quickAdoptionSuiteSource.Contains("'IntegrityFailures'")) {
-    Add-Failure 'TEST-0117 legacy monolithic IntegrityFailures routing is still active.'
+    Add-Failure 'TEST-0124 legacy monolithic IntegrityFailures routing is active.'
 }
 foreach ($requiredWorkflowText in @(
+    'merge_group:',
+    'concurrency:',
+    "cancel-in-progress: `${{ github.event_name == 'pull_request' }}",
     'linux-validation:',
-    'windows-base:',
-    'windows-quick-adoption:',
     'windows-validation:',
     'name: Validate on windows-latest',
-    'ExecutionProfile WindowsBase',
-    'needs:',
-    '- windows-base',
-    '- windows-quick-adoption'
+    'fetch-depth: 0',
+    'id: windows-profile',
+    'tests/Select-WindowsValidationProfile.ps1',
+    'ExecutionProfile',
+    'steps.windows-profile.outputs.profile'
 )) {
     if (-not $ciWorkflow.Contains($requiredWorkflowText)) {
-        Add-Failure "TEST-0117 sharded workflow is missing '$requiredWorkflowText'."
+        Add-Failure "TEST-0124 efficient workflow is missing '$requiredWorkflowText'."
     }
 }
-foreach ($requiredSuiteText in @(
+foreach ($forbiddenWorkflowText in @(
+    'windows-base:',
+    'windows-quick-adoption:',
+    'matrix:',
+    'needs.windows-base.result',
+    'needs.windows-quick-adoption.result'
+)) {
+    if ($ciWorkflow.Contains($forbiddenWorkflowText)) {
+        Add-Failure "TEST-0124 obsolete hosted fan-out remains active: '$forbiddenWorkflowText'."
+    }
+}
+if ([regex]::Matches($ciWorkflow, '(?m)^\s+runs-on:\s+windows-latest\s*$').Count -ne 1 -or
+    [regex]::Matches($ciWorkflow, '(?m)^\s+name:\s+Validate on windows-latest\s*$').Count -ne 1) {
+    Add-Failure 'TEST-0124 ordinary validation must expose exactly one real Windows runner and one stable Windows check identity.'
+}
+$windowsJobIndex = $ciWorkflow.IndexOf("`n  windows-validation:", [StringComparison]::Ordinal)
+$postPublicationIndex = $ciWorkflow.IndexOf("`n  post-publication:", [StringComparison]::Ordinal)
+if ($windowsJobIndex -lt 0 -or $postPublicationIndex -le $windowsJobIndex) {
+    Add-Failure 'TEST-0124 Windows and post-publication job boundaries are missing or unordered.'
+}
+else {
+    $windowsJobSource = $ciWorkflow.Substring(
+        $windowsJobIndex,
+        $postPublicationIndex - $windowsJobIndex
+    )
+    if (-not $windowsJobSource.Contains('runs-on: windows-latest') -or
+        $windowsJobSource.Contains('needs:') -or
+        $windowsJobSource.Contains('matrix:')) {
+        Add-Failure 'TEST-0124 stable Windows check is not the single executing Windows job.'
+    }
+}
+foreach ($requiredProfileText in @(
+    "'WindowsNative'",
     'MEANDAI_COMPATIBILITY_SHARD_RESULT=',
     "if (`$Shard -ceq 'All')"
 )) {
-    if (-not $quickAdoptionSuiteSource.Contains($requiredSuiteText)) {
-        Add-Failure "TEST-0117 quick-adoption suite is missing '$requiredSuiteText'."
+    if (-not $quickAdoptionSuiteSource.Contains($requiredProfileText)) {
+        Add-Failure "TEST-0124 quick-adoption native profile is missing '$requiredProfileText'."
+    }
+}
+foreach ($requiredStreamingText in @(
+    "'WindowsNative'",
+    'MEANDAI_COMPATIBILITY_SHARD_RESULT='
+)) {
+    if (-not $streamingSuiteSource.Contains($requiredStreamingText)) {
+        Add-Failure "TEST-0124 streaming native profile is missing '$requiredStreamingText'."
+    }
+}
+foreach ($requiredSelectorText in @(
+    "[ValidateSet('pull_request', 'push', 'workflow_dispatch', 'merge_group')]",
+    '--no-renames',
+    'WindowsNative',
+    'Full',
+    '300'
+)) {
+    if (-not $selectorSource.Contains($requiredSelectorText)) {
+        Add-Failure "TEST-0124 fail-safe selector is missing '$requiredSelectorText'."
     }
 }
 $normalValidationGuard = "if: `${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}"
 if ([regex]::Matches(
     $ciWorkflow,
     [regex]::Escape($normalValidationGuard)
-).Count -ne 3) {
-    Add-Failure 'TEST-0118 Linux, Windows base, and Windows shard jobs do not share the exact release-only inverse guard.'
-}
-$aggregateValidationGuard = "if: `${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}"
-if (-not $ciWorkflow.Contains($aggregateValidationGuard)) {
-    Add-Failure 'TEST-0118 the aggregate Windows job can run during release-only verification.'
+).Count -ne 2) {
+    Add-Failure 'TEST-0118 Linux and Windows ordinary jobs do not share the exact release-only inverse guard.'
 }
 $postPublicationGuard = "if: github.event_name == 'workflow_dispatch' && inputs.verify_post_publication"
 if (-not $ciWorkflow.Contains($postPublicationGuard)) {
@@ -1558,17 +1681,25 @@ if (-not $StructureOnly) {
         [System.StringComparer]::Ordinal
     )
     $engine = (Get-Process -Id $PID).Path
-    $executionSuites = if ($ExecutionProfile -ceq 'WindowsBase') {
+    $executionSuites = if ($ExecutionProfile -ceq 'WindowsNative') {
         @($testSuites | Where-Object {
-            $_.Name -cne 'quick-adoption.tests.ps1'
+            $_.Name -cin @(
+                'quick-adoption.tests.ps1',
+                'quick-adoption-streaming.tests.ps1'
+            )
         })
     }
     else {
         @($testSuites)
     }
     foreach ($suite in $executionSuites) {
-        $suiteOutput = @(& $engine -NoProfile -ExecutionPolicy Bypass `
-            -File $suite.FullName 2>&1)
+        $suiteArguments = @(
+            '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $suite.FullName
+        )
+        if ($ExecutionProfile -ceq 'WindowsNative') {
+            $suiteArguments += @('-Shard', 'WindowsNative')
+        }
+        $suiteOutput = @(& $engine @suiteArguments 2>&1)
         $suiteExitCode = $LASTEXITCODE
         foreach ($line in $suiteOutput) {
             Write-Host ([string]$line)
@@ -1577,7 +1708,7 @@ if (-not $StructureOnly) {
         if ($suiteExitCode -ne 0) {
             Add-Failure "Child test suite failed: $($suite.Name)"
         }
-        else {
+        elseif ($ExecutionProfile -ceq 'Full') {
             $expectedTestIds = @($authorityByTestId.GetEnumerator() | Where-Object {
                 $_.Value.Evidence -ceq 'ExecutableSuite' -and
                 $_.Value.Owner -ceq $owner
@@ -1591,22 +1722,41 @@ if (-not $StructureOnly) {
                 [void]$completedSuiteOwners.Add($owner)
             }
         }
+        else {
+            $observedResult = Read-CompatibilityShardResultRecord `
+                -Output $suiteOutput -ExpectedSuite $owner `
+                -ExpectedShard 'WindowsNative'
+            if (-not $observedResult.Valid) {
+                Add-Failure "TEST-0124 suite '$owner' has invalid compatibility evidence: $($observedResult.Message)."
+            }
+            else {
+                [void]$completedSuiteOwners.Add($owner)
+            }
+        }
     }
 
-    try {
-        $protocolScenarioResult = New-MeAndAIScenarioResult `
-            -Owner 'tests/protocol.tests.ps1' -SourcePaths @($PSCommandPath) `
-            -AuthorityPath $scenarioAuthorityPath
-        [void]$completedSuiteOwners.Add('tests/protocol.tests.ps1')
+    if ($ExecutionProfile -ceq 'Full') {
+        try {
+            $protocolScenarioResult = New-MeAndAIScenarioResult `
+                -Owner 'tests/protocol.tests.ps1' -SourcePaths @($PSCommandPath) `
+                -AuthorityPath $scenarioAuthorityPath
+            [void]$completedSuiteOwners.Add('tests/protocol.tests.ps1')
+        }
+        catch {
+            Add-Failure "TEST-0091 root suite has invalid source-bound scenario evidence: $($_.Exception.Message)"
+        }
     }
-    catch {
-        Add-Failure "TEST-0091 root suite has invalid source-bound scenario evidence: $($_.Exception.Message)"
+    $requiredSuiteOwners = if ($ExecutionProfile -ceq 'Full') {
+        @($authorityByTestId.Values | Where-Object {
+            $_.Evidence -ceq 'ExecutableSuite'
+        } | ForEach-Object { $_.Owner } | Sort-Object -Unique)
     }
-    $requiredSuiteOwners = @($authorityByTestId.Values | Where-Object {
-        $_.Evidence -ceq 'ExecutableSuite' -and
-        ($ExecutionProfile -cne 'WindowsBase' -or
-            $_.Owner -cne 'tests/quick-adoption.tests.ps1')
-    } | ForEach-Object { $_.Owner } | Sort-Object -Unique)
+    else {
+        @(
+            'tests/quick-adoption.tests.ps1',
+            'tests/quick-adoption-streaming.tests.ps1'
+        )
+    }
     foreach ($owner in $requiredSuiteOwners) {
         if (-not $completedSuiteOwners.Contains($owner)) {
             Add-Failure "TEST-0074 canonical suite has no successful completion evidence: $owner."
@@ -1629,11 +1779,11 @@ else {
         Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($protocolScenarioResult | ConvertTo-Json -Compress))
     }
     else {
-        Write-Host 'Windows base compatibility profile passed.' -ForegroundColor Green
+        Write-Host 'Windows-native compatibility profile passed.' -ForegroundColor Green
         $compatibilityResult = [ordered]@{
             schema = 1
             suite = 'tests/protocol.tests.ps1'
-            shard = 'WindowsBase'
+            shard = 'WindowsNative'
             passed = $true
         }
         Write-Host ('MEANDAI_COMPATIBILITY_SHARD_RESULT=' +
