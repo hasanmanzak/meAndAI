@@ -28,6 +28,7 @@
 | [FEAT-0024](FEAT-0024-v0101-parallel-windows-validation/README.md) | v0.10.1 parallel Windows validation and immutable test fixtures | Complete | 0.10.1 |
 | [FEAT-0025](FEAT-0025-v0102-balanced-windows-validation/README.md) | v0.10.2 balanced Windows integrity validation and isolated publication verification | Complete | 0.10.2 |
 | [FEAT-0026](FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | v0.10.3 generic consumer transition reconciliation | Complete | 0.10.3 |
+| [FEAT-0027](FEAT-0027-v0104-runner-minute-efficiency/README.md) | v0.10.4 hosted runner-minute efficiency | Complete | 0.10.4 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

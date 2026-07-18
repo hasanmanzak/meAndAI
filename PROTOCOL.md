@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.10.3**<br>
+Protocol version: **0.10.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -444,6 +444,20 @@ primary issue and list all related records. Completed changes MUST be pushed.
 If an authorized publication target has no repository, create a private GitHub
 repository by default unless the user specifies visibility. Add a CI workflow
 only when it enforces a recurring gate more reliably than recorded local checks.
+
+Recurring GitHub Actions workflows MUST minimize total hosted runner
+consumption and MUST NOT create redundant job, matrix, setup, checkout, or
+fan-in load merely to reduce wall-clock latency. Every trigger, operating
+system, matrix axis, job, dependency installation, retry, and aggregate runner
+MUST map to declared risk or required evidence. Platform-specific runners
+SHOULD execute only evidence that materially depends on that platform; a
+complete or ambiguous sensitive change fails safe to the declared full
+coverage. Efficiency changes MUST NOT weaken required checks, supported
+runtimes, safety gates, or evidence authority. Automatic cancellation is
+permitted only when the newer run wholly supersedes the same pull request's
+older evidence; main, merge-queue, manual, and publication runs remain
+independent. Workflow reviews compare job count and hosted runner consumption;
+wall-clock latency alone is not runner-efficiency evidence.
 
 ## 8. Versioning
 

@@ -1,33 +1,31 @@
 # Project Snapshot
 
-Last verified: **2026-07-17**
+Last verified: **2026-07-18**
 
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.10.3`. Exact publication state is authoritative
+- Current protocol version: `0.10.4`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) after
+  [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0026](../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
-  adds release-declared, state-based consumer migrations, an exact satisfied
-  ledger, one-draft engine-era updates, and a truthful pre-engine capability
-  handoff; the Derdini live-pin defect is `MIG-0001` data rather than a
-  version-specific code path;
-  [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) owns delivery
+- Current scope: [FEAT-0027](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md)
+  requires hosted runner efficiency, keeps Linux canonical full evidence, and
+  routes one stable Windows job to either fail-safe full validation or focused
+  PowerShell 5.1 native compatibility;
+  [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) owns delivery
   and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: `migrations/index.json` orders immutable migration
-  definitions, `.ai/meandai-update-state.json` records exact satisfied
-  definition blobs, and the pure migration engine plans from repository state
-  instead of an installed tag. `TEST-0119` through `TEST-0122` own the Derdini
-  regression, fail-closed engine, single-draft transition, and pre-engine
-  handoff. Fresh adoption writes a fully satisfied target-catalog baseline;
-  custom, partial, mixed, and drifted states fail closed.
+- Latest tracked work: `tests/Select-WindowsValidationProfile.ps1` classifies
+  exact Git diffs and fails ambiguous or sensitive changes to `Full`.
+  Ordinary CI uses one actual Windows job with a stable check identity; its
+  `WindowsNative` profile emits compatibility-only evidence, while Linux and
+  the Windows `Full` escape hatch retain canonical coverage. `TEST-0123` and
+  `TEST-0124` own selector and orchestration evidence.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and

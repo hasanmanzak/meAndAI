@@ -3,6 +3,30 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.10.4 - 2026-07-18
+
+### Changed
+
+- Require recurring GitHub Actions workflows to minimize total hosted runner
+  consumption without weakening declared platform, runtime, safety, or
+  evidence coverage.
+- Replace the Windows base job, seven-child matrix, and Ubuntu fan-in runner
+  with one actual Windows PowerShell 5.1 job retaining the stable
+  `Validate on windows-latest` identity.
+- Select `WindowsNative` for complete platform-neutral diffs and fail safe to
+  `Full` for PowerShell, command-wrapper, workflow, migration, rename,
+  deletion, manual, merge-queue, empty, unavailable, or oversized evidence.
+- Keep Linux as the canonical full-suite authority, make focused Windows runs
+  compatibility-only, and cancel only superseded runs for the same pull
+  request while isolating main, manual, merge-queue, and publication runs.
+- Preserve the seven focused quick-adoption shard names as local diagnostic
+  entry points without paying for hosted matrix fan-out.
+
+Related work: [FEAT-0027](docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md),
+[DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
+[TEST-0123 and TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md),
+and [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72).
+
 ## 0.10.3 - 2026-07-17
 
 ### Fixed
