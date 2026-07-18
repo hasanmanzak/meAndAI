@@ -50,13 +50,52 @@ $ManagedUpdateLabels = @(
 )
 
 function Invoke-Native {
-    param([string]$Command, [string[]]$Arguments)
+    param(
+        [string]$Command,
+        [string[]]$Arguments,
+        [int[]]$AcceptedExitCodes = @(0),
+        [switch]$PassThruResult
+    )
 
-    $output = @(& $Command @Arguments 2>&1)
-    if ($LASTEXITCODE -ne 0) {
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $global:LASTEXITCODE = 0
+        $output = @(& $Command @Arguments 2>&1)
+        $exitCode = if ($null -eq $LASTEXITCODE) {
+            0
+        }
+        else {
+            [int]$LASTEXITCODE
+        }
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if (-not ($AcceptedExitCodes -contains $exitCode)) {
         throw "$Command $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
     }
+    if ($PassThruResult) {
+        return [pscustomobject]@{
+            ExitCode = [int]$exitCode
+            Output = @($output)
+        }
+    }
     $output
+}
+
+function Test-GitAncestor {
+    param(
+        [string]$RepositoryPath,
+        [string]$Ancestor,
+        [string]$Descendant
+    )
+
+    $result = Invoke-Native -Command 'git' -Arguments @(
+        '-C', $RepositoryPath, 'merge-base', '--is-ancestor',
+        $Ancestor, $Descendant
+    ) -AcceptedExitCodes @(0, 1) -PassThruResult
+    return [int]$result.ExitCode -eq 0
 }
 
 function Invoke-GhJson {
@@ -421,7 +460,7 @@ function Import-ConsumerMigrationCatalogAtCommit {
         throw 'Consumer migration capability is partial or not stored as regular immutable blobs.'
     }
     Invoke-Native -Command 'git' -Arguments @(
-        '-C', $SourcePath, 'checkout', '--detach', $Commit
+        '-C', $SourcePath, 'checkout', '--quiet', '--detach', $Commit
     ) | Out-Null
     $indexFile = Join-Path $SourcePath `
         ($ConsumerMigrationIndexPath -replace '/', [IO.Path]::DirectorySeparatorChar)
@@ -1408,13 +1447,13 @@ function Remove-RemoteBranch {
 function Get-RemoteBranchHead {
     param([string]$Branch)
 
-    $output = @(& git ls-remote --exit-code --heads origin "refs/heads/$Branch" 2>&1)
-    $exitCode = $LASTEXITCODE
+    $result = Invoke-Native -Command 'git' -Arguments @(
+        'ls-remote', '--exit-code', '--heads', 'origin', "refs/heads/$Branch"
+    ) -AcceptedExitCodes @(0, 2) -PassThruResult
+    $output = @($result.Output)
+    $exitCode = [int]$result.ExitCode
     if ($exitCode -eq 2) {
         return $null
-    }
-    if ($exitCode -ne 0) {
-        throw "Unable to inspect remote branch '$Branch'; git exited with $exitCode."
     }
     if ($output.Count -ne 1) {
         throw "Remote branch '$Branch' returned an ambiguous ref result."
@@ -3073,8 +3112,10 @@ foreach ($tag in $orderedCompatibleTags) {
     $targetShaForCatalog = ((Invoke-Native -Command 'git' -Arguments @(
         '-C', $sourcePath, 'rev-list', '-n', '1', $tag
     )) -join '').Trim()
-    & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetShaForCatalog
-    if ($LASTEXITCODE -ne 0) { continue }
+    if (-not (Test-GitAncestor -RepositoryPath $sourcePath `
+            -Ancestor $currentProtocolSha -Descendant $targetShaForCatalog)) {
+        continue
+    }
     $targetCatalog = Import-ConsumerMigrationCatalogAtCommit `
         -SourcePath $sourcePath -Commit $targetShaForCatalog
     if ($null -eq $targetCatalog) {
@@ -3355,8 +3396,8 @@ if ($create.Count -eq 1) {
         throw "Resolver target '$targetTag' lacks one deterministic consumer migration plan."
     }
     if ($proposalKind -ceq 'Update') {
-        & git -C $sourcePath merge-base --is-ancestor $currentProtocolSha $targetSha
-        if ($LASTEXITCODE -ne 0) {
+        if (-not (Test-GitAncestor -RepositoryPath $sourcePath `
+                -Ancestor $currentProtocolSha -Descendant $targetSha)) {
             throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."
         }
     }

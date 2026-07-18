@@ -171,6 +171,13 @@ selects only the verified recovery replacement before legacy cleanup. The real
 Derdini validator, isolated-launcher shard, resolver, adapter, and finalizer
 regressions pass locally with no unresolved blocking finding.
 
+A later real v0.10.4 adoption exposed `FIND-0158`: Windows PowerShell 5.1
+promoted successful native Git stderr to a terminating error before the target
+adapter could inspect exit code 0. The immutable v0.10.4 release remains
+unchanged; [FEAT-0029](../FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
+[PR #78](https://github.com/hasanmanzak/meAndAI/pull/78), and the amended
+`TEST-0126` carry the forward correction.
+
 ## Definition of Done
 
 - [x] Acceptance criteria met.

@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.11.0 |
 | Issue and post-publication authority | [#77](https://github.com/hasanmanzak/meAndAI/issues/77) |
-| Pull request | Pending |
+| Pull request | [#78](https://github.com/hasanmanzak/meAndAI/pull/78) |
 | Decisions | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md); [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
 | Tests | [TEST-0131 and TEST-0132](test-cases.md) |
 
@@ -166,6 +166,7 @@ FEAT-0029/FEAT-0030 convergence reports no unresolved `Blocking` finding.
 ## Post-merge publication evidence
 
 [Issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) is the stable
-external authority. Exact pull request, checks, merge, branch cleanup, release,
+external authority and [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78)
+is the current draft delivery. Checks, review, merge, branch cleanup, release,
 tag, commit, asset, and post-publication verification remain `Pending` until
 they exist.

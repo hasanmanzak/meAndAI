@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [switch]$NativeStderrOnly
+)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -54,16 +56,208 @@ function Get-AdapterFunctionDefinition {
 Import-Module $moduleSource -Force
 foreach ($helperName in @(
     'Invoke-Native',
+    'Test-GitAncestor',
     'Get-LocalTreeEntry',
     'Get-StagedTreeEntry',
     'Get-OrdinalUniquePaths',
     'Get-ExpectedManagedPaths',
     'Assert-StagedManagedUpdate',
     'Stage-ManagedProposalTree',
+    'Get-RemoteBranchHead',
     'Assert-RemoteDefaultBranchUnchanged',
     'Get-ExistingReplacementCandidates'
 )) {
     . ([scriptblock]::Create((Get-AdapterFunctionDefinition -Name $helperName)))
+}
+
+$catalogImportDefinition = Get-AdapterFunctionDefinition `
+    -Name 'Import-ConsumerMigrationCatalogAtCommit'
+if (-not $catalogImportDefinition.Contains(
+        "'checkout', '--quiet', '--detach', `$Commit")) {
+    Add-Failure 'TEST-0126 target migration-catalog checkout is not quiet and detached.'
+}
+$remoteBranchDefinition = Get-AdapterFunctionDefinition `
+    -Name 'Get-RemoteBranchHead'
+if (-not $remoteBranchDefinition.Contains(
+        '-AcceptedExitCodes @(0, 2) -PassThruResult')) {
+    Add-Failure 'TEST-0126 missing remote-ref exit code 2 is not captured by the native wrapper.'
+}
+if ([regex]::IsMatch($adapterContent, '(?m)^\s*&\s+git\b')) {
+    Add-Failure 'TEST-0126 target adapter bypasses the native exit-code wrapper.'
+}
+
+$nativeStderrRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-native-stderr-$([guid]::NewGuid().ToString('N'))"
+try {
+    $nativeStderrRepository = Join-Path $nativeStderrRoot 'consumer'
+    [IO.Directory]::CreateDirectory($nativeStderrRepository) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'init', '--quiet', '--initial-branch=main'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'user.name', 'TEST-0126'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'user.email',
+        'test-0126@example.invalid'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'commit.gpgsign', 'false'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'core.autocrlf', 'false'
+    ) | Out-Null
+
+    $nativeStderrFixture = Join-Path $nativeStderrRepository 'fixture.txt'
+    [IO.File]::WriteAllText($nativeStderrFixture, "first`n",
+        [Text.UTF8Encoding]::new($false))
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'add', '--', 'fixture.txt'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'commit', '--quiet', '-m', 'first'
+    ) | Out-Null
+    $firstCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+
+    [IO.File]::WriteAllText($nativeStderrFixture, "second`n",
+        [Text.UTF8Encoding]::new($false))
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'add', '--', 'fixture.txt'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'commit', '--quiet', '-m', 'second'
+    ) | Out-Null
+    $secondCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+
+    $expectedPreference = [string]$ErrorActionPreference
+    $checkoutOutput = @()
+    try {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach', $firstCommit
+        ) | Out-Null
+        $checkoutOutput = @(Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach', $secondCommit
+        ))
+    }
+    catch {
+        Add-Failure "TEST-0126 successful native stderr was treated as failure: $($_.Exception.Message)"
+    }
+    if ($checkoutOutput.Count -eq 0) {
+        Add-Failure 'TEST-0126 did not exercise the successful Git checkout stderr path.'
+    }
+    $checkedOutCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    if ($checkedOutCommit -cne $secondCommit) {
+        Add-Failure 'TEST-0126 successful native stderr did not preserve the requested checkout result.'
+    }
+    if ([string]$ErrorActionPreference -cne $expectedPreference) {
+        Add-Failure 'TEST-0126 native invocation did not restore ErrorActionPreference.'
+    }
+
+    if (-not (Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor $firstCommit -Descendant $secondCommit)) {
+        Add-Failure 'TEST-0126 rejected a valid Git ancestor relation.'
+    }
+    if (Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor $secondCommit -Descendant $firstCommit) {
+        Add-Failure 'TEST-0126 accepted exit code 1 as a valid Git ancestor relation.'
+    }
+    $invalidAncestorFailed = $false
+    try {
+        Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor 'test-0126-missing' -Descendant $secondCommit | Out-Null
+    }
+    catch {
+        $invalidAncestorFailed = $true
+    }
+    if (-not $invalidAncestorFailed) {
+        Add-Failure 'TEST-0126 accepted an unexpected Git ancestor error.'
+    }
+
+    $nativeStderrRemote = Join-Path $nativeStderrRoot 'origin.git'
+    Invoke-Native -Command 'git' -Arguments @(
+        'clone', '--quiet', '--bare', $nativeStderrRepository,
+        $nativeStderrRemote
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'remote', 'add', 'origin',
+        $nativeStderrRemote
+    ) | Out-Null
+    Push-Location $nativeStderrRepository
+    try {
+        $actualRemoteHead = Get-RemoteBranchHead -Branch 'main'
+        if ($actualRemoteHead -cne $secondCommit) {
+            Add-Failure 'TEST-0126 did not return the exact remote branch head.'
+        }
+        $missingRemoteHead = Get-RemoteBranchHead `
+            -Branch 'test-0126-missing'
+        if ($null -ne $missingRemoteHead) {
+            Add-Failure 'TEST-0126 did not preserve missing remote ref exit code 2.'
+        }
+        Invoke-Native -Command 'git' -Arguments @(
+            'remote', 'set-url', 'origin',
+            (Join-Path $nativeStderrRoot 'missing-origin.git')
+        ) | Out-Null
+        $invalidRemoteFailed = $false
+        try {
+            Get-RemoteBranchHead -Branch 'main' | Out-Null
+        }
+        catch {
+            $invalidRemoteFailed = $true
+        }
+        if (-not $invalidRemoteFailed) {
+            Add-Failure 'TEST-0126 accepted an unexpected remote inspection error.'
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+    $nativeHost = (Get-Process -Id $PID).Path
+    $exitTwoResult = Invoke-Native -Command $nativeHost -Arguments @(
+        '-NoProfile', '-Command', 'exit 2'
+    ) -AcceptedExitCodes @(0, 2) -PassThruResult
+    if ([int]$exitTwoResult.ExitCode -ne 2) {
+        Add-Failure 'TEST-0126 did not preserve an accepted native exit code 2.'
+    }
+
+    $invalidCheckoutFailed = $false
+    try {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach',
+            'refs/heads/test-0126-missing'
+        ) | Out-Null
+    }
+    catch {
+        $invalidCheckoutFailed = $true
+    }
+    if (-not $invalidCheckoutFailed) {
+        Add-Failure 'TEST-0126 accepted a native command with a nonzero exit code.'
+    }
+}
+catch {
+    Add-Failure "TEST-0126 native stderr fixture failed unexpectedly: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $nativeStderrRoot) {
+        Remove-Item -LiteralPath $nativeStderrRoot -Recurse -Force
+    }
+}
+
+if ($NativeStderrOnly) {
+    if ($failures.Count -gt 0) {
+        foreach ($failure in $failures) {
+            Write-Host "FAIL: $failure" -ForegroundColor Red
+        }
+        exit 1
+    }
+    Write-Host 'Protocol update native stderr regression passed.' -ForegroundColor Green
+    exit 0
 }
 
 $script:FocusedRemoteDefaultHead = '0' * 40

@@ -13,7 +13,10 @@ one optional stability-cycle agent prompt. Follow
 and the [v0.11.0 continuation](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md).
 [Issues #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
 [#77](https://github.com/hasanmanzak/meAndAI/issues/77) own external delivery
-facts. `FIND-0120` remains the separate open follow-up in issue #44.
+facts; [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78) is the current
+draft delivery and carries the resolved local corrections for `FIND-0158` and
+`FIND-0159`; replacement hosted evidence remains pending. `FIND-0120` remains
+the separate open follow-up in issue #44.
 
 ## History
 

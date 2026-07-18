@@ -234,7 +234,14 @@ function Get-MeAndAIProtocolSurfaceInventory {
     $surfaces = [System.Collections.Generic.HashSet[string]]::new(
         [StringComparer]::Ordinal
     )
-    foreach ($value in @($Paths)) {
+    [object[]]$pathValues = @()
+    if ($null -ne $Paths) {
+        $pathValues = [object[]]@($Paths)
+    }
+    if ($pathValues.Count -eq 1 -and $null -eq $pathValues[0]) {
+        $pathValues = [object[]]@()
+    }
+    foreach ($value in $pathValues) {
         $path = [string]$value
         if (-not (Test-MeAndAICanonicalRepositoryPath -Path $path) -or
             -not $seenPaths.Add($path)) {

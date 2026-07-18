@@ -6,9 +6,9 @@
 | Status | Complete |
 | Target version | 0.11.0 |
 | Issue and post-publication authority | [#76](https://github.com/hasanmanzak/meAndAI/issues/76) |
-| Pull request | Pending |
+| Pull request | [#78](https://github.com/hasanmanzak/meAndAI/pull/78) |
 | Decision | [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md) |
-| Tests | [TEST-0127 through TEST-0130](test-cases.md) |
+| Tests | [TEST-0127 through TEST-0130](test-cases.md); compatibility regression [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -185,7 +185,7 @@ changing application behavior or inventing project facts.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0127 through TEST-0130](test-cases.md) |
-| Test code | Passed | Pure policy, adapter, launcher, and structural suites own and pass `TEST-0127` through `TEST-0130` |
+| Test code | Passed locally; replacement hosted run pending | Pure policy, adapter, launcher, and structural suites own `TEST-0127` through `TEST-0130`; the target updater adapter owns the amended `TEST-0126` regression |
 | Baseline run | Green inherited baseline | v0.10.4 complete suite recorded by FEAT-0028; branch baseline is clean |
 
 ## Decomposition and review gates
@@ -195,14 +195,23 @@ changing application behavior or inventing project facts.
 | `SUBF-0053` | Pure strategy/inventory resolver, workflow event gate, manifest and proposal identity | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | `TEST-0127`, `TEST-0128`; passed | Exact enum/path/schema/event diff and negative matrix; no open `Blocking` finding | Complete |
 | `SUBF-0054` | Launcher selection, strategy-specific semantic prompt, deletion boundary, recovery, and guidance | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | `TEST-0129`, `TEST-0130`; passed | Parameter/prompt/change-set/recovery diff and negative matrix; no open `Blocking` finding | Complete |
 
+## Corrective finding
+
+| ID | Classification / status | Priority / impact | Resolution and evidence |
+| --- | --- | --- | --- |
+| `FIND-0158` | Windows PowerShell 5.1 compatibility defect / `Blocking` then resolved | `p1` / the immutable v0.10.4 target adapter completed its detached checkout but the latest launcher aborted before creating the atomic recovery proposal | `Invoke-Native` now scopes `ErrorActionPreference=Continue` only around the native process, captures its exit code, restores the caller preference in `finally`, and throws unless the code is explicitly accepted. Every adapter Git call uses that boundary; ancestry false and missing-ref exits 1/2 remain typed control flow, while unexpected failures stop. The catalog checkout is also quiet. The real-Git `TEST-0126` fixture and final updater family pass after two expected-red corrections. |
+| `FIND-0159` | PowerShell 7 / Linux empty-inventory compatibility defect / `Blocking` then resolved | `p1` / Ubuntu rejected an otherwise valid empty initial-adoption marker before quick adoption could reuse its deterministic draft | The pure classifier now normalizes only a sole null/empty-collection sentinel to an empty inventory; a null mixed with any real path remains invalid. `TEST-0127` covers scalar null, empty array, singleton-null, and mixed-null inputs; the `TEST-0130` adoption marker round trip and full capabilities adapter pass. The original Ubuntu run is the expected-red cross-platform evidence; the replacement hosted run remains the publication gate. |
+
 ## Relationships
 
 - Initial adoption lifecycle: [FEAT-0005](../FEAT-0005-ai-capabilities-lifecycle/README.md) / [DEC-0006](../../decisions/DEC-0006-seed-workflow-adoption-handoff.md)
 - Local semantic completion: [FEAT-0007](../FEAT-0007-local-codex-adoption/README.md) / [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
 - Adoption containment: [FEAT-0009](../FEAT-0009-adoption-integrity/README.md) / [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)
 - Consumer transition migrations: [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) / [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md)
+- Target-bound current-launcher recovery: [FEAT-0028](../FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md) / [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md)
 - Strategy decision: [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md)
 - Tracking and post-publication authority: [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76)
+- Review delivery: [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78)
 
 ## Definition of Ready
 
@@ -253,7 +262,9 @@ changing application behavior or inventing project facts.
 
 The implementation review identified and closed containment, live-base drift,
 preflight, event-routing, collision-identity, credential-link, Git-hook,
-empty-remote all-ref race, and duplicated-policy gaps. The exact immutable
+empty-remote all-ref race, duplicated-policy, and Windows PowerShell 5.1 native
+stderr gaps. Hosted review also closed PowerShell 7's singleton-null binding of
+an empty protocol-surface inventory. The exact immutable
 capabilities module is now the single pure-policy authority; launcher and
 workflow actors retain only their distinct evidence and mutation guards. One
 status-aware completion envelope covers normal and recovery publication,
@@ -279,6 +290,7 @@ convergence scan reports no unresolved `Blocking` finding.
 ## Post-merge publication evidence
 
 [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) is the stable
-external authority. Exact pull request, checks, merge, branch cleanup, release,
+external authority and [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78)
+is the current draft delivery. Checks, review, merge, branch cleanup, release,
 tag, commit, asset, and post-publication verification remain `Pending` until
 they exist.

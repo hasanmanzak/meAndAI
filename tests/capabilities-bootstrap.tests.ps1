@@ -259,11 +259,40 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $moduleRecognizedInventory = @(& $surfaceClassifier -Paths @(
             'src/app.ps1', $moduleRecognizedPath
         ))
-        $emptyInventory = @(& $surfaceClassifier -Paths $null)
-        if ($emptyInventory.Count -ne 0 -or
-            $moduleRecognizedInventory.Count -ne 1 -or
+        foreach ($emptyInventoryInput in @(
+            [pscustomobject]@{ Name = 'scalar null'; Paths = $null },
+            [pscustomobject]@{ Name = 'empty array'; Paths = [object[]]@() },
+            [pscustomobject]@{
+                Name = 'PowerShell 7 singleton-null sentinel'
+                Paths = [object[]]@($null)
+            }
+        )) {
+            try {
+                $emptyInventory = @(& $surfaceClassifier `
+                    -Paths $emptyInventoryInput.Paths)
+                if ($emptyInventory.Count -ne 0) {
+                    Add-Failure "TEST-0127 $($emptyInventoryInput.Name) did not produce an empty protocol inventory."
+                }
+            }
+            catch {
+                Add-Failure "TEST-0127 $($emptyInventoryInput.Name) was not accepted as an empty protocol inventory: $($_.Exception.Message)"
+            }
+        }
+        if ($moduleRecognizedInventory.Count -ne 1 -or
             [string]$moduleRecognizedInventory[0] -cne $moduleRecognizedPath) {
             Add-Failure 'TEST-0127 module-owned relevant-path predicate and surface inventory disagree.'
+        }
+        $mixedNullInventoryFailed = $false
+        try {
+            [void]@(& $surfaceClassifier -Paths ([object[]]@(
+                'AGENTS.md', $null
+            )))
+        }
+        catch {
+            $mixedNullInventoryFailed = $true
+        }
+        if (-not $mixedNullInventoryFailed) {
+            Add-Failure 'TEST-0127 a null mixed with a real protocol path was silently ignored.'
         }
         $casingFailed = $false
         $canonicalCasingOutput = @(& $pathCasingAssertion `

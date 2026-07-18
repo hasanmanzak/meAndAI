@@ -52,6 +52,19 @@
   override and restores the previous Git configuration environment in its
   outer `finally`, so launcher-owned Git operations cannot execute consumer or
   global hooks while token files are present.
+- The target updater adapter treats native stderr as output, not failure. Its
+  native wrapper temporarily uses `ErrorActionPreference=Continue`, captures
+  the process exit code, restores the caller preference in `finally`, and
+  throws unless that code is explicitly accepted. Every adapter Git call uses
+  the wrapper; ancestry false and missing-ref exits 1/2 remain typed control
+  flow while every unexpected nonzero exit stops. The migration-catalog
+  detached checkout is quiet; this resolves the Windows PowerShell 5.1 failure
+  recorded as `FIND-0158` without changing immutable v0.10.4 assets.
+- The capabilities classifier treats only a sole null/empty-collection
+  sentinel as an empty inventory. This normalizes PowerShell 7/Linux parameter
+  binding for empty schema-5/6 adoption markers while continuing to reject a
+  null mixed with any real repository path. The hosted defect and correction
+  are recorded as `FIND-0159` under existing `TEST-0127` and `TEST-0130`.
 - The canonical stability-cycle prompt lives at
   `docs/agent-prompts/stability-and-consistency-cycle.md`. It is single-run,
   report-only by default, and cannot create or schedule its next invocation.
@@ -66,12 +79,30 @@
   `-Shard All` harness in 1107 seconds, including cross-shard fixture isolation.
 - `TEST-0131` and `TEST-0132` pass the final 2.5-second structure-only protocol
   suite after local convergence was separated from authorized full completion.
+- The amended `TEST-0126` real-Git fixture reproduced `FIND-0158` under Windows
+  PowerShell 5.1 in 3.5 seconds and initially passed in 3.6 seconds. Self-review
+  then exposed three direct Git bypasses with an expected 3.7-second red; the
+  final unrestricted 5.0-second pass covers exact HEAD, error-preference
+  restoration, real ancestry/remote exits 0/1/2, invalid ancestry/remote
+  failure, unexpected-nonzero rejection, and no direct bypass.
+- The complete `tests/protocol-update.tests.ps1` updater family passed outside
+  the process sandbox in 34.8 seconds with every declared adapter scenario and
+  canonical `TEST-0126` ownership green. Two preceding sandboxed attempts
+  reached only the known Git-for-Windows `sh.exe` signal-pipe error 5 in the
+  unchanged `TEST-0125` clone fixture; the identical unrestricted run passed.
+- Ubuntu run `29651797496` supplied the expected-red `FIND-0159` evidence at
+  commit `617d1b0`: capabilities and quick adoption both rejected the same
+  empty inventory representation. After the correction, the complete
+  capabilities/adapter family passed locally in 461.7 seconds and the focused
+  `AdoptionLifecycle` quick shard passed in 160.3 seconds; replacement Ubuntu
+  evidence remains required from the pushed correction.
 - The complete repository suite passes in 1576 seconds with every discovered
   suite and canonical scenario owner green before that documentation-and-
   assertion-only clarification. Fresh-diff review and bounded post-development
   confirmation report no unresolved `Blocking` finding.
 - [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
   [issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) own delivery and
-  post-publication facts. Pull request, hosted checks, merge, branch cleanup,
-  immutable release, asset, and post-publication verification remain pending
-  until they exist.
+  post-publication facts; [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78)
+  is the current draft. Checks, review, merge, branch cleanup, immutable
+  release, asset, and post-publication verification remain pending until they
+  exist.

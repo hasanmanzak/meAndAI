@@ -53,12 +53,29 @@ This project uses the `M.m.rev` version format defined in the
   establish local convergence, but remains `Blocked` and cannot claim full
   cycle completion or `Waiting` until that final-push authority is exercised.
 
+### Fixed
+
+- Treat successful native-command stderr as output under Windows PowerShell
+  5.1 and decide target-updater failure from the captured process exit code;
+  restore the caller error preference, retain failure for every unexpected
+  nonzero exit, preserve ancestry/missing-ref exits 1/2 as typed control flow,
+  route every adapter Git call through that boundary, and quiet the detached
+  migration-catalog checkout that exposed the defect.
+- Normalize PowerShell 7's singleton-null representation of an empty protocol
+  inventory without weakening fail-closed validation: a null mixed with any
+  real path remains invalid, and empty initial-adoption markers round-trip on
+  both Windows PowerShell and PowerShell 7.
+
 Related work: [FEAT-0029](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
 [FEAT-0030](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
 [DEC-0021](docs/decisions/DEC-0021-explicit-initial-adoption-strategy.md),
 [TEST-0127 through TEST-0132](tests/scenario-ownership.psd1),
 [issue #76](https://github.com/hasanmanzak/meAndAI/issues/76), and
-[issue #77](https://github.com/hasanmanzak/meAndAI/issues/77).
+[issue #77](https://github.com/hasanmanzak/meAndAI/issues/77). The resolved
+PowerShell compatibility corrections are `FIND-0158`, `FIND-0159`, and amended
+[TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md)
+plus [TEST-0127 / TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md)
+in [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78).
 
 ## 0.10.4 - 2026-07-18
 
