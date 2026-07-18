@@ -9,7 +9,8 @@ param(
         'IntegrityManifestIssue',
         'IntegrityCodexFailure',
         'IntegrityMetadataCredential',
-        'RepositoryRoutes'
+        'RepositoryRoutes',
+        'CurrentLauncherRecovery'
     )]
     [string]$Shard = 'All'
 )
@@ -3702,7 +3703,7 @@ try {
         $legacyError = ''
         try {
             & $launcherPath -TargetPath $legacyConsumer.Repository `
-                -CodexCommand $mockCodexPath | Out-Null
+                -SkipLifecycleDispatch -CodexCommand $mockCodexPath | Out-Null
         }
         catch {
             $legacyError = $_.Exception.Message
@@ -3721,10 +3722,10 @@ try {
         })
         if ($legacyError -or $legacyHeadAfter -cne $legacyConsumer.Head -or
             $legacyWorkflowShaAfter -cne $legacyWorkflowShaBefore -or
-            $legacyDispatches.Count -ne 1 -or -not $global:QuickAdoptionWorkflowDispatched -or
+            $legacyDispatches.Count -ne 0 -or $global:QuickAdoptionWorkflowDispatched -or
             $legacyPrLookups.Count -ne 0 -or $global:QuickAdoptionSecrets.Count -ne 0 -or
             @(Get-MockCodexCalls).Count -ne $legacyCodexCallsBefore) {
-            Add-Failure "TEST-0113 exact older same-major adoption did not dispatch only its preserved installed updater: $legacyError"
+            Add-Failure "TEST-0113 exact older same-major adoption did not preserve its checkout when current-launcher recovery was explicitly skipped: $legacyError"
         }
 
         foreach ($blockedRoute in @(
@@ -3844,17 +3845,446 @@ finally {
     }
 }
 
-if (Test-QuickAdoptionShard -Name 'RepositoryRoutes') {
+if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
     $launcher = Get-Content -LiteralPath $launcherPath -Raw
     foreach ($requiredRepeatRouteText in @(
         'Get-ExistingAdoptionRoute',
         'AlreadyCurrent',
         'CompatibleUpdate',
-        'Dispatching installed updater',
+        'Invoke-LocalCurrentLauncherRecovery',
+        'Running target-bound updater recovery',
         'The installed updater seed was preserved'
     )) {
         if (-not $launcher.Contains($requiredRepeatRouteText)) {
             Add-Failure "TEST-0113 launcher lacks repeat-adoption route '$requiredRepeatRouteText'."
+        }
+    }
+
+    $launcherTokens = $null
+    $launcherParseErrors = $null
+    $launcherAst = [Management.Automation.Language.Parser]::ParseFile(
+        $launcherPath,
+        [ref]$launcherTokens,
+        [ref]$launcherParseErrors
+    )
+    $recoveryFunctions = @($launcherAst.FindAll({
+        param($node)
+        $node -is [Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -ceq 'Invoke-LocalCurrentLauncherRecovery'
+    }, $true))
+    if ($recoveryFunctions.Count -ne 1) {
+        Add-Failure 'TEST-0126 launcher must define one current-launcher recovery boundary.'
+    }
+    else {
+        $recoveryText = $recoveryFunctions[0].Extent.Text
+        foreach ($requiredRecoveryContract in @(
+            "'repo', 'clone', `$Repository, `$consumerClone",
+            "'repo', 'clone', `$ProtocolRepository, `$protocolSource",
+            'The consumer default branch changed before its isolated recovery clone was bound.',
+            'The cloned protocol tag does not match the verified immutable release commit.',
+            '-CurrentLauncher',
+            '-RequestedTargetTag $TargetTag',
+            '-RequestedTargetCommit $TargetCommit',
+            '-RequestedBaseSha $HeadSha',
+            '-ProtocolSourcePath $protocolSource',
+            'GITHUB_REPOSITORY',
+            'GITHUB_WORKSPACE',
+            'DEFAULT_BRANCH',
+            'finally',
+            'Remove-Item -LiteralPath $temporaryRoot -Recurse -Force',
+            'The maintainer checkout changed during isolated current-launcher recovery.'
+        )) {
+            if (-not $recoveryText.Contains($requiredRecoveryContract)) {
+                Add-Failure "TEST-0126 current-launcher recovery lacks '$requiredRecoveryContract'."
+            }
+        }
+        if ($recoveryText.Contains('MEANDAI_UPDATER_TOKEN') -or
+            $recoveryText.Contains('MEANDAI_PROTOCOL_TOKEN') -or
+            $recoveryText.Contains('FG_PAT.txt') -or
+            $recoveryText.Contains('MEANDAI_RO_FG_PAT.txt')) {
+            Add-Failure 'TEST-0126 current-launcher recovery attempts to read or name stored credential material.'
+        }
+    }
+
+    $compatibleRoute = [regex]::Match(
+        $launcher,
+        "(?s)if \(\[string\]\`$existingAdoptionRoute\.State -ceq 'CompatibleUpdate'\) \{(?<body>.*?)\r?\n\}\r?\n\r?\nSet-QuickAdoptionProgress -Status 'Publishing canonical seed workflow'",
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $compatibleRoute.Success -or
+        -not $compatibleRoute.Groups['body'].Value.Contains(
+            'Invoke-LocalCurrentLauncherRecovery'
+        ) -or
+        $compatibleRoute.Groups['body'].Value.Contains('Invoke-LifecycleWorkflow') -or
+        $compatibleRoute.Groups['body'].Value.IndexOf(
+            'if ($SkipLifecycleDispatch)', [StringComparison]::Ordinal
+        ) -gt $compatibleRoute.Groups['body'].Value.IndexOf(
+            'Invoke-LocalCurrentLauncherRecovery', [StringComparison]::Ordinal
+        )) {
+        Add-Failure 'TEST-0126 CompatibleUpdate is not routed through the target-bound local launcher after its explicit skip gate.'
+    }
+
+    if ($recoveryFunctions.Count -eq 1) {
+        $recoveryTestRoot = Join-Path ([IO.Path]::GetTempPath()) `
+            "meandai-quick-current-launcher-$([guid]::NewGuid().ToString('N'))"
+        $recoveryModule = $null
+        $testLocation = (Get-Location).Path
+        $savedRecoveryEnvironment = @{
+            GITHUB_REPOSITORY = [Environment]::GetEnvironmentVariable(
+                'GITHUB_REPOSITORY', 'Process'
+            )
+            GITHUB_WORKSPACE = [Environment]::GetEnvironmentVariable(
+                'GITHUB_WORKSPACE', 'Process'
+            )
+            DEFAULT_BRANCH = [Environment]::GetEnvironmentVariable(
+                'DEFAULT_BRANCH', 'Process'
+            )
+            MEANDAI_TEST_CURRENT_LAUNCHER_RECORD = `
+                [Environment]::GetEnvironmentVariable(
+                    'MEANDAI_TEST_CURRENT_LAUNCHER_RECORD', 'Process'
+                )
+            MEANDAI_TEST_CURRENT_LAUNCHER_FAIL = `
+                [Environment]::GetEnvironmentVariable(
+                    'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', 'Process'
+                )
+        }
+        try {
+            [IO.Directory]::CreateDirectory($recoveryTestRoot) | Out-Null
+            $consumerSeed = Join-Path $recoveryTestRoot 'consumer-seed'
+            $consumerRemote = Join-Path $recoveryTestRoot 'consumer.git'
+            $maintainerRepository = Join-Path $recoveryTestRoot 'maintainer'
+            & git init -b main $consumerSeed 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Unable to initialize the current-launcher consumer fixture.'
+            }
+            Set-TestGitIdentity -Repository $consumerSeed
+            [IO.File]::WriteAllText(
+                (Join-Path $consumerSeed 'app.txt'),
+                "consumer`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+            Invoke-TestGit -Repository $consumerSeed -Arguments @(
+                'add', '--', 'app.txt'
+            ) | Out-Null
+            Invoke-TestGit -Repository $consumerSeed -Arguments @(
+                'commit', '-m', 'Create recovery consumer fixture'
+            ) | Out-Null
+            Invoke-TestGit -Repository $recoveryTestRoot -Arguments @(
+                'clone', '--bare', $consumerSeed, $consumerRemote
+            ) | Out-Null
+            Invoke-TestGit -Repository $recoveryTestRoot -Arguments @(
+                'clone', $consumerRemote, $maintainerRepository
+            ) | Out-Null
+            [IO.File]::WriteAllText(
+                (Join-Path $maintainerRepository 'preserved.tmp'),
+                "preserve me`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+            $consumerHead = (@(Invoke-TestGit `
+                -Repository $maintainerRepository `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+            $maintainerStatusBefore = @((Invoke-TestGit `
+                -Repository $maintainerRepository `
+                -Arguments @(
+                    'status', '--porcelain=v1', '--untracked-files=all'
+                ))) -join "`n"
+
+            $protocolSeed = Join-Path $recoveryTestRoot 'protocol-seed'
+            & git init -b main $protocolSeed 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Unable to initialize the current-launcher protocol fixture.'
+            }
+            Set-TestGitIdentity -Repository $protocolSeed
+            [IO.File]::WriteAllText(
+                (Join-Path $protocolSeed 'VERSION'),
+                '0.10.4',
+                [Text.UTF8Encoding]::new($false)
+            )
+            $adapterPath = Join-Path $protocolSeed `
+                'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+            [IO.Directory]::CreateDirectory((Split-Path -Parent $adapterPath)) |
+                Out-Null
+            $adapterFixture = @'
+[CmdletBinding()]
+param(
+    [switch]$CurrentLauncher,
+    [string]$RequestedTargetTag,
+    [string]$RequestedTargetCommit,
+    [string]$RequestedBaseSha,
+    [string]$ProtocolSourcePath
+)
+$record = [ordered]@{
+    CurrentLauncher = [bool]$CurrentLauncher
+    TargetTag = $RequestedTargetTag
+    TargetCommit = $RequestedTargetCommit
+    BaseSha = $RequestedBaseSha
+    Repository = $env:GITHUB_REPOSITORY
+    Workspace = $env:GITHUB_WORKSPACE
+    DefaultBranch = $env:DEFAULT_BRANCH
+    ProtocolSourcePath = $ProtocolSourcePath
+}
+[IO.File]::WriteAllText(
+    $env:MEANDAI_TEST_CURRENT_LAUNCHER_RECORD,
+    ($record | ConvertTo-Json -Compress),
+    [Text.UTF8Encoding]::new($false)
+)
+Set-Location -LiteralPath $env:GITHUB_WORKSPACE
+if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
+    throw 'simulated adapter interruption'
+}
+'@
+            [IO.File]::WriteAllText(
+                $adapterPath,
+                $adapterFixture,
+                [Text.UTF8Encoding]::new($false)
+            )
+            Invoke-TestGit -Repository $protocolSeed -Arguments @(
+                'add', '--', 'VERSION',
+                'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+            ) | Out-Null
+            Invoke-TestGit -Repository $protocolSeed -Arguments @(
+                'commit', '-m', 'Create current-launcher protocol fixture'
+            ) | Out-Null
+            Invoke-TestGit -Repository $protocolSeed -Arguments @(
+                'tag', 'v0.10.4'
+            ) | Out-Null
+            $protocolCommit = (@(Invoke-TestGit -Repository $protocolSeed `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+
+            $recoveryModule = New-Module `
+                -Name "MeAndAIQuickRecovery$([guid]::NewGuid().ToString('N'))" `
+                -ArgumentList @(
+                    $recoveryFunctions[0].Extent.Text,
+                    $consumerRemote,
+                    $protocolSeed
+                ) `
+                -ScriptBlock {
+                    param(
+                        [string]$RecoveryDefinition,
+                        [string]$ConsumerSource,
+                        [string]$ProtocolRepositorySource
+                    )
+                    $script:ProtocolRepository = 'hasanmanzak/meAndAI'
+
+                    function Invoke-Git {
+                        param(
+                            [Parameter(Mandatory)][string]$Repository,
+                            [Parameter(Mandatory)][string[]]$Arguments,
+                            [switch]$AllowFailure
+                        )
+                        $previousPreference = $ErrorActionPreference
+                        $ErrorActionPreference = 'Continue'
+                        try {
+                            $output = @(& git -C $Repository @Arguments 2>&1)
+                            $exitCode = $LASTEXITCODE
+                        }
+                        finally {
+                            $ErrorActionPreference = $previousPreference
+                        }
+                        if ($exitCode -ne 0 -and -not $AllowFailure) {
+                            throw "git $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
+                        }
+                        return [pscustomobject]@{
+                            ExitCode = $exitCode
+                            Output = @($output | ForEach-Object { [string]$_ })
+                        }
+                    }
+
+                    function Invoke-External {
+                        param(
+                            [Parameter(Mandatory)][string]$Command,
+                            [Parameter(Mandatory)][string[]]$Arguments,
+                            [string]$InputText = '',
+                            [switch]$AllowFailure
+                        )
+                        if ($Command -cne 'gh' -or $Arguments.Count -lt 4 -or
+                            $Arguments[0] -cne 'repo' -or
+                            $Arguments[1] -cne 'clone') {
+                            throw 'Recovery orchestration invoked an unexpected external command.'
+                        }
+                        $cloneSource = switch -CaseSensitive ($Arguments[2]) {
+                            'test-owner/recovery-consumer' { $ConsumerSource }
+                            'hasanmanzak/meAndAI' { $ProtocolRepositorySource }
+                            default {
+                                throw "Recovery clone requested unexpected repository '$($Arguments[2])'."
+                            }
+                        }
+                        $separator = [Array]::IndexOf(
+                            [object[]]$Arguments,
+                            '--'
+                        )
+                        $gitArguments = @('clone', $cloneSource, $Arguments[3])
+                        if ($separator -ge 0 -and
+                            $separator + 1 -lt $Arguments.Count) {
+                            $gitArguments += @($Arguments[($separator + 1)..(
+                                $Arguments.Count - 1
+                            )])
+                        }
+                        $previousPreference = $ErrorActionPreference
+                        $ErrorActionPreference = 'Continue'
+                        try {
+                            $output = @(& git @gitArguments 2>&1)
+                            $exitCode = $LASTEXITCODE
+                        }
+                        finally {
+                            $ErrorActionPreference = $previousPreference
+                        }
+                        if ($exitCode -ne 0 -and -not $AllowFailure) {
+                            throw "git clone failed: $($output -join [Environment]::NewLine)"
+                        }
+                        if ($Arguments[2] -ceq 'hasanmanzak/meAndAI') {
+                            $clonedTags = @(& git -C $Arguments[3] tag --list 2>&1)
+                            if ($LASTEXITCODE -ne 0 -or
+                                $clonedTags -cnotcontains 'v0.10.4') {
+                                throw "Protocol clone '$cloneSource' omitted target tag; observed: $($clonedTags -join ', ')."
+                            }
+                        }
+                        return [pscustomobject]@{
+                            ExitCode = $exitCode
+                            Output = @($output | ForEach-Object { [string]$_ })
+                        }
+                    }
+
+                    function Assert-CredentialFilesAbsent {
+                        param([Parameter(Mandatory)][string]$Repository)
+                        $credentialFiles = @(Get-ChildItem -LiteralPath $Repository `
+                            -Recurse -Force -File | Where-Object {
+                                [string]$_.Name -cin @(
+                                    'FG_PAT.txt', 'MEANDAI_RO_FG_PAT.txt'
+                                )
+                            })
+                        if ($credentialFiles.Count -ne 0) {
+                            throw 'Credential material entered the isolated recovery clone.'
+                        }
+                    }
+
+                    Invoke-Expression $RecoveryDefinition
+                }
+
+            $recordPath = Join-Path $recoveryTestRoot 'adapter-record.json'
+            [Environment]::SetEnvironmentVariable(
+                'GITHUB_REPOSITORY', 'preserved/repository', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'GITHUB_WORKSPACE', 'preserved-workspace', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'DEFAULT_BRANCH', 'preserved-branch', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'MEANDAI_TEST_CURRENT_LAUNCHER_RECORD', $recordPath, 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', $null, 'Process'
+            )
+            $recoveryArguments = @{
+                Repository = 'test-owner/recovery-consumer'
+                Branch = 'main'
+                HeadSha = $consumerHead
+                TargetTag = 'v0.10.4'
+                TargetCommit = $protocolCommit
+                MaintainerRepository = $maintainerRepository
+            }
+            $recoveryRootsBefore = @(Get-ChildItem `
+                -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
+                -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
+            & $recoveryModule {
+                param($Arguments)
+                Invoke-LocalCurrentLauncherRecovery @Arguments
+            } $recoveryArguments | Out-Null
+            $recoveryRootsAfter = @(Get-ChildItem `
+                -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
+                -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
+            $record = [IO.File]::ReadAllText($recordPath) | ConvertFrom-Json
+            $maintainerStatusAfter = @((Invoke-TestGit `
+                -Repository $maintainerRepository `
+                -Arguments @(
+                    'status', '--porcelain=v1', '--untracked-files=all'
+                ))) -join "`n"
+            if ($record.CurrentLauncher -isnot [bool] -or
+                -not [bool]$record.CurrentLauncher -or
+                [string]$record.TargetTag -cne 'v0.10.4' -or
+                [string]$record.TargetCommit -cne $protocolCommit -or
+                [string]$record.BaseSha -cne $consumerHead -or
+                [string]$record.Repository -cne 'test-owner/recovery-consumer' -or
+                [string]$record.DefaultBranch -cne 'main' -or
+                [string]$record.Workspace -cnotmatch 'meandai-update-recovery-[0-9a-f]{32}[\\/]consumer$' -or
+                [string]$record.ProtocolSourcePath -cnotmatch 'meandai-update-recovery-[0-9a-f]{32}[\\/]protocol-source$' -or
+                (Test-Path -LiteralPath ([string]$record.Workspace)) -or
+                (Test-Path -LiteralPath ([string]$record.ProtocolSourcePath)) -or
+                (Compare-Object $recoveryRootsBefore $recoveryRootsAfter) -or
+                $maintainerStatusAfter -cne $maintainerStatusBefore -or
+                [Environment]::GetEnvironmentVariable(
+                    'GITHUB_REPOSITORY', 'Process'
+                ) -cne 'preserved/repository' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GITHUB_WORKSPACE', 'Process'
+                ) -cne 'preserved-workspace' -or
+                [Environment]::GetEnvironmentVariable(
+                    'DEFAULT_BRANCH', 'Process'
+                ) -cne 'preserved-branch') {
+                Add-Failure 'TEST-0126 successful local recovery did not preserve exact target bindings, environment, checkout, and temporary-root cleanup.'
+            }
+
+            [Environment]::SetEnvironmentVariable(
+                'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', 'true', 'Process'
+            )
+            $interruptionError = ''
+            $recoveryRootsBefore = @(Get-ChildItem `
+                -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
+                -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
+            try {
+                & $recoveryModule {
+                    param($Arguments)
+                    Invoke-LocalCurrentLauncherRecovery @Arguments
+                } $recoveryArguments | Out-Null
+            }
+            catch {
+                $interruptionError = $_.Exception.Message
+            }
+            $recoveryRootsAfter = @(Get-ChildItem `
+                -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
+                -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
+            $maintainerStatusAfter = @((Invoke-TestGit `
+                -Repository $maintainerRepository `
+                -Arguments @(
+                    'status', '--porcelain=v1', '--untracked-files=all'
+                ))) -join "`n"
+            if ($interruptionError -cnotlike '*simulated adapter interruption*' -or
+                (Compare-Object $recoveryRootsBefore $recoveryRootsAfter) -or
+                $maintainerStatusAfter -cne $maintainerStatusBefore -or
+                [Environment]::GetEnvironmentVariable(
+                    'GITHUB_REPOSITORY', 'Process'
+                ) -cne 'preserved/repository' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GITHUB_WORKSPACE', 'Process'
+                ) -cne 'preserved-workspace' -or
+                [Environment]::GetEnvironmentVariable(
+                    'DEFAULT_BRANCH', 'Process'
+                ) -cne 'preserved-branch') {
+                Add-Failure "TEST-0126 interrupted local recovery did not fail cleanly without checkout/environment/temp-root residue: $interruptionError"
+            }
+        }
+        catch {
+            Add-Failure "TEST-0126 current-launcher orchestration harness failed: $($_.Exception.Message)"
+        }
+        finally {
+            Set-Location -LiteralPath $testLocation
+            if ($null -ne $recoveryModule) {
+                Remove-Module -ModuleInfo $recoveryModule -Force `
+                    -ErrorAction SilentlyContinue
+            }
+            foreach ($entry in $savedRecoveryEnvironment.GetEnumerator()) {
+                [Environment]::SetEnvironmentVariable(
+                    [string]$entry.Key,
+                    $entry.Value,
+                    'Process'
+                )
+            }
+            if (Test-Path -LiteralPath $recoveryTestRoot) {
+                Remove-Item -LiteralPath $recoveryTestRoot -Recurse -Force `
+                    -ErrorAction SilentlyContinue
+            }
         }
     }
 }

@@ -33,6 +33,19 @@ function ConvertTo-ProtocolVersionRecord {
     }
 }
 
+function Compare-ProtocolVersionRecord {
+    param(
+        [Parameter(Mandatory)]$Left,
+        [Parameter(Mandatory)]$Right
+    )
+
+    foreach ($property in @('Major', 'Minor', 'Revision')) {
+        if ($Left.$property -lt $Right.$property) { return -1 }
+        if ($Left.$property -gt $Right.$property) { return 1 }
+    }
+    return 0
+}
+
 function Test-MeAndAIProtocolTag {
     [CmdletBinding()]
     param([string]$Tag)
@@ -121,6 +134,15 @@ function Get-MeAndAIProtocolCandidateProblems {
         '-migrations'
     }
     else { [string]$suffixProperty.Value }
+    $updateSuffixProperty = $Context.PSObject.Properties['UpdateBranchSuffix']
+    $updateBranchSuffix = if ($null -eq $updateSuffixProperty) {
+        ''
+    }
+    else { [string]$updateSuffixProperty.Value }
+    $supersedeOnlyProperty = $Candidate.PSObject.Properties['SupersedeOnly']
+    $supersedeOnly = $null -ne $supersedeOnlyProperty -and
+        $supersedeOnlyProperty.Value -is [bool] -and
+        [bool]$supersedeOnlyProperty.Value
 
     $stateProperty = $Context.PSObject.Properties['ExpectedPullRequestState']
     $expectedState = if ($null -ne $stateProperty) {
@@ -139,7 +161,10 @@ function Get-MeAndAIProtocolCandidateProblems {
     $expectedBranch = if ($isMigration) {
         "$($Context.BranchPrefix)$target$migrationBranchSuffix"
     }
-    else { "$($Context.BranchPrefix)$target" }
+    else {
+        $effectiveUpdateSuffix = if ($supersedeOnly) { '' } else { $updateBranchSuffix }
+        "$($Context.BranchPrefix)$target$effectiveUpdateSuffix"
+    }
     if ([string]$Candidate.HeadRef -cne $expectedBranch) {
         $problems.Add('head branch is not the deterministic target branch')
     }
@@ -319,6 +344,15 @@ function Resolve-MeAndAIProtocolUpdatePlan {
     if ($migrationBranchSuffix -cnotmatch '^-[a-z0-9]+(?:-[a-z0-9]+)*$') {
         $diagnostics.Add('MigrationBranchSuffix must be one canonical lowercase hyphen-prefixed branch suffix.')
     }
+    $updateSuffixProperty = $Snapshot.PSObject.Properties['UpdateBranchSuffix']
+    $updateBranchSuffix = if ($null -eq $updateSuffixProperty) {
+        ''
+    }
+    else { [string]$updateSuffixProperty.Value }
+    if ($updateBranchSuffix -ne '' -and
+        $updateBranchSuffix -cnotmatch '^-[a-z0-9]+(?:-[a-z0-9]+)*$') {
+        $diagnostics.Add('UpdateBranchSuffix must be empty or one canonical lowercase hyphen-prefixed branch suffix.')
+    }
 
     $currentRecord = ConvertTo-ProtocolVersionRecord ([string]$Snapshot.CurrentTag)
     if ($null -eq $currentRecord) {
@@ -345,6 +379,31 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         $diagnostics.Add('Release inventory contains no exact stable vM.m.rev tag.')
     }
 
+    $requestedTargetProperty = $Snapshot.PSObject.Properties['RequestedTargetTag']
+    $requestedTargetTag = if ($null -ne $requestedTargetProperty) {
+        [string]$requestedTargetProperty.Value
+    }
+    else { '' }
+    $requestedTargetRecord = $null
+    if ($null -ne $requestedTargetProperty) {
+        $requestedTargetRecord = ConvertTo-ProtocolVersionRecord $requestedTargetTag
+        if ($null -eq $requestedTargetRecord) {
+            $diagnostics.Add("Requested target '$requestedTargetTag' is not canonical vM.m.rev.")
+        }
+        elseif (-not $seenTags.Contains($requestedTargetTag)) {
+            $diagnostics.Add("Requested target '$requestedTargetTag' is absent from the release inventory.")
+        }
+        elseif ($null -ne $currentRecord -and
+            $requestedTargetRecord.Major -ne $currentRecord.Major) {
+            $diagnostics.Add("Requested target '$requestedTargetTag' crosses the current major version.")
+        }
+        elseif ($null -ne $currentRecord -and
+            (Compare-ProtocolVersionRecord -Left $requestedTargetRecord `
+                -Right $currentRecord) -lt 0) {
+            $diagnostics.Add("Requested target '$requestedTargetTag' would downgrade the current release.")
+        }
+    }
+
     $latestAvailable = $null
     $latestCompatible = $null
     $majorUpgradeAvailable = $false
@@ -362,7 +421,12 @@ function Resolve-MeAndAIProtocolUpdatePlan {
             $diagnostics.Add("No release exists for current major '$($currentRecord.Major)'.")
         }
         else {
-            $latestCompatible = $compatible[-1]
+            $latestCompatible = if ($null -ne $requestedTargetRecord -and
+                $requestedTargetRecord.Major -eq $currentRecord.Major -and
+                $seenTags.Contains($requestedTargetTag)) {
+                $requestedTargetRecord
+            }
+            else { $compatible[-1] }
         }
         $majorUpgradeAvailable = @($records | Where-Object {
             $_.Major -gt $currentRecord.Major
@@ -377,6 +441,7 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         DefaultBranch = [string]$Snapshot.DefaultBranch
         BranchPrefix = [string]$Snapshot.BranchPrefix
         MigrationBranchSuffix = $migrationBranchSuffix
+        UpdateBranchSuffix = $updateBranchSuffix
         ProtocolPath = [string]$Snapshot.ProtocolPath
         ManagedPaths = @($Snapshot.ManagedPaths)
         TrustedActor = [string]$Snapshot.TrustedActor
@@ -415,6 +480,22 @@ function Resolve-MeAndAIProtocolUpdatePlan {
             ''
         }
         else { [string]$candidateMigrationPlanProperty.Value }
+        $supersedeOnlyProperty = $candidate.PSObject.Properties['SupersedeOnly']
+        $supersedeOnly = $false
+        if ($null -ne $supersedeOnlyProperty) {
+            if ($supersedeOnlyProperty.Value -isnot [bool]) {
+                $diagnostics.Add("Candidate PR #$number SupersedeOnly must be Boolean when supplied.")
+            }
+            else { $supersedeOnly = [bool]$supersedeOnlyProperty.Value }
+        }
+        $unboundIssueProperty = $candidate.PSObject.Properties['UnboundIssue']
+        $unboundIssue = $false
+        if ($null -ne $unboundIssueProperty) {
+            if ($unboundIssueProperty.Value -isnot [bool]) {
+                $diagnostics.Add("Candidate PR #$number UnboundIssue must be Boolean when supplied.")
+            }
+            else { $unboundIssue = [bool]$unboundIssueProperty.Value }
+        }
 
         if (-not $seenNumbers.Add($number)) {
             $diagnostics.Add("Duplicate managed PR number '$number'.")
@@ -427,6 +508,18 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         }
         elseif ($null -ne $currentRecord -and $targetRecord.Major -ne $currentRecord.Major) {
             $diagnostics.Add("Candidate PR #$number targets a different major '$target'.")
+        }
+        elseif ($null -ne $requestedTargetRecord -and
+            (Compare-ProtocolVersionRecord -Left $targetRecord `
+                -Right $requestedTargetRecord) -gt 0) {
+            $diagnostics.Add("Candidate PR #$number targets '$target', newer than requested target '$requestedTargetTag'.")
+        }
+        if ($supersedeOnly -and
+            ($proposalKind -cne 'Update' -or [int]$candidate.MarkerSchema -ne 1)) {
+            $diagnostics.Add("Candidate PR #$number has invalid SupersedeOnly proposal identity.")
+        }
+        if ($unboundIssue -and -not $supersedeOnly) {
+            $diagnostics.Add("Candidate PR #$number cannot be UnboundIssue without SupersedeOnly.")
         }
         if ($proposalKind -ceq 'MigrationReconciliation' -and
             $migrationRequired -and
@@ -447,10 +540,14 @@ function Resolve-MeAndAIProtocolUpdatePlan {
             ExpectedHeadSha = [string]$candidate.MarkerHeadSha
             ExpectedProtocolSha = [string]$candidate.ExpectedProtocolSha
             MigrationPlanSha = $candidateMigrationPlanSha
+            SupersedeOnly = $supersedeOnly
+            UnboundIssue = $unboundIssue
         })
     }
 
-    foreach ($group in @($candidateRecords | Group-Object {
+    foreach ($group in @($candidateRecords | Where-Object {
+        -not [bool]$_.SupersedeOnly
+    } | Group-Object {
         "$($_.ProposalKind)`n$($_.TargetTag)"
     })) {
         if ($group.Count -gt 1) {
@@ -470,12 +567,13 @@ function Resolve-MeAndAIProtocolUpdatePlan {
         $currentRecord.Minor -eq $latestCompatible.Minor -and
         $currentRecord.Revision -eq $latestCompatible.Revision
     $latestUpdateCandidates = @($candidateRecords | Where-Object {
-        $_.ProposalKind -ceq 'Update' -and
+        -not [bool]$_.SupersedeOnly -and $_.ProposalKind -ceq 'Update' -and
         [string]::Equals([string]$_.TargetTag, [string]$latestCompatible.Tag, [StringComparison]::Ordinal)
     })
 
     if ($currentIsLatest -and $migrationRequired) {
         $exactMigrationCandidates = @($candidateRecords | Where-Object {
+            -not [bool]$_.SupersedeOnly -and
             $_.ProposalKind -ceq 'MigrationReconciliation' -and
             [string]::Equals([string]$_.TargetTag, [string]$latestCompatible.Tag, [StringComparison]::Ordinal) -and
             [string]::Equals([string]$_.MigrationPlanSha, $currentMigrationPlanSha, [StringComparison]::Ordinal)
@@ -508,6 +606,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
             $operations.Add([pscustomobject]@{
                 Kind = 'DeleteBranch'; ProposalKind = $candidate.ProposalKind
@@ -516,6 +616,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
         }
 
@@ -536,6 +638,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
             $operations.Add([pscustomobject]@{
                 Kind = 'DeleteBranch'; ProposalKind = $candidate.ProposalKind
@@ -544,6 +648,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
         }
 
@@ -562,12 +668,14 @@ function Resolve-MeAndAIProtocolUpdatePlan {
             $operations.Add([pscustomobject]@{
                 Kind = 'CreateUpgrade'; ProposalKind = 'Update'
                 TargetTag = $latestCompatible.Tag
-                PullRequestNumber = $null; Branch = "$($Snapshot.BranchPrefix)$($latestCompatible.Tag)"
+                PullRequestNumber = $null
+                Branch = "$($Snapshot.BranchPrefix)$($latestCompatible.Tag)$updateBranchSuffix"
                 ExpectedHeadSha = $null; MigrationPlanSha = ''
             })
         }
 
         $supersededCandidates = @($candidateRecords | Where-Object {
+            [bool]$_.SupersedeOnly -or
             -not ($_.ProposalKind -ceq 'Update' -and
                 [string]::Equals([string]$_.TargetTag, [string]$latestCompatible.Tag, [StringComparison]::Ordinal))
         } | Sort-Object PullRequestNumber)
@@ -579,6 +687,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
             $operations.Add([pscustomobject]@{
                 Kind = 'DeleteBranch'; ProposalKind = $candidate.ProposalKind
@@ -587,6 +697,8 @@ function Resolve-MeAndAIProtocolUpdatePlan {
                 ExpectedProtocolSha = $candidate.ExpectedProtocolSha
                 ExpectedHeadSha = $candidate.ExpectedHeadSha
                 MigrationPlanSha = $candidate.MigrationPlanSha
+                SupersedeOnly = [bool]$candidate.SupersedeOnly
+                UnboundIssue = [bool]$candidate.UnboundIssue
             })
         }
 

@@ -51,6 +51,38 @@ function Get-AdapterFunctionDefinition {
     -Name 'Assert-ContainedMigrationDestination')))
 . ([scriptblock]::Create((Get-AdapterFunctionDefinition `
     -Name 'Apply-ConsumerMigrationPlan')))
+Import-Module $moduleSource -Force
+foreach ($helperName in @(
+    'Invoke-Native',
+    'Get-LocalTreeEntry',
+    'Get-StagedTreeEntry',
+    'Get-OrdinalUniquePaths',
+    'Get-ExpectedManagedPaths',
+    'Assert-StagedManagedUpdate',
+    'Stage-ManagedProposalTree',
+    'Get-ExistingReplacementCandidates'
+)) {
+    . ([scriptblock]::Create((Get-AdapterFunctionDefinition -Name $helperName)))
+}
+
+$legacyInterruptedCandidate = [pscustomobject]@{
+    PullRequestNumber = 21; TargetTag = 'v0.10.4'; Kind = 'Update'
+    HeadRef = 'automation/meandai-protocol-v0.10.4'
+    MarkerSchema = 1; SupersedeOnly = $true; MigrationPlanSha = ''
+}
+$recoveryInterruptedCandidate = [pscustomobject]@{
+    PullRequestNumber = 30; TargetTag = 'v0.10.4'; Kind = 'Update'
+    HeadRef = 'automation/meandai-protocol-v0.10.4-recovery'
+    MarkerSchema = 2; SupersedeOnly = $false; MigrationPlanSha = '4' * 64
+}
+$interruptedReplacement = @(Get-ExistingReplacementCandidates `
+    -Candidates @($legacyInterruptedCandidate, $recoveryInterruptedCandidate) `
+    -TargetTag 'v0.10.4' -ProposalKind Update `
+    -CurrentLauncherMode $true)
+if ($interruptedReplacement.Count -ne 1 -or
+    [int]$interruptedReplacement[0].PullRequestNumber -ne 30) {
+    Add-Failure 'TEST-0126 interrupted recovery rerun did not select only the verified schema-2 recovery replacement.'
+}
 
 $destinationGuardRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-migration-leaf-guard-$([guid]::NewGuid().ToString('N'))"
@@ -121,6 +153,332 @@ catch {
 finally {
     if (Test-Path -LiteralPath $destinationGuardRoot) {
         Remove-Item -LiteralPath $destinationGuardRoot -Recurse -Force
+    }
+}
+
+function Set-AtomicGateFixtureFile {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$RelativePath,
+        [Parameter(Mandatory)][string]$Content
+    )
+
+    $path = Join-Path $Root ($RelativePath -replace '/', `
+        [IO.Path]::DirectorySeparatorChar)
+    $parent = Split-Path -Parent $path
+    [IO.Directory]::CreateDirectory($parent) | Out-Null
+    [IO.File]::WriteAllText($path, $Content, [Text.UTF8Encoding]::new($false))
+}
+
+function Copy-AtomicGateFixtureFile {
+    param(
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$RelativePath
+    )
+
+    $path = Join-Path $Root ($RelativePath -replace '/', `
+        [IO.Path]::DirectorySeparatorChar)
+    $parent = Split-Path -Parent $path
+    [IO.Directory]::CreateDirectory($parent) | Out-Null
+    [IO.File]::WriteAllBytes($path, [IO.File]::ReadAllBytes($Source))
+}
+
+function Invoke-FrozenDerdiniValidator {
+    param([Parameter(Mandatory)][string]$ValidatorPath)
+
+    $powerShellPath = $null
+    foreach ($hostName in @('pwsh', 'pwsh.exe', 'powershell', 'powershell.exe')) {
+        $candidatePath = Join-Path $PSHOME $hostName
+        if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+            $powerShellPath = $candidatePath
+            break
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($powerShellPath)) {
+        throw "No PowerShell host executable was found under PSHOME '$PSHOME'."
+    }
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = $powerShellPath
+    $startInfo.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$ValidatorPath`""
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        if (-not $process.Start()) {
+            throw 'The Derdini validator child process did not start.'
+        }
+        $stdout = $process.StandardOutput.ReadToEndAsync()
+        $stderr = $process.StandardError.ReadToEndAsync()
+        $process.WaitForExit()
+        return [pscustomobject]@{
+            ExitCode = [int]$process.ExitCode
+            Text = (($stdout.Result, $stderr.Result) -join "`n").Trim()
+        }
+    }
+    finally {
+        $process.Dispose()
+    }
+}
+
+$atomicGateRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-derdini-atomic-gate-$([guid]::NewGuid().ToString('N'))"
+try {
+    $derdiniValidatorFixture = Join-Path $root `
+        'tests/fixtures/derdini-v092/Verify-MeAndAIAdoption.ps1'
+    $fixtureBlob = ((Invoke-Native -Command 'git' -Arguments @(
+        'hash-object', '--', $derdiniValidatorFixture
+    )) -join '').Trim()
+    if ($fixtureBlob -cne 'b4e5067ac409bb2ffc153b5b8ba867ce3ae46aab') {
+        throw "Frozen Derdini validator blob differs: $fixtureBlob"
+    }
+
+    $sourceRoot = Join-Path $atomicGateRoot 'protocol'
+    $consumerRoot = Join-Path $atomicGateRoot 'consumer'
+    [IO.Directory]::CreateDirectory($sourceRoot) | Out-Null
+    [IO.Directory]::CreateDirectory($consumerRoot) | Out-Null
+    foreach ($repositoryPath in @($sourceRoot, $consumerRoot)) {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $repositoryPath, 'init', '--initial-branch=main'
+        ) | Out-Null
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $repositoryPath, 'config', 'user.name', 'TEST-0125'
+        ) | Out-Null
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $repositoryPath, 'config', 'user.email',
+            'test-0125@example.invalid'
+        ) | Out-Null
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $repositoryPath, 'config', 'commit.gpgsign', 'false'
+        ) | Out-Null
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $repositoryPath, 'config', 'tag.gpgsign', 'false'
+        ) | Out-Null
+        Set-AtomicGateFixtureFile -Root $repositoryPath `
+            -RelativePath '.gitattributes' -Content "* text=auto eol=lf`n"
+    }
+
+    $managedAssets = @(
+        [pscustomobject]@{
+            TemplatePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
+            ConsumerPath = '.github/workflows/meandai-protocol-update.yml'
+        },
+        [pscustomobject]@{
+            TemplatePath = 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+            ConsumerPath = '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+        },
+        [pscustomobject]@{
+            TemplatePath = 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+            ConsumerPath = '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        }
+    )
+    foreach ($asset in $managedAssets) {
+        $source = switch ([string]$asset.ConsumerPath) {
+            '.github/workflows/meandai-protocol-update.yml' { $workflowSource }
+            '.github/scripts/MeAndAI.ProtocolUpdate.psm1' { $moduleSource }
+            '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1' { $adapterSource }
+        }
+        Copy-AtomicGateFixtureFile -Source $source -Root $sourceRoot `
+            -RelativePath ([string]$asset.TemplatePath)
+        Set-AtomicGateFixtureFile -Root $consumerRoot `
+            -RelativePath ([string]$asset.ConsumerPath) `
+            -Content "legacy $([string]$asset.ConsumerPath)`n"
+    }
+    foreach ($sourceRecord in @(
+        [pscustomobject]@{ Source = $consumerMigrationModuleSource; Path = 'scripts/MeAndAI.ConsumerMigrations.psm1' },
+        [pscustomobject]@{ Source = $consumerMigrationIndexSource; Path = 'migrations/index.json' },
+        [pscustomobject]@{ Source = (Join-Path $root 'migrations/MIG-0001.json'); Path = 'migrations/MIG-0001.json' }
+    )) {
+        Copy-AtomicGateFixtureFile -Source ([string]$sourceRecord.Source) `
+            -Root $sourceRoot -RelativePath ([string]$sourceRecord.Path)
+    }
+    foreach ($sourceText in @(
+        [pscustomobject]@{ Path = 'VERSION'; Content = "0.10.4`n" },
+        [pscustomobject]@{ Path = 'PROTOCOL.md'; Content = "# Protocol`n" },
+        [pscustomobject]@{ Path = 'templates/idea.md'; Content = "# Idea`n" },
+        [pscustomobject]@{ Path = 'templates/feature/README.md'; Content = "# Feature`n" },
+        [pscustomobject]@{ Path = 'templates/decision.md'; Content = "# Decision`n" }
+    )) {
+        Set-AtomicGateFixtureFile -Root $sourceRoot `
+            -RelativePath ([string]$sourceText.Path) `
+            -Content ([string]$sourceText.Content)
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourceRoot, 'add', '--all'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourceRoot, 'commit', '--quiet', '-m', 'Target protocol fixture'
+    ) | Out-Null
+    $targetProtocolSha = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourceRoot, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+
+    $fixtureContentByPath = @{}
+    foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
+        foreach ($operation in @($migration.Operations)) {
+            $fixtureContentByPath[[string]$operation.Path] = `
+                ([string]$operation.Before) + "`n"
+        }
+    }
+    $fixtureContentByPath['AGENTS.md'] += @(
+        '',
+        '- Product purpose: Not yet established.',
+        '- Runtime and stack: Not yet established.',
+        '- Architecture: Not yet established.',
+        '- Product build command: Not yet established.',
+        '- Product test command: Not yet established.'
+    ) -join "`n"
+    $fixtureContentByPath['.ai/memory/project.md'] += @(
+        '',
+        '- Purpose: Not yet established.',
+        '- Runtime and stack: Not yet established.',
+        '- Build command: Not yet established.',
+        '- Product test command: Not yet established.'
+    ) -join "`n"
+    foreach ($record in $fixtureContentByPath.GetEnumerator()) {
+        if ([string]$record.Key -ceq 'tests/Verify-MeAndAIAdoption.ps1') {
+            continue
+        }
+        Set-AtomicGateFixtureFile -Root $consumerRoot `
+            -RelativePath ([string]$record.Key) -Content ([string]$record.Value)
+    }
+    Copy-AtomicGateFixtureFile -Source $derdiniValidatorFixture `
+        -Root $consumerRoot -RelativePath 'tests/Verify-MeAndAIAdoption.ps1'
+    foreach ($consumerText in @(
+        [pscustomobject]@{
+            Path = '.gitmodules'
+            Content = "[submodule `"meandai`"]`n`tpath = .ai/protocol`n`turl = https://github.com/hasanmanzak/meAndAI.git`n"
+        },
+        [pscustomobject]@{
+            Path = '.ai/memory/log/2026-07-17-meandai-adoption.md'
+            Content = "# Adoption log`n"
+        },
+        [pscustomobject]@{
+            Path = 'docs/features/FEAT-0001-meandai-capabilities-adoption/README.md'
+            Content = "# Adoption`n`nhttps://github.com/hasanmanzak/Derdini/issues/2`nhttps://github.com/hasanmanzak/Derdini/pull/1`n"
+        },
+        [pscustomobject]@{
+            Path = 'docs/features/FEAT-0001-meandai-capabilities-adoption/test-cases.md'
+            Content = "# Test cases`n"
+        }
+    )) {
+        Set-AtomicGateFixtureFile -Root $consumerRoot `
+            -RelativePath ([string]$consumerText.Path) `
+            -Content ([string]$consumerText.Content)
+    }
+
+    $legacyProtocolSha = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'add', '--all'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'update-index', '--add', '--cacheinfo',
+        "160000,$legacyProtocolSha,.ai/protocol"
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'commit', '--quiet', '-m', 'Derdini v0.9.2 fixture'
+    ) | Out-Null
+    $baseCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $protocolCheckout = Join-Path $consumerRoot '.ai/protocol'
+    Invoke-Native -Command 'git' -Arguments @(
+        'clone', '--quiet', $sourceRoot, $protocolCheckout
+    ) | Out-Null
+
+    $validatorPath = Join-Path $consumerRoot 'tests/Verify-MeAndAIAdoption.ps1'
+    $baselineValidation = Invoke-FrozenDerdiniValidator `
+        -ValidatorPath $validatorPath
+    if ($baselineValidation.ExitCode -ne 0) {
+        throw "Baseline Derdini validator is not green: $($baselineValidation.Text)"
+    }
+
+    $targetCatalog = Import-MeAndAIConsumerMigrationCatalog `
+        -IndexPath (Join-Path $sourceRoot 'migrations/index.json')
+    $migrationInputs = [System.Collections.Generic.List[object]]::new()
+    foreach ($path in @(Get-MeAndAIConsumerMigrationRequiredPaths `
+        -Catalog $targetCatalog)) {
+        $inputPath = Join-Path $consumerRoot ($path -replace '/', `
+            [IO.Path]::DirectorySeparatorChar)
+        $migrationInputs.Add([pscustomobject]@{
+            Path = $path
+            Bytes = [IO.File]::ReadAllBytes($inputPath)
+        })
+    }
+    $migrationPlan = Resolve-MeAndAIConsumerMigrationPlan `
+        -Catalog $targetCatalog -Files @($migrationInputs)
+
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'update-index', '--add', '--cacheinfo',
+        "160000,$targetProtocolSha,.ai/protocol"
+    ) | Out-Null
+    $coreOnlyValidation = Invoke-FrozenDerdiniValidator `
+        -ValidatorPath $validatorPath
+    $coreOnlyCompact = $coreOnlyValidation.Text.Replace("`r", '').Replace("`n", '')
+    $coreOnlyMarkers = @([regex]::Matches(
+        $coreOnlyCompact, 'TEST-[0-9]{4}'
+    ) | ForEach-Object { [string]$_.Value } | Select-Object -Unique)
+    if ($coreOnlyValidation.ExitCode -eq 0 -or
+        $coreOnlyMarkers.Count -ne 1 -or
+        [string]$coreOnlyMarkers[0] -cne 'TEST-0001') {
+        throw "Core-only proposal did not fail only TEST-0001: $($coreOnlyValidation.Text)"
+    }
+
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'reset', '--hard', $baseCommit
+    ) | Out-Null
+    Push-Location -LiteralPath $consumerRoot
+    try {
+        $stagedPaths = @(Stage-ManagedProposalTree -Workspace $consumerRoot `
+            -BaseCommit $baseCommit -TargetProtocolSha $targetProtocolSha `
+            -SourcePath $sourceRoot -ProtocolPath '.ai/protocol' `
+            -Assets $managedAssets -MigrationPlan $migrationPlan `
+            -ProposalKind 'Update')
+    }
+    finally {
+        Pop-Location
+    }
+    $expectedPaths = @(
+        '.ai/meandai-update-state.json',
+        '.ai/memory/README.md',
+        '.ai/memory/project.md',
+        '.ai/protocol',
+        '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+        '.github/workflows/meandai-protocol-update.yml',
+        'AGENTS.md',
+        'docs/decisions/DEC-0001-pinned-meandai-submodule.md',
+        'docs/decisions/README.md',
+        'docs/features/README.md',
+        'docs/ideas/README.md',
+        'tests/Verify-MeAndAIAdoption.ps1'
+    )
+    if (-not (Test-MeAndAIExactOrdinalPathSet `
+        -Actual $stagedPaths -Expected $expectedPaths)) {
+        throw "Production staging returned a non-atomic path set: $($stagedPaths -join ', ')"
+    }
+    $indexPaths = @(Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRoot, 'diff', '--cached', '--name-only'
+    ))
+    if (-not (Test-MeAndAIExactOrdinalPathSet `
+        -Actual $indexPaths -Expected $expectedPaths)) {
+        throw "Atomic proposal index differs from the exact 13 paths: $($indexPaths -join ', ')"
+    }
+    $atomicValidation = Invoke-FrozenDerdiniValidator `
+        -ValidatorPath $validatorPath
+    if ($atomicValidation.ExitCode -ne 0) {
+        throw "Atomic proposal does not satisfy the real Derdini validator: $($atomicValidation.Text)"
+    }
+}
+catch {
+    Add-Failure "TEST-0125 atomic Derdini gate fixture failed: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $atomicGateRoot) {
+        Remove-Item -LiteralPath $atomicGateRoot -Recurse -Force
     }
 }
 

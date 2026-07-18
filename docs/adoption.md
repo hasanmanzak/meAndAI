@@ -188,12 +188,12 @@ do not become fields that must be rewritten after every compatible update.
 
 A consumer created before the migration engine may have no ledger and may carry
 derived state that a later release needs to reconcile. Do not select a manual
-repair from the consumer's installed tag. Run the ordinary installed updater.
-Its immutable code first proposes only the core update it can prove. After that
-proposal merges, the newly installed workflow automatically opens one
-same-target reconciliation proposal from the target release's state-based
-catalog. Review and merge that proposal normally. Customized, partial, mixed,
-or unknown state blocks for explicit maintainer review instead of being guessed.
+repair from the consumer's installed tag. Run the latest quick launcher for the
+requested immutable target. Its target-bound current-launcher route works in
+isolated exact-base and exact-source clones and creates one proposal containing
+the core update, required state-based catalog outputs, and ledger atomically.
+Review and merge that proposal normally. Customized, partial, mixed, or unknown
+state blocks for explicit maintainer review instead of being guessed.
 
 The repository's `.github/ISSUE_TEMPLATE/config.yml` is deliberately excluded:
 its contact link describes this protocol repository and follows its current
@@ -354,7 +354,7 @@ Its state rules are:
 | Consumer already pins the latest compatible tag and its ledger satisfies that target catalog | Recover any exact retained merged branch, then make no update change |
 | Consumer already pins the latest compatible tag but a pre-engine handoff left its target catalog unsatisfied | Create or reuse the canonical issue and automatically open one same-target reconciliation draft containing only the exact catalog-derived changes and resulting ledger |
 | No valid managed pull request targets the latest tag and the installed updater supports migrations | Create or reuse its canonical issue and missing Agile labels, then create one deterministic draft containing the target gitlink, target-different updater assets, exact required migration outputs, and resulting ledger |
-| No valid managed pull request targets the latest tag and the installed updater predates the migration engine | Let the immutable installed updater create its ordinary core update. After maintainer merge and finalization, the newly installed workflow automatically opens the same-target reconciliation draft |
+| No valid managed pull request targets the requested tag and the installed updater predates the migration engine | Run the latest quick launcher; its verified target updater creates one atomic exact-base draft containing the pin, changed updater assets, required migrations, and ledger |
 | One valid managed pull request already targets the latest tag | Keep its exact issue, branch, and pull request; create no duplicate |
 | An older valid managed pull request is open and a newer compatible tag exists | Recompute the complete transition from the unchanged default branch, create and fully verify the newer issue, replacement branch, and draft first, then revalidate and clean only the exact older owned pull request, branch, and issue |
 | Catalog, ledger, repository state, ownership marker, plan digest, planned head, protocol commit, gitlink mode, expected managed path/blob set, base, draft state, author, repository, API head, or remote ref is ambiguous | Stop or compensate without deleting ambiguous work |
@@ -387,12 +387,14 @@ backlink, branch reuse, and live ref. It lease-deletes only the unchanged
 deterministic branch, records one issue evidence marker, removes transient
 meAndAI status labels, and closes the issue. A default-branch `push`, schedule,
 or ordinary manual dispatch also checks the bounded retained-branch recovery
-route before update discovery. After a pre-engine core update merges, this same
-event chain runs the newly installed updater; if the target catalog is still
-unsatisfied, it opens the automatically tracked same-target reconciliation
-draft. After that draft merges, finalization performs the same branch-first,
-issue-last cleanup and the next discovery is a no-op. Foreign, partial, moved,
-unexpected-path, or ambiguous state fails before mutation.
+  route before update discovery. After an atomic current-launcher recovery
+  draft merges, finalization performs the same branch-first, issue-last cleanup
+  and the installed target updater owns the next scheduled or manual discovery.
+  Foreign, partial, moved, unexpected-path, or ambiguous state fails before
+  mutation. The historical two-proposal fallback remains descriptive of
+  immutable pre-engine behavior but is superseded whenever the verified current
+  launcher is available, as recorded in
+  [DEC-0020](decisions/DEC-0020-target-bound-current-launcher-recovery.md).
 
 If an event or recovery run still fails, rerun the workflow manually with
 `finalize_pull_request` set to that merged PR number. The same idempotent route

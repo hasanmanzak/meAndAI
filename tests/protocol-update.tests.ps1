@@ -51,7 +51,10 @@ function New-Candidate {
         [string]$ProtocolEntryMode = '160000',
         [string]$ProtocolEntrySha = '',
         [string]$BaseRef = 'main',
-        [bool]$Draft = $true
+        [bool]$Draft = $true,
+        [bool]$SupersedeOnly = $false,
+        [bool]$UnboundIssue = $false,
+        [string]$UpdateBranchSuffix = ''
     )
 
     if (-not $ApiHeadSha) {
@@ -78,7 +81,10 @@ function New-Candidate {
     $headRef = if ($isMigration) {
         "automation/meandai-protocol-$TargetTag$MigrationBranchSuffix"
     }
-    else { "automation/meandai-protocol-$TargetTag" }
+    else {
+        $effectiveUpdateSuffix = if ($SupersedeOnly) { '' } else { $UpdateBranchSuffix }
+        "automation/meandai-protocol-$TargetTag$effectiveUpdateSuffix"
+    }
 
     $candidate = [pscustomobject]@{
         PullRequestNumber = $Number
@@ -120,6 +126,14 @@ function New-Candidate {
         $candidate | Add-Member -NotePropertyName AllowedExpectedPaths `
             -NotePropertyValue @($AllowedExpectedPaths)
     }
+    if ($PSBoundParameters.ContainsKey('SupersedeOnly')) {
+        $candidate | Add-Member -NotePropertyName SupersedeOnly `
+            -NotePropertyValue $SupersedeOnly
+    }
+    if ($PSBoundParameters.ContainsKey('UnboundIssue')) {
+        $candidate | Add-Member -NotePropertyName UnboundIssue `
+            -NotePropertyValue $UnboundIssue
+    }
     return $candidate
 }
 
@@ -130,7 +144,9 @@ function Invoke-Plan {
         [object[]]$Candidates = @(),
         [bool]$MigrationRequired = $false,
         [string]$CurrentMigrationPlanSha = '',
-        [string]$MigrationBranchSuffix = '-migrations'
+        [string]$MigrationBranchSuffix = '-migrations',
+        [string]$RequestedTargetTag = '',
+        [string]$UpdateBranchSuffix = ''
     )
 
     $snapshot = [pscustomobject]@{
@@ -163,6 +179,14 @@ function Invoke-Plan {
         $snapshot | Add-Member -NotePropertyName MigrationBranchSuffix `
             -NotePropertyValue $MigrationBranchSuffix
     }
+    if ($PSBoundParameters.ContainsKey('RequestedTargetTag')) {
+        $snapshot | Add-Member -NotePropertyName RequestedTargetTag `
+            -NotePropertyValue $RequestedTargetTag
+    }
+    if ($PSBoundParameters.ContainsKey('UpdateBranchSuffix')) {
+        $snapshot | Add-Member -NotePropertyName UpdateBranchSuffix `
+            -NotePropertyValue $UpdateBranchSuffix
+    }
 
     Resolve-MeAndAIProtocolUpdatePlan -Snapshot $snapshot
 }
@@ -175,6 +199,86 @@ Assert-Equal 'v0.10.0' $plan.LatestCompatibleTag 'TEST-0009 numeric tag ordering
 Assert-Equal 'CreateUpgrade' $plan.Operations[0].Kind 'TEST-0009 should create an upgrade'
 Assert-Equal 'v0.10.0' $plan.Operations[0].TargetTag 'TEST-0009 selected the wrong target'
 Assert-Equal 5 @($plan.IgnoredTags).Count 'TEST-0009 should report case-variant, noncanonical, malformed, or prerelease tags'
+
+$targetBoundPlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.2.0', 'v0.3.0', 'v0.4.0') `
+    -RequestedTargetTag 'v0.3.0' -UpdateBranchSuffix '-recovery'
+Assert-Equal 'OpenUpgrade' $targetBoundPlan.State `
+    'TEST-0126 an explicit current-launcher target should still create an upgrade'
+Assert-Equal 'v0.3.0' $targetBoundPlan.LatestCompatibleTag `
+    'TEST-0126 a release published later must not move the explicit target ceiling'
+Assert-Equal 'v0.3.0' $targetBoundPlan.Operations[0].TargetTag `
+    'TEST-0126 the create operation must remain bound to the requested target'
+Assert-Equal 'automation/meandai-protocol-v0.3.0-recovery' `
+    $targetBoundPlan.Operations[0].Branch `
+    'TEST-0126 a recovery proposal must not collide with a same-target legacy branch'
+
+foreach ($invalidRequestedTarget in @('v0.0.9', 'v0.2', 'v1.0.0', 'v0.9.9')) {
+    $invalidTargetPlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+        -AvailableTags @('v0.1.0', 'v0.3.0', 'v1.0.0') `
+        -RequestedTargetTag $invalidRequestedTarget
+    Assert-Equal 'BlockedManualReview' $invalidTargetPlan.State `
+        "TEST-0126 invalid, absent, cross-major, or downgrade target '$invalidRequestedTarget' must block"
+    Assert-Equal 0 @($invalidTargetPlan.Operations).Count `
+        "TEST-0126 blocked target '$invalidRequestedTarget' must remain mutation-free"
+}
+
+$newerOpenCandidate = New-Candidate -Number 60 -TargetTag 'v0.4.0' `
+    -ProtocolSha ('4' * 40)
+$newerOpenTargetPlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.3.0', 'v0.4.0') `
+    -RequestedTargetTag 'v0.3.0' -Candidates @($newerOpenCandidate)
+Assert-Equal 'BlockedManualReview' $newerOpenTargetPlan.State `
+    'TEST-0126 a current-launcher request must not retire a valid proposal newer than its target'
+Assert-Equal 0 @($newerOpenTargetPlan.Operations).Count `
+    'TEST-0126 a newer open proposal must remain untouched'
+
+$legacyLatest = New-Candidate -Number 61 -TargetTag 'v0.3.0' `
+    -ProtocolSha ('3' * 40) -SupersedeOnly $true -UnboundIssue $true
+$legacyLatestPlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.3.0') `
+    -RequestedTargetTag 'v0.3.0' -UpdateBranchSuffix '-recovery' `
+    -Candidates @($legacyLatest)
+Assert-Equal 'Supersede' $legacyLatestPlan.State `
+    'TEST-0126 a same-target legacy unbound draft must never satisfy the requested proposal'
+Assert-Equal 'CreateUpgrade,ClosePullRequest,DeleteBranch' `
+    (@($legacyLatestPlan.Operations.Kind) -join ',') `
+    'TEST-0126 a legacy unbound draft must be cleaned only after replacement creation'
+Assert-Equal $true $legacyLatestPlan.Operations[1].UnboundIssue `
+    'TEST-0126 issue-less legacy identity must reach cleanup without inventing an issue'
+
+$currentReplacement = New-Candidate -Number 62 -TargetTag 'v0.3.0' `
+    -ProtocolSha ('3' * 40) -MarkerHeadSha ('c' * 40) `
+    -UpdateBranchSuffix '-recovery'
+$legacyWithReplacementPlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.3.0') -RequestedTargetTag 'v0.3.0' `
+    -UpdateBranchSuffix '-recovery' `
+    -Candidates @($legacyLatest, $currentReplacement)
+Assert-Equal 'Supersede' $legacyWithReplacementPlan.State `
+    'TEST-0126 an exact replacement must allow legacy cleanup'
+Assert-Equal 'ClosePullRequest,DeleteBranch' `
+    (@($legacyWithReplacementPlan.Operations.Kind) -join ',') `
+    'TEST-0126 an existing exact replacement must not be duplicated'
+Assert-Equal 61 $legacyWithReplacementPlan.Operations[0].PullRequestNumber `
+    'TEST-0126 only the SupersedeOnly draft should be retired'
+
+$invalidSupersedeOnly = New-Candidate -Number 63 -TargetTag 'v0.2.0'
+$invalidSupersedeOnly | Add-Member -NotePropertyName SupersedeOnly `
+    -NotePropertyValue 'true'
+$invalidSupersedePlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -RequestedTargetTag 'v0.2.0' -Candidates @($invalidSupersedeOnly)
+Assert-Equal 'BlockedManualReview' $invalidSupersedePlan.State `
+    'TEST-0126 SupersedeOnly must be an exact Boolean contract'
+
+$invalidUnboundIssue = New-Candidate -Number 64 -TargetTag 'v0.2.0'
+$invalidUnboundIssue | Add-Member -NotePropertyName UnboundIssue `
+    -NotePropertyValue $true
+$invalidUnboundIssuePlan = Invoke-Plan -CurrentTag 'v0.1.0' `
+    -AvailableTags @('v0.1.0', 'v0.2.0') `
+    -RequestedTargetTag 'v0.2.0' -Candidates @($invalidUnboundIssue)
+Assert-Equal 'BlockedManualReview' $invalidUnboundIssuePlan.State `
+    'TEST-0126 UnboundIssue must be restricted to SupersedeOnly recovery candidates'
 
 $compatibleCatalogOrder = @(Get-MeAndAICompatibleProtocolTagsInOrder `
     -CurrentTag 'v0.10.3' `

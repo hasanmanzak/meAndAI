@@ -216,12 +216,12 @@ adapter blobs identical to that installed release.
   without workflow dispatch, Git publication, pull-request resolution, or
   Codex.
 - If the installed tag is older in the same major, the launcher preserves the
-  installed seed, reconciles only missing secrets, dispatches that installed
-  updater with correlation evidence, waits for its result, and never enters
-  adoption/Codex handling. An engine-era updater includes required catalog
-  migrations in the managed update draft. A pre-engine updater first installs
-  the newer lifecycle; after that merge, the new workflow automatically opens
-  one same-target reconciliation draft if its catalog remains unsatisfied.
+  installed seed, reconciles only missing secrets, and runs the explicitly
+  requested immutable target updater against an isolated clone of the captured
+  default-branch head. The target updater creates one atomic managed draft with
+  the target pin, changed updater assets, required catalog migrations, and
+  ledger. The maintainer checkout and default branch are unchanged, and no
+  installed workflow or Codex adoption flow is started.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
@@ -237,14 +237,15 @@ ordinary managed update draft contains the target gitlink, target-different
 updater assets, exact catalog-derived consumer changes, and resulting ledger.
 Only one maintainer merge is required.
 
-For a consumer whose immutable updater predates the engine, the first managed
-draft can contain only the core update that old code knows how to prove. Merge
-it normally. The newly installed workflow then automatically creates one
-same-target reconciliation draft and tracking issue. Review and merge that
-draft; finalization deletes its exact owned branch and closes its issue. Later
-compatible transitions use the one-draft path. If the follow-up event was
-suppressed, run the installed workflow manually; do not add a launcher flag or
-hand-edit the ledger.
+For a consumer whose immutable updater predates the engine, rerun the latest
+quick launcher with the requested target tag. It verifies that immutable
+release, clones the exact consumer base and target source into a temporary
+workspace, and invokes the target updater locally. The resulting single
+schema-2 draft crosses the capability boundary atomically; no knowingly red
+core-only merge or second reconciliation merge is required. Review and merge
+that draft normally. Its installed workflow handles later compatible updates
+through the ordinary scheduled or manual one-draft path. Do not hand-edit the
+ledger or replace managed updater files in the maintainer checkout.
 
 Exact already-satisfied state is idempotent. Customized, partial, mixed,
 drifted, linked, or otherwise ambiguous state fails closed before remote

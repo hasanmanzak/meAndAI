@@ -5,6 +5,24 @@ This project uses the `M.m.rev` version format defined in the
 
 ## 0.10.4 - 2026-07-18
 
+### Fixed
+
+- Let the latest quick launcher recover any compatible pre-engine consumer by
+  running the exact requested immutable target updater in isolated consumer and
+  protocol clones, without dispatching old workflow code or changing the
+  maintainer checkout.
+- Produce one atomic schema-2 proposal containing the target gitlink, changed
+  updater assets, all required release-declared migrations, and the ledger, so
+  no knowingly red core-only merge is required.
+- Retire exact legacy schema-1 drafts only after the replacement validates;
+  issue-less historical drafts are cleanup-only and never receive an invented
+  tracking issue.
+
+Related correction: [FEAT-0028](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md),
+[DEC-0020](docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md),
+[TEST-0125 and TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md),
+and [issue #74](https://github.com/hasanmanzak/meAndAI/issues/74).
+
 ### Changed
 
 - Require recurring GitHub Actions workflows to minimize total hosted runner
