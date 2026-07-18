@@ -255,6 +255,8 @@ $requiredFiles = @(
     'docs/adoption.md',
     'docs/quick-adoption.md',
     'docs/README.md',
+    'docs/agent-prompts/README.md',
+    'docs/agent-prompts/stability-and-consistency-cycle.md',
     'docs/ideas/README.md',
     'docs/features/README.md',
     'docs/decisions/README.md',
@@ -921,20 +923,42 @@ if ([regex]::Matches($ciWorkflow, '(?m)^\s+runs-on:\s+windows-latest\s*$').Count
     [regex]::Matches($ciWorkflow, '(?m)^\s+name:\s+Validate on windows-latest\s*$').Count -ne 1) {
     Add-Failure 'TEST-0124 ordinary validation must expose exactly one real Windows runner and one stable Windows check identity.'
 }
+$linuxJobIndex = $ciWorkflow.IndexOf("`n  linux-validation:", [StringComparison]::Ordinal)
 $windowsJobIndex = $ciWorkflow.IndexOf("`n  windows-validation:", [StringComparison]::Ordinal)
 $postPublicationIndex = $ciWorkflow.IndexOf("`n  post-publication:", [StringComparison]::Ordinal)
-if ($windowsJobIndex -lt 0 -or $postPublicationIndex -le $windowsJobIndex) {
-    Add-Failure 'TEST-0124 Windows and post-publication job boundaries are missing or unordered.'
+if ($linuxJobIndex -lt 0 -or $windowsJobIndex -le $linuxJobIndex -or
+    $postPublicationIndex -le $windowsJobIndex) {
+    Add-Failure 'TEST-0124 Linux, Windows, and post-publication job boundaries are missing or unordered.'
 }
 else {
+    $linuxJobSource = $ciWorkflow.Substring(
+        $linuxJobIndex,
+        $windowsJobIndex - $linuxJobIndex
+    )
     $windowsJobSource = $ciWorkflow.Substring(
         $windowsJobIndex,
         $postPublicationIndex - $windowsJobIndex
     )
+    $postPublicationJobSource = $ciWorkflow.Substring($postPublicationIndex)
     if (-not $windowsJobSource.Contains('runs-on: windows-latest') -or
         $windowsJobSource.Contains('needs:') -or
         $windowsJobSource.Contains('matrix:')) {
         Add-Failure 'TEST-0124 stable Windows check is not the single executing Windows job.'
+    }
+    if (-not [regex]::IsMatch(
+        $windowsJobSource,
+        '(?m)^ {4}timeout-minutes: 35\r?$'
+    )) {
+        Add-Failure 'TEST-0124 Windows full validation timeout does not cover the measured serial-suite budget.'
+    }
+    if (-not [regex]::IsMatch(
+        $linuxJobSource,
+        '(?m)^ {4}timeout-minutes: 20\r?$'
+    ) -or -not [regex]::IsMatch(
+        $postPublicationJobSource,
+        '(?m)^ {4}timeout-minutes: 5\r?$'
+    )) {
+        Add-Failure 'TEST-0124 unchanged Linux and post-publication timeout bounds are not exact.'
     }
 }
 foreach ($requiredProfileText in @(
@@ -1452,6 +1476,9 @@ foreach ($requiredText in @(
     'reopens the same cycle',
     'Exact converged-push commit and ref evidence MUST be written to the issue or pull request after the push exists',
     'A repository document records local push eligibility and MUST NOT predict the commit that contains itself',
+    'Local convergence is not full normative cycle completion',
+    'cycle completes and enters `Waiting` only after the authorized converged final review-branch push exists',
+    'stop as `Blocked` on missing final-push authority without claiming completion or `Waiting`',
     'Do not push a locally known non-converged tree'
 )) {
     if (-not $normalizedMandatePublication.Contains($requiredText)) {
@@ -1466,6 +1493,143 @@ foreach ($requiredText in @(
     if (-not $normalizedConsumerMandate.Contains($requiredText)) {
         Add-Failure "TEST-0099 consumer reachability contract is missing '$requiredText'."
     }
+}
+
+$agentPromptIndex = Get-Content -LiteralPath (
+    Join-Path $root 'docs/agent-prompts/README.md'
+) -Raw
+$stabilityCyclePrompt = Get-Content -LiteralPath (
+    Join-Path $root 'docs/agent-prompts/stability-and-consistency-cycle.md'
+) -Raw
+$normalizedStabilityCyclePrompt = [regex]::Replace($stabilityCyclePrompt, '\s+', ' ')
+$copyReadyPromptBlocks = @([regex]::Matches(
+    $stabilityCyclePrompt,
+    '(?ms)^```text\r?\n.+?^```\s*$'
+))
+if ($copyReadyPromptBlocks.Count -ne 1) {
+    Add-Failure 'TEST-0131 canonical stability-cycle guidance must contain exactly one copy-ready text prompt.'
+}
+foreach ($requiredText in @(
+    'exact pinned PROTOCOL.md',
+    'DEC-0015',
+    'Trigger context',
+    'material development',
+    'new failed evidence',
+    'Scan scope and exclusions',
+    'entire declared tracked-project scope',
+    'Validation budget',
+    'finite',
+    'Blocking, AcceptedResidual, ExternalOrLegacyFollowUp, or OptionalImprovement',
+    'dependencies (or None)',
+    'priority, severity, impact rank, and then stable identifier',
+    'one Blocking finding at a time',
+    'smallest explicitly recorded dependency-coherent group',
+    'focused tests',
+    'fresh-diff self-review',
+    'caused or exposed by the correction remains in this cycle',
+    'Do not run an unchanged confirmation scan',
+    'one budgeted confirmation scan',
+    'zero unresolved Blocking findings',
+    'report-only',
+    'push-review-branch',
+    'separately granted authority for the exact review branch',
+    'ordinary converged final push',
+    'report Waiting',
+    'Blocked',
+    'creating a tag',
+    'creating a GitHub Release'
+)) {
+    if (-not $normalizedStabilityCyclePrompt.Contains($requiredText)) {
+        Add-Failure "TEST-0131 canonical stability-cycle prompt is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'The default is `report-only`',
+    'In report-only mode, do not commit or push',
+    'Local convergence is not full normative cycle completion',
+    'Blocked` on missing final-push authority',
+    'Do not report `Waiting` or full cycle completion',
+    'The mode name alone grants no Git authority',
+    'Neither publication mode authorizes'
+)) {
+    if (-not $normalizedStabilityCyclePrompt.Contains($requiredText)) {
+        Add-Failure "TEST-0131 publication authority boundary is missing '$requiredText'."
+    }
+}
+
+$docsIndexContent = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw
+$agentPromptMarkdownFiles = @(Get-ChildItem -LiteralPath (
+    Join-Path $root 'docs/agent-prompts'
+) -File -Filter '*.md' | Sort-Object Name)
+$expectedAgentPromptFiles = @('README.md', 'stability-and-consistency-cycle.md')
+if (($agentPromptMarkdownFiles.Name -join '|') -cne ($expectedAgentPromptFiles -join '|')) {
+    Add-Failure 'TEST-0132 optional agent-prompt directory must contain only its index and one canonical prompt.'
+}
+foreach ($linkContract in @(
+    [pscustomobject]@{
+        Content = $docsIndexContent
+        Text = 'agent-prompts/README.md'
+        Location = 'documentation index'
+    },
+    [pscustomobject]@{
+        Content = $protocolContent
+        Text = 'docs/agent-prompts/stability-and-consistency-cycle.md'
+        Location = 'protocol mandate'
+    },
+    [pscustomobject]@{
+        Content = $adoption
+        Text = 'agent-prompts/stability-and-consistency-cycle.md'
+        Location = 'adoption guide'
+    },
+    [pscustomobject]@{
+        Content = $agentPromptIndex
+        Text = 'stability-and-consistency-cycle.md'
+        Location = 'agent-prompt index'
+    },
+    [pscustomobject]@{
+        Content = $adoption
+        Text = '.ai/protocol/docs/agent-prompts/stability-and-consistency-cycle.md'
+        Location = 'submodule consumer route'
+    },
+    [pscustomobject]@{
+        Content = $adoption
+        Text = 'provider-configured immutable ref'
+        Location = 'repository-reference consumer route'
+    }
+)) {
+    if (-not $linkContract.Content.Contains($linkContract.Text)) {
+        Add-Failure "TEST-0132 $($linkContract.Location) is missing '$($linkContract.Text)'."
+    }
+}
+foreach ($requiredText in @(
+    'copy or reference',
+    'does not install, create, schedule, or activate a goal, recurring task, automation, workflow, scheduler, background loop, or next invocation',
+    'Consumers do not need a consumer-owned copy'
+)) {
+    if (-not ([regex]::Replace($agentPromptIndex, '\s+', ' ')).Contains($requiredText)) {
+        Add-Failure "TEST-0132 opt-in prompt index is missing '$requiredText'."
+    }
+}
+$automaticPromptInstallRoots = @(
+    'templates/project',
+    '.github/workflows',
+    'migrations'
+)
+foreach ($relativeRoot in $automaticPromptInstallRoots) {
+    $candidateRoot = Join-Path $root $relativeRoot
+    if (-not (Test-Path -LiteralPath $candidateRoot -PathType Container)) {
+        continue
+    }
+    foreach ($candidateFile in @(Get-ChildItem -LiteralPath $candidateRoot -Recurse -File)) {
+        $candidateContent = Get-Content -LiteralPath $candidateFile.FullName -Raw
+        if ($candidateContent.Contains('stability-and-consistency-cycle.md')) {
+            $relativeCandidate = $candidateFile.FullName.Substring($root.Length + 1).Replace('\', '/')
+            Add-Failure "TEST-0132 optional prompt is automatically installed or scheduled by '$relativeCandidate'."
+        }
+    }
+}
+if (Test-Path -LiteralPath (Join-Path $root 'templates/project/docs/agent-prompts')) {
+    Add-Failure 'TEST-0132 optional prompt must not have a consumer-owned template copy.'
 }
 $currentProtocolVersion = (Get-Content -LiteralPath (Join-Path $root 'VERSION') -Raw).Trim()
 $currentProtocolTag = "v$currentProtocolVersion"

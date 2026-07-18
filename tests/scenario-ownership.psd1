@@ -12,7 +12,8 @@
                 'TEST-0064', 'TEST-0066', 'TEST-0074', 'TEST-0076',
                 'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092',
                 'TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099',
-                'TEST-0101', 'TEST-0114', 'TEST-0118'
+                'TEST-0101', 'TEST-0114', 'TEST-0118', 'TEST-0131',
+                'TEST-0132'
             )
         }
         @{
@@ -35,7 +36,8 @@
                 'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
                 'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
                 'TEST-0068', 'TEST-0071', 'TEST-0077', 'TEST-0080',
-                'TEST-0093', 'TEST-0094', 'TEST-0095'
+                'TEST-0093', 'TEST-0094', 'TEST-0095', 'TEST-0127',
+                'TEST-0128'
             )
         }
         @{
@@ -51,7 +53,7 @@
                 'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
-                'TEST-0113', 'TEST-0116'
+                'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130'
             )
         }
         @{

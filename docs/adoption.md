@@ -44,6 +44,15 @@ reviewed upgrade merges. Repository-reference consumers apply the same
 single-authority rule to their configured immutable ref and update it manually
 or through their own reviewed provider adapter.
 
+Maintainers may optionally copy or reference the canonical
+[stability and consistency cycle agent prompt](agent-prompts/stability-and-consistency-cycle.md)
+for one deliberately invoked cycle. Submodule consumers resolve it at
+`.ai/protocol/docs/agent-prompts/stability-and-consistency-cycle.md`;
+repository-reference consumers resolve `docs/agent-prompts/stability-and-consistency-cycle.md`
+at their provider-configured immutable ref. Adoption and updates do not copy,
+install, schedule, or activate this non-normative prompt in consumer-owned
+files.
+
 For the shortest supported setup, follow the
 [quick adoption guide](quick-adoption.md). It creates or validates the GitHub
 repository, provisions the required secrets, publishes only the lifecycle
@@ -70,9 +79,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.10.4`, the only repository file required
+For a new submodule consumer on `v0.11.0`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.10.4/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.11.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -81,9 +90,63 @@ GitHub Release, then checks out that locked tag; it never executes a moving
 `main`.
 
 The same operation covers an empty repository, a populated repository, and an
-already adopted repository. Classification depends only on collisions with
-declared adoption targets; unrelated application files do not prevent the
-deterministic path.
+already adopted repository. Migration-policy classification depends on the
+declared protocol/governance surface inventory, while target collisions remain
+a separate technical review dimension; unrelated application files do not
+prevent the deterministic path.
+
+Initial adoption has a separate maintainer-owned strategy gate. `Auto` chooses
+`FreshAdoption` only when the bounded exact-path inventory contains no
+protocol/governance evidence. A generic target collision still creates an
+`AdoptionReviewRequired` handoff without inventing migration evidence. Existing
+protocol/governance evidence requires
+`FullMigration`, `HybridReconciliation`, or acknowledged `CleanStart` through
+the quick launcher or explicit `workflow_dispatch` inputs. A `push`, scheduled
+run, or non-interactive `Auto` dispatch cannot create an unselected migration
+proposal. `Abort` creates nothing. Completed consumers bypass this gate and
+continue through their installed update route.
+
+The exact immutable `MeAndAI.CapabilitiesBootstrap.psm1` module is the single
+pure-policy authority for this classification and strategy state machine. The
+standalone launcher loads it read-only before adoption mutation, and the
+workflow adapter imports the same pinned module. Their independent Git/GitHub
+tree, identity, race, and mutation checks remain actor-specific; neither actor
+keeps or cross-validates a second policy implementation.
+
+`FullMigration` preserves valid project semantics before retiring legacy live
+authority. `HybridReconciliation` requires a consumer decision that makes
+ownership and precedence explicit. `CleanStart` imports no legacy governance
+semantics and permits deletion only from the exact reviewed governance surface
+inventory. A shared completion envelope rejects unauthorized application or
+product additions, modifications, type changes, and deletions in both normal
+publication and recovery. The resolved choice
+and exact sorted paths are bound in the transient manifest and proposal marker,
+then repeated in the project adoption issue and semantic-agent prompt. The
+agent cannot change the strategy, and any additional authority or required
+out-of-inventory deletion blocks for maintainer reassessment.
+
+Reserved `.ai/protocol` paths and `.ai/meandai-update-state.json` are always
+migration evidence. Evidence-only product/release documents and existing
+feature, decision, finding, or idea records do not become writable merely
+because they triggered the strategy gate. Clean start may discard declared
+legacy governance and reserved protocol-tree records, but stops before mutation
+on ambiguous evidence. Managed path casing is exact.
+
+A target without a committed `HEAD` must contain only the two fixed local
+credential files and the exact canonical seed. Other project content must be
+committed first. Created seed, proposal, completion, and updater commits are
+validated from their committed trees with clean index/worktree state before
+publication.
+
+The launcher also rechecks the exact canonical consumer repository identity,
+live default-branch name, and base before completion publication and before
+readiness. A concurrent branch rename or advance blocks instead of becoming an
+implicit migration input.
+
+Legacy manifest and marker schemas retain only their original policy-free
+recovery meaning. A legacy collision proposal that now needs an explicit
+migration strategy must be closed and reassessed; it is never retroactively
+bound to a choice absent from its immutable record.
 
 | State | Proposal and next owner |
 | --- | --- |
@@ -91,6 +154,8 @@ deterministic path.
 | `AdoptionReviewRequired` | At least one target collides. The draft adds only `.ai/adoption/meandai-capabilities.json`, listing the exact paths that need semantic review. No consumer target is overwritten. |
 | `PendingAdoption` | The deterministic branch and one draft already exist. Later runs retain them and create nothing else. |
 | `Update` | Adoption is complete, so the reviewed consumer-owned updater performs same-major update discovery and supersession. |
+| `ProtocolMigrationReviewRequired` | Existing protocol/governance evidence has no explicit strategy. The run stops before proposal mutation. |
+| `Aborted` | The maintainer selected `Abort`; no adoption proposal is created. |
 | `BlockedManualReview` | Seed identity, manifest ownership, branch/PR ownership, source, or another prerequisite is ambiguous. The run stops without cleanup or overwrite. |
 
 The workflow does not start an AI agent. It opens a durable, review-only
@@ -117,7 +182,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.10.4'
+$tag = 'v0.11.0'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -441,7 +506,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.10.4`
+- ref: `v0.11.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -489,11 +554,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.10.4`:
+before checkout; the current example then installs `v0.11.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.10.4
+git -C .ai/protocol checkout v0.11.0
 git add .ai/protocol
 ```
 

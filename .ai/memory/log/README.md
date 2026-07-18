@@ -5,18 +5,22 @@ and follow its canonical links.
 
 ## Current continuation
 
-The shared v0.10.4 release combines hosted runner-minute efficiency and atomic
-legacy updater recovery. Follow
-[FEAT-0027](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md),
-[FEAT-0028 / BUG-0013](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md),
-the [runner continuation](2026-07-18-v0104-runner-minute-efficiency.md), and the
-[recovery continuation](2026-07-18-v0104-atomic-legacy-updater-recovery.md).
-[Issues #72](https://github.com/hasanmanzak/meAndAI/issues/72) and
-[#74](https://github.com/hasanmanzak/meAndAI/issues/74) own external delivery
-facts. `FIND-0120` remains the separate open follow-up in issue #44.
+The v0.11.0 work adds protocol-aware initial-adoption strategy selection and
+one optional stability-cycle agent prompt. Follow
+[FEAT-0029](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
+[FEAT-0030](../../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
+[DEC-0021](../../../docs/decisions/DEC-0021-explicit-initial-adoption-strategy.md),
+and the [v0.11.0 continuation](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md).
+[Issues #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
+[#77](https://github.com/hasanmanzak/meAndAI/issues/77) own external delivery
+facts; [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78) is the current
+draft delivery and carries the resolved local corrections for `FIND-0158` and
+`FIND-0159`; replacement hosted evidence remains pending. `FIND-0120` remains
+the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-18 - v0.11.0 adoption strategy and optional agent prompt](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md)
 - [2026-07-18 - v0.10.4 atomic legacy updater recovery](2026-07-18-v0104-atomic-legacy-updater-recovery.md)
 - [2026-07-18 - v0.10.4 hosted runner-minute efficiency](2026-07-18-v0104-runner-minute-efficiency.md)
 - [2026-07-17 - v0.10.3 generic consumer transition reconciliation](2026-07-17-v0103-generic-consumer-transition-reconciliation.md)

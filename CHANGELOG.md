@@ -3,6 +3,86 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.11.0 - 2026-07-18
+
+### Added
+
+- Add a maintainer-owned initial-adoption strategy gate with `FreshAdoption`,
+  `FullMigration`, `HybridReconciliation`, acknowledged `CleanStart`, and
+  `Abort` semantics; `Auto` selects only evidence-free fresh adoption.
+- Carry the selected strategy and bounded exact-path inventory through manual
+  workflow dispatch, transient manifest, proposal marker, adoption issue,
+  semantic-agent prompt, recovery, and completion.
+- Publish one optional, copy/reference-only stability and consistency cycle
+  prompt that maintainers may use when configuring their own task or goal.
+
+### Changed
+
+- Stop seed-push and scheduled events from creating an unselected initial
+  migration proposal while retaining completed-consumer update and
+  finalization routes.
+- Bound protocol-surface assessment to a declared classifier, 256 paths, and
+  16 KiB; non-interactive ambiguity and inventory overflow fail closed without
+  growing a universal semantic bootstrapper. Reserved protocol roots, exact
+  rule-root entries, and the consumer migration ledger cannot be mistaken for
+  a fresh repository.
+- Make the exact immutable capabilities contract module the single pure-policy
+  authority used by both the standalone launcher and workflow adapter; remove
+  their copied classifiers and the launcher-to-module validator chain while
+  retaining actor-specific Git/GitHub evidence and mutation-boundary checks.
+- Use one normal/recovery completion envelope: deletion is limited to the
+  transient manifest and exact assessed governance paths authorized by a
+  migration strategy, while unauthorized application or product additions,
+  modifications, type changes, and deletions are rejected.
+- Recheck live repository identity, default-branch name, and exact base before
+  seed, proposal, completion, and readiness publication; a concurrent branch
+  rename or advance blocks, and an invocation-owned seed race is compensated
+  only through an exact lease. Treat a remote as empty only when it advertises
+  no branch, tag, or other ref, and verify the exact first-ref set after push.
+- Re-read every launcher/bootstrap/updater-created commit before publication,
+  require its exact parent, paths, modes, and source-bound blobs, and stop on a
+  dirty post-commit index or working tree. Canonical target casing and every
+  `.gitmodules` subsection/path collision with `.ai/protocol` fail closed.
+- Accept credential inputs only as exact root regular non-link files, recheck
+  their identity at read time, and suppress Git hooks for the bounded launcher
+  process so consumer hooks cannot observe plaintext token sources.
+- Keep the stability-cycle prompt non-normative, single-invocation, and
+  report-only by default. It neither creates nor activates a goal, recurring
+  task, automation, scheduler, workflow, background loop, or next invocation;
+  a review-branch push requires separate explicit authority. Report-only may
+  establish local convergence, but remains `Blocked` and cannot claim full
+  cycle completion or `Waiting` until that final-push authority is exercised.
+
+### Fixed
+
+- Treat successful native-command stderr as output under Windows PowerShell
+  5.1 and decide target-updater failure from the captured process exit code;
+  restore the caller error preference, retain failure for every unexpected
+  nonzero exit, preserve ancestry/missing-ref exits 1/2 as typed control flow,
+  route every adapter Git call through that boundary, and quiet the detached
+  migration-catalog checkout that exposed the defect.
+- Normalize PowerShell 7's singleton-null representation of an empty protocol
+  inventory without weakening fail-closed validation: a null mixed with any
+  real path remains invalid, and empty initial-adoption markers round-trip on
+  both Windows PowerShell and PowerShell 7.
+- Raise only the serial Windows `Full` validation job's bounded timeout from
+  20 to 35 minutes after the expanded suite passed its capabilities and
+  updater families but was canceled by the stale limit; keep the Linux and
+  post-publication limits and the single-runner topology unchanged.
+
+Related work: [FEAT-0029](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
+[FEAT-0030](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
+[DEC-0021](docs/decisions/DEC-0021-explicit-initial-adoption-strategy.md),
+[TEST-0127 through TEST-0132](tests/scenario-ownership.psd1),
+[issue #76](https://github.com/hasanmanzak/meAndAI/issues/76), and
+[issue #77](https://github.com/hasanmanzak/meAndAI/issues/77). The resolved
+PowerShell and validation corrections are `FIND-0158` through `FIND-0160`,
+with amended
+[TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md)
+plus [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md)
+and [TEST-0127 / TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md)
+in [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78).
+
 ## 0.10.4 - 2026-07-18
 
 ### Fixed

@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [switch]$NativeStderrOnly
+)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -54,15 +56,273 @@ function Get-AdapterFunctionDefinition {
 Import-Module $moduleSource -Force
 foreach ($helperName in @(
     'Invoke-Native',
+    'Test-GitAncestor',
     'Get-LocalTreeEntry',
     'Get-StagedTreeEntry',
     'Get-OrdinalUniquePaths',
     'Get-ExpectedManagedPaths',
     'Assert-StagedManagedUpdate',
     'Stage-ManagedProposalTree',
+    'Get-RemoteBranchHead',
+    'Assert-RemoteDefaultBranchUnchanged',
     'Get-ExistingReplacementCandidates'
 )) {
     . ([scriptblock]::Create((Get-AdapterFunctionDefinition -Name $helperName)))
+}
+
+$catalogImportDefinition = Get-AdapterFunctionDefinition `
+    -Name 'Import-ConsumerMigrationCatalogAtCommit'
+if (-not $catalogImportDefinition.Contains(
+        "'checkout', '--quiet', '--detach', `$Commit")) {
+    Add-Failure 'TEST-0126 target migration-catalog checkout is not quiet and detached.'
+}
+$remoteBranchDefinition = Get-AdapterFunctionDefinition `
+    -Name 'Get-RemoteBranchHead'
+if (-not $remoteBranchDefinition.Contains(
+        '-AcceptedExitCodes @(0, 2) -PassThruResult')) {
+    Add-Failure 'TEST-0126 missing remote-ref exit code 2 is not captured by the native wrapper.'
+}
+if ([regex]::IsMatch($adapterContent, '(?m)^\s*&\s+git\b')) {
+    Add-Failure 'TEST-0126 target adapter bypasses the native exit-code wrapper.'
+}
+
+$nativeStderrRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-native-stderr-$([guid]::NewGuid().ToString('N'))"
+try {
+    $nativeStderrRepository = Join-Path $nativeStderrRoot 'consumer'
+    [IO.Directory]::CreateDirectory($nativeStderrRepository) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'init', '--quiet', '--initial-branch=main'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'user.name', 'TEST-0126'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'user.email',
+        'test-0126@example.invalid'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'commit.gpgsign', 'false'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'config', 'core.autocrlf', 'false'
+    ) | Out-Null
+
+    $nativeStderrFixture = Join-Path $nativeStderrRepository 'fixture.txt'
+    [IO.File]::WriteAllText($nativeStderrFixture, "first`n",
+        [Text.UTF8Encoding]::new($false))
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'add', '--', 'fixture.txt'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'commit', '--quiet', '-m', 'first'
+    ) | Out-Null
+    $firstCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+
+    [IO.File]::WriteAllText($nativeStderrFixture, "second`n",
+        [Text.UTF8Encoding]::new($false))
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'add', '--', 'fixture.txt'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'commit', '--quiet', '-m', 'second'
+    ) | Out-Null
+    $secondCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+
+    $expectedPreference = [string]$ErrorActionPreference
+    $checkoutOutput = @()
+    try {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach', $firstCommit
+        ) | Out-Null
+        $checkoutOutput = @(Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach', $secondCommit
+        ))
+    }
+    catch {
+        Add-Failure "TEST-0126 successful native stderr was treated as failure: $($_.Exception.Message)"
+    }
+    if ($checkoutOutput.Count -eq 0) {
+        Add-Failure 'TEST-0126 did not exercise the successful Git checkout stderr path.'
+    }
+    $checkedOutCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    if ($checkedOutCommit -cne $secondCommit) {
+        Add-Failure 'TEST-0126 successful native stderr did not preserve the requested checkout result.'
+    }
+    if ([string]$ErrorActionPreference -cne $expectedPreference) {
+        Add-Failure 'TEST-0126 native invocation did not restore ErrorActionPreference.'
+    }
+
+    if (-not (Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor $firstCommit -Descendant $secondCommit)) {
+        Add-Failure 'TEST-0126 rejected a valid Git ancestor relation.'
+    }
+    if (Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor $secondCommit -Descendant $firstCommit) {
+        Add-Failure 'TEST-0126 accepted exit code 1 as a valid Git ancestor relation.'
+    }
+    $invalidAncestorFailed = $false
+    try {
+        Test-GitAncestor -RepositoryPath $nativeStderrRepository `
+            -Ancestor 'test-0126-missing' -Descendant $secondCommit | Out-Null
+    }
+    catch {
+        $invalidAncestorFailed = $true
+    }
+    if (-not $invalidAncestorFailed) {
+        Add-Failure 'TEST-0126 accepted an unexpected Git ancestor error.'
+    }
+
+    $nativeStderrRemote = Join-Path $nativeStderrRoot 'origin.git'
+    Invoke-Native -Command 'git' -Arguments @(
+        'clone', '--quiet', '--bare', $nativeStderrRepository,
+        $nativeStderrRemote
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $nativeStderrRepository, 'remote', 'add', 'origin',
+        $nativeStderrRemote
+    ) | Out-Null
+    Push-Location $nativeStderrRepository
+    try {
+        $actualRemoteHead = Get-RemoteBranchHead -Branch 'main'
+        if ($actualRemoteHead -cne $secondCommit) {
+            Add-Failure 'TEST-0126 did not return the exact remote branch head.'
+        }
+        $missingRemoteHead = Get-RemoteBranchHead `
+            -Branch 'test-0126-missing'
+        if ($null -ne $missingRemoteHead) {
+            Add-Failure 'TEST-0126 did not preserve missing remote ref exit code 2.'
+        }
+        Invoke-Native -Command 'git' -Arguments @(
+            'remote', 'set-url', 'origin',
+            (Join-Path $nativeStderrRoot 'missing-origin.git')
+        ) | Out-Null
+        $invalidRemoteFailed = $false
+        try {
+            Get-RemoteBranchHead -Branch 'main' | Out-Null
+        }
+        catch {
+            $invalidRemoteFailed = $true
+        }
+        if (-not $invalidRemoteFailed) {
+            Add-Failure 'TEST-0126 accepted an unexpected remote inspection error.'
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+    $nativeHost = (Get-Process -Id $PID).Path
+    $exitTwoResult = Invoke-Native -Command $nativeHost -Arguments @(
+        '-NoProfile', '-Command', 'exit 2'
+    ) -AcceptedExitCodes @(0, 2) -PassThruResult
+    if ([int]$exitTwoResult.ExitCode -ne 2) {
+        Add-Failure 'TEST-0126 did not preserve an accepted native exit code 2.'
+    }
+
+    $invalidCheckoutFailed = $false
+    try {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $nativeStderrRepository, 'checkout', '--detach',
+            'refs/heads/test-0126-missing'
+        ) | Out-Null
+    }
+    catch {
+        $invalidCheckoutFailed = $true
+    }
+    if (-not $invalidCheckoutFailed) {
+        Add-Failure 'TEST-0126 accepted a native command with a nonzero exit code.'
+    }
+}
+catch {
+    Add-Failure "TEST-0126 native stderr fixture failed unexpectedly: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $nativeStderrRoot) {
+        Remove-Item -LiteralPath $nativeStderrRoot -Recurse -Force
+    }
+}
+
+if ($NativeStderrOnly) {
+    if ($failures.Count -gt 0) {
+        foreach ($failure in $failures) {
+            Write-Host "FAIL: $failure" -ForegroundColor Red
+        }
+        exit 1
+    }
+    Write-Host 'Protocol update native stderr regression passed.' -ForegroundColor Green
+    exit 0
+}
+
+$script:FocusedRemoteDefaultHead = '0' * 40
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'main'
+}
+function Invoke-GhJson {
+    param([string[]]$Arguments)
+
+    if (($Arguments -join ' ') -cne 'api repos/owner/consumer') {
+        throw "Unexpected focused repository-metadata lookup: $($Arguments -join ' ')"
+    }
+    return $script:FocusedRepositoryMetadata
+}
+function Get-RemoteBranchHead {
+    param([string]$Branch)
+
+    if ($Branch -cne 'main') {
+        throw "Unexpected focused default-branch ref lookup '$Branch'."
+    }
+    return $script:FocusedRemoteDefaultHead
+}
+
+$defaultRenameError = ''
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'trunk'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    $defaultRenameError = $_.Exception.Message
+}
+if ($defaultRenameError -notlike '*live default branch*') {
+    Add-Failure "TEST-0126 a live default-branch rename with the old ref SHA intact did not fail closed: $defaultRenameError"
+}
+
+$repositoryIdentityError = ''
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/redirected-consumer'
+    default_branch = 'main'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    $repositoryIdentityError = $_.Exception.Message
+}
+if ($repositoryIdentityError -notlike '*live repository identity*') {
+    Add-Failure "TEST-0126 a redirected live repository identity did not fail closed: $repositoryIdentityError"
+}
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'main'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    Add-Failure "TEST-0126 unchanged live repository/default identity was rejected: $($_.Exception.Message)"
 }
 
 $legacyInterruptedCandidate = [pscustomobject]@{
@@ -589,9 +849,28 @@ function global:git {
         return
     }
     if ($arguments[0] -eq 'ls-tree') {
+        $commit = [string]$arguments[1]
         $path = [string]$arguments[-1]
+        $committedProposal = $commit -ceq $script:Scenario.NewHead
         if ($path -eq '.ai/protocol') {
-            "160000 commit $($script:Scenario.CurrentProtocolSha)`t.ai/protocol"
+            $protocolSha = if ($committedProposal) {
+                $script:Scenario.TargetProtocolSha
+            }
+            else { $script:Scenario.CurrentProtocolSha }
+            "160000 commit $protocolSha`t.ai/protocol"
+        }
+        elseif ($committedProposal -and
+            $script:Scenario.TargetConsumerBlobs.ContainsKey($path)) {
+            $blob = [string]$script:Scenario.TargetConsumerBlobs[$path]
+            if ($script:Scenario.WrongCommittedAssetBlob -and
+                $path -ceq '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1') {
+                $blob = '8' * 40
+            }
+            if ($script:Scenario.WrongCommittedMigrationBlob -and
+                $path -ceq 'AGENTS.md') {
+                $blob = '9' * 40
+            }
+            "100644 blob $blob`t$path"
         }
         elseif ($script:Scenario.ConsumerTreeEntries.ContainsKey($path)) {
             "100644 blob $($script:Scenario.ConsumerTreeEntries[$path])`t$path"
@@ -664,9 +943,20 @@ function global:git {
         $global:LASTEXITCODE = 2
         return
     }
-    if ($arguments[0] -eq 'diff' -and $arguments -contains '--cached') {
-        @($script:Scenario.ExpectedStagedPaths)
-        return
+    if ($arguments[0] -eq 'diff') {
+        if ($arguments -contains '--cached') {
+            @($script:Scenario.ExpectedStagedPaths)
+            return
+        }
+        if ($arguments -contains '--name-only' -and
+            $arguments -contains '--no-renames') {
+            Add-ScenarioEvent 'validate-committed-tree'
+            @($script:Scenario.ExpectedStagedPaths)
+            if ($script:Scenario.CommitExtraApplicationPath) {
+                'src/injected-product-file.txt'
+            }
+            return
+        }
     }
     if ($arguments[0] -eq 'ls-files' -and $arguments -contains '--stage') {
         $path = [string]$arguments[-1]
@@ -685,6 +975,15 @@ function global:git {
     }
     if ($arguments[0] -eq 'add') {
         Add-ScenarioEvent 'stage-target-assets'
+        return
+    }
+    if ($arguments[0] -eq 'rev-list' -and $arguments -contains '--parents') {
+        Add-ScenarioEvent 'validate-committed-parent'
+        $parent = if ($script:Scenario.WrongCommittedParent) {
+            '7' * 40
+        }
+        else { $script:Scenario.BaseHead }
+        "$($script:Scenario.NewHead) $parent"
         return
     }
     if ($arguments[0] -eq 'rev-parse') {
@@ -745,7 +1044,11 @@ function global:git {
         }
         return
     }
-    if ($arguments[0] -in @('switch', 'update-index', 'config', 'commit')) {
+    if ($arguments[0] -eq 'commit') {
+        Add-ScenarioEvent 'commit-proposal'
+        return
+    }
+    if ($arguments[0] -in @('switch', 'update-index', 'config')) {
         return
     }
 
@@ -1229,6 +1532,10 @@ function Invoke-AdapterScenario {
         [string]$OldAuthorLogin = 'updater-owner',
         [bool]$DriftCurrentAsset = $false,
         [bool]$WrongStagedAssetBlob = $false,
+        [bool]$CommitExtraApplicationPath = $false,
+        [bool]$WrongCommittedParent = $false,
+        [bool]$WrongCommittedAssetBlob = $false,
+        [bool]$WrongCommittedMigrationBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
         [bool]$MissingManagedLabels = $false,
         [bool]$ReservedOrphanBranchExists = $false,
@@ -1551,6 +1858,10 @@ function Invoke-AdapterScenario {
         AuthenticatedActor = $AuthenticatedActor
         OldAuthorLogin = $OldAuthorLogin
         WrongStagedAssetBlob = $WrongStagedAssetBlob
+        CommitExtraApplicationPath = $CommitExtraApplicationPath
+        WrongCommittedParent = $WrongCommittedParent
+        WrongCommittedAssetBlob = $WrongCommittedAssetBlob
+        WrongCommittedMigrationBlob = $WrongCommittedMigrationBlob
         WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
         ReleaseMode = $ReleaseMode
@@ -1829,6 +2140,56 @@ if (-not $wrongStagedAsset.Threw -or
 if ((Get-EventIndex $wrongStagedAsset 'push-new') -ge 0 -or
     (Get-EventIndex $wrongStagedAsset 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0024 wrong staged updater blob reached remote mutation.'
+}
+
+$extraCommittedPath = Invoke-AdapterScenario -Name 'extra-committed-path' `
+    -CommitExtraApplicationPath $true
+if (-not $extraCommittedPath.Threw -or
+    $extraCommittedPath.Error -notlike '*Committed proposal paths*') {
+    Add-Failure "TEST-0024 a commit-hook application-path injection did not fail at the committed-tree gate: $($extraCommittedPath.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $extraCommittedPath $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 a commit-hook application-path injection reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedParent = Invoke-AdapterScenario -Name 'wrong-committed-parent' `
+    -WrongCommittedParent $true
+if (-not $wrongCommittedParent.Threw -or
+    $wrongCommittedParent.Error -notlike '*exact captured base*') {
+    Add-Failure "TEST-0024 a proposal commit not parented by the captured base did not fail closed: $($wrongCommittedParent.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedParent $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 a wrong-parent proposal commit reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedAsset = Invoke-AdapterScenario -Name 'wrong-committed-asset' `
+    -WrongCommittedAssetBlob $true
+if (-not $wrongCommittedAsset.Threw -or
+    $wrongCommittedAsset.Error -notlike '*Committed updater asset*target release blob*') {
+    Add-Failure "TEST-0024 committed updater-asset substitution did not fail closed: $($wrongCommittedAsset.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedAsset $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 committed updater-asset substitution reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedMigration = Invoke-AdapterScenario `
+    -Name 'wrong-committed-migration-result' -MigrationRequired $true `
+    -MigrationWithUpgrade $true -OldCandidateExists $false `
+    -OldBranchExists $false -WrongCommittedMigrationBlob $true
+if (-not $wrongCommittedMigration.Threw -or
+    $wrongCommittedMigration.Error -notlike "*Committed migration result 'AGENTS.md'*deterministic plan*") {
+    Add-Failure "TEST-0121 committed migration-result substitution did not fail closed: $($wrongCommittedMigration.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedMigration $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0121 committed migration-result substitution reached remote mutation '$forbiddenEvent'."
+    }
 }
 
 $wrongTargetAsset = Invoke-AdapterScenario -Name 'wrong-target-asset' `

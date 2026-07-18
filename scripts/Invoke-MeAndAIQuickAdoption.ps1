@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.10.4',
+    [string]$ProtocolTag = 'v0.11.0',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -14,6 +14,10 @@ param(
     [int]$CodexTimeoutMinutes = 30,
     [ValidateRange(0, 7200)]
     [int]$CodexTimeoutSeconds = 0,
+    [ValidateSet('Auto', 'FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart', 'Abort')]
+    [string]$AdoptionStrategy = 'Auto',
+    [switch]$NonInteractive,
+    [switch]$AcknowledgeProtocolRecordLoss,
     [switch]$SkipLifecycleDispatch,
     [Alias('SkipCodexDelegation')]
     [switch]$SkipLocalCodex,
@@ -29,6 +33,9 @@ $minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
+$initialAdoptionPolicyTag = 'v0.11.0'
+$initialAdoptionPolicySourcePath =
+    'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
 $consumerMigrationIndexPath = 'migrations/index.json'
 $consumerMigrationLedgerPath = '.ai/meandai-update-state.json'
@@ -102,6 +109,14 @@ $managedUpdaterAssets = @(
         TemplatePath = $workflowSourcePath
     }
 ) + @($adoptionUpdaterAssets)
+$adoptionCanonicalTargetPaths = @(
+    '.gitmodules', '.ai/protocol', '.ai/meandai-update-state.json'
+) + @($adoptionAssets | ForEach-Object { [string]$_.ConsumerPath })
+$adoptionCanonicalIdentityPaths = @(
+    $workflowTargetPath, $adoptionManifestPath
+) + @($adoptionCanonicalTargetPaths)
+$protocolSurfaceTraversalMaximumDirectoryCount = 4096
+$protocolSurfaceTraversalMaximumEntryCount = 65536
 $secretLockLabel = 'meandai:secret-reconciliation-lock'
 $tokenMappings = [ordered]@{
     'FG_PAT.txt' = 'MEANDAI_UPDATER_TOKEN'
@@ -132,6 +147,7 @@ $script:ValidatedProtocolReleases = [System.Collections.Generic.Dictionary[strin
 $script:CanonicalProtocolAssets = [System.Collections.Generic.Dictionary[string, object]]::new(
     [StringComparer]::Ordinal
 )
+$script:InitialAdoptionPolicy = $null
 
 function ConvertTo-QuickAdoptionDisplayText {
     param(
@@ -458,6 +474,87 @@ function Invoke-External {
     }
 }
 
+function Enter-GitHookSuppression {
+    $countName = 'GIT_CONFIG_COUNT'
+    $previousCount = [Environment]::GetEnvironmentVariable($countName, 'Process')
+    $count = if ([string]::IsNullOrEmpty($previousCount)) {
+        0
+    }
+    elseif ($previousCount -cmatch '^(?:0|[1-9][0-9]*)$' -and
+        [int64]$previousCount -le 64) {
+        [int]$previousCount
+    }
+    else {
+        throw 'The process Git configuration environment is malformed; hooks cannot be suppressed safely.'
+    }
+    $keyName = "GIT_CONFIG_KEY_$count"
+    $valueName = "GIT_CONFIG_VALUE_$count"
+    $previousKey = [Environment]::GetEnvironmentVariable($keyName, 'Process')
+    $previousValue = [Environment]::GetEnvironmentVariable($valueName, 'Process')
+    $disabledHooksPath = Join-Path ([IO.Path]::GetTempPath()) `
+        ".meandai-disabled-hooks-$([guid]::NewGuid().ToString('N'))"
+    if (Test-Path -LiteralPath $disabledHooksPath) {
+        throw 'Unable to establish a unique disabled Git hooks path.'
+    }
+
+    try {
+        [Environment]::SetEnvironmentVariable(
+            $keyName, 'core.hooksPath', 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            $valueName, $disabledHooksPath, 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            $countName, [string]($count + 1), 'Process'
+        )
+    }
+    catch {
+        [Environment]::SetEnvironmentVariable($countName, $previousCount, 'Process')
+        [Environment]::SetEnvironmentVariable($keyName, $previousKey, 'Process')
+        [Environment]::SetEnvironmentVariable($valueName, $previousValue, 'Process')
+        throw
+    }
+
+    return [pscustomobject]@{
+        CountName = $countName
+        PreviousCount = $previousCount
+        KeyName = $keyName
+        PreviousKey = $previousKey
+        ValueName = $valueName
+        PreviousValue = $previousValue
+        DisabledHooksPath = $disabledHooksPath
+    }
+}
+
+function Assert-GitHookSuppression {
+    param([Parameter(Mandatory)]$State)
+
+    $result = Invoke-External -Command 'git' -Arguments @(
+        'config', '--get', 'core.hooksPath'
+    )
+    $values = @($result.Output | Where-Object { $_ } | ForEach-Object {
+        [string]$_
+    })
+    if ($values.Count -ne 1 -or
+        $values[0] -cne [string]$State.DisabledHooksPath) {
+        throw 'The installed Git does not honor the launcher hook-suppression boundary.'
+    }
+}
+
+function Exit-GitHookSuppression {
+    param([Parameter(Mandatory)]$State)
+
+    [Environment]::SetEnvironmentVariable(
+        [string]$State.CountName, $State.PreviousCount, 'Process'
+    )
+    [Environment]::SetEnvironmentVariable(
+        [string]$State.KeyName, $State.PreviousKey, 'Process'
+    )
+    [Environment]::SetEnvironmentVariable(
+        [string]$State.ValueName, $State.PreviousValue, 'Process'
+    )
+}
+
 function Compare-CanonicalDecimalComponent {
     param(
         [Parameter(Mandatory)][string]$Left,
@@ -593,6 +690,475 @@ function Assert-ContainedManagedDestination {
     return $destination
 }
 
+function Test-QuickAdoptionCanonicalRepositoryPath {
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or
+        [IO.Path]::IsPathRooted($Path) -or
+        $Path.Contains('\') -or $Path -match '[\x00-\x1f]') {
+        return $false
+    }
+    $segments = @($Path.Split('/'))
+    return $segments.Count -gt 0 -and
+        @($segments | Where-Object {
+            $_ -ceq '' -or $_ -ceq '.' -or $_ -ceq '..'
+        }).Count -eq 0
+}
+
+function Get-InitialAdoptionPolicyCommand {
+    param([Parameter(Mandatory)][string]$Name)
+
+    if ($null -eq $script:InitialAdoptionPolicy -or
+        $null -eq $script:InitialAdoptionPolicy.Commands -or
+        -not $script:InitialAdoptionPolicy.Commands.ContainsKey($Name)) {
+        throw "The exact initial-adoption policy command '$Name' is unavailable."
+    }
+    return $script:InitialAdoptionPolicy.Commands[$Name]
+}
+
+function Assert-QuickAdoptionCanonicalPathCasing {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Assert-MeAndAIProtocolAssessmentPathCasing'
+    & $command -Path $Path
+}
+
+function Get-QuickAdoptionProtocolSurfaceInventory {
+    param([AllowNull()][AllowEmptyCollection()][object[]]$Paths = @())
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Get-MeAndAIProtocolSurfaceInventory'
+    $arguments = @{ Paths = [object[]]@($Paths) }
+    return @(& $command @arguments)
+}
+
+function Get-QuickAdoptionCanonicalCollisions {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
+
+    $pathValues = @($Paths | ForEach-Object { [string]$_ })
+    $collisions = [System.Collections.Generic.List[string]]::new()
+    foreach ($targetPath in $adoptionCanonicalTargetPaths) {
+        $found = @($pathValues | Where-Object {
+            $_.Equals($targetPath, [StringComparison]::OrdinalIgnoreCase) -or
+            $_.StartsWith("$targetPath/", [StringComparison]::OrdinalIgnoreCase) -or
+            $targetPath.StartsWith("$($_)/", [StringComparison]::OrdinalIgnoreCase)
+        }).Count -gt 0
+        if ($found) {
+            $collisions.Add($targetPath)
+        }
+    }
+    $result = @($collisions | Select-Object -Unique)
+    [Array]::Sort($result, [StringComparer]::Ordinal)
+    return @($result)
+}
+
+function Test-QuickAdoptionAssessmentRelevantPath {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TargetPaths
+    )
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAIProtocolAssessmentRelevantPath'
+    return [bool](& $command -Path $Path -TargetPaths @($TargetPaths))
+}
+
+function Get-QuickAdoptionRelevantTreePaths {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TargetPaths
+    )
+
+    if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Bounded tree assessment requires one canonical commit.'
+    }
+    $paths = [System.Collections.Generic.List[string]]::new()
+    $seen = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    $maximumRelevantCount =
+        [int]$script:InitialAdoptionPolicy.Limits.MaximumSurfaceCount +
+        @($TargetPaths).Count + 2
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $global:LASTEXITCODE = 0
+        & git -C $Repository ls-tree -r --name-only $Commit -- 2>&1 |
+            ForEach-Object {
+                $path = [string]$_
+                Assert-QuickAdoptionCanonicalPathCasing -Path $path
+                if (-not (Test-QuickAdoptionAssessmentRelevantPath `
+                    -Path $path -TargetPaths $TargetPaths)) {
+                    return
+                }
+                if (-not (Test-QuickAdoptionCanonicalRepositoryPath -Path $path) -or
+                    -not $seen.Add($path)) {
+                    throw "Protocol inventory path '$path' is invalid or case-ambiguous."
+                }
+                $paths.Add($path)
+                if ($paths.Count -gt $maximumRelevantCount) {
+                    throw 'Protocol inventory exceeds the bounded assessment budget; maintainer review is required.'
+                }
+            }
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousPreference
+    }
+    if ($exitCode -ne 0) {
+        throw "Git tree assessment failed with exit code $exitCode."
+    }
+    return @($paths)
+}
+
+function Get-QuickAdoptionWorkingTreePaths {
+    param([Parameter(Mandatory)][string]$Root)
+
+    $paths = [System.Collections.Generic.List[string]]::new()
+    $seenPaths = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    $maximumRelevantCount =
+        [int]$script:InitialAdoptionPolicy.Limits.MaximumSurfaceCount +
+        $adoptionCanonicalTargetPaths.Count + 2
+    # Traverse the no-HEAD tree once so every retained path uses its actual
+    # casing. Do not follow repository metadata or reparse points, and fail
+    # closed at finite directory/entry ceilings instead of assuming freshness.
+    $pendingDirectories = [System.Collections.Generic.Queue[string]]::new()
+    $pendingDirectories.Enqueue($Root)
+    $directoryCount = 0
+    $entryCount = 0
+    while ($pendingDirectories.Count -gt 0) {
+        $directory = $pendingDirectories.Dequeue()
+        $directoryCount++
+        if ($directoryCount -gt $protocolSurfaceTraversalMaximumDirectoryCount) {
+            throw 'Protocol working-tree assessment exceeds the bounded directory budget; maintainer review is required.'
+        }
+        foreach ($item in @(Get-ChildItem -LiteralPath $directory -Force)) {
+            $entryCount++
+            if ($entryCount -gt $protocolSurfaceTraversalMaximumEntryCount) {
+                throw 'Protocol working-tree assessment exceeds the bounded entry budget; maintainer review is required.'
+            }
+            $relativePath = $item.FullName.Substring($Root.Length).TrimStart('\', '/') `
+                -replace '\\', '/'
+            if ($item.PSIsContainer) {
+                if ($item.Name.Equals('.git', [StringComparison]::OrdinalIgnoreCase)) {
+                    continue
+                }
+                Assert-QuickAdoptionCanonicalPathCasing -Path $relativePath
+                if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                    throw "A repository without a committed HEAD may contain only the two local credential files and the exact canonical seed workflow; linked directory '$relativePath' must be removed or replaced with committed project history before adoption."
+                }
+                $pendingDirectories.Enqueue($item.FullName)
+                continue
+            }
+            Assert-QuickAdoptionCanonicalPathCasing -Path $relativePath
+            $allowedUncommittedSeedInput = $relativePath -ceq $workflowTargetPath -or
+                @($tokenMappings.Keys | Where-Object {
+                    $relativePath -ceq [string]$_
+                }).Count -eq 1
+            if (-not $allowedUncommittedSeedInput) {
+                throw "A repository without a committed HEAD may contain only the two local credential files and the exact canonical seed workflow; commit project files before adoption. Unexpected path: '$relativePath'."
+            }
+            if (-not (Test-QuickAdoptionAssessmentRelevantPath -Path $relativePath `
+                -TargetPaths $adoptionCanonicalTargetPaths)) {
+                continue
+            }
+            [void](Assert-ContainedManagedDestination -Root $Root `
+                -RelativePath $relativePath)
+            if (-not $seenPaths.Add($relativePath)) {
+                throw "Protocol inventory path '$relativePath' is case-ambiguous."
+            }
+            $paths.Add($relativePath)
+            if ($paths.Count -gt $maximumRelevantCount) {
+                throw 'Protocol inventory exceeds the bounded assessment budget; maintainer review is required.'
+            }
+        }
+    }
+    return @($paths)
+}
+
+function Assert-QuickAdoptionSeedWorkflowPathIdentity {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
+
+    $matches = @($Paths | Where-Object {
+        ([string]$_).Equals(
+            $workflowTargetPath, [StringComparison]::OrdinalIgnoreCase
+        )
+    })
+    if ($matches.Count -gt 1 -or
+        ($matches.Count -eq 1 -and [string]$matches[0] -cne $workflowTargetPath)) {
+        throw "The lifecycle seed workflow path must be exactly '$workflowTargetPath'; remove case variants before adoption."
+    }
+}
+
+function Test-QuickAdoptionCompletedConsumerCandidate {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    $manifestEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $HeadSha -Path $adoptionManifestPath
+    if ($manifestEntry.Path) {
+        return $false
+    }
+    $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $HeadSha -Path '.ai/protocol'
+    if ($protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit') {
+        return $false
+    }
+    $requiredAssets = @(
+        [pscustomobject]@{ Path = '.gitmodules'; Mode = '100644'; Type = 'blob' }
+    ) + @($managedUpdaterAssets | ForEach-Object {
+        [pscustomobject]@{
+            Path = [string]$_.ConsumerPath
+            Mode = '100644'
+            Type = 'blob'
+        }
+    })
+    foreach ($asset in $requiredAssets) {
+        $entry = Get-AdoptionTreeEntry -Repository $Repository `
+            -Commit $HeadSha -Path ([string]$asset.Path)
+        if ($entry.Mode -cne [string]$asset.Mode -or
+            $entry.Type -cne [string]$asset.Type) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Assert-QuickAdoptionSeedWorkflowCandidate {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [AllowEmptyString()][string]$Commit = ''
+    )
+
+    $text = if ($Commit) {
+        $entry = Get-AdoptionTreeEntry -Repository $Root -Commit $Commit `
+            -Path $workflowTargetPath
+        if (-not $entry.Path) { return $false }
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob') {
+            throw 'The seed workflow candidate is not one regular committed file.'
+        }
+        (@(Invoke-Git -Repository $Root -Arguments @(
+            'show', "${Commit}:$workflowTargetPath"
+        )).Output -join "`n")
+    }
+    else {
+        $path = Assert-ContainedManagedDestination -Root $Root `
+            -RelativePath $workflowTargetPath
+        if (-not (Test-Path -LiteralPath $path)) { return $false }
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            throw 'The seed workflow candidate is not one regular file.'
+        }
+        [IO.File]::ReadAllText($path)
+    }
+    $names = [regex]::Matches(
+        $text, '(?m)^name: meAndAI AI capabilities lifecycle\r?$'
+    )
+    $tags = [regex]::Matches(
+        $text,
+        '(?m)^  BOOTSTRAP_PROTOCOL_TAG: (?<tag>v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))\r?$'
+    )
+    if ($names.Count -ne 1 -or $tags.Count -ne 1 -or
+        [string]$tags[0].Groups['tag'].Value -cne $ProtocolTag) {
+        throw "The existing seed workflow candidate is not recognizable as the $ProtocolTag launcher seed."
+    }
+    return $true
+}
+
+function Get-QuickAdoptionPreflightAssessment {
+    param([Parameter(Mandatory)][string]$Root)
+
+    $inside = Invoke-Git -Repository $Root `
+        -Arguments @('rev-parse', '--is-inside-work-tree') -AllowFailure
+    $headSha = ''
+    $paths = @()
+    $completedCandidate = $false
+    if ($inside.ExitCode -eq 0 -and
+        ((@($inside.Output) -join '').Trim() -ceq 'true')) {
+        $rootResult = Invoke-Git -Repository $Root `
+            -Arguments @('rev-parse', '--show-toplevel')
+        $gitRoot = Get-NormalizedPath -Path ((@($rootResult.Output) -join '').Trim())
+        if (-not $gitRoot.Equals($Root, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'TargetPath is nested inside another Git repository; select that repository root explicitly.'
+        }
+        # Credential containment is part of the mutation-free preflight. A
+        # tracked-but-clean token file does not appear in porcelain status, so
+        # reject tracked, staged, shallow, or reachable-history evidence before
+        # gh authentication or .git/info/exclude reconciliation can run.
+        Assert-TokenFilesAreLocalOnly -Repository $Root
+        $headResult = Invoke-Git -Repository $Root `
+            -Arguments @('rev-parse', '--verify', 'HEAD') -AllowFailure
+        if ($headResult.ExitCode -eq 0) {
+            $headSha = ((@($headResult.Output) -join '').Trim())
+            if ($headSha -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'The initial-adoption preflight resolved an invalid HEAD.'
+            }
+            $statusLines = @((Invoke-Git -Repository $Root -Arguments @(
+                'status', '--porcelain=v1', '--untracked-files=all'
+            )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+            foreach ($line in $statusLines) {
+                $isLocalCredential = @($tokenMappings.Keys | Where-Object {
+                    $line -ceq "?? $_"
+                }).Count -eq 1
+                $isSeedCandidate = $line -ceq "?? $workflowTargetPath" -or
+                    $line -ceq "A  $workflowTargetPath"
+                if (-not $isLocalCredential -and -not $isSeedCandidate) {
+                    throw 'Commit or discard working-tree changes before initial-adoption strategy assessment.'
+                }
+            }
+            $paths = @(Get-QuickAdoptionRelevantTreePaths -Repository $Root `
+                -Commit $headSha -TargetPaths $adoptionCanonicalTargetPaths)
+            Assert-AdoptionReservedProtocolSubmoduleAvailable `
+                -Repository $Root -Commit $headSha
+            $completedCandidate = Test-QuickAdoptionCompletedConsumerCandidate `
+                -Repository $Root -HeadSha $headSha
+            if (-not $completedCandidate) {
+                $hasWorkingSeed = @($statusLines | Where-Object {
+                    $_ -ceq "?? $workflowTargetPath" -or
+                    $_ -ceq "A  $workflowTargetPath"
+                }).Count -gt 0
+                if ($hasWorkingSeed) {
+                    [void](Assert-QuickAdoptionSeedWorkflowCandidate -Root $Root)
+                }
+                else {
+                    [void](Assert-QuickAdoptionSeedWorkflowCandidate `
+                        -Root $Root -Commit $headSha)
+                }
+            }
+            $protocolEntry = Get-AdoptionTreeEntry -Repository $Root `
+                -Commit $headSha -Path '.ai/protocol'
+            if ($protocolEntry.Mode -ceq '160000' -and -not $completedCandidate) {
+                throw 'A protocol gitlink candidate exists with an incomplete managed adoption footprint; reconcile it before rerunning.'
+            }
+        }
+        else {
+            $paths = @(Get-QuickAdoptionWorkingTreePaths -Root $Root)
+            [void](Assert-QuickAdoptionSeedWorkflowCandidate -Root $Root)
+        }
+    }
+    else {
+        $paths = @(Get-QuickAdoptionWorkingTreePaths -Root $Root)
+        [void](Assert-QuickAdoptionSeedWorkflowCandidate -Root $Root)
+    }
+
+    Assert-QuickAdoptionSeedWorkflowPathIdentity -Paths $paths
+    $surfaces = @(Get-QuickAdoptionProtocolSurfaceInventory -Paths $paths)
+    $collisions = @(Get-QuickAdoptionCanonicalCollisions -Paths $paths)
+    if (-not $headSha -and ($surfaces.Count -gt 0 -or $collisions.Count -gt 0)) {
+        throw 'Uncommitted protocol or governance evidence cannot be handed to the isolated adoption clone; commit the repository history before migration.'
+    }
+    return [pscustomobject]@{
+        HeadSha = $headSha
+        ProtocolSurfaces = @($surfaces)
+        Collisions = @($collisions)
+        CompletedConsumerCandidate = [bool]$completedCandidate
+    }
+}
+
+function Assert-QuickAdoptionPreflightAssessmentUnchanged {
+    param(
+        [Parameter(Mandatory)]$Expected,
+        [Parameter(Mandatory)]$Actual,
+        [Parameter(Mandatory)][string]$FailureMessage
+    )
+
+    if ([string]$Actual.HeadSha -cne [string]$Expected.HeadSha -or
+        [bool]$Actual.CompletedConsumerCandidate -ne
+            [bool]$Expected.CompletedConsumerCandidate -or
+        -not (Test-ExactOrdinalPathSet `
+            -Actual @($Actual.ProtocolSurfaces) `
+            -Expected @($Expected.ProtocolSurfaces)) -or
+        -not (Test-ExactOrdinalPathSet `
+            -Actual @($Actual.Collisions) -Expected @($Expected.Collisions))) {
+        throw $FailureMessage
+    }
+}
+
+function Resolve-QuickAdoptionStrategy {
+    param(
+        [Parameter(Mandatory)]$Assessment,
+        [Parameter(Mandatory)][string]$RequestedStrategy,
+        [Parameter(Mandatory)][bool]$IsNonInteractive,
+        [Parameter(Mandatory)][bool]$LossAcknowledged
+    )
+
+    if ($Assessment.CompletedConsumerCandidate) {
+        if ($RequestedStrategy -cne 'Auto' -or $LossAcknowledged) {
+            throw 'Initial-adoption strategy options do not apply to a completed meAndAI consumer.'
+        }
+        return [pscustomobject]@{
+            State = 'DeferredCompletedConsumer'
+            AdoptionStrategy = 'LegacyUnspecified'
+            ProtocolSurfaces = @()
+            ProtocolRecordLossAcknowledged = $false
+        }
+    }
+
+    $surfaces = @($Assessment.ProtocolSurfaces)
+    $collisions = @($Assessment.Collisions)
+    $resolvedRequest = $RequestedStrategy
+    if ($resolvedRequest -ceq 'Auto' -and $surfaces.Count -gt 0) {
+        if ($IsNonInteractive -or [Console]::IsInputRedirected) {
+            throw 'Existing protocol or governance evidence requires an explicit adoption strategy in non-interactive mode.'
+        }
+        Write-Host 'Detected protocol/governance surfaces:'
+        @($surfaces | ForEach-Object { Write-Host "  - $_" })
+        Write-Host 'Canonical adoption collisions:'
+        @($collisions | ForEach-Object { Write-Host "  - $_" })
+        $choice = Read-Host 'Choose FullMigration (F), HybridReconciliation (H), CleanStart (C), or Abort (A)'
+        $resolvedRequest = switch -CaseSensitive ($choice) {
+            { $_ -cin @('F', 'FullMigration') } { 'FullMigration'; break }
+            { $_ -cin @('H', 'HybridReconciliation') } { 'HybridReconciliation'; break }
+            { $_ -cin @('C', 'CleanStart') } { 'CleanStart'; break }
+            { $_ -cin @('A', 'Abort') } { 'Abort'; break }
+            default { throw 'The interactive adoption strategy selection was not recognized.' }
+        }
+    }
+    if ($resolvedRequest -ceq 'CleanStart' -and $surfaces.Count -gt 0 -and
+        -not $LossAcknowledged) {
+        if ($IsNonInteractive -or [Console]::IsInputRedirected) {
+            throw 'CleanStart requires explicit acknowledgement of protocol record loss.'
+        }
+        $confirmation = Read-Host 'Type CLEANSTART to acknowledge that detected governance records may be discarded'
+        if ($confirmation -cne 'CLEANSTART') {
+            throw 'CleanStart protocol record loss was not acknowledged exactly.'
+        }
+        $LossAcknowledged = $true
+    }
+
+    $resolver = Get-InitialAdoptionPolicyCommand `
+        -Name 'Resolve-MeAndAIAdoptionStrategy'
+    $result = & $resolver -RequestedStrategy $resolvedRequest `
+        -ProtocolSurfaces @($surfaces) -Collisions @($collisions) `
+        -AcknowledgeProtocolRecordLoss ([bool]$LossAcknowledged)
+    if ($null -eq $result -or $result -is [array] -or
+        [string]$result.State -cnotin @('Resolved', 'Aborted')) {
+        $diagnostic = @()
+        if ($null -ne $result -and $result -isnot [array] -and
+            $null -ne $result.PSObject.Properties['Diagnostics']) {
+            $diagnostic = @($result.Diagnostics | Where-Object { $_ } |
+                Select-Object -First 1)
+        }
+        if ($diagnostic.Count -eq 1) {
+            throw [string]$diagnostic[0]
+        }
+        throw 'The exact initial-adoption policy could not resolve the requested strategy.'
+    }
+    return [pscustomobject]@{
+        State = [string]$result.State
+        AdoptionStrategy = [string]$result.AdoptionStrategy
+        ProtocolSurfaces = @($result.ProtocolSurfaces)
+        ProtocolRecordLossAcknowledged =
+            [bool]$result.ProtocolRecordLossAcknowledged
+    }
+}
+
 function Get-GitBlobSha {
     param([Parameter(Mandatory)][byte[]]$Bytes)
 
@@ -691,9 +1257,8 @@ function Get-ExpectedAdoptionManifestContract {
     )
 
     $baseHead = Get-SingleCommitParent -Repository $Repository -Commit $ProposalHead
-    $basePaths = @((Invoke-Git -Repository $Repository -Arguments @(
-        'ls-tree', '-r', '--name-only', $baseHead
-    )).Output | ForEach-Object { [string]$_ })
+    $basePaths = @(Get-QuickAdoptionRelevantTreePaths -Repository $Repository `
+        -Commit $baseHead -TargetPaths $TargetPaths)
     $pathLookup = [System.Collections.Generic.Dictionary[string, string]]::new(
         [StringComparer]::OrdinalIgnoreCase
     )
@@ -709,21 +1274,31 @@ function Get-ExpectedAdoptionManifestContract {
 
     $collisions = [System.Collections.Generic.List[string]]::new()
     foreach ($path in $TargetPaths) {
-        if ($pathLookup.ContainsKey($path)) {
-            $collisions.Add([string]$pathLookup[$path])
+        $collisionFound = $pathLookup.ContainsKey($path) -or
+            @($basePaths | Where-Object {
+                $_.StartsWith("$path/", [StringComparison]::OrdinalIgnoreCase) -or
+                $path.StartsWith("$($_)/", [StringComparison]::OrdinalIgnoreCase)
+            }).Count -gt 0
+        if ($collisionFound) {
+            $collisions.Add([string]$path)
         }
     }
+    $protocolSurfaces = @(
+        Get-QuickAdoptionProtocolSurfaceInventory -Paths $basePaths
+    )
     $updaterCount = @($adoptionUpdaterAssets | Where-Object {
         $pathLookup.ContainsKey([string]$_.ConsumerPath)
     }).Count
     return [pscustomobject]@{
         BaseHead = $baseHead
+        BasePaths = @($basePaths)
         LocalUpdaterState = if ($updaterCount -eq 0) {
             'Absent'
         }
         elseif ($updaterCount -eq $adoptionUpdaterAssets.Count) { 'Complete' }
         else { 'Partial' }
         Collisions = @($collisions)
+        ProtocolSurfaces = @($protocolSurfaces)
     }
 }
 
@@ -841,8 +1416,8 @@ function Assert-AdoptionUpdaterAssetsExact {
 
 function Test-ExactOrdinalPathSet {
     param(
-        [Parameter(Mandatory)][object[]]$Actual,
-        [Parameter(Mandatory)][object[]]$Expected
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Actual,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Expected
     )
 
     if ($Actual.Count -ne $Expected.Count) {
@@ -1028,54 +1603,107 @@ function Add-LocalTokenExcludes {
 function Assert-TokenFilesAreLocalOnly {
     param([Parameter(Mandatory)][string]$Repository)
 
-    $head = Invoke-Git -Repository $Repository -Arguments @(
-        'rev-parse', '--verify', 'HEAD'
+    # HEAD may be unborn while another branch, tag, or reflog remains locally
+    # reachable. History completeness and credential-path evidence therefore
+    # cannot be conditional on the currently checked-out branch having a commit.
+    $shallow = Invoke-Git -Repository $Repository -Arguments @(
+        'rev-parse', '--is-shallow-repository'
     ) -AllowFailure
-    $hasHead = $head.ExitCode -eq 0
-    if ($hasHead) {
-        $shallow = Invoke-Git -Repository $Repository -Arguments @(
-            'rev-parse', '--is-shallow-repository'
-        ) -AllowFailure
-        $shallowText = ((@($shallow.Output) -join '').Trim())
-        if ($shallow.ExitCode -ne 0 -or $shallowText -cnotin @('true', 'false')) {
-            throw 'The launcher could not determine whether repository history is complete.'
-        }
-        if ($shallowText -ceq 'true') {
-            throw 'Credential-history validation requires a non-shallow repository. Fetch complete history before rerunning.'
-        }
+    $shallowText = ((@($shallow.Output) -join '').Trim())
+    if ($shallow.ExitCode -ne 0 -or $shallowText -cnotin @('true', 'false')) {
+        throw 'The launcher could not determine whether repository history is complete.'
+    }
+    if ($shallowText -ceq 'true') {
+        throw 'Credential-history validation requires a non-shallow repository. Fetch complete history before rerunning.'
     }
 
     foreach ($name in $tokenMappings.Keys) {
+        # Recursive glob plus icase catches the protected basename at the root
+        # or any depth, including case variants on case-sensitive Git indexes.
+        $credentialPathspec = ":(icase,glob)**/$name"
         $tracked = Invoke-Git -Repository $Repository -Arguments @(
-            'ls-files', '--error-unmatch', '--', $name
+            'ls-files', '--error-unmatch', '--', $credentialPathspec
         ) -AllowFailure
         if ($tracked.ExitCode -eq 0) {
-            throw "Credential file '$name' is tracked or staged. Remove it from Git, rotate that token, and rerun."
+            throw "Credential-shaped file '$name' is tracked or staged. Remove every case/path variant from Git, rotate that token, and rerun."
         }
 
-        if ($hasHead) {
-            $history = Invoke-Git -Repository $Repository -Arguments @(
-                'log', '--all', '--reflog', '--format=%H', '--', $name
-            ) -AllowFailure
-            if ($history.ExitCode -ne 0) {
-                throw "Credential history for '$name' could not be inspected."
-            }
-            if ((@($history.Output) -join '').Trim()) {
-                throw "Credential file '$name' appears in locally reachable ref or reflog history. Rotate that token and clean the history before rerunning."
-            }
+        $history = Invoke-Git -Repository $Repository -Arguments @(
+            'log', '--all', '--reflog', '--format=%H', '--',
+            $credentialPathspec
+        ) -AllowFailure
+        if ($history.ExitCode -ne 0) {
+            throw "Credential history for '$name' could not be inspected."
+        }
+        if ((@($history.Output) -join '').Trim()) {
+            throw "Credential-shaped file '$name' appears in locally reachable ref or reflog history. Rotate that token and clean every case/path variant from history before rerunning."
         }
 
     }
 }
 
-function Read-LocalToken {
-    param([Parameter(Mandatory)][string]$Path)
+function Assert-LocalCredentialRegularFile {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$Name
+    )
 
-    $value = [IO.File]::ReadAllText($Path).Trim()
+    if (@($tokenMappings.Keys | Where-Object { [string]$_ -ceq $Name }).Count -ne 1) {
+        throw "Credential file name '$Name' is not one canonical launcher input."
+    }
+    $path = Assert-ContainedManagedDestination -Root $Root -RelativePath $Name
+    $item = Get-Item -LiteralPath $path -Force -ErrorAction Stop
+    $linkTypeProperty = $item.PSObject.Properties['LinkType']
+    $isLink = $null -ne $linkTypeProperty -and
+        -not [string]::IsNullOrEmpty([string]$linkTypeProperty.Value)
+    $isReparsePoint = ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0
+    if ($item.PSIsContainer -or $isLink -or $isReparsePoint -or
+        $item.Name -cne $Name -or
+        -not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Credential path '$Name' must be one exact root regular non-link file."
+    }
+    return $path
+}
+
+function Read-LocalToken {
+    param(
+        [Parameter(Mandatory)][string]$Root,
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    $path = Assert-LocalCredentialRegularFile -Root $Root -Name $Name
+    $value = [IO.File]::ReadAllText($path).Trim()
+    [void](Assert-LocalCredentialRegularFile -Root $Root -Name $Name)
     if (-not $value -or $value -match '\s') {
-        throw "Credential file '$([IO.Path]::GetFileName($Path))' must contain exactly one non-whitespace token value."
+        throw "Credential file '$Name' must contain exactly one non-whitespace token value."
     }
     return $value
+}
+
+function Read-ProtocolTokenForInitialPolicy {
+    param([Parameter(Mandatory)][string]$Root)
+
+    $tokenPath = Join-Path $Root 'MEANDAI_RO_FG_PAT.txt'
+    if (-not (Test-Path -LiteralPath $tokenPath -PathType Leaf)) {
+        return ''
+    }
+    $inside = Invoke-Git -Repository $Root `
+        -Arguments @('rev-parse', '--is-inside-work-tree') -AllowFailure
+    if ($inside.ExitCode -eq 0 -and
+        ((@($inside.Output) -join '').Trim() -ceq 'true')) {
+        $rootResult = Invoke-Git -Repository $Root `
+            -Arguments @('rev-parse', '--show-toplevel')
+        $gitRoot = Get-NormalizedPath `
+            -Path ((@($rootResult.Output) -join '').Trim())
+        if (-not $gitRoot.Equals($Root, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'TargetPath is nested inside another Git repository; select that repository root explicitly.'
+        }
+        Assert-TokenFilesAreLocalOnly -Repository $Root
+    }
+    elseif (Test-Path -LiteralPath (Join-Path $Root '.git')) {
+        throw 'The local Git repository identity could not be verified before reading the protocol token.'
+    }
+    return Read-LocalToken -Root $Root -Name 'MEANDAI_RO_FG_PAT.txt'
 }
 
 function Invoke-GitHubApi {
@@ -1255,6 +1883,80 @@ function Get-CanonicalWorkflow {
     return [byte[]]$asset.Bytes
 }
 
+function Import-CanonicalInitialAdoptionPolicy {
+    param([string]$ProtocolToken = '')
+
+    $asset = Get-CanonicalProtocolAsset -Tag $initialAdoptionPolicyTag `
+        -TemplatePath $initialAdoptionPolicySourcePath `
+        -ProtocolToken $ProtocolToken
+    $decoder = [Text.UTF8Encoding]::new($false, $true)
+    try {
+        $source = $decoder.GetString([byte[]]$asset.Bytes)
+        $scriptBlock = [scriptblock]::Create($source)
+    }
+    catch {
+        throw 'The exact initial-adoption policy module is not valid UTF-8 PowerShell source.'
+    }
+
+    $moduleName = "MeAndAI.InitialAdoptionPolicy.$($asset.Sha).$([guid]::NewGuid().ToString('N'))"
+    $dynamicModule = New-Module -Name $moduleName -ScriptBlock $scriptBlock
+    $loaded = @()
+    try {
+        $loaded = @(Import-Module -ModuleInfo $dynamicModule -Force -PassThru)
+        if ($loaded.Count -ne 1) {
+            throw 'The exact initial-adoption policy module could not be loaded unambiguously.'
+        }
+        $requiredCommands = @(
+            'Assert-MeAndAIProtocolAssessmentPathCasing',
+            'Get-MeAndAIProtocolAssessmentLimits',
+            'Get-MeAndAIProtocolSurfaceInventory',
+            'Resolve-MeAndAIAdoptionStrategy',
+            'Test-MeAndAIConsumerGovernancePath',
+            'Test-MeAndAILegacyCommonAuthorityPath',
+            'Test-MeAndAILegacyGovernancePath',
+            'Test-MeAndAIProtocolAssessmentRelevantPath'
+        )
+        $commands = [System.Collections.Generic.Dictionary[string, object]]::new(
+            [StringComparer]::Ordinal
+        )
+        foreach ($name in $requiredCommands) {
+            $command = $loaded[0].ExportedCommands[$name]
+            if ($null -eq $command -or [string]$command.ModuleName -cne $moduleName) {
+                throw "The exact initial-adoption policy module does not export '$name'."
+            }
+            $commands.Add($name, $command)
+        }
+        $limits = & $commands['Get-MeAndAIProtocolAssessmentLimits']
+        if ($null -eq $limits -or $limits -is [array] -or
+            $null -eq $limits.PSObject.Properties['MaximumSurfaceCount'] -or
+            $null -eq $limits.PSObject.Properties['MaximumSurfaceUtf8Bytes'] -or
+            [long]$limits.MaximumSurfaceCount -lt 1 -or
+            [long]$limits.MaximumSurfaceCount -gt 65536 -or
+            [long]$limits.MaximumSurfaceUtf8Bytes -lt 1 -or
+            [long]$limits.MaximumSurfaceUtf8Bytes -gt 1048576) {
+            throw 'The exact initial-adoption policy returned invalid assessment limits.'
+        }
+        return [pscustomobject]@{
+            Tag = $initialAdoptionPolicyTag
+            BlobSha = [string]$asset.Sha
+            Module = $loaded[0]
+            Commands = $commands
+            Limits = [pscustomobject]@{
+                MaximumSurfaceCount = [int]$limits.MaximumSurfaceCount
+                MaximumSurfaceUtf8Bytes = [int]$limits.MaximumSurfaceUtf8Bytes
+            }
+        }
+    }
+    catch {
+        foreach ($module in @($loaded) + @($dynamicModule)) {
+            if ($null -ne $module) {
+                Remove-Module -ModuleInfo $module -Force -ErrorAction SilentlyContinue
+            }
+        }
+        throw
+    }
+}
+
 function ConvertTo-CanonicalProtocolVersionRecord {
     param([Parameter(Mandatory)][string]$Tag)
 
@@ -1343,16 +2045,6 @@ function Get-ExistingAdoptionRoute {
     $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
         -Commit $HeadSha -Path '.ai/protocol'
     if (-not $protocolEntry.Path) {
-        $partialManagedPaths = @('.gitmodules') + @($adoptionUpdaterAssets | ForEach-Object {
-            [string]$_.ConsumerPath
-        })
-        foreach ($partialManagedPath in $partialManagedPaths) {
-            $partialManagedEntry = Get-AdoptionTreeEntry -Repository $Repository `
-                -Commit $HeadSha -Path $partialManagedPath
-            if ($partialManagedEntry.Path) {
-                throw "Managed adoption footprint '$partialManagedPath' exists without the protocol gitlink."
-            }
-        }
         return [pscustomobject]@{
             State = 'InitialAdoption'; InstalledTag = ''; InstalledProtocolSha = ''
         }
@@ -1360,7 +2052,9 @@ function Get-ExistingAdoptionRoute {
     if ($protocolEntry.Mode -cne '160000' -or
         $protocolEntry.Type -cne 'commit' -or
         $protocolEntry.Sha -cnotmatch '^[0-9a-f]{40}$') {
-        throw "Existing '.ai/protocol' is not one canonical protocol gitlink."
+        return [pscustomobject]@{
+            State = 'InitialAdoption'; InstalledTag = ''; InstalledProtocolSha = ''
+        }
     }
 
     $workingChanges = @((Invoke-Git -Repository $Repository -Arguments @(
@@ -1585,7 +2279,10 @@ function Invoke-LifecycleWorkflow {
     param(
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][string]$Branch,
-        [Parameter(Mandatory)][string]$HeadSha
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][ValidateSet('FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart')]
+        [string]$ResolvedAdoptionStrategy,
+        [Parameter(Mandatory)][bool]$ProtocolRecordLossAcknowledged
     )
 
     $workflowName = [IO.Path]::GetFileName($workflowTargetPath)
@@ -1633,7 +2330,10 @@ function Invoke-LifecycleWorkflow {
     $dispatchStarted = [DateTimeOffset]::UtcNow.AddSeconds(-5)
     Invoke-External -Command 'gh' -Arguments @(
         'workflow', 'run', $workflowName, '--repo', $Repository, '--ref', $Branch,
-        '--field', "correlation_id=$correlationId"
+        '--field', "correlation_id=$correlationId",
+        '--field', "adoption_strategy=$ResolvedAdoptionStrategy",
+        '--field', "acknowledge_protocol_record_loss=$($ProtocolRecordLossAcknowledged.ToString().ToLowerInvariant())",
+        '--field', "expected_base_sha=$HeadSha"
     ) | Out-Null
 
     $deadline = [DateTimeOffset]::UtcNow.AddMinutes($WorkflowTimeoutMinutes)
@@ -1712,7 +2412,10 @@ function Get-ValidatedAdoptionMarker {
         [Parameter(Mandatory)][string]$Branch,
         [Parameter(Mandatory)][string]$BaseBranch,
         [Parameter(Mandatory)][string]$ExpectedActor,
-        [string]$ExpectedMarkerHead = ''
+        [string]$ExpectedMarkerHead = '',
+        [string]$ExpectedAdoptionStrategy = '',
+        [AllowEmptyCollection()][object[]]$ExpectedProtocolSurfaces = @(),
+        [bool]$ExpectedProtocolRecordLossAcknowledgement = $false
     )
 
     $requiredProperties = @(
@@ -1802,6 +2505,21 @@ function Get-ValidatedAdoptionMarker {
             'previousHead', 'plannedHead', 'repository', 'actor'
         )
     }
+    elseif ($schema -eq 5) {
+        @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'adoptionStrategy', 'protocolSurfaces',
+            'protocolRecordLossAcknowledged', 'repository', 'actor'
+        )
+    }
+    elseif ($schema -eq 6) {
+        @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'previousHead', 'plannedHead', 'adoptionStrategy',
+            'protocolSurfaces', 'protocolRecordLossAcknowledged',
+            'repository', 'actor'
+        )
+    }
     else {
         throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
     }
@@ -1819,8 +2537,48 @@ function Get-ValidatedAdoptionMarker {
         -not ([string]$marker.actor).Equals($ExpectedActor, [StringComparison]::OrdinalIgnoreCase)) {
         throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
     }
+    if ($schema -in @(5, 6)) {
+        $markerSurfaces = if ($marker.protocolSurfaces -is [array]) {
+            @($marker.protocolSurfaces | ForEach-Object { [string]$_ })
+        }
+        else { @() }
+        $classifiedMarkerSurfaces = @(
+            Get-QuickAdoptionProtocolSurfaceInventory -Paths $markerSurfaces
+        )
+        if ([string]$marker.adoptionStrategy -cnotin @(
+            'FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart'
+        ) -or $marker.protocolSurfaces -isnot [array] -or
+            $marker.protocolRecordLossAcknowledged -isnot [bool] -or
+            -not (([bool]$marker.protocolRecordLossAcknowledged) -eq
+                ([string]$marker.adoptionStrategy -ceq 'CleanStart')) -or
+            (($markerSurfaces -join "`n") -cne
+                ($classifiedMarkerSurfaces -join "`n"))) {
+            throw 'The deterministic adoption pull request strategy marker is invalid.'
+        }
+    }
+    elseif ($ExpectedAdoptionStrategy -and
+        $ExpectedAdoptionStrategy -cnotin @('LegacyUnspecified', 'FreshAdoption')) {
+        throw 'A legacy adoption marker cannot satisfy the expected strategy identity.'
+    }
+    if ($ExpectedAdoptionStrategy) {
+        $strategyMatches = if ($schema -in @(5, 6)) {
+            [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
+            ((@($marker.protocolSurfaces) -join "`n") -ceq
+                (@($ExpectedProtocolSurfaces) -join "`n")) -and
+            [bool]$marker.protocolRecordLossAcknowledged -eq
+                $ExpectedProtocolRecordLossAcknowledgement
+        }
+        else {
+            $ExpectedAdoptionStrategy -cin @('LegacyUnspecified', 'FreshAdoption') -and
+            @($ExpectedProtocolSurfaces).Count -eq 0 -and
+            -not $ExpectedProtocolRecordLossAcknowledgement
+        }
+        if (-not $strategyMatches) {
+            throw 'The deterministic adoption pull request strategy identity changed.'
+        }
+    }
     if ($phase -ceq 'Publishing') {
-        if ($schema -ne 4 -or
+        if ($schema -notin @(4, 6) -or
             [string]$marker.previousHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.plannedHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.previousHead -ceq [string]$marker.plannedHead -or
@@ -1833,7 +2591,7 @@ function Get-ValidatedAdoptionMarker {
         }
     }
     else {
-        if ($schema -eq 4) {
+        if ($schema -in @(4, 6)) {
             throw 'The deterministic adoption pull request uses the publishing schema outside its publishing phase.'
         }
         $requiredMarkerHead = if ($ExpectedMarkerHead) {
@@ -1850,6 +2608,14 @@ function Get-ValidatedAdoptionMarker {
     if ($schema -eq 2) {
         $marker | Add-Member -NotePropertyName phase -NotePropertyValue 'Proposed' -Force
     }
+    if ($schema -in @(2, 3, 4)) {
+        $marker | Add-Member -NotePropertyName adoptionStrategy `
+            -NotePropertyValue 'LegacyUnspecified' -Force
+        $marker | Add-Member -NotePropertyName protocolSurfaces `
+            -NotePropertyValue @() -Force
+        $marker | Add-Member -NotePropertyName protocolRecordLossAcknowledged `
+            -NotePropertyValue $false -Force
+    }
     return $marker
 }
 
@@ -1863,6 +2629,9 @@ function Get-AdoptionPullRequest {
         [string]$ExpectedUrl = '',
         [string]$ExpectedLiveHead = '',
         [string]$ExpectedMarkerHead = '',
+        [string]$ExpectedAdoptionStrategy = '',
+        [AllowEmptyCollection()][object[]]$ExpectedProtocolSurfaces = @(),
+        [bool]$ExpectedProtocolRecordLossAcknowledgement = $false,
         [string]$ExpectedBody,
         [object]$ExpectedDraft = $null
     )
@@ -1884,7 +2653,11 @@ function Get-AdoptionPullRequest {
         if ($matchingPullRequests.Count -eq 1) {
             $marker = Get-ValidatedAdoptionMarker -PullRequest $matchingPullRequests[0] `
                 -Repository $Repository -Branch $branch -BaseBranch $BaseBranch `
-                -ExpectedActor $ExpectedActor -ExpectedMarkerHead $ExpectedMarkerHead
+                -ExpectedActor $ExpectedActor -ExpectedMarkerHead $ExpectedMarkerHead `
+                -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
+                -ExpectedProtocolSurfaces @($ExpectedProtocolSurfaces) `
+                -ExpectedProtocolRecordLossAcknowledgement `
+                    $ExpectedProtocolRecordLossAcknowledgement
             $pullRequest = $matchingPullRequests[0]
             if (($ExpectedNumber -and [string]$pullRequest.number -cne $ExpectedNumber) -or
                 ($ExpectedUrl -and [string]$pullRequest.url -cne $ExpectedUrl) -or
@@ -2028,18 +2801,38 @@ function Set-AdoptionPullRequestPublishingMarker {
         throw 'The adoption publishing transition has invalid commit identities.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $publishingMarker = [ordered]@{
-        schema = 4
-        phase = 'Publishing'
-        state = [string]$marker.state
-        target = [string]$marker.target
-        protocolSha = [string]$marker.protocolSha
-        head = $PreviousHead
-        previousHead = $PreviousHead
-        plannedHead = $PlannedHead
-        repository = [string]$marker.repository
-        actor = [string]$marker.actor
-    } | ConvertTo-Json -Compress
+    $publishingMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+        [ordered]@{
+            schema = 6
+            phase = 'Publishing'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            previousHead = $PreviousHead
+            plannedHead = $PlannedHead
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    else {
+        [ordered]@{
+            schema = 4
+            phase = 'Publishing'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            previousHead = $PreviousHead
+            plannedHead = $PlannedHead
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    $publishingMarker = $publishingMarkerRecord | ConvertTo-Json -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $publishingMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'publishing-adoption-pr.md'
@@ -2057,16 +2850,34 @@ function Set-AdoptionPullRequestProposedMarker {
         throw 'The restored adoption proposal head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $proposedMarker = [ordered]@{
-        schema = 3
-        phase = 'Proposed'
-        state = [string]$marker.state
-        target = [string]$marker.target
-        protocolSha = [string]$marker.protocolSha
-        head = $PreviousHead
-        repository = [string]$marker.repository
-        actor = [string]$marker.actor
-    } | ConvertTo-Json -Compress
+    $proposedMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+        [ordered]@{
+            schema = 5
+            phase = 'Proposed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    else {
+        [ordered]@{
+            schema = 3
+            phase = 'Proposed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    $proposedMarker = $proposedMarkerRecord | ConvertTo-Json -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $proposedMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'proposed-adoption-pr.md'
@@ -2085,16 +2896,34 @@ function Set-AdoptionPullRequestCompletedMarker {
         throw 'The completed adoption head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $completedMarker = [ordered]@{
-        schema = 3
-        phase = 'Completed'
-        state = [string]$marker.state
-        target = [string]$marker.target
-        protocolSha = [string]$marker.protocolSha
-        head = $PublishedHead
-        repository = [string]$marker.repository
-        actor = [string]$marker.actor
-    } | ConvertTo-Json -Compress
+    $completedMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+        [ordered]@{
+            schema = 5
+            phase = 'Completed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PublishedHead
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    else {
+        [ordered]@{
+            schema = 3
+            phase = 'Completed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PublishedHead
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    $completedMarker = $completedMarkerRecord | ConvertTo-Json -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $completedMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'completed-adoption-pr.md' `
@@ -2116,13 +2945,20 @@ function Get-RevalidatedAdoptionPullRequest {
         -ExpectedActor ([string]$OriginalPullRequest.meAndAIMarker.actor) `
         -MaxAttempts 1 -ExpectedNumber ([string]$OriginalPullRequest.number) `
         -ExpectedUrl ([string]$OriginalPullRequest.url) -ExpectedLiveHead $LiveHead `
-        -ExpectedMarkerHead $MarkerHead -ExpectedBody $Body -ExpectedDraft $Draft
+        -ExpectedMarkerHead $MarkerHead `
+        -ExpectedAdoptionStrategy ([string]$OriginalPullRequest.meAndAIMarker.adoptionStrategy) `
+        -ExpectedProtocolSurfaces @($OriginalPullRequest.meAndAIMarker.protocolSurfaces) `
+        -ExpectedProtocolRecordLossAcknowledgement `
+            ([bool]$OriginalPullRequest.meAndAIMarker.protocolRecordLossAcknowledged) `
+        -ExpectedBody $Body -ExpectedDraft $Draft
 }
 
 function Complete-AdoptionReviewTransition {
     param(
         [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
         [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$CanonicalBaseHead,
         [Parameter(Mandatory)][string]$PublishedHead,
         [Parameter(Mandatory)][string]$ExpectedMarkerHead,
         [Parameter(Mandatory)][string]$TemporaryDirectory,
@@ -2140,6 +2976,10 @@ function Complete-AdoptionReviewTransition {
         throw 'The canonical adoption issue has invalid identity metadata.'
     }
     $issueNumber = [int]$issueNumberProperty.Value
+    Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+        -Branch ([string]$PullRequest.baseRefName) `
+        -ExpectedHead $CanonicalBaseHead `
+        -FailureMessage 'The canonical consumer base changed before adoption review transition.'
     $body = [string]$PullRequest.body
     $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
         -OriginalPullRequest $PullRequest -LiveHead $PublishedHead `
@@ -2168,13 +3008,55 @@ function Complete-AdoptionReviewTransition {
             -MarkerHead $PublishedHead -Body $body `
             -Draft ([bool]$current.isDraft)
     }
-    if ([bool]$current.isDraft) {
-        Invoke-External -Command 'gh' -Arguments @(
-            'pr', 'ready', [string]$current.number, '--repo', $Repository
-        ) | Out-Null
-        $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
-            -OriginalPullRequest $current -LiveHead $PublishedHead `
-            -MarkerHead $PublishedHead -Body $body -Draft $false
+    $madeReady = $false
+    try {
+        if ([bool]$current.isDraft) {
+            Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+                -Branch ([string]$current.baseRefName) `
+                -ExpectedHead $CanonicalBaseHead `
+                -FailureMessage 'The canonical consumer base changed before the adoption pull request became ready.'
+            Invoke-External -Command 'gh' -Arguments @(
+                'pr', 'ready', [string]$current.number, '--repo', $Repository
+            ) | Out-Null
+            $madeReady = $true
+            $current = Get-RevalidatedAdoptionPullRequest -Repository $Repository `
+                -OriginalPullRequest $current -LiveHead $PublishedHead `
+                -MarkerHead $PublishedHead -Body $body -Draft $false
+        }
+        Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+            -Branch ([string]$current.baseRefName) `
+            -ExpectedHead $CanonicalBaseHead `
+            -FailureMessage 'The canonical consumer base changed while the adoption pull request became ready.'
+    }
+    catch {
+        $baseFailure = $_.Exception.Message
+        $undoFailure = ''
+        if ($madeReady) {
+            try {
+                $readyForCompensation = Get-RevalidatedAdoptionPullRequest `
+                    -Repository $Repository -OriginalPullRequest $current `
+                    -LiveHead $PublishedHead -MarkerHead $PublishedHead `
+                    -Body $body -Draft $false
+                Invoke-External -Command 'gh' -Arguments @(
+                    'pr', 'ready', [string]$readyForCompensation.number, '--undo',
+                    '--repo', $Repository
+                ) | Out-Null
+                $current = Get-RevalidatedAdoptionPullRequest `
+                    -Repository $Repository -OriginalPullRequest $readyForCompensation `
+                    -LiveHead $PublishedHead -MarkerHead $PublishedHead `
+                    -Body $body -Draft $true
+            }
+            catch {
+                $undoFailure = $_.Exception.Message
+            }
+        }
+        if ($undoFailure) {
+            throw "$baseFailure The ready-state compensation could not be proven; manual review is required. $undoFailure"
+        }
+        if ($madeReady) {
+            throw "$baseFailure The pull request was returned to draft for reassessment."
+        }
+        throw "$baseFailure No ready-state compensation was attempted because this invocation did not own a proven ready transition."
     }
     Set-AdoptionIssueReadyForReview -Repository $Repository -Issue $Issue
     return $current
@@ -2296,17 +3178,30 @@ function Ensure-AdoptionIssue {
     $marker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
         $ProtocolTag, [string]$PullRequest.number
     $issueTitle = "Track meAndAI AI capabilities adoption from $ProtocolTag"
-    $issueBody = @(
+    $surfaceLines = if (@($PullRequest.meAndAIMarker.protocolSurfaces).Count -gt 0) {
+        @($PullRequest.meAndAIMarker.protocolSurfaces | ForEach-Object {
+            "- ``$_``"
+        })
+    }
+    else { @('- None') }
+    $issueBodyLines = @(
         $marker,
         '## AI capabilities adoption tracking',
         '',
         "- Protocol release: ``$ProtocolTag``",
         "- Adoption draft: $($PullRequest.url)",
+        "- Adoption strategy: ``$($PullRequest.meAndAIMarker.adoptionStrategy)``",
+        "- Protocol-record loss acknowledged: ``$(([bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``",
+        '',
+        '### Detected protocol and governance surfaces',
+        ''
+    ) + @($surfaceLines) + @(
         '',
         'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
         '',
         'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
-    ) -join [Environment]::NewLine
+    )
+    $issueBody = $issueBodyLines -join [Environment]::NewLine
     $completed = [string]$PullRequest.meAndAIMarker.phase -ceq 'Completed'
     $desiredStatusLabel = if ($completed) {
         'status:needs-review'
@@ -3386,6 +4281,152 @@ function Assert-AdoptionProtocolReference {
     }
 }
 
+function Get-AdoptionGitModulesConfigurationRows {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [string]$Commit = '',
+        [switch]$UseIndex,
+        [switch]$AllowAbsent
+    )
+
+    if ($UseIndex -eq [bool]$Commit) {
+        throw 'Exactly one .gitmodules tree source must be selected.'
+    }
+    $entry = if ($UseIndex) {
+        Get-AdoptionTreeEntry -Repository $Repository -Path '.gitmodules' -UseIndex
+    }
+    else {
+        Get-AdoptionTreeEntry -Repository $Repository -Path '.gitmodules' `
+            -Commit $Commit
+    }
+    if (-not $entry.Path) {
+        if ($AllowAbsent) { return @() }
+        throw 'The completed adoption is missing .gitmodules.'
+    }
+    if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob') {
+        throw 'The adoption .gitmodules source is not one regular file.'
+    }
+    $blobExpression = if ($UseIndex) { ':.gitmodules' } else { "${Commit}:.gitmodules" }
+    $result = Invoke-Git -Repository $Repository -Arguments @(
+        'config', '--blob', $blobExpression, '--null', '--list'
+    )
+    $raw = @($result.Output) -join "`n"
+    $rows = [System.Collections.Generic.List[string]]::new()
+    foreach ($record in @($raw.Split([char]0))) {
+        if ([string]::IsNullOrEmpty($record)) { continue }
+        $separator = $record.IndexOf("`n", [StringComparison]::Ordinal)
+        if ($separator -le 0) {
+            throw 'The adoption .gitmodules configuration could not be parsed exactly.'
+        }
+        $key = $record.Substring(0, $separator)
+        $value = $record.Substring($separator + 1)
+        $rows.Add("$key`n$value")
+    }
+    $sorted = [string[]]@($rows)
+    [Array]::Sort($sorted, [StringComparer]::Ordinal)
+    return @($sorted)
+}
+
+function Assert-AdoptionReservedProtocolSubmoduleAvailable {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $rows = @(Get-AdoptionGitModulesConfigurationRows `
+        -Repository $Repository -Commit $Commit -AllowAbsent)
+    $protocolPrefix = 'submodule..ai/protocol.'
+    $reservedRows = @($rows | Where-Object {
+        $row = [string]$_
+        $separator = $row.IndexOf("`n", [StringComparison]::Ordinal)
+        if ($separator -le 0) { return $false }
+        $key = $row.Substring(0, $separator)
+        $value = $row.Substring($separator + 1)
+        if ($key.StartsWith(
+            $protocolPrefix, [StringComparison]::OrdinalIgnoreCase
+        )) {
+            return $true
+        }
+        if (-not [regex]::IsMatch(
+            $key, '^submodule\..+\.path$',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )) {
+            return $false
+        }
+        $candidate = $value.Replace('\', '/').Trim('/')
+        while ($candidate.StartsWith('./', [StringComparison]::Ordinal)) {
+            $candidate = $candidate.Substring(2).TrimEnd('/')
+        }
+        return $candidate -and (
+            $candidate.Equals('.ai/protocol', [StringComparison]::OrdinalIgnoreCase) -or
+            $candidate.StartsWith('.ai/protocol/', [StringComparison]::OrdinalIgnoreCase) -or
+            '.ai/protocol'.StartsWith("$candidate/", [StringComparison]::OrdinalIgnoreCase)
+        )
+    })
+    if ($reservedRows.Count -eq 0) {
+        return
+    }
+    $expectedRows = [string[]]@(
+        "submodule..ai/protocol.path`n.ai/protocol",
+        "submodule..ai/protocol.url`nhttps://github.com/$ProtocolRepository.git"
+    )
+    [Array]::Sort($expectedRows, [StringComparer]::Ordinal)
+    $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
+        -Commit $Commit -Path '.ai/protocol'
+    if (($reservedRows -join "`0") -cne ($expectedRows -join "`0") -or
+        $protocolEntry.Mode -cne '160000' -or
+        $protocolEntry.Type -cne 'commit') {
+        throw "The reserved .gitmodules subsection '.ai/protocol' is consumer-owned or noncanonical; reconcile it manually before adoption."
+    }
+}
+
+function Assert-AdoptionGitModulesPreserved {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$ProposalHead,
+        [string]$Commit = '',
+        [switch]$UseIndex
+    )
+
+    if ($ProposalHead -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'The adoption proposal head is not canonical.'
+    }
+    $consumerBase = Get-SingleCommitParent -Repository $Repository `
+        -Commit $ProposalHead
+    $baseRows = @(Get-AdoptionGitModulesConfigurationRows `
+        -Repository $Repository -Commit $consumerBase -AllowAbsent)
+    Assert-AdoptionReservedProtocolSubmoduleAvailable `
+        -Repository $Repository -Commit $consumerBase
+    $finalRows = if ($UseIndex) {
+        @(Get-AdoptionGitModulesConfigurationRows -Repository $Repository -UseIndex)
+    }
+    else {
+        @(Get-AdoptionGitModulesConfigurationRows `
+            -Repository $Repository -Commit $Commit)
+    }
+    $protocolPrefix = 'submodule..ai/protocol.'
+    $baseConsumerRows = @($baseRows | Where-Object {
+        -not $_.StartsWith($protocolPrefix, [StringComparison]::Ordinal)
+    })
+    $finalConsumerRows = @($finalRows | Where-Object {
+        -not $_.StartsWith($protocolPrefix, [StringComparison]::Ordinal)
+    })
+    if (($baseConsumerRows -join "`0") -cne ($finalConsumerRows -join "`0")) {
+        throw 'Adoption completion changed non-protocol .gitmodules configuration.'
+    }
+    $protocolRows = @($finalRows | Where-Object {
+        $_.StartsWith($protocolPrefix, [StringComparison]::Ordinal)
+    })
+    $expectedProtocolRows = [string[]]@(
+        "submodule..ai/protocol.path`n.ai/protocol",
+        "submodule..ai/protocol.url`nhttps://github.com/$ProtocolRepository.git"
+    )
+    [Array]::Sort($expectedProtocolRows, [StringComparer]::Ordinal)
+    if (($protocolRows -join "`0") -cne ($expectedProtocolRows -join "`0")) {
+        throw 'The completed protocol .gitmodules section is not exact.'
+    }
+}
+
 function Get-ValidatedAdoptionManifest {
     param(
         [Parameter(Mandatory)][string]$ManifestPath,
@@ -3424,6 +4465,8 @@ function Get-ValidatedAdoptionManifest {
             -Module ([string]$module.Name) -CommandType Function -ErrorAction SilentlyContinue)
         $targetPathGetters = @(Get-Command -Name 'Get-MeAndAIAdoptionTargetPaths' `
             -Module ([string]$module.Name) -CommandType Function -ErrorAction SilentlyContinue)
+        $surfaceGetters = @(Get-Command -Name 'Get-MeAndAIProtocolSurfaceInventory' `
+            -Module ([string]$module.Name) -CommandType Function -ErrorAction SilentlyContinue)
         if ($validators.Count -ne 1 -or $resolvers.Count -ne 1 -or
             $targetPathGetters.Count -ne 1) {
             throw 'The exact protocol capabilities contract does not export one path getter, resolver, and manifest validator.'
@@ -3447,27 +4490,87 @@ function Get-ValidatedAdoptionManifest {
         elseif (-not $baseWorkflowEntry.Path) { 'Missing' }
         else { 'Drifted' }
         $resolver = $resolvers[0]
-        $plan = & $resolver -Snapshot ([pscustomobject]@{
-            SchemaVersion = 1
-            LocalUpdaterState = [string]$contract.LocalUpdaterState
-            SeedWorkflowState = $seedWorkflowState
-            Collisions = @($contract.Collisions)
-            ManifestExists = $false
-            RemoteBranchExists = $false
-            OpenPullRequestCount = 0
-            ExistingProposalValid = $false
-        })
+        $validator = $validators[0]
+        $newValidatorParameters = @(
+            'ExpectedAdoptionStrategy', 'ExpectedProtocolSurfaces',
+            'ExpectedProtocolRecordLossAcknowledgement'
+        )
+        $newParameterCount = @($newValidatorParameters | Where-Object {
+            $validator.Parameters.ContainsKey($_)
+        }).Count
+        $usesStrategyContract = $newParameterCount -eq $newValidatorParameters.Count -and
+            $surfaceGetters.Count -eq 1
+        $usesLegacyContract = $newParameterCount -eq 0 -and $surfaceGetters.Count -eq 0
+        if (-not $usesStrategyContract -and -not $usesLegacyContract) {
+            throw 'The exact protocol capabilities contract mixes incompatible adoption schemas.'
+        }
+        if ($usesStrategyContract) {
+            if ([long]$PullRequest.meAndAIMarker.schema -notin @(5, 6)) {
+                throw 'The strategy-aware protocol source requires a strategy-bound proposal marker.'
+            }
+            $plan = & $resolver -Snapshot ([pscustomobject]@{
+                SchemaVersion = 2
+                LocalUpdaterState = [string]$contract.LocalUpdaterState
+                SeedWorkflowState = $seedWorkflowState
+                Collisions = @($contract.Collisions)
+                AdoptionStrategy = [string]$PullRequest.meAndAIMarker.adoptionStrategy
+                ProtocolSurfaces = @($contract.ProtocolSurfaces)
+                AcknowledgeProtocolRecordLoss = [bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged
+                ManifestExists = $false
+                RemoteBranchExists = $false
+                OpenPullRequestCount = 0
+                ExistingProposalValid = $false
+            })
+        }
+        else {
+            if ([long]$PullRequest.meAndAIMarker.schema -notin @(2, 3, 4)) {
+                throw 'A legacy protocol source cannot validate a strategy-bound proposal marker.'
+            }
+            if (@($contract.ProtocolSurfaces).Count -gt 0) {
+                throw 'The legacy adoption proposal now has migration-policy evidence; close it and rerun initial assessment with an explicit maintainer strategy.'
+            }
+            $plan = & $resolver -Snapshot ([pscustomobject]@{
+                SchemaVersion = 1
+                LocalUpdaterState = [string]$contract.LocalUpdaterState
+                SeedWorkflowState = $seedWorkflowState
+                Collisions = @($contract.Collisions)
+                ManifestExists = $false
+                RemoteBranchExists = $false
+                OpenPullRequestCount = 0
+                ExistingProposalValid = $false
+            })
+        }
         if ($null -eq $plan -or
             [string]$plan.State -cnotin @('BootstrapReady', 'AdoptionReviewRequired') -or
             [string]$PullRequest.meAndAIMarker.state -cne [string]$plan.State) {
             throw 'The adoption proposal is not permitted by the independently derived lifecycle contract.'
         }
-        $validator = $validators[0]
-        $valid = & $validator -Manifest $manifest -Repository $Repository `
-            -TargetTag $ProtocolTag `
-            -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
-            -ExpectedState ([string]$plan.State) `
-            -ExpectedCollisions @($contract.Collisions)
+        if ($usesStrategyContract) {
+            if ([string]$plan.AdoptionStrategy -cne
+                    [string]$PullRequest.meAndAIMarker.adoptionStrategy -or
+                ((@($plan.ProtocolSurfaces) -join "`n") -cne
+                    (@($PullRequest.meAndAIMarker.protocolSurfaces) -join "`n")) -or
+                [bool]$plan.ProtocolRecordLossAcknowledged -ne
+                    [bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged) {
+                throw 'The independently derived lifecycle plan does not match the proposal strategy identity.'
+            }
+            $valid = & $validator -Manifest $manifest -Repository $Repository `
+                -TargetTag $ProtocolTag `
+                -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
+                -ExpectedState ([string]$plan.State) `
+                -ExpectedAdoptionStrategy ([string]$plan.AdoptionStrategy) `
+                -ExpectedProtocolSurfaces @($plan.ProtocolSurfaces) `
+                -ExpectedProtocolRecordLossAcknowledgement `
+                    ([bool]$plan.ProtocolRecordLossAcknowledged) `
+                -ExpectedCollisions @($contract.Collisions)
+        }
+        else {
+            $valid = & $validator -Manifest $manifest -Repository $Repository `
+                -TargetTag $ProtocolTag `
+                -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
+                -ExpectedState ([string]$plan.State) `
+                -ExpectedCollisions @($contract.Collisions)
+        }
     }
     finally {
         Remove-Module -Name ([string]$module.Name) -Force -ErrorAction SilentlyContinue
@@ -3483,10 +4586,305 @@ function Get-ValidatedAdoptionManifest {
     return $manifest
 }
 
+function Test-QuickAdoptionConsumerGovernancePath {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAIConsumerGovernancePath'
+    return [bool](& $command -Path $Path)
+}
+
+function Test-QuickAdoptionLegacyGovernancePath {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAILegacyGovernancePath'
+    return [bool](& $command -Path $Path)
+}
+
+function Test-QuickAdoptionLegacyCommonAuthorityPath {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAILegacyCommonAuthorityPath'
+    return [bool](& $command -Path $Path)
+}
+
+function ConvertFrom-AdoptionStatusLines {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Lines)
+
+    $changes = [System.Collections.Generic.List[object]]::new()
+    foreach ($value in @($Lines)) {
+        $line = [string]$value
+        $match = [regex]::Match($line, '^(?<status>[ADMT])\t(?<path>[^\t]+)$')
+        if (-not $match.Success -or
+            -not (Test-QuickAdoptionCanonicalRepositoryPath `
+                -Path ([string]$match.Groups['path'].Value))) {
+            throw 'Local Codex produced an unparseable or noncanonical staged change.'
+        }
+        $changes.Add([pscustomobject]@{
+            Status = [string]$match.Groups['status'].Value
+            Path = [string]$match.Groups['path'].Value
+        })
+    }
+    return @($changes)
+}
+
+function Assert-QuickAdoptionFinalSeedWorkflowIdentity {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [string]$Commit = '',
+        [switch]$UseIndex
+    )
+
+    if ($UseIndex -eq [bool]$Commit) {
+        throw 'Exactly one final workflow tree source must be selected.'
+    }
+    $pathLines = if ($UseIndex) {
+        @((Invoke-Git -Repository $Repository -Arguments @(
+            'ls-files', '--cached'
+        )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    }
+    else {
+        @((Invoke-Git -Repository $Repository -Arguments @(
+            'ls-tree', '-r', '--name-only', $Commit, '--'
+        )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    }
+    foreach ($path in $pathLines) {
+        Assert-QuickAdoptionCanonicalPathCasing -Path $path
+    }
+    $matches = @($pathLines | Where-Object {
+        $_.Equals($workflowTargetPath, [StringComparison]::OrdinalIgnoreCase)
+    })
+    if ($matches.Count -ne 1 -or [string]$matches[0] -cne $workflowTargetPath) {
+        throw "The final adoption tree must contain exactly one canonical '$workflowTargetPath'."
+    }
+    $entry = if ($UseIndex) {
+        Get-AdoptionTreeEntry -Repository $Repository `
+            -Path $workflowTargetPath -UseIndex
+    }
+    else {
+        Get-AdoptionTreeEntry -Repository $Repository `
+            -Path $workflowTargetPath -Commit $Commit
+    }
+    if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob') {
+        throw 'The final lifecycle seed workflow is not one regular canonical file.'
+    }
+}
+
+function Assert-AdoptionCompletionEnvelope {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Manifest,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Changes,
+        [Parameter(Mandatory)][string]$ProtocolSource,
+        [Parameter(Mandatory)][string]$ProposalHead,
+        [string]$Commit = '',
+        [switch]$UseIndex
+    )
+
+    if ($UseIndex -eq [bool]$Commit) {
+        throw 'Exactly one adoption completion tree source must be selected.'
+    }
+    $strategy = if ($null -ne $Manifest.PSObject.Properties['adoptionStrategy']) {
+        [string]$Manifest.adoptionStrategy
+    }
+    else { 'LegacyUnspecified' }
+    $migrationStrategy = $strategy -cin @(
+        'FullMigration', 'HybridReconciliation', 'CleanStart'
+    )
+    $surfaceSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    if ($null -ne $Manifest.PSObject.Properties['protocolSurfaces']) {
+        foreach ($surface in @($Manifest.protocolSurfaces)) {
+            [void]$surfaceSet.Add([string]$surface)
+        }
+    }
+    $changedSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($change in @($Changes)) {
+        [void]$changedSet.Add([string]$change.Path)
+    }
+    $requiredPaths = @(
+        '.gitmodules', '.ai/protocol', $consumerMigrationLedgerPath
+    ) + @($adoptionAssets | ForEach-Object { [string]$_.ConsumerPath })
+    $requiredSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($path in $requiredPaths) { [void]$requiredSet.Add([string]$path) }
+    $sourceEnforcedRequiredSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    [void]$sourceEnforcedRequiredSet.Add($consumerMigrationLedgerPath)
+    foreach ($asset in $managedUpdaterAssets) {
+        [void]$sourceEnforcedRequiredSet.Add([string]$asset.ConsumerPath)
+    }
+
+    $manifestDeletions = @($Changes | Where-Object {
+        [string]$_.Status -ceq 'D' -and
+        [string]$_.Path -ceq $adoptionManifestPath
+    })
+    if ($manifestDeletions.Count -ne 1) {
+        throw 'Local Codex did not stage the one required transient manifest deletion.'
+    }
+
+    foreach ($change in @($Changes)) {
+        $status = [string]$change.Status
+        $path = [string]$change.Path
+        $basename = [IO.Path]::GetFileName($path)
+        if (@($tokenMappings.Keys | Where-Object {
+            $basename.Equals($_, [StringComparison]::OrdinalIgnoreCase)
+        }).Count -gt 0) {
+            throw "Local Codex changed credential-shaped path '$path'."
+        }
+        if ($path.Equals($workflowTargetPath, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Local Codex changed protected adoption path '$workflowTargetPath'."
+        }
+        if ($path -ceq $adoptionManifestPath) {
+            if ($status -cne 'D') {
+                throw 'The transient manifest may only be deleted during completion.'
+            }
+            continue
+        }
+        if ($requiredSet.Contains($path)) {
+            if ($status -ceq 'D') {
+                throw "Required adoption target '$path' cannot be deleted."
+            }
+            continue
+        }
+        if ($path.StartsWith('.ai/protocol/', [StringComparison]::Ordinal)) {
+            if (-not $migrationStrategy -or $status -cne 'D' -or
+                -not $surfaceSet.Contains($path)) {
+                throw "Adoption strategy '$strategy' does not authorize protocol-tree change '$path'."
+            }
+            continue
+        }
+        if ($status -ceq 'A') {
+            if (-not (Test-QuickAdoptionConsumerGovernancePath -Path $path)) {
+                throw "Adoption completion does not authorize adding application or product path '$path'."
+            }
+            continue
+        }
+        if ($status -cin @('M', 'D')) {
+            if (-not $migrationStrategy -or -not $surfaceSet.Contains($path) -or
+                -not (Test-QuickAdoptionLegacyGovernancePath -Path $path)) {
+                throw "Adoption strategy '$strategy' does not authorize changing '$path'."
+            }
+            continue
+        }
+        throw "Adoption completion does not authorize type change '$path'."
+    }
+
+    foreach ($path in $requiredPaths) {
+        $entry = if ($UseIndex) {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $path -UseIndex
+        }
+        else {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $path -Commit $Commit
+        }
+        $expectedMode = if ($path -ceq '.ai/protocol') { '160000' } else { '100644' }
+        if ($entry.Mode -cne $expectedMode -or -not $entry.Path) {
+            throw "Required adoption target '$path' is missing or has an invalid final mode."
+        }
+    }
+    if ($UseIndex) {
+        Assert-QuickAdoptionFinalSeedWorkflowIdentity `
+            -Repository $Repository -UseIndex
+        Assert-AdoptionGitModulesPreserved -Repository $Repository `
+            -ProposalHead $ProposalHead -UseIndex
+    }
+    else {
+        Assert-QuickAdoptionFinalSeedWorkflowIdentity `
+            -Repository $Repository -Commit $Commit
+        Assert-AdoptionGitModulesPreserved -Repository $Repository `
+            -ProposalHead $ProposalHead -Commit $Commit
+    }
+
+    if ($strategy -ceq 'HybridReconciliation') {
+        $decisionChanges = @($Changes | Where-Object {
+            [string]$_.Status -cin @('A', 'M') -and
+            [string]$_.Path.StartsWith(
+                'docs/decisions/', [StringComparison]::Ordinal
+            ) -and
+            [string]$_.Path.EndsWith('.md', [StringComparison]::Ordinal)
+        })
+        if ($decisionChanges.Count -eq 0) {
+            throw 'Hybrid reconciliation requires a changed consumer decision that records ownership and precedence.'
+        }
+    }
+    foreach ($surface in @($surfaceSet)) {
+        if ($requiredSet.Contains($surface)) {
+            $mustReconcileRequiredSurface =
+                (Test-QuickAdoptionLegacyCommonAuthorityPath -Path $surface) -or
+                ($strategy -ceq 'CleanStart' -and
+                 -not $sourceEnforcedRequiredSet.Contains($surface))
+            if ($mustReconcileRequiredSurface -and
+                -not $changedSet.Contains($surface)) {
+                throw "Adoption strategy '$strategy' left detected required governance surface '$surface' unchanged."
+            }
+            continue
+        }
+        $entry = if ($UseIndex) {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $surface -UseIndex
+        }
+        else {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $surface `
+                -Commit $Commit
+        }
+        if ($strategy -ceq 'CleanStart' -and $entry.Path -and
+            (Test-QuickAdoptionLegacyGovernancePath -Path $surface)) {
+            throw "CleanStart left detected legacy governance surface '$surface' in the final tree."
+        }
+        if (Test-QuickAdoptionLegacyCommonAuthorityPath -Path $surface) {
+            if ($strategy -ceq 'FullMigration' -and $entry.Path) {
+                throw "FullMigration left legacy common authority '$surface' in the final tree."
+            }
+            if ($strategy -ceq 'HybridReconciliation' -and $entry.Path -and
+                -not $changedSet.Contains($surface)) {
+                throw "HybridReconciliation left legacy common authority '$surface' unchanged."
+            }
+        }
+    }
+    $baseline = Get-ExactConsumerMigrationBaseline -ProtocolSource $ProtocolSource `
+        -ProtocolSha ([string]$Manifest.protocolSha)
+    $ledgerEntry = if ($UseIndex) {
+        Get-AdoptionTreeEntry -Repository $Repository `
+            -Path $consumerMigrationLedgerPath -UseIndex
+    }
+    else {
+        Get-AdoptionTreeEntry -Repository $Repository `
+            -Path $consumerMigrationLedgerPath -Commit $Commit
+    }
+    if ($ledgerEntry.Mode -cne '100644' -or
+        $ledgerEntry.Sha -cne [string]$baseline.Blob) {
+        throw 'The consumer migration ledger does not match the exact protocol baseline.'
+    }
+
+    foreach ($change in @($Changes | Where-Object { [string]$_.Status -cne 'D' })) {
+        $path = [string]$change.Path
+        if ($requiredSet.Contains($path)) { continue }
+        $entry = if ($UseIndex) {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $path -UseIndex
+        }
+        else {
+            Get-AdoptionTreeEntry -Repository $Repository -Path $path -Commit $Commit
+        }
+        $allowedModes = if ($path.StartsWith(
+            'tests/meandai-adoption/', [StringComparison]::Ordinal
+        )) { @('100644', '100755') } else { @('100644') }
+        if ($entry.Mode -cnotin $allowedModes -or -not $entry.Path) {
+            throw "Consumer-owned adoption path '$path' has an unsupported final type."
+        }
+    }
+}
+
 function Get-ValidatedAdoptionChangeSet {
     param(
         [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)]$Manifest
+        [Parameter(Mandatory)]$Manifest,
+        [Parameter(Mandatory)][string]$ProtocolSource
     )
 
     Assert-CredentialFilesAbsent -Repository $Repository
@@ -3494,28 +4892,21 @@ function Get-ValidatedAdoptionChangeSet {
     Invoke-Git -Repository $Repository -Arguments @(
         'add', '-A', '--', '.', ':(exclude).ai/protocol'
     ) | Out-Null
-    $changedPaths = @((Invoke-Git -Repository $Repository -Arguments @(
-        'diff', '--cached', '--name-only', '--diff-filter=ACMRTD'
-    )).Output | Where-Object { $_ })
-    if ($changedPaths.Count -eq 0) {
+    $statusLines = @((Invoke-Git -Repository $Repository -Arguments @(
+        'diff', '--cached', '--name-status', '--no-renames',
+        '--diff-filter=ACMTD'
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    if ($statusLines.Count -eq 0) {
         throw 'Local Codex produced no reviewable adoption change.'
     }
-    foreach ($forbiddenPath in @(
-        $workflowTargetPath, $consumerMigrationLedgerPath
-    ) + @($tokenMappings.Keys)) {
-        $protectedDiff = Invoke-Git -Repository $Repository -Arguments @(
-            'diff', '--cached', '--quiet', '--exit-code', '--', $forbiddenPath
-        ) -AllowFailure
-        if ($protectedDiff.ExitCode -eq 1) {
-            throw "Local Codex changed protected adoption path '$forbiddenPath'."
-        }
-        if ($protectedDiff.ExitCode -ne 0) {
-            throw "Protected adoption path '$forbiddenPath' could not be validated."
-        }
-    }
-    if (@($changedPaths | Where-Object { $_ -clike '.ai/protocol/*' }).Count -gt 0) {
-        throw 'Local Codex changed files inside the protocol reference instead of preserving one gitlink.'
-    }
+    $changes = @(ConvertFrom-AdoptionStatusLines -Lines $statusLines)
+    $changedPaths = @($changes | ForEach-Object { [string]$_.Path })
+    $proposalHead = ((@(Invoke-Git -Repository $Repository -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Output -join '').Trim())
+    Assert-AdoptionCompletionEnvelope -Repository $Repository `
+        -Manifest $Manifest -Changes $changes -ProtocolSource $ProtocolSource `
+        -ProposalHead $proposalHead -UseIndex
     Assert-AdoptionProtocolReference -Repository $Repository `
         -ProtocolSha ([string]$Manifest.protocolSha)
     Invoke-Git -Repository $Repository -Arguments @('diff', '--cached', '--check') | Out-Null
@@ -3527,6 +4918,7 @@ function Assert-RecoverablePublishedAdoption {
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][string]$PreviousHead,
         [Parameter(Mandatory)][string]$PlannedHead,
+        [Parameter(Mandatory)]$Manifest,
         [Parameter(Mandatory)][string]$ProtocolSha,
         [Parameter(Mandatory)][string]$ProtocolSource
     )
@@ -3542,7 +4934,7 @@ function Assert-RecoverablePublishedAdoption {
         'status', '--porcelain=v1', '--untracked-files=all'
     )).Output | Where-Object { $_ })
     if ($status.Count -ne 0) {
-        throw 'The published adoption recovery clone is not clean.'
+        throw "The published adoption recovery clone is not clean: $($status -join ', ')."
     }
     Assert-CredentialFilesAbsent -Repository $Repository
     $manifestPath = Join-Path $Repository `
@@ -3553,21 +4945,17 @@ function Assert-RecoverablePublishedAdoption {
     Invoke-Git -Repository $Repository -Arguments @(
         'diff', '--check', $PreviousHead, $PlannedHead, '--'
     ) | Out-Null
-    $changedPaths = @((Invoke-Git -Repository $Repository -Arguments @(
-        'diff', '--no-renames', '--name-only', '--diff-filter=ACMRTD',
+    $statusLines = @((Invoke-Git -Repository $Repository -Arguments @(
+        'diff', '--no-renames', '--name-status', '--diff-filter=ACMTD',
         $PreviousHead, $PlannedHead, '--'
-    )).Output | Where-Object { $_ })
-    if ($changedPaths.Count -eq 0) {
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    if ($statusLines.Count -eq 0) {
         throw 'The published adoption recovery commit contains no reviewable change.'
     }
-    foreach ($path in @($workflowTargetPath) + @($tokenMappings.Keys)) {
-        if ($changedPaths -ccontains $path) {
-            throw "The published adoption recovery commit changed protected path '$path'."
-        }
-    }
-    if (@($changedPaths | Where-Object { $_ -clike '.ai/protocol/*' }).Count -gt 0) {
-        throw 'The published adoption recovery commit changed content inside the protocol gitlink.'
-    }
+    $changes = @(ConvertFrom-AdoptionStatusLines -Lines $statusLines)
+    Assert-AdoptionCompletionEnvelope -Repository $Repository `
+        -Manifest $Manifest -Changes $changes -ProtocolSource $ProtocolSource `
+        -ProposalHead $PreviousHead -Commit $PlannedHead
     Assert-AdoptionProtocolReference -Repository $Repository -ProtocolSha $ProtocolSha
     Assert-AdoptionUpdaterAssetsExact -Repository $Repository `
         -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha -Commit $PlannedHead
@@ -3633,10 +5021,58 @@ function Invoke-AdoptionCodexCompletion {
         -WorkingDirectory $ClonePath `
         -TimeoutMilliseconds $timeoutMilliseconds
     $resultPath = Join-Path $TemporaryRoot 'codex-result.txt'
+    $resolvedStrategy = if ($null -ne $Manifest.PSObject.Properties['adoptionStrategy']) {
+        [string]$Manifest.adoptionStrategy
+    }
+    else { 'LegacyUnspecified' }
+    $lossAcknowledged = if ($null -ne $Manifest.PSObject.Properties[
+        'protocolRecordLossAcknowledged'
+    ]) {
+        [bool]$Manifest.protocolRecordLossAcknowledged
+    }
+    else { $false }
+    $surfaceText = if ($null -ne $Manifest.PSObject.Properties['protocolSurfaces'] -and
+        @($Manifest.protocolSurfaces).Count -gt 0) {
+        @($Manifest.protocolSurfaces | ForEach-Object { "- $_" }) -join "`n"
+    }
+    else { '- None' }
+    $collisionText = if (@($Manifest.collisions).Count -gt 0) {
+        @($Manifest.collisions | ForEach-Object { "- $_" }) -join "`n"
+    }
+    else { '- None' }
+    $strategyInstruction = switch ($resolvedStrategy) {
+        'FreshAdoption' {
+            'Perform a fresh adoption. The bounded assessment found no prior protocol evidence; do not invent legacy semantics and do not delete existing consumer files.'
+        }
+        'FullMigration' {
+            'Map and preserve every still-valid repository-specific directive, decision, scope, dependency, risk, test intent, and approval before retiring the old protocol as live authority. The final tree must have one common authority and no permanent compatibility ledger or required legacy topology.'
+        }
+        'HybridReconciliation' {
+            'Reconcile selected existing structures under a consumer-owned decision that records ownership and precedence. meAndAI must be the single common pinned authority; do not leave two ambiguous common authorities.'
+        }
+        'CleanStart' {
+            'Import no legacy governance semantics. Protocol-record loss was explicitly acknowledged. You may delete only exact detected governance surface paths listed below; preserve application source, assets, runtime configuration, product tests, and product documentation.'
+        }
+        default {
+            'Complete this legacy proposal conservatively without expanding its historical authorization.'
+        }
+    }
     $prompt = @"
 Complete the meAndAI AI-capabilities adoption for $Repository pull request #$($PullRequest.number) in this isolated temporary clone.
 
-Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create it from $ProtocolRepository at exactly $($Manifest.protocolSha); never substitute a moving ref.
+The maintainer-selected adoption strategy is $resolvedStrategy. Protocol-record loss acknowledgement is $($lossAcknowledged.ToString().ToLowerInvariant()). This selection is a command: do not select, change, upgrade, downgrade, or reinterpret it. $strategyInstruction
+
+Exact approved protocol/governance surfaces from the proposal-parent tree:
+$surfaceText
+
+Canonical adoption target collisions:
+$collisionText
+
+If you discover another live protocol authority, or if completion would require deleting any path outside that exact approved surface list, keep the manifest and report MEANDAI_ADOPTION_BLOCKED with the new assessment required. No strategy authorizes deletion or behavioral modification of application/product content.
+
+Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create its nested repository using only the launcher-supplied local exact protocol source at $ProtocolSource as the object and checkout source, pin exactly $($Manifest.protocolSha), and write the canonical https://github.com/$ProtocolRepository.git URL to .gitmodules. Do not fetch or substitute a moving ref.
+
+The final tree must contain every canonical target named by the manifest, except the transient manifest itself, while preserving the lifecycle workflow. Reconcile required templates from the exact local protocol source and create .ai/meandai-update-state.json only from that source's exact consumer-migration baseline contract. New consumer-authored files are allowed only as root or scoped AGENTS.md, Markdown under .ai/memory/, docs/features/, docs/decisions/, docs/findings/, docs/governance/, docs/ideas/, or docs/agent-prompts/, and adoption-only tests under tests/meandai-adoption/. Do not add product files elsewhere merely to satisfy adoption evidence.
 
 Treat the .ai/protocol gitlink and the VERSION inside that exact checkout as the sole live protocol identity. Consumer-owned instructions, memory, decisions, features, indexes, and tests must resolve the current identity from those sources and must not embed a literal current tag or commit. Exact values may appear only as dated historical event evidence.
 
@@ -3664,6 +5100,181 @@ Your final response must start with MEANDAI_ADOPTION_READY only when the manifes
     return [pscustomobject]@{ Runner = $runner; Result = $result }
 }
 
+function Assert-LiveConsumerRepositoryBoundary {
+    param(
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$ExpectedRepository,
+        [AllowEmptyString()][string]$ExpectedDefaultBranch = '',
+        [AllowEmptyString()][string]$ExpectedHead = '',
+        [switch]$ExpectEmpty,
+        [switch]$RequireOnlyExpectedHead,
+        [Parameter(Mandatory)][string]$FailureMessage
+    )
+
+    # Read the configured identity rather than Git's rewritten transport URL.
+    # Tests and maintainers may use url.*.insteadOf for a safe local transport,
+    # while repository identity must remain bound to the canonical GitHub URL.
+    $remoteUrl = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+        'config', '--get', "remote.$RemoteName.url"
+    )).Output -join '').Trim())
+    $remoteSlug = Get-GitHubSlugFromRemote -RemoteUrl $remoteUrl
+    if (-not $remoteSlug.Equals(
+        $ExpectedRepository, [StringComparison]::OrdinalIgnoreCase
+    )) {
+        throw $FailureMessage
+    }
+    $readLiveMetadata = {
+        $view = Invoke-External -Command 'gh' -Arguments @(
+            'repo', 'view', $remoteSlug, '--json',
+            'nameWithOwner,defaultBranchRef'
+        )
+        try {
+            $repositoryInfo = ((@($view.Output) -join [Environment]::NewLine) |
+                ConvertFrom-Json)
+        }
+        catch {
+            throw $FailureMessage
+        }
+        return [pscustomobject]@{
+            Repository = if ($null -ne $repositoryInfo) {
+                [string]$repositoryInfo.nameWithOwner
+            }
+            else { '' }
+            DefaultBranch = if ($null -ne $repositoryInfo -and
+                $null -ne $repositoryInfo.defaultBranchRef) {
+                [string]$repositoryInfo.defaultBranchRef.name
+            }
+            else { '' }
+        }
+    }
+    $liveMetadata = & $readLiveMetadata
+    if (-not ([string]$liveMetadata.Repository).Equals(
+        $ExpectedRepository, [StringComparison]::OrdinalIgnoreCase
+    )) {
+        throw $FailureMessage
+    }
+
+    if ($ExpectEmpty) {
+        if ($ExpectedDefaultBranch -or $ExpectedHead -or
+            [string]$liveMetadata.DefaultBranch) {
+            throw $FailureMessage
+        }
+        $advertisedRefs = @((Invoke-Git -Repository $TargetRepository -Arguments @(
+            'ls-remote', $RemoteName
+        )).Output | Where-Object { $_ })
+        if ($advertisedRefs.Count -ne 0) {
+            throw $FailureMessage
+        }
+        return
+    }
+
+    $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository `
+        -Remote $RemoteName -Branch $ExpectedDefaultBranch
+    if ($ExpectedDefaultBranch -eq '' -or
+        $ExpectedHead -cnotmatch '^[0-9a-f]{40}$' -or
+        $remoteHead -cne $ExpectedHead) {
+        throw $FailureMessage
+    }
+    if ($RequireOnlyExpectedHead) {
+        $advertisedRefs = @((Invoke-Git -Repository $TargetRepository -Arguments @(
+            'ls-remote', $RemoteName
+        )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+        $expectedBranchLine = "$ExpectedHead`trefs/heads/$ExpectedDefaultBranch"
+        $expectedHeadLine = "$ExpectedHead`tHEAD"
+        $branchLines = @($advertisedRefs | Where-Object {
+            $_ -ceq $expectedBranchLine
+        })
+        $headLines = @($advertisedRefs | Where-Object {
+            $_ -ceq $expectedHeadLine
+        })
+        $unexpectedRefs = @($advertisedRefs | Where-Object {
+            $_ -cne $expectedBranchLine -and $_ -cne $expectedHeadLine
+        })
+        if ($branchLines.Count -ne 1 -or $headLines.Count -gt 1 -or
+            $unexpectedRefs.Count -gt 0) {
+            throw $FailureMessage
+        }
+        # GitHub may expose the exact first branch before its repository
+        # metadata reports defaultBranchRef. Retry only that one unambiguous
+        # transient state; a contradictory nonempty branch name fails at once.
+        $metadataRetried = $false
+        if (-not [string]$liveMetadata.DefaultBranch) {
+            $metadataRetried = $true
+            for ($attempt = 1; $attempt -le 5; $attempt++) {
+                Start-Sleep -Milliseconds 500
+                $liveMetadata = & $readLiveMetadata
+                if (-not ([string]$liveMetadata.Repository).Equals(
+                    $ExpectedRepository, [StringComparison]::OrdinalIgnoreCase
+                )) {
+                    throw $FailureMessage
+                }
+                if ([string]$liveMetadata.DefaultBranch) { break }
+            }
+        }
+        if ($metadataRetried) {
+            $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository `
+                -Remote $RemoteName -Branch $ExpectedDefaultBranch
+            $advertisedRefs = @((Invoke-Git -Repository $TargetRepository `
+                -Arguments @('ls-remote', $RemoteName)).Output |
+                Where-Object { $_ } | ForEach-Object { [string]$_ })
+            $branchLines = @($advertisedRefs | Where-Object {
+                $_ -ceq $expectedBranchLine
+            })
+            $headLines = @($advertisedRefs | Where-Object {
+                $_ -ceq $expectedHeadLine
+            })
+            $unexpectedRefs = @($advertisedRefs | Where-Object {
+                $_ -cne $expectedBranchLine -and $_ -cne $expectedHeadLine
+            })
+            if ($remoteHead -cne $ExpectedHead -or
+                $branchLines.Count -ne 1 -or $headLines.Count -gt 1 -or
+                $unexpectedRefs.Count -gt 0) {
+                throw $FailureMessage
+            }
+        }
+    }
+    if ([string]$liveMetadata.DefaultBranch -cne $ExpectedDefaultBranch) {
+        throw $FailureMessage
+    }
+}
+
+function Assert-LiveConsumerDefaultBranchUnchanged {
+    param(
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$ExpectedHead,
+        [Parameter(Mandatory)][string]$FailureMessage
+    )
+
+    $remoteUrl = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+        'config', '--get', "remote.$RemoteName.url"
+    )).Output -join '').Trim())
+    $remoteSlug = Get-GitHubSlugFromRemote -RemoteUrl $remoteUrl
+    Assert-LiveConsumerRepositoryBoundary `
+        -TargetRepository $TargetRepository -ExpectedRepository $remoteSlug `
+        -ExpectedDefaultBranch $Branch -ExpectedHead $ExpectedHead `
+        -FailureMessage $FailureMessage
+}
+
+function Assert-CanonicalConsumerBaseUnchanged {
+    param(
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$ExpectedHead,
+        [Parameter(Mandatory)][string]$FailureMessage
+    )
+
+    $localHead = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Output -join '').Trim())
+    if ($localHead -cne $ExpectedHead) {
+        throw $FailureMessage
+    }
+    Assert-LiveConsumerDefaultBranchUnchanged `
+        -TargetRepository $TargetRepository -Branch $Branch `
+        -ExpectedHead $ExpectedHead -FailureMessage $FailureMessage
+}
+
 function Complete-AdoptionWithLocalCodex {
     param(
         [Parameter(Mandatory)][string]$TargetRepository,
@@ -3676,16 +5287,9 @@ function Complete-AdoptionWithLocalCodex {
     $branch = [string]$PullRequest.headRefName
     $expectedHead = [string]$PullRequest.headRefOid
     $expectedBody = [string]$PullRequest.body
-    $localBaseHead = ((@(Invoke-Git -Repository $TargetRepository -Arguments @(
-        'rev-parse', 'HEAD'
-    )).Output -join '').Trim())
-    $remoteBaseHead = Get-RemoteBranchHead -Repository $TargetRepository `
-        -Remote $RemoteName -Branch ([string]$PullRequest.baseRefName)
-    if ($CanonicalBaseHead -cnotmatch '^[0-9a-f]{40}$' -or
-        $localBaseHead -cne $CanonicalBaseHead -or
-        $remoteBaseHead -cne $CanonicalBaseHead) {
-        throw 'The canonical consumer base changed before local adoption validation.'
-    }
+    Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+        -Branch ([string]$PullRequest.baseRefName) -ExpectedHead $CanonicalBaseHead `
+        -FailureMessage 'The canonical consumer base changed before local adoption validation.'
     $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository -Remote $RemoteName -Branch $branch
     if ($remoteHead -cne $expectedHead) {
         throw 'The pull-request head and live adoption branch differ before local execution.'
@@ -3722,15 +5326,41 @@ function Complete-AdoptionWithLocalCodex {
                 -Commit ([string]$PullRequest.meAndAIMarker.protocolSha) `
                 -Destination $temporaryRoot
             if ($expectedHead -ceq $plannedHead) {
+                $proposalManifestText = @((Invoke-Git -Repository $clonePath `
+                    -Arguments @('show', "${previousHead}:$adoptionManifestPath")).Output) `
+                    -join [Environment]::NewLine
+                if ([string]::IsNullOrWhiteSpace($proposalManifestText)) {
+                    throw 'The publishing recovery parent does not contain its proposal manifest.'
+                }
+                $proposalManifestPath = Join-Path $temporaryRoot `
+                    'publishing-proposal-manifest.json'
+                [IO.File]::WriteAllText(
+                    $proposalManifestPath,
+                    $proposalManifestText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+                $recoveryManifest = Get-ValidatedAdoptionManifest `
+                    -ManifestPath $proposalManifestPath -Repository $Repository `
+                    -PullRequest $PullRequest -ProtocolSource $protocolSource `
+                    -ProposalRepository $clonePath -ProposalHead $previousHead `
+                    -CanonicalBaseHead $CanonicalBaseHead
                 Assert-RecoverablePublishedAdoption -Repository $clonePath `
                     -PreviousHead $previousHead -PlannedHead $plannedHead `
+                    -Manifest $recoveryManifest `
                     -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
                     -ProtocolSource $protocolSource
                 Ensure-AdoptionLabels -Repository $Repository
                 $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
                     -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+                Assert-CanonicalConsumerBaseUnchanged `
+                    -TargetRepository $TargetRepository `
+                    -Branch ([string]$PullRequest.baseRefName) `
+                    -ExpectedHead $CanonicalBaseHead `
+                    -FailureMessage 'The canonical consumer base changed before publishing recovery readiness.'
                 [void](Complete-AdoptionReviewTransition -Repository $Repository `
+                    -TargetRepository $TargetRepository `
                     -PullRequest $PullRequest -PublishedHead $plannedHead `
+                    -CanonicalBaseHead $CanonicalBaseHead `
                     -ExpectedMarkerHead $previousHead -TemporaryDirectory $temporaryRoot `
                     -Issue $adoptionIssue -PersistCompletedMarker)
                 return [pscustomobject]@{
@@ -3778,20 +5408,28 @@ function Complete-AdoptionWithLocalCodex {
                     $proposalManifestText,
                     [Text.UTF8Encoding]::new($false)
                 )
-                [void](Get-ValidatedAdoptionManifest `
+                $recoveryManifest = Get-ValidatedAdoptionManifest `
                     -ManifestPath $proposalManifestPath -Repository $Repository `
                     -PullRequest $PullRequest -ProtocolSource $protocolSource `
                     -ProposalRepository $clonePath -ProposalHead $proposalHead `
-                    -CanonicalBaseHead $CanonicalBaseHead)
+                    -CanonicalBaseHead $CanonicalBaseHead
                 Assert-RecoverablePublishedAdoption -Repository $clonePath `
                     -PreviousHead $proposalHead -PlannedHead $expectedHead `
+                    -Manifest $recoveryManifest `
                     -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
                     -ProtocolSource $protocolSource
                 Ensure-AdoptionLabels -Repository $Repository
                 $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
                     -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+                Assert-CanonicalConsumerBaseUnchanged `
+                    -TargetRepository $TargetRepository `
+                    -Branch ([string]$PullRequest.baseRefName) `
+                    -ExpectedHead $CanonicalBaseHead `
+                    -FailureMessage 'The canonical consumer base changed before completed recovery readiness.'
                 [void](Complete-AdoptionReviewTransition -Repository $Repository `
+                    -TargetRepository $TargetRepository `
                     -PullRequest $PullRequest -PublishedHead $expectedHead `
+                    -CanonicalBaseHead $CanonicalBaseHead `
                     -ExpectedMarkerHead $expectedHead -TemporaryDirectory $temporaryRoot `
                     -Issue $adoptionIssue)
                 return [pscustomobject]@{
@@ -3855,7 +5493,8 @@ function Complete-AdoptionWithLocalCodex {
         if (Test-Path -LiteralPath $manifestPath) {
             throw 'Local Codex declared readiness but left the transient adoption manifest.'
         }
-        Get-ValidatedAdoptionChangeSet -Repository $clonePath -Manifest $manifest | Out-Null
+        Get-ValidatedAdoptionChangeSet -Repository $clonePath -Manifest $manifest `
+            -ProtocolSource $protocolSource | Out-Null
         Assert-AdoptionUpdaterAssetsExact -Repository $clonePath `
             -ProtocolSource $protocolSource -ProtocolSha ([string]$manifest.protocolSha) `
             -UseIndex
@@ -3885,12 +5524,17 @@ function Complete-AdoptionWithLocalCodex {
         if ((Get-SingleCommitParent -Repository $clonePath -Commit $publishedHead) -cne $expectedHead) {
             throw 'The completed adoption commit does not have the exact proposal parent.'
         }
-        Assert-AdoptionUpdaterAssetsExact -Repository $clonePath `
-            -ProtocolSource $protocolSource -ProtocolSha ([string]$manifest.protocolSha) `
-            -Commit $publishedHead
+        Assert-RecoverablePublishedAdoption -Repository $clonePath `
+            -PreviousHead $expectedHead -PlannedHead $publishedHead `
+            -Manifest $manifest -ProtocolSha ([string]$manifest.protocolSha) `
+            -ProtocolSource $protocolSource
         [void](Get-RevalidatedAdoptionPullRequest -Repository $Repository `
             -OriginalPullRequest $PullRequest -LiveHead $expectedHead `
             -MarkerHead $expectedHead -Body $expectedBody -Draft $true)
+        Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+            -Branch ([string]$PullRequest.baseRefName) `
+            -ExpectedHead $CanonicalBaseHead `
+            -FailureMessage 'The canonical consumer base changed while local Codex was running; no completion result was published.'
         $publishingBody = Set-AdoptionPullRequestPublishingMarker `
             -Repository $Repository -PullRequest $PullRequest `
             -PreviousHead $expectedHead -PlannedHead $publishedHead `
@@ -3909,8 +5553,14 @@ function Complete-AdoptionWithLocalCodex {
             throw 'The adoption branch did not resolve to the launcher-published commit.'
         }
 
+        Assert-CanonicalConsumerBaseUnchanged -TargetRepository $TargetRepository `
+            -Branch ([string]$PullRequest.baseRefName) `
+            -ExpectedHead $CanonicalBaseHead `
+            -FailureMessage 'The canonical consumer base changed before adoption readiness.'
         [void](Complete-AdoptionReviewTransition -Repository $Repository `
+            -TargetRepository $TargetRepository `
             -PullRequest $publishingPullRequest -PublishedHead $publishedHead `
+            -CanonicalBaseHead $CanonicalBaseHead `
             -ExpectedMarkerHead $expectedHead -TemporaryDirectory $temporaryRoot `
             -Issue $adoptionIssue -PersistCompletedMarker)
         return [pscustomobject]@{
@@ -3930,20 +5580,60 @@ function Complete-AdoptionWithLocalCodex {
 }
 
 Set-QuickAdoptionProgress -Status 'Validating prerequisites' -PercentComplete 5
+$gitHookSuppression = $null
 try {
+if ($AdoptionStrategy -ceq 'Abort') {
+    $target = Get-NormalizedPath -Path $TargetPath
+    if (-not (Test-Path -LiteralPath $target -PathType Container)) {
+        throw "TargetPath must identify an existing directory: $target"
+    }
+    Write-Host 'Initial adoption was aborted before repository or GitHub mutation.'
+    Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+    return
+}
+$gitHookSuppression = Enter-GitHookSuppression
 foreach ($command in @('git', 'gh')) {
     if (-not (Get-Command $command -ErrorAction SilentlyContinue)) {
         throw "Required command '$command' is not available."
     }
 }
+Assert-GitHookSuppression -State $gitHookSuppression
 Assert-MinimumGitHubCliVersion
 
 $target = Get-NormalizedPath -Path $TargetPath
 if (-not (Test-Path -LiteralPath $target -PathType Container)) {
     throw "TargetPath must identify an existing directory: $target"
 }
-
+foreach ($tokenFileName in $tokenMappings.Keys) {
+    $tokenCandidate = Get-Item -LiteralPath (Join-Path $target $tokenFileName) `
+        -Force -ErrorAction SilentlyContinue
+    if ($null -eq $tokenCandidate) { continue }
+    [void](Assert-LocalCredentialRegularFile -Root $target `
+        -Name ([string]$tokenFileName))
+}
+$protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
+$protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
+$protocolToken = Read-ProtocolTokenForInitialPolicy -Root $target
+if (-not $protocolToken) {
+    $protocolToken = $null
+}
 Invoke-External -Command 'gh' -Arguments @('auth', 'status') | Out-Null
+$script:InitialAdoptionPolicy = Import-CanonicalInitialAdoptionPolicy `
+    -ProtocolToken ([string]$protocolToken)
+$preflightAssessment = Get-QuickAdoptionPreflightAssessment -Root $target
+$initialAdoptionSelection = Resolve-QuickAdoptionStrategy `
+    -Assessment $preflightAssessment -RequestedStrategy $AdoptionStrategy `
+    -IsNonInteractive ([bool]$NonInteractive) `
+    -LossAcknowledged ([bool]$AcknowledgeProtocolRecordLoss)
+if ([string]$initialAdoptionSelection.State -ceq 'Aborted') {
+    Write-Host 'Initial adoption was aborted before repository or GitHub mutation.'
+    Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
+    return
+}
+$assessmentBeforeLocalMutation = Get-QuickAdoptionPreflightAssessment -Root $target
+Assert-QuickAdoptionPreflightAssessmentUnchanged `
+    -Expected $preflightAssessment -Actual $assessmentBeforeLocalMutation `
+    -FailureMessage 'Repository protocol evidence changed after strategy selection; no adoption mutation was started.'
 
 Set-QuickAdoptionProgress -Status 'Inspecting repository state' -PercentComplete 15
 
@@ -3972,18 +5662,15 @@ $remoteIsEmpty = $false
 $discoveredExistingRepository = $false
 $discoveredRemoteUrl = ''
 $candidateRepository = ''
-$protocolToken = $null
 $workflowBytes = $null
-$protocolTokenPath = Join-Path $target 'MEANDAI_RO_FG_PAT.txt'
-$protocolTokenFileExists = Test-Path -LiteralPath $protocolTokenPath -PathType Leaf
 
 if ($hasRemote) {
     $remoteUrl = ((@($remoteResult.Output) -join '').Trim())
     $remoteSlug = Get-GitHubSlugFromRemote -RemoteUrl $remoteUrl
-    $remoteHeads = Invoke-Git -Repository $target -Arguments @(
-        'ls-remote', '--heads', $RemoteName
+    $remoteRefs = Invoke-Git -Repository $target -Arguments @(
+        'ls-remote', $RemoteName
     )
-    $remoteIsEmpty = -not ((@($remoteHeads.Output) -join '').Trim())
+    $remoteIsEmpty = -not ((@($remoteRefs.Output) -join '').Trim())
 }
 
 # Credential exposure checks are unconditional and precede repository-state
@@ -4035,10 +5722,10 @@ if (-not $hasRemote) {
         }
 
         $discoveredRemoteUrl = "https://github.com/$candidateCanonicalName.git"
-        $candidateHeads = Invoke-Git -Repository $target -Arguments @(
-            'ls-remote', '--heads', $discoveredRemoteUrl
+        $candidateRefs = Invoke-Git -Repository $target -Arguments @(
+            'ls-remote', $discoveredRemoteUrl
         )
-        if ((@($candidateHeads.Output) -join '').Trim()) {
+        if ((@($candidateRefs.Output) -join '').Trim()) {
             throw 'The derived GitHub repository already contains history; clone or reconcile it manually.'
         }
         $remoteSlug = $candidateCanonicalName
@@ -4059,17 +5746,33 @@ foreach ($requiredTokenFile in $requiredTokenFiles) {
     }
 }
 
+# Resolve the immutable workflow and reject a recognizable-but-modified seed
+# before creating a GitHub repository or attaching a discovered remote.
+if ($protocolTokenFileExists) {
+    $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
+}
+else {
+    $workflowBytes = Get-CanonicalWorkflow
+}
+$preMutationWorkflowPath = Assert-ContainedManagedDestination `
+    -Root $target -RelativePath $workflowTargetPath
+# This early byte gate protects the actions that create a GitHub repository or
+# attach a newly discovered remote. An already connected consumer is routed
+# first, because an exact older managed seed is valid input to the bounded
+# same-major updater path and is verified by that route's pinned contract.
+if (-not $hasRemote -and (Test-Path -LiteralPath $preMutationWorkflowPath)) {
+    if (-not (Test-Path -LiteralPath $preMutationWorkflowPath -PathType Leaf) -or
+        -not (Test-ByteArrayEqual `
+            -Left ([IO.File]::ReadAllBytes($preMutationWorkflowPath)) `
+            -Right ([byte[]]$workflowBytes))) {
+        throw "The existing seed workflow '$workflowTargetPath' is not the exact canonical $ProtocolTag file; no GitHub repository or remote was changed."
+    }
+}
+
 if ($discoveredExistingRepository) {
     # Verify executable source before mutating the local remote configuration.
     # The repository secret value remains unreadable; authenticated gh is the
     # existing file-free source fallback when the local read token is absent.
-    if ($protocolTokenFileExists) {
-        $protocolToken = Read-LocalToken -Path $protocolTokenPath
-        $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
-    }
-    else {
-        $workflowBytes = Get-CanonicalWorkflow
-    }
     Invoke-Git -Repository $target -Arguments @(
         'remote', 'add', $RemoteName, $discoveredRemoteUrl
     ) | Out-Null
@@ -4125,11 +5828,6 @@ else {
             throw 'The connected repository must be clean apart from the exact seed workflow candidate.'
         }
     }
-}
-
-if (-not $hasRemote) {
-    $protocolToken = Read-LocalToken -Path (Join-Path $target 'MEANDAI_RO_FG_PAT.txt')
-    $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
 }
 
 if ($hasRemote) {
@@ -4192,6 +5890,12 @@ else {
         'public' { '--public' }
         'internal' { '--internal' }
     }
+    $assessmentBeforeRepositoryCreation = Get-QuickAdoptionPreflightAssessment `
+        -Root $target
+    Assert-QuickAdoptionPreflightAssessmentUnchanged `
+        -Expected $preflightAssessment `
+        -Actual $assessmentBeforeRepositoryCreation `
+        -FailureMessage 'Repository protocol evidence changed before GitHub repository creation; no repository was created.'
     Invoke-External -Command 'gh' -Arguments @(
         'repo', 'create', $repository, $visibilityArgument,
         '--source', $target, '--remote', $RemoteName
@@ -4203,6 +5907,7 @@ else {
     if (-not $createdSlug.Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
         throw 'The created remote identity does not match the requested GitHub repository.'
     }
+    $hasRemote = $true
     $remoteIsEmpty = $true
 }
 
@@ -4212,7 +5917,6 @@ if ($null -eq $workflowBytes) {
     # when its verified file is present; otherwise use the authenticated gh
     # identity without attempting to recover an existing Actions secret.
     if ($protocolTokenFileExists) {
-        $protocolToken = Read-LocalToken -Path $protocolTokenPath
         $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
     }
     else {
@@ -4229,6 +5933,34 @@ $routingHead = if ($routingHeadResult.ExitCode -eq 0) {
 else { '' }
 $existingAdoptionRoute = Get-ExistingAdoptionRoute -Repository $target `
     -HeadSha $routingHead -ProtocolToken $protocolToken
+
+if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
+    if ([string]$initialAdoptionSelection.State -cne 'Resolved') {
+        throw 'The completed-consumer preflight no longer matches authoritative initial-adoption routing.'
+    }
+}
+elseif ([string]$initialAdoptionSelection.State -cne 'DeferredCompletedConsumer') {
+    throw 'The initial-adoption preflight no longer matches authoritative completed-consumer routing.'
+}
+if ($routingHead -cne [string]$preflightAssessment.HeadSha) {
+    throw 'Repository HEAD changed after initial-adoption strategy assessment; secrets and seed publication were not changed.'
+}
+$assessmentBeforeRepositoryMutation = Get-QuickAdoptionPreflightAssessment `
+    -Root $target
+Assert-QuickAdoptionPreflightAssessmentUnchanged `
+    -Expected $preflightAssessment -Actual $assessmentBeforeRepositoryMutation `
+    -FailureMessage 'Repository protocol evidence changed before repository mutation; secrets and seed publication were not changed.'
+if ($hasRemote -and $remoteIsEmpty) {
+    Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+        -ExpectedRepository $repository -ExpectEmpty `
+        -FailureMessage 'The repository assumed to be empty gained history or live identity before repository mutation; secrets and seed publication were not changed.'
+}
+elseif ($hasRemote -and $routingHead) {
+    Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+        -ExpectedRepository $repository `
+        -ExpectedDefaultBranch $defaultBranch -ExpectedHead $routingHead `
+        -FailureMessage 'The live repository/default branch changed after strategy assessment; secrets and seed publication were not changed.'
+}
 
 if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
     $repositoryOwner = $repository.Split('/')[0]
@@ -4277,7 +6009,8 @@ try {
         throw "Required local credential file 'MEANDAI_RO_FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_PROTOCOL_TOKEN' does not exist."
     }
     if ($null -eq $protocolToken -and $protocolTokenFileExists) {
-        $protocolToken = Read-LocalToken -Path $protocolTokenPath
+        $protocolToken = Read-LocalToken -Root $target `
+            -Name 'MEANDAI_RO_FG_PAT.txt'
     }
 
     $updaterSecretMissing = $existingSecretNames -notcontains 'MEANDAI_UPDATER_TOKEN'
@@ -4287,7 +6020,7 @@ try {
         if (-not (Test-Path -LiteralPath $updaterTokenPath -PathType Leaf)) {
             throw "Required local credential file 'FG_PAT.txt' is missing because repository Actions secret 'MEANDAI_UPDATER_TOKEN' does not exist."
         }
-        $updaterToken = Read-LocalToken -Path $updaterTokenPath
+        $updaterToken = Read-LocalToken -Root $target -Name 'FG_PAT.txt'
         try {
             $targetInfo = Invoke-GitHubApi -Uri "https://api.github.com/repos/$repository" -Token $updaterToken
             if (-not ([string]$targetInfo.full_name).Equals($repository, [StringComparison]::OrdinalIgnoreCase)) {
@@ -4358,13 +6091,29 @@ if ([string]$existingAdoptionRoute.State -ceq 'CompatibleUpdate') {
     return
 }
 
+$assessmentBeforeSeedPublication = Get-QuickAdoptionPreflightAssessment -Root $target
+Assert-QuickAdoptionPreflightAssessmentUnchanged `
+    -Expected $preflightAssessment -Actual $assessmentBeforeSeedPublication `
+    -FailureMessage 'Repository protocol evidence changed before seed publication; the selected strategy was not published.'
+if ($hasRemote -and $remoteIsEmpty) {
+    Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+        -ExpectedRepository $repository -ExpectEmpty `
+        -FailureMessage 'The repository assumed to be empty gained history before seed publication; the selected strategy was not published.'
+}
+elseif ($hasRemote -and $routingHead) {
+    Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+        -ExpectedRepository $repository `
+        -ExpectedDefaultBranch $defaultBranch -ExpectedHead $routingHead `
+        -FailureMessage 'The live repository/default branch changed before seed publication; the selected strategy was not published.'
+}
+
 Set-QuickAdoptionProgress -Status 'Publishing canonical seed workflow' `
     -PercentComplete 58
 [void](Write-CanonicalWorkflow -Path $workflowFullPath -Bytes $workflowBytes)
 
 Invoke-Git -Repository $target -Arguments @('add', '--', $workflowTargetPath) | Out-Null
 $staged = @((Invoke-Git -Repository $target -Arguments @(
-    'diff', '--cached', '--name-only', '--diff-filter=ACMRT'
+    'diff', '--cached', '--name-only'
 )).Output | Where-Object { $_ })
 if ($staged.Count -gt 1 -or ($staged.Count -eq 1 -and $staged[0] -cne $workflowTargetPath)) {
     throw 'The staged change set is not exactly the canonical seed workflow.'
@@ -4385,10 +6134,161 @@ if ($staged.Count -eq 1) {
     $createdCommit = $true
 }
 
+$publishedHead = ((@(Invoke-Git -Repository $target -Arguments @(
+    'rev-parse', 'HEAD'
+)).Output -join '').Trim())
+if ($publishedHead -cnotmatch '^[0-9a-f]{40}$') {
+    throw 'The seed publication head is not canonical.'
+}
+if ($createdCommit) {
+    if ([string]$preflightAssessment.HeadSha) {
+        if ((Get-SingleCommitParent -Repository $target -Commit $publishedHead) -cne
+            [string]$preflightAssessment.HeadSha) {
+            throw 'The canonical seed commit does not have the strategy-assessed parent.'
+        }
+    }
+    else {
+        $rootCommitLine = ((@(Invoke-Git -Repository $target -Arguments @(
+            'rev-list', '--parents', '-n', '1', $publishedHead
+        )).Output -join '').Trim())
+        if ($rootCommitLine -cne $publishedHead) {
+            throw 'The canonical seed for a new repository is not one root commit.'
+        }
+    }
+}
+elseif ($publishedHead -cne [string]$preflightAssessment.HeadSha) {
+    throw 'Repository HEAD changed before seed publication.'
+}
+$seedCommitPaths = @(if ($createdCommit -and [string]$preflightAssessment.HeadSha) {
+    @((Invoke-Git -Repository $target -Arguments @(
+        'diff-tree', '--no-commit-id', '--name-only', '-r', '--no-renames',
+        $publishedHead
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+}
+elseif ($createdCommit -or $remoteIsEmpty) {
+    @((Invoke-Git -Repository $target -Arguments @(
+        'ls-tree', '-r', '--name-only', $publishedHead, '--'
+    )).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+}
+else { @($workflowTargetPath) }
+)
+if ($seedCommitPaths.Count -ne 1 -or
+    [string]$seedCommitPaths[0] -cne $workflowTargetPath) {
+    throw 'The committed seed publication is not an exact workflow-only change.'
+}
+$publishedWorkflowEntry = Get-AdoptionTreeEntry -Repository $target `
+    -Commit $publishedHead -Path $workflowTargetPath
+$canonicalWorkflowBlob = Get-GitBlobSha -Bytes ([byte[]]$workflowBytes)
+if ($publishedWorkflowEntry.Mode -cne '100644' -or
+    $publishedWorkflowEntry.Type -cne 'blob' -or
+    $publishedWorkflowEntry.Sha -cne $canonicalWorkflowBlob) {
+    throw 'The committed seed workflow does not match the exact canonical release bytes.'
+}
+$postSeedCommitStatus = @((Invoke-Git -Repository $target -Arguments @(
+    'status', '--porcelain=v1', '--untracked-files=all'
+)).Output | Where-Object { $_ } | ForEach-Object { [string]$_ })
+if ($postSeedCommitStatus.Count -ne 0) {
+    throw "The canonical seed commit left staged or working-tree changes and was not published: $($postSeedCommitStatus -join ', ')."
+}
+$publishedPaths = @(Get-QuickAdoptionRelevantTreePaths -Repository $target `
+    -Commit $publishedHead -TargetPaths $adoptionCanonicalTargetPaths)
+Assert-QuickAdoptionSeedWorkflowPathIdentity -Paths $publishedPaths
+$publishedSurfaces = @(Get-QuickAdoptionProtocolSurfaceInventory `
+    -Paths $publishedPaths)
+$publishedCollisions = @(Get-QuickAdoptionCanonicalCollisions `
+    -Paths $publishedPaths)
+if (-not (Test-ExactOrdinalPathSet -Actual $publishedSurfaces `
+        -Expected @($initialAdoptionSelection.ProtocolSurfaces)) -or
+    -not (Test-ExactOrdinalPathSet -Actual $publishedCollisions `
+        -Expected @($preflightAssessment.Collisions))) {
+    throw 'The canonical seed tree no longer matches the maintainer-selected strategy assessment.'
+}
+
 if ($createdCommit -or $remoteIsEmpty) {
+    $defaultRef = "refs/heads/$defaultBranch"
+    $expectedRemoteHead = if ($remoteIsEmpty) { '' } else { $routingHead }
+    if ($remoteIsEmpty) {
+        Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+            -ExpectedRepository $repository -ExpectEmpty `
+            -FailureMessage 'The repository assumed to be empty gained history immediately before seed push; the seed was not published.'
+    }
+    else {
+        Assert-LiveConsumerRepositoryBoundary -TargetRepository $target `
+            -ExpectedRepository $repository `
+            -ExpectedDefaultBranch $defaultBranch -ExpectedHead $routingHead `
+            -FailureMessage 'The live repository/default branch changed immediately before seed push; the seed was not published.'
+    }
     Invoke-Git -Repository $target -Arguments @(
-        'push', '-u', $RemoteName, $defaultBranch
+        'push', '-u', "--force-with-lease=${defaultRef}:$expectedRemoteHead",
+        $RemoteName, "HEAD:$defaultRef"
     ) | Out-Null
+    $verifiedRemoteHead = Get-RemoteBranchHead -Repository $target `
+        -Remote $RemoteName -Branch $defaultBranch
+    if ($verifiedRemoteHead -cne $publishedHead) {
+        throw 'The published seed does not match the exact strategy-bound local head.'
+    }
+    if ($remoteIsEmpty) {
+        $postSeedBindingValid = $true
+        try {
+            Assert-LiveConsumerRepositoryBoundary `
+                -TargetRepository $target -ExpectedRepository $repository `
+                -ExpectedDefaultBranch $defaultBranch `
+                -ExpectedHead $publishedHead -RequireOnlyExpectedHead `
+                -FailureMessage 'The repository assumed to be empty changed during seed push.'
+        }
+        catch {
+            $postSeedBindingValid = $false
+        }
+        if (-not $postSeedBindingValid) {
+            $compensationFailure = ''
+            try {
+                Invoke-Git -Repository $target -Arguments @(
+                    'push', "--force-with-lease=${defaultRef}:$publishedHead",
+                    $RemoteName, ":$defaultRef"
+                ) | Out-Null
+            }
+            catch {
+                $compensationFailure = $_.Exception.Message
+            }
+            $remainingDefaultHead = Get-RemoteBranchHead `
+                -Repository $target -Remote $RemoteName -Branch $defaultBranch `
+                -AllowMissing
+            if ($compensationFailure -or $remainingDefaultHead) {
+                throw "The repository assumed to be empty changed during seed push and exact compensation could not be proven; manual review is required. $compensationFailure"
+            }
+            throw 'The repository assumed to be empty changed during seed push; the exact seed ref was removed and the local seed commit was retained for review.'
+        }
+    }
+    else {
+        $postSeedBindingValid = $true
+        try {
+            Assert-LiveConsumerRepositoryBoundary `
+                -TargetRepository $target -ExpectedRepository $repository `
+                -ExpectedDefaultBranch $defaultBranch -ExpectedHead $publishedHead `
+                -FailureMessage 'The live repository/default branch changed during seed push.'
+        }
+        catch {
+            $postSeedBindingValid = $false
+        }
+        if (-not $postSeedBindingValid) {
+            $compensationFailure = ''
+            try {
+                Invoke-Git -Repository $target -Arguments @(
+                    'push', "--force-with-lease=${defaultRef}:$publishedHead",
+                    $RemoteName, "$routingHead`:$defaultRef"
+                ) | Out-Null
+            }
+            catch {
+                $compensationFailure = $_.Exception.Message
+            }
+            $remainingDefaultHead = Get-RemoteBranchHead `
+                -Repository $target -Remote $RemoteName -Branch $defaultBranch
+            if ($compensationFailure -or $remainingDefaultHead -cne $routingHead) {
+                throw "The live repository/default branch changed during seed push and exact compensation could not be proven; manual review is required. $compensationFailure"
+            }
+            throw 'The live repository/default branch changed during seed push; the exact seed push was reverted and the local seed commit was retained for review.'
+        }
+    }
 }
 
 Write-Host "meAndAI quick adoption seed is ready in $repository at $ProtocolTag."
@@ -4398,9 +6298,12 @@ if ($SkipLifecycleDispatch) {
     Write-Host 'Lifecycle dispatch was explicitly skipped. Run the meAndAI AI capabilities lifecycle workflow before adoption.'
 }
 else {
-    $publishedHead = ((@(Invoke-Git -Repository $target -Arguments @(
+    $currentPublishedHead = ((@(Invoke-Git -Repository $target -Arguments @(
         'rev-parse', 'HEAD'
     )).Output -join '').Trim())
+    if ($currentPublishedHead -cne $publishedHead) {
+        throw 'Repository HEAD changed after exact seed publication.'
+    }
     $actorResult = Invoke-External -Command 'gh' -Arguments @('api', 'user', '--jq', '.login')
     $authenticatedActor = ((@($actorResult.Output) -join '').Trim())
     if ($authenticatedActor -cnotmatch '^[A-Za-z0-9_.-]+$') {
@@ -4411,7 +6314,11 @@ else {
         -Remote $RemoteName -Branch $adoptionBranch -AllowMissing
     $preExistingPullRequest = if ($existingAdoptionHead) {
         Get-AdoptionPullRequest -Repository $repository -BaseBranch $defaultBranch `
-            -ExpectedActor $authenticatedActor -MaxAttempts 1
+            -ExpectedActor $authenticatedActor -MaxAttempts 1 `
+            -ExpectedAdoptionStrategy ([string]$initialAdoptionSelection.AdoptionStrategy) `
+            -ExpectedProtocolSurfaces @($initialAdoptionSelection.ProtocolSurfaces) `
+            -ExpectedProtocolRecordLossAcknowledgement `
+                ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged)
     }
     else { $null }
     if ($null -ne $preExistingPullRequest -and
@@ -4422,12 +6329,20 @@ else {
     else {
         Set-QuickAdoptionProgress -Status 'Waiting for lifecycle workflow' `
             -PercentComplete 70
-        $run = Invoke-LifecycleWorkflow -Repository $repository -Branch $defaultBranch -HeadSha $publishedHead
+        $run = Invoke-LifecycleWorkflow -Repository $repository `
+            -Branch $defaultBranch -HeadSha $publishedHead `
+            -ResolvedAdoptionStrategy ([string]$initialAdoptionSelection.AdoptionStrategy) `
+            -ProtocolRecordLossAcknowledged `
+                ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged)
         Write-Host "Lifecycle workflow completed successfully: $($run.url)"
         Set-QuickAdoptionProgress -Status 'Resolving adoption draft' `
             -PercentComplete 78
         $adoptionPullRequestResults = @(Get-AdoptionPullRequest -Repository $repository `
-            -BaseBranch $defaultBranch -ExpectedActor $authenticatedActor)
+            -BaseBranch $defaultBranch -ExpectedActor $authenticatedActor `
+            -ExpectedAdoptionStrategy ([string]$initialAdoptionSelection.AdoptionStrategy) `
+            -ExpectedProtocolSurfaces @($initialAdoptionSelection.ProtocolSurfaces) `
+            -ExpectedProtocolRecordLossAcknowledgement `
+                ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged))
     }
     if ($adoptionPullRequestResults.Count -gt 1) {
         $types = @($adoptionPullRequestResults | ForEach-Object { $_.GetType().FullName }) -join ', '
@@ -4478,5 +6393,18 @@ Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
 Write-Host 'The launcher never approves or merges the adoption pull request; the maintainer owns the final merge.'
 }
 finally {
-    Complete-QuickAdoptionProgress
+    try {
+        if ($null -ne $script:InitialAdoptionPolicy -and
+            $null -ne $script:InitialAdoptionPolicy.Module) {
+            Remove-Module -ModuleInfo $script:InitialAdoptionPolicy.Module `
+                -Force -ErrorAction SilentlyContinue
+            $script:InitialAdoptionPolicy = $null
+        }
+        if ($null -ne $gitHookSuppression) {
+            Exit-GitHookSuppression -State $gitHookSuppression
+        }
+    }
+    finally {
+        Complete-QuickAdoptionProgress
+    }
 }

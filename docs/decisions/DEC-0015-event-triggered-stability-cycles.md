@@ -47,10 +47,12 @@ Adopt one event-triggered stability and consistency cycle:
 6. If the initial scan has no unresolved `Blocking`, it is already the
    convergence evidence and no unchanged confirmation is run. After remediation
    changes the tree and empties the queue, use the one budgeted confirmation
-   scan. If no unresolved `Blocking` finding remains, the local cycle has
-   converged. Push the converged review branch, then wait for new material
-   development or new failed evidence. Do not repeat an unchanged scan merely
-   because the process is persistent.
+   scan. If no unresolved `Blocking` finding remains, the tree has locally
+   converged. Local convergence is not full normative cycle completion. The
+   cycle completes only after the authorized converged final review-branch push
+   exists and then enters `Waiting`. Without that authority, preserve
+   push-eligible evidence and stop as `Blocked` without a completion claim. Do
+   not repeat an unchanged scan merely because the process is persistent.
 7. Hosted CI or review evidence found after a push reopens the same cycle and
    requires a corrected converged push. Correctable new failed evidence is a
    re-entry trigger, not itself a terminal outcome. Exhausted budget,

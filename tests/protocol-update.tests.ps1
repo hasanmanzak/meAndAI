@@ -637,7 +637,7 @@ if ($failures.Count -eq 0) {
             Add-Failure "TEST-0017 repository CI contains forbidden behavior '$forbidden'"
         }
     }
-    foreach ($required in @("'pr', 'create'", '--draft', 'meandai-protocol-update', 'ClosePullRequest', 'DeleteBranch', 'Assert-ManagedPullRequestSafe', 'Get-AuthenticatedUpdaterActor', 'Assert-CurrentManagedAssets', 'Get-ExpectedManagedPaths', 'Assert-StagedManagedUpdate', 'ManagedAssetEntriesMatchTarget', 'Get-RemoteBranchHead', 'ExpectedProtocolSha', '--paginate', '--force-with-lease=', '-isnot [long]')) {
+    foreach ($required in @("'pr', 'create'", '--draft', 'meandai-protocol-update', 'ClosePullRequest', 'DeleteBranch', 'Assert-ManagedPullRequestSafe', 'Get-AuthenticatedUpdaterActor', 'Assert-CurrentManagedAssets', 'Get-ExpectedManagedPaths', 'Assert-StagedManagedUpdate', 'Assert-CommittedManagedUpdate', "'rev-list', '--parents'", 'Assert-RemoteDefaultBranchUnchanged', 'default_branch', 'full_name', 'ManagedAssetEntriesMatchTarget', 'Get-RemoteBranchHead', 'ExpectedProtocolSha', '--paginate', '--force-with-lease=', '-isnot [long]')) {
         if (-not $adapter.Contains($required)) {
             Add-Failure "TEST-0017 adapter is missing '$required'"
         }

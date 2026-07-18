@@ -4,11 +4,12 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.10.4**
+Current protocol version: **0.11.0**
 
-For v0.10.4, publication authority is the repository's
-[GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface and
-[issue #72](https://github.com/hasanmanzak/meAndAI/issues/72); this file does
+For v0.11.0, publication authority is the repository's
+[GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
+[issue #76](https://github.com/hasanmanzak/meAndAI/issues/76), and
+[issue #77](https://github.com/hasanmanzak/meAndAI/issues/77); this file does
 not assert a pre-merge release state.
 
 ## Start here
@@ -16,6 +17,8 @@ not assert a pre-merge release state.
 - Read the [common protocol](PROTOCOL.md).
 - Follow the [adoption guide](docs/adoption.md) in a consuming repository.
 - Use [quick adoption](docs/quick-adoption.md) for the single-file local seed.
+- Browse the [optional agent prompts](docs/agent-prompts/README.md) for
+  maintainer-invoked, non-activating aids.
 - Browse the [feature index](docs/features/README.md) and
   [decision index](docs/decisions/README.md).
 - Browse incubating possibilities in the [idea index](docs/ideas/README.md).

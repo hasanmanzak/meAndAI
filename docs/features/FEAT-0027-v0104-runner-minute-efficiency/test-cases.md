@@ -3,7 +3,7 @@
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0123` | `SUBF-0049` | Classify real Git diffs containing Markdown-only changes, sensitive modifications, deletions, renames, more than 300 paths, malformed/unavailable commit identities, empty diffs, pull-request/push events, manual dispatch, and merge-queue events. | Markdown-only evidence selects `WindowsNative`; every sensitive or ambiguous case selects `Full`; rename classification sees both paths; no classifier error silently narrows coverage. | Unit / integration / boundary / negative | Passing | `tests/windows-validation-profile.tests.ps1` |
-| `TEST-0124` | `SUBF-0049`, `SUBF-0050` | Inspect ordinary, superseded-PR, main, manual, merge-queue, and post-publication workflow routing; execute the focused Windows profile and vary partial evidence output. | One Linux full job and one actual Windows job retain stable identities; only same-PR runs are cancellable; release-only dispatch is isolated; `WindowsNative` covers the declared native contracts and emits exactly compatibility-only evidence; `Full` retains canonical authority. | Structure / hosted integration / compatibility / negative | Passing locally; hosted pending | `tests/protocol.tests.ps1`, `tests/quick-adoption.tests.ps1`, `tests/quick-adoption-streaming.tests.ps1`, and `.github/workflows/protocol-tests.yml` |
+| `TEST-0124` | `SUBF-0049`, `SUBF-0050` | Inspect ordinary, superseded-PR, main, manual, merge-queue, and post-publication workflow routing; execute the focused Windows profile, vary partial evidence output, and verify that the Windows job timeout covers the measured serial `Full` budget. | One Linux full job and one actual Windows job retain stable identities; only same-PR runs are cancellable; release-only dispatch is isolated; `WindowsNative` covers the declared native contracts and emits exactly compatibility-only evidence; `Full` retains canonical authority and a bounded upper limit sufficient for its measured serial execution. | Structure / hosted integration / compatibility / negative | Passing locally; replacement Windows hosted run pending | `tests/protocol.tests.ps1`, `tests/quick-adoption.tests.ps1`, `tests/quick-adoption-streaming.tests.ps1`, and `.github/workflows/protocol-tests.yml` |
 
 ## Required coverage
 
@@ -18,6 +18,8 @@
   cancellation, and junction/reparse containment on Windows PowerShell 5.1.
 - Compatibility-only partial result with no canonical scenario leakage.
 - Full PowerShell 5.1 escape hatch and unchanged Linux canonical full suite.
+- A 35-minute bound on the single Windows job, with Linux remaining at 20
+  minutes and post-publication remaining at 5 minutes.
 
 ## Evidence
 
@@ -30,3 +32,5 @@
 | 2026-07-18 | Implementation working tree outside the restricted Git signal-pipe sandbox | Windows PowerShell 5.1 | `tests/protocol.tests.ps1 -ExecutionProfile WindowsNative` | Passed in 187.1 seconds; both child suites and root emitted compatibility-only evidence |
 | 2026-07-18 | Implementation working tree outside the restricted Git signal-pipe sandbox | Windows PowerShell 5.1 | `tests/protocol.tests.ps1` | Passed in 577.7 seconds after the expected-red structure gate and two narrowly corrected fixture/document-state defects; every canonical suite passed once |
 | 2026-07-18 | Implementation working tree | actionlint 1.7.12, checksummed Windows amd64 binary | `actionlint -shellcheck= -pyflakes= .github/workflows/protocol-tests.yml templates/project/.github/workflows/meandai-protocol-update.yml` | Passed for both repository and consumer workflow definitions |
+| 2026-07-18 | `cf818e5` | GitHub-hosted Windows PowerShell 5.1 expected red | [Protocol validation run 29653339317](https://github.com/hasanmanzak/meAndAI/actions/runs/29653339317) | `Full` was selected correctly; capabilities and protocol-update, including `TEST-0126`, passed, then the still-running quick-adoption family was canceled at the stale 20-minute job limit without a test failure (`FIND-0160`) |
+| 2026-07-18 | Test-first correction working tree | Windows PowerShell 5.1 | `tests/protocol.tests.ps1 -StructureOnly` | Expected red in 2.6 seconds with one failure while the Windows limit remained 20 minutes; passed in 2.6 seconds after the Windows-only 35-minute bound, with Linux 20 and post-publication 5 unchanged |

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.10.4**<br>
+Protocol version: **0.11.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -337,13 +337,18 @@ convergence evidence; do not spend a confirmation pass on an unchanged tree. A
 confirmation scan is required only after remediation changed the tree. When
 the remediation queue becomes empty, run that one budgeted confirmation scan.
 If it finds a new `Blocking` observation, add that observation to the queue and
-continue only while the declared finite budget remains. The completion
-condition is no unresolved `Blocking` finding. A finding is not cleared or
-reclassified merely by relabeling it.
+continue only while the declared finite budget remains. The local convergence
+condition is no unresolved `Blocking` finding. Local convergence is not full
+normative cycle completion. A finding is not cleared or reclassified merely by
+relabeling it.
 
-When the declared tests pass and the confirmation scan proves convergence,
-perform the **converged final push** of the review branch and enter `Waiting`.
-This is an ordinary Git push and does not create a tag or GitHub Release.
+When the declared tests pass and the applicable convergence scan proves local
+convergence, perform the **converged final push** of the review branch. The
+cycle completes and enters `Waiting` only after the authorized converged final
+review-branch push exists. If exact push authority is unavailable, preserve
+push-eligible evidence and stop as `Blocked` on missing final-push authority
+without claiming completion or `Waiting`. This is an ordinary Git push and
+does not create a tag or GitHub Release.
 Hosted CI or review evidence discovered after that push reopens the same cycle;
 after correction and renewed convergence, publish a corrected converged final
 push. Correctable new failed evidence reopens the active cycle and receives the
@@ -356,6 +361,12 @@ pull request after the push exists. A repository document records local push
 eligibility and MUST NOT predict the commit that contains itself.
 Protocol-version tags and GitHub Releases are separate post-merge distribution
 events governed by Gate 7 and Section 8.
+
+Maintainers who deliberately invoke an AI agent MAY copy or reference the
+[optional stability and consistency cycle prompt](docs/agent-prompts/stability-and-consistency-cycle.md).
+That non-normative aid does not create or activate a goal, recurring task,
+automation, schedule, background loop, or next invocation, and it cannot
+override this protocol or repository-local instructions.
 
 The cycle MUST remain bounded. Before the first pass, declare the scan scope,
 exclusions, and a finite validation budget; the default is one initial scan and
@@ -607,6 +618,13 @@ used, their values MUST be stored only as `MEANDAI_UPDATER_TOKEN` and
 standard input rather than command arguments and MUST NOT be printed, tracked,
 committed, deleted, or written to project memory. Tracked or historically
 committed credential files require rotation and MUST block the launcher.
+Each present input MUST be the exact canonical root name and one regular
+non-link, non-reparse file, and the launcher MUST revalidate that identity at
+read time. While plaintext credential inputs may be accessible, every
+launcher-owned Git process MUST use an invocation-scoped disabled hooks path;
+the launcher MUST prove that Git honors the override and MUST restore the prior
+process configuration on every exit. Detection after a consumer or global hook
+ran is not credential containment.
 
 For an existing repository, reconciliation MUST first list repository-level
 Actions secret names without requesting their values. Each mapped local
@@ -676,11 +694,12 @@ tests, apply bounded review gates, and leave every GitHub mutation and Git
 publication operation to the launcher. Those records and tests MUST resolve
 the current protocol identity through the integration authority defined in
 Section 8 rather than embedding the adoption tag or commit as a live fact.
-Before publication, the launcher MUST
-verify the unchanged draft head, manifest removal, credential-file absence, a
-valid reviewable change set, and an unchanged live remote branch. It MAY then
-create one completion commit, push it only with an exact expected-head lease,
-and mark the pull request ready. A draft whose manifest was already absent when
+Before publication, the launcher MUST verify the unchanged draft head,
+unchanged canonical consumer base, manifest removal, credential-file absence,
+a valid reviewable change set, and an unchanged live remote branch. It MAY then
+create one completion commit and push it only with an exact expected-head
+lease. Immediately before marking the pull request ready, it MUST revalidate
+the canonical base. A draft whose manifest was already absent when
 the launcher inspected it MUST NOT be promoted automatically because its
 completion provenance is unknown. Missing or ambiguous workflow runs, drafts,
 local CLI authentication, semantic results, or branch ownership MUST block or
@@ -703,6 +722,35 @@ product purpose, runtime/stack, architecture, build command, and product test
 command MUST be recorded as `Not yet established`. Their absence MUST NOT by
 itself block protocol adoption, and the agent MUST use structural adoption
 checks without inventing product facts or behavior.
+
+Before initial-adoption mutation, a launcher MUST assess a declared, bounded
+set of exact committed protocol/governance paths and canonical target
+collisions. Protocol/governance surfaces determine migration-policy evidence;
+a generic target collision MAY require semantic review without falsely
+asserting another protocol. `Auto` MAY resolve only protocol-evidence-free
+state to `FreshAdoption`.
+Evidence-bearing state MUST receive the maintainer's explicit
+`FullMigration`, `HybridReconciliation`, acknowledged `CleanStart`, or `Abort`
+selection; non-interactive ambiguity MUST fail closed. `FullMigration` MUST
+preserve still-valid repository semantics before retiring old live authority.
+`HybridReconciliation` MUST end with a consumer decision that makes ownership
+and precedence unambiguous. `CleanStart` MUST import no legacy governance
+semantics and MAY delete only exact assessed governance-record paths; a shared
+completion envelope MUST reject unauthorized application or product-content
+addition, modification, type change, or deletion. `Abort` MUST exit
+without adoption mutation. The selected strategy and exact sorted surface
+inventory MUST remain identical through dispatch, transient manifest,
+proposal marker, project adoption issue, semantic prompt, recovery, and
+completion for every strategy-bound proposal. A legacy proposal MAY recover
+only the policy-free meaning already encoded in its immutable schema; if a
+collision now requires a maintainer strategy, it MUST block for close and
+reassessment rather than receive a retroactive policy. The agent MUST NOT
+select or change that policy. Discovery of an
+additional authority or a required deletion outside the bound inventory MUST
+retain the manifest and block for maintainer reassessment. Push and scheduled
+events MUST NOT create an unselected initial migration proposal. Completed
+consumers remain on their installed current/update route; this transient
+initial strategy is not a persisted consumer setting or migration-ledger item.
 
 When completion spans a remote head update and a later ownership-marker or
 pull-request update, the launcher MUST persist exact pre-push intent that binds

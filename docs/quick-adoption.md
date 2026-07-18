@@ -74,6 +74,14 @@ environment secrets do not replace these two repository secrets. Secret
 provisioning is deterministic PowerShell/`gh` work; it does not require Codex
 and values are never placed in the Codex prompt.
 
+Each present token input must be the exact canonical root filename and one
+regular non-link, non-reparse file; that identity is checked again immediately
+before and after every read. For the duration of the launcher, every Git
+process receives an invocation-scoped empty `core.hooksPath` through process
+configuration and the prior environment is restored in `finally`. Consumer or
+global Git hooks therefore cannot run while the launcher may still have access
+to plaintext token inputs.
+
 Secret-name inventory and missing-secret writes run inside one temporary,
 repository-scoped lock represented by the label
 `meandai:secret-reconciliation-lock`. The launcher creates that label with a
@@ -95,8 +103,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.10.4/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.10.4` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.11.0/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.11.0` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -108,7 +116,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.10.4` is an exact published immutable release
+launcher itself verifies that `v0.11.0` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -124,7 +132,12 @@ connects it and applies the same repository-secret preservation rules as an
 already connected target. If it does not exist, the launcher creates a private
 repository by default and both local token files remain mandatory before that
 creation. An existing non-empty repository must be cloned or reconciled
-manually. Unrelated local files remain untracked and are not published. To
+manually. Empty means that the remote advertises no branch, tag, or other ref;
+a tag-only repository is not empty. The launcher repeats that all-ref check
+before secret reconciliation, seed writing, and seed push. A first-push race
+must leave only the exact published default ref or the launcher removes its own
+ref with an exact lease and stops. Unrelated local files remain untracked and
+are not published. To
 override the inferred identity or visibility:
 
 ```powershell
@@ -135,6 +148,99 @@ Running the command is explicit authorization to read the applicable fixed
 token files and transmit a value only when its mapped repository secret is
 missing. Existing mapped secret names are preserved without overwrite. The
 values are not command-line arguments and are not printed.
+
+### Initial-adoption strategy
+
+Before repository initialization, remote creation, secret writes, or seed
+publication, the launcher verifies the authenticated `gh` identity and loads
+the pure strategy/classification policy from the exact immutable `v0.11.0`
+capabilities contract module. The standalone launcher and workflow adapter do
+not maintain competing policy copies; each keeps only its own Git/GitHub
+evidence and mutation-boundary checks. The launcher then performs one bounded
+path assessment of the exact committed consumer tree. `-AdoptionStrategy Auto`
+is the default. It resolves to `FreshAdoption` only when no declared
+protocol/governance surface exists. A collision with a generic target such as a
+pull-request template is still routed to semantic review, but does not falsely
+assert that the consumer already has another protocol.
+
+Reserved state at `.ai/protocol`, anywhere below `.ai/protocol/`, or in
+`.ai/meandai-update-state.json` is protocol evidence even when incomplete.
+Path-specific GitHub Copilot instructions below `.github/instructions/` are
+also active protocol evidence alongside the declared Cursor and Windsurf rule
+roots.
+Exact casing is mandatory for every managed path and ancestor. Existing broad
+feature, decision, finding, idea, release, or product-documentation paths may
+trigger the strategy gate without becoming writable: they remain evidence-only
+unless they are in the declared safe legacy-governance allowlist.
+
+When evidence exists, an interactive `Auto` run displays the exact detected
+paths and asks the maintainer to choose one policy. A redirected or
+`-NonInteractive` run fails closed instead; automation must pass an explicit
+choice:
+
+```powershell
+# Preserve valid repository semantics, then retire the old protocol authority.
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -AdoptionStrategy FullMigration -NonInteractive
+
+# Reconcile selected structures under an explicit ownership/precedence decision.
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -AdoptionStrategy HybridReconciliation -NonInteractive
+```
+
+`CleanStart` imports no legacy governance semantics. It is intentionally
+separate from full migration and requires a second acknowledgement. In an
+interactive run, type the exact confirmation requested by the launcher. In
+automation, pass both controls:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -AdoptionStrategy CleanStart -AcknowledgeProtocolRecordLoss -NonInteractive
+```
+
+`CleanStart` can delete only exact detected governance-record paths. Every
+completion mode is mechanically restricted to required protocol targets,
+declared governance/memory records, and `tests/meandai-adoption/`; it cannot
+add, modify, type-change, or delete application source, assets, runtime
+configuration, product tests, or product documentation. It may discard exact
+legacy records below the reserved `.ai/protocol/` root, but stops before
+mutation when a detected ambiguous document cannot be proven governance-only.
+`FreshAdoption` contradicts detected evidence and is rejected. `Abort` exits
+before local Git or GitHub adoption mutation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath . -AdoptionStrategy Abort
+```
+
+The inverse mismatch also fails closed: `FullMigration`,
+`HybridReconciliation`, and `CleanStart` require at least one detected protocol
+surface. A protocol-free repository uses `FreshAdoption`; a generic target
+collision may still require semantic review but does not justify a fictional
+migration or record-loss choice.
+
+A proposal created by a legacy manifest/marker schema can recover only the
+policy-free meaning already encoded in that immutable record. If such a
+proposal has collisions that now require an explicit migration strategy,
+close the legacy draft and rerun the assessment; the launcher does not
+retroactively label it with a maintainer choice it never recorded.
+
+Detected governance files must already belong to committed repository history;
+otherwise they cannot appear in the isolated proposal clone and the launcher
+asks the maintainer to commit/reconcile the repository first. The chosen
+strategy and exact sorted path inventory are carried through workflow
+dispatch, transient manifest, proposal marker, adoption issue, local Codex
+prompt, reruns, and completion. The AI actor cannot change the choice. A newly
+discovered authority or required deletion outside that inventory blocks for a
+new maintainer assessment.
+
+A target with no committed `HEAD` may contain only `FG_PAT.txt`,
+`MEANDAI_RO_FG_PAT.txt`, and the exact canonical seed workflow. Commit
+application and governance files before adoption so the isolated clone cannot
+silently omit them. A recognizable but byte-modified current seed is rejected
+before repository creation or remote attachment; an already connected exact
+older managed seed remains eligible for its bounded same-major update route.
+
+These choices govern only initial adoption. A completed meAndAI consumer keeps
+the existing current/update route and rejects explicit initial-strategy
+arguments. Catalog-driven transition migrations remain a different mechanism
+for already adopted consumers.
 
 If remote creation succeeds but a later credential, commit, workflow, or local
 Codex gate blocks, do not delete or reset anything. Resolve the reported
@@ -175,8 +281,11 @@ created—and the seed commit is pushed, the launcher:
    synchronously with an ephemeral `workspace-write` session, a 30-minute
    default process limit, spawned-command network access disabled, and its
    JSONL activity stream mapped to safe `Codex | ...` console lines.
-9. Requires an unchanged Git head, manifest removal, a valid non-empty diff,
-   absent credential files, and an unchanged live remote branch.
+9. Requires an unchanged Git head, live repository/default-branch identity,
+   manifest removal, a valid non-empty diff, absent credential files, and an
+   unchanged live remote branch; it repeats the base check before publication
+   and readiness. Every created commit is re-read from Git and the index and
+   worktree must be clean before any push.
 10. Creates the adoption completion commit, pushes it with an exact
    `--force-with-lease`, binds the canonical issue through exactly one
    non-closing `Tracking issue: #N` body line, and marks the pull request ready
