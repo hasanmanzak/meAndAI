@@ -14,7 +14,7 @@
 The updater historically treats the protocol gitlink and three updater assets
 as its complete managed path set. That boundary safely updates common protocol
 code, but it cannot reconcile consumer-owned derived state when a protocol
-release changes the required shape of that state. The Derdini adoption exposed
+release changes the required shape of that state. The first affected adoption exposed
 the first concrete example: eight active files retained a copied live protocol
 tag or commit while three dated historical records legitimately retained the
 same values.
@@ -114,12 +114,12 @@ all later compatible transitions use the normal single-proposal path.
 
 ### First catalog entry
 
-`MIG-0001` represents the Derdini-discovered duplicated-live-pin state as data,
+`MIG-0001` represents the first-observed duplicated-live-pin state as data,
 not as version-specific control flow. It recognizes the exact eight active
 current-authority fragments and replaces them with gitlink/`VERSION`-derived
 forms. It explicitly leaves the dated adoption memory log, completed adoption
 feature, and other historical version evidence unchanged. The same definition
-must reconcile both the original Derdini-shaped pin and that same consumer
+must reconcile both the original duplicated-live-pin shape and that same state
 state after an intermediate protocol gitlink update.
 
 ## Consequences

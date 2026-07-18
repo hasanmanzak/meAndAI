@@ -31,8 +31,8 @@ foreach ($path in $required) {
 }
 
 $feature = Get-Content -Raw (Join-Path $root 'docs/features/FEAT-0001-meandai-capabilities-adoption/README.md')
-Assert-True ($feature.Contains('https://github.com/hasanmanzak/Derdini/issues/2')) 'TEST-0002: adoption issue link is missing.'
-Assert-True ($feature.Contains('https://github.com/hasanmanzak/Derdini/pull/1')) 'TEST-0002: pull request link is missing.'
+Assert-True ($feature.Contains('https://example.invalid/legacy-consumer/issues/2')) 'TEST-0002: adoption issue link is missing.'
+Assert-True ($feature.Contains('https://example.invalid/legacy-consumer/pull/1')) 'TEST-0002: pull request link is missing.'
 
 $markdownFiles = Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.md' |
     Where-Object { $_.FullName -notmatch '[\\/]\.ai[\\/]protocol([\\/]|$)' }

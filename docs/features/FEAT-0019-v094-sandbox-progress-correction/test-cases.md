@@ -20,13 +20,13 @@ and the complete repository suite.
   `-NoProgress`, and final cleanup.
 - Empty-repository adoption with explicit unknown application facts and no
   fabricated build or product-test evidence.
-- Existing Derdini `v0.9.2` draft recovery and all prior quick-adoption gates.
+- Existing affected-consumer `v0.9.2` draft recovery and all prior quick-adoption gates.
 
 ## Evidence
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
-| 2026-07-16 | `v0.9.3` release asset | Windows PowerShell 5.1 / Codex CLI 0.144.4 | Derdini quick-adoption run linked by [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) | External red: model entered a read-only workspace and treated absent product facts as adoption blockers |
+| 2026-07-16 | `v0.9.3` release asset | Windows PowerShell 5.1 / Codex CLI 0.144.4 | Affected-consumer quick-adoption run recorded in [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) | External red: model entered a read-only workspace and treated absent product facts as adoption blockers |
 | 2026-07-16 | Pre-implementation host probe | Windows PowerShell 5.1 / Codex CLI 0.144.4 | `codex sandbox -P :workspace ...` with explicit Windows implementations | External red/green isolation: `unelevated` wrote/read/deleted the probe; `elevated` failed to launch the setup helper with Access Denied |
 | 2026-07-16 | Test-first working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Expected red in 2.6 seconds: 24 focused failures identified the absent sandbox carry-forward, token-free probe, progress lifecycle, empty-consumer prompt, guide, and fixture contracts before integration execution |
 | 2026-07-16 | Reviewed v0.9.4 working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Passed in 359.1 seconds; all 34 owned scenarios passed, including `TEST-0103` and `TEST-0104` |

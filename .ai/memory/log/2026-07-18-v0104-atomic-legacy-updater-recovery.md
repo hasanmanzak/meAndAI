@@ -28,7 +28,7 @@
 
 ## Evidence state
 
-- `TEST-0125` freezes the real Derdini pre-migration validator by exact Git blob.
+- `TEST-0125` freezes a minimal project-neutral pre-migration validator by exact Git blob.
   It proves core-only red and the production 13-path atomic proposal green.
 - `TEST-0126` covers requested-target ceiling, invalid target forms, recovery
   branch separation, legacy cleanup identity, isolated-clone cleanup, and

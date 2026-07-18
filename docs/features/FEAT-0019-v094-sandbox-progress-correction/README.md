@@ -13,7 +13,7 @@
 ## Problem and intended outcome
 
 The corrected `v0.9.3` launcher reaches local semantic completion for the
-retained Derdini adoption draft, but its `codex exec --ignore-user-config`
+retained affected-consumer adoption draft, but its `codex exec --ignore-user-config`
 boundary also discards the maintainer's native Windows sandbox implementation.
 On the reproduced host, `unelevated` workspace access can create and remove a
 probe file, while the ignored/default `elevated` setup fails to launch
@@ -50,8 +50,8 @@ truthful bounded progress for the existing launcher phases.
 
 No `danger-full-access`, approval bypass, Codex Cloud connection, secret
 exposure, second launcher, hosted service, general sandbox manager, automatic
-approval or merge, Derdini branch reset, or retained-draft retargeting is in
-scope. The corrected launcher continues to resume the original Derdini
+approval or merge, affected-consumer branch reset, or retained-draft retargeting is in
+scope. The corrected launcher continues to resume the original affected-consumer
 `v0.9.2` proposal when invoked with `-ProtocolTag v0.9.2`.
 
 ## Contracts and risks
@@ -113,7 +113,7 @@ a misleading percentage from its timeout. Progress records are completed in a
 6. Interactive execution shows repository, release, secret, seed, workflow,
    draft, local Codex, validation, and completion phases. `-NoProgress`
    suppresses the display, and every exit completes active progress records.
-7. The retained Derdini draft is resumed with the corrected launcher and
+7. The retained affected-consumer draft is resumed with the corrected launcher and
    `-ProtocolTag v0.9.2`; it is not reset, duplicated, or retargeted.
 8. Focused and complete repository suites pass, links and current release
    metadata agree, and fresh-diff self-review leaves no blocking finding.
@@ -136,7 +136,7 @@ at setup with Access Denied.
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
 - Delivery pull request: [#56](https://github.com/hasanmanzak/meAndAI/pull/56)
-- Consumer evidence: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
+- External consumer evidence: [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
 
 ## Self-review and completion
 
@@ -171,5 +171,5 @@ asserts that no Windows sandbox selection or probe is attempted.
 ## Post-merge publication gate
 
 Issue #55 is the external authority for the exact merged commit, immutable
-`v0.9.4` release, launcher asset digest, hosted checks, and retained Derdini
+`v0.9.4` release, launcher asset digest, hosted checks, and retained affected-consumer
 continuation evidence after those facts exist.

@@ -50,7 +50,7 @@ temporary-clone cleanup on every bounded-process exit.
 No interactive TUI, Codex Cloud connection, raw chain-of-thought, command
 output transcript, credential output, automatic merge, consumer reset,
 protocol retargeting, new bootstrapper, or new validation framework is in
-scope. The retained Derdini PR #1 remains a v0.9.2 adoption proposal.
+scope. The retained affected-consumer proposal remains a v0.9.2 adoption proposal.
 
 ## Contracts and risks
 
@@ -134,7 +134,7 @@ or additional validation framework is introduced.
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57)
 - Delivery pull request: [#58](https://github.com/hasanmanzak/meAndAI/pull/58)
-- Consumer evidence: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
+- External consumer evidence: [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57)
 
 ## Self-review and completion
 
@@ -169,4 +169,4 @@ remaining `Blocking` observation and was not repeated unchanged.
 
 Issue #57 is the external authority for the exact merged commit, immutable
 v0.9.5 release, launcher asset digest, hosted checks, branch cleanup, and
-retained Derdini continuation evidence after those facts exist.
+retained affected-consumer continuation evidence after those facts exist.

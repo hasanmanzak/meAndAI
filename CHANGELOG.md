@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.11.1 - 2026-07-18
+
+### Changed
+
+- Replace the named pre-engine consumer fixture with a minimal project-neutral
+  legacy-consumer fixture using reserved `example.invalid` evidence links.
+- Keep immutable `MIG-0001` and updater runtime behavior unchanged while making
+  `TEST-0125` execute its documented exact no-op second plan.
+- Neutralize canonical documentation and project memory through state-based
+  terminology and protocol-owned issue evidence instead of consumer identity.
+
+### Added
+
+- Add bounded `TEST-0133` coverage for the project-neutral fixture path,
+  reserved-link contract, and absence of a live consumer GitHub URL.
+
 ## 0.11.0 - 2026-07-18
 
 ### Added
@@ -140,7 +156,7 @@ and [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72).
   old updater first installs the target engine, then the new workflow
   automatically opens one same-target reconciliation proposal. Fresh adoption
   starts with the target catalog recorded as satisfied.
-- Preserve the sole-live-pin adoption rule and represent the Derdini regression
+- Preserve the sole-live-pin adoption rule and represent the duplicated-live-pin legacy-consumer regression
   as `MIG-0001` data rather than a tag-named launcher switch.
 - Validate every compatible intermediate release catalog cumulatively so a
   skipped migration cannot be removed or rewritten by a later target.

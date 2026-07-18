@@ -124,7 +124,7 @@ cleanup-only and is retired only after the replacement is fully validated.
 4. One schema-2 proposal contains the target gitlink, every target-different
    updater asset, all required declarative migration outputs, and the exact
    ledger. There is no required red intermediate merge.
-5. A Derdini-shaped core-only tree fails its real validator; the atomic
+5. A project-neutral legacy-consumer core-only tree fails its frozen validator; the atomic
    proposal tree passes that validator and an exact rerun creates no duplicate
    work.
 6. A strictly qualified legacy unbound draft is never retained as the current
@@ -146,8 +146,8 @@ cleanup-only and is retired only after the replacement is fully validated.
 ## Verification approach
 
 Add focused failing tests before production changes. Reuse current adapter and
-launcher mocks for local handoff and remote lifecycle evidence. Add one small Derdini-shaped
-fixture containing the real pre-migration validator and only its required
+launcher mocks for local handoff and remote lifecycle evidence. Add one small
+project-neutral fixture containing the frozen pre-migration validator and only its required
 project stubs; derive migration inputs from the immutable `MIG-0001` states.
 Prove the core-only intermediate failure, invoke the production atomic staging
 path, then run the real validator against the proposal tree. Finish with the
@@ -168,7 +168,7 @@ The implementation uses one target-source adapter and one production proposal
 path. Focused review found and closed two lifecycle gaps before publication:
 schema-2 recovery branches now finalize after merge, and an interrupted rerun
 selects only the verified recovery replacement before legacy cleanup. The real
-Derdini validator, isolated-launcher shard, resolver, adapter, and finalizer
+project-neutral validator, isolated-launcher shard, resolver, adapter, and finalizer
 regressions pass locally with no unresolved blocking finding.
 
 A later real v0.10.4 adoption exposed `FIND-0158`: Windows PowerShell 5.1

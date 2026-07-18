@@ -22,7 +22,7 @@ and the complete repository suite.
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
-| 2026-07-17 | `main` at `v0.9.5` behavior | GitHub CLI 2.42.1 / Derdini adoption | User-reported quick-adoption run linked by [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) | External red: late `repository.pullRequest.projectCards` failure instead of an initial compatibility rejection |
+| 2026-07-17 | `main` at `v0.9.5` behavior | GitHub CLI 2.42.1 / affected-consumer adoption | User-reported quick-adoption run recorded in [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) | External red: late `repository.pullRequest.projectCards` failure instead of an initial compatibility rejection |
 | 2026-07-17 | Working tree before implementation | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Expected red: the seven TEST-0107 cases failed at the missing version-query boundary |
 | 2026-07-17 | Working tree after implementation | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/quick-adoption.tests.ps1` | Passing in 362.5 seconds; the first sandboxed attempt reached a Git signal-pipe ACL error, and the required unrestricted retry passed |
 | 2026-07-17 | Working tree after active-pin alignment | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Failed after 208.2 seconds; `FIND-0152` identified three stale escaped release-fixture pins |

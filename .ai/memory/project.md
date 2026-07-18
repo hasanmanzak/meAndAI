@@ -7,18 +7,15 @@ Last verified: **2026-07-18**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.11.0`. Exact publication state is authoritative
+- Current protocol version: `0.11.1`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
-  [issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) after
+  [issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0029](../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md)
-  adds a maintainer-owned initial-adoption strategy gate, while
-  [FEAT-0030](../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md)
-  publishes one optional, single-invocation stability-cycle prompt. Issues
-  [#76](https://github.com/hasanmanzak/meAndAI/issues/76) and
-  [#77](https://github.com/hasanmanzak/meAndAI/issues/77) own delivery and
-  future publication evidence.
+- Current scope: [FEAT-0031](../../docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/README.md)
+  removes named-consumer coupling from the frozen pre-engine regression,
+  executes the documented exact no-op rerun, and leaves updater and immutable
+  migration behavior unchanged. [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79)
+  owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -167,7 +164,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   that capability through its ordinary immutable path, after which the new
   engine opens one same-target reconciliation draft and the normal finalizer
   cleans its branch and issue after maintainer merge. Fresh adoption records
-  the catalog as satisfied. `MIG-0001` captures the Derdini live-pin shape
+  the catalog as satisfied. `MIG-0001` captures the duplicated-live-pin legacy-consumer shape
   without a source-version switch.
 - `v0.10.4` adds the target-bound recovery path required when an immutable
   pre-engine updater cannot produce a validator-green transition. The latest

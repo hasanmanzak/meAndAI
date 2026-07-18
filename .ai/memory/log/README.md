@@ -5,21 +5,16 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.11.0 work adds protocol-aware initial-adoption strategy selection and
-one optional stability-cycle agent prompt. Follow
-[FEAT-0029](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
-[FEAT-0030](../../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
-[DEC-0021](../../../docs/decisions/DEC-0021-explicit-initial-adoption-strategy.md),
-and the [v0.11.0 continuation](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md).
-[Issues #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
-[#77](https://github.com/hasanmanzak/meAndAI/issues/77) own external delivery
-facts; [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78) is the current
-draft delivery and carries the resolved local corrections for `FIND-0158` and
-`FIND-0159`; replacement hosted evidence remains pending. `FIND-0120` remains
-the separate open follow-up in issue #44.
+The v0.11.1 work removes named-consumer coupling from the frozen pre-engine
+regression without changing updater behavior or immutable migration data.
+Follow [FEAT-0031](../../../docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/README.md)
+and the [v0.11.1 continuation](2026-07-18-v0111-project-neutral-legacy-fixture.md).
+[Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) owns external
+delivery facts. `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-18 - v0.11.1 project-neutral legacy-consumer fixture](2026-07-18-v0111-project-neutral-legacy-fixture.md)
 - [2026-07-18 - v0.11.0 adoption strategy and optional agent prompt](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md)
 - [2026-07-18 - v0.10.4 atomic legacy updater recovery](2026-07-18-v0104-atomic-legacy-updater-recovery.md)
 - [2026-07-18 - v0.10.4 hosted runner-minute efficiency](2026-07-18-v0104-runner-minute-efficiency.md)
