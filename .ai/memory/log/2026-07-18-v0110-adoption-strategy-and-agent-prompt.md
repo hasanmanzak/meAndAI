@@ -65,6 +65,11 @@
   binding for empty schema-5/6 adoption markers while continuing to reject a
   null mixed with any real repository path. The hosted defect and correction
   are recorded as `FIND-0159` under existing `TEST-0127` and `TEST-0130`.
+- The single Windows validation job has a 35-minute bound after the expanded
+  serial `Full` suite passed capabilities and updater compatibility but hit its
+  stale 20-minute ceiling. Linux remains bounded at 20 minutes and
+  post-publication at 5; no runner, matrix, setup, profile, or coverage route
+  was added. This is `FIND-0160` under existing `TEST-0124`.
 - The canonical stability-cycle prompt lives at
   `docs/agent-prompts/stability-and-consistency-cycle.md`. It is single-run,
   report-only by default, and cannot create or schedule its next invocation.
@@ -94,8 +99,15 @@
   commit `617d1b0`: capabilities and quick adoption both rejected the same
   empty inventory representation. After the correction, the complete
   capabilities/adapter family passed locally in 461.7 seconds and the focused
-  `AdoptionLifecycle` quick shard passed in 160.3 seconds; replacement Ubuntu
-  evidence remains required from the pushed correction.
+  `AdoptionLifecycle` quick shard passed in 160.3 seconds. Replacement Ubuntu
+  run `29653339317` passed in 7 minutes 33 seconds.
+- Windows run `29653339317` selected the required `Full` profile and passed the
+  capabilities and protocol-update families, including the real PowerShell
+  5.1 `TEST-0126` regression, before GitHub canceled the still-running
+  quick-adoption family at the old 20-minute bound without a test failure.
+  The `TEST-0124` structure gate then failed first against 20 and passed in
+  2.6 seconds after the Windows-only 35-minute correction; replacement hosted
+  Windows evidence remains required from the follow-up commit.
 - The complete repository suite passes in 1576 seconds with every discovered
   suite and canonical scenario owner green before that documentation-and-
   assertion-only clarification. Fresh-diff review and bounded post-development

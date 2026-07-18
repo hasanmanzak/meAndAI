@@ -185,7 +185,7 @@ changing application behavior or inventing project facts.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0127 through TEST-0130](test-cases.md) |
-| Test code | Passed locally; replacement hosted run pending | Pure policy, adapter, launcher, and structural suites own `TEST-0127` through `TEST-0130`; the target updater adapter owns the amended `TEST-0126` regression |
+| Test code | Passed locally and on replacement Ubuntu; replacement Windows run pending after its bounded timeout correction | Pure policy, adapter, launcher, and structural suites own `TEST-0127` through `TEST-0130`; the target updater adapter owns the amended `TEST-0126` regression and `TEST-0124` owns the Windows job boundary |
 | Baseline run | Green inherited baseline | v0.10.4 complete suite recorded by FEAT-0028; branch baseline is clean |
 
 ## Decomposition and review gates
@@ -200,7 +200,8 @@ changing application behavior or inventing project facts.
 | ID | Classification / status | Priority / impact | Resolution and evidence |
 | --- | --- | --- | --- |
 | `FIND-0158` | Windows PowerShell 5.1 compatibility defect / `Blocking` then resolved | `p1` / the immutable v0.10.4 target adapter completed its detached checkout but the latest launcher aborted before creating the atomic recovery proposal | `Invoke-Native` now scopes `ErrorActionPreference=Continue` only around the native process, captures its exit code, restores the caller preference in `finally`, and throws unless the code is explicitly accepted. Every adapter Git call uses that boundary; ancestry false and missing-ref exits 1/2 remain typed control flow, while unexpected failures stop. The catalog checkout is also quiet. The real-Git `TEST-0126` fixture and final updater family pass after two expected-red corrections. |
-| `FIND-0159` | PowerShell 7 / Linux empty-inventory compatibility defect / `Blocking` then resolved | `p1` / Ubuntu rejected an otherwise valid empty initial-adoption marker before quick adoption could reuse its deterministic draft | The pure classifier now normalizes only a sole null/empty-collection sentinel to an empty inventory; a null mixed with any real path remains invalid. `TEST-0127` covers scalar null, empty array, singleton-null, and mixed-null inputs; the `TEST-0130` adoption marker round trip and full capabilities adapter pass. The original Ubuntu run is the expected-red cross-platform evidence; the replacement hosted run remains the publication gate. |
+| `FIND-0159` | PowerShell 7 / Linux empty-inventory compatibility defect / `Blocking` then resolved | `p1` / Ubuntu rejected an otherwise valid empty initial-adoption marker before quick adoption could reuse its deterministic draft | The pure classifier now normalizes only a sole null/empty-collection sentinel to an empty inventory; a null mixed with any real path remains invalid. `TEST-0127` covers scalar null, empty array, singleton-null, and mixed-null inputs; the `TEST-0130` adoption marker round trip and full capabilities adapter pass. The original Ubuntu run is the expected-red cross-platform evidence and replacement run `29653339317` passed. |
+| `FIND-0160` | Windows `Full`-profile timeout under-provisioning / `Blocking` then resolved locally | `p1` / the correct serial Windows profile passed the capabilities and updater families but GitHub canceled the still-running suite at the stale 20-minute job limit | Only the Windows job bound is 35 minutes, giving the measured 1576-second local `Full` run about 33 percent headroom. Linux remains 20 minutes, post-publication remains 5, and no job, matrix, setup, or coverage route is added. `TEST-0124` failed first against 20 and passes against the exact Windows job boundary; replacement hosted evidence remains required. |
 
 ## Relationships
 
@@ -209,6 +210,7 @@ changing application behavior or inventing project facts.
 - Adoption containment: [FEAT-0009](../FEAT-0009-adoption-integrity/README.md) / [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)
 - Consumer transition migrations: [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) / [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md)
 - Target-bound current-launcher recovery: [FEAT-0028](../FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md) / [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md)
+- Hosted runner and timeout authority: [FEAT-0027](../FEAT-0027-v0104-runner-minute-efficiency/README.md) / [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md)
 - Strategy decision: [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md)
 - Tracking and post-publication authority: [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76)
 - Review delivery: [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78)
@@ -264,7 +266,8 @@ The implementation review identified and closed containment, live-base drift,
 preflight, event-routing, collision-identity, credential-link, Git-hook,
 empty-remote all-ref race, duplicated-policy, and Windows PowerShell 5.1 native
 stderr gaps. Hosted review also closed PowerShell 7's singleton-null binding of
-an empty protocol-surface inventory. The exact immutable
+an empty protocol-surface inventory and the stale Windows serial-suite timeout.
+The exact immutable
 capabilities module is now the single pure-policy authority; launcher and
 workflow actors retain only their distinct evidence and mutation guards. One
 status-aware completion envelope covers normal and recovery publication,

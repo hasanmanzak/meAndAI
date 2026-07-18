@@ -65,6 +65,10 @@ This project uses the `M.m.rev` version format defined in the
   inventory without weakening fail-closed validation: a null mixed with any
   real path remains invalid, and empty initial-adoption markers round-trip on
   both Windows PowerShell and PowerShell 7.
+- Raise only the serial Windows `Full` validation job's bounded timeout from
+  20 to 35 minutes after the expanded suite passed its capabilities and
+  updater families but was canceled by the stale limit; keep the Linux and
+  post-publication limits and the single-runner topology unchanged.
 
 Related work: [FEAT-0029](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
 [FEAT-0030](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
@@ -72,9 +76,11 @@ Related work: [FEAT-0029](docs/features/FEAT-0029-v0110-protocol-aware-initial-a
 [TEST-0127 through TEST-0132](tests/scenario-ownership.psd1),
 [issue #76](https://github.com/hasanmanzak/meAndAI/issues/76), and
 [issue #77](https://github.com/hasanmanzak/meAndAI/issues/77). The resolved
-PowerShell compatibility corrections are `FIND-0158`, `FIND-0159`, and amended
+PowerShell and validation corrections are `FIND-0158` through `FIND-0160`,
+with amended
 [TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md)
-plus [TEST-0127 / TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md)
+plus [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md)
+and [TEST-0127 / TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md)
 in [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78).
 
 ## 0.10.4 - 2026-07-18

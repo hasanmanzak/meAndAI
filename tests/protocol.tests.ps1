@@ -923,20 +923,42 @@ if ([regex]::Matches($ciWorkflow, '(?m)^\s+runs-on:\s+windows-latest\s*$').Count
     [regex]::Matches($ciWorkflow, '(?m)^\s+name:\s+Validate on windows-latest\s*$').Count -ne 1) {
     Add-Failure 'TEST-0124 ordinary validation must expose exactly one real Windows runner and one stable Windows check identity.'
 }
+$linuxJobIndex = $ciWorkflow.IndexOf("`n  linux-validation:", [StringComparison]::Ordinal)
 $windowsJobIndex = $ciWorkflow.IndexOf("`n  windows-validation:", [StringComparison]::Ordinal)
 $postPublicationIndex = $ciWorkflow.IndexOf("`n  post-publication:", [StringComparison]::Ordinal)
-if ($windowsJobIndex -lt 0 -or $postPublicationIndex -le $windowsJobIndex) {
-    Add-Failure 'TEST-0124 Windows and post-publication job boundaries are missing or unordered.'
+if ($linuxJobIndex -lt 0 -or $windowsJobIndex -le $linuxJobIndex -or
+    $postPublicationIndex -le $windowsJobIndex) {
+    Add-Failure 'TEST-0124 Linux, Windows, and post-publication job boundaries are missing or unordered.'
 }
 else {
+    $linuxJobSource = $ciWorkflow.Substring(
+        $linuxJobIndex,
+        $windowsJobIndex - $linuxJobIndex
+    )
     $windowsJobSource = $ciWorkflow.Substring(
         $windowsJobIndex,
         $postPublicationIndex - $windowsJobIndex
     )
+    $postPublicationJobSource = $ciWorkflow.Substring($postPublicationIndex)
     if (-not $windowsJobSource.Contains('runs-on: windows-latest') -or
         $windowsJobSource.Contains('needs:') -or
         $windowsJobSource.Contains('matrix:')) {
         Add-Failure 'TEST-0124 stable Windows check is not the single executing Windows job.'
+    }
+    if (-not [regex]::IsMatch(
+        $windowsJobSource,
+        '(?m)^ {4}timeout-minutes: 35\r?$'
+    )) {
+        Add-Failure 'TEST-0124 Windows full validation timeout does not cover the measured serial-suite budget.'
+    }
+    if (-not [regex]::IsMatch(
+        $linuxJobSource,
+        '(?m)^ {4}timeout-minutes: 20\r?$'
+    ) -or -not [regex]::IsMatch(
+        $postPublicationJobSource,
+        '(?m)^ {4}timeout-minutes: 5\r?$'
+    )) {
+        Add-Failure 'TEST-0124 unchanged Linux and post-publication timeout bounds are not exact.'
     }
 }
 foreach ($requiredProfileText in @(
