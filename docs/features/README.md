@@ -29,6 +29,7 @@
 | [FEAT-0025](FEAT-0025-v0102-balanced-windows-validation/README.md) | v0.10.2 balanced Windows integrity validation and isolated publication verification | Complete | 0.10.2 |
 | [FEAT-0026](FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | v0.10.3 generic consumer transition reconciliation | Complete | 0.10.3 |
 | [FEAT-0027](FEAT-0027-v0104-runner-minute-efficiency/README.md) | v0.10.4 hosted runner-minute efficiency | Complete | 0.10.4 |
+| [FEAT-0028](FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md) | v0.10.4 atomic legacy updater recovery | Complete | 0.10.4 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

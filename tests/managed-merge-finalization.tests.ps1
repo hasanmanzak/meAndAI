@@ -293,7 +293,8 @@ function New-FinalizationScenario {
         [int]$UpdateSchema = 1,
         [bool]$InvalidLegacyRelease = $false,
         [bool]$WrongLegacyAssetBlob = $false,
-        [bool]$FabricatedSchema2Output = $false
+        [bool]$FabricatedSchema2Output = $false,
+        [bool]$RecoveryBranch = $false
     )
 
     $head = 'a' * 40
@@ -406,7 +407,9 @@ function New-FinalizationScenario {
 
     $branch = switch ($Kind) {
         'Adoption' { "automation/meandai-capabilities-$target" }
-        'Update' { "automation/meandai-protocol-$target" }
+        'Update' {
+            "automation/meandai-protocol-$target$(if ($RecoveryBranch) { '-recovery' } else { '' })"
+        }
         'MigrationReconciliation' {
             "automation/meandai-protocol-$target-migrations"
         }
@@ -989,6 +992,19 @@ try {
             $_ -ceq 'delete-branch'
         }).Count -ne 1) {
         Add-Failure "TEST-0121 exact schema-2 update did not independently verify and finalize its immutable target plan: $($schema2Update.Error)"
+    }
+
+    $recoveryUpdate = Invoke-FinalizationScenario -Scenario (
+        New-FinalizationScenario -Kind Update -UpdateSchema 2 `
+            -RecoveryBranch $true
+    )
+    if ($recoveryUpdate.Threw -or $recoveryUpdate.Scenario.BranchExists -or
+        $recoveryUpdate.Scenario.ExistingEvidenceComments -ne 1 -or
+        $recoveryUpdate.Scenario.IssueState -cne 'closed' -or
+        @($recoveryUpdate.Scenario.Events | Where-Object {
+            $_ -ceq 'delete-branch'
+        }).Count -ne 1) {
+        Add-Failure "TEST-0126 merged recovery proposal did not finalize its exact suffixed branch and issue: $($recoveryUpdate.Error)"
     }
 
     $migration = Invoke-FinalizationScenario -Scenario (

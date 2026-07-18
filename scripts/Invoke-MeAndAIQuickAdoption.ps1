@@ -3180,6 +3180,185 @@ function Assert-CredentialFilesAbsent {
     }
 }
 
+function Invoke-LocalCurrentLauncherRecovery {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$TargetCommit,
+        [Parameter(Mandatory)][string]$MaintainerRepository
+    )
+
+    if ($Repository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' -or
+        $Branch -cnotmatch '^[A-Za-z0-9._/-]+$' -or
+        $Branch.Contains('..') -or $Branch.StartsWith('/') -or
+        $Branch.EndsWith('/') -or
+        $HeadSha -cnotmatch '^[0-9a-f]{40}$' -or
+        $TargetTag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$' -or
+        $TargetCommit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Current-launcher recovery received a noncanonical repository, branch, release, or commit identity.'
+    }
+
+    $maintainerHeadBefore = ((@(Invoke-Git -Repository $MaintainerRepository `
+        -Arguments @('rev-parse', '--verify', 'HEAD')).Output -join '').Trim())
+    $maintainerBranchBefore = ((@(Invoke-Git -Repository $MaintainerRepository `
+        -Arguments @('branch', '--show-current')).Output -join '').Trim())
+    $maintainerStatusBefore = @((Invoke-Git -Repository $MaintainerRepository `
+        -Arguments @('status', '--porcelain=v1', '--untracked-files=all')).Output |
+        ForEach-Object { [string]$_ }) -join "`n"
+    if ($maintainerHeadBefore -cne $HeadSha -or
+        $maintainerBranchBefore -cne $Branch) {
+        throw 'The maintainer checkout no longer matches the captured default-branch identity.'
+    }
+
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-update-recovery-$([guid]::NewGuid().ToString('N'))"
+    $consumerClone = Join-Path $temporaryRoot 'consumer'
+    $protocolSource = Join-Path $temporaryRoot 'protocol-source'
+    $operationError = $null
+    $cleanupError = $null
+    $preservationError = $null
+    $previousRepository = [Environment]::GetEnvironmentVariable(
+        'GITHUB_REPOSITORY', 'Process'
+    )
+    $previousWorkspace = [Environment]::GetEnvironmentVariable(
+        'GITHUB_WORKSPACE', 'Process'
+    )
+    $previousDefaultBranch = [Environment]::GetEnvironmentVariable(
+        'DEFAULT_BRANCH', 'Process'
+    )
+    $locationPushed = $false
+
+    try {
+        [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
+        Invoke-External -Command 'gh' -Arguments @(
+            'repo', 'clone', $Repository, $consumerClone, '--',
+            '--branch', $Branch, '--single-branch'
+        ) | Out-Null
+        $clonedHead = ((@(Invoke-Git -Repository $consumerClone -Arguments @(
+            'rev-parse', '--verify', 'HEAD'
+        )).Output -join '').Trim())
+        if ($clonedHead -cne $HeadSha) {
+            throw 'The consumer default branch changed before its isolated recovery clone was bound.'
+        }
+        $consumerStatus = @((Invoke-Git -Repository $consumerClone -Arguments @(
+            'status', '--porcelain=v1', '--untracked-files=all'
+        )).Output | Where-Object { $_ })
+        if ($consumerStatus.Count -ne 0) {
+            throw 'The isolated consumer recovery clone is not clean.'
+        }
+        Assert-CredentialFilesAbsent -Repository $consumerClone
+
+        Invoke-External -Command 'gh' -Arguments @(
+            'repo', 'clone', $ProtocolRepository, $protocolSource, '--',
+            '--no-checkout'
+        ) | Out-Null
+        $tagCommit = ((@(Invoke-Git -Repository $protocolSource -Arguments @(
+            'rev-parse', '--verify', "refs/tags/$TargetTag^{commit}"
+        )).Output -join '').Trim())
+        if ($tagCommit -cne $TargetCommit) {
+            throw 'The cloned protocol tag does not match the verified immutable release commit.'
+        }
+        Invoke-Git -Repository $protocolSource -Arguments @(
+            'checkout', '--quiet', '--detach', $TargetCommit
+        ) | Out-Null
+        $sourceHead = ((@(Invoke-Git -Repository $protocolSource -Arguments @(
+            'rev-parse', '--verify', 'HEAD'
+        )).Output -join '').Trim())
+        $versionPath = Join-Path $protocolSource 'VERSION'
+        if ($sourceHead -cne $TargetCommit -or
+            -not (Test-Path -LiteralPath $versionPath -PathType Leaf) -or
+            [IO.File]::ReadAllText($versionPath).Trim() -cne $TargetTag.Substring(1)) {
+            throw 'The isolated protocol source does not match the verified target release.'
+        }
+        $adapterPath = Join-Path $protocolSource `
+            'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+        if (-not (Test-Path -LiteralPath $adapterPath -PathType Leaf)) {
+            throw 'The verified target release does not contain its current-launcher adapter.'
+        }
+
+        [Environment]::SetEnvironmentVariable(
+            'GITHUB_REPOSITORY', $Repository, 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            'GITHUB_WORKSPACE', $consumerClone, 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            'DEFAULT_BRANCH', $Branch, 'Process'
+        )
+        Push-Location -LiteralPath $consumerClone
+        $locationPushed = $true
+        & $adapterPath -CurrentLauncher `
+            -RequestedTargetTag $TargetTag `
+            -RequestedTargetCommit $TargetCommit `
+            -RequestedBaseSha $HeadSha `
+            -ProtocolSourcePath $protocolSource
+    }
+    catch {
+        $operationError = $_.Exception
+    }
+    finally {
+        if ($locationPushed) {
+            Pop-Location
+        }
+        [Environment]::SetEnvironmentVariable(
+            'GITHUB_REPOSITORY', $previousRepository, 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            'GITHUB_WORKSPACE', $previousWorkspace, 'Process'
+        )
+        [Environment]::SetEnvironmentVariable(
+            'DEFAULT_BRANCH', $previousDefaultBranch, 'Process'
+        )
+        try {
+            if (Test-Path -LiteralPath $temporaryRoot) {
+                Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+            }
+        }
+        catch {
+            $cleanupError = $_.Exception
+        }
+        try {
+            $maintainerHeadAfter = ((@(Invoke-Git `
+                -Repository $MaintainerRepository `
+                -Arguments @('rev-parse', '--verify', 'HEAD')).Output -join '').Trim())
+            $maintainerBranchAfter = ((@(Invoke-Git `
+                -Repository $MaintainerRepository `
+                -Arguments @('branch', '--show-current')).Output -join '').Trim())
+            $maintainerStatusAfter = @((Invoke-Git `
+                -Repository $MaintainerRepository `
+                -Arguments @(
+                    'status', '--porcelain=v1', '--untracked-files=all'
+                )).Output | ForEach-Object { [string]$_ }) -join "`n"
+            if ($maintainerHeadAfter -cne $maintainerHeadBefore -or
+                $maintainerBranchAfter -cne $maintainerBranchBefore -or
+                $maintainerStatusAfter -cne $maintainerStatusBefore) {
+                throw 'The maintainer checkout changed during isolated current-launcher recovery.'
+            }
+        }
+        catch {
+            $preservationError = $_.Exception
+        }
+    }
+
+    $failureDetails = @(
+        if ($null -ne $operationError) { $operationError.Message }
+        if ($null -ne $cleanupError) {
+            "Temporary recovery cleanup failed: $($cleanupError.Message)"
+        }
+        if ($null -ne $preservationError) { $preservationError.Message }
+    )
+    if ($failureDetails.Count -gt 0) {
+        throw ($failureDetails -join ' ')
+    }
+    return [pscustomobject]@{
+        TargetTag = $TargetTag
+        TargetCommit = $TargetCommit
+        BaseSha = $HeadSha
+    }
+}
+
 function Assert-AdoptionProtocolReference {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -4160,16 +4339,20 @@ if ([string]$existingAdoptionRoute.State -ceq 'CompatibleUpdate') {
     Write-Host "The completed meAndAI adoption at $($existingAdoptionRoute.InstalledTag) is older than requested target $ProtocolTag."
     Write-Host 'The installed updater seed was preserved; the launcher will not overwrite managed updater assets.'
     if ($SkipLifecycleDispatch) {
-        Write-Host 'Installed updater dispatch was explicitly skipped.'
+        Write-Host 'Current-launcher recovery was explicitly skipped.'
         Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
         return
     }
-    Set-QuickAdoptionProgress -Status 'Waiting for installed updater workflow' `
+    Set-QuickAdoptionProgress -Status 'Running target-bound updater recovery' `
         -PercentComplete 70
-    Write-Host "Dispatching installed updater at $($existingAdoptionRoute.InstalledTag)."
-    $updateRun = Invoke-LifecycleWorkflow -Repository $repository `
-        -Branch $defaultBranch -HeadSha $routingHead
-    Write-Host "Installed updater workflow completed successfully: $($updateRun.url)"
+    $targetRelease = Get-ValidatedImmutableProtocolRelease `
+        -ProtocolToken $protocolToken -Tag $ProtocolTag
+    [void](Invoke-LocalCurrentLauncherRecovery -Repository $repository `
+        -Branch $defaultBranch -HeadSha $routingHead `
+        -TargetTag $ProtocolTag `
+        -TargetCommit ([string]$targetRelease.CommitSha) `
+        -MaintainerRepository $target)
+    Write-Host "The exact $ProtocolTag updater created or reconciled the managed update draft locally."
     Write-Host 'Review and merge the managed update pull request; adoption Codex execution was not started.'
     Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
     return

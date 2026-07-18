@@ -12,11 +12,12 @@ Last verified: **2026-07-18**
   [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) after
   publication, not predicted or duplicated in this repository snapshot.
 - Current scope: [FEAT-0027](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md)
-  requires hosted runner efficiency, keeps Linux canonical full evidence, and
-  routes one stable Windows job to either fail-safe full validation or focused
-  PowerShell 5.1 native compatibility;
-  [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) owns delivery
-  and future publication evidence.
+  reduces hosted runner consumption, while
+  [FEAT-0028 / BUG-0013](../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
+  lets the latest launcher recover a pre-engine consumer through one atomic,
+  target-bound proposal. [Issues #72](https://github.com/hasanmanzak/meAndAI/issues/72)
+  and [#74](https://github.com/hasanmanzak/meAndAI/issues/74) own delivery and
+  future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -156,6 +157,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   cleans its branch and issue after maintainer merge. Fresh adoption records
   the catalog as satisfied. `MIG-0001` captures the Derdini live-pin shape
   without a source-version switch.
+- `v0.10.4` adds the target-bound recovery path required when an immutable
+  pre-engine updater cannot produce a validator-green transition. The latest
+  launcher uses isolated exact-base and exact-target clones and the target
+  release's production updater to create one schema-2 proposal containing the
+  pin, changed updater assets, required migrations, and ledger. Exact legacy
+  schema-1 drafts are cleanup-only and are retired replacement-first; no
+  issue is invented for an unbound historical draft.
 - Compatible catalogs are checked as a complete numeric descendant chain, not
   only as a current-to-latest pair. Schema-2 finalization independently
   rebuilds the target plan from immutable release and pull-request base blobs;

@@ -6,6 +6,10 @@ param(
     [string]$BranchPrefix = 'automation/meandai-protocol-',
     [switch]$FinalizeMergedPullRequest,
     [switch]$RecoverMergedPullRequests,
+    [switch]$CurrentLauncher,
+    [string]$RequestedTargetTag = '',
+    [string]$RequestedTargetCommit = '',
+    [string]$RequestedBaseSha = '',
     [int]$PullRequestNumber = 0
 )
 
@@ -33,7 +37,10 @@ $ConsumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
 $ConsumerMigrationIndexPath = 'migrations/index.json'
 $ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 $MigrationBranchSuffix = '-migrations'
+$RecoveryBranchSuffix = '-recovery'
+$UpdateBranchSuffix = if ($CurrentLauncher) { $RecoveryBranchSuffix } else { '' }
 $script:ConsumerMigrationPlansByTag = @{}
+$script:CurrentLauncher = [bool]$CurrentLauncher
 $ManagedUpdateLabels = @(
     [pscustomobject]@{ Name = 'type:task'; Color = 'd4c5f9'; Description = 'Implementation or maintenance task' },
     [pscustomobject]@{ Name = 'priority:p1'; Color = 'd93f0b'; Description = 'High priority' },
@@ -60,13 +67,15 @@ function Invoke-GhJson {
 
     $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
     try {
-        if ($PSBoundParameters.ContainsKey('Token')) {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
         }
         $text = (Invoke-Native -Command 'gh' -Arguments $Arguments) -join [Environment]::NewLine
     }
     finally {
-        if ($PSBoundParameters.ContainsKey('Token')) {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
         }
     }
@@ -84,7 +93,8 @@ function Invoke-GhPagedJson {
 
     $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
     try {
-        if ($PSBoundParameters.ContainsKey('Token')) {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
         }
         $encodedItems = @(Invoke-Native -Command 'gh' -Arguments @(
@@ -92,7 +102,8 @@ function Invoke-GhPagedJson {
         ))
     }
     finally {
-        if ($PSBoundParameters.ContainsKey('Token')) {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
         }
     }
@@ -709,6 +720,76 @@ function Assert-StagedManagedUpdate {
     }
 }
 
+function Stage-ManagedProposalTree {
+    param(
+        [Parameter(Mandatory)][string]$Workspace,
+        [Parameter(Mandatory)][string]$BaseCommit,
+        [Parameter(Mandatory)][string]$TargetProtocolSha,
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$ProtocolPath,
+        [Parameter(Mandatory)][object[]]$Assets,
+        [AllowNull()]$MigrationPlan = $null,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update'
+    )
+
+    $expectedPaths = @(Get-ExpectedManagedPaths -BaseCommit $BaseCommit `
+        -TargetProtocolSha $TargetProtocolSha -SourcePath $SourcePath `
+        -ProtocolPath $ProtocolPath -Assets $Assets `
+        -MigrationPlan $MigrationPlan -ProposalKind $ProposalKind)
+    Push-Location -LiteralPath $Workspace
+    try {
+        if ($ProposalKind -ceq 'Update') {
+            Invoke-Native -Command 'git' -Arguments @(
+                '-C', $SourcePath, 'checkout', '--quiet', '--detach',
+                $TargetProtocolSha
+            ) | Out-Null
+            Invoke-Native -Command 'git' -Arguments @(
+                'update-index', '--add', '--cacheinfo',
+                "160000,$TargetProtocolSha,$ProtocolPath"
+            ) | Out-Null
+            foreach ($asset in $Assets) {
+                $templateRelative = [string]$asset.TemplatePath -replace '/', `
+                    [IO.Path]::DirectorySeparatorChar
+                $templatePath = Join-Path $SourcePath $templateRelative
+                if (-not (Test-Path -LiteralPath $templatePath -PathType Leaf)) {
+                    throw "Target release checkout is missing updater template '$($asset.TemplatePath)'."
+                }
+                if ([string]$asset.ConsumerPath -cnotin $expectedPaths) {
+                    continue
+                }
+                $consumerRelative = [string]$asset.ConsumerPath -replace '/', `
+                    [IO.Path]::DirectorySeparatorChar
+                $consumerPath = Join-Path $Workspace $consumerRelative
+                $consumerParent = Split-Path -Parent $consumerPath
+                if (-not (Test-Path -LiteralPath $consumerParent -PathType Container)) {
+                    New-Item -ItemType Directory -Path $consumerParent -Force |
+                        Out-Null
+                }
+                Copy-Item -LiteralPath $templatePath -Destination $consumerPath `
+                    -Force
+            }
+        }
+        if ($null -ne $MigrationPlan) {
+            Apply-ConsumerMigrationPlan -Plan $MigrationPlan `
+                -Workspace $Workspace
+        }
+        $addPaths = @($expectedPaths | Where-Object { $_ -cne $ProtocolPath })
+        if ($addPaths.Count -ne 0) {
+            Invoke-Native -Command 'git' -Arguments (@('add', '--') + $addPaths) |
+                Out-Null
+        }
+        Assert-StagedManagedUpdate -ExpectedPaths $expectedPaths `
+            -TargetProtocolSha $TargetProtocolSha -SourcePath $SourcePath `
+            -ProtocolPath $ProtocolPath -Assets $Assets `
+            -MigrationPlan $MigrationPlan -ProposalKind $ProposalKind
+        return @($expectedPaths)
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Add-RunSummary {
     param([string]$Text)
     if ($env:GITHUB_STEP_SUMMARY) {
@@ -1022,7 +1103,9 @@ function Ensure-ManagedUpdateLabels {
     param([string]$Repository)
 
     $token = [string]$env:ISSUE_TOKEN
-    if (-not $token) { throw "Required workflow environment 'ISSUE_TOKEN' is missing." }
+    if (-not $token -and -not $script:CurrentLauncher) {
+        throw "Required workflow environment 'ISSUE_TOKEN' is missing."
+    }
     $existing = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/labels?per_page=100" -Token $token)
     $names = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($label in $existing) {
@@ -1046,7 +1129,9 @@ function Get-ManagedUpdateIssueInventory {
     param([string]$Repository)
 
     $token = [string]$env:ISSUE_TOKEN
-    if (-not $token) { throw "Required workflow environment 'ISSUE_TOKEN' is missing." }
+    if (-not $token -and -not $script:CurrentLauncher) {
+        throw "Required workflow environment 'ISSUE_TOKEN' is missing."
+    }
     @(Invoke-GhPagedJson -Endpoint "repos/$Repository/issues?state=all&per_page=100" -Token $token |
         Where-Object { $null -eq $_.PSObject.Properties['pull_request'] })
 }
@@ -1258,6 +1343,21 @@ function Get-RemoteBranchHead {
         throw "Remote branch '$Branch' returned an invalid ref result."
     }
     return $parts[0]
+}
+
+function Assert-RemoteDefaultBranchUnchanged {
+    param(
+        [Parameter(Mandatory)][string]$DefaultBranch,
+        [Parameter(Mandatory)][string]$ExpectedHeadSha
+    )
+
+    if ($ExpectedHeadSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Remote default-branch binding lacks one exact expected SHA.'
+    }
+    $observed = Get-RemoteBranchHead -Branch $DefaultBranch
+    if ($null -eq $observed -or [string]$observed -cne $ExpectedHeadSha) {
+        throw "Consumer default branch '$DefaultBranch' changed after recovery planning; no GitHub mutation is permitted."
+    }
 }
 
 function Get-RemoteBranchesByPrefix {
@@ -1727,7 +1827,16 @@ function Assert-ManagedPullRequestSafe {
         [string]$Operation.ProposalKind
     }
     else { 'Update' }
-    $migrationPlan = $script:ConsumerMigrationPlansByTag[[string]$Operation.TargetTag]
+    $supersedeOnly = $null -ne $Operation.PSObject.Properties['SupersedeOnly'] -and
+        $Operation.SupersedeOnly -is [bool] -and [bool]$Operation.SupersedeOnly
+    $unboundIssue = $null -ne $Operation.PSObject.Properties['UnboundIssue'] -and
+        $Operation.UnboundIssue -is [bool] -and [bool]$Operation.UnboundIssue
+    $migrationPlan = if ($supersedeOnly) {
+        New-EmptyConsumerMigrationPlan
+    }
+    else {
+        $script:ConsumerMigrationPlansByTag[[string]$Operation.TargetTag]
+    }
     if ($null -eq $migrationPlan) {
         throw "Managed PR #$number has no deterministic consumer migration plan."
     }
@@ -1794,12 +1903,15 @@ function Assert-ManagedPullRequestSafe {
             [string]$migrationPlan.PlanSha256
         } else { '' }
         MigrationPlanValid = $migrationMarkerValid -and $migrationEntriesMatch
+        SupersedeOnly = $supersedeOnly
     }
     $context = [pscustomobject]@{
         Repository = $Repository; DefaultBranch = [string]$env:DEFAULT_BRANCH
         BranchPrefix = [string]$script:BranchPrefix
         ProtocolPath = $ProtocolPath; ManagedPaths = $ManagedPaths
         TrustedActor = $TrustedActor
+        MigrationBranchSuffix = $MigrationBranchSuffix
+        UpdateBranchSuffix = if ($script:CurrentLauncher) { '-recovery' } else { '' }
         ExpectedPullRequestState = $ExpectedPullRequestState
         ExpectedBranchExists = $ExpectedBranchExists
     }
@@ -1808,17 +1920,24 @@ function Assert-ManagedPullRequestSafe {
     if ($problems.Count -gt 0) {
         throw "Managed PR #$number changed after planning: $($problems -join '; ')."
     }
-    Get-ValidatedManagedUpdateIssue -Repository $Repository `
-        -PullRequestNumber $number -TargetTag ([string]$Operation.TargetTag) `
-        -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
-        -HeadSha ([string]$Operation.ExpectedHeadSha) `
-        -Branch ([string]$Operation.Branch) `
-        -PullRequestBody ([string]$details.body) `
-        -ProposalKind $proposalKind `
-        -MigrationPlanSha $(if ($marker.Schema -eq 2) {
-            [string]$migrationPlan.PlanSha256
-        } else { '' }) `
-        -RequireOpen $true | Out-Null
+    if ($unboundIssue) {
+        if (-not (Test-LegacyUnboundTrackingBody -Body ([string]$details.body))) {
+            throw "Supersede-only PR #$number unexpectedly owns a canonical tracking issue."
+        }
+    }
+    else {
+        Get-ValidatedManagedUpdateIssue -Repository $Repository `
+            -PullRequestNumber $number -TargetTag ([string]$Operation.TargetTag) `
+            -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
+            -HeadSha ([string]$Operation.ExpectedHeadSha) `
+            -Branch ([string]$Operation.Branch) `
+            -PullRequestBody ([string]$details.body) `
+            -ProposalKind $proposalKind `
+            -MigrationPlanSha $(if ($marker.Schema -eq 2) {
+                [string]$migrationPlan.PlanSha256
+            } else { '' }) `
+            -RequireOpen $true | Out-Null
+    }
 }
 
 function Get-CanonicalAdoptionMarker {
@@ -1951,6 +2070,69 @@ function Get-CanonicalTrackingIssueNumber {
         throw 'Managed pull request tracking issue number is outside the supported range.'
     }
     return $number
+}
+
+function Test-LegacyUnboundTrackingBody {
+    param([string]$Body)
+
+    $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
+    if ([regex]::IsMatch(
+        $normalized,
+        '(?im)(?:^|\s)(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+(?:[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?#\d+\b',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )) {
+        throw 'Legacy managed pull request uses an ambiguous native issue-closing keyword.'
+    }
+    $candidateLines = [regex]::Matches(
+        $normalized,
+        '(?im)^tracking[ \t]+issue[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $canonical = [regex]::Matches(
+        $normalized,
+        '(?m)^Tracking issue: #[1-9][0-9]*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($canonical.Count -eq 1 -and $candidateLines.Count -eq 1 -and
+        [string]$canonical[0].Value -ceq [string]$candidateLines[0].Value) {
+        return $false
+    }
+    if ($candidateLines.Count -eq 0) {
+        return $true
+    }
+    if ($candidateLines.Count -eq 1 -and
+        [string]$candidateLines[0].Value -ceq 'Tracking issue: #REQUIRED') {
+        return $true
+    }
+    throw 'Legacy managed pull request has ambiguous tracking-issue text.'
+}
+
+function Get-ExistingReplacementCandidates {
+    param(
+        [Parameter(Mandatory)][object[]]$Candidates,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind,
+        [string]$MigrationPlanSha = '',
+        [bool]$CurrentLauncherMode = $false,
+        [string]$BranchPrefix = 'automation/meandai-protocol-',
+        [string]$RecoveryBranchSuffix = '-recovery'
+    )
+
+    return @($Candidates | Where-Object {
+        $supersedeOnly = $null -ne $_.PSObject.Properties['SupersedeOnly'] -and
+            $_.SupersedeOnly -is [bool] -and [bool]$_.SupersedeOnly
+        $baseMatch = -not $supersedeOnly -and
+            [string]$_.TargetTag -ceq $TargetTag -and
+            [string]$_.Kind -ceq $ProposalKind -and
+            ($ProposalKind -ceq 'Update' -or
+                [string]$_.MigrationPlanSha -ceq $MigrationPlanSha)
+        if (-not $baseMatch) { return $false }
+        if (-not $CurrentLauncherMode) { return $true }
+        return [int]$_.MarkerSchema -eq 2 -and
+            [string]$_.HeadRef -ceq
+                "$BranchPrefix$TargetTag$RecoveryBranchSuffix"
+    })
 }
 
 function Get-FinalizationIssueEvidence {
@@ -2213,15 +2395,18 @@ function Get-ManagedMergedPullRequestState {
     }
 
     $target = [string]$marker.Target
-    $expectedBranch = if ($kind -ceq 'Adoption') {
-        "$adoptionPrefix$target"
+    $expectedBranches = if ($kind -ceq 'Adoption') {
+        @("$adoptionPrefix$target")
     }
     elseif ($kind -ceq 'MigrationReconciliation') {
-        "$BranchPrefix$target$MigrationBranchSuffix"
+        @("$BranchPrefix$target$MigrationBranchSuffix")
     }
-    else { "$BranchPrefix$target" }
+    elseif ($updateMarker.Schema -eq 2) {
+        @("$BranchPrefix$target", "$BranchPrefix$target$RecoveryBranchSuffix")
+    }
+    else { @("$BranchPrefix$target") }
     if ($target -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
-        $headRef -cne $expectedBranch -or
+        $headRef -cnotin $expectedBranches -or
         [string]$marker.Repository -cne $Repository -or
         [string]$marker.ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
         [string]$marker.Head -cnotmatch '^[0-9a-f]{40}$') {
@@ -2528,6 +2713,10 @@ function Complete-SupersededProtocolUpdateIssue {
         [int]$ReplacementPullRequestNumber = 0
     )
 
+    if ($null -ne $Operation.PSObject.Properties['UnboundIssue'] -and
+        $Operation.UnboundIssue -is [bool] -and [bool]$Operation.UnboundIssue) {
+        return
+    }
     $pullNumber = [int]$Operation.PullRequestNumber
     $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$pullNumber")
     $issue = Get-ValidatedManagedUpdateIssue -Repository $Repository `
@@ -2595,8 +2784,22 @@ function Complete-SupersededProtocolUpdateIssue {
     }
 }
 
-if ($FinalizeMergedPullRequest -and $RecoverMergedPullRequests) {
-    throw 'Finalization and merged-branch recovery modes are mutually exclusive.'
+if (@(@(
+    [bool]$FinalizeMergedPullRequest,
+    [bool]$RecoverMergedPullRequests,
+    [bool]$CurrentLauncher
+    ) | Where-Object { $_ }).Count -gt 1) {
+    throw 'Finalization, merged-branch recovery, and current-launcher modes are mutually exclusive.'
+}
+if ($CurrentLauncher) {
+    if ($RequestedTargetTag -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
+        $RequestedTargetCommit -cnotmatch '^[0-9a-f]{40}$' -or
+        $RequestedBaseSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Current-launcher mode requires one canonical target tag, target commit, and consumer base SHA.'
+    }
+}
+elseif ($RequestedTargetTag -or $RequestedTargetCommit -or $RequestedBaseSha) {
+    throw 'Target-bound recovery inputs are valid only in current-launcher mode.'
 }
 if ($FinalizeMergedPullRequest) {
     Invoke-ManagedMergedPullRequestFinalization -Number $PullRequestNumber
@@ -2607,10 +2810,16 @@ if ($RecoverMergedPullRequests) {
     return
 }
 
-foreach ($name in @(
-    'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
-    'PROTOCOL_TOKEN', 'ISSUE_TOKEN'
-)) {
+$requiredEnvironment = if ($CurrentLauncher) {
+    @('GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH')
+}
+else {
+    @(
+        'GITHUB_REPOSITORY', 'GITHUB_WORKSPACE', 'DEFAULT_BRANCH', 'GH_TOKEN',
+        'PROTOCOL_TOKEN', 'ISSUE_TOKEN'
+    )
+}
+foreach ($name in $requiredEnvironment) {
     if (-not [Environment]::GetEnvironmentVariable($name)) {
         throw "Required workflow environment '$name' is missing."
     }
@@ -2618,8 +2827,19 @@ foreach ($name in @(
 
 $workspace = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
 Set-Location -LiteralPath $workspace
-$modulePath = Join-Path $workspace '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
-$sourcePath = [IO.Path]::GetFullPath((Join-Path $workspace $ProtocolSourcePath))
+$sourcePath = if ([IO.Path]::IsPathRooted($ProtocolSourcePath)) {
+    [IO.Path]::GetFullPath($ProtocolSourcePath)
+}
+else {
+    [IO.Path]::GetFullPath((Join-Path $workspace $ProtocolSourcePath))
+}
+$modulePath = if ($CurrentLauncher) {
+    Join-Path $sourcePath `
+        'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+}
+else {
+    Join-Path $workspace '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+}
 $consumerMigrationModule = Join-Path $sourcePath `
     ($ConsumerMigrationModulePath -replace '/', [IO.Path]::DirectorySeparatorChar)
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
@@ -2634,6 +2854,23 @@ if (-not (Test-Path -LiteralPath $consumerMigrationModule -PathType Leaf)) {
 }
 Import-Module $consumerMigrationModule -Force
 $TrustedActor = Get-AuthenticatedUpdaterActor
+
+if ($CurrentLauncher) {
+    $sourceHead = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourcePath, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $sourceTagHead = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $sourcePath, 'rev-list', '-n', '1', $RequestedTargetTag
+    )) -join '').Trim()
+    $sourceVersionPath = Join-Path $sourcePath 'VERSION'
+    if ($sourceHead -cne $RequestedTargetCommit -or
+        $sourceTagHead -cne $RequestedTargetCommit -or
+        -not (Test-Path -LiteralPath $sourceVersionPath -PathType Leaf) -or
+        [IO.File]::ReadAllText($sourceVersionPath).Trim() -cne
+            $RequestedTargetTag.Substring(1)) {
+        throw 'Current-launcher source does not match the exact requested immutable target.'
+    }
+}
 
 $submodulePaths = @(Invoke-Native -Command 'git' -Arguments @(
     'config', '-f', '.gitmodules', '--get-regexp', '^submodule\..*\.path$'
@@ -2667,6 +2904,9 @@ $baseHeadSha = ((Invoke-Native -Command 'git' -Arguments @(
 if ($baseHeadSha -notmatch '^[0-9a-f]{40}$') {
     throw 'Unable to resolve the consumer default-branch head.'
 }
+if ($CurrentLauncher -and $baseHeadSha -cne $RequestedBaseSha) {
+    throw 'Current-launcher consumer clone does not match the exact requested base SHA.'
+}
 $protocolBaseEntry = Get-LocalTreeEntry -Commit $baseHeadSha -Path $ProtocolPath
 if ($protocolBaseEntry.Mode -cne '160000' -or
     $protocolBaseEntry.Type -cne 'commit' -or
@@ -2699,7 +2939,7 @@ Assert-CurrentManagedAssets -BaseCommit $baseHeadSha `
 
 $currentCatalog = Import-ConsumerMigrationCatalogAtCommit `
     -SourcePath $sourcePath -Commit $currentProtocolSha
-if ($null -eq $currentCatalog) {
+if ($null -eq $currentCatalog -and -not $CurrentLauncher) {
     throw 'Installed updater declares consumer-migration capability but the current immutable protocol release has no catalog.'
 }
 $currentMigrationPlan = Get-ConsumerMigrationPlanForBase `
@@ -2709,15 +2949,19 @@ $migrationManagedPaths = [System.Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal
 )
 [void]$migrationManagedPaths.Add($ConsumerMigrationLedgerPath)
-foreach ($migration in @($currentCatalog.Migrations)) {
-    foreach ($operation in @($migration.Operations)) {
-        [void]$migrationManagedPaths.Add([string]$operation.Path)
+if ($null -ne $currentCatalog) {
+    foreach ($migration in @($currentCatalog.Migrations)) {
+        foreach ($operation in @($migration.Operations)) {
+            [void]$migrationManagedPaths.Add([string]$operation.Path)
+        }
     }
 }
 
 $orderedCompatibleTags = @(Get-MeAndAICompatibleProtocolTagsInOrder `
     -Tags $availableTags -CurrentTag $currentTag)
 $previousCatalog = $currentCatalog
+$catalogSeen = $null -ne $currentCatalog
+$requestedTargetReached = $currentTag -ceq $RequestedTargetTag
 foreach ($tag in $orderedCompatibleTags) {
     if ($tag -ceq $currentTag) {
         continue
@@ -2730,10 +2974,20 @@ foreach ($tag in $orderedCompatibleTags) {
     $targetCatalog = Import-ConsumerMigrationCatalogAtCommit `
         -SourcePath $sourcePath -Commit $targetShaForCatalog
     if ($null -eq $targetCatalog) {
-        throw "Descendant protocol release '$tag' removed the consumer migration catalog."
+        if (-not $CurrentLauncher -or $catalogSeen) {
+            throw "Descendant protocol release '$tag' removed the consumer migration catalog."
+        }
+        $script:ConsumerMigrationPlansByTag[$tag] = New-EmptyConsumerMigrationPlan
+        if ($CurrentLauncher -and $tag -ceq $RequestedTargetTag) {
+            $requestedTargetReached = $true
+            break
+        }
+        continue
     }
-    Assert-MeAndAIConsumerMigrationCatalogChain `
-        -Catalogs @($previousCatalog, $targetCatalog)
+    if ($null -ne $previousCatalog) {
+        Assert-MeAndAIConsumerMigrationCatalogChain `
+            -Catalogs @($previousCatalog, $targetCatalog)
+    }
     $targetPlan = Get-ConsumerMigrationPlanForBase `
         -Catalog $targetCatalog -BaseCommit $baseHeadSha -Workspace $workspace
     $script:ConsumerMigrationPlansByTag[$tag] = $targetPlan
@@ -2743,6 +2997,14 @@ foreach ($tag in $orderedCompatibleTags) {
         }
     }
     $previousCatalog = $targetCatalog
+    $catalogSeen = $true
+    if ($CurrentLauncher -and $tag -ceq $RequestedTargetTag) {
+        $requestedTargetReached = $true
+        break
+    }
+}
+if ($CurrentLauncher -and -not $requestedTargetReached) {
+    throw "Requested target '$RequestedTargetTag' is absent from the compatible immutable release chain."
 }
 $ManagedPaths = @(Get-OrdinalUniquePaths -Paths @(
     @($ManagedPaths) + @($migrationManagedPaths)
@@ -2779,7 +3041,13 @@ foreach ($pull in $pulls) {
     } else { 'Update' }
     $target = if ($proposalKind -ceq 'MigrationReconciliation') {
         $branchTail.Substring(0, $branchTail.Length - $MigrationBranchSuffix.Length)
-    } else { $branchTail }
+    }
+    elseif ($CurrentLauncher -and $branchTail.EndsWith(
+        $UpdateBranchSuffix, [StringComparison]::Ordinal
+    )) {
+        $branchTail.Substring(0, $branchTail.Length - $UpdateBranchSuffix.Length)
+    }
+    else { $branchTail }
     $expectedProtocolSha = ''
     if ((Test-MeAndAIProtocolTag -Tag $target) -and $availableTags -ccontains $target) {
         $expectedProtocolSha = ((Invoke-Native -Command 'git' -Arguments @(
@@ -2791,7 +3059,14 @@ foreach ($pull in $pulls) {
     $observedRemoteHead = Get-RemoteBranchHead -Branch ([string]$details.head.ref)
     $expectedChangedPaths = @($ProtocolPath)
     $managedAssetsMatchTarget = $false
-    $migrationPlan = if ($script:ConsumerMigrationPlansByTag.ContainsKey($target)) {
+    $schemaOneRecoveryCandidate = $CurrentLauncher -and
+        $marker.Schema -eq 1 -and $proposalKind -ceq 'Update'
+    $unboundLegacyIssue = $schemaOneRecoveryCandidate -and
+        (Test-LegacyUnboundTrackingBody -Body ([string]$details.body))
+    $migrationPlan = if ($schemaOneRecoveryCandidate) {
+        New-EmptyConsumerMigrationPlan
+    }
+    elseif ($script:ConsumerMigrationPlansByTag.ContainsKey($target)) {
         $script:ConsumerMigrationPlansByTag[$target]
     } else { New-EmptyConsumerMigrationPlan }
     $migrationEntriesMatchTarget = $false
@@ -2812,7 +3087,8 @@ foreach ($pull in $pulls) {
             -Repository $repository -HeadSha ([string]$details.head.sha) `
             -Plan $migrationPlan
     }
-    if ($marker.Schema -in @(1, 2) -and $expectedProtocolSha -match '^[0-9a-f]{40}$') {
+    if (-not $unboundLegacyIssue -and $marker.Schema -in @(1, 2) -and
+        $expectedProtocolSha -match '^[0-9a-f]{40}$') {
         Get-ValidatedManagedUpdateIssue -Repository $repository `
             -PullRequestNumber ([int]$details.number) -TargetTag $target `
             -ProtocolSha $expectedProtocolSha -HeadSha ([string]$details.head.sha) `
@@ -2856,8 +3132,10 @@ foreach ($pull in $pulls) {
             (($marker.Schema -eq 1 -and $proposalKind -ceq 'Update') -or
              ($marker.Schema -eq 2 -and [string]$marker.Kind -ceq $proposalKind -and
               [string]$marker.MigrationPlanSha -ceq [string]$migrationPlan.PlanSha256 -and
-              [string]$marker.PathsSha -ceq
-                (Get-MigrationPathSetSha256 -Paths $expectedChangedPaths)))
+               [string]$marker.PathsSha -ceq
+                 (Get-MigrationPathSetSha256 -Paths $expectedChangedPaths)))
+        SupersedeOnly = [bool]$schemaOneRecoveryCandidate
+        UnboundIssue = [bool]$unboundLegacyIssue
     })
 }
 
@@ -2898,10 +3176,20 @@ $snapshot = [pscustomobject]@{
     MigrationRequired = [string]$currentMigrationPlan.State -ceq 'ChangesRequired'
     CurrentMigrationPlanSha = [string]$currentMigrationPlan.PlanSha256
     MigrationBranchSuffix = $MigrationBranchSuffix
+    UpdateBranchSuffix = $UpdateBranchSuffix
     Candidates = @($candidates)
+}
+if ($CurrentLauncher) {
+    $snapshot | Add-Member -NotePropertyName RequestedTargetTag `
+        -NotePropertyValue $RequestedTargetTag
 }
 $plan = Resolve-MeAndAIProtocolUpdatePlan -Snapshot $snapshot
 Add-RunSummary "## meAndAI protocol update`n`n- Current: ``$($plan.CurrentTag)```n- Latest compatible: ``$($plan.LatestCompatibleTag)```n- State: ``$($plan.State)``"
+
+if ($CurrentLauncher -and
+    [string]$plan.LatestCompatibleTag -cne $RequestedTargetTag) {
+    throw "Current-launcher plan did not resolve the exact requested target '$RequestedTargetTag'."
+}
 
 if ($plan.State -eq 'BlockedManualReview') {
     throw "Protocol update requires manual review: $($plan.Diagnostics -join '; ')"
@@ -2921,6 +3209,10 @@ if ([string]$plan.LatestCompatibleTag -cne [string]$plan.CurrentTag -or
     )) -join '').Trim()
     if ($localTargetSha -cne [string]$releaseEvidence.CommitSha) {
         throw "Protocol release '$($plan.LatestCompatibleTag)' does not match the checked-out exact tag commit."
+    }
+    if ($CurrentLauncher -and
+        [string]$releaseEvidence.CommitSha -cne $RequestedTargetCommit) {
+        throw 'Immutable release evidence differs from the current-launcher target binding.'
     }
 }
 if (@($plan.Operations).Count -eq 0) {
@@ -2964,55 +3256,17 @@ if ($create.Count -eq 1) {
             throw "Target '$targetTag' is not a descendant of current protocol '$currentTag'."
         }
     }
-    $expectedManagedPaths = @(Get-ExpectedManagedPaths `
-        -BaseCommit $baseHeadSha -TargetProtocolSha $targetSha `
-        -SourcePath $sourcePath -ProtocolPath $ProtocolPath `
-        -Assets $ManagedUpdaterAssets -MigrationPlan $migrationPlan `
-        -ProposalKind $proposalKind)
-    if ($proposalKind -ceq 'Update') {
-        Invoke-Native -Command 'git' -Arguments @(
-            '-C', $sourcePath, 'checkout', '--detach', $targetSha
-        ) | Out-Null
-        foreach ($asset in $ManagedUpdaterAssets) {
-            $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
-            $templateFile = Join-Path $sourcePath $relativeTemplatePath
-            if (-not (Test-Path -LiteralPath $templateFile -PathType Leaf)) {
-                throw "Target release checkout is missing updater template '$($asset.TemplatePath)'."
-            }
-        }
-    }
-
     $createdBranch = [string]$create[0].Branch
     if ($null -ne (Get-RemoteBranchHead -Branch $createdBranch)) {
         throw "Reserved target branch '$createdBranch' already exists without a valid managed PR."
     }
 
     Invoke-Native -Command 'git' -Arguments @('switch', '-c', $createdBranch) | Out-Null
-    if ($proposalKind -ceq 'Update') {
-        Invoke-Native -Command 'git' -Arguments @(
-            'update-index', '--add', '--cacheinfo',
-            "160000,$targetSha,$ProtocolPath"
-        ) | Out-Null
-        foreach ($asset in $ManagedUpdaterAssets) {
-            if ([string]$asset.ConsumerPath -cnotin $expectedManagedPaths) {
-                continue
-            }
-            $relativeTemplatePath = [string]$asset.TemplatePath -replace '/', [IO.Path]::DirectorySeparatorChar
-            $relativeConsumerPath = [string]$asset.ConsumerPath -replace '/', [IO.Path]::DirectorySeparatorChar
-            Copy-Item -LiteralPath (Join-Path $sourcePath $relativeTemplatePath) `
-                -Destination (Join-Path $workspace $relativeConsumerPath) -Force
-        }
-    }
-    Apply-ConsumerMigrationPlan -Plan $migrationPlan -Workspace $workspace
-    $addPaths = @($expectedManagedPaths | Where-Object { $_ -cne $ProtocolPath })
-    if ($addPaths.Count -ne 0) {
-        Invoke-Native -Command 'git' -Arguments (@('add', '--') + $addPaths) |
-            Out-Null
-    }
-    Assert-StagedManagedUpdate -ExpectedPaths $expectedManagedPaths `
+    $expectedManagedPaths = @(Stage-ManagedProposalTree `
+        -Workspace $workspace -BaseCommit $baseHeadSha `
         -TargetProtocolSha $targetSha -SourcePath $sourcePath `
         -ProtocolPath $ProtocolPath -Assets $ManagedUpdaterAssets `
-        -MigrationPlan $migrationPlan -ProposalKind $proposalKind
+        -MigrationPlan $migrationPlan -ProposalKind $proposalKind)
 
     Invoke-Native -Command 'git' -Arguments @('config', 'user.name', 'github-actions[bot]') | Out-Null
     Invoke-Native -Command 'git' -Arguments @('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com') | Out-Null
@@ -3025,6 +3279,10 @@ if ($create.Count -eq 1) {
     ) | Out-Null
     $headSha = ((Invoke-Native -Command 'git' -Arguments @('rev-parse', 'HEAD')) -join '').Trim()
 
+    if ($CurrentLauncher) {
+        Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+            -ExpectedHeadSha $RequestedBaseSha
+    }
     $updateIssue = Ensure-ProtocolUpdateIssue -Repository $repository `
         -TargetTag $targetTag -ProtocolSha $targetSha -Branch $createdBranch `
         -ProposalKind $proposalKind `
@@ -3033,6 +3291,10 @@ if ($create.Count -eq 1) {
     $pushSucceeded = $false
     $marker = ''
     try {
+        if ($CurrentLauncher) {
+            Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+                -ExpectedHeadSha $RequestedBaseSha
+        }
         $confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
         if (-not (Test-ExactRemoteBranchInventory -Expected $reservedBranches `
             -Actual $confirmedReservedBranches)) {
@@ -3201,13 +3463,14 @@ if ($plan.State -eq 'Supersede') {
             'MigrationReconciliation'
         }
         else { 'Update' }
-        $existingReplacements = @($candidates | Where-Object {
-            [string]$_.TargetTag -ceq [string]$plan.LatestCompatibleTag -and
-            [string]$_.Kind -ceq $replacementProposalKind -and
-            ($replacementProposalKind -ceq 'Update' -or
-                [string]$_.MigrationPlanSha -ceq
-                    [string]$snapshot.CurrentMigrationPlanSha)
-        })
+        $existingReplacements = @(Get-ExistingReplacementCandidates `
+            -Candidates @($candidates) `
+            -TargetTag ([string]$plan.LatestCompatibleTag) `
+            -ProposalKind $replacementProposalKind `
+            -MigrationPlanSha ([string]$snapshot.CurrentMigrationPlanSha) `
+            -CurrentLauncherMode ([bool]$CurrentLauncher) `
+            -BranchPrefix $BranchPrefix `
+            -RecoveryBranchSuffix $RecoveryBranchSuffix)
         if ($existingReplacements.Count -ne 1) {
             throw 'Unable to identify exactly one verified replacement PR before cleanup.'
         }
@@ -3227,6 +3490,10 @@ if ($plan.State -eq 'Supersede') {
 
 $deleteOperations = @($plan.Operations | Where-Object Kind -eq 'DeleteBranch')
 $closeOperations = @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest')
+if ($CurrentLauncher -and $closeOperations.Count -gt 0) {
+    Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+        -ExpectedHeadSha $RequestedBaseSha
+}
 if (-not $reservedNamespaceRevalidated -and $closeOperations.Count -gt 0) {
     $confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
     if (-not (Test-ExactRemoteBranchInventory -Expected $reservedBranches `

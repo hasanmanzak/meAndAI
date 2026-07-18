@@ -5,17 +5,19 @@ and follow its canonical links.
 
 ## Current continuation
 
-Hosted runner-minute efficiency is tracked as
+The shared v0.10.4 release combines hosted runner-minute efficiency and atomic
+legacy updater recovery. Follow
 [FEAT-0027](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md),
-[DEC-0019](../../../docs/decisions/DEC-0019-hosted-runner-efficiency.md),
-[`TEST-0123` and `TEST-0124`](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md),
-and the [v0.10.4 continuation](2026-07-18-v0104-runner-minute-efficiency.md).
-[Issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) owns delivery and
-future post-publication evidence. `FIND-0120` remains the separate open external
-follow-up in issue #44.
+[FEAT-0028 / BUG-0013](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md),
+the [runner continuation](2026-07-18-v0104-runner-minute-efficiency.md), and the
+[recovery continuation](2026-07-18-v0104-atomic-legacy-updater-recovery.md).
+[Issues #72](https://github.com/hasanmanzak/meAndAI/issues/72) and
+[#74](https://github.com/hasanmanzak/meAndAI/issues/74) own external delivery
+facts. `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-18 - v0.10.4 atomic legacy updater recovery](2026-07-18-v0104-atomic-legacy-updater-recovery.md)
 - [2026-07-18 - v0.10.4 hosted runner-minute efficiency](2026-07-18-v0104-runner-minute-efficiency.md)
 - [2026-07-17 - v0.10.3 generic consumer transition reconciliation](2026-07-17-v0103-generic-consumer-transition-reconciliation.md)
 - [2026-07-17 - v0.10.2 balanced Windows validation](2026-07-17-v0102-balanced-windows-validation.md)
