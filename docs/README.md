@@ -5,6 +5,7 @@ explain what the protocol repository provides and why it is designed this way.
 
 - [Adopt the protocol](adoption.md)
 - [Quick adoption](quick-adoption.md)
+- [Optional agent prompts](agent-prompts/README.md)
 - [Feature index](features/README.md)
 - [Decision index](decisions/README.md)
 - [Idea index](ideas/README.md)

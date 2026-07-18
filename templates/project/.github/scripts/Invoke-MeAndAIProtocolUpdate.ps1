@@ -720,6 +720,89 @@ function Assert-StagedManagedUpdate {
     }
 }
 
+function Assert-CommittedManagedUpdate {
+    param(
+        [Parameter(Mandatory)][string[]]$ExpectedPaths,
+        [Parameter(Mandatory)][string]$BaseCommit,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][string]$TargetProtocolSha,
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$ProtocolPath,
+        [Parameter(Mandatory)][object[]]$Assets,
+        [AllowNull()]$MigrationPlan = $null,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update'
+    )
+
+    if ($BaseCommit -cnotmatch '^[0-9a-f]{40}$' -or
+        $Commit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Committed proposal validation requires canonical base and head commits.'
+    }
+    $parentLines = @(Invoke-Native -Command 'git' -Arguments @(
+        'rev-list', '--parents', '-n', '1', $Commit
+    ))
+    $parentParts = if ($parentLines.Count -eq 1) {
+        @([regex]::Split(([string]$parentLines[0]).Trim(), '\s+') |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    }
+    else { @() }
+    if ($parentParts.Count -ne 2 -or
+        [string]$parentParts[0] -cne $Commit -or
+        [string]$parentParts[1] -cne $BaseCommit) {
+        throw "Proposal commit '$Commit' is not based directly on the exact captured base '$BaseCommit'."
+    }
+
+    $committedPaths = @(Invoke-Native -Command 'git' -Arguments @(
+        'diff', '--name-only', '--no-renames', $BaseCommit, $Commit, '--'
+    ))
+    if (-not (Test-MeAndAIExactOrdinalPathSet `
+        -Actual $committedPaths -Expected $ExpectedPaths)) {
+        throw "Committed proposal paths do not match the expected managed paths: $($committedPaths -join ', ')."
+    }
+
+    if ($ProposalKind -ceq 'Update') {
+        $protocolEntry = Get-LocalTreeEntry -Commit $Commit -Path $ProtocolPath
+        if ($protocolEntry.Mode -cne '160000' -or
+            $protocolEntry.Type -cne 'commit' -or
+            $protocolEntry.Sha -cne $TargetProtocolSha) {
+            throw "Committed protocol gitlink does not match target commit '$TargetProtocolSha'."
+        }
+        foreach ($asset in $Assets) {
+            if ([string]$asset.ConsumerPath -cnotin $ExpectedPaths) {
+                continue
+            }
+            $targetEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+                -Commit $TargetProtocolSha -Path ([string]$asset.TemplatePath)
+            $committedEntry = Get-LocalTreeEntry -Commit $Commit `
+                -Path ([string]$asset.ConsumerPath)
+            if ($targetEntry.Mode -cne '100644' -or
+                $targetEntry.Type -cne 'blob' -or
+                $committedEntry.Mode -cne $targetEntry.Mode -or
+                $committedEntry.Type -cne $targetEntry.Type -or
+                $committedEntry.Sha -cne $targetEntry.Sha) {
+                throw "Committed updater asset '$($asset.ConsumerPath)' does not match the target release blob."
+            }
+        }
+    }
+    if ($null -eq $MigrationPlan) { return }
+    foreach ($pathResult in @($MigrationPlan.Paths | Where-Object { [bool]$_.Changed })) {
+        $entry = Get-LocalTreeEntry -Commit $Commit `
+            -Path ([string]$pathResult.Path)
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cne [string]$pathResult.ResultBlob) {
+            throw "Committed migration result '$([string]$pathResult.Path)' does not match its deterministic plan."
+        }
+    }
+    if ([bool]$MigrationPlan.Ledger.Changed) {
+        $entry = Get-LocalTreeEntry -Commit $Commit `
+            -Path ([string]$MigrationPlan.Ledger.Path)
+        if ($entry.Mode -cne '100644' -or $entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cne [string]$MigrationPlan.Ledger.ResultBlob) {
+            throw 'Committed consumer migration ledger does not match its deterministic plan.'
+        }
+    }
+}
+
 function Stage-ManagedProposalTree {
     param(
         [Parameter(Mandatory)][string]$Workspace,
@@ -1347,12 +1430,33 @@ function Get-RemoteBranchHead {
 
 function Assert-RemoteDefaultBranchUnchanged {
     param(
+        [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][string]$DefaultBranch,
         [Parameter(Mandatory)][string]$ExpectedHeadSha
     )
 
     if ($ExpectedHeadSha -cnotmatch '^[0-9a-f]{40}$') {
         throw 'Remote default-branch binding lacks one exact expected SHA.'
+    }
+    $metadata = Invoke-GhJson -Arguments @('api', "repos/$Repository")
+    $fullNameProperty = if ($null -ne $metadata) {
+        $metadata.PSObject.Properties['full_name']
+    }
+    else { $null }
+    $liveRepository = if ($null -ne $fullNameProperty) {
+        [string]$fullNameProperty.Value
+    }
+    else { '' }
+    if ($liveRepository -cne $Repository) {
+        throw "Current-launcher live repository identity '$liveRepository' does not match '$Repository'; no GitHub mutation is permitted."
+    }
+    $defaultBranchProperty = $metadata.PSObject.Properties['default_branch']
+    $liveDefaultBranch = if ($null -ne $defaultBranchProperty) {
+        [string]$defaultBranchProperty.Value
+    }
+    else { '' }
+    if ($liveDefaultBranch -cne $DefaultBranch) {
+        throw "Consumer live default branch '$liveDefaultBranch' does not match captured '$DefaultBranch'; no GitHub mutation is permitted."
     }
     $observed = Get-RemoteBranchHead -Branch $DefaultBranch
     if ($null -eq $observed -or [string]$observed -cne $ExpectedHeadSha) {
@@ -3278,9 +3382,15 @@ if ($create.Count -eq 1) {
         'commit', '-m', $commitMessage
     ) | Out-Null
     $headSha = ((Invoke-Native -Command 'git' -Arguments @('rev-parse', 'HEAD')) -join '').Trim()
+    Assert-CommittedManagedUpdate -ExpectedPaths $expectedManagedPaths `
+        -BaseCommit $baseHeadSha -Commit $headSha `
+        -TargetProtocolSha $targetSha -SourcePath $sourcePath `
+        -ProtocolPath $ProtocolPath -Assets $ManagedUpdaterAssets `
+        -MigrationPlan $migrationPlan -ProposalKind $proposalKind
 
     if ($CurrentLauncher) {
-        Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+        Assert-RemoteDefaultBranchUnchanged -Repository $repository `
+            -DefaultBranch $env:DEFAULT_BRANCH `
             -ExpectedHeadSha $RequestedBaseSha
     }
     $updateIssue = Ensure-ProtocolUpdateIssue -Repository $repository `
@@ -3292,7 +3402,8 @@ if ($create.Count -eq 1) {
     $marker = ''
     try {
         if ($CurrentLauncher) {
-            Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+            Assert-RemoteDefaultBranchUnchanged -Repository $repository `
+                -DefaultBranch $env:DEFAULT_BRANCH `
                 -ExpectedHeadSha $RequestedBaseSha
         }
         $confirmedReservedBranches = @(Get-RemoteBranchesByPrefix -Prefix $BranchPrefix)
@@ -3491,7 +3602,8 @@ if ($plan.State -eq 'Supersede') {
 $deleteOperations = @($plan.Operations | Where-Object Kind -eq 'DeleteBranch')
 $closeOperations = @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest')
 if ($CurrentLauncher -and $closeOperations.Count -gt 0) {
-    Assert-RemoteDefaultBranchUnchanged -DefaultBranch $env:DEFAULT_BRANCH `
+    Assert-RemoteDefaultBranchUnchanged -Repository $repository `
+        -DefaultBranch $env:DEFAULT_BRANCH `
         -ExpectedHeadSha $RequestedBaseSha
 }
 if (-not $reservedNamespaceRevalidated -and $closeOperations.Count -gt 0) {

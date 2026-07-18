@@ -38,6 +38,9 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             [string]$LocalUpdaterState = 'Absent',
             [string]$SeedWorkflowState = 'Exact',
             [string[]]$Collisions = @(),
+            [string]$AdoptionStrategy = 'Auto',
+            [string[]]$ProtocolSurfaces = @(),
+            [bool]$AcknowledgeProtocolRecordLoss = $false,
             [bool]$ManifestExists = $false,
             [bool]$RemoteBranchExists = $false,
             [int]$OpenPullRequestCount = 0,
@@ -45,10 +48,13 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         )
 
         Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobject]@{
-            SchemaVersion = 1
+            SchemaVersion = 2
             LocalUpdaterState = $LocalUpdaterState
             SeedWorkflowState = $SeedWorkflowState
             Collisions = @($Collisions)
+            AdoptionStrategy = $AdoptionStrategy
+            ProtocolSurfaces = @($ProtocolSurfaces)
+            AcknowledgeProtocolRecordLoss = $AcknowledgeProtocolRecordLoss
             ManifestExists = $ManifestExists
             RemoteBranchExists = $RemoteBranchExists
             OpenPullRequestCount = $OpenPullRequestCount
@@ -63,14 +69,81 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     $plan = Invoke-LifecyclePlan
     Assert-Equal 'BootstrapReady' $plan.State 'TEST-0028 collision-free seed should bootstrap'
     Assert-Equal 'Full' $plan.ProposalMode 'TEST-0028 collision-free seed should propose full core assets'
+    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should resolve a clean tree to FreshAdoption'
+
+    $plan = Invoke-LifecyclePlan -Collisions @('.gitmodules')
+    Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0127 a generic target collision should require semantic review without inventing prior protocol evidence'
+    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should retain FreshAdoption for a protocol-free generic collision'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md')
+    Assert-Equal 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 Auto with protocol evidence should require maintainer selection'
+    Assert-Equal 'None' $plan.ProposalMode 'TEST-0127 unresolved strategy must not create a proposal'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
+        -AdoptionStrategy 'FreshAdoption'
+    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 explicit FreshAdoption must reject protocol evidence'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
+        -AdoptionStrategy 'FullMigration'
+    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 explicit FullMigration should authorize a collision-free proposal'
+    Assert-Equal 'FullMigration' $plan.AdoptionStrategy 'TEST-0127 resolved strategy should remain exact'
+
+    foreach ($unsupportedEvidenceFreeStrategy in @(
+        'FullMigration', 'HybridReconciliation', 'CleanStart'
+    )) {
+        $plan = Invoke-LifecyclePlan `
+            -Collisions @('.github/PULL_REQUEST_TEMPLATE.md') `
+            -AdoptionStrategy $unsupportedEvidenceFreeStrategy `
+            -AcknowledgeProtocolRecordLoss `
+                ($unsupportedEvidenceFreeStrategy -ceq 'CleanStart')
+        Assert-Equal 'BlockedManualReview' $plan.State "TEST-0127 $unsupportedEvidenceFreeStrategy must reject an evidence-free repository"
+    }
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
+        -AdoptionStrategy 'CleanStart'
+    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart without loss acknowledgement must block'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
+        -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
+    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should authorize a proposal'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('.ai/protocol/legacy.md') `
+        -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
+    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow exact legacy protocol-root records'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('.cursor/rules') `
+        -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
+    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow an exact active-rule root'
+
+    $plan = Invoke-LifecyclePlan `
+        -ProtocolSurfaces @('.github/instructions/api.instructions.md') `
+        -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
+    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow path-specific GitHub Copilot instructions'
+
+    $plan = Invoke-LifecyclePlan `
+        -ProtocolSurfaces @('.ai/meandai-update-state.json')
+    Assert-Equal 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 a pre-existing protocol ledger must not be classified as fresh'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('RELEASES.md') `
+        -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
+    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart must reject ambiguous product-or-governance records before proposal mutation'
+
+    $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
+        -AdoptionStrategy 'Abort'
+    Assert-Equal 'Aborted' $plan.State 'TEST-0127 Abort should produce an explicit no-mutation state'
+    Assert-Equal 'None' $plan.ProposalMode 'TEST-0127 Abort must not create a proposal'
 
     $plan = Invoke-LifecyclePlan -LocalUpdaterState 'Partial' -Collisions @(
         '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
-    )
+    ) -ProtocolSurfaces @(
+        '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+    ) -AdoptionStrategy 'HybridReconciliation'
     Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0027 partial updater must not execute as complete'
     Assert-Equal 'ManifestOnly' $plan.ProposalMode 'TEST-0030 partial adoption should preserve existing targets'
 
-    $plan = Invoke-LifecyclePlan -Collisions @('AGENTS.md', '.gitmodules')
+    $plan = Invoke-LifecyclePlan -Collisions @('AGENTS.md', '.gitmodules') `
+        -ProtocolSurfaces @('AGENTS.md') `
+        -AdoptionStrategy 'FullMigration'
     Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0030 collisions should require semantic review'
     Assert-Equal 'AGENTS.md,.gitmodules' (@($plan.Collisions) -join ',') 'TEST-0030 collision paths should remain exact and deterministic'
 
@@ -78,6 +151,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         -ExistingProposalValid $true
     Assert-Equal 'PendingAdoption' $plan.State 'TEST-0031 one pending adoption proposal should remain idempotent'
     Assert-Equal 'None' $plan.ProposalMode 'TEST-0031 pending work must not be replaced'
+    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0130 pending work should retain its validated strategy identity'
 
     $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1
     Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0047 an unverified existing proposal must block'
@@ -96,13 +170,48 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 
     $manifestValidator = Get-Command -Name 'Test-MeAndAIExactAdoptionManifest' `
         -CommandType Function -ErrorAction SilentlyContinue
+    $surfaceClassifier = Get-Command -Name 'Get-MeAndAIProtocolSurfaceInventory' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $assessmentLimitGetter = Get-Command `
+        -Name 'Get-MeAndAIProtocolAssessmentLimits' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $strategyResolver = Get-Command -Name 'Resolve-MeAndAIAdoptionStrategy' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $relevantPathClassifier = Get-Command `
+        -Name 'Test-MeAndAIProtocolAssessmentRelevantPath' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $pathCasingAssertion = Get-Command `
+        -Name 'Assert-MeAndAIProtocolAssessmentPathCasing' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $canonicalPathValidator = Get-Command `
+        -Name 'Test-MeAndAICanonicalRepositoryPath' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $legacyGovernanceClassifier = Get-Command `
+        -Name 'Test-MeAndAILegacyGovernancePath' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $legacyCommonAuthorityClassifier = Get-Command `
+        -Name 'Test-MeAndAILegacyCommonAuthorityPath' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $consumerGovernanceClassifier = Get-Command `
+        -Name 'Test-MeAndAIConsumerGovernancePath' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $cleanStartClassifier = Get-Command `
+        -Name 'Test-MeAndAICleanStartSurfaceSupported' `
+        -CommandType Function -ErrorAction SilentlyContinue
     $targetPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionTargetPaths' `
         -CommandType Function -ErrorAction SilentlyContinue
     $proposedPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionProposedPaths' `
         -CommandType Function -ErrorAction SilentlyContinue
     if ($null -eq $manifestValidator -or $null -eq $targetPathGetter -or
-        $null -eq $proposedPathGetter) {
-        Add-Failure 'TEST-0080 pure lifecycle module does not export the canonical adoption path contract and validator.'
+        $null -eq $proposedPathGetter -or $null -eq $surfaceClassifier -or
+        $null -eq $assessmentLimitGetter -or $null -eq $strategyResolver -or
+        $null -eq $relevantPathClassifier -or
+        $null -eq $pathCasingAssertion -or $null -eq $canonicalPathValidator -or
+        $null -eq $legacyGovernanceClassifier -or
+        $null -eq $legacyCommonAuthorityClassifier -or
+        $null -eq $consumerGovernanceClassifier -or
+        $null -eq $cleanStartClassifier) {
+        Add-Failure 'TEST-0080/TEST-0127 pure lifecycle module does not export the canonical adoption path, assessment, strategy, inventory, and manifest contract.'
     }
     else {
         $protocolSha = ('a' * 40) -join ''
@@ -132,22 +241,142 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         if (($actualProposedPaths -join "`n") -cne ($expectedProposedPaths -join "`n")) {
             Add-Failure 'TEST-0080 canonical adoption proposed path inventory is not exact.'
         }
+        $assessmentLimits = & $assessmentLimitGetter
+        if ($null -eq $assessmentLimits -or
+            $assessmentLimits.MaximumSurfaceCount -isnot [int] -or
+            [int]$assessmentLimits.MaximumSurfaceCount -ne 256 -or
+            $assessmentLimits.MaximumSurfaceUtf8Bytes -isnot [int] -or
+            [int]$assessmentLimits.MaximumSurfaceUtf8Bytes -ne 16384) {
+            Add-Failure 'TEST-0127 module-owned assessment limits are missing or noncanonical.'
+        }
+        $moduleRecognizedPath = 'docs/findings/FIND-9999-wrapper-prefilter.md'
+        if (-not (& $relevantPathClassifier -Path $moduleRecognizedPath `
+                -TargetPaths $actualTargetPaths) -or
+            (& $relevantPathClassifier -Path 'src/app.ps1' `
+                -TargetPaths $actualTargetPaths)) {
+            Add-Failure 'TEST-0127 module-owned streaming assessment predicate did not distinguish a recognized governance surface from application content.'
+        }
+        $moduleRecognizedInventory = @(& $surfaceClassifier -Paths @(
+            'src/app.ps1', $moduleRecognizedPath
+        ))
+        $emptyInventory = @(& $surfaceClassifier -Paths $null)
+        if ($emptyInventory.Count -ne 0 -or
+            $moduleRecognizedInventory.Count -ne 1 -or
+            [string]$moduleRecognizedInventory[0] -cne $moduleRecognizedPath) {
+            Add-Failure 'TEST-0127 module-owned relevant-path predicate and surface inventory disagree.'
+        }
+        $casingFailed = $false
+        $canonicalCasingOutput = @(& $pathCasingAssertion `
+            -Path '.github/workflows/meandai-protocol-update.yml')
+        try {
+            & $pathCasingAssertion -Path 'agents.md'
+        }
+        catch {
+            $casingFailed = $_.Exception.Message -like '*noncanonical casing*'
+        }
+        if ($canonicalCasingOutput.Count -ne 0 -or -not $casingFailed -or
+            -not (& $canonicalPathValidator -Path $moduleRecognizedPath) -or
+            (& $canonicalPathValidator -Path '../AGENTS.md')) {
+            Add-Failure 'TEST-0127 module-owned canonical path and adoption casing policy did not fail closed.'
+        }
+        if (-not (& $legacyGovernanceClassifier `
+                -Path 'docs/governance/legacy.md') -or
+            -not (& $legacyGovernanceClassifier -Path 'nested/AGENTS.md') -or
+            (& $legacyGovernanceClassifier -Path 'docs/features/FEAT-9999.md') -or
+            -not (& $legacyCommonAuthorityClassifier `
+                -Path '.github/instructions/api.instructions.md') -or
+            (& $legacyCommonAuthorityClassifier -Path 'ai/WORK_INDEX.md') -or
+            -not (& $consumerGovernanceClassifier `
+                -Path 'docs/features/FEAT-9999.md') -or
+            (& $consumerGovernanceClassifier -Path 'docs/features/FEAT-9999.json') -or
+            (& $consumerGovernanceClassifier -Path 'src/app.ps1') -or
+            -not (& $cleanStartClassifier -Path 'docs/ideas/README.md') -or
+            (& $cleanStartClassifier -Path 'docs/features/FEAT-9999.md')) {
+            Add-Failure 'TEST-0127 module-owned legacy authority and CleanStart classifiers do not preserve their policy boundaries.'
+        }
         $requiredTasks = @(
             'Create or reconcile the repository labels required by the protocol.',
             'Create project-owned feature and decision records for adoption.',
+            'Apply the manifest-selected adoption strategy; do not infer or change it.',
             'Tailor project-local memory without importing protocol-repository facts.',
             'Resolve every collision through semantic review; do not overwrite blindly.',
             'Create and run the project test evidence required by DoR and DoD.',
             'Verify all documentation links and traceability references.',
             'Remove the manifest before marking the pull request ready or merging it.'
         )
+        $expectedProtocolSurfaces = @(
+            '.ai/meandai-update-state.json', '.ai/protocol/legacy.md',
+            '.cursor/rules', '.github/instructions/api.instructions.md',
+            'AGENTS.md', 'ai/DECISIONS.md', 'ai/WORK_INDEX.md'
+        )
+        $classifiedSurfaces = @(& $surfaceClassifier -Paths @(
+            'src/app.ps1', 'ai/WORK_INDEX.md', 'AGENTS.md',
+            '.github/workflows/build.yml', 'ai/DECISIONS.md', 'ai/model.py',
+            '.ai/protocol/legacy.md', '.ai/meandai-update-state.json',
+            '.cursor/rules', '.github/instructions/api.instructions.md'
+        ))
+        if (($classifiedSurfaces -join ',') -cne ($expectedProtocolSurfaces -join ',')) {
+            Add-Failure "TEST-0127 bounded protocol-surface inventory was not unique and deterministic: $($classifiedSurfaces -join ',')"
+        }
+        foreach ($invalidInventory in @(
+            @('../AGENTS.md'),
+            @('/AGENTS.md'),
+            @('ai/file.md', 'AI/FILE.md')
+        )) {
+            $inventoryFailed = $false
+            try {
+                [void]@(& $surfaceClassifier -Paths $invalidInventory)
+            }
+            catch {
+                $inventoryFailed = $true
+            }
+            if (-not $inventoryFailed) {
+                Add-Failure "TEST-0127 invalid or ambiguous inventory was accepted: $($invalidInventory -join ',')"
+            }
+        }
+        foreach ($invalidStrategyInput in @(
+            [pscustomobject]@{
+                ProtocolSurfaces = @('../AGENTS.md')
+                Collisions = @()
+            },
+            [pscustomobject]@{
+                ProtocolSurfaces = @()
+                Collisions = @('/AGENTS.md')
+            }
+        )) {
+            $invalidStrategy = & $strategyResolver `
+                -RequestedStrategy 'FullMigration' `
+                -ProtocolSurfaces @($invalidStrategyInput.ProtocolSurfaces) `
+                -Collisions @($invalidStrategyInput.Collisions) `
+                -AcknowledgeProtocolRecordLoss $false
+            if ([string]$invalidStrategy.State -cne 'BlockedManualReview') {
+                Add-Failure 'TEST-0127 the pure strategy resolver accepted a noncanonical protocol surface or collision path.'
+            }
+        }
+        $oversizedInventory = @(0..256 | ForEach-Object {
+            "docs/governance/record-$_.md"
+        })
+        $oversizedFailed = $false
+        try {
+            [void]@(& $surfaceClassifier -Paths $oversizedInventory)
+        }
+        catch {
+            $oversizedFailed = $true
+        }
+        if (-not $oversizedFailed) {
+            Add-Failure 'TEST-0127 oversized protocol inventory did not fail closed.'
+        }
+
         $validManifest = [pscustomobject][ordered]@{
-            schema = 1
+            schema = 2
             operation = 'ai-capabilities-adoption'
             state = 'AdoptionReviewRequired'
             repository = 'owner/consumer'
             targetTag = 'v0.9.7'
             protocolSha = $protocolSha
+            adoptionStrategy = 'HybridReconciliation'
+            protocolSurfaces = $expectedProtocolSurfaces
+            protocolRecordLossAcknowledged = $false
             collisions = $expectedCollisions
             proposedPaths = $expectedProposedPaths
             requiredTasks = $requiredTasks
@@ -158,6 +387,9 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
                 -Repository 'owner/consumer' -TargetTag 'v0.9.7' `
                 -ProtocolSha $protocolSha -ExpectedState 'AdoptionReviewRequired' `
+                -ExpectedAdoptionStrategy 'HybridReconciliation' `
+                -ExpectedProtocolSurfaces $expectedProtocolSurfaces `
+                -ExpectedProtocolRecordLossAcknowledgement $false `
                 -ExpectedCollisions $expectedCollisions
         }
 
@@ -181,6 +413,12 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $wrongCollisions = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
         $wrongCollisions.collisions = @('docs/ideas/README.md')
         $invalidManifests['wrong collision inventory'] = $wrongCollisions
+        $wrongStrategy = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $wrongStrategy.adoptionStrategy = 'FullMigration'
+        $invalidManifests['wrong adoption strategy'] = $wrongStrategy
+        $wrongSurfaces = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
+        $wrongSurfaces.protocolSurfaces = @('AGENTS.md')
+        $invalidManifests['wrong protocol surface inventory'] = $wrongSurfaces
         $invalidManifests['array root type'] = [object[]]@(
             $validManifest,
             $validManifest
@@ -191,8 +429,8 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             @{ Name = 'protocol-SHA identity'; Property = 'protocolSha'; Value = ('b' * 40) },
             @{ Name = 'state identity'; Property = 'state'; Value = 'BootstrapReady' },
             @{ Name = 'operation identity'; Property = 'operation'; Value = 'other-operation' },
-            @{ Name = 'schema value'; Property = 'schema'; Value = 2 },
-            @{ Name = 'schema type'; Property = 'schema'; Value = '1' },
+            @{ Name = 'schema value'; Property = 'schema'; Value = 1 },
+            @{ Name = 'schema type'; Property = 'schema'; Value = '2' },
             @{ Name = 'collision property type'; Property = 'collisions'; Value = 'AGENTS.md' }
         )) {
             $variant = $validManifest | ConvertTo-Json -Depth 5 | ConvertFrom-Json
@@ -211,9 +449,11 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.10.4',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.11.0',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
+        'adoption_strategy:',
+        'acknowledge_protocol_record_loss:',
         'Verify immutable protocol release',
         "'X-GitHub-Api-Version' = '2026-03-10'",
         'immutable',
@@ -253,6 +493,45 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
         $trustedPreflightIndex -ge $localUpdaterInvocationIndex) {
         Add-Failure 'TEST-0077 trusted-source updater validation must run before the local updater adapter.'
     }
+    foreach ($requiredStrategyBoundary in @(
+        "if (`$env:EVENT_NAME -cne 'workflow_dispatch')",
+        'Initial adoption waits for a launcher-owned or explicit manual dispatch with an adoption strategy.',
+        '-AdoptionStrategy $env:ADOPTION_STRATEGY',
+        '-AcknowledgeProtocolRecordLoss'
+    )) {
+        if (-not $workflow.Contains($requiredStrategyBoundary)) {
+            Add-Failure "TEST-0128 workflow initial-adoption strategy gate is missing '$requiredStrategyBoundary'."
+        }
+    }
+    foreach ($requiredEventBinding in @(
+        'ref: ${{ github.sha }}',
+        'EVENT_SHA: ${{ github.sha }}',
+        "EXPECTED_BASE_SHA: `${{ inputs.expected_base_sha || '' }}",
+        '$checkedOutHead = (& git rev-parse HEAD) -join ''''',
+        '$checkedOutHead -cne $env:EVENT_SHA',
+        '$env:EVENT_SHA -cne $env:EXPECTED_BASE_SHA',
+        '$defaultRef = "refs/heads/$env:DEFAULT_BRANCH"',
+        '$env:EVENT_REF -cne $defaultRef',
+        '& git ls-remote --heads origin $defaultRef',
+        '[string]$Matches.sha -cne $env:EVENT_SHA'
+    )) {
+        if (-not $workflow.Contains($requiredEventBinding)) {
+            Add-Failure "TEST-0128 workflow immutable event/base binding is missing '$requiredEventBinding'."
+        }
+    }
+    $eventCheckoutIndex = $workflow.IndexOf(
+        '$checkedOutHead = (& git rev-parse HEAD)', [StringComparison]::Ordinal
+    )
+    $liveDefaultIndex = $workflow.IndexOf(
+        '& git ls-remote --heads origin $defaultRef', [StringComparison]::Ordinal
+    )
+    $bootstrapInvocationIndex = $workflow.IndexOf(
+        '& "./$bootstrap" -TargetTag', [StringComparison]::Ordinal
+    )
+    if ($eventCheckoutIndex -lt 0 -or $liveDefaultIndex -le $eventCheckoutIndex -or
+        $bootstrapInvocationIndex -le $liveDefaultIndex) {
+        Add-Failure 'TEST-0128 workflow must bind the checked-out event and live default head before bootstrap mutation.'
+    }
 }
 
 if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
@@ -270,11 +549,24 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
         '.ai/adoption/meandai-capabilities.json',
         'Resolve-MeAndAICapabilitiesLifecycle',
         '--force-with-lease=',
+        'Assert-LiveConsumerDefaultBranch -ExpectedBranch $env:DEFAULT_BRANCH',
+        '--force-with-lease=${ref}:$headSha',
+        'the exact unpublished proposal branch was removed',
+        'the exact draft and proposal branch were removed',
         "'pr', 'create'",
         '--draft',
         'BootstrapReady',
         'AdoptionReviewRequired',
         'PendingAdoption',
+        'ProtocolMigrationReviewRequired',
+        'AdoptionStrategy',
+        'ProtocolSurfaces',
+        'Get-MeAndAIProtocolAssessmentLimits',
+        'Test-MeAndAIProtocolAssessmentRelevantPath -Path $path',
+        'Assert-MeAndAIProtocolAssessmentPathCasing -Path $path',
+        'Test-MeAndAIConsumerGovernancePath -Path $Path',
+        'Test-MeAndAILegacyGovernancePath -Path $path',
+        'Test-MeAndAILegacyCommonAuthorityPath -Path $surface',
         'BlockedManualReview',
         'ValidateLocalUpdaterOnly'
     )) {
@@ -285,6 +577,18 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
     foreach ($forbidden in @("'issue', 'create'", "'label', 'create'", "'pr', 'merge'")) {
         if ($adapter.Contains($forbidden)) {
             Add-Failure "TEST-0032 bootstrap adapter contains forbidden mutation '$forbidden'"
+        }
+    }
+    foreach ($duplicatedPolicy in @(
+        '$AssessmentSurfaceFiles', '$AssessmentSurfaceRoots',
+        '$AssessmentMaximumSurfaceCount',
+        '$LegacyCommonAuthorityFiles', '$LegacyAiGovernanceFiles',
+        'function Test-AssessmentRelevantPath',
+        'function Test-CompletedLegacyGovernancePath',
+        'function Test-CompletedLegacyCommonAuthorityPath'
+    )) {
+        if ($adapter.Contains($duplicatedPolicy)) {
+            Add-Failure "TEST-0127 bootstrap adapter duplicates module-owned assessment policy '$duplicatedPolicy'."
         }
     }
 }

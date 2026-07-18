@@ -7,26 +7,27 @@ Last verified: **2026-07-18**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.10.4`. Exact publication state is authoritative
+- Current protocol version: `0.11.0`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) after
+  [issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) and
+  [issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0027](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md)
-  reduces hosted runner consumption, while
-  [FEAT-0028 / BUG-0013](../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
-  lets the latest launcher recover a pre-engine consumer through one atomic,
-  target-bound proposal. [Issues #72](https://github.com/hasanmanzak/meAndAI/issues/72)
-  and [#74](https://github.com/hasanmanzak/meAndAI/issues/74) own delivery and
+- Current scope: [FEAT-0029](../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md)
+  adds a maintainer-owned initial-adoption strategy gate, while
+  [FEAT-0030](../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md)
+  publishes one optional, single-invocation stability-cycle prompt. Issues
+  [#76](https://github.com/hasanmanzak/meAndAI/issues/76) and
+  [#77](https://github.com/hasanmanzak/meAndAI/issues/77) own delivery and
   future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: `tests/Select-WindowsValidationProfile.ps1` classifies
-  exact Git diffs and fails ambiguous or sensitive changes to `Full`.
-  Ordinary CI uses one actual Windows job with a stable check identity; its
-  `WindowsNative` profile emits compatibility-only evidence, while Linux and
-  the Windows `Full` escape hatch retain canonical coverage. `TEST-0123` and
-  `TEST-0124` own selector and orchestration evidence.
+- Latest tracked work: the quick launcher and lifecycle bind one explicit
+  adoption strategy and exact bounded protocol-surface inventory through
+  dispatch, manifest, marker, issue, prompt, recovery, and completion.
+  `TEST-0127` through `TEST-0130` own that behavior. `TEST-0131` and
+  `TEST-0132` own the optional prompt's fidelity, immutable consumer
+  reachability, and no-activation boundary.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -76,6 +77,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- `v0.11.0` adds explicit `FreshAdoption`, `FullMigration`,
+  `HybridReconciliation`, acknowledged `CleanStart`, and `Abort` strategy
+  handling. `Auto` selects only protocol-evidence-free fresh adoption;
+  ambiguous non-interactive state fails closed.
+- The immutable capabilities contract module is the only pure classifier and
+  strategy-policy authority. Launcher and workflow actors keep separate
+  evidence/mutation guards but do not embed or cross-check policy copies.
+- The optional stability-cycle prompt remains inside the immutable protocol
+  source. Adoption and updates do not copy it into consumer-owned files or
+  create a goal, recurring task, automation, workflow, schedule, background
+  loop, or next invocation.
 - Existing consumers pinned to immutable `v0.1.0` require one manual upgrade
   and updater installation; consumers adopting `v0.2.0` receive the updater
   assets during initial collision-safe adoption.

@@ -60,9 +60,75 @@ foreach ($helperName in @(
     'Get-ExpectedManagedPaths',
     'Assert-StagedManagedUpdate',
     'Stage-ManagedProposalTree',
+    'Assert-RemoteDefaultBranchUnchanged',
     'Get-ExistingReplacementCandidates'
 )) {
     . ([scriptblock]::Create((Get-AdapterFunctionDefinition -Name $helperName)))
+}
+
+$script:FocusedRemoteDefaultHead = '0' * 40
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'main'
+}
+function Invoke-GhJson {
+    param([string[]]$Arguments)
+
+    if (($Arguments -join ' ') -cne 'api repos/owner/consumer') {
+        throw "Unexpected focused repository-metadata lookup: $($Arguments -join ' ')"
+    }
+    return $script:FocusedRepositoryMetadata
+}
+function Get-RemoteBranchHead {
+    param([string]$Branch)
+
+    if ($Branch -cne 'main') {
+        throw "Unexpected focused default-branch ref lookup '$Branch'."
+    }
+    return $script:FocusedRemoteDefaultHead
+}
+
+$defaultRenameError = ''
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'trunk'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    $defaultRenameError = $_.Exception.Message
+}
+if ($defaultRenameError -notlike '*live default branch*') {
+    Add-Failure "TEST-0126 a live default-branch rename with the old ref SHA intact did not fail closed: $defaultRenameError"
+}
+
+$repositoryIdentityError = ''
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/redirected-consumer'
+    default_branch = 'main'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    $repositoryIdentityError = $_.Exception.Message
+}
+if ($repositoryIdentityError -notlike '*live repository identity*') {
+    Add-Failure "TEST-0126 a redirected live repository identity did not fail closed: $repositoryIdentityError"
+}
+$script:FocusedRepositoryMetadata = [pscustomobject]@{
+    full_name = 'owner/consumer'
+    default_branch = 'main'
+}
+try {
+    Assert-RemoteDefaultBranchUnchanged -Repository 'owner/consumer' `
+        -DefaultBranch 'main' -ExpectedHeadSha $script:FocusedRemoteDefaultHead
+}
+catch {
+    Add-Failure "TEST-0126 unchanged live repository/default identity was rejected: $($_.Exception.Message)"
 }
 
 $legacyInterruptedCandidate = [pscustomobject]@{
@@ -589,9 +655,28 @@ function global:git {
         return
     }
     if ($arguments[0] -eq 'ls-tree') {
+        $commit = [string]$arguments[1]
         $path = [string]$arguments[-1]
+        $committedProposal = $commit -ceq $script:Scenario.NewHead
         if ($path -eq '.ai/protocol') {
-            "160000 commit $($script:Scenario.CurrentProtocolSha)`t.ai/protocol"
+            $protocolSha = if ($committedProposal) {
+                $script:Scenario.TargetProtocolSha
+            }
+            else { $script:Scenario.CurrentProtocolSha }
+            "160000 commit $protocolSha`t.ai/protocol"
+        }
+        elseif ($committedProposal -and
+            $script:Scenario.TargetConsumerBlobs.ContainsKey($path)) {
+            $blob = [string]$script:Scenario.TargetConsumerBlobs[$path]
+            if ($script:Scenario.WrongCommittedAssetBlob -and
+                $path -ceq '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1') {
+                $blob = '8' * 40
+            }
+            if ($script:Scenario.WrongCommittedMigrationBlob -and
+                $path -ceq 'AGENTS.md') {
+                $blob = '9' * 40
+            }
+            "100644 blob $blob`t$path"
         }
         elseif ($script:Scenario.ConsumerTreeEntries.ContainsKey($path)) {
             "100644 blob $($script:Scenario.ConsumerTreeEntries[$path])`t$path"
@@ -664,9 +749,20 @@ function global:git {
         $global:LASTEXITCODE = 2
         return
     }
-    if ($arguments[0] -eq 'diff' -and $arguments -contains '--cached') {
-        @($script:Scenario.ExpectedStagedPaths)
-        return
+    if ($arguments[0] -eq 'diff') {
+        if ($arguments -contains '--cached') {
+            @($script:Scenario.ExpectedStagedPaths)
+            return
+        }
+        if ($arguments -contains '--name-only' -and
+            $arguments -contains '--no-renames') {
+            Add-ScenarioEvent 'validate-committed-tree'
+            @($script:Scenario.ExpectedStagedPaths)
+            if ($script:Scenario.CommitExtraApplicationPath) {
+                'src/injected-product-file.txt'
+            }
+            return
+        }
     }
     if ($arguments[0] -eq 'ls-files' -and $arguments -contains '--stage') {
         $path = [string]$arguments[-1]
@@ -685,6 +781,15 @@ function global:git {
     }
     if ($arguments[0] -eq 'add') {
         Add-ScenarioEvent 'stage-target-assets'
+        return
+    }
+    if ($arguments[0] -eq 'rev-list' -and $arguments -contains '--parents') {
+        Add-ScenarioEvent 'validate-committed-parent'
+        $parent = if ($script:Scenario.WrongCommittedParent) {
+            '7' * 40
+        }
+        else { $script:Scenario.BaseHead }
+        "$($script:Scenario.NewHead) $parent"
         return
     }
     if ($arguments[0] -eq 'rev-parse') {
@@ -745,7 +850,11 @@ function global:git {
         }
         return
     }
-    if ($arguments[0] -in @('switch', 'update-index', 'config', 'commit')) {
+    if ($arguments[0] -eq 'commit') {
+        Add-ScenarioEvent 'commit-proposal'
+        return
+    }
+    if ($arguments[0] -in @('switch', 'update-index', 'config')) {
         return
     }
 
@@ -1229,6 +1338,10 @@ function Invoke-AdapterScenario {
         [string]$OldAuthorLogin = 'updater-owner',
         [bool]$DriftCurrentAsset = $false,
         [bool]$WrongStagedAssetBlob = $false,
+        [bool]$CommitExtraApplicationPath = $false,
+        [bool]$WrongCommittedParent = $false,
+        [bool]$WrongCommittedAssetBlob = $false,
+        [bool]$WrongCommittedMigrationBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
         [bool]$MissingManagedLabels = $false,
         [bool]$ReservedOrphanBranchExists = $false,
@@ -1551,6 +1664,10 @@ function Invoke-AdapterScenario {
         AuthenticatedActor = $AuthenticatedActor
         OldAuthorLogin = $OldAuthorLogin
         WrongStagedAssetBlob = $WrongStagedAssetBlob
+        CommitExtraApplicationPath = $CommitExtraApplicationPath
+        WrongCommittedParent = $WrongCommittedParent
+        WrongCommittedAssetBlob = $WrongCommittedAssetBlob
+        WrongCommittedMigrationBlob = $WrongCommittedMigrationBlob
         WrongTargetAssetBlob = $WrongTargetAssetBlob
         LeadingUnmanagedCount = $LeadingUnmanagedCount
         ReleaseMode = $ReleaseMode
@@ -1829,6 +1946,56 @@ if (-not $wrongStagedAsset.Threw -or
 if ((Get-EventIndex $wrongStagedAsset 'push-new') -ge 0 -or
     (Get-EventIndex $wrongStagedAsset 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0024 wrong staged updater blob reached remote mutation.'
+}
+
+$extraCommittedPath = Invoke-AdapterScenario -Name 'extra-committed-path' `
+    -CommitExtraApplicationPath $true
+if (-not $extraCommittedPath.Threw -or
+    $extraCommittedPath.Error -notlike '*Committed proposal paths*') {
+    Add-Failure "TEST-0024 a commit-hook application-path injection did not fail at the committed-tree gate: $($extraCommittedPath.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $extraCommittedPath $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 a commit-hook application-path injection reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedParent = Invoke-AdapterScenario -Name 'wrong-committed-parent' `
+    -WrongCommittedParent $true
+if (-not $wrongCommittedParent.Threw -or
+    $wrongCommittedParent.Error -notlike '*exact captured base*') {
+    Add-Failure "TEST-0024 a proposal commit not parented by the captured base did not fail closed: $($wrongCommittedParent.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedParent $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 a wrong-parent proposal commit reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedAsset = Invoke-AdapterScenario -Name 'wrong-committed-asset' `
+    -WrongCommittedAssetBlob $true
+if (-not $wrongCommittedAsset.Threw -or
+    $wrongCommittedAsset.Error -notlike '*Committed updater asset*target release blob*') {
+    Add-Failure "TEST-0024 committed updater-asset substitution did not fail closed: $($wrongCommittedAsset.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedAsset $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0024 committed updater-asset substitution reached remote mutation '$forbiddenEvent'."
+    }
+}
+
+$wrongCommittedMigration = Invoke-AdapterScenario `
+    -Name 'wrong-committed-migration-result' -MigrationRequired $true `
+    -MigrationWithUpgrade $true -OldCandidateExists $false `
+    -OldBranchExists $false -WrongCommittedMigrationBlob $true
+if (-not $wrongCommittedMigration.Threw -or
+    $wrongCommittedMigration.Error -notlike "*Committed migration result 'AGENTS.md'*deterministic plan*") {
+    Add-Failure "TEST-0121 committed migration-result substitution did not fail closed: $($wrongCommittedMigration.Error)"
+}
+foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr')) {
+    if ((Get-EventIndex $wrongCommittedMigration $forbiddenEvent) -ge 0) {
+        Add-Failure "TEST-0121 committed migration-result substitution reached remote mutation '$forbiddenEvent'."
+    }
 }
 
 $wrongTargetAsset = Invoke-AdapterScenario -Name 'wrong-target-asset' `

@@ -30,6 +30,8 @@
 | [FEAT-0026](FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | v0.10.3 generic consumer transition reconciliation | Complete | 0.10.3 |
 | [FEAT-0027](FEAT-0027-v0104-runner-minute-efficiency/README.md) | v0.10.4 hosted runner-minute efficiency | Complete | 0.10.4 |
 | [FEAT-0028](FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md) | v0.10.4 atomic legacy updater recovery | Complete | 0.10.4 |
+| [FEAT-0029](FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) | v0.11.0 protocol-aware initial adoption | Complete | 0.11.0 |
+| [FEAT-0030](FEAT-0030-v0110-stability-cycle-agent-prompt/README.md) | v0.11.0 optional stability cycle agent prompt | Complete | 0.11.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
