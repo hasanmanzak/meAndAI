@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.11.1 |
 | Issue | [#79](https://github.com/hasanmanzak/meAndAI/issues/79) |
-| Pull request | Pending |
+| Pull request | [#80](https://github.com/hasanmanzak/meAndAI/pull/80) |
 | Decisions | [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md) |
 | Tests | [TEST-0125 and TEST-0133](test-cases.md) |
 
@@ -151,7 +151,7 @@ recursive hardening or additional validator was introduced.
 - [x] Bounded self-review and post-development scan complete.
 - [x] No unresolved `Blocking` finding.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
 
 ## Post-merge release evidence

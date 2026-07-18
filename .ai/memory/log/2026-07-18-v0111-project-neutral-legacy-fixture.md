@@ -2,6 +2,7 @@
 
 - Feature: [FEAT-0031](../../../docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/README.md)
 - Tracking: [issue #79](https://github.com/hasanmanzak/meAndAI/issues/79)
+- Pull request: [#80](https://github.com/hasanmanzak/meAndAI/pull/80)
 - Target version: `0.11.1`
 
 ## Durable continuation
