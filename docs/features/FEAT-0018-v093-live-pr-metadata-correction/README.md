@@ -42,7 +42,7 @@ recovery.
 
 No new launcher, wrapper, workflow, bootstrap layer, credential behavior,
 Codex execution behavior, adoption content, automatic merge, or destructive
-consumer cleanup is in scope. The retained Derdini draft is continuation
+consumer cleanup is in scope. The retained affected-consumer draft is continuation
 evidence, not content owned by this repository change.
 
 ## Contracts, risks, and verification
@@ -61,7 +61,7 @@ already authenticated `nameWithOwner` returned by `gh repo view`.
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0102](test-cases.md) |
 | Test code | Planned before production change | Real-shape fixture and negative variants in `tests/quick-adoption.tests.ps1` |
-| Baseline run | Reproduced externally | [Derdini run](https://github.com/hasanmanzak/Derdini/actions/runs/29524327514) succeeded, then [draft PR #1](https://github.com/hasanmanzak/Derdini/pull/1) was falsely rejected |
+| Baseline run | Reproduced externally | The successful run and falsely rejected same-repository draft are recorded in [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) |
 
 The correction is one small reviewable slice; subfeature decomposition would
 add no independent value. Verification is bounded to one expected-red focused
@@ -85,7 +85,7 @@ confirmation scan is used only if remediation changes the tree.
 1. The launcher requests and validates `headRepository.name`,
    `headRepositoryOwner.login`, and Boolean `isCrossRepository` from the real
    GitHub CLI pull-request contract.
-2. The retained same-repository Derdini draft passes repository-origin
+2. The retained same-repository affected-consumer draft passes repository-origin
    validation when the corrected launcher retains `-ProtocolTag v0.9.2`,
    without weakening the existing branch, head, actor, marker, draft, base, or
    state gates.
@@ -142,7 +142,7 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 - Quick guide: [Quick adoption](../../quick-adoption.md)
 - Tracking and post-publication authority: [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53)
 - Delivery: [pull request #54](https://github.com/hasanmanzak/meAndAI/pull/54)
-- Consumer reproduction: [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
+- External consumer reproduction: [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53)
 
 ## Definition of Done
 
@@ -156,5 +156,5 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 ## Post-merge publication gate
 
 Issue #53 is the external authority for the exact merged commit, immutable
-`v0.9.3` release, launcher asset digest, hosted checks, and the Derdini
+`v0.9.3` release, launcher asset digest, hosted checks, and the affected-consumer
 continuation result after those facts exist.

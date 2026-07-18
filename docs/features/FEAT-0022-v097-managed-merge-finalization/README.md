@@ -47,7 +47,7 @@ manual dispatch reconciles an exact missed event idempotently.
 
 - Approving or merging any pull request.
 - Enabling GitHub's repository-wide automatic branch deletion setting.
-- Retrospectively cleaning Derdini or another existing consumer.
+- Retrospectively cleaning any existing consumer.
 - Deleting human-owned branches, closing unrelated issues, or guessing ownership.
 - Adding a service, scheduler, bootstrapper, or generalized validator framework.
 

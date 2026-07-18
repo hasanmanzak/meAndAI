@@ -13,7 +13,7 @@
 
 DEC-0018 correctly states that immutable old updater code cannot interpret a
 future migration catalog. Its fallback installs the new engine in one proposal
-and creates migration output in a second proposal. Derdini demonstrates that a
+and creates migration output in a second proposal. The first affected consumer demonstrates that a
 consumer's required validator can reject the first core-only tree, making the
 fallback incompatible with the protocol's pre-merge gate.
 
@@ -65,7 +65,7 @@ fails closed. The maintainer still reviews and merges the resulting draft.
   one reviewable green proposal instead of a knowingly red intermediate merge.
 - Immutable old code remains truthful: it is not modified or claimed to know
   the future contract; a separately verified current launcher supplies it.
-- The recovery mechanism is capability- and state-based, not tied to Derdini or
+- The recovery mechanism is capability- and state-based, not tied to a named consumer or
   a source version.
 - Recovery requires a locally authenticated maintainer invocation once for a
   pre-engine consumer; no Codex Cloud or temporary executable workflow ref is
@@ -85,7 +85,7 @@ fails closed. The maintainer still reviews and merges the resulting draft.
   values are intentionally non-readable and must remain inside Actions.
 - Execute arbitrary target scripts: rejected because release-declared data and
   the bounded updater already provide the required authority.
-- Add a `v0.9.2` or Derdini-specific repair: rejected because the defect is a
+- Add a `v0.9.2` or named-consumer-specific repair: rejected because the defect is a
   generic capability transition.
 
 ## Review condition

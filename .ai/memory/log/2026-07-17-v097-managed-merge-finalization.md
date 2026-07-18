@@ -28,7 +28,7 @@
   retain the consumer-scoped `MEANDAI_UPDATER_TOKEN` contract.
 - Existing merge events are not replayed. The first merge installing this route,
   a `GITHUB_TOKEN`-suppressed event, or a partial cleanup uses the explicit
-  recovery dispatch. Derdini remediation is outside this feature; adoption will
+  recovery dispatch. Existing-consumer remediation is outside this feature; adoption will
   be exercised later against another empty consumer.
 - The focused managed-finalization suite and the complete repository suite pass;
   the latter completed in 543.1 seconds with all declared scenario evidence.

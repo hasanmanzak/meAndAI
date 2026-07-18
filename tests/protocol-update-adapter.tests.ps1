@@ -444,7 +444,8 @@ function Copy-AtomicGateFixtureFile {
     [IO.File]::WriteAllBytes($path, [IO.File]::ReadAllBytes($Source))
 }
 
-function Invoke-FrozenDerdiniValidator {
+# TEST-0133-LEGACY-CONSUMER-SURFACE-BEGIN
+function Invoke-FrozenLegacyConsumerValidator {
     param([Parameter(Mandatory)][string]$ValidatorPath)
 
     $powerShellPath = $null
@@ -469,7 +470,7 @@ function Invoke-FrozenDerdiniValidator {
     $process.StartInfo = $startInfo
     try {
         if (-not $process.Start()) {
-            throw 'The Derdini validator child process did not start.'
+            throw 'The frozen legacy-consumer validator child process did not start.'
         }
         $stdout = $process.StandardOutput.ReadToEndAsync()
         $stderr = $process.StandardError.ReadToEndAsync()
@@ -485,15 +486,27 @@ function Invoke-FrozenDerdiniValidator {
 }
 
 $atomicGateRoot = Join-Path ([IO.Path]::GetTempPath()) `
-    "meandai-derdini-atomic-gate-$([guid]::NewGuid().ToString('N'))"
+    "meandai-legacy-consumer-atomic-gate-$([guid]::NewGuid().ToString('N'))"
 try {
-    $derdiniValidatorFixture = Join-Path $root `
-        'tests/fixtures/derdini-v092/Verify-MeAndAIAdoption.ps1'
+    $legacyConsumerValidatorFixture = Join-Path $root `
+        'tests/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1'
+    $fixtureText = Get-Content -Raw -LiteralPath $legacyConsumerValidatorFixture
+    foreach ($requiredSyntheticLink in @(
+        'https://example.invalid/legacy-consumer/issues/2',
+        'https://example.invalid/legacy-consumer/pull/1'
+    )) {
+        if (-not $fixtureText.Contains($requiredSyntheticLink)) {
+            throw "TEST-0133 frozen fixture lacks reserved synthetic link '$requiredSyntheticLink'."
+        }
+    }
+    if ([regex]::Matches($fixtureText, 'https://github\.com/(?!hasanmanzak/meAndAI\.git)').Count -ne 0) {
+        throw 'TEST-0133 frozen fixture contains a live consumer GitHub URL.'
+    }
     $fixtureBlob = ((Invoke-Native -Command 'git' -Arguments @(
-        'hash-object', '--', $derdiniValidatorFixture
+        'hash-object', '--', $legacyConsumerValidatorFixture
     )) -join '').Trim()
-    if ($fixtureBlob -cne 'b4e5067ac409bb2ffc153b5b8ba867ce3ae46aab') {
-        throw "Frozen Derdini validator blob differs: $fixtureBlob"
+    if ($fixtureBlob -cne '1dffab9c6b6d6f22aedb83c313b95d7b0f275183') {
+        throw "Frozen legacy-consumer validator blob differs: $fixtureBlob"
     }
 
     $sourceRoot = Join-Path $atomicGateRoot 'protocol'
@@ -605,7 +618,7 @@ try {
         Set-AtomicGateFixtureFile -Root $consumerRoot `
             -RelativePath ([string]$record.Key) -Content ([string]$record.Value)
     }
-    Copy-AtomicGateFixtureFile -Source $derdiniValidatorFixture `
+    Copy-AtomicGateFixtureFile -Source $legacyConsumerValidatorFixture `
         -Root $consumerRoot -RelativePath 'tests/Verify-MeAndAIAdoption.ps1'
     foreach ($consumerText in @(
         [pscustomobject]@{
@@ -618,7 +631,7 @@ try {
         },
         [pscustomobject]@{
             Path = 'docs/features/FEAT-0001-meandai-capabilities-adoption/README.md'
-            Content = "# Adoption`n`nhttps://github.com/hasanmanzak/Derdini/issues/2`nhttps://github.com/hasanmanzak/Derdini/pull/1`n"
+            Content = "# Adoption`n`nhttps://example.invalid/legacy-consumer/issues/2`nhttps://example.invalid/legacy-consumer/pull/1`n"
         },
         [pscustomobject]@{
             Path = 'docs/features/FEAT-0001-meandai-capabilities-adoption/test-cases.md'
@@ -639,7 +652,8 @@ try {
         "160000,$legacyProtocolSha,.ai/protocol"
     ) | Out-Null
     Invoke-Native -Command 'git' -Arguments @(
-        '-C', $consumerRoot, 'commit', '--quiet', '-m', 'Derdini v0.9.2 fixture'
+        '-C', $consumerRoot, 'commit', '--quiet', '-m',
+        'Legacy pre-engine consumer fixture'
     ) | Out-Null
     $baseCommit = ((Invoke-Native -Command 'git' -Arguments @(
         '-C', $consumerRoot, 'rev-parse', 'HEAD'
@@ -650,10 +664,10 @@ try {
     ) | Out-Null
 
     $validatorPath = Join-Path $consumerRoot 'tests/Verify-MeAndAIAdoption.ps1'
-    $baselineValidation = Invoke-FrozenDerdiniValidator `
+    $baselineValidation = Invoke-FrozenLegacyConsumerValidator `
         -ValidatorPath $validatorPath
     if ($baselineValidation.ExitCode -ne 0) {
-        throw "Baseline Derdini validator is not green: $($baselineValidation.Text)"
+        throw "Baseline legacy-consumer validator is not green: $($baselineValidation.Text)"
     }
 
     $targetCatalog = Import-MeAndAIConsumerMigrationCatalog `
@@ -675,7 +689,7 @@ try {
         '-C', $consumerRoot, 'update-index', '--add', '--cacheinfo',
         "160000,$targetProtocolSha,.ai/protocol"
     ) | Out-Null
-    $coreOnlyValidation = Invoke-FrozenDerdiniValidator `
+    $coreOnlyValidation = Invoke-FrozenLegacyConsumerValidator `
         -ValidatorPath $validatorPath
     $coreOnlyCompact = $coreOnlyValidation.Text.Replace("`r", '').Replace("`n", '')
     $coreOnlyMarkers = @([regex]::Matches(
@@ -727,18 +741,80 @@ try {
         -Actual $indexPaths -Expected $expectedPaths)) {
         throw "Atomic proposal index differs from the exact 13 paths: $($indexPaths -join ', ')"
     }
-    $atomicValidation = Invoke-FrozenDerdiniValidator `
+    $atomicValidation = Invoke-FrozenLegacyConsumerValidator `
         -ValidatorPath $validatorPath
     if ($atomicValidation.ExitCode -ne 0) {
-        throw "Atomic proposal does not satisfy the real Derdini validator: $($atomicValidation.Text)"
+        throw "Atomic proposal does not satisfy the frozen legacy-consumer validator: $($atomicValidation.Text)"
+    }
+
+    $appliedLedgerBytes = [IO.File]::ReadAllBytes(
+        (Join-Path $consumerRoot '.ai/meandai-update-state.json')
+    )
+    $rerunPlan = Resolve-MeAndAIConsumerMigrationPlan `
+        -Catalog $targetCatalog -Files @() -LedgerBytes $appliedLedgerBytes
+    if ([string]$rerunPlan.State -cne 'Satisfied' -or
+        [bool]$rerunPlan.LedgerWasMissing -or
+        @($rerunPlan.ExpectedChangedPaths).Count -ne 0 -or
+        @($rerunPlan.Migrations).Count -ne 0 -or
+        @($rerunPlan.Paths).Count -ne 0 -or
+        [bool]$rerunPlan.Ledger.Changed -or
+        [string]$rerunPlan.Ledger.OriginalBlob -cne
+            [string]$rerunPlan.Ledger.ResultBlob) {
+        throw 'Atomic legacy-consumer migration rerun was not an exact no-op.'
     }
 }
 catch {
-    Add-Failure "TEST-0125 atomic Derdini gate fixture failed: $($_.Exception.Message)"
+    Add-Failure "TEST-0125/TEST-0133 project-neutral atomic gate fixture failed: $($_.Exception.Message)"
 }
 finally {
     if (Test-Path -LiteralPath $atomicGateRoot) {
         Remove-Item -LiteralPath $atomicGateRoot -Recurse -Force
+    }
+}
+# TEST-0133-LEGACY-CONSUMER-SURFACE-END
+
+$adapterTestText = [IO.File]::ReadAllText($PSCommandPath)
+$surfaceStartMarker = '# TEST-0133-' + 'LEGACY-CONSUMER-SURFACE-BEGIN'
+$surfaceEndMarker = '# TEST-0133-' + 'LEGACY-CONSUMER-SURFACE-END'
+$surfaceStart = $adapterTestText.IndexOf(
+    $surfaceStartMarker, [StringComparison]::Ordinal
+)
+$surfaceEnd = $adapterTestText.IndexOf(
+    $surfaceEndMarker, [StringComparison]::Ordinal
+)
+if ($surfaceStart -lt 0 -or $surfaceEnd -le $surfaceStart -or
+    $adapterTestText.IndexOf(
+        $surfaceStartMarker, $surfaceStart + $surfaceStartMarker.Length,
+        [StringComparison]::Ordinal
+    ) -ge 0 -or
+    $adapterTestText.IndexOf(
+        $surfaceEndMarker, $surfaceEnd + $surfaceEndMarker.Length,
+        [StringComparison]::Ordinal
+    ) -ge 0) {
+    Add-Failure 'TEST-0133 project-neutral adapter surface markers are missing or ambiguous.'
+}
+else {
+    $adapterSurfaceText = $adapterTestText.Substring(
+        $surfaceStart, $surfaceEnd - $surfaceStart
+    )
+    foreach ($requiredNeutralToken in @(
+        'function Invoke-FrozenLegacyConsumerValidator',
+        '$legacyConsumerValidatorFixture = Join-Path',
+        'tests/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1',
+        'meandai-legacy-consumer-atomic-gate-',
+        'Legacy pre-engine consumer fixture',
+        'Baseline legacy-consumer validator',
+        'frozen legacy-consumer validator'
+    )) {
+        if (-not $adapterSurfaceText.Contains($requiredNeutralToken)) {
+            Add-Failure "TEST-0133 adapter surface lacks neutral token '$requiredNeutralToken'."
+        }
+    }
+    $nonCanonicalGitHubText = $adapterSurfaceText.Replace(
+        'https://github.com/hasanmanzak/meAndAI.git', ''
+    )
+    if ($nonCanonicalGitHubText.Contains('https://github.com/')) {
+        Add-Failure 'TEST-0133 adapter surface contains a live consumer GitHub URL.'
     }
 }
 

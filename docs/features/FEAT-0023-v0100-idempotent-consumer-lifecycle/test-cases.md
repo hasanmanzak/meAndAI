@@ -13,7 +13,7 @@ The original TEST-0114 description claimed a synthetic consumer across two
 same-major gitlinks. Its executable assertions inspected only five current
 templates and the protocol wording; they did not instantiate a real consumer
 shape created before the prospective rule. [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
-defines release-declared transition reconciliation; Derdini supplies the
+defines release-declared transition reconciliation; the first-observed state supplies the
 `MIG-0001` regression under `TEST-0119`. The prospective template assertions
 remain valid, while `TEST-0120` through `TEST-0122` own the generic engine,
 single-draft, and immutable legacy-handoff evidence.

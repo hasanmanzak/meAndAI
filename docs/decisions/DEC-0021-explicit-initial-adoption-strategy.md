@@ -137,9 +137,8 @@ register or second common protocol is introduced.
 - Empty and protocol-free repositories retain a one-command fresh path.
 - Existing-protocol repositories stop safely in non-interactive automation
   unless an explicit strategy is provided.
-- TravelOS-style clean final trees and HAnchor-style semantic normalization are
-  representable as `FullMigration` without forcing that policy on every
-  consumer.
+- Clean-final-tree and semantic-normalization outcomes are both representable
+  as `FullMigration` without forcing either policy on every consumer.
 - Hybrid adoption is possible but must end with explicit authority precedence.
 - Clean start is deliberately harder to invoke because its information loss is
   irreversible in the current tree.

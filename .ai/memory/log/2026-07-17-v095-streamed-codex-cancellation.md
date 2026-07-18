@@ -31,6 +31,6 @@
 
 Run one focused regression and one complete repository suite after version and
 documentation alignment. Fix only a verified blocker, perform one fresh-diff
-self-review and bounded scan, then publish v0.9.5. The retained
-[Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1) must continue to
+self-review and bounded scan, then publish v0.9.5. The retained affected-consumer
+proposal recorded in [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) must continue to
 target v0.9.2 when resumed with the newer launcher.

@@ -32,7 +32,7 @@ and the complete repository suite.
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
-| 2026-07-17 | v0.9.4 release asset | Windows PowerShell 5.1 / Codex CLI 0.144.4 | Derdini quick-adoption run linked by [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) | External red: native blue progress overlay collides with console history; semantic Codex activity is buffered; Ctrl+C child cleanup is not guaranteed by the process finalizer |
+| 2026-07-17 | v0.9.4 release asset | Windows PowerShell 5.1 / Codex CLI 0.144.4 | Affected-consumer quick-adoption run recorded in [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) | External red: native blue progress overlay collides with console history; semantic Codex activity is buffered; Ctrl+C child cleanup is not guaranteed by the process finalizer |
 | 2026-07-17 | Working tree before implementation | Windows PowerShell 5.1 | `powershell -NoProfile -File tests/quick-adoption-streaming.tests.ps1` | Expected red: eight contract failures proved the absent line renderer, JSONL consumer, incremental reads, and exceptional process-tree cleanup |
 | 2026-07-17 | Working tree | Windows PowerShell 5.1 | `powershell -NoProfile -File tests/quick-adoption-streaming.tests.ps1` | Passed `TEST-0105` and `TEST-0106`; observable scenario result manifest emitted |
 | 2026-07-17 | Reviewed working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Every executable suite and scenario owner passed; the repository gate correctly blocked only because FEAT-0020 was still marked `In Progress` during that pre-completion run |

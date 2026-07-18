@@ -23,7 +23,8 @@ not block structural protocol adoption and does not authorize fabricated
 facts. Launcher progress follows real phases, represents local Codex as
 indeterminate elapsed work, and can be disabled with `-NoProgress`.
 
-The retained [Derdini PR #1](https://github.com/hasanmanzak/Derdini/pull/1)
+The retained affected-consumer proposal recorded in
+[issue #55](https://github.com/hasanmanzak/meAndAI/issues/55)
 remains pinned to `v0.9.2`. Resume it with the corrected launcher plus
 `-ProtocolTag v0.9.2`; do not reset, duplicate, or retarget the proposal.
 

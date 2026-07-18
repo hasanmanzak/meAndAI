@@ -14,7 +14,8 @@
 
 Compatible protocol updates currently reconcile the protocol gitlink and three
 updater assets. They do not have a generic contract for consumer-owned derived
-state that must change with the protocol. Derdini exposed the first instance:
+state that must change with the protocol. The first affected adoption exposed
+the initial instance:
 eight active files retained a copied protocol tag or commit, while three dated
 records correctly retained the same values as historical evidence.
 
@@ -47,7 +48,7 @@ use that same path for every later compatible transition.
 - Detect pre-engine consumers by missing capability/ledger rather than by a
   source tag. After their ordinary updater-installing proposal merges, have the
   newly installed engine open one same-target reconciliation draft.
-- Express the Derdini regression only as `MIG-0001` data and prove that it
+- Express the duplicated-live-pin regression only as `MIG-0001` data and prove that it
   applies to matching state even after an intermediate gitlink update.
 - Keep the executable adoption prompt version-neutral so new consumers do not
   recreate duplicated live protocol identity.
@@ -58,7 +59,7 @@ use that same path for every later compatible transition.
 - Claiming that immutable pre-engine updater code can run a target-defined
   migration in its first proposal.
 - A tag-named migration switch, one script per source version, or a hardcoded
-  Derdini branch in the transition engine.
+  named-consumer branch in the transition engine.
 - Arbitrary search-and-replace, arbitrary target-release script execution, an
   AI migration agent, hosted service, daemon, or unrestricted consumer-tree
   write authority.
@@ -101,7 +102,7 @@ use that same path for every later compatible transition.
   temporary release-declared authority, not permanent ownership of consumer
   files.
 - Historical event records may preserve exact tags and commits. `MIG-0001`
-  changes only the eight active Derdini-shaped current-authority fragments.
+  changes only the eight active duplicated-live-pin current-authority fragments.
 
 ### Lifecycle behavior
 
@@ -128,7 +129,7 @@ use that same path for every later compatible transition.
 | `RISK-0115` | Recurrence | A future transition needs another version-named repair | Append-only generic catalog, state-based applicability, and `TEST-0119` / `TEST-0121` |
 | `RISK-0116` | Provenance | A changed or reordered definition is treated as previously satisfied | Exact definition-blob ledger prefix and `TEST-0121` |
 | `RISK-0117` | Proposal integrity | Candidate validation accepts migration paths not produced by the target catalog | Recomputed exact path/output/ledger/plan evidence and `TEST-0121` |
-| `RISK-0118` | Historical accuracy | Live-pin cleanup erases legitimate adoption evidence | Explicit `MIG-0001` preservation set and Derdini regression in `TEST-0119` |
+| `RISK-0118` | Historical accuracy | Live-pin cleanup erases legitimate adoption evidence | Explicit `MIG-0001` preservation set and project-neutral regression in `TEST-0119` |
 
 ## Definition of Ready
 
@@ -138,7 +139,7 @@ use that same path for every later compatible transition.
       authority, proposal identity, and fail-closed contracts are explicit.
 - [x] Same-PR engine-era behavior and immutable pre-engine handoff are separated
       without a false retroactivity claim.
-- [x] Derdini active and historical files are classified, and the regression
+- [x] Affected active and historical files are classified, and the regression
       must survive a simulated intermediate protocol update.
 - [x] Scope excludes arbitrary execution, AI migration, major transitions, and
       automatic merge.
@@ -157,7 +158,7 @@ use that same path for every later compatible transition.
    changed updater assets, exact required migration paths, and ledger.
 5. Candidate validation, supersession, and merge finalization independently
    prove the catalog, ordered IDs, definition blobs, changed paths, and plan.
-6. The real Derdini-shaped stale state is reconciled by `MIG-0001` both at its
+6. The real duplicated-live-pin stale state is reconciled by `MIG-0001` both at its
    original pin and after a simulated update to an intermediate pin. The eight
    active fragments change and dated historical evidence does not.
 7. A directly adopted version-neutral consumer records `MIG-0001` as satisfied
@@ -176,13 +177,13 @@ use that same path for every later compatible transition.
 
 | ID | Slice | Tracking | Tests | Review gate | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0046` | Immutable catalog, pure engine, ledger model, and Derdini `MIG-0001` data | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0119`, `TEST-0120` | Exact state/bytes, cumulative catalog chain, leaf-link rejection, historical preservation, and rollback passed | Implemented |
+| `SUBF-0046` | Immutable catalog, pure engine, ledger model, and project-neutral `MIG-0001` data | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0119`, `TEST-0120` | Exact state/bytes, cumulative catalog chain, leaf-link rejection, historical preservation, and rollback passed | Implemented |
 | `SUBF-0047` | Engine-era one-draft updater, candidate, supersession, and finalization integration | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0121` | Exact ledger/path/plan evidence and independent schema-2 base-to-head finalization passed, including fabricated-output rejection | Implemented |
 | `SUBF-0048` | Generic pre-engine capability handoff and prospective adoption prevention | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0122` and `TEST-0119` | Capability-based automatic handoff, adoption baseline, and absence of tag-specific control flow passed | Implemented |
 
 ## Verification approach
 
-Use a real Derdini-shaped fixture and an independent expected-byte oracle for
+Use a minimal project-neutral legacy-consumer fixture and an independent expected-byte oracle for
 `MIG-0001`. Exercise that same consumer state under both its original gitlink
 and a simulated intermediate gitlink; also exercise a direct version-neutral
 consumer. Add catalog/ledger contract fixtures, skipped releases, supersession,

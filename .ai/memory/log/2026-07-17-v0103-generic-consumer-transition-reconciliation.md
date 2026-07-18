@@ -30,7 +30,8 @@
   capability/ledger state and automatically opens one same-target migration
   reconciliation draft. The ordinary finalizer cleans its exact branch and
   issue after maintainer merge. Later compatible transitions are single-draft.
-- Derdini is the first regression fixture, not a control-flow exception.
+- The first-observed duplicated-live-pin state is regression data, not a
+  control-flow exception.
   `MIG-0001` changes its eight active duplicated-live-pin fragments while
   preserving dated adoption memory, the completed adoption feature, and other
   historical version evidence.
@@ -50,7 +51,7 @@
 ## Evidence state
 
 - [TEST-0119 through TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md)
-  define the Derdini state-based regression, negative/atomic engine matrix,
+  define the project-neutral state-based regression, negative/atomic engine matrix,
   single-draft lifecycle, and generic pre-engine handoff.
 - Focused `TEST-0119` through `TEST-0122` evidence passes, including cumulative
   catalog removal/rewrite negatives, linked-leaf containment, rollback,
