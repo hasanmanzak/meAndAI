@@ -187,9 +187,16 @@ function Copy-AtomicGateFixtureFile {
 function Invoke-FrozenDerdiniValidator {
     param([Parameter(Mandatory)][string]$ValidatorPath)
 
-    $powerShellPath = Join-Path $PSHOME 'powershell.exe'
-    if (-not (Test-Path -LiteralPath $powerShellPath -PathType Leaf)) {
-        $powerShellPath = [string](Get-Command powershell -ErrorAction Stop).Source
+    $powerShellPath = $null
+    foreach ($hostName in @('pwsh', 'pwsh.exe', 'powershell', 'powershell.exe')) {
+        $candidatePath = Join-Path $PSHOME $hostName
+        if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+            $powerShellPath = $candidatePath
+            break
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($powerShellPath)) {
+        throw "No PowerShell host executable was found under PSHOME '$PSHOME'."
     }
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
     $startInfo.FileName = $powerShellPath
