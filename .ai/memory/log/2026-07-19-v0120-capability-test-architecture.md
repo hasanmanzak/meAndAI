@@ -45,24 +45,25 @@
   Ledger import now restores runtime date values to invariant UTC seconds and
   still requires exact source-to-canonical byte equality. Canonical round-trip
   and fraction/offset/zone negatives pass on Windows PowerShell 5.1 and the
-  matching Linux PowerShell 7.4.2 container; replacement hosted confirmation
-  is pending.
+  matching Linux PowerShell 7.4.2 container.
 - The corrected Linux catalog slice then exposed `FIND-0171`: both shared
   property accessors used `Write-Output -NoEnumerate`, which represented scalar
   evidence and a null fixture binding as `List<object>` values on PowerShell
   7.4. They now return through unary comma, preserving scalar, null, empty,
   singleton, and multi-value shapes on Windows PowerShell 5.1 and PowerShell
-  7.4.2. Focused `TEST-0139`/`TEST-0140` pass on both hosts; replacement hosted
-  confirmation is pending.
+  7.4.2. Focused `TEST-0139`/`TEST-0140` pass on both hosts.
 - Hosted Ubuntu then reached `TEST-0136` and exposed `FIND-0172`: Linux
   PowerShell returned from `New-Item -ItemType Junction` without creating a
   path, while the fixture treated call completion as link creation and skipped
   its `SymbolicLink` fallback. The fixture now requires the link path to exist
   before accepting an item type. Focused discovery passes with an actual link
-  on Windows PowerShell 5.1 and Linux PowerShell 7.4.2; replacement hosted
-  confirmation is pending.
+  on Windows PowerShell 5.1 and Linux PowerShell 7.4.2.
+- Replacement hosted run 29670698209 passed on exact candidate commit
+  `773a415`: Ubuntu completed in 6 minutes 57 seconds and Windows completed in
+  31 minutes 26 seconds. `FIND-0170` through `FIND-0172` are resolved.
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness
   boundary, not product evidence.
-- Draft pull request #82 exists. Hosted-check, merge, immutable release, and
-  post-publication evidence remain pending until those facts exist.
+- Draft pull request #82 exists and its hosted candidate checks passed. Merge,
+  immutable release, and post-publication evidence remain pending until those
+  facts exist.
