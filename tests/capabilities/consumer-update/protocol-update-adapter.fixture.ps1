@@ -5,11 +5,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$realGitApplication = [string](@(Get-Command git -CommandType Application `
+    -ErrorAction Stop | Select-Object -First 1)[0].Source)
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $workflowSource = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $consumerMigrationModuleSource = Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1'
 $consumerMigrationIndexSource = Join-Path $root 'migrations/index.json'
+$ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 Import-Module $consumerMigrationModuleSource -Force
 $consumerMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath $consumerMigrationIndexSource
@@ -58,6 +61,9 @@ foreach ($helperName in @(
     'Invoke-Native',
     'Test-GitAncestor',
     'Get-LocalTreeEntry',
+    'Get-LocalGitBlobBytes',
+    'Assert-WorktreeBlobMatchesBase',
+    'Get-ConsumerMigrationPlanForBase',
     'Get-StagedTreeEntry',
     'Get-OrdinalUniquePaths',
     'Get-ExpectedManagedPaths',
@@ -413,6 +419,326 @@ catch {
 finally {
     if (Test-Path -LiteralPath $destinationGuardRoot) {
         Remove-Item -LiteralPath $destinationGuardRoot -Recurse -Force
+    }
+}
+
+$canonicalBlobRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-canonical-base-blob-$([guid]::NewGuid().ToString('N'))"
+try {
+    $catalogRoot = Join-Path $canonicalBlobRoot 'catalog'
+    $currentCatalogRoot = Join-Path $catalogRoot 'current'
+    $targetCatalogRoot = Join-Path $catalogRoot 'target'
+    $seedRepository = Join-Path $canonicalBlobRoot 'seed'
+    $consumerRepository = Join-Path $canonicalBlobRoot 'consumer'
+    foreach ($path in @($currentCatalogRoot, $targetCatalogRoot,
+            $seedRepository)) {
+        [IO.Directory]::CreateDirectory($path) | Out-Null
+    }
+    $utf8NoBom = [Text.UTF8Encoding]::new($false)
+    $migrationOne = '{"schema":1,"id":"MIG-9001","operations":[{"kind":"replace-exactly-once","path":"consumer.txt","before":["ALPHA"],"after":["BETA"]}]}' + "`n"
+    $migrationTwo = '{"schema":1,"id":"MIG-9002","operations":[{"kind":"replace-exactly-once","path":"consumer.txt","before":["BETA"],"after":["GAMMA"]}]}' + "`n"
+    [IO.File]::WriteAllText((Join-Path $currentCatalogRoot 'index.json'),
+        '{"schema":1,"migrations":[{"id":"MIG-9001","introducedIn":"v0.12.0","definition":"MIG-9001.json"}]}' + "`n", $utf8NoBom)
+    [IO.File]::WriteAllText((Join-Path $currentCatalogRoot 'MIG-9001.json'),
+        $migrationOne, $utf8NoBom)
+    [IO.File]::WriteAllText((Join-Path $targetCatalogRoot 'index.json'),
+        '{"schema":1,"migrations":[{"id":"MIG-9001","introducedIn":"v0.12.0","definition":"MIG-9001.json"},{"id":"MIG-9002","introducedIn":"v0.12.1","definition":"MIG-9002.json"}]}' + "`n", $utf8NoBom)
+    [IO.File]::WriteAllText((Join-Path $targetCatalogRoot 'MIG-9001.json'),
+        $migrationOne, $utf8NoBom)
+    [IO.File]::WriteAllText((Join-Path $targetCatalogRoot 'MIG-9002.json'),
+        $migrationTwo, $utf8NoBom)
+    $currentCatalog = Import-MeAndAIConsumerMigrationCatalog `
+        -IndexPath (Join-Path $currentCatalogRoot 'index.json')
+    $targetCatalog = Import-MeAndAIConsumerMigrationCatalog `
+        -IndexPath (Join-Path $targetCatalogRoot 'index.json')
+    $currentLedger = New-MeAndAIConsumerMigrationBaseline -Catalog $currentCatalog
+
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'init', '--quiet', '--initial-branch=main'
+    ) | Out-Null
+    foreach ($setting in @(
+        @('user.name', 'TEST-0141'),
+        @('user.email', 'test-0141@example.invalid'),
+        @('commit.gpgsign', 'false'),
+        @('core.autocrlf', 'false')
+    )) {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $seedRepository, 'config', $setting[0], $setting[1]
+        ) | Out-Null
+    }
+    $seedInputPath = Join-Path $seedRepository 'consumer.txt'
+    $seedLedgerPath = Join-Path $seedRepository $ConsumerMigrationLedgerPath
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $seedLedgerPath)) |
+        Out-Null
+    [IO.File]::WriteAllText($seedInputPath, "prefix`nBETA`nsuffix`n", $utf8NoBom)
+    [IO.File]::WriteAllBytes($seedLedgerPath, [byte[]]$currentLedger.Bytes)
+    foreach ($seedPath in @($seedInputPath, $seedLedgerPath)) {
+        $seedBytes = [IO.File]::ReadAllBytes($seedPath)
+        $seedText = [Text.Encoding]::UTF8.GetString($seedBytes)
+        if ($seedText.Contains("`r") -or -not $seedText.Contains("`n")) {
+            throw "TEST-0141 seed input '$seedPath' is not canonical LF content."
+        }
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'add', '--all'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'commit', '--quiet', '-m',
+        'Canonical LF base'
+    ) | Out-Null
+    $baseCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $seedInputEntry = Get-LocalTreeEntry -RepositoryPath $seedRepository `
+        -Commit $baseCommit -Path 'consumer.txt'
+    $seedLedgerEntry = Get-LocalTreeEntry -RepositoryPath $seedRepository `
+        -Commit $baseCommit -Path $ConsumerMigrationLedgerPath
+    $seedInputHash = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'hash-object', '--no-filters', '--',
+        'consumer.txt'
+    )) -join '').Trim()
+    $seedLedgerHash = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $seedRepository, 'hash-object', '--no-filters', '--',
+        $ConsumerMigrationLedgerPath
+    )) -join '').Trim()
+    if ($seedInputEntry.Sha -cne $seedInputHash -or
+        $seedLedgerEntry.Sha -cne $seedLedgerHash) {
+        throw 'TEST-0141 committed blobs do not match the canonical LF seed bytes.'
+    }
+    $unexpectedAttributes = Get-LocalTreeEntry -RepositoryPath $seedRepository `
+        -Commit $baseCommit -Path '.gitattributes'
+    if ($unexpectedAttributes.Path) {
+        throw 'TEST-0141 seed repository unexpectedly contains .gitattributes.'
+    }
+
+    Invoke-Native -Command 'git' -Arguments @(
+        'clone', '--quiet', '--no-checkout', $seedRepository,
+        $consumerRepository
+    ) | Out-Null
+    foreach ($setting in @(
+        @('user.name', 'TEST-0141'),
+        @('user.email', 'test-0141@example.invalid'),
+        @('commit.gpgsign', 'false'),
+        @('core.autocrlf', 'true')
+    )) {
+        Invoke-Native -Command 'git' -Arguments @(
+            '-C', $consumerRepository, 'config', $setting[0], $setting[1]
+        ) | Out-Null
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'checkout', '--quiet', '--detach',
+        $baseCommit
+    ) | Out-Null
+    $configuredAutoCrlf = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'config', '--get', 'core.autocrlf'
+    )) -join '').Trim()
+    $checkedOutHead = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $initialStatus = @((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'status', '--porcelain=v1',
+        '--untracked-files=all'
+    )))
+    if ($configuredAutoCrlf -cne 'true' -or $checkedOutHead -cne $baseCommit -or
+        $initialStatus.Count -ne 0) {
+        throw 'TEST-0141 fresh autocrlf checkout is not exact and clean.'
+    }
+    foreach ($relativePath in @('consumer.txt', $ConsumerMigrationLedgerPath)) {
+        $worktreeText = [Text.Encoding]::UTF8.GetString(
+            [IO.File]::ReadAllBytes((Join-Path $consumerRepository $relativePath))
+        )
+        if (-not $worktreeText.Contains("`r`n")) {
+            throw "TEST-0141 fresh checkout did not smudge '$relativePath' to CRLF."
+        }
+    }
+
+    Push-Location $consumerRepository
+    try {
+        $plan = Get-ConsumerMigrationPlanForBase -Catalog $targetCatalog `
+            -BaseCommit $baseCommit -Workspace $consumerRepository
+        $repeatPlan = Get-ConsumerMigrationPlanForBase -Catalog $targetCatalog `
+            -BaseCommit $baseCommit -Workspace $consumerRepository
+    }
+    finally {
+        Pop-Location
+    }
+    if ([string]$plan.State -cne 'ChangesRequired' -or
+        [bool]$plan.LedgerWasMissing -or @($plan.Migrations).Count -ne 1 -or
+        [string]$plan.Migrations[0].Id -cne 'MIG-9002' -or
+        [string]$plan.Migrations[0].State -cne 'Applied' -or
+        @($plan.Paths).Count -ne 1 -or
+        [string]$plan.Paths[0].Path -cne 'consumer.txt') {
+        throw 'TEST-0141 canonical base-blob plan has unexpected migration evidence.'
+    }
+    if ([string]$plan.Paths[0].OriginalBlob -cne $seedInputEntry.Sha -or
+        [string]$plan.Ledger.OriginalBlob -cne $seedLedgerEntry.Sha) {
+        throw 'TEST-0141 plan is not bound to the exact committed base blobs.'
+    }
+    $expectedChangedPaths = @($ConsumerMigrationLedgerPath, 'consumer.txt')
+    if ((@($plan.ExpectedChangedPaths) -join "`n") -cne
+        ($expectedChangedPaths -join "`n")) {
+        throw 'TEST-0141 exact changed-path inventory differs.'
+    }
+    $resultText = [Text.Encoding]::UTF8.GetString([byte[]]$plan.Paths[0].ResultBytes)
+    $resultLedgerText = [Text.Encoding]::UTF8.GetString(
+        [byte[]]$plan.Ledger.ResultBytes
+    )
+    if ($resultText.Contains("`r") -or -not $resultText.Contains('GAMMA') -or
+        $resultLedgerText.Contains("`r") -or
+        $resultLedgerText.IndexOf('MIG-9001', [StringComparison]::Ordinal) -lt 0 -or
+        $resultLedgerText.IndexOf('MIG-9002', [StringComparison]::Ordinal) -le
+            $resultLedgerText.IndexOf('MIG-9001', [StringComparison]::Ordinal)) {
+        throw 'TEST-0141 result bytes are not canonical ordered LF output.'
+    }
+    if ([string]$repeatPlan.PlanSha256 -cne [string]$plan.PlanSha256 -or
+        [string]$repeatPlan.Paths[0].ResultBlob -cne
+            [string]$plan.Paths[0].ResultBlob -or
+        [string]$repeatPlan.Ledger.ResultBlob -cne
+            [string]$plan.Ledger.ResultBlob) {
+        throw 'TEST-0141 repeated base planning is not deterministic.'
+    }
+    $statusAfterPlanning = @((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'status', '--porcelain=v1',
+        '--untracked-files=all'
+    )))
+    if ($statusAfterPlanning.Count -ne 0) {
+        throw 'TEST-0141 planning mutated the consumer worktree.'
+    }
+
+    [IO.File]::WriteAllText((Join-Path $consumerRepository 'consumer.txt'),
+        "prefix`nUNCOMMITTED-DRIFT`nsuffix`n", $utf8NoBom)
+    $worktreeDriftRejected = $false
+    Push-Location $consumerRepository
+    try {
+        try {
+            Get-ConsumerMigrationPlanForBase -Catalog $targetCatalog `
+                -BaseCommit $baseCommit -Workspace $consumerRepository |
+                Out-Null
+        }
+        catch { $worktreeDriftRejected = $true }
+    }
+    finally { Pop-Location }
+    if (-not $worktreeDriftRejected) {
+        throw 'TEST-0141 real filtered worktree drift was accepted.'
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'checkout', '--quiet', '--force',
+        '--detach', $baseCommit
+    ) | Out-Null
+
+    [IO.File]::WriteAllText((Join-Path $consumerRepository 'consumer.txt'),
+        "prefix`nDRIFT`nsuffix`n", $utf8NoBom)
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'add', '--', 'consumer.txt'
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'commit', '--quiet', '-m',
+        'Committed input drift'
+    ) | Out-Null
+    $inputDriftCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $inputDriftRejected = $false
+    Push-Location $consumerRepository
+    try {
+        try {
+            Get-ConsumerMigrationPlanForBase -Catalog $targetCatalog `
+                -BaseCommit $inputDriftCommit -Workspace $consumerRepository |
+                Out-Null
+        }
+        catch { $inputDriftRejected = $true }
+    }
+    finally { Pop-Location }
+    if (-not $inputDriftRejected) {
+        throw 'TEST-0141 real committed migration-input drift was accepted.'
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'checkout', '--quiet', '--force',
+        '--detach', $baseCommit
+    ) | Out-Null
+
+    $ledgerText = [Text.Encoding]::UTF8.GetString([byte[]]$currentLedger.Bytes)
+    $driftedLedgerText = $ledgerText.Replace(
+        [string]$currentCatalog.Migrations[0].DefinitionBlob, ('0' * 40)
+    )
+    [IO.File]::WriteAllText(
+        (Join-Path $consumerRepository $ConsumerMigrationLedgerPath),
+        $driftedLedgerText, $utf8NoBom
+    )
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'add', '--', $ConsumerMigrationLedgerPath
+    ) | Out-Null
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'commit', '--quiet', '-m',
+        'Committed ledger drift'
+    ) | Out-Null
+    $ledgerDriftCommit = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'rev-parse', 'HEAD'
+    )) -join '').Trim()
+    $ledgerDriftRejected = $false
+    Push-Location $consumerRepository
+    try {
+        try {
+            Get-ConsumerMigrationPlanForBase -Catalog $targetCatalog `
+                -BaseCommit $ledgerDriftCommit -Workspace $consumerRepository |
+                Out-Null
+        }
+        catch { $ledgerDriftRejected = $true }
+    }
+    finally { Pop-Location }
+    if (-not $ledgerDriftRejected) {
+        throw 'TEST-0141 real committed migration-ledger drift was accepted.'
+    }
+    Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'checkout', '--quiet', '--force',
+        '--detach', $baseCommit
+    ) | Out-Null
+
+    Apply-ConsumerMigrationPlan -Plan $plan -Workspace $consumerRepository
+    Push-Location $consumerRepository
+    try {
+        $stageArguments = @('add', '--') + @($plan.ExpectedChangedPaths)
+        Invoke-Native -Command 'git' -Arguments $stageArguments | Out-Null
+        $stagedInput = Get-StagedTreeEntry -Path 'consumer.txt'
+        $stagedLedger = Get-StagedTreeEntry -Path $ConsumerMigrationLedgerPath
+        if ([string]$stagedInput.Sha -cne [string]$plan.Paths[0].ResultBlob -or
+            [string]$stagedLedger.Sha -cne [string]$plan.Ledger.ResultBlob) {
+            throw 'TEST-0141 staged result blobs differ from the exact plan.'
+        }
+        Invoke-Native -Command 'git' -Arguments @(
+            'commit', '--quiet', '-m', 'Apply canonical migration plan'
+        ) | Out-Null
+        $appliedCommit = ((Invoke-Native -Command 'git' -Arguments @(
+            'rev-parse', 'HEAD'
+        )) -join '').Trim()
+        $satisfiedPlan = Get-ConsumerMigrationPlanForBase `
+            -Catalog $targetCatalog -BaseCommit $appliedCommit `
+            -Workspace $consumerRepository
+    }
+    finally { Pop-Location }
+    if ([string]$satisfiedPlan.State -cne 'Satisfied' -or
+        @($satisfiedPlan.ExpectedChangedPaths).Count -ne 0 -or
+        @($satisfiedPlan.Migrations).Count -ne 0 -or
+        @($satisfiedPlan.Paths).Count -ne 0 -or
+        [bool]$satisfiedPlan.Ledger.Changed -or
+        [string]$satisfiedPlan.Ledger.OriginalBlob -cne
+            [string]$satisfiedPlan.Ledger.ResultBlob) {
+        throw 'TEST-0141 applied-state rerun is not an exact no-op.'
+    }
+    $finalStatus = @((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $consumerRepository, 'status', '--porcelain=v1',
+        '--untracked-files=all'
+    )))
+    if ($finalStatus.Count -ne 0) {
+        throw 'TEST-0141 idempotent rerun did not leave a clean repository.'
+    }
+}
+catch {
+    Add-Failure "TEST-0141 canonical base-blob fixture failed: $($_.Exception.Message)"
+}
+finally {
+    if (Test-Path -LiteralPath $canonicalBlobRoot) {
+        Remove-Item -LiteralPath $canonicalBlobRoot -Recurse -Force
     }
 }
 
@@ -921,6 +1247,14 @@ function global:git {
         $key = "$commit|$path"
         if ($script:Scenario.SourceTreeEntries.ContainsKey($key)) {
             "100644 blob $($script:Scenario.SourceTreeEntries[$key])`t$path"
+        }
+        return
+    }
+    if ($arguments[0] -eq '-C' -and $arguments[2] -eq 'hash-object' -and
+        $arguments -ccontains '--filters') {
+        $path = [string]$arguments[-1]
+        if ($script:Scenario.ConsumerTreeEntries.ContainsKey($path)) {
+            [string]$script:Scenario.ConsumerTreeEntries[$path]
         }
         return
     }
@@ -1640,6 +1974,9 @@ function Invoke-AdapterScenario {
     New-Item -ItemType Directory -Force $scriptsPath, $workflowsPath, $sourceGitPath, `
         $sourceScriptsPath, $sourceWorkflowsPath, $sourceMigrationModulePath, `
         $sourceMigrationsPath, $consumerStatePath | Out-Null
+    Invoke-Native -Command $realGitApplication -Arguments @(
+        '-C', $tempRoot, 'init', '--quiet', '--initial-branch=main'
+    ) | Out-Null
     Copy-Item -LiteralPath $moduleSource -Destination (Join-Path $scriptsPath 'MeAndAI.ProtocolUpdate.psm1')
     Copy-Item -LiteralPath $adapterSource -Destination (Join-Path $scriptsPath 'Invoke-MeAndAIProtocolUpdate.ps1')
     Copy-Item -LiteralPath $workflowSource -Destination (Join-Path $workflowsPath 'meandai-protocol-update.yml')
@@ -1686,6 +2023,30 @@ function Invoke-AdapterScenario {
             (Join-Path $consumerStatePath 'meandai-update-state.json'),
             [byte[]]$consumerMigrationBaseline.Bytes
         )
+    }
+    $baseBlobByPath = @{}
+    if ($MigrationRequired) {
+        foreach ($pathResult in @($migrationPlan.Paths)) {
+            $baseBlobByPath[[string]$pathResult.Path] = `
+                [string]$pathResult.OriginalBlob
+        }
+        if (-not [bool]$migrationPlan.LedgerWasMissing) {
+            $baseBlobByPath[[string]$migrationPlan.Ledger.Path] = `
+                [string]$migrationPlan.Ledger.OriginalBlob
+        }
+    }
+    else {
+        $baseBlobByPath['.ai/meandai-update-state.json'] = `
+            [string]$consumerMigrationBaseline.Blob
+    }
+    foreach ($blobPath in @($baseBlobByPath.Keys)) {
+        $writtenBlob = ((Invoke-Native -Command $realGitApplication -Arguments @(
+            '-C', $tempRoot, 'hash-object', '-w', '--no-filters', '--',
+            [string]$blobPath
+        )) -join '').Trim()
+        if ($writtenBlob -cne [string]$baseBlobByPath[$blobPath]) {
+            throw "Focused adapter fixture blob '$blobPath' differs from its exact scenario identity."
+        }
     }
 
     $oldHead = 'a' * 40

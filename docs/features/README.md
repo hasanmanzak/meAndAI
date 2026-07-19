@@ -34,6 +34,7 @@
 | [FEAT-0030](FEAT-0030-v0110-stability-cycle-agent-prompt/README.md) | v0.11.0 optional stability cycle agent prompt | Complete | 0.11.0 |
 | [FEAT-0031](FEAT-0031-v0111-project-neutral-legacy-fixture/README.md) | v0.11.1 project-neutral legacy-consumer fixture | Complete | 0.11.1 |
 | [FEAT-0032](FEAT-0032-general-capability-test-architecture/README.md) | General capability framework and test architecture | Complete | 0.12.0 |
+| [FEAT-0033](FEAT-0033-canonical-base-blob-migration-planning/README.md) | Canonical base-blob consumer migration planning | Complete | 0.12.1 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

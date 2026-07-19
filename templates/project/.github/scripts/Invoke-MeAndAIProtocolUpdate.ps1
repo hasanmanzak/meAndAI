@@ -313,6 +313,84 @@ function Get-LocalTreeEntry {
     }
 }
 
+function Get-LocalGitBlobBytes {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [Parameter(Mandatory)][string]$BlobSha
+    )
+
+    if ($BlobSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Local Git blob SHA '$BlobSha' is not canonical."
+    }
+    $fullRepositoryPath = [IO.Path]::GetFullPath($RepositoryPath)
+    if (-not (Test-Path -LiteralPath $fullRepositoryPath -PathType Container)) {
+        throw "Local Git repository path does not exist: $fullRepositoryPath"
+    }
+    $gitApplications = @(Get-Command git -CommandType Application `
+        -ErrorAction Stop | Select-Object -First 1)
+    if ($gitApplications.Count -ne 1 -or
+        [string]::IsNullOrWhiteSpace([string]$gitApplications[0].Source)) {
+        throw 'Git application could not be resolved for binary blob inspection.'
+    }
+
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = [string]$gitApplications[0].Source
+    $startInfo.Arguments = "cat-file blob $BlobSha"
+    $startInfo.WorkingDirectory = $fullRepositoryPath
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        if (-not $process.Start()) {
+            throw "Git blob inspection did not start for '$BlobSha'."
+        }
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $stream = [IO.MemoryStream]::new()
+        try {
+            $process.StandardOutput.BaseStream.CopyTo($stream)
+            $process.WaitForExit()
+            $stderr = $stderrTask.GetAwaiter().GetResult().Trim()
+            if ($process.ExitCode -ne 0) {
+                $detail = if ($stderr) { ": $stderr" } else { '' }
+                throw "Git blob inspection failed for '$BlobSha'$detail"
+            }
+            return ,$stream.ToArray()
+        }
+        finally {
+            $stream.Dispose()
+        }
+    }
+    finally {
+        $process.Dispose()
+    }
+}
+
+function Assert-WorktreeBlobMatchesBase {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [Parameter(Mandatory)][string]$RelativePath,
+        [Parameter(Mandatory)][string]$ExpectedBlobSha,
+        [Parameter(Mandatory)][string]$Label
+    )
+
+    if ($RelativePath -cnotmatch
+            '^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$' -or
+        $ExpectedBlobSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "$Label has a noncanonical path or base blob identity."
+    }
+    $filteredBlob = ((Invoke-Native -Command 'git' -Arguments @(
+        '-C', $RepositoryPath, 'hash-object', "--path=$RelativePath",
+        '--filters', '--', $RelativePath
+    )) -join '').Trim()
+    if ($filteredBlob -cnotmatch '^[0-9a-f]{40}$' -or
+        $filteredBlob -cne $ExpectedBlobSha) {
+        throw "$Label worktree content differs from the committed base after Git clean filters."
+    }
+}
+
 function Get-StagedTreeEntry {
     param([string]$Path)
 
@@ -516,7 +594,12 @@ function Get-ConsumerMigrationPlanForBase {
             -not (Test-Path -LiteralPath $ledgerPath -PathType Leaf)) {
             throw 'Consumer migration ledger is not one regular tracked file.'
         }
-        $ledgerBytes = [IO.File]::ReadAllBytes($ledgerPath)
+        Assert-WorktreeBlobMatchesBase -RepositoryPath $Workspace `
+            -RelativePath $ConsumerMigrationLedgerPath `
+            -ExpectedBlobSha ([string]$ledgerEntry.Sha) `
+            -Label 'Consumer migration ledger'
+        $ledgerBytes = Get-LocalGitBlobBytes -RepositoryPath $Workspace `
+            -BlobSha ([string]$ledgerEntry.Sha)
     }
     elseif (Test-Path -LiteralPath $ledgerPath) {
         throw 'Consumer migration ledger exists outside the committed base tree.'
@@ -539,9 +622,13 @@ function Get-ConsumerMigrationPlanForBase {
             -not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
             throw "Consumer migration input '$path' is not one regular tracked file."
         }
+        Assert-WorktreeBlobMatchesBase -RepositoryPath $Workspace `
+            -RelativePath $path -ExpectedBlobSha ([string]$entry.Sha) `
+            -Label "Consumer migration input '$path'"
         $files.Add([pscustomobject]@{
             Path = $path
-            Bytes = [IO.File]::ReadAllBytes($fullPath)
+            Bytes = Get-LocalGitBlobBytes -RepositoryPath $Workspace `
+                -BlobSha ([string]$entry.Sha)
         })
     }
     $plan = Resolve-MeAndAIConsumerMigrationPlan -Catalog $Catalog `
