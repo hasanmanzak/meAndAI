@@ -5,25 +5,29 @@ Last verified: **2026-07-19**
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
-- Visibility: private
+- Visibility: public temporarily for hosted-CI continuity during FEAT-0035;
+  maintainer intends to return the repository to private after the workflow
+  optimization and outstanding hosted work complete.
 - Default branch: `main`
 - Current protocol version: `0.12.2`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
   [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0034](../../docs/features/FEAT-0034-ci-evidence-hygiene/README.md)
-  isolates fixture-owned job summaries and permits only fail-closed reuse of
-  an exact already-green merge tree on `main`. Live delivery facts stay in the
-  issue or pull request instead of evidence-only candidate commits.
-  [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85)
+- Current scope: [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
+  corrects full-suite runtime by moving combinatorial policy evidence to
+  faithful production-owned contracts while retaining representative real
+  Git/launcher and native-Windows slices. Linux 2 minutes and Windows 3 minutes
+  are soft goals, not timing gates. [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: capability-owned `TEST-0142` summary isolation and
-  `TEST-0143` exact-tree routing across real Git graphs, mocked GitHub evidence,
-  retained workflow identities, fail-closed negatives, and external-evidence
-  discipline.
+- Latest tracked work: ready `TEST-0144` through `TEST-0146` cover non-gating
+  suite observations, exhaustive hotspot variant-to-evidence mapping,
+  production-owned contract extraction, retained real vertical slices,
+  immutable fixture ownership, cross-runtime proof, and unchanged one-Linux/
+  one-Windows hosted topology. Implementation is handed off to the stronger
+  computer; no production or executable-test code changed on this machine.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -73,6 +77,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- `FEAT-0035` / `BUG-0017` is ready under issue #87. Preserve every active
+  scenario and declared quick-adoption/bootstrap variant while changing its
+  evidence level only where a real launcher/Git process adds no material
+  evidence. Retain real security, recovery, TOCTOU, credential, link/reparse,
+  process, Codex, and native-Windows vertical slices.
+- Hosted Linux 2 minutes and Windows 3 minutes are non-gating optimization
+  goals. Normal workflow runs and justified reruns continue; do not encode the
+  goals as timeouts or restore hosted fan-out.
+- The implementation machine must refresh a same-commit baseline, then execute
+  `SUBF-0064` through `SUBF-0066` in dependency order. This machine's WSL
+  hotspot measurement exceeded its 15-minute diagnostic wrapper and is not an
+  appropriate iterative performance host.
 - `v0.12.2` keeps `push: main` because private-main protection remains
   unavailable. Both stable jobs may run `StructureOnly` only when local Git
   and paginated GitHub evidence prove an exact successful merge-queue commit
