@@ -5,8 +5,10 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$runtimeModulePath = Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module $runtimeModulePath -Force
 $failures = [System.Collections.Generic.List[string]]::new()
 
 function Add-Failure {
@@ -80,6 +82,120 @@ $runtimeSource = Get-Content -LiteralPath (
 if (-not $runtimeSource.Contains('& $EnginePath @processArguments') -or
     -not $runtimeSource.Contains("'-NoProfile', '-ExecutionPolicy', 'Bypass', '-File'")) {
     Add-Failure 'TEST-0138 canonical suites are not executed through one isolated child process each.'
+}
+
+$runtimeFixtureRoot = Join-Path ([IO.Path]::GetTempPath()) `
+    ('meandai-test-runtime-' + [guid]::NewGuid().ToString('N'))
+try {
+    [IO.Directory]::CreateDirectory($runtimeFixtureRoot) | Out-Null
+    $successChild = Join-Path $runtimeFixtureRoot 'success.ps1'
+    $failureChild = Join-Path $runtimeFixtureRoot 'failure.ps1'
+    [IO.File]::WriteAllText($successChild, `
+        "Write-Output 'alpha'`nWrite-Output 'omega'`nexit 0`n", `
+        [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($failureChild, `
+        "Write-Output 'expected failure'`nexit 7`n", `
+        [Text.UTF8Encoding]::new($false))
+
+    $enginePath = (Get-Process -Id $PID).Path
+    $successfulProcess = Invoke-MeAndAITestSuiteProcess `
+        -EnginePath $enginePath -SuitePath $successChild
+    $failedProcess = Invoke-MeAndAITestSuiteProcess `
+        -EnginePath $enginePath -SuitePath $failureChild
+    foreach ($processCase in @(
+        [pscustomobject]@{
+            Name = 'successful'
+            Result = $successfulProcess
+            ExitCode = 0
+            Output = @('alpha', 'omega')
+        },
+        [pscustomobject]@{
+            Name = 'failed'
+            Result = $failedProcess
+            ExitCode = 7
+            Output = @('expected failure')
+        }
+    )) {
+        $elapsedProperty = $processCase.Result.PSObject.Properties['ElapsedMilliseconds']
+        if ($null -eq $elapsedProperty -or
+            $elapsedProperty.Value -isnot [long] -or
+            [long]$elapsedProperty.Value -lt 0) {
+            Add-Failure "TEST-0144 $($processCase.Name) child has no normalized non-negative Int64 elapsed observation."
+        }
+        if ([int]$processCase.Result.ExitCode -ne $processCase.ExitCode -or
+            (@($processCase.Result.Output) -join "`n") -cne `
+                (@($processCase.Output) -join "`n")) {
+            Add-Failure "TEST-0144 $($processCase.Name) child timing changed exit or output authority."
+        }
+    }
+
+    $formatter = Get-Command -Name 'Format-MeAndAITestSuiteObservation' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    if ($null -eq $formatter) {
+        Add-Failure 'TEST-0144 canonical suite observation formatter is missing.'
+    }
+    else {
+        $expectedOwner = 'tests/capabilities/test-architecture/test-architecture.tests.ps1'
+        $line = & $formatter -Owner $expectedOwner -ElapsedMilliseconds ([long]42)
+        if ($line -isnot [string] -or
+            -not $line.StartsWith('MEANDAI_SUITE_OBSERVATION=', `
+                [StringComparison]::Ordinal)) {
+            Add-Failure 'TEST-0144 suite observation line has no canonical prefix.'
+        }
+        else {
+            try {
+                $observation = $line.Substring(
+                    'MEANDAI_SUITE_OBSERVATION='.Length) | ConvertFrom-Json
+                $observationProperties = @(
+                    $observation.PSObject.Properties | ForEach-Object { $_.Name }
+                )
+                if ($observationProperties.Count -ne 3 -or
+                    $observationProperties -cnotcontains 'schema' -or
+                    $observationProperties -cnotcontains 'owner' -or
+                    $observationProperties -cnotcontains 'elapsedMs' -or
+                    [long]$observation.schema -ne 1 -or
+                    [string]$observation.owner -cne $expectedOwner -or
+                    [long]$observation.elapsedMs -ne 42 -or
+                    $observationProperties -contains 'passed' -or
+                    $observationProperties -contains 'exitCode' -or
+                    $observationProperties -contains 'status') {
+                    Add-Failure 'TEST-0144 suite observation schema or authority boundary is invalid.'
+                }
+            }
+            catch {
+                Add-Failure "TEST-0144 suite observation JSON is invalid: $($_.Exception.Message)"
+            }
+        }
+
+        foreach ($invalidObservation in @(
+            [pscustomobject]@{ Owner = ''; Elapsed = [long]0; Name = 'empty owner' },
+            [pscustomobject]@{ Owner = $expectedOwner; Elapsed = [long]-1; Name = 'negative elapsed time' },
+            [pscustomobject]@{ Owner = $expectedOwner; Elapsed = [double]1.5; Name = 'fractional elapsed time' }
+        )) {
+            $rejected = $false
+            try {
+                [void](& $formatter -Owner $invalidObservation.Owner `
+                    -ElapsedMilliseconds $invalidObservation.Elapsed)
+            }
+            catch { $rejected = $true }
+            if (-not $rejected) {
+                Add-Failure "TEST-0144 formatter accepted $($invalidObservation.Name)."
+            }
+        }
+    }
+
+    if (-not $runnerSource.Contains('Format-MeAndAITestSuiteObservation')) {
+        Add-Failure 'TEST-0144 stable runner does not emit the production suite observation contract.'
+    }
+}
+catch {
+    Add-Failure "TEST-0144 runtime fixture failed: $($_.Exception.Message) [$($_.ScriptStackTrace)]"
+}
+finally {
+    if (Test-Path -LiteralPath $runtimeFixtureRoot) {
+        Remove-Item -LiteralPath $runtimeFixtureRoot -Recurse -Force `
+            -ErrorAction SilentlyContinue
+    }
 }
 $governanceSource = Get-Content -LiteralPath (Join-Path $root `
     'tests/capabilities/protocol-governance/protocol-governance.tests.ps1') -Raw

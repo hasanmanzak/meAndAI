@@ -107,7 +107,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/test-architecture/test-architecture.tests.ps1'
-            TestIds = @('TEST-0137', 'TEST-0138')
+            TestIds = @('TEST-0137', 'TEST-0138', 'TEST-0144')
         }
         @{
             Evidence = 'ExecutableSuite'
