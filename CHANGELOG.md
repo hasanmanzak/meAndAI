@@ -3,6 +3,36 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.0 - 2026-07-19
+
+### Added
+
+- Add a minimal release-declared capability framework with typed immutable
+  definitions, append-only catalog validation, and a separate reviewed
+  consumer capability ledger.
+- Add `test-architecture` as the first semantic capability, covering
+  capability-based physical ownership, feature-based scenario traceability,
+  deterministic recursive discovery, common runtime infrastructure, separate
+  suite processes, and capability-local fixture isolation.
+- Add fresh-adoption, already-current, and post-update semantic capability
+  discovery with one canonical review issue, branch, transient manifest, and
+  draft proposal plus evidence-based branch-first, issue-last completion.
+
+### Changed
+
+- Reorganize this repository's canonical suites and fixtures below
+  `tests/capabilities/<capability>` while retaining
+  `tests/protocol.tests.ps1` as the stable CLI and CI entry point.
+- Replace root-only suite enumeration and filename-derived partial execution
+  with normalized recursive owner discovery, ordinal ordering, explicit
+  execution profiles, and shared result/runtime modules.
+- Make an already-current quick-adoption run dispatch the installed lifecycle
+  so protocol currency and semantic capability adoption cannot be conflated.
+- Keep semantic capability assessment outside deterministic updater managed
+  paths and outside the initial-adoption content envelope; a pre-framework
+  consumer first receives its ordinary update and is assessed by the newly
+  installed same-target workflow.
+
 ## 0.11.1 - 2026-07-18
 
 ### Changed

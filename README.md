@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.11.1**
+Current protocol version: **0.12.0**
 
-For v0.11.1, publication authority is the repository's
+For v0.12.0, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[issue #79](https://github.com/hasanmanzak/meAndAI/issues/79); this file does
+[issue #81](https://github.com/hasanmanzak/meAndAI/issues/81); this file does
 not assert a pre-merge release state.
 
 ## Start here
@@ -40,6 +40,15 @@ an older immutable updater first installs the capability, after which the new
 workflow automatically opens one same-target reconciliation draft. Both paths
 fail closed for customized, partial, or otherwise ambiguous state and still
 leave the final merge to the consumer maintainer.
+
+Releases may also declare repository practices through the immutable
+[capability catalog](capabilities/index.json). Consumers record reviewed
+terminal evidence in `.ai/meandai-capabilities-state.json`; open semantic work
+is handed off through one separately reviewed proposal and never becomes
+deterministic updater ownership. The first definition,
+[`test-architecture`](capabilities/test-architecture.json), keeps tests
+physically capability-oriented while preserving feature-owned `TEST-NNNN`
+traceability.
 
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings

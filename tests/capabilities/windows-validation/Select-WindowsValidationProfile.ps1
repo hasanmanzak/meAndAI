@@ -5,7 +5,7 @@ param(
     [string]$EventName,
     [string]$BaseCommit = '',
     [string]$HeadCommit = '',
-    [string]$RepositoryRoot = (Join-Path $PSScriptRoot '..')
+    [string]$RepositoryRoot = (Join-Path $PSScriptRoot '../../..')
 )
 
 $ErrorActionPreference = 'Stop'

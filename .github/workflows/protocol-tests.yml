@@ -102,7 +102,7 @@ jobs:
           HEAD_COMMIT: ${{ github.event.pull_request.head.sha || github.event.after || github.sha }}
         run: |
           $profile = @(
-            ./tests/Select-WindowsValidationProfile.ps1 `
+            ./tests/capabilities/windows-validation/Select-WindowsValidationProfile.ps1 `
               -EventName $env:EVENT_NAME `
               -BaseCommit $env:BASE_COMMIT `
               -HeadCommit $env:HEAD_COMMIT
@@ -143,7 +143,7 @@ jobs:
           MEANDAI_ISSUE_NUMBER: ${{ inputs.issue_number }}
           MEANDAI_OWNED_BRANCH: ${{ inputs.owned_branch }}
         run: |
-          ./tests/Verify-PostPublicationEvidence.ps1 `
+          ./tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1 `
             -Repository '${{ github.repository }}' `
             -Tag $env:MEANDAI_RELEASE_TAG `
             -ExpectedCommit $env:MEANDAI_EXPECTED_COMMIT `

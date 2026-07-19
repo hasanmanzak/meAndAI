@@ -1,6 +1,6 @@
 # FEAT-0007 Test Scenarios
 
-Test implementation: [`tests/quick-adoption.tests.ps1`](../../../tests/quick-adoption.tests.ps1)
+Test implementation: [`tests/capabilities/initial-adoption/quick-adoption.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1)
 and the existing repository suites.
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

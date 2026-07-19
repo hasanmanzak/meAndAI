@@ -23,6 +23,7 @@
 | [DEC-0019](DEC-0019-hosted-runner-efficiency.md) | Minimize hosted runner consumption without weakening evidence | Accepted | 2026-07-18 |
 | [DEC-0020](DEC-0020-target-bound-current-launcher-recovery.md) | Use a target-bound current launcher for atomic legacy recovery | Accepted | 2026-07-18 |
 | [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) | Require explicit strategy for existing-protocol initial adoption | Accepted | 2026-07-18 |
+| [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md) | Use release-declared capability assessment with reviewed semantic adoption | Accepted | 2026-07-19 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

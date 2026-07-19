@@ -1,6 +1,6 @@
 # FEAT-0022 Test Scenarios
 
-Test implementation: [managed merge finalization fixture](../../../tests/managed-merge-finalization.tests.ps1).
+Test implementation: [managed merge finalization fixture](../../../tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |

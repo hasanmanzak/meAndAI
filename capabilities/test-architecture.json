@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "slug": "test-architecture",
+  "type": "Semantic",
+  "title": "Capability-based test architecture",
+  "applicability": {
+    "condition": "automated-test-or-validation-surface",
+    "description": "The repository owns an automated test, validation, verification, or policy-checking surface."
+  },
+  "requirements": [
+    {
+      "id": "capability-based-physical-ownership",
+      "statement": "Canonical suites and their support assets are physically owned by the capability or behavior they verify; repository-native equivalent structures are permitted."
+    },
+    {
+      "id": "feature-based-scenario-traceability",
+      "statement": "Feature records remain the canonical history and each active numbered scenario maps to exactly one executable owner and evidence kind."
+    },
+    {
+      "id": "deterministic-recursive-discovery",
+      "statement": "Canonical suites are discovered recursively as normalized repository-relative identities in ordinal order, and ambiguous, unsafe, linked, duplicate, or empty discovery fails closed."
+    },
+    {
+      "id": "small-common-infrastructure",
+      "statement": "Shared test infrastructure contains only generic discovery, execution, result, evidence, or cleanup mechanics and does not own capability-specific assertions."
+    },
+    {
+      "id": "separate-suite-processes",
+      "statement": "Canonical suites execute in separate processes unless reviewed repository-native evidence proves an equivalent isolation boundary."
+    },
+    {
+      "id": "capability-local-fixtures",
+      "statement": "Mutable fixtures, mocks, repositories, environment state, and temporary roots are capability-local and freshly reset for each case; shared immutable fixtures have explicit owners and byte identity."
+    }
+  ],
+  "evidence": {
+    "conforming": [
+      "Reviewed topology evidence identifies canonical suites, support assets, discovery order, and process boundaries.",
+      "Reviewed traceability evidence maps every active numbered scenario to one executable owner and evidence kind.",
+      "Focused execution evidence demonstrates fixture reset, cleanup, and isolation for representative mutable boundaries."
+    ],
+    "notApplicable": [
+      "Reviewed repository evidence proves that no automated test, validation, verification, or policy-checking surface exists.",
+      "The review identifies the repository scope and explains why adding such a surface is outside the repository's current authority."
+    ]
+  }
+}

@@ -5,15 +5,16 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.11.1 work removes named-consumer coupling from the frozen pre-engine
-regression without changing updater behavior or immutable migration data.
-Follow [FEAT-0031](../../../docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/README.md)
-and the [v0.11.1 continuation](2026-07-18-v0111-project-neutral-legacy-fixture.md).
-[Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) owns external
+The v0.12.0 work adds release-declared semantic capabilities and reorganizes
+tests by capability while preserving feature traceability. Follow
+[FEAT-0032](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+and the [v0.12.0 continuation](2026-07-19-v0120-capability-test-architecture.md).
+[Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) owns external
 delivery facts. `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-19 - v0.12.0 capability framework and test architecture](2026-07-19-v0120-capability-test-architecture.md)
 - [2026-07-18 - v0.11.1 project-neutral legacy-consumer fixture](2026-07-18-v0111-project-neutral-legacy-fixture.md)
 - [2026-07-18 - v0.11.0 adoption strategy and optional agent prompt](2026-07-18-v0110-adoption-strategy-and-agent-prompt.md)
 - [2026-07-18 - v0.10.4 atomic legacy updater recovery](2026-07-18-v0104-atomic-legacy-updater-recovery.md)

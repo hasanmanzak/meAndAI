@@ -4,7 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $workflowSource = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
@@ -489,7 +489,7 @@ $atomicGateRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-legacy-consumer-atomic-gate-$([guid]::NewGuid().ToString('N'))"
 try {
     $legacyConsumerValidatorFixture = Join-Path $root `
-        'tests/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1'
+        'tests/capabilities/consumer-update/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1'
     $fixtureText = Get-Content -Raw -LiteralPath $legacyConsumerValidatorFixture
     foreach ($requiredSyntheticLink in @(
         'https://example.invalid/legacy-consumer/issues/2',
@@ -800,7 +800,7 @@ else {
     foreach ($requiredNeutralToken in @(
         'function Invoke-FrozenLegacyConsumerValidator',
         '$legacyConsumerValidatorFixture = Join-Path',
-        'tests/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1',
+        'tests/capabilities/consumer-update/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1',
         'meandai-legacy-consumer-atomic-gate-',
         'Legacy pre-engine consumer fixture',
         'Baseline legacy-consumer validator',

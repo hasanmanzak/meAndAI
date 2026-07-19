@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "capabilities": [
+    {
+      "slug": "test-architecture",
+      "definition": "test-architecture.json",
+      "type": "Semantic",
+      "definitionBlob": "9a3a999f05abbbb4ee710f14d82fb26d86de5ad5"
+    }
+  ]
+}

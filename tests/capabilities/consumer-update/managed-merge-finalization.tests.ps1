@@ -2,11 +2,11 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
 
@@ -1206,6 +1206,6 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'Managed merge finalization tests passed.' -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/managed-merge-finalization.tests.ps1' `
+    -Owner 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1' `
     -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

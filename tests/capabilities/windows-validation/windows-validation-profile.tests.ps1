@@ -2,10 +2,10 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$selectorPath = Join-Path $root 'tests/Select-WindowsValidationProfile.ps1'
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$selectorPath = Join-Path $root 'tests/capabilities/windows-validation/Select-WindowsValidationProfile.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-windows-profile-$([guid]::NewGuid().ToString('N'))"
@@ -195,7 +195,7 @@ if ($failures.Count -gt 0) {
 Write-Host 'Windows validation profile tests passed for TEST-0123.' `
     -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/windows-validation-profile.tests.ps1' `
+    -Owner 'tests/capabilities/windows-validation/windows-validation-profile.tests.ps1' `
     -SourcePaths @($PSCommandPath, $selectorPath) `
     -AuthorityPath $scenarioAuthorityPath
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
