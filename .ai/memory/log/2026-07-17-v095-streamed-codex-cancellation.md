@@ -15,7 +15,7 @@
 ## Current evidence
 
 - `TEST-0105` and `TEST-0106` are owned by
-  [`tests/quick-adoption-streaming.tests.ps1`](../../../tests/quick-adoption-streaming.tests.ps1).
+  [`tests/quick-adoption-streaming.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1).
 - The expected-red run proved the v0.9.4 overlay, buffered stdout, and weak
   exceptional-finalizer boundary. The focused implementation run passed on
   Windows PowerShell 5.1.

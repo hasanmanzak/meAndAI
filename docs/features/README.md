@@ -33,6 +33,7 @@
 | [FEAT-0029](FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) | v0.11.0 protocol-aware initial adoption | Complete | 0.11.0 |
 | [FEAT-0030](FEAT-0030-v0110-stability-cycle-agent-prompt/README.md) | v0.11.0 optional stability cycle agent prompt | Complete | 0.11.0 |
 | [FEAT-0031](FEAT-0031-v0111-project-neutral-legacy-fixture/README.md) | v0.11.1 project-neutral legacy-consumer fixture | Complete | 0.11.1 |
+| [FEAT-0032](FEAT-0032-general-capability-test-architecture/README.md) | General capability framework and test architecture | Complete | 0.12.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

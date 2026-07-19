@@ -1,8 +1,8 @@
 # FEAT-0004 Test Scenarios
 
 Test implementation:
-[workflow and resolver tests](../../../tests/protocol-update.tests.ps1),
-[adapter fixtures](../../../tests/protocol-update-adapter.tests.ps1), and
+[workflow and resolver tests](../../../tests/capabilities/consumer-update/protocol-update.tests.ps1),
+[adapter fixtures](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1), and
 [repository structural tests](../../../tests/protocol.tests.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

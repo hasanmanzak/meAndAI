@@ -9,6 +9,8 @@ explain what the protocol repository provides and why it is designed this way.
 - [Feature index](features/README.md)
 - [Decision index](decisions/README.md)
 - [Idea index](ideas/README.md)
+- [Capability catalog](../capabilities/index.json)
+- [Test-architecture capability](../capabilities/test-architecture.json)
 - [Project memory](../.ai/memory/README.md)
 - [Common protocol](../PROTOCOL.md)
 - [Repository overview](../README.md)

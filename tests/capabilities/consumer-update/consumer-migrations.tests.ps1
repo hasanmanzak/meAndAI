@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$root = Split-Path -Parent $PSScriptRoot
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
 
 function Assert-True {
@@ -400,6 +400,6 @@ Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0119'
 Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0120'
 Write-Host 'Consumer migration tests passed.'
 $scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/consumer-migrations.tests.ps1' `
+    -Owner 'tests/capabilities/consumer-update/consumer-migrations.tests.ps1' `
     -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

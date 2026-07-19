@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.11.1',
+    [string]$ProtocolTag = 'v0.12.0',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -33,7 +33,7 @@ $minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
-$initialAdoptionPolicyTag = 'v0.11.1'
+$initialAdoptionPolicyTag = 'v0.12.0'
 $initialAdoptionPolicySourcePath =
     'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
@@ -2280,7 +2280,7 @@ function Invoke-LifecycleWorkflow {
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][string]$Branch,
         [Parameter(Mandatory)][string]$HeadSha,
-        [Parameter(Mandatory)][ValidateSet('FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart')]
+        [Parameter(Mandatory)][ValidateSet('Auto', 'FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart')]
         [string]$ResolvedAdoptionStrategy,
         [Parameter(Mandatory)][bool]$ProtocolRecordLossAcknowledged
     )
@@ -6064,7 +6064,20 @@ if ($null -ne $secretLockCleanupError) {
 
 if ([string]$existingAdoptionRoute.State -ceq 'AlreadyCurrent') {
     Write-Host "The completed meAndAI adoption is already current at $($existingAdoptionRoute.InstalledTag)."
-    Write-Host 'The installed updater seed was preserved; no workflow dispatch, Git publication, pull-request resolution, or local Codex execution was required.'
+    Write-Host 'The installed updater seed was preserved; semantic capability discovery remains a separate workflow responsibility.'
+    if ($SkipLifecycleDispatch) {
+        Write-Host 'Capability discovery dispatch was explicitly skipped.'
+    }
+    else {
+        Set-QuickAdoptionProgress -Status 'Checking current capabilities' `
+            -PercentComplete 90
+        $run = Invoke-LifecycleWorkflow -Repository $repository `
+            -Branch $defaultBranch -HeadSha $routingHead `
+            -ResolvedAdoptionStrategy 'Auto' `
+            -ProtocolRecordLossAcknowledged $false
+        Write-Host "Current capability discovery completed successfully: $($run.url)"
+        Write-Host 'Review any separately tracked semantic capability draft created by the installed workflow.'
+    }
     Set-QuickAdoptionProgress -Status 'Completed' -PercentComplete 100
     return
 }

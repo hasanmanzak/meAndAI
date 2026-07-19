@@ -2,11 +2,11 @@
 
 Implemented automation:
 
-- [Quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1)
-- [Bootstrap adapter fixtures](../../../tests/capabilities-bootstrap-adapter.tests.ps1)
-- [Updater resolver and adapter fixtures](../../../tests/protocol-update.tests.ps1)
+- [Quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1)
+- [Bootstrap adapter fixtures](../../../tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1)
+- [Updater resolver and adapter fixtures](../../../tests/capabilities/consumer-update/protocol-update.tests.ps1)
 - [Repository and scenario-ownership validator](../../../tests/protocol.tests.ps1)
-- [Post-publication evidence fixtures](../../../tests/post-publication-evidence.tests.ps1)
+- [Post-publication evidence fixtures](../../../tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1)
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |

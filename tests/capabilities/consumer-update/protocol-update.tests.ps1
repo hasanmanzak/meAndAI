@@ -2,9 +2,9 @@
 param([switch]$PureResolverOnly)
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $failures = [System.Collections.Generic.List[string]]::new()
 
@@ -655,7 +655,7 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-$adapterTestPath = Join-Path $root 'tests/protocol-update-adapter.tests.ps1'
+$adapterTestPath = Join-Path $root 'tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1'
 if (-not (Test-Path -LiteralPath $adapterTestPath -PathType Leaf)) {
     Write-Host 'Protocol update tests failed: missing adapter integration tests.' -ForegroundColor Red
     exit 1
@@ -668,7 +668,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host 'Protocol update tests passed for all declared scenarios in this suite.' -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/protocol-update.tests.ps1' `
+    -Owner 'tests/capabilities/consumer-update/protocol-update.tests.ps1' `
     -SourcePaths @($PSCommandPath, $adapterTestPath) `
     -AuthorityPath $scenarioAuthorityPath
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

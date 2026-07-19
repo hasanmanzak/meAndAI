@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.11.1**<br>
+Protocol version: **0.12.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -535,6 +535,59 @@ one same-target reconciliation proposal. After that capability handoff merges,
 later compatible transitions use the ordinary one-proposal path. This split is
 capability-based and MUST NOT be implemented as a source-version-specific
 switch.
+
+### Release-declared capabilities
+
+An immutable release MAY declare reusable repository practices through the
+ordered catalog at `capabilities/index.json`. Each entry has one stable
+lowercase slug, one declared type, one immutable definition path, and the
+exact Git-blob identity of that definition. The supported types are
+`Deterministic`, `DeclarativeMigration`, `Semantic`, and `Manual`.
+Deterministic state remains subject to exact automation, declarative migration
+state delegates to the migration catalog above, semantic state requires
+repository-aware maintainer review, and manual state requires reviewed evidence
+that automation cannot establish. A compatible catalog is append-only: an
+existing slug/definition-path/type/blob tuple cannot be removed, reordered,
+or rewritten.
+
+Consumers record terminal capability assessments separately in
+`.ai/meandai-capabilities-state.json`. This ledger is reviewed adoption
+evidence, not another current protocol pin and not updater ownership of the
+assessed files. It MUST be an exact ordered prefix of the target capability
+catalog. The assessment boundary returns exactly `Conforming`,
+`NotApplicable`, `AdoptionRequired`, or `ReviewRequired`; only reviewed
+`Conforming` and `NotApplicable` evidence may enter the terminal ledger.
+Missing, stale, partial, reordered, duplicated, unreviewed, or ambiguous
+evidence remains open or fails closed.
+
+Capability discovery runs after reviewed first adoption, for an already-current
+consumer, and after ordinary compatible update discovery. It MUST NOT broaden
+the initial-adoption content envelope. An updater installed before this
+framework first performs only the ordinary update it can prove; the newly
+installed same-target workflow then evaluates the immutable capability
+catalog. That handoff MUST NOT switch source versions or pretend old immutable
+code already possessed the new capability.
+
+An unresolved immutable capability batch owns at most one canonical issue,
+branch, transient `.ai/adoption/meandai-capability-review.json` manifest, and
+draft semantic pull request. Automation MAY create or resume that review-only
+handoff but MUST NOT edit, approve, mark ready, or merge semantic consumer
+paths. Completion requires the reviewed pull request, a complete terminal
+default-branch ledger, exact repository/catalog/branch/head evidence, removal
+of the transient manifest, default-branch merge containment, branch deletion
+with an exact-head lease, and issue-last closure evidence. Exact pending and
+completed reruns are no-ops; duplicate or drifted ownership fails closed.
+
+The `test-architecture` semantic capability establishes the shared test
+baseline for adopting repositories: canonical suites are physically grouped by
+capability while feature records retain canonical `TEST-NNNN` traceability;
+suite discovery is recursive, normalized, link-safe, case-safe, and ordinal;
+the stable repository runner executes each suite in a separate process; common
+infrastructure contains only generic discovery, execution, result, evidence,
+and cleanup mechanics; mutable fixtures are capability-local and reset per
+case, while any shared immutable fixture has one explicit owner and byte
+identity. A repository-native equivalent is acceptable only with reviewed
+evidence satisfying the same outcomes.
 
 ### Consumer update proposals
 

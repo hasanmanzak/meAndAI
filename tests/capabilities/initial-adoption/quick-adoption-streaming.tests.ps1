@@ -5,11 +5,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $launcherPath = Join-Path $root 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
-$fixturePath = Join-Path $root 'tests/fixtures/Invoke-MockCodexEventProcess.ps1'
+$fixturePath = Join-Path $root 'tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
 
 if ($Shard -ceq 'WindowsNative' -and $env:OS -cne 'Windows_NT') {
@@ -333,7 +333,7 @@ if ($Shard -ceq 'All') {
     Write-Host 'Quick-adoption streaming tests passed for TEST-0105 and TEST-0106.' `
         -ForegroundColor Green
     $scenarioResult = New-MeAndAIScenarioResult `
-        -Owner 'tests/quick-adoption-streaming.tests.ps1' `
+        -Owner 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1' `
         -SourcePaths @($PSCommandPath, $fixturePath) `
         -AuthorityPath $scenarioAuthorityPath
     Write-Host ('MEANDAI_SCENARIO_RESULTS=' +
@@ -344,7 +344,7 @@ else {
         -ForegroundColor Green
     $compatibilityResult = [ordered]@{
         schema = 1
-        suite = 'tests/quick-adoption-streaming.tests.ps1'
+        suite = 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1'
         shard = 'WindowsNative'
         passed = $true
     }

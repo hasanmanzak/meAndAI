@@ -1,30 +1,31 @@
 # Project Snapshot
 
-Last verified: **2026-07-18**
+Last verified: **2026-07-19**
 
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.11.1`. Exact publication state is authoritative
+- Current protocol version: `0.12.0`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) after
+  [issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0031](../../docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/README.md)
-  removes named-consumer coupling from the frozen pre-engine regression,
-  executes the documented exact no-op rerun, and leaves updater and immutable
-  migration behavior unchanged. [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79)
-  owns delivery and future publication evidence.
+- Current scope: [FEAT-0032](../../docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+  adds the minimum release-declared capability framework and its first
+  semantic definition, `test-architecture`. Fresh adoption and normal
+  existing-consumer protocol updates converge on one reviewed, idempotent
+  capability handoff without expanding deterministic updater ownership.
+  [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) owns delivery
+  and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: the quick launcher and lifecycle bind one explicit
-  adoption strategy and exact bounded protocol-surface inventory through
-  dispatch, manifest, marker, issue, prompt, recovery, and completion.
-  `TEST-0127` through `TEST-0130` own that behavior. `TEST-0131` and
-  `TEST-0132` own the optional prompt's fidelity, immutable consumer
-  reachability, and no-activation boundary.
+- Latest tracked work: immutable capability catalog/ledger contracts,
+  capability-based test ownership with feature-based scenario traceability,
+  recursive ordinal discovery, common runtime infrastructure, fixture
+  isolation, and fresh/current/post-update semantic review lifecycle.
+  `TEST-0134` through `TEST-0140` own that behavior.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -74,6 +75,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- `v0.12.0` declares typed immutable capabilities separately from deterministic
+  migrations. The first semantic capability, `test-architecture`, keeps
+  canonical suites under `tests/capabilities/<capability>`, preserves one
+  feature-owned `TEST-NNNN` authority, discovers suites recursively, runs them
+  in separate processes, and keeps mutable fixtures capability-local.
+- Freshly adopted, already-current, and normally updated consumers evaluate
+  the same target catalog. A pre-framework updater first completes its normal
+  protocol update; only the installed same-target workflow may open the
+  semantic handoff. One canonical issue, branch, transient manifest, and draft
+  review are reused until reviewed terminal ledger evidence permits exact
+  branch-first, issue-last finalization.
 - `v0.11.0` adds explicit `FreshAdoption`, `FullMigration`,
   `HybridReconciliation`, acknowledged `CleanStart`, and `Abort` strategy
   handling. `Auto` selects only protocol-evidence-free fresh adoption;

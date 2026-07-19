@@ -2,9 +2,9 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
@@ -478,7 +478,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.11.1',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.12.0',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',
@@ -653,7 +653,7 @@ if (Test-Path -LiteralPath $protocolPath -PathType Leaf) {
     }
 }
 
-$adapterTestPath = Join-Path $root 'tests/capabilities-bootstrap-adapter.tests.ps1'
+$adapterTestPath = Join-Path $root 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1'
 if (-not (Test-Path -LiteralPath $adapterTestPath -PathType Leaf)) {
     Add-Failure 'TEST-0028 missing bootstrap adapter integration tests.'
 }
@@ -673,7 +673,7 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in this suite.' -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities-bootstrap.tests.ps1' `
+    -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
     -SourcePaths @($PSCommandPath, $adapterTestPath) `
     -AuthorityPath $scenarioAuthorityPath
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

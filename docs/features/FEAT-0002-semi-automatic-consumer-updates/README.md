@@ -58,8 +58,8 @@ supersede an untouched older proposal. It never approves or merges the update.
 - [Consumer workflow](../../../templates/project/.github/workflows/meandai-protocol-update.yml)
 - [Pure resolver and shared validator](../../../templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1)
 - [Live GitHub adapter](../../../templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1)
-- [Resolver and structural tests](../../../tests/protocol-update.tests.ps1)
-- [Adapter race fixture](../../../tests/protocol-update-adapter.tests.ps1)
+- [Resolver and structural tests](../../../tests/capabilities/consumer-update/protocol-update.tests.ps1)
+- [Adapter race fixture](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1)
 - [Repository validation workflow](../../../.github/workflows/protocol-tests.yml)
 
 ## Risks

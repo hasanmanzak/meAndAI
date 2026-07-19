@@ -1,8 +1,8 @@
 # FEAT-0020 Test Scenarios
 
-Implementation: [`tests/quick-adoption-streaming.tests.ps1`](../../../tests/quick-adoption-streaming.tests.ps1),
-[`tests/quick-adoption.tests.ps1`](../../../tests/quick-adoption.tests.ps1),
-[`tests/fixtures/Invoke-MockCodex.ps1`](../../../tests/fixtures/Invoke-MockCodex.ps1),
+Implementation: [`tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1),
+[`tests/capabilities/initial-adoption/quick-adoption.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1),
+[`tests/capabilities/initial-adoption/fixtures/Invoke-MockCodex.ps1`](../../../tests/capabilities/initial-adoption/fixtures/Invoke-MockCodex.ps1),
 and the complete repository suite.
 
 | ID | Related work | Scenario | Expected result | Level | Status | Automation |

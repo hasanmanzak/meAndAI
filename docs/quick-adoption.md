@@ -103,8 +103,8 @@ private protocol repository, the launcher stops with a source-access error.
 ## Quick command
 
 Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.11.1/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.11.1` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.0/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.12.0` GitHub Release with an authenticated browser.
 Save the reusable file outside the consumer repository, such as in
 `$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
 launcher reusable across consumers pinned to the same release.
@@ -116,7 +116,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.11.1` is an exact published immutable release
+launcher itself verifies that `v0.12.0` is an exact published immutable release
 before it downloads canonical source; it never executes a moving `main` file.
 
 ## Target behavior and options
@@ -153,7 +153,7 @@ values are not command-line arguments and are not printed.
 
 Before repository initialization, remote creation, secret writes, or seed
 publication, the launcher verifies the authenticated `gh` identity and loads
-the pure strategy/classification policy from the exact immutable `v0.11.1`
+the pure strategy/classification policy from the exact immutable `v0.12.0`
 capabilities contract module. The standalone launcher and workflow adapter do
 not maintain competing policy copies; each keeps only its own Git/GitHub
 evidence and mutation-boundary checks. The launcher then performs one bounded
@@ -400,6 +400,18 @@ behavior when their reviewed update installs the current workflow and adapter.
 If that immutable installing updater predates transition migrations, the new
 workflow performs the generic same-target reconciliation handoff described
 above; no source-version-specific bridge is selected.
+
+After adoption or update finalization, the installed workflow independently
+discovers release-declared semantic capabilities. An already-current launcher
+run dispatches that workflow instead of treating the current pin as proof that
+semantic capability assessment is complete. The first capability is
+`test-architecture`: tests remain feature-traceable but canonical suites and
+fixtures are reviewed into capability ownership with deterministic recursive
+discovery and separate suite processes. Exact terminal ledger state is a
+no-op; an unresolved batch reuses one canonical issue, branch, transient
+manifest, and draft review. The workflow may create that handoff, but only the
+consumer's reviewed proposal may change semantic files or record terminal
+evidence.
 
 ## Stopping and resuming safely
 

@@ -3,7 +3,7 @@
     Authorities = @(
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/protocol.tests.ps1'
+            Owner = 'tests/capabilities/protocol-governance/protocol-governance.tests.ps1'
             TestIds = @(
                 'TEST-0001', 'TEST-0002', 'TEST-0003', 'TEST-0004',
                 'TEST-0005', 'TEST-0006', 'TEST-0007', 'TEST-0008',
@@ -18,7 +18,7 @@
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/protocol-update.tests.ps1'
+            Owner = 'tests/capabilities/consumer-update/protocol-update.tests.ps1'
             TestIds = @(
                 'TEST-0009', 'TEST-0010', 'TEST-0011', 'TEST-0012',
                 'TEST-0013', 'TEST-0014', 'TEST-0015', 'TEST-0016',
@@ -31,7 +31,7 @@
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/capabilities-bootstrap.tests.ps1'
+            Owner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
             TestIds = @(
                 'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
                 'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
@@ -42,7 +42,7 @@
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/quick-adoption.tests.ps1'
+            Owner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
             TestIds = @(
                 'TEST-0033', 'TEST-0034', 'TEST-0035', 'TEST-0036',
                 'TEST-0038', 'TEST-0039', 'TEST-0040',
@@ -58,33 +58,53 @@
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/quick-adoption-streaming.tests.ps1'
+            Owner = 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1'
             TestIds = @('TEST-0105', 'TEST-0106')
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/consumer-migrations.tests.ps1'
+            Owner = 'tests/capabilities/consumer-update/consumer-migrations.tests.ps1'
             TestIds = @('TEST-0119', 'TEST-0120')
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/windows-validation-profile.tests.ps1'
+            Owner = 'tests/capabilities/windows-validation/windows-validation-profile.tests.ps1'
             TestIds = @('TEST-0123')
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/post-publication-evidence.tests.ps1'
+            Owner = 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1'
             TestIds = @('TEST-0083')
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/managed-merge-finalization.tests.ps1'
+            Owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
             TestIds = @('TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112')
         }
         @{
             Evidence = 'ExecutableSuite'
-            Owner = 'tests/idea-incubation.tests.ps1'
+            Owner = 'tests/capabilities/idea-incubation/idea-incubation.tests.ps1'
             TestIds = @('TEST-0043')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
+            TestIds = @('TEST-0134', 'TEST-0135')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/test-architecture/test-discovery.tests.ps1'
+            TestIds = @('TEST-0136')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/test-architecture/test-architecture.tests.ps1'
+            TestIds = @('TEST-0137', 'TEST-0138')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
+            TestIds = @('TEST-0139', 'TEST-0140')
         }
         @{
             Evidence = 'GitHubActionsSemantic'
@@ -93,7 +113,7 @@
         }
         @{
             Evidence = 'ExternalPostPublication'
-            Owner = 'tests/Verify-PostPublicationEvidence.ps1'
+            Owner = 'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'
             TestIds = @('TEST-0065')
         }
         @{

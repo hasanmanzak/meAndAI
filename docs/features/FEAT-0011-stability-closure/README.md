@@ -180,10 +180,10 @@ blocked their slice until corrected:
 
 | No. | Owning finding | Classification / severity | Evidence and impact | Resolution / status |
 | --- | --- | --- | --- | --- |
-| 1 | `FIND-0093` | Test fixture contract / High | An escaped mock URI prevented the host-qualified fixture from exercising the intended request | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
-| 2 | `FIND-0097` | Boundary binding / High | An empty issue inventory bound incorrectly and could hide the zero-result convergence path | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
-| 3 | `FIND-0099` | Timeout fixture semantics / High | The timeout fixture selected the wrong mock mode and did not exercise the documented path | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
-| 4 | `FIND-0099` | Process termination race / High | A child-process race hid the canonical timeout result | Corrected in [quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1); resolved before merge |
+| 1 | `FIND-0093` | Test fixture contract / High | An escaped mock URI prevented the host-qualified fixture from exercising the intended request | Corrected in [quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1); resolved before merge |
+| 2 | `FIND-0097` | Boundary binding / High | An empty issue inventory bound incorrectly and could hide the zero-result convergence path | Corrected in [quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1); resolved before merge |
+| 3 | `FIND-0099` | Timeout fixture semantics / High | The timeout fixture selected the wrong mock mode and did not exercise the documented path | Corrected in [quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1); resolved before merge |
+| 4 | `FIND-0099` | Process termination race / High | A child-process race hid the canonical timeout result | Corrected in [quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1); resolved before merge |
 | 5 | `FIND-0099` | Workflow compatibility / High | Hosted Actions rejected unsupported `matrix.shell` before any validation job started | Replaced with OS-qualified constant shells in [protocol CI](../../../.github/workflows/protocol-tests.yml); actionlint and hosted CI passed before merge |
 
 ## Self-review

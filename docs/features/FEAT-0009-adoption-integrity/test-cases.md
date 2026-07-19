@@ -1,8 +1,8 @@
 # FEAT-0009 Test Scenarios
 
 Test implementation:
-[quick-adoption fixtures](../../../tests/quick-adoption.tests.ps1),
-[updater adapter fixtures](../../../tests/protocol-update-adapter.tests.ps1),
+[quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1),
+[updater adapter fixtures](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1),
 and [repository validation](../../../tests/protocol.tests.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
