@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.12.0 |
 | Issue | [#81](https://github.com/hasanmanzak/meAndAI/issues/81) |
-| Pull request | Pending |
+| Pull request | [#82](https://github.com/hasanmanzak/meAndAI/pull/82) |
 | Decision | [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
 | Tests | [TEST-0134 through TEST-0140](test-cases.md) |
 
@@ -277,12 +277,13 @@ decision: [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabili
 - [x] No unresolved `Blocking` finding; every other observation has its
       required disposition evidence.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [ ] Issue, pull request, decision, tests, and related work cross-linked.
+- [x] Issue, pull request, decision, tests, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.
 
 ## Post-merge release evidence
 
-[Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) is the stable
-external authority. Exact merge commit, immutable `v0.12.0` release, hosted
-checks, branch cleanup, and post-publication verification remain `Pending`
-until those facts exist.
+[Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) and draft
+[pull request #82](https://github.com/hasanmanzak/meAndAI/pull/82) are the
+stable pre-merge authorities. Exact merge commit, immutable `v0.12.0` release,
+hosted checks, branch cleanup, and post-publication verification remain
+`Pending` until those facts exist.

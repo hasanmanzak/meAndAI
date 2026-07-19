@@ -3,7 +3,7 @@
 - Feature: [FEAT-0032](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md)
 - Decision: [DEC-0022](../../../docs/decisions/DEC-0022-release-declared-semantic-capabilities.md)
 - Tracking: [issue #81](https://github.com/hasanmanzak/meAndAI/issues/81)
-- Pull request: Pending
+- Pull request: [#82](https://github.com/hasanmanzak/meAndAI/pull/82)
 - Target version: `0.12.0`
 
 ## Durable continuation
@@ -41,5 +41,5 @@
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness
   boundary, not product evidence.
-- Pull-request, hosted-check, merge, immutable release, and post-publication
-  evidence remain pending until those facts exist.
+- Draft pull request #82 exists. Hosted-check, merge, immutable release, and
+  post-publication evidence remain pending until those facts exist.
