@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.12.1 |
 | Issue | [#83](https://github.com/hasanmanzak/meAndAI/issues/83) |
-| Pull request | Pending |
+| Pull request | [#84](https://github.com/hasanmanzak/meAndAI/pull/84) |
 | Decisions | [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md) |
 | Tests | [TEST-0141](test-cases.md) |
 
@@ -184,12 +184,15 @@ worktree, staged-result, and remote-planner boundaries.
 - [x] Bounded self-review and post-development scan complete.
 - [x] No unresolved `Blocking` finding.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [ ] Pull request and final hosted-check evidence cross-linked after creation.
+- [x] Pull request [#84](https://github.com/hasanmanzak/meAndAI/pull/84) is
+      cross-linked.
+- [ ] Final hosted-check evidence is cross-linked after the candidate passes.
 - [ ] Applicable hosted CI gates pass before merge.
 
 ## Post-merge release evidence
 
 [Issue #83](https://github.com/hasanmanzak/meAndAI/issues/83) is the stable
-external publication authority. Exact merge commit, immutable release, branch
-cleanup, and post-publication verification remain `Pending` until those facts
-exist.
+external publication authority, with implementation review in [PR
+#84](https://github.com/hasanmanzak/meAndAI/pull/84). Exact merge commit,
+immutable release, branch cleanup, and post-publication verification remain
+`Pending` until those facts exist.

@@ -3,7 +3,7 @@
 - Feature: [FEAT-0033](../../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/README.md)
 - Decisions: [DEC-0018](../../../docs/decisions/DEC-0018-release-declared-consumer-migrations.md), [DEC-0020](../../../docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md)
 - Tracking: [issue #83](https://github.com/hasanmanzak/meAndAI/issues/83)
-- Pull request: pending
+- Pull request: [#84](https://github.com/hasanmanzak/meAndAI/pull/84)
 - Target version: `0.12.1`
 
 ## Durable continuation
