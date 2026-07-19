@@ -54,6 +54,13 @@
   singleton, and multi-value shapes on Windows PowerShell 5.1 and PowerShell
   7.4.2. Focused `TEST-0139`/`TEST-0140` pass on both hosts; replacement hosted
   confirmation is pending.
+- Hosted Ubuntu then reached `TEST-0136` and exposed `FIND-0172`: Linux
+  PowerShell returned from `New-Item -ItemType Junction` without creating a
+  path, while the fixture treated call completion as link creation and skipped
+  its `SymbolicLink` fallback. The fixture now requires the link path to exist
+  before accepting an item type. Focused discovery passes with an actual link
+  on Windows PowerShell 5.1 and Linux PowerShell 7.4.2; replacement hosted
+  confirmation is pending.
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness
   boundary, not product evidence.

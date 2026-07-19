@@ -275,8 +275,10 @@ try {
         try {
             [void](New-Item -ItemType $itemType -Path $linkPath `
                 -Target $linkTarget -ErrorAction Stop)
-            $linkCreated = $true
-            break
+            if (Test-Path -LiteralPath $linkPath) {
+                $linkCreated = $true
+                break
+            }
         }
         catch { }
     }
