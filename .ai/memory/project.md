@@ -7,25 +7,22 @@ Last verified: **2026-07-19**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.12.0`. Exact publication state is authoritative
+- Current protocol version: `0.12.1`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) after
+  [issue #83](https://github.com/hasanmanzak/meAndAI/issues/83) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0032](../../docs/features/FEAT-0032-general-capability-test-architecture/README.md)
-  adds the minimum release-declared capability framework and its first
-  semantic definition, `test-architecture`. Fresh adoption and normal
-  existing-consumer protocol updates converge on one reviewed, idempotent
-  capability handoff without expanding deterministic updater ownership.
-  [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) owns delivery
-  and future publication evidence.
+- Current scope: [FEAT-0033](../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/README.md)
+  corrects local consumer migration planning so exact captured base-commit
+  Git blobs, including the ledger, supply binary planning bytes regardless of
+  checkout filters. [Issue #83](https://github.com/hasanmanzak/meAndAI/issues/83)
+  owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable capability catalog/ledger contracts,
-  capability-based test ownership with feature-based scenario traceability,
-  recursive ordinal discovery, common runtime infrastructure, fixture
-  isolation, and fresh/current/post-update semantic review lifecycle.
-  `TEST-0134` through `TEST-0140` own that behavior.
+- Latest tracked work: binary-safe local Git blob acquisition at the
+  committed-state boundary plus capability-owned `TEST-0141` coverage for
+  LF blobs, CRLF worktrees, true committed drift, exact staged results, and an
+  idempotent applied-state rerun.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -75,6 +72,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- `v0.12.1` corrects the local/current-launcher migration planner's committed-
+  state input boundary. Required inputs and the optional ledger come from
+  exact validated base-commit Git blobs; worktree presence and containment
+  remain write-safety evidence but checkout-filtered bytes are never used as
+  committed-state evidence.
 - `v0.12.0` declares typed immutable capabilities separately from deterministic
   migrations. The first semantic capability, `test-architecture`, keeps
   canonical suites under `tests/capabilities/<capability>`, preserves one

@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.1 - 2026-07-19
+
+### Fixed
+
+- Read local consumer migration inputs and the optional ledger from the exact
+  captured base-commit Git blobs instead of checkout-filtered worktree bytes.
+- Prevent clean `core.autocrlf=true` Windows checkouts from reporting false
+  consumer drift while retaining committed-state, staged-result, and
+  idempotency rejection gates.
+
+### Added
+
+- Add capability-owned `TEST-0141` coverage for canonical LF blobs, CRLF
+  worktrees, present-ledger planning, genuine committed input and ledger drift,
+  exact staged blobs, and an applied-state no-op rerun.
+
 ## 0.12.0 - 2026-07-19
 
 ### Added

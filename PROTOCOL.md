@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.12.0**<br>
+Protocol version: **0.12.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -523,6 +523,16 @@ prefix of the target catalog. A fresh adoption records the complete target
 catalog as its satisfied baseline. Missing, duplicate, reordered, changed,
 partial, mixed, customized, linked, escaping, or otherwise ambiguous state
 MUST fail closed before remote mutation.
+
+Local migration planning MUST read every required input and the optional
+ledger as binary-safe bytes from their validated regular-blob entries in the
+exact captured consumer base commit. A checkout-filtered worktree is a write
+destination, not committed-state evidence, and MUST NOT supply those planning
+bytes. The worktree file's Git clean-filtered blob identity MUST still equal
+the captured base blob so newline smudging is accepted without hiding genuine
+content drift. Worktree containment, leaf type, staged-result,
+committed-result, and live remote-head checks remain separate mandatory
+fail-closed gates.
 
 An updater that already implements this migration contract MUST include the
 protocol gitlink, target-different updater assets, exact catalog-derived
