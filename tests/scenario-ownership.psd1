@@ -79,7 +79,15 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
-            TestIds = @('TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112')
+            TestIds = @(
+                'TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112',
+                'TEST-0142'
+            )
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1'
+            TestIds = @('TEST-0143')
         }
         @{
             Evidence = 'ExecutableSuite'

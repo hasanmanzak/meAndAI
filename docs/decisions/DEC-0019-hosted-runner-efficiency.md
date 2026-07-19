@@ -3,8 +3,9 @@
 - Classification: Decision
 - Status: Accepted
 - Date: 2026-07-18
+- Amended: 2026-07-19 for exact validated-tree reuse and external evidence hygiene
 - Decision owners: meAndAI maintainers and consumer maintainers
-- Related feature: [FEAT-0027](../features/FEAT-0027-v0104-runner-minute-efficiency/README.md)
+- Related features: [FEAT-0027](../features/FEAT-0027-v0104-runner-minute-efficiency/README.md), [FEAT-0034](../features/FEAT-0034-ci-evidence-hygiene/README.md)
 - Related decisions: [DEC-0004](DEC-0004-bounded-completion-convergence.md), [DEC-0010](DEC-0010-stable-automation-invariants.md), and [DEC-0015](DEC-0015-event-triggered-stability-cycles.md)
 - Supersedes: the hosted seven-child Windows matrix and aggregate topology of
   [FEAT-0025](../features/FEAT-0025-v0102-balanced-windows-validation/README.md),
@@ -55,6 +56,22 @@ cancellation applies only to superseded runs for the same pull request. Main,
 manual, merge-queue, and publication runs use unique identities and cannot
 cancel each other.
 
+Because private `main` protection is unavailable, `push: main` remains a
+validation event. Both stable jobs may select `ReuseExactValidatedTree` and run
+only structural verification when the pushed SHA is an exact successful
+merge-queue commit, or when local Git plus paginated GitHub evidence prove one
+merged pull request with exact before/after parents, base/head identities,
+merge-tree equality with the validated PR head, one successful current-
+workflow run for that head, and both stable jobs green. Every ambiguous,
+missing, duplicated, failed, canceled, direct, squash, rebase, forced, or
+mismatched case selects `Full`. This is exact evidence reuse, not trust in a
+commit message or merge shape.
+
+Live PR, pushed-SHA, hosted-check, merge, publication, and cleanup facts remain
+in the linked issue or pull request. A converged candidate does not receive a
+new commit solely to copy those external facts, because that commit invalidates
+the exact candidate evidence and starts another complete PR run.
+
 ## Consequences
 
 - Ordinary validation starts one Windows runner instead of a base job, seven
@@ -69,6 +86,11 @@ cancel each other.
   define hosted orchestration.
 - Workflow changes must report coverage mapping and total job/runner
   observations; shorter elapsed time alone is not efficiency evidence.
+- A proven exact merge tree keeps both stable job identities but avoids
+  repeating complete Linux and Windows suites on `main`; unproven pushes retain
+  complete fail-safe coverage.
+- External delivery evidence no longer creates self-invalidating metadata-only
+  commits or their redundant full pull-request runs.
 
 ## Alternatives considered
 
@@ -83,6 +105,9 @@ cancel each other.
   changes do not justify complete duplicate coverage.
 - Add a scheduler or self-hosted coordinator: rejected as unnecessary
   infrastructure for an event-triggered protocol repository.
+- Remove `push: main`: rejected while the branch is unprotected.
+- Trust every merge-looking commit: rejected because commit messages and broad
+  graph shape do not prove exact prior validation.
 
 ## Review condition
 

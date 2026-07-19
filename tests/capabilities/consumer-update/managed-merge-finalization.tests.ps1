@@ -9,6 +9,10 @@ $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
 $failures = [System.Collections.Generic.List[string]]::new()
+$outerSummaryPath = Join-Path ([IO.Path]::GetTempPath()) `
+    "meandai-finalization-outer-$([guid]::NewGuid().ToString('N')).md"
+$outerSummarySentinel = 'outer-summary-sentinel'
+$previousStepSummary = $env:GITHUB_STEP_SUMMARY
 
 $testManagedAssets = @(
     [pscustomobject]@{
@@ -907,29 +911,56 @@ function Invoke-FinalizationScenario {
     $previousToken = $env:GH_TOKEN
     $previousIssueToken = $env:ISSUE_TOKEN
     $previousProtocolToken = $env:PROTOCOL_TOKEN
+    $previousStepSummary = $env:GITHUB_STEP_SUMMARY
+    $summaryPath = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-finalization-summary-$([guid]::NewGuid().ToString('N')).md"
+    $summaryLines = @()
+    $threw = $false
+    $errorMessage = ''
     try {
         $env:GITHUB_REPOSITORY = $Scenario.Repository
         $env:DEFAULT_BRANCH = $Scenario.DefaultBranch
         $env:GH_TOKEN = 'test-finalizer-token'
         $env:ISSUE_TOKEN = 'test-finalizer-token'
         $env:PROTOCOL_TOKEN = 'test-protocol-token'
+        $env:GITHUB_STEP_SUMMARY = $summaryPath
         & $adapterPath -FinalizeMergedPullRequest `
             -PullRequestNumber $Scenario.PullRequestNumber
-        [pscustomobject]@{ Threw = $false; Error = ''; Scenario = $Scenario }
     }
     catch {
-        [pscustomobject]@{
-            Threw = $true
-            Error = $_.Exception.Message
-            Scenario = $Scenario
-        }
+        $threw = $true
+        $errorMessage = $_.Exception.Message
     }
     finally {
-        $env:GITHUB_REPOSITORY = $previousRepository
-        $env:DEFAULT_BRANCH = $previousDefaultBranch
-        $env:GH_TOKEN = $previousToken
-        $env:ISSUE_TOKEN = $previousIssueToken
-        $env:PROTOCOL_TOKEN = $previousProtocolToken
+        try {
+            if (Test-Path -LiteralPath $summaryPath -PathType Leaf) {
+                $summaryLines = @(Get-Content -LiteralPath $summaryPath)
+            }
+        }
+        catch {
+            $threw = $true
+            if ([string]::IsNullOrWhiteSpace($errorMessage)) {
+                $errorMessage = "Unable to read isolated test summary: $($_.Exception.Message)"
+            }
+        }
+        finally {
+            $env:GITHUB_REPOSITORY = $previousRepository
+            $env:DEFAULT_BRANCH = $previousDefaultBranch
+            $env:GH_TOKEN = $previousToken
+            $env:ISSUE_TOKEN = $previousIssueToken
+            $env:PROTOCOL_TOKEN = $previousProtocolToken
+            $env:GITHUB_STEP_SUMMARY = $previousStepSummary
+            if (Test-Path -LiteralPath $summaryPath) {
+                Remove-Item -LiteralPath $summaryPath -Force `
+                    -ErrorAction SilentlyContinue
+            }
+        }
+    }
+    return [pscustomobject]@{
+        Threw = $threw
+        Error = $errorMessage
+        Scenario = $Scenario
+        SummaryLines = [string[]]@($summaryLines)
     }
 }
 
@@ -946,6 +977,13 @@ function Test-NoFinalizationMutation {
 }
 
 try {
+    [IO.File]::WriteAllLines(
+        $outerSummaryPath,
+        [string[]]@($outerSummarySentinel),
+        [Text.UTF8Encoding]::new($false)
+    )
+    $env:GITHUB_STEP_SUMMARY = $outerSummaryPath
+
     $adoption = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Adoption)
     if ($adoption.Threw -or $adoption.Scenario.BranchExists -or
         $adoption.Scenario.IssueState -cne 'closed' -or
@@ -953,6 +991,17 @@ try {
         $adoption.Scenario.IssueLabels -contains 'status:needs-review' -or
         @($adoption.Scenario.Events | Where-Object { $_ -ceq 'delete-branch' }).Count -ne 1) {
         Add-Failure "TEST-0108 exact adoption merge did not converge: $($adoption.Error)"
+    }
+    $expectedAdoptionSummary = "Managed merge #42 finalized at ``$($adoption.Scenario.ExpectedHead)``; exact branch absent and issue #9 closed."
+    $adoptionSummaryProperty = $adoption.PSObject.Properties['SummaryLines']
+    $adoptionSummaryLines = @(
+        if ($null -ne $adoptionSummaryProperty) {
+            @($adoptionSummaryProperty.Value)
+        }
+    )
+    if ($adoptionSummaryLines.Count -ne 1 -or
+        [string]$adoptionSummaryLines[0] -cne $expectedAdoptionSummary) {
+        Add-Failure "TEST-0142 adoption summary was not captured exactly in its isolated invocation: $($adoptionSummaryLines -join ' | ')"
     }
     $deleteIndex = [array]::IndexOf(@($adoption.Scenario.Events), 'delete-branch')
     $commentIndex = [array]::IndexOf(@($adoption.Scenario.Events), 'comment-issue')
@@ -1043,6 +1092,11 @@ try {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
     }
     Test-NoFinalizationMutation -Result $normal -Name 'ordinary pull request'
+    $normalSummaryProperty = $normal.PSObject.Properties['SummaryLines']
+    if ($null -ne $normalSummaryProperty -and
+        @($normalSummaryProperty.Value).Count -ne 0) {
+        Add-Failure 'TEST-0142 ordinary no-op emitted finalization summary output.'
+    }
 
     foreach ($legacyMode in @('Absent', 'Placeholder')) {
         $legacy = Invoke-FinalizationScenario -Scenario (
@@ -1172,9 +1226,24 @@ try {
             Add-Failure "TEST-0121 $($negative.Name) did not fail on independent schema-2 evidence: $($result.Error)"
         }
         Test-NoFinalizationMutation -Result $result -Name $negative.Name
+        $negativeSummaryProperty = $result.PSObject.Properties['SummaryLines']
+        if ($null -ne $negativeSummaryProperty -and
+            @($negativeSummaryProperty.Value).Count -ne 0) {
+            Add-Failure "TEST-0142 rejected '$($negative.Name)' emitted finalization summary output."
+        }
+    }
+
+    $outerSummaryLines = @(Get-Content -LiteralPath $outerSummaryPath)
+    if ($outerSummaryLines.Count -ne 1 -or
+        [string]$outerSummaryLines[0] -cne $outerSummarySentinel) {
+        Add-Failure "TEST-0142 inherited outer summary was mutated: $($outerSummaryLines -join ' | ')"
     }
 }
 finally {
+    $env:GITHUB_STEP_SUMMARY = $previousStepSummary
+    if (Test-Path -LiteralPath $outerSummaryPath) {
+        Remove-Item -LiteralPath $outerSummaryPath -Force -ErrorAction SilentlyContinue
+    }
     Remove-Item Function:\global:git -ErrorAction SilentlyContinue
     Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIFinalizationScenario -Scope Global -ErrorAction SilentlyContinue

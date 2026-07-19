@@ -7,22 +7,23 @@ Last verified: **2026-07-19**
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: private
 - Default branch: `main`
-- Current protocol version: `0.12.1`. Exact publication state is authoritative
+- Current protocol version: `0.12.2`. Exact publication state is authoritative
   in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #83](https://github.com/hasanmanzak/meAndAI/issues/83) after
+  [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) after
   publication, not predicted or duplicated in this repository snapshot.
-- Current scope: [FEAT-0033](../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/README.md)
-  corrects local consumer migration planning so exact captured base-commit
-  Git blobs, including the ledger, supply binary planning bytes regardless of
-  checkout filters. [Issue #83](https://github.com/hasanmanzak/meAndAI/issues/83)
+- Current scope: [FEAT-0034](../../docs/features/FEAT-0034-ci-evidence-hygiene/README.md)
+  isolates fixture-owned job summaries and permits only fail-closed reuse of
+  an exact already-green merge tree on `main`. Live delivery facts stay in the
+  issue or pull request instead of evidence-only candidate commits.
+  [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: binary-safe local Git blob acquisition at the
-  committed-state boundary plus capability-owned `TEST-0141` coverage for
-  LF blobs, CRLF worktrees, true committed drift, exact staged results, and an
-  idempotent applied-state rerun.
+- Latest tracked work: capability-owned `TEST-0142` summary isolation and
+  `TEST-0143` exact-tree routing across real Git graphs, mocked GitHub evidence,
+  retained workflow identities, fail-closed negatives, and external-evidence
+  discipline.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -72,6 +73,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- `v0.12.2` keeps `push: main` because private-main protection remains
+  unavailable. Both stable jobs may run `StructureOnly` only when local Git
+  and paginated GitHub evidence prove an exact successful merge-queue commit
+  or one exact merged PR whose merge tree equals its already-green head tree.
+  Direct, squash, rebase, forced, mismatched, duplicate, failed, canceled, or
+  unavailable evidence stays on `Full`.
+- Managed-merge finalization fixtures replace and restore
+  `GITHUB_STEP_SUMMARY` per invocation, capture exact summary lines for test
+  assertions, and cannot write synthetic identities into an inherited outer
+  summary. Live PR/push/check/merge/release facts use issue #85 as external
+  authority and do not create metadata-only candidate commits.
 - `v0.12.1` corrects the local/current-launcher migration planner's committed-
   state input boundary. Required inputs and the optional ledger come from
   exact validated base-commit Git blobs; worktree presence and containment
