@@ -148,7 +148,7 @@ infrastructure, process isolation, and capability-local fixtures.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0058` | Immutable catalog, typed definitions, consumer ledger, and pure assessment resolver | [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) | `TEST-0134`, `TEST-0135`; passed | `FIND-0165` resolved | Complete |
+| `SUBF-0058` | Immutable catalog, typed definitions, consumer ledger, and pure assessment resolver | [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) | `TEST-0134`, `TEST-0135`; passed | `FIND-0165` resolved; `FIND-0170` remediation implemented with replacement hosted confirmation pending | Complete |
 | `SUBF-0059` | Capability-based repository test topology, recursive discovery, common infrastructure, and fixture isolation | [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) | `TEST-0136` through `TEST-0138`; passed | `FIND-0166` resolved | Complete |
 | `SUBF-0060` | Fresh-adoption semantic capability handoff | [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) | `TEST-0139`; passed | `FIND-0167` resolved | Complete |
 | `SUBF-0061` | Existing-consumer update discovery, canonical proposal lifecycle, closure, and idempotency | [Issue #81](https://github.com/hasanmanzak/meAndAI/issues/81) | `TEST-0140`; passed | `FIND-0168` and `FIND-0169` resolved | Complete |
@@ -252,6 +252,13 @@ The four slice gates and one bounded post-development scan completed.
   dispatch while Git, secrets, adoption-PR lookup, and Codex remain unchanged.
   The focused shard passed in 165.4 seconds and the complete suite passed in
   1652.5 seconds.
+- Draft PR #82's first Ubuntu job exposed `FIND-0170`: PowerShell 7/.NET did not
+  accept the unescaped UTC-literal timestamp format that Windows PowerShell 5.1
+  had accepted. The parser now quotes `T` and `Z` as exact literals, uses a
+  strongly typed `DateTimeOffset` result, and combines `AssumeUniversal` with
+  `AdjustToUniversal`. Focused `TEST-0134`/`TEST-0135`, `StructureOnly`, parse,
+  and whitespace checks pass locally; replacement hosted confirmation is the
+  remaining evidence.
 
 ### Finding register
 
@@ -267,6 +274,7 @@ decision: [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabili
 | `FIND-0167` - Semantic handoff trust boundaries admitted ambiguous authority | Authorization and proposal-identity defect / `Blocking` | None | `p1` / high / high | Initial review did not prove every issue, comment, proposal, reviewer, permission, and head-repository identity through exact actor ID/login and canonical payload evidence. Token roles could be conflated and an untrusted actor could enter the handoff. | Split updater proposal authority from issue authority; require exact actor and reviewer identity, write-or-higher permission, same-repository head, and canonical issue, PR, and manifest bytes. Negative lifecycle cases fail closed. / Resolved | `SUBF-0060`; [`TEST-0139`](test-cases.md); `RISK-0143`; `RISK-0145` |
 | `FIND-0168` - Completion provenance and cleanup were raceable | Lifecycle provenance, state-machine, and TOCTOU defect / `Blocking` | `FIND-0167` | `p1` / high / high | Finalization initially lacked one complete base-to-handoff-to-reviewed-head-to-merge-to-default-tree proof and sufficiently late live-head/tree rechecks. A raced state could otherwise authorize terminal inventory, branch deletion, or issue closure. | Require canonical inventory and closure evidence, reviewed ledger/manifest provenance, current default-tree containment, managed checkout identity, exact-head deletion, and fresh checks immediately before branch deletion and issue-last closure. / Resolved | `SUBF-0061`; [`TEST-0140`](test-cases.md); `RISK-0146`; `RISK-0150` |
 | `FIND-0169` - Already-current capability dispatch regressed the legacy fixture | Compatibility and regression-fixture defect / `Blocking` | None | `p1` / medium / high | The first 1576.3-second complete suite reached `TEST-0113`/`TEST-0130` and rejected the intentional already-current `Auto` dispatch because the mock excluded `Auto` and required zero dispatches. This blocked acceptance criterion 10 and conflated protocol currency with capability conformance. | Accept `Auto` in the exact workflow mock and require one repository/ref/head/base-bound capability dispatch while preserving Git heads, secrets, adoption-PR lookup, and Codex no-op boundaries. The focused shard passed in 165.4 seconds and the complete suite passed in 1652.5 seconds. / Resolved | `SUBF-0061`; [TEST-0113](../FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md); [TEST-0130](../FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md); [`TEST-0140`](test-cases.md) |
+| `FIND-0170` - UTC review timestamp parsing differed on PowerShell 7 | Cross-platform compatibility defect / `Blocking` | None | `p1` / medium / high | Draft PR #82's first [Ubuntu validation job](https://github.com/hasanmanzak/meAndAI/actions/runs/29669260878/job/88145246394) failed immediately in the capability catalog suite because the UTC `T`/`Z` literals and out value were not expressed with one runtime-stable exact contract. Windows PowerShell 5.1 had accepted the same input, hiding the compatibility defect. | Quote `T` and `Z` in the invariant exact format, strongly type the `DateTimeOffset` out value, and parse with `AssumeUniversal` plus `AdjustToUniversal`. Focused catalog, structure, parse, and whitespace checks pass locally. / Remediation implemented; replacement hosted confirmation pending | `SUBF-0058`; [`TEST-0134`, `TEST-0135`](test-cases.md); [PR #82](https://github.com/hasanmanzak/meAndAI/pull/82) |
 
 ## Definition of Done
 
@@ -274,8 +282,8 @@ decision: [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabili
 - [x] Mandatory test code and scenario mapping complete.
 - [x] Test commands and successful results recorded.
 - [x] Every subfeature review and the bounded post-development scan complete.
-- [x] No unresolved `Blocking` finding; every other observation has its
-      required disposition evidence.
+- [ ] No unresolved `Blocking` finding; `FIND-0170` replacement hosted
+      confirmation remains pending.
 - [x] Documentation, links, version, changelog, and project memory current.
 - [x] Issue, pull request, decision, tests, and related work cross-linked.
 - [ ] Applicable CI and review gates pass.

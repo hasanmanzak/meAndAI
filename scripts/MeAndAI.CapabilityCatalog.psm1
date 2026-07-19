@@ -430,16 +430,21 @@ function Assert-ReviewAuthority {
 function Assert-ReviewedAt {
     param([AllowNull()][string]$Value)
 
-    $parsed = [DateTimeOffset]::MinValue
+    $format = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    [DateTimeOffset]$parsed = [DateTimeOffset]::MinValue
+    $styles = [Globalization.DateTimeStyles](
+        [Globalization.DateTimeStyles]::AssumeUniversal -bor
+        [Globalization.DateTimeStyles]::AdjustToUniversal
+    )
     if ([string]::IsNullOrWhiteSpace($Value) -or
         -not [DateTimeOffset]::TryParseExact(
             $Value,
-            'yyyy-MM-ddTHH:mm:ssZ',
+            $format,
             [Globalization.CultureInfo]::InvariantCulture,
-            [Globalization.DateTimeStyles]::AssumeUniversal,
+            $styles,
             [ref]$parsed
         ) -or $parsed.ToUniversalTime().ToString(
-            'yyyy-MM-ddTHH:mm:ssZ',
+            $format,
             [Globalization.CultureInfo]::InvariantCulture
         ) -cne $Value) {
         throw 'Capability review timestamp must be canonical UTC seconds.'

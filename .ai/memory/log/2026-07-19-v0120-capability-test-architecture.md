@@ -38,6 +38,12 @@
   expectation after 1576.3 seconds; its exact `Auto` dispatch correction passed
   the focused adoption-lifecycle shard in 165.4 seconds and the complete suite
   passed in 1652.5 seconds with every recursively discovered owner green.
+- Draft PR #82's first Ubuntu job found `FIND-0170`: the UTC review timestamp
+  exact format was accepted by Windows PowerShell 5.1 but rejected by
+  PowerShell 7 before capability-catalog evidence. The parser now uses quoted
+  UTC literals, a strongly typed `DateTimeOffset` result, and universal
+  adjustment; focused local evidence is green and replacement hosted
+  confirmation is pending.
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness
   boundary, not product evidence.
