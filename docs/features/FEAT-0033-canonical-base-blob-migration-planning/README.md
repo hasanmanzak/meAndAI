@@ -173,8 +173,12 @@ worktree, staged-result, and remote-planner boundaries.
 - `tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1`:
   passed all 17 owned scenarios in 485.8 seconds.
 - The final structure, parse, link, and stale-reference scan is recorded in
-  [TEST-0141 evidence](test-cases.md); hosted PR checks remain the external
-  pre-merge gate.
+  [TEST-0141 evidence](test-cases.md).
+- Hosted candidate `3eff1b0048bbc3371c4a028a198717598d1bff66` passed
+  [run 29686946514](https://github.com/hasanmanzak/meAndAI/actions/runs/29686946514):
+  Ubuntu validation in 7m41s, Windows PowerShell 5.1 validation in 29m37s,
+  and GitGuardian in 2s. Publication verification was correctly skipped
+  before release.
 
 ## Definition of Done
 
@@ -186,8 +190,8 @@ worktree, staged-result, and remote-planner boundaries.
 - [x] Documentation, links, version, changelog, and project memory current.
 - [x] Pull request [#84](https://github.com/hasanmanzak/meAndAI/pull/84) is
       cross-linked.
-- [ ] Final hosted-check evidence is cross-linked after the candidate passes.
-- [ ] Applicable hosted CI gates pass before merge.
+- [x] Final hosted-check evidence is cross-linked after the candidate passes.
+- [x] Applicable hosted CI gates pass before merge.
 
 ## Post-merge release evidence
 

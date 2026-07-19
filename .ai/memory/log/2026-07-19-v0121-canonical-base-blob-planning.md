@@ -36,5 +36,10 @@
 - After the binary base-blob correction, the complete focused adapter fixture,
   including all existing scenarios and `TEST-0141`, passed in 52.2 seconds on
   Windows PowerShell 5.1.
-- Broader local, hosted, pull-request, merge, immutable-release, cleanup, and
-  post-publication evidence remains pending until those facts exist.
+- The complete consumer-update owner suite passed all 27 scenarios in 56.2
+  seconds after the bounded self-review correction.
+- Candidate `3eff1b0048bbc3371c4a028a198717598d1bff66` passed [hosted run
+  29686946514](https://github.com/hasanmanzak/meAndAI/actions/runs/29686946514):
+  Ubuntu in 7m41s, Windows PowerShell 5.1 in 29m37s, and GitGuardian in 2s.
+- Merge, immutable-release, cleanup, and post-publication evidence remains
+  pending until those facts exist.
