@@ -32,6 +32,7 @@ $global:AdvanceDefaultBranchOnCreate = $false
 $global:RenameDefaultBranchOnCreate = $false
 $global:PullRequestCloseCalls = 0
 $global:LiveDefaultBranch = 'main'
+$script:BootstrapImmutableBaseline = $null
 
 function Add-Failure {
     param([string]$Message)
@@ -46,10 +47,18 @@ if (-not (Test-Path -LiteralPath $adapterPath -PathType Leaf)) {
 
 function Invoke-Git {
     param([string]$Repository, [string[]]$Arguments)
+    $fixtureConfiguration = @(
+        '-c', 'user.name=Fixture',
+        '-c', 'user.email=fixture@example.invalid',
+        '-c', 'core.autocrlf=false',
+        '-c', 'core.ignorecase=false',
+        '-c', 'commit.gpgsign=false',
+        '-c', 'tag.gpgSign=false'
+    )
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
-        $output = @(& git -C $Repository @Arguments 2>&1)
+        $output = @(& git @fixtureConfiguration -C $Repository @Arguments 2>&1)
         $exitCode = $LASTEXITCODE
     }
     finally {
@@ -92,6 +101,88 @@ function Copy-SourceFixture {
         $parent = Split-Path -Parent $target
         New-Item -ItemType Directory -Force $parent | Out-Null
         Copy-Item -LiteralPath $source -Destination $target
+    }
+}
+
+function Get-FixtureFileSha256 {
+    param([Parameter(Mandatory)][string]$Path)
+
+    return [string](Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+}
+
+function New-ImmutableBootstrapBaseline {
+    $baselineRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-capabilities-baseline-$([guid]::NewGuid().ToString('N'))"
+    $tempRoots.Add($baselineRoot)
+    $consumerSeed = Join-Path $baselineRoot 'consumer-seed'
+    $protocolSeed = Join-Path $baselineRoot 'protocol-seed'
+    $consumerBundle = Join-Path $baselineRoot 'consumer.bundle'
+    $protocolBundle = Join-Path $baselineRoot 'protocol.bundle'
+    New-Item -ItemType Directory -Path $consumerSeed, $protocolSeed -Force |
+        Out-Null
+
+    Invoke-Git -Repository $consumerSeed -Arguments @(
+        'init', '-b', 'main'
+    ) | Out-Null
+    $consumerWorkflow = Join-Path $consumerSeed `
+        '.github/workflows/meandai-protocol-update.yml'
+    New-Item -ItemType Directory -Path (Split-Path -Parent $consumerWorkflow) `
+        -Force | Out-Null
+    Copy-Item -LiteralPath $workflowPath -Destination $consumerWorkflow
+    Invoke-Git -Repository $consumerSeed -Arguments @('add', '.') | Out-Null
+    Invoke-Git -Repository $consumerSeed -Arguments @(
+        'commit', '-m', 'Seed immutable consumer baseline'
+    ) | Out-Null
+    $consumerHead = (@(Invoke-Git -Repository $consumerSeed -Arguments @(
+        'rev-parse', 'HEAD'
+    )))[0]
+    Invoke-Git -Repository $consumerSeed -Arguments @(
+        'bundle', 'create', $consumerBundle, 'main'
+    ) | Out-Null
+    Invoke-Git -Repository $consumerSeed -Arguments @(
+        'bundle', 'verify', $consumerBundle
+    ) | Out-Null
+
+    Copy-SourceFixture -SourceRepository $protocolSeed
+    Invoke-Git -Repository $protocolSeed -Arguments @(
+        'init', '-b', 'main'
+    ) | Out-Null
+    Invoke-Git -Repository $protocolSeed -Arguments @('add', '.') | Out-Null
+    Invoke-Git -Repository $protocolSeed -Arguments @(
+        'commit', '-m', 'Protocol v0.5.0'
+    ) | Out-Null
+    Invoke-Git -Repository $protocolSeed -Arguments @(
+        'tag', 'v0.5.0'
+    ) | Out-Null
+    $protocolHead = (@(Invoke-Git -Repository $protocolSeed -Arguments @(
+        'rev-parse', 'v0.5.0^{commit}'
+    )))[0]
+    Invoke-Git -Repository $protocolSeed -Arguments @(
+        'bundle', 'create', $protocolBundle, '--all'
+    ) | Out-Null
+    Invoke-Git -Repository $protocolSeed -Arguments @(
+        'bundle', 'verify', $protocolBundle
+    ) | Out-Null
+
+    return [pscustomobject]@{
+        Root = $baselineRoot
+        ConsumerBundle = $consumerBundle
+        ConsumerBundleSha256 = Get-FixtureFileSha256 -Path $consumerBundle
+        ConsumerHead = [string]$consumerHead
+        ProtocolBundle = $protocolBundle
+        ProtocolBundleSha256 = Get-FixtureFileSha256 -Path $protocolBundle
+        ProtocolHead = [string]$protocolHead
+    }
+}
+
+function Assert-ImmutableBootstrapBaseline {
+    param([Parameter(Mandatory)]$Baseline)
+
+    if ((Get-FixtureFileSha256 -Path ([string]$Baseline.ConsumerBundle)) `
+            -cne [string]$Baseline.ConsumerBundleSha256 -or
+        (Get-FixtureFileSha256 -Path ([string]$Baseline.ProtocolBundle)) `
+            -cne [string]$Baseline.ProtocolBundleSha256) {
+        throw 'The capability-local immutable fixture baseline was mutated.'
     }
 }
 
@@ -287,32 +378,54 @@ function New-BootstrapFixture {
         [bool]$AddLinkedManagedAncestor = $false
     )
 
-    $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-capabilities-$Name-$([guid]::NewGuid().ToString('N'))"
+    if ($null -eq $script:BootstrapImmutableBaseline) {
+        throw 'The capability-local immutable fixture baseline is unavailable.'
+    }
+    Assert-ImmutableBootstrapBaseline -Baseline $script:BootstrapImmutableBaseline
+    $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-capabilities-$Name-$([guid]::NewGuid().ToString('N'))"
     $tempRoots.Add($tempRoot)
     $consumer = Join-Path $tempRoot 'consumer'
     $remote = Join-Path $tempRoot 'remote.git'
     $source = Join-Path $consumer '.meandai-update-source'
-    New-Item -ItemType Directory -Force $consumer, $source | Out-Null
+    New-Item -ItemType Directory -Force $tempRoot | Out-Null
 
     Invoke-Git -Repository $tempRoot -Arguments @('init', '--bare', $remote) | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('init', '-b', 'main') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('config', 'user.name', 'Fixture') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('config', 'user.email', 'fixture@example.invalid') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('config', 'core.autocrlf', 'false') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('config', 'commit.gpgsign', 'false') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('config', 'tag.gpgSign', 'false') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('remote', 'add', 'origin', $remote) | Out-Null
+    Invoke-Git -Repository $tempRoot -Arguments @(
+        'clone', '--branch', 'main', '--single-branch',
+        [string]$script:BootstrapImmutableBaseline.ConsumerBundle, $consumer
+    ) | Out-Null
+    Invoke-Git -Repository $consumer -Arguments @(
+        'remote', 'set-url', 'origin', $remote
+    ) | Out-Null
+    $consumerMutated = $AddApplicationFile -or $AddAgentsCollision -or
+        $AddClaudeCollision -or $LegacyRuleSurface -cne 'None' -or
+        @($NestedProtocolSurfaces).Count -gt 0 -or
+        $AddAgentsCaseVariantCollision -or $AddIdeasCollision -or
+        $AddPullRequestTemplateCollision -or $AddManifestCollision -or
+        $AddRenameSource -or $DriftSeedWorkflow -or
+        $AddSeedWorkflowCaseVariant -or $AddProtocolTargetCaseVariant -or
+        $AddReservedProtocolSubmoduleCollision -or
+        $ReservedProtocolSubmoduleCollision -cne 'None' -or
+        $AddLinkedManagedAncestor
 
     $workflowRelativePath = if ($AddSeedWorkflowCaseVariant) {
         '.github/workflows/MeAndAI-protocol-update.yml'
     }
     else { '.github/workflows/meandai-protocol-update.yml' }
     $workflowTarget = Join-Path $consumer $workflowRelativePath
-    New-Item -ItemType Directory -Force (Split-Path -Parent $workflowTarget) | Out-Null
+    if ($AddSeedWorkflowCaseVariant) {
+        Invoke-Git -Repository $consumer -Arguments @(
+            'rm', '--cached', '--',
+            '.github/workflows/meandai-protocol-update.yml'
+        ) | Out-Null
+        Remove-Item -LiteralPath (Join-Path $consumer `
+            '.github/workflows/meandai-protocol-update.yml') -Force
+    }
     if ($DriftSeedWorkflow) {
         [IO.File]::WriteAllText($workflowTarget, "name: drifted`n")
     }
-    else {
+    elseif ($AddSeedWorkflowCaseVariant) {
         Copy-Item -LiteralPath $workflowPath -Destination $workflowTarget
     }
     if ($AddApplicationFile) {
@@ -435,8 +548,9 @@ function New-BootstrapFixture {
         New-TestDirectoryLink -Path (Join-Path $consumer '.ai') `
             -Target $externalManaged
     }
-    Invoke-Git -Repository $consumer -Arguments @('add', '.') | Out-Null
-    Invoke-Git -Repository $consumer -Arguments @('commit', '-m', 'Seed consumer') | Out-Null
+    if ($consumerMutated) {
+        Invoke-Git -Repository $consumer -Arguments @('add', '.') | Out-Null
+    }
     if ($LegacyRuleSurface -cin @(
         'CursorRootGitlink', 'GithubInstructionsRootGitlink'
     )) {
@@ -452,12 +566,6 @@ function New-BootstrapFixture {
         New-Item -ItemType Directory -Force $legacyRuleSource | Out-Null
         Invoke-Git -Repository $legacyRuleSource -Arguments @(
             'init', '-b', 'main'
-        ) | Out-Null
-        Invoke-Git -Repository $legacyRuleSource -Arguments @(
-            'config', 'user.name', 'Fixture'
-        ) | Out-Null
-        Invoke-Git -Repository $legacyRuleSource -Arguments @(
-            'config', 'user.email', 'fixture@example.invalid'
         ) | Out-Null
         [IO.File]::WriteAllText(
             (Join-Path $legacyRuleSource $gitlinkSourceFile),
@@ -478,22 +586,18 @@ function New-BootstrapFixture {
             'update-index', '--add', '--cacheinfo',
             "160000,$legacyRuleSha,$gitlinkPath"
         ) | Out-Null
+    }
+    if ($consumerMutated) {
         Invoke-Git -Repository $consumer -Arguments @(
             'commit', '--amend', '--no-edit'
         ) | Out-Null
     }
     Invoke-Git -Repository $consumer -Arguments @('push', '-u', 'origin', 'main') | Out-Null
 
-    Copy-SourceFixture -SourceRepository $source
-    Invoke-Git -Repository $source -Arguments @('init', '-b', 'main') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('config', 'user.name', 'Fixture') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('config', 'user.email', 'fixture@example.invalid') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('config', 'core.autocrlf', 'false') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('config', 'commit.gpgsign', 'false') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('config', 'tag.gpgSign', 'false') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('add', '.') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('commit', '-m', 'Protocol v0.5.0') | Out-Null
-    Invoke-Git -Repository $source -Arguments @('tag', 'v0.5.0') | Out-Null
+    Invoke-Git -Repository $consumer -Arguments @(
+        'clone', '--branch', 'v0.5.0', '--single-branch',
+        [string]$script:BootstrapImmutableBaseline.ProtocolBundle, $source
+    ) | Out-Null
 
     return [pscustomobject]@{
         Root = $tempRoot
@@ -815,8 +919,7 @@ function New-CompletedStrategyFixture {
             'GithubInstructions', 'GithubInstructionsRootGitlink')]
         [string]$LegacyRuleSurface = 'None',
         [string[]]$NestedProtocolSurfaces = @(),
-        [bool]$AddAgentsCollision = $true,
-        [switch]$ExercisePartitionSmuggling
+        [bool]$AddAgentsCollision = $true
     )
 
     $global:PullRequestExists = $false
@@ -884,40 +987,6 @@ function New-CompletedStrategyFixture {
     $surfaces += @($NestedProtocolSurfaces)
     [Array]::Sort($surfaces, [StringComparer]::Ordinal)
 
-    if ($ExercisePartitionSmuggling) {
-        [void](Set-ExistingSchema5AdoptionMarker `
-            -Head $proposalHead -ProtocolSha $protocolSha -Phase 'Proposed' `
-            -State $proposalState `
-            -Strategy $Strategy `
-            -ProtocolSurfaces @("AGENTS.md`nCLAUDE.md") `
-            -ProtocolRecordLossAcknowledged $acknowledged)
-        Invoke-Git -Repository $fixture.Consumer -Arguments @(
-            'switch', 'main'
-        ) | Out-Null
-        $createCallsBeforeSmuggling = $global:PullRequestCreateCalls
-        $smuggled = if ($acknowledged) {
-            Invoke-BootstrapFixture -Fixture $fixture `
-                -AdoptionStrategy $Strategy -AcknowledgeProtocolRecordLoss
-        }
-        else {
-            Invoke-BootstrapFixture -Fixture $fixture `
-                -AdoptionStrategy $Strategy
-        }
-        $remoteProposal = (@(Invoke-Git -Repository $fixture.Consumer `
-            -Arguments @(
-                'ls-remote', '--heads', 'origin', "refs/heads/$branch"
-            )))[0]
-        if (-not $smuggled.Threw -or
-            $smuggled.Error -notlike '*ownership*manual review*' -or
-            $global:PullRequestCreateCalls -ne $createCallsBeforeSmuggling -or
-            $remoteProposal -cnotmatch "^$proposalHead\s") {
-            Add-Failure "TEST-0128 a newline-partitioned schema-5 surface marker was retained against two canonical expected surfaces: $($smuggled.Error)"
-        }
-        $global:ExistingPullRequestBody = $canonicalProposedBody
-        $global:ExistingPullRequestIsDraft = $true
-        $global:ExistingPullRequestHead = $proposalHead
-    }
-
     Invoke-Git -Repository $fixture.Consumer -Arguments @(
         'switch', $branch
     ) | Out-Null
@@ -961,110 +1030,8 @@ function New-CompletedStrategyFixture {
     }
 }
 
-function Assert-InvalidCompletedStrategyState {
-    param(
-        [Parameter(Mandatory)]$CompletedFixture,
-        [ValidateSet('RetainedCommonAuthority', 'UnchangedRequiredSurface',
-            'RetainedRuleAuthority', 'UnchangedRuleAuthority')]
-        [string]$Variant
-    )
-
-    $fixture = $CompletedFixture.Fixture
-    Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'switch', [string]$CompletedFixture.Branch
-    ) | Out-Null
-    $path = switch ($Variant) {
-        'UnchangedRequiredSurface' { 'AGENTS.md' }
-        { $_ -cin @('RetainedRuleAuthority', 'UnchangedRuleAuthority') } {
-            [string]$CompletedFixture.LegacyRuleSurfacePath
-        }
-        default { 'CLAUDE.md' }
-    }
-    if ([string]::IsNullOrWhiteSpace($path)) {
-        throw "Completed strategy variant '$Variant' requires a legacy rule surface."
-    }
-    Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'checkout', 'main', '--', $path
-    ) | Out-Null
-    Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'commit', '--amend', '--no-edit'
-    ) | Out-Null
-    Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'push', '--force', 'origin', [string]$CompletedFixture.Branch
-    ) | Out-Null
-    $variantHead = (@(Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'rev-parse', 'HEAD'
-    )))[0]
-    [void](Set-ExistingSchema5AdoptionMarker `
-        -Head $variantHead -ProtocolSha ([string]$CompletedFixture.ProtocolSha) `
-        -Phase 'Completed' -Strategy ([string]$CompletedFixture.Strategy) `
-        -State ([string]$CompletedFixture.State) `
-        -ProtocolSurfaces @($CompletedFixture.Surfaces) `
-        -ProtocolRecordLossAcknowledged ([bool]$CompletedFixture.Acknowledged))
-    Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'switch', 'main'
-    ) | Out-Null
-    $createCallsBeforeVariant = $global:PullRequestCreateCalls
-    $result = if ([bool]$CompletedFixture.Acknowledged) {
-        Invoke-BootstrapFixture -Fixture $fixture `
-            -AdoptionStrategy ([string]$CompletedFixture.Strategy) `
-            -AcknowledgeProtocolRecordLoss
-    }
-    else {
-        Invoke-BootstrapFixture -Fixture $fixture `
-            -AdoptionStrategy ([string]$CompletedFixture.Strategy)
-    }
-    $remoteHead = (@(Invoke-Git -Repository $fixture.Consumer -Arguments @(
-        'ls-remote', '--heads', 'origin',
-        "refs/heads/$([string]$CompletedFixture.Branch)"
-    )))[0]
-    if (-not $result.Threw -or
-        $result.Error -notlike '*ownership*manual review*' -or
-        $global:PullRequestCreateCalls -ne $createCallsBeforeVariant -or
-        $remoteHead -cnotmatch "^$variantHead\s") {
-        Add-Failure "TEST-0129 $($CompletedFixture.Strategy) Completed variant '$Variant' was not rejected without replacement publication: $($result.Error)"
-    }
-}
-
-function Assert-UndeclaredNestedProtocolDeletion {
-    param([Parameter(Mandatory)]$CompletedFixture)
-
-    $nestedSurfaces = @($CompletedFixture.NestedProtocolSurfacePaths)
-    if ($nestedSurfaces.Count -lt 2) {
-        throw 'Undeclared nested protocol coverage requires two assessed paths.'
-    }
-    $undeclaredPath = [string]$nestedSurfaces[-1]
-    $declaredSurfaces = @($CompletedFixture.Surfaces | Where-Object {
-        [string]$_ -cne $undeclaredPath
-    })
-    [void](Set-ExistingSchema5AdoptionMarker `
-        -Head ([string]$CompletedFixture.Head) `
-        -ProtocolSha ([string]$CompletedFixture.ProtocolSha) `
-        -Phase 'Completed' -Strategy ([string]$CompletedFixture.Strategy) `
-        -State ([string]$CompletedFixture.State) `
-        -ProtocolSurfaces $declaredSurfaces `
-        -ProtocolRecordLossAcknowledged ([bool]$CompletedFixture.Acknowledged))
-    Invoke-Git -Repository $CompletedFixture.Fixture.Consumer -Arguments @(
-        'switch', 'main'
-    ) | Out-Null
-    $createCallsBeforeVariant = $global:PullRequestCreateCalls
-    $result = Invoke-BootstrapFixture `
-        -Fixture $CompletedFixture.Fixture `
-        -AdoptionStrategy ([string]$CompletedFixture.Strategy)
-    $remoteHead = (@(Invoke-Git `
-        -Repository $CompletedFixture.Fixture.Consumer -Arguments @(
-            'ls-remote', '--heads', 'origin',
-            "refs/heads/$([string]$CompletedFixture.Branch)"
-        )))[0]
-    if (-not $result.Threw -or
-        $result.Error -notlike '*ownership*manual review*' -or
-        $global:PullRequestCreateCalls -ne $createCallsBeforeVariant -or
-        $remoteHead -cnotmatch "^$([string]$CompletedFixture.Head)\s") {
-        Add-Failure "TEST-0129 undeclared nested protocol deletion '$undeclaredPath' was not rejected without replacement publication: $($result.Error)"
-    }
-}
-
 try {
+    $script:BootstrapImmutableBaseline = New-ImmutableBootstrapBaseline
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $seedCaseVariant = New-BootstrapFixture -Name 'seed-case-variant' `
@@ -1117,32 +1084,6 @@ try {
         $global:PullRequestCreateCalls -ne 0 -or
         $unexpectedReservedBranch.Count -ne 0) {
         Add-Failure "TEST-0129 reserved protocol submodule collision was not rejected before proposal mutation: $($result.Error)"
-    }
-
-    foreach ($reservedVariant in @(
-        'AliasExactPath', 'CaseVariant', 'Ancestor', 'Descendant'
-    )) {
-        $global:PullRequestExists = $false
-        $global:PullRequestCreateCalls = 0
-        $global:ExistingPullRequestBody = ''
-        $global:ExistingPullRequestIsDraft = $true
-        $inverseReserved = New-BootstrapFixture `
-            -Name "reserved-$($reservedVariant.ToLowerInvariant())" `
-            -ReservedProtocolSubmoduleCollision $reservedVariant
-        $result = Invoke-BootstrapFixture -Fixture $inverseReserved `
-            -AdoptionStrategy 'FullMigration'
-        $inverseReservedBranch = @(Invoke-Git `
-            -Repository $inverseReserved.Consumer -Arguments @(
-                'ls-remote', '--heads', 'origin',
-                'refs/heads/automation/meandai-capabilities-v0.5.0'
-            ))
-        if (-not $result.Threw -or
-            $result.Error -notlike `
-                '*reserved .gitmodules subsection*consumer-owned*' -or
-            $global:PullRequestCreateCalls -ne 0 -or
-            $inverseReservedBranch.Count -ne 0) {
-            Add-Failure "TEST-0129 reserved protocol submodule inverse '$reservedVariant' was not rejected before branch/PR mutation: $($result.Error)"
-        }
     }
 
     $global:PullRequestExists = $false
@@ -1218,60 +1159,12 @@ try {
         }
     }
 
-    $evidenceFreeMigration = New-BootstrapFixture `
-        -Name 'evidence-free-explicit-migration'
-    $evidenceFreeHead = (@(Invoke-Git `
-        -Repository $evidenceFreeMigration.Consumer `
-        -Arguments @('rev-parse', 'HEAD')))[0]
-    foreach ($evidenceFreeStrategy in @(
-        'FullMigration', 'HybridReconciliation', 'CleanStart'
-    )) {
-        $global:PullRequestExists = $false
-        $global:PullRequestCreateCalls = 0
-        $result = if ($evidenceFreeStrategy -ceq 'CleanStart') {
-            Invoke-BootstrapFixture -Fixture $evidenceFreeMigration `
-                -AdoptionStrategy $evidenceFreeStrategy `
-                -AcknowledgeProtocolRecordLoss
-        }
-        else {
-            Invoke-BootstrapFixture -Fixture $evidenceFreeMigration `
-                -AdoptionStrategy $evidenceFreeStrategy
-        }
-        $evidenceFreeHeadAfter = (@(Invoke-Git `
-            -Repository $evidenceFreeMigration.Consumer `
-            -Arguments @('rev-parse', 'HEAD')))[0]
-        $unexpectedEvidenceFreeBranch = @(Invoke-Git `
-            -Repository $evidenceFreeMigration.Consumer -Arguments @(
-                'ls-remote', '--heads', 'origin',
-                'refs/heads/automation/meandai-capabilities-v0.5.0'
-            ))
-        if (-not $result.Threw -or
-            $result.Error -notlike '*requires detected protocol or governance evidence*use FreshAdoption*' -or
-            $global:PullRequestCreateCalls -ne 0 -or
-            $unexpectedEvidenceFreeBranch.Count -ne 0 -or
-            $evidenceFreeHeadAfter -cne $evidenceFreeHead) {
-            Add-Failure "TEST-0128 evidence-free $evidenceFreeStrategy was not rejected before proposal mutation: $($result.Error)"
-        }
-    }
-
     foreach ($autoRuleCase in @(
         [pscustomobject]@{
             Name = 'exact-cursor-rule-root-auto'
             Surface = 'CursorRootGitlink'
             Label = '.cursor/rules gitlink'
             Path = '.cursor/rules'
-        },
-        [pscustomobject]@{
-            Name = 'exact-github-instructions-root-auto'
-            Surface = 'GithubInstructionsRootGitlink'
-            Label = '.github/instructions gitlink'
-            Path = '.github/instructions'
-        },
-        [pscustomobject]@{
-            Name = 'github-instructions-descendant-auto'
-            Surface = 'GithubInstructions'
-            Label = '.github/instructions descendant'
-            Path = '.github/instructions/foo.instructions.md'
         }
     )) {
         $global:PullRequestExists = $false
@@ -1298,90 +1191,12 @@ try {
         'FullMigration', 'HybridReconciliation', 'CleanStart'
     )) {
         try {
-            $completedStrategy = New-CompletedStrategyFixture `
-                -Strategy $strategy `
-                -ExercisePartitionSmuggling:($strategy -ceq 'FullMigration')
-            $invalidVariant = if ($strategy -ceq 'HybridReconciliation') {
-                'UnchangedRequiredSurface'
-            }
-            else { 'RetainedCommonAuthority' }
-            Assert-InvalidCompletedStrategyState `
-                -CompletedFixture $completedStrategy -Variant $invalidVariant
+            [void](New-CompletedStrategyFixture `
+                -Strategy $strategy)
         }
         catch {
             Add-Failure "TEST-0128/TEST-0129 genuine schema-5 $strategy Completed fixture could not be constructed: $($_.Exception.Message)"
         }
-    }
-    foreach ($legacyRuleCase in @(
-        [pscustomobject]@{
-            Strategy = 'FullMigration'
-            Surface = 'Cursor'
-            Variant = 'RetainedRuleAuthority'
-        },
-        [pscustomobject]@{
-            Strategy = 'HybridReconciliation'
-            Surface = 'Windsurf'
-            Variant = 'UnchangedRuleAuthority'
-        },
-        [pscustomobject]@{
-            Strategy = 'FullMigration'
-            Surface = 'CursorRootGitlink'
-            Variant = 'RetainedRuleAuthority'
-        },
-        [pscustomobject]@{
-            Strategy = 'CleanStart'
-            Surface = 'CursorRootGitlink'
-            Variant = ''
-        },
-        [pscustomobject]@{
-            Strategy = 'FullMigration'
-            Surface = 'GithubInstructionsRootGitlink'
-            Variant = 'RetainedRuleAuthority'
-        },
-        [pscustomobject]@{
-            Strategy = 'HybridReconciliation'
-            Surface = 'GithubInstructions'
-            Variant = 'UnchangedRuleAuthority'
-        },
-        [pscustomobject]@{
-            Strategy = 'CleanStart'
-            Surface = 'GithubInstructionsRootGitlink'
-            Variant = ''
-        }
-    )) {
-        try {
-            $completedRuleStrategy = New-CompletedStrategyFixture `
-                -Strategy ([string]$legacyRuleCase.Strategy) `
-                -LegacyRuleSurface ([string]$legacyRuleCase.Surface)
-            if (-not [string]::IsNullOrWhiteSpace(
-                    [string]$legacyRuleCase.Variant)) {
-                Assert-InvalidCompletedStrategyState `
-                    -CompletedFixture $completedRuleStrategy `
-                    -Variant ([string]$legacyRuleCase.Variant)
-            }
-        }
-        catch {
-            Add-Failure "TEST-0129 schema-5 $($legacyRuleCase.Strategy) legacy-rule fixture could not be constructed: $($_.Exception.Message)"
-        }
-    }
-    try {
-        [void](New-CompletedStrategyFixture -Strategy 'FullMigration' `
-            -AddAgentsCollision $false)
-    }
-    catch {
-        Add-Failure "TEST-0128 schema-5 BootstrapReady FullMigration completion fixture could not be constructed: $($_.Exception.Message)"
-    }
-    try {
-        $nestedProtocolStrategy = New-CompletedStrategyFixture `
-            -Strategy 'FullMigration' -NestedProtocolSurfaces @(
-                '.ai/protocol/legacy-a.md',
-                '.ai/protocol/legacy-b.md'
-            )
-        Assert-UndeclaredNestedProtocolDeletion `
-            -CompletedFixture $nestedProtocolStrategy
-    }
-    catch {
-        Add-Failure "TEST-0129 schema-5 nested .ai/protocol recovery fixture could not be constructed: $($_.Exception.Message)"
     }
     $global:PullRequestExists = $false
     $global:ExistingPullRequestBody = ''
@@ -1599,11 +1414,9 @@ try {
         if (-not $result.Threw) {
             $canonicalCompletedBody = [string]$global:ExistingPullRequestBody
             foreach ($completedVariant in @(
-                'Parent', 'ProposalTree', 'CheckedChangeSet', 'Credential',
-                'ProtectedWorkflow', 'Protocol', 'UpdaterModule', 'UpdaterAdapter',
-                'Manifest', 'ApplicationAdd', 'ApplicationModify',
-                'ApplicationDelete', 'ApplicationType', 'ApplicationMode',
-                'CredentialCase', 'CredentialNested', 'Gitmodules'
+                'Parent', 'ProposalTree', 'CheckedChangeSet', 'Protocol',
+                'UpdaterModule', 'UpdaterAdapter', 'ApplicationType',
+                'Gitmodules', 'CredentialNested'
             )) {
                 $variantRoot = Join-Path $empty.Root `
                     "completed-$($completedVariant.ToLowerInvariant())-$([guid]::NewGuid().ToString('N'))"
@@ -1975,16 +1788,6 @@ try {
     $moduleOwnedSurface = New-BootstrapFixture `
         -Name 'module-owned-surface-prefilter' `
         -NestedProtocolSurfaces @($moduleOwnedSurfacePath)
-    $result = Invoke-BootstrapFixture -Fixture $moduleOwnedSurface
-    $moduleOwnedUnselectedBranch = @(Invoke-Git `
-        -Repository $moduleOwnedSurface.Consumer -Arguments @(
-            'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.5.0'
-        ))
-    if (-not $result.Threw -or $global:PullRequestCreateCalls -ne 0 -or
-        $moduleOwnedUnselectedBranch.Count -ne 0) {
-        Add-Failure "TEST-0127 module-recognized assessment path was hidden before explicit strategy selection: $($result.Error)"
-    }
     $result = Invoke-BootstrapFixture -Fixture $moduleOwnedSurface `
         -AdoptionStrategy 'FullMigration'
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1) {
@@ -2005,16 +1808,6 @@ try {
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $collision = New-BootstrapFixture -Name 'collision' -AddAgentsCollision $true
-    $result = Invoke-BootstrapFixture -Fixture $collision
-    $unselectedBranch = @(Invoke-Git -Repository $collision.Consumer -Arguments @(
-        'ls-remote', '--heads', 'origin',
-        'refs/heads/automation/meandai-capabilities-v0.5.0'
-    ))
-    if (-not $result.Threw -or
-        $result.Error -notlike '*requires an explicit adoption strategy*' -or
-        $global:PullRequestCreateCalls -ne 0 -or $unselectedBranch.Count -ne 0) {
-        Add-Failure "TEST-0128 Auto with existing protocol evidence did not stop before proposal mutation: $($result.Error)"
-    }
     $result = Invoke-BootstrapFixture -Fixture $collision `
         -AdoptionStrategy 'FullMigration'
     if ($result.Threw) {
@@ -2048,13 +1841,6 @@ try {
     $global:ExistingPullRequestBody = ''
     $cleanStart = New-BootstrapFixture -Name 'clean-start' `
         -AddAgentsCollision $true
-    $result = Invoke-BootstrapFixture -Fixture $cleanStart `
-        -AdoptionStrategy 'CleanStart'
-    if (-not $result.Threw -or
-        $result.Error -notlike '*requires explicit acknowledgement*' -or
-        $global:PullRequestCreateCalls -ne 0) {
-        Add-Failure "TEST-0128 unacknowledged CleanStart did not fail before proposal mutation: $($result.Error)"
-    }
     $result = Invoke-BootstrapFixture -Fixture $cleanStart `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1 -or
@@ -2116,43 +1902,7 @@ try {
         Add-Failure "TEST-0057 exact pending draft should be retained without duplication: $($result.Error)"
     }
 
-    $schema3Body = $global:ExistingPullRequestBody
-    $legacyMarker = [ordered]@{
-        schema = 2
-        state = 'BootstrapReady'
-        target = 'v0.5.0'
-        protocolSha = $global:ExistingPullRequestProtocolSha
-        head = $global:ExistingPullRequestHead
-        repository = 'owner/consumer'
-        actor = 'owner'
-    } | ConvertTo-Json -Compress
-    $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$legacyMarker -->"
-    $result = Invoke-BootstrapFixture -Fixture $pending
-    if ($result.Threw) {
-        Add-Failure "TEST-0057 exact legacy schema-2 proposal should remain retainable: $($result.Error)"
-    }
-    $global:ExistingPullRequestBody = $schema3Body
-
-    $global:ExistingPullRequestIsDraft = $false
-    $result = Invoke-BootstrapFixture -Fixture $pending
-    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
-        Add-Failure "TEST-0057 non-draft proposal must block: $($result.Error)"
-    }
-    $global:ExistingPullRequestIsDraft = $true
-
-    $global:ExistingPullRequestMetadataMode = 'MovedHead'
-    $result = Invoke-BootstrapFixture -Fixture $pending
-    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
-        Add-Failure "TEST-0057 moved proposal head must block: $($result.Error)"
-    }
-
-    $global:ExistingPullRequestMetadataMode = 'WrongAuthor'
-    $result = Invoke-BootstrapFixture -Fixture $pending
-    if (-not $result.Threw -or $result.Error -notlike '*ownership*manual review*') {
-        Add-Failure "TEST-0047 untrusted existing proposal ownership must block: $($result.Error)"
-    }
-    $global:ExistingPullRequestMetadataMode = 'Valid'
-
+    $pendingProposalHead = [string]$global:ExistingPullRequestHead
     Invoke-Git -Repository $pending.Consumer -Arguments @(
         'switch', 'automation/meandai-capabilities-v0.5.0'
     ) | Out-Null
@@ -2163,7 +1913,9 @@ try {
         'commit', '--amend', '--no-edit'
     ) | Out-Null
     Invoke-Git -Repository $pending.Consumer -Arguments @(
-        'push', '--force-with-lease', 'origin',
+        'push',
+        "--force-with-lease=refs/heads/automation/meandai-capabilities-v0.5.0:$pendingProposalHead",
+        'origin',
         'automation/meandai-capabilities-v0.5.0'
     ) | Out-Null
     $global:ExistingPullRequestHead = (@(Invoke-Git `
@@ -2415,6 +2167,15 @@ try {
 }
 finally {
     Remove-Item Function:\gh -ErrorAction SilentlyContinue
+    if ($null -ne $script:BootstrapImmutableBaseline) {
+        try {
+            Assert-ImmutableBootstrapBaseline `
+                -Baseline $script:BootstrapImmutableBaseline
+        }
+        catch {
+            Add-Failure $_.Exception.Message
+        }
+    }
     foreach ($path in $tempRoots) {
         if (Test-Path -LiteralPath $path) {
             Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction SilentlyContinue

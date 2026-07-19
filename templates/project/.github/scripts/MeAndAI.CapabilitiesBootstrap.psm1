@@ -70,6 +70,11 @@ $script:MeAndAIResolvedAdoptionStrategies = @(
 )
 $script:MeAndAIProtocolSurfaceMaximumCount = 256
 $script:MeAndAIProtocolSurfaceMaximumUtf8Bytes = 16384
+$script:MeAndAISourceEnforcedRequiredPaths = @(
+    '.ai/meandai-update-state.json',
+    '.github/scripts/MeAndAI.ProtocolUpdate.psm1',
+    '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
+)
 
 function Test-MeAndAIExactOrdinalSequence {
     param(
@@ -100,6 +105,32 @@ function Test-MeAndAIUniqueCanonicalPaths {
         $path = [string]$value
         if (-not (Test-MeAndAICanonicalRepositoryPath -Path $path) -or
             -not $seen.Add($path)) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Test-MeAndAIExactCanonicalSurfaceSequence {
+    param(
+        [AllowEmptyCollection()][object[]]$Actual,
+        [AllowEmptyCollection()][object[]]$Expected
+    )
+
+    $actualValues = @($Actual)
+    $expectedValues = @($Expected | ForEach-Object { [string]$_ })
+    if ($actualValues.Count -ne $expectedValues.Count) {
+        return $false
+    }
+    $seen = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    for ($index = 0; $index -lt $actualValues.Count; $index++) {
+        $value = $actualValues[$index]
+        if ($value -isnot [string] -or
+            -not (Test-MeAndAICanonicalRepositoryPath -Path $value) -or
+            -not $seen.Add($value) -or
+            $value -cne $expectedValues[$index]) {
             return $false
         }
     }
@@ -538,6 +569,427 @@ function Test-MeAndAIExactAdoptionManifest {
     return $true
 }
 
+function Test-MeAndAIExactAdoptionPullRequestMarker {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$RemoteHead,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$TargetSha,
+        [Parameter(Mandatory)][string]$ExpectedActor,
+        [Parameter(Mandatory)][string]$ExpectedState,
+        [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
+        [Parameter(Mandatory)][AllowEmptyCollection()]
+        [object[]]$ExpectedProtocolSurfaces,
+        [Parameter(Mandatory)][bool]$ExpectedProtocolRecordLossAcknowledgement,
+        [ValidateSet('Proposed', 'Completed')]
+        [string]$ExpectedPhase = 'Proposed'
+    )
+
+    foreach ($property in @(
+        'number', 'url', 'headRefName', 'headRefOid', 'baseRefName',
+        'headRepository', 'author', 'body', 'isDraft', 'state'
+    )) {
+        if ($null -eq $PullRequest.PSObject.Properties[$property]) {
+            return $false
+        }
+    }
+    $expectedDraft = $ExpectedPhase -ceq 'Proposed'
+    if ([string]$PullRequest.state -cne 'OPEN' -or
+        [string]$PullRequest.headRefName -cne $Branch -or
+        [string]$PullRequest.headRefOid -cne $RemoteHead -or
+        [string]$PullRequest.baseRefName -cne $BaseBranch -or
+        $PullRequest.isDraft -isnot [bool] -or
+        [bool]$PullRequest.isDraft -ne $expectedDraft -or
+        [string]$PullRequest.number -cnotmatch '^[1-9][0-9]*$' -or
+        [string]$PullRequest.url -cnotmatch
+            "/pull/$([regex]::Escape([string]$PullRequest.number))/?$") {
+        return $false
+    }
+    if ($null -eq $PullRequest.headRepository -or
+        $null -eq $PullRequest.headRepository.PSObject.Properties['nameWithOwner'] -or
+        -not ([string]$PullRequest.headRepository.nameWithOwner).Equals(
+            $Repository, [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        $null -eq $PullRequest.author -or
+        $null -eq $PullRequest.author.PSObject.Properties['login'] -or
+        -not ([string]$PullRequest.author.login).Equals(
+            $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
+        )) {
+        return $false
+    }
+
+    $body = [string]$PullRequest.body
+    $markerStarts = [regex]::Matches(
+        $body, '<!--\s*meandai-capabilities-adoption:',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    $markerMatches = [regex]::Matches(
+        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
+        return $false
+    }
+    try {
+        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
+    }
+    catch {
+        return $false
+    }
+    $schemaProperty = $marker.PSObject.Properties['schema']
+    if ($null -eq $schemaProperty -or
+        ($schemaProperty.Value -isnot [int] -and
+         $schemaProperty.Value -isnot [long])) {
+        return $false
+    }
+    $schema = [long]$schemaProperty.Value
+    $expectedProperties = if ($schema -eq 2) {
+        @('schema', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor')
+    }
+    elseif ($schema -eq 3) {
+        @('schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'repository', 'actor')
+    }
+    elseif ($schema -eq 5) {
+        @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'adoptionStrategy', 'protocolSurfaces',
+            'protocolRecordLossAcknowledged', 'repository', 'actor'
+        )
+    }
+    else {
+        return $false
+    }
+    $actualProperties = @($marker.PSObject.Properties | ForEach-Object {
+        $_.Name
+    })
+    if ($actualProperties.Count -ne $expectedProperties.Count -or
+        @($expectedProperties | Where-Object {
+            $actualProperties -cnotcontains $_
+        }).Count -ne 0) {
+        return $false
+    }
+    $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
+    if (-not (
+        $phase -ceq $ExpectedPhase -and
+        ($ExpectedPhase -ceq 'Proposed' -or $schema -in @(3, 5)) -and
+        [string]$marker.state -ceq $ExpectedState -and
+        [string]$marker.target -ceq $TargetTag -and
+        [string]$marker.protocolSha -ceq $TargetSha -and
+        [string]$marker.head -ceq $RemoteHead -and
+        ([string]$marker.repository).Equals(
+            $Repository, [StringComparison]::OrdinalIgnoreCase
+        ) -and
+        ([string]$marker.actor).Equals(
+            $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
+        ) -and
+        (($schema -in @(2, 3) -and
+          $ExpectedAdoptionStrategy -cin @('LegacyUnspecified', 'FreshAdoption') -and
+          @($ExpectedProtocolSurfaces).Count -eq 0 -and
+          -not $ExpectedProtocolRecordLossAcknowledgement) -or
+         ($schema -eq 5 -and
+          [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
+          $marker.protocolSurfaces -is [array] -and
+          (Test-MeAndAIExactCanonicalSurfaceSequence `
+              -Actual @($marker.protocolSurfaces) `
+              -Expected @($ExpectedProtocolSurfaces)) -and
+          $marker.protocolRecordLossAcknowledged -is [bool] -and
+          [bool]$marker.protocolRecordLossAcknowledged -eq
+              $ExpectedProtocolRecordLossAcknowledgement))
+    )) {
+        return $false
+    }
+    return $true
+}
+
+function Test-MeAndAIReservedProtocolSubmoduleContract {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Rows,
+        [Parameter(Mandatory)]$ProtocolEntry,
+        [Parameter(Mandatory)][string]$ProtocolRepository
+    )
+
+    $normalizedRows = [System.Collections.Generic.List[string]]::new()
+    foreach ($value in @($Rows)) {
+        if ($value -isnot [string]) { return $false }
+        $row = [string]$value
+        $separator = $row.IndexOf("`n", [StringComparison]::Ordinal)
+        if ($separator -le 0) {
+            return $false
+        }
+        $normalizedRows.Add($row)
+    }
+    $sortedRows = [string[]]@($normalizedRows)
+    [Array]::Sort($sortedRows, [StringComparer]::Ordinal)
+    $protocolPrefix = 'submodule..ai/protocol.'
+    $reservedRows = @($sortedRows | Where-Object {
+        $row = [string]$_
+        $separator = $row.IndexOf("`n", [StringComparison]::Ordinal)
+        $key = $row.Substring(0, $separator)
+        $value = $row.Substring($separator + 1)
+        if ($key.StartsWith(
+            $protocolPrefix, [StringComparison]::OrdinalIgnoreCase
+        )) {
+            return $true
+        }
+        if (-not [regex]::IsMatch(
+            $key, '^submodule\..+\.path$',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )) {
+            return $false
+        }
+        $candidate = $value.Replace('\', '/').Trim('/')
+        while ($candidate.StartsWith('./', [StringComparison]::Ordinal)) {
+            $candidate = $candidate.Substring(2).TrimEnd('/')
+        }
+        return $candidate -and (
+            $candidate.Equals(
+                '.ai/protocol', [StringComparison]::OrdinalIgnoreCase
+            ) -or
+            $candidate.StartsWith(
+                '.ai/protocol/', [StringComparison]::OrdinalIgnoreCase
+            ) -or
+            '.ai/protocol'.StartsWith(
+                "$candidate/", [StringComparison]::OrdinalIgnoreCase
+            )
+        )
+    })
+    if ($reservedRows.Count -eq 0) { return $true }
+    $expectedRows = [string[]]@(
+        "submodule..ai/protocol.path`n.ai/protocol",
+        "submodule..ai/protocol.url`nhttps://github.com/$ProtocolRepository.git"
+    )
+    [Array]::Sort($expectedRows, [StringComparer]::Ordinal)
+    if (($reservedRows -join "`0") -cne ($expectedRows -join "`0")) {
+        return $false
+    }
+    foreach ($property in @('Mode', 'Type', 'Path')) {
+        if ($null -eq $ProtocolEntry.PSObject.Properties[$property]) {
+            return $false
+        }
+    }
+    return [string]$ProtocolEntry.Mode -ceq '160000' -and
+        [string]$ProtocolEntry.Type -ceq 'commit' -and
+        [string]$ProtocolEntry.Path -ceq '.ai/protocol'
+}
+
+function Test-MeAndAICompletedAdoptionChangeSet {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Changes,
+        [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TargetPaths,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$FinalEntries
+    )
+
+    if ($ExpectedAdoptionStrategy -cnotin @(
+        'LegacyUnspecified', 'FreshAdoption', 'FullMigration',
+        'HybridReconciliation', 'CleanStart'
+    ) -or
+        -not (Test-MeAndAIExactOrdinalSequence -Actual $TargetPaths `
+            -Expected $script:MeAndAIAdoptionTargetPaths) -or
+        -not (Test-MeAndAIUniqueCanonicalPaths -Paths $ProtocolSurfaces) -or
+        ($ExpectedAdoptionStrategy -ceq 'LegacyUnspecified' -and
+         @($ProtocolSurfaces).Count -ne 0)) {
+        return $false
+    }
+    $surfaceValues = @($ProtocolSurfaces | ForEach-Object { [string]$_ })
+    $sortedSurfaces = @($surfaceValues)
+    [Array]::Sort($sortedSurfaces, [StringComparer]::Ordinal)
+    if (-not (Test-MeAndAIExactOrdinalSequence -Actual $surfaceValues `
+        -Expected $sortedSurfaces)) {
+        return $false
+    }
+
+    $entryMap = [System.Collections.Generic.Dictionary[string, object]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($entry in @($FinalEntries)) {
+        if ($null -eq $entry -or
+            $null -eq $entry.PSObject.Properties['Path'] -or
+            $null -eq $entry.PSObject.Properties['Exists'] -or
+            $null -eq $entry.PSObject.Properties['Mode'] -or
+            $entry.Exists -isnot [bool]) {
+            return $false
+        }
+        $path = [string]$entry.Path
+        if (-not (Test-MeAndAICanonicalRepositoryPath -Path $path) -or
+            $entryMap.ContainsKey($path)) {
+            return $false
+        }
+        $entryMap.Add($path, $entry)
+    }
+
+    $normalizedChanges = [System.Collections.Generic.List[object]]::new()
+    $changedSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($change in @($Changes)) {
+        if ($null -eq $change -or
+            $null -eq $change.PSObject.Properties['Status'] -or
+            $null -eq $change.PSObject.Properties['Path']) {
+            return $false
+        }
+        $status = [string]$change.Status
+        $path = [string]$change.Path
+        if ($status -cnotin @('A', 'D', 'M', 'T') -or
+            -not (Test-MeAndAICanonicalRepositoryPath -Path $path) -or
+            -not $changedSet.Add($path)) {
+            return $false
+        }
+        $normalizedChanges.Add([pscustomobject]@{
+            Status = $status
+            Path = $path
+        })
+    }
+    if ($normalizedChanges.Count -eq 0) { return $false }
+    if ($ExpectedAdoptionStrategy -ceq 'HybridReconciliation') {
+        $decisionChanges = @($normalizedChanges | Where-Object {
+            $path = [string]$_.Path
+            [string]$_.Status -cin @('A', 'M') -and
+            $path.StartsWith(
+                'docs/decisions/', [StringComparison]::Ordinal
+            ) -and
+            $path.EndsWith(
+                '.md', [StringComparison]::Ordinal
+            )
+        })
+        if ($decisionChanges.Count -eq 0) { return $false }
+    }
+
+    $requiredSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($path in $TargetPaths) { [void]$requiredSet.Add([string]$path) }
+    $surfaceSet = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($path in $surfaceValues) { [void]$surfaceSet.Add($path) }
+    $sourceEnforcedRequired = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($path in $script:MeAndAISourceEnforcedRequiredPaths) {
+        [void]$sourceEnforcedRequired.Add([string]$path)
+    }
+    $migrationStrategy = $ExpectedAdoptionStrategy -cin @(
+        'FullMigration', 'HybridReconciliation', 'CleanStart'
+    )
+    $manifestDeletions = @($normalizedChanges | Where-Object {
+        [string]$_.Status -ceq 'D' -and
+        [string]$_.Path -ceq $script:MeAndAIAdoptionManifestPath
+    })
+    if ($manifestDeletions.Count -ne 1) { return $false }
+
+    foreach ($change in $normalizedChanges) {
+        $status = [string]$change.Status
+        $path = [string]$change.Path
+        $basename = [IO.Path]::GetFileName($path)
+        if ($basename.Equals('FG_PAT.txt', [StringComparison]::OrdinalIgnoreCase) -or
+            $basename.Equals(
+                'MEANDAI_RO_FG_PAT.txt', [StringComparison]::OrdinalIgnoreCase
+            ) -or
+            $path.Equals(
+                $script:MeAndAISeedWorkflowPath,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            return $false
+        }
+        if ($path -ceq $script:MeAndAIAdoptionManifestPath) {
+            if ($status -cne 'D') { return $false }
+            continue
+        }
+        if ($requiredSet.Contains($path)) {
+            if ($status -ceq 'D') { return $false }
+            continue
+        }
+        if ($path.StartsWith('.ai/protocol/', [StringComparison]::Ordinal)) {
+            if (-not $migrationStrategy -or $status -cne 'D' -or
+                -not $surfaceSet.Contains($path)) {
+                return $false
+            }
+            continue
+        }
+        if ($status -ceq 'A') {
+            if (-not (Test-MeAndAIConsumerGovernancePath -Path $path)) {
+                return $false
+            }
+            continue
+        }
+        if ($status -cin @('M', 'D')) {
+            if (-not $migrationStrategy -or -not $surfaceSet.Contains($path) -or
+                -not (Test-MeAndAILegacyGovernancePath -Path $path)) {
+                return $false
+            }
+            continue
+        }
+        return $false
+    }
+
+    foreach ($path in $TargetPaths) {
+        $value = [string]$path
+        if (-not $entryMap.ContainsKey($value)) { return $false }
+        $entry = $entryMap[$value]
+        $expectedMode = if ($value -ceq '.ai/protocol') {
+            '160000'
+        }
+        else { '100644' }
+        if (-not [bool]$entry.Exists -or
+            [string]$entry.Mode -cne $expectedMode) {
+            return $false
+        }
+    }
+    foreach ($change in @($normalizedChanges | Where-Object {
+        [string]$_.Status -cne 'D'
+    })) {
+        $path = [string]$change.Path
+        if ($requiredSet.Contains($path)) { continue }
+        if (-not $entryMap.ContainsKey($path)) { return $false }
+        $entry = $entryMap[$path]
+        $allowedModes = if ($path.StartsWith(
+            'tests/meandai-adoption/', [StringComparison]::Ordinal
+        )) { @('100644', '100755') } else { @('100644') }
+        if (-not [bool]$entry.Exists -or
+            [string]$entry.Mode -cnotin $allowedModes) {
+            return $false
+        }
+    }
+
+    foreach ($surface in $surfaceSet) {
+        if ($requiredSet.Contains($surface)) {
+            $mustChange =
+                (Test-MeAndAILegacyCommonAuthorityPath -Path $surface) -or
+                ($ExpectedAdoptionStrategy -ceq 'CleanStart' -and
+                 -not $sourceEnforcedRequired.Contains($surface))
+            if ($mustChange -and -not $changedSet.Contains($surface)) {
+                return $false
+            }
+            continue
+        }
+        $exists = $entryMap.ContainsKey($surface) -and
+            [bool]$entryMap[$surface].Exists
+        if ($ExpectedAdoptionStrategy -ceq 'CleanStart' -and $exists -and
+            (Test-MeAndAILegacyGovernancePath -Path $surface)) {
+            return $false
+        }
+        if (Test-MeAndAILegacyCommonAuthorityPath -Path $surface) {
+            if ($ExpectedAdoptionStrategy -ceq 'FullMigration' -and $exists) {
+                return $false
+            }
+            if ($ExpectedAdoptionStrategy -ceq 'HybridReconciliation' -and
+                $exists -and -not $changedSet.Contains($surface)) {
+                return $false
+            }
+        }
+    }
+    return $true
+}
+
 function New-MeAndAICapabilitiesPlan {
     param(
         [string]$State,
@@ -728,11 +1180,14 @@ Export-ModuleMember -Function @(
     'Get-MeAndAIRequiredAdoptionTasks',
     'Resolve-MeAndAIAdoptionStrategy',
     'Resolve-MeAndAICapabilitiesLifecycle',
+    'Test-MeAndAICompletedAdoptionChangeSet',
     'Test-MeAndAICanonicalRepositoryPath',
     'Test-MeAndAICleanStartSurfaceSupported',
     'Test-MeAndAIConsumerGovernancePath',
+    'Test-MeAndAIExactAdoptionPullRequestMarker',
     'Test-MeAndAILegacyCommonAuthorityPath',
     'Test-MeAndAILegacyGovernancePath',
     'Test-MeAndAIProtocolAssessmentRelevantPath',
-    'Test-MeAndAIExactAdoptionManifest'
+    'Test-MeAndAIExactAdoptionManifest',
+    'Test-MeAndAIReservedProtocolSubmoduleContract'
 )

@@ -236,32 +236,6 @@ function Test-ExactOrdinalSequence {
     return $true
 }
 
-function Test-ExactCanonicalSurfaceSequence {
-    param(
-        [AllowEmptyCollection()][object[]]$Actual,
-        [AllowEmptyCollection()][object[]]$Expected
-    )
-
-    $actualValues = @($Actual)
-    $expectedValues = @($Expected | ForEach-Object { [string]$_ })
-    if ($actualValues.Count -ne $expectedValues.Count) {
-        return $false
-    }
-    $seen = [System.Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::OrdinalIgnoreCase
-    )
-    for ($index = 0; $index -lt $actualValues.Count; $index++) {
-        $value = $actualValues[$index]
-        if ($value -isnot [string] -or
-            -not (Test-MeAndAICanonicalRepositoryPath -Path $value) -or
-            -not $seen.Add($value) -or
-            $value -cne $expectedValues[$index]) {
-            return $false
-        }
-    }
-    return $true
-}
-
 function Get-TreeEntry {
     param(
         [string]$RepositoryPath,
@@ -335,45 +309,11 @@ function Assert-ReservedProtocolSubmoduleAvailable {
 
     $rows = @(Get-CommittedGitModulesConfigurationRows `
         -RepositoryPath $RepositoryPath -Commit $Commit)
-    $protocolPrefix = 'submodule..ai/protocol.'
-    $reservedRows = @($rows | Where-Object {
-        $row = [string]$_
-        $separator = $row.IndexOf("`n", [StringComparison]::Ordinal)
-        if ($separator -le 0) { return $false }
-        $key = $row.Substring(0, $separator)
-        $value = $row.Substring($separator + 1)
-        if ($key.StartsWith(
-            $protocolPrefix, [StringComparison]::OrdinalIgnoreCase
-        )) {
-            return $true
-        }
-        if (-not [regex]::IsMatch(
-            $key, '^submodule\..+\.path$',
-            [Text.RegularExpressions.RegexOptions]::IgnoreCase
-        )) {
-            return $false
-        }
-        $candidate = $value.Replace('\', '/').Trim('/')
-        while ($candidate.StartsWith('./', [StringComparison]::Ordinal)) {
-            $candidate = $candidate.Substring(2).TrimEnd('/')
-        }
-        return $candidate -and (
-            $candidate.Equals('.ai/protocol', [StringComparison]::OrdinalIgnoreCase) -or
-            $candidate.StartsWith('.ai/protocol/', [StringComparison]::OrdinalIgnoreCase) -or
-            '.ai/protocol'.StartsWith("$candidate/", [StringComparison]::OrdinalIgnoreCase)
-        )
-    })
-    if ($reservedRows.Count -eq 0) { return }
-    $expectedRows = [string[]]@(
-        "submodule..ai/protocol.path`n.ai/protocol",
-        "submodule..ai/protocol.url`nhttps://github.com/$ProtocolRepository.git"
-    )
-    [Array]::Sort($expectedRows, [StringComparer]::Ordinal)
     $protocolEntry = Get-TreeEntry -RepositoryPath $RepositoryPath `
         -Commit $Commit -Path '.ai/protocol'
-    if (($reservedRows -join "`0") -cne ($expectedRows -join "`0") -or
-        $protocolEntry.Mode -cne '160000' -or
-        $protocolEntry.Type -cne 'commit') {
+    if (-not (Test-MeAndAIReservedProtocolSubmoduleContract -Rows $rows `
+            -ProtocolEntry $protocolEntry `
+            -ProtocolRepository $ProtocolRepository)) {
         throw "The reserved .gitmodules subsection '.ai/protocol' is consumer-owned or noncanonical; reconcile it manually before adoption."
     }
 }
@@ -621,114 +561,16 @@ function Test-ExactAdoptionPullRequestMarker {
         [string]$ExpectedPhase = 'Proposed'
     )
 
-    foreach ($property in @(
-        'number', 'url', 'headRefName', 'headRefOid', 'baseRefName',
-        'headRepository', 'author', 'body', 'isDraft', 'state'
-    )) {
-        if ($null -eq $PullRequest.PSObject.Properties[$property]) {
-            return $false
-        }
-    }
-    $expectedDraft = $ExpectedPhase -ceq 'Proposed'
-    if ([string]$PullRequest.state -cne 'OPEN' -or
-        [string]$PullRequest.headRefName -cne $Branch -or
-        [string]$PullRequest.headRefOid -cne $RemoteHead -or
-        [string]$PullRequest.baseRefName -cne $BaseBranch -or
-        $PullRequest.isDraft -isnot [bool] -or
-        [bool]$PullRequest.isDraft -ne $expectedDraft -or
-        [string]$PullRequest.number -cnotmatch '^[1-9][0-9]*$' -or
-        [string]$PullRequest.url -cnotmatch "/pull/$([regex]::Escape([string]$PullRequest.number))/?$") {
-        return $false
-    }
-    if ($null -eq $PullRequest.headRepository -or
-        $null -eq $PullRequest.headRepository.PSObject.Properties['nameWithOwner'] -or
-        -not ([string]$PullRequest.headRepository.nameWithOwner).Equals(
-            $Repository, [StringComparison]::OrdinalIgnoreCase
-        ) -or
-        $null -eq $PullRequest.author -or
-        $null -eq $PullRequest.author.PSObject.Properties['login'] -or
-        -not ([string]$PullRequest.author.login).Equals(
-            $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
-        )) {
-        return $false
-    }
-
-    $body = [string]$PullRequest.body
-    $markerStarts = [regex]::Matches(
-        $body, '<!--\s*meandai-capabilities-adoption:',
-        [Text.RegularExpressions.RegexOptions]::IgnoreCase
-    )
-    $markerMatches = [regex]::Matches(
-        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
-        [Text.RegularExpressions.RegexOptions]::CultureInvariant
-    )
-    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
-        return $false
-    }
-    try {
-        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
-    }
-    catch {
-        return $false
-    }
-    $schemaProperty = $marker.PSObject.Properties['schema']
-    if ($null -eq $schemaProperty -or
-        ($schemaProperty.Value -isnot [int] -and
-         $schemaProperty.Value -isnot [long])) {
-        return $false
-    }
-    $schema = [long]$schemaProperty.Value
-    # Schemas 2 and 3 remain readable legacy representations. New strategy-bound
-    # proposals use schema 5; schema 4/6 are launcher-owned publishing states.
-    $expectedProperties = if ($schema -eq 2) {
-        @('schema', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor')
-    }
-    elseif ($schema -eq 3) {
-        @('schema', 'phase', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor')
-    }
-    elseif ($schema -eq 5) {
-        @(
-            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
-            'adoptionStrategy', 'protocolSurfaces',
-            'protocolRecordLossAcknowledged',
-            'repository', 'actor'
-        )
-    }
-    else {
-        return $false
-    }
-    $actualProperties = @($marker.PSObject.Properties | ForEach-Object { $_.Name })
-    if ($actualProperties.Count -ne $expectedProperties.Count -or
-        @($expectedProperties | Where-Object { $actualProperties -cnotcontains $_ }).Count -ne 0) {
-        return $false
-    }
-    $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
-    if (-not (
-        $phase -ceq $ExpectedPhase -and
-        ($ExpectedPhase -ceq 'Proposed' -or $schema -in @(3, 5)) -and
-        [string]$marker.state -ceq $ExpectedState -and
-        [string]$marker.target -ceq $TargetTag -and
-        [string]$marker.protocolSha -ceq $TargetSha -and
-        [string]$marker.head -ceq $RemoteHead -and
-        ([string]$marker.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -and
-        ([string]$marker.actor).Equals($ExpectedActor, [StringComparison]::OrdinalIgnoreCase) -and
-        (($schema -in @(2, 3) -and
-          $ExpectedAdoptionStrategy -cin @('LegacyUnspecified', 'FreshAdoption') -and
-          -not $ExpectedProtocolRecordLossAcknowledgement) -or
-         ($schema -eq 5 -and
-          [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
-          $marker.protocolSurfaces -is [array] -and
-          (Test-ExactCanonicalSurfaceSequence `
-              -Actual @($marker.protocolSurfaces) `
-              -Expected @($ExpectedProtocolSurfaces)) -and
-          $marker.protocolRecordLossAcknowledged -is [bool] -and
-          [bool]$marker.protocolRecordLossAcknowledged -eq
-              $ExpectedProtocolRecordLossAcknowledgement))
-    )) {
-        return $false
-    }
-
-    return $true
+    return Test-MeAndAIExactAdoptionPullRequestMarker `
+        -PullRequest $PullRequest -RemoteHead $RemoteHead `
+        -Repository $Repository -Branch $Branch -BaseBranch $BaseBranch `
+        -TargetTag $TargetTag -TargetSha $TargetSha `
+        -ExpectedActor $ExpectedActor -ExpectedState $ExpectedState `
+        -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
+        -ExpectedProtocolSurfaces @($ExpectedProtocolSurfaces) `
+        -ExpectedProtocolRecordLossAcknowledgement `
+            $ExpectedProtocolRecordLossAcknowledgement `
+        -ExpectedPhase $ExpectedPhase
 }
 
 function Test-ExactAdoptionTree {
@@ -936,12 +778,6 @@ function Test-ExactAdoptionProposal {
         -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch
 }
 
-function Test-CompletedConsumerGovernancePath {
-    param([Parameter(Mandatory)][string]$Path)
-
-    return [bool](Test-MeAndAIConsumerGovernancePath -Path $Path)
-}
-
 function Test-ExactCompletedAdoptionProposal {
     param(
         [object[]]$PullRequests,
@@ -1141,91 +977,37 @@ function Test-ExactCompletedAdoptionProposal {
             })
         }
 
-        $requiredSet = [System.Collections.Generic.HashSet[string]]::new(
+        $evidencePathSet = [System.Collections.Generic.HashSet[string]]::new(
             [StringComparer]::Ordinal
         )
-        foreach ($path in $TargetPaths) { [void]$requiredSet.Add([string]$path) }
-        $surfaceSet = [System.Collections.Generic.HashSet[string]]::new(
-            [StringComparer]::Ordinal
-        )
-        foreach ($path in $ProtocolSurfaces) { [void]$surfaceSet.Add([string]$path) }
-        $changedSet = [System.Collections.Generic.HashSet[string]]::new(
-            [StringComparer]::Ordinal
-        )
-        foreach ($change in $changes) { [void]$changedSet.Add([string]$change.Path) }
-        $migrationStrategy = $ExpectedAdoptionStrategy -cin @(
-            'FullMigration', 'HybridReconciliation', 'CleanStart'
-        )
-        $manifestDeletions = @($changes | Where-Object {
-            [string]$_.Status -ceq 'D' -and [string]$_.Path -ceq $ManifestPath
-        })
-        if ($manifestDeletions.Count -ne 1) { return $false }
-
-        foreach ($change in $changes) {
-            $status = [string]$change.Status
-            $path = [string]$change.Path
-            $basename = [IO.Path]::GetFileName($path)
-            if ($basename.Equals('FG_PAT.txt', [StringComparison]::OrdinalIgnoreCase) -or
-                $basename.Equals('MEANDAI_RO_FG_PAT.txt', [StringComparison]::OrdinalIgnoreCase) -or
-                $path.Equals([string]$SeedWorkflow.ConsumerPath,
-                    [StringComparison]::OrdinalIgnoreCase)) {
-                return $false
-            }
-            if ($path -ceq $ManifestPath) {
-                if ($status -cne 'D') { return $false }
-                continue
-            }
-            if ($requiredSet.Contains($path)) {
-                if ($status -ceq 'D') { return $false }
-                continue
-            }
-            if ($path.StartsWith("$ProtocolPath/", [StringComparison]::Ordinal)) {
-                if (-not $migrationStrategy -or $status -cne 'D' -or
-                    -not $surfaceSet.Contains($path)) {
-                    return $false
-                }
-                continue
-            }
-            if ($status -ceq 'A') {
-                if (-not (Test-CompletedConsumerGovernancePath -Path $path)) {
-                    return $false
-                }
-                continue
-            }
-            if ($status -cin @('M', 'D')) {
-                if (-not $migrationStrategy -or -not $surfaceSet.Contains($path) -or
-                    -not (Test-MeAndAILegacyGovernancePath -Path $path)) {
-                    return $false
-                }
-                continue
-            }
-            return $false
-        }
-
-        foreach ($path in $TargetPaths) {
-            $entry = Get-TreeEntry -RepositoryPath $workspace `
-                -Commit $RemoteHead -Path ([string]$path)
-            $expectedMode = if ([string]$path -ceq $ProtocolPath) {
-                '160000'
-            }
-            else { '100644' }
-            if (-not $entry.Path -or $entry.Mode -cne $expectedMode) {
-                return $false
-            }
+        foreach ($path in @($TargetPaths) + @($ProtocolSurfaces)) {
+            [void]$evidencePathSet.Add([string]$path)
         }
         foreach ($change in @($changes | Where-Object {
             [string]$_.Status -cne 'D'
         })) {
-            $path = [string]$change.Path
-            if ($requiredSet.Contains($path)) { continue }
+            [void]$evidencePathSet.Add([string]$change.Path)
+        }
+        $evidencePaths = [string[]]@($evidencePathSet)
+        [Array]::Sort($evidencePaths, [StringComparer]::Ordinal)
+        $finalEntries = @($evidencePaths | ForEach-Object {
+            $path = [string]$_
             $entry = Get-TreeEntry -RepositoryPath $workspace `
                 -Commit $RemoteHead -Path $path
-            $allowedModes = if ($path.StartsWith(
-                'tests/meandai-adoption/', [StringComparison]::Ordinal
-            )) { @('100644', '100755') } else { @('100644') }
-            if (-not $entry.Path -or $entry.Mode -cnotin $allowedModes) {
-                return $false
+            [pscustomobject]@{
+                Path = $path
+                Exists = [bool](-not [string]::IsNullOrEmpty(
+                    [string]$entry.Path
+                ))
+                Mode = [string]$entry.Mode
             }
+        })
+        if (-not (Test-MeAndAICompletedAdoptionChangeSet `
+                -Changes @($changes) `
+                -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
+                -ProtocolSurfaces @($ProtocolSurfaces) `
+                -TargetPaths @($TargetPaths) -FinalEntries $finalEntries)) {
+            return $false
         }
 
         if ($ExpectedAdoptionStrategy -ceq 'HybridReconciliation') {
@@ -1238,41 +1020,6 @@ function Test-ExactCompletedAdoptionProposal {
             })
             if ($decisionChanges.Count -eq 0) { return $false }
         }
-        $sourceEnforcedRequired = [System.Collections.Generic.HashSet[string]]::new(
-            [StringComparer]::Ordinal
-        )
-        [void]$sourceEnforcedRequired.Add([string]$MigrationBaseline.Path)
-        foreach ($asset in $LocalUpdaterAssets) {
-            [void]$sourceEnforcedRequired.Add([string]$asset.ConsumerPath)
-        }
-        foreach ($surface in $surfaceSet) {
-            if ($requiredSet.Contains($surface)) {
-                $mustChange =
-                    (Test-MeAndAILegacyCommonAuthorityPath -Path $surface) -or
-                    ($ExpectedAdoptionStrategy -ceq 'CleanStart' -and
-                     -not $sourceEnforcedRequired.Contains($surface))
-                if ($mustChange -and -not $changedSet.Contains($surface)) {
-                    return $false
-                }
-                continue
-            }
-            $entry = Get-TreeEntry -RepositoryPath $workspace `
-                -Commit $RemoteHead -Path $surface
-            if ($ExpectedAdoptionStrategy -ceq 'CleanStart' -and $entry.Path -and
-                (Test-MeAndAILegacyGovernancePath -Path $surface)) {
-                return $false
-            }
-            if (Test-MeAndAILegacyCommonAuthorityPath -Path $surface) {
-                if ($ExpectedAdoptionStrategy -ceq 'FullMigration' -and $entry.Path) {
-                    return $false
-                }
-                if ($ExpectedAdoptionStrategy -ceq 'HybridReconciliation' -and
-                    $entry.Path -and -not $changedSet.Contains($surface)) {
-                    return $false
-                }
-            }
-        }
-
         Assert-ReservedProtocolSubmoduleAvailable -RepositoryPath $workspace `
             -Commit $BaseHead
         $baseRows = @(Get-CommittedGitModulesConfigurationRows `
