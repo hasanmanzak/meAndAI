@@ -9,6 +9,8 @@ This project uses the `M.m.rev` version format defined in the
 
 - Isolate managed-merge test summaries per invocation so synthetic fixture
   identities cannot leak into a caller-owned GitHub job summary.
+- Treat absent event payload fields as fail-closed full-validation evidence
+  instead of failing during PowerShell parameter binding.
 - Reuse exact already-green merge trees on `main` only after joint Git and
   paginated GitHub evidence; retain full fail-safe validation for every direct,
   ambiguous, mismatched, failed, or unavailable push.

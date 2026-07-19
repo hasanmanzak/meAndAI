@@ -21,6 +21,9 @@
   `ReuseExactValidatedTree` or `Full`. Every direct, squash, rebase, forced,
   mismatched, duplicated, failed, canceled, malformed, missing, or API-error
   case returns `Full`.
+- Event payload fields are validated inside that fail-closed boundary. In
+  particular, the empty `event.before` value produced by a pull-request event
+  is accepted by PowerShell parameter binding and resolves to `Full`.
 - A reusable tree runs `StructureOnly` inside the same Linux and Windows jobs.
   It does not remove a trigger, rename a required check, add fan-out, or treat
   a similar diff as prior evidence.

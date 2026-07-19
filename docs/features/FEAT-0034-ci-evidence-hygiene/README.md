@@ -163,6 +163,12 @@ It did not expand into consumer updater behavior or unrelated issue #44.
   back to `Full`. The provider now flattens exactly one page-envelope level;
   a multi-page fake-CLI regression and a read-only lookup against historical
   PR #84 both prove the exact-tree route. `FIND-0174` is resolved.
+- The first hosted PR run found `FIND-0175` (`Blocking`): GitHub does not expose
+  `event.before` for a `pull_request`, and PowerShell rejected the resulting
+  empty string at parameter binding before the resolver could select `Full`.
+  Externally supplied route strings now accept empty values and validate them
+  inside the fail-closed boundary; `TEST-0143` reproduces the exact hosted
+  empty-before call. `FIND-0175` is resolved.
 - The post-development inventory covered architecture, correctness, negative
   paths, test discovery, documentation links, least-privilege permissions, and
   runner consumption. No unresolved `Blocking` finding remains.

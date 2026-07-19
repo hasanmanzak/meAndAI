@@ -206,12 +206,12 @@ function Test-MeAndAIStableRun {
 function Resolve-MeAndAIMainValidationRoute {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][string]$EventName,
-        [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)][string]$DefaultBranch,
-        [Parameter(Mandatory)][string]$BeforeCommit,
-        [Parameter(Mandatory)][string]$AfterCommit,
-        [Parameter(Mandatory)][string]$RepositoryRoot,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$EventName,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Repository,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$DefaultBranch,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$BeforeCommit,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$AfterCommit,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$RepositoryRoot,
         [scriptblock]$EvidenceProvider
     )
 
@@ -221,7 +221,8 @@ function Resolve-MeAndAIMainValidationRoute {
             $DefaultBranch -cnotmatch '^[A-Za-z0-9._/-]+$' -or
             $BeforeCommit -cnotmatch '^[0-9a-f]{40}$' -or
             $AfterCommit -cnotmatch '^[0-9a-f]{40}$' -or
-            $BeforeCommit -ceq $AfterCommit) {
+            $BeforeCommit -ceq $AfterCommit -or
+            [string]::IsNullOrWhiteSpace($RepositoryRoot)) {
             return $script:FullRoute
         }
         $RepositoryRoot = [IO.Path]::GetFullPath($RepositoryRoot)

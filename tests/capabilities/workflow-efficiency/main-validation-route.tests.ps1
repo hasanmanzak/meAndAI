@@ -158,8 +158,8 @@ function Assert-Route {
     param(
         [Parameter(Mandatory)][string]$Name,
         [Parameter(Mandatory)][string]$Expected,
-        [Parameter(Mandatory)][string]$BeforeCommit,
-        [Parameter(Mandatory)][string]$AfterCommit,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$BeforeCommit,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$AfterCommit,
         [Parameter(Mandatory)]$Evidence,
         [string]$EventName = 'push'
     )
@@ -313,6 +313,9 @@ try {
             Assert-Route -Name 'ordinary non-push event' -Expected 'Full' `
                 -BeforeCommit $baseline -AfterCommit $exactMerge -Evidence $exact `
                 -EventName 'pull_request'
+            Assert-Route -Name 'hosted pull-request event with empty before identity' `
+                -Expected 'Full' -BeforeCommit '' -AfterCommit $exactMerge `
+                -Evidence $exact -EventName 'pull_request'
             Assert-Route -Name 'malformed pushed identity' -Expected 'Full' `
                 -BeforeCommit $baseline -AfterCommit 'not-a-commit' -Evidence $exact
 
