@@ -48,7 +48,7 @@ function Get-PropertyValue {
         }
         throw "$Label is missing '$Name'."
     }
-    Write-Output -NoEnumerate $property.Value
+    return ,$property.Value
 }
 
 function Assert-OrdinaryFile {

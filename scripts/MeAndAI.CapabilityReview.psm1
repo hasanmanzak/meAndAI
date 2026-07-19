@@ -28,7 +28,7 @@ function Get-ObjectPropertyValue {
         if ($AllowMissing) { return $null }
         throw "$Label is missing '$Name'."
     }
-    Write-Output -NoEnumerate $property.Value
+    return ,$property.Value
 }
 
 function Assert-CanonicalRepository {

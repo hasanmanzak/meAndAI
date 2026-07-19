@@ -310,6 +310,8 @@ try {
     Assert-Equal $ledger.Entries.Count 1 'TEST-0134 ledger entry count differs.'
     Assert-Equal $ledger.Entries[0].Outcome 'Conforming' `
         'TEST-0134 terminal outcome differs.'
+    Assert-Equal $ledger.Entries[0].ReviewedAt '2026-07-19T10:20:30Z' `
+        'TEST-0134 canonical review timestamp did not survive ledger import.'
     $terminalPending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $ledgerBytes)
     Assert-Equal $terminalPending.Count 0 `
@@ -379,6 +381,33 @@ try {
             -Bytes ([Text.UTF8Encoding]::new($false).GetBytes($nonCanonicalLedger))
     } -Pattern '*must be in ordinal order*' `
         -Message 'TEST-0134 noncanonical ledger ordering was accepted.'
+
+    foreach ($timestampCase in @(
+        [pscustomobject]@{
+            Name = 'fractional-seconds'
+            Value = '2026-07-19T10:20:30.000Z'
+        },
+        [pscustomobject]@{
+            Name = 'explicit-zero-offset'
+            Value = '2026-07-19T10:20:30+00:00'
+        },
+        [pscustomobject]@{
+            Name = 'missing-zone'
+            Value = '2026-07-19T10:20:30'
+        }
+    )) {
+        $nonCanonicalTimestamp = $canonicalLedgerText.Replace(
+            '2026-07-19T10:20:30Z',
+            [string]$timestampCase.Value
+        )
+        Assert-ThrowsLike -Action {
+            Import-MeAndAICapabilityLedger -Catalog $catalog `
+                -Bytes ([Text.UTF8Encoding]::new($false).GetBytes(
+                    $nonCanonicalTimestamp
+                ))
+        } -Pattern '*canonical*' `
+            -Message "TEST-0134 noncanonical timestamp '$($timestampCase.Name)' was accepted."
+    }
 
     # TEST-0135: every type uses its declared authority model and returns only
     # the four assessment outcomes; only reviewed terminal evidence serializes.

@@ -38,11 +38,21 @@
   expectation after 1576.3 seconds; its exact `Auto` dispatch correction passed
   the focused adoption-lifecycle shard in 165.4 seconds and the complete suite
   passed in 1652.5 seconds with every recursively discovered owner green.
-- Draft PR #82's first Ubuntu job found `FIND-0170`: the UTC review timestamp
-  exact format was accepted by Windows PowerShell 5.1 but rejected by
-  PowerShell 7 before capability-catalog evidence. The parser now uses quoted
-  UTC literals, a strongly typed `DateTimeOffset` result, and universal
-  adjustment; focused local evidence is green and replacement hosted
+- Draft PR #82's first two Ubuntu jobs found and narrowed `FIND-0170`. The
+  exact UTC parser was not the final failing boundary: PowerShell 7.4.2
+  `ConvertFrom-Json` materialized canonical `reviewedAt` JSON as
+  `System.DateTime`, then a direct string cast applied culture formatting.
+  Ledger import now restores runtime date values to invariant UTC seconds and
+  still requires exact source-to-canonical byte equality. Canonical round-trip
+  and fraction/offset/zone negatives pass on Windows PowerShell 5.1 and the
+  matching Linux PowerShell 7.4.2 container; replacement hosted confirmation
+  is pending.
+- The corrected Linux catalog slice then exposed `FIND-0171`: both shared
+  property accessors used `Write-Output -NoEnumerate`, which represented scalar
+  evidence and a null fixture binding as `List<object>` values on PowerShell
+  7.4. They now return through unary comma, preserving scalar, null, empty,
+  singleton, and multi-value shapes on Windows PowerShell 5.1 and PowerShell
+  7.4.2. Focused `TEST-0139`/`TEST-0140` pass on both hosts; replacement hosted
   confirmation is pending.
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness

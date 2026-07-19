@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 
 $script:LedgerPath = '.ai/meandai-capabilities-state.json'
+$script:ReviewedAtFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
 $script:CapabilityTypes = @(
     'Deterministic',
     'DeclarativeMigration',
@@ -430,7 +431,6 @@ function Assert-ReviewAuthority {
 function Assert-ReviewedAt {
     param([AllowNull()][string]$Value)
 
-    $format = "yyyy-MM-dd'T'HH:mm:ss'Z'"
     [DateTimeOffset]$parsed = [DateTimeOffset]::MinValue
     $styles = [Globalization.DateTimeStyles](
         [Globalization.DateTimeStyles]::AssumeUniversal -bor
@@ -439,16 +439,34 @@ function Assert-ReviewedAt {
     if ([string]::IsNullOrWhiteSpace($Value) -or
         -not [DateTimeOffset]::TryParseExact(
             $Value,
-            $format,
+            $script:ReviewedAtFormat,
             [Globalization.CultureInfo]::InvariantCulture,
             $styles,
             [ref]$parsed
         ) -or $parsed.ToUniversalTime().ToString(
-            $format,
+            $script:ReviewedAtFormat,
             [Globalization.CultureInfo]::InvariantCulture
         ) -cne $Value) {
         throw 'Capability review timestamp must be canonical UTC seconds.'
     }
+}
+
+function ConvertTo-ReviewedAtString {
+    param([AllowNull()]$Value)
+
+    if ($Value -is [DateTime]) {
+        return $Value.ToUniversalTime().ToString(
+            $script:ReviewedAtFormat,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+    }
+    if ($Value -is [DateTimeOffset]) {
+        return $Value.ToUniversalTime().ToString(
+            $script:ReviewedAtFormat,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+    }
+    return [string]$Value
 }
 
 function New-ValidatedLedgerEntry {
@@ -623,7 +641,7 @@ function Import-MeAndAICapabilityLedger {
             -Outcome ([string]$rawEntry.outcome) -Evidence $normalizedEvidence `
             -ReviewIdentity ([string]$rawEntry.review.identity) `
             -ReviewAuthority ([string]$rawEntry.review.authority) `
-            -ReviewedAt ([string]$rawEntry.review.reviewedAt)
+            -ReviewedAt (ConvertTo-ReviewedAtString -Value $rawEntry.review.reviewedAt)
         $entry.Slug = $slug
         $entry.DefinitionBlob = [string]$rawEntry.definitionBlob
         $entries.Add($entry)
