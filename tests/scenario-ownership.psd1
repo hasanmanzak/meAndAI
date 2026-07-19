@@ -87,7 +87,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1'
-            TestIds = @('TEST-0143')
+            TestIds = @('TEST-0143', 'TEST-0146')
         }
         @{
             Evidence = 'ExecutableSuite'

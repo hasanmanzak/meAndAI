@@ -392,6 +392,50 @@ try {
         Add-Failure 'TEST-0143 workflow uses path filtering that can remove stable check evidence.'
     }
 
+    $jobsIndex = $workflowSource.IndexOf("jobs:", [StringComparison]::Ordinal)
+    if ($jobsIndex -lt 0) {
+        Add-Failure 'TEST-0146 workflow has no canonical jobs section.'
+    }
+    else {
+        $jobsSource = $workflowSource.Substring($jobsIndex)
+        $jobIds = @([regex]::Matches(
+            $jobsSource,
+            '(?m)^  (?<id>[a-z0-9-]+):\r?$'
+        ) | ForEach-Object { $_.Groups['id'].Value } | Sort-Object)
+        $expectedJobIds = @(
+            'linux-validation', 'post-publication', 'windows-validation'
+        )
+        if (($jobIds -join "`n") -cne ($expectedJobIds -join "`n")) {
+            Add-Failure "TEST-0146 workflow job inventory changed: $($jobIds -join ', ')."
+        }
+    }
+    foreach ($stableJobName in @(
+        'Validate on ubuntu-latest',
+        'Validate on windows-latest'
+    )) {
+        if ([regex]::Matches(
+                $workflowSource,
+                [regex]::Escape("name: $stableJobName")
+            ).Count -ne 1) {
+            Add-Failure "TEST-0146 stable job identity is missing or duplicated: $stableJobName."
+        }
+    }
+    if ($workflowSource -match '(?m)^\s+(?:strategy|matrix|needs):' -or
+        $workflowSource -match '(?m)^\s+timeout-minutes:\s+(?:2|3)\s*$') {
+        Add-Failure 'TEST-0146 workflow adds fan-out/fan-in or turns the soft runtime goals into timeout gates.'
+    }
+    foreach ($runtimeContract in @(
+        'shell: pwsh',
+        'shell: powershell',
+        './tests/protocol.tests.ps1',
+        '-ExecutionProfile',
+        'WindowsNative'
+    )) {
+        if (-not $workflowSource.Contains($runtimeContract)) {
+            Add-Failure "TEST-0146 workflow lost cross-runtime validation contract '$runtimeContract'."
+        }
+    }
+
     $protocolSource = Get-Content -LiteralPath $protocolPath -Raw
     if (-not $protocolSource.Contains('sole purpose is to copy external evidence') -or
         -not $protocolSource.Contains('stable external authority')) {
@@ -425,7 +469,7 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host 'Main-validation exact-tree route tests passed for TEST-0143.' `
+Write-Host 'Main-validation exact-tree route and efficiency tests passed for TEST-0143 and TEST-0146.' `
     -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult `
     -Owner 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1' `
