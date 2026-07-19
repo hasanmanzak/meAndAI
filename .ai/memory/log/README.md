@@ -5,15 +5,17 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.12.1 work corrects local migration planning to use exact captured
-base-commit Git blob bytes rather than checkout-filtered worktree bytes. Follow
-[FEAT-0033](../../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/README.md)
-and the [v0.12.1 continuation](2026-07-19-v0121-canonical-base-blob-planning.md).
-[Issue #83](https://github.com/hasanmanzak/meAndAI/issues/83) owns external
+The v0.12.2 work isolates fixture job summaries, reuses only exact already-
+green merge trees on `main`, and keeps live delivery facts outside candidate
+commits. Follow
+[FEAT-0034](../../../docs/features/FEAT-0034-ci-evidence-hygiene/README.md)
+and the [v0.12.2 continuation](2026-07-19-v0122-ci-evidence-hygiene.md).
+[Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) owns external
 delivery facts. `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-19 - v0.12.2 CI evidence hygiene and exact-tree reuse](2026-07-19-v0122-ci-evidence-hygiene.md)
 - [2026-07-19 - v0.12.1 canonical base-blob migration planning](2026-07-19-v0121-canonical-base-blob-planning.md)
 - [2026-07-19 - v0.12.0 capability framework and test architecture](2026-07-19-v0120-capability-test-architecture.md)
 - [2026-07-18 - v0.11.1 project-neutral legacy-consumer fixture](2026-07-18-v0111-project-neutral-legacy-fixture.md)

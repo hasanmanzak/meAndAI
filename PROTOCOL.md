@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.12.1**<br>
+Protocol version: **0.12.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -359,6 +359,13 @@ non-converged tree merely to mark progress.
 Exact converged-push commit and ref evidence MUST be written to the issue or
 pull request after the push exists. A repository document records local push
 eligibility and MUST NOT predict the commit that contains itself.
+The pull-request number, exact pushed SHA, hosted-check result, merge SHA,
+release identity, and cleanup result are live external facts. Once the
+candidate tree has converged, a maintainer MUST NOT create a repository commit
+whose sole purpose is to copy external evidence into that candidate. Record
+those facts in the linked issue or pull request as the stable external
+authority. A failed hosted check that requires a product, test, or canonical
+documentation correction still reopens the ordinary correction cycle.
 Protocol-version tags and GitHub Releases are separate post-merge distribution
 events governed by Gate 7 and Section 8.
 
@@ -417,8 +424,11 @@ increase detail.
   `test-cases.md`.
 - Every material architectural or process decision has
   `docs/decisions/DEC-NNNN-slug.md`.
-- Feature records link their issue, pull request, decisions, dependencies,
-  tests, and related documentation.
+- Feature records link their issue, decisions, dependencies, tests, and related
+  documentation. They link the delivery pull request directly when its identity
+  exists before the converged candidate push; otherwise they link the delivery
+  issue as the stable indirection and that issue links the pull request after
+  creation. The link graph MUST NOT require an evidence-only candidate commit.
 - Decisions link affected features and superseded or related decisions.
 - Before closure, an issue links its owning canonical feature and every
   applicable decision; the feature links back to the issue. A delivery issue
@@ -469,6 +479,20 @@ permitted only when the newer run wholly supersedes the same pull request's
 older evidence; main, merge-queue, manual, and publication runs remain
 independent. Workflow reviews compare job count and hosted runner consumption;
 wall-clock latency alone is not runner-efficiency evidence.
+
+An unprotected default branch retains its push validation. A short reuse route
+is permitted only when read-only local Git and paginated provider evidence
+jointly prove that the exact pushed commit tree already passed every declared
+stable validation job. For a pull-request merge, this includes exact push
+before/after identity, parent order, base and head repository/branch/commit
+identity, merge-tree equality with the validated head tree, one merged pull
+request, one successful current-workflow run for that exact head, and every
+stable job completed successfully. An exact successful merge-queue commit may
+provide the same authority. Direct, squash, rebase, forced, mismatched,
+duplicated, missing, failed, canceled, malformed, unavailable, or API-error
+evidence MUST run the full fail-safe route. Reuse keeps the stable job
+identities present and performs a focused structural verification of the
+already-validated tree; it is not permission to reuse a merely similar diff.
 
 ## 8. Versioning
 

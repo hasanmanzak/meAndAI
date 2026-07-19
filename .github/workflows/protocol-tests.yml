@@ -35,7 +35,9 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ${{ format('{0}-{1}', github.workflow, github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('{0}-{1}', github.event_name, github.run_id)) }}
@@ -51,8 +53,37 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          fetch-depth: 0
           persist-credentials: false
+      - name: Select fail-closed main validation route
+        id: main-route
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_COMMIT: ${{ github.event.before || '' }}
+          AFTER_COMMIT: ${{ github.event.after || github.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+        run: |
+          Import-Module ./tests/capabilities/workflow-efficiency/MeAndAI.MainValidationRoute.psm1 -Force
+          $route = @(
+            Resolve-MeAndAIMainValidationRoute `
+              -EventName $env:EVENT_NAME `
+              -Repository '${{ github.repository }}' `
+              -DefaultBranch $env:DEFAULT_BRANCH `
+              -BeforeCommit $env:BEFORE_COMMIT `
+              -AfterCommit $env:AFTER_COMMIT `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          )
+          if ($route.Count -ne 1 -or
+              $route[0] -cnotin @('Full', 'ReuseExactValidatedTree')) {
+            throw 'Main validation route returned invalid evidence.'
+          }
+          "route=$($route[0])" | Out-File `
+            -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Selected main validation route: $($route[0])"
       - name: Install checksummed actionlint v1.7.12
+        if: steps.main-route.outputs.route == 'Full'
         shell: bash
         env:
           ACTIONLINT_VERSION: 1.7.12
@@ -70,17 +101,24 @@ jobs:
           "$binary" -version
           printf 'ACTIONLINT=%s\n' "$binary" >> "$GITHUB_ENV"
       - name: Run actionlint semantic workflow validation
+        if: steps.main-route.outputs.route == 'Full'
         shell: bash
         run: >-
           "$ACTIONLINT" -shellcheck= -pyflakes=
           .github/workflows/protocol-tests.yml
           templates/project/.github/workflows/meandai-protocol-update.yml
       - name: Parse consumer workflow YAML
+        if: steps.main-route.outputs.route == 'Full'
         shell: bash
         run: ruby -e "require 'yaml'; YAML.load_file('templates/project/.github/workflows/meandai-protocol-update.yml')"
       - name: Run protocol validation on PowerShell 7
+        if: steps.main-route.outputs.route == 'Full'
         shell: pwsh
         run: ./tests/protocol.tests.ps1
+      - name: Verify exact reused tree structure on PowerShell 7
+        if: steps.main-route.outputs.route == 'ReuseExactValidatedTree'
+        shell: pwsh
+        run: ./tests/protocol.tests.ps1 -StructureOnly
 
   windows-validation:
     name: Validate on windows-latest
@@ -93,8 +131,36 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Select fail-closed main validation route
+        id: main-route
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_COMMIT: ${{ github.event.before || '' }}
+          AFTER_COMMIT: ${{ github.event.after || github.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+        run: |
+          Import-Module ./tests/capabilities/workflow-efficiency/MeAndAI.MainValidationRoute.psm1 -Force
+          $route = @(
+            Resolve-MeAndAIMainValidationRoute `
+              -EventName $env:EVENT_NAME `
+              -Repository '${{ github.repository }}' `
+              -DefaultBranch $env:DEFAULT_BRANCH `
+              -BeforeCommit $env:BEFORE_COMMIT `
+              -AfterCommit $env:AFTER_COMMIT `
+              -RepositoryRoot $env:GITHUB_WORKSPACE
+          )
+          if ($route.Count -ne 1 -or
+              $route[0] -cnotin @('Full', 'ReuseExactValidatedTree')) {
+            throw 'Main validation route returned invalid evidence.'
+          }
+          "route=$($route[0])" | Out-File `
+            -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Selected main validation route: $($route[0])"
       - name: Select fail-safe Windows validation profile
         id: windows-profile
+        if: steps.main-route.outputs.route == 'Full'
         shell: powershell
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -115,10 +181,15 @@ jobs:
             -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           Write-Host "Selected Windows validation profile: $($profile[0])"
       - name: Run selected validation on Windows PowerShell 5.1
+        if: steps.main-route.outputs.route == 'Full'
         shell: powershell
         run: >-
           ./tests/protocol.tests.ps1
           -ExecutionProfile '${{ steps.windows-profile.outputs.profile }}'
+      - name: Verify exact reused tree structure on Windows PowerShell 5.1
+        if: steps.main-route.outputs.route == 'ReuseExactValidatedTree'
+        shell: powershell
+        run: ./tests/protocol.tests.ps1 -StructureOnly
 
   post-publication:
     name: Verify published release evidence

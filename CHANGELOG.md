@@ -3,6 +3,33 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.2 - 2026-07-19
+
+### Fixed
+
+- Isolate managed-merge test summaries per invocation so synthetic fixture
+  identities cannot leak into a caller-owned GitHub job summary.
+- Treat absent event payload fields as fail-closed full-validation evidence
+  instead of failing during PowerShell parameter binding.
+- Reuse exact already-green merge trees on `main` only after joint Git and
+  paginated GitHub evidence; retain full fail-safe validation for every direct,
+  ambiguous, mismatched, failed, or unavailable push.
+
+### Changed
+
+- Keep pull-request, merge-queue, `main`, manual, and publication validation
+  gates while making proven exact-tree `main` pushes run focused structural
+  verification in the two stable jobs instead of repeating both full suites.
+- Record live PR, push, hosted-check, merge, release, and cleanup facts in the
+  linked issue or pull request without evidence-only candidate commits and
+  their redundant workflow runs.
+
+### Added
+
+- Add capability-owned `TEST-0142` summary-isolation coverage and `TEST-0143`
+  exact-tree routing, fail-closed negative, workflow, and evidence-discipline
+  coverage.
+
 ## 0.12.1 - 2026-07-19
 
 ### Fixed
