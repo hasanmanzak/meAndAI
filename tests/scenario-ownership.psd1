@@ -37,7 +37,7 @@
                 'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
                 'TEST-0068', 'TEST-0071', 'TEST-0077', 'TEST-0080',
                 'TEST-0093', 'TEST-0094', 'TEST-0095', 'TEST-0127',
-                'TEST-0128'
+                'TEST-0128', 'TEST-0145'
             )
         }
         @{
@@ -87,7 +87,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1'
-            TestIds = @('TEST-0143')
+            TestIds = @('TEST-0143', 'TEST-0146')
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -107,7 +107,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/test-architecture/test-architecture.tests.ps1'
-            TestIds = @('TEST-0137', 'TEST-0138')
+            TestIds = @('TEST-0137', 'TEST-0138', 'TEST-0144')
         }
         @{
             Evidence = 'ExecutableSuite'

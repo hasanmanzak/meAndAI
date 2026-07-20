@@ -161,16 +161,48 @@ function Invoke-MeAndAITestSuiteProcess {
     $processArguments = @(
         '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $SuitePath
     ) + @($Arguments)
-    $output = @(& $EnginePath @processArguments 2>&1)
-    return [pscustomobject]@{
-        ExitCode = [int]$LASTEXITCODE
-        Output = $output
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    try {
+        $output = @(& $EnginePath @processArguments 2>&1)
+        $exitCode = [int]$LASTEXITCODE
     }
+    finally {
+        $stopwatch.Stop()
+    }
+    return [pscustomobject]@{
+        ExitCode = $exitCode
+        Output = $output
+        ElapsedMilliseconds = [long]$stopwatch.ElapsedMilliseconds
+    }
+}
+
+function Format-MeAndAITestSuiteObservation {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Owner,
+        [Parameter(Mandatory)][object]$ElapsedMilliseconds
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Owner)) {
+        throw 'Suite observation owner must not be empty.'
+    }
+    if ($ElapsedMilliseconds -isnot [long] -or
+        [long]$ElapsedMilliseconds -lt 0) {
+        throw 'Suite observation elapsed milliseconds must be a non-negative Int64.'
+    }
+    $record = [ordered]@{
+        schema = 1
+        owner = $Owner
+        elapsedMs = [long]$ElapsedMilliseconds
+    }
+    return 'MEANDAI_SUITE_OBSERVATION=' +
+        ($record | ConvertTo-Json -Compress)
 }
 
 Export-ModuleMember -Function @(
     'Compare-MeAndAIExactScenarioId',
     'Read-MeAndAIScenarioResultRecord',
     'Read-MeAndAICompatibilityShardResultRecord',
-    'Invoke-MeAndAITestSuiteProcess'
+    'Invoke-MeAndAITestSuiteProcess',
+    'Format-MeAndAITestSuiteObservation'
 )

@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.12.2',
+    [string]$ProtocolTag = 'v0.12.3',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -33,7 +33,7 @@ $minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
-$initialAdoptionPolicyTag = 'v0.12.2'
+$initialAdoptionPolicyTag = 'v0.12.3'
 $initialAdoptionPolicySourcePath =
     'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
@@ -762,6 +762,59 @@ function Test-QuickAdoptionAssessmentRelevantPath {
     $command = Get-InitialAdoptionPolicyCommand `
         -Name 'Test-MeAndAIProtocolAssessmentRelevantPath'
     return [bool](& $command -Path $Path -TargetPaths @($TargetPaths))
+}
+
+function Test-QuickAdoptionExactPullRequestMarker {
+    param(
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$RemoteHead,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$TargetSha,
+        [Parameter(Mandatory)][string]$ExpectedActor,
+        [Parameter(Mandatory)][string]$ExpectedState,
+        [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ExpectedProtocolSurfaces,
+        [Parameter(Mandatory)][bool]$ExpectedProtocolRecordLossAcknowledgement,
+        [Parameter(Mandatory)][ValidateSet('Proposed', 'Completed')]
+        [string]$ExpectedPhase
+    )
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAIExactAdoptionPullRequestMarker'
+    return [bool](& $command @PSBoundParameters)
+}
+
+function Test-QuickAdoptionCompletedChangeSet {
+    param(
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$Changes,
+        [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$TargetPaths,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$FinalEntries
+    )
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAICompletedAdoptionChangeSet'
+    return [bool](& $command @PSBoundParameters)
+}
+
+function Test-QuickAdoptionReservedSubmoduleContract {
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Rows,
+        [Parameter(Mandatory)]$ProtocolEntry,
+        [Parameter(Mandatory)][string]$ProtocolRepository
+    )
+
+    $command = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAIReservedProtocolSubmoduleContract'
+    return [bool](& $command @PSBoundParameters)
 }
 
 function Get-QuickAdoptionRelevantTreePaths {
@@ -1911,10 +1964,13 @@ function Import-CanonicalInitialAdoptionPolicy {
             'Get-MeAndAIProtocolAssessmentLimits',
             'Get-MeAndAIProtocolSurfaceInventory',
             'Resolve-MeAndAIAdoptionStrategy',
+            'Test-MeAndAICompletedAdoptionChangeSet',
             'Test-MeAndAIConsumerGovernancePath',
+            'Test-MeAndAIExactAdoptionPullRequestMarker',
             'Test-MeAndAILegacyCommonAuthorityPath',
             'Test-MeAndAILegacyGovernancePath',
-            'Test-MeAndAIProtocolAssessmentRelevantPath'
+            'Test-MeAndAIProtocolAssessmentRelevantPath',
+            'Test-MeAndAIReservedProtocolSubmoduleContract'
         )
         $commands = [System.Collections.Generic.Dictionary[string, object]]::new(
             [StringComparer]::Ordinal
@@ -2493,91 +2549,83 @@ function Get-ValidatedAdoptionMarker {
         throw 'The deterministic adoption pull request ownership marker has an invalid schema type.'
     }
     $schema = [long]$schemaProperty.Value
-    $expectedMarkerProperties = if ($schema -eq 2) {
-        @('schema', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor')
-    }
-    elseif ($schema -eq 3) {
-        @('schema', 'phase', 'state', 'target', 'protocolSha', 'head', 'repository', 'actor')
-    }
-    elseif ($schema -eq 4) {
-        @(
-            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
-            'previousHead', 'plannedHead', 'repository', 'actor'
-        )
-    }
-    elseif ($schema -eq 5) {
-        @(
-            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
-            'adoptionStrategy', 'protocolSurfaces',
-            'protocolRecordLossAcknowledged', 'repository', 'actor'
-        )
-    }
-    elseif ($schema -eq 6) {
-        @(
-            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
-            'previousHead', 'plannedHead', 'adoptionStrategy',
-            'protocolSurfaces', 'protocolRecordLossAcknowledged',
-            'repository', 'actor'
-        )
-    }
-    else {
+    if ($schema -notin @(2, 3, 4, 5, 6)) {
         throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
     }
-    $actualMarkerProperties = @($marker.PSObject.Properties | ForEach-Object { $_.Name })
-    if ($actualMarkerProperties.Count -ne $expectedMarkerProperties.Count -or
-        @($expectedMarkerProperties | Where-Object { $actualMarkerProperties -cnotcontains $_ }).Count -ne 0) {
-        throw 'The deterministic adoption pull request ownership marker has an unexpected schema.'
-    }
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
-    if ($phase -cnotin @('Proposed', 'Publishing', 'Completed') -or
-        [string]$marker.state -cnotin @('BootstrapReady', 'AdoptionReviewRequired') -or
-        [string]$marker.target -cne $ProtocolTag -or
-        [string]$marker.protocolSha -cnotmatch '^[0-9a-f]{40}$' -or
-        -not ([string]$marker.repository).Equals($Repository, [StringComparison]::OrdinalIgnoreCase) -or
-        -not ([string]$marker.actor).Equals($ExpectedActor, [StringComparison]::OrdinalIgnoreCase)) {
-        throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
-    }
-    if ($schema -in @(5, 6)) {
-        $markerSurfaces = if ($marker.protocolSurfaces -is [array]) {
-            @($marker.protocolSurfaces | ForEach-Object { [string]$_ })
+    if ($phase -ceq 'Publishing') {
+        $expectedPublishingProperties = if ($schema -eq 4) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'previousHead', 'plannedHead', 'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 6) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'previousHead', 'plannedHead', 'adoptionStrategy',
+                'protocolSurfaces', 'protocolRecordLossAcknowledged',
+                'repository', 'actor'
+            )
         }
         else { @() }
-        $classifiedMarkerSurfaces = @(
-            Get-QuickAdoptionProtocolSurfaceInventory -Paths $markerSurfaces
+        $actualPublishingProperties = @(
+            $marker.PSObject.Properties | ForEach-Object { $_.Name }
         )
-        if ([string]$marker.adoptionStrategy -cnotin @(
-            'FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart'
-        ) -or $marker.protocolSurfaces -isnot [array] -or
-            $marker.protocolRecordLossAcknowledged -isnot [bool] -or
-            -not (([bool]$marker.protocolRecordLossAcknowledged) -eq
-                ([string]$marker.adoptionStrategy -ceq 'CleanStart')) -or
-            (($markerSurfaces -join "`n") -cne
-                ($classifiedMarkerSurfaces -join "`n"))) {
-            throw 'The deterministic adoption pull request strategy marker is invalid.'
+        if ($expectedPublishingProperties.Count -eq 0 -or
+            $actualPublishingProperties.Count -ne
+                $expectedPublishingProperties.Count -or
+            @($expectedPublishingProperties | Where-Object {
+                $actualPublishingProperties -cnotcontains $_
+            }).Count -ne 0) {
+            throw 'The deterministic adoption pull request ownership marker has an unexpected schema.'
         }
-    }
-    elseif ($ExpectedAdoptionStrategy -and
-        $ExpectedAdoptionStrategy -cnotin @('LegacyUnspecified', 'FreshAdoption')) {
-        throw 'A legacy adoption marker cannot satisfy the expected strategy identity.'
-    }
-    if ($ExpectedAdoptionStrategy) {
-        $strategyMatches = if ($schema -in @(5, 6)) {
-            [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
-            ((@($marker.protocolSurfaces) -join "`n") -ceq
-                (@($ExpectedProtocolSurfaces) -join "`n")) -and
-            [bool]$marker.protocolRecordLossAcknowledged -eq
-                $ExpectedProtocolRecordLossAcknowledgement
+        if ([string]$marker.state -cnotin @(
+                'BootstrapReady', 'AdoptionReviewRequired'
+            ) -or
+            [string]$marker.target -cne $ProtocolTag -or
+            [string]$marker.protocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+            -not ([string]$marker.repository).Equals(
+                $Repository, [StringComparison]::OrdinalIgnoreCase
+            ) -or
+            -not ([string]$marker.actor).Equals(
+                $ExpectedActor, [StringComparison]::OrdinalIgnoreCase
+            )) {
+            throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
         }
-        else {
-            $ExpectedAdoptionStrategy -cin @('LegacyUnspecified', 'FreshAdoption') -and
-            @($ExpectedProtocolSurfaces).Count -eq 0 -and
-            -not $ExpectedProtocolRecordLossAcknowledgement
+        if ($schema -eq 6) {
+            $markerSurfaces = if ($marker.protocolSurfaces -is [array]) {
+                @($marker.protocolSurfaces | ForEach-Object { [string]$_ })
+            }
+            else { @() }
+            $classifiedMarkerSurfaces = @(
+                Get-QuickAdoptionProtocolSurfaceInventory -Paths $markerSurfaces
+            )
+            if ([string]$marker.adoptionStrategy -cnotin @(
+                'FreshAdoption', 'FullMigration', 'HybridReconciliation',
+                'CleanStart'
+            ) -or $marker.protocolSurfaces -isnot [array] -or
+                $marker.protocolRecordLossAcknowledged -isnot [bool] -or
+                -not (([bool]$marker.protocolRecordLossAcknowledged) -eq
+                    ([string]$marker.adoptionStrategy -ceq 'CleanStart')) -or
+                (($markerSurfaces -join "`n") -cne
+                    ($classifiedMarkerSurfaces -join "`n")) -or
+                ($ExpectedAdoptionStrategy -and
+                 ([string]$marker.adoptionStrategy -cne
+                    $ExpectedAdoptionStrategy -or
+                  ($markerSurfaces -join "`n") -cne
+                    (@($ExpectedProtocolSurfaces) -join "`n") -or
+                  [bool]$marker.protocolRecordLossAcknowledged -ne
+                    $ExpectedProtocolRecordLossAcknowledgement))) {
+                throw 'The deterministic adoption pull request strategy marker is invalid.'
+            }
         }
-        if (-not $strategyMatches) {
-            throw 'The deterministic adoption pull request strategy identity changed.'
+        elseif ($ExpectedAdoptionStrategy -and
+            $ExpectedAdoptionStrategy -cnotin @(
+                'LegacyUnspecified', 'FreshAdoption'
+            )) {
+            throw 'A legacy adoption marker cannot satisfy the expected strategy identity.'
         }
-    }
-    if ($phase -ceq 'Publishing') {
         if ($schema -notin @(4, 6) -or
             [string]$marker.previousHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.plannedHead -cnotmatch '^[0-9a-f]{40}$' -or
@@ -2601,8 +2649,64 @@ function Get-ValidatedAdoptionMarker {
             [string]$PullRequest.headRefOid
         }
         if ($requiredMarkerHead -cnotmatch '^[0-9a-f]{40}$' -or
-            [string]$marker.head -cne $requiredMarkerHead) {
+            [string]$marker.state -cnotin @(
+                'BootstrapReady', 'AdoptionReviewRequired'
+            ) -or
+            [string]$marker.protocolSha -cnotmatch '^[0-9a-f]{40}$') {
             throw 'The deterministic adoption pull request marker head does not match the expected transition state.'
+        }
+        $contractStrategy = if ($ExpectedAdoptionStrategy) {
+            $ExpectedAdoptionStrategy
+        }
+        elseif ($schema -eq 5) { [string]$marker.adoptionStrategy }
+        else { 'LegacyUnspecified' }
+        [object[]]$contractSurfaces = [object[]]::new(0)
+        if ($ExpectedAdoptionStrategy) {
+            $contractSurfaces = [object[]]@($ExpectedProtocolSurfaces)
+        }
+        elseif ($schema -eq 5) {
+            $contractSurfaces = [object[]]@($marker.protocolSurfaces)
+        }
+        $contractLossAcknowledgement = if ($ExpectedAdoptionStrategy) {
+            $ExpectedProtocolRecordLossAcknowledgement
+        }
+        elseif ($schema -eq 5 -and
+            $marker.protocolRecordLossAcknowledged -is [bool]) {
+            [bool]$marker.protocolRecordLossAcknowledged
+        }
+        else { $false }
+        $contractPullRequest = [pscustomobject]@{
+            number = $PullRequest.number
+            url = $PullRequest.url
+            headRefName = $PullRequest.headRefName
+            headRefOid = $PullRequest.headRefOid
+            baseRefName = $PullRequest.baseRefName
+            headRepository = [pscustomobject]@{ nameWithOwner = $Repository }
+            author = $PullRequest.author
+            body = $PullRequest.body
+            # A Completed marker is validated while the live pull request is
+            # still draft, immediately before the caller performs the ready
+            # transition. The caller owns that live transition; the pure
+            # marker contract receives its terminal phase projection.
+            isDraft = if ($phase -ceq 'Completed') {
+                $false
+            }
+            else { $PullRequest.isDraft }
+            state = $PullRequest.state
+        }
+        if (-not (Test-QuickAdoptionExactPullRequestMarker `
+                -PullRequest $contractPullRequest `
+                -RemoteHead $requiredMarkerHead -Repository $Repository `
+                -Branch $Branch -BaseBranch $BaseBranch `
+                -TargetTag $ProtocolTag `
+                -TargetSha ([string]$marker.protocolSha) `
+                -ExpectedActor $ExpectedActor `
+                -ExpectedState ([string]$marker.state) `
+                -ExpectedAdoptionStrategy $contractStrategy `
+                -ExpectedProtocolSurfaces $contractSurfaces `
+                -ExpectedProtocolRecordLossAcknowledgement `
+                    $contractLossAcknowledgement -ExpectedPhase $phase)) {
+            throw 'The deterministic adoption pull request ownership marker violates the canonical capabilities contract.'
         }
     }
     if ($schema -eq 2) {
@@ -4335,47 +4439,11 @@ function Assert-AdoptionReservedProtocolSubmoduleAvailable {
 
     $rows = @(Get-AdoptionGitModulesConfigurationRows `
         -Repository $Repository -Commit $Commit -AllowAbsent)
-    $protocolPrefix = 'submodule..ai/protocol.'
-    $reservedRows = @($rows | Where-Object {
-        $row = [string]$_
-        $separator = $row.IndexOf("`n", [StringComparison]::Ordinal)
-        if ($separator -le 0) { return $false }
-        $key = $row.Substring(0, $separator)
-        $value = $row.Substring($separator + 1)
-        if ($key.StartsWith(
-            $protocolPrefix, [StringComparison]::OrdinalIgnoreCase
-        )) {
-            return $true
-        }
-        if (-not [regex]::IsMatch(
-            $key, '^submodule\..+\.path$',
-            [Text.RegularExpressions.RegexOptions]::IgnoreCase
-        )) {
-            return $false
-        }
-        $candidate = $value.Replace('\', '/').Trim('/')
-        while ($candidate.StartsWith('./', [StringComparison]::Ordinal)) {
-            $candidate = $candidate.Substring(2).TrimEnd('/')
-        }
-        return $candidate -and (
-            $candidate.Equals('.ai/protocol', [StringComparison]::OrdinalIgnoreCase) -or
-            $candidate.StartsWith('.ai/protocol/', [StringComparison]::OrdinalIgnoreCase) -or
-            '.ai/protocol'.StartsWith("$candidate/", [StringComparison]::OrdinalIgnoreCase)
-        )
-    })
-    if ($reservedRows.Count -eq 0) {
-        return
-    }
-    $expectedRows = [string[]]@(
-        "submodule..ai/protocol.path`n.ai/protocol",
-        "submodule..ai/protocol.url`nhttps://github.com/$ProtocolRepository.git"
-    )
-    [Array]::Sort($expectedRows, [StringComparer]::Ordinal)
     $protocolEntry = Get-AdoptionTreeEntry -Repository $Repository `
         -Commit $Commit -Path '.ai/protocol'
-    if (($reservedRows -join "`0") -cne ($expectedRows -join "`0") -or
-        $protocolEntry.Mode -cne '160000' -or
-        $protocolEntry.Type -cne 'commit') {
+    if (-not (Test-QuickAdoptionReservedSubmoduleContract `
+            -Rows $rows -ProtocolEntry $protocolEntry `
+            -ProtocolRepository $ProtocolRepository)) {
         throw "The reserved .gitmodules subsection '.ai/protocol' is consumer-owned or noncanonical; reconcile it manually before adoption."
     }
 }
@@ -4690,104 +4758,43 @@ function Assert-AdoptionCompletionEnvelope {
         [string]$Manifest.adoptionStrategy
     }
     else { 'LegacyUnspecified' }
-    $migrationStrategy = $strategy -cin @(
-        'FullMigration', 'HybridReconciliation', 'CleanStart'
-    )
-    $surfaceSet = [System.Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::Ordinal
-    )
+    [object[]]$protocolSurfaces = [object[]]::new(0)
     if ($null -ne $Manifest.PSObject.Properties['protocolSurfaces']) {
-        foreach ($surface in @($Manifest.protocolSurfaces)) {
-            [void]$surfaceSet.Add([string]$surface)
-        }
+        $protocolSurfaces = [object[]]@($Manifest.protocolSurfaces)
     }
-    $changedSet = [System.Collections.Generic.HashSet[string]]::new(
+    $evidencePathSet = [System.Collections.Generic.HashSet[string]]::new(
         [StringComparer]::Ordinal
     )
-    foreach ($change in @($Changes)) {
-        [void]$changedSet.Add([string]$change.Path)
+    foreach ($path in @($adoptionCanonicalTargetPaths) + $protocolSurfaces) {
+        [void]$evidencePathSet.Add([string]$path)
     }
-    $requiredPaths = @(
-        '.gitmodules', '.ai/protocol', $consumerMigrationLedgerPath
-    ) + @($adoptionAssets | ForEach-Object { [string]$_.ConsumerPath })
-    $requiredSet = [System.Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::Ordinal
-    )
-    foreach ($path in $requiredPaths) { [void]$requiredSet.Add([string]$path) }
-    $sourceEnforcedRequiredSet = [System.Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::Ordinal
-    )
-    [void]$sourceEnforcedRequiredSet.Add($consumerMigrationLedgerPath)
-    foreach ($asset in $managedUpdaterAssets) {
-        [void]$sourceEnforcedRequiredSet.Add([string]$asset.ConsumerPath)
+    foreach ($change in @($Changes | Where-Object {
+        [string]$_.Status -cne 'D'
+    })) {
+        [void]$evidencePathSet.Add([string]$change.Path)
     }
-
-    $manifestDeletions = @($Changes | Where-Object {
-        [string]$_.Status -ceq 'D' -and
-        [string]$_.Path -ceq $adoptionManifestPath
-    })
-    if ($manifestDeletions.Count -ne 1) {
-        throw 'Local Codex did not stage the one required transient manifest deletion.'
-    }
-
-    foreach ($change in @($Changes)) {
-        $status = [string]$change.Status
-        $path = [string]$change.Path
-        $basename = [IO.Path]::GetFileName($path)
-        if (@($tokenMappings.Keys | Where-Object {
-            $basename.Equals($_, [StringComparison]::OrdinalIgnoreCase)
-        }).Count -gt 0) {
-            throw "Local Codex changed credential-shaped path '$path'."
-        }
-        if ($path.Equals($workflowTargetPath, [StringComparison]::OrdinalIgnoreCase)) {
-            throw "Local Codex changed protected adoption path '$workflowTargetPath'."
-        }
-        if ($path -ceq $adoptionManifestPath) {
-            if ($status -cne 'D') {
-                throw 'The transient manifest may only be deleted during completion.'
-            }
-            continue
-        }
-        if ($requiredSet.Contains($path)) {
-            if ($status -ceq 'D') {
-                throw "Required adoption target '$path' cannot be deleted."
-            }
-            continue
-        }
-        if ($path.StartsWith('.ai/protocol/', [StringComparison]::Ordinal)) {
-            if (-not $migrationStrategy -or $status -cne 'D' -or
-                -not $surfaceSet.Contains($path)) {
-                throw "Adoption strategy '$strategy' does not authorize protocol-tree change '$path'."
-            }
-            continue
-        }
-        if ($status -ceq 'A') {
-            if (-not (Test-QuickAdoptionConsumerGovernancePath -Path $path)) {
-                throw "Adoption completion does not authorize adding application or product path '$path'."
-            }
-            continue
-        }
-        if ($status -cin @('M', 'D')) {
-            if (-not $migrationStrategy -or -not $surfaceSet.Contains($path) -or
-                -not (Test-QuickAdoptionLegacyGovernancePath -Path $path)) {
-                throw "Adoption strategy '$strategy' does not authorize changing '$path'."
-            }
-            continue
-        }
-        throw "Adoption completion does not authorize type change '$path'."
-    }
-
-    foreach ($path in $requiredPaths) {
+    $evidencePaths = [string[]]@($evidencePathSet)
+    [Array]::Sort($evidencePaths, [StringComparer]::Ordinal)
+    $finalEntries = @($evidencePaths | ForEach-Object {
+        $path = [string]$_
         $entry = if ($UseIndex) {
             Get-AdoptionTreeEntry -Repository $Repository -Path $path -UseIndex
         }
         else {
             Get-AdoptionTreeEntry -Repository $Repository -Path $path -Commit $Commit
         }
-        $expectedMode = if ($path -ceq '.ai/protocol') { '160000' } else { '100644' }
-        if ($entry.Mode -cne $expectedMode -or -not $entry.Path) {
-            throw "Required adoption target '$path' is missing or has an invalid final mode."
+        [pscustomobject]@{
+            Path = $path
+            Exists = [bool](-not [string]::IsNullOrEmpty([string]$entry.Path))
+            Mode = [string]$entry.Mode
         }
+    })
+    if (-not (Test-QuickAdoptionCompletedChangeSet `
+            -Changes @($Changes) -ExpectedAdoptionStrategy $strategy `
+            -ProtocolSurfaces $protocolSurfaces `
+            -TargetPaths $adoptionCanonicalTargetPaths `
+            -FinalEntries $finalEntries)) {
+        throw 'The adoption completion change set violates the canonical capabilities contract.'
     }
     if ($UseIndex) {
         Assert-QuickAdoptionFinalSeedWorkflowIdentity `
@@ -4800,52 +4807,6 @@ function Assert-AdoptionCompletionEnvelope {
             -Repository $Repository -Commit $Commit
         Assert-AdoptionGitModulesPreserved -Repository $Repository `
             -ProposalHead $ProposalHead -Commit $Commit
-    }
-
-    if ($strategy -ceq 'HybridReconciliation') {
-        $decisionChanges = @($Changes | Where-Object {
-            [string]$_.Status -cin @('A', 'M') -and
-            [string]$_.Path.StartsWith(
-                'docs/decisions/', [StringComparison]::Ordinal
-            ) -and
-            [string]$_.Path.EndsWith('.md', [StringComparison]::Ordinal)
-        })
-        if ($decisionChanges.Count -eq 0) {
-            throw 'Hybrid reconciliation requires a changed consumer decision that records ownership and precedence.'
-        }
-    }
-    foreach ($surface in @($surfaceSet)) {
-        if ($requiredSet.Contains($surface)) {
-            $mustReconcileRequiredSurface =
-                (Test-QuickAdoptionLegacyCommonAuthorityPath -Path $surface) -or
-                ($strategy -ceq 'CleanStart' -and
-                 -not $sourceEnforcedRequiredSet.Contains($surface))
-            if ($mustReconcileRequiredSurface -and
-                -not $changedSet.Contains($surface)) {
-                throw "Adoption strategy '$strategy' left detected required governance surface '$surface' unchanged."
-            }
-            continue
-        }
-        $entry = if ($UseIndex) {
-            Get-AdoptionTreeEntry -Repository $Repository -Path $surface -UseIndex
-        }
-        else {
-            Get-AdoptionTreeEntry -Repository $Repository -Path $surface `
-                -Commit $Commit
-        }
-        if ($strategy -ceq 'CleanStart' -and $entry.Path -and
-            (Test-QuickAdoptionLegacyGovernancePath -Path $surface)) {
-            throw "CleanStart left detected legacy governance surface '$surface' in the final tree."
-        }
-        if (Test-QuickAdoptionLegacyCommonAuthorityPath -Path $surface) {
-            if ($strategy -ceq 'FullMigration' -and $entry.Path) {
-                throw "FullMigration left legacy common authority '$surface' in the final tree."
-            }
-            if ($strategy -ceq 'HybridReconciliation' -and $entry.Path -and
-                -not $changedSet.Contains($surface)) {
-                throw "HybridReconciliation left legacy common authority '$surface' unchanged."
-            }
-        }
     }
     $baseline = Get-ExactConsumerMigrationBaseline -ProtocolSource $ProtocolSource `
         -ProtocolSha ([string]$Manifest.protocolSha)
@@ -4860,23 +4821,6 @@ function Assert-AdoptionCompletionEnvelope {
     if ($ledgerEntry.Mode -cne '100644' -or
         $ledgerEntry.Sha -cne [string]$baseline.Blob) {
         throw 'The consumer migration ledger does not match the exact protocol baseline.'
-    }
-
-    foreach ($change in @($Changes | Where-Object { [string]$_.Status -cne 'D' })) {
-        $path = [string]$change.Path
-        if ($requiredSet.Contains($path)) { continue }
-        $entry = if ($UseIndex) {
-            Get-AdoptionTreeEntry -Repository $Repository -Path $path -UseIndex
-        }
-        else {
-            Get-AdoptionTreeEntry -Repository $Repository -Path $path -Commit $Commit
-        }
-        $allowedModes = if ($path.StartsWith(
-            'tests/meandai-adoption/', [StringComparison]::Ordinal
-        )) { @('100644', '100755') } else { @('100644') }
-        if ($entry.Mode -cnotin $allowedModes -or -not $entry.Path) {
-            throw "Consumer-owned adoption path '$path' has an unsupported final type."
-        }
     }
 }
 

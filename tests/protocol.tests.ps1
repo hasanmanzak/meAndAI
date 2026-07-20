@@ -45,6 +45,8 @@ function Invoke-SuiteAndRelay {
     foreach ($line in @($result.Output)) {
         Write-Host ([string]$line)
     }
+    Write-Host (Format-MeAndAITestSuiteObservation -Owner $Suite.Owner `
+        -ElapsedMilliseconds $result.ElapsedMilliseconds)
     if ($result.ExitCode -ne 0) {
         throw "Child test suite failed: $($Suite.Owner)"
     }

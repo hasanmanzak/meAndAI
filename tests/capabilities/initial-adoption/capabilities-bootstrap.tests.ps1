@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('All', 'Contracts', 'VerticalSlices')]
+    [string]$Shard = 'All'
+)
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
@@ -198,6 +201,15 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     $cleanStartClassifier = Get-Command `
         -Name 'Test-MeAndAICleanStartSurfaceSupported' `
         -CommandType Function -ErrorAction SilentlyContinue
+    $proposalMarkerValidator = Get-Command `
+        -Name 'Test-MeAndAIExactAdoptionPullRequestMarker' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $completedChangeValidator = Get-Command `
+        -Name 'Test-MeAndAICompletedAdoptionChangeSet' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $reservedSubmoduleValidator = Get-Command `
+        -Name 'Test-MeAndAIReservedProtocolSubmoduleContract' `
+        -CommandType Function -ErrorAction SilentlyContinue
     $targetPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionTargetPaths' `
         -CommandType Function -ErrorAction SilentlyContinue
     $proposedPathGetter = Get-Command -Name 'Get-MeAndAIAdoptionProposedPaths' `
@@ -208,9 +220,12 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $null -eq $relevantPathClassifier -or
         $null -eq $pathCasingAssertion -or $null -eq $canonicalPathValidator -or
         $null -eq $legacyGovernanceClassifier -or
-        $null -eq $legacyCommonAuthorityClassifier -or
-        $null -eq $consumerGovernanceClassifier -or
-        $null -eq $cleanStartClassifier) {
+         $null -eq $legacyCommonAuthorityClassifier -or
+         $null -eq $consumerGovernanceClassifier -or
+         $null -eq $cleanStartClassifier -or
+         $null -eq $proposalMarkerValidator -or
+         $null -eq $completedChangeValidator -or
+         $null -eq $reservedSubmoduleValidator) {
         Add-Failure 'TEST-0080/TEST-0127 pure lifecycle module does not export the canonical adoption path, assessment, strategy, inventory, and manifest contract.'
     }
     else {
@@ -472,13 +487,474 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
                 Add-Failure "TEST-0080 manifest with $($entry.Key) was accepted."
             }
         }
+
+        $proposalHead = ('c' * 40)
+        $proposalMarker = [ordered]@{
+            schema = 5
+            phase = 'Proposed'
+            state = 'BootstrapReady'
+            target = 'v0.9.7'
+            protocolSha = $protocolSha
+            head = $proposalHead
+            adoptionStrategy = 'FreshAdoption'
+            protocolSurfaces = @()
+            protocolRecordLossAcknowledged = $false
+            repository = 'owner/consumer'
+            actor = 'owner'
+        } | ConvertTo-Json -Compress
+        $validPullRequest = [pscustomobject][ordered]@{
+            number = 40
+            url = 'https://github.com/owner/consumer/pull/40'
+            headRefName = 'automation/meandai-capabilities-v0.9.7'
+            headRefOid = $proposalHead
+            baseRefName = 'main'
+            headRepository = [pscustomobject]@{ nameWithOwner = 'owner/consumer' }
+            author = [pscustomobject]@{ login = 'owner' }
+            body = "<!-- meandai-capabilities-adoption:$proposalMarker -->"
+            isDraft = $true
+            state = 'OPEN'
+        }
+        $markerParameters = @{
+            RemoteHead = $proposalHead
+            Repository = 'owner/consumer'
+            Branch = 'automation/meandai-capabilities-v0.9.7'
+            BaseBranch = 'main'
+            TargetTag = 'v0.9.7'
+            TargetSha = $protocolSha
+            ExpectedActor = 'owner'
+            ExpectedState = 'BootstrapReady'
+            ExpectedAdoptionStrategy = 'FreshAdoption'
+            ExpectedProtocolSurfaces = @()
+            ExpectedProtocolRecordLossAcknowledgement = $false
+            ExpectedPhase = 'Proposed'
+        }
+        if (-not (& $proposalMarkerValidator -PullRequest $validPullRequest `
+                @markerParameters)) {
+            Add-Failure 'TEST-0145 production-owned proposal marker contract rejected canonical evidence.'
+        }
+        foreach ($markerVariant in @(
+            [pscustomobject]@{ Name = 'non-draft proposal'; Mutate = {
+                param($value) $value.isDraft = $false
+            } },
+            [pscustomobject]@{ Name = 'moved head'; Mutate = {
+                param($value) $value.headRefOid = ('d' * 40)
+            } },
+            [pscustomobject]@{ Name = 'untrusted author'; Mutate = {
+                param($value) $value.author.login = 'untrusted-actor'
+            } },
+            [pscustomobject]@{ Name = 'duplicate marker'; Mutate = {
+                param($value) $value.body += "`n$value.body"
+            } }
+        )) {
+            $variant = $validPullRequest | ConvertTo-Json -Depth 8 |
+                ConvertFrom-Json
+            & $markerVariant.Mutate $variant
+            if (& $proposalMarkerValidator -PullRequest $variant `
+                    @markerParameters) {
+                Add-Failure "TEST-0145 production-owned proposal marker contract accepted $($markerVariant.Name)."
+            }
+        }
+        $legacyPullRequest = $validPullRequest | ConvertTo-Json -Depth 8 |
+            ConvertFrom-Json
+        $legacyMarker = [ordered]@{
+            schema = 2
+            state = 'BootstrapReady'
+            target = 'v0.9.7'
+            protocolSha = $protocolSha
+            head = $proposalHead
+            repository = 'owner/consumer'
+            actor = 'owner'
+        } | ConvertTo-Json -Compress
+        $legacyPullRequest.body =
+            "<!-- meandai-capabilities-adoption:$legacyMarker -->"
+        $legacyMarkerParameters = @{}
+        foreach ($entry in $markerParameters.GetEnumerator()) {
+            $legacyMarkerParameters[$entry.Key] = $entry.Value
+        }
+        $legacyMarkerParameters.ExpectedAdoptionStrategy = 'LegacyUnspecified'
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $legacyPullRequest @legacyMarkerParameters)) {
+            Add-Failure 'TEST-0145 production marker contract rejected legacy schema-2 proposal evidence.'
+        }
+        $legacyMarkerParameters.ExpectedProtocolSurfaces = @('AGENTS.md')
+        if (& $proposalMarkerValidator `
+                -PullRequest $legacyPullRequest @legacyMarkerParameters) {
+            Add-Failure 'TEST-0145 production marker contract accepted protocol surfaces for legacy schema-2 evidence.'
+        }
+
+        $protocolEntry = [pscustomobject]@{
+            Mode = '160000'; Type = 'commit'; Sha = $protocolSha
+            Path = '.ai/protocol'
+        }
+        $canonicalSubmoduleRows = @(
+            "submodule..ai/protocol.path`n.ai/protocol",
+            "submodule..ai/protocol.url`nhttps://github.com/hasanmanzak/meAndAI.git"
+        )
+        if (-not (& $reservedSubmoduleValidator -Rows $canonicalSubmoduleRows `
+                -ProtocolEntry $protocolEntry `
+                -ProtocolRepository 'hasanmanzak/meAndAI')) {
+            Add-Failure 'TEST-0145 production-owned reserved-submodule contract rejected canonical rows.'
+        }
+        $canonicalRowsWithUnrelatedEmptyValue = @(
+            $canonicalSubmoduleRows
+            "submodule.product.ignore`n"
+        )
+        if (-not (& $reservedSubmoduleValidator `
+                -Rows $canonicalRowsWithUnrelatedEmptyValue `
+                -ProtocolEntry $protocolEntry `
+                -ProtocolRepository 'hasanmanzak/meAndAI')) {
+            Add-Failure 'TEST-0145 production-owned reserved-submodule contract rejected an unrelated empty configuration value.'
+        }
+        foreach ($reservedVariant in @(
+            [pscustomobject]@{
+                Name = 'alias exact path'
+                Rows = @(
+                    "submodule.consumer-alias.path`n.ai/protocol",
+                    "submodule.consumer-alias.url`nhttps://example.invalid/product.git"
+                )
+            },
+            [pscustomobject]@{
+                Name = 'case variant'
+                Rows = @(
+                    "submodule..AI/Protocol.path`n.AI/Protocol",
+                    "submodule..AI/Protocol.url`nhttps://example.invalid/product.git"
+                )
+            },
+            [pscustomobject]@{
+                Name = 'ancestor path'
+                Rows = @(
+                    "submodule.consumer-alias.path`n.ai",
+                    "submodule.consumer-alias.url`nhttps://example.invalid/product.git"
+                )
+            },
+            [pscustomobject]@{
+                Name = 'descendant path'
+                Rows = @(
+                    "submodule.consumer-alias.path`n.ai/protocol/vendor",
+                    "submodule.consumer-alias.url`nhttps://example.invalid/product.git"
+                )
+            }
+        )) {
+            if (& $reservedSubmoduleValidator -Rows $reservedVariant.Rows `
+                    -ProtocolEntry ([pscustomobject]@{
+                        Mode = ''; Type = ''; Sha = ''; Path = ''
+                    }) -ProtocolRepository 'hasanmanzak/meAndAI') {
+                Add-Failure "TEST-0145 production-owned reserved-submodule contract accepted $($reservedVariant.Name)."
+            }
+        }
+
+        $completionEntries = @($actualTargetPaths | ForEach-Object {
+            [pscustomobject]@{
+                Path = [string]$_
+                Exists = $true
+                Mode = if ([string]$_ -ceq '.ai/protocol') {
+                    '160000'
+                }
+                else { '100644' }
+            }
+        }) + @([pscustomobject]@{
+            Path = 'docs/governance/adoption-complete.md'
+            Exists = $true
+            Mode = '100644'
+        })
+        $freshCompletionChanges = @(
+            [pscustomobject]@{
+                Status = 'D'; Path = '.ai/adoption/meandai-capabilities.json'
+            },
+            [pscustomobject]@{
+                Status = 'A'; Path = 'docs/governance/adoption-complete.md'
+            }
+        )
+        $completionParameters = @{
+            ExpectedAdoptionStrategy = 'FreshAdoption'
+            ProtocolSurfaces = @()
+            TargetPaths = $actualTargetPaths
+            FinalEntries = $completionEntries
+        }
+        if (-not (& $completedChangeValidator `
+                -Changes $freshCompletionChanges @completionParameters)) {
+            Add-Failure 'TEST-0145 production-owned completion contract rejected the canonical FreshAdoption change set.'
+        }
+        if (-not (& $completedChangeValidator `
+                -Changes $freshCompletionChanges `
+                -ExpectedAdoptionStrategy 'LegacyUnspecified' `
+                -ProtocolSurfaces @() -TargetPaths $actualTargetPaths `
+                -FinalEntries $completionEntries)) {
+            Add-Failure 'TEST-0145 production-owned completion contract rejected a canonical legacy change set.'
+        }
+        if (& $completedChangeValidator `
+                -Changes @(
+                    $freshCompletionChanges + [pscustomobject]@{
+                        Status = 'M'; Path = 'AGENTS.md'
+                    }
+                ) -ExpectedAdoptionStrategy 'HybridReconciliation' `
+                -ProtocolSurfaces @('AGENTS.md') `
+                -TargetPaths $actualTargetPaths `
+                -FinalEntries $completionEntries) {
+            Add-Failure 'TEST-0145 production-owned completion contract accepted HybridReconciliation without a changed decision record.'
+        }
+        $nullFinalEntriesAccepted = $false
+        $nullFinalEntriesError = ''
+        try {
+            $nullFinalEntriesAccepted = [bool](& $completedChangeValidator `
+                -Changes $freshCompletionChanges `
+                -ExpectedAdoptionStrategy 'FreshAdoption' `
+                -ProtocolSurfaces @() -TargetPaths $actualTargetPaths `
+                -FinalEntries $null)
+        }
+        catch {
+            $nullFinalEntriesError = $_.Exception.Message
+        }
+        if ($nullFinalEntriesError -or $nullFinalEntriesAccepted) {
+            Add-Failure "TEST-0145 production-owned completion contract did not fail closed for null-equivalent empty final-entry evidence: $nullFinalEntriesError"
+        }
+        foreach ($invalidCompletion in @(
+            [pscustomobject]@{
+                Name = 'credential addition'
+                Change = [pscustomobject]@{ Status = 'A'; Path = 'FG_PAT.txt' }
+            },
+            [pscustomobject]@{
+                Name = 'credential case variant'
+                Change = [pscustomobject]@{ Status = 'A'; Path = 'fg_pat.txt' }
+            },
+            [pscustomobject]@{
+                Name = 'nested credential'
+                Change = [pscustomobject]@{ Status = 'A'; Path = 'secrets/FG_PAT.txt' }
+            },
+            [pscustomobject]@{
+                Name = 'protected workflow modification'
+                Change = [pscustomobject]@{
+                    Status = 'M'
+                    Path = '.github/workflows/meandai-protocol-update.yml'
+                }
+            },
+            [pscustomobject]@{
+                Name = 'manifest retention'
+                Change = [pscustomobject]@{
+                    Status = 'M'
+                    Path = '.ai/adoption/meandai-capabilities.json'
+                }
+            },
+            [pscustomobject]@{
+                Name = 'application addition'
+                Change = [pscustomobject]@{ Status = 'A'; Path = 'src/new.txt' }
+            },
+            [pscustomobject]@{
+                Name = 'application modification'
+                Change = [pscustomobject]@{ Status = 'M'; Path = 'src/app.txt' }
+            },
+            [pscustomobject]@{
+                Name = 'application deletion'
+                Change = [pscustomobject]@{ Status = 'D'; Path = 'src/app.txt' }
+            }
+        )) {
+            $changes = if ($invalidCompletion.Name -ceq 'manifest retention') {
+                @($invalidCompletion.Change, $freshCompletionChanges[1])
+            }
+            else { @($freshCompletionChanges + $invalidCompletion.Change) }
+            if (& $completedChangeValidator -Changes $changes `
+                    @completionParameters) {
+                Add-Failure "TEST-0145 production-owned completion contract accepted $($invalidCompletion.Name)."
+            }
+        }
+
+        $strategyEntries = @($completionEntries) + @(
+            [pscustomobject]@{
+                Path = 'CLAUDE.md'; Exists = $false; Mode = ''
+            },
+            [pscustomobject]@{
+                Path = '.cursor/rules/consumer.mdc'; Exists = $false; Mode = ''
+            },
+            [pscustomobject]@{
+                Path = '.windsurf/rules/consumer.md'; Exists = $true; Mode = '100644'
+            }
+        )
+        $validFullChanges = @(
+            $freshCompletionChanges[0],
+            $freshCompletionChanges[1],
+            [pscustomobject]@{ Status = 'M'; Path = 'AGENTS.md' },
+            [pscustomobject]@{ Status = 'D'; Path = 'CLAUDE.md' }
+        )
+        if (-not (& $completedChangeValidator -Changes $validFullChanges `
+                -ExpectedAdoptionStrategy 'FullMigration' `
+                -ProtocolSurfaces @('AGENTS.md', 'CLAUDE.md') `
+                -TargetPaths $actualTargetPaths -FinalEntries $strategyEntries)) {
+            Add-Failure 'TEST-0145 production-owned completion contract rejected canonical FullMigration changes.'
+        }
+        $completedContractVariants = @(
+            [pscustomobject]@{
+                Name = 'completed-fullmigration-bootstrap-ready'
+                Strategy = 'FullMigration'
+                CommonStatus = 'D'
+                ExtraPaths = @()
+                ExtraStatus = @()
+            },
+            [pscustomobject]@{
+                Name = 'completed-fullmigration-cursor-rule'
+                Strategy = 'FullMigration'
+                CommonStatus = 'D'
+                ExtraPaths = @('.cursor/rules/consumer.mdc')
+                ExtraStatus = @('D')
+            },
+            [pscustomobject]@{
+                Name = 'completed-hybrid-windsurf-rule'
+                Strategy = 'HybridReconciliation'
+                CommonStatus = 'M'
+                ExtraPaths = @('.windsurf/rules/consumer.md')
+                ExtraStatus = @('M')
+            },
+            [pscustomobject]@{
+                Name = 'completed-fullmigration-cursor-root-gitlink'
+                Strategy = 'FullMigration'
+                CommonStatus = 'D'
+                ExtraPaths = @('.cursor/rules')
+                ExtraStatus = @('D')
+            },
+            [pscustomobject]@{
+                Name = 'completed-cleanstart-cursor-root-gitlink'
+                Strategy = 'CleanStart'
+                CommonStatus = 'D'
+                ExtraPaths = @('.cursor/rules')
+                ExtraStatus = @('D')
+            },
+            [pscustomobject]@{
+                Name = 'completed-fullmigration-github-instructions-root-gitlink'
+                Strategy = 'FullMigration'
+                CommonStatus = 'D'
+                ExtraPaths = @('.github/instructions')
+                ExtraStatus = @('D')
+            },
+            [pscustomobject]@{
+                Name = 'completed-hybrid-github-instructions-descendant'
+                Strategy = 'HybridReconciliation'
+                CommonStatus = 'M'
+                ExtraPaths = @('.github/instructions/foo.instructions.md')
+                ExtraStatus = @('M')
+            },
+            [pscustomobject]@{
+                Name = 'completed-cleanstart-github-instructions-root-gitlink'
+                Strategy = 'CleanStart'
+                CommonStatus = 'D'
+                ExtraPaths = @('.github/instructions')
+                ExtraStatus = @('D')
+            },
+            [pscustomobject]@{
+                Name = 'completed-fullmigration-nested-protocol-surfaces'
+                Strategy = 'FullMigration'
+                CommonStatus = 'D'
+                ExtraPaths = @(
+                    '.ai/protocol/legacy-a.md',
+                    '.ai/protocol/legacy-b.md'
+                )
+                ExtraStatus = @('D', 'D')
+            }
+        )
+        foreach ($contractVariant in $completedContractVariants) {
+            $variantSurfaces = @(
+                @('AGENTS.md', 'CLAUDE.md') +
+                @($contractVariant.ExtraPaths)
+            )
+            [Array]::Sort($variantSurfaces, [StringComparer]::Ordinal)
+            $variantChanges = [System.Collections.Generic.List[object]]::new()
+            foreach ($change in $freshCompletionChanges) {
+                $variantChanges.Add($change)
+            }
+            $variantChanges.Add([pscustomobject]@{
+                Status = 'M'; Path = 'AGENTS.md'
+            })
+            $variantChanges.Add([pscustomobject]@{
+                Status = [string]$contractVariant.CommonStatus
+                Path = 'CLAUDE.md'
+            })
+            $variantEntries = [System.Collections.Generic.List[object]]::new()
+            foreach ($entry in $completionEntries) {
+                $variantEntries.Add($entry)
+            }
+            $commonExists = [string]$contractVariant.CommonStatus -cne 'D'
+            $variantEntries.Add([pscustomobject]@{
+                Path = 'CLAUDE.md'
+                Exists = [bool]$commonExists
+                Mode = if ($commonExists) { '100644' } else { '' }
+            })
+            for ($variantIndex = 0;
+                 $variantIndex -lt @($contractVariant.ExtraPaths).Count;
+                 $variantIndex++) {
+                $status = [string]$contractVariant.ExtraStatus[$variantIndex]
+                $path = [string]$contractVariant.ExtraPaths[$variantIndex]
+                $variantChanges.Add([pscustomobject]@{
+                    Status = $status; Path = $path
+                })
+                $exists = $status -cne 'D'
+                $variantEntries.Add([pscustomobject]@{
+                    Path = $path
+                    Exists = [bool]$exists
+                    Mode = if ($exists) { '100644' } else { '' }
+                })
+            }
+            if ([string]$contractVariant.Strategy -ceq
+                'HybridReconciliation') {
+                $variantChanges.Add([pscustomobject]@{
+                    Status = 'A'
+                    Path = 'docs/decisions/DEC-fixture.md'
+                })
+                $variantEntries.Add([pscustomobject]@{
+                    Path = 'docs/decisions/DEC-fixture.md'
+                    Exists = $true
+                    Mode = '100644'
+                })
+            }
+            if (-not (& $completedChangeValidator `
+                    -Changes @($variantChanges) `
+                    -ExpectedAdoptionStrategy `
+                        ([string]$contractVariant.Strategy) `
+                    -ProtocolSurfaces $variantSurfaces `
+                    -TargetPaths $actualTargetPaths `
+                    -FinalEntries @($variantEntries))) {
+                Add-Failure "TEST-0145 production completion contract rejected '$($contractVariant.Name)'."
+            }
+        }
+        $retainedCommonEntries = @($strategyEntries | ForEach-Object {
+            if ([string]$_.Path -ceq 'CLAUDE.md') {
+                [pscustomobject]@{ Path = 'CLAUDE.md'; Exists = $true; Mode = '100644' }
+            }
+            else { $_ }
+        })
+        if (& $completedChangeValidator `
+                -Changes @($freshCompletionChanges + [pscustomobject]@{
+                    Status = 'M'; Path = 'AGENTS.md'
+                }) -ExpectedAdoptionStrategy 'FullMigration' `
+                -ProtocolSurfaces @('AGENTS.md', 'CLAUDE.md') `
+                -TargetPaths $actualTargetPaths `
+                -FinalEntries $retainedCommonEntries) {
+            Add-Failure 'TEST-0145 FullMigration retained a common authority surface.'
+        }
+        if (& $completedChangeValidator -Changes @(
+                $freshCompletionChanges,
+                [pscustomobject]@{ Status = 'M'; Path = 'CLAUDE.md' }
+            ) -ExpectedAdoptionStrategy 'HybridReconciliation' `
+                -ProtocolSurfaces @('AGENTS.md', 'CLAUDE.md') `
+                -TargetPaths $actualTargetPaths `
+                -FinalEntries (@($retainedCommonEntries))) {
+            Add-Failure 'TEST-0145 HybridReconciliation accepted an unchanged required authority surface.'
+        }
+        if (& $completedChangeValidator -Changes @(
+                $freshCompletionChanges,
+                [pscustomobject]@{
+                    Status = 'D'; Path = '.ai/protocol/legacy-b.md'
+                }
+            ) -ExpectedAdoptionStrategy 'FullMigration' `
+                -ProtocolSurfaces @('.ai/protocol/legacy-a.md') `
+                -TargetPaths $actualTargetPaths `
+                -FinalEntries $completionEntries) {
+            Add-Failure 'TEST-0145 completion contract accepted an undeclared nested protocol deletion.'
+        }
     }
 }
 
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.12.2',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.12.3',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',
@@ -593,9 +1069,9 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
         'Get-MeAndAIProtocolAssessmentLimits',
         'Test-MeAndAIProtocolAssessmentRelevantPath -Path $path',
         'Assert-MeAndAIProtocolAssessmentPathCasing -Path $path',
-        'Test-MeAndAIConsumerGovernancePath -Path $Path',
-        'Test-MeAndAILegacyGovernancePath -Path $path',
-        'Test-MeAndAILegacyCommonAuthorityPath -Path $surface',
+        'Test-MeAndAIExactAdoptionPullRequestMarker',
+        'Test-MeAndAICompletedAdoptionChangeSet',
+        'Test-MeAndAIReservedProtocolSubmoduleContract',
         'BlockedManualReview',
         'ValidateLocalUpdaterOnly'
     )) {
@@ -614,7 +1090,11 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
         '$LegacyCommonAuthorityFiles', '$LegacyAiGovernanceFiles',
         'function Test-AssessmentRelevantPath',
         'function Test-CompletedLegacyGovernancePath',
-        'function Test-CompletedLegacyCommonAuthorityPath'
+        'function Test-CompletedLegacyCommonAuthorityPath',
+        'function Test-ExactCanonicalSurfaceSequence',
+        'Test-MeAndAIConsumerGovernancePath -Path $Path',
+        'Test-MeAndAILegacyGovernancePath -Path $path',
+        'Test-MeAndAILegacyCommonAuthorityPath -Path $surface'
     )) {
         if ($adapter.Contains($duplicatedPolicy)) {
             Add-Failure "TEST-0127 bootstrap adapter duplicates module-owned assessment policy '$duplicatedPolicy'."
@@ -657,7 +1137,7 @@ $adapterTestPath = Join-Path $root 'tests/capabilities/initial-adoption/capabili
 if (-not (Test-Path -LiteralPath $adapterTestPath -PathType Leaf)) {
     Add-Failure 'TEST-0028 missing bootstrap adapter integration tests.'
 }
-elseif ($failures.Count -eq 0) {
+elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
     $engine = (Get-Process -Id $PID).Path
     & $engine -NoProfile -ExecutionPolicy Bypass -File $adapterTestPath
     if ($LASTEXITCODE -ne 0) {
@@ -672,8 +1152,13 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in this suite.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
-    -SourcePaths @($PSCommandPath, $adapterTestPath) `
-    -AuthorityPath $scenarioAuthorityPath
-Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
+if ($Shard -ceq 'All') {
+    $scenarioResult = New-MeAndAIScenarioResult `
+        -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
+        -SourcePaths @($PSCommandPath, $adapterTestPath) `
+        -AuthorityPath $scenarioAuthorityPath
+    Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
+}
+else {
+    Write-Host "AI capabilities lifecycle shard '$Shard' passed." -ForegroundColor Green
+}

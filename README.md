@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.12.2**
+Current protocol version: **0.12.3**
 
-For v0.12.2, publication authority is the repository's
+For v0.12.3, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[issue #85](https://github.com/hasanmanzak/meAndAI/issues/85); this file does
+[issue #87](https://github.com/hasanmanzak/meAndAI/issues/87); this file does
 not assert a pre-merge release state.
 
 ## Start here
@@ -61,5 +61,5 @@ The canonical [feature index](docs/features/README.md),
 the detailed work and release history. The overview deliberately does not
 duplicate that changing inventory.
 
-This repository is private. A consuming environment must have GitHub access to
-clone or update the reference.
+The repository is publicly readable. An environment using authenticated GitHub
+operations must still provide credentials appropriate to those operations.

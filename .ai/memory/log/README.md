@@ -5,16 +5,18 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.12.2 work isolates fixture job summaries, reuses only exact already-
-green merge trees on `main`, and keeps live delivery facts outside candidate
-commits. Follow
-[FEAT-0034](../../../docs/features/FEAT-0034-ci-evidence-hygiene/README.md)
-and the [v0.12.2 continuation](2026-07-19-v0122-ci-evidence-hygiene.md).
-[Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) owns external
-delivery facts. `FIND-0120` remains the separate open follow-up in issue #44.
+The v0.12.3 pre-merge candidate corrects full-suite runtime without reducing
+scenario, variant, runtime, native-Windows, or fail-closed evidence. Follow
+[FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
+and the [v0.12.3 closure record](2026-07-20-v0123-test-runtime-efficiency-closure.md).
+[Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) owns delivery and
+future publication evidence. Final full candidate validation and hosted CI
+remain mandatory; `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-20 - v0.12.3 test runtime efficiency closure](2026-07-20-v0123-test-runtime-efficiency-closure.md)
+- [2026-07-19 - v0.12.3 test runtime efficiency handoff](2026-07-19-v0123-test-runtime-efficiency.md)
 - [2026-07-19 - v0.12.2 CI evidence hygiene and exact-tree reuse](2026-07-19-v0122-ci-evidence-hygiene.md)
 - [2026-07-19 - v0.12.1 canonical base-blob migration planning](2026-07-19-v0121-canonical-base-blob-planning.md)
 - [2026-07-19 - v0.12.0 capability framework and test architecture](2026-07-19-v0120-capability-test-architecture.md)
