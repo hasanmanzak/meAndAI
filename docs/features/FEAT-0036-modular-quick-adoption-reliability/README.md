@@ -138,7 +138,7 @@ malformed record that this defect could produce.
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0067` | Mechanical module extraction, thin verified bootstrapper, deterministic bundle, and publication contract | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | Final `TEST-0147` passed on PS5.1 in 17.7 seconds; focused publication owner passed in 1.7 seconds | Public parity, exact Git-blob builder, trust order, archive containment, token environment, import, publication binding, and cleanup reviewed; `FIND-0184` through `FIND-0190` resolved | Complete; hosted evidence pending externally |
 | `SUBF-0068` | Explicit bounded retry for idempotent GitHub API reads | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0148` passed with `TEST-0149` on PS5.1 in 23.4 seconds | GET-only declaration, classification, attempt cap, delay, paged-attempt reset, final diagnostics, and single-attempt mutations reviewed | Complete; hosted evidence pending externally |
-| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0149` passed with `TEST-0148` on PS5.1 in 23.4 seconds, including stale v0.12.1 repair while targeting v0.12.4 | Exact UTF-8 bytes, argv exclusion, temp cleanup, actor/repository/duplicate/ref/PR/backlink proofs, pre/post refetch, ordinal near matches, and idempotency reviewed | Complete; hosted evidence pending externally |
+| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0149` passed with `TEST-0148` on PS5.1 in 23.4 seconds, including stale v0.12.1 repair while targeting v0.12.4; the focused finalization owner passed in 11.1 seconds after its hosted fixture correction | Exact UTF-8 bytes, argv exclusion, temp cleanup, actor/repository/duplicate/ref/PR/backlink proofs, pre/post refetch, ordinal near matches, idempotency, and the finalization fake's authenticated-actor/body-file parity reviewed | Complete; hosted evidence pending externally |
 
 ## Definition of Ready
 
@@ -223,6 +223,7 @@ observations before the focused green evidence:
 | `FIND-0189` | `SUBF-0067` | Post-publication bundle inspection was weaker than runtime inspection for non-regular entry kinds, canonical entry order, and pre-download asset size bounds. | `Blocking` -> resolved by parity checks, tight launcher and bundle bounds before download, and order/kind/oversize negatives. |
 | `FIND-0190` | `SUBF-0067` | Builder tests could pass while comparing transformed worktree bytes, and their partial-output case failed before an output existed. | `Blocking` -> resolved by transform-sensitive Git-blob authority and an injected post-write failure proving partial-output removal. |
 | `FIND-0191` | `SUBF-0069` | Stale-issue derivation compared its reserved branch allowlist case-insensitively, wider than the exact historical generator contract. | `Blocking` -> resolved by ordinal branch membership and a case-variant reserved-branch negative. |
+| `FIND-0192` | `SUBF-0069` | The hosted finalization fake still assumed every API endpoint began with `repos/` and every body was inline, so the new authenticated-actor read and safe `body=@file` transport failed before exercising legacy repair. | `Blocking` -> resolved by exact `user` endpoint/token handling, UTF-8 body-file decoding at all affected fake mutations, and retained stack traces for actionable hosted diagnostics; the focused PS5.1 owner passed. |
 
 Fresh-diff review for `SUBF-0067` also bound both release assets to the exact
 released source commit and aligned publication archive checks with the runtime
@@ -231,7 +232,10 @@ the explicit GET boundary, incomplete paginated attempts are discarded, and
 mutations remain single-attempt. Fresh-diff review for `SUBF-0069` confirmed
 that structured bodies never enter native argv and that exact legacy repair is
 a pre-mutation, refetched, fail-closed exception rather than parser
-compatibility, including ordinal reserved-branch identity. No unresolved `Blocking` observation remains in those focused
+compatibility, including ordinal reserved-branch identity. The first hosted run
+then exposed `FIND-0192` in an older finalization fake rather than production;
+the focused cross-scenario owner passed after the fake adopted the same actor and
+body-file contracts. No unresolved `Blocking` observation remains in those focused
 slice reviews.
 
 The final feature review and local convergence scan completed across tracked

@@ -610,6 +610,27 @@ function global:git {
     throw "Unexpected fake git command: $($arguments -join ' ')"
 }
 
+function Get-TestGhBody {
+    param([Parameter(Mandatory)][string[]]$Arguments)
+
+    $bodyArguments = @($Arguments | Where-Object {
+        ([string]$_).StartsWith('body=', [StringComparison]::Ordinal)
+    })
+    if ($bodyArguments.Count -ne 1) {
+        throw "Expected exactly one fake gh body field: $($Arguments -join ' ')"
+    }
+    $body = ([string]$bodyArguments[0]).Substring('body='.Length)
+    if (-not $body.StartsWith('@', [StringComparison]::Ordinal)) {
+        return $body
+    }
+
+    $bodyPath = $body.Substring(1)
+    if (-not [IO.File]::Exists($bodyPath)) {
+        throw "Fake gh body file does not exist: $bodyPath"
+    }
+    return [IO.File]::ReadAllText($bodyPath, [Text.UTF8Encoding]::new($false))
+}
+
 function global:gh {
     $scenario = $global:MeAndAIFinalizationScenario
     $arguments = @($args | ForEach-Object { [string]$_ })
@@ -619,11 +640,24 @@ function global:gh {
         throw "Unexpected fake gh command: $($arguments -join ' ')"
     }
 
-    $endpoint = @($arguments | Where-Object { $_ -like 'repos/*' })[0]
+    $endpoints = @($arguments | Where-Object {
+        [string]$_ -ceq 'user' -or [string]$_ -like 'repos/*'
+    })
+    if ($endpoints.Count -ne 1) {
+        throw "Expected exactly one fake gh API endpoint: $($arguments -join ' ')"
+    }
+    $endpoint = [string]$endpoints[0]
     $method = 'GET'
     $methodIndex = [array]::IndexOf($arguments, '--method')
     if ($methodIndex -ge 0) {
         $method = [string]$arguments[$methodIndex + 1]
+    }
+    if ($endpoint -ceq 'user') {
+        if ($env:GH_TOKEN -cne 'test-finalizer-token') {
+            throw 'Authenticated actor lookup crossed the updater credential boundary.'
+        }
+        [ordered]@{ login = $scenario.HeadAuthor } | ConvertTo-Json -Compress
+        return
     }
     if ($endpoint -like 'repos/hasanmanzak/meAndAI/*') {
         if ($env:GH_TOKEN -cne 'test-protocol-token') {
@@ -680,8 +714,7 @@ function global:gh {
     }
     if ($endpoint -ceq 'repos/owner/consumer/pulls/42') {
         if ($method -ceq 'PATCH') {
-            $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
-            $scenario.Body = $bodyArgument.Substring('body='.Length)
+            $scenario.Body = Get-TestGhBody -Arguments $arguments
             Add-FinalizationEvent 'repair-tracking-line'
         }
         Add-FinalizationEvent 'read-pull-request'
@@ -773,9 +806,8 @@ function global:gh {
     }
     if ($endpoint -ceq 'repos/owner/consumer/issues' -and $method -ceq 'POST') {
         $titleArgument = @($arguments | Where-Object { $_ -like 'title=*' })[0]
-        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
         $scenario.IssueTitle = $titleArgument.Substring('title='.Length)
-        $scenario.IssueBody = $bodyArgument.Substring('body='.Length)
+        $scenario.IssueBody = Get-TestGhBody -Arguments $arguments
         $scenario.IssueState = 'open'
         $scenario.IssueExists = $true
         $scenario.IssueLabels = [System.Collections.Generic.List[string]]::new(
@@ -876,8 +908,7 @@ function global:gh {
     }
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/comments" -and
         $method -ceq 'POST') {
-        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
-        $body = $bodyArgument.Substring('body='.Length)
+        $body = Get-TestGhBody -Arguments $arguments
         if ($body.StartsWith(
             '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
         )) {
@@ -930,6 +961,9 @@ function Invoke-FinalizationScenario {
     catch {
         $threw = $true
         $errorMessage = $_.Exception.Message
+        if (-not [string]::IsNullOrWhiteSpace([string]$_.ScriptStackTrace)) {
+            $errorMessage += " [$($_.ScriptStackTrace)]"
+        }
     }
     finally {
         try {
