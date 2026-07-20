@@ -2,12 +2,13 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-20**<br>
-Protocol version: **0.12.4**
+Protocol version: **0.12.5**
 
-Exact v0.12.4 publication state will be authoritative only in
+The immutable v0.12.4 release is published. Exact v0.12.5 publication state
+will be authoritative only in
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases),
-[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after
-publication; it is not predicted or projected into this pre-merge memory file.
+[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after publication;
+it is not predicted or projected into this pre-merge memory file.
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

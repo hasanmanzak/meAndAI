@@ -1813,7 +1813,7 @@ function Ensure-ProtocolUpdateIssue {
     $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
         -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch `
         -ProposalKind $ProposalKind -MigrationPlanSha $MigrationPlanSha
-    $matches = [System.Collections.Generic.List[object]]::new()
+    $canonicalIssues = [System.Collections.Generic.List[object]]::new()
     foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
         $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
         if ($marker.Schema -eq 0) { continue }
@@ -1826,30 +1826,62 @@ function Ensure-ProtocolUpdateIssue {
                 [string]$issue.state -cnotin @('open', 'closed')) {
                 throw 'A canonically marked protocol-update issue has drifted from its exact owned record.'
             }
-            $matches.Add($issue)
+            $canonicalIssues.Add($issue)
         }
     }
-    if ($matches.Count -gt 1) {
+    if ($canonicalIssues.Count -gt 1) {
         throw 'More than one canonical protocol-update issue exists for the same immutable target.'
     }
-    if ($matches.Count -eq 0) {
-        Invoke-GhMutationWithBodyFile -Method POST `
+    if ($canonicalIssues.Count -eq 0) {
+        $createdIssue = Invoke-GhMutationWithBodyFile -Method POST `
             -Endpoint "repos/$Repository/issues" -Body ([string]$contract.Body) `
             -Fields @(
                 "title=$($contract.Title)", 'labels[]=type:task',
                 'labels[]=priority:p1', 'labels[]=status:needs-review'
-            ) -Token ([string]$env:ISSUE_TOKEN) | Out-Null
+            ) -Token ([string]$env:ISSUE_TOKEN)
+        $createdNumberText = if ($null -eq $createdIssue) { '' } else {
+            [string]$createdIssue.number
+        }
+        if ($createdNumberText -cnotmatch '^[1-9][0-9]*$') {
+            throw 'The created protocol-update issue response has no exact issue identity.'
+        }
+        $createdNumber = [int]$createdNumberText
+        $createdIssue = Invoke-GhReadJson `
+            -Endpoint "repos/$Repository/issues/$createdNumber" `
+            -Token ([string]$env:ISSUE_TOKEN)
+        $createdMarker = Get-ManagedUpdateIssueMarker `
+            -Body ([string]$createdIssue.body)
+        $createdBody = ([string]$createdIssue.body).Replace(
+            "`r`n", "`n"
+        ).TrimEnd([char[]]"`r`n")
+        $expectedBody = ([string]$contract.Body).Replace(
+            "`r`n", "`n"
+        ).TrimEnd([char[]]"`r`n")
+        if ([string]$createdIssue.number -cne $createdNumberText -or
+            $createdMarker.CanonicalLine -cne [string]$contract.Marker -or
+            [string]$createdIssue.title -cne [string]$contract.Title -or
+            $createdBody -cne $expectedBody -or
+            [string]$createdIssue.state -cne 'open' -or
+            [string]::IsNullOrWhiteSpace([string]$createdIssue.user.login) -or
+            $null -ne $createdIssue.PSObject.Properties['pull_request']) {
+            throw 'The created protocol-update issue did not converge to its exact owned record.'
+        }
+
+        $visibleMatches = [System.Collections.Generic.List[object]]::new()
         foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
             $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
             if ($marker.CanonicalLine -ceq $contract.Marker) {
-                $matches.Add($issue)
+                $visibleMatches.Add($issue)
             }
         }
-        if ($matches.Count -ne 1) {
-            throw 'The canonical protocol-update issue did not converge after creation.'
+        if ($visibleMatches.Count -gt 1 -or
+            ($visibleMatches.Count -eq 1 -and
+                [string]$visibleMatches[0].number -cne $createdNumberText)) {
+            throw 'The canonical protocol-update issue inventory raced after creation.'
         }
+        $canonicalIssues.Add($createdIssue)
     }
-    $canonical = $matches[0]
+    $canonical = $canonicalIssues[0]
     if ([string]$canonical.state -ceq 'closed') {
         Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
             'api', '--method', 'PATCH', "repos/$Repository/issues/$($canonical.number)",

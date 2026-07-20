@@ -815,9 +815,9 @@ catch {
 $script:RepairState = New-RepairState
 try {
     $staleRepaired = Repair-LegacyQuoteStrippedProtocolUpdateIssue `
-        -Repository $repository -TargetTag 'v0.12.4' `
+        -Repository $repository -TargetTag 'v0.12.5' `
         -ProtocolSha ('b' * 40) `
-        -Branch 'automation/meandai-protocol-v0.12.4-recovery' `
+        -Branch 'automation/meandai-protocol-v0.12.5-recovery' `
         -ProposalKind Update -MigrationPlanSha ('c' * 64) `
         -TrustedActor $trustedActor
     if ($staleRepaired -isnot [bool] -or -not [bool]$staleRepaired -or

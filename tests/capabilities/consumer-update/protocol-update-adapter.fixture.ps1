@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [switch]$NativeStderrOnly,
-    [switch]$SuccessOnly
+    [switch]$SuccessOnly,
+    [switch]$CreatedIssueLagOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -1617,6 +1618,7 @@ function global:gh {
             $body = Get-FakeGhBodyFileContent -Arguments $arguments
             $issue = [pscustomobject]@{
                 number = 130; title = $title; body = $body; state = 'open'
+                user = [pscustomobject]@{ login = $script:Scenario.IssueAuthorLogin }
                 labels = @(
                     [pscustomobject]@{ name = 'type:task' },
                     [pscustomobject]@{ name = 'priority:p1' },
@@ -1624,14 +1626,47 @@ function global:gh {
                 )
                 comments = [System.Collections.Generic.List[object]]::new()
             }
-            $script:Scenario.Issues.Add($issue)
+            if ($script:Scenario.CreatedIssueInventoryLag) {
+                $script:Scenario.PendingCreatedIssue = $issue
+            }
+            else { $script:Scenario.Issues.Add($issue) }
             Add-ScenarioEvent 'create-update-issue'
             $issue | ConvertTo-Json -Depth 6 -Compress
             return
         }
         if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)$') {
             $number = [int]$Matches.number
-            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })
+            $issue = @($script:Scenario.Issues | Where-Object {
+                [int]$_.number -eq $number
+            })
+            if ($issue.Count -eq 0 -and
+                $null -ne $script:Scenario.PendingCreatedIssue -and
+                [int]$script:Scenario.PendingCreatedIssue.number -eq $number) {
+                $issue = @($script:Scenario.PendingCreatedIssue)
+                $script:Scenario.CreatedIssueIdentityReads++
+                if ($script:Scenario.CreatedIssueInventoryRace -and
+                    $script:Scenario.CreatedIssueIdentityReads -eq 1) {
+                    $script:Scenario.Issues.Add([pscustomobject]@{
+                        number = 131
+                        title = [string]$script:Scenario.PendingCreatedIssue.title
+                        body = [string]$script:Scenario.PendingCreatedIssue.body
+                        state = 'open'
+                        user = [pscustomobject]@{
+                            login = $script:Scenario.IssueAuthorLogin
+                        }
+                        labels = @($script:Scenario.PendingCreatedIssue.labels)
+                        comments = [System.Collections.Generic.List[object]]::new()
+                    })
+                    Add-ScenarioEvent 'race-created-issue-became-visible'
+                }
+                elseif ($script:Scenario.CreatedIssueIdentityReads -ge 2) {
+                    $script:Scenario.Issues.Add(
+                        $script:Scenario.PendingCreatedIssue
+                    )
+                    $script:Scenario.PendingCreatedIssue = $null
+                    Add-ScenarioEvent 'created-issue-became-visible-by-identity'
+                }
+            }
             if ($issue.Count -ne 1) { throw "Mock issue #$number is not exact." }
             $issue = $issue[0]
             if ($method -eq 'PATCH') {
@@ -1650,7 +1685,20 @@ function global:gh {
         if ($endpoint -match '^repos/owner/consumer/issues/(?<number>[0-9]+)/labels$' -and
             $method -eq 'POST') {
             $number = [int]$Matches.number
-            $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
+            $issueMatches = @($script:Scenario.Issues | Where-Object {
+                [int]$_.number -eq $number
+            })
+            if ($issueMatches.Count -gt 1) {
+                throw "Mock issue #$number is not unique."
+            }
+            $issue = if ($issueMatches.Count -eq 1) {
+                $issueMatches[0]
+            } else { $null }
+            if ($null -eq $issue -and
+                $null -ne $script:Scenario.PendingCreatedIssue -and
+                [int]$script:Scenario.PendingCreatedIssue.number -eq $number) {
+                $issue = $script:Scenario.PendingCreatedIssue
+            }
             foreach ($argument in @($arguments | Where-Object {
                 ([string]$_).StartsWith('labels[]=', [StringComparison]::Ordinal)
             })) {
@@ -1988,6 +2036,8 @@ function Invoke-AdapterScenario {
         [bool]$WrongCommittedMigrationBlob = $false,
         [bool]$WrongTargetAssetBlob = $false,
         [bool]$MissingManagedLabels = $false,
+        [bool]$CreatedIssueInventoryLag = $false,
+        [bool]$CreatedIssueInventoryRace = $false,
         [bool]$ReservedOrphanBranchExists = $false,
         [bool]$ReservedNamespaceRace = $false,
         [int]$LeadingUnmanagedCount = 0,
@@ -2265,6 +2315,11 @@ function Invoke-AdapterScenario {
         Events = [System.Collections.Generic.List[string]]::new()
         GhCalls = [System.Collections.Generic.List[object]]::new()
         Issues = $issues
+        CreatedIssueInventoryLag = $CreatedIssueInventoryLag
+        CreatedIssueInventoryRace = $CreatedIssueInventoryRace
+        PendingCreatedIssue = $null
+        CreatedIssueIdentityReads = 0
+        IssueAuthorLogin = 'github-actions[bot]'
         RepositoryLabels = [System.Collections.Generic.List[string]]@($(if ($MissingManagedLabels) {
             @()
         } else {
@@ -2399,6 +2454,40 @@ function Get-EventIndex {
     return $Scenario.Events.IndexOf($Event)
 }
 
+if ($CreatedIssueLagOnly) {
+    $focusedLag = Invoke-AdapterScenario -Name 'focused-created-issue-inventory-lag' `
+        -CreatedIssueInventoryLag $true
+    $focusedIssue = @($focusedLag.Issues | Where-Object {
+        [int]$_.number -eq 130
+    })
+    if ($focusedLag.Threw -or $focusedIssue.Count -ne 1 -or
+        [string]$focusedIssue[0].state -cne 'open' -or
+        [string]$focusedIssue[0].user.login -cne 'github-actions[bot]' -or
+        [string]$focusedLag.AuthenticatedActor -ceq `
+            [string]$focusedIssue[0].user.login -or
+        [int]$focusedLag.CreatedIssueIdentityReads -ne 2 -or
+        (Get-EventIndex $focusedLag `
+            'created-issue-became-visible-by-identity') -lt 0 -or
+        (Get-EventIndex $focusedLag 'create-new-pr') -lt 0) {
+        Write-Error "$($focusedLag.Error)`n$($focusedLag.ErrorTrace)"
+        exit 1
+    }
+    $focusedRace = Invoke-AdapterScenario -Name 'focused-created-issue-race' `
+        -CreatedIssueInventoryLag $true -CreatedIssueInventoryRace $true
+    if (-not $focusedRace.Threw -or
+        [string]$focusedRace.Error -cne `
+            'The canonical protocol-update issue inventory raced after creation.' -or
+        [int]$focusedRace.CreatedIssueIdentityReads -ne 1 -or
+        (Get-EventIndex $focusedRace 'race-created-issue-became-visible') -lt 0 -or
+        (Get-EventIndex $focusedRace 'create-new-pr') -ge 0) {
+        Write-Error "Created-issue race did not fail closed: $($focusedRace.Error)"
+        exit 1
+    }
+    Write-Host 'Focused TEST-0150 created-issue lag/race scenario passed.' `
+        -ForegroundColor Green
+    exit 0
+}
+
 $success = Invoke-AdapterScenario -Name 'success'
 if ($SuccessOnly) {
     if ($success.Threw) {
@@ -2426,6 +2515,33 @@ if ($successOldIssue.Count -ne 1 -or [string]$successOldIssue[0].state -cne 'clo
     (Get-EventIndex $success 'close-update-issue-121') -le
         (Get-EventIndex $success 'delete-old-branch')) {
     Add-Failure 'TEST-0111 automatic issue/link/supersession lifecycle did not converge in branch-first order.'
+}
+$createdIssueLag = Invoke-AdapterScenario -Name 'created-issue-inventory-lag' `
+    -CreatedIssueInventoryLag $true
+$laggedIssue = @($createdIssueLag.Issues | Where-Object {
+    [int]$_.number -eq 130
+})
+if ($createdIssueLag.Threw -or $laggedIssue.Count -ne 1 -or
+    [string]$laggedIssue[0].state -cne 'open' -or
+    [string]$laggedIssue[0].user.login -cne 'github-actions[bot]' -or
+    [string]$createdIssueLag.AuthenticatedActor -ceq `
+        [string]$laggedIssue[0].user.login -or
+    [int]$createdIssueLag.CreatedIssueIdentityReads -ne 2 -or
+    (Get-EventIndex $createdIssueLag 'create-update-issue') -lt 0 -or
+    (Get-EventIndex $createdIssueLag `
+        'created-issue-became-visible-by-identity') -lt 0 -or
+    (Get-EventIndex $createdIssueLag 'create-new-pr') -lt 0) {
+    Add-Failure "TEST-0150 created issue identity did not survive lagging list visibility: $($createdIssueLag.Error)"
+}
+$createdIssueRace = Invoke-AdapterScenario -Name 'created-issue-inventory-race' `
+    -CreatedIssueInventoryLag $true -CreatedIssueInventoryRace $true
+if (-not $createdIssueRace.Threw -or
+    [string]$createdIssueRace.Error -cne `
+        'The canonical protocol-update issue inventory raced after creation.' -or
+    [int]$createdIssueRace.CreatedIssueIdentityReads -ne 1 -or
+    (Get-EventIndex $createdIssueRace 'race-created-issue-became-visible') -lt 0 -or
+    (Get-EventIndex $createdIssueRace 'create-new-pr') -ge 0) {
+    Add-Failure "TEST-0150 created-issue identity race did not fail closed: $($createdIssueRace.Error)"
 }
 $engineEraMigration = Invoke-AdapterScenario -Name 'generic-update-with-migration' `
     -MigrationRequired $true -MigrationWithUpgrade $true `

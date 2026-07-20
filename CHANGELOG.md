@@ -3,6 +3,20 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.5 - 2026-07-20
+
+### Fixed
+
+- Bind a newly created managed protocol-update issue to the exact POST response
+  and a direct identity read before consulting the eventually consistent issue
+  inventory. A temporarily lagging list no longer reports a false creation
+  failure, while a visible duplicate or mismatched canonical identity still
+  fails closed.
+
+Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md),
+`BUG-0021`, `FIND-0197`, and
+[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89).
+
 ## 0.12.4 - 2026-07-20
 
 ### Added

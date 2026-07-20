@@ -123,8 +123,8 @@ secret remains untouched and is not a credential source for the local process.
 ## Quick command
 
 Download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.4/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.12.4` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.5/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.12.5` GitHub Release with an authenticated browser.
 Do not separately download or unpack the module bundle; the launcher retrieves
 and verifies the release's one internal bundle asset itself. Save the reusable
 launcher outside the consumer repository, such as in `$HOME\Downloads`. This
@@ -138,11 +138,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.12.4` is an exact published
+launcher itself verifies that its runtime `v0.12.5` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.12.4`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.12.5`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
@@ -179,7 +179,7 @@ values are not command-line arguments and are not printed.
 
 Before repository initialization, remote creation, secret writes, or seed
 publication, the launcher verifies the authenticated `gh` identity and loads
-the pure strategy/classification policy from the exact immutable `v0.12.4`
+the pure strategy/classification policy from the exact immutable `v0.12.5`
 capabilities contract module. The standalone launcher and workflow adapter do
 not maintain competing policy copies; each keeps only its own Git/GitHub
 evidence and mutation-boundary checks. The launcher then performs one bounded
