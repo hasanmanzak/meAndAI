@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-19**
+Last verified: **2026-07-20**
 
 ## Verified facts
 
@@ -9,10 +9,12 @@ Last verified: **2026-07-19**
   maintainer intends to return the repository to private after the workflow
   optimization and outstanding hosted work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.2`. Exact publication state is authoritative
-  in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) after
-  publication, not predicted or duplicated in this repository snapshot.
+- Current protocol version: `0.12.3`. At candidate preparation on 2026-07-20,
+  `0.12.2` was the last published baseline; its publication evidence is authoritative in
+  [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
+  [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85). Candidate
+  publication facts belong in [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
+  after they exist and are not predicted in this repository snapshot.
 - Current scope: [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
   corrects full-suite runtime by moving combinatorial policy evidence to
   faithful production-owned contracts while retaining representative real
@@ -22,12 +24,12 @@ Last verified: **2026-07-19**
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: ready `TEST-0144` through `TEST-0146` cover non-gating
-  suite observations, exhaustive hotspot variant-to-evidence mapping,
-  production-owned contract extraction, retained real vertical slices,
-  immutable fixture ownership, cross-runtime proof, and unchanged one-Linux/
-  one-Windows hosted topology. Implementation is handed off to the stronger
-  computer; no production or executable-test code changed on this machine.
+- Latest tracked work: `TEST-0144` through `TEST-0146` have executable
+  capability ownership. The v0.12.3 pre-merge candidate adds non-gating suite
+  observations, production-owned marker/completion/submodule contracts,
+  immutable fixture reuse, retained real vertical slices, and unchanged
+  one-Linux/one-Windows hosted topology. Focused local evidence is green; final
+  full candidate validation and hosted CI remain mandatory external gates.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -77,18 +79,20 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0035` / `BUG-0017` is ready under issue #87. Preserve every active
-  scenario and declared quick-adoption/bootstrap variant while changing its
-  evidence level only where a real launcher/Git process adds no material
-  evidence. Retain real security, recovery, TOCTOU, credential, link/reparse,
-  process, Codex, and native-Windows vertical slices.
+- `FEAT-0035` / `BUG-0017` is complete as a pre-merge candidate under issue
+  #87. Every active scenario and declared quick-adoption/bootstrap variant
+  retains executable evidence; real security, recovery, TOCTOU, credential,
+  link/reparse, process, Codex, and native-Windows vertical slices remain.
 - Hosted Linux 2 minutes and Windows 3 minutes are non-gating optimization
   goals. Normal workflow runs and justified reruns continue; do not encode the
   goals as timeouts or restore hosted fan-out.
-- The implementation machine must refresh a same-commit baseline, then execute
-  `SUBF-0064` through `SUBF-0066` in dependency order. This machine's WSL
-  hotspot measurement exceeded its 15-minute diagnostic wrapper and is not an
-  appropriate iterative performance host.
+- Exact same-machine Windows PowerShell 5.1 evidence reduced the canonical
+  quick-adoption run from 1055.028 to 643.7 seconds and real launcher
+  invocations from 166 to 113. The capabilities-bootstrap baseline was 444.284
+  seconds; contract extraction and immutable fixture reuse produced an earlier
+  203.636-second canonical run, with the final reviewed `Contracts` and
+  `VerticalSlices` shards green in 2.0 and 245.9 seconds. Final full candidate
+  validation and hosted CI remain pending external evidence.
 - `v0.12.2` keeps `push: main` because private-main protection remains
   unavailable. Both stable jobs may run `StructureOnly` only when local Git
   and paginated GitHub evidence prove an exact successful merge-queue commit

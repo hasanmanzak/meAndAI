@@ -3,6 +3,41 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.3 - 2026-07-20
+
+### Added
+
+- Emit one non-authoritative, owner-bound elapsed-millisecond observation for
+  every suite process without changing child result or exit-code authority.
+- Add executable `TEST-0144` through `TEST-0146` ownership for runtime
+  observations, evidence-preserving hotspot optimization, and hosted topology.
+
+### Changed
+
+- Move deterministic adoption marker, completed-change-set, and reserved
+  protocol-submodule combinations into production-owned contracts while
+  retaining representative real launcher, Git, security, recovery, TOCTOU,
+  credential, Codex, and native-Windows vertical slices.
+- Reuse fingerprinted immutable fixture baselines through fresh isolated case
+  state. On the same Windows PowerShell 5.1 machine, quick-adoption real
+  launcher invocations fell from 166 to 113 and its canonical run fell from
+  1055.028 to 643.7 seconds, approximately 39.0 percent.
+- Retain exactly one ordinary Ubuntu job, one ordinary Windows job, and the
+  isolated publication job without a matrix, fan-in runner, or elapsed-time
+  pass/fail gate.
+
+### Fixed
+
+- Preserve empty unrelated Git configuration and the complete adoption
+  proposal, asset, strategy, legacy, marker, and shard-initialization contracts
+  discovered during bounded review.
+
+Related work: [FEAT-0035](docs/features/FEAT-0035-test-runtime-efficiency/README.md),
+[DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
+[DEC-0022](docs/decisions/DEC-0022-release-declared-semantic-capabilities.md),
+[TEST-0144 through TEST-0146](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md),
+and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
+
 ## 0.12.2 - 2026-07-19
 
 ### Fixed

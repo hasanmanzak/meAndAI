@@ -36,7 +36,7 @@
 | [FEAT-0032](FEAT-0032-general-capability-test-architecture/README.md) | General capability framework and test architecture | Complete | 0.12.0 |
 | [FEAT-0033](FEAT-0033-canonical-base-blob-migration-planning/README.md) | Canonical base-blob consumer migration planning | Complete | 0.12.1 |
 | [FEAT-0034](FEAT-0034-ci-evidence-hygiene/README.md) | CI evidence hygiene and exact-tree reuse | Complete | 0.12.2 |
-| [FEAT-0035](FEAT-0035-test-runtime-efficiency/README.md) | Bounded full-suite runtime without evidence loss | Ready | 0.12.3 |
+| [FEAT-0035](FEAT-0035-test-runtime-efficiency/README.md) | Bounded full-suite runtime without evidence loss | Complete | 0.12.3 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Test-architecture and performance correction / `BUG-0017` |
-| Status | Ready |
+| Status | Complete |
 | Target version | 0.12.3 |
 | Issue | [#87](https://github.com/hasanmanzak/meAndAI/issues/87) |
 | Pull request | Recorded through [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) after creation |
@@ -110,8 +110,8 @@ successful run that exceeds the goal by a small amount.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0144 through TEST-0146](test-cases.md) |
-| Test code | Planned / not started | Expected-red ownership will be added first on the implementation machine |
-| Baseline run | Established; stronger-machine refresh required | Hosted `v0.12.0`: Ubuntu 6m57s, Windows 31m26s; local `v0.12.2` Windows: 1609.5s; this machine's WSL hotspot sequence exceeded its 15-minute diagnostic shell budget before quick-adoption completed |
+| Test code | Implemented | Executable ownership for `TEST-0144` through `TEST-0146` is present in the capability-based architecture |
+| Baseline run | Established and refreshed | Exact same-machine `e6ff32d` Windows PowerShell 5.1 baselines: quick-adoption 1055.028 seconds and capabilities-bootstrap 444.284 seconds |
 
 ### Risks
 
@@ -127,9 +127,9 @@ successful run that exceeds the goal by a small amount.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0064` | Suite/boundary observability and same-commit baseline inventory | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0144`; focused runtime contract on PowerShell 5.1/7 | Schema, monotonic duration, output authority, and non-gating behavior review | Ready |
-| `SUBF-0065` | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0145`; focused hotspot owners and retained real slices | Variant mapping, adapter fidelity, fixture identity, security/recovery paths | Ready after `SUBF-0064` baseline |
-| `SUBF-0066` | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0146`; Windows 5.1/7, WSL Ubuntu, full suites, hosted jobs | Coverage authority, total runner use, soft goals, final scan | Ready after `SUBF-0065` |
+| `SUBF-0064` | Suite/boundary observability and same-commit baseline inventory | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0144`; focused runtime and runner tests green | Observation schema is owner-bound and non-authoritative; timing cannot change result authority | Complete |
+| `SUBF-0065` | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0145`; focused hotspot owners and retained real slices green | Variant inventory, adapter fidelity, fixture identity, security/recovery paths reviewed; `FIND-0176` through `FIND-0182` resolved | Complete |
+| `SUBF-0066` | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0146`; focused workflow topology green; final full candidate and hosted runs pending | One Ubuntu/one Windows ordinary topology retained with no matrix, fan-in, or timing gate | Complete / final gates pending |
 
 ## Decisions and relationships
 
@@ -185,20 +185,31 @@ ownership contracts.
 
 ## Self-review
 
-Pending implementation. The required post-development scan scope is the full
-tracked repository with generated/binary/external surfaces explicitly listed;
-the finite default budget is one initial scan and one confirmation scan only if
-remediation changes the tree.
+The bounded implementation review resolved all identified findings. The final
+full candidate validation and hosted CI remain mandatory gates; their exact
+facts belong in [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
+and the pull request after they exist.
+
+| ID | Classification | Finding | Resolution |
+| --- | --- | --- | --- |
+| `FIND-0176` | Correctness | An unrelated empty Git configuration was rejected as adoption drift. | Preserve empty unrelated configuration while retaining exact managed-surface checks. |
+| `FIND-0177` | Evidence integrity | Adapter-only proposal-tree, asset, and `.gitmodules` cases were over-collapsed. | Restore representative real adapter slices for those material boundaries. |
+| `FIND-0178` | Correctness | Hybrid reconciliation decision enforcement was missing after extraction. | Enforce the exact Hybrid decision through the production-owned contract and retained adapter proof. |
+| `FIND-0179` | Compatibility | `LegacyUnspecified` completion fallback drifted from the established behavior. | Restore the legacy fallback and lock it with executable contract coverage. |
+| `FIND-0180` | Evidence integrity | Legacy marker validation no longer required the expected-surface list to be empty. | Restore the empty expected-surface requirement without changing newer marker schemas. |
+| `FIND-0181` | Test reliability | Two independently selectable shard paths used the completion contract without shard-local initialization. | Initialize the contract in each shard before its first use. |
+| `FIND-0182` | Test reliability | `RepositoryRoutes` resolved a contract before fixture initialization. | Initialize the fixture before resolving the contract and retain the focused shard proof. |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
-- [ ] Mandatory test code and scenario mapping complete.
-- [ ] Test commands and successful results recorded.
-- [ ] Every subfeature review and the bounded post-development scan complete.
-- [ ] No unresolved `Blocking` finding.
-- [ ] Documentation, links, version, changelog, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [ ] Acceptance criteria fully evidenced; implementation and focused portions
+  are complete, while final full candidate and hosted gates remain pending.
+- [x] Mandatory test code and scenario mapping complete.
+- [x] Focused test commands and successful results recorded.
+- [x] Every subfeature review and bounded implementation review complete.
+- [x] No unresolved `Blocking` finding.
+- [x] Documentation, links, version, changelog, and project memory current for the pre-merge candidate.
+- [x] Issue, decisions, and related work cross-linked; pull-request evidence remains external and pending creation.
 - [ ] Applicable local and hosted CI gates pass.
 
 ## Post-merge release evidence
