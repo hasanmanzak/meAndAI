@@ -574,7 +574,7 @@ function Initialize-QuickAdoptionImmutableFixture {
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'switch', '--detach'
     ) | Out-Null
-    foreach ($futureTag in @('v0.12.5', 'v1.0.0')) {
+    foreach ($futureTag in @('v0.12.6', 'v1.0.0')) {
         $futureVersion = $futureTag.Substring(1)
         $futureWorkflow = [IO.File]::ReadAllText($workflowPath).Replace(
             'BOOTSTRAP_PROTOCOL_TAG: v0.12.5',

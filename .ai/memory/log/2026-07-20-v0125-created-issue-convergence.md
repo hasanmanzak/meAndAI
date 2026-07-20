@@ -58,6 +58,14 @@
   one issue creation and before every later managed mutation. The final
   response-shape guard also passed focused `TEST-0150` again in 11.6 seconds,
   and structure-only validation remained green.
+- PR #92 run `29757563950` then passed that finalization owner and all 28 updater
+  scenarios on Ubuntu before exposing `FIND-0199`: the version bump had made
+  both the current fixture and its first synthetic future release v0.12.5, so
+  Git correctly rejected a second no-change commit. The future release is now
+  v0.12.6; `ContractsPreflight` rebuilt the complete immutable fixture and
+  passed in 17.1 seconds outside the sandbox-only Git signal-pipe boundary. The
+  still-running Windows job was cancelled after the deterministic Ubuntu
+  failure to avoid unnecessary runner use.
 
 ## Continue from here
 
