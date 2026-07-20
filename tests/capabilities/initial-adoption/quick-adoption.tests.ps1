@@ -5601,9 +5601,9 @@ try {
 
     if ((Test-QuickAdoptionShard -Name 'RepositoryRoutes') -and
         $failures.Count -eq 0) {
+        Reset-Mocks
         $completionContract = Get-TestQuickAdoptionContractCommand `
             -Name 'Test-MeAndAICompletedAdoptionChangeSet'
-        Reset-Mocks
         $strategyRoot = New-TempRoot -Name 'strategy-preflight'
         $strategyRepo = Join-Path $strategyRoot 'consumer'
         New-Item -ItemType Directory -Path $strategyRepo -Force | Out-Null
