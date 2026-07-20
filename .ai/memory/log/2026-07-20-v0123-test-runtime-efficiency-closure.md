@@ -49,8 +49,9 @@
   selectable shards before first use.
 - `FIND-0182`: initialize the `RepositoryRoutes` fixture before contract
   resolution.
-- `FIND-0183`: preserve a zero-entry completion-contract fixture as an explicit
-  empty object array across Windows PowerShell 5.1 and PowerShell 7.
+- `FIND-0183`: normalize null-equivalent empty completion evidence at both
+  predicate boundaries so Windows PowerShell 5.1 and PowerShell 7 return the
+  same fail-closed result instead of throwing during parameter binding.
 
 No blocking finding remains from the bounded implementation review.
 

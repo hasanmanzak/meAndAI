@@ -693,6 +693,21 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
                 -FinalEntries $completionEntries) {
             Add-Failure 'TEST-0145 production-owned completion contract accepted HybridReconciliation without a changed decision record.'
         }
+        $nullFinalEntriesAccepted = $false
+        $nullFinalEntriesError = ''
+        try {
+            $nullFinalEntriesAccepted = [bool](& $completedChangeValidator `
+                -Changes $freshCompletionChanges `
+                -ExpectedAdoptionStrategy 'FreshAdoption' `
+                -ProtocolSurfaces @() -TargetPaths $actualTargetPaths `
+                -FinalEntries $null)
+        }
+        catch {
+            $nullFinalEntriesError = $_.Exception.Message
+        }
+        if ($nullFinalEntriesError -or $nullFinalEntriesAccepted) {
+            Add-Failure "TEST-0145 production-owned completion contract did not fail closed for null-equivalent empty final-entry evidence: $nullFinalEntriesError"
+        }
         foreach ($invalidCompletion in @(
             [pscustomobject]@{
                 Name = 'credential addition'

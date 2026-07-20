@@ -789,11 +789,15 @@ function Test-QuickAdoptionExactPullRequestMarker {
 
 function Test-QuickAdoptionCompletedChangeSet {
     param(
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Changes,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$Changes,
         [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ProtocolSurfaces,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TargetPaths,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$FinalEntries
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$TargetPaths,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$FinalEntries
     )
 
     $command = Get-InitialAdoptionPolicyCommand `

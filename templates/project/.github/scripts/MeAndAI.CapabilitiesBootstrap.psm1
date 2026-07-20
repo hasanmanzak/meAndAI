@@ -781,12 +781,23 @@ function Test-MeAndAIReservedProtocolSubmoduleContract {
 function Test-MeAndAICompletedAdoptionChangeSet {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Changes,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$Changes,
         [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ProtocolSurfaces,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$TargetPaths,
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$FinalEntries
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$TargetPaths,
+        [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
+        [object[]]$FinalEntries
     )
+
+    if ($null -eq $Changes) { $Changes = [object[]]::new(0) }
+    if ($null -eq $ProtocolSurfaces) {
+        $ProtocolSurfaces = [object[]]::new(0)
+    }
+    if ($null -eq $TargetPaths) { $TargetPaths = [object[]]::new(0) }
+    if ($null -eq $FinalEntries) { $FinalEntries = [object[]]::new(0) }
 
     if ($ExpectedAdoptionStrategy -cnotin @(
         'LegacyUnspecified', 'FreshAdoption', 'FullMigration',

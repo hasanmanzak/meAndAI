@@ -199,7 +199,7 @@ and the pull request after they exist.
 | `FIND-0180` | Evidence integrity | Legacy marker validation no longer required the expected-surface list to be empty. | Restore the empty expected-surface requirement without changing newer marker schemas. |
 | `FIND-0181` | Test reliability | Two independently selectable shard paths used the completion contract without shard-local initialization. | Initialize the contract in each shard before its first use. |
 | `FIND-0182` | Test reliability | `RepositoryRoutes` resolved a contract before fixture initialization. | Initialize the fixture before resolving the contract and retain the focused shard proof. |
-| `FIND-0183` | Cross-runtime test reliability | PowerShell 7 collapsed an empty generic dictionary value collection to a null splat value in one negative completion-contract fixture. | Materialize the final-entry fixture as an explicitly allocated object array so zero-entry evidence remains a real empty collection on every supported PowerShell runtime. |
+| `FIND-0183` | Cross-runtime contract reliability | PowerShell splatting can bind a semantically empty collection as null at predicate boundaries, causing negative completion evidence to throw instead of returning false. | Accept null-equivalent empty collections at both completion-predicate boundaries, normalize them inside the production-owned predicate, and retain direct plus adapter-level fail-closed regression cases. |
 
 ## Definition of Done
 
