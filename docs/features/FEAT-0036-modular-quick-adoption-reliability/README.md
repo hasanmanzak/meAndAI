@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible distribution architecture and correctness correction / `BUG-0018`, `BUG-0019`, `BUG-0020` |
+| Classification | Backward-compatible distribution architecture and correctness correction / `BUG-0018`, `BUG-0019`, `BUG-0020`, `BUG-0021` |
 | Status | Complete |
-| Target version | 0.12.4 |
+| Target version | 0.12.5 |
 | Issue | [#89](https://github.com/hasanmanzak/meAndAI/issues/89) |
-| Pull request | Recorded through [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after creation |
+| Pull request | [#90](https://github.com/hasanmanzak/meAndAI/pull/90), [#91](https://github.com/hasanmanzak/meAndAI/pull/91); v0.12.5 hotfix recorded through [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after creation |
 | Decision | [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md) |
-| Tests | [TEST-0147 through TEST-0149](test-cases.md) |
+| Tests | [TEST-0147 through TEST-0150](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -26,6 +26,12 @@ loads one exact immutable module bundle outside the consumer repository. Then
 make read-only GitHub transport resilient within a finite budget, prevent
 structured-body argv corruption, and reconcile only the exact historical
 malformed record that this defect could produce.
+
+The first released v0.12.4 replay then exposed a separate convergence defect:
+GitHub accepted and returned exact canonical issue #8, while the immediately
+following all-issues inventory had not exposed it yet. v0.12.5 must bind the
+successful creation response to its direct identity without weakening visible
+duplicate/race detection.
 
 ## Scope
 
@@ -45,6 +51,9 @@ malformed record that this defect could produce.
   generated contract, trusted author, repository identity, and absence of a
   related branch or pull request are proved; refetch and validate canonical
   state after repair.
+- Validate one newly created issue from its positive POST identity and exact
+  direct read; tolerate zero immediate canonical list matches, but reject more
+  than one visible match or one match with a different issue identity.
 
 ## Non-goals
 
@@ -97,6 +106,12 @@ malformed record that this defect could produce.
   proves no paired reserved branch or pull request exists, replaces the full
   body through safe transport, then refetches and validates the canonical
   contract. Every near-match blocks without mutation.
+- Created-issue convergence does not retry the POST. The successful POST must
+  return one positive issue number; a direct idempotent GET must preserve its
+  exact marker, title, normalized body, open state, nonempty response author,
+  and non-PR kind. The list inventory is then only a visible duplicate/race
+  detector: zero matches may continue from the exact identity, while multiple
+  matches or one different identity block before branch or PR publication.
 
 ## Consumers and dependencies
 
@@ -123,22 +138,23 @@ malformed record that this defect could produce.
 | `RISK-0167` | Native transport | PowerShell 5.1 corrupts another issue, comment, or pull-request body | Updater maintainer / real native executable boundary and byte-exact round trip in `TEST-0149` |
 | `RISK-0168` | Ownership | Broad legacy repair claims or rewrites an ambiguous/foreign issue | Updater maintainer / exact contract, trusted actor, absent branch/PR proof, near-match negatives, refetch validation in `TEST-0149` |
 | `RISK-0169` | Validation cost | Repeated full suites consume disproportionate local and hosted resources | Test maintainer / focused slice owners, one structure pass, one converged push, and one final hosted full run |
+| `RISK-0170` | Eventual consistency | A successful issue creation is reported as failed because the all-issues list lags, or a visible concurrent duplicate is ignored | Updater maintainer / POST identity, direct read, zero-match success, different-identity and duplicate negatives in `TEST-0150` |
 
 ## Test readiness
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0147 through TEST-0149](test-cases.md) |
+| Scenarios | Defined | [TEST-0147 through TEST-0150](test-cases.md) |
 | Test code | Implemented / focused green | Expected-red evidence and Windows PowerShell 5.1 green runs are recorded in the scenario log |
-| Baseline run | Green | `main` at `f17638f1c4223620e4c13d67b451808e321f4416`; FEAT-0035 local and hosted evidence is linked from its record |
+| Baseline run | Green | Immutable v0.12.4 / `main` at `edf443744e3a72bcc951008bf1b3ba4727104a27`; PR #91 Ubuntu, Windows PowerShell 5.1, and GitGuardian evidence is green |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0067` | Mechanical module extraction, thin verified bootstrapper, deterministic bundle, and publication contract | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | Final `TEST-0147` passed on PS5.1 in 17.7 seconds and again in 18.1 seconds after its Unix temp-environment correction; its direct-builder regression passed in 21.3 seconds; the affected `AdoptionLifecycle` shard passed in 170 seconds after current-version and native-clone fixture corrections; focused publication owner passed in 1.7 seconds | Public parity, exact Git-blob builder, trust order, archive containment, token environment, import, publication binding, cleanup, and cross-platform fixture parity reviewed; `FIND-0184` through `FIND-0190` and `FIND-0193` through `FIND-0196` resolved | Complete; hosted evidence pending externally |
+| `SUBF-0067` | Mechanical module extraction, thin verified bootstrapper, deterministic bundle, and publication contract | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | Final `TEST-0147` passed on PS5.1 in 17.7 seconds and again in 18.1 seconds after its Unix temp-environment correction; its direct-builder regression passed in 21.3 seconds; the affected `AdoptionLifecycle` shard passed in 170 seconds after current-version and native-clone fixture corrections; the v0.12.5 `ContractsPreflight` shard passed in 17.1 seconds; focused publication owner passed in 1.7 seconds | Public parity, exact Git-blob builder, trust order, archive containment, token environment, import, publication binding, cleanup, and cross-platform fixture parity reviewed; `FIND-0184` through `FIND-0190` and `FIND-0193` through `FIND-0196` plus `FIND-0199` resolved | Complete; hosted evidence pending externally |
 | `SUBF-0068` | Explicit bounded retry for idempotent GitHub API reads | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0148` passed with `TEST-0149` on PS5.1 in 23.4 seconds | GET-only declaration, classification, attempt cap, delay, paged-attempt reset, final diagnostics, and single-attempt mutations reviewed | Complete; hosted evidence pending externally |
-| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0149` passed with `TEST-0148` on PS5.1 in 23.4 seconds, including stale v0.12.1 repair while targeting v0.12.4; the focused finalization owner passed in 11.1 seconds after its hosted fixture correction | Exact UTF-8 bytes, argv exclusion, temp cleanup, actor/repository/duplicate/ref/PR/backlink proofs, pre/post refetch, ordinal near matches, idempotency, and the finalization fake's authenticated-actor/body-file parity reviewed | Complete; hosted evidence pending externally |
+| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0149` passed with `TEST-0148` on PS5.1 in 23.5 seconds for v0.12.5; focused `TEST-0150` passed in 12.0 and 11.6 seconds; all 28 canonical updater behavior scenarios passed in 64.0 seconds and their registry binding passed in 0.7 seconds; the corrected finalization owner passed in 13.0 seconds | Exact UTF-8 bytes, argv exclusion, temp cleanup, separate historical/updater/issue actors and token boundaries, controlled missing-author failure, repository/duplicate/ref/PR/backlink proofs, exact created identity, true zero-list tolerance, different-identity race failure, ordinal near matches, and idempotency reviewed; `FIND-0197` and `FIND-0198` resolved | Complete; hosted evidence pending externally |
 
 ## Definition of Ready
 
@@ -147,11 +163,11 @@ malformed record that this defect could produce.
 - [x] Acceptance criteria are measurable.
 - [x] Runtime, archive, retry, body, ownership, lifecycle, error, cleanup, and
       compatibility contracts identify affected consumers and dependencies.
-- [x] `RISK-0163` through `RISK-0169` and DEC-0023 record the architectural
+- [x] `RISK-0163` through `RISK-0170` and DEC-0023 record the architectural
       and operational choices.
 - [x] `SUBF-0067` through `SUBF-0069` preserve the requested implementation
       order and have independent review gates.
-- [x] `TEST-0147` through `TEST-0149` cover success, failure, boundaries,
+- [x] `TEST-0147` through `TEST-0150` cover success, failure, boundaries,
       regression, native-runtime behavior, and fail-closed near matches.
 - [x] Test-first expected-red evidence, executable owners, and the bounded
       verification approach are explicit.
@@ -182,10 +198,14 @@ malformed record that this defect could produce.
    once when all ownership and absence proofs hold, then converges through the
    canonical parser; every changed field, prose, actor, duplicate, branch, or PR
    blocks before mutation.
-8. Focused test owners, one structure pass, the relevant consumer-update and
-   launcher recovery slices, diff checks, fresh-diff self-review, one completion
-   scan, and one final hosted validation run pass with no unresolved `Blocking`
-   finding.
+8. A successful issue POST plus exact direct identity read can continue when
+   the immediate canonical list has zero matches; multiple visible matches or
+   one different visible identity fail before branch or PR publication.
+9. Focused test owners, one structure pass, the relevant consumer-update and
+   launcher recovery slices, diff checks, fresh-diff self-review, and one local
+   completion scan pass with no unresolved `Blocking` finding. The exact hosted
+   validation remains a delivery gate after candidate completion and before
+   merge.
 
 ## Implementation and verification approach
 
@@ -228,6 +248,9 @@ observations before the focused green evidence:
 | `FIND-0194` | `SUBF-0067` | The full adoption-lifecycle fixture still wrote `VERSION` as `0.12.3` while labeling its immutable mock snapshot `v0.12.4`, so the exact source-version gate correctly rejected it. | `Blocking` -> resolved by advancing the sole stale fixture value to `0.12.4` and confirming no current launcher/adoption fixture retains `v0.12.3`. |
 | `FIND-0195` | `SUBF-0067` | After the version correction exposed the next path, the in-process mock `gh repo clone` invoked raw Git under stop-on-stderr semantics, so ordinary clone progress could be misclassified as failure on Windows PowerShell 5.1. | `Blocking` -> resolved by isolating the mock native call, restoring error preference, and deciding from the captured exit code; the exact `AdoptionLifecycle` shard passed. |
 | `FIND-0196` | `SUBF-0067` | The builder computed its omitted `SourceRoot` from `$PSScriptRoot` inside the parameter-default expression, before Windows PowerShell 5.1 initialized that automatic variable, so the documented direct release-build command failed before execution. | `Blocking` -> resolved by computing the default after parameter binding only when the caller omitted it; the focused test now invokes the fixture builder through a real Windows PowerShell 5.1 `-File` process without `-SourceRoot` and compares its archive to explicit-root builds. |
+| `FIND-0197` | `SUBF-0069` | The first released v0.12.4 Derdini replay repaired issue #7 and created exact canonical issue #8, but immediately re-read the eventually consistent all-issues inventory instead of binding the successful POST response; the list had not exposed #8 yet and produced a false convergence failure. | `Blocking` -> resolved for v0.12.5 by validating the created issue number, exact direct identity read, canonical body/title/state and nonempty response author independently of the updater PAT actor, then using list inventory only for visible duplicates; an intentionally lagging list must reach draft-PR creation while one different visible identity fails closed. |
+| `FIND-0198` | `SUBF-0069` | PR #92's first hosted Ubuntu and Windows runs reached managed-merge finalization but its legacy issue-creation fixture returned no `user` object, so the new response-author shape gate stopped before the intended assertions on both hosts. | `Blocking` -> resolved by separating historical owner, authenticated updater, and issue-token actor identities across distinct updater/issue credentials; the negative fixture omits `user` and proves one creation is followed by the exact controlled convergence error with no tracking repair, branch deletion, comment, close, or label-removal mutation. The focused finalization owner passed in 13.0 seconds. |
+| `FIND-0199` | `SUBF-0067` | PR #92 run `29757563950` passed the corrected finalization and all canonical updater scenarios on Ubuntu, then the quick-adoption fixture tried to create a second no-change `v0.12.5` commit because the current-version bump had also made its synthetic future tag `v0.12.5`. | `Blocking` -> resolved by retaining v0.12.5 as the current immutable fixture and advancing only the synthetic next-revision release to v0.12.6; the focused `ContractsPreflight` shard rebuilt the complete fixture and passed in 17.1 seconds outside the known sandbox-only Git signal-pipe boundary. The still-running Windows job was cancelled after the deterministic Ubuntu failure to avoid wasting runner time. |
 
 Fresh-diff review for `SUBF-0067` also bound both release assets to the exact
 released source commit, aligned publication archive checks with the runtime
@@ -254,7 +277,7 @@ cross-suite dependency.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
+- [x] Acceptance criteria met for the locally complete candidate.
 - [x] Mandatory test code and scenario mapping complete.
 - [x] Focused test commands and successful results recorded; final hosted and
       live replay evidence remains external and pending.
@@ -263,8 +286,11 @@ cross-suite dependency.
       required authority, owner, rationale, and link.
 - [x] Candidate documentation, decision, changelog, version, links, and project
       memory are current without projecting external publication facts.
-- [ ] Issue #89 and the pull request cross-link the canonical records.
-- [ ] Applicable hosted Windows and Ubuntu checks pass.
+
+## Delivery gates
+
+- [ ] The v0.12.5 hotfix PR and issue #89 cross-link the canonical records.
+- [ ] Applicable hosted Windows and Ubuntu checks pass before merge.
 
 ## Post-merge release evidence
 

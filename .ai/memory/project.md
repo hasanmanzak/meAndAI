@@ -9,28 +9,29 @@ Last verified: **2026-07-20**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.4`. At candidate preparation on 2026-07-20,
-  `0.12.3` was the last published baseline; its publication evidence is authoritative in
-  [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Candidate
-  publication facts belong in [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
-  after they exist and are not predicted in this repository snapshot.
+- Current protocol version: `0.12.5`. Immutable v0.12.4 targets
+  `edf443744e3a72bcc951008bf1b3ba4727104a27`; its exact publication evidence is
+  authoritative in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.4)
+  and [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89). v0.12.5
+  publication facts belong there only after they exist and are not predicted
+  in this repository snapshot.
 - Current scope: [FEAT-0036](../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
   replaces the quick-adoption monolith with one downloaded thin launcher and
   one verified deterministic module bundle, adds bounded idempotent-GET retry,
   preserves structured GitHub bodies across Windows PowerShell 5.1, and repairs
-  only the exact historical quote-stripped update issue. [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
+  only the exact historical quote-stripped update issue. The v0.12.5 hotfix
+  binds created-issue convergence to the exact POST identity and direct read
+  without trusting immediate list visibility. [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: final `TEST-0147` passed on Windows PowerShell 5.1 in
-  17.7 seconds; `TEST-0148` and `TEST-0149` passed together in 23.4 seconds,
-  including repair of the exact stale v0.12.1 poisoned issue while targeting
-  v0.12.4; the focused publication-evidence owner, canonical consumer-update
-  suite, affected quick-adoption shards, and final structure pass also passed.
-  Pull request, hosted, merge, immutable release, live Derdini replay, and
-  cleanup evidence remain pending external gates.
+- Latest tracked work: v0.12.4 release and asset identity passed. Its first live
+  Derdini replay repaired issue #7 and created exact issue #8, then exposed
+  `FIND-0197` because the immediate all-issues inventory lagged the successful
+  POST. The focused ordinary and intentionally lagging created-issue scenarios
+  pass for the v0.12.5 correction. Remaining focused/hosted validation, hotfix
+  PR/merge/release, successful replay, and cleanup are pending external gates.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -80,18 +81,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0036` / `BUG-0018` / `BUG-0019` is a locally complete pre-merge
-  candidate under issue #89. The implementation has focused local evidence for the exact-source deterministic
-  module bundle, public parameter parity, immutable runtime trust table,
-  transient GET retry, UTF-8-no-BOM native body transport, and exact poisoned-
-  issue recovery. PR, hosted, merge, release, live Derdini replay, and cleanup
-  evidence are still pending and MUST NOT be projected into repository files.
+- `FEAT-0036` delivered v0.12.4 through PRs #90/#91. `BUG-0021` / `FIND-0197`
+  is the bounded v0.12.5 continuation under issue #89. It validates the exact
+  created issue directly and treats the all-issues list only as a visible
+  duplicate/race detector. Hotfix PR, hosted, merge, release, successful live
+  Derdini replay, and cleanup evidence are still pending and MUST NOT be
+  projected into repository files.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.
   Linux 2 minutes and Windows 3 minutes remain non-gating optimization goals;
   do not encode them as timeouts or restore hosted fan-out.
-- The v0.12.4 runtime release contract contains exactly two assets: the thin
+- The v0.12.4-and-later runtime release contract contains exactly two assets: the thin
   launcher downloaded by the maintainer and one internal verified module
   bundle. `RuntimeReleaseTag` identifies the executable runtime independently
   of the compatible consumer target selected by `-ProtocolTag`.

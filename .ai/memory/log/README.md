@@ -5,19 +5,21 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.12.4 candidate splits quick adoption into one downloaded thin launcher
-and one verified deterministic module bundle, adds bounded idempotent-GET retry,
-preserves structured GitHub bodies across Windows PowerShell 5.1, and repairs
-only the exact historical quote-stripped update issue. Follow
+The immutable v0.12.4 release delivered the modular quick-adoption runtime and
+repaired Derdini issue #7, but its first live replay exposed `FIND-0197`: the
+created canonical issue #8 was not yet visible in the all-issues list. The
+v0.12.5 hotfix binds creation to the exact POST response and direct identity
+read while retaining visible duplicate detection. Follow
 [FEAT-0036](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
-and the [v0.12.4 handoff](2026-07-20-v0124-modular-adoption-reliability.md).
+and the [v0.12.5 handoff](2026-07-20-v0125-created-issue-convergence.md).
 [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) owns delivery and
-future publication evidence. PR, hosted checks, merge, immutable release, live
-Derdini replay, and cleanup remain pending; `FIND-0120` remains the separate
-open follow-up in issue #44.
+future publication evidence. The hotfix PR, hosted checks, merge, immutable
+release, successful Derdini replay, and cleanup remain pending; `FIND-0120`
+remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-20 - v0.12.5 created-issue convergence handoff](2026-07-20-v0125-created-issue-convergence.md)
 - [2026-07-20 - v0.12.4 modular adoption reliability handoff](2026-07-20-v0124-modular-adoption-reliability.md)
 - [2026-07-20 - v0.12.3 test runtime efficiency closure](2026-07-20-v0123-test-runtime-efficiency-closure.md)
 - [2026-07-19 - v0.12.3 test runtime efficiency handoff](2026-07-19-v0123-test-runtime-efficiency.md)

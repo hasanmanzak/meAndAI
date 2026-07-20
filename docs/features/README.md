@@ -37,7 +37,7 @@
 | [FEAT-0033](FEAT-0033-canonical-base-blob-migration-planning/README.md) | Canonical base-blob consumer migration planning | Complete | 0.12.1 |
 | [FEAT-0034](FEAT-0034-ci-evidence-hygiene/README.md) | CI evidence hygiene and exact-tree reuse | Complete | 0.12.2 |
 | [FEAT-0035](FEAT-0035-test-runtime-efficiency/README.md) | Bounded full-suite runtime without evidence loss | Complete | 0.12.3 |
-| [FEAT-0036](FEAT-0036-modular-quick-adoption-reliability/README.md) | Modular quick-adoption runtime and recovery reliability | In progress | 0.12.4 |
+| [FEAT-0036](FEAT-0036-modular-quick-adoption-reliability/README.md) | Modular quick-adoption runtime and recovery reliability | Complete | 0.12.5 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
