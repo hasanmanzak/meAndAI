@@ -650,6 +650,7 @@ elseif ($bootstrap) {
     $originalGitHubToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
     $originalTemp = [Environment]::GetEnvironmentVariable('TEMP', 'Process')
     $originalTmp = [Environment]::GetEnvironmentVariable('TMP', 'Process')
+    $originalTmpDir = [Environment]::GetEnvironmentVariable('TMPDIR', 'Process')
     $testTempRoot = [IO.Path]::GetTempPath()
     $sourceCommit = 'a' * 40
     try {
@@ -825,6 +826,28 @@ exit /b %ERRORLEVEL%
         [void](New-Item -ItemType Directory -Path $consumerTemp)
         [Environment]::SetEnvironmentVariable('TEMP', $consumerTemp, 'Process')
         [Environment]::SetEnvironmentVariable('TMP', $consumerTemp, 'Process')
+        [Environment]::SetEnvironmentVariable('TMPDIR', $consumerTemp, 'Process')
+        $resolvedProcessTemp = [IO.Path]::GetFullPath(
+            [IO.Path]::GetTempPath()
+        ).TrimEnd([char[]]@(
+            [IO.Path]::DirectorySeparatorChar,
+            [IO.Path]::AltDirectorySeparatorChar
+        ))
+        $expectedProcessTemp = [IO.Path]::GetFullPath($consumerTemp).TrimEnd(
+            [char[]]@(
+                [IO.Path]::DirectorySeparatorChar,
+                [IO.Path]::AltDirectorySeparatorChar
+            )
+        )
+        $tempComparison = if ($env:OS -eq 'Windows_NT') {
+            [StringComparison]::OrdinalIgnoreCase
+        }
+        else { [StringComparison]::Ordinal }
+        if (-not $resolvedProcessTemp.Equals(
+                $expectedProcessTemp, $tempComparison
+            )) {
+            throw 'The consumer-contained process-temp fixture did not activate.'
+        }
         $tempSentinel = Join-Path $runtimeRoot 'UnsafeTempRoot.sentinel'
         [Environment]::SetEnvironmentVariable('MEANDAI_TEST_RUNTIME_MODE', 'Valid', 'Process')
         [Environment]::SetEnvironmentVariable('MEANDAI_TEST_RUNTIME_BUNDLE', $validBundle, 'Process')
@@ -837,6 +860,7 @@ exit /b %ERRORLEVEL%
         finally {
             [Environment]::SetEnvironmentVariable('TEMP', $originalTemp, 'Process')
             [Environment]::SetEnvironmentVariable('TMP', $originalTmp, 'Process')
+            [Environment]::SetEnvironmentVariable('TMPDIR', $originalTmpDir, 'Process')
         }
         if (-not $tempRejected -or (Test-Path -LiteralPath $tempSentinel)) {
             Add-Failure 'TEST-0147 bootstrap accepted a runtime temporary root inside the consumer.'
@@ -877,6 +901,7 @@ exit /b %ERRORLEVEL%
         [Environment]::SetEnvironmentVariable('GH_TOKEN', $originalGitHubToken, 'Process')
         [Environment]::SetEnvironmentVariable('TEMP', $originalTemp, 'Process')
         [Environment]::SetEnvironmentVariable('TMP', $originalTmp, 'Process')
+        [Environment]::SetEnvironmentVariable('TMPDIR', $originalTmpDir, 'Process')
         foreach ($name in @(
             'MEANDAI_TEST_RUNTIME_MODE', 'MEANDAI_TEST_RUNTIME_BUNDLE',
             'MEANDAI_TEST_RUNTIME_DIGEST', 'MEANDAI_TEST_RUNTIME_LENGTH',

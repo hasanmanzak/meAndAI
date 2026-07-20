@@ -414,7 +414,7 @@ function Copy-CanonicalProtocolFixture {
     )
     [IO.File]::WriteAllText(
         (Join-Path $Destination 'VERSION'),
-        '0.12.3',
+        '0.12.4',
         [Text.UTF8Encoding]::new($false)
     )
     $capabilitiesModulePath = 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
@@ -1824,9 +1824,18 @@ function global:gh {
     }
     if ($Arguments.Count -ge 4 -and $Arguments[0] -eq 'repo' -and
         $Arguments[1] -eq 'clone' -and $Arguments[2] -eq 'hasanmanzak/meAndAI') {
-        & git clone $global:QuickAdoptionProtocolRepository $Arguments[3] 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            throw 'Unable to clone the mock protocol repository.'
+        $previousPreference = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            $cloneOutput = & git clone `
+                $global:QuickAdoptionProtocolRepository $Arguments[3] 2>&1
+            $cloneExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousPreference
+        }
+        if ($cloneExitCode -ne 0) {
+            throw "Unable to clone the mock protocol repository: $($cloneOutput -join [Environment]::NewLine)"
         }
         return
     }
