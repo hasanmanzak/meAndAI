@@ -62,6 +62,14 @@ preserves canonical repository Actions secret names already present and creates
 only missing mappings; GitHub does not expose their values for validation. If
 the protocol secret exists but its local source file does not, the launcher
 uses the authenticated local `gh` identity for exact tagged-source retrieval.
+
+The maintainer downloads only the thin quick-adoption PowerShell launcher. Its
+immutable runtime release contains exactly two assets: that launcher and one
+internal deterministic module bundle. The launcher verifies its own runtime
+release and every bundle payload outside the consumer before import;
+`-ProtocolTag` independently selects the compatible protocol target installed
+in the consumer.
+
 Secret inventory and writes are serialized by the temporary repository label
 `meandai:secret-reconciliation-lock`, owned by a unique launcher nonce. An
 existing, stale, changed, or contended lock blocks. After confirming that no
@@ -79,9 +87,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.12.3`, the only repository file required
+For a new submodule consumer on `v0.12.4`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.12.3/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.12.4/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -182,7 +190,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.12.3'
+$tag = 'v0.12.4'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -510,7 +518,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.12.3`
+- ref: `v0.12.4`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -558,11 +566,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.12.3`:
+before checkout; the current example then installs `v0.12.4`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.12.3
+git -C .ai/protocol checkout v0.12.4
 git add .ai/protocol
 ```
 

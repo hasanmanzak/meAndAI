@@ -5,31 +5,32 @@ Last verified: **2026-07-20**
 ## Verified facts
 
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
-- Visibility: public temporarily for hosted-CI continuity during FEAT-0035;
-  maintainer intends to return the repository to private after the workflow
-  optimization and outstanding hosted work complete.
+- Visibility: public temporarily for hosted-CI continuity; the maintainer
+  intends to return the repository to private after outstanding hosted and
+  adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.3`. At candidate preparation on 2026-07-20,
-  `0.12.2` was the last published baseline; its publication evidence is authoritative in
+- Current protocol version: `0.12.4`. At candidate preparation on 2026-07-20,
+  `0.12.3` was the last published baseline; its publication evidence is authoritative in
   [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) and
-  [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85). Candidate
-  publication facts belong in [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
+  [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Candidate
+  publication facts belong in [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
   after they exist and are not predicted in this repository snapshot.
-- Current scope: [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
-  corrects full-suite runtime by moving combinatorial policy evidence to
-  faithful production-owned contracts while retaining representative real
-  Git/launcher and native-Windows slices. Linux 2 minutes and Windows 3 minutes
-  are soft goals, not timing gates. [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
+- Current scope: [FEAT-0036](../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
+  replaces the quick-adoption monolith with one downloaded thin launcher and
+  one verified deterministic module bundle, adds bounded idempotent-GET retry,
+  preserves structured GitHub bodies across Windows PowerShell 5.1, and repairs
+  only the exact historical quote-stripped update issue. [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
   owns delivery and future publication evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: `TEST-0144` through `TEST-0146` have executable
-  capability ownership. The v0.12.3 pre-merge candidate adds non-gating suite
-  observations, production-owned marker/completion/submodule contracts,
-  immutable fixture reuse, retained real vertical slices, and unchanged
-  one-Linux/one-Windows hosted topology. Focused local evidence is green; final
-  full candidate validation and hosted CI remain mandatory external gates.
+- Latest tracked work: final `TEST-0147` passed on Windows PowerShell 5.1 in
+  17.7 seconds; `TEST-0148` and `TEST-0149` passed together in 23.4 seconds,
+  including repair of the exact stale v0.12.1 poisoned issue while targeting
+  v0.12.4; the focused publication-evidence owner, canonical consumer-update
+  suite, affected quick-adoption shards, and final structure pass also passed.
+  Pull request, hosted, merge, immutable release, live Derdini replay, and
+  cleanup evidence remain pending external gates.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -79,20 +80,21 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0035` / `BUG-0017` is complete as a pre-merge candidate under issue
-  #87. Every active scenario and declared quick-adoption/bootstrap variant
-  retains executable evidence; real security, recovery, TOCTOU, credential,
-  link/reparse, process, Codex, and native-Windows vertical slices remain.
-- Hosted Linux 2 minutes and Windows 3 minutes are non-gating optimization
-  goals. Normal workflow runs and justified reruns continue; do not encode the
-  goals as timeouts or restore hosted fan-out.
-- Exact same-machine Windows PowerShell 5.1 evidence reduced the canonical
-  quick-adoption run from 1055.028 to 643.7 seconds and real launcher
-  invocations from 166 to 113. The capabilities-bootstrap baseline was 444.284
-  seconds; contract extraction and immutable fixture reuse produced an earlier
-  203.636-second canonical run, with the final reviewed `Contracts` and
-  `VerticalSlices` shards green in 2.0 and 245.9 seconds. Final full candidate
-  validation and hosted CI remain pending external evidence.
+- `FEAT-0036` / `BUG-0018` / `BUG-0019` is a locally complete pre-merge
+  candidate under issue #89. The implementation has focused local evidence for the exact-source deterministic
+  module bundle, public parameter parity, immutable runtime trust table,
+  transient GET retry, UTF-8-no-BOM native body transport, and exact poisoned-
+  issue recovery. PR, hosted, merge, release, live Derdini replay, and cleanup
+  evidence are still pending and MUST NOT be projected into repository files.
+- `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
+  hosted evidence retains the representative security, recovery, TOCTOU,
+  credential, link/reparse, process, Codex, and native-Windows vertical slices.
+  Linux 2 minutes and Windows 3 minutes remain non-gating optimization goals;
+  do not encode them as timeouts or restore hosted fan-out.
+- The v0.12.4 runtime release contract contains exactly two assets: the thin
+  launcher downloaded by the maintainer and one internal verified module
+  bundle. `RuntimeReleaseTag` identifies the executable runtime independently
+  of the compatible consumer target selected by `-ProtocolTag`.
 - `v0.12.2` keeps `push: main` because private-main protection remains
   unavailable. Both stable jobs may run `StructureOnly` only when local Git
   and paginated GitHub evidence prove an exact successful merge-queue commit

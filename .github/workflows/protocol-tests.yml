@@ -214,10 +214,21 @@ jobs:
           MEANDAI_ISSUE_NUMBER: ${{ inputs.issue_number }}
           MEANDAI_OWNED_BRANCH: ${{ inputs.owned_branch }}
         run: |
-          ./tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1 `
-            -Repository '${{ github.repository }}' `
-            -Tag $env:MEANDAI_RELEASE_TAG `
-            -ExpectedCommit $env:MEANDAI_EXPECTED_COMMIT `
-            -FeaturePath $env:MEANDAI_FEATURE_PATH `
-            -IssueNumber $env:MEANDAI_ISSUE_NUMBER `
-            -OwnedBranch $env:MEANDAI_OWNED_BRANCH
+          $arguments = @{
+            Repository = '${{ github.repository }}'
+            Tag = $env:MEANDAI_RELEASE_TAG
+            ExpectedCommit = $env:MEANDAI_EXPECTED_COMMIT
+            FeaturePath = $env:MEANDAI_FEATURE_PATH
+            IssueNumber = $env:MEANDAI_ISSUE_NUMBER
+            OwnedBranch = $env:MEANDAI_OWNED_BRANCH
+          }
+          if ([version]$env:MEANDAI_RELEASE_TAG.Substring(1) -ge [version]'0.12.4') {
+            $arguments.ExpectedReleaseAssetNames = @(
+              'Invoke-MeAndAIQuickAdoption.ps1',
+              'MeAndAI.QuickAdoption.Bundle.zip'
+            )
+            $arguments.ExpectedBundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'
+            $arguments.ExpectedBundleSourceInventoryPath = `
+              'scripts/quick-adoption/bundle.sources.json'
+          }
+          & ./tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1 @arguments

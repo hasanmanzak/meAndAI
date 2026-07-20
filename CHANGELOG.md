@@ -3,6 +3,47 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.4 - 2026-07-20
+
+### Added
+
+- Split the tracked quick-adoption implementation into cohesive private and
+  public PowerShell module sources while retaining one exported adoption entry
+  point and the existing public parameter contract.
+- Add an exact source-blob deterministic builder that requires one clean source
+  commit, reads the ordered inventory and payloads from that commit, and emits
+  byte-identical `MeAndAI.QuickAdoption.Bundle.zip` output for repeated builds.
+
+### Changed
+
+- Keep one maintainer-downloaded thin `Invoke-MeAndAIQuickAdoption.ps1`, while
+  each immutable release contains exactly two release assets: that launcher and
+  one internal verified module bundle. The generated archive is not committed.
+- Bind the launcher to its own `RuntimeReleaseTag`, independently of the
+  compatible consumer target selected by `-ProtocolTag`, and verify immutable
+  release, commit, asset, archive, manifest, entry-point, length, and digest
+  evidence outside the consumer before module import.
+- Allow a present, revalidated `MEANDAI_RO_FG_PAT.txt` to authenticate only the
+  exact runtime-release read through invocation-scoped `GH_TOKEN`; restore the
+  caller environment and clear the value before imported code runs. An absent
+  file uses the authenticated local `gh` identity.
+
+### Fixed
+
+- Retry only explicitly declared idempotent GitHub API GET reads, with three
+  total attempts for bounded transient transport, HTTP 408/429, and 5xx
+  failures; permanent/semantic errors and every mutation remain single-attempt.
+- Preserve structured GitHub issue, comment, patch, and pull-request bodies
+  across Windows PowerShell 5.1 through UTF-8-no-BOM body files, and repair only
+  the exact historical quote-stripped schema-2 issue after complete ownership
+  and absence proof.
+
+Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md),
+[DEC-0023](docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md),
+[TEST-0147 through TEST-0149](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md),
+`BUG-0018`, `BUG-0019`, and
+[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89).
+
 ## 0.12.3 - 2026-07-20
 
 ### Added

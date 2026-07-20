@@ -54,8 +54,13 @@ function Invoke-Native {
         [string]$Command,
         [string[]]$Arguments,
         [int[]]$AcceptedExitCodes = @(0),
-        [switch]$PassThruResult
+        [switch]$PassThruResult,
+        [switch]$CaptureFailure
     )
+
+    if ($CaptureFailure -and -not $PassThruResult) {
+        throw 'CaptureFailure requires PassThruResult.'
+    }
 
     $previousErrorActionPreference = $ErrorActionPreference
     try {
@@ -72,7 +77,7 @@ function Invoke-Native {
     finally {
         $ErrorActionPreference = $previousErrorActionPreference
     }
-    if (-not ($AcceptedExitCodes -contains $exitCode)) {
+    if (-not ($AcceptedExitCodes -contains $exitCode) -and -not $CaptureFailure) {
         throw "$Command $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
     }
     if ($PassThruResult) {
@@ -82,6 +87,129 @@ function Invoke-Native {
         }
     }
     $output
+}
+
+function Get-GhReadFailureClassification {
+    param(
+        [int]$ExitCode,
+        [object[]]$Output
+    )
+
+    if ($ExitCode -eq 0) { return 'Success' }
+    $text = (@($Output | ForEach-Object { [string]$_ }) -join "`n")
+    $statusMatches = [regex]::Matches(
+        $text,
+        '(?i)(?:HTTP(?:[ /]|\s+status\s+)?|status(?:\s+code)?[ =:]+)(?<code>[1-5][0-9]{2})',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $statuses = @($statusMatches | ForEach-Object {
+        [int]$_.Groups['code'].Value
+    })
+    if (@($statuses | Where-Object { $_ -cin @(401, 403, 404, 422) }).Count -ne 0) {
+        return 'Permanent'
+    }
+    if (@($statuses | Where-Object {
+        $_ -eq 408 -or $_ -eq 429 -or ($_ -ge 500 -and $_ -le 599)
+    }).Count -ne 0) {
+        return 'Retryable'
+    }
+    foreach ($signal in @(
+        'connectex', 'connection attempt failed', 'context deadline exceeded',
+        'client.timeout', 'timed out', 'timeout', 'connection reset',
+        'forcibly closed', 'wsarecv', 'unexpected eof', 'dial tcp',
+        'tls handshake timeout'
+    )) {
+        if ($text.IndexOf($signal, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            return 'Retryable'
+        }
+    }
+    return 'Permanent'
+}
+
+function Invoke-GhReadNative {
+    param(
+        [Parameter(Mandatory)][string]$Endpoint,
+        [AllowNull()][string]$Token = $null,
+        [switch]$Paginate
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Endpoint) -or
+        $Endpoint.StartsWith('-', [StringComparison]::Ordinal)) {
+        throw 'GitHub API read requires one exact endpoint.'
+    }
+    $arguments = @(
+        'api', '--method', 'GET',
+        '-H', 'Accept: application/vnd.github+json',
+        '-H', 'X-GitHub-Api-Version: 2026-03-10'
+    )
+    if ($Paginate) {
+        $arguments += @('--paginate', '--jq', '.[] | @base64')
+    }
+    $arguments += $Endpoint
+    $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
+    try {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
+        }
+        for ($attempt = 1; $attempt -le 3; $attempt++) {
+            $result = Invoke-Native -Command 'gh' -Arguments $arguments `
+                -PassThruResult -CaptureFailure
+            if ([int]$result.ExitCode -eq 0) {
+                return @($result.Output)
+            }
+            $classification = Get-GhReadFailureClassification `
+                -ExitCode ([int]$result.ExitCode) -Output @($result.Output)
+            if ($classification -cne 'Retryable' -or $attempt -eq 3) {
+                $diagnostic = @($result.Output | ForEach-Object { [string]$_ }) `
+                    -join [Environment]::NewLine
+                throw "GitHub API GET '$Endpoint' failed on attempt $attempt of 3: $diagnostic"
+            }
+            Start-Sleep -Milliseconds $(if ($attempt -eq 1) { 250 } else { 500 })
+        }
+    }
+    finally {
+        if ($PSBoundParameters.ContainsKey('Token') -and
+            -not [string]::IsNullOrEmpty($Token)) {
+            [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
+        }
+    }
+}
+
+function Invoke-GhReadJson {
+    param(
+        [Parameter(Mandatory)][string]$Endpoint,
+        [AllowNull()][string]$Token = $null
+    )
+
+    $output = if ($PSBoundParameters.ContainsKey('Token')) {
+        @(Invoke-GhReadNative -Endpoint $Endpoint -Token $Token)
+    }
+    else { @(Invoke-GhReadNative -Endpoint $Endpoint) }
+    $text = $output -join [Environment]::NewLine
+    if ([string]::IsNullOrWhiteSpace($text)) { return $null }
+    try { return $text | ConvertFrom-Json }
+    catch { throw "GitHub API GET '$Endpoint' returned invalid JSON." }
+}
+
+function Invoke-GhPagedReadJson {
+    param(
+        [Parameter(Mandatory)][string]$Endpoint,
+        [AllowNull()][string]$Token = $null
+    )
+
+    $encodedItems = if ($PSBoundParameters.ContainsKey('Token')) {
+        @(Invoke-GhReadNative -Endpoint $Endpoint -Token $Token -Paginate)
+    }
+    else { @(Invoke-GhReadNative -Endpoint $Endpoint -Paginate) }
+    foreach ($encodedItem in $encodedItems) {
+        try {
+            $bytes = [Convert]::FromBase64String(([string]$encodedItem).Trim())
+            $json = [Text.UTF8Encoding]::new($false, $true).GetString($bytes)
+            $json | ConvertFrom-Json
+        }
+        catch { throw "GitHub API paged GET '$Endpoint' returned invalid JSON evidence." }
+    }
 }
 
 function Test-GitAncestor {
@@ -124,31 +252,96 @@ function Invoke-GhJson {
     $text | ConvertFrom-Json
 }
 
-function Invoke-GhPagedJson {
+function Invoke-GhMutationWithBodyFile {
     param(
-        [string]$Endpoint,
+        [Parameter(Mandatory)][ValidateSet('POST', 'PATCH')][string]$Method,
+        [Parameter(Mandatory)][string]$Endpoint,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [string[]]$Fields = @(),
         [AllowNull()][string]$Token = $null
     )
 
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        ('meandai-gh-body-' + [guid]::NewGuid().ToString('N'))
+    try {
+        [void](New-Item -ItemType Directory -Path $temporaryRoot)
+        $bodyPath = Join-Path $temporaryRoot 'body.txt'
+        [IO.File]::WriteAllText(
+            $bodyPath, $Body, [Text.UTF8Encoding]::new($false)
+        )
+        $arguments = @('api', '--method', $Method, $Endpoint)
+        foreach ($field in @($Fields)) {
+            if ([string]::IsNullOrEmpty([string]$field) -or
+                [string]$field -notmatch '^[^=\r\n]+=' -or
+                ([string]$field).StartsWith(
+                    'body=', [StringComparison]::OrdinalIgnoreCase
+                )) {
+                throw 'GitHub mutation contains an invalid non-body field.'
+            }
+            $arguments += @('-f', [string]$field)
+        }
+        $arguments += @('-F', "body=@$bodyPath")
+        if ($PSBoundParameters.ContainsKey('Token')) {
+            return Invoke-GhJson -Arguments $arguments -Token $Token
+        }
+        return Invoke-GhJson -Arguments $arguments
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+        }
+    }
+}
+
+function Invoke-GhPullRequestCreateWithBodyFile {
+    param(
+        [Parameter(Mandatory)][string]$Base,
+        [Parameter(Mandatory)][string]$Head,
+        [Parameter(Mandatory)][string]$Title,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [AllowNull()][string]$Token = $null
+    )
+
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        ('meandai-gh-pr-body-' + [guid]::NewGuid().ToString('N'))
     $previousToken = [Environment]::GetEnvironmentVariable('GH_TOKEN', 'Process')
     try {
+        [void](New-Item -ItemType Directory -Path $temporaryRoot)
+        $bodyPath = Join-Path $temporaryRoot 'body.txt'
+        [IO.File]::WriteAllText(
+            $bodyPath, $Body, [Text.UTF8Encoding]::new($false)
+        )
         if ($PSBoundParameters.ContainsKey('Token') -and
             -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $Token, 'Process')
         }
-        $encodedItems = @(Invoke-Native -Command 'gh' -Arguments @(
-            'api', '--paginate', '--jq', '.[] | @base64', $Endpoint
-        ))
+        Invoke-Native -Command 'gh' -Arguments @(
+            'pr', 'create', '--draft', '--base', $Base, '--head', $Head,
+            '--title', $Title, '--body-file', $bodyPath
+        )
     }
     finally {
         if ($PSBoundParameters.ContainsKey('Token') -and
             -not [string]::IsNullOrEmpty($Token)) {
             [Environment]::SetEnvironmentVariable('GH_TOKEN', $previousToken, 'Process')
         }
+        if (Test-Path -LiteralPath $temporaryRoot) {
+            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
+        }
     }
-    foreach ($encodedItem in $encodedItems) {
-        $json = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(([string]$encodedItem).Trim()))
-        $json | ConvertFrom-Json
+}
+
+function Invoke-GhPagedJson {
+    param(
+        [string]$Endpoint,
+        [AllowNull()][string]$Token = $null
+    )
+
+    if ($PSBoundParameters.ContainsKey('Token')) {
+        Invoke-GhPagedReadJson -Endpoint $Endpoint -Token $Token
+    }
+    else {
+        Invoke-GhPagedReadJson -Endpoint $Endpoint
     }
 }
 
@@ -162,12 +355,9 @@ function Get-ImmutableProtocolReleaseEvidence {
     if ($Tag -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$') {
         throw "Selected protocol target '$Tag' is not a canonical release tag."
     }
-    $release = Invoke-GhJson -Token $ProtocolToken -Arguments @(
-        'api',
-        '-H', 'Accept: application/vnd.github+json',
-        '-H', 'X-GitHub-Api-Version: 2026-03-10',
-        "repos/$Repository/releases/tags/$Tag"
-    )
+    $release = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/releases/tags/$Tag" `
+        -Token $ProtocolToken
     foreach ($name in @('tag_name', 'draft', 'prerelease', 'immutable', 'published_at')) {
         if ($null -eq $release -or $null -eq $release.PSObject.Properties[$name]) {
             throw "Protocol release '$Tag' is missing required immutable-release metadata '$name'."
@@ -184,12 +374,9 @@ function Get-ImmutableProtocolReleaseEvidence {
         throw "Protocol target '$Tag' is not an exact published, non-prerelease, immutable GitHub Release."
     }
 
-    $reference = Invoke-GhJson -Token $ProtocolToken -Arguments @(
-        'api',
-        '-H', 'Accept: application/vnd.github+json',
-        '-H', 'X-GitHub-Api-Version: 2026-03-10',
-        "repos/$Repository/git/ref/tags/$Tag"
-    )
+    $reference = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/git/ref/tags/$Tag" `
+        -Token $ProtocolToken
     if ($null -eq $reference -or $null -eq $reference.PSObject.Properties['object'] -or
         $null -eq $reference.object -or
         $null -eq $reference.object.PSObject.Properties['type'] -or
@@ -202,12 +389,9 @@ function Get-ImmutableProtocolReleaseEvidence {
         throw "Protocol release '$Tag' has an invalid tag object identity."
     }
     if ($objectType -ceq 'tag') {
-        $annotatedTag = Invoke-GhJson -Token $ProtocolToken -Arguments @(
-            'api',
-            '-H', 'Accept: application/vnd.github+json',
-            '-H', 'X-GitHub-Api-Version: 2026-03-10',
-            "repos/$Repository/git/tags/$objectSha"
-        )
+        $annotatedTag = Invoke-GhReadJson `
+            -Endpoint "repos/$Repository/git/tags/$objectSha" `
+            -Token $ProtocolToken
         if ($null -eq $annotatedTag -or
             $null -eq $annotatedTag.PSObject.Properties['object'] -or
             $null -eq $annotatedTag.object -or
@@ -270,7 +454,7 @@ function Get-ValidatedPullRequestChangedPaths {
 }
 
 function Get-AuthenticatedUpdaterActor {
-    $user = Invoke-GhJson -Arguments @('api', 'user')
+    $user = Invoke-GhReadJson -Endpoint 'user'
     $loginProperty = if ($null -ne $user) { $user.PSObject.Properties['login'] } else { $null }
     $login = if ($null -ne $loginProperty) { [string]$loginProperty.Value } else { '' }
     if ([string]::IsNullOrWhiteSpace($login)) {
@@ -1345,6 +1529,269 @@ function Get-ManagedUpdateIssueInventory {
         Where-Object { $null -eq $_.PSObject.Properties['pull_request'] })
 }
 
+function Test-ExactLegacyQuoteStrippedProtocolUpdateIssue {
+    param(
+        $Issue,
+        $Contract,
+        [string]$Repository,
+        [string]$TrustedActor
+    )
+
+    try {
+        if ($null -eq $Issue -or $null -eq $Contract -or
+            $Repository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' -or
+            [string]::IsNullOrWhiteSpace($TrustedActor) -or
+            $null -ne $Issue.PSObject.Properties['pull_request'] -or
+            [string]$Issue.number -cnotmatch '^[1-9][0-9]*$' -or
+            [string]$Issue.state -cne 'open' -or
+            $null -eq $Issue.PSObject.Properties['user'] -or
+            [string]$Issue.user.login -cne $TrustedActor -or
+            [string]$Issue.title -cne [string]$Contract.Title) {
+            return [bool]$false
+        }
+        $contractMarker = Get-ManagedUpdateIssueMarker `
+            -Body ([string]$Contract.Body)
+        if ($contractMarker.CanonicalLine -cne [string]$Contract.Marker -or
+            $contractMarker.Repository -cne $Repository) {
+            return [bool]$false
+        }
+        $actual = ([string]$Issue.body).Replace("`r`n", "`n").Replace("`r", "`n")
+        $expected = ([string]$Contract.Body).Replace('"', '').Replace(
+            "`r`n", "`n"
+        ).Replace("`r", "`n")
+        return [bool]($actual -ceq $expected)
+    }
+    catch { return [bool]$false }
+}
+
+function Repair-LegacyQuoteStrippedProtocolUpdateIssue {
+    param(
+        [string]$Repository,
+        [string]$TargetTag,
+        [string]$ProtocolSha,
+        [string]$Branch,
+        [ValidateSet('Update', 'MigrationReconciliation')]
+        [string]$ProposalKind = 'Update',
+        [string]$MigrationPlanSha = '',
+        [string]$TrustedActor
+    )
+
+    if ($Repository -cnotmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' -or
+        $TargetTag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$' -or
+        $ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+        [string]::IsNullOrWhiteSpace($Branch) -or
+        [string]::IsNullOrWhiteSpace($TrustedActor)) {
+        throw 'Legacy issue repair requires exact repository, target, branch, commit, and actor identities.'
+    }
+    $requestedContract = Get-ManagedUpdateIssueContract -Repository $Repository `
+        -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch `
+        -ProposalKind $ProposalKind -MigrationPlanSha $MigrationPlanSha
+    $targetIndex = $Branch.LastIndexOf($TargetTag, [StringComparison]::Ordinal)
+    $branchTail = if ($targetIndex -ge 0) {
+        $Branch.Substring($targetIndex + $TargetTag.Length)
+    }
+    else { '' }
+    if ($targetIndex -lt 1 -or $branchTail -cnotin @('', '-recovery', '-migrations')) {
+        throw 'Legacy issue repair could not derive the reserved branch namespace.'
+    }
+    $repairBranchPrefix = $Branch.Substring(0, $targetIndex)
+    $token = [string]$env:ISSUE_TOKEN
+    $repositoryRecord = Invoke-GhReadJson -Endpoint "repos/$Repository" `
+        -Token $token
+    if ([string]$repositoryRecord.full_name -cne $Repository) {
+        throw 'Legacy issue repair repository identity did not resolve exactly.'
+    }
+
+    $issuesEndpoint = "repos/$Repository/issues?state=all&per_page=100"
+    $inventory = @(Invoke-GhPagedReadJson -Endpoint $issuesEndpoint -Token $token)
+    $poisoned = [System.Collections.Generic.List[object]]::new()
+    $canonical = [System.Collections.Generic.List[object]]::new()
+    $nearMatches = [System.Collections.Generic.List[object]]::new()
+    foreach ($issue in $inventory) {
+        if (Test-ExactLegacyQuoteStrippedProtocolUpdateIssue `
+                -Issue $issue -Contract $requestedContract -Repository $Repository `
+                -TrustedActor $TrustedActor) {
+            $poisoned.Add([pscustomobject]@{
+                Issue = $issue; Contract = $requestedContract; Branch = $Branch
+            })
+            continue
+        }
+        $body = [string]$issue.body
+        $normalizedBody = $body.Replace("`r`n", "`n").Replace("`r", "`n")
+        $hasManagedSignal = $normalizedBody.StartsWith(
+            '<!-- meandai-protocol-update-issue:',
+            [StringComparison]::OrdinalIgnoreCase
+        )
+        if ($hasManagedSignal) {
+            $lines = @($normalizedBody.Split([char]"`n"))
+            $legacyMatch = if ($lines.Count -gt 0) {
+                [regex]::Match(
+                    $lines[0],
+                    '^<!-- meandai-protocol-update-issue:\{schema:2,kind:(?<kind>update|migration-reconciliation),target:(?<target>v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)),protocolSha:(?<sha>[0-9a-f]{40}),migrationPlanSha:(?<plan>[0-9a-f]{64}),repository:(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)\} -->$',
+                    [Text.RegularExpressions.RegexOptions]::CultureInvariant
+                )
+            }
+            else { $null }
+            $legacySchema = 2
+            if ($null -eq $legacyMatch -or -not $legacyMatch.Success) {
+                $legacyMatch = if ($lines.Count -gt 0) {
+                    [regex]::Match(
+                        $lines[0],
+                        '^<!-- meandai-protocol-update-issue:\{schema:1,target:(?<target>v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)),protocolSha:(?<sha>[0-9a-f]{40}),repository:(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)\} -->$',
+                        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+                    )
+                }
+                else { $null }
+                $legacySchema = 1
+            }
+            if ($null -ne $legacyMatch -and $legacyMatch.Success -and
+                $legacyMatch.Groups['repository'].Value -ceq $Repository) {
+                $derivedKind = if ($legacySchema -eq 2 -and
+                    $legacyMatch.Groups['kind'].Value -ceq
+                        'migration-reconciliation') {
+                    'MigrationReconciliation'
+                }
+                else { 'Update' }
+                $branchIndex = if ($legacySchema -eq 2) { 6 } else { 5 }
+                $branchMatch = if ($lines.Count -gt $branchIndex) {
+                    [regex]::Match(
+                        $lines[$branchIndex],
+                        '^- Deterministic branch: `(?<branch>[^`\r\n]+)`$',
+                        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+                    )
+                }
+                else { $null }
+                if ($null -ne $branchMatch -and $branchMatch.Success) {
+                    $derivedTarget = $legacyMatch.Groups['target'].Value
+                    $derivedBranch = $branchMatch.Groups['branch'].Value
+                    $baseBranch = "$repairBranchPrefix$derivedTarget"
+                    $allowedBranches = if ($derivedKind -ceq 'Update') {
+                        @($baseBranch, "$baseBranch-recovery")
+                    }
+                    else { @("$baseBranch-migrations") }
+                    if ($allowedBranches -ccontains $derivedBranch) {
+                        $derivedContract = Get-ManagedUpdateIssueContract `
+                            -Repository $Repository -TargetTag $derivedTarget `
+                            -ProtocolSha $legacyMatch.Groups['sha'].Value `
+                            -Branch $derivedBranch -ProposalKind $derivedKind `
+                            -MigrationPlanSha $(if ($legacySchema -eq 2) {
+                                $legacyMatch.Groups['plan'].Value
+                            } else { '' })
+                        if (Test-ExactLegacyQuoteStrippedProtocolUpdateIssue `
+                                -Issue $issue -Contract $derivedContract `
+                                -Repository $Repository `
+                                -TrustedActor $TrustedActor) {
+                            $poisoned.Add([pscustomobject]@{
+                                Issue = $issue; Contract = $derivedContract
+                                Branch = $derivedBranch
+                            })
+                            continue
+                        }
+                    }
+                }
+            }
+        }
+        $marker = $null
+        try { $marker = Get-ManagedUpdateIssueMarker -Body $body }
+        catch {
+            if ($hasManagedSignal) { $nearMatches.Add($issue) }
+            continue
+        }
+        if ($marker.Schema -gt 0) {
+            $canonical.Add([pscustomobject]@{
+                Issue = $issue; Marker = [string]$marker.CanonicalLine
+            })
+        }
+        if ($marker.CanonicalLine -ceq [string]$requestedContract.Marker) {
+            $expectedBody = ([string]$requestedContract.Body).Replace("`r`n", "`n").Replace(
+                "`r", "`n"
+            )
+            if ([string]$issue.title -cne [string]$requestedContract.Title -or
+                $normalizedBody -cne $expectedBody -or
+                [string]$issue.state -cnotin @('open', 'closed') -or
+                $null -ne $issue.PSObject.Properties['pull_request']) {
+                $nearMatches.Add($issue)
+            }
+        }
+    }
+    if ($poisoned.Count -eq 0) {
+        if ($nearMatches.Count -ne 0) {
+            throw 'A managed protocol-update issue resembles the historical malformed record but is not exact.'
+        }
+        return [bool]$false
+    }
+    if ($poisoned.Count -ne 1 -or $nearMatches.Count -ne 0) {
+        throw 'Legacy malformed protocol-update issue ownership is ambiguous.'
+    }
+
+    $candidate = $poisoned[0]
+    $issue = $candidate.Issue
+    $contract = $candidate.Contract
+    $repairBranch = [string]$candidate.Branch
+    if (@($canonical | Where-Object {
+        [string]$_.Marker -ceq [string]$contract.Marker
+    }).Count -ne 0) {
+        throw 'Legacy malformed protocol-update issue has a canonical duplicate.'
+    }
+    if ($null -ne (Get-RemoteBranchHead -Branch $repairBranch)) {
+        throw 'Legacy malformed protocol-update issue cannot be repaired while its reserved branch exists.'
+    }
+    $owner = $Repository.Split('/')[0]
+    $pullsEndpoint = "repos/$Repository/pulls?state=all&head=$owner`:$repairBranch&per_page=100"
+    if (@(Invoke-GhPagedReadJson -Endpoint $pullsEndpoint -Token $token).Count -ne 0) {
+        throw 'Legacy malformed protocol-update issue cannot be repaired while a paired pull request exists.'
+    }
+    $commentsEndpoint = "repos/$Repository/issues/$([int]$issue.number)/comments?per_page=100"
+    $comments = @(Invoke-GhPagedReadJson -Endpoint $commentsEndpoint -Token $token)
+    if (@($comments | Where-Object {
+        ([string]$_.body).StartsWith(
+            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
+        )
+    }).Count -ne 0) {
+        throw 'Legacy malformed protocol-update issue already has managed proposal evidence.'
+    }
+
+    $issueEndpoint = "repos/$Repository/issues/$([int]$issue.number)"
+    $fresh = Invoke-GhReadJson -Endpoint $issueEndpoint -Token $token
+    $freshRepository = Invoke-GhReadJson -Endpoint "repos/$Repository" -Token $token
+    $freshPulls = @(Invoke-GhPagedReadJson -Endpoint $pullsEndpoint -Token $token)
+    $freshComments = @(Invoke-GhPagedReadJson -Endpoint $commentsEndpoint -Token $token)
+    if (-not (Test-ExactLegacyQuoteStrippedProtocolUpdateIssue `
+            -Issue $fresh -Contract $contract -Repository $Repository `
+            -TrustedActor $TrustedActor) -or
+        [int]$fresh.number -ne [int]$issue.number -or
+        [string]$freshRepository.full_name -cne $Repository -or
+        $null -ne (Get-RemoteBranchHead -Branch $repairBranch) -or
+        $freshPulls.Count -ne 0 -or
+        @($freshComments | Where-Object {
+            ([string]$_.body).StartsWith(
+                '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
+            )
+        }).Count -ne 0) {
+        throw 'Legacy malformed protocol-update issue evidence changed before repair.'
+    }
+
+    [void](Invoke-GhMutationWithBodyFile -Method PATCH -Endpoint $issueEndpoint `
+        -Body ([string]$contract.Body) -Token $token)
+    $repaired = Invoke-GhReadJson -Endpoint $issueEndpoint -Token $token
+    $repairedMarker = Get-ManagedUpdateIssueMarker -Body ([string]$repaired.body)
+    $repairedBody = ([string]$repaired.body).Replace("`r`n", "`n").Replace(
+        "`r", "`n"
+    )
+    $expectedBody = ([string]$contract.Body).Replace("`r`n", "`n").Replace(
+        "`r", "`n"
+    )
+    if ($repairedMarker.CanonicalLine -cne [string]$contract.Marker -or
+        [string]$repaired.title -cne [string]$contract.Title -or
+        $repairedBody -cne $expectedBody -or
+        [string]$repaired.state -cne 'open' -or
+        [string]$repaired.user.login -cne $TrustedActor -or
+        $null -ne $repaired.PSObject.Properties['pull_request']) {
+        throw 'Legacy malformed protocol-update issue did not converge to the canonical contract.'
+    }
+    return [bool]$true
+}
+
 function Ensure-ProtocolUpdateIssue {
     param(
         [string]$Repository,
@@ -1353,9 +1800,15 @@ function Ensure-ProtocolUpdateIssue {
         [string]$Branch,
         [ValidateSet('Update', 'MigrationReconciliation')]
         [string]$ProposalKind = 'Update',
-        [string]$MigrationPlanSha = ''
+        [string]$MigrationPlanSha = '',
+        [Parameter(Mandatory)][string]$TrustedActor
     )
 
+    [void](Repair-LegacyQuoteStrippedProtocolUpdateIssue `
+        -Repository $Repository -TargetTag $TargetTag `
+        -ProtocolSha $ProtocolSha -Branch $Branch `
+        -ProposalKind $ProposalKind -MigrationPlanSha $MigrationPlanSha `
+        -TrustedActor $TrustedActor)
     Ensure-ManagedUpdateLabels -Repository $Repository
     $contract = Get-ManagedUpdateIssueContract -Repository $Repository `
         -TargetTag $TargetTag -ProtocolSha $ProtocolSha -Branch $Branch `
@@ -1380,12 +1833,12 @@ function Ensure-ProtocolUpdateIssue {
         throw 'More than one canonical protocol-update issue exists for the same immutable target.'
     }
     if ($matches.Count -eq 0) {
-        Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-            'api', '--method', 'POST', "repos/$Repository/issues",
-            '-f', "title=$($contract.Title)", '-f', "body=$($contract.Body)",
-            '-f', 'labels[]=type:task', '-f', 'labels[]=priority:p1',
-            '-f', 'labels[]=status:needs-review'
-        ) | Out-Null
+        Invoke-GhMutationWithBodyFile -Method POST `
+            -Endpoint "repos/$Repository/issues" -Body ([string]$contract.Body) `
+            -Fields @(
+                "title=$($contract.Title)", 'labels[]=type:task',
+                'labels[]=priority:p1', 'labels[]=status:needs-review'
+            ) -Token ([string]$env:ISSUE_TOKEN) | Out-Null
         foreach ($issue in @(Get-ManagedUpdateIssueInventory -Repository $Repository)) {
             $marker = Get-ManagedUpdateIssueMarker -Body ([string]$issue.body)
             if ($marker.CanonicalLine -ceq $contract.Marker) {
@@ -1408,9 +1861,9 @@ function Ensure-ProtocolUpdateIssue {
         '-f', 'labels[]=type:task', '-f', 'labels[]=priority:p1',
         '-f', 'labels[]=status:needs-review'
     ) | Out-Null
-    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-        'api', "repos/$Repository/issues/$($canonical.number)"
-    )
+    Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/issues/$($canonical.number)" `
+        -Token ([string]$env:ISSUE_TOKEN)
 }
 
 function Get-ManagedUpdateProposalEvidenceMarker {
@@ -1453,10 +1906,9 @@ function Set-ProtocolUpdateIssuePullRequestLink {
             "Managed protocol proposal: #$PullRequestNumber",
             "Exact proposal head: ``$HeadSha``"
         ) -join [Environment]::NewLine
-        Invoke-GhJson -Token $token -Arguments @(
-            'api', '--method', 'POST',
-            "repos/$Repository/issues/$IssueNumber/comments", '-f', "body=$body"
-        ) | Out-Null
+        Invoke-GhMutationWithBodyFile -Method POST `
+            -Endpoint "repos/$Repository/issues/$IssueNumber/comments" `
+            -Body $body -Token $token | Out-Null
     }
 }
 
@@ -1476,9 +1928,8 @@ function Get-ValidatedManagedUpdateIssue {
     )
 
     $issueNumber = Get-CanonicalTrackingIssueNumber -Body $PullRequestBody
-    $issue = Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-        'api', "repos/$Repository/issues/$issueNumber"
-    )
+    $issue = Invoke-GhReadJson -Endpoint "repos/$Repository/issues/$issueNumber" `
+        -Token ([string]$env:ISSUE_TOKEN)
     if ($null -eq $issue -or [int]$issue.number -ne $issueNumber -or
         $null -ne $issue.PSObject.Properties['pull_request']) {
         throw "Managed update pull request #$PullRequestNumber tracking reference is not one same-repository issue."
@@ -1564,7 +2015,7 @@ function Assert-RemoteDefaultBranchUnchanged {
     if ($ExpectedHeadSha -cnotmatch '^[0-9a-f]{40}$') {
         throw 'Remote default-branch binding lacks one exact expected SHA.'
     }
-    $metadata = Invoke-GhJson -Arguments @('api', "repos/$Repository")
+    $metadata = Invoke-GhReadJson -Endpoint "repos/$Repository"
     $fullNameProperty = if ($null -ne $metadata) {
         $metadata.PSObject.Properties['full_name']
     }
@@ -1661,20 +2112,22 @@ function Get-RepositoryTreeEntry {
         return $empty
     }
 
-    $commitArguments = @('api', "repos/$Repository/git/commits/$HeadSha")
     $commit = if ($PSBoundParameters.ContainsKey('Token')) {
-        Invoke-GhJson -Arguments $commitArguments -Token $Token
-    } else { Invoke-GhJson -Arguments $commitArguments }
+        Invoke-GhReadJson -Endpoint "repos/$Repository/git/commits/$HeadSha" `
+            -Token $Token
+    }
+    else { Invoke-GhReadJson -Endpoint "repos/$Repository/git/commits/$HeadSha" }
     $treeSha = [string]$commit.tree.sha
     if ($treeSha -notmatch '^[0-9a-f]{40}$') {
         return $empty
     }
 
     for ($index = 0; $index -lt $segments.Count; $index++) {
-        $treeArguments = @('api', "repos/$Repository/git/trees/$treeSha")
         $tree = if ($PSBoundParameters.ContainsKey('Token')) {
-            Invoke-GhJson -Arguments $treeArguments -Token $Token
-        } else { Invoke-GhJson -Arguments $treeArguments }
+            Invoke-GhReadJson -Endpoint "repos/$Repository/git/trees/$treeSha" `
+                -Token $Token
+        }
+        else { Invoke-GhReadJson -Endpoint "repos/$Repository/git/trees/$treeSha" }
         $matches = @($tree.tree | Where-Object {
             [string]::Equals([string]$_.path, [string]$segments[$index], [StringComparison]::Ordinal)
         })
@@ -1709,11 +2162,11 @@ function Get-RepositoryBlobBytes {
     if ($BlobSha -cnotmatch '^[0-9a-f]{40}$') {
         throw "Repository blob identity '$BlobSha' is not canonical."
     }
-    $arguments = @('api', "repos/$Repository/git/blobs/$BlobSha")
     $blob = if ($PSBoundParameters.ContainsKey('Token')) {
-        Invoke-GhJson -Arguments $arguments -Token $Token
+        Invoke-GhReadJson -Endpoint "repos/$Repository/git/blobs/$BlobSha" `
+            -Token $Token
     }
-    else { Invoke-GhJson -Arguments $arguments }
+    else { Invoke-GhReadJson -Endpoint "repos/$Repository/git/blobs/$BlobSha" }
     if ($null -eq $blob -or [string]$blob.sha -cne $BlobSha -or
         [string]$blob.encoding -cne 'base64' -or
         $null -eq $blob.PSObject.Properties['size'] -or
@@ -1930,11 +2383,9 @@ function Assert-Schema2MergedProtocolEvidence {
         if ([string]$baseProtocol.Sha -ceq $targetSha) {
             throw 'Schema-2 update base already contains the target protocol.'
         }
-        $lineage = Invoke-GhJson -Token ([string]$env:PROTOCOL_TOKEN) `
-            -Arguments @(
-                'api',
-                "repos/$ProtocolRepository/compare/$([string]$baseProtocol.Sha)...$targetSha"
-            )
+        $lineage = Invoke-GhReadJson `
+            -Endpoint "repos/$ProtocolRepository/compare/$([string]$baseProtocol.Sha)...$targetSha" `
+            -Token ([string]$env:PROTOCOL_TOKEN)
         if ([string]$lineage.status -cne 'ahead') {
             throw 'Schema-2 update target is not a descendant of the base protocol commit.'
         }
@@ -2070,7 +2521,7 @@ function Assert-ManagedPullRequestSafe {
     if ($null -eq $migrationPlan) {
         throw "Managed PR #$number has no deterministic consumer migration plan."
     }
-    $details = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$number")
+    $details = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$number"
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$number/files?per_page=100")
     $marker = Get-ProtocolMarker ([string]$details.body)
     $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
@@ -2395,7 +2846,7 @@ function Repair-LegacyInstallingUpdateTracking {
         [int]$Number
     )
 
-    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    $pull = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$Number"
     if ($null -eq $pull -or [int]$pull.number -ne $Number) {
         throw "Pull request #$Number could not be resolved exactly."
     }
@@ -2490,16 +2941,14 @@ function Repair-LegacyInstallingUpdateTracking {
             throw "Managed installing update #$Number updater asset '$($asset.ConsumerPath)' does not match the immutable target release template."
         }
     }
-    $repositoryRecord = Invoke-GhJson -Arguments @('api', "repos/$Repository")
-    $defaultRef = Invoke-GhJson -Arguments @(
-        'api', "repos/$Repository/git/ref/heads/$DefaultBranch"
-    )
+    $repositoryRecord = Invoke-GhReadJson -Endpoint "repos/$Repository"
+    $defaultRef = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/git/ref/heads/$DefaultBranch"
     $defaultHead = [string]$defaultRef.object.sha
     $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
         -HeadSha $defaultHead -Path $ProtocolPath
-    $comparison = Invoke-GhJson -Arguments @(
-        'api', "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
-    )
+    $comparison = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
     if ([string]$repositoryRecord.full_name -cne $Repository -or
         [string]$repositoryRecord.default_branch -cne $DefaultBranch -or
         [string]$defaultRef.ref -cne "refs/heads/$DefaultBranch" -or
@@ -2524,7 +2973,7 @@ function Repair-LegacyInstallingUpdateTracking {
 
     $issue = Ensure-ProtocolUpdateIssue -Repository $Repository `
         -TargetTag ([string]$marker.Target) -ProtocolSha ([string]$marker.ProtocolSha) `
-        -Branch $branch
+        -Branch $branch -TrustedActor (Get-AuthenticatedUpdaterActor)
     Set-ProtocolUpdateIssuePullRequestLink -Repository $Repository `
         -IssueNumber ([int]$issue.number) -PullRequestNumber $Number `
         -HeadSha ([string]$marker.Head)
@@ -2537,11 +2986,10 @@ function Repair-LegacyInstallingUpdateTracking {
         $normalized.TrimEnd([char[]]"`n") + [Environment]::NewLine +
             [Environment]::NewLine + $trackingLine
     }
-    Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-        'api', '--method', 'PATCH', "repos/$Repository/pulls/$Number",
-        '-f', "body=$repairedBody"
-    ) | Out-Null
-    $repaired = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    Invoke-GhMutationWithBodyFile -Method PATCH `
+        -Endpoint "repos/$Repository/pulls/$Number" -Body $repairedBody `
+        -Token ([string]$env:ISSUE_TOKEN) | Out-Null
+    $repaired = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$Number"
     if ((Get-CanonicalTrackingIssueNumber -Body ([string]$repaired.body)) -ne
         [int]$issue.number) {
         throw "Managed installing update #$Number tracking repair did not converge."
@@ -2555,7 +3003,7 @@ function Get-ManagedMergedPullRequestState {
         [int]$Number
     )
 
-    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$Number")
+    $pull = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$Number"
     if ($null -eq $pull -or [int]$pull.number -ne $Number) {
         throw "Pull request #$Number could not be resolved exactly."
     }
@@ -2707,23 +3155,21 @@ function Get-ManagedMergedPullRequestState {
             -ChangedPaths $changedPaths
     }
 
-    $repositoryRecord = Invoke-GhJson -Arguments @('api', "repos/$Repository")
+    $repositoryRecord = Invoke-GhReadJson -Endpoint "repos/$Repository"
     if ([string]$repositoryRecord.full_name -cne $Repository -or
         [string]$repositoryRecord.default_branch -cne $DefaultBranch) {
         throw 'Consumer default branch changed; explicit maintainer review is required.'
     }
-    $defaultRef = Invoke-GhJson -Arguments @(
-        'api', "repos/$Repository/git/ref/heads/$DefaultBranch"
-    )
+    $defaultRef = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/git/ref/heads/$DefaultBranch"
     $defaultHead = [string]$defaultRef.object.sha
     if ([string]$defaultRef.ref -cne "refs/heads/$DefaultBranch" -or
         [string]$defaultRef.object.type -cne 'commit' -or
         $defaultHead -cnotmatch '^[0-9a-f]{40}$') {
         throw 'Consumer default branch head could not be resolved exactly.'
     }
-    $comparison = Invoke-GhJson -Arguments @(
-        'api', "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
-    )
+    $comparison = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
     if ([string]$comparison.status -cnotin @('identical', 'ahead')) {
         throw "Managed pull request #$Number merge is no longer contained in the current default branch."
     }
@@ -2854,16 +3300,13 @@ function Invoke-ManagedMergedPullRequestFinalization {
             "Finalized managed $($afterBranch.Kind.ToLowerInvariant()) merge #$Number at head ``$($afterBranch.Head)``.",
             "The deterministic branch ``$($afterBranch.Branch)`` is absent and the tracking issue can close as completed."
         ) -join [Environment]::NewLine
-        Invoke-Native -Command 'gh' -Arguments @(
-            'api', '--method', 'POST',
-            "repos/$repository/issues/$($afterBranch.IssueNumber)/comments",
-            '-f', "body=$comment"
-        ) | Out-Null
+        Invoke-GhMutationWithBodyFile -Method POST `
+            -Endpoint "repos/$repository/issues/$($afterBranch.IssueNumber)/comments" `
+            -Body $comment | Out-Null
     }
 
-    $liveIssue = Invoke-GhJson -Arguments @(
-        'api', "repos/$repository/issues/$($afterBranch.IssueNumber)"
-    )
+    $liveIssue = Invoke-GhReadJson `
+        -Endpoint "repos/$repository/issues/$($afterBranch.IssueNumber)"
     $labels = @($liveIssue.labels | ForEach-Object { [string]$_.name })
     foreach ($label in @(
         'status:in-progress', 'status:needs-review', 'status:blocked'
@@ -2948,7 +3391,7 @@ function Complete-SupersededProtocolUpdateIssue {
         return
     }
     $pullNumber = [int]$Operation.PullRequestNumber
-    $pull = Invoke-GhJson -Arguments @('api', "repos/$Repository/pulls/$pullNumber")
+    $pull = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$pullNumber"
     $issue = Get-ValidatedManagedUpdateIssue -Repository $Repository `
         -PullRequestNumber $pullNumber -TargetTag ([string]$Operation.TargetTag) `
         -ProtocolSha ([string]$Operation.ExpectedProtocolSha) `
@@ -2988,10 +3431,9 @@ function Complete-SupersededProtocolUpdateIssue {
                 "Verified replacement proposal: #$ReplacementPullRequestNumber"
             } else { 'The consumer default branch already contains the target protocol.' })
         ) -join [Environment]::NewLine
-        Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-            'api', '--method', 'POST',
-            "repos/$Repository/issues/$([int]$issue.number)/comments", '-f', "body=$body"
-        ) | Out-Null
+        Invoke-GhMutationWithBodyFile -Method POST `
+            -Endpoint "repos/$Repository/issues/$([int]$issue.number)/comments" `
+            -Body $body -Token ([string]$env:ISSUE_TOKEN) | Out-Null
     }
     $labels = @($issue.labels | ForEach-Object { [string]$_.name })
     foreach ($label in @('status:in-progress', 'status:needs-review', 'status:blocked')) {
@@ -3006,9 +3448,9 @@ function Complete-SupersededProtocolUpdateIssue {
         'api', '--method', 'PATCH', "repos/$Repository/issues/$([int]$issue.number)",
         '-f', 'state=closed', '-f', 'state_reason=not_planned'
     ) | Out-Null
-    $closed = Invoke-GhJson -Token ([string]$env:ISSUE_TOKEN) -Arguments @(
-        'api', "repos/$Repository/issues/$([int]$issue.number)"
-    )
+    $closed = Invoke-GhReadJson `
+        -Endpoint "repos/$Repository/issues/$([int]$issue.number)" `
+        -Token ([string]$env:ISSUE_TOKEN)
     if ([string]$closed.state -cne 'closed') {
         throw "Superseded managed update issue #$([int]$issue.number) did not close."
     }
@@ -3259,7 +3701,8 @@ foreach ($pull in $pulls) {
         continue
     }
 
-    $details = Invoke-GhJson -Arguments @('api', "repos/$repository/pulls/$($pull.number)")
+    $details = Invoke-GhReadJson `
+        -Endpoint "repos/$repository/pulls/$($pull.number)"
     $marker = Get-ProtocolMarker ([string]$details.body)
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$repository/pulls/$($pull.number)/files?per_page=100")
     $headRef = [string]$details.head.ref
@@ -3524,7 +3967,8 @@ if ($create.Count -eq 1) {
     $updateIssue = Ensure-ProtocolUpdateIssue -Repository $repository `
         -TargetTag $targetTag -ProtocolSha $targetSha -Branch $createdBranch `
         -ProposalKind $proposalKind `
-        -MigrationPlanSha ([string]$migrationPlan.PlanSha256)
+        -MigrationPlanSha ([string]$migrationPlan.PlanSha256) `
+        -TrustedActor $TrustedActor
 
     $pushSucceeded = $false
     $marker = ''
@@ -3593,11 +4037,9 @@ if ($create.Count -eq 1) {
             $bodyLines.Add([string]$line)
         }
         $body = $bodyLines -join [Environment]::NewLine
-        $url = (Invoke-Native -Command 'gh' -Arguments @(
-            'pr', 'create', '--draft', '--base', $env:DEFAULT_BRANCH,
-            '--head', $createdBranch, '--title', $proposalTitle,
-            '--body', $body
-        ) | Select-Object -Last 1).Trim()
+        $url = (Invoke-GhPullRequestCreateWithBodyFile `
+            -Base $env:DEFAULT_BRANCH -Head $createdBranch `
+            -Title $proposalTitle -Body $body | Select-Object -Last 1).Trim()
         $urlMatch = [regex]::Match($url, '/pull/(?<number>\d+)/?$')
         if (-not $urlMatch.Success) {
             throw "Created replacement PR returned an unrecognized URL."
@@ -3816,11 +4258,9 @@ foreach ($operation in $closeOperations) {
     else {
         "The default branch already contains ``$($operation.TargetTag)``. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
     }
-    Invoke-Native -Command 'gh' -Arguments @(
-        'api', '--method', 'POST',
-        "repos/$repository/issues/$($operation.PullRequestNumber)/comments",
-        '-f', "body=$comment"
-    ) | Out-Null
+    Invoke-GhMutationWithBodyFile -Method POST `
+        -Endpoint "repos/$repository/issues/$($operation.PullRequestNumber)/comments" `
+        -Body $comment | Out-Null
 }
 
 Write-Host "Protocol update reconciliation completed: $($plan.State)."
