@@ -128,8 +128,8 @@ successful run that exceeds the goal by a small amount.
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0064` | Suite/boundary observability and same-commit baseline inventory | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0144`; focused runtime and runner tests green | Observation schema is owner-bound and non-authoritative; timing cannot change result authority | Complete |
-| `SUBF-0065` | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0145`; focused hotspot owners and retained real slices green | Variant inventory, adapter fidelity, fixture identity, security/recovery paths reviewed; `FIND-0176` through `FIND-0182` resolved | Complete |
-| `SUBF-0066` | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0146`; focused workflow topology green; final full candidate and hosted runs pending | One Ubuntu/one Windows ordinary topology retained with no matrix, fan-in, or timing gate | Complete / final gates pending |
+| `SUBF-0065` | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0145`; focused hotspot owners and retained real slices green | Variant inventory, adapter fidelity, fixture identity, security/recovery paths reviewed; `FIND-0176` through `FIND-0183` resolved | Complete |
+| `SUBF-0066` | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0146`; focused workflow topology and local final full candidate green; exact hosted revalidation tracked in [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88) | One Ubuntu/one Windows ordinary topology retained with no matrix, fan-in, or timing gate | Complete / hosted gate pending |
 
 ## Decisions and relationships
 
@@ -199,17 +199,19 @@ and the pull request after they exist.
 | `FIND-0180` | Evidence integrity | Legacy marker validation no longer required the expected-surface list to be empty. | Restore the empty expected-surface requirement without changing newer marker schemas. |
 | `FIND-0181` | Test reliability | Two independently selectable shard paths used the completion contract without shard-local initialization. | Initialize the contract in each shard before its first use. |
 | `FIND-0182` | Test reliability | `RepositoryRoutes` resolved a contract before fixture initialization. | Initialize the fixture before resolving the contract and retain the focused shard proof. |
+| `FIND-0183` | Cross-runtime test reliability | PowerShell 7 collapsed an empty generic dictionary value collection to a null splat value in one negative completion-contract fixture. | Materialize the final-entry fixture as an explicitly allocated object array so zero-entry evidence remains a real empty collection on every supported PowerShell runtime. |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria fully evidenced; implementation and focused portions
-  are complete, while final full candidate and hosted gates remain pending.
+- [ ] Acceptance criteria fully evidenced; implementation, focused portions,
+  and the local final full candidate are complete, while the exact hosted
+  revalidation remains pending in [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88).
 - [x] Mandatory test code and scenario mapping complete.
 - [x] Focused test commands and successful results recorded.
 - [x] Every subfeature review and bounded implementation review complete.
 - [x] No unresolved `Blocking` finding.
 - [x] Documentation, links, version, changelog, and project memory current for the pre-merge candidate.
-- [x] Issue, decisions, and related work cross-linked; pull-request evidence remains external and pending creation.
+- [x] Issue, decisions, related work, and [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88) cross-linked.
 - [ ] Applicable local and hosted CI gates pass.
 
 ## Post-merge release evidence

@@ -1220,6 +1220,13 @@ function New-TestQuickAdoptionPullRequestContractFixture {
     $markerJson = $marker | ConvertTo-Json -Compress
     $pullRequest.body =
         "<!-- meandai-capabilities-adoption:$markerJson -->"
+    [object[]]$finalEntries = [object[]]::new($entryMap.Count)
+    $finalEntryIndex = 0
+    foreach ($entry in $entryMap.Values) {
+        $finalEntries[$finalEntryIndex] = $entry
+        $finalEntryIndex++
+    }
+
     return @{
         PullRequest = $pullRequest
         RemoteHead = $head
@@ -1283,7 +1290,7 @@ function New-TestQuickAdoptionCompletionContractFixture {
         ExpectedAdoptionStrategy = $Strategy
         ProtocolSurfaces = @($ProtocolSurfaces)
         TargetPaths = @($targetPaths)
-        FinalEntries = @($entryMap.Values)
+        FinalEntries = $finalEntries
     }
 }
 
