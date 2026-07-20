@@ -37,11 +37,13 @@ This project uses the `M.m.rev` version format defined in the
   across Windows PowerShell 5.1 through UTF-8-no-BOM body files, and repair only
   the exact historical quote-stripped schema-2 issue after complete ownership
   and absence proof.
+- Resolve the bundle builder's omitted `SourceRoot` only after script parameter
+  binding so its documented direct invocation works on Windows PowerShell 5.1.
 
 Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md),
 [DEC-0023](docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md),
 [TEST-0147 through TEST-0149](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md),
-`BUG-0018`, `BUG-0019`, and
+`BUG-0018`, `BUG-0019`, `BUG-0020`, and
 [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89).
 
 ## 0.12.3 - 2026-07-20

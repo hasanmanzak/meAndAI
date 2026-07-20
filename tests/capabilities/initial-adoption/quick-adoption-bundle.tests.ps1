@@ -422,6 +422,9 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         [void](New-Item -ItemType Directory -Path $sourceScripts -Force)
         Copy-Item -LiteralPath (Join-Path $root 'scripts/quick-adoption') `
             -Destination $sourceScripts -Recurse
+        $fixtureBuilderPath = Join-Path $sourceScripts `
+            'Build-MeAndAIQuickAdoptionBundle.ps1'
+        Copy-Item -LiteralPath $builderPath -Destination $fixtureBuilderPath
         $transformRelativePath =
             'scripts/quick-adoption/Private/Configuration.ps1'
         $transformPath = Join-Path $sourceRoot `
@@ -452,7 +455,8 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             if ($LASTEXITCODE -ne 0) { throw 'Unable to disable fixture commit signing.' }
             & git -C $sourceRoot config core.autocrlf false
             if ($LASTEXITCODE -ne 0) { throw 'Unable to pin fixture blob bytes.' }
-            & git -C $sourceRoot add -- .gitattributes scripts/quick-adoption
+            & git -C $sourceRoot add -- .gitattributes scripts/quick-adoption `
+                scripts/Build-MeAndAIQuickAdoptionBundle.ps1
             if ($LASTEXITCODE -ne 0) { throw 'Unable to stage bundle fixture sources.' }
             & git -C $sourceRoot commit -q -m 'TEST-0147 bundle source fixture'
             if ($LASTEXITCODE -ne 0) { throw 'Unable to commit bundle fixture sources.' }
@@ -476,19 +480,45 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
 
         $first = Join-Path $fixtureRoot 'first.zip'
         $second = Join-Path $fixtureRoot 'second.zip'
+        $defaultRoot = Join-Path $fixtureRoot 'default-root.zip'
         [void](& $builderPath -SourceRoot $sourceRoot `
             -RuntimeReleaseTag 'v0.12.4' -SourceCommit $sourceCommit `
             -OutputPath $first)
         [void](& $builderPath -SourceRoot $sourceRoot `
             -RuntimeReleaseTag 'v0.12.4' -SourceCommit $sourceCommit `
             -OutputPath $second)
+        if ($PSVersionTable.PSEdition -ceq 'Desktop') {
+            $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
+            $previousPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = 'Continue'
+                $defaultRootOutput = @(& $windowsPowerShell -NoProfile `
+                    -ExecutionPolicy Bypass -File $fixtureBuilderPath `
+                    -RuntimeReleaseTag 'v0.12.4' `
+                    -SourceCommit $sourceCommit -OutputPath $defaultRoot 2>&1)
+                $defaultRootExitCode = $LASTEXITCODE
+            }
+            finally { $ErrorActionPreference = $previousPreference }
+            if ($defaultRootExitCode -ne 0) {
+                throw "Windows PowerShell default-root build failed: $(@(
+                    $defaultRootOutput
+                ) -join [Environment]::NewLine)"
+            }
+        }
+        else {
+            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.12.4' `
+                -SourceCommit $sourceCommit -OutputPath $defaultRoot)
+        }
         if (-not (Test-Path -LiteralPath $first -PathType Leaf) -or
-            -not (Test-Path -LiteralPath $second -PathType Leaf)) {
-            Add-Failure 'TEST-0147 deterministic builder did not create both bundle outputs.'
+            -not (Test-Path -LiteralPath $second -PathType Leaf) -or
+            -not (Test-Path -LiteralPath $defaultRoot -PathType Leaf)) {
+            Add-Failure 'TEST-0147 deterministic builder did not create every bundle output.'
         }
         elseif ((Get-FileHash -LiteralPath $first -Algorithm SHA256).Hash -cne
-            (Get-FileHash -LiteralPath $second -Algorithm SHA256).Hash) {
-            Add-Failure 'TEST-0147 identical source identities produced different bundle bytes.'
+                (Get-FileHash -LiteralPath $second -Algorithm SHA256).Hash -or
+            (Get-FileHash -LiteralPath $first -Algorithm SHA256).Hash -cne
+                (Get-FileHash -LiteralPath $defaultRoot -Algorithm SHA256).Hash) {
+            Add-Failure 'TEST-0147 explicit and default source roots produced different bundle bytes.'
         }
 
         Add-Type -AssemblyName System.IO.Compression
