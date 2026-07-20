@@ -6,9 +6,11 @@
 - Decision: [DEC-0023](../../../docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md)
 - Delivery and post-publication authority: [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
 - Candidate version: `0.12.4`
-- State: local pre-merge candidate complete; PR, hosted checks, merge, immutable release, live Derdini
-  replay, superseded PR #6, stale issue #7, and branch/issue cleanup evidence
-  remain pending.
+- State: PR #90 merged at `bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`;
+  the focused `BUG-0020` release-builder hotfix is locally validated. Its
+  hotfix PR, hosted checks, merge, immutable release, live Derdini replay,
+  superseded PR #6, stale issue #7, and branch/issue cleanup evidence remain
+  pending.
 
 ## Implemented candidate
 
@@ -30,10 +32,18 @@
   GitHub API GET reads. `BUG-0019` is corrected by UTF-8-no-BOM body-file
   transport and a fail-closed repair for only the exact historical
   quote-stripped schema-2 issue.
+- After PR #90 merged at `bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`,
+  the first exact release build exposed `BUG-0020`: Windows PowerShell 5.1
+  evaluated the builder's `$PSScriptRoot` parameter default before initializing
+  it. The default is now resolved after binding only when `SourceRoot` is
+  omitted.
 
 ## Focused evidence
 
 - Final `TEST-0147`: Windows PowerShell 5.1 passed in 17.7 seconds.
+- Post-`BUG-0020` `TEST-0147`: Windows PowerShell 5.1 passed in 21.3 seconds,
+  including a real child `powershell.exe -File` builder invocation without
+  `SourceRoot` and byte equality with explicit-root builds.
 - `TEST-0148` and `TEST-0149`: Windows PowerShell 5.1 passed together in 23.4
   seconds, including repair of the stale v0.12.1 poisoned issue while targeting
   v0.12.4.
@@ -43,10 +53,10 @@
 
 ## Continue from here
 
-Run only the remaining bounded convergence evidence, then create one converged
-push and PR. After required hosted checks and review pass, merge, publish the
-exact two-asset immutable v0.12.4 release, verify both downloads and bundle
-identity, replay adoption against Derdini, reconcile the superseded PR #6 and
-stale issue #7 only through verified lifecycle evidence, and record
-PR/release/live cleanup facts externally in issue #89. Do not create a
-repository commit merely to copy those later external facts.
+Create only the bounded `BUG-0020` hotfix PR. After its required hosted checks
+and review pass, merge, publish the exact two-asset immutable v0.12.4 release,
+verify both downloads and bundle identity, replay adoption against Derdini,
+reconcile the superseded PR #6 and stale issue #7 only through verified
+lifecycle evidence, and record PR/release/live cleanup facts externally in
+issue #89. Do not create a repository commit merely to copy those later
+external facts.

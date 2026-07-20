@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$SourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path,
+    [string]$SourceRoot,
     [Parameter(Mandatory)][string]$RuntimeReleaseTag,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][string]$OutputPath,
@@ -9,6 +9,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+
+if (-not $PSBoundParameters.ContainsKey('SourceRoot')) {
+    $SourceRoot = (Resolve-Path -LiteralPath (
+        Join-Path $PSScriptRoot '..'
+    )).Path
+}
 
 $maximumBundleSourceBytes = 67108864
 
