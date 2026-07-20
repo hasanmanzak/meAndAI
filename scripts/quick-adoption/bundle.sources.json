@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "kind": "meandai.quick-adoption.bundle-sources",
+  "entryPoint": "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
+  "sources": [
+    "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
+    "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1",
+    "MeAndAI.QuickAdoption/Private/Configuration.ps1",
+    "MeAndAI.QuickAdoption/Private/OutputAndNativeProcess.ps1",
+    "MeAndAI.QuickAdoption/Private/RepositoryAssessment.ps1",
+    "MeAndAI.QuickAdoption/Private/ProtocolReleaseAndAssets.ps1",
+    "MeAndAI.QuickAdoption/Private/ProposalOwnership.ps1",
+    "MeAndAI.QuickAdoption/Private/CodexRuntime.ps1",
+    "MeAndAI.QuickAdoption/Private/CompletionAndPublication.ps1",
+    "MeAndAI.QuickAdoption/Public/Invoke-MeAndAIQuickAdoption.ps1"
+  ]
+}

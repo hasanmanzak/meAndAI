@@ -4,18 +4,19 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.12.3**
+Current protocol version: **0.12.4**
 
-For v0.12.3, publication authority is the repository's
+For v0.12.4, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[issue #87](https://github.com/hasanmanzak/meAndAI/issues/87); this file does
+[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89); this file does
 not assert a pre-merge release state.
 
 ## Start here
 
 - Read the [common protocol](PROTOCOL.md).
 - Follow the [adoption guide](docs/adoption.md) in a consuming repository.
-- Use [quick adoption](docs/quick-adoption.md) for the single-file local seed.
+- Use [quick adoption](docs/quick-adoption.md) for the one-command thin
+  launcher backed by one verified immutable module bundle.
 - Browse the [optional agent prompts](docs/agent-prompts/README.md) for
   maintainer-invoked, non-activating aids.
 - Browse the [feature index](docs/features/README.md) and
@@ -55,6 +56,13 @@ scan after material development, resolves dependency-ready blocking findings
 with per-finding self-review, pushes only after local convergence, and then
 waits for the next development event. That converged push is distinct from a
 protocol-version tag or GitHub Release.
+
+Quick adoption keeps one maintainer-downloaded PowerShell entry point while
+the release contains exactly two release assets: that reviewed thin launcher
+and one deterministic module bundle. The launcher verifies its own immutable
+runtime release, bundle and payload identities outside the consumer before
+import; its runtime release is independent of the protocol release requested
+for the consumer.
 
 The canonical [feature index](docs/features/README.md),
 [decision index](docs/decisions/README.md), and [changelog](CHANGELOG.md) own

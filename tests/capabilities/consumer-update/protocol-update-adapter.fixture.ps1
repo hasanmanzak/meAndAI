@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [switch]$NativeStderrOnly
+    [switch]$NativeStderrOnly,
+    [switch]$SuccessOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -271,11 +272,11 @@ $script:FocusedRepositoryMetadata = [pscustomobject]@{
     full_name = 'owner/consumer'
     default_branch = 'main'
 }
-function Invoke-GhJson {
-    param([string[]]$Arguments)
+function Invoke-GhReadJson {
+    param([string]$Endpoint)
 
-    if (($Arguments -join ' ') -cne 'api repos/owner/consumer') {
-        throw "Unexpected focused repository-metadata lookup: $($Arguments -join ' ')"
+    if ($Endpoint -cne 'repos/owner/consumer') {
+        throw "Unexpected focused repository-metadata lookup: $Endpoint"
     }
     return $script:FocusedRepositoryMetadata
 }
@@ -1149,6 +1150,34 @@ function Add-ScenarioEvent {
     $script:Scenario.Events.Add($Event)
 }
 
+function Get-FakeGhBodyFileContent {
+    param(
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [switch]$PullRequest
+    )
+
+    if ($PullRequest) {
+        $bodyFileIndex = [array]::IndexOf($Arguments, '--body-file')
+        if ($bodyFileIndex -lt 0 -or $bodyFileIndex + 1 -ge $Arguments.Count) {
+            throw 'Fake gh expected one pull-request --body-file argument.'
+        }
+        $bodyPath = [string]$Arguments[$bodyFileIndex + 1]
+    }
+    else {
+        $bodyArguments = @($Arguments | Where-Object {
+            ([string]$_).StartsWith('body=@', [StringComparison]::Ordinal)
+        })
+        if ($bodyArguments.Count -ne 1) {
+            throw 'Fake gh expected one API body=@file argument.'
+        }
+        $bodyPath = ([string]$bodyArguments[0]).Substring('body=@'.Length)
+    }
+    if (-not (Test-Path -LiteralPath $bodyPath -PathType Leaf)) {
+        throw "Fake gh body file does not exist: $bodyPath"
+    }
+    return [IO.File]::ReadAllText($bodyPath, [Text.UTF8Encoding]::new($false, $true))
+}
+
 function ConvertTo-TestBase64Json {
     param($InputObject)
     $json = $InputObject | ConvertTo-Json -Depth 8 -Compress
@@ -1480,8 +1509,8 @@ function global:gh {
         if ($env:GH_TOKEN -cne 'updater-write-token') {
             throw 'Consumer pull-request creation used the wrong credential.'
         }
-        $bodyIndex = [array]::IndexOf($arguments, '--body')
-        $script:Scenario.NewBody = $arguments[$bodyIndex + 1]
+        $script:Scenario.NewBody = Get-FakeGhBodyFileContent `
+            -Arguments $arguments -PullRequest
         Add-ScenarioEvent 'create-new-pr'
         'https://github.com/owner/consumer/pull/30'
         return
@@ -1490,7 +1519,7 @@ function global:gh {
         throw "Unexpected fake gh command: $($arguments -join ' ')"
     }
 
-    if ($arguments.Count -eq 2 -and $arguments[1] -eq 'user') {
+    if ($arguments[0] -eq 'api' -and $arguments[-1] -eq 'user') {
         Add-ScenarioEvent 'resolve-updater-actor'
         if ($script:Scenario.InvalidAuthenticatedActor) {
             '{}'
@@ -1510,8 +1539,8 @@ function global:gh {
     }
 
     if ($method -eq 'POST' -and $endpoint -like '*/issues/21/comments') {
-        $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
-        $script:Scenario.OldPullRequestComment = $bodyArgument.Substring('body='.Length)
+        $script:Scenario.OldPullRequestComment = Get-FakeGhBodyFileContent `
+            -Arguments $arguments
         Add-ScenarioEvent 'comment-old-pr'
         '{}'
         return
@@ -1540,6 +1569,16 @@ function global:gh {
             Add-ScenarioEvent 'close-new-pr'
         }
         '{}'
+        return
+    }
+    if ($endpoint -eq 'repos/owner/consumer' -and $method -eq 'GET') {
+        if ($env:GH_TOKEN -cnotin @('updater-write-token', 'issue-write-token')) {
+            throw 'Consumer repository identity used an unexpected credential.'
+        }
+        [pscustomobject]@{
+            full_name = 'owner/consumer'
+            default_branch = 'main'
+        } | ConvertTo-Json -Compress
         return
     }
     $isIssueAuthorityEndpoint = $endpoint -eq 'repos/owner/consumer/labels' -or
@@ -1575,7 +1614,7 @@ function global:gh {
         }
         if ($endpoint -eq 'repos/owner/consumer/issues' -and $method -eq 'POST') {
             $title = (@($arguments | Where-Object { $_ -like 'title=*' })[0]).Substring('title='.Length)
-            $body = (@($arguments | Where-Object { $_ -like 'body=*' })[0]).Substring('body='.Length)
+            $body = Get-FakeGhBodyFileContent -Arguments $arguments
             $issue = [pscustomobject]@{
                 number = 130; title = $title; body = $body; state = 'open'
                 labels = @(
@@ -1643,8 +1682,9 @@ function global:gh {
             $method -eq 'POST') {
             $number = [int]$Matches.number
             $issue = @($script:Scenario.Issues | Where-Object { [int]$_.number -eq $number })[0]
-            $bodyArgument = @($arguments | Where-Object { $_ -like 'body=*' })[0]
-            $issue.comments.Add([pscustomobject]@{ body = $bodyArgument.Substring('body='.Length) })
+            $issue.comments.Add([pscustomobject]@{
+                body = Get-FakeGhBodyFileContent -Arguments $arguments
+            })
             Add-ScenarioEvent "comment-update-issue-$number"
             '{}'
             return
@@ -2312,6 +2352,7 @@ function Invoke-AdapterScenario {
         OldPullRequestState = 'open'
         Threw = $false
         Error = ''
+        ErrorTrace = ''
     }
     $global:MeAndAITestScenario = $script:Scenario
 
@@ -2337,6 +2378,10 @@ function Invoke-AdapterScenario {
     catch {
         $script:Scenario.Threw = $true
         $script:Scenario.Error = $_.Exception.Message
+        $script:Scenario.ErrorTrace = @(
+            [string]$_.InvocationInfo.PositionMessage,
+            [string]$_.ScriptStackTrace
+        ) -join [Environment]::NewLine
     }
     finally {
         Set-Location -LiteralPath $savedLocation
@@ -2355,6 +2400,14 @@ function Get-EventIndex {
 }
 
 $success = Invoke-AdapterScenario -Name 'success'
+if ($SuccessOnly) {
+    if ($success.Threw) {
+        Write-Error "$($success.Error)`n$($success.ErrorTrace)"
+        exit 1
+    }
+    Write-Host 'Focused successful adapter scenario passed.' -ForegroundColor Green
+    exit 0
+}
 if ($success.Threw) {
     Add-Failure "TEST-0011 replacement scenario failed: $($success.Error)"
 }
@@ -2438,7 +2491,12 @@ $issueCalls = @($success.GhCalls | Where-Object {
         ([string]$_ -like 'repos/owner/consumer/issues*' -or
          [string]$_ -like 'repos/owner/consumer/labels*') -and
         [string]$_ -cne 'repos/owner/consumer/issues/21/comments'
-    }).Count -gt 0
+    }).Count -gt 0 -or (
+        $_.Token -ceq 'issue-write-token' -and
+        @($_.Arguments | Where-Object {
+            [string]$_ -ceq 'repos/owner/consumer'
+        }).Count -gt 0
+    )
 })
 $consumerCalls = @($success.GhCalls | Where-Object {
     @($_.Arguments | Where-Object {

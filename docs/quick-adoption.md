@@ -1,24 +1,33 @@
 # Quick Adoption
 
-This guide installs the one-file seed for the meAndAI AI-capabilities
-lifecycle. It supports both a clean existing GitHub repository and a local
-directory that has no repository or `origin` yet.
+This guide installs the meAndAI AI-capabilities lifecycle through one
+maintainer-downloaded thin PowerShell launcher. It supports both a clean
+existing GitHub repository and a local directory that has no repository or
+`origin` yet.
 
-The launcher is distributed as one asset of the requested immutable GitHub
-Release. It verifies that release again before accepting executable source,
-creates the repository when needed, provisions credentials, publishes the exact
-seed, dispatches the lifecycle workflow, and waits for its bounded result. If
-that run creates a semantic adoption draft, the launcher
-uses local Codex CLI synchronously in a temporary clone, validates and pushes
+The immutable runtime release contains exactly two release assets: the small
+`Invoke-MeAndAIQuickAdoption.ps1` launcher that the maintainer downloads and one
+internal `MeAndAI.QuickAdoption.Bundle.zip` that the launcher retrieves. The
+bundle is built deterministically from an exact commit's tracked Git blobs; it
+is release output and is not committed. The launcher verifies its own immutable
+runtime release, bundle, manifest, and every module payload before importing
+code outside the consumer repository. It then creates the repository when
+needed, provisions credentials, publishes the exact seed, dispatches the
+lifecycle workflow, and waits for its bounded result. If that run creates a
+semantic adoption draft, the launcher uses local Codex CLI synchronously in a
+temporary clone, validates and pushes
 the result, and marks the pull request ready. The launcher, not Codex,
 reconciles the common labels and adoption issue. It never approves or merges;
 the maintainer performs the final review and merge.
 
-The launcher queries the exact `releases/tags/<tag>` endpoint with
+The launcher carries its canonical `RuntimeReleaseTag` and queries that exact
+`releases/tags/<tag>` endpoint with
 `X-GitHub-Api-Version: 2026-03-10` and accepts only a published immutable
-GitHub Release whose tag and publication metadata match the requested version.
-This supply-chain check remains inside the reviewed launcher rather than in a
-copy-pasted command stack.
+GitHub Release whose tag, commit, asset digest, and publication metadata match
+the runtime. `-ProtocolTag` is independent: it selects the compatible protocol
+release to install in the consumer and does not redirect runtime download to a
+different release. These supply-chain checks remain inside the reviewed thin
+launcher rather than in a copy-pasted command stack.
 
 ## Prerequisites
 
@@ -49,7 +58,7 @@ copy-pasted command stack.
 | Local file | Content | Requirement | Actions secret mapping |
 | --- | --- | --- | --- |
 | `FG_PAT.txt` | Consumer updater fine-grained PAT | Required for a new repository or when `MEANDAI_UPDATER_TOKEN` is absent; not read when that secret exists | `MEANDAI_UPDATER_TOKEN` |
-| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | Required for a new repository or when `MEANDAI_PROTOCOL_TOKEN` is absent; optional when that secret exists and used for source retrieval when present | `MEANDAI_PROTOCOL_TOKEN` |
+| `MEANDAI_RO_FG_PAT.txt` | Read-only meAndAI fine-grained PAT | Required for a new repository or when `MEANDAI_PROTOCOL_TOKEN` is absent; optional when that secret exists; also used transiently for exact runtime and protocol source retrieval when present | `MEANDAI_PROTOCOL_TOKEN` |
 
 The updater token needs repository access plus `Contents: Read and write`,
 `Pull requests: Read and write`, and `Workflows: Read and write` for its
@@ -94,20 +103,33 @@ the label description, then delete only that label through the repository UI or
 `gh label delete meandai:secret-reconciliation-lock --repo <owner>/<repo> --yes`
 before rerunning. Never remove a lock owned by an active or uncertain session.
 
-When `MEANDAI_PROTOCOL_TOKEN` exists but its local file is absent, the launcher
-does not and cannot recover the stored value. It uses the authenticated local
-`gh` identity only to retrieve the exact tagged workflow and clone the exact
-protocol commit required by semantic adoption. If that identity cannot read the
-private protocol repository, the launcher stops with a source-access error.
+When `MEANDAI_RO_FG_PAT.txt` is present, the thin launcher revalidates it and
+temporarily exposes its value only as process `GH_TOKEN` while verifying and
+downloading the exact immutable runtime bundle. It restores the caller's prior
+GitHub environment and clears the in-memory token before imported module code
+runs. The value is not put in argv, output, bundle content, or consumer files.
+The verified module separately revalidates and reads the same canonical file
+for exact target-policy and protocol-source retrieval and, when that repository
+Actions secret is missing, for creation of `MEANDAI_PROTOCOL_TOKEN`.
+
+When `MEANDAI_PROTOCOL_TOKEN` exists but its local source file is absent, the
+launcher does not and cannot recover the stored value. Both the thin runtime
+bootstrap and the verified module instead use the authenticated local `gh`
+identity for their respective exact runtime-release, tagged-workflow, and
+protocol-commit reads. If that identity cannot read a private meAndAI
+repository, the launcher stops with a source-access error. The local Actions
+secret remains untouched and is not a credential source for the local process.
 
 ## Quick command
 
-Download the single
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.3/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.12.3` GitHub Release with an authenticated browser.
-Save the reusable file outside the consumer repository, such as in
-`$HOME\Downloads`. This keeps an existing target clean and makes the reviewed
-launcher reusable across consumers pinned to the same release.
+Download only the thin
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.4/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.12.4` GitHub Release with an authenticated browser.
+Do not separately download or unpack the module bundle; the launcher retrieves
+and verifies the release's one internal bundle asset itself. Save the reusable
+launcher outside the consumer repository, such as in `$HOME\Downloads`. This
+keeps an existing target clean and makes the reviewed runtime reusable across
+consumers that select any compatible `-ProtocolTag`.
 
 Open PowerShell in the target directory and run exactly one script invocation:
 
@@ -116,8 +138,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that `v0.12.3` is an exact published immutable release
-before it downloads canonical source; it never executes a moving `main` file.
+launcher itself verifies that its runtime `v0.12.4` is an exact published
+immutable release, downloads the unique bundle, validates its archive manifest
+and every payload digest, and imports it only from an owned temporary directory
+outside the consumer. It never executes a moving `main` file. Omitting
+`-ProtocolTag` selects the runtime-compatible default `v0.12.4`; explicitly
+choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
 
@@ -153,7 +179,7 @@ values are not command-line arguments and are not printed.
 
 Before repository initialization, remote creation, secret writes, or seed
 publication, the launcher verifies the authenticated `gh` identity and loads
-the pure strategy/classification policy from the exact immutable `v0.12.3`
+the pure strategy/classification policy from the exact immutable `v0.12.4`
 capabilities contract module. The standalone launcher and workflow adapter do
 not maintain competing policy copies; each keeps only its own Git/GitHub
 evidence and mutation-boundary checks. The launcher then performs one bounded
@@ -334,6 +360,16 @@ adapter blobs identical to that installed release.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
+
+Target-bound recovery retries only explicitly declared idempotent GitHub API
+GET reads, at most three total attempts, for transient transport failures,
+HTTP 408/429, and 5xx responses. Permanent/semantic failures and all writes
+remain single-attempt. Managed issue, comment, patch, and pull-request bodies
+cross the Windows PowerShell 5.1 native boundary through owner-scoped UTF-8
+without-BOM files rather than native argv. The updater may repair the one exact
+historical quote-stripped schema-2 issue only after its complete generated
+identity, trusted actor, and absence of duplicate issue, branch, pull request,
+or backlink are proved; malformed or changed near matches still fail closed.
 
 ### Transition migrations
 

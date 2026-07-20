@@ -6,7 +6,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
-$launcherPath = Join-Path $root 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
+$launcherSourcePaths = @(
+    'scripts/quick-adoption/Private/OutputAndNativeProcess.ps1',
+    'scripts/quick-adoption/Private/CodexRuntime.ps1',
+    'scripts/quick-adoption/Private/CompletionAndPublication.ps1',
+    'scripts/quick-adoption/Public/Invoke-MeAndAIQuickAdoption.ps1'
+) | ForEach-Object {
+    Join-Path $root ($_ -replace '/', [IO.Path]::DirectorySeparatorChar)
+}
 $fixturePath = Join-Path $root 'tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
@@ -44,17 +51,20 @@ function Test-OwnedProcessAlive {
     }
 }
 
-if (-not (Test-Path -LiteralPath $launcherPath -PathType Leaf)) {
-    Add-Failure 'TEST-0105 launcher source is missing.'
+foreach ($launcherSourcePath in $launcherSourcePaths) {
+    if (-not (Test-Path -LiteralPath $launcherSourcePath -PathType Leaf)) {
+        Add-Failure "TEST-0105 launcher source is missing: $launcherSourcePath"
+    }
 }
 if (-not (Test-Path -LiteralPath $fixturePath -PathType Leaf)) {
     Add-Failure 'TEST-0106 process/event fixture is missing.'
 }
 
-$launcher = if (Test-Path -LiteralPath $launcherPath -PathType Leaf) {
-    Get-Content -LiteralPath $launcherPath -Raw
-}
-else { '' }
+$launcher = @($launcherSourcePaths | Where-Object {
+    Test-Path -LiteralPath $_ -PathType Leaf
+} | ForEach-Object {
+    Get-Content -LiteralPath $_ -Raw
+}) -join [Environment]::NewLine
 $tokens = $null
 $parseErrors = $null
 $launcherAst = [Management.Automation.Language.Parser]::ParseInput(

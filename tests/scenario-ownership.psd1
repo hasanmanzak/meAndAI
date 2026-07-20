@@ -31,6 +31,11 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/consumer-update/protocol-update-reliability.tests.ps1'
+            TestIds = @('TEST-0148', 'TEST-0149')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
             TestIds = @(
                 'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
@@ -60,6 +65,11 @@
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1'
             TestIds = @('TEST-0105', 'TEST-0106')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/initial-adoption/quick-adoption-bundle.tests.ps1'
+            TestIds = @('TEST-0147')
         }
         @{
             Evidence = 'ExecutableSuite'

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.12.3**<br>
+Protocol version: **0.12.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -674,11 +674,34 @@ pin fact into consumer-owned records.
 #### Local quick-adoption launcher
 
 A consumer adopting `v0.6.0` or later MAY use the protocol's source-only local
-launcher to establish the seed workflow. For `v0.8.0` or later, the download
-command and launcher MUST verify the exact published immutable release before
-retrieving or accepting executable source. The launcher MUST fetch the workflow
-from that exact tag, verify the returned Git blob, reject a differing existing
-seed, and stage and publish only
+launcher to establish the seed workflow. A modular quick-adoption release MUST
+publish exactly two release assets: one small source-only
+`Invoke-MeAndAIQuickAdoption.ps1` launcher and one
+`MeAndAI.QuickAdoption.Bundle.zip`. The maintainer downloads and invokes only
+the launcher; that launcher downloads the bundle as one asset and MUST NOT
+assemble its runtime through per-module network requests. The bundle is
+generated release output and MUST NOT be committed.
+
+The launcher MUST bind its code to one canonical immutable
+`RuntimeReleaseTag`. That runtime identity is independent of `-ProtocolTag`,
+which remains the requested compatible protocol target for the consumer. The
+bundle builder MUST accept one exact clean source commit, read its ordered
+inventory and every payload as exact regular Git blobs from that commit, and
+produce byte-identical archive output for repeated builds of the same identity.
+Before module import, the launcher MUST verify the exact published immutable
+runtime release, tag-resolved commit, unique bundle asset, API and downloaded
+length/digest, bounded path-safe archive inventory, canonical manifest identity,
+entry point, and every payload length/digest. Verification and extraction occur
+in an owned temporary directory outside the consumer; invalid evidence MUST
+block before module import or consumer mutation, and module and temporary-root
+cleanup MUST run on every exit. Moving refs, unverified caches, downloaded-text
+execution, and fallback to an older or local monolith are prohibited.
+
+For `v0.8.0` or later, the download command and launcher MUST verify the exact
+published immutable release before retrieving or accepting executable source.
+The verified module MUST fetch the workflow from the exact requested protocol
+tag, verify the returned Git blob, reject a differing existing seed, and stage
+and publish only
 `.github/workflows/meandai-protocol-update.yml`. Existing connected consumers
 MUST be clean, on their synchronized GitHub default branch, and preserve all
 consumer-owned content. A new directory MAY be initialized and connected to a
@@ -738,6 +761,17 @@ credential paths when an optional source file is absent. Both canonical secret
 names MUST be present, whether preserved or created, before the seed is pushed.
 New repositories MUST still provide both mapped local credential files before
 remote creation.
+
+When `MEANDAI_RO_FG_PAT.txt` is present, the thin launcher MAY use its
+revalidated value as invocation-scoped `GH_TOKEN` solely to verify and download
+the exact immutable runtime release before module import. The value MUST NOT
+enter argv, output, the bundle, or the consumer tree. The prior `GH_TOKEN` and
+GitHub host environment MUST be restored, and the in-memory value cleared,
+before downloaded module code runs. When the file is absent, runtime retrieval
+uses the already authenticated local `gh` identity and fails closed if that
+identity cannot read the runtime repository. This read transport does not
+replace the file's separate `MEANDAI_PROTOCOL_TOKEN` provisioning role when
+that repository Actions secret is missing.
 
 After publication, the launcher MAY dispatch the lifecycle workflow and wait
 for the exact published commit under a finite timeout. If that run creates one
@@ -870,6 +904,25 @@ The updater MUST:
   compare their numeric parts;
 - require the selected update target to have an exact published immutable
   release before target checkout, staging, or remote mutation;
+- retry only operations explicitly declared as idempotent GitHub API GET reads,
+  with at most three total attempts and short bounded delays for transport
+  failures, HTTP 408/429, and 5xx responses; each paginated retry MUST discard
+  the incomplete attempt, while authentication, authorization, not-found,
+  validation, JSON, and contract failures and every mutation remain
+  single-attempt;
+- transport structured or multiline GitHub issue, comment, patch, and pull-
+  request bodies as exact UTF-8 without a BOM through an owner-scoped temporary
+  file or standard input, never as native command-line body text, and remove
+  temporary material on success or failure;
+- treat malformed ownership text as non-canonical and fail closed, except that
+  the exact historical quote-stripped schema-2 update issue MAY be rewritten
+  once only after proving its complete generated title/body, trusted actor,
+  repository, target, protocol commit, migration plan, absence of canonical or
+  malformed duplicates, absence of the paired branch and any all-state pull
+  request, and absence of a managed backlink; the updater MUST refetch before
+  mutation, replace the full body through the safe transport, refetch again,
+  and validate canonical ownership, while every near match blocks before
+  mutation;
 - propose only same-major upgrades and leave major migrations for explicit
   maintainer review;
 - open a draft pull request and never merge it automatically;

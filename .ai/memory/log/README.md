@@ -5,16 +5,20 @@ and follow its canonical links.
 
 ## Current continuation
 
-The v0.12.3 pre-merge candidate corrects full-suite runtime without reducing
-scenario, variant, runtime, native-Windows, or fail-closed evidence. Follow
-[FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
-and the [v0.12.3 closure record](2026-07-20-v0123-test-runtime-efficiency-closure.md).
-[Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) owns delivery and
-future publication evidence. Final full candidate validation and hosted CI
-remain mandatory; `FIND-0120` remains the separate open follow-up in issue #44.
+The v0.12.4 candidate splits quick adoption into one downloaded thin launcher
+and one verified deterministic module bundle, adds bounded idempotent-GET retry,
+preserves structured GitHub bodies across Windows PowerShell 5.1, and repairs
+only the exact historical quote-stripped update issue. Follow
+[FEAT-0036](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
+and the [v0.12.4 handoff](2026-07-20-v0124-modular-adoption-reliability.md).
+[Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) owns delivery and
+future publication evidence. PR, hosted checks, merge, immutable release, live
+Derdini replay, and cleanup remain pending; `FIND-0120` remains the separate
+open follow-up in issue #44.
 
 ## History
 
+- [2026-07-20 - v0.12.4 modular adoption reliability handoff](2026-07-20-v0124-modular-adoption-reliability.md)
 - [2026-07-20 - v0.12.3 test runtime efficiency closure](2026-07-20-v0123-test-runtime-efficiency-closure.md)
 - [2026-07-19 - v0.12.3 test runtime efficiency handoff](2026-07-19-v0123-test-runtime-efficiency.md)
 - [2026-07-19 - v0.12.2 CI evidence hygiene and exact-tree reuse](2026-07-19-v0122-ci-evidence-hygiene.md)

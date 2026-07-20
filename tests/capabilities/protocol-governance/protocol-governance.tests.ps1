@@ -1518,8 +1518,8 @@ $singleFileScenarios = Get-Content -LiteralPath (
 $launcherSource = Get-Content -LiteralPath (
     Join-Path $root 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
 ) -Raw
-$quickAdoptionScripts = @(Get-ChildItem -LiteralPath (Join-Path $root 'scripts') `
-    -Filter '*QuickAdoption*.ps1' -File)
+$quickAdoptionLaunchers = @(Get-ChildItem -LiteralPath (Join-Path $root 'scripts') `
+    -Filter 'Invoke-*QuickAdoption*.ps1' -File)
 $expectedAssetUrl = "https://github.com/hasanmanzak/meAndAI/releases/download/$currentProtocolTag/Invoke-MeAndAIQuickAdoption.ps1"
 $expectedInvocation = 'powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAndAIQuickAdoption.ps1" -TargetPath .'
 if (-not $quickCommandMatch.Success) {
@@ -1549,12 +1549,13 @@ else {
     }
 }
 if (-not $launcherSource.Contains("[string]`$ProtocolTag = '$currentProtocolTag'") -or
-    -not $launcherSource.Contains('Get-ValidatedImmutableProtocolRelease') -or
+    -not $launcherSource.Contains("`$runtimeReleaseTag = '$currentProtocolTag'") -or
+    -not $launcherSource.Contains('Get-QuickAdoptionBootstrapRuntimeEvidence') -or
     -not $launcherSource.Contains('published immutable GitHub Release')) {
     Add-Failure 'TEST-0101 canonical launcher is not pinned to the current immutable-release validation contract.'
 }
-if ($quickAdoptionScripts.Count -ne 1 -or
-    $quickAdoptionScripts[0].Name -cne 'Invoke-MeAndAIQuickAdoption.ps1') {
+if ($quickAdoptionLaunchers.Count -ne 1 -or
+    $quickAdoptionLaunchers[0].Name -cne 'Invoke-MeAndAIQuickAdoption.ps1') {
     Add-Failure 'TEST-0101 quick adoption has more than the one canonical launcher script.'
 }
 foreach ($requiredText in @(
