@@ -49,6 +49,15 @@
   outside the sandbox-only Git signal-pipe boundary; after the two new
   assertion labels were assigned to `TEST-0150`, exact registry binding passed
   separately in 0.7 seconds without rerunning unchanged behavior.
+- PR #92 run `29756397638` exposed `FIND-0198` on both hosts: the finalization
+  fixture omitted the author object from its newly created issue. The fixture
+  now distinguishes the historical issue owner, authenticated updater, and new
+  `github-actions[bot]` issue-token author across separate updater and issue
+  credentials. Its focused owner passed in 13.0 seconds, including an omitted
+  `user` response that stopped on the exact controlled convergence error after
+  one issue creation and before every later managed mutation. The final
+  response-shape guard also passed focused `TEST-0150` again in 11.6 seconds,
+  and structure-only validation remained green.
 
 ## Continue from here
 

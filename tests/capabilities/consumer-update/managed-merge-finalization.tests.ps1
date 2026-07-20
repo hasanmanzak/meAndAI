@@ -298,7 +298,8 @@ function New-FinalizationScenario {
         [bool]$InvalidLegacyRelease = $false,
         [bool]$WrongLegacyAssetBlob = $false,
         [bool]$FabricatedSchema2Output = $false,
-        [bool]$RecoveryBranch = $false
+        [bool]$RecoveryBranch = $false,
+        [switch]$MissingCreatedIssueUser
     )
 
     $head = 'a' * 40
@@ -551,6 +552,15 @@ function New-FinalizationScenario {
         else { "Track meAndAI protocol update to $target" }
         IssueBody = $issueBody
         IssueState = 'open'
+        HistoricalOwnerLogin = 'updater-owner'
+        AuthenticatedActorLogin = 'active-updater-owner'
+        IssueAuthorLogin = 'updater-owner'
+        IssueTokenActorLogin = 'github-actions[bot]'
+        IssueUserPresent = $true
+        MissingCreatedIssueUser = [bool]$MissingCreatedIssueUser
+        CreatedIssueThisRun = $false
+        CreatedIssueIdentityReads = 0
+        CreateIssueObservedToken = ''
         IssueIsPullRequest = $false
         IssueLabels = [System.Collections.Generic.List[string]]::new(
             [string[]]@($(if ($Kind -ceq 'Adoption') { 'type:feature' } else { 'type:task' }), 'priority:p1', 'status:needs-review')
@@ -653,10 +663,11 @@ function global:gh {
         $method = [string]$arguments[$methodIndex + 1]
     }
     if ($endpoint -ceq 'user') {
-        if ($env:GH_TOKEN -cne 'test-finalizer-token') {
+        if ($env:GH_TOKEN -cne 'test-updater-token') {
             throw 'Authenticated actor lookup crossed the updater credential boundary.'
         }
-        [ordered]@{ login = $scenario.HeadAuthor } | ConvertTo-Json -Compress
+        [ordered]@{ login = $scenario.AuthenticatedActorLogin } |
+            ConvertTo-Json -Compress
         return
     }
     if ($endpoint -like 'repos/hasanmanzak/meAndAI/*') {
@@ -714,6 +725,9 @@ function global:gh {
     }
     if ($endpoint -ceq 'repos/owner/consumer/pulls/42') {
         if ($method -ceq 'PATCH') {
+            if ($env:GH_TOKEN -cne 'test-issue-token') {
+                throw 'Tracking repair crossed the issue credential boundary.'
+            }
             $scenario.Body = Get-TestGhBody -Arguments $arguments
             Add-FinalizationEvent 'repair-tracking-line'
         }
@@ -796,6 +810,9 @@ function global:gh {
         return
     }
     if ($endpoint -ceq 'repos/owner/consumer/labels?per_page=100') {
+        if ($env:GH_TOKEN -cne 'test-issue-token') {
+            throw 'Managed label inventory crossed the issue credential boundary.'
+        }
         foreach ($name in @(
             'type:task', 'priority:p1', 'status:in-progress',
             'status:needs-review', 'status:blocked'
@@ -805,10 +822,17 @@ function global:gh {
         return
     }
     if ($endpoint -ceq 'repos/owner/consumer/issues' -and $method -ceq 'POST') {
+        if ($env:GH_TOKEN -cne 'test-issue-token') {
+            throw 'Managed issue creation crossed the issue credential boundary.'
+        }
         $titleArgument = @($arguments | Where-Object { $_ -like 'title=*' })[0]
         $scenario.IssueTitle = $titleArgument.Substring('title='.Length)
         $scenario.IssueBody = Get-TestGhBody -Arguments $arguments
         $scenario.IssueState = 'open'
+        $scenario.IssueAuthorLogin = $scenario.IssueTokenActorLogin
+        $scenario.IssueUserPresent = -not $scenario.MissingCreatedIssueUser
+        $scenario.CreatedIssueThisRun = $true
+        $scenario.CreateIssueObservedToken = [string]$env:GH_TOKEN
         $scenario.IssueExists = $true
         $scenario.IssueLabels = [System.Collections.Generic.List[string]]::new(
             [string[]]@('type:task', 'priority:p1', 'status:needs-review')
@@ -823,7 +847,7 @@ function global:gh {
             $scenario.AdoptionIssueCount
         } elseif ($scenario.IssueExists) { 1 } else { 0 }
         for ($index = 0; $index -lt $count; $index++) {
-            $issueRecord = [pscustomobject]@{
+            $issueRecord = [pscustomobject][ordered]@{
                 number = $scenario.IssueNumber
                 title = $scenario.IssueTitle
                 body = $scenario.IssueBody
@@ -831,6 +855,12 @@ function global:gh {
                 labels = @($scenario.IssueLabels | ForEach-Object {
                     [pscustomobject]@{ name = $_ }
                 })
+            }
+            if ($scenario.IssueUserPresent) {
+                $issueRecord | Add-Member -NotePropertyName user `
+                    -NotePropertyValue ([pscustomobject]@{
+                        login = $scenario.IssueAuthorLogin
+                    })
             }
             if ($scenario.IssueIsPullRequest) {
                 $issueRecord | Add-Member -NotePropertyName pull_request `
@@ -874,6 +904,13 @@ function global:gh {
             '{}'
         }
         else {
+            if ($scenario.CreatedIssueThisRun -and
+                $scenario.CreatedIssueIdentityReads -eq 0) {
+                if ($env:GH_TOKEN -cne 'test-issue-token') {
+                    throw 'Created-issue identity read crossed the issue credential boundary.'
+                }
+                $scenario.CreatedIssueIdentityReads++
+            }
             Add-FinalizationEvent 'read-issue'
             $issueRecord = [pscustomobject][ordered]@{
                 number = $scenario.IssueNumber
@@ -883,6 +920,12 @@ function global:gh {
                 labels = @($scenario.IssueLabels | ForEach-Object {
                     [ordered]@{ name = $_ }
                 })
+            }
+            if ($scenario.IssueUserPresent) {
+                $issueRecord | Add-Member -NotePropertyName user `
+                    -NotePropertyValue ([pscustomobject]@{
+                        login = $scenario.IssueAuthorLogin
+                    })
             }
             if ($scenario.IssueIsPullRequest) {
                 $issueRecord | Add-Member -NotePropertyName pull_request `
@@ -948,11 +991,12 @@ function Invoke-FinalizationScenario {
     $summaryLines = @()
     $threw = $false
     $errorMessage = ''
+    $exceptionMessage = ''
     try {
         $env:GITHUB_REPOSITORY = $Scenario.Repository
         $env:DEFAULT_BRANCH = $Scenario.DefaultBranch
-        $env:GH_TOKEN = 'test-finalizer-token'
-        $env:ISSUE_TOKEN = 'test-finalizer-token'
+        $env:GH_TOKEN = 'test-updater-token'
+        $env:ISSUE_TOKEN = 'test-issue-token'
         $env:PROTOCOL_TOKEN = 'test-protocol-token'
         $env:GITHUB_STEP_SUMMARY = $summaryPath
         & $adapterPath -FinalizeMergedPullRequest `
@@ -960,7 +1004,8 @@ function Invoke-FinalizationScenario {
     }
     catch {
         $threw = $true
-        $errorMessage = $_.Exception.Message
+        $exceptionMessage = $_.Exception.Message
+        $errorMessage = $exceptionMessage
         if (-not [string]::IsNullOrWhiteSpace([string]$_.ScriptStackTrace)) {
             $errorMessage += " [$($_.ScriptStackTrace)]"
         }
@@ -993,6 +1038,7 @@ function Invoke-FinalizationScenario {
     return [pscustomobject]@{
         Threw = $threw
         Error = $errorMessage
+        ExceptionMessage = $exceptionMessage
         Scenario = $Scenario
         SummaryLines = [string[]]@($summaryLines)
     }
@@ -1146,6 +1192,36 @@ try {
                 [array]::IndexOf(@($legacy.Scenario.Events), 'delete-branch')) {
             Add-Failure "TEST-0112 legacy installing-update mode '$legacyMode' did not repair and finalize exactly: $($legacy.Error)"
         }
+    }
+    $missingCreatedIssueAuthor = New-FinalizationScenario -Kind Update `
+        -TrackingMode Absent -MissingCreatedIssueUser
+    $missingAuthorResult = Invoke-FinalizationScenario `
+        -Scenario $missingCreatedIssueAuthor
+    $postCreationMutations = @($missingAuthorResult.Scenario.Events | Where-Object {
+        $_ -ceq 'repair-tracking-line' -or $_ -ceq 'delete-branch' -or
+        $_ -ceq 'comment-proposal-link' -or $_ -ceq 'comment-issue' -or
+        $_ -ceq 'close-issue' -or $_ -like 'remove-label-*'
+    })
+    if (-not $missingAuthorResult.Threw -or
+        [string]$missingAuthorResult.ExceptionMessage -cne
+            'The created protocol-update issue did not converge to its exact owned record.' -or
+        @($missingAuthorResult.Scenario.Events | Where-Object {
+            $_ -ceq 'create-update-issue'
+        }).Count -ne 1 -or
+        $postCreationMutations.Count -ne 0 -or
+        -not $missingAuthorResult.Scenario.BranchExists -or
+        [string]$missingAuthorResult.Scenario.Body -cmatch
+            '(?m)^Tracking issue: #[1-9][0-9]*$' -or
+        [string]$missingAuthorResult.Scenario.CreateIssueObservedToken -cne
+            'test-issue-token' -or
+        $missingAuthorResult.Scenario.CreatedIssueIdentityReads -ne 1 -or
+        [string]$missingAuthorResult.Scenario.AuthenticatedActorLogin -ceq
+            [string]$missingAuthorResult.Scenario.HistoricalOwnerLogin -or
+        [string]$missingAuthorResult.Scenario.IssueTokenActorLogin -ceq
+            [string]$missingAuthorResult.Scenario.HistoricalOwnerLogin -or
+        [string]$missingAuthorResult.Scenario.IssueTokenActorLogin -ceq
+            [string]$missingAuthorResult.Scenario.AuthenticatedActorLogin) {
+        Add-Failure "TEST-0112 missing created-issue author did not fail with a controlled convergence error before later mutation: $($missingAuthorResult.Error)"
     }
     $legacyEvidenceNegatives = @(
         [pscustomobject]@{

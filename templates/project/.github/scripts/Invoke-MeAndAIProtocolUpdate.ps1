@@ -1857,12 +1857,22 @@ function Ensure-ProtocolUpdateIssue {
         $expectedBody = ([string]$contract.Body).Replace(
             "`r`n", "`n"
         ).TrimEnd([char[]]"`r`n")
+        $createdAuthor = ''
+        $createdUserProperty = $createdIssue.PSObject.Properties['user']
+        if ($null -ne $createdUserProperty -and
+            $null -ne $createdUserProperty.Value) {
+            $createdLoginProperty =
+                $createdUserProperty.Value.PSObject.Properties['login']
+            if ($null -ne $createdLoginProperty) {
+                $createdAuthor = [string]$createdLoginProperty.Value
+            }
+        }
         if ([string]$createdIssue.number -cne $createdNumberText -or
             $createdMarker.CanonicalLine -cne [string]$contract.Marker -or
             [string]$createdIssue.title -cne [string]$contract.Title -or
             $createdBody -cne $expectedBody -or
             [string]$createdIssue.state -cne 'open' -or
-            [string]::IsNullOrWhiteSpace([string]$createdIssue.user.login) -or
+            [string]::IsNullOrWhiteSpace($createdAuthor) -or
             $null -ne $createdIssue.PSObject.Properties['pull_request']) {
             throw 'The created protocol-update issue did not converge to its exact owned record.'
         }
