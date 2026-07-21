@@ -1296,6 +1296,37 @@ Consult [consumer scheme](consumer+memory:authority/root).
             -not (& $canonicalPathValidator -Path 'c:docs/x.md')
         ) -Message 'TEST-0152 canonical repository path predicate accepted a drive prefix on this host.'
 
+        $multilineReferenceText = @(
+            '# Consumer instructions',
+            '',
+            'If `.ai/adoption/meandai-capabilities.json` exists, treat it as an active handoff.',
+            'Read the [common protocol](.ai/protocol/PROTOCOL.md).'
+        ) -join "`n"
+        $emptyReferenceInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $multilineReferences = @(& $policyModule {
+            param($text, $inventory)
+            Get-MeAndAIInstructionGraphReferences -SourcePath 'AGENTS.md' `
+                -Text $text -RepositoryPathInventory $inventory
+        } $multilineReferenceText $emptyReferenceInventory)
+        Assert-True -Condition (
+            $multilineReferences.Count -eq 2 -and
+            @($multilineReferences | Where-Object {
+                $_.target -ceq '.ai/adoption/meandai-capabilities.json' -and
+                $_.kind -ceq 'References' -and $_.anchor -ceq 'L3' -and
+                $_.reason -ceq 'RepositoryPathToken' -and
+                -not [bool]$_.required -and -not [bool]$_.external
+            }).Count -eq 1 -and
+            @($multilineReferences | Where-Object {
+                $_.target -ceq '.ai/protocol/PROTOCOL.md' -and
+                $_.kind -ceq 'RequiresRead' -and $_.anchor -ceq 'L4' -and
+                $_.reason -ceq 'MarkdownLink' -and
+                [bool]$_.required -and -not [bool]$_.external
+            }).Count -eq 1
+        ) -Message 'TEST-0151 multiline parsing merged conditional and required references across source lines.'
+
         $lineEndingUtf8 = [Text.UTF8Encoding]::new($false)
         $lineEndingCases = [ordered]@{
             LF = "`n"

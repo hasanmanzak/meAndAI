@@ -23,6 +23,12 @@ This project uses the `M.m.rev` version format defined in the
   authority reachable from the root instruction graph; ambiguous, missing,
   unsupported, drifted, or noncanonical authority remains review-blocking.
 
+### Fixed
+
+- Split instruction text into physical CRLF, LF, or CR lines with one
+  cross-runtime .NET regex contract so Windows PowerShell 5.1 and PowerShell 7
+  cannot merge conditional and required references into one authority line.
+
 ### Security
 
 - Protect source, binary, special-mode, and unknown-format content from graph-

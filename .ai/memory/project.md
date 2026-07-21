@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-21**
+Last verified: **2026-07-22**
 
 ## Verified facts
 
@@ -21,11 +21,15 @@ Last verified: **2026-07-21**
   `codex/feat-0037-instruction-graph-containment`: exact-base
   instruction-graph discovery, lifecycle identity binding, and fail-closed
   completion coverage. Focused, structural, native-compatibility, and complete-
-  suite validation pass locally on Windows PowerShell 5.1; local `pwsh` is not
-  available.
+  suite validation pass locally on Windows PowerShell 5.1. The first hosted
+  Ubuntu check exposed a PowerShell 5.1/7 line-splitting difference in the new
+  parser; the corrected graph owner now passes both Windows PowerShell 5.1 and
+  containerized PowerShell 7.4.2, and the local Windows execution of the
+  hosted-adapter fixture passes. A replacement hosted check remains required.
   [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) owns tracking and
   draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is
-  open; hosted PowerShell 7/checks, merge, and release evidence remain pending.
+  open; corrected hosted PowerShell 7/checks, merge, and release evidence remain
+  pending.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -91,8 +95,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   or deletion authority. Its implementation is present locally on
   `codex/feat-0037-instruction-graph-containment`; focused graph/lifecycle/
   closure owners, `StructureOnly`, `WindowsNative`, and the complete protocol
-  suite pass. Draft pull request
-  [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open; hosted
+  suite pass. A cross-runtime physical-line parser correction additionally
+  passes the graph owner on Windows PowerShell 5.1 and containerized PowerShell
+  7.4.2 plus the local Windows execution of the full hosted-adapter fixture.
+  Draft pull request
+  [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open; corrected hosted
   PowerShell 7 evidence, CI completion, merge, release, and post-publication
   verification remain pending.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and

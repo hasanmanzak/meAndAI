@@ -582,7 +582,7 @@ function Get-MeAndAIInstructionGraphReferences {
     if ($Text.Length -gt 0 -and $Text[0] -ceq [char]0xFEFF) {
         $Text = $Text.Substring(1)
     }
-    $lines = @($Text -split "`r`n|`n|`r", -1)
+    $lines = @([regex]::Split($Text, '\r\n|\n|\r'))
     $insideFence = $false
     $fenceCharacter = ''
     $fenceLength = 0

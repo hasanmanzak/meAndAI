@@ -286,15 +286,15 @@ exact N/N+1 evidence; no published graph schema is being revised.
 | --- | --- | --- |
 | Scenarios | Defined and registered | [TEST-0151 through TEST-0154](test-cases.md) have canonical capability-owned executable owners |
 | Test code | Locally complete | Graph, exact-Git acquisition, lifecycle identity, local and hosted-adapter closure, and test-architecture fixtures are present on `codex/feat-0037-instruction-graph-containment` |
-| Local evidence | Complete on Windows PowerShell 5.1 | Final focused graph and closure owners passed in 137.452 and 40.202 seconds; capability-bootstrap `All` passed in 322.254 seconds; quick-adoption `All` passed in 948.236 seconds; `StructureOnly` passed in 5.989 seconds; `WindowsNative` passed in 374.494 seconds; and the complete discovered protocol suite passed in 1,582.88 seconds with canonical `TEST-0151` through `TEST-0154`, `TEST-0059`, and `TEST-0138` evidence |
-| Hosted evidence | Pending delivery gate | Local `pwsh` is unavailable, so supported PowerShell 7 plus hosted Windows and Ubuntu evidence must be supplied by the future pull-request checks without projecting it from Windows PowerShell 5.1 |
+| Local evidence | Complete for the corrected parser and prior candidate | The corrected graph owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2; the local Windows execution of the complete hosted-adapter fixture passed in 316.2 seconds. Prior focused closure, capability-bootstrap `All`, quick-adoption `All`, `StructureOnly`, `WindowsNative`, and complete-suite evidence remains recorded in the test ledger |
+| Hosted evidence | Correction awaiting replacement checks | The first PR run passed Windows and exposed a PowerShell 7 physical-line parsing defect on Ubuntu. The corrected parser has cross-host focused evidence, but supported hosted PowerShell 7 plus the complete Windows and Ubuntu checks remain delivery gates |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0070` | Canonical instruction-graph contract and deterministic discovery | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0151`, `TEST-0152`; final focused owner passed in 137.452 seconds and the complete suite reran it in 155.952 seconds | Parser, lexical-path, culture, budget, cycle, reason, role, and exact-validator review findings were corrected and rerun | Locally complete |
-| `SUBF-0071` | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0153`; capability-bootstrap `All` passed in 322.254 seconds and the complete suite reran the owner in 320.307 seconds | Trust-boundary, schema, drift, target dispatch, and dynamic-module fixture findings were corrected and rerun | Locally complete |
+| `SUBF-0070` | Canonical instruction-graph contract and deterministic discovery | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0151`, `TEST-0152`; corrected focused owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2 | Parser, lexical-path, culture, budget, cycle, reason, role, exact-validator, and cross-runtime physical-line findings were corrected and rerun | Locally complete |
+| `SUBF-0071` | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0153`; the local Windows execution of the corrected complete hosted-adapter fixture passed in 316.2 seconds; prior capability-bootstrap `All` and complete-suite evidence remains recorded | Trust-boundary, schema, drift, target dispatch, dynamic-module, and completed-proposal fixture findings were corrected and rerun | Locally complete; hosted rerun pending |
 | `SUBF-0072` | Independent completion containment and authority closure | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0154`; final focused closure passed in 40.202 seconds, quick-adoption `All` passed in 948.236 seconds, and the complete suite reran it in 928.828 seconds | Fail-closed omission, canonical-retirement, protected-terminal, and out-of-envelope cases were corrected and rerun | Locally complete |
 
 ## Decisions and relationships
@@ -404,6 +404,23 @@ harness changes only; they did not relax the production validator. The final
 focused owners, `StructureOnly`, `WindowsNative`, and the complete 1,582.88-second
 protocol suite all pass. Hosted CI and supported PowerShell 7 evidence remain
 delivery gates and are not projected by this local review.
+
+The first hosted Ubuntu run then exposed a blocking cross-runtime defect in the
+new parser: PowerShell 7 interprets a negative `-split` limit differently from
+Windows PowerShell 5.1 and merged the complete instruction document into one
+logical line. The correction uses explicit .NET regex splitting without
+discarding empty physical lines, and a focused regression binds conditional
+manifest and required protocol references to distinct kinds, anchors, and
+required states. The corrected graph owner passes on both tested runtimes and
+the local Windows execution of the complete hosted-adapter fixture passes;
+replacement hosted checks remain the external gate.
+
+The budgeted 2026-07-22 confirmation convergence scan covered the tracked
+candidate documentation/evidence surface plus all 16 tracked production files
+and the focused regression owner. It found one parser definition, one
+production invocation, no stale or embedded parser copy, and zero unresolved
+local Blocking observations after remediation. Hosted PowerShell 7 remains a
+delivery gate rather than an unresolved local code finding.
 
 ## Definition of Done
 
