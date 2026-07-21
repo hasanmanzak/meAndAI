@@ -7,7 +7,7 @@
 | Target version | 0.12.6 |
 | Issue and post-publication authority | [#93](https://github.com/hasanmanzak/meAndAI/issues/93) |
 | Maintainer disposition | [Accepted on 2026-07-21](https://github.com/hasanmanzak/meAndAI/issues/93#issuecomment-5033653638) |
-| Pull request | Pending; none created; issue #93 owns the future identity |
+| Pull request | [#94](https://github.com/hasanmanzak/meAndAI/pull/94) (Draft) |
 | Decision | [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) (Accepted) |
 | Tests | [TEST-0151 through TEST-0154](test-cases.md) |
 
@@ -419,13 +419,15 @@ delivery gates and are not projected by this local review.
 
 ## Delivery gates
 
-- [ ] Future pull request and issue #93 cross-link the canonical records.
+- [x] Draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94)
+      and issue #93 cross-link the canonical records.
 - [ ] Applicable hosted PowerShell 7, Windows, and Ubuntu checks pass before
       merge.
 
 ## Post-merge release evidence
 
 [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) is the stable
-external evidence authority. Pull request, hosted checks, merge commit,
-immutable release, branch cleanup, and post-publication verification remain
-`Pending` until those facts exist.
+external evidence authority. Draft pull request
+[#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open. Hosted checks,
+merge commit, immutable release, branch cleanup, and post-publication
+verification remain `Pending` until those facts exist.

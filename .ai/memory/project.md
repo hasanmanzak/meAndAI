@@ -23,9 +23,9 @@ Last verified: **2026-07-21**
   completion coverage. Focused, structural, native-compatibility, and complete-
   suite validation pass locally on Windows PowerShell 5.1; local `pwsh` is not
   available.
-  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) owns tracking;
-  pull request, hosted PowerShell 7/checks, merge, and release evidence remain
-  pending.
+  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) owns tracking and
+  draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is
+  open; hosted PowerShell 7/checks, merge, and release evidence remain pending.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -91,8 +91,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   or deletion authority. Its implementation is present locally on
   `codex/feat-0037-instruction-graph-containment`; focused graph/lifecycle/
   closure owners, `StructureOnly`, `WindowsNative`, and the complete protocol
-  suite pass. Hosted PowerShell 7 evidence, pull request, CI, merge, release,
-  and post-publication verification remain pending.
+  suite pass. Draft pull request
+  [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open; hosted
+  PowerShell 7 evidence, CI completion, merge, release, and post-publication
+  verification remain pending.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

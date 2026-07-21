@@ -16,9 +16,10 @@ now have a local implementation on
 [v0.12.6 implementation handoff](2026-07-21-v0126-instruction-graph-containment-implementation.md)
 and [issue #93](https://github.com/hasanmanzak/meAndAI/issues/93). Focused,
 structural, native-compatibility, and complete-suite local validation pass.
-Hosted PowerShell 7 evidence, pull request, CI, merge, release, and
-post-publication verification remain pending. `FIND-0120` remains the separate
-open follow-up in issue #44.
+Draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open.
+Hosted PowerShell 7 evidence, CI completion, merge, release, and post-publication
+verification remain pending. `FIND-0120` remains the separate open follow-up in
+issue #44.
 
 ## History
 

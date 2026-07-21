@@ -5,12 +5,13 @@
 - Feature: [FEAT-0037](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md)
 - Decision: [DEC-0024](../../../docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md)
 - Tracking and future publication authority: [issue #93](https://github.com/hasanmanzak/meAndAI/issues/93)
+- Delivery pull request: [#94](https://github.com/hasanmanzak/meAndAI/pull/94) (Draft)
 - Working branch: `codex/feat-0037-instruction-graph-containment`
 - Development version: `0.12.6`; latest immutable release remains `v0.12.5`
 - State: locally complete and validated; focused graph/lifecycle/closure owners,
   `StructureOnly`, `WindowsNative`, and the complete protocol suite pass, while
-  hosted PowerShell 7/CI, pull request, merge, release, and post-publication
-  verification remain pending
+  draft PR #94 is open, and hosted PowerShell 7/CI, merge, release, and
+  post-publication verification remain pending
 
 ## Implemented boundary
 
@@ -70,8 +71,8 @@ a hosted delivery gate.
 
 ## Continue from here
 
-1. Open and review the future pull request, then obtain supported PowerShell 7
-   plus hosted Windows and Ubuntu evidence.
+1. Review draft PR #94 and obtain supported PowerShell 7 plus hosted Windows
+   and Ubuntu evidence.
 2. Resolve any hosted or review failure before merge.
-3. Do not project a pull request, hosted CI, merge, immutable v0.12.6 release,
-   cleanup, or post-publication verification until each fact exists.
+3. Do not project hosted CI success, merge, immutable v0.12.6 release, cleanup,
+   or post-publication verification until each fact exists.
