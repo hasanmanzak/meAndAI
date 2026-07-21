@@ -215,9 +215,27 @@ if (Test-Path -LiteralPath $fixtureRoot) {
 }
 $adapterFixtures = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests/capabilities') `
     -Recurse -File -Filter '*.fixture.ps1')
-if ($adapterFixtures.Count -ne 2 -or @($adapterFixtures | Where-Object {
-    $_.Name -like '*.tests.ps1'
-}).Count -ne 0) {
+$adapterFixturePaths = @($adapterFixtures | ForEach-Object {
+    $_.FullName.Substring($root.Length + 1).Replace('\', '/')
+})
+[Array]::Sort($adapterFixturePaths, [StringComparer]::Ordinal)
+$expectedAdapterFixturePaths = @(
+    ('tests/capabilities/consumer-update/protocol-update-adapter' +
+        '.fixture.ps1'),
+    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift' +
+        '.fixture.ps1'),
+    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter' +
+        '.fixture.ps1'),
+    ('tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity' +
+        '.fixture.ps1'),
+    ('tests/capabilities/initial-adoption/source-graph-dispatch' +
+        '.fixture.ps1')
+)
+if (($adapterFixturePaths -join "`0") -cne
+    ($expectedAdapterFixturePaths -join "`0") -or
+    @($adapterFixturePaths | Where-Object {
+        $ownerSet.Contains([string]$_)
+    }).Count -ne 0) {
     Add-Failure 'TEST-0138 adapter fixtures are not isolated from canonical suite discovery.'
 }
 

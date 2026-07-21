@@ -36,13 +36,18 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1'
+            TestIds = @('TEST-0151', 'TEST-0152')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
             TestIds = @(
                 'TEST-0027', 'TEST-0028', 'TEST-0029', 'TEST-0030',
                 'TEST-0031', 'TEST-0032', 'TEST-0057', 'TEST-0062',
                 'TEST-0068', 'TEST-0071', 'TEST-0077', 'TEST-0080',
                 'TEST-0093', 'TEST-0094', 'TEST-0095', 'TEST-0127',
-                'TEST-0128', 'TEST-0145'
+                'TEST-0128', 'TEST-0145', 'TEST-0153'
             )
         }
         @{
@@ -58,7 +63,8 @@
                 'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
-                'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130'
+                'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130',
+                'TEST-0154'
             )
         }
         @{

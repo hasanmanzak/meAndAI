@@ -3,12 +3,15 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.12.5',
+    [string]$TargetTag = 'v0.12.6',
     [string]$BranchPrefix = 'automation/meandai-capabilities-',
     [ValidateSet('Auto', 'FreshAdoption', 'FullMigration',
         'HybridReconciliation', 'CleanStart', 'Abort')]
     [string]$AdoptionStrategy = 'Auto',
     [switch]$AcknowledgeProtocolRecordLoss,
+    [string]$SourceGraphBase = '',
+    [string]$SourceGraphDigest = '',
+    [string]$SourceGraphIdentityJson = '',
     [switch]$ValidateLocalUpdaterOnly
 )
 
@@ -157,6 +160,178 @@ function Get-BoundedAssessmentTreePaths {
         throw "Git tree assessment failed with exit code $exitCode."
     }
     return @($paths)
+}
+
+function Get-InstructionGraphTreeEntries {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $limits = Get-MeAndAIInstructionGraphLimits
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = "ls-tree -r -t -z --full-tree $Commit --"
+    $startInfo.WorkingDirectory = $Repository
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $record = [IO.MemoryStream]::new()
+    [long]$treePathUtf8Bytes = 0
+    $started = $false
+    try {
+        if (-not $process.Start()) {
+            throw 'Unable to start exact instruction-graph tree acquisition.'
+        }
+        $started = $true
+        $errorTask = $process.StandardError.ReadToEndAsync()
+        $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+        while (($value = $process.StandardOutput.BaseStream.ReadByte()) -ne -1) {
+            if ($value -ne 0) {
+                if ($record.Length -ge
+                    ([long]$limits.MaximumPathUtf8Bytes + 64)) {
+                    throw 'Exact instruction-graph tree output contains an overlong record.'
+                }
+                $record.WriteByte([byte]$value)
+                continue
+            }
+            $bytes = $record.ToArray()
+            $record.SetLength(0)
+            $tab = [Array]::IndexOf($bytes, [byte]9)
+            if ($tab -le 0 -or $tab -ge ($bytes.Length - 1)) {
+                throw 'Exact instruction-graph tree output is malformed or contains an unsafe path.'
+            }
+            $pathByteLength = $bytes.Length - $tab - 1
+            if ($pathByteLength -gt [int]$limits.MaximumPathUtf8Bytes -or
+                $treePathUtf8Bytes -gt
+                    ([long]$limits.MaximumTreePathUtf8Bytes - $pathByteLength)) {
+                throw 'Exact instruction-graph tree output exceeds its path budget.'
+            }
+            $treePathUtf8Bytes += $pathByteLength
+            $header = [Text.Encoding]::ASCII.GetString($bytes, 0, $tab)
+            $match = [regex]::Match(
+                $header,
+                '^(?<mode>[0-9]{6})\s+(?<type>blob|tree|commit)\s+(?<sha>[0-9a-f]{40})$'
+            )
+            if (-not $match.Success) {
+                throw 'Exact instruction-graph tree output contains an invalid entry identity.'
+            }
+            try {
+                $path = $strictUtf8.GetString(
+                    $bytes, $tab + 1, $pathByteLength
+                )
+            }
+            catch {
+                throw 'Exact instruction-graph tree output contains a non-UTF-8 path.'
+            }
+            if (-not (Test-MeAndAICanonicalRepositoryPath -Path $path)) {
+                throw "Exact instruction-graph tree path '$path' is not canonical."
+            }
+            $entries.Add([pscustomobject]@{
+                Path = $path
+                Mode = [string]$match.Groups['mode'].Value
+                Type = [string]$match.Groups['type'].Value
+                Sha = [string]$match.Groups['sha'].Value
+            })
+            if ($entries.Count -gt [int]$limits.MaximumTreeEntries) {
+                throw 'Instruction graph exceeds the tracked-tree budget; maintainer review is required.'
+            }
+        }
+        if ($record.Length -ne 0) {
+            throw 'Exact instruction-graph tree output is missing its final record terminator.'
+        }
+        $process.WaitForExit()
+        $errorText = [string]$errorTask.Result
+        if ($process.ExitCode -ne 0) {
+            throw "Exact instruction-graph tree acquisition failed: $errorText"
+        }
+        return @($entries)
+    }
+    finally {
+        if ($started -and -not $process.HasExited) { $process.Kill() }
+        $record.Dispose()
+        $process.Dispose()
+    }
+}
+
+function Get-InstructionGraphBlobBytes {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Entry,
+        [Parameter(Mandatory)][long]$MaximumBytes
+    )
+
+    if ([string]$Entry.Type -cne 'blob' -or
+        [string]$Entry.Sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Instruction graph entry '$([string]$Entry.Path)' is not a canonical blob."
+    }
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = "cat-file blob $([string]$Entry.Sha)"
+    $startInfo.WorkingDirectory = $Repository
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $memory = [IO.MemoryStream]::new()
+    $started = $false
+    try {
+        if (-not $process.Start()) {
+            throw "Unable to read exact instruction blob '$([string]$Entry.Path)'."
+        }
+        $started = $true
+        $buffer = [byte[]]::new(81920)
+        [long]$total = 0
+        while (($read = $process.StandardOutput.BaseStream.Read(
+            $buffer, 0, $buffer.Length
+        )) -gt 0) {
+            if ($total -gt ($MaximumBytes - $read)) {
+                throw "Instruction blob '$([string]$Entry.Path)' exceeds the per-blob budget."
+            }
+            $memory.Write($buffer, 0, $read)
+            $total += $read
+        }
+        $errorText = $process.StandardError.ReadToEnd()
+        $process.WaitForExit()
+        if ($process.ExitCode -ne 0) {
+            throw "Unable to read exact instruction blob '$([string]$Entry.Path)': $errorText"
+        }
+        return ,$memory.ToArray()
+    }
+    finally {
+        if ($started -and -not $process.HasExited) { $process.Kill() }
+        $memory.Dispose()
+        $process.Dispose()
+    }
+}
+
+function Get-InstructionGraphForCommit {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $entries = @(Get-InstructionGraphTreeEntries -Repository $Repository `
+        -Commit $Commit)
+    $limits = Get-MeAndAIInstructionGraphLimits
+    $blobReader = ${function:Get-InstructionGraphBlobBytes}
+    $reader = {
+        param($entry)
+        & $blobReader -Repository $Repository -Entry $entry `
+            -MaximumBytes ([long]$limits.MaximumBlobBytes)
+    }.GetNewClosure()
+    $graph = New-MeAndAIInstructionGraph -BaseHead $Commit `
+        -TreeEntries $entries -ReadBlob $reader
+    if (-not (Test-MeAndAIExactInstructionGraph -Graph $graph)) {
+        throw 'Exact instruction-graph discovery returned an invalid graph.'
+    }
+    return $graph
 }
 
 function Assert-ContainedManagedDestination {
@@ -557,6 +732,7 @@ function Test-ExactAdoptionPullRequestMarker {
         [string]$ExpectedAdoptionStrategy,
         [string[]]$ExpectedProtocolSurfaces,
         [bool]$ExpectedProtocolRecordLossAcknowledgement,
+        [AllowNull()]$ExpectedSourceGraph = $null,
         [ValidateSet('Proposed', 'Completed')]
         [string]$ExpectedPhase = 'Proposed'
     )
@@ -570,6 +746,7 @@ function Test-ExactAdoptionPullRequestMarker {
         -ExpectedProtocolSurfaces @($ExpectedProtocolSurfaces) `
         -ExpectedProtocolRecordLossAcknowledgement `
             $ExpectedProtocolRecordLossAcknowledgement `
+        -ExpectedSourceGraph $ExpectedSourceGraph `
         -ExpectedPhase $ExpectedPhase
 }
 
@@ -679,7 +856,8 @@ function Test-ExactAdoptionManifest {
         [string[]]$ProtocolSurfaces,
         [bool]$ExpectedProtocolRecordLossAcknowledgement,
         [string[]]$Collisions,
-        [string[]]$TargetPaths
+        [string[]]$TargetPaths,
+        [AllowNull()]$ExpectedSourceGraph = $null
     )
 
     $manifestText = ((Invoke-Native -Command 'git' -Arguments @(
@@ -698,7 +876,8 @@ function Test-ExactAdoptionManifest {
         -ExpectedProtocolSurfaces @($ProtocolSurfaces) `
         -ExpectedProtocolRecordLossAcknowledgement `
             $ExpectedProtocolRecordLossAcknowledgement `
-        -ExpectedCollisions @($Collisions)
+        -ExpectedCollisions @($Collisions) `
+        -ExpectedSourceGraph $ExpectedSourceGraph
 }
 
 function Test-ExactAdoptionContinuity {
@@ -741,7 +920,8 @@ function Test-ExactAdoptionProposal {
         [string[]]$Collisions,
         [string[]]$TargetPaths,
         [string]$SourcePath,
-        [Parameter(Mandatory)]$MigrationBaseline
+        [Parameter(Mandatory)]$MigrationBaseline,
+        [AllowNull()]$ExpectedSourceGraph = $null
     )
 
     if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
@@ -755,7 +935,8 @@ function Test-ExactAdoptionProposal {
         -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
         -ExpectedProtocolSurfaces @($ProtocolSurfaces) `
         -ExpectedProtocolRecordLossAcknowledgement `
-            $ExpectedProtocolRecordLossAcknowledgement)) {
+            $ExpectedProtocolRecordLossAcknowledgement `
+        -ExpectedSourceGraph $ExpectedSourceGraph)) {
         return $false
     }
     if (-not (Test-ExactAdoptionTree -RemoteHead $RemoteHead -Branch $Branch `
@@ -771,7 +952,8 @@ function Test-ExactAdoptionProposal {
         -ExpectedProtocolRecordLossAcknowledgement `
             $ExpectedProtocolRecordLossAcknowledgement `
         -Collisions $Collisions `
-        -TargetPaths $TargetPaths)) {
+        -TargetPaths $TargetPaths `
+        -ExpectedSourceGraph $ExpectedSourceGraph)) {
         return $false
     }
     return Test-ExactAdoptionContinuity -PullRequest $pullRequest `
@@ -797,7 +979,8 @@ function Test-ExactCompletedAdoptionProposal {
         [string[]]$Collisions,
         [string[]]$TargetPaths,
         [string]$SourcePath,
-        [Parameter(Mandatory)]$MigrationBaseline
+        [Parameter(Mandatory)]$MigrationBaseline,
+        [AllowNull()]$ExpectedSourceGraph = $null
     )
 
     if ($PullRequests.Count -ne 1 -or $RemoteHead -notmatch '^[0-9a-f]{40}$') {
@@ -812,6 +995,7 @@ function Test-ExactCompletedAdoptionProposal {
         -ExpectedProtocolSurfaces @($ProtocolSurfaces) `
         -ExpectedProtocolRecordLossAcknowledgement `
             $ExpectedProtocolRecordLossAcknowledgement `
+        -ExpectedSourceGraph $ExpectedSourceGraph `
         -ExpectedPhase 'Completed')) {
         return $false
     }
@@ -848,7 +1032,8 @@ function Test-ExactCompletedAdoptionProposal {
         -ExpectedProtocolRecordLossAcknowledgement `
             $ExpectedProtocolRecordLossAcknowledgement `
         -Collisions $Collisions `
-        -TargetPaths $TargetPaths)) {
+        -TargetPaths $TargetPaths `
+        -ExpectedSourceGraph $ExpectedSourceGraph)) {
         return $false
     }
 
@@ -1006,8 +1191,23 @@ function Test-ExactCompletedAdoptionProposal {
                 -Changes @($changes) `
                 -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
                 -ProtocolSurfaces @($ProtocolSurfaces) `
-                -TargetPaths @($TargetPaths) -FinalEntries $finalEntries)) {
+                -TargetPaths @($TargetPaths) -FinalEntries $finalEntries `
+                -SourceGraph $ExpectedSourceGraph)) {
             return $false
+        }
+        if ($null -ne $ExpectedSourceGraph) {
+            $finalGraph = Get-InstructionGraphForCommit `
+                -Repository $workspace -Commit $RemoteHead
+            $closure = Resolve-MeAndAIInstructionGraphClosure `
+                -SourceGraph $ExpectedSourceGraph -FinalGraph $finalGraph `
+                -ExpectedAdoptionStrategy $ExpectedAdoptionStrategy `
+                -Changes @($changes) -TargetPaths @($TargetPaths)
+            if ([string]$closure.State -cne 'Ready') {
+                $paths = @($closure.UnresolvedPaths | ForEach-Object {
+                    [string]$_
+                })
+                throw "MEANDAI_ADOPTION_BLOCKED: unresolved instruction authority: $($paths -join ', ')"
+            }
         }
 
         if ($ExpectedAdoptionStrategy -ceq 'HybridReconciliation') {
@@ -1039,6 +1239,11 @@ function Test-ExactCompletedAdoptionProposal {
         }
     }
     catch {
+        if ($_.Exception.Message.StartsWith(
+            'MEANDAI_ADOPTION_BLOCKED:', [StringComparison]::Ordinal
+        )) {
+            throw
+        }
         return $false
     }
     return Test-ExactAdoptionContinuity -PullRequest $pullRequest `
@@ -1200,7 +1405,7 @@ if ($seedWorkflowMatches.Count -gt 1 -or
      [string]$seedWorkflowMatches[0] -cne [string]$SeedWorkflow.ConsumerPath)) {
     throw "The lifecycle seed workflow path must be exactly '$($SeedWorkflow.ConsumerPath)'; remove case variants before adoption."
 }
-$protocolSurfaces = @(Get-MeAndAIProtocolSurfaceInventory -Paths $basePaths)
+$protocolSurfaces = @()
 $basePathLookup = [System.Collections.Generic.Dictionary[string, string]]::new(
     [System.StringComparer]::OrdinalIgnoreCase
 )
@@ -1274,6 +1479,58 @@ if ($ValidateLocalUpdaterOnly) {
     return
 }
 
+$suppliedGraphIdentity = $null
+if ($SourceGraphIdentityJson) {
+    try { $suppliedGraphIdentity = $SourceGraphIdentityJson | ConvertFrom-Json }
+    catch {
+        throw 'The launcher-supplied instruction-graph identity is invalid JSON.'
+    }
+}
+elseif ($SourceGraphBase -or $SourceGraphDigest) {
+    throw 'Instruction-graph base/digest cannot be supplied without the complete compact identity.'
+}
+$sourceBaseHead = if ($null -ne $suppliedGraphIdentity) {
+    [string]$suppliedGraphIdentity.graphBase
+}
+else { $baseHead }
+if ($sourceBaseHead -cnotmatch '^[0-9a-f]{40}$') {
+    throw 'The instruction-graph source base is not one canonical commit.'
+}
+if ($sourceBaseHead -cne $baseHead) {
+    $ancestry = (((Invoke-Native -Command 'git' -Arguments @(
+        'rev-list', '--parents', '-n', '1', $baseHead
+    )) -join '').Trim() -split '\s+')
+    if ($ancestry.Count -ne 2 -or $ancestry[0] -cne $baseHead -or
+        $ancestry[1] -cne $sourceBaseHead) {
+        throw 'The workflow event is not one exact child of the assessed instruction-graph base.'
+    }
+    $seedOnlyPaths = @(Invoke-Native -Command 'git' -Arguments @(
+        'diff-tree', '--no-commit-id', '--name-only', '-r', '--no-renames',
+        $baseHead, '--'
+    ) | Where-Object { $_ } | ForEach-Object { [string]$_ })
+    if ($seedOnlyPaths.Count -ne 1 -or
+        [string]$seedOnlyPaths[0] -cne [string]$SeedWorkflow.ConsumerPath) {
+        throw 'The workflow event child is not the exact canonical workflow-only seed commit.'
+    }
+}
+$sourceGraph = Get-InstructionGraphForCommit -Repository $workspace `
+    -Commit $sourceBaseHead
+if ($null -ne $suppliedGraphIdentity -and
+    -not (Test-MeAndAIExactInstructionGraphIdentity `
+        -Identity $suppliedGraphIdentity -Graph $sourceGraph)) {
+    throw 'The independently rebuilt instruction graph does not match the launcher-authorized identity.'
+}
+if (($SourceGraphBase -and $SourceGraphBase -cne $sourceBaseHead) -or
+    ($SourceGraphDigest -and
+     $SourceGraphDigest -cne [string]$sourceGraph.digest)) {
+    throw 'The launcher-supplied graph base/digest disagrees with the complete identity.'
+}
+$sourceGraphRecord = ConvertTo-MeAndAIInstructionGraphRecord `
+    -Graph $sourceGraph
+$sourceGraphIdentity = Get-MeAndAIInstructionGraphIdentity `
+    -Graph $sourceGraph
+$protocolSurfaces = @($sourceGraphRecord.protocolSurfaces)
+
 $branch = "$BranchPrefix$TargetTag"
 $actor = ((Invoke-Native -Command 'gh' -Arguments @(
     'api', 'user', '--jq', '.login'
@@ -1303,7 +1560,7 @@ if (($inventoriedTarget.Count -eq 0 -and $remoteBranchHead) -or
 $pullRequests = @(Get-OpenAdoptionPullRequests `
     -Repository $env:GITHUB_REPOSITORY -Branch $branch)
 $proposalContract = Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobject]@{
-    SchemaVersion = 2
+    SchemaVersion = 3
     LocalUpdaterState = $localUpdaterState
     SeedWorkflowState = $seedWorkflowState
     Collisions = @($collisions)
@@ -1314,6 +1571,7 @@ $proposalContract = Resolve-MeAndAICapabilitiesLifecycle -Snapshot ([pscustomobj
     RemoteBranchExists = $false
     OpenPullRequestCount = 0
     ExistingProposalValid = $false
+    SourceGraph = $sourceGraphRecord
 })
 $existingProposalValid = if ($proposalContract.State -cin @(
     'BootstrapReady', 'AdoptionReviewRequired'
@@ -1329,7 +1587,8 @@ $existingProposalValid = if ($proposalContract.State -cin @(
             ([bool]$proposalContract.ProtocolRecordLossAcknowledged) `
         -ProposalMode ([string]$proposalContract.ProposalMode) `
         -Collisions @($collisions) -TargetPaths $targetPaths `
-        -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
+        -SourcePath $sourcePath -MigrationBaseline $migrationBaseline `
+        -ExpectedSourceGraph $sourceGraphRecord
     if ($proposedValid) {
         $true
     }
@@ -1345,12 +1604,13 @@ $existingProposalValid = if ($proposalContract.State -cin @(
                 ([bool]$proposalContract.ProtocolRecordLossAcknowledged) `
             -ProposalMode ([string]$proposalContract.ProposalMode) `
             -Collisions @($collisions) -TargetPaths $targetPaths `
-            -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
+            -SourcePath $sourcePath -MigrationBaseline $migrationBaseline `
+            -ExpectedSourceGraph $sourceGraphRecord
     }
 }
 else { $false }
 $snapshot = [pscustomobject]@{
-    SchemaVersion = 2
+    SchemaVersion = 3
     LocalUpdaterState = $localUpdaterState
     SeedWorkflowState = $seedWorkflowState
     Collisions = @($collisions)
@@ -1361,6 +1621,7 @@ $snapshot = [pscustomobject]@{
     RemoteBranchExists = [bool]$remoteBranchHead
     OpenPullRequestCount = $pullRequests.Count
     ExistingProposalValid = $existingProposalValid
+    SourceGraph = $sourceGraphRecord
 }
 $plan = Resolve-MeAndAICapabilitiesLifecycle -Snapshot $snapshot
 Add-RunSummary "## meAndAI AI capabilities lifecycle`n`n- Target: ``$TargetTag```n- State: ``$($plan.State)```n- Proposal: ``$($plan.ProposalMode)```n- Adoption strategy: ``$($plan.AdoptionStrategy)``"
@@ -1460,7 +1721,7 @@ if ($plan.State -ceq 'BootstrapReady') {
 }
 
 $manifest = [ordered]@{
-    schema = 2
+    schema = 3
     operation = 'ai-capabilities-adoption'
     state = [string]$plan.State
     repository = [string]$env:GITHUB_REPOSITORY
@@ -1472,8 +1733,9 @@ $manifest = [ordered]@{
     collisions = @($plan.Collisions)
     proposedPaths = $proposedPaths
     requiredTasks = $RequiredTasks
+    sourceGraph = $sourceGraphRecord
 }
-$manifestText = ($manifest | ConvertTo-Json -Depth 5 -Compress) + "`n"
+$manifestText = ($manifest | ConvertTo-Json -Depth 12 -Compress) + "`n"
 Write-Utf8NoBom -Path (Join-Path $workspace $ManifestPath) -Content $manifestText
 $stagedPaths.Add($ManifestPath)
 
@@ -1508,7 +1770,8 @@ if (-not (Test-ExactAdoptionTree -RemoteHead $headSha -Branch $branch `
         -ProtocolSurfaces @($plan.ProtocolSurfaces) `
         -ExpectedProtocolRecordLossAcknowledgement `
             ([bool]$plan.ProtocolRecordLossAcknowledged) `
-        -Collisions @($plan.Collisions) -TargetPaths $targetPaths)) {
+        -Collisions @($plan.Collisions) -TargetPaths $targetPaths `
+        -ExpectedSourceGraph $sourceGraphRecord)) {
     throw 'The committed adoption proposal escaped its exact staged contract.'
 }
 $postCommitStatus = @(Invoke-Native -Command 'git' -Arguments @(
@@ -1561,18 +1824,23 @@ if (-not $postPushBaseValid) {
 }
 
 $marker = [ordered]@{
-    schema = 5
+    schema = 7
     phase = 'Proposed'
     state = [string]$plan.State
     target = $TargetTag
     protocolSha = $targetSha
     head = $headSha
+    branch = $branch
     adoptionStrategy = [string]$plan.AdoptionStrategy
     protocolSurfaces = @($plan.ProtocolSurfaces)
     protocolRecordLossAcknowledged = [bool]$plan.ProtocolRecordLossAcknowledged
+    graphBase = [string]$sourceGraphIdentity.graphBase
+    graphDigest = [string]$sourceGraphIdentity.graphDigest
+    graphCounts = $sourceGraphIdentity.graphCounts
+    graphLimits = $sourceGraphIdentity.graphLimits
     repository = [string]$env:GITHUB_REPOSITORY
     actor = $actor
-} | ConvertTo-Json -Compress
+} | ConvertTo-Json -Depth 8 -Compress
 $collisionText = if (@($plan.Collisions).Count -gt 0) {
     @($plan.Collisions | ForEach-Object { "- ``$_``" }) -join [Environment]::NewLine
 }
@@ -1587,6 +1855,9 @@ $body = @(
     "- Lifecycle state: ``$($plan.State)``",
     "- Protocol release: ``$TargetTag``",
     "- Protocol commit: ``$targetSha``",
+    "- Source graph base: ``$([string]$sourceGraphIdentity.graphBase)``",
+    "- Source graph digest: ``$([string]$sourceGraphIdentity.graphDigest)``",
+    "- Source graph nodes/edges/candidates: ``$([int]$sourceGraphIdentity.graphCounts.nodes)/$([int]$sourceGraphIdentity.graphCounts.edges)/$([int]$sourceGraphIdentity.graphCounts.candidates)``",
     "- Adoption strategy: ``$($plan.AdoptionStrategy)``",
     "- Protocol record loss acknowledged: ``$([bool]$plan.ProtocolRecordLossAcknowledged)``", '',
     '### Detected protocol and governance surfaces', '', $protocolSurfaceText, '',
@@ -1618,7 +1889,8 @@ $publishedProposalValid = Test-ExactAdoptionProposal `
         ([bool]$plan.ProtocolRecordLossAcknowledged) `
     -ProposalMode ([string]$plan.ProposalMode) `
     -Collisions @($plan.Collisions) -TargetPaths $targetPaths `
-    -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
+    -SourcePath $sourcePath -MigrationBaseline $migrationBaseline `
+    -ExpectedSourceGraph $sourceGraphRecord
 if (-not $publishedProposalValid -or
     $publishedPullRequests.Count -ne 1 -or
     [string]$publishedPullRequests[0].url -cne $url) {
@@ -1649,7 +1921,8 @@ if (-not $postCreateBaseValid) {
             ([bool]$plan.ProtocolRecordLossAcknowledged) `
         -ProposalMode ([string]$plan.ProposalMode) `
         -Collisions @($plan.Collisions) -TargetPaths $targetPaths `
-        -SourcePath $sourcePath -MigrationBaseline $migrationBaseline
+        -SourcePath $sourcePath -MigrationBaseline $migrationBaseline `
+        -ExpectedSourceGraph $sourceGraphRecord
     if (-not $compensationProposalValid -or
         $compensationPullRequests.Count -ne 1 -or
         [string]$compensationPullRequests[0].url -cne $url) {

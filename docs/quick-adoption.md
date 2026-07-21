@@ -123,8 +123,8 @@ secret remains untouched and is not a credential source for the local process.
 ## Quick command
 
 Download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.5/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.12.5` GitHub Release with an authenticated browser.
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.6/Invoke-MeAndAIQuickAdoption.ps1)
+from the exact immutable `v0.12.6` GitHub Release with an authenticated browser.
 Do not separately download or unpack the module bundle; the launcher retrieves
 and verifies the release's one internal bundle asset itself. Save the reusable
 launcher outside the consumer repository, such as in `$HOME\Downloads`. This
@@ -138,11 +138,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.12.5` is an exact published
+launcher itself verifies that its runtime `v0.12.6` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.12.5`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.12.6`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
@@ -179,7 +179,7 @@ values are not command-line arguments and are not printed.
 
 Before repository initialization, remote creation, secret writes, or seed
 publication, the launcher verifies the authenticated `gh` identity and loads
-the pure strategy/classification policy from the exact immutable `v0.12.5`
+the pure strategy/classification policy from the exact immutable `v0.12.6`
 capabilities contract module. The standalone launcher and workflow adapter do
 not maintain competing policy copies; each keeps only its own Git/GitHub
 evidence and mutation-boundary checks. The launcher then performs one bounded
@@ -249,12 +249,23 @@ retroactively label it with a maintainer choice it never recorded.
 
 Detected governance files must already belong to committed repository history;
 otherwise they cannot appear in the isolated proposal clone and the launcher
-asks the maintainer to commit/reconcile the repository first. The chosen
-strategy and exact sorted path inventory are carried through workflow
-dispatch, transient manifest, proposal marker, adoption issue, local Codex
-prompt, reruns, and completion. The AI actor cannot change the choice. A newly
-discovered authority or required deletion outside that inventory blocks for a
-new maintainer assessment.
+asks the maintainer to commit/reconcile the repository first. The launcher
+builds one bounded graph from generic instruction roots, their local references,
+and the versioned compatibility seed. The chosen strategy and graph-derived
+surface projection are carried through workflow dispatch, transient manifest,
+proposal marker, adoption issue, local Codex prompt, reruns, and completion.
+The AI actor cannot change the choice. A newly discovered authority or required
+deletion outside the existing mutation envelope blocks for a new maintainer
+assessment.
+
+The graph is tied to the exact committed base by its digest, counts, limits,
+and required projections. Every mutation boundary independently rebuilds that
+source evidence; completion also builds the candidate final graph. Missing,
+ambiguous, escaping, unsupported, over-budget, or drifted references block
+before proposal mutation or readiness. A graph node is evidence, not write
+authority: product/application files, source evidence, binaries, special Git
+modes, and unknown formats remain protected. Successful completion removes the
+transient manifest and leaves no graph ledger or legacy compatibility router.
 
 A target with no committed `HEAD` may contain only `FG_PAT.txt`,
 `MEANDAI_RO_FG_PAT.txt`, and the exact canonical seed workflow. Commit

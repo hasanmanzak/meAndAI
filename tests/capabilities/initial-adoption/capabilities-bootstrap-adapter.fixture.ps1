@@ -5,6 +5,12 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
+$capabilitiesModulePath = Join-Path $root `
+    'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
+$graphIdentityFixturePath = Join-Path $PSScriptRoot `
+    'capabilities-bootstrap-graph-identity.fixture.ps1'
+$graphDriftFixturePath = Join-Path $PSScriptRoot `
+    'capabilities-bootstrap-adapter-drift.fixture.ps1'
 $consumerMigrationModulePath = Join-Path $root `
     'scripts/MeAndAI.ConsumerMigrations.psm1'
 $consumerMigrationIndexPath = Join-Path $root 'migrations/index.json'
@@ -68,6 +74,151 @@ function Invoke-Git {
         throw "git -C $Repository $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
     }
     return @($output)
+}
+
+function Get-FixtureInstructionGraphIdentity {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    if (-not (Test-Path -LiteralPath $graphIdentityFixturePath `
+            -PathType Leaf)) {
+        throw 'The TEST-0153 isolated graph-identity fixture is missing.'
+    }
+    $engine = (Get-Process -Id $PID).Path
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
+            -File $graphIdentityFixturePath -Repository $Repository `
+            -Commit $Commit -ModulePath $capabilitiesModulePath 2>&1)
+        $exitCode = $LASTEXITCODE
+    }
+    finally { $ErrorActionPreference = $previousPreference }
+    if ($exitCode -ne 0) {
+        throw "The TEST-0153 isolated graph-identity fixture failed: $($output -join [Environment]::NewLine)"
+    }
+    $records = @($output | Where-Object {
+        [string]$_ -like 'MEANDAI_TEST_GRAPH_IDENTITY=*'
+    })
+    if ($records.Count -ne 1) {
+        throw 'The TEST-0153 isolated graph-identity fixture returned ambiguous evidence.'
+    }
+    return ([string]$records[0]).Substring(
+        'MEANDAI_TEST_GRAPH_IDENTITY='.Length
+    ) | ConvertFrom-Json
+}
+
+function Invoke-IsolatedGraphDriftFixture {
+    param(
+        [Parameter(Mandatory)]$Fixture,
+        [Parameter(Mandatory)][string]$SourceGraphIdentityJson
+    )
+
+    if (-not (Test-Path -LiteralPath $graphDriftFixturePath -PathType Leaf)) {
+        throw 'The TEST-0153 isolated adapter-drift fixture is missing.'
+    }
+    $engine = (Get-Process -Id $PID).Path
+    $encodedIdentity = [Convert]::ToBase64String(
+        [Text.UTF8Encoding]::new($false).GetBytes(
+            $SourceGraphIdentityJson
+        )
+    )
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
+            -File $graphDriftFixturePath -AdapterPath $adapterPath `
+            -Workspace ([string]$Fixture.Consumer) `
+            -SourceGraphIdentityBase64 $encodedIdentity 2>&1)
+        $exitCode = $LASTEXITCODE
+    }
+    finally { $ErrorActionPreference = $previousPreference }
+    if ($exitCode -ne 0) {
+        return [pscustomobject]@{
+            Threw = $false
+            Error = $output -join [Environment]::NewLine
+        }
+    }
+    $records = @($output | Where-Object {
+        [string]$_ -like 'MEANDAI_TEST_GRAPH_REJECTION=*'
+    })
+    if ($records.Count -ne 1) {
+        return [pscustomobject]@{
+            Threw = $false
+            Error = 'The isolated drift fixture returned ambiguous evidence.'
+        }
+    }
+    return [pscustomobject]@{
+        Threw = $true
+        Error = ([string]$records[0]).Substring(
+            'MEANDAI_TEST_GRAPH_REJECTION='.Length
+        )
+    }
+}
+
+function Invoke-IsolatedGraphSuccessFixture {
+    param(
+        [Parameter(Mandatory)]$Fixture,
+        [Parameter(Mandatory)][string]$SourceGraphIdentityJson
+    )
+
+    $engine = (Get-Process -Id $PID).Path
+    $encodedIdentity = [Convert]::ToBase64String(
+        [Text.UTF8Encoding]::new($false).GetBytes(
+            $SourceGraphIdentityJson
+        )
+    )
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
+            -File $graphDriftFixturePath -AdapterPath $adapterPath `
+            -Workspace ([string]$Fixture.Consumer) `
+            -SourceGraphIdentityBase64 $encodedIdentity `
+            -ExpectSuccess 2>&1)
+        $exitCode = $LASTEXITCODE
+    }
+    finally { $ErrorActionPreference = $previousPreference }
+    if ($exitCode -ne 0) {
+        return [pscustomobject]@{
+            Threw = $true
+            Error = $output -join [Environment]::NewLine
+            PullRequestBody = ''
+        }
+    }
+    $records = @($output | Where-Object {
+        [string]$_ -like 'MEANDAI_TEST_PROPOSAL_BODY_BASE64=*'
+    })
+    if ($records.Count -ne 1) {
+        return [pscustomobject]@{
+            Threw = $true
+            Error = 'The isolated success fixture returned ambiguous evidence.'
+            PullRequestBody = ''
+        }
+    }
+    try {
+        $body = [Text.UTF8Encoding]::new($false, $true).GetString(
+            [Convert]::FromBase64String(
+                ([string]$records[0]).Substring(
+                    'MEANDAI_TEST_PROPOSAL_BODY_BASE64='.Length
+                )
+            )
+        )
+    }
+    catch {
+        return [pscustomobject]@{
+            Threw = $true
+            Error = 'The isolated success fixture returned invalid body evidence.'
+            PullRequestBody = ''
+        }
+    }
+    return [pscustomobject]@{
+        Threw = $false
+        Error = ''
+        PullRequestBody = $body
+    }
 }
 
 function Copy-SourceFixture {
@@ -615,6 +766,7 @@ function Invoke-BootstrapFixture {
             'HybridReconciliation', 'CleanStart', 'Abort')]
         [string]$AdoptionStrategy = 'Auto',
         [switch]$AcknowledgeProtocolRecordLoss,
+        [string]$SourceGraphIdentityJson = '',
         [switch]$ValidateLocalUpdaterOnly
     )
 
@@ -635,15 +787,19 @@ function Invoke-BootstrapFixture {
                 -TargetTag 'v0.5.0' -ValidateLocalUpdaterOnly
         }
         else {
+            $bootstrapParameters = @{
+                ProtocolSourcePath = '.meandai-update-source'
+                TargetTag = 'v0.5.0'
+                AdoptionStrategy = $AdoptionStrategy
+            }
             if ($AcknowledgeProtocolRecordLoss) {
-                & $adapterPath -ProtocolSourcePath '.meandai-update-source' `
-                    -TargetTag 'v0.5.0' -AdoptionStrategy $AdoptionStrategy `
-                    -AcknowledgeProtocolRecordLoss
+                $bootstrapParameters.AcknowledgeProtocolRecordLoss = $true
             }
-            else {
-                & $adapterPath -ProtocolSourcePath '.meandai-update-source' `
-                    -TargetTag 'v0.5.0' -AdoptionStrategy $AdoptionStrategy
+            if ($SourceGraphIdentityJson) {
+                $bootstrapParameters.SourceGraphIdentityJson =
+                    $SourceGraphIdentityJson
             }
+            & $adapterPath @bootstrapParameters
         }
     }
     catch {
@@ -706,39 +862,41 @@ function Get-RemoteChangedPaths {
     ))
 }
 
-function Set-ExistingSchema5AdoptionMarker {
+function Set-ExistingSchema7AdoptionMarker {
     param(
         [Parameter(Mandatory)][string]$Head,
-        [Parameter(Mandatory)][string]$ProtocolSha,
-        [ValidateSet('Proposed', 'Completed')]
-        [string]$Phase,
-        [ValidateSet('BootstrapReady', 'AdoptionReviewRequired')]
-        [string]$State,
-        [ValidateSet('FullMigration', 'HybridReconciliation', 'CleanStart')]
-        [string]$Strategy,
-        [Parameter(Mandatory)][string[]]$ProtocolSurfaces,
-        [bool]$ProtocolRecordLossAcknowledged
+        [Parameter(Mandatory)]$SourceMarker
     )
 
+    if ([long]$SourceMarker.schema -ne 7 -or
+        [string]$SourceMarker.phase -cne 'Proposed') {
+        throw 'A schema-7 Proposed marker is required to construct current completion evidence.'
+    }
     $marker = [ordered]@{
-        schema = 5
-        phase = $Phase
-        state = $State
-        target = 'v0.5.0'
-        protocolSha = $ProtocolSha
+        schema = 7
+        phase = 'Completed'
+        state = [string]$SourceMarker.state
+        target = [string]$SourceMarker.target
+        protocolSha = [string]$SourceMarker.protocolSha
         head = $Head
-        adoptionStrategy = $Strategy
-        protocolSurfaces = @($ProtocolSurfaces)
-        protocolRecordLossAcknowledged = $ProtocolRecordLossAcknowledged
-        repository = 'owner/consumer'
-        actor = 'owner'
-    } | ConvertTo-Json -Compress
+        branch = [string]$SourceMarker.branch
+        adoptionStrategy = [string]$SourceMarker.adoptionStrategy
+        protocolSurfaces = @($SourceMarker.protocolSurfaces)
+        protocolRecordLossAcknowledged =
+            [bool]$SourceMarker.protocolRecordLossAcknowledged
+        graphBase = [string]$SourceMarker.graphBase
+        graphDigest = [string]$SourceMarker.graphDigest
+        graphCounts = $SourceMarker.graphCounts
+        graphLimits = $SourceMarker.graphLimits
+        repository = [string]$SourceMarker.repository
+        actor = [string]$SourceMarker.actor
+    } | ConvertTo-Json -Depth 8 -Compress
     $global:PullRequestExists = $true
     $global:ExistingPullRequestHead = $Head
-    $global:ExistingPullRequestProtocolSha = $ProtocolSha
+    $global:ExistingPullRequestProtocolSha = [string]$SourceMarker.protocolSha
     $global:ExistingPullRequestBody = `
         "<!-- meandai-capabilities-adoption:$marker -->"
-    $global:ExistingPullRequestIsDraft = $Phase -ceq 'Proposed'
+    $global:ExistingPullRequestIsDraft = $false
     return [string]$global:ExistingPullRequestBody
 }
 
@@ -940,7 +1098,7 @@ function New-CompletedStrategyFixture {
         Invoke-BootstrapFixture -Fixture $fixture -AdoptionStrategy $Strategy
     }
     if ($initial.Threw) {
-        throw "$Strategy schema-5 proposal creation failed: $($initial.Error)"
+        throw "$Strategy schema-7 proposal creation failed: $($initial.Error)"
     }
     $branch = 'automation/meandai-capabilities-v0.5.0'
     $proposalHead = [string]$global:ExistingPullRequestHead
@@ -953,7 +1111,7 @@ function New-CompletedStrategyFixture {
         '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
     )
     if (-not $proposalMarkerMatch.Success) {
-        throw "$Strategy schema-5 proposal marker could not be parsed."
+        throw "$Strategy schema-7 proposal marker could not be parsed."
     }
     $proposalMarker = $proposalMarkerMatch.Groups['json'].Value |
         ConvertFrom-Json
@@ -963,11 +1121,16 @@ function New-CompletedStrategyFixture {
         'AdoptionReviewRequired'
     }
     else { 'BootstrapReady' }
-    if ([long]$proposalMarker.schema -ne 5 -or
+    if ([long]$proposalMarker.schema -ne 7 -or
         [string]$proposalMarker.phase -cne 'Proposed' -or
         $proposalState -cne $expectedProposalState -or
-        [string]$proposalMarker.adoptionStrategy -cne $Strategy) {
-        throw "$Strategy proposal did not publish the expected schema-5 $expectedProposalState state."
+        [string]$proposalMarker.adoptionStrategy -cne $Strategy -or
+        [string]$proposalMarker.branch -cne $branch -or
+        [string]$proposalMarker.graphBase -cnotmatch '^[0-9a-f]{40}$' -or
+        [string]$proposalMarker.graphDigest -cnotmatch '^[0-9a-f]{64}$' -or
+        $null -eq $proposalMarker.graphCounts -or
+        $null -eq $proposalMarker.graphLimits) {
+        throw "$Strategy proposal did not publish the expected graph-aware schema-7 $expectedProposalState state."
     }
     $legacyRuleSurfacePath = switch ($LegacyRuleSurface) {
         'Cursor' { '.cursor/rules/consumer.mdc' }
@@ -994,12 +1157,12 @@ function New-CompletedStrategyFixture {
         -Strategy $Strategy -LegacyRuleSurfacePath $legacyRuleSurfacePath `
         -NestedProtocolSurfacePaths @($NestedProtocolSurfaces) `
         -HasAgentsCollision $AddAgentsCollision
-    $completedBody = Set-ExistingSchema5AdoptionMarker `
-        -Head ([string]$completion.Head) `
-        -ProtocolSha ([string]$completion.ProtocolSha) -Phase 'Completed' `
-        -State $proposalState `
-        -Strategy $Strategy -ProtocolSurfaces $surfaces `
-        -ProtocolRecordLossAcknowledged $acknowledged
+    if ([string]$completion.ProtocolSha -cne
+        [string]$proposalMarker.protocolSha) {
+        throw "$Strategy completion changed the proposal's protocol identity."
+    }
+    $completedBody = Set-ExistingSchema7AdoptionMarker `
+        -Head ([string]$completion.Head) -SourceMarker $proposalMarker
     Invoke-Git -Repository $fixture.Consumer -Arguments @(
         'switch', 'main'
     ) | Out-Null
@@ -1014,7 +1177,7 @@ function New-CompletedStrategyFixture {
     if ($completed.Threw -or
         $global:PullRequestCreateCalls -ne $createCallsBeforeCompletion -or
         [string]$global:ExistingPullRequestBody -cne $completedBody) {
-        Add-Failure "TEST-0128 valid schema-5 $Strategy Completed proposal was not retained: $($completed.Error)"
+        Add-Failure "TEST-0128 valid schema-7 $Strategy Completed proposal was not retained: $($completed.Error)"
     }
     return [pscustomobject]@{
         Fixture = $fixture
@@ -1113,6 +1276,170 @@ try {
         Add-Failure "TEST-0077 exact local updater did not pass source-only preflight without mutation: $($result.Error)"
     }
 
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $graphBound = New-BootstrapFixture -Name 'graph-bound-dispatch' `
+        -AddAgentsCollision $true
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'rm', '--', '.github/workflows/meandai-protocol-update.yml'
+    ) | Out-Null
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'commit', '-m', 'Prepare launcher-assessed graph base'
+    ) | Out-Null
+    $graphAssessedBase = (@(Invoke-Git -Repository $graphBound.Consumer `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    $graphWorkflowTarget = Join-Path $graphBound.Consumer `
+        '.github/workflows/meandai-protocol-update.yml'
+    New-Item -ItemType Directory -Path (Split-Path -Parent $graphWorkflowTarget) `
+        -Force | Out-Null
+    Copy-Item -LiteralPath $workflowPath -Destination $graphWorkflowTarget
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'add', '--', '.github/workflows/meandai-protocol-update.yml'
+    ) | Out-Null
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'commit', '-m', 'Publish exact launcher workflow seed'
+    ) | Out-Null
+    $graphEventHead = (@(Invoke-Git -Repository $graphBound.Consumer `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'push', 'origin', 'main'
+    ) | Out-Null
+    $graphIdentity = Get-FixtureInstructionGraphIdentity `
+        -Repository $graphBound.Consumer -Commit $graphAssessedBase
+    $graphIdentityJson = $graphIdentity | ConvertTo-Json -Depth 30 -Compress
+    $graphStatusBaseline = @(Invoke-Git `
+        -Repository $graphBound.Consumer -Arguments @(
+            'status', '--porcelain=v1', '--untracked-files=all'
+        ))
+
+    $result = Invoke-IsolatedGraphSuccessFixture -Fixture $graphBound `
+        -SourceGraphIdentityJson $graphIdentityJson
+    if ($result.Threw) {
+        Add-Failure "TEST-0153 hosted adapter rejected the exact launcher-authorized source graph: $($result.Error)"
+    }
+    else {
+        Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+            'fetch', 'origin',
+            'automation/meandai-capabilities-v0.5.0'
+        ) | Out-Null
+        $graphManifest = (Invoke-Git -Repository $graphBound.Consumer `
+            -Arguments @(
+                'show',
+                'FETCH_HEAD:.ai/adoption/meandai-capabilities.json'
+            )) -join "`n" | ConvertFrom-Json
+        $graphChangedPaths = @(Invoke-Git `
+            -Repository $graphBound.Consumer -Arguments @(
+                'diff', '--name-only', 'main...FETCH_HEAD'
+            ))
+        $graphMarkerMatch = [regex]::Match(
+            [string]$result.PullRequestBody,
+            '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
+        )
+        $graphMarker = if ($graphMarkerMatch.Success) {
+            $graphMarkerMatch.Groups['json'].Value | ConvertFrom-Json
+        }
+        else { $null }
+        if ([long]$graphManifest.schema -ne 3 -or
+            [string]$graphManifest.sourceGraph.baseHead -cne
+                $graphAssessedBase -or
+            [string]$graphManifest.sourceGraph.digest -cne
+                [string]$graphIdentity.graphDigest -or
+            $graphChangedPaths.Count -ne 1 -or
+            [string]$graphChangedPaths[0] -cne
+                '.ai/adoption/meandai-capabilities.json' -or
+            $null -eq $graphMarker -or [long]$graphMarker.schema -ne 7 -or
+            [string]$graphMarker.graphBase -cne $graphAssessedBase -or
+            [string]$graphMarker.graphDigest -cne
+                [string]$graphIdentity.graphDigest) {
+            Add-Failure 'TEST-0153 exact hosted-adapter proposal did not preserve the independently rebuilt parent-base graph in its schema-3 manifest and schema-7 marker.'
+        }
+        Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+            'push', 'origin', '--delete',
+            'automation/meandai-capabilities-v0.5.0'
+        ) | Out-Null
+    }
+    Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+        'switch', 'main'
+    ) | Out-Null
+    $graphRestoredHead = (@(Invoke-Git -Repository $graphBound.Consumer `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    if ($graphRestoredHead -cne $graphEventHead) {
+        Add-Failure 'TEST-0153 exact hosted-adapter success did not restore the fixture to the workflow event head.'
+        Invoke-Git -Repository $graphBound.Consumer -Arguments @(
+            'switch', '-C', 'main', $graphEventHead
+        ) | Out-Null
+    }
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+
+    $graphIdentityDrifts = [ordered]@{}
+    $graphBaseDrift = $graphIdentityJson | ConvertFrom-Json
+    $graphBaseDrift.graphBase = ('f' * 40)
+    $graphIdentityDrifts['base drift'] = $graphBaseDrift
+    $graphDigestDrift = $graphIdentityJson | ConvertFrom-Json
+    $graphDigestDrift.graphDigest = ('f' * 64)
+    $graphIdentityDrifts['digest drift'] = $graphDigestDrift
+    $graphCountDrift = $graphIdentityJson | ConvertFrom-Json
+    $graphCountDrift.graphCounts.nodes =
+        [long]$graphCountDrift.graphCounts.nodes + 1
+    $graphIdentityDrifts['count drift'] = $graphCountDrift
+    $graphProjectionDrift = $graphIdentityJson | ConvertFrom-Json
+    $graphProjectionDrift.protocolSurfaces = @('CLAUDE.md')
+    $graphProjectionDrift.graphCounts.protocolSurfaces = 1
+    $graphIdentityDrifts['protocol-surface projection drift'] =
+        $graphProjectionDrift
+
+    foreach ($entry in $graphIdentityDrifts.GetEnumerator()) {
+        $global:PullRequestExists = $false
+        $global:PullRequestCreateCalls = 0
+        $global:ExistingPullRequestBody = ''
+        $headBeforeGraphDrift = (@(Invoke-Git `
+            -Repository $graphBound.Consumer -Arguments @(
+                'rev-parse', 'HEAD'
+            )))[0]
+        $result = Invoke-IsolatedGraphDriftFixture -Fixture $graphBound `
+            -SourceGraphIdentityJson ($entry.Value |
+                ConvertTo-Json -Depth 30 -Compress)
+        $headAfterGraphDrift = (@(Invoke-Git `
+            -Repository $graphBound.Consumer -Arguments @(
+                'rev-parse', 'HEAD'
+            )))[0]
+        $statusAfterGraphDrift = @(Invoke-Git `
+            -Repository $graphBound.Consumer -Arguments @(
+                'status', '--porcelain=v1', '--untracked-files=all'
+            ))
+        $unexpectedGraphBranch = @(Invoke-Git `
+            -Repository $graphBound.Consumer -Arguments @(
+                'ls-remote', '--heads', 'origin',
+                'refs/heads/automation/meandai-capabilities-v0.5.0'
+            ))
+        $expectedGraphDriftError = if ([string]$entry.Key -ceq
+            'base drift') {
+            '*workflow event is not one exact child*'
+        }
+        else {
+            '*independently rebuilt instruction graph does not match*'
+        }
+        if (-not $result.Threw -or
+            $result.Error -notlike $expectedGraphDriftError -or
+            $global:PullRequestCreateCalls -ne 0 -or
+            $unexpectedGraphBranch.Count -ne 0 -or
+            $headBeforeGraphDrift -cne $graphEventHead -or
+            $headAfterGraphDrift -cne $graphEventHead -or
+            ($statusAfterGraphDrift -join "`n") -cne
+                ($graphStatusBaseline -join "`n")) {
+            Add-Failure "TEST-0153 hosted adapter accepted $($entry.Key) or mutated proposal state before rejecting it: $($result.Error)"
+        }
+    }
+
+    $global:PullRequestExists = $false
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+
     foreach ($assetName in @(
         'MeAndAI.ProtocolUpdate.psm1',
         'Invoke-MeAndAIProtocolUpdate.ps1'
@@ -1187,15 +1514,136 @@ try {
         }
     }
 
+    $fullMigrationClosureControl = $null
     foreach ($strategy in @(
         'FullMigration', 'HybridReconciliation', 'CleanStart'
     )) {
         try {
-            [void](New-CompletedStrategyFixture `
-                -Strategy $strategy)
+            $completedStrategyFixture = New-CompletedStrategyFixture `
+                -Strategy $strategy
+            if ($strategy -ceq 'FullMigration') {
+                $fullMigrationClosureControl = $completedStrategyFixture
+            }
         }
         catch {
-            Add-Failure "TEST-0128/TEST-0129 genuine schema-5 $strategy Completed fixture could not be constructed: $($_.Exception.Message)"
+            Add-Failure "TEST-0128/TEST-0129 current schema-7 $strategy Completed fixture could not be constructed: $($_.Exception.Message)"
+        }
+    }
+    if ($null -eq $fullMigrationClosureControl) {
+        Add-Failure 'TEST-0154 hosted completion has no positive current-envelope retirement control.'
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $global:ExistingPullRequestBody = ''
+    $global:ExistingPullRequestIsDraft = $true
+    $partialClosure = New-BootstrapFixture `
+        -Name 'completed-partial-instruction-closure' `
+        -AddApplicationFile $true -AddAgentsCollision $true `
+        -AddClaudeCollision $true
+    $partialAuthorityPaths = @(
+        'docs/AI_MEMORY.md',
+        'docs/DEVELOPMENT_PROTOCOL.md',
+        'docs/PROJECT_TRACKER.md',
+        'docs/TEST_CATALOG.md'
+    )
+    [IO.File]::WriteAllText(
+        (Join-Path $partialClosure.Consumer 'AGENTS.md'),
+        @(
+            '# Consumer instruction root',
+            '',
+            'Required reading:',
+            '- [AI memory](docs/AI_MEMORY.md)',
+            '- [development protocol](docs/DEVELOPMENT_PROTOCOL.md)',
+            '- [project tracker](docs/PROJECT_TRACKER.md)',
+            '- [test catalog](docs/TEST_CATALOG.md)',
+            ''
+        ) -join "`n",
+        [Text.UTF8Encoding]::new($false)
+    )
+    foreach ($partialAuthorityPath in $partialAuthorityPaths) {
+        $partialAuthorityTarget = Join-Path `
+            $partialClosure.Consumer $partialAuthorityPath
+        New-Item -ItemType Directory -Path (
+            Split-Path -Parent $partialAuthorityTarget
+        ) -Force | Out-Null
+        [IO.File]::WriteAllText(
+            $partialAuthorityTarget,
+            "# Active consumer authority: $partialAuthorityPath`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+    }
+    Invoke-Git -Repository $partialClosure.Consumer `
+        -Arguments (@('add', '--', 'AGENTS.md') + $partialAuthorityPaths) |
+        Out-Null
+    Invoke-Git -Repository $partialClosure.Consumer -Arguments @(
+        'commit', '-m', 'Create custom instruction closure fixture'
+    ) | Out-Null
+    Invoke-Git -Repository $partialClosure.Consumer `
+        -Arguments @('push', 'origin', 'main') | Out-Null
+    $partialInitial = Invoke-BootstrapFixture -Fixture $partialClosure `
+        -AdoptionStrategy 'FullMigration'
+    if ($partialInitial.Threw) {
+        Add-Failure "TEST-0154 hosted partial-completion proposal could not be created: $($partialInitial.Error)"
+    }
+    else {
+        $partialMarkerMatch = [regex]::Match(
+            [string]$global:ExistingPullRequestBody,
+            '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
+        )
+        $partialProposedMarker = if ($partialMarkerMatch.Success) {
+            $partialMarkerMatch.Groups['json'].Value | ConvertFrom-Json
+        }
+        else { $null }
+        $partialBranch = 'automation/meandai-capabilities-v0.5.0'
+        if ($null -eq $partialProposedMarker -or
+            [long]$partialProposedMarker.schema -ne 7 -or
+            [string]$partialProposedMarker.phase -cne 'Proposed') {
+            Add-Failure 'TEST-0154 hosted partial-completion proposal did not publish one graph-aware schema-7 marker.'
+        }
+        else {
+            Invoke-Git -Repository $partialClosure.Consumer `
+                -Arguments @('switch', $partialBranch) | Out-Null
+            $partialCompletion = Install-StrategyCompletionTree `
+                -Fixture $partialClosure -Strategy 'FullMigration' `
+                -HasAgentsCollision $true
+            $partialCompletedBody = Set-ExistingSchema7AdoptionMarker `
+                -Head ([string]$partialCompletion.Head) `
+                -SourceMarker $partialProposedMarker
+            Invoke-Git -Repository $partialClosure.Consumer `
+                -Arguments @('switch', 'main') | Out-Null
+            $partialMainHead = (@(Invoke-Git `
+                -Repository $partialClosure.Consumer `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+            $partialRemoteHeadBefore = (@(Invoke-Git `
+                -Repository $partialClosure.Consumer -Arguments @(
+                    'ls-remote', '--heads', 'origin',
+                    "refs/heads/$partialBranch"
+                )))[0]
+            $partialCreateCallsBefore = $global:PullRequestCreateCalls
+            $partialResult = Invoke-BootstrapFixture `
+                -Fixture $partialClosure -AdoptionStrategy 'FullMigration'
+            $partialRemoteHeadAfter = (@(Invoke-Git `
+                -Repository $partialClosure.Consumer -Arguments @(
+                    'ls-remote', '--heads', 'origin',
+                    "refs/heads/$partialBranch"
+                )))[0]
+            $partialMainHeadAfter = (@(Invoke-Git `
+                -Repository $partialClosure.Consumer `
+                -Arguments @('rev-parse', 'HEAD')))[0]
+            $expectedPartialError =
+                'MEANDAI_ADOPTION_BLOCKED: unresolved instruction authority: ' +
+                ($partialAuthorityPaths -join ', ')
+            if (-not $partialResult.Threw -or
+                $partialResult.Error -cne $expectedPartialError -or
+                $global:PullRequestCreateCalls -ne
+                    $partialCreateCallsBefore -or
+                [string]$global:ExistingPullRequestBody -cne
+                    $partialCompletedBody -or
+                $partialRemoteHeadAfter -cne $partialRemoteHeadBefore -or
+                $partialMainHeadAfter -cne $partialMainHead) {
+                Add-Failure "TEST-0154 actual hosted Completed validation did not block the exact four live custom authorities before proposal or branch mutation: $($partialResult.Error)"
+            }
         }
     }
     $global:PullRequestExists = $false
@@ -1286,6 +1734,7 @@ try {
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $empty = New-BootstrapFixture -Name 'empty' -AddApplicationFile $true
+    $freshProposedMarker = $null
     $result = Invoke-BootstrapFixture -Fixture $empty
     if ($result.Threw) {
         Add-Failure "TEST-0028/TEST-0093 ordinary contained bootstrap failed: $($result.Error)"
@@ -1335,16 +1784,44 @@ try {
         $manifest = (Invoke-Git -Repository $empty.Consumer -Arguments @(
             'show', 'FETCH_HEAD:.ai/adoption/meandai-capabilities.json'
         )) -join "`n" | ConvertFrom-Json
-        if ([long]$manifest.schema -ne 2 -or
+        $freshMarkerMatch = [regex]::Match(
+            [string]$global:LastPullRequestBody,
+            '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
+        )
+        if ($freshMarkerMatch.Success) {
+            $freshProposedMarker =
+                $freshMarkerMatch.Groups['json'].Value | ConvertFrom-Json
+        }
+        $manifestGraphCounts = $manifest.sourceGraph.counts |
+            ConvertTo-Json -Depth 8 -Compress
+        $markerGraphCounts = $freshProposedMarker.graphCounts |
+            ConvertTo-Json -Depth 8 -Compress
+        $manifestGraphLimits = $manifest.sourceGraph.limits |
+            ConvertTo-Json -Depth 8 -Compress
+        $markerGraphLimits = $freshProposedMarker.graphLimits |
+            ConvertTo-Json -Depth 8 -Compress
+        if ([long]$manifest.schema -ne 3 -or
             [string]$manifest.adoptionStrategy -cne 'FreshAdoption' -or
             $manifest.protocolRecordLossAcknowledged -isnot [bool] -or
             [bool]$manifest.protocolRecordLossAcknowledged -or
-            @($manifest.protocolSurfaces).Count -ne 0) {
-            Add-Failure 'TEST-0128 fresh proposal did not bind the exact strategy, loss, and surface identity.'
+            @($manifest.protocolSurfaces).Count -ne 0 -or
+            $null -eq $manifest.sourceGraph -or
+            $null -eq $freshProposedMarker -or
+            [long]$freshProposedMarker.schema -ne 7 -or
+            [string]$freshProposedMarker.phase -cne 'Proposed' -or
+            [string]$freshProposedMarker.branch -cne
+                'automation/meandai-capabilities-v0.5.0' -or
+            [string]$manifest.sourceGraph.baseHead -cne
+                [string]$freshProposedMarker.graphBase -or
+            [string]$manifest.sourceGraph.digest -cne
+                [string]$freshProposedMarker.graphDigest -or
+            [string]$manifestGraphCounts -cne [string]$markerGraphCounts -or
+            [string]$manifestGraphLimits -cne [string]$markerGraphLimits) {
+            Add-Failure 'TEST-0128 fresh proposal did not bind the exact strategy and source graph through its schema-3 manifest and schema-7 marker.'
         }
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
-            -not $global:LastPullRequestBody.Contains('"schema":5') -or
+            -not $global:LastPullRequestBody.Contains('"schema":7') -or
             -not $global:LastPullRequestBody.Contains('"phase":"Proposed"') -or
             -not $global:LastPullRequestBody.Contains('"adoptionStrategy":"FreshAdoption"') -or
             -not $global:LastPullRequestBody.Contains('"actor":"owner"') -or
@@ -1380,24 +1857,12 @@ try {
         $completedProtocolSha = (@(Invoke-Git -Repository $empty.Source -Arguments @(
             'rev-parse', 'v0.5.0^{commit}'
         )))[0]
-        $completedMarker = [ordered]@{
-            schema = 5
-            phase = 'Completed'
-            state = 'BootstrapReady'
-            target = 'v0.5.0'
-            protocolSha = $completedProtocolSha
-            head = $completedHead
-            adoptionStrategy = 'FreshAdoption'
-            protocolSurfaces = @()
-            protocolRecordLossAcknowledged = $false
-            repository = 'owner/consumer'
-            actor = 'owner'
-        } | ConvertTo-Json -Compress
-        $global:PullRequestExists = $true
-        $global:ExistingPullRequestHead = $completedHead
-        $global:ExistingPullRequestProtocolSha = $completedProtocolSha
-        $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$completedMarker -->"
-        $global:ExistingPullRequestIsDraft = $false
+        if ($completedProtocolSha -cne
+            [string]$freshProposedMarker.protocolSha) {
+            throw 'Fresh completion changed the proposal protocol identity.'
+        }
+        $completedBody = Set-ExistingSchema7AdoptionMarker `
+            -Head $completedHead -SourceMarker $freshProposedMarker
         $createCallsBeforeCompletedRerun = $global:PullRequestCreateCalls
         Invoke-Git -Repository $empty.Consumer -Arguments @('switch', 'main') | Out-Null
         $result = Invoke-BootstrapFixture -Fixture $empty
@@ -1407,7 +1872,7 @@ try {
         if ($result.Threw -or
             $global:PullRequestCreateCalls -ne $createCallsBeforeCompletedRerun -or
             $retainedHead -cnotmatch "^$completedHead\s+refs/heads/$([regex]::Escape($completedBranch))$" -or
-            [string]$global:ExistingPullRequestBody -cne "<!-- meandai-capabilities-adoption:$completedMarker -->") {
+            [string]$global:ExistingPullRequestBody -cne $completedBody) {
             Add-Failure "TEST-0071 exact completed non-draft proposal was not retained without mutation: $($result.Error)"
         }
 
@@ -1668,22 +2133,8 @@ try {
                 $variantHead = (@(Invoke-Git -Repository $variantClone -Arguments @(
                     'rev-parse', 'HEAD'
                 )))[0]
-                $variantMarker = [ordered]@{
-                    schema = 5
-                    phase = 'Completed'
-                    state = 'BootstrapReady'
-                    target = 'v0.5.0'
-                    protocolSha = $completedProtocolSha
-                    head = $variantHead
-                    adoptionStrategy = 'FreshAdoption'
-                    protocolSurfaces = @()
-                    protocolRecordLossAcknowledged = $false
-                    repository = 'owner/consumer'
-                    actor = 'owner'
-                } | ConvertTo-Json -Compress
-                $global:ExistingPullRequestHead = $variantHead
-                $global:ExistingPullRequestBody = "<!-- meandai-capabilities-adoption:$variantMarker -->"
-                $global:ExistingPullRequestIsDraft = $false
+                [void](Set-ExistingSchema7AdoptionMarker `
+                    -Head $variantHead -SourceMarker $freshProposedMarker)
                 $createCallsBeforeVariant = $global:PullRequestCreateCalls
                 $variantResult = Invoke-BootstrapFixture -Fixture $empty
                 $remoteAfterVariant = (@(Invoke-Git -Repository $empty.Consumer -Arguments @(

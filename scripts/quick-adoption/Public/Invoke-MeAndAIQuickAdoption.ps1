@@ -8,7 +8,7 @@ function Invoke-MeAndAIQuickAdoption {
         [ValidateSet('private', 'public', 'internal')]
         [string]$Visibility = 'private',
         [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-        [string]$ProtocolTag = 'v0.12.5',
+        [string]$ProtocolTag = 'v0.12.6',
         [string]$RemoteName = 'origin',
         [ValidateRange(1, 60)]
         [int]$WorkflowTimeoutMinutes = 15,
@@ -667,8 +667,21 @@ function Invoke-MeAndAIQuickAdoption {
     $publishedPaths = @(Get-QuickAdoptionRelevantTreePaths -Repository $target `
         -Commit $publishedHead -TargetPaths $adoptionCanonicalTargetPaths)
     Assert-QuickAdoptionSeedWorkflowPathIdentity -Paths $publishedPaths
-    $publishedSurfaces = @(Get-QuickAdoptionProtocolSurfaceInventory `
-        -Paths $publishedPaths)
+    $dispatchSourceGraph = $preflightAssessment.InstructionGraph
+    if ($null -eq $dispatchSourceGraph) {
+        # A repository without HEAD gains one exact workflow-only root commit;
+        # that commit is both the event head and the first graph base.
+        $dispatchSourceGraph = Get-QuickAdoptionInstructionGraph `
+            -Repository $target -Commit $publishedHead
+    }
+    $expectedGraphBase = if ([string]$preflightAssessment.HeadSha) {
+        [string]$preflightAssessment.HeadSha
+    }
+    else { $publishedHead }
+    if ([string]$dispatchSourceGraph.baseHead -cne $expectedGraphBase) {
+        throw 'The dispatch source graph no longer matches the maintainer-assessed commit.'
+    }
+    $publishedSurfaces = @($dispatchSourceGraph.protocolSurfaces)
     $publishedCollisions = @(Get-QuickAdoptionCanonicalCollisions `
         -Paths $publishedPaths)
     if (-not (Test-ExactOrdinalPathSet -Actual $publishedSurfaces `
@@ -676,6 +689,16 @@ function Invoke-MeAndAIQuickAdoption {
         -not (Test-ExactOrdinalPathSet -Actual $publishedCollisions `
             -Expected @($preflightAssessment.Collisions))) {
         throw 'The canonical seed tree no longer matches the maintainer-selected strategy assessment.'
+    }
+    $dispatchSourceGraphIdentityJson = ''
+    if (Test-CanonicalWorkflowSupportsSourceGraphIdentity `
+            -Bytes ([byte[]]$workflowBytes)) {
+        $graphIdentityCommand = Get-InitialAdoptionPolicyCommand `
+            -Name 'Get-MeAndAIInstructionGraphIdentity'
+        $dispatchSourceGraphIdentity = & $graphIdentityCommand `
+            -Graph $dispatchSourceGraph
+        $dispatchSourceGraphIdentityJson = $dispatchSourceGraphIdentity |
+            ConvertTo-Json -Depth 8 -Compress
     }
 
     if ($createdCommit -or $remoteIsEmpty) {
@@ -807,7 +830,8 @@ function Invoke-MeAndAIQuickAdoption {
                 -Branch $defaultBranch -HeadSha $publishedHead `
                 -ResolvedAdoptionStrategy ([string]$initialAdoptionSelection.AdoptionStrategy) `
                 -ProtocolRecordLossAcknowledged `
-                    ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged)
+                    ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged) `
+                -SourceGraphIdentityJson $dispatchSourceGraphIdentityJson
             Write-Host "Lifecycle workflow completed successfully: $($run.url)"
             Set-QuickAdoptionProgress -Status 'Resolving adoption draft' `
                 -PercentComplete 78

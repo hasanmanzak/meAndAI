@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-20**
+Last verified: **2026-07-21**
 
 ## Verified facts
 
@@ -9,29 +9,32 @@ Last verified: **2026-07-20**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.5`. Immutable v0.12.4 targets
-  `edf443744e3a72bcc951008bf1b3ba4727104a27`; its exact publication evidence is
-  authoritative in [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.4)
-  and [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89). v0.12.5
-  publication facts belong there only after they exist and are not predicted
-  in this repository snapshot.
-- Current scope: [FEAT-0036](../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
-  replaces the quick-adoption monolith with one downloaded thin launcher and
-  one verified deterministic module bundle, adds bounded idempotent-GET retry,
-  preserves structured GitHub bodies across Windows PowerShell 5.1, and repairs
-  only the exact historical quote-stripped update issue. The v0.12.5 hotfix
-  binds created-issue convergence to the exact POST identity and direct read
-  without trusting immediate list visibility. [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
-  owns delivery and future publication evidence.
+- Current protocol version: `0.12.6` in the development tree. Latest immutable
+  release
+  [`v0.12.5`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.5)
+  targets commit `252488a88d2a64ea8816239bbf6d953f506b8840`.
+  [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) retains its
+  exact publication, hosted-validation, Derdini-replay, and cleanup evidence.
+- Current scope: [FEAT-0037](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md)
+  and [DEC-0024](../../docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md)
+  govern the implementation now present on
+  `codex/feat-0037-instruction-graph-containment`: exact-base
+  instruction-graph discovery, lifecycle identity binding, and fail-closed
+  completion coverage. Focused, structural, native-compatibility, and complete-
+  suite validation pass locally on Windows PowerShell 5.1; local `pwsh` is not
+  available.
+  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) owns tracking;
+  pull request, hosted PowerShell 7/checks, merge, and release evidence remain
+  pending.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: v0.12.4 release and asset identity passed. Its first live
-  Derdini replay repaired issue #7 and created exact issue #8, then exposed
-  `FIND-0197` because the immediate all-issues inventory lagged the successful
-  POST. The focused ordinary and intentionally lagging created-issue scenarios
-  pass for the v0.12.5 correction. Remaining focused/hosted validation, hotfix
-  PR/merge/release, successful replay, and cleanup are pending external gates.
+- Latest tracked work: v0.12.5 completed FEAT-0036 and `FIND-0197`. FEAT-0037
+  implements `SUBF-0070` through `SUBF-0072`, `TEST-0151` through `TEST-0154`,
+  and `RISK-0171` through `RISK-0178` locally for the v0.12.6 candidate; remote
+  publication evidence does not yet exist. This is deterministic containment
+  and discovery infrastructure, not the future semantic converter, migration
+  planner, product-catalog conversion, or parity-review capability.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -81,12 +84,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0036` delivered v0.12.4 through PRs #90/#91. `BUG-0021` / `FIND-0197`
-  is the bounded v0.12.5 continuation under issue #89. It validates the exact
-  created issue directly and treats the all-issues list only as a visible
-  duplicate/race detector. Hotfix PR, hosted, merge, release, successful live
-  Derdini replay, and cleanup evidence are still pending and MUST NOT be
-  projected into repository files.
+- `FEAT-0036` and `BUG-0021` / `FIND-0197` completed in immutable v0.12.5
+  under issue #89. FEAT-0037 is the v0.12.6 containment correction: it
+  makes custom instruction authority mechanically discoverable without adding
+  consumer-specific paths, but deliberately does not grant semantic migration
+  or deletion authority. Its implementation is present locally on
+  `codex/feat-0037-instruction-graph-containment`; focused graph/lifecycle/
+  closure owners, `StructureOnly`, `WindowsNative`, and the complete protocol
+  suite pass. Hosted PowerShell 7 evidence, pull request, CI, merge, release,
+  and post-publication verification remain pending.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

@@ -3,6 +3,37 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.6 - 2026-07-21
+
+### Added
+
+- Discover a consumer's committed instruction topology from generic instruction
+  roots and repository-relative references without adding consumer-specific
+  memory paths to the shared protocol.
+- Persist one canonical, exact-base instruction graph identity through local
+  proposal ownership and hosted completion, then independently rebuild and
+  compare it before mutation or readiness publication.
+
+### Changed
+
+- Bind initial-adoption classification and completion closure to the same
+  bounded graph evidence while preserving the existing adoption strategy and
+  change-set authorization envelope.
+- Require FullMigration completion to leave only the canonical live protocol
+  authority reachable from the root instruction graph; ambiguous, missing,
+  unsupported, drifted, or noncanonical authority remains review-blocking.
+
+### Security
+
+- Protect source, binary, special-mode, and unknown-format content from graph-
+  derived mutation authority, and enforce repository containment, exact casing,
+  Unicode normalization, symlink/reparse safety, and deterministic resource
+  limits throughout discovery and closure.
+
+Related work: [FEAT-0037](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md),
+[DEC-0024](docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md),
+and [issue #93](https://github.com/hasanmanzak/meAndAI/issues/93).
+
 ## 0.12.5 - 2026-07-20
 
 ### Fixed

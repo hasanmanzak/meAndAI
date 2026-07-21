@@ -342,6 +342,24 @@ function Get-CanonicalWorkflow {
     return [byte[]]$asset.Bytes
 }
 
+function Test-CanonicalWorkflowSupportsSourceGraphIdentity {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    $decoder = [Text.UTF8Encoding]::new($false, $true)
+    try { $source = $decoder.GetString($Bytes) }
+    catch {
+        throw 'The exact canonical workflow is not valid UTF-8 text.'
+    }
+    $declarations = [regex]::Matches(
+        $source,
+        '(?m)^ {6}source_graph_identity:[ \t]*\r?$'
+    )
+    if ($declarations.Count -gt 1) {
+        throw 'The exact canonical workflow declares ambiguous source-graph identity inputs.'
+    }
+    return $declarations.Count -eq 1
+}
+
 function Import-CanonicalInitialAdoptionPolicy {
     param([string]$ProtocolToken = '')
 
@@ -367,12 +385,20 @@ function Import-CanonicalInitialAdoptionPolicy {
         }
         $requiredCommands = @(
             'Assert-MeAndAIProtocolAssessmentPathCasing',
+            'ConvertTo-MeAndAIInstructionGraphRecord',
+            'Get-MeAndAIInstructionGraphIdentity',
+            'Get-MeAndAIInstructionGraphLimits',
             'Get-MeAndAIProtocolAssessmentLimits',
             'Get-MeAndAIProtocolSurfaceInventory',
+            'New-MeAndAIInstructionGraph',
             'Resolve-MeAndAIAdoptionStrategy',
+            'Resolve-MeAndAIInstructionGraphClosure',
             'Test-MeAndAICompletedAdoptionChangeSet',
             'Test-MeAndAIConsumerGovernancePath',
             'Test-MeAndAIExactAdoptionPullRequestMarker',
+            'Test-MeAndAIExactInstructionGraph',
+            'Test-MeAndAIExactInstructionGraphIdentity',
+            'Test-MeAndAIExactInstructionGraphIdentityRecord',
             'Test-MeAndAILegacyCommonAuthorityPath',
             'Test-MeAndAILegacyGovernancePath',
             'Test-MeAndAIProtocolAssessmentRelevantPath',
@@ -389,6 +415,7 @@ function Import-CanonicalInitialAdoptionPolicy {
             $commands.Add($name, $command)
         }
         $limits = & $commands['Get-MeAndAIProtocolAssessmentLimits']
+        $graphLimits = & $commands['Get-MeAndAIInstructionGraphLimits']
         if ($null -eq $limits -or $limits -is [array] -or
             $null -eq $limits.PSObject.Properties['MaximumSurfaceCount'] -or
             $null -eq $limits.PSObject.Properties['MaximumSurfaceUtf8Bytes'] -or
@@ -398,6 +425,17 @@ function Import-CanonicalInitialAdoptionPolicy {
             [long]$limits.MaximumSurfaceUtf8Bytes -gt 1048576) {
             throw 'The exact initial-adoption policy returned invalid assessment limits.'
         }
+        if ($null -eq $graphLimits -or $graphLimits -is [array] -or
+            [long]$graphLimits.MaximumTreeEntries -ne 65536 -or
+            [long]$graphLimits.MaximumTreePathUtf8Bytes -ne 4194304 -or
+            [long]$graphLimits.MaximumNodes -ne 256 -or
+            [long]$graphLimits.MaximumEdges -ne 2048 -or
+            [long]$graphLimits.MaximumDepth -ne 32 -or
+            [long]$graphLimits.MaximumBlobBytes -ne 262144 -or
+            [long]$graphLimits.MaximumAggregateBlobBytes -ne 4194304 -or
+            [long]$graphLimits.MaximumPathUtf8Bytes -ne 16384) {
+            throw 'The exact initial-adoption policy returned invalid instruction-graph limits.'
+        }
         return [pscustomobject]@{
             Tag = $initialAdoptionPolicyTag
             BlobSha = [string]$asset.Sha
@@ -406,6 +444,17 @@ function Import-CanonicalInitialAdoptionPolicy {
             Limits = [pscustomobject]@{
                 MaximumSurfaceCount = [int]$limits.MaximumSurfaceCount
                 MaximumSurfaceUtf8Bytes = [int]$limits.MaximumSurfaceUtf8Bytes
+                MaximumTreeEntries = [int]$graphLimits.MaximumTreeEntries
+                MaximumTreePathUtf8Bytes =
+                    [int]$graphLimits.MaximumTreePathUtf8Bytes
+                MaximumNodes = [int]$graphLimits.MaximumNodes
+                MaximumEdges = [int]$graphLimits.MaximumEdges
+                MaximumDepth = [int]$graphLimits.MaximumDepth
+                MaximumBlobBytes = [int]$graphLimits.MaximumBlobBytes
+                MaximumAggregateBlobBytes =
+                    [int]$graphLimits.MaximumAggregateBlobBytes
+                MaximumPathUtf8Bytes =
+                    [int]$graphLimits.MaximumPathUtf8Bytes
             }
         }
     }

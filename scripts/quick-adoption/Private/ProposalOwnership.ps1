@@ -6,7 +6,8 @@ function Invoke-LifecycleWorkflow {
         [Parameter(Mandatory)][string]$HeadSha,
         [Parameter(Mandatory)][ValidateSet('Auto', 'FreshAdoption', 'FullMigration', 'HybridReconciliation', 'CleanStart')]
         [string]$ResolvedAdoptionStrategy,
-        [Parameter(Mandatory)][bool]$ProtocolRecordLossAcknowledged
+        [Parameter(Mandatory)][bool]$ProtocolRecordLossAcknowledged,
+        [string]$SourceGraphIdentityJson = ''
     )
 
     $workflowName = [IO.Path]::GetFileName($workflowTargetPath)
@@ -52,13 +53,19 @@ function Invoke-LifecycleWorkflow {
     }
 
     $dispatchStarted = [DateTimeOffset]::UtcNow.AddSeconds(-5)
-    Invoke-External -Command 'gh' -Arguments @(
+    $dispatchArguments = @(
         'workflow', 'run', $workflowName, '--repo', $Repository, '--ref', $Branch,
         '--field', "correlation_id=$correlationId",
         '--field', "adoption_strategy=$ResolvedAdoptionStrategy",
         '--field', "acknowledge_protocol_record_loss=$($ProtocolRecordLossAcknowledged.ToString().ToLowerInvariant())",
         '--field', "expected_base_sha=$HeadSha"
-    ) | Out-Null
+    )
+    if ($SourceGraphIdentityJson) {
+        $dispatchArguments += @(
+            '--field', "source_graph_identity=$SourceGraphIdentityJson"
+        )
+    }
+    Invoke-External -Command 'gh' -Arguments $dispatchArguments | Out-Null
 
     $deadline = [DateTimeOffset]::UtcNow.AddMinutes($WorkflowTimeoutMinutes)
     $observedRunId = $null
@@ -195,7 +202,8 @@ function Get-ValidatedAdoptionMarker {
     $body = [string]$PullRequest.body
     $markerStarts = [regex]::Matches(
         $body, '<!--\s*meandai-capabilities-adoption:',
-        [Text.RegularExpressions.RegexOptions]::IgnoreCase
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
     $markerMatches = [regex]::Matches(
         $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
@@ -217,7 +225,7 @@ function Get-ValidatedAdoptionMarker {
         throw 'The deterministic adoption pull request ownership marker has an invalid schema type.'
     }
     $schema = [long]$schemaProperty.Value
-    if ($schema -notin @(2, 3, 4, 5, 6)) {
+    if ($schema -notin @(2, 3, 4, 5, 6, 7, 8)) {
         throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
     }
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
@@ -233,6 +241,15 @@ function Get-ValidatedAdoptionMarker {
                 'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
                 'previousHead', 'plannedHead', 'adoptionStrategy',
                 'protocolSurfaces', 'protocolRecordLossAcknowledged',
+                'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 8) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'previousHead', 'plannedHead', 'branch', 'adoptionStrategy',
+                'protocolSurfaces', 'protocolRecordLossAcknowledged',
+                'graphBase', 'graphDigest', 'graphCounts', 'graphLimits',
                 'repository', 'actor'
             )
         }
@@ -261,14 +278,30 @@ function Get-ValidatedAdoptionMarker {
             )) {
             throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
         }
-        if ($schema -eq 6) {
+        if ($schema -in @(6, 8)) {
             $markerSurfaces = if ($marker.protocolSurfaces -is [array]) {
                 @($marker.protocolSurfaces | ForEach-Object { [string]$_ })
             }
             else { @() }
-            $classifiedMarkerSurfaces = @(
-                Get-QuickAdoptionProtocolSurfaceInventory -Paths $markerSurfaces
-            )
+            $classifiedMarkerSurfaces = if ($schema -eq 6) {
+                @(Get-QuickAdoptionProtocolSurfaceInventory `
+                    -Paths $markerSurfaces)
+            }
+            else { @($markerSurfaces) }
+            $graphIdentityValid = $true
+            if ($schema -eq 8) {
+                $identityValidator = Get-InitialAdoptionPolicyCommand `
+                    -Name 'Test-MeAndAIExactInstructionGraphIdentityRecord'
+                $graphIdentityValid = [bool](& $identityValidator -Identity `
+                    ([pscustomobject][ordered]@{
+                        schema = 1
+                        graphBase = [string]$marker.graphBase
+                        graphDigest = [string]$marker.graphDigest
+                        graphCounts = $marker.graphCounts
+                        graphLimits = $marker.graphLimits
+                        protocolSurfaces = @($marker.protocolSurfaces)
+                    }))
+            }
             if ([string]$marker.adoptionStrategy -cnotin @(
                 'FreshAdoption', 'FullMigration', 'HybridReconciliation',
                 'CleanStart'
@@ -278,6 +311,8 @@ function Get-ValidatedAdoptionMarker {
                     ([string]$marker.adoptionStrategy -ceq 'CleanStart')) -or
                 (($markerSurfaces -join "`n") -cne
                     ($classifiedMarkerSurfaces -join "`n")) -or
+                -not $graphIdentityValid -or
+                ($schema -eq 8 -and [string]$marker.branch -cne $Branch) -or
                 ($ExpectedAdoptionStrategy -and
                  ([string]$marker.adoptionStrategy -cne
                     $ExpectedAdoptionStrategy -or
@@ -294,7 +329,7 @@ function Get-ValidatedAdoptionMarker {
             )) {
             throw 'A legacy adoption marker cannot satisfy the expected strategy identity.'
         }
-        if ($schema -notin @(4, 6) -or
+        if ($schema -notin @(4, 6, 8) -or
             [string]$marker.previousHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.plannedHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.previousHead -ceq [string]$marker.plannedHead -or
@@ -307,7 +342,7 @@ function Get-ValidatedAdoptionMarker {
         }
     }
     else {
-        if ($schema -in @(4, 6)) {
+        if ($schema -in @(4, 6, 8)) {
             throw 'The deterministic adoption pull request uses the publishing schema outside its publishing phase.'
         }
         $requiredMarkerHead = if ($ExpectedMarkerHead) {
@@ -326,23 +361,34 @@ function Get-ValidatedAdoptionMarker {
         $contractStrategy = if ($ExpectedAdoptionStrategy) {
             $ExpectedAdoptionStrategy
         }
-        elseif ($schema -eq 5) { [string]$marker.adoptionStrategy }
+        elseif ($schema -in @(5, 7)) { [string]$marker.adoptionStrategy }
         else { 'LegacyUnspecified' }
         [object[]]$contractSurfaces = [object[]]::new(0)
         if ($ExpectedAdoptionStrategy) {
             $contractSurfaces = [object[]]@($ExpectedProtocolSurfaces)
         }
-        elseif ($schema -eq 5) {
+        elseif ($schema -in @(5, 7)) {
             $contractSurfaces = [object[]]@($marker.protocolSurfaces)
         }
         $contractLossAcknowledgement = if ($ExpectedAdoptionStrategy) {
             $ExpectedProtocolRecordLossAcknowledgement
         }
-        elseif ($schema -eq 5 -and
+        elseif ($schema -in @(5, 7) -and
             $marker.protocolRecordLossAcknowledged -is [bool]) {
             [bool]$marker.protocolRecordLossAcknowledged
         }
         else { $false }
+        $contractGraphIdentity = if ($schema -eq 7) {
+            [pscustomobject][ordered]@{
+                schema = 1
+                graphBase = [string]$marker.graphBase
+                graphDigest = [string]$marker.graphDigest
+                graphCounts = $marker.graphCounts
+                graphLimits = $marker.graphLimits
+                protocolSurfaces = @($marker.protocolSurfaces)
+            }
+        }
+        else { $null }
         $contractPullRequest = [pscustomobject]@{
             number = $PullRequest.number
             url = $PullRequest.url
@@ -373,7 +419,9 @@ function Get-ValidatedAdoptionMarker {
                 -ExpectedAdoptionStrategy $contractStrategy `
                 -ExpectedProtocolSurfaces $contractSurfaces `
                 -ExpectedProtocolRecordLossAcknowledgement `
-                    $contractLossAcknowledgement -ExpectedPhase $phase)) {
+                    $contractLossAcknowledgement `
+                -ExpectedSourceGraphIdentity $contractGraphIdentity `
+                -ExpectedPhase $phase)) {
             throw 'The deterministic adoption pull request ownership marker violates the canonical capabilities contract.'
         }
     }
@@ -573,7 +621,29 @@ function Set-AdoptionPullRequestPublishingMarker {
         throw 'The adoption publishing transition has invalid commit identities.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $publishingMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+    $publishingMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+        [ordered]@{
+            schema = 8
+            phase = 'Publishing'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            previousHead = $PreviousHead
+            plannedHead = $PlannedHead
+            branch = [string]$marker.branch
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            graphBase = [string]$marker.graphBase
+            graphDigest = [string]$marker.graphDigest
+            graphCounts = $marker.graphCounts
+            graphLimits = $marker.graphLimits
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    elseif ([long]$marker.schema -in @(5, 6)) {
         [ordered]@{
             schema = 6
             phase = 'Publishing'
@@ -604,7 +674,8 @@ function Set-AdoptionPullRequestPublishingMarker {
             actor = [string]$marker.actor
         }
     }
-    $publishingMarker = $publishingMarkerRecord | ConvertTo-Json -Compress
+    $publishingMarker = $publishingMarkerRecord |
+        ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $publishingMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'publishing-adoption-pr.md'
@@ -622,7 +693,27 @@ function Set-AdoptionPullRequestProposedMarker {
         throw 'The restored adoption proposal head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $proposedMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+    $proposedMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+        [ordered]@{
+            schema = 7
+            phase = 'Proposed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PreviousHead
+            branch = [string]$marker.branch
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            graphBase = [string]$marker.graphBase
+            graphDigest = [string]$marker.graphDigest
+            graphCounts = $marker.graphCounts
+            graphLimits = $marker.graphLimits
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    elseif ([long]$marker.schema -in @(5, 6)) {
         [ordered]@{
             schema = 5
             phase = 'Proposed'
@@ -649,7 +740,8 @@ function Set-AdoptionPullRequestProposedMarker {
             actor = [string]$marker.actor
         }
     }
-    $proposedMarker = $proposedMarkerRecord | ConvertTo-Json -Compress
+    $proposedMarker = $proposedMarkerRecord |
+        ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $proposedMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'proposed-adoption-pr.md'
@@ -668,7 +760,27 @@ function Set-AdoptionPullRequestCompletedMarker {
         throw 'The completed adoption head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $completedMarkerRecord = if ([long]$marker.schema -in @(5, 6)) {
+    $completedMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+        [ordered]@{
+            schema = 7
+            phase = 'Completed'
+            state = [string]$marker.state
+            target = [string]$marker.target
+            protocolSha = [string]$marker.protocolSha
+            head = $PublishedHead
+            branch = [string]$marker.branch
+            adoptionStrategy = [string]$marker.adoptionStrategy
+            protocolSurfaces = @($marker.protocolSurfaces)
+            protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+            graphBase = [string]$marker.graphBase
+            graphDigest = [string]$marker.graphDigest
+            graphCounts = $marker.graphCounts
+            graphLimits = $marker.graphLimits
+            repository = [string]$marker.repository
+            actor = [string]$marker.actor
+        }
+    }
+    elseif ([long]$marker.schema -in @(5, 6)) {
         [ordered]@{
             schema = 5
             phase = 'Completed'
@@ -695,7 +807,8 @@ function Set-AdoptionPullRequestCompletedMarker {
             actor = [string]$marker.actor
         }
     }
-    $completedMarker = $completedMarkerRecord | ConvertTo-Json -Compress
+    $completedMarker = $completedMarkerRecord |
+        ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $completedMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'completed-adoption-pr.md' `
@@ -956,6 +1069,14 @@ function Ensure-AdoptionIssue {
         })
     }
     else { @('- None') }
+    $graphLines = if ([long]$PullRequest.meAndAIMarker.schema -in @(7, 8)) {
+        @(
+            "- Source graph base: ``$([string]$PullRequest.meAndAIMarker.graphBase)``",
+            "- Source graph digest: ``$([string]$PullRequest.meAndAIMarker.graphDigest)``",
+            "- Source graph nodes/edges/candidates: ``$([int]$PullRequest.meAndAIMarker.graphCounts.nodes)/$([int]$PullRequest.meAndAIMarker.graphCounts.edges)/$([int]$PullRequest.meAndAIMarker.graphCounts.candidates)``"
+        )
+    }
+    else { @() }
     $issueBodyLines = @(
         $marker,
         '## AI capabilities adoption tracking',
@@ -963,7 +1084,8 @@ function Ensure-AdoptionIssue {
         "- Protocol release: ``$ProtocolTag``",
         "- Adoption draft: $($PullRequest.url)",
         "- Adoption strategy: ``$($PullRequest.meAndAIMarker.adoptionStrategy)``",
-        "- Protocol-record loss acknowledged: ``$(([bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``",
+        "- Protocol-record loss acknowledged: ``$(([bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``"
+    ) + @($graphLines) + @(
         '',
         '### Detected protocol and governance surfaces',
         ''
