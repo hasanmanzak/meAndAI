@@ -9,36 +9,28 @@ Last verified: **2026-07-22**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.6` in the development tree. Latest immutable
+- Current protocol version: `0.12.7` in the development tree. Latest immutable
   release
-  [`v0.12.5`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.5)
-  targets commit `252488a88d2a64ea8816239bbf6d953f506b8840`.
-  [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) retains its
-  exact publication, hosted-validation, Derdini-replay, and cleanup evidence.
-- Current scope: [FEAT-0037](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md)
-  and [DEC-0024](../../docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md)
-  govern the implementation now present on
-  `codex/feat-0037-instruction-graph-containment`: exact-base
-  instruction-graph discovery, lifecycle identity binding, and fail-closed
-  completion coverage. Focused, structural, native-compatibility, and complete-
-  suite validation pass locally on Windows PowerShell 5.1. The first hosted
-  Ubuntu check exposed a PowerShell 5.1/7 line-splitting difference in the new
-  parser; the corrected graph owner now passes both Windows PowerShell 5.1 and
-  containerized PowerShell 7.4.2, and the local Windows execution of the
-  hosted-adapter fixture passes. A replacement hosted check remains required.
-  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) owns tracking and
-  draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is
-  open; corrected hosted PowerShell 7/checks, merge, and release evidence remain
-  pending.
+  [`v0.12.6`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.6)
+  targets commit `6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`.
+  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) retains its
+  hosted-validation, merge, release, and branch-cleanup evidence.
+- Current scope: [FEAT-0038](../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md),
+  `BUG-0022`, and [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
+  govern the API-version-safe managed finalizer correction now present on
+  `codex/feat-0038-api-safe-merge-finalization`. The correction replaces the
+  removed API-2026 pull-request `merge_commit_sha` field with one exact
+  paginated `merged` issue-event commit while preserving the existing
+  branch-first, issue-last lifecycle gates. The exact target-bound launcher now
+  also recovers unambiguous retained merged branches before current-update
+  planning so an older failed finalizer cannot block corrected-updater adoption.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: v0.12.5 completed FEAT-0036 and `FIND-0197`. FEAT-0037
-  implements `SUBF-0070` through `SUBF-0072`, `TEST-0151` through `TEST-0154`,
-  and `RISK-0171` through `RISK-0178` locally for the v0.12.6 candidate; remote
-  publication evidence does not yet exist. This is deterministic containment
-  and discovery infrastructure, not the future semantic converter, migration
-  planner, product-catalog conversion, or parity-review capability.
+- Latest tracked work: immutable v0.12.6 completed FEAT-0037, `SUBF-0070`
+  through `SUBF-0072`, and `TEST-0151` through `TEST-0154`. FEAT-0038 adds
+  `TEST-0155`, `TEST-0156`, and `RISK-0179` through `RISK-0183` for the bounded v0.12.7
+  updater correction; immutable release and consumer recovery remain pending.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -88,20 +80,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0036` and `BUG-0021` / `FIND-0197` completed in immutable v0.12.5
-  under issue #89. FEAT-0037 is the v0.12.6 containment correction: it
-  makes custom instruction authority mechanically discoverable without adding
-  consumer-specific paths, but deliberately does not grant semantic migration
-  or deletion authority. Its implementation is present locally on
-  `codex/feat-0037-instruction-graph-containment`; focused graph/lifecycle/
-  closure owners, `StructureOnly`, `WindowsNative`, and the complete protocol
-  suite pass. A cross-runtime physical-line parser correction additionally
-  passes the graph owner on Windows PowerShell 5.1 and containerized PowerShell
-  7.4.2 plus the local Windows execution of the full hosted-adapter fixture.
-  Draft pull request
-  [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open; corrected hosted
-  PowerShell 7 evidence, CI completion, merge, release, and post-publication
-  verification remain pending.
+- `FEAT-0038` / `BUG-0022` corrects the API-2026 managed merge finalizer under
+  issue #96. The exact PR event collection supplies one canonical merged
+  commit, ordinary/schema-2 and legacy recovery use the same helper, malformed
+  or ambiguous evidence fails before mutation, and ordinary unmanaged PRs do
+  not perform the event read. v0.12.7 publication and the Derdini PR #10
+  recovery are the remaining external delivery steps.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

@@ -64,7 +64,7 @@
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
                 'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130',
-                'TEST-0154'
+                'TEST-0154', 'TEST-0156'
             )
         }
         @{
@@ -97,7 +97,7 @@
             Owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
             TestIds = @(
                 'TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112',
-                'TEST-0142'
+                'TEST-0142', 'TEST-0155'
             )
         }
         @{

@@ -38,7 +38,8 @@
 | [FEAT-0034](FEAT-0034-ci-evidence-hygiene/README.md) | CI evidence hygiene and exact-tree reuse | Complete | 0.12.2 |
 | [FEAT-0035](FEAT-0035-test-runtime-efficiency/README.md) | Bounded full-suite runtime without evidence loss | Complete | 0.12.3 |
 | [FEAT-0036](FEAT-0036-modular-quick-adoption-reliability/README.md) | Modular quick-adoption runtime and recovery reliability | Complete | 0.12.5 |
-| [FEAT-0037](FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) | Exact instruction-graph discovery and fail-closed containment | Complete | 0.12.6 (candidate) |
+| [FEAT-0037](FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) | Exact instruction-graph discovery and fail-closed containment | Complete | 0.12.6 |
+| [FEAT-0038](FEAT-0038-v0127-api-safe-merge-finalization/README.md) | API-version-safe managed merge finalization | Complete | 0.12.7 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

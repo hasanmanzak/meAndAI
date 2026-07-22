@@ -7,7 +7,7 @@
 | Target version | 0.12.6 |
 | Issue and post-publication authority | [#93](https://github.com/hasanmanzak/meAndAI/issues/93) |
 | Maintainer disposition | [Accepted on 2026-07-21](https://github.com/hasanmanzak/meAndAI/issues/93#issuecomment-5033653638) |
-| Pull request | [#94](https://github.com/hasanmanzak/meAndAI/pull/94) (Draft) |
+| Pull request | [#94](https://github.com/hasanmanzak/meAndAI/pull/94) (Merged) |
 | Decision | [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) (Accepted) |
 | Tests | [TEST-0151 through TEST-0154](test-cases.md) |
 
@@ -287,14 +287,14 @@ exact N/N+1 evidence; no published graph schema is being revised.
 | Scenarios | Defined and registered | [TEST-0151 through TEST-0154](test-cases.md) have canonical capability-owned executable owners |
 | Test code | Locally complete | Graph, exact-Git acquisition, lifecycle identity, local and hosted-adapter closure, and test-architecture fixtures are present on `codex/feat-0037-instruction-graph-containment` |
 | Local evidence | Complete for the corrected parser and prior candidate | The corrected graph owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2; the local Windows execution of the complete hosted-adapter fixture passed in 316.2 seconds. Prior focused closure, capability-bootstrap `All`, quick-adoption `All`, `StructureOnly`, `WindowsNative`, and complete-suite evidence remains recorded in the test ledger |
-| Hosted evidence | Correction awaiting replacement checks | The first PR run passed Windows and exposed a PowerShell 7 physical-line parsing defect on Ubuntu. The corrected parser has cross-host focused evidence, but supported hosted PowerShell 7 plus the complete Windows and Ubuntu checks remain delivery gates |
+| Hosted evidence | Complete | Replacement checks passed before PR #94 merged at commit `6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e` |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0070` | Canonical instruction-graph contract and deterministic discovery | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0151`, `TEST-0152`; corrected focused owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2 | Parser, lexical-path, culture, budget, cycle, reason, role, exact-validator, and cross-runtime physical-line findings were corrected and rerun | Locally complete |
-| `SUBF-0071` | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0153`; the local Windows execution of the corrected complete hosted-adapter fixture passed in 316.2 seconds; prior capability-bootstrap `All` and complete-suite evidence remains recorded | Trust-boundary, schema, drift, target dispatch, dynamic-module, and completed-proposal fixture findings were corrected and rerun | Locally complete; hosted rerun pending |
+| `SUBF-0071` | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0153`; the local Windows execution of the corrected complete hosted-adapter fixture passed in 316.2 seconds; prior capability-bootstrap `All` and complete-suite evidence remains recorded | Trust-boundary, schema, drift, target dispatch, dynamic-module, and completed-proposal fixture findings were corrected and rerun | Complete |
 | `SUBF-0072` | Independent completion containment and authority closure | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | `TEST-0154`; final focused closure passed in 40.202 seconds, quick-adoption `All` passed in 948.236 seconds, and the complete suite reran it in 928.828 seconds | Fail-closed omission, canonical-retirement, protected-terminal, and out-of-envelope cases were corrected and rerun | Locally complete |
 
 ## Decisions and relationships
@@ -424,27 +424,26 @@ delivery gate rather than an unresolved local code finding.
 
 ## Definition of Done
 
-- [x] All locally verifiable acceptance criteria met for the candidate;
-      cross-host acceptance remains a delivery gate.
+- [x] All acceptance criteria and cross-host delivery gates completed.
 - [x] Mandatory test code and scenario ownership complete.
 - [x] Local focused, structural, native-compatibility, and complete-suite test
       commands and successful results recorded.
 - [x] Every subfeature fresh-diff review and the bounded convergence scan complete.
 - [x] No unresolved `Blocking` finding.
-- [x] Candidate documentation, links, version, changelog, and project memory are
-      current without projecting external publication facts.
+- [x] Documentation, links, version, changelog, and project memory are current.
 
 ## Delivery gates
 
-- [x] Draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94)
+- [x] Pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94)
       and issue #93 cross-link the canonical records.
-- [ ] Applicable hosted PowerShell 7, Windows, and Ubuntu checks pass before
+- [x] Applicable hosted PowerShell 7, Windows, and Ubuntu checks passed before
       merge.
 
 ## Post-merge release evidence
 
 [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) is the stable
-external evidence authority. Draft pull request
-[#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open. Hosted checks,
-merge commit, immutable release, branch cleanup, and post-publication
-verification remain `Pending` until those facts exist.
+external evidence authority. Pull request
+[#94](https://github.com/hasanmanzak/meAndAI/pull/94) merged as
+`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e` on 2026-07-22. Immutable release
+[v0.12.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.6) targets
+that exact commit, and the owned work branch is absent.

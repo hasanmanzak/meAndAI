@@ -122,9 +122,11 @@ secret remains untouched and is not a credential source for the local process.
 
 ## Quick command
 
-Download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.6/Invoke-MeAndAIQuickAdoption.ps1)
-from the exact immutable `v0.12.6` GitHub Release with an authenticated browser.
+After GitHub marks `v0.12.7` as an immutable release, download only the thin
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.12.7/Invoke-MeAndAIQuickAdoption.ps1)
+from that exact release with an authenticated browser. Until that condition is
+true, use the latest release that GitHub already marks immutable rather than a
+candidate tag or a moving branch.
 Do not separately download or unpack the module bundle; the launcher retrieves
 and verifies the release's one internal bundle asset itself. Save the reusable
 launcher outside the consumer repository, such as in `$HOME\Downloads`. This
@@ -138,11 +140,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.12.6` is an exact published
+launcher itself verifies that its runtime `v0.12.7` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.12.6`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.12.7`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
@@ -179,8 +181,8 @@ values are not command-line arguments and are not printed.
 
 Before repository initialization, remote creation, secret writes, or seed
 publication, the launcher verifies the authenticated `gh` identity and loads
-the pure strategy/classification policy from the exact immutable `v0.12.6`
-capabilities contract module. The standalone launcher and workflow adapter do
+the pure strategy/classification policy from its verified immutable runtime
+release's capabilities contract module. The standalone launcher and workflow adapter do
 not maintain competing policy copies; each keeps only its own Git/GitHub
 evidence and mutation-boundary checks. The launcher then performs one bounded
 path assessment of the exact committed consumer tree. `-AdoptionStrategy Auto`
@@ -364,10 +366,12 @@ adapter blobs identical to that installed release.
 - If the installed tag is older in the same major, the launcher preserves the
   installed seed, reconciles only missing secrets, and runs the explicitly
   requested immutable target updater against an isolated clone of the captured
-  default-branch head. The target updater creates one atomic managed draft with
-  the target pin, changed updater assets, required catalog migrations, and
-  ledger. The maintainer checkout and default branch are unchanged, and no
-  installed workflow or Codex adoption flow is started.
+  default-branch head. Before current-update planning, that exact target updater
+  finalizes only unambiguous retained merged branches left by an older updater;
+  malformed or reused ownership still fails closed. It then creates one atomic
+  managed draft with the target pin, changed updater assets, required catalog
+  migrations, and ledger. The maintainer checkout and default branch are
+  unchanged, and no installed workflow or Codex adoption flow is started.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.
