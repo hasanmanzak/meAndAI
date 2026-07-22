@@ -5,20 +5,26 @@ and follow its canonical links.
 
 ## Current continuation
 
-The immutable v0.12.4 release delivered the modular quick-adoption runtime and
-repaired Derdini issue #7, but its first live replay exposed `FIND-0197`: the
-created canonical issue #8 was not yet visible in the all-issues list. The
-v0.12.5 hotfix binds creation to the exact POST response and direct identity
-read while retaining visible duplicate detection. Follow
-[FEAT-0036](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md)
-and the [v0.12.5 handoff](2026-07-20-v0125-created-issue-convergence.md).
-[Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) owns delivery and
-future publication evidence. The hotfix PR, hosted checks, merge, immutable
-release, successful Derdini replay, and cleanup remain pending; `FIND-0120`
-remains the separate open follow-up in issue #44.
+Immutable `v0.12.5` completed FEAT-0036 and its created-issue convergence
+correction at commit `252488a88d2a64ea8816239bbf6d953f506b8840`.
+[Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) retains its
+publication, hosted-validation, Derdini-replay, and cleanup evidence.
+[FEAT-0037](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md)
+and [DEC-0024](../../../docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md)
+now have a local implementation on
+`codex/feat-0037-instruction-graph-containment`. Follow the
+[v0.12.6 implementation handoff](2026-07-21-v0126-instruction-graph-containment-implementation.md)
+and [issue #93](https://github.com/hasanmanzak/meAndAI/issues/93). Focused,
+structural, native-compatibility, and complete-suite local validation pass.
+Draft pull request [#94](https://github.com/hasanmanzak/meAndAI/pull/94) is open.
+Hosted PowerShell 7 evidence, CI completion, merge, release, and post-publication
+verification remain pending. `FIND-0120` remains the separate open follow-up in
+issue #44.
 
 ## History
 
+- [2026-07-21 - v0.12.6 instruction-graph containment implementation](2026-07-21-v0126-instruction-graph-containment-implementation.md)
+- [2026-07-21 - v0.12.6 instruction-graph containment planning](2026-07-21-v0126-instruction-graph-containment-planning.md)
 - [2026-07-20 - v0.12.5 created-issue convergence handoff](2026-07-20-v0125-created-issue-convergence.md)
 - [2026-07-20 - v0.12.4 modular adoption reliability handoff](2026-07-20-v0124-modular-adoption-reliability.md)
 - [2026-07-20 - v0.12.3 test runtime efficiency closure](2026-07-20-v0123-test-runtime-efficiency-closure.md)

@@ -1,13 +1,14 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-20**<br>
-Protocol version: **0.12.5**
+Last reviewed: **2026-07-21**<br>
+Protocol version: **0.12.6**
 
-The immutable v0.12.4 release is published. Exact v0.12.5 publication state
-will be authoritative only in
+The immutable v0.12.5 release is published. `0.12.6` identifies the local
+development tree on `codex/feat-0037-instruction-graph-containment`; it is not
+a published release. Exact v0.12.6 publication state will be authoritative only in
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases),
-[issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after publication;
+[issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) after publication;
 it is not predicted or projected into this pre-merge memory file.
 
 This directory is the portable, curated handoff between the maintainer and AI

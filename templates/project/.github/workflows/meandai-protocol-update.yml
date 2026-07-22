@@ -3,7 +3,7 @@ run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github
 
 env:
   PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
-  BOOTSTRAP_PROTOCOL_TAG: v0.12.5
+  BOOTSTRAP_PROTOCOL_TAG: v0.12.6
 
 on:
   schedule:
@@ -36,6 +36,10 @@ on:
         type: boolean
       expected_base_sha:
         description: Exact consumer base commit authorized by the launcher
+        required: false
+        type: string
+      source_graph_identity:
+        description: Compact exact source instruction-graph identity authorized by the launcher
         required: false
         type: string
       finalize_pull_request:
@@ -145,6 +149,7 @@ jobs:
           ADOPTION_STRATEGY: ${{ inputs.adoption_strategy || 'Auto' }}
           ACKNOWLEDGE_PROTOCOL_RECORD_LOSS: ${{ inputs.acknowledge_protocol_record_loss || false }}
           EXPECTED_BASE_SHA: ${{ inputs.expected_base_sha || '' }}
+          SOURCE_GRAPH_IDENTITY: ${{ inputs.source_graph_identity || '' }}
         run: |
           if ($env:EVENT_SHA -cnotmatch '^[0-9a-f]{40}$') {
             throw 'The workflow event does not identify one canonical consumer commit.'
@@ -272,15 +277,21 @@ jobs:
               Write-Host 'Initial adoption waits for a launcher-owned or explicit manual dispatch with an adoption strategy.'
               return
             }
+            if ([bool]$env:EXPECTED_BASE_SHA -ne
+                [bool]$env:SOURCE_GRAPH_IDENTITY) {
+              throw 'Launcher initial-adoption dispatch must supply the event head and complete source-graph identity together.'
+            }
             $acknowledgeLoss = $env:ACKNOWLEDGE_PROTOCOL_RECORD_LOSS -ceq 'true'
             if ($acknowledgeLoss) {
               & "./$bootstrap" -TargetTag $env:BOOTSTRAP_PROTOCOL_TAG `
                 -AdoptionStrategy $env:ADOPTION_STRATEGY `
+                -SourceGraphIdentityJson $env:SOURCE_GRAPH_IDENTITY `
                 -AcknowledgeProtocolRecordLoss
             }
             else {
               & "./$bootstrap" -TargetTag $env:BOOTSTRAP_PROTOCOL_TAG `
-                -AdoptionStrategy $env:ADOPTION_STRATEGY
+                -AdoptionStrategy $env:ADOPTION_STRATEGY `
+                -SourceGraphIdentityJson $env:SOURCE_GRAPH_IDENTITY
             }
           }
 

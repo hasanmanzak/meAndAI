@@ -167,7 +167,7 @@ foreach ($surface in $promptSurfaces) {
 }
 $protocolSourceMatch = [regex]::Match(
     $stdin,
-    '(?m)^Read the manifest at .*?, the exact protocol source at (?<path>.+?), every applicable AGENTS\.md'
+    '(?m)Read the exact protocol source at (?<path>.+?), every applicable AGENTS\.md'
 )
 if (-not $protocolSourceMatch.Success) {
     throw 'Mock Codex could not resolve the exact protocol source from the launcher prompt.'
@@ -205,6 +205,11 @@ foreach ($asset in $adoptionAssets) {
             -Force | Out-Null
         Copy-Item -LiteralPath $sourceAsset -Destination $destinationAsset -Force
     }
+}
+if ($mode -ceq 'ReconcileCanonicalAgentsOnly') {
+    Copy-Item -LiteralPath (
+        Join-Path $protocolSource 'templates/project/AGENTS.submodule.md'
+    ) -Destination (Join-Path $working 'AGENTS.md') -Force
 }
 $migrationModulePath = Join-Path $protocolSource 'scripts/MeAndAI.ConsumerMigrations.psm1'
 $migrationIndexPath = Join-Path $protocolSource 'migrations/index.json'
@@ -422,9 +427,13 @@ if (@(
         'DeleteApprovedSurface',
         'RetainLegacyCommonAuthority', 'RetainCursorAuthority'
     ) -ccontains $mode) {
+    $canonicalAgents = [IO.File]::ReadAllText(
+        (Join-Path $protocolSource 'templates/project/AGENTS.submodule.md')
+    ).TrimEnd([char[]]"`r`n")
     [IO.File]::WriteAllText(
         (Join-Path $working 'AGENTS.md'),
-        "# Reconciled consumer instructions`n",
+        $canonicalAgents +
+            "`n`n- Preserve the consumer-specific mock directive.`n",
         [Text.UTF8Encoding]::new($false)
     )
 }
@@ -583,7 +592,7 @@ if ($mode -ceq 'RemoteRace') {
     $raceClone = Join-Path $raceRoot 'clone'
     try {
         New-Item -ItemType Directory -Path $raceRoot -Force | Out-Null
-        & git clone --branch 'automation/meandai-capabilities-v0.12.5' $remote $raceClone
+        & git clone --branch 'automation/meandai-capabilities-v0.12.6' $remote $raceClone
         if ($LASTEXITCODE -ne 0) { throw 'Unable to create mock race clone.' }
         & git -C $raceClone config user.name 'meAndAI Test'
         & git -C $raceClone config user.email 'meandai-test@example.invalid'

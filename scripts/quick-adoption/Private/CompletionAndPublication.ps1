@@ -214,21 +214,87 @@ function Get-ValidatedAdoptionManifest {
             throw 'The exact protocol capabilities contract mixes incompatible adoption schemas.'
         }
         if ($usesStrategyContract) {
-            if ([long]$PullRequest.meAndAIMarker.schema -notin @(5, 6)) {
+            $markerSchema = [long]$PullRequest.meAndAIMarker.schema
+            $graphAwareProposal = $markerSchema -in @(7, 8)
+            if ($markerSchema -notin @(5, 6, 7, 8)) {
                 throw 'The strategy-aware protocol source requires a strategy-bound proposal marker.'
             }
+            if ($graphAwareProposal -ne ([long]$manifest.schema -eq 3)) {
+                throw 'The adoption manifest and ownership marker mix graph-aware and legacy schemas.'
+            }
+            $sourceGraph = $null
+            if ($graphAwareProposal) {
+                if (-not $validator.Parameters.ContainsKey('ExpectedSourceGraph') -or
+                    $null -eq $manifest.PSObject.Properties['sourceGraph'] -or
+                    [string]$manifest.sourceGraph.baseHead -cnotmatch
+                        '^[0-9a-f]{40}$') {
+                    throw 'The graph-aware adoption proposal lacks its complete source graph contract.'
+                }
+                $sourceGraph = Get-QuickAdoptionInstructionGraph `
+                    -Repository $ProposalRepository `
+                    -Commit ([string]$manifest.sourceGraph.baseHead)
+                $identityValidator = Get-InitialAdoptionPolicyCommand `
+                    -Name 'Test-MeAndAIExactInstructionGraphIdentity'
+                $markerIdentity = [pscustomobject][ordered]@{
+                    schema = 1
+                    graphBase = [string]$PullRequest.meAndAIMarker.graphBase
+                    graphDigest = [string]$PullRequest.meAndAIMarker.graphDigest
+                    graphCounts = $PullRequest.meAndAIMarker.graphCounts
+                    graphLimits = $PullRequest.meAndAIMarker.graphLimits
+                    protocolSurfaces = @(
+                        $PullRequest.meAndAIMarker.protocolSurfaces
+                    )
+                }
+                if (-not [bool](& $identityValidator `
+                    -Identity $markerIdentity -Graph $sourceGraph)) {
+                    throw 'The proposal marker does not match the independently rebuilt source graph.'
+                }
+                $structuralBaseHead = [string]$contract.BaseHead
+                if ([string]$sourceGraph.baseHead -cne $structuralBaseHead) {
+                    if ((Get-SingleCommitParent -Repository $ProposalRepository `
+                            -Commit $structuralBaseHead) -cne
+                        [string]$sourceGraph.baseHead) {
+                        throw 'The proposal base is not one exact child of its source graph base.'
+                    }
+                    $seedOnlyPaths = @((Invoke-Git `
+                        -Repository $ProposalRepository -Arguments @(
+                            'diff-tree', '--no-commit-id', '--name-only', '-r',
+                            '--no-renames', $structuralBaseHead, '--'
+                        )).Output | Where-Object { $_ } | ForEach-Object {
+                            [string]$_
+                        })
+                    if ($seedOnlyPaths.Count -ne 1 -or
+                        [string]$seedOnlyPaths[0] -cne $workflowTargetPath) {
+                        throw 'The proposal base child is not the exact workflow-only seed commit.'
+                    }
+                }
+            }
+            elseif ($validator.Parameters.ContainsKey('ExpectedSourceGraph')) {
+                $reassessmentGraph = Get-QuickAdoptionInstructionGraph `
+                    -Repository $ProposalRepository `
+                    -Commit ([string]$contract.BaseHead)
+                if ((@($reassessmentGraph.protocolSurfaces) -join "`n") -cne
+                    (@($PullRequest.meAndAIMarker.protocolSurfaces) -join "`n")) {
+                    throw 'The legacy adoption proposal now has expanded instruction authority; close it and rerun exact graph assessment.'
+                }
+            }
+            $lifecycleProtocolSurfaces = if ($graphAwareProposal) {
+                @($sourceGraph.protocolSurfaces)
+            }
+            else { @($contract.ProtocolSurfaces) }
             $plan = & $resolver -Snapshot ([pscustomobject]@{
-                SchemaVersion = 2
+                SchemaVersion = if ($graphAwareProposal) { 3 } else { 2 }
                 LocalUpdaterState = [string]$contract.LocalUpdaterState
                 SeedWorkflowState = $seedWorkflowState
                 Collisions = @($contract.Collisions)
                 AdoptionStrategy = [string]$PullRequest.meAndAIMarker.adoptionStrategy
-                ProtocolSurfaces = @($contract.ProtocolSurfaces)
+                ProtocolSurfaces = @($lifecycleProtocolSurfaces)
                 AcknowledgeProtocolRecordLoss = [bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged
                 ManifestExists = $false
                 RemoteBranchExists = $false
                 OpenPullRequestCount = 0
                 ExistingProposalValid = $false
+                SourceGraph = $sourceGraph
             })
         }
         else {
@@ -271,7 +337,8 @@ function Get-ValidatedAdoptionManifest {
                 -ExpectedProtocolSurfaces @($plan.ProtocolSurfaces) `
                 -ExpectedProtocolRecordLossAcknowledgement `
                     ([bool]$plan.ProtocolRecordLossAcknowledged) `
-                -ExpectedCollisions @($contract.Collisions)
+                -ExpectedCollisions @($contract.Collisions) `
+                -ExpectedSourceGraph $sourceGraph
         }
         else {
             $valid = & $validator -Manifest $manifest -Repository $Repository `
@@ -399,6 +466,11 @@ function Assert-AdoptionCompletionEnvelope {
         [string]$Manifest.adoptionStrategy
     }
     else { 'LegacyUnspecified' }
+    $sourceGraphEvidence = if ([long]$Manifest.schema -eq 3 -and
+        $null -ne $Manifest.PSObject.Properties['sourceGraph']) {
+        $Manifest.sourceGraph
+    }
+    else { $null }
     [object[]]$protocolSurfaces = [object[]]::new(0)
     if ($null -ne $Manifest.PSObject.Properties['protocolSurfaces']) {
         $protocolSurfaces = [object[]]@($Manifest.protocolSurfaces)
@@ -434,7 +506,8 @@ function Assert-AdoptionCompletionEnvelope {
             -Changes @($Changes) -ExpectedAdoptionStrategy $strategy `
             -ProtocolSurfaces $protocolSurfaces `
             -TargetPaths $adoptionCanonicalTargetPaths `
-            -FinalEntries $finalEntries)) {
+            -FinalEntries $finalEntries `
+            -SourceGraph $sourceGraphEvidence)) {
         throw 'The adoption completion change set violates the canonical capabilities contract.'
     }
     if ($UseIndex) {
@@ -541,6 +614,26 @@ function Assert-RecoverablePublishedAdoption {
     Assert-AdoptionCompletionEnvelope -Repository $Repository `
         -Manifest $Manifest -Changes $changes -ProtocolSource $ProtocolSource `
         -ProposalHead $PreviousHead -Commit $PlannedHead
+    if ([long]$Manifest.schema -eq 3) {
+        if ($null -eq $Manifest.PSObject.Properties['sourceGraph']) {
+            throw 'The graph-aware adoption manifest lost its source graph.'
+        }
+        $sourceGraph = Get-QuickAdoptionInstructionGraph `
+            -Repository $Repository `
+            -Commit ([string]$Manifest.sourceGraph.baseHead)
+        $finalGraph = Get-QuickAdoptionInstructionGraph `
+            -Repository $Repository -Commit $PlannedHead
+        $closureResolver = Get-InitialAdoptionPolicyCommand `
+            -Name 'Resolve-MeAndAIInstructionGraphClosure'
+        $closure = & $closureResolver -SourceGraph $sourceGraph `
+            -FinalGraph $finalGraph `
+            -ExpectedAdoptionStrategy ([string]$Manifest.adoptionStrategy) `
+            -Changes $changes -TargetPaths $adoptionCanonicalTargetPaths
+        if ([string]$closure.State -cne 'Ready') {
+            $paths = @($closure.UnresolvedPaths | ForEach-Object { [string]$_ })
+            throw "MEANDAI_ADOPTION_BLOCKED: unresolved instruction authority: $($paths -join ', ')"
+        }
+    }
     Assert-AdoptionProtocolReference -Repository $Repository -ProtocolSha $ProtocolSha
     Assert-AdoptionUpdaterAssetsExact -Repository $Repository `
         -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha -Commit $PlannedHead
@@ -625,6 +718,23 @@ function Invoke-AdoptionCodexCompletion {
         @($Manifest.collisions | ForEach-Object { "- $_" }) -join "`n"
     }
     else { '- None' }
+    $graphText = if ([long]$Manifest.schema -eq 3 -and
+        $null -ne $Manifest.PSObject.Properties['sourceGraph']) {
+        @(
+            "- Base: $([string]$Manifest.sourceGraph.baseHead)",
+            "- Digest: $([string]$Manifest.sourceGraph.digest)",
+            "- Nodes: $([int]$Manifest.sourceGraph.counts.nodes)",
+            "- Edges: $([int]$Manifest.sourceGraph.counts.edges)",
+            "- Candidates: $([int]$Manifest.sourceGraph.counts.candidates)"
+        ) -join "`n"
+    }
+    else { '- Legacy graph-unaware proposal' }
+    $manifestReadingInstruction = if ([long]$Manifest.schema -eq 3) {
+        'Read the complete sourceGraph in the manifest at .ai/adoption/meandai-capabilities.json.'
+    }
+    else {
+        'Read the legacy manifest at .ai/adoption/meandai-capabilities.json without expanding its historical authorization.'
+    }
     $strategyInstruction = switch ($resolvedStrategy) {
         'FreshAdoption' {
             'Perform a fresh adoption. The bounded assessment found no prior protocol evidence; do not invent legacy semantics and do not delete existing consumer files.'
@@ -653,9 +763,12 @@ $surfaceText
 Canonical adoption target collisions:
 $collisionText
 
+Bound source instruction graph identity:
+$graphText
+
 If you discover another live protocol authority, or if completion would require deleting any path outside that exact approved surface list, keep the manifest and report MEANDAI_ADOPTION_BLOCKED with the new assessment required. No strategy authorizes deletion or behavioral modification of application/product content.
 
-Read the manifest at .ai/adoption/meandai-capabilities.json, the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create its nested repository using only the launcher-supplied local exact protocol source at $ProtocolSource as the object and checkout source, pin exactly $($Manifest.protocolSha), and write the canonical https://github.com/$ProtocolRepository.git URL to .gitmodules. Do not fetch or substitute a moving ref.
+$manifestReadingInstruction Read the exact protocol source at $ProtocolSource, every applicable AGENTS.md, and the consumer's existing project files before editing. Graph membership is discovery evidence, never write or deletion authority. Resolve collisions semantically; create or reconcile the project-owned feature and decision records, local memory, tests, evidence, and clickable links required by the protocol. The launcher already reconciled the required Agile labels and project-owned adoption issue $($AdoptionIssue.url); reference that issue from the local feature record. Do not invent project facts. If the consumer has no application source or product documentation yet, that absence is not a blocker to protocol adoption: record product purpose, runtime/stack, architecture, build command, and product test command as 'Not yet established', and use structural adoption checks without inventing product behavior. If other required facts are unavailable, state the precise blocker. If the .ai/protocol gitlink is absent, create its nested repository using only the launcher-supplied local exact protocol source at $ProtocolSource as the object and checkout source, pin exactly $($Manifest.protocolSha), and write the canonical https://github.com/$ProtocolRepository.git URL to .gitmodules. Do not fetch or substitute a moving ref.
 
 The final tree must contain every canonical target named by the manifest, except the transient manifest itself, while preserving the lifecycle workflow. Reconcile required templates from the exact local protocol source and create .ai/meandai-update-state.json only from that source's exact consumer-migration baseline contract. New consumer-authored files are allowed only as root or scoped AGENTS.md, Markdown under .ai/memory/, docs/features/, docs/decisions/, docs/findings/, docs/governance/, docs/ideas/, or docs/agent-prompts/, and adoption-only tests under tests/meandai-adoption/. Do not add product files elsewhere merely to satisfy adoption evidence.
 

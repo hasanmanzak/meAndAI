@@ -3,7 +3,8 @@ function Test-QuickAdoptionCanonicalRepositoryPath {
     param([string]$Path)
 
     if ([string]::IsNullOrWhiteSpace($Path) -or
-        [IO.Path]::IsPathRooted($Path) -or
+        $Path.StartsWith('/', [StringComparison]::Ordinal) -or
+        $Path -match '^[A-Za-z]:' -or
         $Path.Contains('\') -or $Path -match '[\x00-\x1f]') {
         return $false
     }
@@ -87,6 +88,7 @@ function Test-QuickAdoptionExactPullRequestMarker {
         [Parameter(Mandatory)][string]$ExpectedAdoptionStrategy,
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ExpectedProtocolSurfaces,
         [Parameter(Mandatory)][bool]$ExpectedProtocolRecordLossAcknowledgement,
+        [AllowNull()]$ExpectedSourceGraphIdentity = $null,
         [Parameter(Mandatory)][ValidateSet('Proposed', 'Completed')]
         [string]$ExpectedPhase
     )
@@ -106,7 +108,8 @@ function Test-QuickAdoptionCompletedChangeSet {
         [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
         [object[]]$TargetPaths,
         [Parameter(Mandatory)][AllowNull()][AllowEmptyCollection()]
-        [object[]]$FinalEntries
+        [object[]]$FinalEntries,
+        [AllowNull()]$SourceGraph = $null
     )
 
     $command = Get-InitialAdoptionPolicyCommand `
@@ -173,6 +176,189 @@ function Get-QuickAdoptionRelevantTreePaths {
         throw "Git tree assessment failed with exit code $exitCode."
     }
     return @($paths)
+}
+
+function Get-QuickAdoptionInstructionGraphTreeEntries {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Instruction-graph tree acquisition requires one canonical commit.'
+    }
+    $limitsCommand = Get-InitialAdoptionPolicyCommand `
+        -Name 'Get-MeAndAIInstructionGraphLimits'
+    $limits = & $limitsCommand
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = "ls-tree -r -t -z --full-tree $Commit --"
+    $startInfo.WorkingDirectory = $Repository
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $record = [IO.MemoryStream]::new()
+    [long]$treePathUtf8Bytes = 0
+    $started = $false
+    try {
+        if (-not $process.Start()) {
+            throw 'Unable to start exact instruction-graph tree acquisition.'
+        }
+        $started = $true
+        $errorTask = $process.StandardError.ReadToEndAsync()
+        $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+        while (($value = $process.StandardOutput.BaseStream.ReadByte()) -ne -1) {
+            if ($value -ne 0) {
+                if ($record.Length -ge
+                    ([long]$limits.MaximumPathUtf8Bytes + 64)) {
+                    throw 'Exact instruction-graph tree output contains an overlong record.'
+                }
+                $record.WriteByte([byte]$value)
+                continue
+            }
+            $bytes = $record.ToArray()
+            $record.SetLength(0)
+            $tab = [Array]::IndexOf($bytes, [byte]9)
+            if ($tab -le 0 -or $tab -ge ($bytes.Length - 1)) {
+                throw 'Exact instruction-graph tree output is malformed or contains an unsafe path.'
+            }
+            $pathByteLength = $bytes.Length - $tab - 1
+            if ($pathByteLength -gt [int]$limits.MaximumPathUtf8Bytes -or
+                $treePathUtf8Bytes -gt
+                    ([long]$limits.MaximumTreePathUtf8Bytes - $pathByteLength)) {
+                throw 'Exact instruction-graph tree output exceeds its path budget.'
+            }
+            $treePathUtf8Bytes += $pathByteLength
+            $header = [Text.Encoding]::ASCII.GetString($bytes, 0, $tab)
+            $match = [regex]::Match(
+                $header,
+                '^(?<mode>[0-9]{6})\s+(?<type>blob|tree|commit)\s+(?<sha>[0-9a-f]{40})$'
+            )
+            if (-not $match.Success) {
+                throw 'Exact instruction-graph tree output contains an invalid entry identity.'
+            }
+            try {
+                $path = $strictUtf8.GetString(
+                    $bytes, $tab + 1, $pathByteLength
+                )
+            }
+            catch {
+                throw 'Exact instruction-graph tree output contains a non-UTF-8 path.'
+            }
+            if (-not (Test-QuickAdoptionCanonicalRepositoryPath -Path $path)) {
+                throw "Exact instruction-graph tree path '$path' is not canonical."
+            }
+            $entries.Add([pscustomobject]@{
+                Path = $path
+                Mode = [string]$match.Groups['mode'].Value
+                Type = [string]$match.Groups['type'].Value
+                Sha = [string]$match.Groups['sha'].Value
+            })
+            if ($entries.Count -gt [int]$limits.MaximumTreeEntries) {
+                throw 'Instruction graph exceeds the tracked-tree budget; maintainer review is required.'
+            }
+        }
+        if ($record.Length -ne 0) {
+            throw 'Exact instruction-graph tree output is missing its final record terminator.'
+        }
+        $process.WaitForExit()
+        $errorText = [string]$errorTask.Result
+        if ($process.ExitCode -ne 0) {
+            throw "Exact instruction-graph tree acquisition failed: $errorText"
+        }
+        return @($entries)
+    }
+    finally {
+        if ($started -and -not $process.HasExited) { $process.Kill() }
+        $record.Dispose()
+        $process.Dispose()
+    }
+}
+
+function Get-QuickAdoptionInstructionGraphBlobBytes {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$Entry,
+        [Parameter(Mandatory)][long]$MaximumBytes
+    )
+
+    if ([string]$Entry.Type -cne 'blob' -or
+        [string]$Entry.Sha -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Instruction graph entry '$([string]$Entry.Path)' is not a canonical blob."
+    }
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = "cat-file blob $([string]$Entry.Sha)"
+    $startInfo.WorkingDirectory = $Repository
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $memory = [IO.MemoryStream]::new()
+    $started = $false
+    try {
+        if (-not $process.Start()) {
+            throw "Unable to read exact instruction blob '$([string]$Entry.Path)'."
+        }
+        $started = $true
+        $buffer = [byte[]]::new(81920)
+        [long]$total = 0
+        while (($read = $process.StandardOutput.BaseStream.Read(
+            $buffer, 0, $buffer.Length
+        )) -gt 0) {
+            if ($total -gt ($MaximumBytes - $read)) {
+                throw "Instruction blob '$([string]$Entry.Path)' exceeds the per-blob budget."
+            }
+            $memory.Write($buffer, 0, $read)
+            $total += $read
+        }
+        $errorText = $process.StandardError.ReadToEnd()
+        $process.WaitForExit()
+        if ($process.ExitCode -ne 0) {
+            throw "Unable to read exact instruction blob '$([string]$Entry.Path)': $errorText"
+        }
+        return ,$memory.ToArray()
+    }
+    finally {
+        if ($started -and -not $process.HasExited) { $process.Kill() }
+        $memory.Dispose()
+        $process.Dispose()
+    }
+}
+
+function Get-QuickAdoptionInstructionGraph {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $entries = @(Get-QuickAdoptionInstructionGraphTreeEntries `
+        -Repository $Repository -Commit $Commit)
+    $limitsCommand = Get-InitialAdoptionPolicyCommand `
+        -Name 'Get-MeAndAIInstructionGraphLimits'
+    $limits = & $limitsCommand
+    $blobReader = ${function:Get-QuickAdoptionInstructionGraphBlobBytes}
+    $reader = {
+        param($entry)
+        & $blobReader -Repository $Repository `
+            -Entry $entry -MaximumBytes ([long]$limits.MaximumBlobBytes)
+    }.GetNewClosure()
+    $builder = Get-InitialAdoptionPolicyCommand `
+        -Name 'New-MeAndAIInstructionGraph'
+    $validator = Get-InitialAdoptionPolicyCommand `
+        -Name 'Test-MeAndAIExactInstructionGraph'
+    $graph = & $builder -BaseHead $Commit -TreeEntries $entries `
+        -ReadBlob $reader
+    if (-not (& $validator -Graph $graph)) {
+        throw 'Exact instruction-graph discovery returned an invalid graph.'
+    }
+    return $graph
 }
 
 function Get-QuickAdoptionWorkingTreePaths {
@@ -341,6 +527,7 @@ function Get-QuickAdoptionPreflightAssessment {
     $headSha = ''
     $paths = @()
     $completedCandidate = $false
+    $instructionGraph = $null
     if ($inside.ExitCode -eq 0 -and
         ((@($inside.Output) -join '').Trim() -ceq 'true')) {
         $rootResult = Invoke-Git -Repository $Root `
@@ -381,6 +568,11 @@ function Get-QuickAdoptionPreflightAssessment {
             $completedCandidate = Test-QuickAdoptionCompletedConsumerCandidate `
                 -Repository $Root -HeadSha $headSha
             if (-not $completedCandidate) {
+                # Completed consumers retain their existing current/update
+                # route. Graph-aware initial-adoption policy is prospective
+                # and must not retroactively reassess a completed topology.
+                $instructionGraph = Get-QuickAdoptionInstructionGraph `
+                    -Repository $Root -Commit $headSha
                 $hasWorkingSeed = @($statusLines | Where-Object {
                     $_ -ceq "?? $workflowTargetPath" -or
                     $_ -ceq "A  $workflowTargetPath"
@@ -410,16 +602,35 @@ function Get-QuickAdoptionPreflightAssessment {
     }
 
     Assert-QuickAdoptionSeedWorkflowPathIdentity -Paths $paths
-    $surfaces = @(Get-QuickAdoptionProtocolSurfaceInventory -Paths $paths)
-    $collisions = @(Get-QuickAdoptionCanonicalCollisions -Paths $paths)
+    $surfaces = @(
+        if ($completedCandidate) { @() }
+        elseif ($null -ne $instructionGraph) {
+            @($instructionGraph.protocolSurfaces)
+        }
+        else { Get-QuickAdoptionProtocolSurfaceInventory -Paths $paths }
+    )
+    $collisions = @(
+        if ($completedCandidate) { @() }
+        else { Get-QuickAdoptionCanonicalCollisions -Paths $paths }
+    )
     if (-not $headSha -and ($surfaces.Count -gt 0 -or $collisions.Count -gt 0)) {
         throw 'Uncommitted protocol or governance evidence cannot be handed to the isolated adoption clone; commit the repository history before migration.'
     }
     return [pscustomobject]@{
+        SchemaVersion = if ($null -eq $instructionGraph) { 2 } else { 3 }
         HeadSha = $headSha
         ProtocolSurfaces = @($surfaces)
         Collisions = @($collisions)
         CompletedConsumerCandidate = [bool]$completedCandidate
+        InstructionGraph = $instructionGraph
+        GraphBase = if ($null -eq $instructionGraph) {
+            ''
+        }
+        else { [string]$instructionGraph.baseHead }
+        GraphDigest = if ($null -eq $instructionGraph) {
+            ''
+        }
+        else { [string]$instructionGraph.digest }
     }
 }
 
@@ -430,7 +641,10 @@ function Assert-QuickAdoptionPreflightAssessmentUnchanged {
         [Parameter(Mandatory)][string]$FailureMessage
     )
 
-    if ([string]$Actual.HeadSha -cne [string]$Expected.HeadSha -or
+    if ([long]$Actual.SchemaVersion -ne [long]$Expected.SchemaVersion -or
+        [string]$Actual.HeadSha -cne [string]$Expected.HeadSha -or
+        [string]$Actual.GraphBase -cne [string]$Expected.GraphBase -or
+        [string]$Actual.GraphDigest -cne [string]$Expected.GraphDigest -or
         [bool]$Actual.CompletedConsumerCandidate -ne
             [bool]$Expected.CompletedConsumerCandidate -or
         -not (Test-ExactOrdinalPathSet `

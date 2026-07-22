@@ -11,6 +11,10 @@ Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.ps
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
+$launcherPath = Join-Path $root `
+    'scripts/quick-adoption/Public/Invoke-MeAndAIQuickAdoption.ps1'
+$dispatchPath = Join-Path $root `
+    'scripts/quick-adoption/Private/ProposalOwnership.ps1'
 $adoptionPath = Join-Path $root 'docs/adoption.md'
 $protocolPath = Join-Path $root 'PROTOCOL.md'
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -27,7 +31,26 @@ function Assert-Equal {
     }
 }
 
-foreach ($path in @($modulePath, $adapterPath, $workflowPath, $adoptionPath, $protocolPath)) {
+function Get-Test0153GitBlobSha {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+    $payload = [byte[]]::new($header.Length + $Bytes.Length)
+    [Array]::Copy($header, 0, $payload, 0, $header.Length)
+    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
+    $sha = [Security.Cryptography.SHA1]::Create()
+    try {
+        return ([BitConverter]::ToString(
+            $sha.ComputeHash($payload)
+        )).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $sha.Dispose() }
+}
+
+foreach ($path in @(
+    $modulePath, $adapterPath, $workflowPath, $launcherPath, $dispatchPath,
+    $adoptionPath, $protocolPath
+)) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         Add-Failure "TEST-0027 missing lifecycle asset: $path"
     }
@@ -73,6 +96,10 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     Assert-Equal 'BootstrapReady' $plan.State 'TEST-0028 collision-free seed should bootstrap'
     Assert-Equal 'Full' $plan.ProposalMode 'TEST-0028 collision-free seed should propose full core assets'
     Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should resolve a clean tree to FreshAdoption'
+    if ([long]$plan.SchemaVersion -ne 2 -or
+        $null -ne $plan.PSObject.Properties['SourceGraph']) {
+        Add-Failure 'TEST-0153 legacy schema-2 lifecycle compatibility changed when graph evidence was absent.'
+    }
 
     $plan = Invoke-LifecyclePlan -Collisions @('.gitmodules')
     Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0127 a generic target collision should require semantic review without inventing prior protocol evidence'
@@ -207,6 +234,27 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     $completedChangeValidator = Get-Command `
         -Name 'Test-MeAndAICompletedAdoptionChangeSet' `
         -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphBuilder = Get-Command `
+        -Name 'New-MeAndAIInstructionGraph' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphValidator = Get-Command `
+        -Name 'Test-MeAndAIExactInstructionGraph' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphLimitGetter = Get-Command `
+        -Name 'Get-MeAndAIInstructionGraphLimits' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphRecordConverter = Get-Command `
+        -Name 'ConvertTo-MeAndAIInstructionGraphRecord' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphIdentityGetter = Get-Command `
+        -Name 'Get-MeAndAIInstructionGraphIdentity' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphIdentityValidator = Get-Command `
+        -Name 'Test-MeAndAIExactInstructionGraphIdentity' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $instructionGraphIdentityRecordValidator = Get-Command `
+        -Name 'Test-MeAndAIExactInstructionGraphIdentityRecord' `
+        -CommandType Function -ErrorAction SilentlyContinue
     $reservedSubmoduleValidator = Get-Command `
         -Name 'Test-MeAndAIReservedProtocolSubmoduleContract' `
         -CommandType Function -ErrorAction SilentlyContinue
@@ -228,8 +276,101 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
          $null -eq $reservedSubmoduleValidator) {
         Add-Failure 'TEST-0080/TEST-0127 pure lifecycle module does not export the canonical adoption path, assessment, strategy, inventory, and manifest contract.'
     }
+    if ($null -eq $instructionGraphBuilder -or
+        $null -eq $instructionGraphValidator -or
+        $null -eq $instructionGraphLimitGetter -or
+        $null -eq $instructionGraphRecordConverter -or
+        $null -eq $instructionGraphIdentityGetter -or
+        $null -eq $instructionGraphIdentityValidator -or
+        $null -eq $instructionGraphIdentityRecordValidator) {
+        Add-Failure 'TEST-0153 pure lifecycle module does not export exact instruction-graph identity contracts.'
+    }
     else {
         $protocolSha = ('a' * 40) -join ''
+        $graphBase = ('b' * 40)
+        $graphText =
+            'Required reading: [protocol](.ai/protocol/PROTOCOL.md).'
+        [byte[]]$graphBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+            $graphText
+        )
+        $graphBlobs = @{ 'AGENTS.md' = $graphBytes }
+        $graphEntries = @(
+            [pscustomobject]@{
+                Path = '.ai/protocol'
+                Mode = '160000'
+                Type = 'commit'
+                Sha = $protocolSha
+            },
+            [pscustomobject]@{
+                Path = 'AGENTS.md'
+                Mode = '100644'
+                Type = 'blob'
+                Sha = Get-Test0153GitBlobSha -Bytes $graphBytes
+            }
+        )
+        $graphReader = {
+            param($entry)
+            $path = [string]$entry.Path
+            if (-not $graphBlobs.ContainsKey($path)) {
+                throw "TEST-0153 attempted to dereference '$path'."
+            }
+            return ,([byte[]]$graphBlobs[$path])
+        }.GetNewClosure()
+        $sourceGraph = & $instructionGraphBuilder -BaseHead $graphBase `
+            -TreeEntries $graphEntries -ReadBlob $graphReader
+        $sourceGraphRecord = & $instructionGraphRecordConverter `
+            -Graph $sourceGraph
+        $sourceGraphIdentity = & $instructionGraphIdentityGetter `
+            -Graph $sourceGraph
+        if (-not (& $instructionGraphValidator -Graph $sourceGraph) -or
+            -not (& $instructionGraphIdentityRecordValidator `
+                -Identity $sourceGraphIdentity) -or
+            -not (& $instructionGraphIdentityValidator `
+                -Identity $sourceGraphIdentity -Graph $sourceGraphRecord)) {
+            Add-Failure 'TEST-0153 the small exact graph did not satisfy the exported graph and identity contracts.'
+        }
+        $graphPlan = Resolve-MeAndAICapabilitiesLifecycle `
+            -Snapshot ([pscustomobject]@{
+                SchemaVersion = 3
+                LocalUpdaterState = 'Absent'
+                SeedWorkflowState = 'Exact'
+                Collisions = @()
+                AdoptionStrategy = 'FullMigration'
+                ProtocolSurfaces = @($sourceGraph.protocolSurfaces)
+                AcknowledgeProtocolRecordLoss = $false
+                ManifestExists = $false
+                RemoteBranchExists = $false
+                OpenPullRequestCount = 0
+                ExistingProposalValid = $false
+                SourceGraph = $sourceGraph
+            })
+        if ([long]$graphPlan.SchemaVersion -ne 3 -or
+            [string]$graphPlan.State -cne 'BootstrapReady' -or
+            $null -eq $graphPlan.PSObject.Properties['SourceGraph'] -or
+            -not (& $instructionGraphIdentityValidator `
+                -Identity (& $instructionGraphIdentityGetter `
+                    -Graph $graphPlan.SourceGraph) `
+                -Graph $sourceGraph)) {
+            Add-Failure 'TEST-0153 schema-3 lifecycle did not retain the exact source-graph identity.'
+        }
+        $surfaceDriftPlan = Resolve-MeAndAICapabilitiesLifecycle `
+            -Snapshot ([pscustomobject]@{
+                SchemaVersion = 3
+                LocalUpdaterState = 'Absent'
+                SeedWorkflowState = 'Exact'
+                Collisions = @()
+                AdoptionStrategy = 'FullMigration'
+                ProtocolSurfaces = @('AGENTS.md')
+                AcknowledgeProtocolRecordLoss = $false
+                ManifestExists = $false
+                RemoteBranchExists = $false
+                OpenPullRequestCount = 0
+                ExistingProposalValid = $false
+                SourceGraph = $sourceGraph
+            })
+        Assert-Equal 'BlockedManualReview' $surfaceDriftPlan.State `
+            'TEST-0153 schema-3 lifecycle accepted a surface projection that differs from its source graph'
+
         $expectedCollisions = @('AGENTS.md')
         $expectedTargetPaths = @(
             '.gitmodules', '.ai/protocol', '.ai/meandai-update-state.json', 'AGENTS.md',
@@ -488,6 +629,71 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             }
         }
 
+        $graphManifest = [pscustomobject][ordered]@{
+            schema = 3
+            operation = 'ai-capabilities-adoption'
+            state = 'BootstrapReady'
+            repository = 'owner/consumer'
+            targetTag = 'v0.9.7'
+            protocolSha = $protocolSha
+            adoptionStrategy = 'FullMigration'
+            protocolSurfaces = @($sourceGraph.protocolSurfaces)
+            protocolRecordLossAcknowledged = $false
+            collisions = @()
+            proposedPaths = $expectedProposedPaths
+            requiredTasks = $requiredTasks
+            sourceGraph = $sourceGraphRecord
+        }
+        function Test-GraphManifestFixture {
+            param([Parameter(Mandatory)]$Manifest)
+
+            return Test-MeAndAIExactAdoptionManifest -Manifest $Manifest `
+                -Repository 'owner/consumer' -TargetTag 'v0.9.7' `
+                -ProtocolSha $protocolSha -ExpectedState 'BootstrapReady' `
+                -ExpectedAdoptionStrategy 'FullMigration' `
+                -ExpectedProtocolSurfaces @($sourceGraph.protocolSurfaces) `
+                -ExpectedProtocolRecordLossAcknowledgement $false `
+                -ExpectedCollisions @() -ExpectedSourceGraph $sourceGraph
+        }
+        if (-not (Test-GraphManifestFixture -Manifest $graphManifest)) {
+            Add-Failure 'TEST-0153 exact schema-3 graph manifest was rejected.'
+        }
+        if (Test-MeAndAIExactAdoptionManifest -Manifest $validManifest `
+                -Repository 'owner/consumer' -TargetTag 'v0.9.7' `
+                -ProtocolSha $protocolSha `
+                -ExpectedState 'AdoptionReviewRequired' `
+                -ExpectedAdoptionStrategy 'HybridReconciliation' `
+                -ExpectedProtocolSurfaces $expectedProtocolSurfaces `
+                -ExpectedProtocolRecordLossAcknowledgement $false `
+                -ExpectedCollisions $expectedCollisions `
+                -ExpectedSourceGraph $sourceGraph) {
+            Add-Failure 'TEST-0153 graph-aware manifest validation retroactively accepted legacy schema-2 evidence.'
+        }
+        $graphManifestVariants = [ordered]@{}
+        $manifestDigestDrift = $graphManifest | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $manifestDigestDrift.sourceGraph.digest = ('f' * 64)
+        $graphManifestVariants['digest drift'] = $manifestDigestDrift
+        $manifestCountDrift = $graphManifest | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $manifestCountDrift.sourceGraph.counts.nodes =
+            [long]$manifestCountDrift.sourceGraph.counts.nodes + 1
+        $graphManifestVariants['count drift'] = $manifestCountDrift
+        $manifestLimitDrift = $graphManifest | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $manifestLimitDrift.sourceGraph.limits.maximumNodes =
+            [long]$manifestLimitDrift.sourceGraph.limits.maximumNodes - 1
+        $graphManifestVariants['limit drift'] = $manifestLimitDrift
+        $manifestSurfaceDrift = $graphManifest | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $manifestSurfaceDrift.protocolSurfaces = @('AGENTS.md')
+        $graphManifestVariants['surface drift'] = $manifestSurfaceDrift
+        foreach ($entry in $graphManifestVariants.GetEnumerator()) {
+            if (Test-GraphManifestFixture -Manifest $entry.Value) {
+                Add-Failure "TEST-0153 schema-3 manifest accepted $($entry.Key)."
+            }
+        }
+
         $proposalHead = ('c' * 40)
         $proposalMarker = [ordered]@{
             schema = 5
@@ -580,6 +786,114 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         if (& $proposalMarkerValidator `
                 -PullRequest $legacyPullRequest @legacyMarkerParameters) {
             Add-Failure 'TEST-0145 production marker contract accepted protocol surfaces for legacy schema-2 evidence.'
+        }
+        $graphAwareLegacyMarkerParameters = @{}
+        foreach ($entry in $markerParameters.GetEnumerator()) {
+            $graphAwareLegacyMarkerParameters[$entry.Key] = $entry.Value
+        }
+        $graphAwareLegacyMarkerParameters.ExpectedSourceGraph = $sourceGraph
+        if (& $proposalMarkerValidator -PullRequest $validPullRequest `
+                @graphAwareLegacyMarkerParameters) {
+            Add-Failure 'TEST-0153 graph-aware marker validation retroactively accepted schema-5 evidence.'
+        }
+
+        $graphMarker = [pscustomobject][ordered]@{
+            schema = 7
+            phase = 'Proposed'
+            state = 'BootstrapReady'
+            target = 'v0.9.7'
+            protocolSha = $protocolSha
+            head = $proposalHead
+            branch = 'automation/meandai-capabilities-v0.9.7'
+            adoptionStrategy = 'FullMigration'
+            protocolSurfaces = @($sourceGraphIdentity.protocolSurfaces)
+            protocolRecordLossAcknowledged = $false
+            graphBase = [string]$sourceGraphIdentity.graphBase
+            graphDigest = [string]$sourceGraphIdentity.graphDigest
+            graphCounts = $sourceGraphIdentity.graphCounts
+            graphLimits = $sourceGraphIdentity.graphLimits
+            repository = 'owner/consumer'
+            actor = 'owner'
+        }
+        $graphPullRequest = $validPullRequest | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $graphPullRequest.body = '<!-- meandai-capabilities-adoption:' +
+            ($graphMarker | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+        $graphMarkerParameters = @{
+            RemoteHead = $proposalHead
+            Repository = 'owner/consumer'
+            Branch = 'automation/meandai-capabilities-v0.9.7'
+            BaseBranch = 'main'
+            TargetTag = 'v0.9.7'
+            TargetSha = $protocolSha
+            ExpectedActor = 'owner'
+            ExpectedState = 'BootstrapReady'
+            ExpectedAdoptionStrategy = 'FullMigration'
+            ExpectedProtocolSurfaces = @($sourceGraph.protocolSurfaces)
+            ExpectedProtocolRecordLossAcknowledgement = $false
+            ExpectedSourceGraph = $sourceGraph
+            ExpectedPhase = 'Proposed'
+        }
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $graphPullRequest @graphMarkerParameters)) {
+            Add-Failure 'TEST-0153 schema-7 Proposed marker rejected exact graph evidence.'
+        }
+
+        $completedGraphMarker = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $completedGraphMarker.phase = 'Completed'
+        $completedGraphPullRequest = $graphPullRequest |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $completedGraphPullRequest.isDraft = $false
+        $completedGraphPullRequest.body =
+            '<!-- meandai-capabilities-adoption:' +
+            ($completedGraphMarker | ConvertTo-Json -Depth 30 -Compress) +
+            ' -->'
+        $completedGraphMarkerParameters = @{}
+        foreach ($entry in $graphMarkerParameters.GetEnumerator()) {
+            if ($entry.Key -cne 'ExpectedSourceGraph') {
+                $completedGraphMarkerParameters[$entry.Key] = $entry.Value
+            }
+        }
+        $completedGraphMarkerParameters.ExpectedSourceGraphIdentity =
+            $sourceGraphIdentity
+        $completedGraphMarkerParameters.ExpectedPhase = 'Completed'
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $completedGraphPullRequest `
+                @completedGraphMarkerParameters)) {
+            Add-Failure 'TEST-0153 schema-7 Completed marker rejected exact graph-identity evidence.'
+        }
+
+        $graphMarkerVariants = [ordered]@{}
+        $markerDigestDrift = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $markerDigestDrift.graphDigest = ('f' * 64)
+        $graphMarkerVariants['digest drift'] = $markerDigestDrift
+        $markerCountDrift = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $markerCountDrift.graphCounts.nodes =
+            [long]$markerCountDrift.graphCounts.nodes + 1
+        $graphMarkerVariants['count drift'] = $markerCountDrift
+        $markerLimitDrift = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $markerLimitDrift.graphLimits.maximumNodes =
+            [long]$markerLimitDrift.graphLimits.maximumNodes - 1
+        $graphMarkerVariants['limit drift'] = $markerLimitDrift
+        $markerSurfaceDrift = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $markerSurfaceDrift.protocolSurfaces = @('AGENTS.md')
+        $graphMarkerVariants['surface drift'] = $markerSurfaceDrift
+        foreach ($entry in $graphMarkerVariants.GetEnumerator()) {
+            $variantPullRequest = $graphPullRequest |
+                ConvertTo-Json -Depth 30 | ConvertFrom-Json
+            $variantPullRequest.body =
+                '<!-- meandai-capabilities-adoption:' +
+                ($entry.Value | ConvertTo-Json -Depth 30 -Compress) +
+                ' -->'
+            if (& $proposalMarkerValidator -PullRequest $variantPullRequest `
+                    @graphMarkerParameters) {
+                Add-Failure "TEST-0153 schema-7 marker accepted $($entry.Key)."
+            }
         }
 
         $protocolEntry = [pscustomobject]@{
@@ -954,7 +1268,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.12.5',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.12.6',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',
@@ -1006,6 +1320,17 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     )) {
         if (-not $workflow.Contains($requiredStrategyBoundary)) {
             Add-Failure "TEST-0128 workflow initial-adoption strategy gate is missing '$requiredStrategyBoundary'."
+        }
+    }
+    foreach ($requiredGraphHandoff in @(
+        'source_graph_identity:',
+        "SOURCE_GRAPH_IDENTITY: `${{ inputs.source_graph_identity || '' }}",
+        'if ([bool]$env:EXPECTED_BASE_SHA -ne',
+        '[bool]$env:SOURCE_GRAPH_IDENTITY)',
+        '-SourceGraphIdentityJson $env:SOURCE_GRAPH_IDENTITY'
+    )) {
+        if (-not $workflow.Contains($requiredGraphHandoff)) {
+            Add-Failure "TEST-0153 workflow source-graph handoff is missing '$requiredGraphHandoff'."
         }
     }
     foreach ($requiredEventBinding in @(
@@ -1100,6 +1425,52 @@ if (Test-Path -LiteralPath $adapterPath -PathType Leaf) {
             Add-Failure "TEST-0127 bootstrap adapter duplicates module-owned assessment policy '$duplicatedPolicy'."
         }
     }
+    foreach ($requiredGraphBoundary in @(
+        'SourceGraphIdentityJson',
+        'Get-InstructionGraphForCommit -Repository $workspace',
+        'Test-MeAndAIExactInstructionGraphIdentity',
+        'The workflow event is not one exact child of the assessed instruction-graph base.',
+        'The independently rebuilt instruction graph does not match the launcher-authorized identity.'
+    )) {
+        if (-not $adapter.Contains($requiredGraphBoundary)) {
+            Add-Failure "TEST-0153 hosted adapter source-graph boundary is missing '$requiredGraphBoundary'."
+        }
+    }
+    $graphRebuildIndex = $adapter.IndexOf(
+        'Get-InstructionGraphForCommit -Repository $workspace',
+        [StringComparison]::Ordinal
+    )
+    $proposalBranchIndex = $adapter.IndexOf(
+        '$branch = "$BranchPrefix$TargetTag"',
+        [StringComparison]::Ordinal
+    )
+    if ($graphRebuildIndex -lt 0 -or $proposalBranchIndex -le $graphRebuildIndex) {
+        Add-Failure 'TEST-0153 hosted adapter must rebuild and validate the authorized graph before resolving proposal mutation state.'
+    }
+}
+
+if ((Test-Path -LiteralPath $launcherPath -PathType Leaf) -and
+    (Test-Path -LiteralPath $dispatchPath -PathType Leaf)) {
+    $launcher = Get-Content -LiteralPath $launcherPath -Raw
+    $dispatch = Get-Content -LiteralPath $dispatchPath -Raw
+    foreach ($requiredLauncherHandoff in @(
+        '$dispatchSourceGraph = $preflightAssessment.InstructionGraph',
+        'Get-MeAndAIInstructionGraphIdentity',
+        '$dispatchSourceGraphIdentityJson',
+        '-SourceGraphIdentityJson $dispatchSourceGraphIdentityJson'
+    )) {
+        if (-not $launcher.Contains($requiredLauncherHandoff)) {
+            Add-Failure "TEST-0153 quick-adoption launcher graph handoff is missing '$requiredLauncherHandoff'."
+        }
+    }
+    foreach ($requiredDispatchHandoff in @(
+        '[string]$SourceGraphIdentityJson',
+        '--field', 'source_graph_identity=$SourceGraphIdentityJson'
+    )) {
+        if (-not $dispatch.Contains($requiredDispatchHandoff)) {
+            Add-Failure "TEST-0153 lifecycle dispatch graph handoff is missing '$requiredDispatchHandoff'."
+        }
+    }
 }
 
 if (Test-Path -LiteralPath $adoptionPath -PathType Leaf) {
@@ -1134,11 +1505,26 @@ if (Test-Path -LiteralPath $protocolPath -PathType Leaf) {
 }
 
 $adapterTestPath = Join-Path $root 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1'
+$dispatchTestPath = Join-Path $root `
+    'tests/capabilities/initial-adoption/source-graph-dispatch.fixture.ps1'
+$graphIdentityTestPath = Join-Path $root `
+    'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.fixture.ps1'
+$graphDriftTestPath = Join-Path $root `
+    'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.fixture.ps1'
 if (-not (Test-Path -LiteralPath $adapterTestPath -PathType Leaf)) {
     Add-Failure 'TEST-0028 missing bootstrap adapter integration tests.'
 }
+elseif (-not (Test-Path -LiteralPath $dispatchTestPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $graphIdentityTestPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $graphDriftTestPath -PathType Leaf)) {
+    Add-Failure 'TEST-0153 missing source-graph dispatch or hosted-adapter integration fixture.'
+}
 elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
     $engine = (Get-Process -Id $PID).Path
+    & $engine -NoProfile -ExecutionPolicy Bypass -File $dispatchTestPath
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
     & $engine -NoProfile -ExecutionPolicy Bypass -File $adapterTestPath
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
@@ -1155,7 +1541,10 @@ Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in
 if ($Shard -ceq 'All') {
     $scenarioResult = New-MeAndAIScenarioResult `
         -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
-        -SourcePaths @($PSCommandPath, $adapterTestPath) `
+        -SourcePaths @(
+            $PSCommandPath, $adapterTestPath, $dispatchTestPath,
+            $graphIdentityTestPath, $graphDriftTestPath
+        ) `
         -AuthorityPath $scenarioAuthorityPath
     Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
 }
