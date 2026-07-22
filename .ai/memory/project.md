@@ -21,13 +21,15 @@ Last verified: **2026-07-22**
   `codex/feat-0038-api-safe-merge-finalization`. The correction replaces the
   removed API-2026 pull-request `merge_commit_sha` field with one exact
   paginated `merged` issue-event commit while preserving the existing
-  branch-first, issue-last lifecycle gates.
+  branch-first, issue-last lifecycle gates. The exact target-bound launcher now
+  also recovers unambiguous retained merged branches before current-update
+  planning so an older failed finalizer cannot block corrected-updater adoption.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: immutable v0.12.6 completed FEAT-0037, `SUBF-0070`
   through `SUBF-0072`, and `TEST-0151` through `TEST-0154`. FEAT-0038 adds
-  `TEST-0155` and `RISK-0179` through `RISK-0182` for the bounded v0.12.7
+  `TEST-0155`, `TEST-0156`, and `RISK-0179` through `RISK-0183` for the bounded v0.12.7
   updater correction; immutable release and consumer recovery remain pending.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through

@@ -852,7 +852,21 @@ function Invoke-LocalCurrentLauncherRecovery {
     $previousDefaultBranch = [Environment]::GetEnvironmentVariable(
         'DEFAULT_BRANCH', 'Process'
     )
+    $previousGitHubToken = [Environment]::GetEnvironmentVariable(
+        'GH_TOKEN', 'Process'
+    )
+    $previousIssueToken = [Environment]::GetEnvironmentVariable(
+        'ISSUE_TOKEN', 'Process'
+    )
+    $previousProtocolToken = [Environment]::GetEnvironmentVariable(
+        'PROTOCOL_TOKEN', 'Process'
+    )
+    $previousGitHubHost = [Environment]::GetEnvironmentVariable(
+        'GH_HOST', 'Process'
+    )
+    $callerLocationBefore = (Get-Location).Path
     $locationPushed = $false
+    $restorationErrors = [System.Collections.Generic.List[string]]::new()
 
     try {
         [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
@@ -901,6 +915,13 @@ function Invoke-LocalCurrentLauncherRecovery {
         if (-not (Test-Path -LiteralPath $adapterPath -PathType Leaf)) {
             throw 'The verified target release does not contain its current-launcher adapter.'
         }
+        $tokenResult = Invoke-External -Command 'gh' -Arguments @(
+            'auth', 'token', '--hostname', 'github.com'
+        )
+        $localGitHubToken = ((@($tokenResult.Output) -join '').Trim())
+        if ([string]::IsNullOrWhiteSpace($localGitHubToken)) {
+            throw 'The authenticated local GitHub identity did not expose a recovery token.'
+        }
 
         [Environment]::SetEnvironmentVariable(
             'GITHUB_REPOSITORY', $Repository, 'Process'
@@ -911,8 +932,17 @@ function Invoke-LocalCurrentLauncherRecovery {
         [Environment]::SetEnvironmentVariable(
             'DEFAULT_BRANCH', $Branch, 'Process'
         )
+        foreach ($tokenName in @('GH_TOKEN', 'ISSUE_TOKEN', 'PROTOCOL_TOKEN')) {
+            [Environment]::SetEnvironmentVariable(
+                $tokenName, $localGitHubToken, 'Process'
+            )
+        }
+        [Environment]::SetEnvironmentVariable(
+            'GH_HOST', 'github.com', 'Process'
+        )
         Push-Location -LiteralPath $consumerClone
         $locationPushed = $true
+        & $adapterPath -RecoverMergedPullRequests
         & $adapterPath -CurrentLauncher `
             -RequestedTargetTag $TargetTag `
             -RequestedTargetCommit $TargetCommit `
@@ -924,17 +954,49 @@ function Invoke-LocalCurrentLauncherRecovery {
     }
     finally {
         if ($locationPushed) {
-            Pop-Location
+            try {
+                Pop-Location
+            }
+            catch {
+                $restorationErrors.Add(
+                    "Location-stack restoration failed: $($_.Exception.Message)"
+                )
+                try {
+                    Microsoft.PowerShell.Management\Pop-Location `
+                        -ErrorAction Stop
+                }
+                catch {
+                    try {
+                        Set-Location -LiteralPath $callerLocationBefore
+                    }
+                    catch {
+                        $restorationErrors.Add(
+                            "Caller-location recovery failed: $($_.Exception.Message)"
+                        )
+                    }
+                }
+            }
         }
-        [Environment]::SetEnvironmentVariable(
-            'GITHUB_REPOSITORY', $previousRepository, 'Process'
-        )
-        [Environment]::SetEnvironmentVariable(
-            'GITHUB_WORKSPACE', $previousWorkspace, 'Process'
-        )
-        [Environment]::SetEnvironmentVariable(
-            'DEFAULT_BRANCH', $previousDefaultBranch, 'Process'
-        )
+        foreach ($binding in @(
+            [pscustomobject]@{ Name = 'GITHUB_REPOSITORY'; Value = $previousRepository },
+            [pscustomobject]@{ Name = 'GITHUB_WORKSPACE'; Value = $previousWorkspace },
+            [pscustomobject]@{ Name = 'DEFAULT_BRANCH'; Value = $previousDefaultBranch },
+            [pscustomobject]@{ Name = 'GH_TOKEN'; Value = $previousGitHubToken },
+            [pscustomobject]@{ Name = 'ISSUE_TOKEN'; Value = $previousIssueToken },
+            [pscustomobject]@{ Name = 'PROTOCOL_TOKEN'; Value = $previousProtocolToken },
+            [pscustomobject]@{ Name = 'GH_HOST'; Value = $previousGitHubHost }
+        )) {
+            try {
+                [Environment]::SetEnvironmentVariable(
+                    [string]$binding.Name, $binding.Value, 'Process'
+                )
+            }
+            catch {
+                $restorationErrors.Add(
+                    "Environment restoration for '$([string]$binding.Name)' failed: $($_.Exception.Message)"
+                )
+            }
+        }
         try {
             if (Test-Path -LiteralPath $temporaryRoot) {
                 Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
@@ -972,6 +1034,7 @@ function Invoke-LocalCurrentLauncherRecovery {
             "Temporary recovery cleanup failed: $($cleanupError.Message)"
         }
         if ($null -ne $preservationError) { $preservationError.Message }
+        foreach ($restorationError in $restorationErrors) { $restorationError }
     )
     if ($failureDetails.Count -gt 0) {
         throw ($failureDetails -join ' ')

@@ -6,9 +6,9 @@
 | Status | Complete |
 | Target version | 0.12.7 |
 | Issue | [#96](https://github.com/hasanmanzak/meAndAI/issues/96) |
-| Pull request | Pending |
-| Decisions | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
-| Tests | [TEST-0155](test-cases.md) |
+| Pull request | [#97](https://github.com/hasanmanzak/meAndAI/pull/97) |
+| Decisions | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md) |
+| Tests | [TEST-0155 and TEST-0156](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -33,6 +33,9 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
   any branch, issue, comment, label, or pull-request mutation.
 - Preserve idempotent recovery and the existing exact-head branch deletion and
   issue-last finalization order.
+- Before target-bound current-update planning, let the exact requested updater
+  recover any unambiguous retained merged branch that an older finalizer left
+  behind; use only the authenticated local `gh` identity in the isolated clone.
 - Publish immutable v0.12.7 and use its updater assets to recover the already-
   merged consumer finalization tracked by issue #96.
 
@@ -70,6 +73,7 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
 | `RISK-0180` | Evidence completeness | A first-page-only or ambiguous event read selects incomplete merge evidence | Updater maintainer / paginated project-neutral fixture plus zero, duplicate, and malformed event negatives in `TEST-0155` |
 | `RISK-0181` | Lifecycle safety | Replacing the merge source weakens containment or permits mutation on unrelated evidence | Updater maintainer / unchanged identity gates, compare containment, and no-mutation negatives in `TEST-0155` |
 | `RISK-0182` | Runner efficiency | The correction adds unbounded network calls or new hosted jobs | Updater maintainer / one event read is retained across the existing four-state pre/post-mutation checks, legacy repair keeps one mutation-bound read, unmanaged no-op proof, and no workflow fan-out |
+| `RISK-0183` | Recovery ordering | A retained merged branch blocks current-launcher namespace inventory before the corrected updater can be installed | Quick-adoption maintainer / the exact target adapter runs bounded merged-branch recovery before current planning in one isolated clone; `TEST-0156` proves ordering, GitHub host/token restoration, adapter/location failure cleanup, and maintainer-checkout identity/status preservation |
 
 ## Definition of Ready
 
@@ -78,9 +82,9 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
       explicit.
 - [x] Existing decisions remain applicable; no new architectural decision is
       required.
-- [x] [TEST-0155](test-cases.md) defines success, pagination, legacy recovery,
-      idempotency, malformed/ambiguous evidence, containment, and no-mutation
-      coverage.
+- [x] [TEST-0155 and TEST-0156](test-cases.md) define success, pagination,
+      legacy recovery, local launcher ordering, idempotency,
+      malformed/ambiguous evidence, containment, and no-mutation coverage.
 - [x] Test-first expected-red evidence is recorded before production changes.
 
 ## Acceptance criteria
@@ -96,7 +100,10 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
    before any finalization or legacy-tracking mutation.
 5. An already-finalized rerun remains an exact no-op, while an ordinary pull
    request remains unmanaged and performs no event lookup.
-6. Focused capability evidence, structure validation, diff checks, one bounded
+6. A compatible current-launcher run recovers exact retained merged branches
+   before update planning, restores every process token/environment binding,
+   preserves the maintainer checkout, and rejects ambiguous recovery evidence.
+7. Focused capability evidence, structure validation, diff checks, one bounded
    self-review, hosted gates, immutable release verification, exact owned-
    branch cleanup, and the consumer recovery all complete.
 
@@ -105,12 +112,14 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
 - Managed merge contract: [FEAT-0022](../FEAT-0022-v097-managed-merge-finalization/README.md)
 - Idempotent lifecycle: [FEAT-0023](../FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)
 - Atomic legacy recovery: [FEAT-0028](../FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
+- Target-bound launcher recovery: [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md)
 - Capability test architecture: [FEAT-0032](../FEAT-0032-general-capability-test-architecture/README.md)
 - External evidence: [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
 
 ## Definition of Done
 
-- [x] Acceptance criteria pass with canonical `TEST-0155` evidence.
+- [x] Acceptance criteria pass with canonical `TEST-0155` and `TEST-0156`
+      evidence.
 - [x] Focused and structural validation pass on the exact candidate tree.
 - [x] Bounded self-review and one convergence scan have no unresolved
       `Blocking` finding.

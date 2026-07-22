@@ -5,8 +5,8 @@
 - Feature: [FEAT-0038](../../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md)
 - Tracking and publication authority: [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
 - Correction: `BUG-0022`
-- Test authority: [TEST-0155](../../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md)
-- Governing decisions: [DEC-0016](../../../docs/decisions/DEC-0016-managed-post-merge-finalization.md) and [DEC-0017](../../../docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md)
+- Test authority: [TEST-0155 and TEST-0156](../../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md)
+- Governing decisions: [DEC-0016](../../../docs/decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../../docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md), and [DEC-0020](../../../docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md)
 
 ## Verified problem
 
@@ -29,6 +29,11 @@ event with the required commit identity.
   unrelated records, covers legacy and schema-2 success, idempotency,
   zero/duplicate/malformed/uncontained evidence, no-mutation failure, and a
   structural regression against reintroducing the removed field.
+- The target-bound local launcher invokes the exact target adapter's bounded
+  retained-merge recovery before current-update planning, binds the local `gh`
+  token only for that isolated operation, and restores environment, temporary
+  roots, and maintainer checkout on success or interruption. `TEST-0156` owns
+  that orchestration regression.
 
 ## Current evidence and continuation
 
@@ -38,5 +43,9 @@ event with the required commit identity.
   canonical `TEST-0155` evidence, including the unmanaged no-event-read guard.
 - `StructureOnly`, `git diff --check`, and the bounded review/convergence scan
   pass with no unresolved `Blocking` finding.
+- Test-first `TEST-0156` exposed the missing pre-planning recovery call; the
+  corrected isolated launcher shard passes after GitHub-host and location-stack
+  cleanup hardening. The final complete quick-adoption owner passes in 1030.7
+  seconds and emits canonical `TEST-0156` scenario evidence.
 - Hosted checks, PR merge, immutable v0.12.7 release, owned-branch cleanup, and
   consumer recovery remain pending.

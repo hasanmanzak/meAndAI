@@ -9514,6 +9514,8 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             "'repo', 'clone', `$ProtocolRepository, `$protocolSource",
             'The consumer default branch changed before its isolated recovery clone was bound.',
             'The cloned protocol tag does not match the verified immutable release commit.',
+            "'auth', 'token', '--hostname', 'github.com'",
+            '-RecoverMergedPullRequests',
             '-CurrentLauncher',
             '-RequestedTargetTag $TargetTag',
             '-RequestedTargetCommit $TargetCommit',
@@ -9522,6 +9524,10 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             'GITHUB_REPOSITORY',
             'GITHUB_WORKSPACE',
             'DEFAULT_BRANCH',
+            'GH_TOKEN',
+            'ISSUE_TOKEN',
+            'PROTOCOL_TOKEN',
+            'GH_HOST',
             'finally',
             'Remove-Item -LiteralPath $temporaryRoot -Recurse -Force',
             'The maintainer checkout changed during isolated current-launcher recovery.'
@@ -9529,6 +9535,18 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             if (-not $recoveryText.Contains($requiredRecoveryContract)) {
                 Add-Failure "TEST-0126 current-launcher recovery lacks '$requiredRecoveryContract'."
             }
+        }
+        $mergedRecoveryIndex = $recoveryText.IndexOf(
+            '& $adapterPath -RecoverMergedPullRequests',
+            [StringComparison]::Ordinal
+        )
+        $currentLauncherIndex = $recoveryText.IndexOf(
+            '& $adapterPath -CurrentLauncher',
+            [StringComparison]::Ordinal
+        )
+        if ($mergedRecoveryIndex -lt 0 -or $currentLauncherIndex -lt 0 -or
+            $mergedRecoveryIndex -ge $currentLauncherIndex) {
+            Add-Failure 'TEST-0156 target-bound launcher does not recover exact retained merged branches before current-update planning.'
         }
         if ($recoveryText.Contains('MEANDAI_UPDATER_TOKEN') -or
             $recoveryText.Contains('MEANDAI_PROTOCOL_TOKEN') -or
@@ -9571,6 +9589,18 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             DEFAULT_BRANCH = [Environment]::GetEnvironmentVariable(
                 'DEFAULT_BRANCH', 'Process'
             )
+            GH_TOKEN = [Environment]::GetEnvironmentVariable(
+                'GH_TOKEN', 'Process'
+            )
+            ISSUE_TOKEN = [Environment]::GetEnvironmentVariable(
+                'ISSUE_TOKEN', 'Process'
+            )
+            PROTOCOL_TOKEN = [Environment]::GetEnvironmentVariable(
+                'PROTOCOL_TOKEN', 'Process'
+            )
+            GH_HOST = [Environment]::GetEnvironmentVariable(
+                'GH_HOST', 'Process'
+            )
             MEANDAI_TEST_CURRENT_LAUNCHER_RECORD = `
                 [Environment]::GetEnvironmentVariable(
                     'MEANDAI_TEST_CURRENT_LAUNCHER_RECORD', 'Process'
@@ -9578,6 +9608,10 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             MEANDAI_TEST_CURRENT_LAUNCHER_FAIL = `
                 [Environment]::GetEnvironmentVariable(
                     'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', 'Process'
+                )
+            MEANDAI_TEST_POP_LOCATION_FAIL = `
+                [Environment]::GetEnvironmentVariable(
+                    'MEANDAI_TEST_POP_LOCATION_FAIL', 'Process'
                 )
         }
         try {
@@ -9639,6 +9673,7 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             $adapterFixture = @'
 [CmdletBinding()]
 param(
+    [switch]$RecoverMergedPullRequests,
     [switch]$CurrentLauncher,
     [string]$RequestedTargetTag,
     [string]$RequestedTargetCommit,
@@ -9646,6 +9681,7 @@ param(
     [string]$ProtocolSourcePath
 )
 $record = [ordered]@{
+    RecoverMergedPullRequests = [bool]$RecoverMergedPullRequests
     CurrentLauncher = [bool]$CurrentLauncher
     TargetTag = $RequestedTargetTag
     TargetCommit = $RequestedTargetCommit
@@ -9654,14 +9690,19 @@ $record = [ordered]@{
     Workspace = $env:GITHUB_WORKSPACE
     DefaultBranch = $env:DEFAULT_BRANCH
     ProtocolSourcePath = $ProtocolSourcePath
+    GitHubHost = $env:GH_HOST
+    TokensBound = -not [string]::IsNullOrWhiteSpace([string]$env:GH_TOKEN) -and
+        [string]$env:GH_TOKEN -ceq [string]$env:ISSUE_TOKEN -and
+        [string]$env:GH_TOKEN -ceq [string]$env:PROTOCOL_TOKEN
 }
-[IO.File]::WriteAllText(
+[IO.File]::AppendAllText(
     $env:MEANDAI_TEST_CURRENT_LAUNCHER_RECORD,
-    ($record | ConvertTo-Json -Compress),
+    (($record | ConvertTo-Json -Compress) + [Environment]::NewLine),
     [Text.UTF8Encoding]::new($false)
 )
 Set-Location -LiteralPath $env:GITHUB_WORKSPACE
-if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
+if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true' -and
+    $CurrentLauncher) {
     throw 'simulated adapter interruption'
 }
 '@
@@ -9729,6 +9770,14 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
                             [string]$InputText = '',
                             [switch]$AllowFailure
                         )
+                        if ($Command -ceq 'gh' -and
+                            ($Arguments -join ' ') -ceq
+                                'auth token --hostname github.com') {
+                            return [pscustomobject]@{
+                                ExitCode = 0
+                                Output = @('test-auth-token')
+                            }
+                        }
                         if ($Command -cne 'gh' -or $Arguments.Count -lt 4 -or
                             $Arguments[0] -cne 'repo' -or
                             $Arguments[1] -cne 'clone') {
@@ -9790,6 +9839,15 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
                         }
                     }
 
+                    function Pop-Location {
+                        if ([Environment]::GetEnvironmentVariable(
+                            'MEANDAI_TEST_POP_LOCATION_FAIL', 'Process'
+                        ) -ceq 'true') {
+                            throw 'simulated location-stack interruption'
+                        }
+                        Microsoft.PowerShell.Management\Pop-Location
+                    }
+
                     Invoke-Expression $RecoveryDefinition
                 }
 
@@ -9804,10 +9862,25 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
                 'DEFAULT_BRANCH', 'preserved-branch', 'Process'
             )
             [Environment]::SetEnvironmentVariable(
+                'GH_TOKEN', 'preserved-gh-token', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'ISSUE_TOKEN', 'preserved-issue-token', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'PROTOCOL_TOKEN', 'preserved-protocol-token', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'GH_HOST', 'preserved.example', 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
                 'MEANDAI_TEST_CURRENT_LAUNCHER_RECORD', $recordPath, 'Process'
             )
             [Environment]::SetEnvironmentVariable(
                 'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', $null, 'Process'
+            )
+            [Environment]::SetEnvironmentVariable(
+                'MEANDAI_TEST_POP_LOCATION_FAIL', $null, 'Process'
             )
             $recoveryArguments = @{
                 Repository = 'test-owner/recovery-consumer'
@@ -9827,13 +9900,27 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
             $recoveryRootsAfter = @(Get-ChildItem `
                 -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
                 -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
-            $record = [IO.File]::ReadAllText($recordPath) | ConvertFrom-Json
+            $records = @([IO.File]::ReadAllLines($recordPath) |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                ForEach-Object { $_ | ConvertFrom-Json })
+            $mergedRecoveryRecord = if ($records.Count -ge 1) { $records[0] }
+            else { $null }
+            $record = if ($records.Count -ge 2) { $records[1] } else { $null }
             $maintainerStatusAfter = @((Invoke-TestGit `
                 -Repository $maintainerRepository `
                 -Arguments @(
                     'status', '--porcelain=v1', '--untracked-files=all'
                 ))) -join "`n"
-            if ($record.CurrentLauncher -isnot [bool] -or
+            if ($records.Count -ne 2 -or
+                $mergedRecoveryRecord.RecoverMergedPullRequests -isnot [bool] -or
+                -not [bool]$mergedRecoveryRecord.RecoverMergedPullRequests -or
+                [bool]$mergedRecoveryRecord.CurrentLauncher -or
+                -not [bool]$mergedRecoveryRecord.TokensBound -or
+                [string]$mergedRecoveryRecord.GitHubHost -cne 'github.com' -or
+                [bool]$record.RecoverMergedPullRequests -or
+                -not [bool]$record.TokensBound -or
+                [string]$record.GitHubHost -cne 'github.com' -or
+                $record.CurrentLauncher -isnot [bool] -or
                 -not [bool]$record.CurrentLauncher -or
                 [string]$record.TargetTag -cne 'v0.12.2' -or
                 [string]$record.TargetCommit -cne $protocolCommit -or
@@ -9854,13 +9941,30 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
                 ) -cne 'preserved-workspace' -or
                 [Environment]::GetEnvironmentVariable(
                     'DEFAULT_BRANCH', 'Process'
-                ) -cne 'preserved-branch') {
-                Add-Failure 'TEST-0126 successful local recovery did not preserve exact target bindings, environment, checkout, and temporary-root cleanup.'
+                ) -cne 'preserved-branch' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GH_TOKEN', 'Process'
+                ) -cne 'preserved-gh-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'ISSUE_TOKEN', 'Process'
+                ) -cne 'preserved-issue-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'PROTOCOL_TOKEN', 'Process'
+                ) -cne 'preserved-protocol-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GH_HOST', 'Process'
+                ) -cne 'preserved.example' -or
+                (Get-Location).Path -cne $testLocation) {
+                Add-Failure 'TEST-0156 successful local recovery did not finalize retained merges before current planning while preserving exact bindings, environment, checkout, and temporary-root cleanup.'
             }
 
             [Environment]::SetEnvironmentVariable(
                 'MEANDAI_TEST_CURRENT_LAUNCHER_FAIL', 'true', 'Process'
             )
+            [Environment]::SetEnvironmentVariable(
+                'MEANDAI_TEST_POP_LOCATION_FAIL', 'true', 'Process'
+            )
+            Remove-Item -LiteralPath $recordPath -Force
             $interruptionError = ''
             $recoveryRootsBefore = @(Get-ChildItem `
                 -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
@@ -9877,12 +9981,25 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
             $recoveryRootsAfter = @(Get-ChildItem `
                 -LiteralPath ([IO.Path]::GetTempPath()) -Directory `
                 -Filter 'meandai-update-recovery-*' | ForEach-Object FullName)
+            $interruptedRecords = @([IO.File]::ReadAllLines($recordPath) |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                ForEach-Object { $_ | ConvertFrom-Json })
             $maintainerStatusAfter = @((Invoke-TestGit `
                 -Repository $maintainerRepository `
                 -Arguments @(
                     'status', '--porcelain=v1', '--untracked-files=all'
                 ))) -join "`n"
             if ($interruptionError -cnotlike '*simulated adapter interruption*' -or
+                $interruptionError -cnotlike '*simulated location-stack interruption*' -or
+                $interruptedRecords.Count -ne 2 -or
+                -not [bool]$interruptedRecords[0].RecoverMergedPullRequests -or
+                [bool]$interruptedRecords[0].CurrentLauncher -or
+                [bool]$interruptedRecords[1].RecoverMergedPullRequests -or
+                -not [bool]$interruptedRecords[1].CurrentLauncher -or
+                -not [bool]$interruptedRecords[0].TokensBound -or
+                -not [bool]$interruptedRecords[1].TokensBound -or
+                [string]$interruptedRecords[0].GitHubHost -cne 'github.com' -or
+                [string]$interruptedRecords[1].GitHubHost -cne 'github.com' -or
                 (Compare-Object $recoveryRootsBefore $recoveryRootsAfter) -or
                 $maintainerStatusAfter -cne $maintainerStatusBefore -or
                 [Environment]::GetEnvironmentVariable(
@@ -9893,8 +10010,21 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true') {
                 ) -cne 'preserved-workspace' -or
                 [Environment]::GetEnvironmentVariable(
                     'DEFAULT_BRANCH', 'Process'
-                ) -cne 'preserved-branch') {
-                Add-Failure "TEST-0126 interrupted local recovery did not fail cleanly without checkout/environment/temp-root residue: $interruptionError"
+                ) -cne 'preserved-branch' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GH_TOKEN', 'Process'
+                ) -cne 'preserved-gh-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'ISSUE_TOKEN', 'Process'
+                ) -cne 'preserved-issue-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'PROTOCOL_TOKEN', 'Process'
+                ) -cne 'preserved-protocol-token' -or
+                [Environment]::GetEnvironmentVariable(
+                    'GH_HOST', 'Process'
+                ) -cne 'preserved.example' -or
+                (Get-Location).Path -cne $testLocation) {
+                Add-Failure "TEST-0156 interrupted local recovery did not preserve ordered recovery, checkout/environment, and temp-root cleanup: $interruptionError"
             }
         }
         catch {

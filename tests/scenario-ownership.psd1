@@ -64,7 +64,7 @@
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
                 'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130',
-                'TEST-0154'
+                'TEST-0154', 'TEST-0156'
             )
         }
         @{

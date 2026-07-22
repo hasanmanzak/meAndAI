@@ -13,6 +13,9 @@ This project uses the `M.m.rev` version format defined in the
 - Restore ordinary/schema-2 finalization and bounded legacy installing-update
   recovery without weakening marker, repository, immutable-release,
   changed-path, branch-head, containment, or issue-finalization gates.
+- Let the exact target-bound quick launcher finalize unambiguous retained merged
+  branches before namespace inventory and current-update planning, so older
+  finalizer failures cannot prevent installation of the corrected updater.
 
 ### Changed
 

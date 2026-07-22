@@ -366,10 +366,12 @@ adapter blobs identical to that installed release.
 - If the installed tag is older in the same major, the launcher preserves the
   installed seed, reconciles only missing secrets, and runs the explicitly
   requested immutable target updater against an isolated clone of the captured
-  default-branch head. The target updater creates one atomic managed draft with
-  the target pin, changed updater assets, required catalog migrations, and
-  ledger. The maintainer checkout and default branch are unchanged, and no
-  installed workflow or Codex adoption flow is started.
+  default-branch head. Before current-update planning, that exact target updater
+  finalizes only unambiguous retained merged branches left by an older updater;
+  malformed or reused ownership still fails closed. It then creates one atomic
+  managed draft with the target pin, changed updater assets, required catalog
+  migrations, and ledger. The maintainer checkout and default branch are
+  unchanged, and no installed workflow or Codex adoption flow is started.
 - A partial or drifted footprint, a newer installed tag, or a major-version
   boundary fails before secret or repository mutation. The launcher never
   downgrades and never overwrites an installed updater seed.

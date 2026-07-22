@@ -12,7 +12,7 @@ and [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96) now own the
 v0.12.7 API-version-safe managed finalizer correction on
 `codex/feat-0038-api-safe-merge-finalization`. Follow the
 [v0.12.7 handoff](2026-07-22-v0127-api-safe-merge-finalization.md). Focused
-`TEST-0155`, structural validation, diff checks, and bounded review pass locally;
+`TEST-0155`, `TEST-0156`, structural validation, diff checks, and bounded review pass locally;
 hosted evidence, merge, immutable release, branch cleanup, and consumer recovery
 remain pending. `FIND-0120` remains the separate open follow-up in issue #44.
 
