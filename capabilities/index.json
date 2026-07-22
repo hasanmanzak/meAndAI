@@ -6,6 +6,12 @@
       "definition": "test-architecture.json",
       "type": "Semantic",
       "definitionBlob": "9a3a999f05abbbb4ee710f14d82fb26d86de5ad5"
+    },
+    {
+      "slug": "test-runtime-efficiency",
+      "definition": "test-runtime-efficiency.json",
+      "type": "Semantic",
+      "definitionBlob": "20c6bc064d04be18ede7ab70983503feb4b799ea"
     }
   ]
 }

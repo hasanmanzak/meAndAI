@@ -8,6 +8,19 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$testRuntimePath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$operationContractPath = Join-Path $root `
+    'tests/fixture-operation-budgets.psd1'
+Import-Module $testRuntimePath -Force
+$operationContract = Import-MeAndAITestOperationContract `
+    -Path $operationContractPath
+$operationExpectation = if ($Shard -ceq 'All') {
+    Resolve-MeAndAITestOperationExpectation -Contract $operationContract `
+        -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
+        -SuiteArguments @()
+}
+else { $null }
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
@@ -328,6 +341,22 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             -not (& $instructionGraphIdentityValidator `
                 -Identity $sourceGraphIdentity -Graph $sourceGraphRecord)) {
             Add-Failure 'TEST-0153 the small exact graph did not satisfy the exported graph and identity contracts.'
+        }
+        $countDriftIdentity = $sourceGraphIdentity | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $countDriftIdentity.graphCounts.nodes =
+            [long]$countDriftIdentity.graphCounts.nodes + 1
+        if (& $instructionGraphIdentityValidator `
+                -Identity $countDriftIdentity -Graph $sourceGraphRecord) {
+            Add-Failure 'TEST-0153 the pure graph-identity contract accepted count drift.'
+        }
+        $projectionDriftIdentity = $sourceGraphIdentity |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $projectionDriftIdentity.protocolSurfaces = @('CLAUDE.md')
+        $projectionDriftIdentity.graphCounts.protocolSurfaces = 1
+        if (& $instructionGraphIdentityValidator `
+                -Identity $projectionDriftIdentity -Graph $sourceGraphRecord) {
+            Add-Failure 'TEST-0153 the pure graph-identity contract accepted protocol-surface projection drift.'
         }
         $graphPlan = Resolve-MeAndAICapabilitiesLifecycle `
             -Snapshot ([pscustomobject]@{
@@ -1268,7 +1297,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.12.7',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.13.0',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',
@@ -1525,9 +1554,49 @@ elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
     if ($LASTEXITCODE -ne 0) {
         exit $LASTEXITCODE
     }
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $adapterTestPath
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
+    $adapterOutput = @(& $engine -NoProfile -ExecutionPolicy Bypass `
+        -File $adapterTestPath 2>&1 | ForEach-Object {
+            $line = [string]$_
+            if (-not $line.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
+                    [StringComparison]::Ordinal)) {
+                Write-Host $line
+            }
+            $line
+        })
+    $adapterExitCode = $LASTEXITCODE
+    if ($adapterExitCode -ne 0) {
+        exit $adapterExitCode
+    }
+    $adapterOperationLines = @($adapterOutput | Where-Object {
+        $_.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
+            [StringComparison]::Ordinal)
+    })
+    if ($adapterOperationLines.Count -ne 1) {
+        Add-Failure 'TEST-0159 bootstrap adapter returned missing or ambiguous operation evidence.'
+    }
+    else {
+        $operationLine = [string]$adapterOperationLines[0]
+    }
+}
+
+if ($Shard -ceq 'All' -and $failures.Count -eq 0) {
+    $scenarioResult = New-MeAndAIScenarioResult `
+        -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
+        -SourcePaths @(
+            $PSCommandPath, $adapterTestPath, $dispatchTestPath,
+            $graphIdentityTestPath, $graphDriftTestPath
+        ) `
+        -AuthorityPath $scenarioAuthorityPath
+    $scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +
+        ($scenarioResult | ConvertTo-Json -Compress)
+    $operationRecord = Read-MeAndAITestOperationObservationRecord `
+        -Output @($operationLine, $scenarioLine) `
+        -ExpectedOwner $operationExpectation.Owner `
+        -ExpectedRoute $operationExpectation.Route `
+        -ExpectedRuntime $operationExpectation.Runtime `
+        -ExpectedCounters @($operationExpectation.Counters)
+    if (-not $operationRecord.Valid) {
+        Add-Failure "TEST-0159 bootstrap operation evidence is invalid: $($operationRecord.Message)"
     }
 }
 
@@ -1539,14 +1608,8 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'AI capabilities lifecycle tests passed for all declared scenarios in this suite.' -ForegroundColor Green
 if ($Shard -ceq 'All') {
-    $scenarioResult = New-MeAndAIScenarioResult `
-        -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
-        -SourcePaths @(
-            $PSCommandPath, $adapterTestPath, $dispatchTestPath,
-            $graphIdentityTestPath, $graphDriftTestPath
-        ) `
-        -AuthorityPath $scenarioAuthorityPath
-    Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))
+    Write-Host $operationLine
+    Write-Host $scenarioLine
 }
 else {
     Write-Host "AI capabilities lifecycle shard '$Shard' passed." -ForegroundColor Green

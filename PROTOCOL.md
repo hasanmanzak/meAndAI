@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.12.7**<br>
+Protocol version: **0.13.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -622,6 +622,29 @@ and cleanup mechanics; mutable fixtures are capability-local and reset per
 case, while any shared immutable fixture has one explicit owner and byte
 identity. A repository-native equivalent is acceptable only with reviewed
 evidence satisfying the same outcomes.
+
+The `test-runtime-efficiency` semantic capability applies when automated
+validation repeatedly provisions expensive deterministic repository, archive,
+process, container, service, or equivalent setup. Each retained real boundary
+MUST provide material evidence that a lower production-owned contract or
+injected boundary cannot faithfully establish. Equivalent immutable setup MUST
+build once at the narrowest safe lifecycle scope and be reused through one
+stable owner, key, builder identity, and exact input digest; every mutable case
+MUST receive a distinct isolated derivative or overlay. Reset MUST NOT rebuild
+unchanged immutable input or share mutable repositories, refs, remotes, process
+state, credentials, mocks, or temporary roots.
+
+An applicable repository MUST record or emit machine-readable fixture and
+operation evidence that binds ownership, lifecycle, builds, reuse, mutable
+derivatives, cleanup, and reviewed count budgets. Undeclared construction,
+conflicting or aliased identity, duplicate equivalent build, immutable
+mutation, unsafe link or reparse state, cleanup leakage, and count above the
+reviewed maximum MUST fail before authoritative test success. Increasing an
+expensive-operation budget or broadening fixture lifecycle scope requires
+explicit linked review and rationale. Elapsed time remains observational and
+MUST NOT replace deterministic count or behavior evidence. A repository-native
+equivalent, or reviewed `NotApplicable` disposition, is acceptable only with
+evidence satisfying the release-declared capability outcomes.
 
 ### Consumer update proposals
 

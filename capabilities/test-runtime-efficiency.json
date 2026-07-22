@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "slug": "test-runtime-efficiency",
+  "type": "Semantic",
+  "title": "Reuse-first test runtime efficiency",
+  "applicability": {
+    "condition": "expensive-deterministic-test-setup",
+    "description": "The repository's automated test or validation surface repeatedly provisions deterministic repository, process, archive, container, service, or equivalent setup whose reuse can preserve the required evidence."
+  },
+  "requirements": [
+    {
+      "id": "lowest-faithful-evidence-level",
+      "statement": "Each retained real repository, process, service, or platform boundary supplies material evidence that cannot be proven faithfully at a lower production-owned contract or injected boundary."
+    },
+    {
+      "id": "reuse-equivalent-immutable-setup",
+      "statement": "Equivalent expensive deterministic setup is built once at the narrowest safe lifecycle scope and is reused through one stable owner, key, builder identity, and exact input digest."
+    },
+    {
+      "id": "fresh-mutable-derivatives",
+      "statement": "Every mutable case receives a distinct isolated derivative or overlay; reset does not rebuild unchanged immutable input or share mutable repositories, refs, remotes, process state, credentials, mocks, or temporary roots."
+    },
+    {
+      "id": "machine-readable-resource-contract",
+      "statement": "Fixture ownership, lifecycle, builds, reuse, mutable derivatives, expensive boundary operations, cleanup, and approved count budgets are emitted or recorded in machine-readable repository-owned evidence."
+    },
+    {
+      "id": "fail-closed-resource-integrity",
+      "statement": "Undeclared construction, conflicting identity, duplicate equivalent build, immutable baseline mutation, unsafe link or reparse state, cleanup leakage, and operation-count budget excess fail before authoritative test success."
+    },
+    {
+      "id": "reviewed-budget-deltas",
+      "statement": "An increased expensive-operation budget or broader fixture lifecycle scope requires explicit reviewed rationale linked to its owning work; elapsed time remains observational and does not replace count or behavior evidence."
+    }
+  ],
+  "evidence": {
+    "conforming": [
+      "Reviewed machine-readable evidence binds each expensive deterministic fixture to its owner, key, builder, lifecycle scope, exact input digest, build and reuse counts, mutable derivatives, fingerprints, cleanup, and approved operation budgets.",
+      "Executable negative coverage rejects undeclared or duplicate construction, identity conflict, immutable mutation, unsafe links, derivative leakage, cleanup leakage, and budget excess before authoritative success.",
+      "Focused and parent-runner evidence preserves active scenario ownership, supported runtimes, required real boundaries, separate suite isolation, and reviewed budget deltas."
+    ],
+    "notApplicable": [
+      "Reviewed repository evidence proves that its automated test or validation surface does not repeatedly provision expensive deterministic setup or cross a retained real boundary covered by this capability.",
+      "The review identifies the inspected suites and boundaries and explains why adding fixture reuse or operation budgets would provide no material reliability or runner-consumption benefit."
+    ]
+  }
+}

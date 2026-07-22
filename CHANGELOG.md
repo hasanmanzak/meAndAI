@@ -3,6 +3,52 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.0 - 2026-07-22
+
+### Added
+
+- Declare the append-only `test-runtime-efficiency` semantic capability with
+  reuse-first immutable setup, isolated mutable derivatives, machine-readable
+  operation budgets, and reviewed budget-delta requirements.
+- Add strict owner/route/runtime operation observations to the common test
+  runtime and make the stable parent runner validate them before accepting a
+  suite's canonical scenario or compatibility result.
+
+### Changed
+
+- Build the three repeated quick-adoption fixture families once per suite and
+  provision 21 deep-copy mutable derivatives while retaining fresh fixtures
+  for security, history, link, hook, race, and version-shape evidence.
+- Build bootstrap consumer, protocol, and empty-remote seeds once, reducing its
+  reviewed fixture operations from 38 to 3 `init` and 72 to 2 `clone` calls
+  while preserving all 36 independently published integration cases.
+- Move graph count and surface-projection drift to the production-owned pure
+  identity contract, retaining isolated success, base-drift, and digest-drift
+  evidence with four child processes and three acquisitions.
+- Require applicable repositories to select the lowest faithful evidence
+  boundary, reuse equivalent deterministic setup, and fail closed on missing,
+  malformed, over-budget, or cleanup-incomplete resource evidence.
+- Bind reusable fixture identity to its owner source and canonical committed
+  bytes/modes, verify cleanup leaves no owned resource, and ratchet every
+  owner-source Git, launcher, adapter, child-process, and recursive-cleanup call
+  site so an alias, unclassified Git splat, unreviewed known-owner route, or new
+  bypass cannot silently restore repeated setup or skip its budget.
+- Exercise the focused runtime-efficiency contract under PowerShell 7 in the
+  existing Windows job while retaining the existing Linux Full route and the
+  unchanged one-Windows/one-Ubuntu topology.
+- Preserve imported operation-contract scalar and array types without relying
+  on PowerShell 7's scalar-wrapping `Write-Output -NoEnumerate` behavior.
+- Keep the stable root runner a thin discovery/profile/process orchestrator by
+  delegating required, non-observing, unknown-route, and unowned operation-
+  evidence enforcement to the shared test runtime.
+
+Related work: [FEAT-0039](docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md),
+`TASK-0001`, [DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
+[DEC-0022](docs/decisions/DEC-0022-release-declared-semantic-capabilities.md),
+and [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95). Residual
+wall-clock optimization is assigned to
+[`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+
 ## 0.12.7 - 2026-07-22
 
 ### Fixed

@@ -11,6 +11,7 @@ explain what the protocol repository provides and why it is designed this way.
 - [Idea index](ideas/README.md)
 - [Capability catalog](../capabilities/index.json)
 - [Test-architecture capability](../capabilities/test-architecture.json)
+- [Test-runtime-efficiency capability](../capabilities/test-runtime-efficiency.json)
 - [Project memory](../.ai/memory/README.md)
 - [Common protocol](../PROTOCOL.md)
 - [Repository overview](../README.md)

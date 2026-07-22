@@ -14,10 +14,12 @@ if ($StructureOnly -and $ExecutionProfile -cne 'Full') {
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $discoveryModule = Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1'
 $runtimeModule = Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$operationPath = Join-Path $root 'tests/fixture-operation-budgets.psd1'
 $profilePath = Join-Path $root 'tests/execution-profiles.psd1'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module $discoveryModule -Force
 Import-Module $runtimeModule -Force
+$operationContract = Import-MeAndAITestOperationContract -Path $operationPath
 
 $suites = @(Get-MeAndAITestSuite -RepositoryRoot $root)
 $profiles = @(Import-MeAndAITestExecutionProfile -LiteralPath $profilePath `
@@ -122,6 +124,9 @@ $completedOwners = [System.Collections.Generic.HashSet[string]]::new(
 foreach ($selectedSuite in @($selectedProfiles[0].Suites)) {
     $result = Invoke-SuiteAndRelay -Suite $selectedSuite `
         -Arguments @($selectedSuite.Arguments)
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $operationContract `
+        -Owner $selectedSuite.Owner `
+        -SuiteArguments @($selectedSuite.Arguments) -Output @($result.Output)
     if ($ExecutionProfile -ceq 'Full') {
         $record = Read-MeAndAIScenarioResultRecord -Output @($result.Output) `
             -ExpectedOwner $selectedSuite.Owner `

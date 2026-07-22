@@ -103,6 +103,7 @@ $requiredFiles = @(
     'docs/decisions/README.md',
     'capabilities/index.json',
     'capabilities/test-architecture.json',
+    'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
@@ -681,6 +682,18 @@ foreach ($requiredMandateText in @(
 )) {
     if (-not $normalizedProtocolMandateSource.Contains($requiredMandateText)) {
         Add-Failure "TEST-0124 hosted runner-efficiency mandate is missing '$requiredMandateText'."
+    }
+}
+foreach ($requiredEfficiencyText in @(
+    'The `test-runtime-efficiency` semantic capability applies',
+    'Equivalent immutable setup MUST build once at the narrowest safe lifecycle scope',
+    'every mutable case MUST receive a distinct isolated derivative or overlay',
+    'machine-readable fixture and operation evidence',
+    'Increasing an expensive-operation budget or broadening fixture lifecycle scope requires explicit linked review and rationale',
+    'Elapsed time remains observational'
+)) {
+    if (-not $normalizedProtocolMandateSource.Contains($requiredEfficiencyText)) {
+        Add-Failure "TEST-0001 test-runtime-efficiency protocol contract is missing '$requiredEfficiencyText'."
     }
 }
 

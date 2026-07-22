@@ -138,10 +138,14 @@ function New-TestCatalog {
 }
 
 function New-ReviewedEntry {
-    param($Catalog, [string]$Outcome = 'Conforming')
+    param(
+        $Catalog,
+        [int]$CapabilityIndex = 0,
+        [string]$Outcome = 'Conforming'
+    )
 
     return New-MeAndAICapabilityLedgerEntry `
-        -Capability $Catalog.Capabilities[0] `
+        -Capability $Catalog.Capabilities[$CapabilityIndex] `
         -Outcome $Outcome `
         -Evidence @('https://github.com/example/repo/pull/12', 'docs/test-evidence.md') `
         -ReviewIdentity 'github:maintainer' `
@@ -149,17 +153,20 @@ function New-ReviewedEntry {
         -ReviewedAt '2026-07-19T10:20:30Z'
 }
 
-# TEST-0134: the repository catalog is one exact typed immutable definition.
+# TEST-0134: the repository catalog retains the exact typed immutable
+# test-architecture definition as its first entry.
 $catalog = Import-MeAndAICapabilityCatalog `
     -IndexPath (Join-Path $root 'capabilities/index.json')
 Assert-Equal $catalog.Schema 1 'TEST-0134 catalog schema differs.'
-Assert-Equal $catalog.Capabilities.Count 1 'TEST-0134 catalog count differs.'
 Assert-Equal $catalog.Capabilities[0].Slug 'test-architecture' `
     'TEST-0134 first capability slug differs.'
 Assert-Equal $catalog.Capabilities[0].Type 'Semantic' `
     'TEST-0134 first capability type differs.'
-Assert-True ([string]$catalog.Capabilities[0].DefinitionBlob -cmatch '^[0-9a-f]{40}$') `
-    'TEST-0134 definition evidence is not one exact Git blob SHA.'
+Assert-Equal $catalog.Capabilities[0].DefinitionPath 'test-architecture.json' `
+    'TEST-0134 first capability definition path differs.'
+Assert-Equal $catalog.Capabilities[0].DefinitionBlob `
+    '9a3a999f05abbbb4ee710f14d82fb26d86de5ad5' `
+    'TEST-0134 immutable predecessor definition blob differs.'
 Assert-SequenceEqual -Actual @($catalog.Capabilities[0].Definition.requirements.id) `
     -Expected @(
         'capability-based-physical-ownership',
@@ -170,9 +177,74 @@ Assert-SequenceEqual -Actual @($catalog.Capabilities[0].Definition.requirements.
         'capability-local-fixtures'
     ) -Message 'TEST-0134 test-architecture requirements differ.'
 
+# TEST-0157: the new Semantic capability is one append-only catalog entry;
+# the immutable predecessor remains the exact first entry.
+Assert-Equal $catalog.Capabilities.Count 2 'TEST-0157 catalog count differs.'
+Assert-Equal $catalog.Capabilities[1].Slug 'test-runtime-efficiency' `
+    'TEST-0157 appended capability slug differs.'
+Assert-Equal $catalog.Capabilities[1].Type 'Semantic' `
+    'TEST-0157 appended capability type differs.'
+Assert-Equal $catalog.Capabilities[1].DefinitionPath `
+    'test-runtime-efficiency.json' `
+    'TEST-0157 appended capability definition path differs.'
+Assert-Equal $catalog.Capabilities[1].DefinitionBlob `
+    '20c6bc064d04be18ede7ab70983503feb4b799ea' `
+    'TEST-0157 appended definition blob differs.'
+Assert-SequenceEqual -Actual @(
+    $catalog.Capabilities[1].Definition.requirements.id
+) -Expected @(
+    'lowest-faithful-evidence-level',
+    'reuse-equivalent-immutable-setup',
+    'fresh-mutable-derivatives',
+    'machine-readable-resource-contract',
+    'fail-closed-resource-integrity',
+    'reviewed-budget-deltas'
+) -Message 'TEST-0157 test-runtime-efficiency requirements differ.'
+Assert-Equal $catalog.Capabilities[1].Definition.applicability.condition `
+    'expensive-deterministic-test-setup' `
+    'TEST-0157 applicability condition differs.'
+Assert-Equal @(
+    $catalog.Capabilities[1].Definition.evidence.notApplicable
+).Count 2 'TEST-0157 reviewed NotApplicable evidence contract differs.'
+$efficiencyNotApplicable = Resolve-MeAndAICapabilityAssessment `
+    -Capability $catalog.Capabilities[1] -Applicability NotApplicable `
+    -Conformance Unknown -EvidenceKind SemanticReview `
+    -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
+    -ReviewIdentity 'github:maintainer' -AdoptionPlan NotRequired
+Assert-Equal $efficiencyNotApplicable.Outcome 'NotApplicable' `
+    'TEST-0157 reviewed inapplicable repository did not reach a terminal outcome.'
+
 $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) `
     ('meandai-capability-catalog-' + [guid]::NewGuid().ToString('N'))
 try {
+    $releasePredecessorRoot = Join-Path $fixtureRoot 'release-predecessor'
+    [IO.Directory]::CreateDirectory($releasePredecessorRoot) | Out-Null
+    [IO.File]::Copy(
+        (Join-Path $root 'capabilities/test-architecture.json'),
+        (Join-Path $releasePredecessorRoot 'test-architecture.json')
+    )
+    $releasePredecessorIndex = [ordered]@{
+        schema = 1
+        capabilities = @(
+            [ordered]@{
+                slug = 'test-architecture'
+                definition = 'test-architecture.json'
+                type = 'Semantic'
+                definitionBlob =
+                    '9a3a999f05abbbb4ee710f14d82fb26d86de5ad5'
+            }
+        )
+    }
+    $releasePredecessorIndexPath = Join-Path $releasePredecessorRoot 'index.json'
+    [IO.File]::WriteAllBytes(
+        $releasePredecessorIndexPath,
+        (ConvertTo-TestJsonBytes -Value $releasePredecessorIndex)
+    )
+    $releasePredecessor = Import-MeAndAICapabilityCatalog `
+        -IndexPath $releasePredecessorIndexPath
+    Assert-MeAndAICapabilityCatalogExtension `
+        -CurrentCatalog $releasePredecessor -TargetCatalog $catalog
+
     $allTypesPath = New-TestCatalog -Directory (Join-Path $fixtureRoot 'all-types') `
         -Definitions @(
             [pscustomobject]@{ Slug = 'alpha'; Type = 'Deterministic' },
@@ -314,14 +386,43 @@ try {
         'TEST-0134 canonical review timestamp did not survive ledger import.'
     $terminalPending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $ledgerBytes)
-    Assert-Equal $terminalPending.Count 0 `
-        'TEST-0134 terminal ledger was not idempotent.'
+    Assert-Equal $terminalPending.Count 1 `
+        'TEST-0157 predecessor terminal ledger did not expose one appended capability.'
+    Assert-Equal $terminalPending[0].Slug 'test-runtime-efficiency' `
+        'TEST-0157 predecessor terminal ledger exposed the wrong pending capability.'
+
+    $appendedEntry = New-ReviewedEntry -Catalog $catalog -CapabilityIndex 1
+    $completeLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $catalog -Entries @($entry, $appendedEntry)
+    $completePending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
+        -LedgerBytes $completeLedgerBytes)
+    Assert-Equal $completePending.Count 0 `
+        'TEST-0157 complete two-entry terminal ledger was not idempotent.'
+    foreach ($invalidPrefix in @(
+        [pscustomobject]@{
+            Name = 'reordered'
+            Entries = @($appendedEntry, $entry)
+        },
+        [pscustomobject]@{
+            Name = 'duplicated'
+            Entries = @($entry, $entry)
+        }
+    )) {
+        Assert-ThrowsLike -Action {
+            ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $catalog `
+                -Entries $invalidPrefix.Entries
+        } -Pattern '*not the exact installed-catalog prefix*' `
+            -Message "TEST-0157 $($invalidPrefix.Name) ledger prefix was accepted."
+    }
 
     $missingLedger = Import-MeAndAICapabilityLedger -Catalog $catalog -Bytes $null
     Assert-True $missingLedger.Missing 'TEST-0134 missing ledger was not represented explicitly.'
     $missingPending = @(Get-MeAndAICapabilityPending -Catalog $catalog)
-    Assert-Equal $missingPending.Count 1 `
-        'TEST-0134 missing ledger did not expose the pending capability.'
+    Assert-Equal $missingPending.Count 2 `
+        'TEST-0157 missing ledger did not expose both pending capabilities.'
+    Assert-SequenceEqual -Actual @($missingPending.Slug) -Expected @(
+        'test-architecture', 'test-runtime-efficiency'
+    ) -Message 'TEST-0157 missing-ledger capability order differs.'
     $emptyLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $catalog `
         -Entries @()
     $emptyLedger = Import-MeAndAICapabilityLedger -Catalog $catalog `
