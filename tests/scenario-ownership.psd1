@@ -37,7 +37,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1'
-            TestIds = @('TEST-0151', 'TEST-0152')
+            TestIds = @('TEST-0151', 'TEST-0152', 'TEST-0161')
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -128,7 +128,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/test-runtime-efficiency/test-runtime-efficiency.tests.ps1'
-            TestIds = @('TEST-0158', 'TEST-0159')
+            TestIds = @('TEST-0158', 'TEST-0159', 'TEST-0162')
         }
         @{
             Evidence = 'ExecutableSuite'

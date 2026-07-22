@@ -343,15 +343,27 @@ function New-TestHostedGraphAcquisitionModule {
     if (@($parseErrors).Count -ne 0) {
         throw "Hosted adapter could not be parsed: $($parseErrors[0].Message)"
     }
-    $requiredNames = @(
-        'Get-InstructionGraphTreeEntries',
-        'Get-InstructionGraphBlobBytes',
-        'Get-InstructionGraphForCommit'
-    )
     $definitions = @($ast.FindAll({
         param($node)
         return $node -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
+    $batchFactoryName = 'New-InstructionGraphBatchSession'
+    $blobReaderName = if (@($definitions | Where-Object {
+        $_.Name -ceq $batchFactoryName
+    }).Count -eq 1) {
+        $batchFactoryName
+    }
+    else {
+        # Preserve TEST-0152's real-Git evidence while TEST-0161 is
+        # intentionally red for the absent production batch factory. Once the
+        # factory exists, this isolated hosted module exercises only that shape.
+        'Get-InstructionGraphBlobBytes'
+    }
+    $requiredNames = @(
+        'Get-InstructionGraphTreeEntries',
+        $blobReaderName,
+        'Get-InstructionGraphForCommit'
+    )
     $source = [System.Collections.Generic.List[string]]::new()
     foreach ($name in $requiredNames) {
         $matches = @($definitions | Where-Object { $_.Name -ceq $name })
@@ -373,6 +385,176 @@ function New-TestHostedGraphAcquisitionModule {
         [string]::Join([Environment]::NewLine, @($source))
     )
     return $module
+}
+
+function Test-InstructionGraphBatchActorSourceContract {
+    param(
+        [Parameter(Mandatory)][string]$ActorLabel,
+        [Parameter(Mandatory)][string]$ActorPath,
+        [Parameter(Mandatory)][string]$FactoryName,
+        [Parameter(Mandatory)][string]$GraphEntryName,
+        [Parameter(Mandatory)][string]$LegacyBlobReaderName
+    )
+
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [Management.Automation.Language.Parser]::ParseFile(
+        $ActorPath, [ref]$tokens, [ref]$parseErrors
+    )
+    if (@($parseErrors).Count -ne 0) {
+        Add-Failure (
+            "TEST-0161 $ActorLabel actor does not parse for batch-contract " +
+            "inspection: $($parseErrors[0].Message)"
+        )
+        return $false
+    }
+
+    $definitions = @($ast.FindAll({
+        param($node)
+        return $node -is [Management.Automation.Language.FunctionDefinitionAst]
+    }, $true))
+    $factoryDefinitions = @($definitions | Where-Object {
+        $_.Name -ceq $FactoryName
+    })
+    $actorPasses = $true
+    if ($factoryDefinitions.Count -ne 1) {
+        Add-Failure (
+            "TEST-0161 $ActorLabel actor must define private batch factory " +
+            "'$FactoryName' exactly once; found $($factoryDefinitions.Count)."
+        )
+        $actorPasses = $false
+    }
+    else {
+        $factory = $factoryDefinitions[0]
+        $factoryParameters = if ($null -eq $factory.Body.ParamBlock) {
+            @()
+        }
+        else {
+            @($factory.Body.ParamBlock.Parameters)
+        }
+        $factoryParameterNames = @(
+            $factoryParameters | ForEach-Object {
+                [string]$_.Name.VariablePath.UserPath
+            }
+        )
+        $hookOwners = @($definitions | Where-Object {
+            if ($null -eq $_.Body.ParamBlock) { return $false }
+            $parameterNames = @(
+                $_.Body.ParamBlock.Parameters | ForEach-Object {
+                    [string]$_.Name.VariablePath.UserPath
+                }
+            )
+            $parameterNames -ccontains 'InternalTestHooks'
+        })
+        $internalHooksParameter = @(
+            $factoryParameters | Where-Object {
+                [string]$_.Name.VariablePath.UserPath -ceq 'InternalTestHooks'
+            }
+        )
+        if ($factoryParameterNames -cnotcontains 'InternalTestHooks' -or
+            $internalHooksParameter.Count -ne 1 -or
+            $hookOwners.Count -ne 1 -or
+            $hookOwners[0].Name -cne $FactoryName -or
+            $internalHooksParameter[0].Extent.Text -match '(?i)Mandatory') {
+            Add-Failure (
+                "TEST-0161 $ActorLabel actor must expose one optional " +
+                "InternalTestHooks parameter only on '$FactoryName'."
+            )
+            $actorPasses = $false
+        }
+
+        $factorySource = [string]$factory.Extent.Text
+        if ($factorySource -cnotmatch '(?<![A-Za-z0-9_])TransportFactory(?![A-Za-z0-9_])' -or
+            $factorySource -cnotmatch '(?<![A-Za-z0-9_])GetMonotonicMilliseconds(?![A-Za-z0-9_])') {
+            Add-Failure (
+                "TEST-0161 $ActorLabel batch test seam must name exactly the " +
+                'transport-factory and monotonic-clock intents.'
+            )
+            $actorPasses = $false
+        }
+        if ($factorySource -cnotmatch (
+            '(?i)(?<![A-Za-z0-9-])cat-file\s+--batch' +
+            '(?![A-Za-z0-9-])'
+        )) {
+            Add-Failure (
+                "TEST-0161 $ActorLabel batch factory must own one Git " +
+                'cat-file --batch transport.'
+            )
+            $actorPasses = $false
+        }
+        if ($factorySource -cnotmatch (
+            '(?s)EnvironmentVariables\s*\[\s*[''\"]' +
+            'GIT_NO_REPLACE_OBJECTS[''\"]\s*\]\s*=\s*[''\"]1[''\"]'
+        )) {
+            Add-Failure (
+                "TEST-0161 $ActorLabel batch factory does not disable Git " +
+                'replace objects on its child process.'
+            )
+            $actorPasses = $false
+        }
+    }
+
+    $legacyDefinitions = @($definitions | Where-Object {
+        $_.Name -ceq $LegacyBlobReaderName
+    })
+    $actorSource = [IO.File]::ReadAllText($ActorPath)
+    if ($legacyDefinitions.Count -ne 0 -or
+        $actorSource -match (
+            '(?i)(?<![A-Za-z0-9-])cat-file\s+blob(?![A-Za-z0-9-])'
+        )) {
+        Add-Failure (
+            "TEST-0161 $ActorLabel actor retains the per-blob reader or " +
+            'literal Git cat-file blob process path.'
+        )
+        $actorPasses = $false
+    }
+
+    $graphEntries = @($definitions | Where-Object {
+        $_.Name -ceq $GraphEntryName
+    })
+    if ($graphEntries.Count -ne 1) {
+        Add-Failure (
+            "TEST-0161 $ActorLabel graph entry '$GraphEntryName' is missing " +
+            'or ambiguous.'
+        )
+        $actorPasses = $false
+    }
+    else {
+        $factoryCalls = @($graphEntries[0].Body.FindAll({
+            param($node)
+            return $node -is [Management.Automation.Language.CommandAst] -and
+                $node.GetCommandName() -ceq $FactoryName
+        }, $true))
+        $literalLimitsAreExact = $false
+        if ($factoryCalls.Count -eq 1) {
+            $constantValues = @($factoryCalls[0].FindAll({
+                param($node)
+                return $node -is [Management.Automation.Language.ConstantExpressionAst]
+            }, $true) | ForEach-Object { $_.Value })
+            $literalLimitsAreExact = $true
+            foreach ($expectedLimit in @(120000, 5000, 128, 65536)) {
+                $matchingLimits = @($constantValues | Where-Object {
+                    $_ -is [ValueType] -and
+                    [long]$_ -eq [long]$expectedLimit
+                })
+                if ($matchingLimits.Count -ne 1) {
+                    $literalLimitsAreExact = $false
+                }
+            }
+        }
+        if ($factoryCalls.Count -ne 1 -or
+            -not $literalLimitsAreExact -or
+            $factoryCalls[0].Extent.Text -match '(?i)-InternalTestHooks\b') {
+            Add-Failure (
+                "TEST-0161 $ActorLabel graph entry must create one batch " +
+                'session with literal 120000/5000/128/65536 production limits ' +
+                'and no test hooks.'
+            )
+            $actorPasses = $false
+        }
+    }
+
+    return $actorPasses
 }
 
 function New-TestDepthFixture {
@@ -439,6 +621,17 @@ if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf) -or
     Add-Failure 'TEST-0151/TEST-0152 graph policy or acquisition adapter is missing.'
 }
 else {
+    [void](Test-InstructionGraphBatchActorSourceContract `
+        -ActorLabel 'quick-adoption' -ActorPath $quickAssessmentPath `
+        -FactoryName 'New-QuickAdoptionInstructionGraphBatchSession' `
+        -GraphEntryName 'Get-QuickAdoptionInstructionGraph' `
+        -LegacyBlobReaderName 'Get-QuickAdoptionInstructionGraphBlobBytes')
+    [void](Test-InstructionGraphBatchActorSourceContract `
+        -ActorLabel 'hosted-bootstrap' -ActorPath $hostedAdapterPath `
+        -FactoryName 'New-InstructionGraphBatchSession' `
+        -GraphEntryName 'Get-InstructionGraphForCommit' `
+        -LegacyBlobReaderName 'Get-InstructionGraphBlobBytes')
+
     Import-Module $modulePath -Force
     . $quickAssessmentPath
     $policyModule = Get-Module MeAndAI.CapabilitiesBootstrap |
@@ -2577,6 +2770,7 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0161'
 Write-Host 'Instruction-graph discovery tests passed.' -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
     -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath

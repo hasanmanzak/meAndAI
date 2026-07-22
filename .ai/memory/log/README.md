@@ -5,21 +5,23 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.12.7` completed FEAT-0038 at commit
-`6b01299cfe484c900944b7435d4fef43b11fc38d`; PR #97 merged, the release is
-published, and issue #96 is closed. [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)
-and [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) now own the
-v0.13.0 reusable-fixture and runtime-budget correction on
-`codex/task-0001-reusable-fixture-guardrails`. Follow the
-  [v0.13.0 handoff](2026-07-22-v0130-test-runtime-efficiency.md). Focused,
-  Windows PowerShell 5.1 Full, `WindowsNative`, structural, and final-review
-  evidence pass locally; the operation-count reductions are closed. Hosted
-  Windows/Ubuntu evidence and delivery remain pending. Residual wall-clock
-  work is owned by [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
-  `FIND-0120` remains the separate open follow-up in issue #44.
+Immutable `v0.13.0` completed [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)
+at commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`; PR #99, issue #95, the
+two release assets, exact branch cleanup, and post-publication verification are
+complete. [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
+and [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+now plan the v0.13.1 actor-local batch correction on
+`codex/task-0002-batched-instruction-graph-transport`. Follow the
+[v0.13.1 planning handoff](2026-07-22-v0131-batched-instruction-graph-planning.md).
+The exact v0.13.0 baseline is frozen at 175 blob processes and requests per
+selected acquisition with a one-process target. Focused expected-red authority
+and canonical scenario ownership are now frozen; production remediation is the
+next gate.
+`FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-22 - v0.13.1 batched instruction-graph planning](2026-07-22-v0131-batched-instruction-graph-planning.md)
 - [2026-07-22 - v0.13.0 test runtime efficiency](2026-07-22-v0130-test-runtime-efficiency.md)
 - [2026-07-22 - v0.12.7 API-safe merge finalization](2026-07-22-v0127-api-safe-merge-finalization.md)
 - [2026-07-21 - v0.12.6 instruction-graph containment implementation](2026-07-21-v0126-instruction-graph-containment-implementation.md)

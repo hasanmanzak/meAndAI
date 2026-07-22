@@ -81,6 +81,18 @@ function Replace-FirstOrdinal {
         $Source.Substring($index + $OldValue.Length)
 }
 
+function Get-OptionalPropertyValue {
+    param(
+        [AllowNull()][object]$Value,
+        [Parameter(Mandatory)][string]$Name
+    )
+
+    if ($null -eq $Value) { return $null }
+    $property = $Value.PSObject.Properties[$Name]
+    if ($null -eq $property) { return $null }
+    return $property.Value
+}
+
 function Remove-ContractTempRoot {
     param([Parameter(Mandatory)][string]$Path)
     if (-not (Test-Path -LiteralPath $Path)) { return }
@@ -288,36 +300,84 @@ function Assert-ReviewedOperationInventory {
 }
 
 $contract = Import-MeAndAITestOperationContract -Path $contractPath
-Assert-Equal $contract.SchemaVersion ([long]1) `
-    'TEST-0159 contract schema differs.'
-Assert-Equal $contract.Measurement.BaseCommit `
-    '6b01299cfe484c900944b7435d4fef43b11fc38d' `
-    'TEST-0159 exact measurement base differs.'
-Assert-Equal $contract.Measurement.ObserverDigest `
-    'sha256:ed9a8290b24b191274f35c4bef2cd9af14157e2927be94848a2561a54294e04b' `
-    'TEST-0159 observer identity differs.'
-Assert-Equal @($contract.ObservationOwners).Count 3 `
-    'TEST-0159 observation owner count differs.'
-Assert-Equal @($contract.ClosureTargets).Count 7 `
-    'TEST-0159 closure target count differs.'
+Assert-Equal (Get-OptionalPropertyValue -Value $contract `
+    -Name 'SchemaVersion') ([long]2) `
+    'TEST-0162 operation contract schema differs.'
+Assert-Equal ($contract.PSObject.Properties.Name -join ',') `
+    'SchemaVersion,Capability,Measurements,ObservationOwners,ClosureTargets' `
+    'TEST-0162 normalized contract property shape differs.'
 
-$expectedTargets = [ordered]@{
-    'tests/capabilities/initial-adoption/quick-adoption.tests.ps1|Shard=All|reusable-fixture-family.init' = '47/11'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.init' = '38/3'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.clone' = '72/2'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.bundle' = '2/2'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.push' = '36/36'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|process.child' = '6/4'
-    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|graph.acquisition' = '5/3'
+$measurements = @(
+    Get-OptionalPropertyValue -Value $contract -Name 'Measurements'
+)
+Assert-Equal $measurements.Count 2 `
+    'TEST-0162 measurement authority count differs.'
+$expectedMeasurements = @(
+    [pscustomobject][ordered]@{
+        Id = 'feat-0039-v0127-fixtures'
+        BaseCommit = '6b01299cfe484c900944b7435d4fef43b11fc38d'
+        ObserverDigest =
+            'sha256:ed9a8290b24b191274f35c4bef2cd9af14157e2927be94848a2561a54294e04b'
+    },
+    [pscustomobject][ordered]@{
+        Id = 'feat-0040-v0130-graph-transport'
+        BaseCommit = '299b8982cd57961e2b3a6136b07af3bfb49a16d1'
+        ObserverDigest =
+            'sha256:1f0471fbe882ce959afe52f65713a4f3332c3ba0bc1616db0c5b256687fcf4a8'
+    }
+)
+for ($index = 0; $index -lt $expectedMeasurements.Count; $index++) {
+    if ($index -ge $measurements.Count -or $null -eq $measurements[$index]) {
+        Add-Failure "TEST-0162 measurement authority $index is absent."
+        continue
+    }
+    $measurement = $measurements[$index]
+    $expectedMeasurement = $expectedMeasurements[$index]
+    Assert-Equal ($measurement.PSObject.Properties.Name -join ',') `
+        'Id,BaseCommit,ObserverDigest' `
+        "TEST-0162 measurement authority $index property shape differs."
+    foreach ($propertyName in @('Id', 'BaseCommit', 'ObserverDigest')) {
+        Assert-Equal (Get-OptionalPropertyValue -Value $measurement `
+            -Name $propertyName) $expectedMeasurement.$propertyName `
+            "TEST-0162 measurement authority $index $propertyName differs."
+    }
 }
-foreach ($target in @($contract.ClosureTargets)) {
+
+$observationOwners = @(
+    Get-OptionalPropertyValue -Value $contract -Name 'ObservationOwners'
+)
+$closureTargets = @(
+    Get-OptionalPropertyValue -Value $contract -Name 'ClosureTargets'
+)
+Assert-Equal $observationOwners.Count 4 `
+    'TEST-0162 observation owner count differs.'
+Assert-Equal $closureTargets.Count 9 `
+    'TEST-0162 closure target count differs.'
+
+$fixtureMeasurement = 'feat-0039-v0127-fixtures'
+$graphMeasurement = 'feat-0040-v0130-graph-transport'
+$expectedTargets = [ordered]@{
+    'tests/capabilities/initial-adoption/quick-adoption.tests.ps1|Shard=All|reusable-fixture-family.init' = "47/11|$fixtureMeasurement|SUBF-0075"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.init' = "38/3|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.clone' = "72/2|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.bundle' = "2/2|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.push' = "36/36|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|process.child' = "6/4|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|graph.acquisition' = "5/3|$fixtureMeasurement|SUBF-0076"
+    'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1|default|instruction-graph.blob-process-start' = "4/2|$graphMeasurement|SUBF-0078"
+    'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1|default|instruction-graph.blob-request' = "4/4|$graphMeasurement|SUBF-0078"
+}
+foreach ($target in $closureTargets) {
     $identity = "$($target.Owner)|$($target.Route)|$($target.Counter)"
     Assert-True $expectedTargets.Contains($identity) `
-        "TEST-0159 unexpected closure target '$identity'."
+        "TEST-0162 unexpected closure target '$identity'."
     if ($expectedTargets.Contains($identity)) {
-        Assert-Equal "$($target.Baseline)/$($target.Maximum)" `
+        $measurementId = Get-OptionalPropertyValue -Value $target `
+            -Name 'MeasurementId'
+        Assert-Equal ("$($target.Baseline)/$($target.Maximum)|" +
+            "$measurementId|$($target.WorkId)") `
             $expectedTargets[$identity] `
-            "TEST-0159 closure target '$identity' differs."
+            "TEST-0162 closure target '$identity' differs."
     }
     Assert-True ([bool]$target.Instrumented) `
         "TEST-0159 wired target '$identity' lacks instrumentation authority."
@@ -326,6 +386,8 @@ foreach ($target in @($contract.ClosureTargets)) {
 $quickOwner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $bootstrapOwner =
     'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$graphOwner =
+    'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1'
 $quickExpectation = Resolve-MeAndAITestOperationExpectation `
     -Contract $contract -Owner $quickOwner -SuiteArguments @()
 $quickNativeExpectation = Resolve-MeAndAITestOperationExpectation `
@@ -333,6 +395,8 @@ $quickNativeExpectation = Resolve-MeAndAITestOperationExpectation `
     -SuiteArguments @('-Shard', 'WindowsNative')
 $bootstrapExpectation = Resolve-MeAndAITestOperationExpectation `
     -Contract $contract -Owner $bootstrapOwner -SuiteArguments @()
+$graphExpectation = Resolve-MeAndAITestOperationExpectation `
+    -Contract $contract -Owner $graphOwner -SuiteArguments @()
 $selfExpectation = Resolve-MeAndAITestOperationExpectation `
     -Contract $contract -Owner $owner -SuiteArguments @()
 Assert-Equal $quickExpectation.Route 'Shard=All' `
@@ -341,6 +405,24 @@ Assert-Equal $quickNativeExpectation.Route 'Shard=WindowsNative' `
     'TEST-0159 quick WindowsNative invocation lacks a reviewed route.'
 Assert-Equal $bootstrapExpectation.Route 'Shard=All' `
     'TEST-0159 bootstrap default invocation did not resolve Shard=All.'
+Assert-True ($null -ne $graphExpectation) `
+    'TEST-0162 instruction-graph owner has no reviewed default route.'
+if ($null -ne $graphExpectation) {
+    Assert-Equal $graphExpectation.Route 'default' `
+        'TEST-0162 instruction-graph route differs.'
+    Assert-True ([bool]$graphExpectation.RequiresObservation) `
+        'TEST-0162 instruction-graph route is not observation-required.'
+    $expectedGraphCounters = @(
+        'instruction-graph.blob-process-start|2',
+        'instruction-graph.blob-request|4'
+    )
+    $actualGraphCounters = @($graphExpectation.Counters | ForEach-Object {
+        "$($_.Name)|$($_.Maximum)"
+    })
+    Assert-Equal ($actualGraphCounters -join ',') `
+        ($expectedGraphCounters -join ',') `
+        'TEST-0162 instruction-graph route counters differ.'
+}
 Assert-Equal $selfExpectation.Route 'default' `
     'TEST-0159 focused contract invocation did not resolve default.'
 Assert-Equal $selfExpectation.Runtime (Get-MeAndAITestRuntimeClass) `
@@ -369,13 +451,19 @@ $manifestRoot = Join-Path ([IO.Path]::GetTempPath()) `
 try {
     [IO.Directory]::CreateDirectory($manifestRoot) | Out-Null
     $manifestSource = [IO.File]::ReadAllText($contractPath)
+    $typedSchemaToken = 'SchemaVersion = [long]1'
+    $untypedSchemaToken = 'SchemaVersion = 1'
+    if ($manifestSource.Contains('SchemaVersion = [long]2')) {
+        $typedSchemaToken = 'SchemaVersion = [long]2'
+        $untypedSchemaToken = 'SchemaVersion = 2'
+    }
     $badSources = @(
         $manifestSource.Replace(
             "    Capability = 'test-runtime-efficiency'",
             "    Unexpected = 'value'`r`n    Capability = 'test-runtime-efficiency'"),
         (Replace-FirstOrdinal -Source $manifestSource `
-            -OldValue 'SchemaVersion = [long]1' `
-            -NewValue 'SchemaVersion = 1'),
+            -OldValue $typedSchemaToken `
+            -NewValue $untypedSchemaToken),
         (Replace-FirstOrdinal -Source $manifestSource `
             -OldValue "Name = 'reusable-fixture-family.bundle'" `
             -NewValue "Name = 'z.unsorted'"),
@@ -423,7 +511,7 @@ $observation = Format-MeAndAITestOperationObservation -Owner $owner `
     -Counters $twoCounterActual
 $scenarioFinal = 'MEANDAI_SCENARIO_RESULTS=' +
     ('{"schema":1,"owner":"' + $owner +
-     '","passed":["TEST-0158","TEST-0159"]}')
+     '","passed":["TEST-0158","TEST-0159","TEST-0162"]}')
 $compatibilityFinal =
     'MEANDAI_COMPATIBILITY_SHARD_RESULT=' +
     '{"schema":1,"suite":"synthetic","shard":"All","passed":true}'
@@ -586,6 +674,83 @@ foreach ($badObservation in @(
 
 # These checks protect only the required integration seams. The owning suites
 # remain responsible for executable fixture, child-process, and graph evidence.
+$quickActorPath = Join-Path $root `
+    'scripts/quick-adoption/Private/RepositoryAssessment.ps1'
+$hostedActorPath = Join-Path $root `
+    'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
+$actorTransportContracts = @(
+    [pscustomobject][ordered]@{
+        Label = 'quick-adoption actor'
+        Path = $quickActorPath
+        Factory = 'New-QuickAdoptionInstructionGraphBatchSession'
+        Graph = 'Get-QuickAdoptionInstructionGraph'
+        Tree = 'Get-QuickAdoptionInstructionGraphTreeEntries'
+        Legacy = 'Get-QuickAdoptionInstructionGraphBlobBytes'
+    },
+    [pscustomobject][ordered]@{
+        Label = 'hosted bootstrap actor'
+        Path = $hostedActorPath
+        Factory = 'New-InstructionGraphBatchSession'
+        Graph = 'Get-InstructionGraphForCommit'
+        Tree = 'Get-InstructionGraphTreeEntries'
+        Legacy = 'Get-InstructionGraphBlobBytes'
+    }
+)
+foreach ($actorContract in $actorTransportContracts) {
+    $actorSource = [IO.File]::ReadAllText($actorContract.Path)
+    $actorAst = Get-ParsedTestAst -Path $actorContract.Path
+    $actorFunctions = @($actorAst.FindAll({
+        param($node)
+        $node -is
+            [System.Management.Automation.Language.FunctionDefinitionAst]
+    }, $true))
+    $factoryDefinitions = @($actorFunctions | Where-Object {
+        $_.Name -ceq $actorContract.Factory
+    })
+    Assert-Equal $factoryDefinitions.Count 1 `
+        "TEST-0162 $($actorContract.Label) batch-session factory count differs."
+    $legacyDefinitions = @($actorFunctions | Where-Object {
+        $_.Name -ceq $actorContract.Legacy
+    })
+    Assert-Equal $legacyDefinitions.Count 0 `
+        "TEST-0162 $($actorContract.Label) retains its per-blob reader."
+
+    $factoryCalls = @($actorAst.FindAll({
+        param($node)
+        $node -is [System.Management.Automation.Language.CommandAst] -and
+        $node.GetCommandName() -ceq $actorContract.Factory
+    }, $true))
+    Assert-Equal $factoryCalls.Count 1 `
+        "TEST-0162 $($actorContract.Label) batch-session acquisition count differs."
+    if ($factoryCalls.Count -eq 1) {
+        Assert-Equal (Get-ParentFunctionName -Node $factoryCalls[0]) `
+            $actorContract.Graph `
+            "TEST-0162 $($actorContract.Label) batch session escaped its graph owner."
+    }
+
+    $perBlobLiteralCount = [regex]::Matches(
+        $actorSource, '(?i)cat-file\s+blob(?:\s|[$"''])'
+    ).Count
+    Assert-Equal $perBlobLiteralCount 0 `
+        "TEST-0162 $($actorContract.Label) retains direct per-blob cat-file transport."
+
+    $transportOwners = @($actorFunctions | Where-Object {
+        $_.Name -cmatch 'InstructionGraph' -and
+        $_.Body.Extent.Text -cmatch '(?i)(?:ProcessStartInfo|cat-file)'
+    })
+    $unexpectedTransportOwners = @($transportOwners | Where-Object {
+        $_.Name -cne $actorContract.Factory -and
+        $_.Name -cne $actorContract.Tree
+    })
+    Assert-Equal $unexpectedTransportOwners.Count 0 `
+        "TEST-0162 $($actorContract.Label) has an alternate instruction-graph transport owner."
+    if ($factoryDefinitions.Count -eq 1) {
+        Assert-True ($factoryDefinitions[0].Body.Extent.Text -cmatch
+            '(?i)cat-file\s+--batch(?:\s|["''])') `
+            "TEST-0162 $($actorContract.Label) factory lacks canonical cat-file --batch transport."
+    }
+}
+
 $quickPath = Join-Path $root `
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $bootstrapPath = Join-Path $root `
@@ -936,6 +1101,7 @@ $selfObservation = Format-MeAndAITestOperationObservation -Owner $owner `
     -Counters $selfCounters
 Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0158'
 Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0159'
+Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0162'
 $scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
     -SourcePaths @($PSCommandPath) -AuthorityPath $authorityPath
 Write-Host 'Test-runtime operation contracts passed.' -ForegroundColor Green
