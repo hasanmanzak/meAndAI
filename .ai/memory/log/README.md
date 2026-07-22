@@ -5,19 +5,22 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.12.6` completed FEAT-0037 at commit
-`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`; PR #94 merged and its owned branch
-is absent. [FEAT-0038](../../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md)
-and [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96) now own the
-v0.12.7 API-version-safe managed finalizer correction on
-`codex/feat-0038-api-safe-merge-finalization`. Follow the
-[v0.12.7 handoff](2026-07-22-v0127-api-safe-merge-finalization.md). Focused
-`TEST-0155`, `TEST-0156`, structural validation, diff checks, and bounded review pass locally;
-hosted evidence, merge, immutable release, branch cleanup, and consumer recovery
-remain pending. `FIND-0120` remains the separate open follow-up in issue #44.
+Immutable `v0.12.7` completed FEAT-0038 at commit
+`6b01299cfe484c900944b7435d4fef43b11fc38d`; PR #97 merged, the release is
+published, and issue #96 is closed. [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)
+and [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) now own the
+v0.13.0 reusable-fixture and runtime-budget correction on
+`codex/task-0001-reusable-fixture-guardrails`. Follow the
+  [v0.13.0 handoff](2026-07-22-v0130-test-runtime-efficiency.md). Focused,
+  Windows PowerShell 5.1 Full, `WindowsNative`, structural, and final-review
+  evidence pass locally; the operation-count reductions are closed. Hosted
+  Windows/Ubuntu evidence and delivery remain pending. Residual wall-clock
+  work is owned by [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+  `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-22 - v0.13.0 test runtime efficiency](2026-07-22-v0130-test-runtime-efficiency.md)
 - [2026-07-22 - v0.12.7 API-safe merge finalization](2026-07-22-v0127-api-safe-merge-finalization.md)
 - [2026-07-21 - v0.12.6 instruction-graph containment implementation](2026-07-21-v0126-instruction-graph-containment-implementation.md)
 - [2026-07-21 - v0.12.6 instruction-graph containment planning](2026-07-21-v0126-instruction-graph-containment-planning.md)

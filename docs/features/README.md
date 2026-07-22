@@ -40,6 +40,7 @@
 | [FEAT-0036](FEAT-0036-modular-quick-adoption-reliability/README.md) | Modular quick-adoption runtime and recovery reliability | Complete | 0.12.5 |
 | [FEAT-0037](FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) | Exact instruction-graph discovery and fail-closed containment | Complete | 0.12.6 |
 | [FEAT-0038](FEAT-0038-v0127-api-safe-merge-finalization/README.md) | API-version-safe managed merge finalization | Complete | 0.12.7 |
+| [FEAT-0039](FEAT-0039-v0130-test-runtime-efficiency/README.md) | Reusable test fixtures and runtime-cost guardrails | Complete | 0.13.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

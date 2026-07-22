@@ -9,28 +9,32 @@ Last verified: **2026-07-22**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.12.7` in the development tree. Latest immutable
+- Current protocol version: `0.13.0` in the development tree. Latest immutable
   release
-  [`v0.12.6`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.6)
-  targets commit `6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`.
-  [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) retains its
-  hosted-validation, merge, release, and branch-cleanup evidence.
-- Current scope: [FEAT-0038](../../docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md),
-  `BUG-0022`, and [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
-  govern the API-version-safe managed finalizer correction now present on
-  `codex/feat-0038-api-safe-merge-finalization`. The correction replaces the
-  removed API-2026 pull-request `merge_commit_sha` field with one exact
-  paginated `merged` issue-event commit while preserving the existing
-  branch-first, issue-last lifecycle gates. The exact target-bound launcher now
-  also recovers unambiguous retained merged branches before current-update
-  planning so an older failed finalizer cannot block corrected-updater adoption.
+  [`v0.12.7`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.7)
+  targets commit `6b01299cfe484c900944b7435d4fef43b11fc38d`.
+  [Issue #96](https://github.com/hasanmanzak/meAndAI/issues/96) and
+  [PR #97](https://github.com/hasanmanzak/meAndAI/pull/97) retain its hosted,
+  merge, release, and recovery evidence.
+- Current scope: [FEAT-0039](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md),
+  `TASK-0001`, and [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95)
+  govern reusable test fixtures and deterministic runtime-cost guardrails on
+  `codex/task-0001-reusable-fixture-guardrails`. Owner-specific quick-adoption
+  and bootstrap fixtures build equivalent immutable seeds once per suite
+  process, provision isolated mutable derivatives, and publish bounded
+  machine-readable operation observations to the stable parent runner. Exact
+  deterministic closure is quick init 11; bootstrap init 3, clone 2, bundle 2,
+  push 36; graph child process 4 and acquisition 3. Residual wall-clock work is
+  assigned to [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable v0.12.6 completed FEAT-0037, `SUBF-0070`
-  through `SUBF-0072`, and `TEST-0151` through `TEST-0154`. FEAT-0038 adds
-  `TEST-0155`, `TEST-0156`, and `RISK-0179` through `RISK-0183` for the bounded v0.12.7
-  updater correction; immutable release and consumer recovery remain pending.
+- Latest tracked work: immutable v0.12.7 completed FEAT-0038, `TEST-0155`, and
+  `TEST-0156`. FEAT-0039 adds `SUBF-0073` through `SUBF-0077`, `TEST-0157`
+  through `TEST-0160`, and `RISK-0184` through `RISK-0189` for the bounded
+  v0.13.0 runtime-efficiency correction. Local focused, Full,
+  `WindowsNative`, structural, and review evidence pass; hosted and delivery
+  evidence remain pending.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -80,12 +84,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0038` / `BUG-0022` corrects the API-2026 managed merge finalizer under
-  issue #96. The exact PR event collection supplies one canonical merged
-  commit, ordinary/schema-2 and legacy recovery use the same helper, malformed
-  or ambiguous evidence fails before mutation, and ordinary unmanaged PRs do
-  not perform the event read. v0.12.7 publication and the Derdini PR #10
-  recovery are the remaining external delivery steps.
+- `FEAT-0039` / `TASK-0001` corrects repeated expensive test construction under
+  issue #95. The common runtime owns only strict observation contracts and
+  parent validation; quick-adoption and bootstrap retain their owner-specific
+  immutable identities, isolated derivatives, fingerprints, cleanup, and
+  operation budgets. Elapsed time remains observational and budget increases
+  require linked review.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

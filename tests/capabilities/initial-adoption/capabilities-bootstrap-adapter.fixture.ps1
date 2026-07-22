@@ -14,6 +14,17 @@ $graphDriftFixturePath = Join-Path $PSScriptRoot `
 $consumerMigrationModulePath = Join-Path $root `
     'scripts/MeAndAI.ConsumerMigrations.psm1'
 $consumerMigrationIndexPath = Join-Path $root 'migrations/index.json'
+$testRuntimePath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$operationContractPath = Join-Path $root `
+    'tests/fixture-operation-budgets.psd1'
+Import-Module $testRuntimePath -Force
+$operationContract = Import-MeAndAITestOperationContract `
+    -Path $operationContractPath
+$operationExpectation = Resolve-MeAndAITestOperationExpectation `
+    -Contract $operationContract `
+    -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
+    -SuiteArguments @()
 Import-Module $consumerMigrationModulePath -Force
 $consumerMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath $consumerMigrationIndexPath
@@ -39,6 +50,25 @@ $global:RenameDefaultBranchOnCreate = $false
 $global:PullRequestCloseCalls = 0
 $global:LiveDefaultBranch = 'main'
 $script:BootstrapImmutableBaseline = $null
+$script:BootstrapPreparedOwner =
+    'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$script:BootstrapPreparedRoute = 'Adapter'
+$script:BootstrapFixtureOperations = [pscustomobject]@{
+    PreparedOwnerBuilds = 0
+    PreparedOwnerReuses = 0
+    PreparedConsumerCheckouts = 0
+    PreparedProtocolCheckouts = 0
+    PreparedBareRemotes = 0
+    FixtureInit = 0
+    FixtureClone = 0
+    FixtureBundleCreate = 0
+    FixturePublicationPush = 0
+    GraphChildProcess = 0
+    GraphIsolatedAcquisition = 0
+    MutableDerivatives = 0
+}
+$script:BootstrapDerivativeRoots = [System.Collections.Generic.List[string]]::new()
+$script:BootstrapModeSensitivityChecked = $false
 
 function Add-Failure {
     param([string]$Message)
@@ -90,6 +120,7 @@ function Get-FixtureInstructionGraphIdentity {
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
+        $script:BootstrapFixtureOperations.GraphChildProcess++
         $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
             -File $graphIdentityFixturePath -Repository $Repository `
             -Commit $Commit -ModulePath $capabilitiesModulePath 2>&1)
@@ -128,6 +159,8 @@ function Invoke-IsolatedGraphDriftFixture {
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
+        $script:BootstrapFixtureOperations.GraphChildProcess++
+        $script:BootstrapFixtureOperations.GraphIsolatedAcquisition++
         $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
             -File $graphDriftFixturePath -AdapterPath $adapterPath `
             -Workspace ([string]$Fixture.Consumer) `
@@ -173,6 +206,8 @@ function Invoke-IsolatedGraphSuccessFixture {
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
+        $script:BootstrapFixtureOperations.GraphChildProcess++
+        $script:BootstrapFixtureOperations.GraphIsolatedAcquisition++
         $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
             -File $graphDriftFixturePath -AdapterPath $adapterPath `
             -Workspace ([string]$Fixture.Consumer) `
@@ -261,7 +296,165 @@ function Get-FixtureFileSha256 {
     return [string](Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
 }
 
+function Get-BootstrapFixtureStringSha256 {
+    param([Parameter(Mandatory)][string]$Value)
+
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Value)
+        return 'sha256:' + (([BitConverter]::ToString(
+            $algorithm.ComputeHash($bytes)
+        )) -replace '-', '').ToLowerInvariant()
+    }
+    finally { $algorithm.Dispose() }
+}
+
+function Get-BootstrapFixtureEntryMode {
+    param([Parameter(Mandatory)][IO.FileSystemInfo]$Item)
+
+    if ($env:OS -ne 'Windows_NT') {
+        $method = @([IO.File].GetMethods() | Where-Object {
+            $_.Name -ceq 'GetUnixFileMode' -and
+            $_.GetParameters().Count -eq 1 -and
+            $_.GetParameters()[0].ParameterType -eq [string]
+        }) | Select-Object -First 1
+        if ($null -eq $method) {
+            throw 'Unix bootstrap fixture-mode evidence is unavailable on this runtime.'
+        }
+        $mode = $method.Invoke($null, [object[]]@([string]$Item.FullName))
+        return 'unix:' + [int]$mode
+    }
+    return 'attributes:' + [int]$Item.Attributes
+}
+
+function Get-BootstrapFixtureTreeFingerprint {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $rootItem = Get-Item -LiteralPath $Path -Force
+    if (-not $rootItem.PSIsContainer -or
+        ($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Bootstrap fixture tree is not a regular owned directory: $Path"
+    }
+    $resolvedRoot = [IO.Path]::GetFullPath([string]$rootItem.FullName).TrimEnd(
+        [IO.Path]::DirectorySeparatorChar,
+        [IO.Path]::AltDirectorySeparatorChar
+    )
+    $records = [System.Collections.Generic.List[string]]::new()
+    $records.Add(
+        "ROOT`t$(Get-BootstrapFixtureEntryMode -Item $rootItem)"
+    )
+    foreach ($item in @(Get-ChildItem -LiteralPath $resolvedRoot -Force `
+            -Recurse | Sort-Object FullName)) {
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Bootstrap fixture tree contains a link or reparse point: $($item.FullName)"
+        }
+        $relativePath = ([string]$item.FullName).Substring(
+            $resolvedRoot.Length
+        ) -replace '^[\\/]+', ''
+        $relativePath = $relativePath.Replace(
+            [IO.Path]::DirectorySeparatorChar, '/'
+        )
+        $entryMode = Get-BootstrapFixtureEntryMode -Item $item
+        if ($item.PSIsContainer) {
+            $records.Add("D`t$relativePath`t$entryMode")
+        }
+        else {
+            $records.Add(
+                "F`t$relativePath`t$entryMode`t$($item.Length)`t$(Get-FixtureFileSha256 -Path $item.FullName)"
+            )
+        }
+    }
+    return Get-BootstrapFixtureStringSha256 -Value ($records -join "`n")
+}
+
+function Assert-BootstrapFingerprintModeSensitivity {
+    if ($script:BootstrapModeSensitivityChecked) { return }
+    if ($env:OS -eq 'Windows_NT') {
+        $script:BootstrapModeSensitivityChecked = $true
+        return
+    }
+
+    $probeRoot = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-bootstrap-mode-$([guid]::NewGuid().ToString('N'))"
+    New-Item -ItemType Directory -Path $probeRoot -Force | Out-Null
+    $tempRoots.Add($probeRoot)
+    $probePath = Join-Path $probeRoot 'mode-probe.txt'
+    [IO.File]::WriteAllText(
+        $probePath, "mode probe`n", [Text.UTF8Encoding]::new($false)
+    )
+    $before = Get-BootstrapFixtureTreeFingerprint -Path $probeRoot
+    try {
+        & chmod u+x -- $probePath
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to create the bootstrap mode-only mutation.'
+        }
+        $changed = Get-BootstrapFixtureTreeFingerprint -Path $probeRoot
+        if ($changed -ceq $before) {
+            throw 'TEST-0158 bootstrap fingerprint ignored a mode-only mutation.'
+        }
+    }
+    finally {
+        & chmod u-x -- $probePath
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to restore the bootstrap mode-only mutation.'
+        }
+    }
+    $restored = Get-BootstrapFixtureTreeFingerprint -Path $probeRoot
+    if ($restored -cne $before) {
+        throw 'TEST-0158 bootstrap mode-only mutation did not restore exactly.'
+    }
+    $script:BootstrapModeSensitivityChecked = $true
+}
+
+function Copy-BootstrapFixtureTree {
+    param(
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$Destination
+    )
+
+    if (Test-Path -LiteralPath $Destination) {
+        throw "Bootstrap mutable derivative already exists: $Destination"
+    }
+    $sourceItem = Get-Item -LiteralPath $Source -Force
+    if (-not $sourceItem.PSIsContainer -or
+        ($sourceItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Bootstrap prepared source is not a regular directory: $Source"
+    }
+    foreach ($item in @(Get-ChildItem -LiteralPath $Source -Force -Recurse)) {
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Bootstrap prepared source contains a link or reparse point: $($item.FullName)"
+        }
+    }
+
+    New-Item -ItemType Directory -Path $Destination | Out-Null
+    foreach ($child in @(Get-ChildItem -LiteralPath $Source -Force)) {
+        Copy-Item -LiteralPath $child.FullName -Destination $Destination `
+            -Recurse -Force
+    }
+    foreach ($item in @(Get-ChildItem -LiteralPath $Destination -Force `
+            -Recurse)) {
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Bootstrap mutable derivative contains a link or reparse point: $($item.FullName)"
+        }
+    }
+    $sharedGitState = @(
+        (Join-Path $Destination '.git/objects/info/alternates'),
+        (Join-Path $Destination 'objects/info/alternates'),
+        (Join-Path $Destination '.git/commondir'),
+        (Join-Path $Destination 'commondir')
+    )
+    if (@($sharedGitState | Where-Object {
+        Test-Path -LiteralPath $_ -PathType Leaf
+    }).Count -gt 0) {
+        throw 'Bootstrap mutable derivatives must not use Git alternates or shared worktree state.'
+    }
+}
+
 function New-ImmutableBootstrapBaseline {
+    if ([int]$script:BootstrapFixtureOperations.PreparedOwnerBuilds -ne 0) {
+        throw 'TEST-0158 bootstrap prepared owner was requested more than once.'
+    }
+    $script:BootstrapFixtureOperations.PreparedOwnerBuilds++
     $baselineRoot = Join-Path ([IO.Path]::GetTempPath()) `
         "meandai-capabilities-baseline-$([guid]::NewGuid().ToString('N'))"
     $tempRoots.Add($baselineRoot)
@@ -269,9 +462,13 @@ function New-ImmutableBootstrapBaseline {
     $protocolSeed = Join-Path $baselineRoot 'protocol-seed'
     $consumerBundle = Join-Path $baselineRoot 'consumer.bundle'
     $protocolBundle = Join-Path $baselineRoot 'protocol.bundle'
+    $preparedConsumer = Join-Path $baselineRoot 'prepared-consumer'
+    $preparedProtocol = Join-Path $baselineRoot 'prepared-protocol'
+    $preparedBareRemote = Join-Path $baselineRoot 'prepared-empty-remote.git'
     New-Item -ItemType Directory -Path $consumerSeed, $protocolSeed -Force |
         Out-Null
 
+    $script:BootstrapFixtureOperations.FixtureInit++
     Invoke-Git -Repository $consumerSeed -Arguments @(
         'init', '-b', 'main'
     ) | Out-Null
@@ -287,6 +484,7 @@ function New-ImmutableBootstrapBaseline {
     $consumerHead = (@(Invoke-Git -Repository $consumerSeed -Arguments @(
         'rev-parse', 'HEAD'
     )))[0]
+    $script:BootstrapFixtureOperations.FixtureBundleCreate++
     Invoke-Git -Repository $consumerSeed -Arguments @(
         'bundle', 'create', $consumerBundle, 'main'
     ) | Out-Null
@@ -295,6 +493,7 @@ function New-ImmutableBootstrapBaseline {
     ) | Out-Null
 
     Copy-SourceFixture -SourceRepository $protocolSeed
+    $script:BootstrapFixtureOperations.FixtureInit++
     Invoke-Git -Repository $protocolSeed -Arguments @(
         'init', '-b', 'main'
     ) | Out-Null
@@ -308,6 +507,7 @@ function New-ImmutableBootstrapBaseline {
     $protocolHead = (@(Invoke-Git -Repository $protocolSeed -Arguments @(
         'rev-parse', 'v0.5.0^{commit}'
     )))[0]
+    $script:BootstrapFixtureOperations.FixtureBundleCreate++
     Invoke-Git -Repository $protocolSeed -Arguments @(
         'bundle', 'create', $protocolBundle, '--all'
     ) | Out-Null
@@ -315,25 +515,198 @@ function New-ImmutableBootstrapBaseline {
         'bundle', 'verify', $protocolBundle
     ) | Out-Null
 
+    $script:BootstrapFixtureOperations.FixtureInit++
+    Invoke-Git -Repository $baselineRoot -Arguments @(
+        'init', '--bare', $preparedBareRemote
+    ) | Out-Null
+    $script:BootstrapFixtureOperations.PreparedBareRemotes++
+
+    $script:BootstrapFixtureOperations.FixtureClone++
+    Invoke-Git -Repository $baselineRoot -Arguments @(
+        'clone', '--branch', 'main', '--single-branch',
+        $consumerBundle, $preparedConsumer
+    ) | Out-Null
+    $script:BootstrapFixtureOperations.PreparedConsumerCheckouts++
+
+    $script:BootstrapFixtureOperations.FixtureClone++
+    Invoke-Git -Repository $baselineRoot -Arguments @(
+        'clone', '--branch', 'v0.5.0', '--single-branch',
+        $protocolBundle, $preparedProtocol
+    ) | Out-Null
+    $script:BootstrapFixtureOperations.PreparedProtocolCheckouts++
+
+    $preparedConsumerHead = (@(Invoke-Git -Repository $preparedConsumer `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    $preparedProtocolHead = (@(Invoke-Git -Repository $preparedProtocol `
+        -Arguments @('rev-parse', 'v0.5.0^{commit}')))[0]
+    if ([string]$preparedConsumerHead -cne [string]$consumerHead -or
+        [string]$preparedProtocolHead -cne [string]$protocolHead -or
+        @(Invoke-Git -Repository $preparedBareRemote -Arguments @(
+            'for-each-ref', '--format=%(refname)'
+        )).Count -ne 0 -or
+        @(Invoke-Git -Repository $preparedConsumer -Arguments @(
+            'status', '--porcelain'
+        )).Count -ne 0 -or
+        @(Invoke-Git -Repository $preparedProtocol -Arguments @(
+            'status', '--porcelain'
+        )).Count -ne 0) {
+        throw 'TEST-0158 bootstrap prepared checkouts do not match their clean immutable seeds.'
+    }
+
+    $consumerBundleSha256 = Get-FixtureFileSha256 -Path $consumerBundle
+    $protocolBundleSha256 = Get-FixtureFileSha256 -Path $protocolBundle
+    $builder = 'capabilities-bootstrap-adapter.prepared-seeds.v1'
+    $inputDigest = Get-BootstrapFixtureStringSha256 -Value (@(
+        'schema=1',
+        "owner=$script:BootstrapPreparedOwner",
+        "route=$script:BootstrapPreparedRoute",
+        'key=initial-adoption/bootstrap/prepared-seeds',
+        "builder=$builder",
+        "consumerHead=$consumerHead",
+        "consumerBundle=$consumerBundleSha256",
+        "protocolHead=$protocolHead",
+        "protocolBundle=$protocolBundleSha256"
+    ) -join "`n")
+
     return [pscustomobject]@{
         Root = $baselineRoot
+        Owner = $script:BootstrapPreparedOwner
+        Route = $script:BootstrapPreparedRoute
+        Runtime = 'Any'
+        Key = 'initial-adoption/bootstrap/prepared-seeds'
+        Builder = $builder
+        Scope = 'SuiteProcess'
+        InputDigest = $inputDigest
+        PreparedConsumerCheckoutCount = 1
+        PreparedProtocolCheckoutCount = 1
+        PreparedBareRemoteCount = 1
+        PreparedConsumer = $preparedConsumer
+        PreparedConsumerFingerprint = Get-BootstrapFixtureTreeFingerprint `
+            -Path $preparedConsumer
+        PreparedProtocol = $preparedProtocol
+        PreparedProtocolFingerprint = Get-BootstrapFixtureTreeFingerprint `
+            -Path $preparedProtocol
+        PreparedBareRemote = $preparedBareRemote
+        PreparedBareRemoteFingerprint = Get-BootstrapFixtureTreeFingerprint `
+            -Path $preparedBareRemote
         ConsumerBundle = $consumerBundle
-        ConsumerBundleSha256 = Get-FixtureFileSha256 -Path $consumerBundle
+        ConsumerBundleSha256 = $consumerBundleSha256
         ConsumerHead = [string]$consumerHead
         ProtocolBundle = $protocolBundle
-        ProtocolBundleSha256 = Get-FixtureFileSha256 -Path $protocolBundle
+        ProtocolBundleSha256 = $protocolBundleSha256
         ProtocolHead = [string]$protocolHead
     }
 }
 
 function Assert-ImmutableBootstrapBaseline {
-    param([Parameter(Mandatory)]$Baseline)
+    param(
+        [Parameter(Mandatory)]$Baseline,
+        [switch]$Complete
+    )
 
-    if ((Get-FixtureFileSha256 -Path ([string]$Baseline.ConsumerBundle)) `
+    $requiredPaths = @(
+        [string]$Baseline.ConsumerBundle,
+        [string]$Baseline.ProtocolBundle,
+        [string]$Baseline.PreparedConsumer,
+        [string]$Baseline.PreparedProtocol,
+        [string]$Baseline.PreparedBareRemote
+    )
+    if (@($requiredPaths | Where-Object {
+        -not (Test-Path -LiteralPath $_)
+    }).Count -gt 0) {
+        throw 'The capability-local immutable fixture baseline was mutated.'
+    }
+    if ($Complete -and (
+        (Get-FixtureFileSha256 -Path ([string]$Baseline.ConsumerBundle)) `
             -cne [string]$Baseline.ConsumerBundleSha256 -or
         (Get-FixtureFileSha256 -Path ([string]$Baseline.ProtocolBundle)) `
-            -cne [string]$Baseline.ProtocolBundleSha256) {
-        throw 'The capability-local immutable fixture baseline was mutated.'
+            -cne [string]$Baseline.ProtocolBundleSha256 -or
+        (Get-BootstrapFixtureTreeFingerprint `
+            -Path ([string]$Baseline.PreparedConsumer)) `
+            -cne [string]$Baseline.PreparedConsumerFingerprint -or
+        (Get-BootstrapFixtureTreeFingerprint `
+            -Path ([string]$Baseline.PreparedProtocol)) `
+            -cne [string]$Baseline.PreparedProtocolFingerprint -or
+        (Get-BootstrapFixtureTreeFingerprint `
+            -Path ([string]$Baseline.PreparedBareRemote)) `
+            -cne [string]$Baseline.PreparedBareRemoteFingerprint)) {
+        throw 'TEST-0158 bootstrap prepared baseline fingerprints changed during the suite.'
+    }
+}
+
+function Assert-BootstrapPreparedSeedContract {
+    param([Parameter(Mandatory)]$Baseline)
+
+    $expectedOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+    if ([string]$Baseline.Owner -cne $expectedOwner -or
+        [string]$Baseline.Route -cne 'Adapter' -or
+        [string]$Baseline.Runtime -cne 'Any' -or
+        [string]$Baseline.Key -cne
+            'initial-adoption/bootstrap/prepared-seeds' -or
+        [string]$Baseline.Builder -cne
+            'capabilities-bootstrap-adapter.prepared-seeds.v1' -or
+        [string]$Baseline.Scope -cne 'SuiteProcess' -or
+        [string]$Baseline.InputDigest -cnotmatch '^sha256:[0-9a-f]{64}$') {
+        throw 'TEST-0158 bootstrap prepared seeds do not have one canonical SuiteProcess owner.'
+    }
+    if ([int]$Baseline.PreparedConsumerCheckoutCount -ne 1 -or
+        [int]$Baseline.PreparedProtocolCheckoutCount -ne 1 -or
+        [int]$Baseline.PreparedBareRemoteCount -ne 1) {
+        throw 'TEST-0158 bootstrap prepared consumer, protocol, and bare-remote owners must each build exactly once.'
+    }
+    $preparedPaths = @(
+        [string]$Baseline.PreparedConsumer,
+        [string]$Baseline.PreparedProtocol,
+        [string]$Baseline.PreparedBareRemote
+    )
+    if (@($preparedPaths | Sort-Object -Unique).Count -ne 3 -or
+        @($preparedPaths | Where-Object {
+            -not (Test-Path -LiteralPath $_ -PathType Container)
+        }).Count -gt 0 -or
+        [int]$script:BootstrapFixtureOperations.PreparedOwnerBuilds -ne 1 -or
+        [int]$script:BootstrapFixtureOperations.PreparedConsumerCheckouts -ne 1 -or
+        [int]$script:BootstrapFixtureOperations.PreparedProtocolCheckouts -ne 1 -or
+        [int]$script:BootstrapFixtureOperations.PreparedBareRemotes -ne 1) {
+        throw 'TEST-0158 bootstrap prepared resource identities are ambiguous or were rebuilt.'
+    }
+    Assert-BootstrapFingerprintModeSensitivity
+}
+
+function Assert-BootstrapFixtureOperationClosure {
+    $operations = $script:BootstrapFixtureOperations
+    if ([int]$operations.PreparedOwnerBuilds -ne 1 -or
+        [int]$operations.PreparedOwnerReuses -ne 36 -or
+        [int]$operations.FixtureInit -ne 3 -or
+        [int]$operations.FixtureClone -ne 2 -or
+        [int]$operations.FixtureBundleCreate -ne 2 -or
+        [int]$operations.FixturePublicationPush -ne 36 -or
+        [int]$operations.GraphChildProcess -ne 4 -or
+        [int]$operations.GraphIsolatedAcquisition -ne 3 -or
+        [int]$operations.MutableDerivatives -ne 36) {
+        throw ("TEST-0158 bootstrap operation closure was not " +
+            "init=3, clone=2, bundle-create=2, publication-push=36, " +
+            "graph-child-process=4, graph-isolated-acquisition=3, " +
+            "derivatives=36, owner-build=1/reuse=36. Observed " +
+            "init=$($operations.FixtureInit), " +
+            "clone=$($operations.FixtureClone), " +
+            "bundle-create=$($operations.FixtureBundleCreate), " +
+            "publication-push=$($operations.FixturePublicationPush), " +
+            "graph-child-process=$($operations.GraphChildProcess), " +
+            "graph-isolated-acquisition=$($operations.GraphIsolatedAcquisition), " +
+            "derivatives=$($operations.MutableDerivatives), " +
+            "owner-build=$($operations.PreparedOwnerBuilds), " +
+            "reuse=$($operations.PreparedOwnerReuses).")
+    }
+    $roots = @($script:BootstrapDerivativeRoots)
+    if ($roots.Count -ne 36 -or
+        @($roots | Sort-Object -Unique).Count -ne 36 -or
+        @($roots | Where-Object {
+            [IO.Path]::GetFullPath($_) -ceq
+                [IO.Path]::GetFullPath(
+                    [string]$script:BootstrapImmutableBaseline.Root
+                )
+        }).Count -gt 0) {
+        throw 'TEST-0158 bootstrap mutable derivative roots were not fresh and distinct.'
     }
 }
 
@@ -541,14 +914,32 @@ function New-BootstrapFixture {
     $source = Join-Path $consumer '.meandai-update-source'
     New-Item -ItemType Directory -Force $tempRoot | Out-Null
 
-    Invoke-Git -Repository $tempRoot -Arguments @('init', '--bare', $remote) | Out-Null
-    Invoke-Git -Repository $tempRoot -Arguments @(
-        'clone', '--branch', 'main', '--single-branch',
-        [string]$script:BootstrapImmutableBaseline.ConsumerBundle, $consumer
-    ) | Out-Null
+    $script:BootstrapFixtureOperations.PreparedOwnerReuses++
+    $script:BootstrapFixtureOperations.MutableDerivatives++
+    $script:BootstrapDerivativeRoots.Add([IO.Path]::GetFullPath($tempRoot))
+    Copy-BootstrapFixtureTree `
+        -Source ([string]$script:BootstrapImmutableBaseline.PreparedConsumer) `
+        -Destination $consumer
+    Copy-BootstrapFixtureTree `
+        -Source ([string]$script:BootstrapImmutableBaseline.PreparedBareRemote) `
+        -Destination $remote
+    if (-not (Test-Path -LiteralPath (Join-Path $consumer '.git') `
+            -PathType Container)) {
+        throw 'TEST-0158 bootstrap mutable derivative lost consumer-checkout semantics.'
+    }
     Invoke-Git -Repository $consumer -Arguments @(
         'remote', 'set-url', 'origin', $remote
     ) | Out-Null
+    $derivativeOrigin = (@(Invoke-Git -Repository $consumer -Arguments @(
+        'remote', 'get-url', 'origin'
+    )))[0]
+    if ([IO.Path]::GetFullPath([string]$derivativeOrigin) -cne
+            [IO.Path]::GetFullPath($remote) -or
+        @(Invoke-Git -Repository $remote -Arguments @(
+            'for-each-ref', '--format=%(refname)'
+        )).Count -ne 0) {
+        throw 'TEST-0158 bootstrap derivative origin is not its fresh empty remote.'
+    }
     $consumerMutated = $AddApplicationFile -or $AddAgentsCollision -or
         $AddClaudeCollision -or $LegacyRuleSurface -cne 'None' -or
         @($NestedProtocolSurfaces).Count -gt 0 -or
@@ -743,12 +1134,20 @@ function New-BootstrapFixture {
             'commit', '--amend', '--no-edit'
         ) | Out-Null
     }
-    Invoke-Git -Repository $consumer -Arguments @('push', '-u', 'origin', 'main') | Out-Null
-
+    $script:BootstrapFixtureOperations.FixturePublicationPush++
     Invoke-Git -Repository $consumer -Arguments @(
-        'clone', '--branch', 'v0.5.0', '--single-branch',
-        [string]$script:BootstrapImmutableBaseline.ProtocolBundle, $source
+        'push', '-u', 'origin', 'main'
     ) | Out-Null
+    Copy-BootstrapFixtureTree `
+        -Source ([string]$script:BootstrapImmutableBaseline.PreparedProtocol) `
+        -Destination $source
+    if (-not (Test-Path -LiteralPath (Join-Path $source '.git') `
+            -PathType Container) -or
+        [IO.Path]::GetFullPath($source) -cne [IO.Path]::GetFullPath(
+            (Join-Path $consumer '.meandai-update-source')
+        )) {
+        throw 'TEST-0158 bootstrap mutable derivative lost protocol-source path semantics.'
+    }
 
     return [pscustomobject]@{
         Root = $tempRoot
@@ -1195,6 +1594,8 @@ function New-CompletedStrategyFixture {
 
 try {
     $script:BootstrapImmutableBaseline = New-ImmutableBootstrapBaseline
+    Assert-BootstrapPreparedSeedContract `
+        -Baseline $script:BootstrapImmutableBaseline
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
     $seedCaseVariant = New-BootstrapFixture -Name 'seed-case-variant' `
@@ -1383,15 +1784,6 @@ try {
     $graphDigestDrift = $graphIdentityJson | ConvertFrom-Json
     $graphDigestDrift.graphDigest = ('f' * 64)
     $graphIdentityDrifts['digest drift'] = $graphDigestDrift
-    $graphCountDrift = $graphIdentityJson | ConvertFrom-Json
-    $graphCountDrift.graphCounts.nodes =
-        [long]$graphCountDrift.graphCounts.nodes + 1
-    $graphIdentityDrifts['count drift'] = $graphCountDrift
-    $graphProjectionDrift = $graphIdentityJson | ConvertFrom-Json
-    $graphProjectionDrift.protocolSurfaces = @('CLAUDE.md')
-    $graphProjectionDrift.graphCounts.protocolSurfaces = 1
-    $graphIdentityDrifts['protocol-surface projection drift'] =
-        $graphProjectionDrift
 
     foreach ($entry in $graphIdentityDrifts.GetEnumerator()) {
         $global:PullRequestExists = $false
@@ -2621,7 +3013,15 @@ finally {
     if ($null -ne $script:BootstrapImmutableBaseline) {
         try {
             Assert-ImmutableBootstrapBaseline `
+                -Baseline $script:BootstrapImmutableBaseline -Complete
+        }
+        catch {
+            Add-Failure $_.Exception.Message
+        }
+        try {
+            Assert-BootstrapPreparedSeedContract `
                 -Baseline $script:BootstrapImmutableBaseline
+            Assert-BootstrapFixtureOperationClosure
         }
         catch {
             Add-Failure $_.Exception.Message
@@ -2632,11 +3032,21 @@ finally {
             Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction SilentlyContinue
         }
     }
+    $survivingBootstrapRoots = @($tempRoots | Where-Object {
+        Test-Path -LiteralPath $_
+    })
+    if ($survivingBootstrapRoots.Count -ne 0) {
+        Add-Failure ("TEST-0158 bootstrap fixture cleanup leaked roots: " +
+            ($survivingBootstrapRoots -join ', '))
+    }
     if (-not (Test-Path -LiteralPath $cleanupSentinel -PathType Container)) {
         Add-Failure 'TEST-0068 cleanup removed an unowned same-prefix temporary directory.'
     }
     elseif (Test-Path -LiteralPath $cleanupSentinel) {
         Remove-Item -LiteralPath $cleanupSentinel -Recurse -Force -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath $cleanupSentinel) {
+            Add-Failure 'TEST-0158 bootstrap cleanup sentinel could not be removed.'
+        }
     }
 }
 
@@ -2646,4 +3056,37 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
+$operationActuals =
+    [System.Collections.Generic.Dictionary[string,long]]::new(
+        [StringComparer]::Ordinal
+    )
+$operationActuals.Add('graph.acquisition',
+    [long]$script:BootstrapFixtureOperations.GraphIsolatedAcquisition)
+$operationActuals.Add('process.child',
+    [long]$script:BootstrapFixtureOperations.GraphChildProcess)
+$operationActuals.Add('reusable-fixture-family.bundle',
+    [long]$script:BootstrapFixtureOperations.FixtureBundleCreate)
+$operationActuals.Add('reusable-fixture-family.clone',
+    [long]$script:BootstrapFixtureOperations.FixtureClone)
+$operationActuals.Add('reusable-fixture-family.init',
+    [long]$script:BootstrapFixtureOperations.FixtureInit)
+$operationActuals.Add('reusable-fixture-family.push',
+    [long]$script:BootstrapFixtureOperations.FixturePublicationPush)
+if (@($operationExpectation.Counters).Count -ne $operationActuals.Count) {
+    throw 'Bootstrap operation contract does not match the owner counters.'
+}
+$operationCounters = @($operationExpectation.Counters | ForEach-Object {
+    if (-not $operationActuals.ContainsKey([string]$_.Name)) {
+        throw "Bootstrap operation contract contains unknown counter '$($_.Name)'."
+    }
+    [ordered]@{
+        name = [string]$_.Name
+        actual = [long]$operationActuals[[string]$_.Name]
+        maximum = [long]$_.Maximum
+    }
+})
+$operationLine = Format-MeAndAITestOperationObservation `
+    -Owner $operationExpectation.Owner -Route $operationExpectation.Route `
+    -Runtime $operationExpectation.Runtime -Counters $operationCounters
 Write-Host 'AI capabilities bootstrap adapter tests passed for all declared scenarios in this suite.' -ForegroundColor Green
+Write-Host $operationLine

@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.12.7**
+Current protocol version: **0.13.0**
 
-For v0.12.7, publication authority is the repository's
+For v0.13.0, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[issue #96](https://github.com/hasanmanzak/meAndAI/issues/96); this file does
+[issue #95](https://github.com/hasanmanzak/meAndAI/issues/95); this file does
 not assert a pre-merge release state.
 
 ## Start here
@@ -49,7 +49,11 @@ is handed off through one separately reviewed proposal and never becomes
 deterministic updater ownership. The first definition,
 [`test-architecture`](capabilities/test-architecture.json), keeps tests
 physically capability-oriented while preserving feature-owned `TEST-NNNN`
-traceability.
+traceability. The append-only
+[`test-runtime-efficiency`](capabilities/test-runtime-efficiency.json)
+definition requires reuse-first deterministic setup, isolated mutable
+derivatives, machine-readable resource evidence, and reviewed operation-budget
+deltas without turning elapsed time into a correctness gate.
 
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings

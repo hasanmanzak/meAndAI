@@ -180,6 +180,11 @@ jobs:
           "profile=$($profile[0])" | Out-File `
             -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           Write-Host "Selected Windows validation profile: $($profile[0])"
+      - name: Run runtime-efficiency contract on Windows PowerShell 7
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        run: >-
+          ./tests/capabilities/test-runtime-efficiency/test-runtime-efficiency.tests.ps1
       - name: Run selected validation on Windows PowerShell 5.1
         if: steps.main-route.outputs.route == 'Full'
         shell: powershell

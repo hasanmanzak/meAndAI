@@ -113,7 +113,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
-            TestIds = @('TEST-0134', 'TEST-0135')
+            TestIds = @('TEST-0134', 'TEST-0135', 'TEST-0157')
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -127,13 +127,18 @@
         }
         @{
             Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/test-runtime-efficiency/test-runtime-efficiency.tests.ps1'
+            TestIds = @('TEST-0158', 'TEST-0159')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
             TestIds = @('TEST-0139', 'TEST-0140')
         }
         @{
             Evidence = 'GitHubActionsSemantic'
             Owner = '.github/workflows/protocol-tests.yml'
-            TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124')
+            TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124', 'TEST-0160')
         }
         @{
             Evidence = 'ExternalPostPublication'

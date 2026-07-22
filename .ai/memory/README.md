@@ -2,16 +2,15 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-22**<br>
-Protocol version: **0.12.7**
+Protocol version: **0.13.0**
 
-The immutable v0.12.6 release is published at commit
-`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`. `0.12.7` identifies the local
-FEAT-0038 development tree on
-`codex/feat-0038-api-safe-merge-finalization`; it is not a published release.
-Exact v0.12.7 publication state will be authoritative only in
-[GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases),
-[issue #96](https://github.com/hasanmanzak/meAndAI/issues/96) after publication;
-it is not predicted or projected into this pre-merge memory file.
+The immutable v0.12.7 release is published at commit
+`6b01299cfe484c900944b7435d4fef43b11fc38d`; [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
+and [PR #97](https://github.com/hasanmanzak/meAndAI/pull/97) retain its delivery
+evidence. `0.13.0` identifies the local FEAT-0039 development tree on
+`codex/task-0001-reusable-fixture-guardrails`; it is not a published release.
+[Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) is the external
+tracking authority for this candidate.
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

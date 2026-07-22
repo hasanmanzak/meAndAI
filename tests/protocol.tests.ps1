@@ -14,10 +14,12 @@ if ($StructureOnly -and $ExecutionProfile -cne 'Full') {
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $discoveryModule = Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1'
 $runtimeModule = Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$operationPath = Join-Path $root 'tests/fixture-operation-budgets.psd1'
 $profilePath = Join-Path $root 'tests/execution-profiles.psd1'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module $discoveryModule -Force
 Import-Module $runtimeModule -Force
+$operationContract = Import-MeAndAITestOperationContract -Path $operationPath
 
 $suites = @(Get-MeAndAITestSuite -RepositoryRoot $root)
 $profiles = @(Import-MeAndAITestExecutionProfile -LiteralPath $profilePath `
@@ -122,6 +124,32 @@ $completedOwners = [System.Collections.Generic.HashSet[string]]::new(
 foreach ($selectedSuite in @($selectedProfiles[0].Suites)) {
     $result = Invoke-SuiteAndRelay -Suite $selectedSuite `
         -Arguments @($selectedSuite.Arguments)
+    $operationExpectation = Resolve-MeAndAITestOperationExpectation `
+        -Contract $operationContract -Owner $selectedSuite.Owner `
+        -SuiteArguments @($selectedSuite.Arguments)
+    if ($null -ne $operationExpectation -and
+        $operationExpectation.RequiresObservation) {
+        $operationRecord = Read-MeAndAITestOperationObservationRecord `
+            -Output @($result.Output) `
+            -ExpectedOwner $operationExpectation.Owner `
+            -ExpectedRoute $operationExpectation.Route `
+            -ExpectedRuntime $operationExpectation.Runtime `
+            -ExpectedCounters @($operationExpectation.Counters)
+        if (-not $operationRecord.Valid) {
+            throw "Suite '$($selectedSuite.Owner)' has invalid operation evidence: $($operationRecord.Message)."
+        }
+    }
+    elseif ($null -ne $operationExpectation) {
+        $unexpectedOperationEvidence = @($result.Output | ForEach-Object {
+            [string]$_
+        } | Where-Object {
+            $_.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
+                [StringComparison]::Ordinal)
+        })
+        if ($unexpectedOperationEvidence.Count -ne 0) {
+            throw "Suite '$($selectedSuite.Owner)' emitted operation evidence on reviewed non-observing route '$($operationExpectation.Route)'."
+        }
+    }
     if ($ExecutionProfile -ceq 'Full') {
         $record = Read-MeAndAIScenarioResultRecord -Output @($result.Output) `
             -ExpectedOwner $selectedSuite.Owner `

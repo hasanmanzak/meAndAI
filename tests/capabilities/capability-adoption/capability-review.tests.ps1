@@ -109,15 +109,38 @@ $releaseLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
     -Catalog $releaseCatalog -Entries @($releaseEntry)
 $releaseLedger = Import-MeAndAICapabilityLedger `
     -Catalog $releaseCatalog -Bytes $releaseLedgerBytes
-$releaseCurrent = Resolve-MeAndAICapabilityReview `
+$releasePrefixPlan = Resolve-MeAndAICapabilityReview `
     -Catalog $releaseCatalog -Ledger $releaseLedger `
     -Repository 'hasanmanzak/consumer' -DefaultBranch main `
     -DefaultHead $baseHead -TargetVersion v0.12.0 `
     -DiscoveryContext AlreadyCurrent
+Assert-Equal $releasePrefixPlan.State 'CreateReviewHandoff' `
+    'TEST-0157 predecessor terminal ledger did not request appended capability review.'
+Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 1 `
+    'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix size.'
+Assert-Equal $releasePrefixPlan.CapabilityBatch[0].Slug `
+    'test-runtime-efficiency' `
+    'TEST-0157 predecessor terminal ledger exposed the wrong pending capability.'
+
+$releaseEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
+    -Capability $releaseCatalog.Capabilities[1] -Outcome NotApplicable `
+    -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
+    -ReviewIdentity 'pull-request:87' `
+    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+    -ReviewedAt '2026-07-19T00:00:00Z'
+$releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+    -Catalog $releaseCatalog -Entries @($releaseEntry, $releaseEfficiencyEntry)
+$releaseCompleteLedger = Import-MeAndAICapabilityLedger `
+    -Catalog $releaseCatalog -Bytes $releaseCompleteLedgerBytes
+$releaseCurrent = Resolve-MeAndAICapabilityReview `
+    -Catalog $releaseCatalog -Ledger $releaseCompleteLedger `
+    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+    -DefaultHead $baseHead -TargetVersion v0.12.0 `
+    -DiscoveryContext AlreadyCurrent
 Assert-Equal $releaseCurrent.State 'Current' `
-    'TEST-0140 exact imported terminal ledger was not current.'
+    'TEST-0157 exact imported two-entry terminal ledger was not current.'
 Assert-Equal $releaseCurrent.Operations.Count 0 `
-    'TEST-0140 exact imported terminal ledger was not a no-op.'
+    'TEST-0157 exact imported two-entry terminal ledger was not a no-op.'
 
 # TEST-0139: fresh adoption is followed by the same source-only semantic review
 # boundary, without expanding the adoption envelope or writing product paths.
@@ -488,6 +511,7 @@ $managedEnvelopeText = $quickAdoptionTestText.Substring(0, $fixtureCopyStart)
 foreach ($sourceOnlyPath in @(
     'capabilities/index.json',
     'capabilities/test-architecture.json',
+    'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAICapabilityReview.ps1'
@@ -1064,8 +1088,14 @@ try {
         -ReviewIdentity "pull-request:$finalPullNumber" `
         -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
         -ReviewedAt '2026-07-19T00:00:00Z'
+    $finalEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseCatalog.Capabilities[1] -Outcome Conforming `
+        -Evidence @('Reviewed reuse-first fixture and operation-budget evidence.') `
+        -ReviewIdentity "pull-request:$finalPullNumber" `
+        -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
+        -ReviewedAt '2026-07-19T00:00:00Z'
     $finalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-        -Catalog $releaseCatalog -Entries @($finalEntry)
+        -Catalog $releaseCatalog -Entries @($finalEntry, $finalEfficiencyEntry)
     $apiState.FinalLedgerBytes = [byte[]]$finalLedgerBytes
     $fixtureAiRoot = Join-Path $fixtureRoot '.ai'
     [void](New-Item -ItemType Directory -Path $fixtureAiRoot)
