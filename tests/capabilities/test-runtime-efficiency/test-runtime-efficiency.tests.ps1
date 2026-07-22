@@ -161,6 +161,108 @@ function Get-ParsedTestAst {
     return $ast
 }
 
+function Assert-TestOwnedRawGitBatchStdinContract {
+    param(
+        [Parameter(Mandatory)]
+        [Management.Automation.Language.FunctionDefinitionAst]$FunctionAst,
+        [Parameter(Mandatory)][string]$Label
+    )
+
+    $source = [string]$FunctionAst.Extent.Text
+    $encodingTries = @($FunctionAst.Body.FindAll({
+        param($node)
+        if ($node -isnot
+                [Management.Automation.Language.TryStatementAst] -or
+            $null -eq $node.Finally) {
+            return $false
+        }
+        $bodySource = [string]$node.Body.Extent.Text
+        $finallySource = [string]$node.Finally.Extent.Text
+        return $bodySource -cmatch (
+            '(?s)\[Console\]::InputEncoding\s*=\s*' +
+            '\[Text\.UTF8Encoding\]::new\(\$false\)'
+        ) -and $bodySource -cmatch '\$process\.Start\(\)' -and
+            $bodySource -cmatch (
+                '(?s)\$state\.InputStream\s*=\s*' +
+                '\$process\.StandardInput\.BaseStream'
+            ) -and $finallySource -cmatch (
+                '(?s)\[Console\]::InputEncoding\s*=\s*' +
+                '\$originalInputEncoding'
+            )
+    }, $true))
+    Assert-Equal $encodingTries.Count 1 `
+        "TEST-0162 $Label lacks one scoped no-BOM capture try/finally."
+    if ($encodingTries.Count -eq 1) {
+        $encodingTry = $encodingTries[0]
+        $bodySource = [string]$encodingTry.Body.Extent.Text
+        $noBomEncoding = [regex]::Match(
+            $bodySource,
+            '(?s)\[Console\]::InputEncoding\s*=\s*' +
+            '\[Text\.UTF8Encoding\]::new\(\$false\)'
+        )
+        $processStart = [regex]::Match($bodySource, '\$process\.Start\(\)')
+        $rawInputCapture = [regex]::Match(
+            $bodySource,
+            '(?s)\$state\.InputStream\s*=\s*' +
+            '\$process\.StandardInput\.BaseStream'
+        )
+        Assert-True (
+            $noBomEncoding.Success -and $processStart.Success -and
+            $rawInputCapture.Success -and
+            $noBomEncoding.Index -lt $processStart.Index -and
+            $processStart.Index -lt $rawInputCapture.Index
+        ) "TEST-0162 $Label no-BOM start/capture order differs."
+        $lastTryStatement = @($encodingTry.Body.Statements)[-1]
+        Assert-True (
+            [string]$lastTryStatement.Extent.Text -cmatch (
+                '(?s)^\s*\$state\.InputStream\s*=\s*' +
+                '\$process\.StandardInput\.BaseStream\s*$'
+            )
+        ) "TEST-0162 $Label does not restore ambient encoding immediately after capture."
+        $finallyStatements = @($encodingTry.Finally.Statements)
+        Assert-True (
+            $finallyStatements.Count -eq 1 -and
+            [string]$finallyStatements[0].Extent.Text -cmatch (
+                '(?s)^\s*\[Console\]::InputEncoding\s*=\s*' +
+                '\$originalInputEncoding\s*$'
+            )
+        ) "TEST-0162 $Label ambient restore is not the exact finally action."
+        $encodingSaves = @($FunctionAst.Body.FindAll({
+            param($node)
+            return $node -is
+                    [Management.Automation.Language.AssignmentStatementAst] -and
+                [string]$node.Extent.Text -cmatch (
+                    '(?s)^\s*\$originalInputEncoding\s*=\s*' +
+                    '\[Console\]::InputEncoding\s*$'
+                )
+        }, $true))
+        Assert-True (
+            $encodingSaves.Count -eq 1 -and
+            $encodingSaves[0].Extent.EndOffset -le
+                $encodingTry.Extent.StartOffset
+        ) "TEST-0162 $Label does not save ambient encoding before the capture scope."
+    }
+    $standardInputAccesses = @($FunctionAst.Body.FindAll({
+        param($node)
+        return $node -is
+                [Management.Automation.Language.MemberExpressionAst] -and
+            [string]$node.Extent.Text -cmatch '(?s)\.StandardInput\s*$'
+    }, $true))
+    Assert-Equal $standardInputAccesses.Count 1 `
+        "TEST-0162 $Label has an alternate StandardInput access."
+    Assert-True ($source -cmatch
+        '(?s)\$state\.InputStream\.Write(?:Async)?\s*\(') `
+        "TEST-0162 $Label does not write through its raw stdin pipe."
+    Assert-True ($source -cmatch
+        '(?s)\$state\.InputStream\.Flush(?:Async)?\s*\(') `
+        "TEST-0162 $Label does not flush its raw stdin pipe."
+    Assert-True ($source -cmatch
+        '(?s)\$state\.InputStream\.Close\s*\(') `
+        "TEST-0162 $Label does not close its raw stdin pipe."
+    Assert-True ($source -cnotmatch '(?s)\.StandardInput\.Close\s*\(') `
+        "TEST-0162 $Label closes the StreamWriter-backed stdin."
+}
+
 function Get-ParentFunctionName {
     param([Parameter(Mandatory)][object]$Node)
     $parent = $Node.Parent
@@ -880,6 +982,9 @@ if ($testGitBatchFactories.Count -eq 1) {
     Assert-True ($testGitBatchSource -cnotmatch
         '(?i)cat-file\s+blob(?:\s|["''])') `
         'TEST-0162 shared test Git reader restored per-blob processes.'
+    Assert-TestOwnedRawGitBatchStdinContract `
+        -FunctionAst $testGitBatchFactories[0] `
+        -Label 'shared test Git reader'
 }
 $instructionGraphAst = Get-ParsedTestAst -Path $instructionGraphPath
 $instructionGraphExpectedReaders = @($instructionGraphAst.FindAll({
@@ -901,6 +1006,9 @@ if ($instructionGraphExpectedReaders.Count -eq 1) {
     Assert-True ($instructionGraphExpectedReaderSource -cnotmatch
         '(?i)cat-file\s+blob(?:\s|["''])') `
         'TEST-0162 instruction-graph expected reader restored per-blob processes.'
+    Assert-TestOwnedRawGitBatchStdinContract `
+        -FunctionAst $instructionGraphExpectedReaders[0] `
+        -Label 'instruction-graph expected reader'
 }
 $quickOperationInventory = Get-ReviewedOperationInventory -Ast $quickAst `
     -CommandNames @(

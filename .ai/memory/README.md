@@ -20,9 +20,14 @@ independent expected-reader implementation is complete through commits
 complete. [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
 [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) now own the
 separate delivery/publication path, while issue #98 remains open for
-`FIND-0204`. Hosted, merge, and release evidence remain pending external facts;
-elapsed results establish no wall-clock improvement. Follow the
-[delivery-authority correction](log/2026-07-23-v0131-delivery-authority-correction.md).
+`FIND-0204`. Exact-head hosted run 29963388824 then exposed and locally resolved
+`FIND-0206`, a Windows PowerShell 5.1 BOM-prefixed stdin defect in the
+independent self-HEAD test reader; both test-owned batch readers now share one
+ordered no-BOM raw-pipe guard, and the existing self-HEAD fixture proves the
+ambient-encoding boundary on PS5.1 and PS7. Replacement hosted, merge, and
+release evidence remain pending external facts; elapsed results establish no
+wall-clock improvement. Follow the
+[hosted Windows stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

@@ -20,6 +20,10 @@ This project uses the `M.m.rev` version format defined in the
 - Keep the separately implemented self-HEAD expected reader on one local batch
   process and make TEST-0162 reject a restored per-blob path in any of the
   three expected-evidence readers.
+- Harden every repository-owned instruction-graph batch transport against the
+  Windows PowerShell 5.1 stdin preamble hazard: production and test readers
+  must capture, write, flush, and close a no-BOM raw pipe, restore ambient
+  encoding, and pass a preamble-bearing regression without rebuilding fixtures.
 - Prove the immutable 175-blob workload changes from 175 blob-process starts
   to exactly one per production actor while retaining all 175 requests and the
   exact graph bytes, counts, request order, and digest.

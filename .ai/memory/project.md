@@ -29,7 +29,12 @@ Last verified: **2026-07-23**
   `FIND-0205`: [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
   [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) own the
   closeable delivery/publication path, while issue #98 remains open for
-  `FIND-0204`. Hosted, merge, and release gates remain pending external facts.
+  `FIND-0204`. Hosted run 29963388824 passed on Ubuntu but exposed
+  `FIND-0206` on Windows: the independent self-HEAD test reader inherited a
+  BOM-emitting PowerShell 5.1 stdin encoding. The local correction reuses that
+  fixture under a preamble-bearing ambient encoding and binds both test-owned
+  batch readers to one raw no-BOM source guard. Replacement hosted, merge, and
+  release gates remain pending external facts.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -101,7 +106,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   seconds; the Full hotspots were quick adoption 742.281 seconds, hosted
   bootstrap 253.297 seconds, and instruction graph 145.462 seconds. These
   results prove deterministic process reduction, not a wall-clock gain.
-  `FIND-0200`/`FIND-0201`/`FIND-0205` are resolved;
+  Hosted run 29963388824 then failed only on Windows because the independent
+  self-HEAD reader prefixed its first raw OID with `EF-BB-BF`. `FIND-0206`
+  corrects that test-only transport and extends the complete raw-stdin
+  invariant across all four repository-owned batch transports without a new
+  fixture. Focused instruction-graph and test-runtime owners are green on
+  PS5.1 and PS7; replacement hosted evidence is pending.
+  `FIND-0200`/`FIND-0201`/`FIND-0205`/`FIND-0206` are resolved locally;
   `FIND-0202`/`FIND-0203` are optional bounded improvements and `FIND-0204`
   keeps further runtime work under issue #98. Continue PR #100 with hosted
   Windows/Linux, merge, and release evidence through issue #101.

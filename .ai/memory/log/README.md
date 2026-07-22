@@ -22,13 +22,18 @@ in 343.0 seconds, Full passed in 1,306.9 seconds, and bounded local convergence
 closed `FIND-0200`/`FIND-0201`. A pre-delivery audit then resolved `FIND-0205`
 by separating [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
 closeable [delivery issue #101](https://github.com/hasanmanzak/meAndAI/issues/101)
-from the open residual owner. Hosted, merge, and release evidence remain pending
-through issue #101; `FIND-0204` keeps the unimproved wall-clock path owned by
-issue #98.
+from the open residual owner. Exact-head hosted run 29963388824 passed on Ubuntu
+but exposed `FIND-0206` on Windows PowerShell 5.1: a BOM-prefixed first OID in
+the independent self-HEAD reader. Follow the
+[hosted Windows stdin correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md).
+The focused PS5.1/PS7 correction is green; replacement hosted, merge, and
+release evidence remain pending through issue #101. `FIND-0204` keeps the
+unimproved wall-clock path owned by issue #98.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.1 hosted Windows stdin encoding correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
 - [2026-07-23 - v0.13.1 delivery authority correction](2026-07-23-v0131-delivery-authority-correction.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph implementation](2026-07-22-v0131-batched-instruction-graph-implementation.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph planning](2026-07-22-v0131-batched-instruction-graph-planning.md)

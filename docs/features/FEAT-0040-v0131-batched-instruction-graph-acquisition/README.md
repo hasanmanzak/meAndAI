@@ -314,6 +314,18 @@ observer and final tree-identical run above.
   `cat-file --batch` and no `cat-file blob` inside
   `Get-TestCommittedGraphFixture`. Focused PS5.1 and PS7 confirmations passed
   in 9.3 and 9.2 seconds, and `StructureOnly` passed in 7.8 seconds.
+- Exact-head [hosted run 29963388824](https://github.com/hasanmanzak/meAndAI/actions/runs/29963388824)
+  passed on Ubuntu but failed on Windows after 20:25.9 because the independent
+  self-HEAD reader inherited a preamble-bearing PowerShell 5.1 stdin encoding.
+  The first raw OID was therefore prefixed with `EF-BB-BF` and Git returned a
+  `missing` header. Production graph transports were not affected.
+- The `FIND-0206` correction reuses the existing self-HEAD fixture under an
+  explicit preamble-bearing ambient encoding, captures the independent
+  reader's raw stdin under UTF-8 without a BOM, restores ambient encoding, and
+  makes one TEST-0162 source-contract helper guard both test-owned batch
+  readers. After AST-scoped guard review, TEST-0151/0152/0161 passed under
+  PS5.1 and PS7 in 163.6 and 97.7 seconds with exact `2/2` process and `4/4`
+  request observations; TEST-0158/0159/0162 passed in 9.2 and 8.5 seconds.
 - Hosted Windows/Linux jobs, the pull request, merge, and immutable release
   evidence remain pending external delivery facts.
 
@@ -330,7 +342,7 @@ observer and final tree-identical run above.
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0078` | Actor-local lazy binary-safe batch transport, exact parity, and operation ratchet | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0161`; PS7 84.1s, PS5.1 147.6s and Full 145.462s; process 2/2 and request 4/4 | Framing, lifecycle, budget, hashing, parity, cleanup, and final transport review complete | Complete; hosted confirmation pending externally |
-| `SUBF-0079` | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0162`; PS7/PS5.1 focused and post-review confirmations, WindowsNative 343.0s, Full 1,306.9s | Independent-reader correction, cross-runtime review, and bounded local convergence complete | Complete; hosted delivery evidence pending externally |
+| `SUBF-0079` | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0162`; PS7/PS5.1 focused, BOM-ambient, and post-review confirmations, WindowsNative 343.0s, Full 1,306.9s | Independent-reader framing correction, complete four-owner transport inventory, cross-runtime review, and bounded local convergence complete | Complete; replacement hosted delivery evidence pending externally |
 
 ## Decisions and relationships
 
@@ -453,6 +465,18 @@ closed-delivery-issue contract in TEST-0065. Issue #101 now owns delivery and
 publication evidence while issue #98 remains open for the residual; the
 correction changes no runtime behavior or test topology.
 
+The first exact-head hosted candidate then exposed `FIND-0206`. The Ubuntu job
+passed, while Windows PowerShell 5.1 inherited a BOM-emitting stdin encoding in
+the independent self-HEAD reader and corrupted its first raw Git request. The
+same transport invariant already protected both production actors, but the
+earlier TEST-0162 addition guarded the third reader only against per-blob
+process restoration. The correction inventories all four repository-owned
+batch transports: TEST-0161 retains production source and preamble-bearing
+runtime coverage, while one reusable TEST-0162 source contract now covers both
+test-owned readers and TEST-0152 runs the existing self-HEAD fixture under a
+preamble-bearing ambient encoding. No new fixture, production behavior, graph
+policy, or hosted fan-out was added.
+
 | ID | Classification / disposition | Dependencies | Priority / severity / impact / confidence | Evidence, affected scope, and impact | Recommended action / status | Links |
 | --- | --- | --- | --- | --- | --- | --- |
 | `FIND-0200` | Test-coverage defect / `Blocking` | None | `p1` / medium / high / high | TEST-0162 guarded the quick and bootstrap expected readers but not `Get-TestCommittedGraphFixture`; that third reader could have regressed to per-blob Git while production counters stayed green. | Require exactly one local `cat-file --batch` and zero `cat-file blob` in the sole function; PS5.1/PS7 focused and structural confirmations passed. / `Resolved` | `SUBF-0079`; [TEST-0162](test-cases.md) |
@@ -461,6 +485,7 @@ correction changes no runtime behavior or test topology.
 | `FIND-0203` | Test-runtime reliability risk / `OptionalImprovement` | None | `p3` / low / low / high | The deliberately independent self-HEAD expected reader uses synchronous, simplified test-only batch I/O. It is one exact-tree/hash-checked process, is outside production authority, and is now regression-guarded, but does not duplicate the production lifecycle machinery. | Retain independence; harden only if this exact reader exhibits a measured hang or leak. / `OptionalImprovement` | `SUBF-0079`; [TEST-0161 and TEST-0162](test-cases.md) |
 | `FIND-0204` | Performance residual / `ExternalOrLegacyFollowUp` | None | `p2` / medium / medium / high | Local Full remained 1,306.9 seconds: quick adoption 742.281 seconds, hosted bootstrap 253.297 seconds, and graph discovery 145.462 seconds. Environments differ from immutable hosted evidence, so no regression or gain is inferred, but the Windows critical path remains material. | Keep elapsed time observational and continue lower faithful boundary work through TASK-0002 without weakening evidence or adding hosted fan-out. / `Open`, owned by issue #98 | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0162](test-cases.md) |
 | `FIND-0205` | Publication-authority conflict / `Blocking` | `FIND-0204` | `p1` / medium / high / high | TEST-0065 requires the canonical delivery issue to be closed after publication, while issue #98 must remain open as the explicit owner of FIND-0204. One issue could not satisfy both lifecycle contracts, so post-publication closure would fail or erase the residual owner. | Use issue #101 as the closeable FEAT-0040 delivery/publication authority and retain issue #98 solely for implementation history and residual runtime work; PS5.1 StructureOnly and the focused verifier fixture pass. / `Resolved` | [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0065](../FEAT-0011-stability-closure/test-cases.md) |
+| `FIND-0206` | Hosted cross-runtime test-transport defect / `Blocking` | None | `p1` / medium / high / high | Exact-head hosted run 29963388824 passed on Ubuntu but failed on Windows because `Get-TestCommittedGraphFixture` let PowerShell 5.1 prefix its first raw OID with a UTF-8 BOM. Earlier production and shared-test corrections had not extended the complete framing invariant to this independently implemented reader. | Capture and use its BOM-free raw stdin pipe, restore ambient encoding, reuse the self-HEAD fixture under a preamble-bearing ambient encoding, and apply one TEST-0162 framing guard to both test-owned readers; focused PS5.1/PS7 owners pass. / `Resolved locally`; replacement exact-head hosted evidence pending externally | [Run 29963388824](https://github.com/hasanmanzak/meAndAI/actions/runs/29963388824); [TEST-0161 and TEST-0162](test-cases.md); [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) |
 
 ## Definition of Done
 

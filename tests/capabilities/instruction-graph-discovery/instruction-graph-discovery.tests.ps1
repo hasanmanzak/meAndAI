@@ -299,6 +299,8 @@ function Get-TestCommittedGraphFixture {
     }
     $state = [pscustomobject]@{
         Process = $null
+        InputStream = $null
+        OutputStream = $null
         ErrorTask = $null
         Started = $false
         Completed = $false
@@ -320,13 +322,41 @@ function Get-TestCommittedGraphFixture {
         $childEnvironment['GIT_NO_REPLACE_OBJECTS'] = '1'
         $process = [Diagnostics.Process]::new()
         $process.StartInfo = $startInfo
-        if (-not $process.Start()) {
-            $process.Dispose()
-            throw 'Independent expected-graph batch reader did not start.'
-        }
         $state.Process = $process
-        $state.ErrorTask = $process.StandardError.ReadToEndAsync()
-        $state.Started = $true
+        try {
+            $originalInputEncoding = [Console]::InputEncoding
+            try {
+                # Windows PowerShell 5.1 has no StandardInputEncoding. Initialize
+                # and capture the raw pipe while the enclosing writer is BOM-free.
+                [Console]::InputEncoding = [Text.UTF8Encoding]::new($false)
+                if (-not $process.Start()) {
+                    throw 'Independent expected-graph batch reader did not start.'
+                }
+                $state.Started = $true
+                $state.InputStream = $process.StandardInput.BaseStream
+            }
+            finally {
+                [Console]::InputEncoding = $originalInputEncoding
+            }
+            $state.OutputStream = $process.StandardOutput.BaseStream
+            $state.ErrorTask = $process.StandardError.ReadToEndAsync()
+        }
+        catch {
+            if ($state.Started) {
+                try {
+                    if (-not $process.HasExited) { $process.Kill() }
+                    [void]$process.WaitForExit(5000)
+                }
+                catch { }
+            }
+            $process.Dispose()
+            $state.Process = $null
+            $state.InputStream = $null
+            $state.OutputStream = $null
+            $state.ErrorTask = $null
+            $state.Started = $false
+            throw
+        }
     }.GetNewClosure()
     $reader = {
         param($entry)
@@ -339,14 +369,12 @@ function Get-TestCommittedGraphFixture {
         $request = [Text.Encoding]::ASCII.GetBytes(
             "$([string]$entry.Sha)`n"
         )
-        $state.Process.StandardInput.BaseStream.Write(
-            $request, 0, $request.Length
-        )
-        $state.Process.StandardInput.BaseStream.Flush()
+        $state.InputStream.Write($request, 0, $request.Length)
+        $state.InputStream.Flush()
         $state.Requests++
         $header = [Collections.Generic.List[byte]]::new()
         while ($true) {
-            $value = $state.Process.StandardOutput.BaseStream.ReadByte()
+            $value = $state.OutputStream.ReadByte()
             if ($value -lt 0) {
                 throw 'Independent expected-graph batch response ended before its header.'
             }
@@ -374,7 +402,7 @@ function Get-TestCommittedGraphFixture {
         $payload = [byte[]]::new([int]$size)
         $offset = 0
         while ($offset -lt $payload.Length) {
-            $read = $state.Process.StandardOutput.BaseStream.Read(
+            $read = $state.OutputStream.Read(
                 $payload, $offset, $payload.Length - $offset
             )
             if ($read -le 0) {
@@ -382,7 +410,7 @@ function Get-TestCommittedGraphFixture {
             }
             $offset += $read
         }
-        if ($state.Process.StandardOutput.BaseStream.ReadByte() -ne 10 -or
+        if ($state.OutputStream.ReadByte() -ne 10 -or
             (Get-TestGitBlobSha -Bytes $payload) -cne [string]$entry.Sha) {
             throw 'Independent expected-graph batch payload identity differs.'
         }
@@ -393,8 +421,8 @@ function Get-TestCommittedGraphFixture {
         $state.Completed = $true
         if (-not $state.Started) { return }
         try {
-            $state.Process.StandardInput.Close()
-            if ($state.Process.StandardOutput.BaseStream.ReadByte() -ne -1) {
+            $state.InputStream.Close()
+            if ($state.OutputStream.ReadByte() -ne -1) {
                 throw 'Independent expected-graph batch reader retained extra output.'
             }
             $state.Process.WaitForExit()
@@ -4250,12 +4278,32 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             (Invoke-TestGitBytes -WorkingDirectory $root `
                 -Arguments 'rev-parse HEAD')
         ).Trim()
-        $selfFixture = Get-TestCommittedGraphFixture `
-            -RepositoryRoot $root -BaseHead $head
+        $originalSelfFixtureInputEncoding = [Console]::InputEncoding
+        $selfFixture = $null
         $selfReaderCompleted = $false
         try {
+            [Console]::InputEncoding = [Text.UTF8Encoding]::new($true)
+            $ambientPreamble = [Console]::InputEncoding.GetPreamble()
+            Assert-True -Condition (
+                $ambientPreamble.Length -eq 3 -and
+                $ambientPreamble[0] -eq 0xEF -and
+                $ambientPreamble[1] -eq 0xBB -and
+                $ambientPreamble[2] -eq 0xBF
+            ) -Message 'TEST-0152 ambient stdin encoding lacks the UTF-8 preamble.'
+            $selfFixture = Get-TestCommittedGraphFixture `
+                -RepositoryRoot $root -BaseHead $head
             $selfGraph = & $graphBuilder -BaseHead $head `
                 -TreeEntries $selfFixture.Entries -ReadBlob $selfFixture.Reader
+            $restoredPreamble = [Console]::InputEncoding.GetPreamble()
+            Assert-True -Condition (
+                $restoredPreamble.Length -eq 3 -and
+                $restoredPreamble[0] -eq 0xEF -and
+                $restoredPreamble[1] -eq 0xBB -and
+                $restoredPreamble[2] -eq 0xBF
+            ) -Message (
+                'TEST-0152 independent expected reader did not restore the ' +
+                'preamble-bearing ambient stdin encoding.'
+            )
             & $selfFixture.Complete
             $selfReaderCompleted = $true
             Assert-True -Condition ([bool](& $graphValidator -Graph $selfGraph)) `
@@ -4275,7 +4323,10 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             )
         }
         finally {
-            if (-not $selfReaderCompleted) { & $selfFixture.Abort }
+            if ($null -ne $selfFixture -and -not $selfReaderCompleted) {
+                & $selfFixture.Abort
+            }
+            [Console]::InputEncoding = $originalSelfFixtureInputEncoding
         }
     }
 }
