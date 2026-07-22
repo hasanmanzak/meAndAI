@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.12.6',
+    [string]$TargetTag = 'v0.12.7',
     [string]$BranchPrefix = 'automation/meandai-capabilities-',
     [ValidateSet('Auto', 'FreshAdoption', 'FullMigration',
         'HybridReconciliation', 'CleanStart', 'Abort')]

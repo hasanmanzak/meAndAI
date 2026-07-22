@@ -534,6 +534,10 @@ function New-FinalizationScenario {
         Branch = $branch
         ExpectedHead = $head
         MergeCommitSha = $mergeCommit
+        MergeEvents = @([pscustomobject]@{
+            event = 'merged'
+            commit_id = $mergeCommit
+        })
         DefaultHead = $defaultHead
         CompareStatus = 'ahead'
         LiveHead = $head
@@ -737,7 +741,6 @@ function global:gh {
             state = $scenario.PullRequestState
             merged = [bool]$scenario.Merged
             merged_at = if ($scenario.Merged) { '2026-07-17T00:00:00Z' } else { $null }
-            merge_commit_sha = $scenario.MergeCommitSha
             body = $scenario.Body
             user = [ordered]@{ login = $scenario.HeadAuthor }
             head = [ordered]@{
@@ -751,6 +754,17 @@ function global:gh {
                 repo = [ordered]@{ full_name = $scenario.Repository }
             }
         } | ConvertTo-Json -Depth 8 -Compress
+        return
+    }
+    if ($endpoint -ceq 'repos/owner/consumer/issues/42/events?per_page=100') {
+        if ($arguments -cnotcontains '--paginate' -or
+            $arguments -cnotcontains '.[] | @base64') {
+            throw 'Managed merge-event lookup did not preserve complete pagination.'
+        }
+        Add-FinalizationEvent 'read-pull-request-events'
+        foreach ($event in @($scenario.MergeEvents)) {
+            ConvertTo-TestBase64Json $event
+        }
         return
     }
     if ($endpoint -ceq 'repos/owner/consumer') {
@@ -1123,6 +1137,34 @@ try {
         Add-Failure "TEST-0121 exact schema-2 update did not independently verify and finalize its immutable target plan: $($schema2Update.Error)"
     }
 
+    $pagedEventUpdate = New-FinalizationScenario -Kind Update -UpdateSchema 2
+    $pagedEvents = [System.Collections.Generic.List[object]]::new()
+    foreach ($index in 1..100) {
+        $pagedEvents.Add([pscustomobject]@{
+            event = 'labeled'
+            commit_id = $null
+            ordinal = $index
+        })
+    }
+    $pagedEvents.Add([pscustomobject]@{
+        event = 'merged'
+        commit_id = [string]$pagedEventUpdate.MergeCommitSha
+    })
+    $pagedEventUpdate.MergeEvents = @($pagedEvents)
+    $pagedEventResult = Invoke-FinalizationScenario -Scenario $pagedEventUpdate
+    $pagedEventReadCount = @($pagedEventResult.Scenario.Events | Where-Object {
+        $_ -ceq 'read-pull-request-events'
+    }).Count
+    $pagedDeleteCount = @($pagedEventResult.Scenario.Events | Where-Object {
+        $_ -ceq 'delete-branch'
+    }).Count
+    if ($pagedEventResult.Threw -or
+        $pagedEventResult.Scenario.BranchExists -or
+        $pagedEventResult.Scenario.IssueState -cne 'closed' -or
+        $pagedEventReadCount -ne 1 -or $pagedDeleteCount -ne 1) {
+        Add-Failure "TEST-0155 paginated API-2026 merge-event finalization did not converge: eventReads=$pagedEventReadCount; deletes=$pagedDeleteCount; branchExists=$($pagedEventResult.Scenario.BranchExists); issueState=$($pagedEventResult.Scenario.IssueState); error=$($pagedEventResult.Error)"
+    }
+
     $recoveryUpdate = Invoke-FinalizationScenario -Scenario (
         New-FinalizationScenario -Kind Update -UpdateSchema 2 `
             -RecoveryBranch $true
@@ -1170,6 +1212,11 @@ try {
     $normal = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Normal)
     if ($normal.Threw) {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
+    }
+    if (@($normal.Scenario.Events | Where-Object {
+        $_ -ceq 'read-pull-request-events'
+    }).Count -ne 0) {
+        Add-Failure 'TEST-0155 ordinary pull request performed a managed merge-event read.'
     }
     Test-NoFinalizationMutation -Result $normal -Name 'ordinary pull request'
     $normalSummaryProperty = $normal.PSObject.Properties['SummaryLines']
@@ -1248,6 +1295,24 @@ try {
         }
     }
 
+    $legacyMissingMergeEvent = New-FinalizationScenario -Kind Update `
+        -TrackingMode Absent
+    $legacyMissingMergeEvent.MergeEvents = @()
+    $legacyMissingMergeEventResult = Invoke-FinalizationScenario `
+        -Scenario $legacyMissingMergeEvent
+    $legacyMergeEventMutations = @(
+        $legacyMissingMergeEventResult.Scenario.Events | Where-Object {
+            $_ -cin @(
+                'create-update-issue', 'repair-tracking-line', 'delete-branch',
+                'comment-issue', 'close-issue'
+            )
+        }
+    )
+    if (-not $legacyMissingMergeEventResult.Threw -or
+        $legacyMergeEventMutations.Count -ne 0) {
+        Add-Failure 'TEST-0155 absent merge-event evidence did not block legacy repair before mutation.'
+    }
+
     $negativeScenarios = [System.Collections.Generic.List[object]]::new()
 
     $unmerged = New-FinalizationScenario -Kind Adoption
@@ -1264,7 +1329,51 @@ try {
 
     $mergeNotContained = New-FinalizationScenario -Kind Adoption
     $mergeNotContained.CompareStatus = 'diverged'
-    $negativeScenarios.Add([pscustomobject]@{ Name = 'merge not on default'; Scenario = $mergeNotContained })
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'merge not on default'
+        Scenario = $mergeNotContained
+        TestId = 'TEST-0155'
+    })
+
+    $missingMergeEvent = New-FinalizationScenario -Kind Adoption
+    $missingMergeEvent.MergeEvents = @([pscustomobject]@{
+        event = 'closed'; commit_id = $null
+    })
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'missing merged event'
+        Scenario = $missingMergeEvent
+        TestId = 'TEST-0155'
+    })
+
+    $duplicateMergeEvent = New-FinalizationScenario -Kind Adoption
+    $duplicateMergeEvent.MergeEvents = @(
+        [pscustomobject]@{
+            event = 'merged'; commit_id = $duplicateMergeEvent.MergeCommitSha
+        },
+        [pscustomobject]@{
+            event = 'merged'; commit_id = $duplicateMergeEvent.MergeCommitSha
+        }
+    )
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'duplicate merged event'
+        Scenario = $duplicateMergeEvent
+        TestId = 'TEST-0155'
+    })
+
+    foreach ($malformedCommit in @(
+        ('d' * 40).ToUpperInvariant(),
+        ('d' * 39)
+    )) {
+        $malformedMergeEvent = New-FinalizationScenario -Kind Adoption
+        $malformedMergeEvent.MergeEvents = @([pscustomobject]@{
+            event = 'merged'; commit_id = $malformedCommit
+        })
+        $negativeScenarios.Add([pscustomobject]@{
+            Name = "noncanonical merged event commit '$malformedCommit'"
+            Scenario = $malformedMergeEvent
+            TestId = 'TEST-0155'
+        })
+    }
 
     $duplicateMarker = New-FinalizationScenario -Kind Adoption
     $duplicateMarker.Body += "`n$($duplicateMarker.Body.Split("`n")[0])"
@@ -1327,8 +1436,13 @@ try {
 
     foreach ($negative in $negativeScenarios) {
         $result = Invoke-FinalizationScenario -Scenario $negative.Scenario
+        $testIdProperty = $negative.PSObject.Properties['TestId']
+        $testId = if ($null -ne $testIdProperty) {
+            [string]$testIdProperty.Value
+        }
+        else { 'TEST-0110' }
         if (-not $result.Threw) {
-            Add-Failure "TEST-0110 $($negative.Name) did not fail closed."
+            Add-Failure "$testId $($negative.Name) did not fail closed."
         }
         $expectedErrorProperty = $negative.PSObject.Properties['ExpectedError']
         if ($null -ne $expectedErrorProperty -and
@@ -1360,6 +1474,9 @@ finally {
 }
 
 $adapterLifecycleSource = Get-Content -LiteralPath $adapterPath -Raw
+if ($adapterLifecycleSource.Contains('merge_commit_sha')) {
+    Add-Failure 'TEST-0155 API-2026 updater still depends on the removed pull-request merge_commit_sha field.'
+}
 foreach ($requiredLegacyText in @(
     'Repair-LegacyInstallingUpdateTracking',
     'Invoke-LegacyInstallingUpdateRecovery',

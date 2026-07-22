@@ -3,6 +3,27 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.12.7 - 2026-07-22
+
+### Fixed
+
+- Resolve managed pull-request merge containment from the exact paginated
+  `merged` issue event and its canonical `commit_id`, because GitHub REST API
+  `2026-03-10` no longer returns `merge_commit_sha` in pull-request payloads.
+- Restore ordinary/schema-2 finalization and bounded legacy installing-update
+  recovery without weakening marker, repository, immutable-release,
+  changed-path, branch-head, containment, or issue-finalization gates.
+
+### Changed
+
+- Retain one verified merged-event commit across the finalizer's existing
+  pre/post-mutation state checks, avoiding repeated event reads while ordinary
+  unmanaged pull requests remain no-ops.
+
+Related work: [FEAT-0038](docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md),
+`BUG-0022`, [DEC-0016](docs/decisions/DEC-0016-managed-post-merge-finalization.md),
+and [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96).
+
 ## 0.12.6 - 2026-07-21
 
 ### Added

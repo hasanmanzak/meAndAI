@@ -97,7 +97,7 @@
             Owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
             TestIds = @(
                 'TEST-0108', 'TEST-0109', 'TEST-0110', 'TEST-0112',
-                'TEST-0142'
+                'TEST-0142', 'TEST-0155'
             )
         }
         @{

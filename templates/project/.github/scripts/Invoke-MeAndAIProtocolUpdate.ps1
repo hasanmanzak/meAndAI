@@ -2881,6 +2881,34 @@ function Get-FinalizationIssueEvidence {
     return [pscustomobject]@{ Exists = $exact.Count -eq 1 }
 }
 
+function Get-ExactPullRequestMergedEventCommitSha {
+    param(
+        [string]$Repository,
+        [int]$Number
+    )
+
+    $events = @(Invoke-GhPagedJson -Endpoint (
+        "repos/$Repository/issues/$Number/events?per_page=100"
+    ))
+    $mergedEvents = @($events | Where-Object {
+        if ($null -eq $_) { return $false }
+        $eventProperty = $_.PSObject.Properties['event']
+        return $null -ne $eventProperty -and
+            $eventProperty.Value -is [string] -and
+            [string]$eventProperty.Value -ceq 'merged'
+    })
+    if ($mergedEvents.Count -ne 1) {
+        throw "Pull request #$Number does not have one exact merged event."
+    }
+    $commitProperty = $mergedEvents[0].PSObject.Properties['commit_id']
+    if ($null -eq $commitProperty -or
+        $commitProperty.Value -isnot [string] -or
+        [string]$commitProperty.Value -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Pull request #$Number merged event has an invalid commit identity."
+    }
+    return [string]$commitProperty.Value
+}
+
 function Repair-LegacyInstallingUpdateTracking {
     param(
         [string]$Repository,
@@ -2949,10 +2977,11 @@ function Repair-LegacyInstallingUpdateTracking {
         [string]$pull.base.ref -cne $DefaultBranch -or
         $null -eq $pull.head.repo -or
         [string]$pull.head.repo.full_name -cne $Repository -or
-        [string]$pull.head.sha -cne [string]$marker.Head -or
-        [string]$pull.merge_commit_sha -cnotmatch '^[0-9a-f]{40}$') {
+        [string]$pull.head.sha -cne [string]$marker.Head) {
         throw "Managed installing update #$Number does not satisfy the exact legacy-repair identity."
     }
+    $mergeCommitSha = Get-ExactPullRequestMergedEventCommitSha `
+        -Repository $Repository -Number $Number
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$Number/files?per_page=100")
     $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
     if ($changedPaths.Count -eq 0 -or $changedPaths -cnotcontains $ProtocolPath) {
@@ -2990,7 +3019,7 @@ function Repair-LegacyInstallingUpdateTracking {
     $protocolEntry = Get-RepositoryTreeEntry -Repository $Repository `
         -HeadSha $defaultHead -Path $ProtocolPath
     $comparison = Invoke-GhReadJson `
-        -Endpoint "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
+        -Endpoint "repos/$Repository/compare/$mergeCommitSha...$defaultHead"
     if ([string]$repositoryRecord.full_name -cne $Repository -or
         [string]$repositoryRecord.default_branch -cne $DefaultBranch -or
         [string]$defaultRef.ref -cne "refs/heads/$DefaultBranch" -or
@@ -3042,7 +3071,8 @@ function Get-ManagedMergedPullRequestState {
     param(
         [string]$Repository,
         [string]$DefaultBranch,
-        [int]$Number
+        [int]$Number,
+        [AllowNull()][string]$ExpectedMergeCommitSha = $null
     )
 
     $pull = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$Number"
@@ -3138,9 +3168,20 @@ function Get-ManagedMergedPullRequestState {
         [string]$pull.base.ref -cne $DefaultBranch -or
         $null -eq $pull.head.repo -or
         [string]$pull.head.repo.full_name -cne $Repository -or
-        [string]$pull.head.sha -cne [string]$marker.Head -or
-        [string]$pull.merge_commit_sha -cnotmatch '^[0-9a-f]{40}$') {
+        [string]$pull.head.sha -cne [string]$marker.Head) {
         throw "Managed pull request #$Number is not an exact same-repository merge into the current default branch."
+    }
+    $mergeCommitSha = if ($PSBoundParameters.ContainsKey(
+        'ExpectedMergeCommitSha'
+    )) {
+        if ($ExpectedMergeCommitSha -cnotmatch '^[0-9a-f]{40}$') {
+            throw "Managed pull request #$Number has invalid retained merge evidence."
+        }
+        $ExpectedMergeCommitSha
+    }
+    else {
+        Get-ExactPullRequestMergedEventCommitSha `
+            -Repository $Repository -Number $Number
     }
     if ($kind -ceq 'Adoption' -and
         [string]$pull.user.login -cne [string]$marker.Actor) {
@@ -3211,7 +3252,7 @@ function Get-ManagedMergedPullRequestState {
         throw 'Consumer default branch head could not be resolved exactly.'
     }
     $comparison = Invoke-GhReadJson `
-        -Endpoint "repos/$Repository/compare/$([string]$pull.merge_commit_sha)...$defaultHead"
+        -Endpoint "repos/$Repository/compare/$mergeCommitSha...$defaultHead"
     if ([string]$comparison.status -cnotin @('identical', 'ahead')) {
         throw "Managed pull request #$Number merge is no longer contained in the current default branch."
     }
@@ -3280,6 +3321,7 @@ function Get-ManagedMergedPullRequestState {
         IssueNumber = $trackingIssueNumber
         EvidenceMarker = $evidenceMarker
         EvidenceExists = [bool]$evidence.Exists
+        MergeCommitSha = $mergeCommitSha
     }
 }
 
@@ -3312,8 +3354,11 @@ function Invoke-ManagedMergedPullRequestFinalization {
     }
 
     $fresh = Get-ManagedMergedPullRequestState -Repository $repository `
-        -DefaultBranch $defaultBranch -Number $Number
-    foreach ($property in @('Kind', 'Branch', 'Head', 'IssueNumber', 'EvidenceMarker')) {
+        -DefaultBranch $defaultBranch -Number $Number `
+        -ExpectedMergeCommitSha ([string]$state.MergeCommitSha)
+    foreach ($property in @(
+        'Kind', 'Branch', 'Head', 'IssueNumber', 'EvidenceMarker', 'MergeCommitSha'
+    )) {
         if ([string]$fresh.$property -cne [string]$state.$property) {
             throw "Managed pull request #$Number changed before finalization mutation."
         }
@@ -3330,7 +3375,8 @@ function Invoke-ManagedMergedPullRequestFinalization {
     }
 
     $afterBranch = Get-ManagedMergedPullRequestState -Repository $repository `
-        -DefaultBranch $defaultBranch -Number $Number
+        -DefaultBranch $defaultBranch -Number $Number `
+        -ExpectedMergeCommitSha ([string]$state.MergeCommitSha)
     if ($null -ne $afterBranch.BranchHead -or
         [int]$afterBranch.IssueNumber -ne [int]$fresh.IssueNumber) {
         throw "Managed pull request #$Number did not remain stable after branch convergence."
@@ -3370,7 +3416,8 @@ function Invoke-ManagedMergedPullRequestFinalization {
     }
 
     $complete = Get-ManagedMergedPullRequestState -Repository $repository `
-        -DefaultBranch $defaultBranch -Number $Number
+        -DefaultBranch $defaultBranch -Number $Number `
+        -ExpectedMergeCommitSha ([string]$state.MergeCommitSha)
     $remainingTransient = @($complete.Issue.labels | ForEach-Object {
         [string]$_.name
     } | Where-Object { $_ -cin @(
