@@ -733,6 +733,44 @@ function Read-MeAndAITestOperationObservationRecord {
     }
 }
 
+function Assert-MeAndAITestSuiteOperationEvidence {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][object]$Contract,
+        [Parameter(Mandatory)][string]$Owner,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$SuiteArguments,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Output
+    )
+
+    $expectation = Resolve-MeAndAITestOperationExpectation `
+        -Contract $Contract -Owner $Owner -SuiteArguments $SuiteArguments
+    $observations = @($Output | ForEach-Object { [string]$_ } |
+        Where-Object {
+            $_.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
+                [StringComparison]::Ordinal)
+        })
+    if ($null -eq $expectation) {
+        if ($observations.Count -ne 0) {
+            throw "Suite '$Owner' emitted operation evidence without a reviewed owner contract."
+        }
+        return
+    }
+    if (-not $expectation.RequiresObservation) {
+        if ($observations.Count -ne 0) {
+            throw "Suite '$Owner' emitted operation evidence on reviewed non-observing route '$($expectation.Route)'."
+        }
+        return
+    }
+
+    $record = Read-MeAndAITestOperationObservationRecord -Output $Output `
+        -ExpectedOwner $expectation.Owner -ExpectedRoute $expectation.Route `
+        -ExpectedRuntime $expectation.Runtime `
+        -ExpectedCounters @($expectation.Counters)
+    if (-not $record.Valid) {
+        throw "Suite '$Owner' has invalid operation evidence: $($record.Message)."
+    }
+}
+
 Export-ModuleMember -Function @(
     'Compare-MeAndAIExactScenarioId',
     'Read-MeAndAIScenarioResultRecord',
@@ -743,5 +781,6 @@ Export-ModuleMember -Function @(
     'Import-MeAndAITestOperationContract',
     'Resolve-MeAndAITestOperationExpectation',
     'Format-MeAndAITestOperationObservation',
-    'Read-MeAndAITestOperationObservationRecord'
+    'Read-MeAndAITestOperationObservationRecord',
+    'Assert-MeAndAITestSuiteOperationEvidence'
 )

@@ -57,6 +57,18 @@
   only arrays with unary comma; focused runtime and `StructureOnly` pass under
   PowerShell 7.6.4 and Windows PowerShell 5.1. Corrected hosted execution, pull-
   request/release delivery, and post-publication evidence remain pending.
+- Corrected hosted run 29919821489 reached every expensive Ubuntu owner:
+  quick-adoption 188.0 seconds, bootstrap 62.2 seconds, and instruction graph
+  70.7 seconds. It then exposed TEST-0138 because inline operation enforcement
+  grew the stable root runner beyond 180 lines. The limit was not raised;
+  enforcement moved into one shared-runtime assertion and the root returned to
+  167 lines. Focused TEST-0138 and runtime contracts pass under PS5 and PS7.
+- The same run's Windows step reached quick-adoption 821.5 seconds, bootstrap
+  236.0 seconds, and instruction graph 129.8 seconds before the identical final
+  TEST-0138 failure. Approximate test-step totals were Windows 22:08 and Ubuntu
+  6:51. Bootstrap improved, but total Windows, quick-adoption, and graph time did
+  not; v0.13.0 therefore makes no wall-clock improvement claim and TASK-0002
+  owns the measured residual regression.
 - The 2/3-minute soft goals were missed without violating a correctness gate.
   Residual wall-clock work is owned by
   [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).

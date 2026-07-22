@@ -427,6 +427,45 @@ $scenarioFinal = 'MEANDAI_SCENARIO_RESULTS=' +
 $compatibilityFinal =
     'MEANDAI_COMPATIBILITY_SHARD_RESULT=' +
     '{"schema":1,"suite":"synthetic","shard":"All","passed":true}'
+$selfObservation = Format-MeAndAITestOperationObservation -Owner $owner `
+    -Route default -Runtime $selfExpectation.Runtime -Counters @(
+        [pscustomobject][ordered]@{
+            name = 'contract.self-check'
+            actual = [long]1
+            maximum = [long]1
+        }
+    )
+Assert-MeAndAITestSuiteOperationEvidence -Contract $contract -Owner $owner `
+    -SuiteArguments @() -Output @($selfObservation, $scenarioFinal)
+Assert-ThrowsLike -Action {
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+        -Owner $owner -SuiteArguments @() -Output @($scenarioFinal)
+} -Pattern '*invalid operation evidence*' `
+    -Message 'TEST-0159 parent contract accepted missing required operation evidence.'
+Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+    -Owner $quickOwner -SuiteArguments @('-Shard', 'WindowsNative') `
+    -Output @($compatibilityFinal)
+Assert-ThrowsLike -Action {
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+        -Owner $quickOwner -SuiteArguments @('-Shard', 'WindowsNative') `
+        -Output @($selfObservation, $compatibilityFinal)
+} -Pattern '*reviewed non-observing route*' `
+    -Message 'TEST-0159 parent contract accepted evidence on a non-observing route.'
+Assert-ThrowsLike -Action {
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+        -Owner $quickOwner -SuiteArguments @('-Shard', 'Unreviewed') `
+        -Output @($compatibilityFinal)
+} -Pattern '*has no reviewed operation route*' `
+    -Message 'TEST-0159 parent contract accepted an unknown known-owner route.'
+$unknownOwner = 'tests/capabilities/unknown/unknown.tests.ps1'
+Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+    -Owner $unknownOwner -SuiteArguments @() -Output @($scenarioFinal)
+Assert-ThrowsLike -Action {
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $contract `
+        -Owner $unknownOwner -SuiteArguments @() `
+        -Output @($selfObservation, $scenarioFinal)
+} -Pattern '*without a reviewed owner contract*' `
+    -Message 'TEST-0159 parent contract accepted unowned operation evidence.'
 $positive = Read-MeAndAITestOperationObservationRecord `
     -Output @('diagnostic', $observation, $scenarioFinal) `
     -ExpectedOwner $owner -ExpectedRoute default `
@@ -792,11 +831,11 @@ foreach ($entry in $expectedBootstrapIncrements.GetEnumerator()) {
 }
 
 $runnerAst = Get-ParsedTestAst -Path $runnerPath
-$operationReads = @($runnerAst.FindAll({
+$operationAssertions = @($runnerAst.FindAll({
     param($node)
     $node -is [System.Management.Automation.Language.CommandAst] -and
     $node.GetCommandName() -ceq
-        'Read-MeAndAITestOperationObservationRecord'
+        'Assert-MeAndAITestSuiteOperationEvidence'
 }, $true))
 $scenarioReads = @($runnerAst.FindAll({
     param($node)
@@ -808,27 +847,18 @@ $compatibilityReads = @($runnerAst.FindAll({
     $node -is [System.Management.Automation.Language.CommandAst] -and
     $node.GetCommandName() -ceq 'Read-MeAndAICompatibilityShardResultRecord'
 }, $true))
-$operationRequirementReads = @($runnerAst.FindAll({
-    param($node)
-    $node -is [System.Management.Automation.Language.MemberExpressionAst] -and
-    $node.Member -is
-        [System.Management.Automation.Language.StringConstantExpressionAst] -and
-    $node.Member.Value -ceq 'RequiresObservation'
-}, $true))
-Assert-Equal $operationReads.Count 1 `
-    'TEST-0159 root runner operation parser call count differs.'
+Assert-Equal $operationAssertions.Count 1 `
+    'TEST-0159 root runner operation assertion call count differs.'
 Assert-Equal $scenarioReads.Count 1 `
     'TEST-0159 root runner scenario parser call count differs.'
 Assert-Equal $compatibilityReads.Count 1 `
     'TEST-0159 root runner compatibility parser call count differs.'
-Assert-Equal $operationRequirementReads.Count 1 `
-    'TEST-0159 root runner does not enforce reviewed route observation policy.'
-if ($operationReads.Count -eq 1 -and $scenarioReads.Count -eq 1 -and
+if ($operationAssertions.Count -eq 1 -and $scenarioReads.Count -eq 1 -and
     $compatibilityReads.Count -eq 1) {
-    Assert-True ($operationReads[0].Extent.StartOffset -lt
+    Assert-True ($operationAssertions[0].Extent.StartOffset -lt
         $scenarioReads[0].Extent.StartOffset) `
         'TEST-0159 root runner parses scenario success before operation evidence.'
-    Assert-True ($operationReads[0].Extent.StartOffset -lt
+    Assert-True ($operationAssertions[0].Extent.StartOffset -lt
         $compatibilityReads[0].Extent.StartOffset) `
         'TEST-0159 root runner parses compatibility success before operation evidence.'
 }

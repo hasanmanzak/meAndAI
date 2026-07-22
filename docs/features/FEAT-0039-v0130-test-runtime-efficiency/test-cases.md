@@ -68,7 +68,21 @@ Official portable PowerShell 7.6.4 reproduced the failure and exposed that
 Scalar properties now return directly while only arrays receive unary-comma
 preservation. Focused runtime and `StructureOnly` routes pass under both
 PowerShell 7.6.4 and Windows PowerShell 5.1. The corrected candidate hosted run
-remains external delivery evidence.
+then reached every expensive Ubuntu owner: quick-adoption 188.0 seconds,
+bootstrap 62.2 seconds, and instruction graph 70.7 seconds. It exposed one
+TEST-0138 architecture regression after those owners passed: inline operation-
+route enforcement had grown the stable root runner beyond its 180-line thin-
+orchestrator boundary. The threshold was not raised. Enforcement moved into
+one shared-runtime assertion, the root returned to 167 lines, and focused
+TEST-0138 plus runtime contracts pass under PowerShell 7.6.4 and Windows
+PowerShell 5.1. The same run's Windows step also reached every expensive owner
+before the identical TEST-0138 failure: quick-adoption 821.5 seconds, bootstrap
+236.0 seconds, and instruction graph 129.8 seconds. The full Windows test step
+was approximately 22 minutes 8 seconds and the Ubuntu step 6 minutes 51
+seconds. Deterministic bootstrap operations and duration improved, but total
+Windows time and the quick/graph owners did not; no runtime-improvement claim
+is made. Residual work remains assigned to TASK-0002. The next corrected
+candidate run remains external delivery evidence.
 
 The first fresh-diff review found incomplete bypass inventory, cleanup leakage,
 mode-blind fingerprints, and an under-bound input digest. Expected-red

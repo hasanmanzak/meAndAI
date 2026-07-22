@@ -38,6 +38,9 @@ This project uses the `M.m.rev` version format defined in the
   unchanged one-Windows/one-Ubuntu topology.
 - Preserve imported operation-contract scalar and array types without relying
   on PowerShell 7's scalar-wrapping `Write-Output -NoEnumerate` behavior.
+- Keep the stable root runner a thin discovery/profile/process orchestrator by
+  delegating required, non-observing, unknown-route, and unowned operation-
+  evidence enforcement to the shared test runtime.
 
 Related work: [FEAT-0039](docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md),
 `TASK-0001`, [DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),

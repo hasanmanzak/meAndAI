@@ -124,32 +124,9 @@ $completedOwners = [System.Collections.Generic.HashSet[string]]::new(
 foreach ($selectedSuite in @($selectedProfiles[0].Suites)) {
     $result = Invoke-SuiteAndRelay -Suite $selectedSuite `
         -Arguments @($selectedSuite.Arguments)
-    $operationExpectation = Resolve-MeAndAITestOperationExpectation `
-        -Contract $operationContract -Owner $selectedSuite.Owner `
-        -SuiteArguments @($selectedSuite.Arguments)
-    if ($null -ne $operationExpectation -and
-        $operationExpectation.RequiresObservation) {
-        $operationRecord = Read-MeAndAITestOperationObservationRecord `
-            -Output @($result.Output) `
-            -ExpectedOwner $operationExpectation.Owner `
-            -ExpectedRoute $operationExpectation.Route `
-            -ExpectedRuntime $operationExpectation.Runtime `
-            -ExpectedCounters @($operationExpectation.Counters)
-        if (-not $operationRecord.Valid) {
-            throw "Suite '$($selectedSuite.Owner)' has invalid operation evidence: $($operationRecord.Message)."
-        }
-    }
-    elseif ($null -ne $operationExpectation) {
-        $unexpectedOperationEvidence = @($result.Output | ForEach-Object {
-            [string]$_
-        } | Where-Object {
-            $_.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
-                [StringComparison]::Ordinal)
-        })
-        if ($unexpectedOperationEvidence.Count -ne 0) {
-            throw "Suite '$($selectedSuite.Owner)' emitted operation evidence on reviewed non-observing route '$($operationExpectation.Route)'."
-        }
-    }
+    Assert-MeAndAITestSuiteOperationEvidence -Contract $operationContract `
+        -Owner $selectedSuite.Owner `
+        -SuiteArguments @($selectedSuite.Arguments) -Output @($result.Output)
     if ($ExecutionProfile -ceq 'Full') {
         $record = Read-MeAndAIScenarioResultRecord -Output @($result.Output) `
             -ExpectedOwner $selectedSuite.Owner `
