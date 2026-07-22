@@ -5,8 +5,8 @@
 | Classification | Backward-compatible test/runtime efficiency correction / `TASK-0002` |
 | Status | Complete |
 | Target version | 0.13.1 |
-| Issue and external evidence authority | [#98](https://github.com/hasanmanzak/meAndAI/issues/98) |
-| Pull request | Recorded through [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) after creation |
+| Delivery and external evidence authority | [#101](https://github.com/hasanmanzak/meAndAI/issues/101) |
+| Pull request | [#100](https://github.com/hasanmanzak/meAndAI/pull/100) |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md), [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
 | Tests | [TEST-0161 and TEST-0162](test-cases.md) |
 
@@ -344,7 +344,9 @@ observer and final tree-identical run above.
   [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md).
 - Parent runtime guardrails:
   [FEAT-0039](../FEAT-0039-v0130-test-runtime-efficiency/README.md).
-- Tracking and future publication authority:
+- Delivery and future publication authority:
+  [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101).
+- Implementation tracking and residual runtime successor:
   [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
 
 No new decision is required for one bounded, per-acquisition transport that
@@ -354,7 +356,8 @@ feature and require a new decision.
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0040`, `TASK-0002`, `SUBF-0078`, `SUBF-0079`, and issue #98 identities.
+- [x] Stable `FEAT-0040`, `TASK-0002`, `SUBF-0078`, `SUBF-0079`, issue #98
+      implementation/residual ownership, and issue #101 delivery authority.
 - [x] Problem, outcome, scope, and non-goals are explicit.
 - [x] Session, framing, identity, budget, error, cleanup, ownership, and compatibility contracts are explicit.
 - [x] Consumers, dependencies, decisions, capability boundary, and risks are identified.
@@ -444,7 +447,11 @@ duplication and ownership, test authority, documentation/version/memory/links,
 security and performance, PowerShell compatibility, and Git hygiene. All 21
 changed PowerShell files parsed, normalized actor factories matched, local
 links and `git diff --check origin/main` passed, and the confirmation found no
-unresolved `Blocking` finding.
+unresolved `Blocking` finding. The pre-delivery audit then found `FIND-0205`:
+issue #98 could not remain the open `FIND-0204` owner and also satisfy the
+closed-delivery-issue contract in TEST-0065. Issue #101 now owns delivery and
+publication evidence while issue #98 remains open for the residual; the
+correction changes no runtime behavior or test topology.
 
 | ID | Classification / disposition | Dependencies | Priority / severity / impact / confidence | Evidence, affected scope, and impact | Recommended action / status | Links |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -453,6 +460,7 @@ unresolved `Blocking` finding.
 | `FIND-0202` | Cross-runtime concurrency risk / `OptionalImprovement` | None | `p3` / low / medium / medium | The Windows PowerShell 5.1 no-BOM stdin workaround briefly changes process-global `Console.InputEncoding` while each private actor captures redirected stdin. Supported actor paths start sessions serially, so no current call path races. | Preserve serial actor acquisition; require synchronization or a replacement capture mechanism before same-process parallel acquisition is introduced. / `OptionalImprovement` | `RISK-0191`; [TEST-0161](test-cases.md) |
 | `FIND-0203` | Test-runtime reliability risk / `OptionalImprovement` | None | `p3` / low / low / high | The deliberately independent self-HEAD expected reader uses synchronous, simplified test-only batch I/O. It is one exact-tree/hash-checked process, is outside production authority, and is now regression-guarded, but does not duplicate the production lifecycle machinery. | Retain independence; harden only if this exact reader exhibits a measured hang or leak. / `OptionalImprovement` | `SUBF-0079`; [TEST-0161 and TEST-0162](test-cases.md) |
 | `FIND-0204` | Performance residual / `ExternalOrLegacyFollowUp` | None | `p2` / medium / medium / high | Local Full remained 1,306.9 seconds: quick adoption 742.281 seconds, hosted bootstrap 253.297 seconds, and graph discovery 145.462 seconds. Environments differ from immutable hosted evidence, so no regression or gain is inferred, but the Windows critical path remains material. | Keep elapsed time observational and continue lower faithful boundary work through TASK-0002 without weakening evidence or adding hosted fan-out. / `Open`, owned by issue #98 | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0162](test-cases.md) |
+| `FIND-0205` | Publication-authority conflict / `Blocking` | `FIND-0204` | `p1` / medium / high / high | TEST-0065 requires the canonical delivery issue to be closed after publication, while issue #98 must remain open as the explicit owner of FIND-0204. One issue could not satisfy both lifecycle contracts, so post-publication closure would fail or erase the residual owner. | Use issue #101 as the closeable FEAT-0040 delivery/publication authority and retain issue #98 solely for implementation history and residual runtime work; PS5.1 StructureOnly and the focused verifier fixture pass. / `Resolved` | [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0065](../FEAT-0011-stability-closure/test-cases.md) |
 
 ## Definition of Done
 
@@ -472,7 +480,10 @@ unresolved `Blocking` finding.
 
 ## Post-merge release evidence
 
-[Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) is the stable
-external authority. Pull request, converged push, hosted checks, merge, owned-
-branch cleanup, release identifier, immutable target commit, assets, and post-
-publication verification remain `Pending` until those facts exist.
+[Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) is the stable
+delivery and publication authority. Pull request, converged push, hosted checks,
+merge, owned-branch cleanup, release identifier, immutable target commit,
+assets, and post-publication verification remain `Pending` until those facts
+exist. [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+remains open as the separate owner of `FIND-0204` and further measured runtime
+work.

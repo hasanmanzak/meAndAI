@@ -3,7 +3,7 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
-## 0.13.1 - 2026-07-22
+## 0.13.1 - 2026-07-23
 
 ### Changed
 
@@ -33,6 +33,8 @@ This project uses the `M.m.rev` version format defined in the
 
 Related work: [FEAT-0040](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md),
 `TASK-0002`, and [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+Delivery and publication evidence is owned separately by
+[issue #101](https://github.com/hasanmanzak/meAndAI/issues/101).
 
 ## 0.13.0 - 2026-07-22
 

@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-22**
+Last verified: **2026-07-23**
 
 ## Verified facts
 
@@ -25,8 +25,11 @@ Last verified: **2026-07-22**
   `78c8706e9d4d4f4c020d983b22114165687b475e` and independent-reader commit
   `55764442820c884e8c3115726bb010a0a9004d77` are focused green.
   `WindowsNative` passed in 343.0 seconds, the Full suite passed in 1,306.9
-  seconds, and bounded local convergence has no unresolved `Blocking` finding.
-  Hosted, pull-request, merge, and release gates remain pending external facts.
+  seconds. Pre-delivery audit resolved publication-authority conflict
+  `FIND-0205`: [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
+  [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) own the
+  closeable delivery/publication path, while issue #98 remains open for
+  `FIND-0204`. Hosted, merge, and release gates remain pending external facts.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -98,9 +101,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   seconds; the Full hotspots were quick adoption 742.281 seconds, hosted
   bootstrap 253.297 seconds, and instruction graph 145.462 seconds. These
   results prove deterministic process reduction, not a wall-clock gain.
-  `FIND-0200`/`FIND-0201` are resolved; `FIND-0202`/`FIND-0203` are optional
-  bounded improvements and `FIND-0204` keeps further runtime work under issue
-  #98. Continue with hosted Windows/Linux, PR, merge, and release evidence.
+  `FIND-0200`/`FIND-0201`/`FIND-0205` are resolved;
+  `FIND-0202`/`FIND-0203` are optional bounded improvements and `FIND-0204`
+  keeps further runtime work under issue #98. Continue PR #100 with hosted
+  Windows/Linux, merge, and release evidence through issue #101.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

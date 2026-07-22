@@ -19,13 +19,17 @@ commits `78c8706e9d4d4f4c020d983b22114165687b475e` and
 supporting integration routes are green; the deterministic actor boundary is
 175 processes/175 requests to one process/175 requests. `WindowsNative` passed
 in 343.0 seconds, Full passed in 1,306.9 seconds, and bounded local convergence
-closed `FIND-0200`/`FIND-0201` with no unresolved `Blocking` finding. Hosted,
-pull-request, merge, and release evidence remain pending; `FIND-0204` keeps the
-unimproved wall-clock path owned by issue #98.
+closed `FIND-0200`/`FIND-0201`. A pre-delivery audit then resolved `FIND-0205`
+by separating [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
+closeable [delivery issue #101](https://github.com/hasanmanzak/meAndAI/issues/101)
+from the open residual owner. Hosted, merge, and release evidence remain pending
+through issue #101; `FIND-0204` keeps the unimproved wall-clock path owned by
+issue #98.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.1 delivery authority correction](2026-07-23-v0131-delivery-authority-correction.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph implementation](2026-07-22-v0131-batched-instruction-graph-implementation.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph planning](2026-07-22-v0131-batched-instruction-graph-planning.md)
 - [2026-07-22 - v0.13.0 test runtime efficiency](2026-07-22-v0130-test-runtime-efficiency.md)
