@@ -152,7 +152,11 @@ envelope, semantic capability catalog, and consumer ledger remain unchanged.
   limits.
 - Each request is encoded as exact 7-bit ASCII OID bytes plus one byte `0x0A`;
   a BOM, CRLF, host newline, locale encoding, or text-writer preamble is
-  forbidden. Request write and flush are deadline-bound.
+  forbidden. Windows PowerShell 5.1 captures the raw stdin pipe under an
+  explicit no-BOM encoding and then restores the ambient console encoding. A
+  failure while capturing any redirected stream after process start must kill,
+  reap, and dispose that child before surfacing the failure. Request write and
+  flush are deadline-bound.
 - Returned OID equals the request; size is canonical non-negative decimal;
   per-blob and remaining aggregate limits pass before allocation; the payload's
   Git blob SHA-1 equals the tree OID.
@@ -160,8 +164,9 @@ envelope, semantic capability catalog, and consumer ledger remain unchanged.
   missing-trailer, extra-output, non-zero-exit, concurrent/reentrant read, or
   budget overflow permanently faults the session and returns no partial graph.
 - Standard error is drained concurrently while stdout is awaited. At most
-  65,536 stderr bytes are retained/read as diagnostic evidence; overflow
-  faults and aborts the session instead of buffering without bound. Process
+  65,536 stderr bytes are retained as diagnostic evidence; one additional byte
+  may be read only as the bounded overflow sentinel. Overflow faults and aborts
+  the session instead of buffering without bound. Process
   start failure, broken stdin, a child that stops producing bytes, and a child
   that does not exit within the common 120-second deadline all fail closed.
 - Completion closes stdin, consumes exact stdout EOF, completes bounded stderr

@@ -12,6 +12,14 @@ $hostedAdapterPath = Join-Path $root `
     'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
+$operationContract = Import-MeAndAITestOperationContract `
+    -Path (Join-Path $root 'tests/fixture-operation-budgets.psd1')
+$operationExpectation = Resolve-MeAndAITestOperationExpectation `
+    -Contract $operationContract -Owner $owner -SuiteArguments @()
+$script:InstructionGraphBlobProcessStarts = [long]0
+$script:InstructionGraphBlobRequests = [long]0
 $failures = [System.Collections.Generic.List[string]]::new()
 
 function Add-Failure {
@@ -226,7 +234,8 @@ function New-TestGraphFixture {
 function Invoke-TestGitBytes {
     param(
         [Parameter(Mandatory)][string]$WorkingDirectory,
-        [Parameter(Mandatory)][string]$Arguments
+        [Parameter(Mandatory)][string]$Arguments,
+        [switch]$DisableReplaceObjects
     )
 
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
@@ -237,6 +246,11 @@ function Invoke-TestGitBytes {
     $startInfo.CreateNoWindow = $true
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
+    if ($DisableReplaceObjects) {
+        [void]$startInfo.EnvironmentVariables
+        $childEnvironment = $startInfo.EnvironmentVariables
+        $childEnvironment['GIT_NO_REPLACE_OBJECTS'] = '1'
+    }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $startInfo
     $output = [IO.MemoryStream]::new()
@@ -283,14 +297,131 @@ function Get-TestCommittedGraphFixture {
             -Type ([string]$match.Groups['type'].Value) `
             -Sha ([string]$match.Groups['sha'].Value)))
     }
-    $gitBytes = ${function:Invoke-TestGitBytes}
+    $state = [pscustomobject]@{
+        Process = $null
+        ErrorTask = $null
+        Started = $false
+        Completed = $false
+        Requests = [long]0
+    }
+    $ensureStarted = {
+        if ($state.Started) { return }
+        $startInfo = [Diagnostics.ProcessStartInfo]::new()
+        $startInfo.FileName = 'git'
+        $startInfo.Arguments = 'cat-file --batch'
+        $startInfo.WorkingDirectory = $RepositoryRoot
+        $startInfo.UseShellExecute = $false
+        $startInfo.CreateNoWindow = $true
+        $startInfo.RedirectStandardInput = $true
+        $startInfo.RedirectStandardOutput = $true
+        $startInfo.RedirectStandardError = $true
+        [void]$startInfo.EnvironmentVariables
+        $childEnvironment = $startInfo.EnvironmentVariables
+        $childEnvironment['GIT_NO_REPLACE_OBJECTS'] = '1'
+        $process = [Diagnostics.Process]::new()
+        $process.StartInfo = $startInfo
+        if (-not $process.Start()) {
+            $process.Dispose()
+            throw 'Independent expected-graph batch reader did not start.'
+        }
+        $state.Process = $process
+        $state.ErrorTask = $process.StandardError.ReadToEndAsync()
+        $state.Started = $true
+    }.GetNewClosure()
+    $reader = {
+        param($entry)
+
+        if ($state.Completed -or [string]$entry.Type -cne 'blob' -or
+            [string]$entry.Sha -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'Independent expected-graph batch reader received an invalid request.'
+        }
+        & $ensureStarted
+        $request = [Text.Encoding]::ASCII.GetBytes(
+            "$([string]$entry.Sha)`n"
+        )
+        $state.Process.StandardInput.BaseStream.Write(
+            $request, 0, $request.Length
+        )
+        $state.Process.StandardInput.BaseStream.Flush()
+        $state.Requests++
+        $header = [Collections.Generic.List[byte]]::new()
+        while ($true) {
+            $value = $state.Process.StandardOutput.BaseStream.ReadByte()
+            if ($value -lt 0) {
+                throw 'Independent expected-graph batch response ended before its header.'
+            }
+            if ($value -eq 10) { break }
+            if ($value -gt 127 -or $header.Count -ge 128) {
+                throw 'Independent expected-graph batch response header is invalid.'
+            }
+            $header.Add([byte]$value)
+        }
+        $match = [regex]::Match(
+            [Text.Encoding]::ASCII.GetString($header.ToArray()),
+            '^(?<oid>[0-9a-f]{40}) blob (?<size>0|[1-9][0-9]*)$'
+        )
+        [long]$size = 0
+        if (-not $match.Success -or
+            [string]$match.Groups['oid'].Value -cne [string]$entry.Sha -or
+            -not [long]::TryParse(
+                [string]$match.Groups['size'].Value,
+                [Globalization.NumberStyles]::None,
+                [Globalization.CultureInfo]::InvariantCulture,
+                [ref]$size
+            ) -or $size -gt [int]::MaxValue) {
+            throw 'Independent expected-graph batch response identity is invalid.'
+        }
+        $payload = [byte[]]::new([int]$size)
+        $offset = 0
+        while ($offset -lt $payload.Length) {
+            $read = $state.Process.StandardOutput.BaseStream.Read(
+                $payload, $offset, $payload.Length - $offset
+            )
+            if ($read -le 0) {
+                throw 'Independent expected-graph batch payload ended early.'
+            }
+            $offset += $read
+        }
+        if ($state.Process.StandardOutput.BaseStream.ReadByte() -ne 10 -or
+            (Get-TestGitBlobSha -Bytes $payload) -cne [string]$entry.Sha) {
+            throw 'Independent expected-graph batch payload identity differs.'
+        }
+        return ,$payload
+    }.GetNewClosure()
+    $complete = {
+        if ($state.Completed) { return }
+        $state.Completed = $true
+        if (-not $state.Started) { return }
+        try {
+            $state.Process.StandardInput.Close()
+            if ($state.Process.StandardOutput.BaseStream.ReadByte() -ne -1) {
+                throw 'Independent expected-graph batch reader retained extra output.'
+            }
+            $state.Process.WaitForExit()
+            $errorText = [string]$state.ErrorTask.Result
+            if ($state.Process.ExitCode -ne 0) {
+                throw "Independent expected-graph batch reader failed: $errorText"
+            }
+        }
+        finally {
+            if (-not $state.Process.HasExited) { $state.Process.Kill() }
+            $state.Process.Dispose()
+        }
+    }.GetNewClosure()
+    $abort = {
+        if ($state.Completed) { return }
+        $state.Completed = $true
+        if ($state.Started) {
+            if (-not $state.Process.HasExited) { $state.Process.Kill() }
+            $state.Process.Dispose()
+        }
+    }.GetNewClosure()
     return [pscustomobject]@{
         Entries = @($entries)
-        Reader = {
-            param($entry)
-            return ,(& $gitBytes -WorkingDirectory $RepositoryRoot `
-                -Arguments "cat-file blob $([string]$entry.Sha)")
-        }.GetNewClosure()
+        Reader = $reader
+        Complete = $complete
+        Abort = $abort
+        State = $state
     }
 }
 
@@ -348,7 +479,7 @@ function New-TestHostedGraphAcquisitionModule {
         return $node -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
     $batchFactoryName = 'New-InstructionGraphBatchSession'
-    $blobReaderName = if (@($definitions | Where-Object {
+    $transportName = if (@($definitions | Where-Object {
         $_.Name -ceq $batchFactoryName
     }).Count -eq 1) {
         $batchFactoryName
@@ -359,18 +490,53 @@ function New-TestHostedGraphAcquisitionModule {
         # factory exists, this isolated hosted module exercises only that shape.
         'Get-InstructionGraphBlobBytes'
     }
-    $requiredNames = @(
+    $rootNames = @(
         'Get-InstructionGraphTreeEntries',
-        $blobReaderName,
+        $transportName,
         'Get-InstructionGraphForCommit'
     )
-    $source = [System.Collections.Generic.List[string]]::new()
-    foreach ($name in $requiredNames) {
+    $requiredNames = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    $pendingNames = [Collections.Generic.Queue[string]]::new()
+    foreach ($name in $rootNames) { $pendingNames.Enqueue($name) }
+    while ($pendingNames.Count -gt 0) {
+        $name = $pendingNames.Dequeue()
+        if (-not $requiredNames.Add($name)) { continue }
         $matches = @($definitions | Where-Object { $_.Name -ceq $name })
         if ($matches.Count -ne 1) {
             throw "Hosted adapter must define '$name' exactly once."
         }
-        $source.Add([string]$matches[0].Extent.Text)
+        foreach ($call in @($matches[0].Body.FindAll({
+            param($node)
+            return $node -is [Management.Automation.Language.CommandAst]
+        }, $true))) {
+            $calledName = [string]$call.GetCommandName()
+            if ([string]::IsNullOrEmpty($calledName)) { continue }
+            if (@($definitions | Where-Object {
+                $_.Name -ceq $calledName
+            }).Count -eq 1 -and -not $requiredNames.Contains($calledName)) {
+                $pendingNames.Enqueue($calledName)
+            }
+        }
+        foreach ($reference in [regex]::Matches(
+            [string]$matches[0].Extent.Text,
+            '\$\{function:(?<name>[A-Za-z][A-Za-z0-9-]*)\}'
+        )) {
+            $referencedName = [string]$reference.Groups['name'].Value
+            if (@($definitions | Where-Object {
+                $_.Name -ceq $referencedName
+            }).Count -eq 1 -and
+                -not $requiredNames.Contains($referencedName)) {
+                $pendingNames.Enqueue($referencedName)
+            }
+        }
+    }
+    $source = [System.Collections.Generic.List[string]]::new()
+    foreach ($definition in $definitions) {
+        if ($requiredNames.Contains([string]$definition.Name)) {
+            $source.Add([string]$definition.Extent.Text)
+        }
     }
 
     $factory = {
@@ -385,6 +551,58 @@ function New-TestHostedGraphAcquisitionModule {
         [string]::Join([Environment]::NewLine, @($source))
     )
     return $module
+}
+
+function New-TestStreamCaptureFaultFactoryModule {
+    param(
+        [Parameter(Mandatory)][string]$ActorPath,
+        [Parameter(Mandatory)][string]$FactoryName
+    )
+
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [Management.Automation.Language.Parser]::ParseFile(
+        $ActorPath, [ref]$tokens, [ref]$parseErrors
+    )
+    if (@($parseErrors).Count -ne 0) {
+        throw "Stream-capture fault actor could not be parsed: $($parseErrors[0].Message)"
+    }
+    $matches = @($ast.FindAll({
+        param($node)
+        return $node -is
+            [Management.Automation.Language.FunctionDefinitionAst] -and
+            $node.Name -ceq $FactoryName
+    }, $true))
+    if ($matches.Count -ne 1) {
+        throw "Stream-capture fault actor must define '$FactoryName' once."
+    }
+    $testFactoryName = 'New-TestStreamCaptureFaultSession'
+    $renamePattern = [regex]::new(
+        '(?m)^function\s+' + [regex]::Escape($FactoryName) + '\b'
+    )
+    $source = $renamePattern.Replace(
+        [string]$matches[0].Extent.Text,
+        "function $testFactoryName",
+        1
+    )
+    $captureExpression = '$process.StandardOutput.BaseStream'
+    if ([regex]::Matches(
+        $source, [regex]::Escape($captureExpression)
+    ).Count -ne 1) {
+        throw 'Stream-capture fault injection point is missing or ambiguous.'
+    }
+    $source = $source.Replace(
+        $captureExpression,
+        "(& { throw 'synthetic stream-capture failure' })"
+    )
+    $module = New-Module -Name (
+        'MeAndAI.TestStreamCaptureFault.' +
+        [Guid]::NewGuid().ToString('N')
+    ) -ScriptBlock ([scriptblock]::Create($source))
+    return [pscustomobject]@{
+        Module = $module
+        FactoryName = $testFactoryName
+    }
 }
 
 function Test-InstructionGraphBatchActorSourceContract {
@@ -492,6 +710,29 @@ function Test-InstructionGraphBatchActorSourceContract {
             )
             $actorPasses = $false
         }
+        if ($factorySource -cnotmatch (
+            '(?s)UTF8Encoding\]\s*::\s*new\s*\(\s*\$false\s*\).*?' +
+            'StandardInput\.BaseStream'
+        ) -or $factorySource -cnotmatch (
+            '(?s)CloseInput\s*=\s*\{.*?streamState\.Input\.Close\s*\('
+        ) -or $factorySource -cmatch 'StandardInput\.Close\s*\(') {
+            Add-Failure (
+                "TEST-0161 $ActorLabel batch factory must capture a no-BOM " +
+                'raw stdin pipe and close it without a text-writer preamble.'
+            )
+            $actorPasses = $false
+        }
+        if ($factorySource -cnotmatch (
+            '(?s)catch\s*\{.*?\$started.*?\$process\.Kill\s*\(\s*\)' +
+            '.*?WaitForExit\s*\(.*?AbortTimeoutMilliseconds.*?' +
+            '\$process\.Dispose\s*\(\s*\)'
+        )) {
+            Add-Failure (
+                "TEST-0161 $ActorLabel batch factory does not kill, reap, " +
+                'and dispose a child after stream-capture failure.'
+            )
+            $actorPasses = $false
+        }
     }
 
     $legacyDefinitions = @($definitions | Where-Object {
@@ -552,9 +793,1111 @@ function Test-InstructionGraphBatchActorSourceContract {
             )
             $actorPasses = $false
         }
+        $graphSource = [string]$graphEntries[0].Extent.Text
+        $tryFinallyBlocks = @($graphEntries[0].Body.FindAll({
+            param($node)
+            return $node -is [Management.Automation.Language.TryStatementAst] `
+                -and $null -ne $node.Finally
+        }, $true))
+        if ($tryFinallyBlocks.Count -ne 1 -or
+            $graphSource -cnotmatch '(?i)\.Complete\b' -or
+            $graphSource -cnotmatch '(?i)\.Abort\b') {
+            Add-Failure (
+                "TEST-0161 $ActorLabel graph entry must complete its batch " +
+                'session and abort it from one finally boundary so builder ' +
+                'or validator faults cannot leak the child.'
+            )
+            $actorPasses = $false
+        }
     }
 
     return $actorPasses
+}
+
+function Get-TestOptionValue {
+    param(
+        [Parameter(Mandatory)][System.Collections.IDictionary]$Options,
+        [Parameter(Mandatory)][string]$Name,
+        $Default
+    )
+
+    if ($Options.Contains($Name)) { return $Options[$Name] }
+    return $Default
+}
+
+function New-TestVirtualClock {
+    param([long[]]$Values = @([long]0))
+
+    $queue = [Collections.Generic.Queue[long]]::new()
+    foreach ($value in @($Values)) { $queue.Enqueue([long]$value) }
+    $state = [pscustomobject]@{
+        Value = if ($queue.Count -gt 0) { [long]$queue.Peek() } else { [long]0 }
+        Calls = [long]0
+        Queue = $queue
+    }
+    $callback = {
+        $state.Calls++
+        if ($state.Queue.Count -gt 0) {
+            $state.Value = [long]$state.Queue.Dequeue()
+        }
+        return [long]$state.Value
+    }.GetNewClosure()
+    return [pscustomobject]@{
+        State = $state
+        Callback = $callback
+    }
+}
+
+function New-TestCompletedTask {
+    param([bool]$Value = $true)
+
+    $source = [Threading.Tasks.TaskCompletionSource[bool]]::new()
+    $source.SetResult($Value)
+    return $source.Task
+}
+
+function New-TestCompletedIntTask {
+    param([int]$Value)
+
+    $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
+    $source.SetResult($Value)
+    return $source.Task
+}
+
+function New-TestFaultedTask {
+    param([Parameter(Mandatory)][string]$Message, [switch]$Integer)
+
+    if ($Integer) {
+        $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
+        $source.SetException([IO.IOException]::new($Message))
+        return $source.Task
+    }
+    $source = [Threading.Tasks.TaskCompletionSource[bool]]::new()
+    $source.SetException([IO.IOException]::new($Message))
+    return $source.Task
+}
+
+function Join-TestByteArrays {
+    param([Parameter(Mandatory)][object[]]$Arrays)
+
+    [long]$length = 0
+    foreach ($array in @($Arrays)) { $length += ([byte[]]$array).Length }
+    if ($length -gt [int]::MaxValue) { throw 'Test byte sequence is too large.' }
+    $result = [byte[]]::new([int]$length)
+    $offset = 0
+    foreach ($array in @($Arrays)) {
+        [byte[]]$bytes = [byte[]]$array
+        [Array]::Copy($bytes, 0, $result, $offset, $bytes.Length)
+        $offset += $bytes.Length
+    }
+    return ,$result
+}
+
+function New-TestBatchResponseBytes {
+    param(
+        [Parameter(Mandatory)][string]$Oid,
+        [Parameter(Mandatory)][byte[]]$Payload,
+        [string]$HeaderOid = $Oid,
+        [string]$Type = 'blob',
+        [string]$SizeText,
+        [byte[]]$HeaderBytes,
+        [switch]$OmitTrailer,
+        [byte]$Trailer = 10,
+        [byte[]]$Extra = @(),
+        [int]$PayloadBytesToEmit = -1
+    )
+
+    if ($null -eq $HeaderBytes) {
+        if ([string]::IsNullOrEmpty($SizeText)) {
+            $SizeText = [string]$Payload.Length
+        }
+        $HeaderBytes = [Text.Encoding]::ASCII.GetBytes(
+            "$HeaderOid $Type $SizeText`n"
+        )
+    }
+    $emitLength = if ($PayloadBytesToEmit -lt 0) {
+        $Payload.Length
+    }
+    else { [Math]::Min($PayloadBytesToEmit, $Payload.Length) }
+    $emittedPayload = [byte[]]::new($emitLength)
+    if ($emitLength -gt 0) {
+        [Array]::Copy($Payload, 0, $emittedPayload, 0, $emitLength)
+    }
+    $parts = [Collections.Generic.List[object]]::new()
+    $parts.Add([byte[]]$HeaderBytes)
+    $parts.Add([byte[]]$emittedPayload)
+    if (-not $OmitTrailer) { $parts.Add([byte[]]@($Trailer)) }
+    if ($Extra.Length -gt 0) { $parts.Add([byte[]]$Extra) }
+    return Join-TestByteArrays -Arrays @($parts)
+}
+
+function New-TestBatchTransport {
+    param([System.Collections.IDictionary]$Options = @{})
+
+    [byte[]]$output = [byte[]](Get-TestOptionValue -Options $Options `
+        -Name Output -Default ([byte[]]@()))
+    [byte[]]$standardError = [byte[]](Get-TestOptionValue -Options $Options `
+        -Name StandardError -Default ([byte[]]@()))
+    $waitQueue = [Collections.Generic.Queue[bool]]::new()
+    foreach ($value in @((Get-TestOptionValue -Options $Options `
+        -Name WaitForExitResults -Default @($true)))) {
+        $waitQueue.Enqueue([bool]$value)
+    }
+    $state = [pscustomobject]@{
+        StartCalls = [long]0
+        WriteCalls = [long]0
+        FlushCalls = [long]0
+        OutputReadCalls = [long]0
+        ErrorReadCalls = [long]0
+        CloseInputCalls = [long]0
+        WaitForExitCalls = [long]0
+        WaitForExitMilliseconds = [Collections.Generic.List[int]]::new()
+        KillCalls = [long]0
+        DisposeCalls = [long]0
+        Started = $false
+        HasExited = $false
+        Output = $output
+        OutputOffset = [int]0
+        StandardError = $standardError
+        ErrorOffset = [int]0
+        Input = [Collections.Generic.List[byte]]::new()
+        PendingSources = [Collections.Generic.List[object]]::new()
+        WaitQueue = $waitQueue
+    }
+    $startResult = [bool](Get-TestOptionValue -Options $Options `
+        -Name StartResult -Default $true)
+    $startThrows = [bool](Get-TestOptionValue -Options $Options `
+        -Name StartThrows -Default $false)
+    $writeFault = [bool](Get-TestOptionValue -Options $Options `
+        -Name WriteFault -Default $false)
+    $flushFault = [bool](Get-TestOptionValue -Options $Options `
+        -Name FlushFault -Default $false)
+    $outputFault = [bool](Get-TestOptionValue -Options $Options `
+        -Name OutputFault -Default $false)
+    $errorFault = [bool](Get-TestOptionValue -Options $Options `
+        -Name ErrorFault -Default $false)
+    $pendingOutput = [bool](Get-TestOptionValue -Options $Options `
+        -Name PendingOutput -Default $false)
+    $pendingError = [bool](Get-TestOptionValue -Options $Options `
+        -Name PendingError -Default $false)
+    $completePendingOnKill = [bool](Get-TestOptionValue -Options $Options `
+        -Name CompletePendingOnKill -Default $true)
+    $killExits = [bool](Get-TestOptionValue -Options $Options `
+        -Name KillExits -Default $true)
+    $killThrows = [bool](Get-TestOptionValue -Options $Options `
+        -Name KillThrows -Default $false)
+    $disposeThrows = [bool](Get-TestOptionValue -Options $Options `
+        -Name DisposeThrows -Default $false)
+    $exitCode = [int](Get-TestOptionValue -Options $Options `
+        -Name ExitCode -Default 0)
+    $outputChunkSize = [int](Get-TestOptionValue -Options $Options `
+        -Name OutputChunkSize -Default 7)
+    $errorChunkSize = [int](Get-TestOptionValue -Options $Options `
+        -Name ErrorChunkSize -Default 11)
+    $onWrite = Get-TestOptionValue -Options $Options -Name OnWrite -Default $null
+    $onOutputRead = Get-TestOptionValue -Options $Options `
+        -Name OnOutputRead -Default $null
+    $onErrorRead = Get-TestOptionValue -Options $Options `
+        -Name OnErrorRead -Default $null
+
+    $transport = [pscustomobject][ordered]@{
+        Start = {
+            $state.StartCalls++
+            if ($startThrows) { throw 'synthetic process-start failure' }
+            if ($startResult) { $state.Started = $true }
+            return $startResult
+        }.GetNewClosure()
+        WriteInputAsync = {
+            param([byte[]]$bytes, [int]$offset = 0, [int]$count = -1)
+            $state.WriteCalls++
+            if ($count -lt 0) { $count = $bytes.Length - $offset }
+            $writtenBytes = [byte[]]::new($count)
+            if ($count -gt 0) {
+                [Array]::Copy($bytes, $offset, $writtenBytes, 0, $count)
+            }
+            if ($null -ne $onWrite) { & $onWrite $state $writtenBytes }
+            if ($writeFault) {
+                return New-TestFaultedTask -Message 'synthetic broken stdin'
+            }
+            foreach ($value in $writtenBytes) {
+                $state.Input.Add([byte]$value)
+            }
+            return New-TestCompletedTask
+        }.GetNewClosure()
+        FlushInputAsync = {
+            $state.FlushCalls++
+            if ($flushFault) {
+                return New-TestFaultedTask -Message 'synthetic flush failure'
+            }
+            return New-TestCompletedTask
+        }.GetNewClosure()
+        ReadStandardOutputAsync = {
+            param([byte[]]$buffer, [int]$offset, [int]$count)
+            $state.OutputReadCalls++
+            if ($null -ne $onOutputRead) { & $onOutputRead $state }
+            if ($outputFault) {
+                return New-TestFaultedTask `
+                    -Message 'synthetic stdout failure' -Integer
+            }
+            if ($pendingOutput) {
+                $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
+                $state.PendingSources.Add($source)
+                return $source.Task
+            }
+            $remaining = $state.Output.Length - $state.OutputOffset
+            if ($remaining -le 0) { return New-TestCompletedIntTask -Value 0 }
+            $read = [Math]::Min($count, [Math]::Min(
+                $remaining, $outputChunkSize
+            ))
+            [Array]::Copy(
+                $state.Output, $state.OutputOffset, $buffer, $offset, $read
+            )
+            $state.OutputOffset += $read
+            return New-TestCompletedIntTask -Value $read
+        }.GetNewClosure()
+        ReadStandardErrorAsync = {
+            param([byte[]]$buffer, [int]$offset, [int]$count)
+            $state.ErrorReadCalls++
+            if ($null -ne $onErrorRead) { & $onErrorRead $state }
+            if ($errorFault) {
+                return New-TestFaultedTask `
+                    -Message 'synthetic stderr failure' -Integer
+            }
+            if ($pendingError) {
+                $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
+                $state.PendingSources.Add($source)
+                return $source.Task
+            }
+            $remaining = $state.StandardError.Length - $state.ErrorOffset
+            if ($remaining -le 0) { return New-TestCompletedIntTask -Value 0 }
+            $read = [Math]::Min($count, [Math]::Min(
+                $remaining, $errorChunkSize
+            ))
+            [Array]::Copy(
+                $state.StandardError, $state.ErrorOffset, $buffer, $offset,
+                $read
+            )
+            $state.ErrorOffset += $read
+            return New-TestCompletedIntTask -Value $read
+        }.GetNewClosure()
+        CloseInput = {
+            $state.CloseInputCalls++
+        }.GetNewClosure()
+        WaitForExit = {
+            param([int]$milliseconds)
+            $state.WaitForExitCalls++
+            [void]$state.WaitForExitMilliseconds.Add($milliseconds)
+            $result = if ($state.WaitQueue.Count -gt 0) {
+                [bool]$state.WaitQueue.Dequeue()
+            }
+            else { $true }
+            if ($result) { $state.HasExited = $true }
+            return $result
+        }.GetNewClosure()
+        GetHasExited = {
+            return [bool]$state.HasExited
+        }.GetNewClosure()
+        GetExitCode = {
+            return [int]$exitCode
+        }.GetNewClosure()
+        Kill = {
+            $state.KillCalls++
+            if ($killThrows) { throw 'synthetic kill failure' }
+            if ($completePendingOnKill) {
+                foreach ($source in @($state.PendingSources)) {
+                    if (-not $source.Task.IsCompleted) { $source.SetResult(0) }
+                }
+            }
+            if ($killExits) { $state.HasExited = $true }
+        }.GetNewClosure()
+        Dispose = {
+            $state.DisposeCalls++
+            if ($disposeThrows) { throw 'synthetic dispose failure' }
+        }.GetNewClosure()
+    }
+    return [pscustomobject]@{
+        Transport = $transport
+        State = $state
+    }
+}
+
+function New-TestBatchHooks {
+    param(
+        [Parameter(Mandatory)]$TransportFixture,
+        [Parameter(Mandatory)]$ClockFixture
+    )
+
+    $state = [pscustomobject]@{ FactoryCalls = [long]0 }
+    $transportFactory = {
+        param([string]$repository)
+        $state.FactoryCalls++
+        return $TransportFixture.Transport
+    }.GetNewClosure()
+    return [pscustomobject]@{
+        Hooks = [pscustomobject][ordered]@{
+            TransportFactory = $transportFactory
+            GetMonotonicMilliseconds = $ClockFixture.Callback
+        }
+        State = $state
+    }
+}
+
+function New-TestBatchGraphCounts {
+    param([long]$ParsedBlobs, [long]$ParsedBlobBytes)
+
+    return [pscustomobject]@{
+        counts = [pscustomobject]@{
+            parsedBlobs = [long]$ParsedBlobs
+            parsedBlobBytes = [long]$ParsedBlobBytes
+        }
+    }
+}
+
+function Invoke-TestActorBatchFactory {
+    param(
+        [Parameter(Mandatory)][ValidateSet('quick', 'hosted')]
+        [string]$Actor,
+        [Parameter(Mandatory)]$HostedModule,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$Arguments
+    )
+
+    if ($Actor -ceq 'quick') {
+        return New-QuickAdoptionInstructionGraphBatchSession @Arguments
+    }
+    return & $HostedModule {
+        param($factoryArguments)
+        New-InstructionGraphBatchSession @factoryArguments
+    } $Arguments
+}
+
+function New-TestActorBatchSessionFixture {
+    param(
+        [Parameter(Mandatory)][ValidateSet('quick', 'hosted')]
+        [string]$Actor,
+        [Parameter(Mandatory)]$HostedModule,
+        [System.Collections.IDictionary]$TransportOptions = @{},
+        [long[]]$ClockValues = @([long]0),
+        [long]$MaximumBlobBytes = 262144,
+        [long]$MaximumAggregateBlobBytes = 4194304,
+        [int]$SessionTimeoutMilliseconds = 120000,
+        [int]$AbortTimeoutMilliseconds = 5000,
+        [int]$MaximumHeaderBytes = 128,
+        [int]$MaximumStandardErrorBytes = 65536
+    )
+
+    $transport = New-TestBatchTransport -Options $TransportOptions
+    $clock = New-TestVirtualClock -Values $ClockValues
+    $transport.State | Add-Member -NotePropertyName ClockState `
+        -NotePropertyValue $clock.State -Force
+    $hooks = New-TestBatchHooks -TransportFixture $transport `
+        -ClockFixture $clock
+    $arguments = [ordered]@{
+        Repository = 'C:/synthetic/instruction-graph.git'
+        MaximumBlobBytes = [long]$MaximumBlobBytes
+        MaximumAggregateBlobBytes = [long]$MaximumAggregateBlobBytes
+        SessionTimeoutMilliseconds = [int]$SessionTimeoutMilliseconds
+        AbortTimeoutMilliseconds = [int]$AbortTimeoutMilliseconds
+        MaximumHeaderBytes = [int]$MaximumHeaderBytes
+        MaximumStandardErrorBytes = [int]$MaximumStandardErrorBytes
+        InternalTestHooks = $hooks.Hooks
+    }
+    $session = Invoke-TestActorBatchFactory -Actor $Actor `
+        -HostedModule $HostedModule -Arguments $arguments
+    return [pscustomobject]@{
+        Session = $session
+        Transport = $transport
+        Clock = $clock
+        Hooks = $hooks
+    }
+}
+
+function Test-InstructionGraphBatchActorBehavior {
+    param(
+        [Parameter(Mandatory)][ValidateSet('quick', 'hosted')]
+        [string]$Actor,
+        [Parameter(Mandatory)]$HostedModule,
+        [Parameter(Mandatory)]$GraphBuilder,
+        [Parameter(Mandatory)]$GraphValidator
+    )
+
+    $label = "TEST-0161 $Actor batch transport"
+    $baseFactoryArguments = [ordered]@{
+        Repository = 'C:/synthetic/instruction-graph.git'
+        MaximumBlobBytes = [long]262144
+        MaximumAggregateBlobBytes = [long]4194304
+        SessionTimeoutMilliseconds = [int]120000
+        AbortTimeoutMilliseconds = [int]5000
+        MaximumHeaderBytes = [int]128
+        MaximumStandardErrorBytes = [int]65536
+    }
+    $validTransport = New-TestBatchTransport
+    $validClock = New-TestVirtualClock
+    $validHooks = New-TestBatchHooks -TransportFixture $validTransport `
+        -ClockFixture $validClock
+    foreach ($badHookCase in @(
+        [pscustomobject]@{
+            Name = 'missing clock'
+            Hooks = [pscustomobject][ordered]@{
+                TransportFactory = $validHooks.Hooks.TransportFactory
+            }
+        },
+        [pscustomobject]@{
+            Name = 'unknown hook'
+            Hooks = [pscustomobject][ordered]@{
+                TransportFactory = $validHooks.Hooks.TransportFactory
+                GetMonotonicMilliseconds = $validHooks.Hooks.GetMonotonicMilliseconds
+                Unknown = { 0 }
+            }
+        },
+        [pscustomobject]@{
+            Name = 'non-scriptblock hook'
+            Hooks = [pscustomobject][ordered]@{
+                TransportFactory = 'not-a-scriptblock'
+                GetMonotonicMilliseconds = $validHooks.Hooks.GetMonotonicMilliseconds
+            }
+        }
+    )) {
+        $arguments = [ordered]@{}
+        foreach ($key in $baseFactoryArguments.Keys) {
+            $arguments[$key] = $baseFactoryArguments[$key]
+        }
+        $arguments.InternalTestHooks = $badHookCase.Hooks
+        Assert-ThrowsLike -Action {
+            [void](Invoke-TestActorBatchFactory -Actor $Actor `
+                -HostedModule $HostedModule -Arguments $arguments)
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label accepted $([string]$badHookCase.Name)."
+    }
+
+    $zero = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule
+    & $zero.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 0 -ParsedBlobBytes 0)
+    $zeroObservation = & $zero.Session.GetObservation
+    Assert-True -Condition (
+        [long]$zero.Hooks.State.FactoryCalls -eq 0 -and
+        [long]$zero.Transport.State.StartCalls -eq 0 -and
+        [long]$zeroObservation.ProcessStarts -eq 0 -and
+        [long]$zeroObservation.Requests -eq 0 -and
+        [string]$zeroObservation.Lifecycle -ceq 'Completed'
+    ) -Message "$label zero-read completion was not lazy."
+    Assert-ThrowsLike -Action {
+        & $zero.Session.ReadBlob (New-TestTreeEntry -Path 'after.md')
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label completed session remained readable."
+
+    [byte[]]$binaryPayload = @(
+        0, 10, 255, 35, 32, 104, 101, 97, 100, 101, 114, 32, 108,
+        105, 107, 101, 10, 128, 1
+    )
+    $binaryOid = Get-TestGitBlobSha -Bytes $binaryPayload
+    $binaryResponse = New-TestBatchResponseBytes -Oid $binaryOid `
+        -Payload $binaryPayload
+    $one = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = $binaryResponse
+            OutputChunkSize = 3
+        }
+    $binaryEntry = New-TestTreeEntry -Path 'AGENTS.md' -Sha $binaryOid
+    [byte[]]$binaryActual = & $one.Session.ReadBlob $binaryEntry
+    & $one.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    $oneObservation = & $one.Session.GetObservation
+    [byte[]]$oneInput = @($one.Transport.State.Input)
+    [byte[]]$expectedOneInput = [Text.Encoding]::ASCII.GetBytes(
+        "$binaryOid`n"
+    )
+    Assert-True -Condition (
+        (Get-TestSha256Hex -Bytes $binaryActual) -ceq
+            (Get-TestSha256Hex -Bytes $binaryPayload) -and
+        (Get-TestSha256Hex -Bytes $oneInput) -ceq
+            (Get-TestSha256Hex -Bytes $expectedOneInput) -and
+        $oneInput.Length -eq 41 -and $oneInput[40] -eq 10 -and
+        [long]$one.Hooks.State.FactoryCalls -eq 1 -and
+        [long]$oneObservation.ProcessStarts -eq 1 -and
+        [long]$oneObservation.Requests -eq 1 -and
+        [long]$oneObservation.ResponseBytes -eq $binaryPayload.Length -and
+        [string]$oneObservation.Lifecycle -ceq 'Completed' -and
+        [long]$one.Transport.State.DisposeCalls -eq 1
+    ) -Message "$label one-read binary framing or lifecycle differs."
+
+    [byte[]]$secondPayload = [Text.UTF8Encoding]::new($false).GetBytes(
+        "Required reading: [root](../AGENTS.md).`n"
+    )
+    $secondOid = Get-TestGitBlobSha -Bytes $secondPayload
+    $manyOutput = Join-TestByteArrays -Arrays @(
+        (New-TestBatchResponseBytes -Oid $binaryOid -Payload $binaryPayload),
+        (New-TestBatchResponseBytes -Oid $secondOid -Payload $secondPayload)
+    )
+    $many = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{ Output = $manyOutput }
+    [void](& $many.Session.ReadBlob $binaryEntry)
+    [void](& $many.Session.ReadBlob (New-TestTreeEntry `
+        -Path 'docs/AUTHORITY.md' -Sha $secondOid))
+    & $many.Session.Complete (New-TestBatchGraphCounts -ParsedBlobs 2 `
+        -ParsedBlobBytes ($binaryPayload.Length + $secondPayload.Length))
+    $manyObservation = & $many.Session.GetObservation
+    $expectedManyInput = [Text.Encoding]::ASCII.GetBytes(
+        "$binaryOid`n$secondOid`n"
+    )
+    [byte[]]$manyInput = @($many.Transport.State.Input)
+    Assert-True -Condition (
+        [long]$manyObservation.ProcessStarts -eq 1 -and
+        [long]$manyObservation.Requests -eq 2 -and
+        (Get-TestSha256Hex -Bytes $manyInput) -ceq
+            (Get-TestSha256Hex -Bytes $expectedManyInput)
+    ) -Message "$label many-read request sequence was not one serial session."
+
+    $duplicateOutput = Join-TestByteArrays -Arrays @(
+        $binaryResponse, $binaryResponse
+    )
+    $duplicate = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = $duplicateOutput
+        }
+    [void](& $duplicate.Session.ReadBlob $binaryEntry)
+    [void](& $duplicate.Session.ReadBlob (New-TestTreeEntry `
+        -Path 'docs/SAME-CONTENT.md' -Sha $binaryOid))
+    & $duplicate.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 2 -ParsedBlobBytes (2 * $binaryPayload.Length))
+    $duplicateObservation = & $duplicate.Session.GetObservation
+    Assert-True -Condition (
+        [long]$duplicateObservation.ProcessStarts -eq 1 -and
+        [long]$duplicateObservation.Requests -eq 2 -and
+        $duplicate.Transport.State.Input.Count -eq 82
+    ) -Message "$label duplicate OID was cached, prefetched, or reordered."
+
+    [byte[]]$cycleRootBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        'Required reading: [authority](docs/AUTHORITY.md).'
+    )
+    [byte[]]$cycleAuthorityBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        'Reference: [root](../AGENTS.md).'
+    )
+    $cycleRootOid = Get-TestGitBlobSha -Bytes $cycleRootBytes
+    $cycleAuthorityOid = Get-TestGitBlobSha -Bytes $cycleAuthorityBytes
+    $cycle = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = (Join-TestByteArrays -Arrays @(
+                (New-TestBatchResponseBytes -Oid $cycleRootOid `
+                    -Payload $cycleRootBytes),
+                (New-TestBatchResponseBytes -Oid $cycleAuthorityOid `
+                    -Payload $cycleAuthorityBytes)
+            ))
+        }
+    $cycleReader = {
+        param($entry)
+        & $cycle.Session.ReadBlob $entry
+    }.GetNewClosure()
+    $cycleGraph = & $GraphBuilder -BaseHead ('a' * 40) -TreeEntries @(
+        (New-TestTreeEntry -Path 'AGENTS.md' -Sha $cycleRootOid),
+        (New-TestTreeEntry -Path 'docs/AUTHORITY.md' -Sha $cycleAuthorityOid)
+    ) -ReadBlob $cycleReader
+    & $cycle.Session.Complete $cycleGraph
+    Assert-True -Condition (
+        [bool](& $GraphValidator -Graph $cycleGraph) -and
+        [long]$cycleGraph.counts.parsedBlobs -eq 2 -and
+        @($cycleGraph.edges | Where-Object {
+            $_.source -ceq 'docs/AUTHORITY.md' -and
+            $_.target -ceq 'AGENTS.md'
+        }).Count -eq 1
+    ) -Message "$label changed cyclic graph acquisition semantics."
+
+    $malformedCases = @(
+        [pscustomobject]@{
+            Name = 'missing object header'
+            Output = [Text.Encoding]::ASCII.GetBytes("$binaryOid missing`n")
+        },
+        [pscustomobject]@{
+            Name = 'ambiguous header'
+            Output = [Text.Encoding]::ASCII.GetBytes(
+                "$binaryOid blob $($binaryPayload.Length) extra`n"
+            )
+        },
+        [pscustomobject]@{
+            Name = 'wrong oid'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -HeaderOid ('e' * 40) -Payload $binaryPayload
+        },
+        [pscustomobject]@{
+            Name = 'wrong type'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -Type 'tree' -Payload $binaryPayload
+        },
+        [pscustomobject]@{
+            Name = 'noncanonical size'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -SizeText ('0' + [string]$binaryPayload.Length) `
+                -Payload $binaryPayload
+        },
+        [pscustomobject]@{
+            Name = 'hash mismatch'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -Payload ([byte[]](1..$binaryPayload.Length))
+        },
+        [pscustomobject]@{
+            Name = 'early eof'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -Payload $binaryPayload -PayloadBytesToEmit 3 -OmitTrailer
+        },
+        [pscustomobject]@{
+            Name = 'missing trailer'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -Payload $binaryPayload -OmitTrailer
+        },
+        [pscustomobject]@{
+            Name = 'bad trailer'
+            Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                -Payload $binaryPayload -Trailer 13
+        }
+    )
+    foreach ($case in $malformedCases) {
+        $fault = New-TestActorBatchSessionFixture -Actor $Actor `
+            -HostedModule $HostedModule -TransportOptions @{
+                Output = [byte[]]$case.Output
+            }
+        Assert-ThrowsLike -Action {
+            & $fault.Session.ReadBlob $binaryEntry
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label accepted $([string]$case.Name)."
+        Assert-ThrowsLike -Action {
+            & $fault.Session.ReadBlob $binaryEntry
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label $([string]$case.Name) was not terminal."
+        try { & $fault.Session.Abort } catch { }
+        $faultObservation = & $fault.Session.GetObservation
+        Assert-True -Condition (
+            [string]$faultObservation.Lifecycle -in @('Faulted', 'Aborted') -and
+            [long]$fault.Transport.State.DisposeCalls -eq 1
+        ) -Message "$label $([string]$case.Name) did not dispose exactly once."
+    }
+
+    foreach ($completionCase in @(
+        [pscustomobject]@{
+            Name = 'extra stdout'
+            Options = @{
+                Output = New-TestBatchResponseBytes -Oid $binaryOid `
+                    -Payload $binaryPayload -Extra ([byte[]]@(88))
+            }
+        },
+        [pscustomobject]@{
+            Name = 'nonzero exit'
+            Options = @{
+                Output = $binaryResponse
+                ExitCode = 17
+            }
+        }
+    )) {
+        $fault = New-TestActorBatchSessionFixture -Actor $Actor `
+            -HostedModule $HostedModule -TransportOptions $completionCase.Options
+        [void](& $fault.Session.ReadBlob $binaryEntry)
+        Assert-ThrowsLike -Action {
+            & $fault.Session.Complete (New-TestBatchGraphCounts `
+                -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label accepted $([string]$completionCase.Name)."
+        try { & $fault.Session.Abort } catch { }
+    }
+
+    $headerBytes = [Text.Encoding]::ASCII.GetBytes(
+        "$binaryOid blob $($binaryPayload.Length)`n"
+    )
+    $headerAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumHeaderBytes ($headerBytes.Length - 1) `
+        -TransportOptions @{ Output = $binaryResponse }
+    [void](& $headerAtN.Session.ReadBlob $binaryEntry)
+    & $headerAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    $headerAtNPlusOne = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumHeaderBytes ($headerBytes.Length - 2) `
+        -TransportOptions @{ Output = $binaryResponse }
+    Assert-ThrowsLike -Action {
+        & $headerAtNPlusOne.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label header N+1 did not fail closed."
+    try { & $headerAtNPlusOne.Session.Abort } catch { }
+
+    [byte[]]$headerCeilingProbe = [byte[]]::new(256)
+    for ($headerIndex = 0; $headerIndex -lt $headerCeilingProbe.Length;
+        $headerIndex++) {
+        $headerCeilingProbe[$headerIndex] = [byte]88
+    }
+    $headerAtExactProductionCeiling = New-TestActorBatchSessionFixture `
+        -Actor $Actor -HostedModule $HostedModule -MaximumHeaderBytes 128 `
+        -TransportOptions @{
+            Output = $headerCeilingProbe
+            OutputChunkSize = 1
+        }
+    Assert-ThrowsLike -Action {
+        & $headerAtExactProductionCeiling.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label exact 128-byte header ceiling was not enforced."
+    Assert-True -Condition (
+        [int]$headerAtExactProductionCeiling.Transport.State.OutputOffset -eq
+            129
+    ) -Message "$label header ceiling consumed beyond its N+1 sentinel."
+    try { & $headerAtExactProductionCeiling.Session.Abort } catch { }
+
+    $blobAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -MaximumBlobBytes $binaryPayload.Length `
+        -TransportOptions @{ Output = $binaryResponse }
+    [void](& $blobAtN.Session.ReadBlob $binaryEntry)
+    & $blobAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    $blobAtNPlusOne = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumBlobBytes ($binaryPayload.Length - 1) `
+        -TransportOptions @{ Output = $binaryResponse }
+    Assert-ThrowsLike -Action {
+        & $blobAtNPlusOne.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label per-blob N+1 did not fail closed."
+    try { & $blobAtNPlusOne.Session.Abort } catch { }
+
+    $aggregateBytes = $binaryPayload.Length + $secondPayload.Length
+    $aggregateAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -MaximumAggregateBlobBytes $aggregateBytes `
+        -TransportOptions @{ Output = $manyOutput }
+    [void](& $aggregateAtN.Session.ReadBlob $binaryEntry)
+    [void](& $aggregateAtN.Session.ReadBlob (New-TestTreeEntry `
+        -Path 'docs/AUTHORITY.md' -Sha $secondOid))
+    & $aggregateAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 2 -ParsedBlobBytes $aggregateBytes)
+    $aggregateAtNPlusOne = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumAggregateBlobBytes ($aggregateBytes - 1) `
+        -TransportOptions @{ Output = $manyOutput }
+    [void](& $aggregateAtNPlusOne.Session.ReadBlob $binaryEntry)
+    Assert-ThrowsLike -Action {
+        & $aggregateAtNPlusOne.Session.ReadBlob (New-TestTreeEntry `
+            -Path 'docs/AUTHORITY.md' -Sha $secondOid)
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label aggregate N+1 did not fail closed."
+    try { & $aggregateAtNPlusOne.Session.Abort } catch { }
+
+    [byte[]]$productionBlobPayload = [byte[]]::new(262144)
+    $productionBlobOid = Get-TestGitBlobSha -Bytes $productionBlobPayload
+    $productionBlobEntry = New-TestTreeEntry `
+        -Path 'docs/PRODUCTION-LIMIT.md' -Sha $productionBlobOid
+    [byte[]]$productionBlobResponse = New-TestBatchResponseBytes `
+        -Oid $productionBlobOid -Payload $productionBlobPayload
+    $productionBlobAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -MaximumBlobBytes 262144 `
+        -TransportOptions @{
+            Output = $productionBlobResponse
+            OutputChunkSize = 65536
+        }
+    [void](& $productionBlobAtN.Session.ReadBlob $productionBlobEntry)
+    & $productionBlobAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes 262144)
+
+    [byte[]]$productionBlobAtNPlusOnePayload = [byte[]]::new(262145)
+    $productionBlobAtNPlusOneOid = Get-TestGitBlobSha `
+        -Bytes $productionBlobAtNPlusOnePayload
+    $productionBlobAtNPlusOne = New-TestActorBatchSessionFixture `
+        -Actor $Actor -HostedModule $HostedModule `
+        -MaximumBlobBytes 262144 `
+        -TransportOptions @{
+            Output = New-TestBatchResponseBytes `
+                -Oid $productionBlobAtNPlusOneOid `
+                -Payload $productionBlobAtNPlusOnePayload `
+                -PayloadBytesToEmit 0
+            OutputChunkSize = 65536
+        }
+    Assert-ThrowsLike -Action {
+        & $productionBlobAtNPlusOne.Session.ReadBlob (
+            New-TestTreeEntry -Path 'docs/PRODUCTION-LIMIT-PLUS-ONE.md' `
+                -Sha $productionBlobAtNPlusOneOid
+        )
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label exact 262144-byte blob ceiling was not enforced."
+    try { & $productionBlobAtNPlusOne.Session.Abort } catch { }
+
+    $productionAggregateParts =
+        [Collections.Generic.List[object]]::new()
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+        $aggregateIndex++) {
+        $productionAggregateParts.Add($productionBlobResponse)
+    }
+    [byte[]]$productionAggregateResponse = Join-TestByteArrays `
+        -Arrays @($productionAggregateParts)
+    $productionAggregateAtN = New-TestActorBatchSessionFixture `
+        -Actor $Actor -HostedModule $HostedModule `
+        -MaximumAggregateBlobBytes 4194304 `
+        -TransportOptions @{
+            Output = $productionAggregateResponse
+            OutputChunkSize = 65536
+        }
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+        $aggregateIndex++) {
+        [void](& $productionAggregateAtN.Session.ReadBlob (
+            New-TestTreeEntry `
+                -Path ('docs/aggregate/{0:D2}.md' -f $aggregateIndex) `
+                -Sha $productionBlobOid
+        ))
+    }
+    & $productionAggregateAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 16 -ParsedBlobBytes 4194304)
+
+    [byte[]]$aggregateSentinelPayload = [byte[]]@(1)
+    $aggregateSentinelOid = Get-TestGitBlobSha `
+        -Bytes $aggregateSentinelPayload
+    [byte[]]$aggregateSentinelResponse = New-TestBatchResponseBytes `
+        -Oid $aggregateSentinelOid -Payload $aggregateSentinelPayload `
+        -PayloadBytesToEmit 0
+    $productionAggregateNPlusOneParts =
+        [Collections.Generic.List[object]]::new()
+    $productionAggregateNPlusOneParts.Add($productionAggregateResponse)
+    $productionAggregateNPlusOneParts.Add($aggregateSentinelResponse)
+    [byte[]]$productionAggregateNPlusOneResponse = Join-TestByteArrays `
+        -Arrays @($productionAggregateNPlusOneParts)
+    $productionAggregateAtNPlusOne = New-TestActorBatchSessionFixture `
+        -Actor $Actor -HostedModule $HostedModule `
+        -MaximumAggregateBlobBytes 4194304 `
+        -TransportOptions @{
+            Output = $productionAggregateNPlusOneResponse
+            OutputChunkSize = 65536
+        }
+    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+        $aggregateIndex++) {
+        [void](& $productionAggregateAtNPlusOne.Session.ReadBlob (
+            New-TestTreeEntry `
+                -Path ('docs/aggregate-plus/{0:D2}.md' -f $aggregateIndex) `
+                -Sha $productionBlobOid
+        ))
+    }
+    Assert-ThrowsLike -Action {
+        & $productionAggregateAtNPlusOne.Session.ReadBlob (
+            New-TestTreeEntry -Path 'docs/aggregate-plus/sentinel.md' `
+                -Sha $aggregateSentinelOid
+        )
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label exact 4194304-byte aggregate ceiling was not enforced."
+    try { & $productionAggregateAtNPlusOne.Session.Abort } catch { }
+
+    [byte[]]$stderrAtNBytes = [byte[]]::new(65536)
+    for ($stderrIndex = 0; $stderrIndex -lt $stderrAtNBytes.Length;
+        $stderrIndex++) {
+        $stderrAtNBytes[$stderrIndex] = [byte]83
+    }
+    $stderrAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumStandardErrorBytes 65536 `
+        -TransportOptions @{
+            Output = $binaryResponse
+            StandardError = $stderrAtNBytes
+            ErrorChunkSize = 8192
+        }
+    [void](& $stderrAtN.Session.ReadBlob $binaryEntry)
+    & $stderrAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    [byte[]]$stderrAtNPlusOneBytes = [byte[]]::new(65537)
+    [Array]::Copy(
+        $stderrAtNBytes, 0, $stderrAtNPlusOneBytes, 0,
+        $stderrAtNBytes.Length
+    )
+    $stderrAtNPlusOneBytes[65536] = [byte]83
+    $stderrAtNPlusOne = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule `
+        -MaximumStandardErrorBytes 65536 `
+        -TransportOptions @{
+            Output = $binaryResponse
+            StandardError = $stderrAtNPlusOneBytes
+            ErrorChunkSize = 8192
+        }
+    Assert-ThrowsLike -Action {
+        & $stderrAtNPlusOne.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label stderr N+1 did not fail closed."
+    Assert-True -Condition (
+        [int]$stderrAtNPlusOne.Transport.State.ErrorOffset -eq 65537
+    ) -Message "$label stderr overflow consumed beyond one sentinel byte."
+    try { & $stderrAtNPlusOne.Session.Abort } catch { }
+
+    foreach ($ioFaultCase in @(
+        [pscustomobject]@{ Name = 'start false'; Options = @{ StartResult = $false } },
+        [pscustomobject]@{ Name = 'start throw'; Options = @{ StartThrows = $true } },
+        [pscustomobject]@{ Name = 'broken stdin'; Options = @{ WriteFault = $true } },
+        [pscustomobject]@{ Name = 'broken flush'; Options = @{ FlushFault = $true } },
+        [pscustomobject]@{ Name = 'stdout fault'; Options = @{ OutputFault = $true } }
+    )) {
+        $fault = New-TestActorBatchSessionFixture -Actor $Actor `
+            -HostedModule $HostedModule -TransportOptions $ioFaultCase.Options
+        Assert-ThrowsLike -Action {
+            & $fault.Session.ReadBlob $binaryEntry
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label accepted $([string]$ioFaultCase.Name)."
+        try { & $fault.Session.Abort } catch { }
+    }
+
+    $deadlinePassOnRead = {
+        param($state)
+        $state.ClockState.Value = [long]120000
+    }.GetNewClosure()
+    $deadlineAtN = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            Output = $binaryResponse
+            OnOutputRead = $deadlinePassOnRead
+        }
+    [void](& $deadlineAtN.Session.ReadBlob $binaryEntry)
+    & $deadlineAtN.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+
+    $deadlineFailOnRead = {
+        param($state)
+        $state.ClockState.Value = [long]120001
+    }.GetNewClosure()
+    $deadlineAtNPlusOne = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            Output = $binaryResponse
+            PendingOutput = $true
+            OnOutputRead = $deadlineFailOnRead
+        }
+    Assert-ThrowsLike -Action {
+        & $deadlineAtNPlusOne.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label deadline N+1 pending I/O did not fail closed."
+    try { & $deadlineAtNPlusOne.Session.Abort } catch { }
+
+    foreach ($clockCase in @(
+        [pscustomobject]@{ Values = [long[]]@(-1) },
+        [pscustomobject]@{ Values = [long[]]@(0, 1, 0) }
+    )) {
+        $clockFault = New-TestActorBatchSessionFixture -Actor $Actor `
+            -HostedModule $HostedModule `
+            -ClockValues ([long[]]$clockCase.Values) `
+            -TransportOptions @{ Output = $binaryResponse }
+        Assert-ThrowsLike -Action {
+            & $clockFault.Session.ReadBlob $binaryEntry
+        }.GetNewClosure() -Pattern '*' `
+            -Message "$label accepted a negative or decreasing clock."
+        try { & $clockFault.Session.Abort } catch { }
+    }
+
+    $hung = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = $binaryResponse
+            WaitForExitResults = @($false, $true)
+        }
+    [void](& $hung.Session.ReadBlob $binaryEntry)
+    Assert-ThrowsLike -Action {
+        & $hung.Session.Complete (New-TestBatchGraphCounts `
+            -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label hung child did not abort."
+    try { & $hung.Session.Abort } catch { }
+    Assert-True -Condition (
+        [long]$hung.Transport.State.KillCalls -eq 1 -and
+        [long]$hung.Transport.State.DisposeCalls -eq 1 -and
+        [bool]$hung.Transport.State.HasExited -and
+        $hung.Transport.State.WaitForExitMilliseconds.Count -eq 2 -and
+        [int]$hung.Transport.State.WaitForExitMilliseconds[1] -eq 5000
+    ) -Message "$label hung child was not killed, reaped, and disposed."
+
+    $unreapable = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = $binaryResponse
+            WaitForExitResults = @($false, $false)
+            KillExits = $false
+        }
+    [void](& $unreapable.Session.ReadBlob $binaryEntry)
+    Assert-ThrowsLike -Action {
+        & $unreapable.Session.Complete (New-TestBatchGraphCounts `
+            -ParsedBlobs 1 -ParsedBlobBytes $binaryPayload.Length)
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label unreapable child was accepted."
+    Assert-ThrowsLike -Action {
+        & $unreapable.Session.Abort
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label unreapable child did not report cleanup failure."
+
+    $parityMismatch = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{ Output = $binaryResponse }
+    [void](& $parityMismatch.Session.ReadBlob $binaryEntry)
+    Assert-ThrowsLike -Action {
+        & $parityMismatch.Session.Complete (New-TestBatchGraphCounts `
+            -ParsedBlobs 0 -ParsedBlobBytes $binaryPayload.Length)
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label request-count parity mismatch was accepted."
+    try { & $parityMismatch.Session.Abort } catch { }
+    $byteParityMismatch = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{ Output = $binaryResponse }
+    [void](& $byteParityMismatch.Session.ReadBlob $binaryEntry)
+    Assert-ThrowsLike -Action {
+        & $byteParityMismatch.Session.Complete (New-TestBatchGraphCounts `
+            -ParsedBlobs 1 -ParsedBlobBytes ($binaryPayload.Length + 1))
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label response-byte parity mismatch was accepted."
+    try { & $byteParityMismatch.Session.Abort } catch { }
+
+    $reentrantState = [pscustomobject]@{
+        Session = $null
+        Error = $null
+        Triggered = $false
+    }
+    $onReentrantRead = {
+        param($state)
+        if ($reentrantState.Triggered) { return }
+        $reentrantState.Triggered = $true
+        try { & $reentrantState.Session.ReadBlob $binaryEntry }
+        catch { $reentrantState.Error = $_.Exception.Message }
+    }.GetNewClosure()
+    $reentrantFixture = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = $binaryResponse
+            OnOutputRead = $onReentrantRead
+        }
+    $reentrantState.Session = $reentrantFixture.Session
+    Assert-ThrowsLike -Action {
+        & $reentrantState.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label reentrant read was accepted."
+    Assert-True -Condition (-not [string]::IsNullOrEmpty($reentrantState.Error)) `
+        -Message "$label did not report the nested reentrant fault."
+    try { & $reentrantFixture.Session.Abort } catch { }
+
+    foreach ($cleanupCase in @('builder', 'validator')) {
+        $cleanup = New-TestActorBatchSessionFixture -Actor $Actor `
+            -HostedModule $HostedModule -TransportOptions @{ Output = $binaryResponse }
+        try {
+            [void](& $cleanup.Session.ReadBlob $binaryEntry)
+            throw "synthetic $cleanupCase failure"
+        }
+        catch {
+            if ($_.Exception.Message -cne "synthetic $cleanupCase failure") {
+                Add-Failure "$label $cleanupCase primary fault was replaced."
+            }
+        }
+        finally {
+            try { & $cleanup.Session.Abort } catch { }
+        }
+        Assert-True -Condition (
+            [long]$cleanup.Transport.State.KillCalls -eq 1 -and
+            [long]$cleanup.Transport.State.DisposeCalls -eq 1
+        ) -Message "$label $cleanupCase fault did not abort and dispose."
+    }
+
+    $primaryAndCleanup = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = [Text.Encoding]::ASCII.GetBytes('malformed')
+            KillThrows = $true
+            DisposeThrows = $true
+        }
+    $primaryMessage = $null
+    $cleanupMessage = $null
+    try { & $primaryAndCleanup.Session.ReadBlob $binaryEntry }
+    catch { $primaryMessage = $_.Exception.Message }
+    try { & $primaryAndCleanup.Session.Abort }
+    catch { $cleanupMessage = $_.Exception.Message }
+    Assert-True -Condition (
+        -not [string]::IsNullOrEmpty($primaryMessage) -and
+        $primaryMessage -match '(?i)(response|header|protocol|blob)' -and
+        -not [string]::IsNullOrEmpty($cleanupMessage) -and
+        $cleanupMessage -match '(?i)(kill|dispose)'
+    ) -Message "$label cleanup fault hid the primary protocol failure."
 }
 
 function New-TestDepthFixture {
@@ -621,16 +1964,16 @@ if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf) -or
     Add-Failure 'TEST-0151/TEST-0152 graph policy or acquisition adapter is missing.'
 }
 else {
-    [void](Test-InstructionGraphBatchActorSourceContract `
+    $quickBatchContractPasses = Test-InstructionGraphBatchActorSourceContract `
         -ActorLabel 'quick-adoption' -ActorPath $quickAssessmentPath `
         -FactoryName 'New-QuickAdoptionInstructionGraphBatchSession' `
         -GraphEntryName 'Get-QuickAdoptionInstructionGraph' `
-        -LegacyBlobReaderName 'Get-QuickAdoptionInstructionGraphBlobBytes')
-    [void](Test-InstructionGraphBatchActorSourceContract `
+        -LegacyBlobReaderName 'Get-QuickAdoptionInstructionGraphBlobBytes'
+    $hostedBatchContractPasses = Test-InstructionGraphBatchActorSourceContract `
         -ActorLabel 'hosted-bootstrap' -ActorPath $hostedAdapterPath `
         -FactoryName 'New-InstructionGraphBatchSession' `
         -GraphEntryName 'Get-InstructionGraphForCommit' `
-        -LegacyBlobReaderName 'Get-InstructionGraphBlobBytes')
+        -LegacyBlobReaderName 'Get-InstructionGraphBlobBytes'
 
     Import-Module $modulePath -Force
     . $quickAssessmentPath
@@ -675,6 +2018,28 @@ else {
         )) {
             $script:InitialAdoptionPolicy.Commands[$name] = Get-Command `
                 -Name $name -CommandType Function
+        }
+
+        $hostedAcquisitionModule = $null
+        try {
+            $hostedAcquisitionModule = New-TestHostedGraphAcquisitionModule `
+                -AdapterPath $hostedAdapterPath -PolicyModulePath $modulePath
+        }
+        catch {
+            Add-Failure (
+                'TEST-0161 hosted actor dependency extraction failed: ' +
+                $_.Exception.Message
+            )
+        }
+        if ($quickBatchContractPasses -and
+            $hostedBatchContractPasses -and
+            $null -ne $hostedAcquisitionModule) {
+            Test-InstructionGraphBatchActorBehavior -Actor quick `
+                -HostedModule $hostedAcquisitionModule `
+                -GraphBuilder $graphBuilder -GraphValidator $graphValidator
+            Test-InstructionGraphBatchActorBehavior -Actor hosted `
+                -HostedModule $hostedAcquisitionModule `
+                -GraphBuilder $graphBuilder -GraphValidator $graphValidator
         }
 
         $files = [ordered]@{
@@ -2150,7 +3515,6 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
         $realGitRoot = Join-Path ([IO.Path]::GetTempPath()) (
             'meandai-real-graph-' + [Guid]::NewGuid().ToString('N')
         )
-        $hostedAcquisitionModule = $null
         [void][IO.Directory]::CreateDirectory($realGitRoot)
         try {
             [void](Invoke-TestGitCommand -RepositoryRoot $realGitRoot `
@@ -2227,6 +3591,49 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                     -Arguments @('rev-parse', 'HEAD')
             )[0].Trim()
 
+            $originalAgentsOid = [string]@(
+                Invoke-TestGitCommand -RepositoryRoot $realGitRoot `
+                    -Arguments @('rev-parse', "$realGitHead`:AGENTS.md")
+            )[0].Trim()
+            $replacementAgentsText = @(
+                '# Replacement-only instructions',
+                '',
+                'Required reading: [replacement](docs/REPLACED_ONLY.md).',
+                ''
+            ) -join "`n"
+            $replacementPayloadPath = Join-Path $realGitRoot `
+                '.replacement-agents-payload'
+            Set-TestFixtureBytes -Path $replacementPayloadPath `
+                -Bytes $fixtureUtf8.GetBytes($replacementAgentsText)
+            $replacementAgentsOid = [string]@(
+                Invoke-TestGitCommand -RepositoryRoot $realGitRoot `
+                    -Arguments @(
+                        'hash-object', '-w', '--', $replacementPayloadPath
+                    )
+            )[0].Trim()
+            Remove-Item -LiteralPath $replacementPayloadPath -Force
+            [void](Invoke-TestGitCommand -RepositoryRoot $realGitRoot `
+                -Arguments @(
+                    'replace', $originalAgentsOid, $replacementAgentsOid
+                ))
+            [byte[]]$replaceEnabledAgentsBlob = Invoke-TestGitBytes `
+                -WorkingDirectory $realGitRoot `
+                -Arguments "cat-file blob $originalAgentsOid"
+            [byte[]]$replaceDisabledAgentsBlob = Invoke-TestGitBytes `
+                -WorkingDirectory $realGitRoot `
+                -Arguments "cat-file blob $originalAgentsOid" `
+                -DisableReplaceObjects
+            Assert-True -Condition (
+                (Get-TestSha256Hex -Bytes $replaceEnabledAgentsBlob) -ceq
+                    (Get-TestSha256Hex -Bytes (
+                        $fixtureUtf8.GetBytes($replacementAgentsText)
+                    )) -and
+                (Get-TestSha256Hex -Bytes $replaceDisabledAgentsBlob) -ceq
+                    (Get-TestSha256Hex -Bytes (
+                        $fixtureUtf8.GetBytes($committedAgentsText)
+                    ))
+            ) -Message 'TEST-0161 real-Git replace ref was not active or could not be disabled at the child boundary.'
+
             $worktreeAgentsText = @(
                 '# CRLF worktree drift',
                 '',
@@ -2258,15 +3665,128 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
 
             $quickEntries = @(Get-QuickAdoptionInstructionGraphTreeEntries `
                 -Repository $realGitRoot -Commit $realGitHead)
-            $quickGraph = Get-QuickAdoptionInstructionGraph `
-                -Repository $realGitRoot -Commit $realGitHead
-            $hostedAcquisitionModule = New-TestHostedGraphAcquisitionModule `
-                -AdapterPath $hostedAdapterPath -PolicyModulePath $modulePath
             $hostedEntries = @(& $hostedAcquisitionModule {
                 param($repository, $commit)
                 @(Get-InstructionGraphTreeEntries -Repository $repository `
                     -Commit $commit)
             } $realGitRoot $realGitHead)
+            $realBatchArguments = [ordered]@{
+                Repository = $realGitRoot
+                MaximumBlobBytes = [long]262144
+                MaximumAggregateBlobBytes = [long]4194304
+                SessionTimeoutMilliseconds = [int]120000
+                AbortTimeoutMilliseconds = [int]5000
+                MaximumHeaderBytes = [int]128
+                MaximumStandardErrorBytes = [int]65536
+            }
+            $realPositiveEntries = @(
+                $quickEntries | Where-Object {
+                    $_.Path -in @('AGENTS.md', 'docs/AUTHORITY.md')
+                } | Sort-Object Path
+            )
+            foreach ($streamFaultActor in @(
+                [pscustomobject]@{
+                    Path = $quickAssessmentPath
+                    Factory =
+                        'New-QuickAdoptionInstructionGraphBatchSession'
+                },
+                [pscustomobject]@{
+                    Path = $hostedAdapterPath
+                    Factory = 'New-InstructionGraphBatchSession'
+                }
+            )) {
+                $faultFactory = $null
+                $faultSession = $null
+                try {
+                    $faultFactory =
+                        New-TestStreamCaptureFaultFactoryModule `
+                            -ActorPath $streamFaultActor.Path `
+                            -FactoryName $streamFaultActor.Factory
+                    $faultSession = & $faultFactory.Module {
+                        param($factoryName, $factoryArguments)
+                        & $factoryName @factoryArguments
+                    } $faultFactory.FactoryName $realBatchArguments
+                    Assert-ThrowsLike -Action {
+                        & $faultSession.ReadBlob $realPositiveEntries[0]
+                    }.GetNewClosure() `
+                        -Pattern '*synthetic stream-capture failure*' `
+                        -Message 'TEST-0161 stream-capture failure did not fail closed.'
+                }
+                finally {
+                    if ($null -ne $faultSession) {
+                        try { & $faultSession.Abort } catch {
+                            Add-Failure (
+                                'TEST-0161 stream-capture cleanup failed: ' +
+                                $_.Exception.Message
+                            )
+                        }
+                    }
+                    if ($null -ne $faultFactory) {
+                        Remove-Module $faultFactory.Module -Force
+                    }
+                }
+            }
+            $actorObservations = @{}
+            $originalConsoleInputEncoding = [Console]::InputEncoding
+            try {
+                # A preamble-bearing ambient encoding reproduces the PS5.1
+                # StreamWriter-close hazard. The production actor must remain
+                # exact because it closes only the raw BaseStream pipe.
+                [Console]::InputEncoding =
+                    [Text.UnicodeEncoding]::new($false, $true)
+                Assert-True -Condition (
+                    [Console]::InputEncoding.GetPreamble().Length -gt 0
+                ) -Message 'TEST-0161 ambient stdin encoding has no preamble.'
+                foreach ($realActor in @('quick', 'hosted')) {
+                    $realSession = Invoke-TestActorBatchFactory `
+                        -Actor $realActor `
+                        -HostedModule $hostedAcquisitionModule `
+                        -Arguments $realBatchArguments
+                    [long]$realResponseBytes = 0
+                    $realSessionCompleted = $false
+                    try {
+                        foreach ($realEntry in $realPositiveEntries) {
+                            [byte[]]$realBytes =
+                                & $realSession.ReadBlob $realEntry
+                            $realResponseBytes += $realBytes.Length
+                        }
+                        & $realSession.Complete (New-TestBatchGraphCounts `
+                            -ParsedBlobs $realPositiveEntries.Count `
+                            -ParsedBlobBytes $realResponseBytes)
+                        $realSessionCompleted = $true
+                        $actorObservations[$realActor] =
+                            & $realSession.GetObservation
+                    }
+                    finally {
+                        if (-not $realSessionCompleted) {
+                            try { & $realSession.Abort } catch { }
+                        }
+                    }
+                }
+            }
+            finally {
+                [Console]::InputEncoding = $originalConsoleInputEncoding
+            }
+            [long]$quickBatchStarts =
+                [long]$actorObservations.quick.ProcessStarts
+            [long]$hostedBatchStarts =
+                [long]$actorObservations.hosted.ProcessStarts
+            [long]$quickBatchRequests =
+                [long]$actorObservations.quick.Requests
+            [long]$hostedBatchRequests =
+                [long]$actorObservations.hosted.Requests
+            Assert-True -Condition (
+                $quickBatchStarts -eq 1 -and $quickBatchRequests -eq 2
+            ) -Message 'TEST-0161 quick real-Git acquisition was not exactly one batch process and two requests.'
+            Assert-True -Condition (
+                $hostedBatchStarts -eq 1 -and $hostedBatchRequests -eq 2
+            ) -Message 'TEST-0161 hosted real-Git acquisition was not exactly one batch process and two requests.'
+            $script:InstructionGraphBlobProcessStarts =
+                $quickBatchStarts + $hostedBatchStarts
+            $script:InstructionGraphBlobRequests =
+                $quickBatchRequests + $hostedBatchRequests
+            $quickGraph = Get-QuickAdoptionInstructionGraph `
+                -Repository $realGitRoot -Commit $realGitHead
             $hostedGraph = & $hostedAcquisitionModule {
                 param($repository, $commit)
                 Get-InstructionGraphForCommit -Repository $repository `
@@ -2298,28 +3818,19 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             $quickAgentsEntry = @($quickEntries | Where-Object {
                 $_.Path -ceq 'AGENTS.md'
             })[0]
-            [byte[]]$quickAgentsBlob =
-                Get-QuickAdoptionInstructionGraphBlobBytes `
-                    -Repository $realGitRoot -Entry $quickAgentsEntry `
-                    -MaximumBytes 262144
-            [byte[]]$hostedAgentsBlob = & $hostedAcquisitionModule {
-                param($repository, $entry)
-                Get-InstructionGraphBlobBytes -Repository $repository `
-                    -Entry $entry -MaximumBytes 262144
-            } $realGitRoot $quickAgentsEntry
             $expectedAgentsBlob = $fixtureUtf8.GetBytes($committedAgentsText)
             Assert-True -Condition (
-                (Get-TestSha256Hex -Bytes $quickAgentsBlob) -ceq
-                    (Get-TestSha256Hex -Bytes $expectedAgentsBlob) -and
-                (Get-TestSha256Hex -Bytes $hostedAgentsBlob) -ceq
+                [string]$quickAgentsEntry.Sha -ceq $originalAgentsOid -and
+                (Get-TestSha256Hex -Bytes $replaceDisabledAgentsBlob) -ceq
                     (Get-TestSha256Hex -Bytes $expectedAgentsBlob) -and
                 (Get-TestSha256Hex -Bytes $worktreeAgentsBytes) -cne
                     (Get-TestSha256Hex -Bytes $expectedAgentsBlob)
-            ) -Message 'TEST-0152 cat-file acquisition used CRLF/filter-affected worktree bytes instead of the exact LF blob.'
+            ) -Message 'TEST-0152 independent exact reader or tree identity used replace/filter/worktree bytes.'
             Assert-True -Condition (
                 [string]$quickGraph.digest -ceq [string]$hostedGraph.digest -and
                 [string]$quickGraph.baseHead -ceq $realGitHead -and
                 @($quickGraph.nodes.path) -ccontains 'docs/AUTHORITY.md' -and
+                @($quickGraph.nodes.path) -cnotcontains 'docs/REPLACED_ONLY.md' -and
                 @($quickGraph.nodes.path) -cnotcontains 'docs/WORKTREE_ONLY.md' -and
                 @($quickGraph.nodes | Where-Object {
                     $_.path -ceq 'docs/governance/LINK.md' -and
@@ -2741,9 +4252,12 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
         ).Trim()
         $selfFixture = Get-TestCommittedGraphFixture `
             -RepositoryRoot $root -BaseHead $head
+        $selfReaderCompleted = $false
         try {
             $selfGraph = & $graphBuilder -BaseHead $head `
                 -TreeEntries $selfFixture.Entries -ReadBlob $selfFixture.Reader
+            & $selfFixture.Complete
+            $selfReaderCompleted = $true
             Assert-True -Condition ([bool](& $graphValidator -Graph $selfGraph)) `
                 -Message 'TEST-0152 meAndAI HEAD did not satisfy its consumer graph contract.'
             Assert-True -Condition (
@@ -2760,6 +4274,9 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                 "graph contract: $($_.Exception.Message)"
             )
         }
+        finally {
+            if (-not $selfReaderCompleted) { & $selfFixture.Abort }
+        }
     }
 }
 
@@ -2774,5 +4291,30 @@ Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0161'
 Write-Host 'Instruction-graph discovery tests passed.' -ForegroundColor Green
 $scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
     -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
-Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
-    ($scenarioResult | ConvertTo-Json -Compress))
+$scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +
+    ($scenarioResult | ConvertTo-Json -Compress)
+$operationLine = Format-MeAndAITestOperationObservation `
+    -Owner $operationExpectation.Owner -Route $operationExpectation.Route `
+    -Runtime $operationExpectation.Runtime -Counters @(
+        [ordered]@{
+            name = 'instruction-graph.blob-process-start'
+            actual = [long]$script:InstructionGraphBlobProcessStarts
+            maximum = [long]$operationExpectation.Counters[0].Maximum
+        },
+        [ordered]@{
+            name = 'instruction-graph.blob-request'
+            actual = [long]$script:InstructionGraphBlobRequests
+            maximum = [long]$operationExpectation.Counters[1].Maximum
+        }
+    )
+$operationRecord = Read-MeAndAITestOperationObservationRecord `
+    -Output @($operationLine, $scenarioLine) `
+    -ExpectedOwner $operationExpectation.Owner `
+    -ExpectedRoute $operationExpectation.Route `
+    -ExpectedRuntime $operationExpectation.Runtime `
+    -ExpectedCounters @($operationExpectation.Counters)
+if (-not $operationRecord.Valid) {
+    throw "Instruction-graph operation evidence is invalid: $($operationRecord.Message)"
+}
+Write-Host $operationLine
+Write-Host $scenarioLine
