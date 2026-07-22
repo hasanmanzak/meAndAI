@@ -303,6 +303,15 @@ function Assert-MeAndAITestRuntimeCounterName {
     }
 }
 
+function Assert-MeAndAITestRuntimeMeasurementId {
+    param([Parameter(Mandatory)][object]$Id)
+
+    if ($Id -isnot [string] -or
+        [string]$Id -cnotmatch '^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$') {
+        throw "Operation measurement identity '$Id' is invalid."
+    }
+}
+
 function Get-MeAndAITestRuntimeArgumentSignature {
     param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Arguments)
 
@@ -368,30 +377,62 @@ function Import-MeAndAITestOperationContract {
     $resolved = (Resolve-Path -LiteralPath $Path).Path
     $data = Import-PowerShellDataFile -LiteralPath $resolved
     Assert-MeAndAITestRuntimeExactProperties -Value $data -Expected @(
-        'SchemaVersion', 'Capability', 'Measurement', 'ObservationOwners',
+        'SchemaVersion', 'Capability', 'Measurements', 'ObservationOwners',
         'ClosureTargets'
     ) -Context 'Operation contract'
     if ($data.SchemaVersion -isnot [long] -or
-        [long]$data.SchemaVersion -ne 1 -or
+        [long]$data.SchemaVersion -ne 2 -or
         $data.Capability -isnot [string] -or
         [string]$data.Capability -cne 'test-runtime-efficiency') {
         throw 'Operation contract identity is invalid.'
     }
-    Assert-MeAndAITestRuntimeExactProperties -Value $data.Measurement `
-        -Expected @('BaseCommit', 'ObserverDigest') `
-        -Context 'Operation contract measurement'
-    if ($data.Measurement.BaseCommit -isnot [string] -or
-        [string]$data.Measurement.BaseCommit -cnotmatch '^[0-9a-f]{40}$' -or
-        $data.Measurement.ObserverDigest -isnot [string] -or
-        [string]$data.Measurement.ObserverDigest -cnotmatch
-            '^sha256:[0-9a-f]{64}$') {
-        throw 'Operation contract measurement identity is invalid.'
-    }
-    if ($data.ObservationOwners -isnot [array] -or
+    if ($data.Measurements -isnot [array] -or
+        @($data.Measurements).Count -eq 0 -or
+        $data.ObservationOwners -isnot [array] -or
         @($data.ObservationOwners).Count -eq 0 -or
         $data.ClosureTargets -isnot [array] -or
         @($data.ClosureTargets).Count -eq 0) {
-        throw 'Operation contract owners and closure targets must be non-empty arrays.'
+        throw 'Operation contract measurements, owners, and closure targets must be non-empty arrays.'
+    }
+
+    $measurements = [System.Collections.Generic.List[object]]::new()
+    $measurementIndex =
+        [System.Collections.Generic.Dictionary[string, object]]::new(
+            [StringComparer]::Ordinal
+        )
+    $previousMeasurementId = $null
+    foreach ($measurement in @($data.Measurements)) {
+        Assert-MeAndAITestRuntimeExactProperties -Value $measurement `
+            -Expected @('Id', 'BaseCommit', 'ObserverDigest') `
+            -Context 'Operation contract measurement'
+        $measurementId = Get-MeAndAITestRuntimePropertyValue `
+            -Value $measurement -Name Id
+        $baseCommit = Get-MeAndAITestRuntimePropertyValue `
+            -Value $measurement -Name BaseCommit
+        $observerDigest = Get-MeAndAITestRuntimePropertyValue `
+            -Value $measurement -Name ObserverDigest
+        Assert-MeAndAITestRuntimeMeasurementId -Id $measurementId
+        if ($baseCommit -isnot [string] -or
+            [string]$baseCommit -cnotmatch '^[0-9a-f]{40}$' -or
+            $observerDigest -isnot [string] -or
+            [string]$observerDigest -cnotmatch '^sha256:[0-9a-f]{64}$') {
+            throw "Operation contract measurement '$measurementId' provenance is invalid."
+        }
+        if ($null -ne $previousMeasurementId -and
+            [StringComparer]::Ordinal.Compare(
+                [string]$previousMeasurementId,
+                [string]$measurementId
+            ) -ge 0) {
+            throw 'Operation contract measurements must be unique and ordinally sorted.'
+        }
+        $normalizedMeasurement = [pscustomobject][ordered]@{
+            Id = [string]$measurementId
+            BaseCommit = [string]$baseCommit
+            ObserverDigest = [string]$observerDigest
+        }
+        $measurements.Add($normalizedMeasurement)
+        $measurementIndex.Add([string]$measurementId, $normalizedMeasurement)
+        $previousMeasurementId = [string]$measurementId
     }
 
     $owners = [System.Collections.Generic.List[object]]::new()
@@ -475,7 +516,7 @@ function Import-MeAndAITestOperationContract {
     foreach ($target in @($data.ClosureTargets)) {
         Assert-MeAndAITestRuntimeExactProperties -Value $target -Expected @(
             'Owner', 'Route', 'Counter', 'Baseline', 'Maximum',
-            'Instrumented', 'WorkId'
+            'Instrumented', 'MeasurementId', 'WorkId'
         ) -Context 'Operation closure target'
         $owner = Get-MeAndAITestRuntimePropertyValue -Value $target -Name Owner
         $route = Get-MeAndAITestRuntimePropertyValue -Value $target -Name Route
@@ -487,6 +528,8 @@ function Import-MeAndAITestOperationContract {
             -Name Maximum
         $instrumented = Get-MeAndAITestRuntimePropertyValue -Value $target `
             -Name Instrumented
+        $measurementId = Get-MeAndAITestRuntimePropertyValue -Value $target `
+            -Name MeasurementId
         $workId = Get-MeAndAITestRuntimePropertyValue -Value $target -Name WorkId
         Assert-MeAndAITestRuntimeOwner -Owner $owner
         Assert-MeAndAITestRuntimeRoute -Route $route
@@ -497,6 +540,10 @@ function Import-MeAndAITestOperationContract {
             $instrumented -isnot [bool] -or $workId -isnot [string] -or
             [string]$workId -cnotmatch '^SUBF-[0-9]{4}$') {
             throw "Operation closure target '$owner|$route|$counter' is invalid."
+        }
+        Assert-MeAndAITestRuntimeMeasurementId -Id $measurementId
+        if (-not $measurementIndex.ContainsKey([string]$measurementId)) {
+            throw "Operation closure target '$owner|$route|$counter' references unknown measurement '$measurementId'."
         }
         if (-not $ownerIndex.ContainsKey([string]$owner) -or
             -not $ownerIndex[[string]$owner].ContainsKey([string]$route)) {
@@ -522,17 +569,15 @@ function Import-MeAndAITestOperationContract {
             Baseline = [long]$baseline
             Maximum = [long]$maximum
             Instrumented = [bool]$instrumented
+            MeasurementId = [string]$measurementId
             WorkId = [string]$workId
         })
     }
 
     return [pscustomobject][ordered]@{
-        SchemaVersion = [long]1
+        SchemaVersion = [long]2
         Capability = 'test-runtime-efficiency'
-        Measurement = [pscustomobject][ordered]@{
-            BaseCommit = [string]$data.Measurement.BaseCommit
-            ObserverDigest = [string]$data.Measurement.ObserverDigest
-        }
+        Measurements = @($measurements)
         ObservationOwners = @($owners)
         ClosureTargets = @($targets)
     }

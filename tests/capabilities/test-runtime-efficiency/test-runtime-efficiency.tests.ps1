@@ -81,6 +81,25 @@ function Replace-FirstOrdinal {
         $Source.Substring($index + $OldValue.Length)
 }
 
+function Swap-FirstOrdinal {
+    param(
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$First,
+        [Parameter(Mandatory)][string]$Second
+    )
+
+    $placeholder = '__MEANDAI_OPERATION_CONTRACT_SWAP__'
+    if ($Source.Contains($placeholder)) {
+        throw 'Synthetic manifest swap placeholder already exists.'
+    }
+    $result = Replace-FirstOrdinal -Source $Source -OldValue $First `
+        -NewValue $placeholder
+    $result = Replace-FirstOrdinal -Source $result -OldValue $Second `
+        -NewValue $First
+    return Replace-FirstOrdinal -Source $result -OldValue $placeholder `
+        -NewValue $Second
+}
+
 function Get-OptionalPropertyValue {
     param(
         [AllowNull()][object]$Value,
@@ -91,6 +110,25 @@ function Get-OptionalPropertyValue {
     $property = $Value.PSObject.Properties[$Name]
     if ($null -eq $property) { return $null }
     return $property.Value
+}
+
+function Test-CanonicalTargetMeasurementBindings {
+    param(
+        [Parameter(Mandatory)][object[]]$Targets,
+        [Parameter(Mandatory)][System.Collections.IDictionary]$Expected
+    )
+
+    if ($Targets.Count -ne $Expected.Count) { return $false }
+    foreach ($target in $Targets) {
+        $identity = "$($target.Owner)|$($target.Route)|$($target.Counter)"
+        if (-not $Expected.Contains($identity)) { return $false }
+        $parts = @(([string]$Expected[$identity]).Split('|'))
+        if ($parts.Count -ne 3 -or
+            [string]$target.MeasurementId -cne $parts[1]) {
+            return $false
+        }
+    }
+    return $true
 }
 
 function Remove-ContractTempRoot {
@@ -367,6 +405,9 @@ $expectedTargets = [ordered]@{
     'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1|default|instruction-graph.blob-process-start' = "4/2|$graphMeasurement|SUBF-0078"
     'tests/capabilities/instruction-graph-discovery/instruction-graph-discovery.tests.ps1|default|instruction-graph.blob-request' = "4/4|$graphMeasurement|SUBF-0078"
 }
+Assert-True (Test-CanonicalTargetMeasurementBindings `
+    -Targets $closureTargets -Expected $expectedTargets) `
+    'TEST-0162 canonical target-to-measurement bindings differ.'
 foreach ($target in $closureTargets) {
     $identity = "$($target.Owner)|$($target.Route)|$($target.Counter)"
     Assert-True $expectedTargets.Contains($identity) `
@@ -478,7 +519,22 @@ try {
             -NewValue "RequiresObservation = 'false'"),
         (Replace-FirstOrdinal -Source $manifestSource `
             -OldValue 'Counters = @()' `
-            -NewValue "Counters = @(@{ Name = 'unreviewed'; Maximum = [long]0 })")
+            -NewValue "Counters = @(@{ Name = 'unreviewed'; Maximum = [long]0 })"),
+        (Replace-FirstOrdinal -Source $manifestSource `
+            -OldValue "Id = 'feat-0039-v0127-fixtures'" `
+            -NewValue '# Id intentionally absent'),
+        (Replace-FirstOrdinal -Source $manifestSource `
+            -OldValue "MeasurementId = 'feat-0039-v0127-fixtures'" `
+            -NewValue '# MeasurementId intentionally absent'),
+        (Replace-FirstOrdinal -Source $manifestSource `
+            -OldValue "MeasurementId = 'feat-0039-v0127-fixtures'" `
+            -NewValue "MeasurementId = 'feat-9999-v9999-unknown'"),
+        (Replace-FirstOrdinal -Source $manifestSource `
+            -OldValue "Id = 'feat-0040-v0130-graph-transport'" `
+            -NewValue "Id = 'feat-0039-v0127-fixtures'"),
+        (Swap-FirstOrdinal -Source $manifestSource `
+            -First "Id = 'feat-0039-v0127-fixtures'" `
+            -Second "Id = 'feat-0040-v0130-graph-transport'")
     )
     for ($index = 0; $index -lt $badSources.Count; $index++) {
         $path = Join-Path $manifestRoot ("bad-$index.psd1")
@@ -489,6 +545,19 @@ try {
         } -Pattern '*' `
             -Message "TEST-0159 malformed manifest $index was accepted."
     }
+
+    $crossWorkSource = Replace-FirstOrdinal -Source $manifestSource `
+        -OldValue "MeasurementId = 'feat-0039-v0127-fixtures'" `
+        -NewValue "MeasurementId = 'feat-0040-v0130-graph-transport'"
+    $crossWorkPath = Join-Path $manifestRoot 'cross-work.psd1'
+    [IO.File]::WriteAllText($crossWorkPath, $crossWorkSource,
+        [Text.UTF8Encoding]::new($false))
+    $crossWorkContract = Import-MeAndAITestOperationContract `
+        -Path $crossWorkPath
+    Assert-True (-not (Test-CanonicalTargetMeasurementBindings `
+        -Targets @($crossWorkContract.ClosureTargets) `
+        -Expected $expectedTargets)) `
+        'TEST-0162 canonical bindings accepted a valid-known cross-work measurement swap.'
 }
 finally {
     Remove-ContractTempRoot -Path $manifestRoot
