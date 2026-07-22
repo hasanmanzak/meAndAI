@@ -50,9 +50,12 @@
   bypass, known-owner/unknown-route bypass, and dynamically assembled direct
   Git operation missed by inventory. All three have expected-red coverage,
   fail-closed remediation, and a no-blocker confirmation review.
-- Local PowerShell 7 is unavailable. The unchanged hosted topology runs one
-  focused PowerShell 7 contract step in the existing Windows job and the Full
-  route under PowerShell 7 in the existing Ubuntu job. Hosted execution, pull-
+- Initial hosted run 29919072917 failed before expensive suites under
+  PowerShell 7: `Write-Output -NoEnumerate` wrapped a scalar data-file property
+  in `List<object>`. Official portable PowerShell 7.6.4 reproduced the expected
+  red locally. The property accessor now returns scalars directly and preserves
+  only arrays with unary comma; focused runtime and `StructureOnly` pass under
+  PowerShell 7.6.4 and Windows PowerShell 5.1. Corrected hosted execution, pull-
   request/release delivery, and post-publication evidence remain pending.
 - The 2/3-minute soft goals were missed without violating a correctness gate.
   Residual wall-clock work is owned by

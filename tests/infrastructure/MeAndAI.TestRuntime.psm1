@@ -229,11 +229,17 @@ function Get-MeAndAITestRuntimePropertyValue {
         [Parameter(Mandatory)][string]$Name
     )
 
+    $propertyValue = $null
     if ($Value -is [System.Collections.IDictionary]) {
-        Write-Output -NoEnumerate $Value[$Name]
-        return
+        $propertyValue = $Value[$Name]
     }
-    Write-Output -NoEnumerate $Value.PSObject.Properties[$Name].Value
+    else {
+        $propertyValue = $Value.PSObject.Properties[$Name].Value
+    }
+    if ($propertyValue -is [array]) {
+        return ,$propertyValue
+    }
+    return $propertyValue
 }
 
 function Assert-MeAndAITestRuntimeExactProperties {

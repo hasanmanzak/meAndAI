@@ -62,6 +62,13 @@ instruction-graph owner takes 135.9 seconds. The final `WindowsNative` rerun
 passes in 341.0 seconds, including a 329.2-second native quick-adoption route. The unchanged
 one-Windows/one-Ubuntu workflow adds one focused Windows PowerShell 7 contract
 step to the existing Windows job; Linux retains the PowerShell 7 Full route.
+The first candidate hosted run failed in both jobs before expensive suites.
+Official portable PowerShell 7.6.4 reproduced the failure and exposed that
+`Write-Output -NoEnumerate` wraps a scalar contract property in `List<object>`.
+Scalar properties now return directly while only arrays receive unary-comma
+preservation. Focused runtime and `StructureOnly` routes pass under both
+PowerShell 7.6.4 and Windows PowerShell 5.1. The corrected candidate hosted run
+remains external delivery evidence.
 
 The first fresh-diff review found incomplete bypass inventory, cleanup leakage,
 mode-blind fingerprints, and an under-bound input digest. Expected-red

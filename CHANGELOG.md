@@ -36,6 +36,8 @@ This project uses the `M.m.rev` version format defined in the
 - Exercise the focused runtime-efficiency contract under PowerShell 7 in the
   existing Windows job while retaining the existing Linux Full route and the
   unchanged one-Windows/one-Ubuntu topology.
+- Preserve imported operation-contract scalar and array types without relying
+  on PowerShell 7's scalar-wrapping `Write-Output -NoEnumerate` behavior.
 
 Related work: [FEAT-0039](docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md),
 `TASK-0001`, [DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
