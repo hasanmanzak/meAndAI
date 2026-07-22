@@ -830,6 +830,9 @@ $bootstrapGraphIdentityPath = Join-Path $root `
      'capabilities-bootstrap-graph-' + 'identity.fixture.ps1')
 $testGitBatchPath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
+$instructionGraphPath = Join-Path $root `
+    ('tests/capabilities/instruction-graph-discovery/' +
+     'instruction-graph-discovery' + '.tests.ps1')
 $runnerPath = Join-Path $root 'tests/protocol.tests.ps1'
 $quickAst = Get-ParsedTestAst -Path $quickPath
 $quickGraphReaders = @($quickAst.FindAll({
@@ -877,6 +880,27 @@ if ($testGitBatchFactories.Count -eq 1) {
     Assert-True ($testGitBatchSource -cnotmatch
         '(?i)cat-file\s+blob(?:\s|["''])') `
         'TEST-0162 shared test Git reader restored per-blob processes.'
+}
+$instructionGraphAst = Get-ParsedTestAst -Path $instructionGraphPath
+$instructionGraphExpectedReaders = @($instructionGraphAst.FindAll({
+    param($node)
+    return $node -is
+        [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -ceq 'Get-TestCommittedGraphFixture'
+}, $true))
+Assert-Equal $instructionGraphExpectedReaders.Count 1 `
+    'TEST-0162 instruction-graph expected reader is missing or ambiguous.'
+if ($instructionGraphExpectedReaders.Count -eq 1) {
+    $instructionGraphExpectedReaderSource =
+        [string]$instructionGraphExpectedReaders[0].Extent.Text
+    Assert-Equal @([regex]::Matches(
+        $instructionGraphExpectedReaderSource,
+        '(?i)cat-file\s+--batch(?:\s|["''])'
+    )).Count 1 `
+        'TEST-0162 instruction-graph expected reader lacks one batch transport.'
+    Assert-True ($instructionGraphExpectedReaderSource -cnotmatch
+        '(?i)cat-file\s+blob(?:\s|["''])') `
+        'TEST-0162 instruction-graph expected reader restored per-blob processes.'
 }
 $quickOperationInventory = Get-ReviewedOperationInventory -Ast $quickAst `
     -CommandNames @(

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.13.0**<br>
+Protocol version: **0.13.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority

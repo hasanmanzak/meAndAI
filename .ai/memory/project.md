@@ -9,7 +9,7 @@ Last verified: **2026-07-22**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.0`. Latest immutable release:
+- Current protocol version: `0.13.1`. Latest immutable release:
   [v0.13.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.0)
   targets commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`.
   [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) and
@@ -20,17 +20,21 @@ Last verified: **2026-07-22**
   govern the v0.13.1 actor-local batched instruction-graph correction on
   `codex/task-0002-batched-instruction-graph-transport`. The exact released
   baseline is 175 blob processes and requests per selected acquisition; the
-  target is one process with all requests/evidence unchanged. Gate 1 is
-  complete: focused expected-red authority is frozen and structural ownership
-  is green; production remediation is the next gate.
+  implemented reviewed boundary is one process with all requests/evidence
+  unchanged. Production commit
+  `78c8706e9d4d4f4c020d983b22114165687b475e` and independent-reader commit
+  `55764442820c884e8c3115726bb010a0a9004d77` are focused green.
+  `WindowsNative` passed in 343.0 seconds, the Full suite passed in 1,306.9
+  seconds, and bounded local convergence has no unresolved `Blocking` finding.
+  Hosted, pull-request, merge, and release gates remain pending external facts.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
 - Latest tracked work: immutable v0.13.0 completed FEAT-0039,
   `SUBF-0073` through `SUBF-0077`, `TEST-0157` through `TEST-0160`, and
   `RISK-0184` through `RISK-0189`. FEAT-0040 defines `SUBF-0078`/`0079`,
-  `TEST-0161`/`0162`, and `RISK-0190` through `RISK-0192`; implementation has
-  not started.
+  `TEST-0161`/`0162`, and `RISK-0190` through `RISK-0192`; both subfeatures are
+  complete locally with hosted delivery and release closure pending.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -81,12 +85,22 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 ## Open context
 
 - `FEAT-0040` / `TASK-0002` owns the residual Windows/adoption/graph runtime
-  under issue #98. The first selected correction is one lazy binary-safe
+  under issue #98. The implemented correction is one lazy binary-safe
   `git cat-file --batch` session per quick/hosted graph acquisition, with zero
   process for zero blobs, exact OID/type/size/hash and graph-count parity, and
   fail-closed cleanup. The pure graph module, capability catalog, migration
   authority, hosted topology, and elapsed-time-as-observation rule remain
-  unchanged.
+  unchanged. Focused TEST-0161 passed on PS7/PS5.1 in 84.1/147.6 seconds with
+  exact aggregate process/request observations 2/2 and 4/4; TEST-0162 passed in
+  5.3/6.5 seconds. Independent expected readers use separate test-owned batch
+  sessions and returned identical full-HEAD graph identity on both runtimes.
+  `WindowsNative` then passed in 343.0 seconds and Full passed in 1,306.9
+  seconds; the Full hotspots were quick adoption 742.281 seconds, hosted
+  bootstrap 253.297 seconds, and instruction graph 145.462 seconds. These
+  results prove deterministic process reduction, not a wall-clock gain.
+  `FIND-0200`/`FIND-0201` are resolved; `FIND-0202`/`FIND-0203` are optional
+  bounded improvements and `FIND-0204` keeps further runtime work under issue
+  #98. Continue with hosted Windows/Linux, PR, merge, and release evidence.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

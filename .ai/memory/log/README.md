@@ -10,17 +10,23 @@ at commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`; PR #99, issue #95, the
 two release assets, exact branch cleanup, and post-publication verification are
 complete. [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
 and [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-now plan the v0.13.1 actor-local batch correction on
+now govern the v0.13.1 actor-local batch correction on
 `codex/task-0002-batched-instruction-graph-transport`. Follow the
-[v0.13.1 planning handoff](2026-07-22-v0131-batched-instruction-graph-planning.md).
-The exact v0.13.0 baseline is frozen at 175 blob processes and requests per
-selected acquisition with a one-process target. Focused expected-red authority
-and canonical scenario ownership are now frozen; production remediation is the
-next gate.
+[v0.13.1 implementation handoff](2026-07-22-v0131-batched-instruction-graph-implementation.md).
+Production and independent expected-reader implementation is complete through
+commits `78c8706e9d4d4f4c020d983b22114165687b475e` and
+`55764442820c884e8c3115726bb010a0a9004d77`. Focused PS5.1/PS7 and
+supporting integration routes are green; the deterministic actor boundary is
+175 processes/175 requests to one process/175 requests. `WindowsNative` passed
+in 343.0 seconds, Full passed in 1,306.9 seconds, and bounded local convergence
+closed `FIND-0200`/`FIND-0201` with no unresolved `Blocking` finding. Hosted,
+pull-request, merge, and release evidence remain pending; `FIND-0204` keeps the
+unimproved wall-clock path owned by issue #98.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-22 - v0.13.1 batched instruction-graph implementation](2026-07-22-v0131-batched-instruction-graph-implementation.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph planning](2026-07-22-v0131-batched-instruction-graph-planning.md)
 - [2026-07-22 - v0.13.0 test runtime efficiency](2026-07-22-v0130-test-runtime-efficiency.md)
 - [2026-07-22 - v0.12.7 API-safe merge finalization](2026-07-22-v0127-api-safe-merge-finalization.md)

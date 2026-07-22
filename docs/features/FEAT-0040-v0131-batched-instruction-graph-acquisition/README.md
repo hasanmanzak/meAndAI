@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Backward-compatible test/runtime efficiency correction / `TASK-0002` |
-| Status | Ready / Gate 1 complete |
+| Status | Complete |
 | Target version | 0.13.1 |
 | Issue and external evidence authority | [#98](https://github.com/hasanmanzak/meAndAI/issues/98) |
-| Pull request | `Pending` |
+| Pull request | Recorded through [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) after creation |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md), [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
 | Tests | [TEST-0161 and TEST-0162](test-cases.md) |
 
@@ -247,12 +247,14 @@ The production correction applies to
 `quick-adoption.tests.ps1`,
 `capabilities-bootstrap-graph-identity.fixture.ps1`, and
 `instruction-graph-discovery.tests.ps1` deliberately do not call the
-production reader to calculate expected evidence. TEST-0161 inventories their
-direct Git work separately and prevents it from being counted as production
-process reduction. If their measured residual is material after SUBF-0078,
-SUBF-0079 must either lower it through an independently faithful test boundary
-or record a linked successor; it may not make the expected side depend on the
-production batch implementation.
+production reader to calculate expected evidence. `SUBF-0079` replaced their
+material per-blob subprocess loops with separate test-owned binary batch
+readers in commit `55764442820c884e8c3115726bb010a0a9004d77`; this preserves
+expected-side independence and does not count as production process reduction.
+The shared full-HEAD fixture returned the same graph digest under PowerShell 7
+and Windows PowerShell 5.1 for 178 parsed blobs and 1,371,315 parsed bytes.
+TEST-0161 continues to inventory this test work separately from the production
+operation ratchet.
 
 ### Prior local timing dispositions
 
@@ -276,6 +278,45 @@ observer and final tree-identical run above.
 | Test code | Expected red complete | TEST-0161 reports exactly six missing batch-contract findings in 146.507 seconds with TEST-0151/0152 intact; TEST-0162 reports 25 schema-2/batch-ratchet findings in 8.3 seconds without parse/null failure; final `StructureOnly` accepts both canonical owners |
 | Baseline run | Complete | Exact released hosted/tree timings plus per-actor observer identity, 175 process/request baseline, and process-start maximum 1 are frozen |
 
+### Implementation evidence
+
+- Commit `78c8706e9d4d4f4c020d983b22114165687b475e` implements the two
+  actor-local lazy binary batch transports and the schema-2 operation ratchet.
+  TEST-0161 passed under PowerShell 7 in 84.1 seconds and Windows PowerShell
+  5.1 in 147.6 seconds. Both runs observed exactly two of two allowed batch
+  process starts and four of four required blob requests across the quick and
+  hosted actors.
+- Commit `55764442820c884e8c3115726bb010a0a9004d77` converts the three
+  independent expected-graph readers to separate test-owned batch sessions.
+  The full-HEAD identity fixture passed under PowerShell 7 in 22.2 seconds and
+  Windows PowerShell 5.1 in 34.8 seconds with identical digest
+  `d0a03bde53b7652706059b5faf74ad9f748da9c0a3401df44eeea6ee365fe091`,
+  178 parsed blobs, and 1,371,315 parsed bytes.
+- TEST-0162 passed under PowerShell 7 in 5.3 seconds and Windows PowerShell
+  5.1 in 6.5 seconds. Structural validation passed in 4.8 seconds. Supporting
+  source dispatch, bundle, final quick closure, and local hosted-bootstrap
+  vertical-slice
+  routes passed in 2.6, 23.0, 38.2, and 280.3 seconds respectively.
+- The immutable actor boundary is deterministically reduced from 175 blob
+  processes and 175 requests to one process and the same 175 requests per
+  positive acquisition. No wall-clock improvement is claimed: the local
+  Windows PowerShell 5.1 TEST-0161 result, 147.6 seconds, is above the
+  immutable hosted observation of 130.214 seconds and the environments are not
+  interchangeable.
+- `WindowsNative` passed in 343.0 seconds; its streaming owner took 6.493
+  seconds and its quick-adoption owner took 331.854 seconds. The Windows
+  PowerShell 5.1 Full profile passed in 1,306.9 seconds. Its largest owners
+  were quick adoption at 742.281 seconds, hosted bootstrap at 253.297 seconds,
+  and instruction-graph discovery at 145.462 seconds; TEST-0161 again emitted
+  exact `2/2` process and `4/4` request observations.
+- The post-Full regression correction added exact TEST-0162 ownership for the
+  third independent expected-graph reader: exactly one local
+  `cat-file --batch` and no `cat-file blob` inside
+  `Get-TestCommittedGraphFixture`. Focused PS5.1 and PS7 confirmations passed
+  in 9.3 and 9.2 seconds, and `StructureOnly` passed in 7.8 seconds.
+- Hosted Windows/Linux jobs, the pull request, merge, and immutable release
+  evidence remain pending external delivery facts.
+
 ### Risks
 
 | ID | Classification | Risk | Owner / response |
@@ -288,8 +329,8 @@ observer and final tree-identical run above.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0078` | Actor-local lazy binary-safe batch transport, exact parity, and operation ratchet | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0161`; expected red is exactly six actor-contract findings | Framing, lifecycle, budgets, hashing, packaging duplication, and process cleanup review pending | Ready / Gate 1 complete |
-| `SUBF-0079` | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0162`; PS5/PS7/Linux/Windows and hosted evidence pending | Full diff and bounded convergence review pending | Proposed / depends on SUBF-0078 |
+| `SUBF-0078` | Actor-local lazy binary-safe batch transport, exact parity, and operation ratchet | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0161`; PS7 84.1s, PS5.1 147.6s and Full 145.462s; process 2/2 and request 4/4 | Framing, lifecycle, budget, hashing, parity, cleanup, and final transport review complete | Complete; hosted confirmation pending externally |
+| `SUBF-0079` | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | `TEST-0162`; PS7/PS5.1 focused and post-review confirmations, WindowsNative 343.0s, Full 1,306.9s | Independent-reader correction, cross-runtime review, and bounded local convergence complete | Complete; hosted delivery evidence pending externally |
 
 ## Decisions and relationships
 
@@ -381,19 +422,53 @@ planned `TEST-0161` and `TEST-0162` missing-authority findings and no unrelated
 problem. Independent review required exact route/counter units, a bounded
 deadline test seam, replace-object coverage, and explicit issue-timing
 dispositions; the contracts above resolve those planning findings without
-changing production authority. Focused expected-red runs now bind both new
-canonical scenarios, and final `StructureOnly` is green. Implementation review
-is pending.
+changing production authority. Focused expected-red runs bind both new
+canonical scenarios. Implementation review then confirmed that production I/O
+remains in the two actors, the pure graph module is unchanged, the actor
+sources retain executable parity, and the independent expected side does not
+import either production transport. Focused PS5.1/PS7, structural, bundle,
+source-dispatch, quick-closure, and local hosted-bootstrap vertical-slice
+evidence is green with the deterministic process/request ratchet satisfied.
+`WindowsNative` and the one budgeted Windows PowerShell 5.1 Full suite also
+passed. The Full result was 1,306.9 seconds, so it supplies scenario evidence
+but does not establish a wall-clock improvement over a different hosted
+environment.
+
+The bounded convergence scope was the complete 35-file branch diff against
+`origin/main` plus the new implementation handoff. `.git` internals, generated
+temporary fixtures, unchanged binaries, and live hosted/publication state that
+does not yet exist were excluded. The finite budget was one initial scan and
+one confirmation after Blocking remediation. The scan covered inventory and
+entry points, architecture and decisions, binary framing and error paths,
+duplication and ownership, test authority, documentation/version/memory/links,
+security and performance, PowerShell compatibility, and Git hygiene. All 21
+changed PowerShell files parsed, normalized actor factories matched, local
+links and `git diff --check origin/main` passed, and the confirmation found no
+unresolved `Blocking` finding.
+
+| ID | Classification / disposition | Dependencies | Priority / severity / impact / confidence | Evidence, affected scope, and impact | Recommended action / status | Links |
+| --- | --- | --- | --- | --- | --- | --- |
+| `FIND-0200` | Test-coverage defect / `Blocking` | None | `p1` / medium / high / high | TEST-0162 guarded the quick and bootstrap expected readers but not `Get-TestCommittedGraphFixture`; that third reader could have regressed to per-blob Git while production counters stayed green. | Require exactly one local `cat-file --batch` and zero `cat-file blob` in the sole function; PS5.1/PS7 focused and structural confirmations passed. / `Resolved` | `SUBF-0079`; [TEST-0162](test-cases.md) |
+| `FIND-0201` | Documentation-state defect / `Blocking` | `FIND-0200` | `p1` / medium / high / high | The temporary version-gate state used exact `Status | Complete` while the index, evidence, and DoD still said `WindowsNative`, Full, and convergence were pending. A committed candidate would have overstated closure. | Record the actual local gates, reconcile the index/subfeatures/test status/memory, and retain hosted/PR/release facts as external pending evidence. / `Resolved` | [TEST-0092](../FEAT-0014-v085-convergence/test-cases.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) |
+| `FIND-0202` | Cross-runtime concurrency risk / `OptionalImprovement` | None | `p3` / low / medium / medium | The Windows PowerShell 5.1 no-BOM stdin workaround briefly changes process-global `Console.InputEncoding` while each private actor captures redirected stdin. Supported actor paths start sessions serially, so no current call path races. | Preserve serial actor acquisition; require synchronization or a replacement capture mechanism before same-process parallel acquisition is introduced. / `OptionalImprovement` | `RISK-0191`; [TEST-0161](test-cases.md) |
+| `FIND-0203` | Test-runtime reliability risk / `OptionalImprovement` | None | `p3` / low / low / high | The deliberately independent self-HEAD expected reader uses synchronous, simplified test-only batch I/O. It is one exact-tree/hash-checked process, is outside production authority, and is now regression-guarded, but does not duplicate the production lifecycle machinery. | Retain independence; harden only if this exact reader exhibits a measured hang or leak. / `OptionalImprovement` | `SUBF-0079`; [TEST-0161 and TEST-0162](test-cases.md) |
+| `FIND-0204` | Performance residual / `ExternalOrLegacyFollowUp` | None | `p2` / medium / medium / high | Local Full remained 1,306.9 seconds: quick adoption 742.281 seconds, hosted bootstrap 253.297 seconds, and graph discovery 145.462 seconds. Environments differ from immutable hosted evidence, so no regression or gain is inferred, but the Windows critical path remains material. | Keep elapsed time observational and continue lower faithful boundary work through TASK-0002 without weakening evidence or adding hosted fan-out. / `Open`, owned by issue #98 | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0162](test-cases.md) |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
-- [ ] Mandatory test code and scenario mapping complete.
-- [ ] Test commands and successful results recorded.
-- [ ] Per-slice self-review and bounded convergence scan complete.
-- [ ] No unresolved `Blocking` finding; residuals have explicit disposition.
-- [ ] Documentation, version, links, changelog, and project memory current.
-- [ ] Pull request, applicable hosted checks, and pre-merge review gates complete.
+- [x] Implemented acceptance criteria pass locally and structurally; hosted and
+      publication facts remain external delivery evidence.
+- [x] Mandatory test code and exact scenario mapping complete.
+- [x] Focused PS5.1/PS7, supporting integration, `WindowsNative`, Full,
+      structural, version, and publication-contract evidence recorded.
+- [ ] Candidate Windows/Ubuntu hosted execution and same-topology timing recorded.
+- [x] Per-slice reviews and bounded convergence have no unresolved `Blocking`
+      finding.
+- [x] Residual risks and missed wall-clock improvement have explicit owners and
+      dispositions.
+- [x] Documentation, version, links, changelog, and project memory current.
+- [ ] Pull request, hosted checks, merge, release, and external evidence are
+      cross-linked after those facts exist.
 
 ## Post-merge release evidence
 
