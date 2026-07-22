@@ -21,10 +21,13 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$testGitBatchPath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module $testRuntimePath -Force
+Import-Module $testGitBatchPath -Force
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = if ($Shard -ceq 'All') {
@@ -322,17 +325,39 @@ function Get-TestCommittedInstructionGraph {
             Sha = [string]$match.Groups['sha'].Value
         })
     }
-    $gitBinary = ${function:Invoke-TestGitBinary}
-    $reader = {
-        param($entry)
-        return ,(& $gitBinary -Repository $Repository `
-            -Arguments "cat-file blob $([string]$entry.Sha)")
-    }.GetNewClosure()
-    $graph = & $Builder -BaseHead $Commit -TreeEntries @($entries) `
-        -ReadBlob $reader
-    if (-not (& $Validator -Graph $graph)) {
-        throw 'The TEST-0154 exported policy returned a non-exact graph.'
+
+    $session = New-MeAndAITestGitBlobBatchSession `
+        -Repository $Repository
+    $graph = $null
+    $primaryFailure = $null
+    $cleanupFailure = $null
+    try {
+        $graph = & $Builder -BaseHead $Commit -TreeEntries @($entries) `
+            -ReadBlob $session.ReadBlob
+        & $session.Complete $graph
+        if (-not (& $Validator -Graph $graph)) {
+            throw 'The TEST-0154 exported policy returned a non-exact graph.'
+        }
     }
+    catch {
+        $primaryFailure = $_.Exception
+    }
+    finally {
+        try { & $session.Abort }
+        catch { $cleanupFailure = $_.Exception }
+    }
+
+    if ($null -ne $primaryFailure) {
+        if ($null -ne $cleanupFailure) {
+            throw [AggregateException]::new(
+                ($primaryFailure.Message + ' Cleanup failed: ' +
+                    $cleanupFailure.Message),
+                [Exception[]]@($primaryFailure, $cleanupFailure)
+            )
+        }
+        throw $primaryFailure
+    }
+    if ($null -ne $cleanupFailure) { throw $cleanupFailure }
     return $graph
 }
 
@@ -5872,7 +5897,10 @@ try {
         catch { $bogusProtocolError = $_.Exception.Message }
         if ($bogusProtocolError -notlike
                 '*not a canonical protocol authority*') {
-            Add-Failure 'TEST-0154 bogus reserved-protocol descendant did not fail closed during final graph discovery.'
+            Add-Failure (
+                'TEST-0154 bogus reserved-protocol descendant did not fail ' +
+                "closed during final graph discovery. Actual: $bogusProtocolError"
+            )
         }
 
         Invoke-TestGit -Repository $closureRepository -Arguments @(

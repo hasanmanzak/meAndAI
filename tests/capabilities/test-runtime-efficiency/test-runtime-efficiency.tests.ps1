@@ -825,8 +825,59 @@ $quickPath = Join-Path $root `
 $bootstrapPath = Join-Path $root `
     ('tests/capabilities/initial-adoption/' +
      'capabilities-bootstrap-adapter' + '.fixture.ps1')
+$bootstrapGraphIdentityPath = Join-Path $root `
+    ('tests/capabilities/initial-adoption/' +
+     'capabilities-bootstrap-graph-' + 'identity.fixture.ps1')
+$testGitBatchPath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
 $runnerPath = Join-Path $root 'tests/protocol.tests.ps1'
 $quickAst = Get-ParsedTestAst -Path $quickPath
+$quickGraphReaders = @($quickAst.FindAll({
+    param($node)
+    return $node -is
+        [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -ceq 'Get-TestCommittedInstructionGraph'
+}, $true))
+Assert-Equal $quickGraphReaders.Count 1 `
+    'TEST-0162 quick expected graph reader is missing or ambiguous.'
+if ($quickGraphReaders.Count -eq 1) {
+    $quickGraphReaderSource =
+        [string]$quickGraphReaders[0].Extent.Text
+    Assert-True ($quickGraphReaderSource -cmatch
+        '(?i)New-MeAndAITestGitBlobBatchSession\b') `
+        'TEST-0162 quick expected graph reader lacks the shared batch transport.'
+    Assert-True ($quickGraphReaderSource -cnotmatch
+        '(?i)cat-file\s+(?:--batch|blob)(?:\s|["''])') `
+        'TEST-0162 quick expected graph reader bypasses the shared transport.'
+}
+$bootstrapGraphIdentitySource =
+    [IO.File]::ReadAllText($bootstrapGraphIdentityPath)
+Assert-Equal @([regex]::Matches($bootstrapGraphIdentitySource,
+    '(?i)New-MeAndAITestGitBlobBatchSession\b')).Count 1 `
+    'TEST-0162 bootstrap expected graph reader lacks one shared batch session.'
+Assert-True ($bootstrapGraphIdentitySource -cnotmatch
+    '(?i)cat-file\s+(?:--batch|blob)(?:\s|["''])') `
+    'TEST-0162 bootstrap expected graph reader bypasses the shared transport.'
+$testGitBatchAst = Get-ParsedTestAst -Path $testGitBatchPath
+$testGitBatchFactories = @($testGitBatchAst.FindAll({
+    param($node)
+    return $node -is
+        [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -ceq 'New-MeAndAITestGitBlobBatchSession'
+}, $true))
+Assert-Equal $testGitBatchFactories.Count 1 `
+    'TEST-0162 shared test Git batch factory is missing or ambiguous.'
+if ($testGitBatchFactories.Count -eq 1) {
+    $testGitBatchSource = [string]$testGitBatchFactories[0].Extent.Text
+    Assert-Equal @([regex]::Matches(
+        $testGitBatchSource,
+        '(?i)cat-file\s+--batch(?:\s|["''])'
+    )).Count 1 `
+        'TEST-0162 shared test Git reader lacks one batch transport.'
+    Assert-True ($testGitBatchSource -cnotmatch
+        '(?i)cat-file\s+blob(?:\s|["''])') `
+        'TEST-0162 shared test Git reader restored per-blob processes.'
+}
 $quickOperationInventory = Get-ReviewedOperationInventory -Ast $quickAst `
     -CommandNames @(
         'git', 'Invoke-Git', 'Invoke-TestGit',
@@ -870,7 +921,6 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$changeSetValidator|<script>' = 7
     '$closureResolver|<script>' = 17
     '$completionContract|<script>' = 12
-    '$gitBinary|Get-TestCommittedInstructionGraph' = 1
     '$graphIdentityGetter|<script>' = 1
     '$graphRecordConverter|<script>' = 1
     '$graphRecordConverter|global:gh' = 1
