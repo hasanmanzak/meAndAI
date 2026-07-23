@@ -102,8 +102,10 @@ $requiredFiles = @(
     'docs/features/README.md',
     'docs/decisions/README.md',
     'capabilities/index.json',
+    'capabilities/canonical-repository-evidence.json',
     'capabilities/test-architecture.json',
     'capabilities/test-runtime-efficiency.json',
+    'scripts/MeAndAI.RepositoryEvidence.psm1',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
@@ -1191,8 +1193,61 @@ if ($memoryTemplateFiles.Count -lt 3) {
 Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0047'
 
 $protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
+$localInstructions = Get-Content -LiteralPath (Join-Path $root 'AGENTS.md') -Raw
 $featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/README.md') -Raw
 $normalizedProtocolContent = [regex]::Replace($protocolContent, '\s+', ' ')
+$normalizedLocalInstructions = [regex]::Replace($localInstructions, '\s+', ' ')
+
+# TEST-0173: a reusable defect exposed by one consumer remains owned by the
+# common authority, and its canonical correction carries no external consumer
+# repository identity or local-machine path.
+foreach ($requiredText in @(
+    'classify its owning layer before correction',
+    'project-neutral regression',
+    'MUST NOT be presented as generic closure',
+    'MUST NOT encode a named consumer',
+    'does not authorize scanning or mutating unrelated consumer repositories'
+)) {
+    if (-not $normalizedProtocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0173 common upstream-ownership mandate is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'classify the owning layer',
+    'corrected and proven in meAndAI',
+    'project-neutral fixture and immutable release',
+    'do not close common work with a named-consumer patch',
+    'consumer recovery as a separate, linked operation'
+)) {
+    if (-not $normalizedLocalInstructions.Contains($requiredText)) {
+        Add-Failure "TEST-0173 local upstream-ownership mandate is missing '$requiredText'."
+    }
+}
+$canonicalEvidenceArtifacts = @(
+    'capabilities/canonical-repository-evidence.json',
+    'scripts/MeAndAI.RepositoryEvidence.psm1',
+    'docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md',
+    'docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md',
+    'docs/features/FEAT-0045-v0140-canonical-repository-evidence/test-cases.md'
+)
+foreach ($relativePath in $canonicalEvidenceArtifacts) {
+    $artifactPath = Join-Path $root $relativePath
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+        Add-Failure "TEST-0173 missing canonical evidence artifact: $relativePath"
+        continue
+    }
+    $artifactContent = Get-Content -LiteralPath $artifactPath -Raw
+    if ($artifactContent -cmatch '(?i)(?<![a-z])[a-z]:[\\/]' -or
+        $artifactContent -cmatch '(?i)/(?:home|users)/[^/\s]+/' -or
+        @([regex]::Matches(
+            $artifactContent,
+            'https://github\.com/(?<repository>[^/\s)]+/[^/\s)#]+)'
+        ) | Where-Object {
+            $_.Groups['repository'].Value -cne 'hasanmanzak/meAndAI'
+        }).Count -gt 0) {
+        Add-Failure "TEST-0173 canonical evidence artifact is consumer- or machine-coupled: $relativePath"
+    }
+}
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',

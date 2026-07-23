@@ -87,9 +87,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.13.5`, the only repository file required
+For a new submodule consumer on `v0.14.0`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.13.5/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.0/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -204,7 +204,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.13.5'
+$tag = 'v0.14.0'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -532,7 +532,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.13.5`
+- ref: `v0.14.0`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -580,11 +580,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.13.5`:
+before checkout; the current example then installs `v0.14.0`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.13.5
+git -C .ai/protocol checkout v0.14.0
 git add .ai/protocol
 ```
 
@@ -615,9 +615,14 @@ is already current, and after an ordinary protocol update. Reviewed terminal
 review with the transient
 `.ai/adoption/meandai-capability-review.json` manifest. That proposal is not a
 migration and automation does not reorganize consumer tests or other semantic
-paths: the maintainer reviews the `test-architecture` definition, applies a
-repository-native conforming structure, records evidence, removes the
-transient manifest, and completes the consumer's normal gates. A pre-framework
+paths: the maintainer reviews each pending definition, applies a repository-
+native conforming structure, records evidence, removes the transient manifest,
+and completes the consumer's normal gates. For
+`canonical-repository-evidence`, PowerShell consumers should call the pinned
+shared `scripts/MeAndAI.RepositoryEvidence.psm1` boundary where applicable
+instead of copying its Git state algorithm; another stack may use a reviewed
+repository-native equivalent with the same exact authority, containment,
+ambiguity, and byte-preservation outcomes. A pre-framework
 workflow first installs the ordinary update; its replacement then performs
 this same-target assessment without a source-version switch.
 

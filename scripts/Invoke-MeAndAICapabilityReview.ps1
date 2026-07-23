@@ -21,6 +21,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+Import-Module (Join-Path $PSScriptRoot 'MeAndAI.RepositoryEvidence.psm1') -Force
 
 $script:LedgerRelativePath = '.ai/meandai-capabilities-state.json'
 $script:ManifestRelativePath = '.ai/adoption/meandai-capability-review.json'
@@ -183,6 +184,24 @@ function Invoke-ReviewGit {
     }
     return Invoke-NativeCapture -Command 'git' -Arguments $Arguments `
         -AllowedExitCodes $AllowedExitCodes
+}
+
+function Get-ReviewRepositoryEvidence {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryRoot,
+        [Parameter(Mandatory)][string]$RelativePath,
+        [Parameter(Mandatory)][string]$Head,
+        [Parameter(Mandatory)]
+        [ValidateSet('ReadBase', 'VerifyWrite')]
+        [string]$Operation
+    )
+
+    if ($Runtime.Contains('RepositoryEvidence')) {
+        return & ([scriptblock]$Runtime['RepositoryEvidence']) `
+            $RepositoryRoot $RelativePath $Head $Operation
+    }
+    return Get-MeAndAIRepositoryEvidence -RepositoryRoot $RepositoryRoot `
+        -RelativePath $RelativePath -Head $Head
 }
 
 function ConvertFrom-StrictUtf8Bytes {
@@ -2489,7 +2508,17 @@ else {
     }
 }
 $ledgerBytes = $null
-if (Test-Path -LiteralPath $ledgerPath -PathType Leaf) {
+if ($null -eq $FixtureInventory) {
+    $ledgerEvidence = Get-ReviewRepositoryEvidence `
+        -RepositoryRoot $consumerFull `
+        -RelativePath $script:LedgerRelativePath `
+        -Head ([string]$checkoutEvidence.Head) `
+        -Operation ReadBase
+    if ([string]$ledgerEvidence.Source -cne 'Missing') {
+        $ledgerBytes = [byte[]]$ledgerEvidence.Bytes
+    }
+}
+elseif (Test-Path -LiteralPath $ledgerPath -PathType Leaf) {
     Assert-OrdinaryFile -LiteralPath $ledgerPath `
         -Label 'Consumer capability ledger'
     $ledgerBytes = [IO.File]::ReadAllBytes($ledgerPath)
@@ -2957,8 +2986,16 @@ $handlers = @{
             [void](New-Item -ItemType Directory -Path $parent -Force)
         }
         [IO.File]::WriteAllBytes($ledgerPath, $bytes)
+        $writtenLedgerEvidence = Get-ReviewRepositoryEvidence `
+            -RepositoryRoot $consumerFull `
+            -RelativePath $script:LedgerRelativePath `
+            -Head ([string]$checkoutEvidence.Head) `
+            -Operation VerifyWrite
+        if ([string]$writtenLedgerEvidence.Source -cne 'Worktree') {
+            throw 'Written capability ledger is not exact worktree evidence.'
+        }
         [void](Import-MeAndAICapabilityLedger -Catalog $catalog `
-            -Bytes ([IO.File]::ReadAllBytes($ledgerPath)))
+            -Bytes ([byte[]]$writtenLedgerEvidence.Bytes))
     }
     DeleteBranch = {
         param($Operation, $ReviewPlan)

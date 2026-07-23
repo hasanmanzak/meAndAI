@@ -3,6 +3,7 @@ Set-StrictMode -Version Latest
 
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 Import-Module (Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1') -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.RepositoryEvidence.psm1') -Force
 
 function Assert-True {
     param([bool]$Condition, [string]$Message)
@@ -28,6 +29,22 @@ function Assert-SequenceEqual {
     }
 }
 
+function Assert-BytesEqual {
+    param([byte[]]$Actual, [byte[]]$Expected, [string]$Message)
+    if ($null -eq $Actual -or $null -eq $Expected) {
+        if ($null -eq $Actual -and $null -eq $Expected) { return }
+        throw "$Message One byte sequence is null."
+    }
+    if ($Actual.Length -ne $Expected.Length) {
+        throw "$Message Length differs: $($Actual.Length) != $($Expected.Length)."
+    }
+    for ($index = 0; $index -lt $Actual.Length; $index++) {
+        if ($Actual[$index] -ne $Expected[$index]) {
+            throw "$Message Byte $index differs: $($Actual[$index]) != $($Expected[$index])."
+        }
+    }
+}
+
 function Assert-ThrowsLike {
     param([scriptblock]$Action, [string]$Pattern, [string]$Message)
     try {
@@ -38,6 +55,83 @@ function Assert-ThrowsLike {
         throw "$Message Unexpected error: $($_.Exception.Message)"
     }
     throw "$Message No error was thrown."
+}
+
+function Invoke-TestGit {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [int[]]$AllowedExitCodes = @(0)
+    )
+
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $output = @(& git -C $Repository @Arguments 2>&1 | ForEach-Object {
+            [string]$_
+        })
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousPreference
+    }
+    if ($AllowedExitCodes -cnotcontains $exitCode) {
+        throw "Test git '$($Arguments -join ' ')' failed with exit code $exitCode. $($output -join "`n")"
+    }
+    return [pscustomobject][ordered]@{
+        ExitCode = $exitCode
+        Text = ($output -join "`n").Trim()
+    }
+}
+
+function Initialize-TestGitRepository {
+    param(
+        [Parameter(Mandatory)][string]$Directory,
+        [bool]$AutoCrLf = $false
+    )
+
+    [IO.Directory]::CreateDirectory($Directory) | Out-Null
+    [void](Invoke-TestGit -Repository $Directory -Arguments @('init', '--quiet'))
+    [void](Invoke-TestGit -Repository $Directory -Arguments @(
+        'config', 'user.name', 'meAndAI Test'
+    ))
+    [void](Invoke-TestGit -Repository $Directory -Arguments @(
+        'config', 'user.email', 'meandai-test@example.invalid'
+    ))
+    [void](Invoke-TestGit -Repository $Directory -Arguments @(
+        'config', 'core.autocrlf', $AutoCrLf.ToString().ToLowerInvariant()
+    ))
+    [void](Invoke-TestGit -Repository $Directory -Arguments @(
+        'config', 'commit.gpgsign', 'false'
+    ))
+}
+
+function Assert-TestRepositoryEvidenceRerun {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$RelativePath,
+        [Parameter(Mandatory)][string]$Head,
+        [Parameter(Mandatory)][string]$ExpectedSource,
+        [Parameter(Mandatory)][byte[]]$ExpectedBytes,
+        [Parameter(Mandatory)][string]$Message
+    )
+
+    $statusBefore = (Invoke-TestGit -Repository $Repository -Arguments @(
+        'status', '--porcelain=v1', '--untracked-files=all'
+    )).Text
+    $first = Get-MeAndAIRepositoryEvidence -RepositoryRoot $Repository `
+        -RelativePath $RelativePath -Head $Head
+    $second = Get-MeAndAIRepositoryEvidence -RepositoryRoot $Repository `
+        -RelativePath $RelativePath -Head $Head
+    Assert-Equal $first.Source $ExpectedSource "$Message source differs."
+    Assert-Equal $second.Source $ExpectedSource "$Message rerun source differs."
+    Assert-BytesEqual -Actual $first.Bytes -Expected $ExpectedBytes `
+        -Message "$Message bytes differ."
+    Assert-BytesEqual -Actual $second.Bytes -Expected $ExpectedBytes `
+        -Message "$Message rerun bytes differ."
+    Assert-Equal (Invoke-TestGit -Repository $Repository -Arguments @(
+        'status', '--porcelain=v1', '--untracked-files=all'
+    )).Text $statusBefore "$Message resolution mutated repository state."
 }
 
 function Get-TestGitBlobSha {
@@ -179,7 +273,7 @@ Assert-SequenceEqual -Actual @($catalog.Capabilities[0].Definition.requirements.
 
 # TEST-0157: the new Semantic capability is one append-only catalog entry;
 # the immutable predecessor remains the exact first entry.
-Assert-Equal $catalog.Capabilities.Count 2 'TEST-0157 catalog count differs.'
+Assert-Equal $catalog.Capabilities.Count 3 'TEST-0157 catalog count differs.'
 Assert-Equal $catalog.Capabilities[1].Slug 'test-runtime-efficiency' `
     'TEST-0157 appended capability slug differs.'
 Assert-Equal $catalog.Capabilities[1].Type 'Semantic' `
@@ -206,6 +300,27 @@ Assert-Equal $catalog.Capabilities[1].Definition.applicability.condition `
 Assert-Equal @(
     $catalog.Capabilities[1].Definition.evidence.notApplicable
 ).Count 2 'TEST-0157 reviewed NotApplicable evidence contract differs.'
+$canonicalEvidence = $catalog.Capabilities[2]
+Assert-Equal $canonicalEvidence.Slug 'canonical-repository-evidence' `
+    'TEST-0171 canonical repository-evidence slug differs.'
+Assert-Equal $canonicalEvidence.Type 'Semantic' `
+    'TEST-0171 canonical repository-evidence type differs.'
+Assert-Equal $canonicalEvidence.DefinitionPath `
+    'canonical-repository-evidence.json' `
+    'TEST-0171 canonical repository-evidence definition path differs.'
+Assert-Equal $canonicalEvidence.DefinitionBlob `
+    '5a323d1cc9b5e64564f63dc577ad0c937a1c91c0' `
+    'TEST-0171 canonical repository-evidence definition blob differs.'
+Assert-SequenceEqual -Actual @(
+    $canonicalEvidence.Definition.requirements.id
+) -Expected @(
+    'state-owned-byte-source',
+    'exact-byte-preservation',
+    'fail-closed-state-ambiguity',
+    'contained-ordinary-evidence',
+    'read-only-idempotent-resolution',
+    'semantic-consumer-ownership'
+) -Message 'TEST-0171 canonical repository-evidence requirements differ.'
 $efficiencyNotApplicable = Resolve-MeAndAICapabilityAssessment `
     -Capability $catalog.Capabilities[1] -Applicability NotApplicable `
     -Conformance Unknown -EvidenceKind SemanticReview `
@@ -386,18 +501,30 @@ try {
         'TEST-0134 canonical review timestamp did not survive ledger import.'
     $terminalPending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $ledgerBytes)
-    Assert-Equal $terminalPending.Count 1 `
-        'TEST-0157 predecessor terminal ledger did not expose one appended capability.'
-    Assert-Equal $terminalPending[0].Slug 'test-runtime-efficiency' `
-        'TEST-0157 predecessor terminal ledger exposed the wrong pending capability.'
+    Assert-Equal $terminalPending.Count 2 `
+        'TEST-0171 one-entry predecessor did not expose both appended capabilities.'
+    Assert-SequenceEqual -Actual @($terminalPending.Slug) -Expected @(
+        'test-runtime-efficiency',
+        'canonical-repository-evidence'
+    ) -Message 'TEST-0171 one-entry predecessor capability order differs.'
 
     $appendedEntry = New-ReviewedEntry -Catalog $catalog -CapabilityIndex 1
     $completeLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
         -Catalog $catalog -Entries @($entry, $appendedEntry)
     $completePending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $completeLedgerBytes)
-    Assert-Equal $completePending.Count 0 `
-        'TEST-0157 complete two-entry terminal ledger was not idempotent.'
+    Assert-Equal $completePending.Count 1 `
+        'TEST-0171 two-entry predecessor did not expose one appended capability.'
+    Assert-Equal $completePending[0].Slug 'canonical-repository-evidence' `
+        'TEST-0171 two-entry predecessor exposed the wrong capability.'
+    $canonicalEvidenceEntry = New-ReviewedEntry -Catalog $catalog `
+        -CapabilityIndex 2
+    $terminalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $catalog `
+        -Entries @($entry, $appendedEntry, $canonicalEvidenceEntry)
+    Assert-Equal @(Get-MeAndAICapabilityPending -Catalog $catalog `
+        -LedgerBytes $terminalLedgerBytes).Count 0 `
+        'TEST-0171 complete three-entry terminal ledger was not idempotent.'
     foreach ($invalidPrefix in @(
         [pscustomobject]@{
             Name = 'reordered'
@@ -418,11 +545,13 @@ try {
     $missingLedger = Import-MeAndAICapabilityLedger -Catalog $catalog -Bytes $null
     Assert-True $missingLedger.Missing 'TEST-0134 missing ledger was not represented explicitly.'
     $missingPending = @(Get-MeAndAICapabilityPending -Catalog $catalog)
-    Assert-Equal $missingPending.Count 2 `
-        'TEST-0157 missing ledger did not expose both pending capabilities.'
+    Assert-Equal $missingPending.Count 3 `
+        'TEST-0171 missing ledger did not expose all pending capabilities.'
     Assert-SequenceEqual -Actual @($missingPending.Slug) -Expected @(
-        'test-architecture', 'test-runtime-efficiency'
-    ) -Message 'TEST-0157 missing-ledger capability order differs.'
+        'test-architecture',
+        'test-runtime-efficiency',
+        'canonical-repository-evidence'
+    ) -Message 'TEST-0171 missing-ledger capability order differs.'
     $emptyLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $catalog `
         -Entries @()
     $emptyLedger = Import-MeAndAICapabilityLedger -Catalog $catalog `
@@ -587,6 +716,257 @@ try {
     Assert-SequenceEqual -Actual $outcomes -Expected @(
         'AdoptionRequired', 'Conforming', 'NotApplicable', 'ReviewRequired'
     ) -Message 'TEST-0135 resolver exposed an unexpected outcome set.'
+
+    # TEST-0171: repository evidence uses the exact canonical Git boundary
+    # without normalizing bytes and fails closed for ambiguous repository state.
+    $seedRoot = Join-Path $fixtureRoot 'repository-evidence-seed'
+    Initialize-TestGitRepository -Directory $seedRoot
+    $trackedRelative = 'tracked-ledger.json'
+    $seedTrackedPath = Join-Path $seedRoot $trackedRelative
+    [IO.File]::WriteAllBytes($seedTrackedPath, $ledgerBytes)
+    [void](Invoke-TestGit -Repository $seedRoot -Arguments @(
+        'add', '--', $trackedRelative
+    ))
+    [void](Invoke-TestGit -Repository $seedRoot -Arguments @(
+        'commit', '--quiet', '-m', 'canonical LF ledger'
+    ))
+    Assert-True (-not (Test-Path -LiteralPath (
+        Join-Path $seedRoot '.gitattributes'
+    ))) 'TEST-0171 seed unexpectedly contains a .gitattributes rule.'
+    $evidenceRoot = Join-Path $fixtureRoot 'repository-evidence-consumer'
+    [void](Invoke-TestGit -Repository $fixtureRoot -Arguments @(
+        '-c', 'core.autocrlf=true',
+        'clone', '--quiet', '--local',
+        './repository-evidence-seed',
+        'repository-evidence-consumer'
+    ))
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'config', 'core.autocrlf', 'true'
+    ))
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'config', 'commit.gpgsign', 'false'
+    ))
+    $trackedPath = Join-Path $evidenceRoot $trackedRelative
+    $evidenceHead = (Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Text
+    $transformedWorktreeBytes = [IO.File]::ReadAllBytes($trackedPath)
+    Assert-True ($transformedWorktreeBytes -contains [byte]13) `
+        'TEST-0171 fresh autocrlf checkout did not expose transformed worktree bytes.'
+    Assert-Equal (Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'status', '--porcelain=v1', '--', $trackedRelative
+    )).Text '' 'TEST-0171 transformed checkout was not Git-clean.'
+    $cleanEvidence = Get-MeAndAIRepositoryEvidence `
+        -RepositoryRoot $evidenceRoot -RelativePath $trackedRelative `
+        -Head $evidenceHead
+    Assert-Equal $cleanEvidence.Source 'Head' `
+        'TEST-0171 clean tracked evidence did not identify the requested HEAD.'
+    Assert-BytesEqual -Actual $cleanEvidence.Bytes -Expected $ledgerBytes `
+        -Message 'TEST-0171 clean state returned transformed worktree bytes.'
+    [void](Import-MeAndAICapabilityLedger -Catalog $catalog `
+        -Bytes ([byte[]]$cleanEvidence.Bytes))
+    Assert-ThrowsLike -Action {
+        Import-MeAndAICapabilityLedger -Catalog $catalog `
+            -Bytes $transformedWorktreeBytes
+    } -Pattern '*must use LF line endings*' `
+        -Message 'TEST-0171 strict parser accepted transformed CRLF worktree bytes.'
+    Assert-TestRepositoryEvidenceRerun -Repository $evidenceRoot `
+        -RelativePath $trackedRelative -Head $evidenceHead `
+        -ExpectedSource Head -ExpectedBytes $ledgerBytes `
+        -Message 'TEST-0171 clean HEAD rerun'
+
+    $stagedBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        '{"staged":true}' + "`n"
+    )
+    [IO.File]::WriteAllBytes($trackedPath, $stagedBytes)
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'add', '--', $trackedRelative
+    ))
+    $stagedEvidence = Get-MeAndAIRepositoryEvidence `
+        -RepositoryRoot $evidenceRoot -RelativePath $trackedRelative `
+        -Head $evidenceHead
+    Assert-Equal $stagedEvidence.Source 'Index' `
+        'TEST-0171 staged-only evidence did not identify the stage-zero index.'
+    Assert-BytesEqual -Actual $stagedEvidence.Bytes -Expected $stagedBytes `
+        -Message 'TEST-0171 staged-only evidence did not preserve index bytes.'
+    Assert-TestRepositoryEvidenceRerun -Repository $evidenceRoot `
+        -RelativePath $trackedRelative -Head $evidenceHead `
+        -ExpectedSource Index -ExpectedBytes $stagedBytes `
+        -Message 'TEST-0171 stage-zero index rerun'
+    [IO.File]::WriteAllBytes(
+        $trackedPath,
+        [Text.UTF8Encoding]::new($false).GetBytes('{"unstaged":true}' + "`n")
+    )
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath $trackedRelative -Head $evidenceHead
+    } -Pattern '*staged and unstaged*' `
+        -Message 'TEST-0171 staged-plus-unstaged state did not fail closed.'
+
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+    $rawDriftBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        '{"real-drift":true}' + "`r`n"
+    )
+    [IO.File]::WriteAllBytes($trackedPath, $rawDriftBytes)
+    $unstagedEvidence = Get-MeAndAIRepositoryEvidence `
+        -RepositoryRoot $evidenceRoot -RelativePath $trackedRelative `
+        -Head $evidenceHead
+    Assert-Equal $unstagedEvidence.Source 'Worktree' `
+        'TEST-0171 unstaged evidence did not identify the worktree.'
+    Assert-BytesEqual -Actual $unstagedEvidence.Bytes -Expected $rawDriftBytes `
+        -Message 'TEST-0171 unstaged evidence normalized raw worktree bytes.'
+    Assert-TestRepositoryEvidenceRerun -Repository $evidenceRoot `
+        -RelativePath $trackedRelative -Head $evidenceHead `
+        -ExpectedSource Worktree -ExpectedBytes $rawDriftBytes `
+        -Message 'TEST-0171 tracked worktree rerun'
+    Assert-ThrowsLike -Action {
+        Import-MeAndAICapabilityLedger -Catalog $catalog `
+            -Bytes ([byte[]]$unstagedEvidence.Bytes)
+    } -Pattern '*must use LF line endings*' `
+        -Message 'TEST-0171 genuine CRLF drift was normalized before strict parsing.'
+
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+    $untrackedRelative = 'untracked-evidence.json'
+    $untrackedBytes = [byte[]](0x00, 0x0D, 0x0A, 0xFF)
+    [IO.File]::WriteAllBytes(
+        (Join-Path $evidenceRoot $untrackedRelative),
+        $untrackedBytes
+    )
+    $untrackedEvidence = Get-MeAndAIRepositoryEvidence `
+        -RepositoryRoot $evidenceRoot -RelativePath $untrackedRelative `
+        -Head $evidenceHead
+    Assert-Equal $untrackedEvidence.Source 'Worktree' `
+        'TEST-0171 untracked evidence did not identify the worktree.'
+    Assert-BytesEqual -Actual $untrackedEvidence.Bytes -Expected $untrackedBytes `
+        -Message 'TEST-0171 untracked evidence normalized raw worktree bytes.'
+    Assert-TestRepositoryEvidenceRerun -Repository $evidenceRoot `
+        -RelativePath $untrackedRelative -Head $evidenceHead `
+        -ExpectedSource Worktree -ExpectedBytes $untrackedBytes `
+        -Message 'TEST-0171 untracked worktree rerun'
+    $missingEvidence = Get-MeAndAIRepositoryEvidence `
+        -RepositoryRoot $evidenceRoot -RelativePath 'optional-missing.json' `
+        -Head $evidenceHead
+    Assert-Equal $missingEvidence.Source 'Missing' `
+        'TEST-0171 clean optional absence did not resolve as Missing.'
+    Assert-True ($null -eq $missingEvidence.Bytes) `
+        'TEST-0171 clean optional absence returned bytes.'
+
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'rm', '--quiet', '--', $trackedRelative
+    ))
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath $trackedRelative -Head $evidenceHead
+    } -Pattern '*deletion*' `
+        -Message 'TEST-0171 staged deletion did not fail closed.'
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+
+    $renamedRelative = 'renamed-evidence.json'
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'mv', $trackedRelative, $renamedRelative
+    ))
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath $renamedRelative -Head $evidenceHead
+    } -Pattern '*rename or copy*' `
+        -Message 'TEST-0171 staged rename did not fail closed.'
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+
+    $copyRelative = 'copied-evidence.json'
+    [IO.File]::Copy($trackedPath, (Join-Path $evidenceRoot $copyRelative))
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'add', '--', $copyRelative
+    ))
+    $copyIndexBlob = (Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'rev-parse', ":$copyRelative"
+    )).Text
+    $copyHeadBlob = (Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'rev-parse', "${evidenceHead}:$trackedRelative"
+    )).Text
+    Assert-Equal $copyIndexBlob $copyHeadBlob `
+        'TEST-0171 exact staged-copy blob precondition differs.'
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath $copyRelative -Head $evidenceHead
+    } -Pattern '*rename or copy*' `
+        -Message 'TEST-0171 staged copy did not fail closed.'
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+    [IO.File]::Delete((Join-Path $evidenceRoot $copyRelative))
+
+    $linkRelative = 'linked-evidence.json'
+    $linkTargetPath = Join-Path $evidenceRoot 'link-target.txt'
+    [IO.File]::WriteAllText($linkTargetPath, 'tracked-ledger.json')
+    $linkBlob = (Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'hash-object', '-w', '--', $linkTargetPath
+    )).Text
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'update-index', '--add', '--cacheinfo',
+        "120000,$linkBlob,$linkRelative"
+    ))
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath $linkRelative -Head $evidenceHead
+    } -Pattern '*regular blob*' `
+        -Message 'TEST-0171 staged link did not fail closed.'
+    [void](Invoke-TestGit -Repository $evidenceRoot -Arguments @(
+        'reset', '--hard', '--quiet', $evidenceHead
+    ))
+
+    $conflictRoot = Join-Path $fixtureRoot 'repository-evidence-conflict'
+    Initialize-TestGitRepository -Directory $conflictRoot
+    $conflictRelative = 'conflicted.json'
+    $conflictPath = Join-Path $conflictRoot $conflictRelative
+    [IO.File]::WriteAllText($conflictPath, "base`n")
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'add', '--', $conflictRelative
+    ))
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'commit', '--quiet', '-m', 'conflict base'
+    ))
+    $conflictBase = (Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Text
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'checkout', '--quiet', '-b', 'other'
+    ))
+    [IO.File]::WriteAllText($conflictPath, "other`n")
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'commit', '--quiet', '-am', 'other side'
+    ))
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'checkout', '--quiet', '-b', 'current', $conflictBase
+    ))
+    [IO.File]::WriteAllText($conflictPath, "current`n")
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'commit', '--quiet', '-am', 'current side'
+    ))
+    $conflictHead = (Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'rev-parse', 'HEAD'
+    )).Text
+    [void](Invoke-TestGit -Repository $conflictRoot -Arguments @(
+        'merge', 'other'
+    ) -AllowedExitCodes @(1))
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $conflictRoot `
+            -RelativePath $conflictRelative -Head $conflictHead
+    } -Pattern '*conflicted*' `
+        -Message 'TEST-0171 conflicted index did not fail closed.'
+
+    Assert-ThrowsLike -Action {
+        Get-MeAndAIRepositoryEvidence -RepositoryRoot $evidenceRoot `
+            -RelativePath '../escaped.json' -Head $evidenceHead
+    } -Pattern '*canonical repository-relative path*' `
+        -Message 'TEST-0171 escaping path did not fail closed.'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot) {

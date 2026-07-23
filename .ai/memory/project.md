@@ -9,20 +9,19 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.5` candidate. Latest immutable release:
-  [v0.13.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.4)
-  targets commit `089c63d2aeca2d8188bdaeeced5e33be8d01c256`.
-  [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107) and
-  [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) retain its
+- Current protocol version: `0.14.0` candidate. Latest immutable release:
+  [v0.13.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.5)
+  targets commit `014f9bbe30074a742c84e3915ebcf94b9fe9cc3e`.
+  [PR #109](https://github.com/hasanmanzak/meAndAI/pull/109) and
+  [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0044](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md),
-  `BUG-0026`, `SUBF-0083`, `SUBF-0084`, and
-  [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) govern the
-  v0.13.5 correction on `codex/bug-0026-slash-safe-single-owner-lifecycle`.
-  TEST-0169 and TEST-0170 belong to the existing capability-review and managed-
-  finalization owners. Slash-bearing refs preserve literal separators; merged
-  PR events alone own the managed-merge lifecycle; push is not admitted;
-  schedule/manual routes retain bounded repository-evidence recovery.
+- Current scope: [FEAT-0045](../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md),
+  `BUG-0027`, `SUBF-0085` through `SUBF-0087`, and
+  [issue #110](https://github.com/hasanmanzak/meAndAI/issues/110) govern the
+  v0.14.0 correction on `codex/bug-0027-canonical-repository-evidence`.
+  TEST-0171 through TEST-0173 pass in existing capability owners. Clean,
+  staged, and worktree bytes use their exact repository authorities; reusable
+  consumer-exposed failures close in the common upstream protocol.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -80,11 +79,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Complete the bounded FEAT-0044 test-first correction, review, validation,
-  pull request, and immutable v0.13.5 publication through issue #108. Do not
-  mutate an affected consumer from this protocol branch. After publication,
-  install the released workflow/runtime and recover only the exact revalidated
-  consumer branch.
+- Publish the completed FEAT-0045 candidate through one reviewed pull request
+  and immutable v0.14.0 release under issue #110. Do not
+  mutate a consumer from this protocol branch. Consumer recovery, if required,
+  starts only from the published common capability and remains separately
+  reviewed.
 - `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
   issue #98; FEAT-0043 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and

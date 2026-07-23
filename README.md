@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.13.5**
+Current protocol version: **0.14.0**
 
-For v0.13.5, publication authority is the repository's
+For v0.14.0, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[delivery issue #108](https://github.com/hasanmanzak/meAndAI/issues/108); this
+[delivery issue #110](https://github.com/hasanmanzak/meAndAI/issues/110); this
 file does not assert a pre-merge release state. [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains open as the separate residual runtime owner.
 
@@ -55,6 +55,11 @@ traceability. The append-only
 definition requires reuse-first deterministic setup, isolated mutable
 derivatives, machine-readable resource evidence, and reviewed operation-budget
 deltas without turning elapsed time into a correctness gate.
+The appended
+[`canonical-repository-evidence`](capabilities/canonical-repository-evidence.json)
+definition binds byte-sensitive clean, staged, and worktree evidence to their
+exact Git authorities without normalization, and keeps reusable corrections in
+the common upstream protocol while semantic consumer changes remain reviewed.
 
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings

@@ -200,11 +200,11 @@ $releasePrefixPlan = Resolve-MeAndAICapabilityReview `
     -DiscoveryContext AlreadyCurrent
 Assert-Equal $releasePrefixPlan.State 'CreateReviewHandoff' `
     'TEST-0157 predecessor terminal ledger did not request appended capability review.'
-Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 1 `
+Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 2 `
     'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix size.'
-Assert-Equal $releasePrefixPlan.CapabilityBatch[0].Slug `
-    'test-runtime-efficiency' `
-    'TEST-0157 predecessor terminal ledger exposed the wrong pending capability.'
+Assert-Equal ($releasePrefixPlan.CapabilityBatch.Slug -join ',') `
+    'test-runtime-efficiency,canonical-repository-evidence' `
+    'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix.'
 
 $releaseEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
     -Capability $releaseCatalog.Capabilities[1] -Outcome NotApplicable `
@@ -212,8 +212,46 @@ $releaseEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
     -ReviewIdentity 'pull-request:87' `
     -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
     -ReviewedAt '2026-07-19T00:00:00Z'
-$releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+$releasePredecessorLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
     -Catalog $releaseCatalog -Entries @($releaseEntry, $releaseEfficiencyEntry)
+$releasePredecessorLedger = Import-MeAndAICapabilityLedger `
+    -Catalog $releaseCatalog -Bytes $releasePredecessorLedgerBytes
+$releaseEvidencePlan = Resolve-MeAndAICapabilityReview `
+    -Catalog $releaseCatalog -Ledger $releasePredecessorLedger `
+    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+    -DefaultHead $baseHead -TargetVersion v0.12.0 `
+    -DiscoveryContext AlreadyCurrent
+Assert-Equal $releaseCatalog.Capabilities.Count 3 `
+    'TEST-0172 catalog does not contain exactly two immutable predecessors and one appended capability.'
+Assert-Equal (($releaseCatalog.Capabilities | ForEach-Object {
+    "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
+} | Select-Object -First 2) -join ',') `
+    'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5,test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea' `
+    'TEST-0172 immutable predecessor tuples changed.'
+Assert-Equal $releaseEvidencePlan.State 'CreateReviewHandoff' `
+    'TEST-0172 two-entry terminal ledger did not request appended capability review.'
+Assert-Equal $releaseEvidencePlan.CapabilityBatch.Count 1 `
+    'TEST-0172 two-entry terminal ledger exposed more than the appended capability.'
+Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Slug `
+    'canonical-repository-evidence' `
+    'TEST-0172 two-entry terminal ledger exposed the wrong appended capability.'
+Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Type 'Semantic' `
+    'TEST-0172 appended capability is not review-only Semantic state.'
+Assert-Equal $releaseEvidencePlan.SemanticWritePaths.Count 0 `
+    'TEST-0172 automation claimed a semantic consumer path.'
+Assert-Equal ($releaseEvidencePlan.AutomationWritePaths -join ',') `
+    '.ai/adoption/meandai-capability-review.json' `
+    'TEST-0172 review handoff writes outside its transient manifest.'
+
+$releaseEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
+    -Capability $releaseCatalog.Capabilities[2] -Outcome NotApplicable `
+    -Evidence @('Reviewed repository does not read byte-sensitive repository evidence.') `
+    -ReviewIdentity 'pull-request:87' `
+    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+    -ReviewedAt '2026-07-19T00:00:00Z'
+$releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+    -Catalog $releaseCatalog `
+    -Entries @($releaseEntry, $releaseEfficiencyEntry, $releaseEvidenceEntry)
 $releaseCompleteLedger = Import-MeAndAICapabilityLedger `
     -Catalog $releaseCatalog -Bytes $releaseCompleteLedgerBytes
 $releaseCurrent = Resolve-MeAndAICapabilityReview `
@@ -222,9 +260,9 @@ $releaseCurrent = Resolve-MeAndAICapabilityReview `
     -DefaultHead $baseHead -TargetVersion v0.12.0 `
     -DiscoveryContext AlreadyCurrent
 Assert-Equal $releaseCurrent.State 'Current' `
-    'TEST-0157 exact imported two-entry terminal ledger was not current.'
+    'TEST-0172 exact imported three-entry terminal ledger was not current.'
 Assert-Equal $releaseCurrent.Operations.Count 0 `
-    'TEST-0157 exact imported two-entry terminal ledger was not a no-op.'
+    'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
 
 # TEST-0139: fresh adoption is followed by the same source-only semantic review
 # boundary, without expanding the adoption envelope or writing product paths.
@@ -474,6 +512,17 @@ $runnerAst = [Management.Automation.Language.Parser]::ParseFile(
 )
 Assert-Equal @($runnerErrors).Count 0 `
     'TEST-0140 production capability-review runner does not parse.'
+$runnerText = [IO.File]::ReadAllText($runnerPath)
+Assert-True $runnerText.Contains(
+    "Import-Module (Join-Path `$PSScriptRoot 'MeAndAI.RepositoryEvidence.psm1') -Force"
+) 'TEST-0140 production runner does not import the shared repository-evidence boundary.'
+Assert-True $runnerText.Contains('Get-MeAndAIRepositoryEvidence') `
+    'TEST-0140 production runner does not acquire capability-ledger bytes through the shared boundary.'
+Assert-Equal ([regex]::Matches(
+    $runnerText,
+    [regex]::Escape('[IO.File]::ReadAllBytes($ledgerPath)')
+)).Count 1 `
+    'TEST-0140 worktree ledger read escaped its one fixture-only branch.'
 $runnerParameterNames = @($runnerAst.ParamBlock.Parameters | ForEach-Object {
     [string]$_.Name.VariablePath.UserPath
 })
@@ -1454,6 +1503,40 @@ try {
         throw "TEST-0140 unexpected fixture GitHub call: $Method $Endpoint"
     }.GetNewClosure()
 
+    $repositoryEvidenceRuntime = {
+        param(
+            [string]$RepositoryRoot,
+            [string]$RelativePath,
+            [string]$Head,
+            [string]$Operation
+        )
+        if ($RepositoryRoot -cne $fixtureRoot -or
+            $RelativePath -cne '.ai/meandai-capabilities-state.json' -or
+            $Head -cne [string]$apiState.DefaultHead) {
+            throw 'TEST-0140 repository-evidence fixture identity differs.'
+        }
+        $path = Join-Path $RepositoryRoot $RelativePath
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            return [pscustomobject]@{
+                Source = 'Missing'
+                Bytes = $null
+                ObjectId = $null
+            }
+        }
+        return [pscustomobject]@{
+            Source = if ($Operation -ceq 'VerifyWrite' -or
+                $apiState.DirtyManagedPaths) { 'Worktree' } else { 'Head' }
+            Bytes = [IO.File]::ReadAllBytes($path)
+            ObjectId = if ($Operation -ceq 'ReadBase' -and
+                -not $apiState.DirtyManagedPaths) { $Head } else { $null }
+        }
+    }.GetNewClosure()
+    $reviewRuntime = @{
+        Git = $gitRuntime
+        GitHub = $githubRuntime
+        RepositoryEvidence = $repositoryEvidenceRuntime
+    }
+
     # TEST-0169: an interrupted run may leave only the exact canonical branch
     # at the captured default head. The next run must resume after branch
     # creation, use literal-slash Git ref endpoints, and converge idempotently.
@@ -1464,7 +1547,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+        -Runtime $reviewRuntime
     Assert-Equal $branchOnlyRecovery.State 'CreateReviewHandoff' `
         'TEST-0169 exact branch-only recovery did not resume the handoff.'
     Assert-Equal ($branchOnlyRecovery.Execution.Executed -join ',') `
@@ -1494,7 +1577,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $branchOnlyRerun.State 'ReviewPending' `
         'TEST-0169 recovered review was not recognized on rerun.'
@@ -1524,7 +1607,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     Assert-Equal $executeResult.Mode 'Execute' `
         'TEST-0140 injected production runner did not execute.'
     Assert-Equal ($executeResult.Execution.Executed -join ',') `
@@ -1558,7 +1641,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $rerunResult.State 'ReviewPending' `
         'TEST-0140 production inventory did not reuse the exact pending review.'
@@ -1575,7 +1658,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $forgedMarkerResult.State 'ReviewPending' `
         'TEST-0140 an untrusted public issue marker displaced canonical inventory.'
@@ -1589,7 +1672,7 @@ try {
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $forgedCommentResult.State 'ReviewPending' `
         'TEST-0140 an untrusted public closure marker changed lifecycle state.'
@@ -1602,7 +1685,7 @@ try {
             -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact canonical handoff content*' `
         -Message 'TEST-0140 reused issue body accepted noncanonical drift.'
@@ -1617,7 +1700,7 @@ try {
             -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*unsupported property set*' `
         -Message 'TEST-0140 reused manifest accepted noncanonical drift.'
@@ -1629,7 +1712,7 @@ try {
             -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*noncanonical branch*' `
         -Message 'TEST-0140 canonical PR accepted another head repository.'
@@ -1641,7 +1724,7 @@ try {
             -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*dirty outside exact HEAD*' `
         -Message 'TEST-0140 dirty managed checkout reached remote review state.'
@@ -1663,8 +1746,15 @@ try {
         -ReviewIdentity "pull-request:$finalPullNumber" `
         -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
         -ReviewedAt '2026-07-19T00:00:00Z'
+    $finalEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseCatalog.Capabilities[2] -Outcome Conforming `
+        -Evidence @('Reviewed canonical repository-evidence byte authority.') `
+        -ReviewIdentity "pull-request:$finalPullNumber" `
+        -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
+        -ReviewedAt '2026-07-19T00:00:00Z'
     $finalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-        -Catalog $releaseCatalog -Entries @($finalEntry, $finalEfficiencyEntry)
+        -Catalog $releaseCatalog `
+        -Entries @($finalEntry, $finalEfficiencyEntry, $finalEvidenceEntry)
     $apiState.FinalLedgerBytes = [byte[]]$finalLedgerBytes
     $fixtureAiRoot = Join-Path $fixtureRoot '.ai'
     [void](New-Item -ItemType Directory -Path $fixtureAiRoot)
@@ -1756,7 +1846,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     } -Pattern '*permission resolved another actor*' `
         -Message 'TEST-0140 reviewer permission identity was not bound to approval actor ID.'
     $apiState.PermissionActor = $apiState.ReviewerActor
@@ -1768,7 +1858,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     } -Pattern '*trusted maintainer approval*' `
         -Message 'TEST-0140 read-only approval authorized merged finalization.'
     $apiState.ReviewerPermission = 'write'
@@ -1779,7 +1869,7 @@ try {
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $finalPullNumber `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $approvedPlan.State 'Finalize' `
         'TEST-0163 independent exact-head approval no longer finalizes.'
@@ -1805,7 +1895,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*approval for the exact review head*' `
         -Message 'TEST-0163 stale review submission fell through to owner attestation.'
@@ -1822,7 +1912,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*trusted maintainer approval*' `
         -Message 'TEST-0163 creator-authored review fell through to owner attestation.'
@@ -1849,7 +1939,7 @@ try {
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $finalPullNumber `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $attestedPlan.State 'Finalize' `
         'TEST-0163 canonical personal-owner attestation did not authorize the exact merged head.'
@@ -1872,7 +1962,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 stale owner attestation authorized another review head.'
@@ -1890,7 +1980,7 @@ try {
                 -DefaultBranch main -TargetVersion v0.12.0 `
                 -DiscoveryContext AlreadyCurrent `
                 -FinalizePullRequestNumber $finalPullNumber `
-                -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
                 -PlanOnly
         } -Pattern '*exact-head personal-owner attestation*' `
             -Message 'TEST-0163 wrong repository or pull-request attestation binding was accepted.'
@@ -1903,7 +1993,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*not exact canonical evidence*' `
         -Message 'TEST-0163 trusted owner marker accepted noncanonical comment bytes.'
@@ -1918,7 +2008,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*duplicate or conflicting*' `
         -Message 'TEST-0163 duplicate trusted owner attestations were accepted.'
@@ -1931,7 +2021,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 non-admin owner attestation authorized finalization.'
@@ -1944,7 +2034,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 organization-owned repository accepted personal-owner fallback.'
@@ -1961,7 +2051,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 repository owner and pull-request creator mismatch authorized fallback.'
@@ -1981,7 +2071,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*permission resolved another actor*' `
         -Message 'TEST-0163 owner permission identity drift authorized finalization.'
@@ -1997,7 +2087,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 untrusted comment author authorized owner attestation.'
@@ -2018,7 +2108,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     } -Pattern '*review head capability ledger*' `
         -Message 'TEST-0140 out-of-band ledger replacement passed reviewed-tree proof.'
     $apiState.ForceLedgerMismatch = $false
@@ -2034,7 +2124,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     } -Pattern '*not exact canonical evidence*' `
         -Message 'TEST-0140 trusted closure marker accepted noncanonical comment bytes.'
     $apiState.ClosureComments.Clear()
@@ -2047,7 +2137,7 @@ try {
             -DefaultBranch main -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     } -Pattern '*Default branch changed after capability finalization proof*' `
         -Message 'TEST-0140 default-head race reached branch or issue mutation.'
     Assert-True $apiState.BranchCreated `
@@ -2069,7 +2159,7 @@ try {
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $finalPullNumber `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+            -Runtime $reviewRuntime
     Assert-Equal $finalizeExecution.State 'Finalize' `
         'TEST-0140 production runner did not enter verified finalization.'
     Assert-Equal ($finalizeExecution.Execution.Executed -join ',') `
@@ -2099,7 +2189,7 @@ try {
         -DefaultBranch main -TargetVersion v0.12.0 `
         -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $finalPullNumber `
-        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -Runtime $reviewRuntime `
         -PlanOnly
     Assert-Equal $completedExecution.State 'Completed' `
         'TEST-0140 production completed rerun was not recognized.'
@@ -2278,10 +2368,17 @@ try {
             -ReviewIdentity 'pull-request:95' `
             -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
             -ReviewedAt '2026-07-20T00:00:00Z'
+        $currentEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $releaseCatalog.Capabilities[2] -Outcome Conforming `
+            -Evidence @('Reviewed canonical repository-evidence byte authority.') `
+            -ReviewIdentity 'pull-request:95' `
+            -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
+            -ReviewedAt '2026-07-20T00:00:00Z'
         $currentLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
             -Catalog $releaseCatalog -Entries @(
                 $currentPrefixEntry,
-                $currentSuffixEntry
+                $currentSuffixEntry,
+                $currentEvidenceEntry
             )
         return [pscustomobject][ordered]@{
             CatalogBytes = $SourceCatalogBytes
@@ -2389,6 +2486,7 @@ try {
         Git = $gitRuntime
         GitHub = $githubRuntime
         ProtocolGitBlob = $protocolGitBlobRuntime
+        RepositoryEvidence = $repositoryEvidenceRuntime
     }
     $setHistoricalReviewAuthority = {
         param([Parameter(Mandatory)][string]$Authority)
@@ -2424,9 +2522,12 @@ try {
     )
     $currentLedgerBeforeObject = Import-MeAndAICapabilityLedger `
         -Catalog $releaseCatalog -Bytes $currentLedgerBefore
-    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 2 `
+    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 3 `
         'TEST-0165 fixture did not start with a historical prefix plus current suffix.'
-    $currentSuffixBefore = @($currentLedgerBeforeObject.Entries)[1]
+    $currentSuffixBefore = @($currentLedgerBeforeObject.Entries | Select-Object -Skip 1)
+    Assert-Equal ($currentSuffixBefore.Slug -join ',') `
+        'test-runtime-efficiency,canonical-repository-evidence' `
+        'TEST-0165 fixture did not preserve the complete current suffix.'
     $historicalRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
@@ -2482,14 +2583,15 @@ try {
     )) 'TEST-0165 historical recovery rewrote current ledger content.'
     $currentLedgerAfterObject = Import-MeAndAICapabilityLedger `
         -Catalog $releaseCatalog -Bytes $currentLedgerAfter
-    $currentSuffixAfter = @($currentLedgerAfterObject.Entries)[1]
-    Assert-True (
-        [string]$currentSuffixAfter.Slug -ceq [string]$currentSuffixBefore.Slug -and
-        [string]$currentSuffixAfter.DefinitionBlob -ceq
-            [string]$currentSuffixBefore.DefinitionBlob -and
-        [string]$currentSuffixAfter.ReviewIdentity -ceq
-            [string]$currentSuffixBefore.ReviewIdentity
-    ) 'TEST-0165 historical recovery did not preserve the appended current entry.'
+    $currentSuffixAfter = @($currentLedgerAfterObject.Entries | Select-Object -Skip 1)
+    $currentSuffixBeforeIdentity = @($currentSuffixBefore | ForEach-Object {
+        "$($_.Slug)|$($_.DefinitionBlob)|$($_.ReviewIdentity)"
+    }) -join ','
+    $currentSuffixAfterIdentity = @($currentSuffixAfter | ForEach-Object {
+        "$($_.Slug)|$($_.DefinitionBlob)|$($_.ReviewIdentity)"
+    }) -join ','
+    Assert-Equal $currentSuffixAfterIdentity $currentSuffixBeforeIdentity `
+        'TEST-0165 historical recovery did not preserve the appended current suffix.'
     Assert-True (Test-TestBytesEqual `
         -Left ([byte[]]$apiState.HistoricalReview.CurrentLedgerBytes) `
         -Right (

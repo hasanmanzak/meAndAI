@@ -45,7 +45,8 @@
 | [FEAT-0041](FEAT-0041-v0132-exact-head-owner-attestation/README.md) | Exact-head personal-owner attestation for capability review | Complete; hosted delivery evidence pending | 0.13.2 |
 | [FEAT-0042](FEAT-0042-v0133-historical-capability-review-recovery/README.md) | Historical capability-review recovery across compatible protocol updates | Complete; hosted delivery evidence pending | 0.13.3 |
 | [FEAT-0043](FEAT-0043-v0134-case-safe-review-authority/README.md) | Case-safe repository identity for review authority | Complete; publication evidence pending | 0.13.4 |
-| [FEAT-0044](FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) | Slash-safe ref and single-owner consumer lifecycle | Complete; publication and consumer evidence pending | 0.13.5 |
+| [FEAT-0044](FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) | Slash-safe ref and single-owner consumer lifecycle | Complete | 0.13.5 |
+| [FEAT-0045](FEAT-0045-v0140-canonical-repository-evidence/README.md) | Canonical repository evidence and upstream-owned corrections | Complete | 0.14.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
