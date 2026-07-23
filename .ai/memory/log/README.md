@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Immutable `v0.13.3` completed [FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
-at commit `4285c7aef819e7d197c6897a29103194ee675b2b`; PR #105 and issue #104
+at commit `4285c7a6169d91a7b7cc75b72ce6c88230bf0039`; PR #105 and issue #104
 retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 

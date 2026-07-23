@@ -11,7 +11,7 @@ Last verified: **2026-07-23**
 - Default branch: `main`
 - Current protocol version: `0.13.4` candidate. Latest immutable release:
   [v0.13.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.3)
-  targets commit `4285c7aef819e7d197c6897a29103194ee675b2b`.
+  targets commit `4285c7a6169d91a7b7cc75b72ce6c88230bf0039`.
   [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) and
   [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
