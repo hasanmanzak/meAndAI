@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.13.4**<br>
+Protocol version: **0.13.5**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -479,6 +479,15 @@ permitted only when the newer run wholly supersedes the same pull request's
 older evidence; main, merge-queue, manual, and publication runs remain
 independent. Workflow reviews compare job count and hosted runner consumption;
 wall-clock latency alone is not runner-efficiency evidence.
+
+For a managed consumer merge, the exact merged pull-request event owns
+metadata-dependent finalization and follow-on discovery. The consumer
+adoption/update lifecycle MUST NOT subscribe to `push`: the corresponding
+default-branch push and any self-created automation branch push MUST NOT create
+a second lifecycle run, replace the pending exact-merge event, or consume a
+redundant runner. Schedule and explicit manual dispatch own repository-evidence
+recovery when the exact merged event is missed or fails. This restriction does
+not remove independent default-branch validation required below.
 
 An unprotected default branch retains its push validation. A short reuse route
 is permitted only when read-only local Git and paginated provider evidence
@@ -985,6 +994,9 @@ The updater MUST:
   expected-head lease immediately before branch deletion;
 - use expected-state Git leases for automation branch creation and deletion,
   and attempt to reopen an old PR when its paired branch cleanup fails;
+- preserve `/` as the Git ref path delimiter when calling provider ref APIs,
+  encode each ref-name segment independently, and bind every read, update,
+  deletion lease, and post-delete verification to the same exact ref and OID;
 - fail closed after interrupted creation and require lease-safe reviewed
   recovery for an orphan reserved branch;
 - inventory the complete reserved automation-branch namespace before mutation;
@@ -1028,9 +1040,10 @@ The updater MUST:
   NOT grant contents/pull-request/workflow authority to the proposal job;
 - provide an explicit pull-request-number recovery dispatch that is idempotent
   for an already absent exact branch and an issue already closed with the exact
-  finalization marker; before update discovery, default-branch push, schedule,
-  and ordinary dispatch MUST also recover retained exact merged branches through
-  this route;
+  finalization marker; before update discovery, schedule and ordinary dispatch
+  MUST also recover retained exact merged branches through this route, while the
+  consumer lifecycle MUST NOT subscribe to default-branch or automation-branch
+  push events;
 - repair an installing legacy update only after proving its same-repository
   merge, canonical marker/branch/head/base, current default containment, current
   gitlink, allowed path set, immutable target release and exact changed updater

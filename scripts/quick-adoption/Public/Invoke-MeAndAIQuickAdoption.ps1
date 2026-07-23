@@ -8,7 +8,7 @@ function Invoke-MeAndAIQuickAdoption {
         [ValidateSet('private', 'public', 'internal')]
         [string]$Visibility = 'private',
         [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-        [string]$ProtocolTag = 'v0.13.4',
+        [string]$ProtocolTag = 'v0.13.5',
         [string]$RemoteName = 'origin',
         [ValidateRange(1, 60)]
         [int]$WorkflowTimeoutMinutes = 15,

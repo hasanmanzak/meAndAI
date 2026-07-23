@@ -28,6 +28,7 @@
 | [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md) | Use exact instruction-graph discovery and fail-closed completion coverage | Accepted | 2026-07-21 |
 | [DEC-0025](DEC-0025-exact-head-personal-owner-attestation.md) | Allow exact-head personal-owner attestation as a review fallback | Accepted | 2026-07-23 |
 | [DEC-0026](DEC-0026-historical-capability-review-recovery.md) | Recover only proven merged strict-predecessor capability reviews | Accepted | 2026-07-23 |
+| [DEC-0027](DEC-0027-single-owner-consumer-merge-events.md) | Use one consumer lifecycle event per managed merge | Accepted | 2026-07-23 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

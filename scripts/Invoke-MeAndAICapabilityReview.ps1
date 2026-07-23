@@ -515,6 +515,23 @@ function Get-GitHubFileAtRef {
     }
 }
 
+function ConvertTo-GitRefEndpointPath {
+    param([Parameter(Mandatory)][string]$RefName)
+
+    $segments = $RefName.Split(
+        [char[]]@('/'),
+        [StringSplitOptions]::None
+    )
+    if ($segments.Count -eq 0 -or @($segments | Where-Object {
+        [string]::IsNullOrEmpty([string]$_)
+    }).Count -gt 0) {
+        throw 'Git ref name contains an empty path segment.'
+    }
+    return (@($segments | ForEach-Object {
+        [Uri]::EscapeDataString([string]$_)
+    }) -join '/')
+}
+
 function Get-SingleBodyField {
     param(
         [Parameter(Mandatory)][string]$Body,
@@ -1195,7 +1212,7 @@ function Get-ProductionInventory {
         throw 'Canonical historical inventory contains a duplicate issue.'
     }
 
-    $escapedBranch = [Uri]::EscapeDataString($ExpectedBranch)
+    $escapedBranch = ConvertTo-GitRefEndpointPath -RefName $ExpectedBranch
     $branchRaw = Invoke-ReviewGitHub -Method GET `
         -Endpoint "repos/$Repository/git/ref/heads/$escapedBranch" `
         -AcceptNotFound
@@ -2255,7 +2272,8 @@ function Remove-ReviewBranchWithLease {
     Assert-GitSha -Value $ExpectedHead `
         -Label 'Capability-review branch expected head'
     Assert-LiveDefaultHeadUnchanged
-    $endpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($Branch))"
+    $escapedBranch = ConvertTo-GitRefEndpointPath -RefName $Branch
+    $endpoint = "repos/$Repository/git/ref/heads/$escapedBranch"
     $remote = Invoke-ReviewGitHub -Method GET -Endpoint $endpoint `
         -AcceptNotFound
     if ($null -eq $remote) {
@@ -2293,7 +2311,8 @@ function Close-VerifiedReviewIssue {
     )
 
     Assert-LiveDefaultHeadUnchanged
-    $branchEndpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($Branch))"
+    $escapedBranch = ConvertTo-GitRefEndpointPath -RefName $Branch
+    $branchEndpoint = "repos/$Repository/git/ref/heads/$escapedBranch"
     if ($null -ne (Invoke-ReviewGitHub -Method GET `
         -Endpoint $branchEndpoint -AcceptNotFound)) {
         throw 'Capability review issue cannot close before branch deletion.'
@@ -2707,6 +2726,8 @@ $executionState = [ordered]@{
 $handlers = @{
     CreateBranch = {
         param($Operation, $ReviewPlan)
+        $escapedBranch = ConvertTo-GitRefEndpointPath `
+            -RefName ([string]$ReviewPlan.Branch)
         $response = Invoke-ReviewGitHub -Method POST `
             -Endpoint "repos/$Repository/git/refs" -Body ([ordered]@{
                 ref = "refs/heads/$($ReviewPlan.Branch)"
@@ -2722,7 +2743,7 @@ $handlers = @{
             throw 'Created capability-review branch has unexpected head.'
         }
         $createdBranch = Invoke-ReviewGitHub -Method GET `
-            -Endpoint "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($ReviewPlan.Branch))"
+            -Endpoint "repos/$Repository/git/ref/heads/$escapedBranch"
         $createdObject = Get-PropertyValue -Value $createdBranch -Name object `
             -Label 'Created capability review branch ref'
         $head = [string](Get-PropertyValue -Value $createdObject -Name sha `
@@ -2773,6 +2794,8 @@ $handlers = @{
             $null -eq $executionState.Branch) {
             throw 'Capability review manifest requires branch and issue identity.'
         }
+        $escapedBranch = ConvertTo-GitRefEndpointPath `
+            -RefName ([string]$ReviewPlan.Branch)
         $manifestBytes = New-ManifestBytes -Plan $ReviewPlan `
             -IssueNumber ([long]$executionState.Issue.Number) `
             -LedgerPrefixCount @($ledger.Entries).Count
@@ -2823,7 +2846,7 @@ $handlers = @{
             throw 'Capability review manifest commit has unexpected parent.'
         }
         [void](Invoke-ReviewGitHub -Method PATCH `
-            -Endpoint "repos/$Repository/git/refs/heads/$([Uri]::EscapeDataString($ReviewPlan.Branch))" `
+            -Endpoint "repos/$Repository/git/refs/heads/$escapedBranch" `
             -Body ([ordered]@{ sha = $commitSha; force = $false }))
         $compare = Invoke-ReviewGitHub -Method GET `
             -Endpoint "repos/$Repository/compare/$parentHead...$commitSha"

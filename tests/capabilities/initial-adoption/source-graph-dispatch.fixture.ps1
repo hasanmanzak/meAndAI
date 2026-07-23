@@ -185,7 +185,7 @@ $currentWorkflowBytes = [IO.File]::ReadAllBytes($currentWorkflowPath)
 $legacyWorkflowBytes = Get-GitObjectBytes -Repository $root `
     -Object "$immutableGraphUnawareCommit`:$immutableWorkflowPath"
 Invoke-DispatchCase -WorkflowBytes $currentWorkflowBytes `
-    -ExpectedGraphSupport $true -Label 'current v0.13.4'
+    -ExpectedGraphSupport $true -Label 'current v0.13.5'
 Invoke-DispatchCase -WorkflowBytes $legacyWorkflowBytes `
     -ExpectedGraphSupport $false -Label 'immutable v0.12.5'
 

@@ -2,25 +2,22 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-23**<br>
-Protocol version: **0.13.4** (candidate)<br>
-Latest immutable release: **0.13.3**
+Protocol version: **0.13.5** (candidate)<br>
+Latest immutable release: **0.13.4**
 
-The immutable [v0.13.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.3)
-release targets commit `4285c7a6169d91a7b7cc75b72ce6c88230bf0039`;
-[PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) and
-[issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) retain its
+The immutable [v0.13.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.4)
+release targets commit `089c63d2aeca2d8188bdaeeced5e33be8d01c256`;
+[PR #107](https://github.com/hasanmanzak/meAndAI/pull/107) and
+[issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) retain its
 delivery and publication evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
-[FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md)
-/ `BUG-0025`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106),
-[PR #107](https://github.com/hasanmanzak/meAndAI/pull/107), and `SUBF-0082`
-own the bounded v0.13.4 case-safe repository-identity
-correction on `codex/bug-0025-case-safe-review-authority`. The correction may
-fold only GitHub owner and repository-name components while every PR number,
-head, authority, provenance, ledger, and cleanup gate remains strict.
-TEST-0167 and TEST-0168 belong to the existing capability-review owner. Follow
-the [v0.13.4 handoff](log/2026-07-23-v0134-case-safe-review-authority.md).
+[FEAT-0044](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md)
+/ `BUG-0026`, [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108),
+`SUBF-0083`, and `SUBF-0084` own the bounded v0.13.5 slash-safe ref and
+single-owner consumer-lifecycle correction. TEST-0169 and TEST-0170 remain in
+their existing capability owners. Follow the
+[v0.13.5 handoff](log/2026-07-23-v0135-slash-safe-ref-single-owner-lifecycle.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

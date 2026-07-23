@@ -651,6 +651,13 @@ try {
         Join-Path $fixtureRoot '.ai'
     ))) 'TEST-0140 PlanOnly fixture wrote consumer state.'
 
+    $canonicalReviewBranch =
+        'automation/meandai-capability-review-' +
+        $releaseCatalog.CatalogDigest.Substring(0, 16)
+    $canonicalReadRefEndpoint =
+        "repos/hasanmanzak/consumer/git/ref/heads/$canonicalReviewBranch"
+    $canonicalWriteRefEndpoint =
+        "repos/hasanmanzak/consumer/git/refs/heads/$canonicalReviewBranch"
     $apiState = [pscustomobject][ordered]@{
         Calls = [System.Collections.Generic.List[string]]::new()
         DefaultHead = $fixtureHead
@@ -875,6 +882,10 @@ try {
             [string]$Authority
         )
         $apiState.Calls.Add("$Authority $Method $Endpoint")
+        if ($Endpoint -match '/git/refs?/heads/' -and
+            $Endpoint -match '%2[fF]') {
+            throw 'TEST-0169 Git ref endpoint encoded a branch separator as %2F.'
+        }
         $issueEndpoint = $Endpoint -match '^repos/hasanmanzak/consumer/issues(?:[/?]|$)'
         $protocolEndpoint =
             $Endpoint -match '^repos/hasanmanzak/meAndAI/(?:releases|commits)(?:[/?]|$)'
@@ -1008,9 +1019,7 @@ try {
             $Endpoint -match '^repos/.+/git/ref/heads/') {
             if ($null -ne $apiState.HistoricalReview -and
                 $Endpoint.EndsWith(
-                    [Uri]::EscapeDataString(
-                        [string]$apiState.HistoricalReview.Branch
-                    )
+                    [string]$apiState.HistoricalReview.Branch
                 )) {
                 if ($apiState.HistoricalReview.BranchExists) {
                     return [pscustomobject]@{
@@ -1020,6 +1029,9 @@ try {
                     }
                 }
                 return $null
+            }
+            if ($Endpoint -cne $canonicalReadRefEndpoint) {
+                throw "TEST-0169 used a noncanonical Git ref lookup: $Endpoint"
             }
             if ($apiState.BranchCreated) {
                 return [pscustomobject]@{
@@ -1345,6 +1357,9 @@ try {
         }
         if ($Method -ceq 'PATCH' -and
             $Endpoint -match '^repos/.+/git/refs/heads/') {
+            if ($Endpoint -cne $canonicalWriteRefEndpoint) {
+                throw "TEST-0169 used a noncanonical Git ref update: $Endpoint"
+            }
             $apiState.BranchHead = [string]$Body.sha
             return [pscustomobject]@{
                 object = [pscustomobject]@{ sha = [string]$Body.sha }
@@ -1385,11 +1400,12 @@ try {
             $Endpoint -match '^repos/.+/git/ref/heads/') {
             if ($null -ne $apiState.HistoricalReview -and
                 $Endpoint.EndsWith(
-                    [Uri]::EscapeDataString(
-                        [string]$apiState.HistoricalReview.Branch
-                    )
+                    [string]$apiState.HistoricalReview.Branch
                 )) {
                 throw 'TEST-0166 historical branch deletion bypassed the Git expected-head lease.'
+            }
+            if ($Endpoint -cne $canonicalReadRefEndpoint) {
+                throw "TEST-0169 used a noncanonical Git ref deletion: $Endpoint"
             }
             $apiState.BranchCreated = $false
             return $null
@@ -1437,6 +1453,73 @@ try {
         }
         throw "TEST-0140 unexpected fixture GitHub call: $Method $Endpoint"
     }.GetNewClosure()
+
+    # TEST-0169: an interrupted run may leave only the exact canonical branch
+    # at the captured default head. The next run must resume after branch
+    # creation, use literal-slash Git ref endpoints, and converge idempotently.
+    $apiState.BranchCreated = $true
+    $apiState.BranchHead = $fixtureHead
+    $apiState.Calls.Clear()
+    $branchOnlyRecovery = & $runnerPath -ConsumerRoot $fixtureRoot `
+        -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+        -DefaultBranch main -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent `
+        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime }
+    Assert-Equal $branchOnlyRecovery.State 'CreateReviewHandoff' `
+        'TEST-0169 exact branch-only recovery did not resume the handoff.'
+    Assert-Equal ($branchOnlyRecovery.Execution.Executed -join ',') `
+        'OpenIssue,WriteReviewManifest,OpenDraftPullRequest' `
+        'TEST-0169 branch-only recovery repeated or skipped an operation.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '^Proposal POST repos/.+/git/refs$'
+    }).Count 0 `
+        'TEST-0169 branch-only recovery created a second branch ref.'
+    Assert-True (@($apiState.Calls | Where-Object {
+        $_ -ceq "Proposal GET $canonicalReadRefEndpoint"
+    }).Count -gt 0) `
+        'TEST-0169 branch-only recovery omitted the literal-slash ref lookup.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -ceq "Proposal PATCH $canonicalWriteRefEndpoint"
+    }).Count 1 `
+        'TEST-0169 branch-only recovery did not update the exact branch once.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '%2[fF]'
+    }).Count 0 `
+        'TEST-0169 branch-only recovery emitted an encoded branch separator.'
+
+    $branchOnlyMutationCount = @($apiState.Calls | Where-Object {
+        $_ -match ' (?:POST|PATCH|DELETE) '
+    }).Count
+    $branchOnlyRerun = & $runnerPath -ConsumerRoot $fixtureRoot `
+        -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+        -DefaultBranch main -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent `
+        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -PlanOnly
+    Assert-Equal $branchOnlyRerun.State 'ReviewPending' `
+        'TEST-0169 recovered review was not recognized on rerun.'
+    Assert-Equal $branchOnlyRerun.Plan.Operations.Count 0 `
+        'TEST-0169 recovered review rerun planned duplicate work.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match ' (?:POST|PATCH|DELETE) '
+    }).Count $branchOnlyMutationCount `
+        'TEST-0169 recovered review rerun performed another mutation.'
+
+    # Restore the original TEST-0140 lifecycle arrangement.
+    $apiState.Calls.Clear()
+    $apiState.BranchHead = $fixtureHead
+    $apiState.BranchCreated = $false
+    $apiState.IssueCreated = $false
+    $apiState.IssueClosed = $false
+    $apiState.PullCreated = $false
+    $apiState.PullMerged = $false
+    $apiState.ClosureComments.Clear()
+    $apiState.IssueBody = ''
+    $apiState.BlobBody = $null
+    $apiState.TreeBody = $null
+    $apiState.CommitBody = $null
+    $apiState.PullBody = $null
+
     $executeResult = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
@@ -1978,6 +2061,9 @@ try {
         body = $ownerAttestationBody
         user = $apiState.ProposalActor
     })
+    $finalizationRefReadCount = @($apiState.Calls | Where-Object {
+        $_ -ceq "Proposal GET $canonicalReadRefEndpoint"
+    }).Count
     $finalizeExecution = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
@@ -1995,6 +2081,14 @@ try {
         'TEST-0140 production finalization did not close its issue last.'
     Assert-Equal $apiState.ClosureComments.Count 1 `
         'TEST-0140 production finalization did not write one closure marker.'
+    Assert-True ((@($apiState.Calls | Where-Object {
+        $_ -ceq "Proposal GET $canonicalReadRefEndpoint"
+    }).Count - $finalizationRefReadCount) -ge 3) `
+        'TEST-0169 finalization omitted exact lookup or post-delete absence checks.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '/git/refs?/heads/.+%2[fF]'
+    }).Count 0 `
+        'TEST-0169 finalization emitted an encoded branch separator.'
     Assert-Equal (@($apiState.Calls | Where-Object {
         $_ -match 'issues/92/comments'
     }).Count -gt 0) $true `
@@ -2336,7 +2430,7 @@ try {
     $historicalRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $historicalPullNumber `
         -Runtime $historicalRuntime
     Assert-Equal $historicalRecovery.State 'Current' `
@@ -2413,7 +2507,7 @@ try {
     $historicalRerun = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
         -Runtime $historicalRuntime -PlanOnly
     Assert-Equal $historicalRerun.State 'Current' `
         'TEST-0165 completed historical recovery rerun was not current.'
@@ -2428,7 +2522,7 @@ try {
     $partialRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $historicalPullNumber `
         -Runtime $historicalRuntime
     Assert-Equal $partialRecovery.State 'Current' `
@@ -2458,7 +2552,7 @@ try {
         Assert-ThrowsLike -Action {
             & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
                 -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-                -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+                -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
                 -Runtime $historicalRuntime
         } -Pattern $Pattern -Message "TEST-0166 $Name did not fail closed."
         Assert-Equal $apiState.HistoricalMutationCalls.Count 0 `
@@ -2526,7 +2620,7 @@ try {
     Assert-ThrowsLike -Action {
         & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
             -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+            -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
             -Runtime $historicalRuntime
     } -Pattern '*prefix*' `
         -Message 'TEST-0166 non-prefix historical catalog did not fail closed.'
@@ -2581,7 +2675,7 @@ try {
         $mixedCaseRecovery = & $runnerPath `
             -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
             -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+            -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
             -FinalizePullRequestNumber $historicalPullNumber `
             -Runtime $historicalRuntime
         Assert-Equal $mixedCaseRecovery.State 'Current' `
@@ -2602,7 +2696,7 @@ try {
         $mixedCaseRerun = & $runnerPath `
             -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
             -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+            -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
             -Runtime $historicalRuntime -PlanOnly
         Assert-Equal $mixedCaseRerun.State 'Current' `
             'TEST-0167 mixed-case completed recovery rerun was not current.'

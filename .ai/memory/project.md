@@ -9,29 +9,28 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.4` candidate. Latest immutable release:
-  [v0.13.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.3)
-  targets commit `4285c7a6169d91a7b7cc75b72ce6c88230bf0039`.
-  [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) and
-  [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) retain its
+- Current protocol version: `0.13.5` candidate. Latest immutable release:
+  [v0.13.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.4)
+  targets commit `089c63d2aeca2d8188bdaeeced5e33be8d01c256`.
+  [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107) and
+  [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
-  `BUG-0025`, `SUBF-0082`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106),
-  and [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107) govern the
-  v0.13.4 case-safe review-authority correction on
-  `codex/bug-0025-case-safe-review-authority`. TEST-0167 and TEST-0168 belong
-  to the existing capability-review suite. The change treats only GitHub owner
-  and repository-name components as case-insensitive identity while preserving
-  exact host/path/PR/head, review authority, immutable provenance, ledger, and
-  branch-first/issue-last recovery behavior.
+- Current scope: [FEAT-0044](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md),
+  `BUG-0026`, `SUBF-0083`, `SUBF-0084`, and
+  [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) govern the
+  v0.13.5 correction on `codex/bug-0026-slash-safe-single-owner-lifecycle`.
+  TEST-0169 and TEST-0170 belong to the existing capability-review and managed-
+  finalization owners. Slash-bearing refs preserve literal separators; merged
+  PR events alone own the managed-merge lifecycle; push is not admitted;
+  schedule/manual routes retain bounded repository-evidence recovery.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable v0.13.3 completed FEAT-0042, `SUBF-0081`,
-  `TEST-0165`/`0166`, and `RISK-0197` through `RISK-0200`. FEAT-0043 defines
-  `SUBF-0082`, `TEST-0167`/`0168`, and `RISK-0201`/`RISK-0202` for the bounded
-  v0.13.4 correction. The external failure is retained by
-  [Derdini run 30004752646](https://github.com/hasanmanzak/Derdini/actions/runs/30004752646).
+- Latest tracked work: immutable v0.13.4 completed FEAT-0043, `SUBF-0082`,
+  `TEST-0167`/`0168`, and `RISK-0201`/`RISK-0202`. FEAT-0044 defines
+  `SUBF-0083`/`0084`, `TEST-0169`/`0170`, and `RISK-0203` through `RISK-0206`.
+  The external failures are retained by Derdini runs 30011058590,
+  30011059451, and 30011271796.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -81,11 +80,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Complete the bounded FEAT-0043 test-first correction, review, validation,
-  pull request, and immutable v0.13.4 publication through issue #106. Do not
+- Complete the bounded FEAT-0044 test-first correction, review, validation,
+  pull request, and immutable v0.13.5 publication through issue #108. Do not
   mutate an affected consumer from this protocol branch. After publication,
-  install the released updater in the consumer and rerun its separately
-  authorized historical finalization.
+  install the released workflow/runtime and recover only the exact revalidated
+  consumer branch.
 - `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
   issue #98; FEAT-0043 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
