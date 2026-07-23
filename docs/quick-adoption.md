@@ -122,8 +122,8 @@ secret remains untouched and is not a credential source for the local process.
 
 ## Quick command
 
-After GitHub marks `v0.13.5` as an immutable release, download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.13.5/Invoke-MeAndAIQuickAdoption.ps1)
+After GitHub marks `v0.14.0` as an immutable release, download only the thin
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.14.0/Invoke-MeAndAIQuickAdoption.ps1)
 from that exact release with an authenticated browser. Until that condition is
 true, use the latest release that GitHub already marks immutable rather than a
 candidate tag or a moving branch.
@@ -140,11 +140,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.13.5` is an exact published
+launcher itself verifies that its runtime `v0.14.0` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.13.5`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.14.0`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options

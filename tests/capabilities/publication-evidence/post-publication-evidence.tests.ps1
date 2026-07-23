@@ -42,7 +42,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.13.5' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.0' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")

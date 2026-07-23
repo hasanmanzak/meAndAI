@@ -3,6 +3,29 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.14.0 - 2026-07-23
+
+### Added
+
+- Add the append-only `canonical-repository-evidence` Semantic capability so
+  existing consumers review one project-neutral byte-source contract without
+  rewriting either released capability definition.
+- Add one shared, binary-safe repository-evidence reader for exact HEAD,
+  stage-zero index, and contained ordinary worktree candidate bytes.
+- Require reusable consumer-exposed defects to be corrected and proven at the
+  common upstream authority; consumer recovery remains separate and linked.
+
+### Fixed
+
+- Read a Git-clean production capability ledger from the exact already-verified
+  default-branch HEAD blob instead of checkout-filtered worktree bytes.
+- Preserve strict UTF-8/LF rejection, ambiguity failures, read-only behavior,
+  and idempotent reruns without newline normalization.
+
+Related work: [FEAT-0045](docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md),
+`BUG-0027`, [DEC-0028](docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md),
+and [issue #110](https://github.com/hasanmanzak/meAndAI/issues/110).
+
 ## 0.13.5 - 2026-07-23
 
 ### Fixed

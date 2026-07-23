@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.13.5 |
 | Issue | [#108](https://github.com/hasanmanzak/meAndAI/issues/108) |
-| Pull request | Pending |
+| Pull request | [#109](https://github.com/hasanmanzak/meAndAI/pull/109) |
 | Decisions | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0027](../../decisions/DEC-0027-single-owner-consumer-merge-events.md) |
 | Tests | [TEST-0169 and TEST-0170](test-cases.md) |
 
@@ -157,8 +157,8 @@ remains.
 | Field | Evidence |
 | --- | --- |
 | External evidence authority | [Issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) |
-| Pull request | Pending |
-| Release authority | Pending |
-| Release identifier | Pending |
-| Target commit | Pending |
-| Consumer recovery | Pending |
+| Pull request | [#109](https://github.com/hasanmanzak/meAndAI/pull/109) |
+| Release authority | [Immutable v0.13.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.5) |
+| Release identifier | `v0.13.5` |
+| Target commit | `014f9bbe30074a742c84e3915ebcf94b9fe9cc3e` |
+| Consumer recovery | No consumer mutation is claimed by this feature; later shared byte-evidence work is owned by [FEAT-0045](../FEAT-0045-v0140-canonical-repository-evidence/README.md) |

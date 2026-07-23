@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "slug": "canonical-repository-evidence",
+  "type": "Semantic",
+  "title": "Canonical byte-sensitive repository evidence",
+  "applicability": {
+    "condition": "byte-sensitive-repository-evidence",
+    "description": "The repository owns automated logic that parses, compares, validates, or migrates byte-sensitive versioned artifacts across Git baseline, index, or worktree state."
+  },
+  "requirements": [
+    {
+      "id": "state-owned-byte-source",
+      "statement": "Clean tracked evidence comes from the exact verified HEAD regular blob, staged-only evidence from the exact stage-zero index blob, and unstaged or untracked evidence from the contained ordinary worktree file."
+    },
+    {
+      "id": "exact-byte-preservation",
+      "statement": "Repository evidence is acquired and passed to strict parsers as exact bytes without text pipelines, newline conversion, checkout-filter substitution, encoding inference, or normalization."
+    },
+    {
+      "id": "fail-closed-state-ambiguity",
+      "statement": "Conflicts, staged-plus-unstaged state, rename or copy state, deletion, missing required evidence, and any other ambiguous authority fail before evidence is accepted."
+    },
+    {
+      "id": "contained-ordinary-evidence",
+      "statement": "Git evidence must be a regular blob and worktree evidence must be an ordinary contained file; links, reparse points, non-regular entries, and escaping paths fail closed."
+    },
+    {
+      "id": "read-only-idempotent-resolution",
+      "statement": "Evidence resolution is read-only and bounded, and an exact rerun over unchanged repository state returns the same source identity and bytes without changing repository state."
+    },
+    {
+      "id": "semantic-consumer-ownership",
+      "statement": "Automation may request maintainer review of this Semantic capability but does not rewrite, approve, mark ready, or merge consumer-owned semantic implementation."
+    }
+  ],
+  "evidence": {
+    "conforming": [
+      "Reviewed source-mapping evidence binds every supported clean, staged-only, unstaged, and untracked state to its owning Git or worktree byte authority and records fail-closed ambiguous states.",
+      "Executable anonymous-repository evidence proves exact bytes under checkout filtering, genuine noncanonical-byte rejection, containment, read-only behavior, and idempotent reruns.",
+      "Reviewed semantic handoff evidence confirms that automation writes only its transient review state and leaves consumer-owned semantic implementation to maintainers."
+    ],
+    "notApplicable": [
+      "Reviewed repository evidence proves that no automated logic parses, compares, validates, or migrates byte-sensitive versioned artifacts across Git baseline, index, or worktree state.",
+      "The review identifies the inspected automation boundary and explains why byte-source selection cannot affect its evidence or decisions."
+    ]
+  }
+}

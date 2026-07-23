@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.13.5**<br>
+Protocol version: **0.14.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -143,6 +143,17 @@ and validation semantics where applicable.
 Review ownership and invariants, dependency direction, transaction and state
 boundaries, concurrency, error behavior, compatibility, and existing extension
 points. Search for related logic before introducing a new implementation.
+
+When a defect is exposed in a consuming repository, classify its owning layer
+before correction. If the root contract, algorithm, automation, template,
+capability, or adoption rule is reusable across consumers, its canonical work
+item, project-neutral regression, correction, and release belong to the common
+upstream authority. A named-consumer change MAY represent only genuinely
+project-specific behavior or bounded recovery linked to an available upstream
+correction; it MUST NOT be presented as generic closure. Common production
+code, tests, fixtures, and normative records MUST NOT encode a named
+consumer's paths or domain facts. This rule does not authorize scanning or
+mutating unrelated consumer repositories.
 
 ### Gate 3 - Tests first
 
@@ -603,6 +614,16 @@ catalog. The assessment boundary returns exactly `Conforming`,
 Missing, stale, partial, reordered, duplicated, unreviewed, or ambiguous
 evidence remains open or fails closed.
 
+Byte-sensitive repository evidence MUST be read from the authority that owns
+the state being assessed. A clean tracked baseline comes from the exact
+verified `HEAD:<path>` regular Git blob; a staged-only candidate comes from the
+stage-zero index blob; and an unstaged or untracked candidate comes from the
+contained ordinary worktree file. Conflicts, rename/copy/delete state,
+non-regular entries, links, escaping paths, staged-plus-unstaged ambiguity, or
+missing required evidence MUST fail closed. Readers MUST preserve exact bytes,
+MUST NOT normalize checkout-filtered content, and MUST be read-only and
+idempotent.
+
 Capability discovery runs after reviewed first adoption, for an already-current
 consumer, and after ordinary compatible update discovery. It MUST NOT broaden
 the initial-adoption content envelope. An updater installed before this
@@ -661,6 +682,14 @@ stable owner, key, builder identity, and exact input digest; every mutable case
 MUST receive a distinct isolated derivative or overlay. Reset MUST NOT rebuild
 unchanged immutable input or share mutable repositories, refs, remotes, process
 state, credentials, mocks, or temporary roots.
+
+The `canonical-repository-evidence` semantic capability applies when automated
+logic parses, compares, validates, or migrates byte-sensitive versioned
+artifacts across Git baseline, index, or worktree state. It requires the exact
+authority matrix above, binary-safe acquisition without normalization,
+contained regular-blob or ordinary-file evidence, fail-closed ambiguity, and
+read-only idempotent resolution. Automation may request the semantic review but
+does not gain ownership of the consumer's implementation.
 
 An applicable repository MUST record or emit machine-readable fixture and
 operation evidence that binds ownership, lifecycle, builds, reuse, mutable

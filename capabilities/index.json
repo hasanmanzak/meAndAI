@@ -12,6 +12,12 @@
       "definition": "test-runtime-efficiency.json",
       "type": "Semantic",
       "definitionBlob": "20c6bc064d04be18ede7ab70983503feb4b799ea"
+    },
+    {
+      "slug": "canonical-repository-evidence",
+      "definition": "canonical-repository-evidence.json",
+      "type": "Semantic",
+      "definitionBlob": "5a323d1cc9b5e64564f63dc577ad0c937a1c91c0"
     }
   ]
 }
