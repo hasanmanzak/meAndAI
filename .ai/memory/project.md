@@ -16,8 +16,9 @@ Last verified: **2026-07-23**
   [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
 - Current scope: [FEAT-0042](../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
-  `BUG-0024`, `SUBF-0081`, and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
-  govern the v0.13.3 historical capability-review recovery on
+  `BUG-0024`, `SUBF-0081`, [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104),
+  and [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) govern the
+  v0.13.3 historical capability-review recovery on
   `codex/bug-0024-historical-review-recovery`. TEST-0165 and TEST-0166 belong to
   the existing capability-review suite. Recovery accepts only one exact merged
   strict-predecessor review, retains current review authority and all later

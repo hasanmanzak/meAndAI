@@ -5,6 +5,7 @@
 - Feature: [FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
 - Decision: [DEC-0026](../../../docs/decisions/DEC-0026-historical-capability-review-recovery.md)
 - Tracking: [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
+- Delivery: [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105)
 - Tests: [TEST-0165 and TEST-0166](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md)
 
 ## Verified problem

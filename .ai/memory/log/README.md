@@ -11,8 +11,9 @@ retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 
 [FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
-`BUG-0024`, and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
-govern the v0.13.3 historical capability-review recovery on
+`BUG-0024`, [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104), and
+[PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) govern the v0.13.3
+historical capability-review recovery on
 `codex/bug-0024-historical-review-recovery`. Follow the
 [v0.13.3 handoff](2026-07-23-v0133-historical-capability-review-recovery.md).
 TEST-0165/0166 expected red and focused green are recorded; final validation,

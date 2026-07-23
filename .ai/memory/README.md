@@ -13,8 +13,9 @@ delivery and publication evidence. [`TASK-0002` / issue #98](https://github.com/
 remains the separate runtime residual owner.
 
 [FEAT-0042](../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
-/ `BUG-0024` and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
-own the bounded v0.13.3 historical capability-review recovery on
+/ `BUG-0024`, [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104),
+and [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) own the bounded
+v0.13.3 historical capability-review recovery on
 `codex/bug-0024-historical-review-recovery`. It accepts only one fully proven
 merged strict-predecessor review, preserves the complete current ledger, uses
 expected-OID branch deletion, closes the issue last, and performs one fresh

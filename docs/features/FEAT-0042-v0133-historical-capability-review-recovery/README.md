@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.13.3 |
 | Issue | [#104](https://github.com/hasanmanzak/meAndAI/issues/104) |
-| Pull request | Pending |
+| Pull request | [#105](https://github.com/hasanmanzak/meAndAI/pull/105) |
 | Decision | [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) |
 | Tests | [TEST-0165 and TEST-0166](test-cases.md) |
 
