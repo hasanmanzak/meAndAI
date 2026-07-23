@@ -1299,7 +1299,7 @@ function Initialize-QuickAdoptionImmutableFixture {
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'switch', '--detach'
     ) | Out-Null
-    foreach ($futureTag in @('v0.13.4', 'v1.0.0')) {
+    foreach ($futureTag in @('v0.13.5', 'v1.0.0')) {
         Copy-CanonicalProtocolFixture -Destination $protocolRepository `
             -Tag $futureTag
         Invoke-TestGit -Repository $protocolRepository -Arguments @(
