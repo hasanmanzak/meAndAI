@@ -9,40 +9,30 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.1`. Latest immutable release:
-  [v0.13.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.0)
-  targets commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`.
-  [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) and
-  [PR #99](https://github.com/hasanmanzak/meAndAI/pull/99) retain its hosted,
-  merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0040](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md),
-  `TASK-0002`, and [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-  govern the v0.13.1 actor-local batched instruction-graph correction on
-  `codex/task-0002-batched-instruction-graph-transport`. The exact released
-  baseline is 175 blob processes and requests per selected acquisition; the
-  implemented reviewed boundary is one process with all requests/evidence
-  unchanged. Production commit
-  `78c8706e9d4d4f4c020d983b22114165687b475e` and independent-reader commit
-  `55764442820c884e8c3115726bb010a0a9004d77` are focused green.
-  `WindowsNative` passed in 343.0 seconds, the Full suite passed in 1,306.9
-  seconds. Pre-delivery audit resolved publication-authority conflict
-  `FIND-0205`: [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
-  [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) own the
-  closeable delivery/publication path, while issue #98 remains open for
-  `FIND-0204`. Hosted run 29963388824 passed on Ubuntu but exposed
-  `FIND-0206` on Windows: the independent self-HEAD test reader inherited a
-  BOM-emitting PowerShell 5.1 stdin encoding. The local correction reuses that
-  fixture under a preamble-bearing ambient encoding and binds both test-owned
-  batch readers to one raw no-BOM source guard. Replacement hosted, merge, and
-  release gates remain pending external facts.
+- Current protocol version: `0.13.2` candidate. Latest immutable release:
+  [v0.13.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.1)
+  targets commit `f8296cf8d4aba66519a24603c5c7a2a3727f973c`.
+  [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
+  [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) retain its
+  hosted, merge, release, asset, cleanup, and post-publication evidence.
+- Current scope: [FEAT-0041](../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md),
+  `BUG-0023`, `SUBF-0080`, and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
+  govern the v0.13.2 exact-head personal-owner attestation correction on
+  `codex/bug-0023-owner-attestation`. TEST-0163 and TEST-0164 belong to the
+  existing capability-review suite. The fallback is unavailable beside any
+  review submission and requires one canonical exact-head comment whose author,
+  personal repository owner, PR creator, and exact admin actor are identical.
+  Focused expected-red/corrected-green, structural, and release-bundle
+  validation are complete; hosted gates, publication, and external consumer
+  recovery remain pending.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable v0.13.0 completed FEAT-0039,
+- Latest tracked work: immutable v0.13.1 completed FEAT-0040,
   `SUBF-0073` through `SUBF-0077`, `TEST-0157` through `TEST-0160`, and
-  `RISK-0184` through `RISK-0189`. FEAT-0040 defines `SUBF-0078`/`0079`,
-  `TEST-0161`/`0162`, and `RISK-0190` through `RISK-0192`; both subfeatures are
-  complete locally with hosted delivery and release closure pending.
+  `RISK-0190` through `RISK-0192`. FEAT-0041 defines `SUBF-0080`,
+  `TEST-0163`/`0164`, and `RISK-0193` through `RISK-0196` for the bounded
+  v0.13.2 correction.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -92,30 +82,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- `FEAT-0040` / `TASK-0002` owns the residual Windows/adoption/graph runtime
-  under issue #98. The implemented correction is one lazy binary-safe
-  `git cat-file --batch` session per quick/hosted graph acquisition, with zero
-  process for zero blobs, exact OID/type/size/hash and graph-count parity, and
-  fail-closed cleanup. The pure graph module, capability catalog, migration
-  authority, hosted topology, and elapsed-time-as-observation rule remain
-  unchanged. Focused TEST-0161 passed on PS7/PS5.1 in 84.1/147.6 seconds with
-  exact aggregate process/request observations 2/2 and 4/4; TEST-0162 passed in
-  5.3/6.5 seconds. Independent expected readers use separate test-owned batch
-  sessions and returned identical full-HEAD graph identity on both runtimes.
-  `WindowsNative` then passed in 343.0 seconds and Full passed in 1,306.9
-  seconds; the Full hotspots were quick adoption 742.281 seconds, hosted
-  bootstrap 253.297 seconds, and instruction graph 145.462 seconds. These
-  results prove deterministic process reduction, not a wall-clock gain.
-  Hosted run 29963388824 then failed only on Windows because the independent
-  self-HEAD reader prefixed its first raw OID with `EF-BB-BF`. `FIND-0206`
-  corrects that test-only transport and extends the complete raw-stdin
-  invariant across all four repository-owned batch transports without a new
-  fixture. Focused instruction-graph and test-runtime owners are green on
-  PS5.1 and PS7; replacement hosted evidence is pending.
-  `FIND-0200`/`FIND-0201`/`FIND-0205`/`FIND-0206` are resolved locally;
-  `FIND-0202`/`FIND-0203` are optional bounded improvements and `FIND-0204`
-  keeps further runtime work under issue #98. Continue PR #100 with hosted
-  Windows/Linux, merge, and release evidence through issue #101.
+- Complete the bounded FEAT-0041 validation and v0.13.2 publication through
+  issue #102. After the immutable release is installed in the affected
+  consumer, the personal owner must add the exact canonical comment to the
+  retained merged capability PR and invoke the existing
+  `finalize_pull_request` recovery. Do not infer attestation from Ready or
+  merge and do not mutate the consumer from this protocol branch.
+- `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
+  issue #98; FEAT-0041 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

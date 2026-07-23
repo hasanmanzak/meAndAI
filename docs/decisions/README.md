@@ -26,6 +26,7 @@
 | [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md) | Use release-declared capability assessment with reviewed semantic adoption | Accepted | 2026-07-19 |
 | [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md) | Use a thin launcher with one verified immutable module bundle | Accepted | 2026-07-20 |
 | [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md) | Use exact instruction-graph discovery and fail-closed completion coverage | Accepted | 2026-07-21 |
+| [DEC-0025](DEC-0025-exact-head-personal-owner-attestation.md) | Allow exact-head personal-owner attestation as a review fallback | Accepted | 2026-07-23 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

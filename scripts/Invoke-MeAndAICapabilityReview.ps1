@@ -26,8 +26,10 @@ $script:LedgerRelativePath = '.ai/meandai-capabilities-state.json'
 $script:ManifestRelativePath = '.ai/adoption/meandai-capability-review.json'
 $script:MarkerPrefix = '<!-- meandai-capability-review:v1:'
 $script:ClosurePrefix = '<!-- meandai-capability-review-closed:v1:'
+$script:AttestationPrefix = '<!-- meandai-capability-review-attestation:v1:'
 $script:ProposalActor = $null
 $script:IssueActor = $null
+$script:RepositoryOwner = $null
 $script:BaseLedgerDigest = ''
 
 function Get-PropertyValue {
@@ -333,6 +335,16 @@ function Test-IsIssueActor {
 
     return [long]$Actor.Id -eq [long]$script:IssueActor.Id -and
         [string]$Actor.Login -ceq [string]$script:IssueActor.Login
+}
+
+function Test-SameActorIdentity {
+    param(
+        [Parameter(Mandatory)]$Left,
+        [Parameter(Mandatory)]$Right
+    )
+
+    return [long]$Left.Id -eq [long]$Right.Id -and
+        [string]$Left.Login -ieq [string]$Right.Login
 }
 
 function Get-CollaboratorPermission {
@@ -848,6 +860,92 @@ function New-CanonicalClosureCommentBody {
     return "$Marker`n`nVerified merged review, terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
 }
 
+function New-CanonicalOwnerAttestationCommentBody {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][long]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    if ($Repository -cnotmatch '^[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+$' -or
+        $PullRequestNumber -le 0) {
+        throw 'Owner attestation identity is not canonical.'
+    }
+    Assert-GitSha -Value $HeadSha -Label 'Owner attestation review head'
+    $marker = $script:AttestationPrefix + $Repository + ':pr-' +
+        $PullRequestNumber + ':head-' + $HeadSha + ' -->'
+    return $marker + ' I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.'
+}
+
+function Get-ExactHeadOwnerAttestation {
+    param(
+        [Parameter(Mandatory)]$PullRequest
+    )
+
+    if ($null -eq $script:RepositoryOwner -or
+        [string]$script:RepositoryOwner.Type -cne 'User' -or
+        -not (Test-SameActorIdentity -Left $script:RepositoryOwner `
+            -Right $PullRequest.Creator)) {
+        return $null
+    }
+
+    $expectedBody = New-CanonicalOwnerAttestationCommentBody `
+        -Repository $Repository `
+        -PullRequestNumber ([long]$PullRequest.Number) `
+        -HeadSha ([string]$PullRequest.HeadSha)
+    $expectedMarker = $expectedBody.Substring(
+        0,
+        $expectedBody.IndexOf(' -->', [StringComparison]::Ordinal) + 4
+    )
+    $comments = @(Get-PagedGitHubCollection `
+        -Endpoint "repos/$Repository/issues/$($PullRequest.Number)/comments" `
+        -Label 'Capability review owner attestations' -Authority Issue)
+    $matches = [System.Collections.Generic.List[object]]::new()
+    foreach ($comment in $comments) {
+        $body = [string](Get-PropertyValue -Value $comment -Name body `
+            -Label 'Capability review owner attestation' -AllowMissing)
+        $user = Get-PropertyValue -Value $comment -Name user `
+            -Label 'Capability review owner attestation' -AllowMissing
+        if ($null -eq $user) {
+            continue
+        }
+        $actor = Get-ActorRecord -User $user `
+            -Label 'Capability review owner attestation actor'
+        if (-not (Test-SameActorIdentity -Left $actor `
+            -Right $script:RepositoryOwner)) {
+            continue
+        }
+        if ($body -ceq $expectedBody) {
+            $matches.Add([pscustomobject][ordered]@{
+                Actor = $actor
+                Body = $body
+            })
+        }
+        elseif ($body.Contains($expectedMarker)) {
+            throw 'Trusted capability review owner attestation is not exact canonical evidence.'
+        }
+    }
+    if ($matches.Count -gt 1) {
+        throw 'Capability review contains duplicate or conflicting owner attestations.'
+    }
+    if ($matches.Count -ne 1) {
+        return $null
+    }
+
+    $permission = Get-CollaboratorPermission `
+        -Login ([string]$matches[0].Actor.Login) `
+        -ExpectedId ([long]$matches[0].Actor.Id)
+    if ($permission -cne 'admin') {
+        return $null
+    }
+    return [pscustomobject][ordered]@{
+        Id = [long]$matches[0].Actor.Id
+        Login = [string]$matches[0].Actor.Login
+        Permission = $permission
+        Commit = [string]$PullRequest.HeadSha
+    }
+}
+
 function Get-ClosureMarkerFromComments {
     param(
         [Parameter(Mandatory)][long]$IssueNumber,
@@ -1270,6 +1368,21 @@ function Assert-ProductionCheckout {
         $repositoryDefault -cne $DefaultBranch) {
         throw 'GitHub repository identity/default branch does not match the runner target.'
     }
+    $repositoryOwnerResponse = Get-PropertyValue -Value $repositoryResponse `
+        -Name owner -Label 'GitHub repository'
+    $repositoryOwner = Get-ActorRecord -User $repositoryOwnerResponse `
+        -Label 'GitHub repository owner'
+    $repositoryOwnerType = [string](Get-PropertyValue `
+        -Value $repositoryOwnerResponse -Name type `
+        -Label 'GitHub repository owner')
+    if (@('User', 'Organization') -cnotcontains $repositoryOwnerType) {
+        throw 'GitHub repository owner type is unsupported.'
+    }
+    $script:RepositoryOwner = [pscustomobject][ordered]@{
+        Id = [long]$repositoryOwner.Id
+        Login = [string]$repositoryOwner.Login
+        Type = $repositoryOwnerType
+    }
     $proposalActorResponse = Invoke-ReviewGitHub -Method GET -Endpoint 'user'
     $script:ProposalActor = Get-ActorRecord -User $proposalActorResponse `
         -Label 'Authenticated proposal actor'
@@ -1390,32 +1503,41 @@ function Assert-MergedReview {
         [string]$_.state -ceq 'APPROVED' -and
         [string]$_.commit_id -ceq [string]$PullRequest.HeadSha
     })
-    if ($approved.Count -eq 0) {
+    if ($approved.Count -eq 0 -and $reviews.Count -gt 0) {
         throw 'Merged capability review lacks an approval for the exact review head.'
     }
     $trustedReviewer = $null
-    foreach ($review in @($approved | Sort-Object {
-        [string]$_.user.login
-    })) {
-        $reviewer = Get-ActorRecord -User $review.user `
-            -Label 'Capability review approving reviewer'
-        if ([long]$reviewer.Id -eq [long]$PullRequest.Creator.Id) {
-            continue
-        }
-        $permission = Get-CollaboratorPermission -Login $reviewer.Login `
-            -ExpectedId ([long]$reviewer.Id)
-        if (@('write', 'maintain', 'admin') -ccontains $permission) {
-            $trustedReviewer = [pscustomobject][ordered]@{
-                Id = [long]$reviewer.Id
-                Login = [string]$reviewer.Login
-                Permission = $permission
-                Commit = [string]$review.commit_id
+    if ($reviews.Count -gt 0) {
+        foreach ($review in @($approved | Sort-Object {
+            [string]$_.user.login
+        })) {
+            $reviewer = Get-ActorRecord -User $review.user `
+                -Label 'Capability review approving reviewer'
+            if ([long]$reviewer.Id -eq [long]$PullRequest.Creator.Id) {
+                continue
             }
-            break
+            $permission = Get-CollaboratorPermission -Login $reviewer.Login `
+                -ExpectedId ([long]$reviewer.Id)
+            if (@('write', 'maintain', 'admin') -ccontains $permission) {
+                $trustedReviewer = [pscustomobject][ordered]@{
+                    Id = [long]$reviewer.Id
+                    Login = [string]$reviewer.Login
+                    Permission = $permission
+                    Commit = [string]$review.commit_id
+                }
+                break
+            }
         }
     }
+    else {
+        $trustedReviewer = Get-ExactHeadOwnerAttestation `
+            -PullRequest $PullRequest
+    }
     if ($null -eq $trustedReviewer) {
-        throw 'Merged capability review lacks trusted maintainer approval.'
+        if ($reviews.Count -gt 0) {
+            throw 'Merged capability review lacks trusted maintainer approval.'
+        }
+        throw 'Merged capability review lacks an exact-head personal-owner attestation.'
     }
 
     $pullIdentity = "pull-request:$($PullRequest.Number)"

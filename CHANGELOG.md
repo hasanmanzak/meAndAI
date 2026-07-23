@@ -3,6 +3,30 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.2 - 2026-07-23
+
+### Fixed
+
+- Preserve independent exact-head capability-review approval while adding a
+  bounded fallback only for an entirely empty review collection in a personal
+  GitHub repository.
+- Accept one canonical single-line attestation only when the comment author,
+  pull-request creator, personal repository owner, and exact `admin`
+  permission actor are the same identity and the body binds the repository,
+  pull-request number, and exact reviewed head.
+- Recover an already-merged retained semantic review through the existing
+  explicit finalization dispatch without weakening terminal ledger, reviewed
+  tree, merge containment, exact branch lease, issue-last closure, or rerun
+  idempotency checks.
+- Reject existing review submissions, stale or wrong bindings, malformed or
+  duplicate trusted markers, organization owners, insufficient permission,
+  and actor-identity drift before mutation; no new workflow job or credential
+  scope is introduced.
+
+Related work: [FEAT-0041](docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md),
+`BUG-0023`, [DEC-0025](docs/decisions/DEC-0025-exact-head-personal-owner-attestation.md),
+and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102).
+
 ## 0.13.1 - 2026-07-23
 
 ### Changed

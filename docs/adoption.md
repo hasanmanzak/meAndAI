@@ -87,9 +87,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.13.1`, the only repository file required
+For a new submodule consumer on `v0.13.2`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.13.1/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.13.2/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -204,7 +204,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.13.1'
+$tag = 'v0.13.2'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -532,7 +532,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.13.1`
+- ref: `v0.13.2`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -580,11 +580,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.13.1`:
+before checkout; the current example then installs `v0.13.2`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.13.1
+git -C .ai/protocol checkout v0.13.2
 git add .ai/protocol
 ```
 
@@ -620,6 +620,30 @@ repository-native conforming structure, records evidence, removes the
 transient manifest, and completes the consumer's normal gates. A pre-framework
 workflow first installs the ordinary update; its replacement then performs
 this same-target assessment without a source-version switch.
+
+Semantic capability finalization normally uses an exact-head GitHub approval
+from a different trusted maintainer. A personal-repository owner cannot approve
+their own pull request through GitHub. When, and only when, that pull request
+has no review submissions at all, the owner may instead add one exact single-
+line attestation comment. The author must be the same personal repository
+owner, pull-request creator, and current `admin` collaborator. Replace the
+three values below, use the lowercase repository identity and lowercase head,
+and do not change spaces, punctuation, or wording:
+
+```text
+<!-- meandai-capability-review-attestation:v1:<owner>/<repository>:pr-<number>:head-<40-character-lowercase-head-sha> --> I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.
+```
+
+Ready and merge actions do not create this evidence, and the workflow never
+posts it for the maintainer. Any existing review submission keeps the normal
+approval state authoritative, so a stale approval or requested change cannot
+be bypassed with an attestation. If the pull request already merged and left
+its exact branch and issue retained, the owner can add the comment to that
+merged pull request and dispatch the installed workflow with
+`finalize_pull_request` set to its number. The normal merged-tree, ledger,
+branch-lease, and issue-last gates still run. This bounded path is defined by
+[FEAT-0041](features/FEAT-0041-v0132-exact-head-owner-attestation/README.md)
+and [DEC-0025](decisions/DEC-0025-exact-head-personal-owner-attestation.md).
 
 If another release appears before merge, the newer proposal supersedes the
 older one. Supersession is replacement-first and compensated, not a distributed

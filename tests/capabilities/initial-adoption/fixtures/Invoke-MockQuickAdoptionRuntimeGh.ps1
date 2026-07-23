@@ -7,7 +7,7 @@ $bundlePath = [string]$env:MEANDAI_TEST_RUNTIME_BUNDLE
 $bundleDigest = [string]$env:MEANDAI_TEST_RUNTIME_DIGEST
 $bundleLength = [long]$env:MEANDAI_TEST_RUNTIME_LENGTH
 $sourceCommit = [string]$env:MEANDAI_TEST_RUNTIME_COMMIT
-$tag = 'v0.13.1'
+$tag = 'v0.13.2'
 $assetName = 'MeAndAI.QuickAdoption.Bundle.zip'
 
 if ([string]$env:GH_HOST -cne 'github.com') {
