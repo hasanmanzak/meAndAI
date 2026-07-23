@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.13.1**<br>
+Protocol version: **0.13.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -611,6 +611,22 @@ default-branch ledger, exact repository/catalog/branch/head evidence, removal
 of the transient manifest, default-branch merge containment, branch deletion
 with an exact-head lease, and issue-last closure evidence. Exact pending and
 completed reruns are no-ops; duplicate or drifted ownership fails closed.
+
+Semantic capability finalization normally requires an exact-head `APPROVED`
+review from a different repository collaborator whose current permission is
+`write`, `maintain`, or `admin`. If any review submission exists, that review
+collection remains authoritative and MUST NOT fall through to self-
+attestation. Only an entirely empty review collection in a personal GitHub
+repository MAY use one canonical single-line owner-attestation comment. Its
+repository, pull-request number, and exact review-head SHA binding MUST match;
+its author, the pull-request creator, the `User`-type repository owner, and the
+collaborator-permission actor MUST be the same exact identity, with permission
+exactly `admin`. Ready state, merge state, ordinary or stale comments,
+organization ownership, and workflow identity are not review evidence.
+Automation MUST NOT create the attestation. The owner MAY add it before merge
+or after a retained failed finalization, after which the existing explicit
+pull-request-number recovery route revalidates every tree, ledger, merge,
+branch, issue, and cleanup gate.
 
 The `test-architecture` semantic capability establishes the shared test
 baseline for adopting repositories: canonical suites are physically grouped by

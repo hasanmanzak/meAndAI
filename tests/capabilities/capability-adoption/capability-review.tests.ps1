@@ -578,6 +578,8 @@ try {
         PullMerged = $false
         MergeCommit = '5' * 40
         ClosureComments = [System.Collections.Generic.List[object]]::new()
+        AttestationComments = [System.Collections.Generic.List[object]]::new()
+        Reviews = [System.Collections.Generic.List[object]]::new()
         IssueBody = ''
         BlobBody = $null
         TreeBody = $null
@@ -585,6 +587,7 @@ try {
         PullBody = $null
         FinalLedgerBytes = $null
         ReviewerPermission = 'write'
+        OwnerPermission = 'admin'
         DefaultHeadReadCount = 0
         DriftDefaultHeadAfterReadCount = 0
         ProposalActor = [pscustomobject]@{
@@ -603,12 +606,27 @@ try {
             id = 202
             login = 'consumer-maintainer'
         }
+        RepositoryOwner = [pscustomobject]@{
+            id = 101
+            login = 'meandai-bot'
+            type = 'User'
+        }
+        OwnerPermissionActor = [pscustomobject]@{
+            id = 101
+            login = 'meandai-bot'
+        }
         ForeignIssues = [System.Collections.Generic.List[object]]::new()
         ForceManifestOnReviewedTree = $false
         ForceLedgerMismatch = $false
         DirtyManagedPaths = $false
         PullHeadRepository = 'hasanmanzak/consumer'
     }
+    $apiState.Reviews.Add([pscustomobject]@{
+        state = 'APPROVED'
+        commit_id = [string]$apiState.BranchHead
+        submitted_at = '2026-07-19T00:00:30Z'
+        user = $apiState.ReviewerActor
+    })
     $gitRuntime = {
         param([string[]]$Arguments, [int[]]$AllowedExitCodes)
         $text = if ($Arguments -contains '--show-toplevel') {
@@ -666,6 +684,7 @@ try {
                 id = 100
                 full_name = 'hasanmanzak/consumer'
                 default_branch = 'main'
+                owner = $apiState.RepositoryOwner
             }
         }
         if ($Method -ceq 'GET' -and $Endpoint -ceq 'user') {
@@ -773,20 +792,38 @@ try {
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/pulls/92/reviews\?') {
-            return @(
-                [pscustomobject]@{
-                    state = 'APPROVED'
-                    commit_id = [string]$apiState.BranchHead
-                    submitted_at = '2026-07-19T00:00:30Z'
-                    user = $apiState.ReviewerActor
-                }
+            return @($apiState.Reviews)
+        }
+        if ($Method -ceq 'GET' -and
+            $Endpoint -match '^repos/.+/issues/92/comments\?') {
+            $page = if ($Endpoint -match '[?&]page=(?<page>[1-9][0-9]*)') {
+                [int]$Matches.page
+            }
+            else {
+                1
+            }
+            $start = ($page - 1) * 100
+            if ($start -ge $apiState.AttestationComments.Count) {
+                return @()
+            }
+            $end = [Math]::Min(
+                $start + 99,
+                $apiState.AttestationComments.Count - 1
             )
+            return @($apiState.AttestationComments[$start..$end])
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/collaborators/consumer-maintainer/permission$') {
             return [pscustomobject]@{
                 permission = [string]$apiState.ReviewerPermission
                 user = $apiState.PermissionActor
+            }
+        }
+        if ($Method -ceq 'GET' -and
+            $Endpoint -match '^repos/.+/collaborators/meandai-bot/permission$') {
+            return [pscustomobject]@{
+                permission = [string]$apiState.OwnerPermission
+                user = $apiState.OwnerPermissionActor
             }
         }
         if ($Method -ceq 'GET' -and
@@ -1176,6 +1213,7 @@ try {
     $apiState.PullMerged = $true
     $apiState.BranchHead = $finalReviewHead
     $apiState.DefaultHead = $finalMergeCommit
+    $apiState.Reviews[0].commit_id = $finalReviewHead
     $apiState.PermissionActor = [pscustomobject]@{
         id = 203
         login = 'consumer-maintainer'
@@ -1202,6 +1240,244 @@ try {
     } -Pattern '*trusted maintainer approval*' `
         -Message 'TEST-0140 read-only approval authorized merged finalization.'
     $apiState.ReviewerPermission = 'write'
+
+    $apiState.Calls.Clear()
+    $approvedPlan = & $runnerPath -ConsumerRoot $fixtureRoot `
+        -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+        -DefaultBranch main -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent `
+        -FinalizePullRequestNumber $finalPullNumber `
+        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -PlanOnly
+    Assert-Equal $approvedPlan.State 'Finalize' `
+        'TEST-0163 independent exact-head approval no longer finalizes.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match 'issues/92/comments'
+    }).Count 0 `
+        'TEST-0163 independent approval unnecessarily read owner attestations.'
+
+    $ownerAttestationMarker =
+        "<!-- meandai-capability-review-attestation:v1:hasanmanzak/consumer:pr-92:head-$finalReviewHead -->"
+    $ownerAttestationBody = $ownerAttestationMarker + ' ' +
+        'I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.'
+
+    $apiState.Reviews[0].commit_id = '7' * 40
+    $apiState.AttestationComments.Add([pscustomobject]@{
+        body = $ownerAttestationBody
+        user = $apiState.ProposalActor
+    })
+    $apiState.Calls.Clear()
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*approval for the exact review head*' `
+        -Message 'TEST-0163 stale review submission fell through to owner attestation.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match 'issues/92/comments'
+    }).Count 0 `
+        'TEST-0163 nonempty review collection read owner attestations.'
+    $apiState.Reviews[0].commit_id = $finalReviewHead
+    $apiState.Reviews[0].user = $apiState.ProposalActor
+    $apiState.Calls.Clear()
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*trusted maintainer approval*' `
+        -Message 'TEST-0163 creator-authored review fell through to owner attestation.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match 'issues/92/comments'
+    }).Count 0 `
+        'TEST-0163 creator-authored review read owner attestations.'
+    $apiState.Reviews[0].user = $apiState.ReviewerActor
+    $apiState.AttestationComments.Clear()
+
+    $apiState.Reviews.Clear()
+    for ($index = 0; $index -lt 100; $index++) {
+        $apiState.AttestationComments.Add([pscustomobject]@{
+            body = "Ordinary review discussion $index"
+            user = $apiState.ProposalActor
+        })
+    }
+    $apiState.AttestationComments.Add([pscustomobject]@{
+        body = $ownerAttestationBody
+        user = $apiState.ProposalActor
+    })
+    $attestedPlan = & $runnerPath -ConsumerRoot $fixtureRoot `
+        -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+        -DefaultBranch main -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent `
+        -FinalizePullRequestNumber $finalPullNumber `
+        -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+        -PlanOnly
+    Assert-Equal $attestedPlan.State 'Finalize' `
+        'TEST-0163 canonical personal-owner attestation did not authorize the exact merged head.'
+    Assert-True @($apiState.Calls | Where-Object {
+        $_ -match 'issues/92/comments.*page=2'
+    }).Count -gt 0 `
+        'TEST-0163 exact owner attestation was not discovered after a full first page.'
+
+    $apiState.AttestationComments.Clear()
+    $apiState.AttestationComments.Add([pscustomobject]@{
+        body = $ownerAttestationBody
+        user = $apiState.ProposalActor
+    })
+
+    $apiState.AttestationComments[0].body =
+        $ownerAttestationBody.Replace($finalReviewHead, ('7' * 40))
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 stale owner attestation authorized another review head.'
+    foreach ($wrongBinding in @(
+        $ownerAttestationBody.Replace(
+            'hasanmanzak/consumer',
+            'hasanmanzak/another-consumer'
+        ),
+        $ownerAttestationBody.Replace(':pr-92:', ':pr-93:')
+    )) {
+        $apiState.AttestationComments[0].body = $wrongBinding
+        Assert-ThrowsLike -Action {
+            & $runnerPath -ConsumerRoot $fixtureRoot `
+                -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+                -DefaultBranch main -TargetVersion v0.12.0 `
+                -DiscoveryContext AlreadyCurrent `
+                -FinalizePullRequestNumber $finalPullNumber `
+                -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+                -PlanOnly
+        } -Pattern '*exact-head personal-owner attestation*' `
+            -Message 'TEST-0163 wrong repository or pull-request attestation binding was accepted.'
+    }
+    $apiState.AttestationComments[0].body =
+        $ownerAttestationMarker + "`nnoncanonical trusted content`n"
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*not exact canonical evidence*' `
+        -Message 'TEST-0163 trusted owner marker accepted noncanonical comment bytes.'
+    $apiState.AttestationComments[0].body = $ownerAttestationBody
+    $apiState.AttestationComments.Add([pscustomobject]@{
+        body = $ownerAttestationBody
+        user = $apiState.ProposalActor
+    })
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*duplicate or conflicting*' `
+        -Message 'TEST-0163 duplicate trusted owner attestations were accepted.'
+    $apiState.AttestationComments.RemoveAt(1)
+
+    $apiState.OwnerPermission = 'write'
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 non-admin owner attestation authorized finalization.'
+    $apiState.OwnerPermission = 'admin'
+
+    $apiState.RepositoryOwner.type = 'Organization'
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 organization-owned repository accepted personal-owner fallback.'
+    $apiState.RepositoryOwner.type = 'User'
+
+    $apiState.RepositoryOwner = [pscustomobject]@{
+        id = 404
+        login = 'another-owner'
+        type = 'User'
+    }
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 repository owner and pull-request creator mismatch authorized fallback.'
+    $apiState.RepositoryOwner = [pscustomobject]@{
+        id = 101
+        login = 'meandai-bot'
+        type = 'User'
+    }
+
+    $apiState.OwnerPermissionActor = [pscustomobject]@{
+        id = 303
+        login = 'meandai-bot'
+    }
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*permission resolved another actor*' `
+        -Message 'TEST-0163 owner permission identity drift authorized finalization.'
+    $apiState.OwnerPermissionActor = $apiState.ProposalActor
+
+    $apiState.AttestationComments[0].user = [pscustomobject]@{
+        id = 999
+        login = 'public-forger'
+    }
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime @{ Git = $gitRuntime; GitHub = $githubRuntime } `
+            -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 untrusted comment author authorized owner attestation.'
+    $apiState.AttestationComments[0].user = $apiState.ProposalActor
+
+    $apiState.Reviews.Add([pscustomobject]@{
+        state = 'APPROVED'
+        commit_id = [string]$apiState.BranchHead
+        submitted_at = '2026-07-19T00:00:30Z'
+        user = $apiState.ReviewerActor
+    })
+    $apiState.AttestationComments.Clear()
 
     $apiState.ForceLedgerMismatch = $true
     Assert-ThrowsLike -Action {
@@ -1248,6 +1524,11 @@ try {
         'TEST-0140 default-head race closed the capability issue.'
     $apiState.DriftDefaultHeadAfterReadCount = 0
 
+    $apiState.Reviews.Clear()
+    $apiState.AttestationComments.Add([pscustomobject]@{
+        body = $ownerAttestationBody
+        user = $apiState.ProposalActor
+    })
     $finalizeExecution = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
         -DefaultBranch main -TargetVersion v0.12.0 `
@@ -1265,6 +1546,10 @@ try {
         'TEST-0140 production finalization did not close its issue last.'
     Assert-Equal $apiState.ClosureComments.Count 1 `
         'TEST-0140 production finalization did not write one closure marker.'
+    Assert-Equal (@($apiState.Calls | Where-Object {
+        $_ -match 'issues/92/comments'
+    }).Count -gt 0) $true `
+        'TEST-0164 merged recovery did not use exact-head owner attestation evidence.'
 
     $completedExecution = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `

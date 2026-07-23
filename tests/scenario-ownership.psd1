@@ -133,7 +133,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
-            TestIds = @('TEST-0139', 'TEST-0140')
+            TestIds = @('TEST-0139', 'TEST-0140', 'TEST-0163', 'TEST-0164')
         }
         @{
             Evidence = 'GitHubActionsSemantic'

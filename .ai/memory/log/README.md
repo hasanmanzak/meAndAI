@@ -5,34 +5,24 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.13.0` completed [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)
-at commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`; PR #99, issue #95, the
-two release assets, exact branch cleanup, and post-publication verification are
-complete. [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
-and [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-now govern the v0.13.1 actor-local batch correction on
-`codex/task-0002-batched-instruction-graph-transport`. Follow the
-[v0.13.1 implementation handoff](2026-07-22-v0131-batched-instruction-graph-implementation.md).
-Production and independent expected-reader implementation is complete through
-commits `78c8706e9d4d4f4c020d983b22114165687b475e` and
-`55764442820c884e8c3115726bb010a0a9004d77`. Focused PS5.1/PS7 and
-supporting integration routes are green; the deterministic actor boundary is
-175 processes/175 requests to one process/175 requests. `WindowsNative` passed
-in 343.0 seconds, Full passed in 1,306.9 seconds, and bounded local convergence
-closed `FIND-0200`/`FIND-0201`. A pre-delivery audit then resolved `FIND-0205`
-by separating [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
-closeable [delivery issue #101](https://github.com/hasanmanzak/meAndAI/issues/101)
-from the open residual owner. Exact-head hosted run 29963388824 passed on Ubuntu
-but exposed `FIND-0206` on Windows PowerShell 5.1: a BOM-prefixed first OID in
-the independent self-HEAD reader. Follow the
-[hosted Windows stdin correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md).
-The focused PS5.1/PS7 correction is green; replacement hosted, merge, and
-release evidence remain pending through issue #101. `FIND-0204` keeps the
-unimproved wall-clock path owned by issue #98.
+Immutable `v0.13.1` completed [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
+at commit `f8296cf8d4aba66519a24603c5c7a2a3727f973c`; PR #100 and issue #101
+retain its delivery and publication evidence. `FIND-0204` remains separately
+owned by TASK-0002 / issue #98.
+
+[FEAT-0041](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md),
+`BUG-0023`, and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
+now govern the v0.13.2 exact-head personal-owner attestation correction on
+`codex/bug-0023-owner-attestation`. Follow the
+[v0.13.2 handoff](2026-07-23-v0132-exact-head-owner-attestation.md).
+TEST-0163/0164 expected red, focused green, structural validation, and the
+release-bundle check are complete. Hosted review, immutable release, and the
+retained consumer recovery remain pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.2 exact-head personal-owner attestation](2026-07-23-v0132-exact-head-owner-attestation.md)
 - [2026-07-23 - v0.13.1 hosted Windows stdin encoding correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
 - [2026-07-23 - v0.13.1 delivery authority correction](2026-07-23-v0131-delivery-authority-correction.md)
 - [2026-07-22 - v0.13.1 batched instruction-graph implementation](2026-07-22-v0131-batched-instruction-graph-implementation.md)
