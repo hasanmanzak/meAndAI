@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.4 - 2026-07-23
+
+### Fixed
+
+- Treat GitHub owner and repository-name components as case-insensitive when
+  validating a terminal capability-review pull-request authority.
+- Preserve exact HTTPS GitHub host, pull path, pull-request number, reviewed
+  head, actor authority, immutable provenance, ledger bytes, and cleanup gates.
+- Recover valid historical review evidence that retained GitHub display case
+  without accepting foreign, malformed, query-bearing, or ambiguous URLs.
+
+Related work: [FEAT-0043](docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
+`BUG-0025`, [DEC-0025](docs/decisions/DEC-0025-exact-head-personal-owner-attestation.md),
+[DEC-0026](docs/decisions/DEC-0026-historical-capability-review-recovery.md),
+and [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106).
+
 ## 0.13.3 - 2026-07-23
 
 ### Fixed

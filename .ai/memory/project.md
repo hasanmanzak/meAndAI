@@ -9,28 +9,28 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.3` candidate. Latest immutable release:
-  [v0.13.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.2)
-  targets commit `0c67c8a26192921840bbd12559d83f0ad450e880`.
-  [PR #103](https://github.com/hasanmanzak/meAndAI/pull/103) and
-  [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) retain its
+- Current protocol version: `0.13.4` candidate. Latest immutable release:
+  [v0.13.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.3)
+  targets commit `4285c7aef819e7d197c6897a29103194ee675b2b`.
+  [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) and
+  [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0042](../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
-  `BUG-0024`, `SUBF-0081`, [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104),
-  and [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) govern the
-  v0.13.3 historical capability-review recovery on
-  `codex/bug-0024-historical-review-recovery`. TEST-0165 and TEST-0166 belong to
-  the existing capability-review suite. Recovery accepts only one exact merged
-  strict-predecessor review, retains current review authority and all later
-  ledger entries, deletes the exact branch through an expected-OID lease,
-  closes the issue last, and then performs one fresh current inventory.
+- Current scope: [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
+  `BUG-0025`, `SUBF-0082`, and [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106)
+  govern the v0.13.4 case-safe review-authority correction on
+  `codex/bug-0025-case-safe-review-authority`. TEST-0167 and TEST-0168 belong
+  to the existing capability-review suite. The change treats only GitHub owner
+  and repository-name components as case-insensitive identity while preserving
+  exact host/path/PR/head, review authority, immutable provenance, ledger, and
+  branch-first/issue-last recovery behavior.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable v0.13.2 completed FEAT-0041, `SUBF-0080`,
-  `TEST-0163`/`0164`, and `RISK-0193` through `RISK-0196`. FEAT-0042 defines
-  `SUBF-0081`, `TEST-0165`/`0166`, and `RISK-0197` through `RISK-0200` for the
-  bounded v0.13.3 correction.
+- Latest tracked work: immutable v0.13.3 completed FEAT-0042, `SUBF-0081`,
+  `TEST-0165`/`0166`, and `RISK-0197` through `RISK-0200`. FEAT-0043 defines
+  `SUBF-0082`, `TEST-0167`/`0168`, and `RISK-0201`/`RISK-0202` for the bounded
+  v0.13.4 correction. The external failure is retained by
+  [Derdini run 30004752646](https://github.com/hasanmanzak/Derdini/actions/runs/30004752646).
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -80,13 +80,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Complete the bounded FEAT-0042 validation and v0.13.3 publication through
-  issue #104. After the immutable release is installed in an affected consumer,
-  the existing lifecycle may recover one fully proven merged historical review
-  and then rediscover the current catalog. Do not mutate a consumer from this
-  protocol branch.
+- Complete the bounded FEAT-0043 test-first correction, review, validation,
+  pull request, and immutable v0.13.4 publication through issue #106. Do not
+  mutate an affected consumer from this protocol branch. After publication,
+  install the released updater in the consumer and rerun its separately
+  authorized historical finalization.
 - `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
-  issue #98; FEAT-0041 does not reopen or expand that performance work.
+  issue #98; FEAT-0043 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

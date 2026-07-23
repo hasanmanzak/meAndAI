@@ -5,23 +5,23 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.13.2` completed [FEAT-0041](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md)
-at commit `0c67c8a26192921840bbd12559d83f0ad450e880`; PR #103 and issue #102
+Immutable `v0.13.3` completed [FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
+at commit `4285c7aef819e7d197c6897a29103194ee675b2b`; PR #105 and issue #104
 retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 
-[FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
-`BUG-0024`, [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104), and
-[PR #105](https://github.com/hasanmanzak/meAndAI/pull/105) govern the v0.13.3
-historical capability-review recovery on
-`codex/bug-0024-historical-review-recovery`. Follow the
-[v0.13.3 handoff](2026-07-23-v0133-historical-capability-review-recovery.md).
-TEST-0165/0166 expected red and focused green are recorded; final validation,
-hosted review, immutable release, and consumer-side recovery remain pending.
+[FEAT-0043](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
+`BUG-0025`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106), and
+`SUBF-0082` govern the v0.13.4 case-safe repository-identity correction on
+`codex/bug-0025-case-safe-review-authority`. Follow the
+[v0.13.4 handoff](2026-07-23-v0134-case-safe-review-authority.md).
+TEST-0167/0168, test-first evidence, corrected evidence, bounded review, hosted
+delivery, immutable release, and consumer-side recovery remain pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.4 case-safe review authority](2026-07-23-v0134-case-safe-review-authority.md)
 - [2026-07-23 - v0.13.3 historical capability-review recovery](2026-07-23-v0133-historical-capability-review-recovery.md)
 - [2026-07-23 - v0.13.2 exact-head personal-owner attestation](2026-07-23-v0132-exact-head-owner-attestation.md)
 - [2026-07-23 - v0.13.1 hosted Windows stdin encoding correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)

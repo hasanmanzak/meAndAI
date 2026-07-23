@@ -3,7 +3,7 @@ run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github
 
 env:
   PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
-  BOOTSTRAP_PROTOCOL_TAG: v0.13.3
+  BOOTSTRAP_PROTOCOL_TAG: v0.13.4
 
 on:
   schedule:
