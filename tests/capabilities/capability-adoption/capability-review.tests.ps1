@@ -2296,6 +2296,33 @@ try {
         GitHub = $githubRuntime
         ProtocolGitBlob = $protocolGitBlobRuntime
     }
+    $setHistoricalReviewAuthority = {
+        param([Parameter(Mandatory)][string]$Authority)
+
+        $utf8 = [Text.UTF8Encoding]::new($false, $true)
+        $canonicalAuthority =
+            "https://github.com/hasanmanzak/consumer/pull/$historicalPullNumber"
+        foreach ($property in @(
+            'HistoricalLedgerBytes',
+            'CurrentLedgerBytes'
+        )) {
+            $currentBytes = [byte[]]$apiState.HistoricalReview.$property
+            $currentText = $utf8.GetString($currentBytes)
+            $updatedText = $currentText.Replace(
+                $canonicalAuthority,
+                $Authority
+            )
+            if ($updatedText -ceq $currentText) {
+                throw "TEST-0167 fixture did not find the canonical historical review authority in $property."
+            }
+            $apiState.HistoricalReview.$property =
+                [Text.UTF8Encoding]::new($false).GetBytes($updatedText)
+        }
+        [IO.File]::WriteAllBytes(
+            (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json'),
+            [byte[]]$apiState.HistoricalReview.CurrentLedgerBytes
+        )
+    }.GetNewClosure()
 
     & $resetHistoricalProductionState
     $currentLedgerBefore = [IO.File]::ReadAllBytes(
@@ -2309,7 +2336,7 @@ try {
     $historicalRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $historicalPullNumber `
         -Runtime $historicalRuntime
     Assert-Equal $historicalRecovery.State 'Current' `
@@ -2376,17 +2403,17 @@ try {
             (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
         )
     )) 'TEST-0165 historical recovery performed an unplanned ledger write.'
-    Assert-True @($apiState.Calls | Where-Object {
+    Assert-Equal @($apiState.Calls | Where-Object {
         $_ -match 'GET repos/.+/issues\?state=all'
-    }).Count -eq 2 `
-        'TEST-0165 recovery did not use exactly one initial and one fresh issue inventory.'
+    }).Count 3 `
+        'TEST-0165 recovery did not use one current, one historical, and one fresh current issue inventory.'
 
     $historicalMutationCount =
         $apiState.HistoricalMutationCalls.Count
     $historicalRerun = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
         -Runtime $historicalRuntime -PlanOnly
     Assert-Equal $historicalRerun.State 'Current' `
         'TEST-0165 completed historical recovery rerun was not current.'
@@ -2401,7 +2428,7 @@ try {
     $partialRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
         -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
         -FinalizePullRequestNumber $historicalPullNumber `
         -Runtime $historicalRuntime
     Assert-Equal $partialRecovery.State 'Current' `
@@ -2431,7 +2458,7 @@ try {
         Assert-ThrowsLike -Action {
             & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
                 -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-                -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+                -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
                 -Runtime $historicalRuntime
         } -Pattern $Pattern -Message "TEST-0166 $Name did not fail closed."
         Assert-Equal $apiState.HistoricalMutationCalls.Count 0 `
@@ -2499,7 +2526,7 @@ try {
     Assert-ThrowsLike -Action {
         & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
             -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-            -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
             -Runtime $historicalRuntime
     } -Pattern '*prefix*' `
         -Message 'TEST-0166 non-prefix historical catalog did not fail closed.'
@@ -2530,6 +2557,134 @@ try {
         param($state)
         $state.BranchLeaseRace = $true
     } '*branch*'
+
+    # TEST-0167: GitHub preserves repository display case in durable ledger
+    # authority URLs while the workflow canonicalizes the runtime repository to
+    # lowercase. The same owner/repository/PR identity must still finalize, and
+    # recovery must preserve the original ledger bytes.
+    $mixedCaseAuthorities = @(
+        'https://github.com/HasanManzak/consumer/pull/94',
+        'https://github.com/hasanmanzak/Consumer/pull/94',
+        'https://github.com/HasanManzak/Consumer/pull/94'
+    )
+    foreach ($mixedCaseAuthority in $mixedCaseAuthorities) {
+        & $resetHistoricalProductionState
+        & $setHistoricalReviewAuthority $mixedCaseAuthority
+        $apiState.HistoricalReview.Reviews.Clear()
+        $apiState.HistoricalReview.AttestationComments.Add([pscustomobject]@{
+            body = "<!-- meandai-capability-review-attestation:v1:hasanmanzak/consumer:pr-94:head-$historicalReviewHead --> I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization."
+            user = $apiState.ProposalActor
+        })
+        $mixedCaseLedgerBefore = [IO.File]::ReadAllBytes(
+            (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
+        )
+        $mixedCaseRecovery = & $runnerPath `
+            -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+            -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $historicalPullNumber `
+            -Runtime $historicalRuntime
+        Assert-Equal $mixedCaseRecovery.State 'Current' `
+            'TEST-0167 mixed-case GitHub repository display identity did not finalize.'
+        Assert-Equal ($apiState.HistoricalMutationCalls -join ',') `
+            'DeleteHistoricalBranch,CommentHistoricalIssue,CloseHistoricalIssue' `
+            'TEST-0167 mixed-case review authority changed recovery ordering.'
+        Assert-Equal @($apiState.Calls | Where-Object {
+            $_ -match 'GET repos/.+/issues\?state=all'
+        }).Count 3 `
+            'TEST-0167 mixed-case recovery did not perform exactly one fresh inventory.'
+        Assert-True (Test-TestBytesEqual -Left $mixedCaseLedgerBefore -Right (
+            [IO.File]::ReadAllBytes(
+                (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
+            )
+        )) 'TEST-0167 mixed-case recovery rewrote durable ledger authority bytes.'
+        $mixedCaseMutationCount = $apiState.HistoricalMutationCalls.Count
+        $mixedCaseRerun = & $runnerPath `
+            -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+            -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+            -TargetVersion v0.13.4 -DiscoveryContext AlreadyCurrent `
+            -Runtime $historicalRuntime -PlanOnly
+        Assert-Equal $mixedCaseRerun.State 'Current' `
+            'TEST-0167 mixed-case completed recovery rerun was not current.'
+        Assert-Equal $mixedCaseRerun.Plan.Operations.Count 0 `
+            'TEST-0167 mixed-case completed recovery rerun planned duplicate work.'
+        Assert-Equal $apiState.HistoricalMutationCalls.Count `
+            $mixedCaseMutationCount `
+            'TEST-0167 mixed-case completed recovery repeated cleanup.'
+    }
+
+    # TEST-0168: case-insensitive GitHub owner/repository identity does not
+    # weaken the exact HTTPS GitHub pull-request authority boundary.
+    $invalidAuthorityCases = @(
+        [pscustomobject]@{
+            Name = 'wrong owner'
+            Authority = 'https://github.com/another-owner/Consumer/pull/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'wrong repository'
+            Authority = 'https://github.com/hasanmanzak/AnotherConsumer/pull/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'wrong pull-request number'
+            Authority = 'https://github.com/hasanmanzak/Consumer/pull/95'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'non-HTTPS authority'
+            Authority = 'http://github.com/hasanmanzak/Consumer/pull/94'
+            Pattern = '*absolute HTTPS URI*'
+        },
+        [pscustomobject]@{
+            Name = 'non-GitHub authority'
+            Authority = 'https://example.com/hasanmanzak/Consumer/pull/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'deceptive GitHub host suffix'
+            Authority = 'https://github.com.evil/hasanmanzak/Consumer/pull/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'deceptive repository suffix'
+            Authority = 'https://github.com/hasanmanzak/Consumer-copy/pull/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'deceptive path suffix'
+            Authority = 'https://github.com/hasanmanzak/Consumer/pull/94/extra'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'query-bearing authority'
+            Authority = 'https://github.com/hasanmanzak/Consumer/pull/94?view=1'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'fragment-bearing authority'
+            Authority = 'https://github.com/hasanmanzak/Consumer/pull/94#review'
+            Pattern = '*terminal ledger*exact pull request*'
+        },
+        [pscustomobject]@{
+            Name = 'malformed pull path'
+            Authority = 'https://github.com/hasanmanzak/Consumer/pulls/94'
+            Pattern = '*terminal ledger*exact pull request*'
+        }
+    )
+    foreach ($invalidAuthorityCase in $invalidAuthorityCases) {
+        $authority = [string]$invalidAuthorityCase.Authority
+        $arrangeAuthority = {
+            param($state)
+            & $setHistoricalReviewAuthority $authority
+        }.GetNewClosure()
+        & $assertHistoricalBlock `
+            ([string]$invalidAuthorityCase.Name) `
+            $arrangeAuthority `
+            ([string]$invalidAuthorityCase.Pattern)
+    }
+    Assert-Equal $invalidAuthorityCases.Count 11 `
+        'TEST-0168 authority-boundary case matrix changed unexpectedly.'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot -PathType Container) {

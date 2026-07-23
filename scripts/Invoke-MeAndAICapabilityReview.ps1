@@ -1784,6 +1784,44 @@ function Assert-LiveDefaultHeadUnchanged {
     }
 }
 
+function Test-ExactGitHubPullReviewAuthority {
+    param(
+        [AllowEmptyString()][string]$Authority,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][long]$PullRequestNumber
+    )
+
+    if ($Repository -cnotmatch
+            '^[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+$' -or
+        $PullRequestNumber -le 0) {
+        return $false
+    }
+    $authorityMatch = [regex]::Match(
+        $Authority,
+        '^https://github\.com/(?<owner>[A-Za-z0-9](?:[A-Za-z0-9-]{0,38}))/(?<repository>[A-Za-z0-9._-]+)/pull/(?<number>[1-9][0-9]*)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $authorityMatch.Success) {
+        return $false
+    }
+    $expectedParts = $Repository.Split('/')
+    if (-not $authorityMatch.Groups['owner'].Value.Equals(
+            $expectedParts[0],
+            [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        -not $authorityMatch.Groups['repository'].Value.Equals(
+            $expectedParts[1],
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        return $false
+    }
+    [long]$authorityPullRequestNumber = 0
+    return [long]::TryParse(
+        $authorityMatch.Groups['number'].Value,
+        [ref]$authorityPullRequestNumber
+    ) -and $authorityPullRequestNumber -eq $PullRequestNumber
+}
+
 function Assert-MergedReview {
     param(
         [Parameter(Mandatory)]$PullRequest,
@@ -1850,14 +1888,16 @@ function Assert-MergedReview {
     }
 
     $pullIdentity = "pull-request:$($PullRequest.Number)"
-    $pullAuthority = "https://github.com/$Repository/pull/$($PullRequest.Number)"
     $entries = @($Ledger.Entries)
     if ($LedgerPrefixCount -lt 0 -or $LedgerPrefixCount -ge $entries.Count) {
         throw 'Merged capability review has an invalid ledger-prefix binding.'
     }
     foreach ($entry in @($entries | Select-Object -Skip $LedgerPrefixCount)) {
         if ([string]$entry.ReviewIdentity -cne $pullIdentity -or
-            [string]$entry.ReviewAuthority -cne $pullAuthority) {
+            -not (Test-ExactGitHubPullReviewAuthority `
+                -Authority ([string]$entry.ReviewAuthority) `
+                -Repository $Repository `
+                -PullRequestNumber ([long]$PullRequest.Number))) {
             throw 'Merged capability review terminal ledger is not linked to the exact pull request.'
         }
     }

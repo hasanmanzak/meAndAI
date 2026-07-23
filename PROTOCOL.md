@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.13.3**<br>
+Protocol version: **0.13.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -619,6 +619,9 @@ collection remains authoritative and MUST NOT fall through to self-
 attestation. Only an entirely empty review collection in a personal GitHub
 repository MAY use one canonical single-line owner-attestation comment. Its
 repository, pull-request number, and exact review-head SHA binding MUST match;
+GitHub owner and repository-name identity are case-insensitive, while the
+HTTPS GitHub host, `/pull/` path shape, pull-request number, and all remaining
+authority fields remain exact;
 its author, the pull-request creator, the `User`-type repository owner, and the
 collaborator-permission actor MUST be the same exact identity, with permission
 exactly `admin`. Ready state, merge state, ordinary or stale comments,

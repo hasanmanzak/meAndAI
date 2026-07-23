@@ -4,11 +4,11 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.13.3**
+Current protocol version: **0.13.4**
 
-For v0.13.3, publication authority is the repository's
+For v0.13.4, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[delivery issue #104](https://github.com/hasanmanzak/meAndAI/issues/104); this
+[delivery issue #106](https://github.com/hasanmanzak/meAndAI/issues/106); this
 file does not assert a pre-merge release state. [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains open as the separate residual runtime owner.
 
