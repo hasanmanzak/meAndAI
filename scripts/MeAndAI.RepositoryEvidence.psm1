@@ -293,6 +293,7 @@ function Test-MeAndAIRenameOrCopyState {
         }
         $errorTask = $process.StandardError.ReadToEndAsync()
         $count = 0
+        $renameOrCopy = $false
         while (-not $process.StandardOutput.EndOfStream) {
             $line = $process.StandardOutput.ReadLine()
             $count++
@@ -305,10 +306,7 @@ function Test-MeAndAIRenameOrCopyState {
                     '^[0-9]{6} blob (?<oid>[0-9a-f]{40}|[0-9a-f]{64})\t(?<path>.+)$' -and
                 [string]$Matches['oid'] -ceq $IndexObjectId -and
                 [string]$Matches['path'] -cne $RelativePath) {
-                $process.Kill()
-                $process.WaitForExit()
-                [void]$errorTask.GetAwaiter().GetResult()
-                return $true
+                $renameOrCopy = $true
             }
         }
         $process.WaitForExit()
@@ -316,7 +314,7 @@ function Test-MeAndAIRenameOrCopyState {
         if ($process.ExitCode -ne 0) {
             throw "Rename/copy evidence could not be read. $errorText"
         }
-        return $false
+        return $renameOrCopy
     }
     finally {
         $process.Dispose()

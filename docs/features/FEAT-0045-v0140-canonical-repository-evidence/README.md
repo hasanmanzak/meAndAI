@@ -129,9 +129,13 @@ integration run exposed that existing production-path fixtures inject Git but
 are not physical Git repositories. The correction keeps production on the
 shared resolver and injects repository evidence only through the existing test
 runtime boundary; TEST-0140 and TEST-0172 then passed. TEST-0171 independently
-exercises the real Git implementation. No duplicated consumer implementation,
-named-consumer fixture, hidden normalization, new suite, workflow, or unresolved
-`Blocking` finding remains.
+exercises the real Git implementation. PR #111's first hosted Windows run then
+found that terminating an already completed `git ls-tree` process after a
+rename/copy match can raise `Access denied`. The resolver now drains the bounded
+process output and returns the already established match without an unnecessary
+termination call; focused TEST-0171 passed again. No duplicated consumer
+implementation, named-consumer fixture, hidden normalization, new suite,
+workflow, or unresolved `Blocking` finding remains.
 
 ## Definition of Done
 

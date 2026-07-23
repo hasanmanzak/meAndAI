@@ -27,11 +27,14 @@ own this bounded capability addition.
   injected lifecycle fixtures use the existing runtime seam instead of copying
   the production algorithm.
 - One bounded fresh-diff review has no unresolved `Blocking` finding.
+- PR #111's first hosted Windows run exposed an unnecessary matched-process
+  termination in the bounded rename/copy scan; the correction drains the
+  process and focused TEST-0171 passes without changing evidence authority.
 - Derdini-specific PR #24, issue #23, and its owned branch were closed or
   deleted without merging consumer code; issue #110 owns the common correction.
 
 ## Continuation
 
-Run the final exact-tree validation, publish the reviewed pull request, and
-release exactly the merged commit as immutable v0.14.0. Record PR, commit,
-release, asset, and branch-cleanup evidence in FEAT-0045 and issue #110.
+Wait for PR #111's exact-head hosted validation, publish the reviewed pull
+request, and release exactly the merged commit as immutable v0.14.0. Record PR,
+commit, release, asset, and branch-cleanup evidence in FEAT-0045 and issue #110.
