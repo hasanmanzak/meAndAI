@@ -87,9 +87,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.14.0`, the only repository file required
+For a new submodule consumer on `v0.14.1`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.0/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.1/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -175,7 +175,7 @@ bound to a choice absent from its immutable record.
 | `BootstrapReady` | No target collides. One deterministic draft adds `.gitmodules`, the `.ai/protocol` gitlink, `AGENTS.md`, the memory skeleton, issue/PR templates, local updater scripts, a fully satisfied `.ai/meandai-update-state.json` baseline, and `.ai/adoption/meandai-capabilities.json`. |
 | `AdoptionReviewRequired` | At least one target collides. The draft adds only `.ai/adoption/meandai-capabilities.json`, listing the exact paths that need semantic review. No consumer target is overwritten. |
 | `PendingAdoption` | The deterministic branch and one draft already exist. Later runs retain them and create nothing else. |
-| `Update` | Adoption is complete, so the reviewed consumer-owned updater performs same-major update discovery and supersession. |
+| `Update` | Adoption is complete, so the reviewed consumer-resident, protocol-owned managed updater projection performs same-major update discovery and supersession. |
 | `ProtocolMigrationReviewRequired` | Existing protocol/governance evidence has no explicit strategy. The run stops before proposal mutation. |
 | `Aborted` | The maintainer selected `Abort`; no adoption proposal is created. |
 | `BlockedManualReview` | Seed identity, manifest ownership, branch/PR ownership, source, or another prerequisite is ambiguous. The run stops without cleanup or overwrite. |
@@ -204,7 +204,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.14.0'
+$tag = 'v0.14.1'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -292,7 +292,7 @@ current-version literal.
 
 Submodule consumers also materialize these submodule-only automation assets:
 
-| Pinned source | Consumer-owned target |
+| Pinned source | Consumer-resident managed target |
 | --- | --- |
 | `templates/project/.github/workflows/meandai-protocol-update.yml` | `.github/workflows/meandai-protocol-update.yml` |
 | `templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1` | `.github/scripts/MeAndAI.ProtocolUpdate.psm1` |
@@ -380,9 +380,10 @@ identity adopt an old `github-actions[bot]` proposal.
 
 ### Update workflow prerequisites and behavior
 
-The supplied workflow is consumer-owned and supports the recommended
-`.ai/protocol` Git submodule only when its gitlink resolves to exactly one
-canonical lowercase `vM.m.rev` release tag with no leading zeros, and
+The supplied workflow is a consumer-resident, protocol-owned managed projection
+and supports the recommended `.ai/protocol` Git submodule only when its gitlink
+resolves to exactly one canonical lowercase `vM.m.rev` release tag with no
+leading zeros, and
 `.gitmodules` points to the configured protocol repository. A commit pin
 remains valid protocol usage, but it uses the manual reviewed update process
 because the generic updater cannot infer its current major unambiguously.
@@ -532,7 +533,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.14.0`
+- ref: `v0.14.1`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -580,11 +581,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.14.0`:
+before checkout; the current example then installs `v0.14.1`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.14.0
+git -C .ai/protocol checkout v0.14.1
 git add .ai/protocol
 ```
 

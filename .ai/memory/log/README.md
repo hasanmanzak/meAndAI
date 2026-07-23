@@ -5,20 +5,21 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.13.5` completed [FEAT-0044](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md)
-at commit `014f9bbe30074a742c84e3915ebcf94b9fe9cc3e`; PR #109 and issue #108
+Immutable `v0.14.0` completed [FEAT-0045](../../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md)
+at commit `a2a987b322f5ea8d705ad6c5325cffc662a60978`; PR #111 and issue #110
 retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 
-[FEAT-0045](../../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md),
-`BUG-0027`, [issue #110](https://github.com/hasanmanzak/meAndAI/issues/110),
-and `SUBF-0085` through `SUBF-0087` govern the bounded v0.14.0 capability.
-Follow the [v0.14.0 handoff](2026-07-23-v0140-canonical-repository-evidence.md).
-TEST-0171 through TEST-0173 are test-first owners; delivery remains pending.
+[FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md),
+`BUG-0028`, [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112),
+and `SUBF-0088` govern the bounded v0.14.1 mandate. Follow the
+[v0.14.1 handoff](2026-07-23-v0141-consumer-nonduplication.md).
+TEST-0174 is the test-first owner; delivery remains pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.14.1 consumer non-duplication mandate](2026-07-23-v0141-consumer-nonduplication.md)
 - [2026-07-23 - v0.14.0 canonical repository evidence](2026-07-23-v0140-canonical-repository-evidence.md)
 - [2026-07-23 - v0.13.5 slash-safe ref and single-owner lifecycle](2026-07-23-v0135-slash-safe-ref-single-owner-lifecycle.md)
 - [2026-07-23 - v0.13.4 case-safe review authority](2026-07-23-v0134-case-safe-review-authority.md)

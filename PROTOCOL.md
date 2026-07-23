@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.14.0**<br>
+Protocol version: **0.14.1**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -154,6 +154,28 @@ correction; it MUST NOT be presented as generic closure. Common production
 code, tests, fixtures, and normative records MUST NOT encode a named
 consumer's paths or domain facts. This rule does not authorize scanning or
 mutating unrelated consumer repositories.
+
+Protocol-provided reusable assets include code, tests, fixtures, validators,
+workflows, templates, prompts, scripts, and documentation. A consumer MUST
+reuse or reference those assets through the pinned protocol integration and
+MUST NOT copy, reimplement, port, shadow, fork, or maintain consumer-local
+equivalents, including renamed equivalents or generic regression suites for
+behavior already proven upstream. Consumer-owned changes are limited to
+genuinely project-specific integration, configuration, domain behavior, or
+semantic evidence that the common asset cannot own. A missing, defective, or
+insufficient common asset MUST be corrected and tested in meAndAI, published
+as an immutable release, and only then used by a separately reviewed bounded
+consumer recovery. A consumer MUST NOT temporarily duplicate the common asset
+as a shortcut while that upstream correction is pending.
+
+An exact protocol-declared managed projection is not a consumer-owned
+equivalent when the consumer execution platform requires one resident hook.
+Such a projection MUST have one immutable-release-declared source path,
+canonical consumer target path, exact content digest or Git blob, and lifecycle;
+MUST be installed and updated only by deterministic protocol automation; and
+MUST NOT be edited or independently maintained by the consumer. This narrow
+projection rule does not authorize consumer-local tests, fixtures, validators,
+or shadow implementations of behavior available through the pinned protocol.
 
 ### Gate 3 - Tests first
 
@@ -962,9 +984,9 @@ retry. Any other head MUST block; push-first state that only the later marker
 can explain is prohibited.
 
 A GitHub submodule consumer adopting `v0.4.0` or later MUST install the
-self-reconciling, consumer-owned update workflow supplied by the pinned
-protocol, or record a decision that defines an equivalent reviewed update
-control for its platform.
+self-reconciling update workflow as a consumer-resident, protocol-owned managed
+projection supplied by the pinned protocol, or record a decision that defines
+an equivalent reviewed update control for its platform.
 
 Re-running the current quick-adoption launcher against a connected non-empty
 consumer MUST classify committed repository evidence before secret or

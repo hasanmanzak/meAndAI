@@ -39,6 +39,24 @@ introduced as a new append-only Semantic capability. Existing consumers review
 only the new catalog suffix. Automation may open that review but does not edit,
 approve, mark ready, or merge semantic consumer paths.
 
+Protocol-provided reusable assets are single-owned by meAndAI. Consumers must
+not reproduce their implementation or generic regression evidence through a
+copy, port, rename, shadow implementation, fork, or consumer-local equivalent.
+A consumer may own only a project-specific adapter, configuration, domain
+behavior, or semantic assessment that cannot be expressed by the common asset.
+If the shared asset is missing or insufficient, its correction and generic
+regression close in meAndAI and ship in an immutable release before any linked
+consumer recovery begins.
+
+One exact release-declared managed projection may reside at its canonical
+consumer path only when the execution platform requires a resident hook, such
+as the consumer GitHub Actions workflow. It MUST have one
+immutable-release-declared source path, canonical consumer target path, exact
+content digest or Git blob, and lifecycle; it MUST be installed and updated
+only by deterministic protocol automation; and it remains owned by meAndAI.
+This exception does not permit consumer-local tests, fixtures, validators, or
+shadow implementations.
+
 ## Consequences
 
 - One common fix and anonymous regression protect future implementations.
@@ -48,6 +66,8 @@ approve, mark ready, or merge semantic consumer paths.
   release and may adapt only genuinely project-specific structure.
 - Common code, fixtures, and normative records do not embed a named consumer's
   repository, paths, domain facts, commits, or tests.
+- Protocol-provided tests and fixtures remain upstream evidence; consumers
+  reference them and add only tests for genuinely project-specific behavior.
 - This decision grants no authority to inspect or mutate unrelated consumers.
 
 ## Alternatives considered

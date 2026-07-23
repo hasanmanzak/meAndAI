@@ -10,9 +10,9 @@
 
 ## Context
 
-The consumer-owned updater is deliberately safe after adoption: it executes
-reviewed local code, verifies the existing protocol gitlink, and changes only
-managed update paths. Those same preconditions make it incapable of installing
+The consumer-resident, protocol-owned managed updater is deliberately safe
+after adoption: it executes reviewed local code, verifies the existing protocol
+gitlink, and changes only managed update paths. Those same preconditions make it incapable of installing
 itself. A consumer that copies only the workflow has neither local scripts nor
 a protocol submodule, while a populated consumer may already own files that
 need semantic rather than mechanical merging.

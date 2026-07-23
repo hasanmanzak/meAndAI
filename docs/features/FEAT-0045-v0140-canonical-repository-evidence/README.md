@@ -151,7 +151,7 @@ workflow, or unresolved `Blocking` finding remains.
 | Field | Evidence |
 | --- | --- |
 | External evidence authority | [Issue #110](https://github.com/hasanmanzak/meAndAI/issues/110) |
-| Pull request | Pending |
-| Release authority | Pending |
-| Release identifier | Pending |
-| Target commit | Pending |
+| Pull request | [PR #111](https://github.com/hasanmanzak/meAndAI/pull/111) |
+| Release authority | [GitHub release v0.14.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.0) |
+| Release identifier | `v0.14.0` |
+| Target commit | `a2a987b322f5ea8d705ad6c5325cffc662a60978` |

@@ -1248,6 +1248,101 @@ foreach ($relativePath in $canonicalEvidenceArtifacts) {
         Add-Failure "TEST-0173 canonical evidence artifact is consumer- or machine-coupled: $relativePath"
     }
 }
+
+# TEST-0174: protocol-provided reusable assets remain single-owned upstream;
+# consumers reuse the pinned authority and contain only project-specific work.
+foreach ($requiredText in @(
+    'Protocol-provided reusable assets include code, tests, fixtures, validators, workflows, templates, prompts, scripts, and documentation',
+    'MUST reuse or reference those assets through the pinned protocol integration',
+    'MUST NOT copy, reimplement, port, shadow, fork, or maintain consumer-local equivalents',
+    'genuinely project-specific integration, configuration, domain behavior, or semantic evidence',
+    'missing, defective, or insufficient common asset MUST be corrected and tested in meAndAI',
+    'An exact protocol-declared managed projection is not a consumer-owned equivalent',
+    'immutable-release-declared source path, canonical consumer target path, exact content digest or Git blob, and lifecycle',
+    'MUST be installed and updated only by deterministic protocol automation',
+    'does not authorize consumer-local tests, fixtures, validators, or shadow implementations'
+)) {
+    if (-not $normalizedProtocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0174 consumer non-duplication mandate is missing '$requiredText'."
+    }
+}
+$upstreamDecisionPath = Join-Path $root `
+    'docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md'
+$normalizedUpstreamDecision = [regex]::Replace(
+    (Get-Content -LiteralPath $upstreamDecisionPath -Raw),
+    '\s+',
+    ' '
+)
+foreach ($requiredText in @(
+    'Protocol-provided reusable assets are single-owned by meAndAI',
+    'must not reproduce their implementation or generic regression evidence',
+    'project-specific adapter, configuration, domain behavior, or semantic assessment',
+    'immutable-release-declared source path, canonical consumer target path, exact content digest or Git blob, and lifecycle',
+    'MUST be installed and updated only by deterministic protocol automation',
+    'does not permit consumer-local tests, fixtures, validators, or shadow implementations'
+)) {
+    if (-not $normalizedUpstreamDecision.Contains($requiredText)) {
+        Add-Failure "TEST-0174 DEC-0028 non-duplication boundary is missing '$requiredText'."
+    }
+}
+foreach ($requiredText in @(
+    'Protocol-provided reusable assets must not be copied, reimplemented, or retested in a consumer',
+    'Consumer changes are limited to genuinely project-specific integration, configuration, domain behavior, and semantic evidence',
+    'correct the common asset and its regression in meAndAI first'
+)) {
+    if (-not $normalizedLocalInstructions.Contains($requiredText)) {
+        Add-Failure "TEST-0174 local non-duplication instruction is missing '$requiredText'."
+    }
+}
+$managedProjectionContracts = @(
+    [pscustomobject]@{
+        Path = 'PROTOCOL.md'
+        Required = 'consumer-resident, protocol-owned managed projection'
+    },
+    [pscustomobject]@{
+        Path = 'docs/adoption.md'
+        Required = 'consumer-resident, protocol-owned managed projection'
+    },
+    [pscustomobject]@{
+        Path = 'docs/decisions/DEC-0003-reviewed-consumer-update-supersession.md'
+        Required = 'consumer-resident, protocol-owned scheduled/manual workflow projection'
+    },
+    [pscustomobject]@{
+        Path = 'docs/decisions/DEC-0006-seed-workflow-adoption-handoff.md'
+        Required = 'consumer-resident, protocol-owned managed updater'
+    },
+    [pscustomobject]@{
+        Path = 'docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md'
+        Required = 'consumer-resident, protocol-owned workflow projection'
+    }
+)
+foreach ($contract in $managedProjectionContracts) {
+    $content = [regex]::Replace(
+        (Get-Content -LiteralPath (Join-Path $root $contract.Path) -Raw),
+        '\s+',
+        ' '
+    )
+    if (-not $content.Contains($contract.Required)) {
+        Add-Failure "TEST-0174 managed projection ownership is inconsistent in '$($contract.Path)'."
+    }
+    if ($content -match 'consumer-owned (?:update workflow|updater)' -or
+        $content -match 'workflow is consumer-owned') {
+        Add-Failure "TEST-0174 legacy consumer-owned updater terminology remains in '$($contract.Path)'."
+    }
+}
+$adoptionContent = Get-Content -LiteralPath (
+    Join-Path $root 'docs/adoption.md'
+) -Raw
+$managedAutomationSection = [regex]::Match(
+    $adoptionContent,
+    '(?ms)^Submodule consumers also materialize these submodule-only automation assets:\s+(?<table>.*?)(?:\r?\n){2}'
+)
+if (-not $managedAutomationSection.Success -or
+    -not $managedAutomationSection.Groups['table'].Value.Contains(
+        '| Pinned source | Consumer-resident managed target |'
+    )) {
+    Add-Failure 'TEST-0174 adoption guide does not classify exact updater assets as consumer-resident managed projections.'
+}
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',
@@ -1655,7 +1750,7 @@ $expectedManagedAssets = @(
     '.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 )
 if (($actualManagedAssets -join '|') -cne ($expectedManagedAssets -join '|')) {
-    Add-Failure 'TEST-0099 updater managed assets exceed or omit the exact three consumer-owned automation files.'
+    Add-Failure 'TEST-0099 updater managed assets exceed or omit the exact three consumer-resident, protocol-owned automation projections.'
 }
 foreach ($testId in @('TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099')) {
     if (-not $mandateTestCases.Contains("``$testId``") -or

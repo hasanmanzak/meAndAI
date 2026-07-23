@@ -28,8 +28,9 @@ after pushing a branch. The updater also cannot exist retroactively in immutable
 
 ## Decision
 
-Submodule consumers adopting `v0.2.0` or later install a consumer-owned
-scheduled/manual workflow from the pinned protocol templates. The workflow:
+Submodule consumers adopting `v0.2.0` or later install a consumer-resident,
+protocol-owned scheduled/manual workflow projection from the pinned protocol
+templates. The workflow:
 
 1. verifies that `.ai/protocol` is the configured protocol submodule and that
    its gitlink resolves to exactly one canonical lowercase `vM.m.rev` tag;
