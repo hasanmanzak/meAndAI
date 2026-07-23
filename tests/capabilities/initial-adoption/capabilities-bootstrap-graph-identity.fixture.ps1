@@ -7,6 +7,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+$testGitBatchPath = Join-Path $PSScriptRoot `
+    '../../infrastructure/MeAndAI.TestGitBatch.psm1'
+Import-Module $testGitBatchPath -Force
 
 function Invoke-GitBinary {
     param(
@@ -43,6 +46,7 @@ function Invoke-GitBinary {
     }
 }
 
+
 if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
     throw 'The TEST-0153 graph fixture requires one exact commit.'
 }
@@ -71,12 +75,6 @@ foreach ($record in @($treeText.Split([char]0))) {
         Sha = [string]$match.Groups['sha'].Value
     })
 }
-$gitBinary = ${function:Invoke-GitBinary}
-$reader = {
-    param($entry)
-    return ,(& $gitBinary -WorkingDirectory $Repository `
-        -Arguments "cat-file blob $([string]$entry.Sha)")
-}.GetNewClosure()
 $loaded = @(Import-Module $ModulePath -Force -PassThru)
 if ($loaded.Count -ne 1) {
     throw 'The TEST-0153 capabilities contract did not load exactly once.'
@@ -90,11 +88,37 @@ if ($null -eq $builder -or $null -eq $validator -or
     $null -eq $identityGetter) {
     throw 'The TEST-0153 capabilities contract lacks graph exports.'
 }
-$graph = & $builder -BaseHead $Commit -TreeEntries @($entries) `
-    -ReadBlob $reader
-if (-not (& $validator -Graph $graph)) {
-    throw 'The TEST-0153 fixture returned a non-exact graph.'
+$session = New-MeAndAITestGitBlobBatchSession `
+    -Repository $Repository
+$graph = $null
+$primaryError = $null
+$cleanupError = $null
+try {
+    $graph = & $builder -BaseHead $Commit -TreeEntries @($entries) `
+        -ReadBlob $session.ReadBlob
+    & $session.Complete $graph
+    if (-not (& $validator -Graph $graph)) {
+        throw 'The TEST-0153 fixture returned a non-exact graph.'
+    }
 }
+catch {
+    $primaryError = $_.Exception
+}
+finally {
+    try { & $session.Abort }
+    catch { $cleanupError = $_.Exception }
+}
+if ($null -ne $primaryError) {
+    if ($null -ne $cleanupError) {
+        throw [AggregateException]::new(
+            ($primaryError.Message + ' Cleanup failed: ' +
+                $cleanupError.Message),
+            [Exception[]]@($primaryError, $cleanupError)
+        )
+    }
+    throw $primaryError
+}
+if ($null -ne $cleanupError) { throw $cleanupError }
 $identity = & $identityGetter -Graph $graph
 Write-Output ('MEANDAI_TEST_GRAPH_IDENTITY=' +
     ($identity | ConvertTo-Json -Depth 30 -Compress))

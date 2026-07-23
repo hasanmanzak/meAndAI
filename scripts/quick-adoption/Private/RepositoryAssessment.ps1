@@ -279,56 +279,599 @@ function Get-QuickAdoptionInstructionGraphTreeEntries {
     }
 }
 
-function Get-QuickAdoptionInstructionGraphBlobBytes {
+function New-QuickAdoptionInstructionGraphBatchSession {
     param(
         [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)]$Entry,
-        [Parameter(Mandatory)][long]$MaximumBytes
+        [Parameter(Mandatory)][long]$MaximumBlobBytes,
+        [Parameter(Mandatory)][long]$MaximumAggregateBlobBytes,
+        [Parameter(Mandatory)][int]$SessionTimeoutMilliseconds,
+        [Parameter(Mandatory)][int]$AbortTimeoutMilliseconds,
+        [Parameter(Mandatory)][int]$MaximumHeaderBytes,
+        [Parameter(Mandatory)][int]$MaximumStandardErrorBytes,
+        [AllowNull()]$InternalTestHooks = $null
     )
 
-    if ([string]$Entry.Type -cne 'blob' -or
-        [string]$Entry.Sha -cnotmatch '^[0-9a-f]{40}$') {
-        throw "Instruction graph entry '$([string]$Entry.Path)' is not a canonical blob."
+    if ($MaximumBlobBytes -lt 0 -or $MaximumAggregateBlobBytes -lt 0 -or
+        $SessionTimeoutMilliseconds -le 0 -or
+        $AbortTimeoutMilliseconds -le 0 -or $MaximumHeaderBytes -le 0 -or
+        $MaximumStandardErrorBytes -lt 0) {
+        throw 'Instruction-graph batch-session limits are invalid.'
     }
-    $startInfo = [Diagnostics.ProcessStartInfo]::new()
-    $startInfo.FileName = 'git'
-    $startInfo.Arguments = "cat-file blob $([string]$Entry.Sha)"
-    $startInfo.WorkingDirectory = $Repository
-    $startInfo.UseShellExecute = $false
-    $startInfo.CreateNoWindow = $true
-    $startInfo.RedirectStandardOutput = $true
-    $startInfo.RedirectStandardError = $true
-    $process = [Diagnostics.Process]::new()
-    $process.StartInfo = $startInfo
-    $memory = [IO.MemoryStream]::new()
-    $started = $false
-    try {
-        if (-not $process.Start()) {
-            throw "Unable to read exact instruction blob '$([string]$Entry.Path)'."
+
+    $stopwatch = [Diagnostics.Stopwatch]::StartNew()
+    $getMonotonicMilliseconds = {
+        return [long]$stopwatch.ElapsedMilliseconds
+    }.GetNewClosure()
+    $transportFactory = {
+        param([string]$WorkingRepository)
+
+        $startInfo = [Diagnostics.ProcessStartInfo]::new()
+        $startInfo.FileName = 'git'
+        $startInfo.Arguments = 'cat-file --batch'
+        $startInfo.WorkingDirectory = $WorkingRepository
+        $startInfo.UseShellExecute = $false
+        $startInfo.CreateNoWindow = $true
+        $startInfo.RedirectStandardInput = $true
+        $startInfo.RedirectStandardOutput = $true
+        $startInfo.RedirectStandardError = $true
+        # Windows PowerShell 5.1 initializes this legacy dictionary lazily.
+        [void]$startInfo.EnvironmentVariables
+        $startInfo.EnvironmentVariables['GIT_NO_REPLACE_OBJECTS'] = '1'
+        $process = [Diagnostics.Process]::new()
+        $process.StartInfo = $startInfo
+        $streamState = [pscustomobject]@{
+            Input = $null
+            Output = $null
+            Error = $null
         }
-        $started = $true
-        $buffer = [byte[]]::new(81920)
-        [long]$total = 0
-        while (($read = $process.StandardOutput.BaseStream.Read(
-            $buffer, 0, $buffer.Length
-        )) -gt 0) {
-            if ($total -gt ($MaximumBytes - $read)) {
-                throw "Instruction blob '$([string]$Entry.Path)' exceeds the per-blob budget."
+        return [pscustomobject][ordered]@{
+            Start = {
+                # Windows PowerShell 5.1 has no
+                # ProcessStartInfo.StandardInputEncoding property. Capture
+                # its StreamWriter-backed pipe while Console.InputEncoding is
+                # explicitly no-BOM so ambient encodings cannot prefix raw
+                # batch requests.
+                $started = $false
+                try {
+                    $originalInputEncoding = [Console]::InputEncoding
+                    try {
+                        [Console]::InputEncoding =
+                            [Text.UTF8Encoding]::new($false)
+                        if (-not $process.Start()) { return $false }
+                        $started = $true
+                        $streamState.Input =
+                            $process.StandardInput.BaseStream
+                    }
+                    finally {
+                        [Console]::InputEncoding = $originalInputEncoding
+                    }
+                    $streamState.Output =
+                        $process.StandardOutput.BaseStream
+                    $streamState.Error =
+                        $process.StandardError.BaseStream
+                    return $true
+                }
+                catch {
+                    $primaryFailure = $_.Exception
+                    if ($started) {
+                        $cleanupProblems =
+                            [System.Collections.Generic.List[string]]::new()
+                        $hasExited = $false
+                        try { $hasExited = [bool]$process.HasExited }
+                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                        if (-not $hasExited) {
+                            try { $process.Kill() }
+                            catch { $cleanupProblems.Add($_.Exception.Message) }
+                        }
+                        try {
+                            if (-not $process.WaitForExit(
+                                $AbortTimeoutMilliseconds
+                            )) {
+                                $cleanupProblems.Add(
+                                    'Instruction-graph batch child survived failed stream capture.'
+                                )
+                            }
+                        }
+                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                        try { $process.Dispose() }
+                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                        if ($cleanupProblems.Count -gt 0) {
+                            throw ($primaryFailure.Message +
+                                ' Stream-capture cleanup failed: ' +
+                                ($cleanupProblems -join ' '))
+                        }
+                    }
+                    throw $primaryFailure
+                }
+            }.GetNewClosure()
+            WriteInputAsync = {
+                param([byte[]]$Buffer, [int]$Offset, [int]$Count)
+                return $streamState.Input.WriteAsync(
+                    $Buffer, $Offset, $Count
+                )
+            }.GetNewClosure()
+            FlushInputAsync = {
+                return $streamState.Input.FlushAsync()
+            }.GetNewClosure()
+            ReadStandardOutputAsync = {
+                param([byte[]]$Buffer, [int]$Offset, [int]$Count)
+                return $streamState.Output.ReadAsync(
+                    $Buffer, $Offset, $Count
+                )
+            }.GetNewClosure()
+            ReadStandardErrorAsync = {
+                param([byte[]]$Buffer, [int]$Offset, [int]$Count)
+                return $streamState.Error.ReadAsync(
+                    $Buffer, $Offset, $Count
+                )
+            }.GetNewClosure()
+            # Close the raw pipe. Closing the enclosing StreamWriter can emit
+            # an encoding preamble after the exact ASCII-LF batch requests.
+            CloseInput = {
+                $streamState.Input.Close()
+            }.GetNewClosure()
+            WaitForExit = {
+                param([int]$Milliseconds)
+                return [bool]$process.WaitForExit($Milliseconds)
+            }.GetNewClosure()
+            GetHasExited = { return [bool]$process.HasExited }.GetNewClosure()
+            GetExitCode = { return [int]$process.ExitCode }.GetNewClosure()
+            Kill = { $process.Kill() }.GetNewClosure()
+            Dispose = { $process.Dispose() }.GetNewClosure()
+        }
+    }.GetNewClosure()
+
+    if ($null -ne $InternalTestHooks) {
+        $hookNames = @($InternalTestHooks.PSObject.Properties.Name)
+        [Array]::Sort($hookNames, [StringComparer]::Ordinal)
+        if ($hookNames.Count -ne 2 -or
+            $hookNames[0] -cne 'GetMonotonicMilliseconds' -or
+            $hookNames[1] -cne 'TransportFactory' -or
+            $InternalTestHooks.TransportFactory -isnot [scriptblock] -or
+            $InternalTestHooks.GetMonotonicMilliseconds -isnot [scriptblock]) {
+            throw 'Instruction-graph batch-session test hooks are invalid.'
+        }
+        $transportFactory = $InternalTestHooks.TransportFactory
+        $getMonotonicMilliseconds =
+            $InternalTestHooks.GetMonotonicMilliseconds
+    }
+
+    $state = [pscustomobject][ordered]@{
+        Lifecycle = 'NotStarted'
+        Busy = $false
+        Transport = $null
+        ProcessStarted = $false
+        ProcessStarts = [long]0
+        Requests = [long]0
+        ResponseBytes = [long]0
+        StartedAt = [long]0
+        LastClock = [long]-1
+        StdoutBuffer = [byte[]]::new(8192)
+        StdoutOffset = [int]0
+        StdoutCount = [int]0
+        StderrBuffer = [byte[]]::new(8192)
+        StderrTask = $null
+        StderrEof = $false
+        StderrBytes = [long]0
+        StderrMemory = [IO.MemoryStream]::new()
+        PendingPrimaryTask = $null
+    }
+    $requiredTransportCallbacks = @(
+        'Start', 'WriteInputAsync', 'FlushInputAsync',
+        'ReadStandardOutputAsync', 'ReadStandardErrorAsync', 'CloseInput',
+        'WaitForExit', 'GetHasExited', 'GetExitCode', 'Kill', 'Dispose'
+    )
+
+    $getNow = {
+        $raw = & $getMonotonicMilliseconds
+        if ($raw -isnot [ValueType]) {
+            throw 'Instruction-graph batch-session clock is invalid.'
+        }
+        [long]$now = $raw
+        if ($now -lt 0 -or
+            ($state.LastClock -ge 0 -and $now -lt $state.LastClock)) {
+            throw 'Instruction-graph batch-session clock is not monotonic.'
+        }
+        $state.LastClock = $now
+        return $now
+    }.GetNewClosure()
+    $getRemainingMilliseconds = {
+        [long]$elapsed = (& $getNow) - $state.StartedAt
+        [long]$remaining = [long]$SessionTimeoutMilliseconds - $elapsed
+        if ($remaining -lt 0) {
+            throw 'Instruction-graph batch session deadline exceeded.'
+        }
+        if ($remaining -gt [int]::MaxValue) { return [int]::MaxValue }
+        return [int]$remaining
+    }.GetNewClosure()
+    $startStderrRead = {
+        if ($state.StderrEof -or $null -ne $state.StderrTask) { return }
+        [long]$remainingEvidenceBytes =
+            [long]$MaximumStandardErrorBytes - $state.StderrBytes
+        if ($remainingEvidenceBytes -lt 0) {
+            throw 'Instruction-graph batch standard error exceeds its budget.'
+        }
+        # One byte beyond the retained ceiling is the bounded overflow
+        # sentinel. Never consume a full extra buffer merely to detect it.
+        [int]$readCount = [int][Math]::Min(
+            [long]$state.StderrBuffer.Length,
+            $remainingEvidenceBytes + 1
+        )
+        $task = & $state.Transport.ReadStandardErrorAsync `
+            $state.StderrBuffer 0 $readCount
+        if ($task -isnot [Threading.Tasks.Task]) {
+            throw 'Instruction-graph batch stderr reader returned an invalid task.'
+        }
+        $state.StderrTask = $task
+    }.GetNewClosure()
+    $consumeStderrRead = {
+        if ($null -eq $state.StderrTask) { return }
+        $task = $state.StderrTask
+        $state.StderrTask = $null
+        [int]$read = $task.GetAwaiter().GetResult()
+        if ($read -lt 0 -or $read -gt $state.StderrBuffer.Length) {
+            throw 'Instruction-graph batch stderr reader returned an invalid length.'
+        }
+        if ($read -eq 0) {
+            $state.StderrEof = $true
+            return
+        }
+        if ($state.StderrBytes -gt
+            ([long]$MaximumStandardErrorBytes - $read)) {
+            throw 'Instruction-graph batch standard error exceeds its budget.'
+        }
+        $state.StderrMemory.Write($state.StderrBuffer, 0, $read)
+        $state.StderrBytes += $read
+        & $startStderrRead
+    }.GetNewClosure()
+    $waitTask = {
+        param([Parameter(Mandatory)][Threading.Tasks.Task]$Task)
+
+        $state.PendingPrimaryTask = $Task
+        try {
+            while ($true) {
+                [int]$remaining = & $getRemainingMilliseconds
+                if ($null -ne $state.StderrTask) {
+                    $tasks = [Threading.Tasks.Task[]]@(
+                        $state.StderrTask, $Task
+                    )
+                    [int]$completed = [Threading.Tasks.Task]::WaitAny(
+                        $tasks, $remaining
+                    )
+                    if ($completed -lt 0) {
+                        throw 'Instruction-graph batch session deadline exceeded.'
+                    }
+                    if ($completed -eq 0) {
+                        & $consumeStderrRead
+                        continue
+                    }
+                }
+                else {
+                    [int]$completed = [Threading.Tasks.Task]::WaitAny(
+                        [Threading.Tasks.Task[]]@($Task), $remaining
+                    )
+                    if ($completed -lt 0) {
+                        throw 'Instruction-graph batch session deadline exceeded.'
+                    }
+                }
+                return $Task.GetAwaiter().GetResult()
             }
-            $memory.Write($buffer, 0, $read)
-            $total += $read
         }
-        $errorText = $process.StandardError.ReadToEnd()
-        $process.WaitForExit()
-        if ($process.ExitCode -ne 0) {
-            throw "Unable to read exact instruction blob '$([string]$Entry.Path)': $errorText"
+        finally {
+            if ($Task.IsCompleted) { $state.PendingPrimaryTask = $null }
         }
-        return ,$memory.ToArray()
-    }
-    finally {
-        if ($started -and -not $process.HasExited) { $process.Kill() }
-        $memory.Dispose()
-        $process.Dispose()
+    }.GetNewClosure()
+    $readOutputChunk = {
+        if ($state.StdoutOffset -lt $state.StdoutCount) { return $true }
+        $state.StdoutOffset = 0
+        $state.StdoutCount = 0
+        $task = & $state.Transport.ReadStandardOutputAsync `
+            $state.StdoutBuffer 0 $state.StdoutBuffer.Length
+        if ($task -isnot [Threading.Tasks.Task]) {
+            throw 'Instruction-graph batch stdout reader returned an invalid task.'
+        }
+        [int]$read = & $waitTask $task
+        if ($read -lt 0 -or $read -gt $state.StdoutBuffer.Length) {
+            throw 'Instruction-graph batch stdout reader returned an invalid length.'
+        }
+        $state.StdoutCount = $read
+        return $read -gt 0
+    }.GetNewClosure()
+    $readOutputByte = {
+        if (-not (& $readOutputChunk)) { return [int]-1 }
+        [int]$value = $state.StdoutBuffer[$state.StdoutOffset]
+        $state.StdoutOffset++
+        return $value
+    }.GetNewClosure()
+    $readOutputExact = {
+        param([Parameter(Mandatory)][byte[]]$Buffer)
+
+        [int]$written = 0
+        while ($written -lt $Buffer.Length) {
+            if ($state.StdoutOffset -lt $state.StdoutCount) {
+                [int]$available = $state.StdoutCount - $state.StdoutOffset
+                [int]$copy = [Math]::Min($available, $Buffer.Length - $written)
+                [Array]::Copy($state.StdoutBuffer, $state.StdoutOffset,
+                    $Buffer, $written, $copy)
+                $state.StdoutOffset += $copy
+                $written += $copy
+                continue
+            }
+            $task = & $state.Transport.ReadStandardOutputAsync `
+                $Buffer $written ($Buffer.Length - $written)
+            if ($task -isnot [Threading.Tasks.Task]) {
+                throw 'Instruction-graph batch stdout reader returned an invalid task.'
+            }
+            [int]$read = & $waitTask $task
+            if ($read -le 0 -or $read -gt ($Buffer.Length - $written)) {
+                throw 'Instruction-graph batch response ended before its declared payload.'
+            }
+            $written += $read
+        }
+    }.GetNewClosure()
+    $ensureStarted = {
+        if ($state.Lifecycle -cne 'NotStarted') { return }
+        $state.StartedAt = & $getNow
+        $transport = & $transportFactory $Repository
+        if ($null -eq $transport) {
+            throw 'Instruction-graph batch transport factory returned no transport.'
+        }
+        $state.Transport = $transport
+        $actualNames = @($transport.PSObject.Properties.Name)
+        [Array]::Sort($actualNames, [StringComparer]::Ordinal)
+        $expectedNames = @($requiredTransportCallbacks)
+        [Array]::Sort($expectedNames, [StringComparer]::Ordinal)
+        if (($actualNames -join "`0") -cne ($expectedNames -join "`0")) {
+            throw 'Instruction-graph batch transport callback shape is invalid.'
+        }
+        foreach ($callbackName in $requiredTransportCallbacks) {
+            if ($transport.$callbackName -isnot [scriptblock]) {
+                throw "Instruction-graph batch transport callback '$callbackName' is invalid."
+            }
+        }
+        if (-not (& $transport.Start)) {
+            throw 'Unable to start exact instruction-graph batch acquisition.'
+        }
+        $state.ProcessStarted = $true
+        $state.ProcessStarts++
+        $state.Lifecycle = 'Running'
+        & $startStderrRead
+    }.GetNewClosure()
+    $getGitBlobSha = {
+        param([Parameter(Mandatory)][byte[]]$Bytes)
+
+        $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+        $combined = [byte[]]::new($header.Length + $Bytes.Length)
+        [Array]::Copy($header, 0, $combined, 0, $header.Length)
+        [Array]::Copy($Bytes, 0, $combined, $header.Length, $Bytes.Length)
+        $sha = [Security.Cryptography.SHA1]::Create()
+        try {
+            return ([BitConverter]::ToString(
+                $sha.ComputeHash($combined)
+            )).Replace('-', '').ToLowerInvariant()
+        }
+        finally { $sha.Dispose() }
+    }.GetNewClosure()
+
+    $readBlob = {
+        param([Parameter(Mandatory)]$Entry)
+
+        if ($state.Busy) {
+            $state.Lifecycle = 'Faulted'
+            throw 'Instruction-graph batch session does not allow reentrant reads.'
+        }
+        if ($state.Lifecycle -ceq 'Faulted' -or
+            $state.Lifecycle -ceq 'Aborted' -or
+            $state.Lifecycle -ceq 'Completed') {
+            throw "Instruction-graph batch session is terminal: $($state.Lifecycle)."
+        }
+        $state.Busy = $true
+        try {
+            if ([string]$Entry.Type -cne 'blob' -or
+                @('100644', '100755') -cnotcontains [string]$Entry.Mode -or
+                [string]$Entry.Sha -cnotmatch '^[0-9a-f]{40}$') {
+                throw "Instruction graph entry '$([string]$Entry.Path)' is not a canonical regular blob."
+            }
+            & $ensureStarted
+            $requestBytes = [byte[]]::new(41)
+            $oidBytes = [Text.Encoding]::ASCII.GetBytes([string]$Entry.Sha)
+            [Array]::Copy($oidBytes, 0, $requestBytes, 0, 40)
+            $requestBytes[40] = 10
+            $writeTask = & $state.Transport.WriteInputAsync `
+                $requestBytes 0 $requestBytes.Length
+            if ($writeTask -isnot [Threading.Tasks.Task]) {
+                throw 'Instruction-graph batch stdin writer returned an invalid task.'
+            }
+            [void](& $waitTask $writeTask)
+            if ($state.Lifecycle -cne 'Running') {
+                throw 'Instruction-graph batch session faulted during a reentrant read.'
+            }
+            $flushTask = & $state.Transport.FlushInputAsync
+            if ($flushTask -isnot [Threading.Tasks.Task]) {
+                throw 'Instruction-graph batch stdin flusher returned an invalid task.'
+            }
+            [void](& $waitTask $flushTask)
+            if ($state.Lifecycle -cne 'Running') {
+                throw 'Instruction-graph batch session faulted during a reentrant read.'
+            }
+            $state.Requests++
+
+            $headerBytes = [System.Collections.Generic.List[byte]]::new()
+            while ($true) {
+                [int]$value = & $readOutputByte
+                if ($value -lt 0) {
+                    throw 'Instruction-graph batch response ended before its header.'
+                }
+                if ($value -eq 10) { break }
+                if ($value -gt 127 -or $headerBytes.Count -ge $MaximumHeaderBytes) {
+                    throw 'Instruction-graph batch response header is invalid or over budget.'
+                }
+                $headerBytes.Add([byte]$value)
+            }
+            $headerText = [Text.Encoding]::ASCII.GetString(
+                $headerBytes.ToArray()
+            )
+            $headerMatch = [regex]::Match($headerText,
+                '^(?<oid>[0-9a-f]{40}) blob (?<size>0|[1-9][0-9]*)$')
+            if (-not $headerMatch.Success -or
+                [string]$headerMatch.Groups['oid'].Value -cne
+                    [string]$Entry.Sha) {
+                throw 'Instruction-graph batch response identity or type is invalid.'
+            }
+            [long]$size = 0
+            if (-not [long]::TryParse(
+                [string]$headerMatch.Groups['size'].Value,
+                [Globalization.NumberStyles]::None,
+                [Globalization.CultureInfo]::InvariantCulture,
+                [ref]$size
+            ) -or $size -gt $MaximumBlobBytes -or
+                $size -gt ([long]$MaximumAggregateBlobBytes -
+                    $state.ResponseBytes) -or $size -gt [int]::MaxValue) {
+                throw 'Instruction-graph batch response size exceeds its budget.'
+            }
+            $payload = [byte[]]::new([int]$size)
+            if ($payload.Length -gt 0) { & $readOutputExact $payload }
+            if ((& $readOutputByte) -ne 10) {
+                throw 'Instruction-graph batch response is missing its exact LF trailer.'
+            }
+            if ((& $getGitBlobSha $payload) -cne [string]$Entry.Sha) {
+                throw 'Instruction-graph batch payload does not match its exact tree identity.'
+            }
+            if ($state.Lifecycle -cne 'Running') {
+                throw 'Instruction-graph batch session faulted during a reentrant read.'
+            }
+            $state.ResponseBytes += $size
+            return ,$payload
+        }
+        catch {
+            $state.Lifecycle = 'Faulted'
+            throw
+        }
+        finally { $state.Busy = $false }
+    }.GetNewClosure()
+
+    $complete = {
+        param([Parameter(Mandatory)]$Graph)
+
+        if ($state.Busy -or $state.Lifecycle -ceq 'Faulted' -or
+            $state.Lifecycle -ceq 'Aborted' -or
+            $state.Lifecycle -ceq 'Completed') {
+            throw "Instruction-graph batch session cannot complete from '$($state.Lifecycle)'."
+        }
+        try {
+            if ($state.Lifecycle -ceq 'NotStarted') {
+                if ([long]$Graph.counts.parsedBlobs -ne 0 -or
+                    [long]$Graph.counts.parsedBlobBytes -ne 0) {
+                    throw 'Instruction-graph batch zero-process evidence does not match the graph.'
+                }
+                $state.StderrMemory.Dispose()
+                $state.Lifecycle = 'Completed'
+                return
+            }
+            & $state.Transport.CloseInput
+            if ((& $readOutputByte) -ne -1) {
+                throw 'Instruction-graph batch response contains extra output.'
+            }
+            while (-not $state.StderrEof) {
+                if ($null -eq $state.StderrTask) { & $startStderrRead }
+                $stderrTask = $state.StderrTask
+                $state.PendingPrimaryTask = $stderrTask
+                [int]$remaining = & $getRemainingMilliseconds
+                [int]$completed = [Threading.Tasks.Task]::WaitAny(
+                    [Threading.Tasks.Task[]]@($stderrTask), $remaining
+                )
+                if ($completed -lt 0) {
+                    throw 'Instruction-graph batch session deadline exceeded.'
+                }
+                $state.PendingPrimaryTask = $null
+                & $consumeStderrRead
+            }
+            [int]$remaining = & $getRemainingMilliseconds
+            if (-not (& $state.Transport.WaitForExit $remaining)) {
+                throw 'Instruction-graph batch session deadline exceeded while reaping the child.'
+            }
+            if ((& $state.Transport.GetExitCode) -ne 0) {
+                $stderrText = [Text.Encoding]::UTF8.GetString(
+                    $state.StderrMemory.ToArray()
+                )
+                throw "Instruction-graph batch child failed: $stderrText"
+            }
+            if ($state.Requests -ne [long]$Graph.counts.parsedBlobs -or
+                $state.ResponseBytes -ne
+                    [long]$Graph.counts.parsedBlobBytes) {
+                throw 'Instruction-graph batch request/byte evidence does not match the graph.'
+            }
+            & $state.Transport.Dispose
+            $state.Transport = $null
+            $state.StderrMemory.Dispose()
+            $state.Lifecycle = 'Completed'
+        }
+        catch {
+            $state.Lifecycle = 'Faulted'
+            throw
+        }
+    }.GetNewClosure()
+
+    $abort = {
+        if ($state.Lifecycle -ceq 'Completed' -or
+            $state.Lifecycle -ceq 'Aborted') { return }
+        $cleanupProblems = [System.Collections.Generic.List[string]]::new()
+        try {
+            if ($null -ne $state.Transport) {
+                $hasExited = $false
+                if ($state.ProcessStarted) {
+                    try { $hasExited = [bool](& $state.Transport.GetHasExited) }
+                    catch { $cleanupProblems.Add($_.Exception.Message) }
+                    if (-not $hasExited) {
+                        try { & $state.Transport.Kill }
+                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                        try {
+                            if (-not (& $state.Transport.WaitForExit `
+                                $AbortTimeoutMilliseconds)) {
+                                $cleanupProblems.Add(
+                                    'Instruction-graph batch child survived abort.'
+                                )
+                            }
+                        }
+                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                    }
+                }
+                foreach ($pending in @(
+                    $state.PendingPrimaryTask, $state.StderrTask
+                )) {
+                    if ($null -ne $pending -and -not $pending.IsCompleted) {
+                        $cleanupProblems.Add(
+                            'Instruction-graph batch I/O task did not join after abort.'
+                        )
+                    }
+                }
+                try { & $state.Transport.Dispose }
+                catch { $cleanupProblems.Add($_.Exception.Message) }
+                $state.Transport = $null
+            }
+        }
+        finally {
+            $state.StderrMemory.Dispose()
+            $state.Lifecycle = 'Aborted'
+        }
+        if ($cleanupProblems.Count -gt 0) {
+            throw ($cleanupProblems -join ' ')
+        }
+    }.GetNewClosure()
+    $getObservation = {
+        return [pscustomobject][ordered]@{
+            Lifecycle = [string]$state.Lifecycle
+            ProcessStarts = [long]$state.ProcessStarts
+            Requests = [long]$state.Requests
+            ResponseBytes = [long]$state.ResponseBytes
+        }
+    }.GetNewClosure()
+
+    return [pscustomobject][ordered]@{
+        ReadBlob = $readBlob
+        Complete = $complete
+        Abort = $abort
+        GetObservation = $getObservation
     }
 }
 
@@ -343,21 +886,42 @@ function Get-QuickAdoptionInstructionGraph {
     $limitsCommand = Get-InitialAdoptionPolicyCommand `
         -Name 'Get-MeAndAIInstructionGraphLimits'
     $limits = & $limitsCommand
-    $blobReader = ${function:Get-QuickAdoptionInstructionGraphBlobBytes}
-    $reader = {
-        param($entry)
-        & $blobReader -Repository $Repository `
-            -Entry $entry -MaximumBytes ([long]$limits.MaximumBlobBytes)
-    }.GetNewClosure()
     $builder = Get-InitialAdoptionPolicyCommand `
         -Name 'New-MeAndAIInstructionGraph'
     $validator = Get-InitialAdoptionPolicyCommand `
         -Name 'Test-MeAndAIExactInstructionGraph'
-    $graph = & $builder -BaseHead $Commit -TreeEntries $entries `
-        -ReadBlob $reader
-    if (-not (& $validator -Graph $graph)) {
-        throw 'Exact instruction-graph discovery returned an invalid graph.'
+    $session = New-QuickAdoptionInstructionGraphBatchSession `
+        -Repository $Repository `
+        -MaximumBlobBytes ([long]$limits.MaximumBlobBytes) `
+        -MaximumAggregateBlobBytes ([long]$limits.MaximumAggregateBlobBytes) `
+        -SessionTimeoutMilliseconds 120000 `
+        -AbortTimeoutMilliseconds 5000 `
+        -MaximumHeaderBytes 128 `
+        -MaximumStandardErrorBytes 65536
+    $primaryFailure = $null
+    $cleanupFailure = $null
+    $graph = $null
+    try {
+        $graph = & $builder -BaseHead $Commit -TreeEntries $entries `
+            -ReadBlob $session.ReadBlob
+        & $session.Complete $graph
+        if (-not (& $validator -Graph $graph)) {
+            throw 'Exact instruction-graph discovery returned an invalid graph.'
+        }
     }
+    catch { $primaryFailure = $_.Exception }
+    finally {
+        try { & $session.Abort }
+        catch { $cleanupFailure = $_.Exception }
+    }
+    if ($null -ne $primaryFailure) {
+        if ($null -ne $cleanupFailure) {
+            throw ($primaryFailure.Message + ' Cleanup failed: ' +
+                $cleanupFailure.Message)
+        }
+        throw $primaryFailure
+    }
+    if ($null -ne $cleanupFailure) { throw $cleanupFailure }
     return $graph
 }
 

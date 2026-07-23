@@ -3,6 +3,43 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.1 - 2026-07-23
+
+### Changed
+
+- Replace per-blob instruction-graph Git processes with one lazy, actor-local
+  `git cat-file --batch` session in both production adapters, using exact
+  binary framing, bounded stderr, a common deadline, identity checks, and
+  fail-closed cleanup.
+- Bind runtime-efficiency closure targets to ordered schema-2 measurement
+  authorities so missing, unknown, duplicate, reordered, or cross-work
+  measurement identities cannot satisfy the process ratchet.
+- Reuse one independent, test-owned binary batch reader across quick-adoption
+  and bootstrap expected-evidence fixtures without making expected evidence
+  depend on either production transport implementation.
+- Keep the separately implemented self-HEAD expected reader on one local batch
+  process and make TEST-0162 reject a restored per-blob path in any of the
+  three expected-evidence readers.
+- Harden every repository-owned instruction-graph batch transport against the
+  Windows PowerShell 5.1 stdin preamble hazard: production and test readers
+  must capture, write, flush, and close a no-BOM raw pipe, restore ambient
+  encoding, and pass a preamble-bearing regression without rebuilding fixtures.
+- Prove the immutable 175-blob workload changes from 175 blob-process starts
+  to exactly one per production actor while retaining all 175 requests and the
+  exact graph bytes, counts, request order, and digest.
+- Exercise the transport and measurement contracts locally under Windows
+  PowerShell 5.1 and PowerShell 7, while retaining Linux PowerShell 7 as a
+  required hosted gate; malformed framing, budget, timeout, replace-object,
+  cleanup, and parity failures remain blocking.
+- Treat elapsed time as observational evidence only: the deterministic process
+  reduction is proven, but current results do not establish a wall-clock
+  improvement.
+
+Related work: [FEAT-0040](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md),
+`TASK-0002`, and [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+Delivery and publication evidence is owned separately by
+[issue #101](https://github.com/hasanmanzak/meAndAI/issues/101).
+
 ## 0.13.0 - 2026-07-22
 
 ### Added

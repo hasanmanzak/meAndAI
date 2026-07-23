@@ -1,16 +1,33 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-22**<br>
-Protocol version: **0.13.0**
+Last reviewed: **2026-07-23**<br>
+Protocol version: **0.13.1**<br>
+Latest immutable release: **0.13.0**
 
-The immutable v0.12.7 release is published at commit
-`6b01299cfe484c900944b7435d4fef43b11fc38d`; [issue #96](https://github.com/hasanmanzak/meAndAI/issues/96)
-and [PR #97](https://github.com/hasanmanzak/meAndAI/pull/97) retain its delivery
-evidence. `0.13.0` identifies the local FEAT-0039 development tree on
-`codex/task-0001-reusable-fixture-guardrails`; it is not a published release.
-[Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) is the external
-tracking authority for this candidate.
+The immutable v0.13.0 release is published at commit
+`299b8982cd57961e2b3a6136b07af3bfb49a16d1`; [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95)
+and [PR #99](https://github.com/hasanmanzak/meAndAI/pull/99) retain its delivery,
+asset, cleanup, and post-publication evidence. [FEAT-0040](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
+and [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+own the bounded v0.13.1 residual runtime correction on
+`codex/task-0002-batched-instruction-graph-transport`. Production and
+independent expected-reader implementation is complete through commits
+`78c8706e9d4d4f4c020d983b22114165687b475e` and
+`55764442820c884e8c3115726bb010a0a9004d77`; follow the
+[implementation handoff](log/2026-07-22-v0131-batched-instruction-graph-implementation.md).
+`WindowsNative`, the one budgeted Full suite, and bounded local convergence are
+complete. [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
+[issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) now own the
+separate delivery/publication path, while issue #98 remains open for
+`FIND-0204`. Exact-head hosted run 29963388824 then exposed and locally resolved
+`FIND-0206`, a Windows PowerShell 5.1 BOM-prefixed stdin defect in the
+independent self-HEAD test reader; both test-owned batch readers now share one
+ordered no-BOM raw-pipe guard, and the existing self-HEAD fixture proves the
+ambient-encoding boundary on PS5.1 and PS7. Replacement hosted, merge, and
+release evidence remain pending external facts; elapsed results establish no
+wall-clock improvement. Follow the
+[hosted Windows stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer
