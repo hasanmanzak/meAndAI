@@ -16,8 +16,9 @@ Last verified: **2026-07-23**
   [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
 - Current scope: [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
-  `BUG-0025`, `SUBF-0082`, and [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106)
-  govern the v0.13.4 case-safe review-authority correction on
+  `BUG-0025`, `SUBF-0082`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106),
+  and [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107) govern the
+  v0.13.4 case-safe review-authority correction on
   `codex/bug-0025-case-safe-review-authority`. TEST-0167 and TEST-0168 belong
   to the existing capability-review suite. The change treats only GitHub owner
   and repository-name components as case-insensitive identity while preserving

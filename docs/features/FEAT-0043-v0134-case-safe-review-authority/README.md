@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.13.4 |
 | Issue | [#106](https://github.com/hasanmanzak/meAndAI/issues/106) |
-| Pull request | Pending |
+| Pull request | [#107](https://github.com/hasanmanzak/meAndAI/pull/107) |
 | Decisions | [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md) and [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) |
 | Tests | [TEST-0167 and TEST-0168](test-cases.md) |
 
@@ -171,7 +171,7 @@ No URL, authorization, provenance, ledger, or cleanup boundary was widened.
 | Field | Evidence |
 | --- | --- |
 | External evidence authority | [Issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) |
-| Pull request | Pending |
+| Pull request | [#107](https://github.com/hasanmanzak/meAndAI/pull/107) |
 | Release authority | Pending |
 | Release identifier | Pending |
 | Target commit | Pending |

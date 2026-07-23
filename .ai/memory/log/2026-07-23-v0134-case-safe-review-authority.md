@@ -6,7 +6,7 @@
 - Governing decisions: [DEC-0025](../../../docs/decisions/DEC-0025-exact-head-personal-owner-attestation.md)
   and [DEC-0026](../../../docs/decisions/DEC-0026-historical-capability-review-recovery.md)
 - Tracking: [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106)
-- Delivery: Pending
+- Delivery: [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107)
 - Tests: [TEST-0167 and TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md)
 
 ## Verified problem

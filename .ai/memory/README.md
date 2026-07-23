@@ -14,7 +14,8 @@ remains the separate runtime residual owner.
 
 [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md)
 / `BUG-0025`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106),
-and `SUBF-0082` own the bounded v0.13.4 case-safe repository-identity
+[PR #107](https://github.com/hasanmanzak/meAndAI/pull/107), and `SUBF-0082`
+own the bounded v0.13.4 case-safe repository-identity
 correction on `codex/bug-0025-case-safe-review-authority`. The correction may
 fold only GitHub owner and repository-name components while every PR number,
 head, authority, provenance, ledger, and cleanup gate remains strict.

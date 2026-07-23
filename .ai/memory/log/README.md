@@ -12,11 +12,12 @@ owned by TASK-0002 / issue #98.
 
 [FEAT-0043](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
 `BUG-0025`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106), and
-`SUBF-0082` govern the v0.13.4 case-safe repository-identity correction on
-`codex/bug-0025-case-safe-review-authority`. Follow the
+`SUBF-0082` govern the v0.13.4 case-safe repository-identity correction in
+[PR #107](https://github.com/hasanmanzak/meAndAI/pull/107). Follow the
 [v0.13.4 handoff](2026-07-23-v0134-case-safe-review-authority.md).
-TEST-0167/0168, test-first evidence, corrected evidence, bounded review, hosted
-delivery, immutable release, and consumer-side recovery remain pending.
+TEST-0167/0168, test-first evidence, corrected evidence, and bounded review are
+complete; hosted delivery, immutable release, and consumer-side recovery remain
+pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
