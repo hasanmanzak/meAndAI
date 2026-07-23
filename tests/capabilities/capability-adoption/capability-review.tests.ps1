@@ -31,6 +31,90 @@ function Assert-ThrowsLike {
     throw "$Message No error was thrown."
 }
 
+function Get-TestGitBlobSha {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    $prefix = [Text.Encoding]::ASCII.GetBytes(
+        "blob $($Bytes.Length)$([char]0)"
+    )
+    $payload = [byte[]]::new($prefix.Length + $Bytes.Length)
+    [Array]::Copy($prefix, 0, $payload, 0, $prefix.Length)
+    [Array]::Copy($Bytes, 0, $payload, $prefix.Length, $Bytes.Length)
+    $algorithm = [Security.Cryptography.SHA1]::Create()
+    try {
+        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
+            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
+        })
+    }
+    finally {
+        $algorithm.Dispose()
+    }
+}
+
+function Test-TestBytesEqual {
+    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
+
+    if ($null -eq $Left -or $null -eq $Right) {
+        return $null -eq $Left -and $null -eq $Right
+    }
+    if ($Left.Length -ne $Right.Length) {
+        return $false
+    }
+    for ($index = 0; $index -lt $Left.Length; $index++) {
+        if ($Left[$index] -ne $Right[$index]) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function New-TestCapabilityReviewBody {
+    param(
+        [Parameter(Mandatory)]$Plan,
+        [Parameter(Mandatory)][int]$LedgerPrefixCount,
+        [Parameter(Mandatory)][long]$ProposalActorId,
+        [Parameter(Mandatory)][string]$ProposalActorLogin,
+        [Parameter(Mandatory)][long]$IssueActorId,
+        [Parameter(Mandatory)][string]$IssueActorLogin,
+        [ValidateRange(0, 2147483647)][int]$IssueNumber = 0,
+        [string]$HandoffHead = 'pending',
+        [string]$BaseLedgerDigest = 'missing'
+    )
+
+    $tick = [string][char]96
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add([string]$Plan.Marker)
+    $lines.Add('')
+    $lines.Add('This is a review-only meAndAI semantic capability handoff.')
+    $lines.Add('Automation owns only the transient manifest; semantic consumer changes require maintainer review.')
+    $lines.Add('')
+    $lines.Add("Catalog digest: $tick$($Plan.CatalogDigest)$tick")
+    $lines.Add("Batch digest: $tick$($Plan.BatchDigest)$tick")
+    $lines.Add("Base branch: $tick$($Plan.BaseBranch)$tick")
+    $lines.Add("Base head: $tick$($Plan.BaseHead)$tick")
+    $lines.Add("Base ledger digest: $tick$BaseLedgerDigest$tick")
+    $lines.Add("Review branch: $tick$($Plan.Branch)$tick")
+    $lines.Add("Handoff head: $tick$HandoffHead$tick")
+    $lines.Add("Ledger prefix count: $tick$LedgerPrefixCount$tick")
+    $lines.Add("Proposal actor ID: $tick$ProposalActorId$tick")
+    $lines.Add("Proposal actor login: $tick$ProposalActorLogin$tick")
+    $lines.Add("Issue actor ID: $tick$IssueActorId$tick")
+    $lines.Add("Issue actor login: $tick$IssueActorLogin$tick")
+    if ($IssueNumber -gt 0) {
+        $lines.Add("Tracking issue: $tick$IssueNumber$tick")
+        $lines.Add('')
+        $lines.Add("Tracking issue: #$IssueNumber")
+    }
+    $lines.Add('')
+    $lines.Add('Capability batch:')
+    foreach ($capability in @($Plan.CapabilityBatch)) {
+        $lines.Add(
+            "- $([string]$capability.Slug)@$([string]$capability.DefinitionBlob) ($([string]$capability.Outcome))"
+        )
+    }
+    return ($lines -join "`n") + "`n"
+}
+
 $catalogDigest = 'a' * 64
 $definitionBlob = 'b' * 40
 $baseHead = 'c' * 40
@@ -620,6 +704,9 @@ try {
         ForceLedgerMismatch = $false
         DirtyManagedPaths = $false
         PullHeadRepository = 'hasanmanzak/consumer'
+        HistoricalReview = $null
+        HistoricalMutationCalls = [System.Collections.Generic.List[string]]::new()
+        HistoricalEvidenceCalls = [System.Collections.Generic.List[string]]::new()
     }
     $apiState.Reviews.Add([pscustomobject]@{
         state = 'APPROVED'
@@ -629,11 +716,27 @@ try {
     })
     $gitRuntime = {
         param([string[]]$Arguments, [int[]]$AllowedExitCodes)
+        $commandText = $Arguments -join ' '
+        $workingRoot = if ($Arguments.Count -ge 2 -and
+            $Arguments[0] -ceq '-C') {
+            [string]$Arguments[1]
+        }
+        else {
+            ''
+        }
         $text = if ($Arguments -contains '--show-toplevel') {
             $fixtureRoot
         }
         elseif ($Arguments -contains 'get-url') {
-            'https://github.com/hasanmanzak/consumer.git'
+            if ($workingRoot -ceq $root) {
+                if ($null -ne $apiState.HistoricalReview) {
+                    $apiState.HistoricalEvidenceCalls.Add('protocol-origin')
+                }
+                'https://github.com/hasanmanzak/meAndAI.git'
+            }
+            else {
+                'https://github.com/hasanmanzak/consumer.git'
+            }
         }
         elseif ($Arguments -contains 'status') {
             if ($apiState.DirtyManagedPaths) {
@@ -643,10 +746,111 @@ try {
                 ''
             }
         }
-        elseif ($Arguments -contains 'HEAD') {
+        elseif ($workingRoot -ceq $fixtureRoot -and
+            $Arguments -contains 'rev-parse' -and
+            $Arguments[-1] -ceq 'HEAD') {
             [string]$apiState.DefaultHead
         }
+        elseif ($null -ne $apiState.HistoricalReview -and
+            $workingRoot -ceq $fixtureRoot -and
+            $Arguments -contains 'ls-tree' -and
+            $Arguments -contains '.ai/protocol') {
+            if ($Arguments -cnotcontains
+                [string]$apiState.HistoricalReview.BaseHead) {
+                throw 'TEST-0166 historical catalog was not resolved from the exact review BaseHead.'
+            }
+            $apiState.HistoricalEvidenceCalls.Add('base-gitlink')
+            if ($apiState.HistoricalReview.MissingBaseGitlink) {
+                ''
+            }
+            else {
+                "160000 commit $($apiState.HistoricalReview.ProtocolCommit)`t.ai/protocol"
+            }
+        }
+        elseif ($null -ne $apiState.HistoricalReview -and
+            $workingRoot -ceq $root -and
+            $Arguments -contains 'rev-parse' -and
+            $commandText.Contains('refs/tags/')) {
+            $apiState.HistoricalEvidenceCalls.Add('tag-peel')
+            if ($apiState.HistoricalReview.MissingReleaseTag) {
+                return [pscustomobject][ordered]@{
+                    ExitCode = 1
+                    Output = @()
+                    Text = ''
+                }
+            }
+            [string]$apiState.HistoricalReview.ProtocolCommit
+        }
+        elseif ($null -ne $apiState.HistoricalReview -and
+            $workingRoot -ceq $root -and
+            $Arguments -contains 'cat-file' -and
+            $Arguments -contains '-e') {
+            $apiState.HistoricalEvidenceCalls.Add('protocol-commit')
+            ''
+        }
+        elseif ($null -ne $apiState.HistoricalReview -and
+            $workingRoot -ceq $root -and
+            $Arguments -contains 'merge-base' -and
+            $Arguments -contains '--is-ancestor' -and
+            $Arguments -contains $apiState.HistoricalReview.ProtocolCommit) {
+            $apiState.HistoricalEvidenceCalls.Add('protocol-ancestor')
+            if ($apiState.HistoricalReview.ProtocolCommitNotAncestor) {
+                return [pscustomobject][ordered]@{
+                    ExitCode = 1
+                    Output = @()
+                    Text = ''
+                }
+            }
+            ''
+        }
+        elseif ($null -ne $apiState.HistoricalReview -and
+            $workingRoot -ceq $fixtureRoot -and
+            $Arguments -contains 'push' -and
+            $commandText.Contains(
+                ":refs/heads/$($apiState.HistoricalReview.Branch)"
+            )) {
+            $apiState.HistoricalEvidenceCalls.Add('branch-delete-lease')
+            if (-not $commandText.Contains(
+                "--force-with-lease=refs/heads/$($apiState.HistoricalReview.Branch):$($apiState.HistoricalReview.ReviewHead)"
+            )) {
+                throw 'TEST-0166 historical branch deletion omitted the exact expected-head lease.'
+            }
+            if ($apiState.HistoricalReview.BranchLeaseRace) {
+                return [pscustomobject][ordered]@{
+                    ExitCode = 1
+                    Output = @('stale info')
+                    Text = 'stale info'
+                }
+            }
+            $apiState.HistoricalReview.BranchExists = $false
+            $apiState.HistoricalMutationCalls.Add('DeleteHistoricalBranch')
+            ''
+        }
+        elseif ($workingRoot -ceq $fixtureRoot -and
+            $Arguments -contains 'push' -and
+            $commandText.Contains(
+                ':refs/heads/automation/meandai-capability-review-'
+            )) {
+            $currentBranch = 'automation/meandai-capability-review-' +
+                $releaseCatalog.CatalogDigest.Substring(0, 16)
+            if (-not $commandText.Contains(
+                "--force-with-lease=refs/heads/$currentBranch`:$($apiState.BranchHead)"
+            )) {
+                throw 'TEST-0140 capability branch deletion omitted the exact expected-head lease.'
+            }
+            $apiState.BranchCreated = $false
+            ''
+        }
         elseif ($Arguments -contains 'merge-base') {
+            if ($null -ne $apiState.HistoricalReview -and
+                ($Arguments -contains $apiState.HistoricalReview.MergeCommit) -and
+                $apiState.HistoricalReview.DefaultContainmentFailure) {
+                return [pscustomobject][ordered]@{
+                    ExitCode = 1
+                    Output = @()
+                    Text = ''
+                }
+            }
             return [pscustomobject][ordered]@{
                 ExitCode = 0
                 Output = @()
@@ -672,11 +876,32 @@ try {
         )
         $apiState.Calls.Add("$Authority $Method $Endpoint")
         $issueEndpoint = $Endpoint -match '^repos/hasanmanzak/consumer/issues(?:[/?]|$)'
-        if ($issueEndpoint -and $Authority -cne 'Issue') {
+        $protocolEndpoint =
+            $Endpoint -match '^repos/hasanmanzak/meAndAI/(?:releases|commits)(?:[/?]|$)'
+        if ($protocolEndpoint -and $Authority -cne 'Protocol') {
+            throw "TEST-0166 protocol endpoint used '$Authority' authority: $Endpoint"
+        }
+        if (-not $protocolEndpoint -and
+            $issueEndpoint -and $Authority -cne 'Issue') {
             throw "TEST-0140 issue endpoint used '$Authority' authority: $Endpoint"
         }
-        if (-not $issueEndpoint -and $Authority -cne 'Proposal') {
+        if (-not $protocolEndpoint -and -not $issueEndpoint -and
+            $Authority -cne 'Proposal') {
             throw "TEST-0140 proposal endpoint used '$Authority' authority: $Endpoint"
+        }
+        if ($Method -ceq 'GET' -and
+            $Endpoint -match '^repos/hasanmanzak/meAndAI/releases/tags/') {
+            if ($null -eq $apiState.HistoricalReview) {
+                throw 'TEST-0166 historical release evidence was requested without a scenario.'
+            }
+            $apiState.HistoricalEvidenceCalls.Add('immutable-release')
+            return [pscustomobject]@{
+                tag_name = [string]$apiState.HistoricalReview.ProtocolTag
+                draft = $false
+                prerelease = $false
+                immutable = -not $apiState.HistoricalReview.ReleaseNotImmutable
+                published_at = '2026-07-19T00:00:00Z'
+            }
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -ceq 'repos/hasanmanzak/consumer') {
@@ -729,7 +954,42 @@ try {
                     user = $apiState.IssueActor
                 })
             }
+            if ($null -ne $apiState.HistoricalReview) {
+                for ($copy = 0; $copy -lt
+                    $apiState.HistoricalReview.IssueCopies; $copy++) {
+                    $items.Add([pscustomobject]@{
+                        number = [long]$apiState.HistoricalReview.IssueNumber +
+                            $copy
+                        state = if ($apiState.HistoricalReview.IssueClosed) {
+                            'closed'
+                        } else {
+                            'open'
+                        }
+                        body = [string]$apiState.HistoricalReview.IssueBody
+                        user = $apiState.IssueActor
+                    })
+                }
+            }
             return @($items)
+        }
+        if ($Method -ceq 'GET' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/issues/$($apiState.HistoricalReview.IssueNumber)/comments\?") {
+            return @($apiState.HistoricalReview.ClosureComments)
+        }
+        if ($Method -ceq 'GET' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/issues/$($apiState.HistoricalReview.IssueNumber)$") {
+            return [pscustomobject]@{
+                number = [long]$apiState.HistoricalReview.IssueNumber
+                state = if ($apiState.HistoricalReview.IssueClosed) {
+                    'closed'
+                } else {
+                    'open'
+                }
+                body = [string]$apiState.HistoricalReview.IssueBody
+                user = $apiState.IssueActor
+            }
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/issues/91/comments\?') {
@@ -746,6 +1006,21 @@ try {
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/git/ref/heads/') {
+            if ($null -ne $apiState.HistoricalReview -and
+                $Endpoint.EndsWith(
+                    [Uri]::EscapeDataString(
+                        [string]$apiState.HistoricalReview.Branch
+                    )
+                )) {
+                if ($apiState.HistoricalReview.BranchExists) {
+                    return [pscustomobject]@{
+                        object = [pscustomobject]@{
+                            sha = [string]$apiState.HistoricalReview.ReviewHead
+                        }
+                    }
+                }
+                return $null
+            }
             if ($apiState.BranchCreated) {
                 return [pscustomobject]@{
                     object = [pscustomobject]@{
@@ -757,38 +1032,86 @@ try {
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/pulls\?state=all') {
-            if ($apiState.PullCreated) {
-                return @(
-                    [pscustomobject]@{
-                        number = 92
-                        state = if ($apiState.PullMerged) { 'closed' } else { 'open' }
-                        merged_at = if ($apiState.PullMerged) {
+            $pullItems = [System.Collections.Generic.List[object]]::new()
+            if ($null -ne $apiState.HistoricalReview) {
+                for ($copy = 0; $copy -lt
+                    $apiState.HistoricalReview.PullCopies; $copy++) {
+                    $historicalState =
+                        [string]$apiState.HistoricalReview.PullState
+                    $pullItems.Add([pscustomobject]@{
+                        number = [long]$apiState.HistoricalReview.PullNumber +
+                            $copy
+                        state = if ($historicalState -ceq 'Open') {
+                            'open'
+                        } else {
+                            'closed'
+                        }
+                        merged_at = if ($historicalState -ceq 'Merged') {
                             '2026-07-19T00:01:00Z'
                         } else {
                             $null
                         }
-                        merge_commit_sha = if ($apiState.PullMerged) {
-                            [string]$apiState.MergeCommit
+                        merge_commit_sha = if (
+                            $historicalState -ceq 'Merged'
+                        ) {
+                            [string]$apiState.HistoricalReview.MergeCommit
                         } else {
                             $null
                         }
-                        draft = -not $apiState.PullMerged
-                        body = $apiState.PullBody.body
+                        draft = $historicalState -ceq 'Open'
+                        body = [string]$apiState.HistoricalReview.PullBody
                         head = [pscustomobject]@{
-                            ref = [string]$apiState.PullBody.head
-                            sha = $apiState.BranchHead
+                            ref = [string]$apiState.HistoricalReview.Branch
+                            sha = [string]$apiState.HistoricalReview.ReviewHead
                             repo = [pscustomobject]@{
-                                full_name = [string]$apiState.PullHeadRepository
+                                full_name = 'hasanmanzak/consumer'
                             }
                         }
-                        base = [pscustomobject]@{
-                            ref = [string]$apiState.PullBody.base
-                        }
+                        base = [pscustomobject]@{ ref = 'main' }
                         user = $apiState.ProposalActor
-                    }
-                )
+                    })
+                }
             }
-            return @()
+            if ($apiState.PullCreated) {
+                $pullItems.Add([pscustomobject]@{
+                    number = 92
+                    state = if ($apiState.PullMerged) { 'closed' } else { 'open' }
+                    merged_at = if ($apiState.PullMerged) {
+                        '2026-07-19T00:01:00Z'
+                    } else {
+                        $null
+                    }
+                    merge_commit_sha = if ($apiState.PullMerged) {
+                        [string]$apiState.MergeCommit
+                    } else {
+                        $null
+                    }
+                    draft = -not $apiState.PullMerged
+                    body = $apiState.PullBody.body
+                    head = [pscustomobject]@{
+                        ref = [string]$apiState.PullBody.head
+                        sha = $apiState.BranchHead
+                        repo = [pscustomobject]@{
+                            full_name = [string]$apiState.PullHeadRepository
+                        }
+                    }
+                    base = [pscustomobject]@{
+                        ref = [string]$apiState.PullBody.base
+                    }
+                    user = $apiState.ProposalActor
+                })
+            }
+            return @($pullItems)
+        }
+        if ($Method -ceq 'GET' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/pulls/$($apiState.HistoricalReview.PullNumber)/reviews\?") {
+            return @($apiState.HistoricalReview.Reviews)
+        }
+        if ($Method -ceq 'GET' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/issues/$($apiState.HistoricalReview.PullNumber)/comments\?") {
+            return @($apiState.HistoricalReview.AttestationComments)
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/pulls/92/reviews\?') {
@@ -834,9 +1157,91 @@ try {
             )
         }
         if ($Method -ceq 'GET' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/pulls/$($apiState.HistoricalReview.PullNumber)/commits\?") {
+            return @(
+                [pscustomobject]@{
+                    sha = [string]$apiState.HistoricalReview.HandoffHead
+                },
+                [pscustomobject]@{
+                    sha = [string]$apiState.HistoricalReview.ReviewHead
+                }
+            )
+        }
+        if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/contents/(?<path>[^?]+)\?ref=(?<ref>[0-9a-f]{40})$') {
             $path = [string]$Matches.path
             $ref = [string]$Matches.ref
+            if ($null -ne $apiState.HistoricalReview) {
+                $historical = $apiState.HistoricalReview
+                if ($path -ceq '.ai/adoption/meandai-capability-review.json') {
+                    if ($ref -ceq [string]$historical.HandoffHead) {
+                        return [pscustomobject]@{
+                            type = 'file'
+                            sha = ('8' * 40)
+                            encoding = 'base64'
+                            content = [Convert]::ToBase64String(
+                                [byte[]]$historical.ManifestBytes
+                            )
+                        }
+                    }
+                    if ($historical.ManifestOnReviewedTree -and
+                        ($ref -ceq [string]$historical.ReviewHead -or
+                         $ref -ceq [string]$historical.MergeCommit -or
+                         $ref -ceq [string]$apiState.DefaultHead)) {
+                        return [pscustomobject]@{
+                            type = 'file'
+                            sha = ('8' * 40)
+                            encoding = 'base64'
+                            content = [Convert]::ToBase64String(
+                                [byte[]]$historical.ManifestBytes
+                            )
+                        }
+                    }
+                    if (@(
+                        [string]$historical.BaseHead,
+                        [string]$historical.ReviewHead,
+                        [string]$historical.MergeCommit,
+                        [string]$apiState.DefaultHead
+                    ) -ccontains $ref) {
+                        return $null
+                    }
+                }
+                if ($path -ceq '.ai/meandai-capabilities-state.json') {
+                    if ($ref -ceq [string]$historical.BaseHead -or
+                        $ref -ceq [string]$historical.HandoffHead) {
+                        return $null
+                    }
+                    if (@(
+                        [string]$historical.ReviewHead,
+                        [string]$historical.MergeCommit,
+                        [string]$apiState.DefaultHead
+                    ) -ccontains $ref) {
+                        $historicalLedger = if (
+                            $historical.ReviewTreeLedgerMismatch -and
+                            $ref -ceq [string]$historical.ReviewHead
+                        ) {
+                            [Text.UTF8Encoding]::new($false).GetBytes(
+                                '{"schema":1,"assessments":[]}' + "`n"
+                            )
+                        }
+                        elseif ($ref -ceq [string]$apiState.DefaultHead) {
+                            [byte[]]$historical.CurrentLedgerBytes
+                        }
+                        else {
+                            [byte[]]$historical.HistoricalLedgerBytes
+                        }
+                        return [pscustomobject]@{
+                            type = 'file'
+                            sha = ('7' * 40)
+                            encoding = 'base64'
+                            content = [Convert]::ToBase64String(
+                                $historicalLedger
+                            )
+                        }
+                    }
+                }
+            }
             $handoffHead = '4' * 40
             $reviewedTree = $ref -ceq [string]$apiState.BranchHead -and
                 $apiState.PullMerged
@@ -903,6 +1308,19 @@ try {
         }
         if ($Method -ceq 'GET' -and
             $Endpoint -match '^repos/.+/git/commits/') {
+            if ($null -ne $apiState.HistoricalReview -and
+                $Endpoint.EndsWith(
+                    [string]$apiState.HistoricalReview.HandoffHead
+                )) {
+                return [pscustomobject]@{
+                    tree = [pscustomobject]@{ sha = ('2' * 40) }
+                    parents = @(
+                        [pscustomobject]@{
+                            sha = [string]$apiState.HistoricalReview.BaseHead
+                        }
+                    )
+                }
+            }
             return [pscustomobject]@{
                 tree = [pscustomobject]@{ sha = ('2' * 40) }
                 parents = @(
@@ -921,7 +1339,7 @@ try {
             return [pscustomobject]@{
                 sha = ('4' * 40)
                 parents = @(
-                    [pscustomobject]@{ sha = $fixtureHead }
+                    [pscustomobject]@{ sha = [string]$Body.parents[0] }
                 )
             }
         }
@@ -965,8 +1383,39 @@ try {
         }
         if ($Method -ceq 'DELETE' -and
             $Endpoint -match '^repos/.+/git/ref/heads/') {
+            if ($null -ne $apiState.HistoricalReview -and
+                $Endpoint.EndsWith(
+                    [Uri]::EscapeDataString(
+                        [string]$apiState.HistoricalReview.Branch
+                    )
+                )) {
+                throw 'TEST-0166 historical branch deletion bypassed the Git expected-head lease.'
+            }
             $apiState.BranchCreated = $false
             return $null
+        }
+        if ($Method -ceq 'POST' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/issues/$($apiState.HistoricalReview.IssueNumber)/comments$") {
+            $comment = [pscustomobject]@{
+                body = [string]$Body.body
+                user = $apiState.IssueActor
+            }
+            $apiState.HistoricalReview.ClosureComments.Add($comment)
+            $apiState.HistoricalMutationCalls.Add('CommentHistoricalIssue')
+            return $comment
+        }
+        if ($Method -ceq 'PATCH' -and
+            $null -ne $apiState.HistoricalReview -and
+            $Endpoint -match "^repos/.+/issues/$($apiState.HistoricalReview.IssueNumber)$") {
+            $apiState.HistoricalReview.IssueClosed =
+                [string]$Body.state -ceq 'closed'
+            $apiState.HistoricalMutationCalls.Add('CloseHistoricalIssue')
+            return [pscustomobject]@{
+                number = [long]$apiState.HistoricalReview.IssueNumber
+                state = [string]$Body.state
+                body = [string]$apiState.HistoricalReview.IssueBody
+            }
         }
         if ($Method -ceq 'POST' -and
             $Endpoint -match '^repos/.+/issues/91/comments$') {
@@ -1564,6 +2013,523 @@ try {
         'TEST-0140 production completed rerun was not an exact no-op.'
     Assert-Equal $apiState.ClosureComments.Count 1 `
         'TEST-0140 completed rerun duplicated closure evidence.'
+
+    # TEST-0165: a trusted historical review may be retired only after its
+    # original release catalog is reconstructed from immutable repository
+    # evidence. Recovery then performs one fresh current-catalog discovery.
+    $historicalCatalogRoot = Join-Path $fixtureRoot 'historical-capabilities'
+    [void](New-Item -ItemType Directory -Path $historicalCatalogRoot)
+    $historicalDefinitionBytes = [IO.File]::ReadAllBytes(
+        (Join-Path $root 'capabilities/test-architecture.json')
+    )
+    $historicalIndex = [ordered]@{
+        schema = 1
+        capabilities = @(
+            [ordered]@{
+                slug = 'test-architecture'
+                definition = 'test-architecture.json'
+                type = 'Semantic'
+                definitionBlob = [string]$releaseCatalog.Capabilities[0].DefinitionBlob
+            }
+        )
+    }
+    $historicalCatalogBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        (($historicalIndex | ConvertTo-Json -Depth 10).Replace(
+            "`r`n",
+            "`n"
+        ) + "`n")
+    )
+    [IO.File]::WriteAllBytes(
+        (Join-Path $historicalCatalogRoot 'index.json'),
+        $historicalCatalogBytes
+    )
+    [IO.File]::WriteAllBytes(
+        (Join-Path $historicalCatalogRoot 'test-architecture.json'),
+        $historicalDefinitionBytes
+    )
+    $historicalCatalog = Import-MeAndAICapabilityCatalog -IndexPath (
+        Join-Path $historicalCatalogRoot 'index.json'
+    )
+
+    $alternateDefinitionText = (
+        [Text.UTF8Encoding]::new($false, $true).GetString(
+            $historicalDefinitionBytes
+        )
+    ).Replace(
+        'Capability-based test architecture',
+        'Incompatible historical test architecture'
+    )
+    $alternateDefinitionBytes =
+        [Text.UTF8Encoding]::new($false).GetBytes($alternateDefinitionText)
+    $alternateDefinitionBlob = Get-TestGitBlobSha -Bytes (
+        $alternateDefinitionBytes
+    )
+    $alternateIndex = [ordered]@{
+        schema = 1
+        capabilities = @(
+            [ordered]@{
+                slug = 'test-architecture'
+                definition = 'test-architecture.json'
+                type = 'Semantic'
+                definitionBlob = $alternateDefinitionBlob
+            }
+        )
+    }
+    $alternateCatalogBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        (($alternateIndex | ConvertTo-Json -Depth 10).Replace(
+            "`r`n",
+            "`n"
+        ) + "`n")
+    )
+    $alternateCatalogRoot = Join-Path $fixtureRoot 'alternate-capabilities'
+    [void](New-Item -ItemType Directory -Path $alternateCatalogRoot)
+    [IO.File]::WriteAllBytes(
+        (Join-Path $alternateCatalogRoot 'index.json'),
+        $alternateCatalogBytes
+    )
+    [IO.File]::WriteAllBytes(
+        (Join-Path $alternateCatalogRoot 'test-architecture.json'),
+        $alternateDefinitionBytes
+    )
+    $alternateCatalog = Import-MeAndAICapabilityCatalog -IndexPath (
+        Join-Path $alternateCatalogRoot 'index.json'
+    )
+
+    $historicalBaseHead = 'f' * 40
+    $historicalHandoffHead = '8' * 40
+    $historicalReviewHead = '9' * 40
+    $historicalMergeCommit = 'a' * 40
+    $historicalDefaultHead = 'b' * 40
+    $historicalProtocolCommit = 'c' * 40
+    $historicalIssueNumber = 93
+    $historicalPullNumber = 94
+
+    $newHistoricalReviewState = {
+        param(
+            [Parameter(Mandatory)]$SourceCatalog,
+            [Parameter(Mandatory)][byte[]]$SourceCatalogBytes,
+            [Parameter(Mandatory)][byte[]]$SourceDefinitionBytes
+        )
+
+        $sourceAssessment = Resolve-MeAndAICapabilityAssessment `
+            -Capability $SourceCatalog.Capabilities[0] `
+            -Applicability Unknown -Conformance Unknown `
+            -AdoptionPlan Ambiguous
+        $sourcePlan = Resolve-MeAndAICapabilityReview `
+            -Catalog $SourceCatalog `
+            -Ledger (Import-MeAndAICapabilityLedger `
+                -Catalog $SourceCatalog -Bytes $null) `
+            -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+            -DefaultHead $historicalBaseHead -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -Assessments @($sourceAssessment)
+        $sourceIssueBody = New-TestCapabilityReviewBody `
+            -Plan $sourcePlan -LedgerPrefixCount 0 `
+            -ProposalActorId 101 -ProposalActorLogin 'meandai-bot' `
+            -IssueActorId 41898282 `
+            -IssueActorLogin 'github-actions[bot]'
+        $sourcePullBody = New-TestCapabilityReviewBody `
+            -Plan $sourcePlan -LedgerPrefixCount 0 `
+            -ProposalActorId 101 -ProposalActorLogin 'meandai-bot' `
+            -IssueActorId 41898282 `
+            -IssueActorLogin 'github-actions[bot]' `
+            -IssueNumber $historicalIssueNumber `
+            -HandoffHead $historicalHandoffHead
+        $manifest = [ordered]@{
+            schema = 1
+            marker = [string]$sourcePlan.Marker
+            catalogDigest = [string]$sourcePlan.CatalogDigest
+            batchDigest = [string]$sourcePlan.BatchDigest
+            repository = 'hasanmanzak/consumer'
+            baseBranch = 'main'
+            baseHead = $historicalBaseHead
+            baseLedgerDigest = 'missing'
+            branch = [string]$sourcePlan.Branch
+            issueNumber = $historicalIssueNumber
+            ledgerPrefixCount = 0
+            proposalActorId = 101
+            proposalActorLogin = 'meandai-bot'
+            issueActorId = 41898282
+            issueActorLogin = 'github-actions[bot]'
+            capabilities = @(
+                [ordered]@{
+                    slug = [string]$sourcePlan.CapabilityBatch[0].Slug
+                    definitionBlob =
+                        [string]$sourcePlan.CapabilityBatch[0].DefinitionBlob
+                    type = [string]$sourcePlan.CapabilityBatch[0].Type
+                    outcome = [string]$sourcePlan.CapabilityBatch[0].Outcome
+                }
+            )
+        }
+        $sourceManifestBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+            (($manifest | ConvertTo-Json -Compress -Depth 30) + "`n")
+        )
+        $sourceEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $SourceCatalog.Capabilities[0] -Outcome Conforming `
+            -Evidence @('Reviewed project-neutral historical topology evidence.') `
+            -ReviewIdentity "pull-request:$historicalPullNumber" `
+            -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$historicalPullNumber" `
+            -ReviewedAt '2026-07-19T00:00:00Z'
+        $sourceLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+            -Catalog $SourceCatalog -Entries @($sourceEntry)
+        $currentPrefixEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $releaseCatalog.Capabilities[0] -Outcome Conforming `
+            -Evidence @('Reviewed project-neutral historical topology evidence.') `
+            -ReviewIdentity "pull-request:$historicalPullNumber" `
+            -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$historicalPullNumber" `
+            -ReviewedAt '2026-07-19T00:00:00Z'
+        $currentSuffixEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $releaseCatalog.Capabilities[1] -Outcome Conforming `
+            -Evidence @('Reviewed appended current capability evidence.') `
+            -ReviewIdentity 'pull-request:95' `
+            -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
+            -ReviewedAt '2026-07-20T00:00:00Z'
+        $currentLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+            -Catalog $releaseCatalog -Entries @(
+                $currentPrefixEntry,
+                $currentSuffixEntry
+            )
+        return [pscustomobject][ordered]@{
+            CatalogBytes = $SourceCatalogBytes
+            DefinitionBytes = $SourceDefinitionBytes
+            VersionBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+                "0.12.0`n"
+            )
+            ProtocolCommit = $historicalProtocolCommit
+            ProtocolTag = 'v0.12.0'
+            BaseHead = $historicalBaseHead
+            HandoffHead = $historicalHandoffHead
+            ReviewHead = $historicalReviewHead
+            MergeCommit = $historicalMergeCommit
+            Branch = [string]$sourcePlan.Branch
+            IssueNumber = $historicalIssueNumber
+            PullNumber = $historicalPullNumber
+            IssueBody = $sourceIssueBody
+            PullBody = $sourcePullBody
+            ManifestBytes = $sourceManifestBytes
+            HistoricalLedgerBytes = [byte[]]$sourceLedgerBytes
+            CurrentLedgerBytes = [byte[]]$currentLedgerBytes
+            IssueCopies = 1
+            PullCopies = 1
+            IssueClosed = $false
+            PullState = 'Merged'
+            BranchExists = $true
+            ClosureComments = [System.Collections.Generic.List[object]]::new()
+            AttestationComments = [System.Collections.Generic.List[object]]::new()
+            Reviews = [System.Collections.Generic.List[object]]::new()
+            MissingBaseGitlink = $false
+            MissingReleaseTag = $false
+            ProtocolCommitNotAncestor = $false
+            ReleaseNotImmutable = $false
+            ManifestOnReviewedTree = $false
+            ReviewTreeLedgerMismatch = $false
+            DefaultContainmentFailure = $false
+            BranchLeaseRace = $false
+        }
+    }.GetNewClosure()
+
+    $resetHistoricalProductionState = {
+        param(
+            $SourceCatalog = $historicalCatalog,
+            [byte[]]$SourceCatalogBytes = $historicalCatalogBytes,
+            [byte[]]$SourceDefinitionBytes = $historicalDefinitionBytes
+        )
+        Import-Module $catalogModulePath -Force -Global
+        Import-Module $modulePath -Force -Global
+        $apiState.HistoricalReview = & $newHistoricalReviewState `
+            $SourceCatalog $SourceCatalogBytes $SourceDefinitionBytes
+        $apiState.HistoricalReview.Reviews.Add([pscustomobject]@{
+            state = 'APPROVED'
+            commit_id = $historicalReviewHead
+            submitted_at = '2026-07-19T00:00:30Z'
+            user = $apiState.ReviewerActor
+        })
+        $apiState.IssueCreated = $false
+        $apiState.IssueClosed = $false
+        $apiState.PullCreated = $false
+        $apiState.PullMerged = $false
+        $apiState.BranchCreated = $false
+        $apiState.BranchHead = $historicalDefaultHead
+        $apiState.DefaultHead = $historicalDefaultHead
+        $apiState.PullBody = $null
+        $apiState.BlobBody = $null
+        $apiState.TreeBody = $null
+        $apiState.CommitBody = $null
+        $apiState.DefaultHeadReadCount = 0
+        $apiState.DriftDefaultHeadAfterReadCount = 0
+        $apiState.Calls.Clear()
+        $apiState.HistoricalMutationCalls.Clear()
+        $apiState.HistoricalEvidenceCalls.Clear()
+        $apiState.ClosureComments.Clear()
+        $apiState.AttestationComments.Clear()
+        $apiState.Reviews.Clear()
+        [IO.File]::WriteAllBytes(
+            (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json'),
+            [byte[]]$apiState.HistoricalReview.CurrentLedgerBytes
+        )
+    }.GetNewClosure()
+    $protocolGitBlobRuntime = {
+        param([string]$CommitSha, [string]$RelativePath)
+        if ($null -eq $apiState.HistoricalReview -or
+            $CommitSha -cne
+                [string]$apiState.HistoricalReview.ProtocolCommit) {
+            throw 'TEST-0166 historical protocol blob used another commit.'
+        }
+        $apiState.HistoricalEvidenceCalls.Add("blob:$RelativePath")
+        switch -CaseSensitive ($RelativePath) {
+            'VERSION' {
+                return ,([byte[]]$apiState.HistoricalReview.VersionBytes)
+            }
+            'capabilities/index.json' {
+                return ,([byte[]]$apiState.HistoricalReview.CatalogBytes)
+            }
+            'capabilities/test-architecture.json' {
+                return ,([byte[]]$apiState.HistoricalReview.DefinitionBytes)
+            }
+            default {
+                throw "TEST-0166 unexpected historical protocol blob '$RelativePath'."
+            }
+        }
+    }.GetNewClosure()
+    $historicalRuntime = @{
+        Git = $gitRuntime
+        GitHub = $githubRuntime
+        ProtocolGitBlob = $protocolGitBlobRuntime
+    }
+
+    & $resetHistoricalProductionState
+    $currentLedgerBefore = [IO.File]::ReadAllBytes(
+        (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
+    )
+    $currentLedgerBeforeObject = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseCatalog -Bytes $currentLedgerBefore
+    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 2 `
+        'TEST-0165 fixture did not start with a historical prefix plus current suffix.'
+    $currentSuffixBefore = @($currentLedgerBeforeObject.Entries)[1]
+    $historicalRecovery = & $runnerPath `
+        -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -FinalizePullRequestNumber $historicalPullNumber `
+        -Runtime $historicalRuntime
+    Assert-Equal $historicalRecovery.State 'Current' `
+        'TEST-0165 merged historical review did not continue into fresh current discovery.'
+    Assert-Equal (
+        $apiState.HistoricalMutationCalls -join ','
+    ) 'DeleteHistoricalBranch,CommentHistoricalIssue,CloseHistoricalIssue' `
+        'TEST-0165 historical recovery did not preserve branch-first/issue-last order.'
+    Assert-True (-not $apiState.HistoricalReview.BranchExists) `
+        'TEST-0165 historical recovery retained its exact branch.'
+    Assert-True $apiState.HistoricalReview.IssueClosed `
+        'TEST-0165 historical recovery retained its canonical issue.'
+    Assert-True (-not $apiState.IssueCreated -and
+        -not $apiState.BranchCreated -and -not $apiState.PullCreated) `
+        'TEST-0165 complete current ledger created duplicate capability work.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '^Proposal POST repos/.+/git/refs$'
+    }).Count 0 `
+        'TEST-0165 recovery created a duplicate current review branch.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '^Issue POST repos/.+/issues$'
+    }).Count 0 `
+        'TEST-0165 recovery created a duplicate current tracking issue.'
+    Assert-Equal @($apiState.Calls | Where-Object {
+        $_ -match '^Proposal POST repos/.+/pulls$'
+    }).Count 0 `
+        'TEST-0165 recovery created a duplicate current review pull request.'
+    foreach ($evidenceCall in @(
+        'base-gitlink',
+        'protocol-origin',
+        'protocol-commit',
+        'protocol-ancestor',
+        'tag-peel',
+        'blob:VERSION',
+        'blob:capabilities/index.json',
+        'blob:capabilities/test-architecture.json',
+        'immutable-release',
+        'branch-delete-lease'
+    )) {
+        Assert-True (
+            $apiState.HistoricalEvidenceCalls -ccontains $evidenceCall
+        ) "TEST-0165 historical recovery omitted '$evidenceCall' evidence."
+    }
+    $currentLedgerAfter = [IO.File]::ReadAllBytes(
+        (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
+    )
+    Assert-True (Test-TestBytesEqual -Left $currentLedgerBefore -Right (
+        $currentLedgerAfter
+    )) 'TEST-0165 historical recovery rewrote current ledger content.'
+    $currentLedgerAfterObject = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseCatalog -Bytes $currentLedgerAfter
+    $currentSuffixAfter = @($currentLedgerAfterObject.Entries)[1]
+    Assert-True (
+        [string]$currentSuffixAfter.Slug -ceq [string]$currentSuffixBefore.Slug -and
+        [string]$currentSuffixAfter.DefinitionBlob -ceq
+            [string]$currentSuffixBefore.DefinitionBlob -and
+        [string]$currentSuffixAfter.ReviewIdentity -ceq
+            [string]$currentSuffixBefore.ReviewIdentity
+    ) 'TEST-0165 historical recovery did not preserve the appended current entry.'
+    Assert-True (Test-TestBytesEqual `
+        -Left ([byte[]]$apiState.HistoricalReview.CurrentLedgerBytes) `
+        -Right (
+        [IO.File]::ReadAllBytes(
+            (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
+        )
+    )) 'TEST-0165 historical recovery performed an unplanned ledger write.'
+    Assert-True @($apiState.Calls | Where-Object {
+        $_ -match 'GET repos/.+/issues\?state=all'
+    }).Count -eq 2 `
+        'TEST-0165 recovery did not use exactly one initial and one fresh issue inventory.'
+
+    $historicalMutationCount =
+        $apiState.HistoricalMutationCalls.Count
+    $historicalRerun = & $runnerPath `
+        -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -Runtime $historicalRuntime -PlanOnly
+    Assert-Equal $historicalRerun.State 'Current' `
+        'TEST-0165 completed historical recovery rerun was not current.'
+    Assert-Equal $historicalRerun.Plan.Operations.Count 0 `
+        'TEST-0165 completed recovery rerun planned duplicate work.'
+    Assert-Equal $apiState.HistoricalMutationCalls.Count `
+        $historicalMutationCount `
+        'TEST-0165 completed recovery rerun repeated historical cleanup.'
+
+    & $resetHistoricalProductionState
+    $apiState.HistoricalReview.BranchExists = $false
+    $partialRecovery = & $runnerPath `
+        -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+        -FinalizePullRequestNumber $historicalPullNumber `
+        -Runtime $historicalRuntime
+    Assert-Equal $partialRecovery.State 'Current' `
+        'TEST-0165 proven branch-absent recovery did not continue current discovery.'
+    Assert-Equal ($apiState.HistoricalMutationCalls -join ',') `
+        'CommentHistoricalIssue,CloseHistoricalIssue' `
+        'TEST-0165 proven branch absence did not perform issue-last recovery only.'
+    Assert-True (-not ($apiState.HistoricalEvidenceCalls -ccontains
+        'branch-delete-lease')) `
+        'TEST-0165 proven absent branch attempted a duplicate delete push.'
+    Assert-True ($apiState.HistoricalReview.IssueClosed -and
+        -not $apiState.IssueCreated -and -not $apiState.PullCreated) `
+        'TEST-0165 branch-absent partial recovery did not converge exactly once.'
+
+    # TEST-0166: anything other than one provable immutable historical merge
+    # blocks before successful branch, issue, or current-catalog mutation.
+    $assertHistoricalBlock = {
+        param(
+            [Parameter(Mandatory)][string]$Name,
+            [Parameter(Mandatory)][scriptblock]$Arrange,
+            [Parameter(Mandatory)][string]$Pattern
+        )
+        & $resetHistoricalProductionState
+        & $Arrange $apiState.HistoricalReview
+        $beforeBranch = [bool]$apiState.HistoricalReview.BranchExists
+        $beforeIssue = [bool]$apiState.HistoricalReview.IssueClosed
+        Assert-ThrowsLike -Action {
+            & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+                -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+                -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+                -Runtime $historicalRuntime
+        } -Pattern $Pattern -Message "TEST-0166 $Name did not fail closed."
+        Assert-Equal $apiState.HistoricalMutationCalls.Count 0 `
+            "TEST-0166 $Name mutated historical state before proof."
+        Assert-Equal @($apiState.Calls | Where-Object {
+            $_ -match '^(?:Proposal|Issue|Protocol) (?:POST|PATCH|DELETE) '
+        }).Count 0 `
+            "TEST-0166 $Name reached a GitHub mutation request."
+        Assert-Equal $apiState.HistoricalReview.BranchExists $beforeBranch `
+            "TEST-0166 $Name changed the historical branch."
+        Assert-Equal $apiState.HistoricalReview.IssueClosed $beforeIssue `
+            "TEST-0166 $Name changed the historical issue."
+        Assert-True (-not $apiState.IssueCreated -and
+            -not $apiState.PullCreated) `
+            "TEST-0166 $Name created current work after failed recovery."
+    }.GetNewClosure()
+
+    & $assertHistoricalBlock 'active stale review' {
+        param($state)
+        $state.PullState = 'Open'
+    } '*active*historical*'
+    & $assertHistoricalBlock 'closed-unmerged stale review' {
+        param($state)
+        $state.PullState = 'Closed'
+    } '*closed*without merge*'
+    & $assertHistoricalBlock 'duplicate stale issue inventory' {
+        param($state)
+        $state.IssueCopies = 2
+    } '*duplicate*issue*'
+    & $assertHistoricalBlock 'duplicate stale pull-request inventory' {
+        param($state)
+        $state.PullCopies = 2
+    } '*duplicate*pull request*'
+    & $assertHistoricalBlock 'malformed stale issue binding' {
+        param($state)
+        $state.IssueBody = $state.IssueBody.Replace(
+            'Catalog digest:',
+            'Broken catalog digest:'
+        )
+    } '*canonical*binding*'
+    & $assertHistoricalBlock 'missing exact BaseHead gitlink' {
+        param($state)
+        $state.MissingBaseGitlink = $true
+    } '*gitlink*'
+    & $assertHistoricalBlock 'unverifiable historical protocol tag' {
+        param($state)
+        $state.MissingReleaseTag = $true
+    } '*tag*'
+    & $assertHistoricalBlock 'non-immutable historical release' {
+        param($state)
+        $state.ReleaseNotImmutable = $true
+    } '*immutable*release*'
+    & $assertHistoricalBlock 'historical protocol outside current ancestry' {
+        param($state)
+        $state.ProtocolCommitNotAncestor = $true
+    } '*ancestor*'
+    & $assertHistoricalBlock 'malformed historical catalog blob' {
+        param($state)
+        $state.CatalogBytes =
+            [Text.UTF8Encoding]::new($false).GetBytes("{`n")
+    } '*catalog*'
+
+    & $resetHistoricalProductionState `
+        $alternateCatalog $alternateCatalogBytes $alternateDefinitionBytes
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+            -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+            -TargetVersion v0.13.3 -DiscoveryContext AlreadyCurrent `
+            -Runtime $historicalRuntime
+    } -Pattern '*prefix*' `
+        -Message 'TEST-0166 non-prefix historical catalog did not fail closed.'
+    Assert-Equal $apiState.HistoricalMutationCalls.Count 0 `
+        'TEST-0166 non-prefix historical catalog mutated repository state.'
+
+    & $assertHistoricalBlock 'review-tree ledger drift' {
+        param($state)
+        $state.ReviewTreeLedgerMismatch = $true
+    } '*review head capability ledger*'
+    & $assertHistoricalBlock 'transient manifest on reviewed tree' {
+        param($state)
+        $state.ManifestOnReviewedTree = $true
+    } '*manifest remains*'
+    & $assertHistoricalBlock 'missing exact-head review authority' {
+        param($state)
+        $state.Reviews.Clear()
+    } '*approval*'
+    & $assertHistoricalBlock 'default missing merged review' {
+        param($state)
+        $state.DefaultContainmentFailure = $true
+    } '*contained*default*'
+    & $assertHistoricalBlock 'default-head verification race' {
+        param($state)
+        $apiState.DriftDefaultHeadAfterReadCount = 1
+    } '*Default branch changed*'
+    & $assertHistoricalBlock 'branch expected-head lease race' {
+        param($state)
+        $state.BranchLeaseRace = $true
+    } '*branch*'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot -PathType Container) {

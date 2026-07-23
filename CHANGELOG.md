@@ -3,6 +3,27 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.3 - 2026-07-23
+
+### Fixed
+
+- Recover one retained capability-review record after its exact proposal has
+  merged and a compatible protocol release has appended catalog entries.
+- Resolve the historical catalog from the consumer base commit's protocol
+  gitlink and require its exact tagged immutable release, canonical Git blobs,
+  strict predecessor identity, current review authority, merged tree, and
+  ledger evidence before mutation.
+- Preserve the complete current ledger, including valid later entries, while
+  deleting only the exact historical branch through an expected-OID lease and
+  closing its issue last.
+- Keep active, unmerged, incompatible, duplicate, drifted, unauthorized, or
+  ambiguous historical work fail-closed, and bound each invocation to one
+  cleanup followed by one fresh current-catalog inventory.
+
+Related work: [FEAT-0042](docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
+`BUG-0024`, [DEC-0026](docs/decisions/DEC-0026-historical-capability-review-recovery.md),
+and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104).
+
 ## 0.13.2 - 2026-07-23
 
 ### Fixed
