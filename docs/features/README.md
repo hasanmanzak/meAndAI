@@ -43,6 +43,7 @@
 | [FEAT-0039](FEAT-0039-v0130-test-runtime-efficiency/README.md) | Reusable test fixtures and runtime-cost guardrails | Complete | 0.13.0 |
 | [FEAT-0040](FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) | Batched instruction-graph acquisition and residual runtime reduction | Complete; hosted delivery evidence pending | 0.13.1 |
 | [FEAT-0041](FEAT-0041-v0132-exact-head-owner-attestation/README.md) | Exact-head personal-owner attestation for capability review | Complete; hosted delivery evidence pending | 0.13.2 |
+| [FEAT-0042](FEAT-0042-v0133-historical-capability-review-recovery/README.md) | Historical capability-review recovery across compatible protocol updates | Complete; hosted delivery evidence pending | 0.13.3 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

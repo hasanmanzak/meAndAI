@@ -27,6 +27,7 @@ $script:ManifestRelativePath = '.ai/adoption/meandai-capability-review.json'
 $script:MarkerPrefix = '<!-- meandai-capability-review:v1:'
 $script:ClosurePrefix = '<!-- meandai-capability-review-closed:v1:'
 $script:AttestationPrefix = '<!-- meandai-capability-review-attestation:v1:'
+$script:ProtocolRepository = 'hasanmanzak/meAndAI'
 $script:ProposalActor = $null
 $script:IssueActor = $null
 $script:RepositoryOwner = $null
@@ -184,6 +185,79 @@ function Invoke-ReviewGit {
         -AllowedExitCodes $AllowedExitCodes
 }
 
+function ConvertFrom-StrictUtf8Bytes {
+    param(
+        [Parameter(Mandatory)][byte[]]$Bytes,
+        [Parameter(Mandatory)][string]$Label
+    )
+
+    if ($Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and
+        $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF) {
+        throw "$Label must be UTF-8 without a byte-order mark."
+    }
+    try {
+        $text = [Text.UTF8Encoding]::new($false, $true).GetString($Bytes)
+    }
+    catch {
+        throw "$Label is not strict UTF-8."
+    }
+    if ($text.Contains("`r")) {
+        throw "$Label must use LF line endings."
+    }
+    return $text
+}
+
+function Get-ProtocolGitBlobBytes {
+    param(
+        [Parameter(Mandatory)][string]$CommitSha,
+        [Parameter(Mandatory)][string]$RelativePath
+    )
+
+    Assert-GitSha -Value $CommitSha -Label 'Historical protocol commit'
+    if ($RelativePath -cnotmatch '^[A-Za-z0-9._/-]+$' -or
+        $RelativePath.StartsWith('/') -or $RelativePath.Contains('..')) {
+        throw 'Historical protocol blob path is not canonical.'
+    }
+    if ($Runtime.Contains('ProtocolGitBlob')) {
+        $injected = & ([scriptblock]$Runtime['ProtocolGitBlob']) `
+            $CommitSha $RelativePath
+        if ($null -eq $injected) {
+            throw "Historical protocol blob '$RelativePath' is absent."
+        }
+        return ,([byte[]]$injected)
+    }
+
+    $objectName = "${CommitSha}:$RelativePath"
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.WorkingDirectory = $protocolFull
+    $startInfo.Arguments = "cat-file blob $objectName"
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $stream = [IO.MemoryStream]::new()
+    try {
+        if (-not $process.Start()) {
+            throw 'Git did not start for historical protocol blob acquisition.'
+        }
+        $errorTask = $process.StandardError.ReadToEndAsync()
+        $process.StandardOutput.BaseStream.CopyTo($stream)
+        $process.WaitForExit()
+        $errorText = $errorTask.GetAwaiter().GetResult()
+        if ($process.ExitCode -ne 0) {
+            throw "Historical protocol blob '$RelativePath' could not be read. $errorText"
+        }
+        return ,([byte[]]$stream.ToArray())
+    }
+    finally {
+        $stream.Dispose()
+        $process.Dispose()
+    }
+}
+
 function ConvertTo-RequestJson {
     param([Parameter(Mandatory)]$Value)
 
@@ -195,7 +269,8 @@ function Invoke-DefaultGitHub {
         [Parameter(Mandatory)][string]$Method,
         [Parameter(Mandatory)][string]$Endpoint,
         [AllowNull()]$Body,
-        [ValidateSet('Proposal', 'Issue')][string]$Authority = 'Proposal',
+        [ValidateSet('Proposal', 'Issue', 'Protocol')]
+        [string]$Authority = 'Proposal',
         [switch]$AcceptNotFound
     )
 
@@ -211,11 +286,18 @@ function Invoke-DefaultGitHub {
     $hadGhToken = Test-Path -LiteralPath Env:GH_TOKEN
     $previousGhToken = [string]$env:GH_TOKEN
     try {
-        if ($Authority -ceq 'Issue') {
-            if ([string]::IsNullOrWhiteSpace([string]$env:ISSUE_TOKEN)) {
-                throw 'ISSUE_TOKEN is required for issue-scoped GitHub operations.'
+        if ($Authority -cne 'Proposal') {
+            $tokenName = if ($Authority -ceq 'Issue') {
+                'ISSUE_TOKEN'
             }
-            $env:GH_TOKEN = [string]$env:ISSUE_TOKEN
+            else {
+                'PROTOCOL_TOKEN'
+            }
+            $token = [string][Environment]::GetEnvironmentVariable($tokenName)
+            if ([string]::IsNullOrWhiteSpace($token)) {
+                throw "$tokenName is required for $($Authority.ToLowerInvariant())-scoped GitHub operations."
+            }
+            $env:GH_TOKEN = $token
         }
         if ($null -ne $Body) {
             $temporaryPath = [IO.Path]::GetTempFileName()
@@ -248,7 +330,7 @@ function Invoke-DefaultGitHub {
         }
     }
     finally {
-        if ($Authority -ceq 'Issue') {
+        if ($Authority -cne 'Proposal') {
             if ($hadGhToken) {
                 $env:GH_TOKEN = $previousGhToken
             }
@@ -268,7 +350,8 @@ function Invoke-ReviewGitHub {
         [Parameter(Mandatory)][string]$Method,
         [Parameter(Mandatory)][string]$Endpoint,
         [AllowNull()]$Body = $null,
-        [ValidateSet('Proposal', 'Issue')][string]$Authority = 'Proposal',
+        [ValidateSet('Proposal', 'Issue', 'Protocol')]
+        [string]$Authority = 'Proposal',
         [switch]$AcceptNotFound
     )
 
@@ -999,13 +1082,15 @@ function Get-ProductionInventory {
         [Parameter(Mandatory)]$Catalog,
         [Parameter(Mandatory)][string]$Marker,
         [Parameter(Mandatory)][string]$ExpectedBranch,
-        [Parameter(Mandatory)][string]$CurrentDefaultHead
+        [Parameter(Mandatory)][string]$CurrentDefaultHead,
+        [switch]$SkipStaleCatalogGuard
     )
 
     $issuesRaw = @(Get-PagedGitHubCollection `
         -Endpoint "repos/$Repository/issues?state=all" `
         -Label 'Capability review issues' -Authority Issue)
     $issueCandidates = [System.Collections.Generic.List[object]]::new()
+    $historicalIssueCandidates = [System.Collections.Generic.List[object]]::new()
     foreach ($raw in $issuesRaw) {
         if ($null -ne (Get-PropertyValue -Value $raw -Name pull_request `
             -Label 'Issue inventory item' -AllowMissing)) {
@@ -1028,7 +1113,50 @@ function Get-ProductionInventory {
         $repoPrefix = "$($script:MarkerPrefix)$Repository`:"
         if ($state -ceq 'open' -and $body.Contains($repoPrefix) -and
             -not $body.Contains($Marker)) {
-            throw 'An open capability-review issue has stale catalog identity.'
+            if ($SkipStaleCatalogGuard) {
+                continue
+            }
+            $markerMatches = [regex]::Matches(
+                $body,
+                [regex]::Escape($repoPrefix) +
+                    '(?<digest>[0-9a-f]{64}) -->'
+            )
+            if ($markerMatches.Count -ne 1 -or
+                [regex]::Matches(
+                    $body,
+                    [regex]::Escape($repoPrefix)
+                ).Count -ne 1) {
+                throw 'Historical capability-review issue lacks one canonical binding marker.'
+            }
+            $historicalMarker = [string]$markerMatches[0].Value
+            try {
+                $historicalBinding = Get-ReviewBinding -Body $body `
+                    -Marker $historicalMarker
+            }
+            catch {
+                throw "Historical capability-review issue lacks a canonical binding. $($_.Exception.Message)"
+            }
+            if ([string]$historicalBinding.HandoffHead -cne 'pending' -or
+                [long]$historicalBinding.IssueActorId -ne [long]$creator.Id -or
+                [string]$historicalBinding.IssueActorLogin -cne
+                    [string]$creator.Login -or
+                [long]$historicalBinding.ProposalActorId -ne
+                    [long]$script:ProposalActor.Id -or
+                [string]$historicalBinding.ProposalActorLogin -cne
+                    [string]$script:ProposalActor.Login) {
+                throw 'Historical capability-review issue has a noncanonical dual-authority binding.'
+            }
+            $historicalIssueCandidates.Add([pscustomobject][ordered]@{
+                Number = [long](Get-PropertyValue -Value $raw -Name number `
+                    -Label 'Historical capability review issue')
+                State = 'Open'
+                Marker = $historicalMarker
+                CatalogDigest = [string]$markerMatches[0].Groups['digest'].Value
+                Binding = $historicalBinding
+                Body = $body
+                Creator = $creator
+            })
+            continue
         }
         if (-not $body.Contains($Marker)) {
             continue
@@ -1062,6 +1190,9 @@ function Get-ProductionInventory {
     }
     if ($issueCandidates.Count -gt 1) {
         throw 'Canonical inventory contains a duplicate issue.'
+    }
+    if ($historicalIssueCandidates.Count -gt 1) {
+        throw 'Canonical historical inventory contains a duplicate issue.'
     }
 
     $escapedBranch = [Uri]::EscapeDataString($ExpectedBranch)
@@ -1192,11 +1323,6 @@ function Get-ProductionInventory {
     if ($pullCandidates.Count -gt 1) {
         throw 'Canonical inventory contains a duplicate pull request.'
     }
-    if ($FinalizePullRequestNumber -gt 0 -and
-        ($pullCandidates.Count -ne 1 -or
-         [long]$pullCandidates[0].Number -ne $FinalizePullRequestNumber)) {
-        throw 'The requested finalization pull request is not the exact canonical review.'
-    }
     if ($issueCandidates.Count -eq 1 -and $pullCandidates.Count -eq 1) {
         if ([long]$pullCandidates[0].Binding.IssueNumber -ne
             [long]$issueCandidates[0].Number) {
@@ -1316,6 +1442,7 @@ function Get-ProductionInventory {
         Binding = if ($bindings.Count -gt 0) { $bindings[0] } else { $null }
         ReviewBaseHead = $reviewBaseHead
         CurrentDefaultHead = $CurrentDefaultHead
+        HistoricalIssues = @($historicalIssueCandidates)
         Source = 'GitHub'
     }
 }
@@ -1352,6 +1479,188 @@ function Get-RemoteRepositoryIdentity {
         throw 'Consumer origin is not one canonical GitHub repository remote.'
     }
     return $path.ToLowerInvariant()
+}
+
+function Import-HistoricalProtocolCatalog {
+    param([Parameter(Mandatory)][string]$ProtocolCommit)
+
+    $indexBytes = Get-ProtocolGitBlobBytes -CommitSha $ProtocolCommit `
+        -RelativePath 'capabilities/index.json'
+    $indexText = ConvertFrom-StrictUtf8Bytes -Bytes $indexBytes `
+        -Label 'Historical capability catalog index'
+    try {
+        $index = $indexText | ConvertFrom-Json
+    }
+    catch {
+        throw 'Historical capability catalog index is not valid JSON.'
+    }
+    if ($null -eq $index -or $index.capabilities -isnot [Array] -or
+        @($index.capabilities).Count -eq 0) {
+        throw 'Historical capability catalog index is not canonical.'
+    }
+
+    $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) (
+        'meandai-historical-catalog-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void](New-Item -ItemType Directory -Path $temporaryRoot)
+    try {
+        [IO.File]::WriteAllBytes(
+            (Join-Path $temporaryRoot 'index.json'),
+            [byte[]]$indexBytes
+        )
+        $seen = [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+        foreach ($entry in @($index.capabilities)) {
+            $slug = [string](Get-PropertyValue -Value $entry -Name slug `
+                -Label 'Historical capability catalog entry')
+            $definition = [string](Get-PropertyValue -Value $entry `
+                -Name definition -Label 'Historical capability catalog entry')
+            if ($slug -cnotmatch '^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$' -or
+                $definition -cne "$slug.json" -or -not $seen.Add($definition)) {
+                throw 'Historical capability catalog contains a noncanonical definition path.'
+            }
+            $definitionBytes = Get-ProtocolGitBlobBytes `
+                -CommitSha $ProtocolCommit `
+                -RelativePath "capabilities/$definition"
+            [IO.File]::WriteAllBytes(
+                (Join-Path $temporaryRoot $definition),
+                [byte[]]$definitionBytes
+            )
+        }
+        try {
+            return Import-MeAndAICapabilityCatalog -IndexPath (
+                Join-Path $temporaryRoot 'index.json'
+            )
+        }
+        catch {
+            throw "Historical capability catalog is invalid. $($_.Exception.Message)"
+        }
+    }
+    finally {
+        $resolvedTemporary = [IO.Path]::GetFullPath($temporaryRoot)
+        $temporaryBase = [IO.Path]::GetFullPath(
+            [IO.Path]::GetTempPath()
+        ).TrimEnd(
+            [IO.Path]::DirectorySeparatorChar,
+            [IO.Path]::AltDirectorySeparatorChar
+        ) + [IO.Path]::DirectorySeparatorChar
+        if ($resolvedTemporary.StartsWith(
+            $temporaryBase,
+            [StringComparison]::OrdinalIgnoreCase
+        ) -and (Test-Path -LiteralPath $resolvedTemporary -PathType Container)) {
+            Remove-Item -LiteralPath $resolvedTemporary -Recurse -Force
+        }
+    }
+}
+
+function Get-HistoricalProtocolEvidence {
+    param(
+        [Parameter(Mandatory)]$HistoricalIssue,
+        [Parameter(Mandatory)]$CurrentCatalog,
+        [Parameter(Mandatory)][string]$CurrentDefaultHead
+    )
+
+    $baseHead = [string]$HistoricalIssue.Binding.BaseHead
+    if (-not (Test-LocalAncestor -Ancestor $baseHead `
+        -Descendant $CurrentDefaultHead)) {
+        throw 'Historical capability-review base is not contained by the current default branch.'
+    }
+    $gitlink = Invoke-ReviewGit -Arguments @(
+        '-C', $ConsumerRoot, 'ls-tree', $baseHead, '--', '.ai/protocol'
+    )
+    if ($gitlink.ExitCode -ne 0 -or
+        $gitlink.Text -cnotmatch
+            '^160000 commit (?<sha>[0-9a-f]{40})\t\.ai/protocol$') {
+        throw 'Historical capability-review BaseHead lacks one canonical protocol gitlink.'
+    }
+    $protocolCommit = [string]$Matches['sha']
+    Assert-GitSha -Value $protocolCommit -Label 'Historical protocol gitlink'
+
+    $protocolOrigin = (Invoke-ReviewGit -Arguments @(
+        '-C', $ProtocolRoot, 'remote', 'get-url', 'origin'
+    )).Text
+    if ((Get-RemoteRepositoryIdentity -RemoteUrl $protocolOrigin) -cne
+        $script:ProtocolRepository.ToLowerInvariant()) {
+        throw 'Historical protocol checkout origin is not the canonical meAndAI repository.'
+    }
+    $commitExists = Invoke-ReviewGit -Arguments @(
+        '-C', $ProtocolRoot, 'cat-file', '-e', "${protocolCommit}^{commit}"
+    ) -AllowedExitCodes @(0, 1)
+    if ($commitExists.ExitCode -ne 0) {
+        throw 'Historical protocol gitlink does not identify an available commit.'
+    }
+    $ancestor = Invoke-ReviewGit -Arguments @(
+        '-C', $ProtocolRoot, 'merge-base', '--is-ancestor',
+        $protocolCommit, 'HEAD'
+    ) -AllowedExitCodes @(0, 1)
+    if ($ancestor.ExitCode -ne 0) {
+        throw 'Historical protocol commit is not an ancestor of the current protocol release.'
+    }
+
+    $versionBytes = Get-ProtocolGitBlobBytes -CommitSha $protocolCommit `
+        -RelativePath 'VERSION'
+    $versionText = ConvertFrom-StrictUtf8Bytes -Bytes $versionBytes `
+        -Label 'Historical protocol VERSION'
+    if ($versionText -cnotmatch
+        '^(?<version>(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))\n$') {
+        throw 'Historical protocol VERSION is not canonical.'
+    }
+    $protocolTag = "v$([string]$Matches['version'])"
+    $tagCommit = Invoke-ReviewGit -Arguments @(
+        '-C', $ProtocolRoot, 'rev-parse', '--verify',
+        "refs/tags/${protocolTag}^{commit}"
+    ) -AllowedExitCodes @(0, 1)
+    if ($tagCommit.ExitCode -ne 0 -or $tagCommit.Text -cne $protocolCommit) {
+        throw 'Historical protocol commit does not have its exact immutable version tag.'
+    }
+
+    $escapedTag = [Uri]::EscapeDataString($protocolTag)
+    $release = Invoke-ReviewGitHub -Method GET `
+        -Endpoint "repos/$($script:ProtocolRepository)/releases/tags/$escapedTag" `
+        -Authority Protocol
+    [DateTimeOffset]$publishedAt = [DateTimeOffset]::MinValue
+    if ([string](Get-PropertyValue -Value $release -Name tag_name `
+            -Label 'Historical protocol release') -cne $protocolTag -or
+        (Get-PropertyValue -Value $release -Name draft `
+            -Label 'Historical protocol release') -isnot [bool] -or
+        [bool]$release.draft -or
+        (Get-PropertyValue -Value $release -Name prerelease `
+            -Label 'Historical protocol release') -isnot [bool] -or
+        [bool]$release.prerelease -or
+        (Get-PropertyValue -Value $release -Name immutable `
+            -Label 'Historical protocol release') -isnot [bool] -or
+        -not [bool]$release.immutable -or
+        -not [DateTimeOffset]::TryParse(
+            [string](Get-PropertyValue -Value $release -Name published_at `
+                -Label 'Historical protocol release'),
+            [ref]$publishedAt
+        )) {
+        throw 'Historical protocol tag is not one exact published immutable release.'
+    }
+
+    $historicalCatalog = Import-HistoricalProtocolCatalog `
+        -ProtocolCommit $protocolCommit
+    if ([string]$historicalCatalog.CatalogDigest -cne
+            [string]$HistoricalIssue.CatalogDigest -or
+        [string]$historicalCatalog.CatalogDigest -cne
+            [string]$HistoricalIssue.Binding.CatalogDigest) {
+        throw 'Historical capability-review marker does not match its immutable release catalog.'
+    }
+    Assert-MeAndAICapabilityCatalogExtension `
+        -CurrentCatalog $historicalCatalog -TargetCatalog $CurrentCatalog
+    if (@($historicalCatalog.Capabilities).Count -ge
+        @($CurrentCatalog.Capabilities).Count) {
+        throw 'Historical capability catalog is not a strict predecessor prefix.'
+    }
+    return [pscustomobject][ordered]@{
+        Commit = $protocolCommit
+        Tag = $protocolTag
+        Catalog = $historicalCatalog
+        Marker = [string]$HistoricalIssue.Marker
+        Branch = 'automation/meandai-capability-review-' +
+            $historicalCatalog.CatalogDigest.Substring(0, 16)
+    }
 }
 
 function Assert-ProductionCheckout {
@@ -1622,9 +1931,18 @@ function Assert-MergedTreeEvidence {
         [Parameter(Mandatory)]$Catalog,
         [Parameter(Mandatory)]$Ledger,
         [Parameter(Mandatory)][byte[]]$CurrentLedgerBytes,
+        [AllowNull()][byte[]]$ReviewedLedgerBytes = $null,
+        [AllowNull()]$CurrentCatalog = $null,
         [Parameter(Mandatory)][string]$Marker,
         [Parameter(Mandatory)][string]$CurrentDefaultHead
     )
+
+    if ($null -eq $ReviewedLedgerBytes) {
+        $ReviewedLedgerBytes = $CurrentLedgerBytes
+    }
+    if ($null -eq $CurrentCatalog) {
+        $CurrentCatalog = $Catalog
+    }
 
     Assert-GitSha -Value ([string]$PullRequest.HeadSha) `
         -Label 'Merged capability review head'
@@ -1736,22 +2054,280 @@ function Assert-MergedTreeEvidence {
     }
 
     foreach ($tree in @(
-        [pscustomobject]@{ Ref = [string]$PullRequest.HeadSha; Label = 'review head' },
-        [pscustomobject]@{ Ref = [string]$PullRequest.MergeCommit; Label = 'merge commit' },
-        [pscustomobject]@{ Ref = $CurrentDefaultHead; Label = 'default head' }
+        [pscustomobject]@{
+            Ref = [string]$PullRequest.HeadSha
+            Label = 'review head'
+            ExpectedBytes = [byte[]]$ReviewedLedgerBytes
+            LedgerCatalog = $Catalog
+        },
+        [pscustomobject]@{
+            Ref = [string]$PullRequest.MergeCommit
+            Label = 'merge commit'
+            ExpectedBytes = [byte[]]$ReviewedLedgerBytes
+            LedgerCatalog = $Catalog
+        },
+        [pscustomobject]@{
+            Ref = $CurrentDefaultHead
+            Label = 'default head'
+            ExpectedBytes = [byte[]]$CurrentLedgerBytes
+            LedgerCatalog = $CurrentCatalog
+        }
     )) {
         $treeLedger = Get-GitHubFileAtRef `
             -RelativePath $script:LedgerRelativePath -Ref $tree.Ref
         Assert-ExactLedgerContent -Content $treeLedger `
-            -ExpectedBytes $CurrentLedgerBytes `
+            -ExpectedBytes ([byte[]]$tree.ExpectedBytes) `
             -Label "$($tree.Label) capability ledger"
-        [void](Import-MeAndAICapabilityLedger -Catalog $Catalog `
+        [void](Import-MeAndAICapabilityLedger -Catalog $tree.LedgerCatalog `
             -Bytes ([byte[]]$treeLedger.Bytes))
         $treeManifest = Get-GitHubFileAtRef `
             -RelativePath $script:ManifestRelativePath -Ref $tree.Ref `
             -AllowMissing
         if ([bool]$treeManifest.Exists) {
             throw "Transient capability-review manifest remains on $($tree.Label)."
+        }
+    }
+}
+
+function Resolve-HistoricalCapabilityReviewRecovery {
+    param(
+        [Parameter(Mandatory)]$HistoricalIssue,
+        [Parameter(Mandatory)]$CurrentCatalog,
+        [Parameter(Mandatory)]$CurrentLedger,
+        [Parameter(Mandatory)][byte[]]$CurrentLedgerBytes,
+        [Parameter(Mandatory)][string]$CurrentDefaultHead
+    )
+
+    $protocolEvidence = Get-HistoricalProtocolEvidence `
+        -HistoricalIssue $HistoricalIssue -CurrentCatalog $CurrentCatalog `
+        -CurrentDefaultHead $CurrentDefaultHead
+    $historicalCatalog = $protocolEvidence.Catalog
+    $historicalInventory = Get-ProductionInventory `
+        -Catalog $historicalCatalog -Marker $protocolEvidence.Marker `
+        -ExpectedBranch $protocolEvidence.Branch `
+        -CurrentDefaultHead $CurrentDefaultHead -SkipStaleCatalogGuard
+
+    if (@($historicalInventory.Issues).Count -ne 1 -or
+        [long]$historicalInventory.Issues[0].Number -ne
+            [long]$HistoricalIssue.Number -or
+        [string]$historicalInventory.Issues[0].Body -cne
+            [string]$HistoricalIssue.Body) {
+        throw 'Historical capability-review inventory does not contain one exact issue.'
+    }
+    $pulls = @($historicalInventory.PullRequests)
+    if ($pulls.Count -ne 1) {
+        throw 'Historical capability-review inventory does not contain one exact pull request.'
+    }
+    $pullRequest = $pulls[0]
+    if ($FinalizePullRequestNumber -gt 0 -and
+        [long]$pullRequest.Number -ne $FinalizePullRequestNumber) {
+        throw 'The requested finalization pull request is not the exact canonical review.'
+    }
+    if ([string]$pullRequest.State -ceq 'Open') {
+        throw 'An active historical capability review cannot be recovered.'
+    }
+    if ([string]$pullRequest.State -ceq 'Closed') {
+        throw 'Historical capability-review pull request closed without merge.'
+    }
+    if ([string]$pullRequest.State -cne 'Merged') {
+        throw 'Historical capability-review pull request state is ambiguous.'
+    }
+    $binding = $pullRequest.Binding
+    if ($null -eq $binding) {
+        throw 'Historical capability-review pull request lacks its canonical binding.'
+    }
+
+    $historicalCount = @($historicalCatalog.Capabilities).Count
+    $currentEntries = @($CurrentLedger.Entries)
+    if ($currentEntries.Count -lt $historicalCount) {
+        throw 'Current capability ledger truncates the historical reviewed prefix.'
+    }
+    $historicalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $historicalCatalog `
+        -Entries @($currentEntries | Select-Object -First $historicalCount)
+    $reviewLedgerContent = Get-GitHubFileAtRef `
+        -RelativePath $script:LedgerRelativePath `
+        -Ref ([string]$pullRequest.HeadSha)
+    Assert-ExactLedgerContent -Content $reviewLedgerContent `
+        -ExpectedBytes ([byte[]]$historicalLedgerBytes) `
+        -Label 'review head capability ledger'
+    $historicalLedger = Import-MeAndAICapabilityLedger `
+        -Catalog $historicalCatalog `
+        -Bytes ([byte[]]$reviewLedgerContent.Bytes)
+    if (@($historicalLedger.Entries).Count -ne $historicalCount) {
+        throw 'Historical merged capability review lacks one complete catalog ledger.'
+    }
+
+    try {
+        $verifiedReviewer = Assert-MergedReview -PullRequest $pullRequest `
+            -Ledger $historicalLedger `
+            -LedgerPrefixCount ([int]$binding.LedgerPrefixCount)
+    }
+    catch {
+        throw "Historical capability review lacks current exact-head approval or owner attestation. $($_.Exception.Message)"
+    }
+    Assert-MergedTreeEvidence -PullRequest $pullRequest -Binding $binding `
+        -Catalog $historicalCatalog -Ledger $historicalLedger `
+        -CurrentLedgerBytes $CurrentLedgerBytes `
+        -ReviewedLedgerBytes $historicalLedgerBytes `
+        -CurrentCatalog $CurrentCatalog -Marker $protocolEvidence.Marker `
+        -CurrentDefaultHead $CurrentDefaultHead
+
+    $defaultContainsMerge = Test-LocalAncestor `
+        -Ancestor ([string]$pullRequest.MergeCommit) `
+        -Descendant $CurrentDefaultHead
+    if (-not $defaultContainsMerge) {
+        throw 'Historical merged capability review is not contained by the current default branch.'
+    }
+    $branch = if (@($historicalInventory.Branches).Count -eq 1) {
+        $historicalInventory.Branches[0]
+    }
+    else {
+        $null
+    }
+    $plan = Resolve-MeAndAICapabilityReviewFinalization `
+        -Catalog $historicalCatalog -Ledger $historicalLedger `
+        -Repository $Repository -DefaultBranch $DefaultBranch `
+        -Marker $protocolEvidence.Marker `
+        -ExpectedBranch $protocolEvidence.Branch `
+        -ExpectedBaseHead ([string]$binding.BaseHead) `
+        -ExpectedReviewHead ([string]$pullRequest.HeadSha) `
+        -Issue $historicalInventory.Issues[0] -Branch $branch `
+        -PullRequest $pullRequest `
+        -DefaultContainsMerge:$defaultContainsMerge `
+        -ManifestPresentOnDefault:$false
+    return [pscustomobject][ordered]@{
+        Plan = $plan
+        Catalog = $historicalCatalog
+        Inventory = $historicalInventory
+        Issue = $historicalInventory.Issues[0]
+        PullRequest = $pullRequest
+        VerifiedReviewer = $verifiedReviewer
+    }
+}
+
+function Remove-ReviewBranchWithLease {
+    param(
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][string]$ExpectedHead
+    )
+
+    Assert-GitSha -Value $ExpectedHead `
+        -Label 'Capability-review branch expected head'
+    Assert-LiveDefaultHeadUnchanged
+    $endpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($Branch))"
+    $remote = Invoke-ReviewGitHub -Method GET -Endpoint $endpoint `
+        -AcceptNotFound
+    if ($null -eq $remote) {
+        return
+    }
+    $object = Get-PropertyValue -Value $remote -Name object `
+        -Label 'Finalization branch'
+    $actualHead = [string](Get-PropertyValue -Value $object -Name sha `
+        -Label 'Finalization branch')
+    if ($actualHead -cne $ExpectedHead) {
+        throw 'Finalization branch changed after exact-head verification.'
+    }
+    $lease = "--force-with-lease=refs/heads/${Branch}:$ExpectedHead"
+    $delete = Invoke-ReviewGit -Arguments @(
+        '-C', $ConsumerRoot, 'push', $lease, 'origin',
+        ":refs/heads/$Branch"
+    ) -AllowedExitCodes @(0, 1)
+    if ($delete.ExitCode -ne 0) {
+        throw 'Capability-review branch expected-head lease rejected deletion.'
+    }
+    if ($null -ne (Invoke-ReviewGitHub -Method GET -Endpoint $endpoint `
+        -AcceptNotFound)) {
+        throw 'Capability-review branch remains after expected-head lease deletion.'
+    }
+}
+
+function Close-VerifiedReviewIssue {
+    param(
+        [Parameter(Mandatory)]$Issue,
+        [Parameter(Mandatory)]$Catalog,
+        [Parameter(Mandatory)][string]$Marker,
+        [Parameter(Mandatory)][string]$Branch,
+        [Parameter(Mandatory)][long]$IssueNumber,
+        [Parameter(Mandatory)][string]$ClosureMarker
+    )
+
+    Assert-LiveDefaultHeadUnchanged
+    $branchEndpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($Branch))"
+    if ($null -ne (Invoke-ReviewGitHub -Method GET `
+        -Endpoint $branchEndpoint -AcceptNotFound)) {
+        throw 'Capability review issue cannot close before branch deletion.'
+    }
+    $issueEndpoint = "repos/$Repository/issues/$IssueNumber"
+    $rawIssue = Invoke-ReviewGitHub -Method GET -Endpoint $issueEndpoint `
+        -Authority Issue
+    $body = [string](Get-PropertyValue -Value $rawIssue -Name body `
+        -Label 'Finalization issue')
+    $state = [string](Get-PropertyValue -Value $rawIssue -Name state `
+        -Label 'Finalization issue')
+    $issueActor = Get-ActorRecord -User (
+        Get-PropertyValue -Value $rawIssue -Name user `
+            -Label 'Finalization issue'
+    ) -Label 'Finalization issue actor'
+    $issueBinding = Get-ReviewBinding -Body $body -Marker $Marker
+    if ($state -cne 'open' -or -not (Test-IsIssueActor -Actor $issueActor) -or
+        [long]$issueBinding.IssueActorId -ne [long]$issueActor.Id -or
+        [string]$issueBinding.IssueActorLogin -cne [string]$issueActor.Login -or
+        [long]$issueBinding.ProposalActorId -ne [long]$script:ProposalActor.Id -or
+        [string]$issueBinding.ProposalActorLogin -cne
+            [string]$script:ProposalActor.Login -or
+        $body -cne [string]$Issue.Body) {
+        throw 'Finalization issue authority drifted before closure.'
+    }
+    Assert-CanonicalReviewBody -Body $body -Binding $issueBinding `
+        -Catalog $Catalog
+    $existingClosure = Get-ClosureMarkerFromComments `
+        -IssueNumber $IssueNumber -Repository $Repository `
+        -CatalogDigest $Catalog.CatalogDigest
+    if ([string]::IsNullOrEmpty($existingClosure)) {
+        $closureBody = New-CanonicalClosureCommentBody -Marker $ClosureMarker
+        $comment = Invoke-ReviewGitHub -Method POST `
+            -Endpoint "$issueEndpoint/comments" -Body ([ordered]@{
+                body = $closureBody
+            }) -Authority Issue
+        $commentActor = Get-ActorRecord -User (
+            Get-PropertyValue -Value $comment -Name user `
+                -Label 'Created capability review closure comment'
+        ) -Label 'Created capability review closure comment actor'
+        if (-not (Test-IsIssueActor -Actor $commentActor) -or
+            [string]$comment.body -cne $closureBody) {
+            throw 'Created capability review closure comment has untrusted authority.'
+        }
+    }
+    elseif ($existingClosure -cne $ClosureMarker) {
+        throw 'Finalization issue has conflicting closure evidence.'
+    }
+    $closedIssue = Invoke-ReviewGitHub -Method PATCH `
+        -Endpoint $issueEndpoint -Body ([ordered]@{ state = 'closed' }) `
+        -Authority Issue
+    if ([string](Get-PropertyValue -Value $closedIssue -Name state `
+        -Label 'Closed capability review issue') -cne 'closed') {
+        throw 'Capability review issue did not reach closed state.'
+    }
+}
+
+function Invoke-HistoricalCapabilityReviewRecovery {
+    param([Parameter(Mandatory)]$Recovery)
+
+    foreach ($operation in @($Recovery.Plan.Operations)) {
+        if ([string]$operation.Kind -ceq 'DeleteBranch') {
+            Remove-ReviewBranchWithLease -Branch ([string]$operation.Branch) `
+                -ExpectedHead ([string]$operation.ExpectedHead)
+        }
+        elseif ([string]$operation.Kind -ceq 'CloseIssue') {
+            Close-VerifiedReviewIssue -Issue $Recovery.Issue `
+                -Catalog $Recovery.Catalog -Marker $Recovery.Plan.Marker `
+                -Branch ([string]$Recovery.PullRequest.HeadBranch) `
+                -IssueNumber ([long]$operation.IssueNumber) `
+                -ClosureMarker ([string]$operation.ClosureMarker)
+        }
+        else {
+            throw 'Historical capability-review recovery contains an unsupported operation.'
         }
     }
 }
@@ -1897,6 +2473,7 @@ if ($null -ne $FixtureInventory) {
         ReviewBaseHead = [string](Get-PropertyValue -Value $FixtureInventory `
             -Name ReviewBaseHead -Label 'Fixture inventory' -AllowMissing)
         CurrentDefaultHead = $DefaultHead
+        HistoricalIssues = @()
         Source = 'Fixture'
         DefaultContainsMerge = [bool](Get-PropertyValue `
             -Value $FixtureInventory -Name DefaultContainsMerge `
@@ -1918,6 +2495,43 @@ else {
         -not (Test-LocalAncestor -Ancestor $inventory.ReviewBaseHead `
             -Descendant $DefaultHead)) {
         throw 'Capability review base is not contained by the current default branch.'
+    }
+    $historicalIssues = @($inventory.HistoricalIssues)
+    if ($historicalIssues.Count -eq 0 -and
+        $FinalizePullRequestNumber -gt 0) {
+        $currentPulls = @($inventory.PullRequests)
+        if ($currentPulls.Count -ne 1 -or
+            [long]$currentPulls[0].Number -ne $FinalizePullRequestNumber) {
+            throw 'The requested finalization pull request is not the exact canonical review.'
+        }
+    }
+    if ($historicalIssues.Count -gt 0) {
+        if ($historicalIssues.Count -ne 1) {
+            throw 'Historical capability-review recovery is not uniquely bounded.'
+        }
+        if ($null -eq $ledgerBytes) {
+            throw 'Historical capability-review recovery requires the committed capability ledger.'
+        }
+        $historicalRecovery = Resolve-HistoricalCapabilityReviewRecovery `
+            -HistoricalIssue $historicalIssues[0] `
+            -CurrentCatalog $catalog -CurrentLedger $ledger `
+            -CurrentLedgerBytes ([byte[]]$ledgerBytes) `
+            -CurrentDefaultHead $DefaultHead
+        if ($PlanOnly) {
+            return New-Result -Plan $historicalRecovery.Plan -Execution $null `
+                -Inventory $inventory -Mode 'PlanOnly'
+        }
+        Invoke-HistoricalCapabilityReviewRecovery -Recovery $historicalRecovery
+        $inventory = Get-ProductionInventory -Catalog $catalog -Marker $marker `
+            -ExpectedBranch $expectedBranch -CurrentDefaultHead $DefaultHead
+        if (@($inventory.HistoricalIssues).Count -ne 0) {
+            throw 'Historical capability-review recovery did not converge to one fresh current inventory.'
+        }
+        if ($inventory.ReviewBaseHead -cne $DefaultHead -and
+            -not (Test-LocalAncestor -Ancestor $inventory.ReviewBaseHead `
+                -Descendant $DefaultHead)) {
+            throw 'Capability review base is not contained by the current default branch.'
+        }
     }
 }
 if ($null -ne $inventory.Binding -and
@@ -2062,10 +2676,18 @@ $handlers = @{
             -Label 'Created capability review branch')
         $object = Get-PropertyValue -Value $response -Name object `
             -Label 'Created capability review branch'
-        $head = [string](Get-PropertyValue -Value $object -Name sha `
+        [void](Get-PropertyValue -Value $object -Name sha `
             -Label 'Created capability review branch')
-        if ($createdRef -cne "refs/heads/$($ReviewPlan.Branch)" -or
-            $head -cne [string]$ReviewPlan.BaseHead) {
+        if ($createdRef -cne "refs/heads/$($ReviewPlan.Branch)") {
+            throw 'Created capability-review branch has unexpected head.'
+        }
+        $createdBranch = Invoke-ReviewGitHub -Method GET `
+            -Endpoint "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($ReviewPlan.Branch))"
+        $createdObject = Get-PropertyValue -Value $createdBranch -Name object `
+            -Label 'Created capability review branch ref'
+        $head = [string](Get-PropertyValue -Value $createdObject -Name sha `
+            -Label 'Created capability review branch ref')
+        if ($head -cne [string]$ReviewPlan.BaseHead) {
             throw 'Created capability-review branch has unexpected head.'
         }
         $executionState.Branch = [pscustomobject][ordered]@{
@@ -2277,81 +2899,16 @@ $handlers = @{
     }
     DeleteBranch = {
         param($Operation, $ReviewPlan)
-        Assert-LiveDefaultHeadUnchanged
-        $endpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($Operation.Branch))"
-        $remote = Invoke-ReviewGitHub -Method GET -Endpoint $endpoint `
-            -AcceptNotFound
-        if ($null -ne $remote) {
-            $object = Get-PropertyValue -Value $remote -Name object `
-                -Label 'Finalization branch'
-            $actualHead = [string](Get-PropertyValue -Value $object -Name sha `
-                -Label 'Finalization branch')
-            if ($actualHead -cne [string]$Operation.ExpectedHead) {
-                throw 'Finalization branch changed after exact-head verification.'
-            }
-            [void](Invoke-ReviewGitHub -Method DELETE -Endpoint $endpoint)
-        }
+        Remove-ReviewBranchWithLease -Branch ([string]$Operation.Branch) `
+            -ExpectedHead ([string]$Operation.ExpectedHead)
     }
     CloseIssue = {
         param($Operation, $ReviewPlan)
-        Assert-LiveDefaultHeadUnchanged
-        $branchEndpoint = "repos/$Repository/git/ref/heads/$([Uri]::EscapeDataString($expectedBranch))"
-        if ($null -ne (Invoke-ReviewGitHub -Method GET `
-            -Endpoint $branchEndpoint -AcceptNotFound)) {
-            throw 'Capability review issue cannot close before branch deletion.'
-        }
-        $issueEndpoint = "repos/$Repository/issues/$($Operation.IssueNumber)"
-        $rawIssue = Invoke-ReviewGitHub -Method GET -Endpoint $issueEndpoint `
-            -Authority Issue
-        $body = [string](Get-PropertyValue -Value $rawIssue -Name body `
-            -Label 'Finalization issue')
-        $issueActor = Get-ActorRecord -User (
-            Get-PropertyValue -Value $rawIssue -Name user `
-                -Label 'Finalization issue'
-        ) -Label 'Finalization issue actor'
-        $issueBinding = Get-ReviewBinding -Body $body -Marker $Operation.Marker
-        if (-not (Test-IsIssueActor -Actor $issueActor) -or
-            [long]$issueBinding.IssueActorId -ne [long]$issueActor.Id -or
-            [string]$issueBinding.IssueActorLogin -cne
-                [string]$issueActor.Login -or
-            [long]$issueBinding.ProposalActorId -ne
-                [long]$script:ProposalActor.Id -or
-            [string]$issueBinding.ProposalActorLogin -cne
-                [string]$script:ProposalActor.Login -or
-            $body -cne [string]$executionState.Issue.Body) {
-            throw 'Finalization issue authority drifted before closure.'
-        }
-        Assert-CanonicalReviewBody -Body $body -Binding $issueBinding `
-            -Catalog $catalog
-        $existingClosure = Get-ClosureMarkerFromComments `
+        Close-VerifiedReviewIssue -Issue $executionState.Issue `
+            -Catalog $catalog -Marker ([string]$Operation.Marker) `
+            -Branch $expectedBranch `
             -IssueNumber ([long]$Operation.IssueNumber) `
-            -Repository $Repository -CatalogDigest $catalog.CatalogDigest
-        if ([string]::IsNullOrEmpty($existingClosure)) {
-            $closureBody = New-CanonicalClosureCommentBody `
-                -Marker ([string]$Operation.ClosureMarker)
-            $comment = Invoke-ReviewGitHub -Method POST `
-                -Endpoint "$issueEndpoint/comments" -Body ([ordered]@{
-                    body = $closureBody
-                }) -Authority Issue
-            $commentActor = Get-ActorRecord -User (
-                Get-PropertyValue -Value $comment -Name user `
-                    -Label 'Created capability review closure comment'
-            ) -Label 'Created capability review closure comment actor'
-            if (-not (Test-IsIssueActor -Actor $commentActor) -or
-                [string]$comment.body -cne $closureBody) {
-                throw 'Created capability review closure comment has untrusted authority.'
-            }
-        }
-        elseif ($existingClosure -cne [string]$Operation.ClosureMarker) {
-            throw 'Finalization issue has conflicting closure evidence.'
-        }
-        $closedIssue = Invoke-ReviewGitHub -Method PATCH `
-            -Endpoint $issueEndpoint -Body ([ordered]@{ state = 'closed' }) `
-            -Authority Issue
-        if ([string](Get-PropertyValue -Value $closedIssue -Name state `
-            -Label 'Closed capability review issue') -cne 'closed') {
-            throw 'Capability review issue did not reach closed state.'
-        }
+            -ClosureMarker ([string]$Operation.ClosureMarker)
     }
 }
 

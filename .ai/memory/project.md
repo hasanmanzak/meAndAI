@@ -9,30 +9,27 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.13.2` candidate. Latest immutable release:
-  [v0.13.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.1)
-  targets commit `f8296cf8d4aba66519a24603c5c7a2a3727f973c`.
-  [PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
-  [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) retain its
+- Current protocol version: `0.13.3` candidate. Latest immutable release:
+  [v0.13.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.2)
+  targets commit `0c67c8a26192921840bbd12559d83f0ad450e880`.
+  [PR #103](https://github.com/hasanmanzak/meAndAI/pull/103) and
+  [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0041](../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md),
-  `BUG-0023`, `SUBF-0080`, and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
-  govern the v0.13.2 exact-head personal-owner attestation correction on
-  `codex/bug-0023-owner-attestation`. TEST-0163 and TEST-0164 belong to the
-  existing capability-review suite. The fallback is unavailable beside any
-  review submission and requires one canonical exact-head comment whose author,
-  personal repository owner, PR creator, and exact admin actor are identical.
-  Focused expected-red/corrected-green, structural, and release-bundle
-  validation are complete; hosted gates, publication, and external consumer
-  recovery remain pending.
+- Current scope: [FEAT-0042](../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
+  `BUG-0024`, `SUBF-0081`, and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
+  govern the v0.13.3 historical capability-review recovery on
+  `codex/bug-0024-historical-review-recovery`. TEST-0165 and TEST-0166 belong to
+  the existing capability-review suite. Recovery accepts only one exact merged
+  strict-predecessor review, retains current review authority and all later
+  ledger entries, deletes the exact branch through an expected-OID lease,
+  closes the issue last, and then performs one fresh current inventory.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Latest tracked work: immutable v0.13.1 completed FEAT-0040,
-  `SUBF-0073` through `SUBF-0077`, `TEST-0157` through `TEST-0160`, and
-  `RISK-0190` through `RISK-0192`. FEAT-0041 defines `SUBF-0080`,
-  `TEST-0163`/`0164`, and `RISK-0193` through `RISK-0196` for the bounded
-  v0.13.2 correction.
+- Latest tracked work: immutable v0.13.2 completed FEAT-0041, `SUBF-0080`,
+  `TEST-0163`/`0164`, and `RISK-0193` through `RISK-0196`. FEAT-0042 defines
+  `SUBF-0081`, `TEST-0165`/`0166`, and `RISK-0197` through `RISK-0200` for the
+  bounded v0.13.3 correction.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
@@ -82,12 +79,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Complete the bounded FEAT-0041 validation and v0.13.2 publication through
-  issue #102. After the immutable release is installed in the affected
-  consumer, the personal owner must add the exact canonical comment to the
-  retained merged capability PR and invoke the existing
-  `finalize_pull_request` recovery. Do not infer attestation from Ready or
-  merge and do not mutate the consumer from this protocol branch.
+- Complete the bounded FEAT-0042 validation and v0.13.3 publication through
+  issue #104. After the immutable release is installed in an affected consumer,
+  the existing lifecycle may recover one fully proven merged historical review
+  and then rediscover the current catalog. Do not mutate a consumer from this
+  protocol branch.
 - `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
   issue #98; FEAT-0041 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and

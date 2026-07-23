@@ -5,23 +5,23 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.13.1` completed [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)
-at commit `f8296cf8d4aba66519a24603c5c7a2a3727f973c`; PR #100 and issue #101
+Immutable `v0.13.2` completed [FEAT-0041](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md)
+at commit `0c67c8a26192921840bbd12559d83f0ad450e880`; PR #103 and issue #102
 retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 
-[FEAT-0041](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md),
-`BUG-0023`, and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
-now govern the v0.13.2 exact-head personal-owner attestation correction on
-`codex/bug-0023-owner-attestation`. Follow the
-[v0.13.2 handoff](2026-07-23-v0132-exact-head-owner-attestation.md).
-TEST-0163/0164 expected red, focused green, structural validation, and the
-release-bundle check are complete. Hosted review, immutable release, and the
-retained consumer recovery remain pending.
+[FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md),
+`BUG-0024`, and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
+govern the v0.13.3 historical capability-review recovery on
+`codex/bug-0024-historical-review-recovery`. Follow the
+[v0.13.3 handoff](2026-07-23-v0133-historical-capability-review-recovery.md).
+TEST-0165/0166 expected red and focused green are recorded; final validation,
+hosted review, immutable release, and consumer-side recovery remain pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.3 historical capability-review recovery](2026-07-23-v0133-historical-capability-review-recovery.md)
 - [2026-07-23 - v0.13.2 exact-head personal-owner attestation](2026-07-23-v0132-exact-head-owner-attestation.md)
 - [2026-07-23 - v0.13.1 hosted Windows stdin encoding correction](2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
 - [2026-07-23 - v0.13.1 delivery authority correction](2026-07-23-v0131-delivery-authority-correction.md)

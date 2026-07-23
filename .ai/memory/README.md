@@ -2,27 +2,25 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-23**<br>
-Protocol version: **0.13.2** (candidate)<br>
-Latest immutable release: **0.13.1**
+Protocol version: **0.13.3** (candidate)<br>
+Latest immutable release: **0.13.2**
 
-The immutable [v0.13.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.1)
-release targets commit `f8296cf8d4aba66519a24603c5c7a2a3727f973c`;
-[PR #100](https://github.com/hasanmanzak/meAndAI/pull/100) and
-[issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) retain its
+The immutable [v0.13.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.2)
+release targets commit `0c67c8a26192921840bbd12559d83f0ad450e880`;
+[PR #103](https://github.com/hasanmanzak/meAndAI/pull/103) and
+[issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) retain its
 delivery and publication evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
-[FEAT-0041](../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md)
-/ `BUG-0023` and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
-now own the bounded v0.13.2 capability-finalization correction on
-`codex/bug-0023-owner-attestation`. It preserves every nonempty GitHub review
-collection as authoritative and permits a fallback only for an empty review
-collection plus one canonical exact-head comment from the personal repository
-owner, pull-request creator, and exact `admin` actor. TEST-0163 and TEST-0164
-were added to the existing capability-adoption owner; expected red, focused
-green, structural, and release-bundle evidence are recorded. Hosted gates,
-publication, and the retained external consumer recovery remain pending. Follow the
-[v0.13.2 handoff](log/2026-07-23-v0132-exact-head-owner-attestation.md).
+[FEAT-0042](../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
+/ `BUG-0024` and [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
+own the bounded v0.13.3 historical capability-review recovery on
+`codex/bug-0024-historical-review-recovery`. It accepts only one fully proven
+merged strict-predecessor review, preserves the complete current ledger, uses
+expected-OID branch deletion, closes the issue last, and performs one fresh
+current-catalog inventory. TEST-0165 and TEST-0166 belong to the existing
+capability-adoption owner. Follow the
+[v0.13.3 handoff](log/2026-07-23-v0133-historical-capability-review-recovery.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer
