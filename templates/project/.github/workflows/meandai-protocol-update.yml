@@ -3,12 +3,11 @@ run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github
 
 env:
   PROTOCOL_REPOSITORY: hasanmanzak/meAndAI
-  BOOTSTRAP_PROTOCOL_TAG: v0.13.4
+  BOOTSTRAP_PROTOCOL_TAG: v0.13.5
 
 on:
   schedule:
     - cron: "17 5 * * *"
-  push:
   pull_request:
     types: [closed]
   workflow_dispatch:
@@ -69,9 +68,7 @@ jobs:
            github.event.pull_request.head.repo.full_name == github.repository &&
            (startsWith(github.event.pull_request.head.ref, 'automation/meandai-capabilities-v') ||
             startsWith(github.event.pull_request.head.ref, 'automation/meandai-protocol-v') ||
-            startsWith(github.event.pull_request.head.ref, 'automation/meandai-capability-review-'))) ||
-          (github.event_name == 'push' &&
-           github.ref == format('refs/heads/{0}', github.event.repository.default_branch))
+            startsWith(github.event.pull_request.head.ref, 'automation/meandai-capability-review-')))
         )
       }}
     runs-on: ubuntu-latest
@@ -300,12 +297,10 @@ jobs:
       ${{
          (github.event_name == 'pull_request' &&
          github.event.pull_request.merged == true &&
-         github.event.pull_request.head.repo.full_name == github.repository &&
-         (startsWith(github.event.pull_request.head.ref, 'automation/meandai-capabilities-v') ||
-           startsWith(github.event.pull_request.head.ref, 'automation/meandai-protocol-v') ||
-           startsWith(github.event.pull_request.head.ref, 'automation/meandai-capability-review-'))) ||
-        (github.event_name == 'push' &&
-         github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) ||
+           github.event.pull_request.head.repo.full_name == github.repository &&
+           (startsWith(github.event.pull_request.head.ref, 'automation/meandai-capabilities-v') ||
+             startsWith(github.event.pull_request.head.ref, 'automation/meandai-protocol-v') ||
+             startsWith(github.event.pull_request.head.ref, 'automation/meandai-capability-review-'))) ||
         github.event_name == 'schedule' ||
         github.event_name == 'workflow_dispatch'
       }}

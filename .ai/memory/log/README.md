@@ -5,23 +5,22 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.13.3` completed [FEAT-0042](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/README.md)
-at commit `4285c7a6169d91a7b7cc75b72ce6c88230bf0039`; PR #105 and issue #104
+Immutable `v0.13.4` completed [FEAT-0043](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md)
+at commit `089c63d2aeca2d8188bdaeeced5e33be8d01c256`; PR #107 and issue #106
 retain its delivery and publication evidence. `FIND-0204` remains separately
 owned by TASK-0002 / issue #98.
 
-[FEAT-0043](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
-`BUG-0025`, [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106), and
-`SUBF-0082` govern the v0.13.4 case-safe repository-identity correction in
-[PR #107](https://github.com/hasanmanzak/meAndAI/pull/107). Follow the
-[v0.13.4 handoff](2026-07-23-v0134-case-safe-review-authority.md).
-TEST-0167/0168, test-first evidence, corrected evidence, and bounded review are
-complete; hosted delivery, immutable release, and consumer-side recovery remain
+[FEAT-0044](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md),
+`BUG-0026`, [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108),
+`SUBF-0083`, and `SUBF-0084` govern the bounded v0.13.5 correction. Follow the
+[v0.13.5 handoff](2026-07-23-v0135-slash-safe-ref-single-owner-lifecycle.md).
+TEST-0169/0170 are test-first owners; delivery and consumer recovery remain
 pending.
 `FIND-0120` remains the separate open follow-up in issue #44.
 
 ## History
 
+- [2026-07-23 - v0.13.5 slash-safe ref and single-owner lifecycle](2026-07-23-v0135-slash-safe-ref-single-owner-lifecycle.md)
 - [2026-07-23 - v0.13.4 case-safe review authority](2026-07-23-v0134-case-safe-review-authority.md)
 - [2026-07-23 - v0.13.3 historical capability-review recovery](2026-07-23-v0133-historical-capability-review-recovery.md)
 - [2026-07-23 - v0.13.2 exact-head personal-owner attestation](2026-07-23-v0132-exact-head-owner-attestation.md)

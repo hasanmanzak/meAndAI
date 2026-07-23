@@ -3,6 +3,28 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.13.5 - 2026-07-23
+
+### Fixed
+
+- Preserve literal Git-ref path separators while encoding slash-bearing
+  capability-review branch segments for GitHub API reads and updates.
+- Resume an exact branch-only interrupted semantic handoff without creating a
+  second branch, while retaining expected-OID finalization and idempotency.
+- Make the merged managed pull-request event the sole owner of post-merge
+  finalization and follow-on discovery.
+- Remove push admission from the consumer lifecycle so merge-caused and self-
+  created branch pushes cannot create redundant runners or replace an exact
+  pending merge event; schedule/manual routes retain recovery.
+
+Related work: [FEAT-0044](docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md),
+`BUG-0026`, [DEC-0016](docs/decisions/DEC-0016-managed-post-merge-finalization.md),
+[DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md),
+[DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
+[DEC-0022](docs/decisions/DEC-0022-release-declared-semantic-capabilities.md),
+[DEC-0027](docs/decisions/DEC-0027-single-owner-consumer-merge-events.md),
+and [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108).
+
 ## 0.13.4 - 2026-07-23
 
 ### Fixed

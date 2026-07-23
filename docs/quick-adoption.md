@@ -122,8 +122,8 @@ secret remains untouched and is not a credential source for the local process.
 
 ## Quick command
 
-After GitHub marks `v0.13.4` as an immutable release, download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.13.4/Invoke-MeAndAIQuickAdoption.ps1)
+After GitHub marks `v0.13.5` as an immutable release, download only the thin
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.13.5/Invoke-MeAndAIQuickAdoption.ps1)
 from that exact release with an authenticated browser. Until that condition is
 true, use the latest release that GitHub already marks immutable rather than a
 candidate tag or a moving branch.
@@ -140,11 +140,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.13.4` is an exact published
+launcher itself verifies that its runtime `v0.13.5` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.13.4`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.13.5`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
@@ -431,11 +431,12 @@ meAndAI status labels, and closes the issue as completed.
 
 GitHub does not replay an event that occurred while a route was absent, and a
 merge performed with `GITHUB_TOKEN` may not create another workflow event. The
-installed workflow therefore also runs bounded recovery on an installing
-default-branch push, the schedule, and ordinary manual dispatch. It repairs only
-an exact legacy installing update, then uses the normal finalizer. For a missed
-or failed recovery, run the same route explicitly after confirming the PR is
-merged:
+installed workflow does not subscribe to `push`, because a normal merge already
+emits both PR and default-push events and self-created branches can displace the
+pending exact PR run. The schedule and ordinary manual dispatch run bounded
+recovery instead. They repair only an exact legacy installing update, then use
+the normal finalizer. For a missed or failed recovery, run the same route
+explicitly after confirming the PR is merged:
 
 ```powershell
 gh workflow run meandai-protocol-update.yml --repo <owner>/<repo> -f finalize_pull_request=<merged-pr-number>

@@ -1209,6 +1209,45 @@ try {
         Add-Failure 'TEST-0109 consumer workflow does not separate update discovery from event/recovery finalization.'
     }
 
+    $eventRouter = [regex]::Match(
+        $workflow,
+        '(?ms)^on:\r?\n(?<body>.*?)(?=^permissions:)'
+    )
+    $proposalJob = [regex]::Match(
+        $workflow,
+        '(?ms)^  propose-update:\r?\n(?<body>.*?)(?=^  finalize-managed-merge:)'
+    )
+    $finalizerJob = [regex]::Match(
+        $workflow,
+        '(?ms)^  finalize-managed-merge:\r?\n(?<body>.*)\z'
+    )
+    $sharedConcurrency = [regex]::Match(
+        $workflow,
+        '(?ms)^concurrency:\r?\n(?<body>.*?)(?=^jobs:)'
+    )
+
+    if (-not $eventRouter.Success -or
+        $eventRouter.Groups['body'].Value -cmatch '(?m)^  push(?:\s*:|\s*$)') {
+        Add-Failure 'TEST-0170 consumer lifecycle still starts a second hosted run for the merge-caused push event.'
+    }
+    if (-not $proposalJob.Success -or
+        $proposalJob.Groups['body'].Value.Contains("github.event_name == 'push'")) {
+        Add-Failure 'TEST-0170 proposal ownership still includes the default-branch push recovery route.'
+    }
+    if (-not $finalizerJob.Success -or
+        -not $finalizerJob.Groups['body'].Value.Contains("github.event_name == 'pull_request'") -or
+        -not $finalizerJob.Groups['body'].Value.Contains('github.event.pull_request.merged == true') -or
+        $finalizerJob.Groups['body'].Value.Contains("github.event_name == 'push'") -or
+        -not $finalizerJob.Groups['body'].Value.Contains("github.event_name == 'schedule'") -or
+        -not $finalizerJob.Groups['body'].Value.Contains("github.event_name == 'workflow_dispatch'")) {
+        Add-Failure 'TEST-0170 finalizer does not retain one managed pull-request owner plus schedule and dispatch recovery without a push route.'
+    }
+    if (-not $sharedConcurrency.Success -or
+        -not $sharedConcurrency.Groups['body'].Value.Contains('group: meandai-protocol-update-${{ github.repository }}') -or
+        -not $sharedConcurrency.Groups['body'].Value.Contains('cancel-in-progress: false')) {
+        Add-Failure 'TEST-0170 consumer workflow no longer preserves one shared repository lifecycle concurrency group.'
+    }
+
     $normal = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Normal)
     if ($normal.Threw) {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
@@ -1487,10 +1526,11 @@ foreach ($requiredLegacyText in @(
         Add-Failure "TEST-0112 managed finalizer lacks bounded legacy transition '$requiredLegacyText'."
     }
 }
-if (-not $workflow.Contains('push:') -or
-    -not $workflow.Contains("github.event_name == 'push'") -or
+if (-not $workflow.Contains('pull_request:') -or
+    -not $workflow.Contains("github.event_name == 'pull_request'") -or
+    -not $workflow.Contains('github.event.pull_request.merged == true') -or
     -not $workflow.Contains('pull-requests: write')) {
-    Add-Failure 'TEST-0112 consumer workflow cannot recover an installing legacy update on its default-branch merge.'
+    Add-Failure 'TEST-0112 consumer workflow cannot recover an installing legacy update from its exact merged pull-request event.'
 }
 
 if ($failures.Count -gt 0) {
