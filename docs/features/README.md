@@ -47,6 +47,7 @@
 | [FEAT-0043](FEAT-0043-v0134-case-safe-review-authority/README.md) | Case-safe repository identity for review authority | Complete; publication evidence pending | 0.13.4 |
 | [FEAT-0044](FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) | Slash-safe ref and single-owner consumer lifecycle | Complete | 0.13.5 |
 | [FEAT-0045](FEAT-0045-v0140-canonical-repository-evidence/README.md) | Canonical repository evidence and upstream-owned corrections | Complete | 0.14.0 |
+| [FEAT-0046](FEAT-0046-v0141-consumer-nonduplication-mandate/README.md) | Consumer non-duplication mandate | Complete | 0.14.1 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

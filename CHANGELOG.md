@@ -3,6 +3,22 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.14.1 - 2026-07-23
+
+### Fixed
+
+- Explicitly prohibit consumers from copying, reimplementing, porting,
+  shadowing, forking, or generically retesting protocol-provided reusable
+  assets.
+- Limit consumer-owned changes to genuinely project-specific integration,
+  configuration, domain behavior, and semantic evidence.
+- Require every missing, defective, or insufficient common asset and its
+  generic regression to close in meAndAI before bounded consumer recovery.
+
+Related work: [FEAT-0046](docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md),
+`BUG-0028`, [DEC-0028](docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md),
+and [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112).
+
 ## 0.14.0 - 2026-07-23
 
 ### Added

@@ -17,6 +17,12 @@ These instructions apply to the entire `meAndAI` repository.
    project-neutral fixture and immutable release; do not close common work with
    a named-consumer patch. Treat later consumer recovery as a separate, linked
    operation.
+8. Protocol-provided reusable assets must not be copied, reimplemented, or
+   retested in a consumer. Consumer changes are limited to genuinely
+   project-specific integration, configuration, domain behavior, and semantic
+   evidence. If the common asset is absent or insufficient, correct the common
+   asset and its regression in meAndAI first, publish it, and only then perform
+   bounded consumer recovery.
 
 The protocol is recursively applied to this repository. Project-specific facts
 belong in `.ai/memory`; reusable rules belong in `PROTOCOL.md`. A project rule

@@ -19,8 +19,8 @@ when a later compatible release appears.
 
 ## Outcome
 
-Submodule consumers install a small, consumer-owned workflow during adoption.
-It proposes the latest compatible release through a draft pull request, keeps
+Submodule consumers install a small consumer-resident, protocol-owned workflow
+projection during adoption. It proposes the latest compatible release through a draft pull request, keeps
 repeated runs idempotent, and uses replacement-first, compensated cleanup to
 supersede an untouched older proposal. It never approves or merges the update.
 

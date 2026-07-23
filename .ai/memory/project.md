@@ -9,19 +9,18 @@ Last verified: **2026-07-23**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.14.0` candidate. Latest immutable release:
-  [v0.13.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.5)
-  targets commit `014f9bbe30074a742c84e3915ebcf94b9fe9cc3e`.
-  [PR #109](https://github.com/hasanmanzak/meAndAI/pull/109) and
-  [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) retain its
+- Current protocol version: `0.14.1` candidate. Latest immutable release:
+  [v0.14.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.0)
+  targets commit `a2a987b322f5ea8d705ad6c5325cffc662a60978`.
+  [PR #111](https://github.com/hasanmanzak/meAndAI/pull/111) and
+  [issue #110](https://github.com/hasanmanzak/meAndAI/issues/110) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0045](../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md),
-  `BUG-0027`, `SUBF-0085` through `SUBF-0087`, and
-  [issue #110](https://github.com/hasanmanzak/meAndAI/issues/110) govern the
-  v0.14.0 correction on `codex/bug-0027-canonical-repository-evidence`.
-  TEST-0171 through TEST-0173 pass in existing capability owners. Clean,
-  staged, and worktree bytes use their exact repository authorities; reusable
-  consumer-exposed failures close in the common upstream protocol.
+- Current scope: [FEAT-0046](../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md),
+  `BUG-0028`, `SUBF-0088`, and
+  [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) govern the
+  v0.14.1 correction on `codex/bug-0028-consumer-nonduplication`.
+  TEST-0174 owns the explicit rule that protocol-provided reusable assets and
+  their generic regressions remain single-owned by meAndAI.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -79,11 +78,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Publish the completed FEAT-0045 candidate through one reviewed pull request
-  and immutable v0.14.0 release under issue #110. Do not
-  mutate a consumer from this protocol branch. Consumer recovery, if required,
-  starts only from the published common capability and remains separately
-  reviewed.
+- Publish FEAT-0046 through one reviewed pull request and immutable v0.14.1
+  release under issue #112. Do not mutate a consumer from this protocol branch.
+  Protocol-provided reusable assets and their generic tests stay in meAndAI;
+  consumer recovery starts only after the common release and contains only
+  genuinely project-specific integration or semantic evidence.
 - `FIND-0204` remains the separate elapsed-time residual under TASK-0002 /
   issue #98; FEAT-0043 does not reopen or expand that performance work.
 - `FEAT-0035` / `BUG-0017` completed in v0.12.3 under issue #87. Its focused and
