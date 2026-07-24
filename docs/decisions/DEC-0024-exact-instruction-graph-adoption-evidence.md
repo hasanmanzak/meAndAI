@@ -83,6 +83,12 @@ Repository path tokens are accepted only in an instruction root or on an
 explicit required-reading, authority, or index line. This prevents historical
 prose, JSON values, API endpoints, and examples from silently becoming live
 authority while retaining root bootstrap discovery.
+Within a traversed JSON file that is not itself an instruction root, JSON
+string scalars are opaque payload: Markdown syntax, authority wording, and path
+tokens inside them produce no graph edge. A JSON file designated as an
+instruction root retains the full instruction grammar. An unterminated string
+or unescaped control character encountered by the scalar masker fails closed;
+the instruction-graph parser does not otherwise validate JSON syntax.
 An extensionless flat code-span token additionally requires an explicit
 required-reading/order item, an imperative read/load/consult form, or a
 colon-form authority/index declaration; ordinary command and finding-ID code

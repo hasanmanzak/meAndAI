@@ -70,6 +70,12 @@
   graph. The assertion and its integrity variants now preserve graph identity
   across resets, require all detected links or the exact `- None`
   representation, and reject empty link labels independently.
+- The following hosted aggregate passed the complete quick-adoption lifecycle
+  on both runtimes, then exposed a self-consumer graph false positive:
+  immutable [MIG-0001](../../../migrations/MIG-0001.json) stores Markdown and
+  authority-shaped replacement output as JSON string payload. Non-root JSON
+  strings are now opaque to instruction semantics, while JSON instruction
+  roots retain full discovery and containment checks.
 
 ## Continuation
 

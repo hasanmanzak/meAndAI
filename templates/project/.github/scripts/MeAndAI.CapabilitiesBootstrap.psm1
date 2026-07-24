@@ -607,6 +607,56 @@ function ConvertTo-MeAndAIInstructionReferenceLabel {
     return ([regex]::Replace($Label.Trim(), '\s+', ' ')).ToLowerInvariant()
 }
 
+function Get-MeAndAIInstructionSemanticLine {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Line
+    )
+
+    $extension =
+        (Get-MeAndAIGitPathExtension -Path $SourcePath).ToLowerInvariant()
+    if ($extension -cne '.json' -or
+        (Test-MeAndAIInstructionRootPath -Path $SourcePath)) {
+        return $Line
+    }
+
+    $characters = $Line.ToCharArray()
+    $masked = [char[]]::new($characters.Length)
+    $insideString = $false
+    $escaped = $false
+    for ($index = 0; $index -lt $characters.Length; $index++) {
+        $character = $characters[$index]
+        if ($insideString) {
+            $masked[$index] = ' '
+            if ([int]$character -lt 0x20) {
+                throw "Instruction JSON string in '$SourcePath' contains an unescaped control character."
+            }
+            if ($escaped) {
+                $escaped = $false
+            }
+            elseif ($character -ceq '\') {
+                $escaped = $true
+            }
+            elseif ($character -ceq '"') {
+                $insideString = $false
+            }
+            continue
+        }
+
+        if ($character -ceq '"') {
+            $insideString = $true
+            $masked[$index] = ' '
+        }
+        else {
+            $masked[$index] = $character
+        }
+    }
+    if ($insideString) {
+        throw "Instruction JSON string in '$SourcePath' is unterminated."
+    }
+    return (-join $masked)
+}
+
 function Resolve-MeAndAIInstructionGraphPath {
     param(
         [Parameter(Mandatory)][string]$SourcePath,
@@ -706,8 +756,13 @@ function Get-MeAndAIInstructionGraphReferences {
             }
         }
         if ($insideFence) { continue }
+        $definitionLine = Get-MeAndAIInstructionSemanticLine `
+            -SourcePath $SourcePath -Line $line
+        $definitionLine = [regex]::Replace(
+            $definitionLine, '`[^`\r\n]+`', ' '
+        )
         $definition = [regex]::Match(
-            $line,
+            $definitionLine,
             '^\s*\[(?<id>[^\]]+)\]:\s*(?<target><[^>]+>|\S+)'
         )
         if ($definition.Success) {
@@ -763,18 +818,21 @@ function Get-MeAndAIInstructionGraphReferences {
         }
         if ($insideFence) { continue }
 
+        $semanticLine = Get-MeAndAIInstructionSemanticLine `
+            -SourcePath $SourcePath -Line $line
+
         $isMarkdownTableRow = [regex]::IsMatch(
-            $line, '^\s*\|',
+            $semanticLine, '^\s*\|',
             [Text.RegularExpressions.RegexOptions]::CultureInvariant
         )
         $negatedInstructionLeadIn = Test-MeAndAIInvariantRegex `
-            -InputText $line `
+            -InputText $semanticLine `
             -Pattern '\b(?:do\s+not|must\s+not|never)\b[^\r\n]*\b(?:read|load|consult|open)\b'
         $imperativeReadingLeadIn =
             (Test-MeAndAIInstructionRootPath -Path $SourcePath) -and
             -not $isMarkdownTableRow -and
             -not $negatedInstructionLeadIn -and
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+)?' +
                 '(?:(?:before|then|next|first|please|always|' +
                 'for\s+(?:each|every))\b[^:\r\n]{0,160}\s+)?' +
@@ -783,23 +841,23 @@ function Get-MeAndAIInstructionGraphReferences {
                 '\b(?:files?|documents?|routing|memory)\b[^:\r\n]*:\s*$'
             ))
         $declaresRequiredReadingContext = -not $isMarkdownTableRow -and
-            ((Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            ((Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\bread\s+in\s+this\s+order\b|' +
                 '\brequired\s+reading(?:\s+order)?(?=\s*(?::|$))'
             )) -or $imperativeReadingLeadIn)
         $requiredReadingItem = $requiredReadingContext -and
-            $line -match '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)'
+            $semanticLine -match '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)'
         if ($declaresRequiredReadingContext) {
             $requiredReadingContext = $true
         }
         elseif ($requiredReadingContext -and
-            -not [string]::IsNullOrWhiteSpace($line) -and
+            -not [string]::IsNullOrWhiteSpace($semanticLine) -and
             -not $requiredReadingItem) {
             $requiredReadingContext = $false
         }
 
         $declaresAuthority =
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
                 '(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth|' +
                 'authoritative(?:\s+(?:source|authority))?|' +
@@ -807,37 +865,37 @@ function Get-MeAndAIInstructionGraphReferences {
                 'protocol)\s+){1,3}authoritative\s+(?:source|authority))\s*:'
             )) -or
             (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\b(?:is|are|remains?|serves?\s+as)\s+(?:the\s+)?' +
                 '(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth|' +
                 'authoritative(?:\s+(?:source|authority))?)\b'
             ))) -or
             (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\b(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth)' +
                 '(?:\s+(?:for|of)\s+[^.;:\r\n]{1,128})?\s+' +
                 '(?:is|are|remains?)\b'
             ))) -or
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*\|\s*(?:canonical\s+(?:source|authority)|' +
                 'source[- ]of[- ]truth|authoritative(?:\s+(?:source|' +
                 'authority))?)\s*\|'
             ))
         $declaresIndex =
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+)?(?:(?:canonical|authoritative)\s+)?' +
                 '(?:(?:project|product|feature|decision|test|work)\s+)?' +
                 '(?:index|catalog|tracker)(?:\s+(?:authority|source))?\s*:'
             )) -or
             (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\b(?:is|are|remains?|serves?\s+as)\s+(?:the\s+)?' +
                  '(?:canonical|authoritative)\s+' +
                  '(?:(?:project|product|feature|decision|test|work)\s+)?' +
                  '(?:index|catalog|tracker)\b'
              ))) -or
             (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\b(?:canonical|authoritative)\s+' +
                 '(?:(?:project|product|feature|decision|test|work)\s+)?' +
                 '(?:index|catalog|tracker)' +
@@ -845,26 +903,26 @@ function Get-MeAndAIInstructionGraphReferences {
                 '(?:\s+(?:for|of)\s+[^.;:\r\n]{1,128})?\s+' +
                 '(?:is|are|remains?)\b'
              ))) -or
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*\|\s*(?:(?:canonical|authoritative)\s+)?' +
                 '(?:(?:project|product|feature|decision|test|work)\s+)?' +
                 '(?:index|catalog|tracker)\s*\|'
             ))
         $requiresReading =
             (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\brequired\s+reading(?:\s+order)?(?=\s*(?::|$))|' +
                 '\b(?:must\s+read|load|consult)\b'
             ))) -or
             ((Test-MeAndAIInstructionRootPath -Path $SourcePath) -and
              -not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $line `
+             (Test-MeAndAIInvariantRegex -InputText $semanticLine `
                 -Pattern '\bread(?:\s+and\s+follow)?\b')) -or
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*\|\s*(?:required\s+reading(?:\s+order)?|' +
                 'must\s+read|load|consult|read(?:\s+and\s+follow)?)\s*\|'
             ))
-        $negatesReading = Test-MeAndAIInvariantRegex -InputText $line `
+        $negatesReading = Test-MeAndAIInvariantRegex -InputText $semanticLine `
             -Pattern '\b(do\s+not|must\s+not|never)\b[^\r\n]*\b(read|load|consult)\b'
 
         $lineKind = if ($declaresAuthority) {
@@ -887,7 +945,7 @@ function Get-MeAndAIInstructionGraphReferences {
             $lineKind -cin @('RequiresRead', 'DeclaresAuthority', 'Indexes')
         $acceptFlatExtensionlessCodeSpan =
             $declaresRequiredReadingContext -or $requiredReadingItem -or
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
                 '(?:(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth|' +
                 'authoritative(?:\s+(?:source|authority))?|' +
@@ -897,14 +955,14 @@ function Get-MeAndAIInstructionGraphReferences {
                 '(?:(?:project|product|feature|decision|test|work)\s+)?' +
                 '(?:index|catalog|tracker)(?:\s+(?:authority|source))?)\s*:'
             )) -or
-            (Test-MeAndAIInvariantRegex -InputText $line -Pattern (
+            (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
                 '(?:must\s+read|load|consult|read(?:\s+and\s+follow)?)\b'
             ))
 
         $tokens = [System.Collections.Generic.List[object]]::new()
         $markdownSyntaxLine = [regex]::Replace(
-            $line, '`[^`\r\n]+`', ' '
+            $semanticLine, '`[^`\r\n]+`', ' '
         )
         foreach ($match in [regex]::Matches(
             $markdownSyntaxLine,
@@ -958,7 +1016,7 @@ function Get-MeAndAIInstructionGraphReferences {
             }
         }
         foreach ($match in [regex]::Matches(
-            $line,
+            $semanticLine,
             '`(?<target>[^`\r\n]+)`'
         )) {
             if (-not $acceptRepositoryPathTokens) { continue }
@@ -1035,7 +1093,7 @@ function Get-MeAndAIInstructionGraphReferences {
         # syntax-owned spans first so a relative Markdown target is not also
         # reinterpreted as a root-relative raw token on the same line.
         $rawTokenLine = [regex]::Replace(
-            $line,
+            $semanticLine,
             '!?\[[^\]]+\]\((?:<[^>]+>|[^)\s]+)(?:\s+["''][^"'']*["''])?\)',
             ' '
         )

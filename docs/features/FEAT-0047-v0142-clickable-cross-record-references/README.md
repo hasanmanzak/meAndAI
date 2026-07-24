@@ -7,8 +7,8 @@
 | Target version | 0.14.2 |
 | Issue | [#114](https://github.com/hasanmanzak/meAndAI/issues/114) |
 | Pull request | [#115](https://github.com/hasanmanzak/meAndAI/pull/115) |
-| Decisions | N/A - direct clarification of the existing clickable-link contract |
-| Tests | [TEST-0175](test-cases.md), [TEST-0176](test-cases.md) |
+| Decisions | Link rule: direct clarification; graph-parser conformance: [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
+| Tests | [TEST-0175](test-cases.md), [TEST-0176](test-cases.md), [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -130,6 +130,7 @@ rule.
 | `FIND-0228` | The last paginated live audit found an Actions run labelled like a pull-request number and one canonical idea-document title left as free text | The closed pull request now labels the exact hosted run without a false `#` identity and the closed issue links the immutable idea document; their states and delivery meaning remain unchanged |
 | `FIND-0229` | A title-inclusive pass found eight secondary record IDs across closed issues [#87](https://github.com/hasanmanzak/meAndAI/issues/87), [#85](https://github.com/hasanmanzak/meAndAI/issues/85), [#83](https://github.com/hasanmanzak/meAndAI/issues/83), [#63](https://github.com/hasanmanzak/meAndAI/issues/63), and [#61](https://github.com/hasanmanzak/meAndAI/issues/61), plus closed pull requests [#62](https://github.com/hasanmanzak/meAndAI/pull/62) and [#2](https://github.com/hasanmanzak/meAndAI/pull/2); GitHub titles cannot render links | Each title retains only its leading owned feature identity, while linked related records remain in the body; all seven records kept their closed state and exact body hash |
 | `FIND-0230` | The next hosted aggregate reached [TEST-0176](test-cases.md) and found that its assertion fabricated an empty blob-link expectation when the fixture correctly detected no protocol surfaces | The assertion now snapshots graph identity before integrity-fixture resets, requires every detected surface link, requires `- None` for an empty surface set, and independently rejects an empty link label |
+| `FIND-0231` | The following hosted aggregate passed the complete quick-adoption lifecycle and then found that Markdown and authority-shaped output payloads inside immutable [MIG-0001](../../../migrations/MIG-0001.json) were being interpreted relative to the migration-definition file as live instruction edges | Non-root JSON string scalars are masked from instruction semantics while JSON instruction roots retain the full grammar; focused [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) fixtures preserve root discovery, containment, unterminated/control-character masking failure, and the immutable migration bytes across PowerShell 5.1 and 7 |
 
 ## Definition of Done
 
