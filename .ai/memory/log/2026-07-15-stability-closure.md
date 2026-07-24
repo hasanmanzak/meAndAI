@@ -5,7 +5,7 @@
 - Tracking: [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36)
 - Delivery: [pull request #37](https://github.com/hasanmanzak/meAndAI/pull/37)
 - Target: `0.8.1`
-- Status: Complete; exact publication evidence is retained by issue #36 and the
+- Status: Complete; exact publication evidence is retained by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and the
   immutable `v0.8.1` release.
 
 The correction closes nine root findings from the v0.8.0 scan. Qualified
@@ -23,5 +23,5 @@ confirmation found no unresolved blocking finding.
 
 The implementation remains inside the existing scripts, fixtures, protocol
 documents, and CI workflow. No hosted coordinator, semantic memory validator,
-or recursive bootstrap layer was added. Issue #36 and its linked pull request
+or recursive bootstrap layer was added. [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and its linked pull request
 own live delivery and post-publication evidence.

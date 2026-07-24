@@ -1261,18 +1261,18 @@ function Get-RemoteChangedPaths {
     ))
 }
 
-function Set-ExistingSchema7AdoptionMarker {
+function Set-ExistingSchema9AdoptionMarker {
     param(
         [Parameter(Mandatory)][string]$Head,
         [Parameter(Mandatory)]$SourceMarker
     )
 
-    if ([long]$SourceMarker.schema -ne 7 -or
+    if ([long]$SourceMarker.schema -ne 9 -or
         [string]$SourceMarker.phase -cne 'Proposed') {
-        throw 'A schema-7 Proposed marker is required to construct current completion evidence.'
+        throw 'A schema-9 Proposed marker is required to construct current completion evidence.'
     }
     $marker = [ordered]@{
-        schema = 7
+        schema = 9
         phase = 'Completed'
         state = [string]$SourceMarker.state
         target = [string]$SourceMarker.target
@@ -1280,7 +1280,6 @@ function Set-ExistingSchema7AdoptionMarker {
         head = $Head
         branch = [string]$SourceMarker.branch
         adoptionStrategy = [string]$SourceMarker.adoptionStrategy
-        protocolSurfaces = @($SourceMarker.protocolSurfaces)
         protocolRecordLossAcknowledged =
             [bool]$SourceMarker.protocolRecordLossAcknowledged
         graphBase = [string]$SourceMarker.graphBase
@@ -1293,8 +1292,20 @@ function Set-ExistingSchema7AdoptionMarker {
     $global:PullRequestExists = $true
     $global:ExistingPullRequestHead = $Head
     $global:ExistingPullRequestProtocolSha = [string]$SourceMarker.protocolSha
-    $global:ExistingPullRequestBody = `
-        "<!-- meandai-capabilities-adoption:$marker -->"
+    $replacement = "<!-- meandai-capabilities-adoption:$marker -->"
+    $matches = [regex]::Matches(
+        [string]$global:ExistingPullRequestBody,
+        '<!-- meandai-capabilities-adoption:\{[^\r\n]*\} -->'
+    )
+    if ($matches.Count -ne 1) {
+        throw 'The current schema-9 proposal body has no single replaceable marker.'
+    }
+    $match = $matches[0]
+    $global:ExistingPullRequestBody =
+        $global:ExistingPullRequestBody.Substring(0, $match.Index) +
+        $replacement + $global:ExistingPullRequestBody.Substring(
+            $match.Index + $match.Length
+        )
     $global:ExistingPullRequestIsDraft = $false
     return [string]$global:ExistingPullRequestBody
 }
@@ -1497,7 +1508,7 @@ function New-CompletedStrategyFixture {
         Invoke-BootstrapFixture -Fixture $fixture -AdoptionStrategy $Strategy
     }
     if ($initial.Threw) {
-        throw "$Strategy schema-7 proposal creation failed: $($initial.Error)"
+        throw "$Strategy schema-9 proposal creation failed: $($initial.Error)"
     }
     $branch = 'automation/meandai-capabilities-v0.5.0'
     $proposalHead = [string]$global:ExistingPullRequestHead
@@ -1510,7 +1521,7 @@ function New-CompletedStrategyFixture {
         '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
     )
     if (-not $proposalMarkerMatch.Success) {
-        throw "$Strategy schema-7 proposal marker could not be parsed."
+        throw "$Strategy schema-9 proposal marker could not be parsed."
     }
     $proposalMarker = $proposalMarkerMatch.Groups['json'].Value |
         ConvertFrom-Json
@@ -1520,7 +1531,7 @@ function New-CompletedStrategyFixture {
         'AdoptionReviewRequired'
     }
     else { 'BootstrapReady' }
-    if ([long]$proposalMarker.schema -ne 7 -or
+    if ([long]$proposalMarker.schema -ne 9 -or
         [string]$proposalMarker.phase -cne 'Proposed' -or
         $proposalState -cne $expectedProposalState -or
         [string]$proposalMarker.adoptionStrategy -cne $Strategy -or
@@ -1529,7 +1540,7 @@ function New-CompletedStrategyFixture {
         [string]$proposalMarker.graphDigest -cnotmatch '^[0-9a-f]{64}$' -or
         $null -eq $proposalMarker.graphCounts -or
         $null -eq $proposalMarker.graphLimits) {
-        throw "$Strategy proposal did not publish the expected graph-aware schema-7 $expectedProposalState state."
+        throw "$Strategy proposal did not publish the expected graph-aware schema-9 $expectedProposalState state."
     }
     $legacyRuleSurfacePath = switch ($LegacyRuleSurface) {
         'Cursor' { '.cursor/rules/consumer.mdc' }
@@ -1560,7 +1571,7 @@ function New-CompletedStrategyFixture {
         [string]$proposalMarker.protocolSha) {
         throw "$Strategy completion changed the proposal's protocol identity."
     }
-    $completedBody = Set-ExistingSchema7AdoptionMarker `
+    $completedBody = Set-ExistingSchema9AdoptionMarker `
         -Head ([string]$completion.Head) -SourceMarker $proposalMarker
     Invoke-Git -Repository $fixture.Consumer -Arguments @(
         'switch', 'main'
@@ -1576,7 +1587,7 @@ function New-CompletedStrategyFixture {
     if ($completed.Threw -or
         $global:PullRequestCreateCalls -ne $createCallsBeforeCompletion -or
         [string]$global:ExistingPullRequestBody -cne $completedBody) {
-        Add-Failure "TEST-0128 valid schema-7 $Strategy Completed proposal was not retained: $($completed.Error)"
+        Add-Failure "TEST-0128 valid schema-9 $Strategy Completed proposal was not retained: $($completed.Error)"
     }
     return [pscustomobject]@{
         Fixture = $fixture
@@ -1750,11 +1761,11 @@ try {
             $graphChangedPaths.Count -ne 1 -or
             [string]$graphChangedPaths[0] -cne
                 '.ai/adoption/meandai-capabilities.json' -or
-            $null -eq $graphMarker -or [long]$graphMarker.schema -ne 7 -or
+            $null -eq $graphMarker -or [long]$graphMarker.schema -ne 9 -or
             [string]$graphMarker.graphBase -cne $graphAssessedBase -or
             [string]$graphMarker.graphDigest -cne
                 [string]$graphIdentity.graphDigest) {
-            Add-Failure 'TEST-0153 exact hosted-adapter proposal did not preserve the independently rebuilt parent-base graph in its schema-3 manifest and schema-7 marker.'
+            Add-Failure 'TEST-0153 exact hosted-adapter proposal did not preserve the independently rebuilt parent-base graph in its schema-3 manifest and path-free schema-9 marker.'
         }
         Invoke-Git -Repository $graphBound.Consumer -Arguments @(
             'push', 'origin', '--delete',
@@ -1918,7 +1929,7 @@ try {
             }
         }
         catch {
-            Add-Failure "TEST-0128/TEST-0129 current schema-7 $strategy Completed fixture could not be constructed: $($_.Exception.Message)"
+            Add-Failure "TEST-0128/TEST-0129 current schema-9 $strategy Completed fixture could not be constructed: $($_.Exception.Message)"
         }
     }
     if ($null -eq $fullMigrationClosureControl) {
@@ -1989,9 +2000,9 @@ try {
         else { $null }
         $partialBranch = 'automation/meandai-capabilities-v0.5.0'
         if ($null -eq $partialProposedMarker -or
-            [long]$partialProposedMarker.schema -ne 7 -or
+            [long]$partialProposedMarker.schema -ne 9 -or
             [string]$partialProposedMarker.phase -cne 'Proposed') {
-            Add-Failure 'TEST-0154 hosted partial-completion proposal did not publish one graph-aware schema-7 marker.'
+            Add-Failure 'TEST-0154 hosted partial-completion proposal did not publish one graph-aware path-free schema-9 marker.'
         }
         else {
             Invoke-Git -Repository $partialClosure.Consumer `
@@ -1999,7 +2010,7 @@ try {
             $partialCompletion = Install-StrategyCompletionTree `
                 -Fixture $partialClosure -Strategy 'FullMigration' `
                 -HasAgentsCollision $true
-            $partialCompletedBody = Set-ExistingSchema7AdoptionMarker `
+            $partialCompletedBody = Set-ExistingSchema9AdoptionMarker `
                 -Head ([string]$partialCompletion.Head) `
                 -SourceMarker $partialProposedMarker
             Invoke-Git -Repository $partialClosure.Consumer `
@@ -2199,7 +2210,7 @@ try {
             @($manifest.protocolSurfaces).Count -ne 0 -or
             $null -eq $manifest.sourceGraph -or
             $null -eq $freshProposedMarker -or
-            [long]$freshProposedMarker.schema -ne 7 -or
+            [long]$freshProposedMarker.schema -ne 9 -or
             [string]$freshProposedMarker.phase -cne 'Proposed' -or
             [string]$freshProposedMarker.branch -cne
                 'automation/meandai-capabilities-v0.5.0' -or
@@ -2209,16 +2220,27 @@ try {
                 [string]$freshProposedMarker.graphDigest -or
             [string]$manifestGraphCounts -cne [string]$markerGraphCounts -or
             [string]$manifestGraphLimits -cne [string]$markerGraphLimits) {
-            Add-Failure 'TEST-0128 fresh proposal did not bind the exact strategy and source graph through its schema-3 manifest and schema-7 marker.'
+            Add-Failure 'TEST-0128 fresh proposal did not bind the exact strategy and source graph through its schema-3 manifest and path-free schema-9 marker.'
         }
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
-            -not $global:LastPullRequestBody.Contains('"schema":7') -or
+            -not $global:LastPullRequestBody.Contains('"schema":9') -or
+            $global:LastPullRequestBody.Contains('"protocolSurfaces"') -or
             -not $global:LastPullRequestBody.Contains('"phase":"Proposed"') -or
             -not $global:LastPullRequestBody.Contains('"adoptionStrategy":"FreshAdoption"') -or
             -not $global:LastPullRequestBody.Contains('"actor":"owner"') -or
             $global:LastPullRequestHead -cne 'automation/meandai-capabilities-v0.5.0') {
             Add-Failure 'TEST-0028 bootstrap did not create the deterministic draft proposal.'
+        }
+        $freshBaseHead = (@(Invoke-Git -Repository $empty.Consumer `
+            -Arguments @('rev-parse', 'main')))[0]
+        $expectedManifestLink =
+            "[``.ai/adoption/meandai-capabilities.json``](https://github.com/owner/consumer/blob/$($global:ExistingPullRequestHead)/.ai/adoption/meandai-capabilities.json)"
+        if (-not $global:LastPullRequestBody.Contains($expectedManifestLink) -or
+            -not $global:LastPullRequestBody.Contains(
+                "[${freshBaseHead}](https://github.com/owner/consumer/commit/$freshBaseHead)"
+            )) {
+            Add-Failure 'TEST-0176 fresh hosted proposal did not link its source commit and transient manifest to exact immutable targets.'
         }
     }
 
@@ -2253,7 +2275,7 @@ try {
             [string]$freshProposedMarker.protocolSha) {
             throw 'Fresh completion changed the proposal protocol identity.'
         }
-        $completedBody = Set-ExistingSchema7AdoptionMarker `
+        $completedBody = Set-ExistingSchema9AdoptionMarker `
             -Head $completedHead -SourceMarker $freshProposedMarker
         $createCallsBeforeCompletedRerun = $global:PullRequestCreateCalls
         Invoke-Git -Repository $empty.Consumer -Arguments @('switch', 'main') | Out-Null
@@ -2525,7 +2547,7 @@ try {
                 $variantHead = (@(Invoke-Git -Repository $variantClone -Arguments @(
                     'rev-parse', 'HEAD'
                 )))[0]
-                [void](Set-ExistingSchema7AdoptionMarker `
+                [void](Set-ExistingSchema9AdoptionMarker `
                     -Head $variantHead -SourceMarker $freshProposedMarker)
                 $createCallsBeforeVariant = $global:PullRequestCreateCalls
                 $variantResult = Invoke-BootstrapFixture -Fixture $empty
@@ -2671,6 +2693,18 @@ try {
             @($manifest.collisions) -cnotcontains 'AGENTS.md') {
             Add-Failure 'TEST-0030 manifest did not record the exact adoption collision.'
         }
+        $collisionBaseHead = (@(Invoke-Git `
+            -Repository $collision.Consumer -Arguments @(
+                'rev-parse', 'main'
+            )))[0]
+        $expectedCollisionLink =
+            "[``AGENTS.md``](https://github.com/owner/consumer/blob/$collisionBaseHead/AGENTS.md)"
+        if (-not $global:LastPullRequestBody.Contains(
+                $expectedCollisionLink
+            ) -or
+            $global:LastPullRequestBody.Contains('"protocolSurfaces"')) {
+            Add-Failure 'TEST-0176 hosted collision proposal did not expose its surface and collision as exact immutable blob links outside the marker.'
+        }
         $agents = (Invoke-Git -Repository $collision.Consumer -Arguments @(
             'show', 'FETCH_HEAD:AGENTS.md'
         )) -join "`n"
@@ -2688,7 +2722,10 @@ try {
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1 -or
         -not $global:LastPullRequestBody.Contains('"adoptionStrategy":"CleanStart"') -or
-        -not $global:LastPullRequestBody.Contains('"protocolSurfaces":["AGENTS.md"]') -or
+        $global:LastPullRequestBody.Contains('"protocolSurfaces"') -or
+        -not $global:LastPullRequestBody.Contains(
+            '[`AGENTS.md`](https://github.com/owner/consumer/blob/'
+        ) -or
         -not $global:LastPullRequestBody.Contains('"protocolRecordLossAcknowledged":true')) {
         Add-Failure "TEST-0128 acknowledged CleanStart did not produce one strategy-bound draft: $($result.Error)"
     }

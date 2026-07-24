@@ -8,11 +8,11 @@
 | Issue and post-publication authority | [#77](https://github.com/hasanmanzak/meAndAI/issues/77) |
 | Pull request | [#78](https://github.com/hasanmanzak/meAndAI/pull/78) |
 | Decisions | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md); [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
-| Tests | [TEST-0131 and TEST-0132](test-cases.md) |
+| Tests | [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
 
 ## Problem and intended outcome
 
-The common protocol and DEC-0015 already define the normative event-triggered
+The common protocol and [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) already define the normative event-triggered
 stability and consistency cycle. Maintainers do not yet have one copy-ready,
 bounded prompt for asking an AI agent to execute that cycle through a tool's
 optional recurring-task or goal mechanism. Calling the artifact a goal or
@@ -32,7 +32,7 @@ final-push authority.
 
 - Add a small `docs/agent-prompts` index and one canonical stability-cycle
   prompt.
-- Preserve DEC-0015 lifecycle, disposition, dependency, review, boundedness,
+- Preserve [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) lifecycle, disposition, dependency, review, boundedness,
   waiting, blocked, and publication semantics in the prompt.
 - Make the artifact reachable from this repository, submodule consumers, and
   repository-reference consumers through the immutable protocol source.
@@ -54,7 +54,7 @@ final-push authority.
 
 ## Contracts and compatibility
 
-- Normative authority remains the consumer's pinned `PROTOCOL.md`, DEC-0015,
+- Normative authority remains the consumer's pinned [PROTOCOL.md](../../../PROTOCOL.md), [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md),
   and applicable repository-local instructions. The prompt summarizes an
   invocation contract and cannot override them.
 - Invocation is event-triggered. With no material development and no new
@@ -80,15 +80,15 @@ final-push authority.
 
 | ID | Classification | Risk | Response and required evidence |
 | --- | --- | --- | --- |
-| `RISK-0135` | Autonomous-loop ambiguity | A reusable prompt is mistaken for a self-running goal | Explicit opt-in/non-scheduling contract and `TEST-0132` |
-| `RISK-0136` | Authority expansion | The prompt assumes push or release authority | Report-only default, explicit publication mode, no-tag/release wording, and `TEST-0131` |
-| `RISK-0137` | Normative drift | Prompt wording diverges from DEC-0015 | Section-bound structural assertions and direct authority links in `TEST-0131` |
+| `RISK-0135` | Autonomous-loop ambiguity | A reusable prompt is mistaken for a self-running goal | Explicit opt-in/non-scheduling contract and [TEST-0132](test-cases.md) |
+| `RISK-0136` | Authority expansion | The prompt assumes push or release authority | Report-only default, explicit publication mode, no-tag/release wording, and [TEST-0131](test-cases.md) |
+| `RISK-0137` | Normative drift | Prompt wording diverges from [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) | Section-bound structural assertions and direct authority links in [TEST-0131](test-cases.md) |
 
 ## Readiness evidence
 
 | Field | Declaration |
 | --- | --- |
-| Baseline | FEAT-0015 and DEC-0015 are complete and normative in protocol 0.10.4 |
+| Baseline | [FEAT-0015](../FEAT-0015-stability-consistency-mandate/README.md) and [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) are complete and normative in protocol 0.10.4 |
 | Entry points | Maintainer copy/reference; immutable submodule path; immutable repository-reference path |
 | Consumers | meAndAI maintainers and consumer-repository maintainers using any agent/task product |
 | Compatibility | Documentation-only opt-in surface; no consumer-owned or managed automation path changes |
@@ -96,15 +96,15 @@ final-push authority.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0131 and TEST-0132](test-cases.md) |
-| Test code | Passed | Repository structural suite owns and passes `TEST-0131` and `TEST-0132` |
-| Baseline run | Green inherited baseline | Existing TEST-0096 through TEST-0099 prove the normative cycle |
+| Scenarios | Defined | [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
+| Test code | Passed | Repository structural suite owns and passes [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
+| Baseline run | Green inherited baseline | Existing [TEST-0096](../FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0097](../FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0098](../FEAT-0015-stability-consistency-mandate/test-cases.md), and [TEST-0099](../FEAT-0015-stability-consistency-mandate/test-cases.md) prove the normative cycle |
 
 ## Decomposition and review gate
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0055` | Optional prompt, index, consumer reachability, and structural contract | [Issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) | `TEST-0131`, `TEST-0132`; passed | Fidelity, authority, reachability, and no-activation diff; no open `Blocking` finding | Complete |
+| `SUBF-0055` | Optional prompt, index, consumer reachability, and structural contract | [Issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) | [TEST-0131](test-cases.md), [TEST-0132](test-cases.md); passed | Fidelity, authority, reachability, and no-activation diff; no open `Blocking` finding | Complete |
 
 ## Relationships
 
@@ -152,12 +152,12 @@ fresh-diff review. The artifact remains report-only by default and does not
 create or activate a goal, recurring task, automation, workflow, schedule,
 background loop, or next invocation. Its local-convergence and full-completion
 states now match the normative final-push boundary. Shared
-FEAT-0029/FEAT-0030 convergence reports no unresolved `Blocking` finding.
+[FEAT-0029](../FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) and [FEAT-0030](README.md) convergence reports no unresolved `Blocking` finding.
 
 ## Definition of Done
 
 - [x] Acceptance criteria met in the focused structural scope.
-- [x] TEST-0131 and TEST-0132 have executable ownership and pass structure-only validation.
+- [x] [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) have executable ownership and pass structure-only validation.
 - [x] Fresh-diff review and bounded full-project convergence complete.
 - [x] Documentation, links, changelog, version, and memory agree.
 - [ ] Pull request, hosted checks, review, merge, branch cleanup, immutable

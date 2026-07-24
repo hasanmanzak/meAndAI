@@ -5,20 +5,26 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable `v0.14.0` completed [FEAT-0045](../../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/README.md)
-at commit `a2a987b322f5ea8d705ad6c5325cffc662a60978`; PR #111 and issue #110
-retain its delivery and publication evidence. `FIND-0204` remains separately
-owned by TASK-0002 / issue #98.
+Immutable [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
+completed [FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md)
+at commit `f153e21a3098945a1b669563046f875ef6fb8b60`;
+[PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
+[issue #112](https://github.com/hasanmanzak/meAndAI/issues/112)
+retain its delivery and publication evidence. [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) remains separately
+owned by [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) / [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
 
-[FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md),
-`BUG-0028`, [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112),
-and `SUBF-0088` govern the bounded v0.14.1 mandate. Follow the
-[v0.14.1 handoff](2026-07-23-v0141-consumer-nonduplication.md).
-TEST-0174 is the test-first owner; delivery remains pending.
-`FIND-0120` remains the separate open follow-up in issue #44.
+[FEAT-0047](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
+[BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
+[SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md),
+and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) govern the
+bounded v0.14.2 correction. Follow the
+[v0.14.2 handoff](2026-07-24-v0142-clickable-cross-record-references.md).
+[FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains the separate open follow-up in [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
 
 ## History
 
+- [2026-07-24 - v0.14.2 clickable cross-record references](2026-07-24-v0142-clickable-cross-record-references.md)
 - [2026-07-23 - v0.14.1 consumer non-duplication mandate](2026-07-23-v0141-consumer-nonduplication.md)
 - [2026-07-23 - v0.14.0 canonical repository evidence](2026-07-23-v0140-canonical-repository-evidence.md)
 - [2026-07-23 - v0.13.5 slash-safe ref and single-owner lifecycle](2026-07-23-v0135-slash-safe-ref-single-owner-lifecycle.md)

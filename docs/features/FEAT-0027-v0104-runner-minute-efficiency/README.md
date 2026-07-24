@@ -8,7 +8,7 @@
 | Issue | [#72](https://github.com/hasanmanzak/meAndAI/issues/72) |
 | Pull request | [#73](https://github.com/hasanmanzak/meAndAI/pull/73) |
 | Decision | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md) |
-| Tests | [TEST-0123 and TEST-0124](test-cases.md) |
+| Tests | [TEST-0123](test-cases.md) and [TEST-0124](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -80,21 +80,21 @@ behavior. Ambiguous classification must select the full suite.
 
 | ID | Classification | Risk | Response and required evidence |
 | --- | --- | --- | --- |
-| `RISK-0119` | Coverage | A sensitive path is misclassified as native-only | Broad explicit sensitive extensions/directories, rename-disabled Git diff, fail-safe `Full`, `TEST-0123` |
-| `RISK-0120` | Evidence integrity | A partial Windows run claims the canonical scenario set | Compatibility-only result parser and profile boundary, `TEST-0124` |
-| `RISK-0121` | Required-check continuity | Conditional workflows or renamed jobs leave branch protection pending or ambiguous | One always-present job keeps the exact `Validate on windows-latest` name; no workflow-level path filter or duplicate name, `TEST-0124` |
-| `RISK-0122` | Cancellation | A newer PR run cancels main, manual, merge-queue, or publication evidence | Workflow-and-PR-scoped group with cancellation enabled only for pull requests, `TEST-0124` |
+| `RISK-0119` | Coverage | A sensitive path is misclassified as native-only | Broad explicit sensitive extensions/directories, rename-disabled Git diff, fail-safe `Full`, [TEST-0123](test-cases.md) |
+| `RISK-0120` | Evidence integrity | A partial Windows run claims the canonical scenario set | Compatibility-only result parser and profile boundary, [TEST-0124](test-cases.md) |
+| `RISK-0121` | Required-check continuity | Conditional workflows or renamed jobs leave branch protection pending or ambiguous | One always-present job keeps the exact `Validate on windows-latest` name; no workflow-level path filter or duplicate name, [TEST-0124](test-cases.md) |
+| `RISK-0122` | Cancellation | A newer PR run cancels main, manual, merge-queue, or publication evidence | Workflow-and-PR-scoped group with cancellation enabled only for pull requests, [TEST-0124](test-cases.md) |
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0027`, `SUBF-0049`, `SUBF-0050`, `DEC-0019`,
-      `TEST-0123`, `TEST-0124`, and issue #72 exist.
+- [x] Stable `FEAT-0027`, `SUBF-0049`, `SUBF-0050`, [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md),
+      [TEST-0123](test-cases.md), [TEST-0124](test-cases.md), and [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) exist.
 - [x] Runner authority, semantic profile, diff identity, sensitive path,
       ambiguity, cancellation, evidence, and release-routing contracts are
       explicit.
 - [x] Scope preserves native Windows coverage and excludes hosted framework or
       timing-gate expansion.
-- [x] Prior FEAT-0024/FEAT-0025 orchestration and current hosted durations were
+- [x] Prior [FEAT-0024](../FEAT-0024-v0101-parallel-windows-validation/README.md)/[FEAT-0025](../FEAT-0025-v0102-balanced-windows-validation/README.md) orchestration and current hosted durations were
       reviewed.
 - [x] Work is decomposed into the protocol/routing slice and focused native
       compatibility slice.
@@ -129,8 +129,8 @@ behavior. Ambiguous classification must select the full suite.
 
 | ID | Slice | Tracking | Tests | Review gate | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0049` | Runner-efficiency mandate, fail-safe profile selector, single-job workflow, and PR-only concurrency | [Issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) | `TEST-0123`, `TEST-0124` | Selector fixtures, structure validation, and the bounded fresh-diff review pass | Complete |
-| `SUBF-0050` | Compatibility-only `WindowsNative` execution across launcher and streaming/process-tree evidence | [Issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) | `TEST-0124` | PowerShell 5.1 profile passed in 187.1 seconds with compatibility-only evidence; the complete suite passed in 577.7 seconds | Complete |
+| `SUBF-0049` | Runner-efficiency mandate, fail-safe profile selector, single-job workflow, and PR-only concurrency | [Issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) | [TEST-0123](test-cases.md), [TEST-0124](test-cases.md) | Selector fixtures, structure validation, and the bounded fresh-diff review pass | Complete |
+| `SUBF-0050` | Compatibility-only `WindowsNative` execution across launcher and streaming/process-tree evidence | [Issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) | [TEST-0124](test-cases.md) | PowerShell 5.1 profile passed in 187.1 seconds with compatibility-only evidence; the complete suite passed in 577.7 seconds | Complete |
 
 ## Verification approach
 

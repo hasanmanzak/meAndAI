@@ -66,6 +66,35 @@ function Get-TestPathSetSha256 {
     }
 }
 
+function Get-TestSha256Text {
+    param([Parameter(Mandatory)][string]$Text)
+
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Text)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($algorithm.ComputeHash($bytes))).Replace(
+            '-', ''
+        ).ToLowerInvariant()
+    }
+    finally {
+        $algorithm.Dispose()
+    }
+}
+
+function Get-TestLinkedPathDigest {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
+
+    $builder = [Text.StringBuilder]::new()
+    [void]$builder.Append("schema=1`ncount=$(@($Paths).Count)`n")
+    foreach ($value in @($Paths)) {
+        $path = [string]$value
+        [void]$builder.Append(
+            "$([Text.Encoding]::UTF8.GetByteCount($path))`:$path`n"
+        )
+    }
+    return Get-TestSha256Text -Text $builder.ToString()
+}
+
 function Get-TestSha1 {
     param([Parameter(Mandatory)][byte[]]$Bytes)
 
@@ -295,6 +324,8 @@ function New-FinalizationScenario {
         [string]$TrackingMode = 'Canonical',
         [ValidateSet(1, 2)]
         [int]$UpdateSchema = 1,
+        [ValidateSet(3, 7, 9, 11)]
+        [int]$AdoptionSchema = 3,
         [bool]$InvalidLegacyRelease = $false,
         [bool]$WrongLegacyAssetBlob = $false,
         [bool]$FabricatedSchema2Output = $false,
@@ -422,11 +453,50 @@ function New-FinalizationScenario {
     }
     $marker = switch ($Kind) {
         'Adoption' {
-            [ordered]@{
-                schema = 3; phase = 'Completed'; state = 'BootstrapReady'
-                target = $target; protocolSha = $protocolSha; head = $head
-                repository = 'owner/consumer'; actor = 'updater-owner'
-            } | ConvertTo-Json -Compress
+            $record = if ($AdoptionSchema -eq 3) {
+                [ordered]@{
+                    schema = 3; phase = 'Completed'; state = 'BootstrapReady'
+                    target = $target; protocolSha = $protocolSha; head = $head
+                    repository = 'owner/consumer'; actor = 'updater-owner'
+                }
+            }
+            elseif ($AdoptionSchema -eq 7) {
+                [ordered]@{
+                    schema = 7; phase = 'Completed'; state = 'BootstrapReady'
+                    target = $target; protocolSha = $protocolSha; head = $head
+                    branch = $branch; adoptionStrategy = 'FreshAdoption'
+                    protocolSurfaces = @('AGENTS.md')
+                    protocolRecordLossAcknowledged = $false
+                    graphBase = $base; graphDigest = 'c' * 64
+                    graphCounts = [ordered]@{ nodes = 1; edges = 0; candidates = 1 }
+                    graphLimits = [ordered]@{ maxNodes = 100; maxEdges = 200; maxCandidates = 100 }
+                    repository = 'owner/consumer'; actor = 'updater-owner'
+                }
+            }
+            elseif ($AdoptionSchema -eq 9) {
+                [ordered]@{
+                    schema = 9; phase = 'Completed'; state = 'BootstrapReady'
+                    target = $target; protocolSha = $protocolSha; head = $head
+                    branch = $branch; adoptionStrategy = 'FreshAdoption'
+                    protocolRecordLossAcknowledged = $false
+                    graphBase = $base; graphDigest = 'c' * 64
+                    graphCounts = [ordered]@{ nodes = 1; edges = 0; candidates = 1 }
+                    graphLimits = [ordered]@{ maxNodes = 100; maxEdges = 200; maxCandidates = 100 }
+                    repository = 'owner/consumer'; actor = 'updater-owner'
+                }
+            }
+            else {
+                [ordered]@{
+                    schema = 11; phase = 'Completed'; state = 'BootstrapReady'
+                    target = $target; protocolSha = $protocolSha; head = $head
+                    branch = $branch; adoptionStrategy = 'FreshAdoption'
+                    surfaceBase = $base
+                    surfaceDigest = Get-TestLinkedPathDigest -Paths @('AGENTS.md')
+                    protocolRecordLossAcknowledged = $false
+                    repository = 'owner/consumer'; actor = 'updater-owner'
+                }
+            }
+            $record | ConvertTo-Json -Depth 8 -Compress
         }
         'Update' {
             if ($isSchema2) {
@@ -456,17 +526,17 @@ function New-FinalizationScenario {
         default { '' }
     }
     $body = switch ($Kind) {
-        'Adoption' { "<!-- meandai-capabilities-adoption:$marker -->`n## Adoption`n`nTracking issue: #9" }
+        'Adoption' { "<!-- meandai-capabilities-adoption:$marker -->`n## Adoption`n`nTracking issue: [#9](https://github.com/owner/consumer/issues/9)" }
         'Update' {
             $tracking = switch ($TrackingMode) {
-                'Canonical' { "`n`nTracking issue: #9" }
+                'Canonical' { "`n`nTracking issue: [#9](https://github.com/owner/consumer/issues/9)" }
                 'Placeholder' { "`n`nTracking issue: #REQUIRED" }
                 default { '' }
             }
             "<!-- meandai-protocol-update:$marker -->`n## Update$tracking"
         }
         'MigrationReconciliation' {
-            "<!-- meandai-protocol-update:$marker -->`n## Reconciliation`n`nTracking issue: #9"
+            "<!-- meandai-protocol-update:$marker -->`n## Reconciliation`n`nTracking issue: [#9](https://github.com/owner/consumer/issues/9)"
         }
         default { '## Ordinary pull request' }
     }
@@ -478,7 +548,40 @@ function New-FinalizationScenario {
         }
     })
     $issueBody = if ($Kind -ceq 'Adoption') {
-        "<!-- meandai-local-adoption:$target`:pr-42 -->`n## AI capabilities adoption tracking"
+        $pullRequestUrl = 'https://github.com/owner/consumer/pull/42'
+        $bindingPayload = @(
+            'schema=2',
+            'repository=owner/consumer',
+            "target=$target",
+            "protocolSha=$protocolSha",
+            "graphDigest=$(if ($AdoptionSchema -in @(7, 9)) { 'c' * 64 } else { '' })",
+            "pullRequestUrl=$pullRequestUrl"
+        ) -join "`n"
+        $bindingDigest = Get-TestSha256Text -Text $bindingPayload
+        $graphIssueLines = if ($AdoptionSchema -in @(7, 9)) {
+            @(
+                "- Source graph base: [$base](https://github.com/owner/consumer/commit/$base)",
+                "- Source graph digest: ``$('c' * 64)``",
+                '- Source graph nodes/edges/candidates: `1/0/1`'
+            )
+        }
+        else { @() }
+        $surfaceIssueLines = if ($AdoptionSchema -in @(7, 9, 11)) {
+            @("- [``AGENTS.md``](https://github.com/owner/consumer/blob/$base/AGENTS.md)")
+        }
+        else { @('- None') }
+        (@(
+            "<!-- meandai-local-adoption:v2:$bindingDigest -->",
+            '## AI capabilities adoption tracking', '',
+            "- Protocol release: [$target](https://github.com/hasanmanzak/meAndAI/releases/tag/$target)",
+            "- Protocol commit: [$protocolSha](https://github.com/hasanmanzak/meAndAI/commit/$protocolSha)",
+            "- Adoption draft: [PR #42]($pullRequestUrl)"
+        ) + @($graphIssueLines) + @(
+            '', '### Detected protocol and governance surfaces', ''
+        ) + @($surfaceIssueLines) + @(
+            '',
+            'This issue tracks the project-owned adoption evidence.'
+        )) -join [Environment]::NewLine
     }
     else {
         $isMigration = $Kind -ceq 'MigrationReconciliation'
@@ -576,6 +679,9 @@ function New-FinalizationScenario {
         ProposalEvidenceComments = if ($Kind -cin @(
             'Update', 'MigrationReconciliation'
         ) -and $TrackingMode -ceq 'Canonical') { 1 } else { 0 }
+        ProposalEvidenceMode = 'Canonical'
+        ExistingEvidenceMode = 'Canonical'
+        PostedIssueComments = [System.Collections.Generic.List[string]]::new()
         InvalidLegacyRelease = $InvalidLegacyRelease
         WrongLegacyAssetBlob = $WrongLegacyAssetBlob
         IsSchema2 = $isSchema2
@@ -952,13 +1058,54 @@ function global:gh {
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/comments?per_page=100") {
         Add-FinalizationEvent 'read-issue-comments'
         for ($index = 0; $index -lt $scenario.ProposalEvidenceComments; $index++) {
+            $proposalBody = switch ([string]$scenario.ProposalEvidenceMode) {
+                'MarkerOnly' {
+                    "<!-- meandai-protocol-update-proposal:head-$($scenario.ExpectedHead) -->"
+                }
+                'WrongTarget' {
+                    "<!-- meandai-protocol-update-proposal:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: [pull request #42](https://github.com/owner/consumer/pull/41)`nExact proposal head: ``$($scenario.ExpectedHead)``"
+                }
+                'LeadingSpace' {
+                    " <!-- meandai-protocol-update-proposal:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: [pull request #42](https://github.com/owner/consumer/pull/42)`nExact proposal head: ``$($scenario.ExpectedHead)``"
+                }
+                'SecondLine' {
+                    "Unmanaged preface`n<!-- meandai-protocol-update-proposal:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: [pull request #42](https://github.com/owner/consumer/pull/42)`nExact proposal head: ``$($scenario.ExpectedHead)``"
+                }
+                default {
+                    "<!-- meandai-protocol-update-proposal:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: [pull request #42](https://github.com/owner/consumer/pull/42)`nExact proposal head: ``$($scenario.ExpectedHead)``"
+                }
+            }
             ConvertTo-TestBase64Json ([pscustomobject]@{
-                body = "<!-- meandai-protocol-update-proposal:pr-42:head-$($scenario.ExpectedHead) -->`nManaged protocol proposal: #42"
+                body = $proposalBody
             })
         }
         for ($index = 0; $index -lt $scenario.ExistingEvidenceComments; $index++) {
+            $kindName = ([string]$scenario.Kind).ToLowerInvariant()
+            $finalizationBody = switch ([string]$scenario.ExistingEvidenceMode) {
+                'MarkerOnly' {
+                    "<!-- meandai-managed-merge-finalization:head-$($scenario.ExpectedHead) -->"
+                }
+                'WrongTarget' {
+                    "<!-- meandai-managed-merge-finalization:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge [pull request #42](https://github.com/owner/consumer/pull/41) at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+                'LegacyBare' {
+                    "<!-- meandai-managed-merge-finalization:pr-42:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge #42 at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+                'LegacyLinked' {
+                    "<!-- meandai-managed-merge-finalization:pr-42:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge [pull request #42](https://github.com/owner/consumer/pull/42) at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+                'LeadingSpace' {
+                    " <!-- meandai-managed-merge-finalization:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge [pull request #42](https://github.com/owner/consumer/pull/42) at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+                'SecondLine' {
+                    "Unmanaged preface`n<!-- meandai-managed-merge-finalization:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge [pull request #42](https://github.com/owner/consumer/pull/42) at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+                default {
+                    "<!-- meandai-managed-merge-finalization:head-$($scenario.ExpectedHead) -->`nFinalized managed $kindName merge [pull request #42](https://github.com/owner/consumer/pull/42) at head ``$($scenario.ExpectedHead)``.`nThe deterministic branch ``$($scenario.Branch)`` is absent and the tracking issue can close as completed."
+                }
+            }
             ConvertTo-TestBase64Json ([pscustomobject]@{
-                body = "<!-- meandai-managed-merge-finalization:pr-42:head-$($scenario.ExpectedHead) -->`nExisting evidence"
+                body = $finalizationBody
             })
         }
         return
@@ -966,6 +1113,7 @@ function global:gh {
     if ($endpoint -ceq "repos/owner/consumer/issues/$($scenario.IssueNumber)/comments" -and
         $method -ceq 'POST') {
         $body = Get-TestGhBody -Arguments $arguments
+        $scenario.PostedIssueComments.Add($body)
         if ($body.StartsWith(
             '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
         )) {
@@ -1086,7 +1234,54 @@ try {
         @($adoption.Scenario.Events | Where-Object { $_ -ceq 'delete-branch' }).Count -ne 1) {
         Add-Failure "TEST-0108 exact adoption merge did not converge: $($adoption.Error)"
     }
-    $expectedAdoptionSummary = "Managed merge #42 finalized at ``$($adoption.Scenario.ExpectedHead)``; exact branch absent and issue #9 closed."
+    if (@($adoption.Scenario.PostedIssueComments | Where-Object {
+        $_.Contains('[pull request #42](https://github.com/owner/consumer/pull/42)')
+    }).Count -ne 1) {
+        Add-Failure 'TEST-0176 managed finalization comment does not link its exact pull request.'
+    }
+    if (@($adoption.Scenario.PostedIssueComments | Where-Object {
+        $_.StartsWith(
+            "<!-- meandai-managed-merge-finalization:head-$($adoption.Scenario.ExpectedHead) -->",
+            [StringComparison]::Ordinal
+        ) -and -not $_.Contains('finalization:pr-')
+    }).Count -ne 1) {
+        Add-Failure 'TEST-0176 managed finalization writer still embeds a pull-request identity in its hidden marker.'
+    }
+    foreach ($completedSchema in @(7, 9, 11)) {
+        $completedAdoption = Invoke-FinalizationScenario -Scenario (
+            New-FinalizationScenario -Kind Adoption -AdoptionSchema $completedSchema
+        )
+        if ($completedAdoption.Threw -or
+            $completedAdoption.Scenario.BranchExists -or
+            [string]$completedAdoption.Scenario.IssueState -cne 'closed') {
+            Add-Failure "TEST-0176 completed adoption schema $completedSchema did not validate its exact v2 issue binding: $($completedAdoption.Error)"
+        }
+    }
+    $legacyAdoptionScenario = New-FinalizationScenario -Kind Adoption
+    $legacyAdoptionScenario.IssueBody = @(
+        '<!-- meandai-local-adoption:v0.10.3:pr-42 -->',
+        '## AI capabilities adoption tracking', '',
+        '- Protocol release: `v0.10.3`',
+        '- Adoption draft: https://github.com/owner/consumer/pull/42'
+    ) -join [Environment]::NewLine
+    $legacyAdoption = Invoke-FinalizationScenario -Scenario $legacyAdoptionScenario
+    if ($legacyAdoption.Threw -or $legacyAdoption.Scenario.BranchExists -or
+        [string]$legacyAdoption.Scenario.IssueState -cne 'closed') {
+        Add-Failure "TEST-0176 bounded exact legacy adoption issue binding was not readable: $($legacyAdoption.Error)"
+    }
+    foreach ($legacyFinalizationMode in @('LegacyBare', 'LegacyLinked')) {
+        $legacyFinalizationScenario = New-FinalizationScenario -Kind Adoption
+        $legacyFinalizationScenario.BranchExists = $false
+        $legacyFinalizationScenario.ExistingEvidenceComments = 1
+        $legacyFinalizationScenario.ExistingEvidenceMode = $legacyFinalizationMode
+        $legacyFinalization = Invoke-FinalizationScenario `
+            -Scenario $legacyFinalizationScenario
+        if ($legacyFinalization.Threw -or
+            [string]$legacyFinalization.Scenario.IssueState -cne 'closed') {
+            Add-Failure "TEST-0176 bounded $legacyFinalizationMode finalization evidence was not readable: $($legacyFinalization.Error)"
+        }
+    }
+    $expectedAdoptionSummary = "Managed merge for [pull request #42](https://github.com/owner/consumer/pull/42) finalized at ``$($adoption.Scenario.ExpectedHead)``; exact branch absent and issue [#9](https://github.com/owner/consumer/issues/9) closed."
     $adoptionSummaryProperty = $adoption.PSObject.Properties['SummaryLines']
     $adoptionSummaryLines = @(
         if ($null -ne $adoptionSummaryProperty) {
@@ -1270,7 +1465,7 @@ try {
         )
         if ($legacy.Threw -or $legacy.Scenario.BranchExists -or
             $legacy.Scenario.IssueState -cne 'closed' -or
-            $legacy.Scenario.Body -cnotmatch '(?m)^Tracking issue: #9$' -or
+            $legacy.Scenario.Body -cnotmatch '(?m)^Tracking issue: \[#9\]\(https://github\.com/owner/consumer/issues/9\)$' -or
             @($legacy.Scenario.Events | Where-Object {
                 $_ -ceq 'create-update-issue'
             }).Count -ne 1 -or
@@ -1297,7 +1492,7 @@ try {
         $postCreationMutations.Count -ne 0 -or
         -not $missingAuthorResult.Scenario.BranchExists -or
         [string]$missingAuthorResult.Scenario.Body -cmatch
-            '(?m)^Tracking issue: #[1-9][0-9]*$' -or
+            '(?im)^tracking[ \t]+issue[ \t]*:' -or
         [string]$missingAuthorResult.Scenario.CreateIssueObservedToken -cne
             'test-issue-token' -or
         $missingAuthorResult.Scenario.CreatedIssueIdentityReads -ne 1 -or
@@ -1422,19 +1617,130 @@ try {
     $missingAdoptionIssue.AdoptionIssueCount = 0
     $negativeScenarios.Add([pscustomobject]@{ Name = 'missing adoption issue'; Scenario = $missingAdoptionIssue })
 
+    $adoptionIssueMarkerOnly = New-FinalizationScenario -Kind Adoption
+    $adoptionIssueMarkerOnly.IssueBody = $adoptionIssueMarkerOnly.IssueBody.Split("`n")[0]
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'adoption issue marker without canonical visible link body'
+        Scenario = $adoptionIssueMarkerOnly
+        TestId = 'TEST-0176'
+    })
+
+    $adoptionIssueWrongTarget = New-FinalizationScenario -Kind Adoption
+    $adoptionIssueWrongTarget.IssueBody = $adoptionIssueWrongTarget.IssueBody.Replace(
+        'https://github.com/owner/consumer/pull/42',
+        'https://github.com/owner/consumer/pull/41'
+    )
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'adoption issue visible link has wrong target'
+        Scenario = $adoptionIssueWrongTarget
+        TestId = 'TEST-0176'
+    })
+
+    $adoptionSurfaceWrongTarget = New-FinalizationScenario -Kind Adoption `
+        -AdoptionSchema 9
+    $adoptionSurfaceWrongTarget.IssueBody =
+        $adoptionSurfaceWrongTarget.IssueBody.Replace(
+            '/AGENTS.md)', '/README.md)'
+        )
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'adoption issue surface label and blob target mismatch'
+        Scenario = $adoptionSurfaceWrongTarget
+        TestId = 'TEST-0176'
+    })
+
+    $adoptionSurfaceDigestDrift = New-FinalizationScenario -Kind Adoption `
+        -AdoptionSchema 11
+    $adoptionSurfaceDigestDrift.Body =
+        $adoptionSurfaceDigestDrift.Body.Replace(
+            (Get-TestLinkedPathDigest -Paths @('AGENTS.md')),
+            ('f' * 64)
+        )
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'schema-11 adoption surface digest does not bind visible links'
+        Scenario = $adoptionSurfaceDigestDrift
+        TestId = 'TEST-0176'
+    })
+
     $multipleUpdateIssues = New-FinalizationScenario -Kind Update
-    $multipleUpdateIssues.Body += "`nTracking issue: #10"
+    $multipleUpdateIssues.Body += "`nTracking issue: [#10](https://github.com/owner/consumer/issues/10)"
     $negativeScenarios.Add([pscustomobject]@{ Name = 'multiple update issues'; Scenario = $multipleUpdateIssues })
 
     $malformedTracking = New-FinalizationScenario -Kind Update
     $malformedTracking.Body = $malformedTracking.Body.Replace(
-        'Tracking issue: #9', 'tracking issue: #9'
+        'Tracking issue: [#9](https://github.com/owner/consumer/issues/9)',
+        'tracking issue: [#9](https://github.com/owner/consumer/issues/9)'
     )
     $negativeScenarios.Add([pscustomobject]@{ Name = 'noncanonical tracking line'; Scenario = $malformedTracking })
+
+    $mismatchedTrackingTarget = New-FinalizationScenario -Kind Update
+    $mismatchedTrackingTarget.Body = $mismatchedTrackingTarget.Body.Replace(
+        '[#9](https://github.com/owner/consumer/issues/9)',
+        '[#9](https://github.com/owner/consumer/issues/10)'
+    )
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'tracking label and target mismatch'
+        Scenario = $mismatchedTrackingTarget
+        TestId = 'TEST-0176'
+    })
+
+    $markerOnlyProposal = New-FinalizationScenario -Kind Update
+    $markerOnlyProposal.ProposalEvidenceMode = 'MarkerOnly'
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'proposal marker without canonical visible link body'
+        Scenario = $markerOnlyProposal
+        TestId = 'TEST-0176'
+    })
+
+    $wrongTargetProposal = New-FinalizationScenario -Kind Update
+    $wrongTargetProposal.ProposalEvidenceMode = 'WrongTarget'
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'proposal visible link has wrong target'
+        Scenario = $wrongTargetProposal
+        TestId = 'TEST-0176'
+    })
+
+    foreach ($proposalSignalMode in @('LeadingSpace', 'SecondLine')) {
+        $misplacedProposal = New-FinalizationScenario -Kind Update
+        $misplacedProposal.ProposalEvidenceMode = $proposalSignalMode
+        $negativeScenarios.Add([pscustomobject]@{
+            Name = "$proposalSignalMode proposal marker is not the exact first line"
+            Scenario = $misplacedProposal
+            TestId = 'TEST-0176'
+        })
+    }
 
     $preclosedIssue = New-FinalizationScenario -Kind Adoption
     $preclosedIssue.IssueState = 'closed'
     $negativeScenarios.Add([pscustomobject]@{ Name = 'closed issue without evidence'; Scenario = $preclosedIssue })
+
+    $markerOnlyFinalization = New-FinalizationScenario -Kind Adoption
+    $markerOnlyFinalization.ExistingEvidenceComments = 1
+    $markerOnlyFinalization.ExistingEvidenceMode = 'MarkerOnly'
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'finalization marker without canonical visible link body'
+        Scenario = $markerOnlyFinalization
+        TestId = 'TEST-0176'
+    })
+
+    $wrongTargetFinalization = New-FinalizationScenario -Kind Adoption
+    $wrongTargetFinalization.ExistingEvidenceComments = 1
+    $wrongTargetFinalization.ExistingEvidenceMode = 'WrongTarget'
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'finalization visible link has wrong target'
+        Scenario = $wrongTargetFinalization
+        TestId = 'TEST-0176'
+    })
+
+    foreach ($finalizationSignalMode in @('LeadingSpace', 'SecondLine')) {
+        $misplacedFinalization = New-FinalizationScenario -Kind Adoption
+        $misplacedFinalization.ExistingEvidenceComments = 1
+        $misplacedFinalization.ExistingEvidenceMode = $finalizationSignalMode
+        $negativeScenarios.Add([pscustomobject]@{
+            Name = "$finalizationSignalMode finalization marker is not the exact first line"
+            Scenario = $misplacedFinalization
+            TestId = 'TEST-0176'
+        })
+    }
 
     $pullRequestAsIssue = New-FinalizationScenario -Kind Update
     $pullRequestAsIssue.IssueIsPullRequest = $true

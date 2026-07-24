@@ -229,6 +229,94 @@ function Test-MeAndAICanonicalRepositoryPath {
         }).Count -eq 0
 }
 
+function New-MeAndAIGitHubBlobLink {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    if ($Repository -cnotmatch '^[^/\s]+/[^/\s]+$' -or
+        $Commit -cnotmatch '^[0-9a-f]{40}$' -or
+        -not (Test-MeAndAICanonicalRepositoryPath -Path $Path)) {
+        throw "Cannot create an immutable GitHub blob link for '$Path'."
+    }
+    $encodedPath = (@($Path.Split('/') | ForEach-Object {
+        [Uri]::EscapeDataString([string]$_)
+    }) -join '/')
+    return "[``$Path``](https://github.com/$Repository/blob/$Commit/$encodedPath)"
+}
+
+function Get-MeAndAILinkedPathIdentityDigest {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths
+    )
+
+    if (-not (Test-MeAndAIExactCanonicalSurfaceSequence `
+            -Actual @($Paths) -Expected @($Paths))) {
+        throw 'Cannot derive a linked-path identity from invalid paths.'
+    }
+    $builder = [Text.StringBuilder]::new()
+    [void]$builder.Append("schema=1`ncount=$(@($Paths).Count)`n")
+    foreach ($pathValue in @($Paths)) {
+        $path = [string]$pathValue
+        $length = [Text.Encoding]::UTF8.GetByteCount($path)
+        [void]$builder.Append("$length`:$path`n")
+    }
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($algorithm.ComputeHash(
+            [Text.UTF8Encoding]::new($false).GetBytes($builder.ToString())
+        ))).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $algorithm.Dispose() }
+}
+
+function Test-MeAndAIExactLinkedPathSection {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][string]$Heading,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths
+    )
+
+    if (-not (Test-MeAndAIExactCanonicalSurfaceSequence `
+            -Actual @($Paths) -Expected @($Paths))) {
+        return $false
+    }
+    $lines = if (@($Paths).Count -eq 0) {
+        @('- None')
+    }
+    else {
+        @($Paths | ForEach-Object {
+            '- ' + (New-MeAndAIGitHubBlobLink -Repository $Repository `
+                -Commit $Commit -Path ([string]$_))
+        })
+    }
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n")
+    $expected = (@($Heading, '') + @($lines)) -join "`n"
+    $headings = @([regex]::Matches(
+        $normalized,
+        '(?m)^' + [regex]::Escape($Heading) + '$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    if ($headings.Count -ne 1) {
+        return $false
+    }
+    $start = [int]$headings[0].Index
+    if ($start + $expected.Length -gt $normalized.Length -or
+        $normalized.Substring($start, $expected.Length) -cne $expected) {
+        return $false
+    }
+    $suffix = $normalized.Substring($start + $expected.Length)
+    return $suffix.Length -eq 0 -or
+        $suffix.StartsWith("`n`n", [StringComparison]::Ordinal)
+}
+
 function Assert-MeAndAIProtocolAssessmentPathCasing {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$Path)
@@ -2691,6 +2779,21 @@ function Test-MeAndAIExactAdoptionPullRequestMarker {
             'graphCounts', 'graphLimits', 'repository', 'actor'
         )
     }
+    elseif ($schema -eq 9 -and $graphAware) {
+        @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'branch', 'adoptionStrategy',
+            'protocolRecordLossAcknowledged', 'graphBase', 'graphDigest',
+            'graphCounts', 'graphLimits', 'repository', 'actor'
+        )
+    }
+    elseif ($schema -eq 11 -and -not $graphAware) {
+        @(
+            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+            'branch', 'adoptionStrategy', 'surfaceBase', 'surfaceDigest',
+            'protocolRecordLossAcknowledged', 'repository', 'actor'
+        )
+    }
     else {
         return $false
     }
@@ -2705,22 +2808,50 @@ function Test-MeAndAIExactAdoptionPullRequestMarker {
     }
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
     $graphIdentityValid = $true
-    if ($schema -eq 7) {
+    if ($schema -in @(7, 9)) {
+        $identitySurfaces = if ($schema -eq 7) {
+            @($marker.protocolSurfaces)
+        }
+        else { @($ExpectedProtocolSurfaces) }
         $markerGraphIdentity = [pscustomobject][ordered]@{
                     schema = [int]$expectedGraphIdentity.schema
                     graphBase = [string]$marker.graphBase
                     graphDigest = [string]$marker.graphDigest
                     graphCounts = $marker.graphCounts
                     graphLimits = $marker.graphLimits
-                    protocolSurfaces = @($marker.protocolSurfaces)
+                    protocolSurfaces = @($identitySurfaces)
                 }
         $graphIdentityValid = [string]$marker.branch -ceq $Branch -and
             (Test-MeAndAIInstructionGraphIdentityEqual `
                 -Actual $markerGraphIdentity -Expected $expectedGraphIdentity)
+        if ($schema -eq 9) {
+            $graphIdentityValid = $graphIdentityValid -and
+                (Test-MeAndAIExactLinkedPathSection -Body $body `
+                    -Heading '### Detected protocol and governance surfaces' `
+                    -Repository $Repository -Commit ([string]$marker.graphBase) `
+                    -Paths @($identitySurfaces))
+        }
+    }
+    $linkedSurfaceIdentityValid = $true
+    if ($schema -eq 11) {
+        $linkedSurfaceIdentityValid =
+            (Test-MeAndAIExactCanonicalSurfaceSequence `
+                -Actual @($ExpectedProtocolSurfaces) `
+                -Expected @($ExpectedProtocolSurfaces)) -and
+            [string]$marker.branch -ceq $Branch -and
+            [string]$marker.surfaceBase -cmatch '^[0-9a-f]{40}$' -and
+            [string]$marker.surfaceDigest -ceq
+                (Get-MeAndAILinkedPathIdentityDigest `
+                    -Paths @($ExpectedProtocolSurfaces)) -and
+            (Test-MeAndAIExactLinkedPathSection -Body $body `
+                -Heading '### Detected protocol and governance surfaces' `
+                -Repository $Repository -Commit ([string]$marker.surfaceBase) `
+                -Paths @($ExpectedProtocolSurfaces))
     }
     if (-not (
         $phase -ceq $ExpectedPhase -and
-        ($ExpectedPhase -ceq 'Proposed' -or $schema -in @(3, 5, 7)) -and
+        ($ExpectedPhase -ceq 'Proposed' -or
+         $schema -in @(3, 5, 7, 9, 11)) -and
         [string]$marker.state -ceq $ExpectedState -and
         [string]$marker.target -ceq $TargetTag -and
         [string]$marker.protocolSha -ceq $TargetSha -and
@@ -2749,6 +2880,16 @@ function Test-MeAndAIExactAdoptionPullRequestMarker {
           (Test-MeAndAIExactCanonicalSurfaceSequence `
               -Actual @($marker.protocolSurfaces) `
               -Expected @($ExpectedProtocolSurfaces)) -and
+          $marker.protocolRecordLossAcknowledged -is [bool] -and
+          [bool]$marker.protocolRecordLossAcknowledged -eq
+              $ExpectedProtocolRecordLossAcknowledgement) -or
+         ($schema -eq 9 -and $graphIdentityValid -and
+          [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
+          $marker.protocolRecordLossAcknowledged -is [bool] -and
+          [bool]$marker.protocolRecordLossAcknowledged -eq
+              $ExpectedProtocolRecordLossAcknowledgement) -or
+         ($schema -eq 11 -and $linkedSurfaceIdentityValid -and
+          [string]$marker.adoptionStrategy -ceq $ExpectedAdoptionStrategy -and
           $marker.protocolRecordLossAcknowledged -is [bool] -and
           [bool]$marker.protocolRecordLossAcknowledged -eq
               $ExpectedProtocolRecordLossAcknowledgement))
@@ -3496,6 +3637,8 @@ Export-ModuleMember -Function @(
     'Get-MeAndAIAdoptionTargetPaths',
     'Get-MeAndAIInstructionGraphIdentity',
     'Get-MeAndAIInstructionGraphLimits',
+    'Get-MeAndAILinkedPathIdentityDigest',
+    'New-MeAndAIGitHubBlobLink',
     'Get-MeAndAIProtocolAssessmentLimits',
     'Get-MeAndAIProtocolSurfaceInventory',
     'Get-MeAndAIRequiredAdoptionTasks',
@@ -3508,6 +3651,7 @@ Export-ModuleMember -Function @(
     'Test-MeAndAICleanStartSurfaceSupported',
     'Test-MeAndAIConsumerGovernancePath',
     'Test-MeAndAIExactAdoptionPullRequestMarker',
+    'Test-MeAndAIExactLinkedPathSection',
     'Test-MeAndAILegacyCommonAuthorityPath',
     'Test-MeAndAILegacyGovernancePath',
     'Test-MeAndAIProtocolAssessmentRelevantPath',

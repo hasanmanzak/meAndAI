@@ -9,7 +9,7 @@
 | Open external follow-up | [`FIND-0120` / #44](https://github.com/hasanmanzak/meAndAI/issues/44) |
 | Pull request | [#42](https://github.com/hasanmanzak/meAndAI/pull/42) |
 | Decision | [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
-| Tests | [TEST-0077 through TEST-0085](test-cases.md) |
+| Tests | [TEST-0077](test-cases.md), [TEST-0078](test-cases.md), [TEST-0079](test-cases.md), [TEST-0080](test-cases.md), [TEST-0081](test-cases.md), [TEST-0082](test-cases.md), [TEST-0083](test-cases.md), [TEST-0084](test-cases.md), and [TEST-0085](test-cases.md) |
 
 ## Problem and outcome
 
@@ -29,8 +29,9 @@ add another bootstrapper, validator layer, service, or scan loop.
 
 ## Scope
 
-- Resolve only `FIND-0112` through `FIND-0122` under their recorded
-  dispositions.
+- Resolve only the [findings register](#findings-register), including external
+  [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44), under its
+  recorded dispositions.
 - Reuse the existing source-only bootstrap path and capabilities contract for
   trusted updater and exact manifest checks.
 - Make seed rejection side-effect-free and completion publication exactly
@@ -73,10 +74,10 @@ add another bootstrapper, validator layer, service, or scan loop.
 
 | ID | Classification | Risk | Status / owner | Response and review condition |
 | --- | --- | --- | --- | --- |
-| `RISK-0072` | Supply-chain boundary | A drifted consumer-local updater can receive repository credentials before trusted validation | Mitigated / automation owner | Exact-release source preflight and `TEST-0077` |
-| `RISK-0073` | Credential side effect | A rejected seed can still leave a secret write behind | Mitigated / launcher owner | Read-only seed preflight before lock or secrets and `TEST-0078` |
-| `RISK-0074` | Interrupted state transition | Push can succeed before the completion marker records the new head | Mitigated / launcher owner | Recoverable intent state and `TEST-0079` |
-| `RISK-0075` | Evidence integrity | Weak manifest checks, overstated fixtures, or first-page-only evidence can produce false closure | Mitigated / test and release owners | `TEST-0080` through `TEST-0083` |
+| `RISK-0072` | Supply-chain boundary | A drifted consumer-local updater can receive repository credentials before trusted validation | Mitigated / automation owner | Exact-release source preflight and [TEST-0077](test-cases.md) |
+| `RISK-0073` | Credential side effect | A rejected seed can still leave a secret write behind | Mitigated / launcher owner | Read-only seed preflight before lock or secrets and [TEST-0078](test-cases.md) |
+| `RISK-0074` | Interrupted state transition | Push can succeed before the completion marker records the new head | Mitigated / launcher owner | Recoverable intent state and [TEST-0079](test-cases.md) |
+| `RISK-0075` | Evidence integrity | Weak manifest checks, overstated fixtures, or first-page-only evidence can produce false closure | Mitigated / test and release owners | [TEST-0080](test-cases.md), [TEST-0081](test-cases.md), [TEST-0082](test-cases.md), and [TEST-0083](test-cases.md) |
 | `RISK-0076` | External repository control | The private repository's `main` branch is not protected under the current GitHub capability | Open `ExternalOrLegacyFollowUp` / maintainer | Tracked by [`FIND-0120` / issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). On 2026-07-16 the repository API reported `protected=false`; branch-protection and ruleset APIs returned HTTP 403 with the private-plan/public-repository limitation. Review when the repository becomes public or the account gains a plan that supports the control; do not change visibility as part of this feature. |
 
 ## Declared scan boundary and finite budget
@@ -86,7 +87,7 @@ add another bootstrapper, validator layer, service, or scan loop.
 | Initial scan | Completed read-only on 2026-07-16 against immutable v0.8.3 commit `7ec7f83c7190c3f064a3c572e7e30d29ea1e5454` |
 | Tracked scope | All 109 tracked files, entry points, PowerShell call paths, both workflows, tests and fixtures, protocol/templates, feature/decision/memory graph, version/changelog, links, diff hygiene, and relevant live GitHub release/issue/PR/branch projections |
 | Exclusions | External consumer repositories. No tracked generated or binary scope was identified. Branch protection was inspected but cannot be enabled under the current private-repository capability without a visibility or plan change. |
-| Initial evidence | Complete suite passed in 273.3 seconds; all 15 tracked PowerShell files parsed; local links and diff hygiene passed. The green baseline did not invalidate `FIND-0112` through `FIND-0122`. |
+| Initial evidence | Complete suite passed in 273.3 seconds; all 15 tracked PowerShell files parsed; local links and diff hygiene passed. The green baseline did not invalidate the [findings register](#findings-register), including external [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44). |
 | Budget | One completed initial scan plus one confirmation scan after remediation; no unchanged or third scan is authorized |
 | Stop condition | Declared tests and relevant gates pass, the confirmation has no unresolved `Blocking` finding, and non-blocking dispositions remain owned here |
 
@@ -94,9 +95,9 @@ add another bootstrapper, validator layer, service, or scan loop.
 
 | ID | Slice | Findings | Tests | Self-review and status |
 | --- | --- | --- | --- | --- |
-| `SUBF-0030` | Trusted adoption boundaries and recoverable completion | `FIND-0112` through `FIND-0115` | `TEST-0077` through `TEST-0080` | Fresh-diff review passed; no unresolved blocker |
-| `SUBF-0031` | Contract-bearing evidence and traceability | `FIND-0116` through `FIND-0119`, `FIND-0121` | `TEST-0081` through `TEST-0085` | Fresh-diff review passed; no unresolved blocker |
-| `SUBF-0032` | Protocol, documentation, memory, and external risk ownership | `FIND-0120`, `FIND-0122` | `TEST-0083` through `TEST-0085` plus link review | Fresh-diff review passed; only owned external follow-up remains |
+| `SUBF-0030` | Trusted adoption boundaries and recoverable completion | `FIND-0112` through `FIND-0115` | [TEST-0077](test-cases.md), [TEST-0078](test-cases.md), [TEST-0079](test-cases.md), and [TEST-0080](test-cases.md) | Fresh-diff review passed; no unresolved blocker |
+| `SUBF-0031` | Contract-bearing evidence and traceability | `FIND-0116` through `FIND-0119`, `FIND-0121` | [TEST-0081](test-cases.md), [TEST-0082](test-cases.md), [TEST-0083](test-cases.md), [TEST-0084](test-cases.md), and [TEST-0085](test-cases.md) | Fresh-diff review passed; no unresolved blocker |
+| `SUBF-0032` | Protocol, documentation, memory, and external risk ownership | [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44), `FIND-0122` | [TEST-0083](test-cases.md), [TEST-0084](test-cases.md), and [TEST-0085](test-cases.md) plus link review | Fresh-diff review passed; only owned external follow-up remains |
 
 ## Acceptance criteria
 
@@ -109,12 +110,12 @@ add another bootstrapper, validator layer, service, or scan loop.
 4. The launcher rejects every manifest that the canonical bootstrap manifest
    contract rejects, including property, path, collision, task, and target
    drift.
-5. `TEST-0069` has explicit malformed and duplicate-marker fixtures, and
-   `TEST-0070` describes and proves its deterministic serialized state model
+5. [TEST-0069](../FEAT-0012-v082-correction/test-cases.md) has explicit malformed and duplicate-marker fixtures, and
+   [TEST-0070](../FEAT-0012-v082-correction/test-cases.md) describes and proves its deterministic serialized state model
    without claiming unexecuted process concurrency.
 6. Post-publication evidence exhausts comment pagination and accepts qualifying
    evidence that exists only on page two; issue-body text is not a substitute.
-7. FEAT-0012 links the merged delivery PRs and keeps exact hosted publication
+7. [FEAT-0012](../FEAT-0012-v082-correction/README.md) links the merged delivery PRs and keeps exact hosted publication
    facts in its designated external authority rather than mutable branch links.
 8. The finding form offers exactly the four protocol dispositions and records
    defect/risk/improvement classification separately.
@@ -127,29 +128,28 @@ add another bootstrapper, validator layer, service, or scan loop.
 ## Findings register
 
 The register is frozen to the initial scan. `Blocking` means actionable and
-in-scope; changing wording cannot clear it. Shared confidence is high. Issue
-[#41](https://github.com/hasanmanzak/meAndAI/issues/41) owns delivery and later
+in-scope; changing wording cannot clear it. Shared confidence is high. [Issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) owns delivery and later
 post-publication evidence.
 
 | ID | Classification | Severity / confidence | Specific evidence and impact | Required action | Disposition / status | Traceability |
 | --- | --- | --- | --- | --- | --- | --- |
-| `FIND-0112` | Verified defect - trust boundary | High / High | The consumer workflow could invoke its local updater with both tokens before source bootstrap compared the updater assets; a drifted executable therefore reached credentials first | Run an exact-source managed-asset preflight before local execution | `Blocking` / Resolved | `SUBF-0030`, `TEST-0077`, [workflow](../../../templates/project/.github/workflows/meandai-protocol-update.yml) |
-| `FIND-0113` | Verified defect - mutation ordering | High / High | The launcher reconciled missing secrets before rejecting a differing existing seed, leaving credential mutation after an otherwise rejected adoption | Move exact seed validation before the mutation boundary | `Blocking` / Resolved | `SUBF-0030`, `TEST-0078`, [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) |
-| `FIND-0114` | Verified defect - recovery | Medium / High | Completion push preceded the ownership-marker update; interruption left new remote head with stale marker and exact rerun rejected it | Persist old/planned-head intent before push and reconcile either state | `Blocking` / Resolved | `SUBF-0030`, `TEST-0079`, [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) |
-| `FIND-0115` | Verified defect - semantic validation | Medium / High | Launcher validation checked only manifest identity while bootstrap enforced the full property, path, collision, and task contract; malformed data could enter the Codex prompt | Reuse one exact manifest contract at both boundaries | `Blocking` / Resolved | `SUBF-0030`, `TEST-0080`, [capabilities module](../../../templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1) |
-| `FIND-0116` | Verified evidence defect | Medium / High | `TEST-0069` named malformed/duplicate variants without explicit fixtures, and `TEST-0070` claimed concurrent launchers while its fixture modeled a pre-existing lock and sequential rerun | Add the missing variants and make scenario wording match executed semantics | `Blocking` / Resolved | `SUBF-0031`, `TEST-0081`, `TEST-0082`, [FEAT-0012 scenarios](../FEAT-0012-v082-correction/test-cases.md) |
-| `FIND-0117` | Verified defect - external evidence | Medium / High | The verifier requested only the first 100 issue comments, while its mock allowed issue-body evidence; valid later-page evidence could be missed and body text could falsely satisfy closure | Traverse bounded pagination and prove comment-only page-two evidence | `Blocking` / Resolved | `SUBF-0031`, `TEST-0083`, [verifier](../../../tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1) |
-| `FIND-0118` | Verified governance defect | Medium / High | FEAT-0012 still showed its PR as pending after PRs #39 and #40 merged, and external records linked deleted work branches instead of stable main/commit content | Link both merged PRs and repair external links to stable authorities | `Blocking` / Resolved | `SUBF-0031`, `TEST-0085`, [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
-| `FIND-0119` | Verified governance defect - taxonomy | Medium / High | The finding issue form offered defect/risk/improvement values as disposition choices, contradicting the four mutually exclusive protocol dispositions | Separate classification from the exact four dispositions | `Blocking` / Resolved | `SUBF-0031`, `TEST-0084`, [finding form](../../../.github/ISSUE_TEMPLATE/finding.yml) |
-| `FIND-0120` | External repository risk | Medium / High | Live API evidence on 2026-07-16 reported unprotected `main`; protection/ruleset APIs returned HTTP 403 under the current private-repository capability | Retain owner and review when public or supported plan becomes available | `ExternalOrLegacyFollowUp` / Open; maintainer owned | `SUBF-0032`, `RISK-0076`, [open finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44); historical delivery authority remains [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) |
-| `FIND-0121` | Verified evidence defect - version grammar | Low / High | The repository validator tested only the current literal version and had no valid/invalid grammar table | Add canonical boundary cases, including leading-zero and non-ASCII/shape failures | `Blocking` / Resolved | `SUBF-0031`, `TEST-0085`, [protocol](../../../PROTOCOL.md#8-versioning) |
-| `FIND-0122` | Documentation clarity | Low / High | Completed FEAT-0005, FEAT-0006, FEAT-0008, and FEAT-0012 scenario records still called their evidence planned | Use implemented-evidence wording without changing historical outcomes | `OptionalImprovement` / Completed | `SUBF-0032`, `TEST-0085` |
+| `FIND-0112` | Verified defect - trust boundary | High / High | The consumer workflow could invoke its local updater with both tokens before source bootstrap compared the updater assets; a drifted executable therefore reached credentials first | Run an exact-source managed-asset preflight before local execution | `Blocking` / Resolved | `SUBF-0030`, [TEST-0077](test-cases.md), [workflow](../../../templates/project/.github/workflows/meandai-protocol-update.yml) |
+| `FIND-0113` | Verified defect - mutation ordering | High / High | The launcher reconciled missing secrets before rejecting a differing existing seed, leaving credential mutation after an otherwise rejected adoption | Move exact seed validation before the mutation boundary | `Blocking` / Resolved | `SUBF-0030`, [TEST-0078](test-cases.md), [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) |
+| `FIND-0114` | Verified defect - recovery | Medium / High | Completion push preceded the ownership-marker update; interruption left new remote head with stale marker and exact rerun rejected it | Persist old/planned-head intent before push and reconcile either state | `Blocking` / Resolved | `SUBF-0030`, [TEST-0079](test-cases.md), [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) |
+| `FIND-0115` | Verified defect - semantic validation | Medium / High | Launcher validation checked only manifest identity while bootstrap enforced the full property, path, collision, and task contract; malformed data could enter the Codex prompt | Reuse one exact manifest contract at both boundaries | `Blocking` / Resolved | `SUBF-0030`, [TEST-0080](test-cases.md), [capabilities module](../../../templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1) |
+| `FIND-0116` | Verified evidence defect | Medium / High | [TEST-0069](../FEAT-0012-v082-correction/test-cases.md) named malformed/duplicate variants without explicit fixtures, and [TEST-0070](../FEAT-0012-v082-correction/test-cases.md) claimed concurrent launchers while its fixture modeled a pre-existing lock and sequential rerun | Add the missing variants and make scenario wording match executed semantics | `Blocking` / Resolved | `SUBF-0031`, [TEST-0081](test-cases.md), [TEST-0082](test-cases.md), [FEAT-0012 scenarios](../FEAT-0012-v082-correction/test-cases.md) |
+| `FIND-0117` | Verified defect - external evidence | Medium / High | The verifier requested only the first 100 issue comments, while its mock allowed issue-body evidence; valid later-page evidence could be missed and body text could falsely satisfy closure | Traverse bounded pagination and prove comment-only page-two evidence | `Blocking` / Resolved | `SUBF-0031`, [TEST-0083](test-cases.md), [verifier](../../../tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1) |
+| `FIND-0118` | Verified governance defect | Medium / High | [FEAT-0012](../FEAT-0012-v082-correction/README.md) still showed its PR as pending after PRs [#39](https://github.com/hasanmanzak/meAndAI/pull/39) and [#40](https://github.com/hasanmanzak/meAndAI/pull/40) merged, and external records linked deleted work branches instead of stable main/commit content | Link both merged PRs and repair external links to stable authorities | `Blocking` / Resolved | `SUBF-0031`, [TEST-0085](test-cases.md), [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
+| `FIND-0119` | Verified governance defect - taxonomy | Medium / High | The finding issue form offered defect/risk/improvement values as disposition choices, contradicting the four mutually exclusive protocol dispositions | Separate classification from the exact four dispositions | `Blocking` / Resolved | `SUBF-0031`, [TEST-0084](test-cases.md), [finding form](../../../.github/ISSUE_TEMPLATE/finding.yml) |
+| [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) | External repository risk | Medium / High | Live API evidence on 2026-07-16 reported unprotected `main`; protection/ruleset APIs returned HTTP 403 under the current private-repository capability | Retain owner and review when public or supported plan becomes available | `ExternalOrLegacyFollowUp` / Open; maintainer owned | `SUBF-0032`, `RISK-0076`, [open finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44); historical delivery authority remains [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) |
+| `FIND-0121` | Verified evidence defect - version grammar | Low / High | The repository validator tested only the current literal version and had no valid/invalid grammar table | Add canonical boundary cases, including leading-zero and non-ASCII/shape failures | `Blocking` / Resolved | `SUBF-0031`, [TEST-0085](test-cases.md), [protocol](../../../PROTOCOL.md#8-versioning) |
+| `FIND-0122` | Documentation clarity | Low / High | Completed [FEAT-0005](../FEAT-0005-ai-capabilities-lifecycle/README.md), [FEAT-0006](../FEAT-0006-quick-adoption-launcher/README.md), [FEAT-0008](../FEAT-0008-idea-incubation/README.md), and [FEAT-0012](../FEAT-0012-v082-correction/README.md) scenario records still called their evidence planned | Use implemented-evidence wording without changing historical outcomes | `OptionalImprovement` / Completed | `SUBF-0032`, [TEST-0085](test-cases.md) |
 
 ## Definition of Ready
 
 - [x] Stable ID, linked issue, problem, outcome, frozen scope, and non-goals.
 - [x] Affected boundaries, consumers, compatibility, and semantic contracts.
-- [x] Numbered risks, DEC-0013, three reviewable slices, and nine scenarios.
+- [x] Numbered risks, [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md), three reviewable slices, and nine scenarios.
 - [x] Baseline limitation, scan boundary, finite budget, and stop condition.
 
 ## Definition of Done
@@ -161,7 +161,7 @@ post-publication evidence.
 - [x] Documentation, links, version, changelog, memory, issue, and pull request
       are current.
 - [ ] Hosted CI and review gates pass before merge.
-- [ ] Exact release evidence is written after publication to issue #41 and the
+- [ ] Exact release evidence is written after publication to [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) and the
       GitHub Release; no release commit is predicted here.
 
 ## Post-publication evidence

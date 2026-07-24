@@ -1,7 +1,7 @@
 # Stability and Consistency Cycle Agent Prompt
 
 This is optional, non-normative, copy/reference-only guidance for one bounded
-invocation of the event-triggered mandate in `PROTOCOL.md` and
+invocation of the event-triggered mandate in [PROTOCOL.md](../../PROTOCOL.md) and
 [DEC-0015](../decisions/DEC-0015-event-triggered-stability-cycles.md). It does
 not create or activate a Codex goal, recurring task, automation, schedule,
 workflow, scheduler, background loop, or next invocation. A maintainer must
@@ -38,10 +38,9 @@ Inputs
   authority for its ordinary converged final push>
 
 Authority and boundaries
-1. Read and obey the exact pinned PROTOCOL.md, DEC-0015, every applicable
-   repository instruction, and repository-local feature, decision, test, and
-   memory records. Those sources are normative; this prompt cannot override
-   them.
+1. Read and obey every normative source supplied by the invoking context,
+   including applicable repository instructions and repository-local memory.
+   Those sources are normative; this prompt cannot override them.
 2. This invocation is not a self-running service. Do not create, schedule, or
    activate a goal, recurring task, automation, workflow, scheduler,
    background loop, heartbeat, or next invocation. End after reporting the
@@ -63,7 +62,8 @@ Trigger gate
 
 Initial scan and triage
 1. Scan the entire declared tracked-project scope at the highest practical
-   detail. Cover the concerns required by PROTOCOL.md, and list every exclusion.
+   detail. Cover the concerns required by the applicable normative sources, and
+   list every exclusion.
 2. Document every observation with a stable finding identity and assign exactly
    one Gate 5 disposition: Blocking, AcceptedResidual,
    ExternalOrLegacyFollowUp, or OptionalImprovement. Preserve the authority,

@@ -59,32 +59,32 @@
   the wrapper; ancestry false and missing-ref exits 1/2 remain typed control
   flow while every unexpected nonzero exit stops. The migration-catalog
   detached checkout is quiet; this resolves the Windows PowerShell 5.1 failure
-  recorded as `FIND-0158` without changing immutable v0.10.4 assets.
+  recorded as [FIND-0158](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) without changing immutable v0.10.4 assets.
 - The capabilities classifier treats only a sole null/empty-collection
   sentinel as an empty inventory. This normalizes PowerShell 7/Linux parameter
   binding for empty schema-5/6 adoption markers while continuing to reject a
   null mixed with any real repository path. The hosted defect and correction
-  are recorded as `FIND-0159` under existing `TEST-0127` and `TEST-0130`.
+  are recorded as [FIND-0159](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) under existing [TEST-0127](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) and [TEST-0130](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md).
 - The single Windows validation job has a 35-minute bound after the expanded
   serial `Full` suite passed capabilities and updater compatibility but hit its
   stale 20-minute ceiling. Linux remains bounded at 20 minutes and
   post-publication at 5; no runner, matrix, setup, profile, or coverage route
-  was added. This is `FIND-0160` under existing `TEST-0124`.
+  was added. This is [FIND-0160](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) under existing [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md).
 - The canonical stability-cycle prompt lives at
-  `docs/agent-prompts/stability-and-consistency-cycle.md`. It is single-run,
+  [docs/agent-prompts/stability-and-consistency-cycle.md](../../../docs/agent-prompts/stability-and-consistency-cycle.md). It is single-run,
   report-only by default, and cannot create or schedule its next invocation.
   Report-only may establish local convergence but leaves the normative cycle
   incomplete and `Blocked` until authorized final-push authority exists.
 
 ## Evidence and continuation
 
-- `TEST-0127` and `TEST-0128` pass their resolver and adapter owners, including
+- [TEST-0127](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) and [TEST-0128](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) pass their resolver and adapter owners, including
   the 466.6-second full adapter suite after the single-policy refactor.
-- `TEST-0129` and `TEST-0130` pass five focused launcher shards and the combined
+- [TEST-0129](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) and [TEST-0130](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) pass five focused launcher shards and the combined
   `-Shard All` harness in 1107 seconds, including cross-shard fixture isolation.
-- `TEST-0131` and `TEST-0132` pass the final 2.5-second structure-only protocol
+- [TEST-0131](../../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md) and [TEST-0132](../../../docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md) pass the final 2.5-second structure-only protocol
   suite after local convergence was separated from authorized full completion.
-- The amended `TEST-0126` real-Git fixture reproduced `FIND-0158` under Windows
+- The amended [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) real-Git fixture reproduced [FIND-0158](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) under Windows
   PowerShell 5.1 in 3.5 seconds and initially passed in 3.6 seconds. Self-review
   then exposed three direct Git bypasses with an expected 3.7-second red; the
   final unrestricted 5.0-second pass covers exact HEAD, error-preference
@@ -92,10 +92,10 @@
   failure, unexpected-nonzero rejection, and no direct bypass.
 - The complete `tests/protocol-update.tests.ps1` updater family passed outside
   the process sandbox in 34.8 seconds with every declared adapter scenario and
-  canonical `TEST-0126` ownership green. Two preceding sandboxed attempts
+  canonical [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) ownership green. Two preceding sandboxed attempts
   reached only the known Git-for-Windows `sh.exe` signal-pipe error 5 in the
-  unchanged `TEST-0125` clone fixture; the identical unrestricted run passed.
-- Ubuntu run `29651797496` supplied the expected-red `FIND-0159` evidence at
+  unchanged [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) clone fixture; the identical unrestricted run passed.
+- Ubuntu run `29651797496` supplied the expected-red [FIND-0159](../../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md) evidence at
   commit `617d1b0`: capabilities and quick adoption both rejected the same
   empty inventory representation. After the correction, the complete
   capabilities/adapter family passed locally in 461.7 seconds and the focused
@@ -103,9 +103,9 @@
   run `29653339317` passed in 7 minutes 33 seconds.
 - Windows run `29653339317` selected the required `Full` profile and passed the
   capabilities and protocol-update families, including the real PowerShell
-  5.1 `TEST-0126` regression, before GitHub canceled the still-running
+  5.1 [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) regression, before GitHub canceled the still-running
   quick-adoption family at the old 20-minute bound without a test failure.
-  The `TEST-0124` structure gate then failed first against 20 and passed in
+  The [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) structure gate then failed first against 20 and passed in
   2.6 seconds after the Windows-only 35-minute correction; replacement hosted
   Windows evidence remains required from the follow-up commit.
 - The complete repository suite passes in 1576 seconds with every discovered

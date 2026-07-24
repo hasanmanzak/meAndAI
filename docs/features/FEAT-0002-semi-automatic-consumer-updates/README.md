@@ -66,11 +66,11 @@ supersede an untouched older proposal. It never approves or merges the update.
 
 | ID | Classification | Risk | Owner | Status | Evidence or response |
 | --- | --- | --- | --- | --- | --- |
-| `RISK-0004` | Concurrency | Overlapping runs create duplicate proposals | Maintainers | Mitigated | Workflow concurrency, deterministic branches, and `TEST-0011`/`TEST-0015` |
+| `RISK-0004` | Concurrency | Overlapping runs create duplicate proposals | Maintainers | Mitigated | Workflow concurrency, deterministic branches, and [TEST-0011](test-cases.md)/[TEST-0015](test-cases.md) |
 | `RISK-0005` | Data loss | Supersession deletes human work | Maintainers | Verified | Shared invariant gate, fresh revalidation, expected-head deletion lease, and [test evidence](test-cases.md#evidence) |
 | `RISK-0006` | Availability | Cleanup removes the old proposal before a valid replacement exists | Maintainers | Mitigated | Replacement-first verification and reopen compensation |
 | `RISK-0007` | Authentication | Consumer token cannot read private `meAndAI` | Consumer admin | Documented prerequisite | Separate read-only `MEANDAI_PROTOCOL_TOKEN`; consumer `GITHUB_TOKEN` performs local mutations |
-| `RISK-0008` | Compatibility | Automation applies an incompatible major | Maintainers | Mitigated | Same-major resolver and `TEST-0016` |
+| `RISK-0008` | Compatibility | Automation applies an incompatible major | Maintainers | Mitigated | Same-major resolver and [TEST-0016](test-cases.md) |
 | `RISK-0009` | Bootstrap | Immutable `v0.1.0` lacks the updater | Maintainers | Accepted transition | One-time reviewed `v0.2.0` migration in the [adoption guide](../../adoption.md) |
 | `RISK-0010` | Portability | Repository-reference providers have no common writable contract | Maintainers | Accepted boundary | Provider decision or manual reviewed update |
 | `RISK-0011` | Maintainability | Planning and live gates drift apart | Maintainers | Mitigated | One pure candidate validator shared by the resolver and adapter |
@@ -81,9 +81,9 @@ supersede an untouched older proposal. It never approves or merges the update.
 
 | ID | Slice | Tracking | Tests and latest run | Self-review and findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0004` | Canonical version resolver and shared candidate validator | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0009`, `TEST-0010`, `TEST-0013`, `TEST-0014`; passed 2026-07-14 | `FIND-0024`, `FIND-0025`, `FIND-0030`, `FIND-0036`, `FIND-0037`, `FIND-0039` resolved | Complete |
-| `SUBF-0005` | Consumer adapter and compensated supersession | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0011`, `TEST-0012`, `TEST-0015`, `TEST-0021`; adapter and real-Git lease fixtures passed 2026-07-14 | `FIND-0020` through `FIND-0029`, `FIND-0035`, `FIND-0038`, and `FIND-0049` resolved | Complete |
-| `SUBF-0006` | Adoption, security boundary, and workflow templates | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | `TEST-0016`, `TEST-0017`; local and PR CI passed 2026-07-14 | `FIND-0032` through `FIND-0034` and `FIND-0040` resolved | Complete |
+| `SUBF-0004` | Canonical version resolver and shared candidate validator | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | [TEST-0009](test-cases.md), [TEST-0010](test-cases.md), [TEST-0013](test-cases.md), [TEST-0014](test-cases.md); passed 2026-07-14 | `FIND-0024`, `FIND-0025`, `FIND-0030`, `FIND-0036`, `FIND-0037`, `FIND-0039` resolved | Complete |
+| `SUBF-0005` | Consumer adapter and compensated supersession | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | [TEST-0011](test-cases.md), [TEST-0012](test-cases.md), [TEST-0015](test-cases.md), [TEST-0021](test-cases.md); adapter and real-Git lease fixtures passed 2026-07-14 | `FIND-0020` through `FIND-0029`, `FIND-0035`, `FIND-0038`, and [FIND-0049](https://github.com/hasanmanzak/meAndAI/issues/11) resolved | Complete |
+| `SUBF-0006` | Adoption, security boundary, and workflow templates | [Issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) | [TEST-0016](test-cases.md), [TEST-0017](test-cases.md); local and PR CI passed 2026-07-14 | `FIND-0032` through `FIND-0034` and `FIND-0040` resolved | Complete |
 
 ## Definition of Ready
 
@@ -93,7 +93,8 @@ supersede an untouched older proposal. It never approves or merges the update.
 - [x] Work is split into independently reviewable subfeatures.
 - [x] Risks and [DEC-0003](../../decisions/DEC-0003-reviewed-consumer-update-supersession.md) are recorded.
 - [x] Numbered [test scenarios](test-cases.md) preceded implementation.
-- [x] The red baseline is recorded: the initial updater test exited `1` with `TEST-0009 missing pure update resolver module.`
+- [x] The red baseline is recorded: the initial updater test exited `1` with
+      [TEST-0009](test-cases.md) reporting `missing pure update resolver module.`
 
 ## Acceptance criteria
 
@@ -138,8 +139,8 @@ supersede an untouched older proposal. It never approves or merges the update.
 | `FIND-0038` | False-green risk | Medium | Resolved | Mocks assert exact leases and hide later pages without `--paginate` |
 | `FIND-0039` | Logic duplication | Medium | Resolved | Planning and live gates share one pure candidate validator |
 | `FIND-0040` | Delivery evidence | High | Resolved | [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) passed Ubuntu and Windows CI |
-| `FIND-0049` | Audit clarity | Low | Resolved | Conditional cleanup wording and `TEST-0021`; tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and [PR #12](https://github.com/hasanmanzak/meAndAI/pull/12) |
-| `FIND-0050` | Traceability | Low | Resolved | Post-merge evidence reconciled with [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4), tag [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0), and its [merge commit](https://github.com/hasanmanzak/meAndAI/commit/0a664648117bc92f92f28bc98e4627c3c1121d65); tracked by [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13) and [PR #14](https://github.com/hasanmanzak/meAndAI/pull/14) |
+| [FIND-0049](https://github.com/hasanmanzak/meAndAI/issues/11) | Audit clarity | Low | Resolved | Conditional cleanup wording and [TEST-0021](test-cases.md); tracked by [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and [PR #12](https://github.com/hasanmanzak/meAndAI/pull/12) |
+| [FIND-0050](https://github.com/hasanmanzak/meAndAI/issues/13) | Traceability | Low | Resolved | Post-merge evidence reconciled with [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4), tag [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0), and its [merge commit](https://github.com/hasanmanzak/meAndAI/commit/0a664648117bc92f92f28bc98e4627c3c1121d65); tracked by [issue #13](https://github.com/hasanmanzak/meAndAI/issues/13) and [PR #14](https://github.com/hasanmanzak/meAndAI/pull/14) |
 
 ## Scan limitations
 
@@ -157,7 +158,7 @@ supersede an untouched older proposal. It never approves or merges the update.
 - [x] Every subfeature completed self-review.
 - [x] Full repository scan findings and limitations are recorded.
 - [x] Documentation, version metadata, links, and project memory are current.
-- [x] [Pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4) and issue #3 cross-link the canonical records.
+- [x] [Pull request #4](https://github.com/hasanmanzak/meAndAI/pull/4) and [issue #3](https://github.com/hasanmanzak/meAndAI/issues/3) cross-link the canonical records.
 - [x] Ubuntu and Windows GitHub CI checks pass on the published pull request.
 - [x] Review gate is satisfied.
 

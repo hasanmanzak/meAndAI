@@ -21,9 +21,13 @@ $tag = 'v1.2.3'
 $commit = '0123456789abcdef0123456789abcdef01234567'
 $featurePath = 'docs/features/FEAT-0042-release-evidence/README.md'
 $issueNumber = 42
+$pullRequestNumber = 43
 $ownedBranch = 'codex/feat-0042-release-evidence'
 $featureUrl = "https://github.com/$repository/blob/main/$featurePath"
 $issueUrl = "https://github.com/$repository/issues/$issueNumber"
+$pullRequestUrl = "https://github.com/$repository/pull/$pullRequestNumber"
+$decisionPath = 'docs/decisions/DEC-0042-release-evidence.md'
+$decisionUrl = "https://github.com/$repository/blob/main/$decisionPath"
 $releaseUrl = "https://github.com/$repository/releases/tag/$tag"
 $commitUrl = "https://github.com/$repository/commit/$commit"
 $launcherAssetName = 'Invoke-MeAndAIQuickAdoption.ps1'
@@ -42,7 +46,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.1' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.2' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
@@ -307,53 +311,574 @@ function global:Invoke-RestMethod {
         return @()
     }
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/issues/42') {
-        $body = 'Publication evidence is recorded in issue comments.'
+        $body = "## Canonical records`n`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`nPublication evidence is recorded in issue comments."
         if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
-            $body = 'Publication evidence is recorded in a paginated issue comment.'
+            $body = "## Canonical records`n`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`nPublication evidence is recorded in a paginated issue comment."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextIssueFeature') {
+            $body = "Feature: FEAT-0042`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MissingIssueDecision') {
+            $body = "- [Feature]($featureUrl)`n- [Pull request]($pullRequestUrl)"
         }
         elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueBodyOnlyEvidence') {
-            $body = "$featureUrl`n$releaseUrl`n$commitUrl"
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n$releaseUrl`n$commitUrl"
         }
-        return [pscustomobject]@{ state = 'closed'; body = $body }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnIssueIdentity') {
+            $body += "`nThis is issue #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnIssueShorthand') {
+            $body += "`nThis is issue-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnIssueIdentity') {
+            $body += "`nThis is PR #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnIssueShorthand') {
+            $body += "`nThis is PR-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedStableId') {
+            $body += "`nRelated record: FEAT\-0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HtmlEntityStableId') {
+            $body += "`nRelated record: FEAT&#45;0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareExactAutolinks') {
+            $body = "$featureUrl`n$decisionUrl`n$pullRequestUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullLinkPrefixCollision') {
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request](https://github.com/example/meandai-consumer/pull/430)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HiddenFeatureLink') {
+            $body = "<!-- [Feature]($featureUrl) -->`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedFeatureLink') {
+            $body = "\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OddEscapeFeatureLink') {
+            $body = "\\\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedReferenceFeatureLink') {
+            $body = "\[Feature][feature]`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`n[feature]: $featureUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EvenEscapeFeatureLink') {
+            $body = "\\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        return [pscustomobject]@{
+            state = 'closed'
+            title = if ($global:MeAndAIPostPublicationMode -ceq 'FeatureIssueIdentityTitle') {
+                '[FEAT-0042] Immutable Release Evidence Contract'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'LinkedRecordInIssueTitle') {
+                "[DEC-0042]($decisionUrl)"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueTitleUrlPrefixCollision') {
+                "https://github.com/$repository/issues/420"
+            }
+            else { '[BUG-0042] Release evidence' }
+            body = $body
+        }
     }
     if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/42/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
         $page = [int]$Matches.page
         if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
             if ($page -eq 1) {
                 return @(1..100 | ForEach-Object {
-                    [pscustomobject]@{ body = "unrelated comment $_" }
+                    [pscustomobject]@{
+                        id = 10000 + $_
+                        body = "unrelated discussion item $_"
+                    }
                 })
             }
             if ($page -eq 2) {
                 return ,([pscustomobject]@{
+                    id = 10101
                     body = "$featureUrl`n$releaseUrl`n$commitUrl"
                 })
             }
         }
         if ($page -eq 1 -and
             $global:MeAndAIPostPublicationMode -cne 'IssueBodyOnlyEvidence') {
-            $commentBody = if ($global:MeAndAIPostPublicationMode -ceq 'MissingFeatureEvidence') {
-                "$releaseUrl`n$commitUrl"
+            $commentBody = if ($global:MeAndAIPostPublicationMode -ceq 'MissingReleaseEvidence') {
+                $commitUrl
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextIssueComment') {
+                "See issue $issueNumber.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextCommentHash') {
+                "See comment #9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongCommentTarget') {
+                "See [comment #9001]($issueUrl).`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+                "[Pull request]($pullRequestUrl)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'ParentIssueCommentLabel') {
+                "[issue #42 comment]($issueUrl#issuecomment-9001)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongParentCommentLabel') {
+                "[issue #99 comment]($issueUrl#issuecomment-9001)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnCommentIdentity') {
+                "This is comment #9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnCommentShorthand') {
+                "This is comment-9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnReviewShorthand') {
+                "This is review-9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongCommentShorthand') {
+                "See comment-9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongReviewShorthand') {
+                "See review-9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'UnusedDefinitionEvidence') {
+                "[release]: $releaseUrl`n[commit]: $commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrappedReleaseUri') {
+                "https://evidence.example/?next=$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'PunctuatedAutolinks') {
+                "$releaseUrl.`n$commitUrl."
             }
             else {
-                "$featureUrl`n$releaseUrl`n$commitUrl"
+                "$releaseUrl`n$commitUrl"
             }
-            return ,([pscustomobject]@{ body = $commentBody })
+            return ,([pscustomobject]@{ id = 9001; body = $commentBody })
+        }
+        return @()
+    }
+    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/pulls/43') {
+        $body = "- [Issue]($issueUrl)`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)"
+        if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullDecision') {
+            $body = "- [Issue]($issueUrl)`n- [Feature]($featureUrl)`nDecision: DEC-0042"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongPullFeatureTarget') {
+            $body = "- [Issue]($issueUrl)`n- [Feature](https://github.com/example/meandai-consumer/blob/main/docs/features/FEAT-9999-wrong/README.md)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongAndCorrectPullFeatureTarget') {
+            $body = "- [Issue]($issueUrl)`n- [FEAT-0042](https://github.com/example/meandai-consumer/blob/main/docs/features/FEAT-9999-wrong/README.md)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedFeatureLink') {
+            $body = "- [Issue]($issueUrl)`n- ``[FEAT-0042]($featureUrl)```n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleLinks') {
+            $body = @"
+- [Issue][delivery-issue]
+- [Feature][]
+- [Decision]
+
+[delivery-issue]: $issueUrl
+[Feature]: <$featureUrl>
+[Decision]: $decisionUrl
+"@
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareIssueHash') {
+            $body += "`nRelated delivery record: #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongNumericIssueLabel') {
+            $body += "`n- [issue #$issueNumber](https://github.com/example/meandai-consumer/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RawDocumentPath') {
+            $body += "`nSee docs/notes/release-evidence.md for context."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentPath') {
+            $body += "`nSee ``docs/notes/release-evidence.md`` for details."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextDocumentTitle') {
+            $body += "`nImmutable Release Evidence Contract is authoritative."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongDocumentTitleTarget') {
+            $body += "`n[See Immutable Release Evidence Contract]($decisionUrl)."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentTitle') {
+            $body += "`n``Immutable Release Evidence Contract`` is authoritative."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonPermalinkCommentLabel') {
+            $body += "`n[comment]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonPermalinkReviewLabel') {
+            $body += "`n[review #123]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongIssueIdentityTarget') {
+            $body += "`n[BUG-0042](https://github.com/example/meandai-consumer/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongTestTarget') {
+            $body += "`n[TEST-0175](https://github.com/example/meandai-consumer/blob/main/docs/features/FEAT-9999-wrong/test-cases.md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RelativeGitHubLink') {
+            $body += "`n[documentation](docs/features/FEAT-0042-release-evidence/README.md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnresolvedReferenceLink') {
+            $body += "`n[guide][missing-guide]"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullBug') {
+            $body += "`nRegression for BUG-0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnPullIdentity') {
+            $body += "`nThis is PR #$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnPullShorthand') {
+            $body += "`nThis is PR-$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnPullIdentity') {
+            $body += "`nThis is issue #$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SameArtifactAndMailLinks') {
+            $body += "`n[Details](#details) and [email](mailto:test@example.com)."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeLiteralMarkdown') {
+            $body += @"
+``[string][int] [label][key] [x](y)``
+
+~~~text
+[string][int] [label][key] [x](y)
+~~~
+
+    [string][int] [label][key] [x](y)
+"@
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongNestedDecisionRecordTarget') {
+            $body += "`n[RISK-0043]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareExactAutolinks') {
+            $body = "$issueUrl`n$featureUrl`n$decisionUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactVisibleUrlLink') {
+            $body += "`n[$issueUrl]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'TildeAngleAutolink') {
+            $body += "`n<https://example.com/~user/doc.md>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnderscoreAngleAutolink') {
+            $body += "`n<https://github.com/example/meandai-consumer/blob/$commit/__init__.md>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'StarQueryAutolink') {
+            $body += "`nhttps://example.com/doc.md?x=a*b"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BalancedInlineDestination') {
+            $body += "`n[guide](https://example.com/foo(and(bar)).md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'AngleInlineDestination') {
+            $body += "`n[guide](<https://example.com/foo(bar).md>)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedInlineDestination') {
+            $body += "`n[guide](https://example.com/foo\(bar\).md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NestedInlineLabel') {
+            $body += "`n[see [issue #42]]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InvalidBareAutolinkBoundary') {
+            $body += "`nx$issueUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InvalidBareAutolinkDomain') {
+            $body += "`nhttps://localhost/doc.md"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueLabelToCommentTarget') {
+            $body += "`n[issue #42]($issueUrl#issuecomment-9001)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'StableIdToCommentTarget') {
+            $body += "`n[BUG-0042]($issueUrl#issuecomment-9001)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DoubleBacktickFeatureLink') {
+            $body += "`n``[FEAT-0042]($featureUrl)``"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'TildeFenceFeatureLink') {
+            $body += "`n~~~text`n[FEAT-0042]($featureUrl)`n~~~"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentPseudoLink') {
+            $body += "`n``[guide](docs/guide.md)``"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IndentedCodeFeatureLink') {
+            $body += "`n`n    [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteIndentedCodeFeatureLink') {
+            $body += "`n>     [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListIndentedCodeFeatureLink') {
+            $body += "`n-     [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SpacedFenceFeatureLink') {
+            $body += "`n" + '   ```md' +
+                "`n   [FEAT-0042]($featureUrl)`n   " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteFenceFeatureLink') {
+            $body += "`n" + '> ```md' +
+                "`n> [FEAT-0042]($featureUrl)`n> " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListFenceFeatureLink') {
+            $body += "`n" + '- ```md' +
+                "`n  [FEAT-0042]($featureUrl)`n  " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MultilineInlineCodeFeatureLink') {
+            $body += "`n" + '`[FEAT-0042](' + $featureUrl +
+                ")`ncontinued" + '`'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedIssueNumber') {
+            $body += "`nRelated issue \#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'GitHubShorthand') {
+            $body += "`nRelated GH-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositoryShorthand') {
+            $body += "`nRelated meandai-consumer#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'QualifiedRepositoryShorthand') {
+            $body += "`nRelated example/meandai-consumer#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueHyphenShorthand') {
+            $body += "`nRelated issue-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullHyphenShorthand') {
+            $body += "`nRelated PR-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongShorthandTarget') {
+            $body += "`n[PR-$pullRequestNumber]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongShorthandRepository') {
+            $body += "`n[GH-$issueNumber](https://github.com/evil/other/issues/$issueNumber)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongOwnerRepositoryShorthand') {
+            $body += "`n[meandai-consumer#$issueNumber](https://github.com/evil/meandai-consumer/issues/$issueNumber)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedLabelWrongTarget') {
+            $body += "`n[FEAT\-0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HtmlEntityLabelWrongTarget') {
+            $body += "`n[FEAT&#45;0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingHtmlFeatureLink') {
+            $body += "`n<pre>[FEAT-0042]($featureUrl)</pre>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingBlockHtmlFeatureLink') {
+            $body += "`n<table>`n[FEAT-0042]($featureUrl)`n</table>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingCustomHtmlFeatureLink') {
+            $body += "`n<x-panel>`n[FEAT-0042]($featureUrl)`n</x-panel>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingAttributedCustomHtmlFeatureLink') {
+            $body += "`n<x-panel title='>'>`n[FEAT-0042]($featureUrl)`n</x-panel>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingProcessingInstructionFeatureLink') {
+            $body += "`n<?process`n[FEAT-0042]($featureUrl)`n?>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingCdataFeatureLink') {
+            $body += "`n<![CDATA[`n[FEAT-0042]($featureUrl)`n]]>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingDeclarationFeatureLink') {
+            $body += "`n<!DECLARATION`n[FEAT-0042]($featureUrl)`n>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteNonRenderingHtmlFeatureLink') {
+            $body += "`n> <x-panel>`n> [FEAT-0042]($featureUrl)`n>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListNonRenderingHtmlFeatureLink') {
+            $body += "`n- <div>`n  [FEAT-0042]($featureUrl)`n  </div>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlStableId') {
+            $body += "`nRelated FEAT-<em>0042</em>."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlAttributeStableId') {
+            $body += "`nRelated FEAT-<span title='>'>0042</span>."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlWrongTarget') {
+            $body += "`n[FEAT-<em>0042</em>]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineCommentLabelWrongTarget') {
+            $body += "`n[FEAT-<!--x-->0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineCodeLabelWrongTarget') {
+            $body += "`n[FEAT-``0042``]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldStableId') {
+            $body += "`nRelated FEAT-**0042**."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldWrongTarget') {
+            $body += "`n[FEAT-**0042**]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldIssueNumber') {
+            $body += "`nRelated issue **#$issueNumber**."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitStableIdWrongTarget') {
+            $body += "`nFEAT-[0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitIssueNumber') {
+            $body += "`nissue [#$issueNumber]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'VisibleUrlWrongTarget') {
+            $body += "`n[$issueUrl](https://github.com/evil/other/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'VisiblePathWrongTarget') {
+            $body += "`n[$decisionPath]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitUrlWrongTarget') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/[42](https://github.com/evil/other/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitReferenceUrlWrongTarget') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/[42][wrong]`n`n[wrong]: https://github.com/evil/other/issues/99"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitInlineCommentUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<!-- -->42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitInlineTagUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<em>42</em>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitSchemeCommentUrl') {
+            $body += "`nhttps<!-- -->://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitSchemeTagUrl') {
+            $body += "`nhtt<em>ps</em>://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitEntityUrl') {
+            $body += "`nhttps&#58;//github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitEmphasisUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/**42**"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitStrikeUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/~~42~~"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitUnderscoreUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/__42__"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitDecimalEntitySchemeUrl') {
+            $body += "`n&#104;ttps://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitHexEntitySchemeUrl') {
+            $body += "`n&#x68;ttps://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateInlineTagUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<em>42</em>(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateSchemeCommentUrl') {
+            $body += "`nhttps<!-- -->://github.com/example/meandai-consumer/issues/42(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateEmphasisUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/**42**(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnclosedHtmlCommentFeatureLink') {
+            $body += "`n<!--`n[FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FootnoteFreeTextFeature') {
+            $body += "`nText[^1]`n`n[^1]: FEAT-0042"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnusedCrossRecordDefinition') {
+            $body += "`n`n[FEAT-0042]: $featureUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CapitalizedIssueNumber') {
+            $body += "`nRelated Issue #$issueNumber."
+        }
+        return [pscustomobject]@{
+            state = 'closed'
+            title = if ($global:MeAndAIPostPublicationMode -ceq 'PullTitleRecord') {
+                'Implement BUG-0042'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FeatureSubjectPullTitle') {
+                'Immutable Release Evidence Contract'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullOwnIdInComment') {
+                '[FEAT-0042] Immutable Release Evidence Contract'
+            }
+            else { 'Publish release evidence' }
+            merged_at = '2026-07-16T00:00:00Z'
+            merge_commit_sha = $commit
+            base = [pscustomobject]@{ ref = 'main' }
+            body = $body
+        }
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/43/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1) {
+            if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullConversation') {
+                return ,([pscustomobject]@{
+                    id = 9101
+                    body = "See PR $pullRequestNumber."
+                })
+            }
+            if ($global:MeAndAIPostPublicationMode -ceq 'WrongAndCorrectPullFeatureTarget') {
+                return ,([pscustomobject]@{ id = 9101; body = $featureUrl })
+            }
+            if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullOwnIdInComment') {
+                return ,([pscustomobject]@{ id = 9101; body = 'FEAT-0042' })
+            }
+        }
+        return @()
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/pulls/43/reviews\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextReviewDecision') {
+            return ,([pscustomobject]@{ id = 9201; body = 'Review follows DEC-0042.' })
+        }
+        return @()
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/pulls/43/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextInlineComment') {
+            return ,([pscustomobject]@{ id = 9301; body = 'See comment #9001 and docs/decisions/DEC-0042-release-evidence.md.' })
+        }
+        return @()
+    }
+    if ($Uri -match "^https://api\.test/repos/example/meandai-consumer/commits/$commit/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$") {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextCommitComment') {
+            return ,([pscustomobject]@{
+                id = 9401
+                body = 'The released commit follows DEC-0042.'
+            })
         }
         return @()
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$commit") {
+        $decisionLabel = if ($global:MeAndAIPostPublicationMode -ceq 'WrongDecisionLabel') {
+            'DEC-0043'
+        }
+        else { 'DEC-0042' }
+        $pullRequestField = if ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+            "Recorded through [$issueNumber]($issueUrl)"
+        }
+        else { "[$pullRequestNumber]($pullRequestUrl)" }
+        $decisionField = if ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleFeatureDecision') {
+            "[$decisionLabel][decision]"
+        }
+        else { "[$decisionLabel](../../decisions/DEC-0042-release-evidence.md)" }
+        $referenceDefinition = if ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleFeatureDecision') {
+            "`n[decision]: ../../decisions/DEC-0042-release-evidence.md"
+        }
+        else { '' }
         $content = @"
-# FEAT-0042 - Release evidence
+# FEAT-0042 - Immutable Release Evidence Contract
 
 | Field | Value |
 | --- | --- |
 | Status | Complete |
 | Issue | [$issueNumber]($issueUrl) |
+| Pull request | $pullRequestField |
+| Decisions | $decisionField |
+| Tests | [TEST-0175](test-cases.md) |
+
+## Risks
+
+| ID | Risk |
+| --- | --- |
+| ``RISK-0042`` | Release evidence can drift |
+$referenceDefinition
 "@
         return [pscustomobject]@{
             encoding = 'base64'
             content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($content))
+        }
+    }
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$decisionPath`?ref=$commit") {
+        return [pscustomobject]@{
+            encoding = 'base64'
+            content = [Convert]::ToBase64String(
+                [Text.Encoding]::UTF8.GetBytes(
+                    "# DEC-0042 - Release Evidence Authority`n`nRelated feature: [FEAT-0042](../features/FEAT-0042-release-evidence/README.md).`n`n| ID | Risk |`n| --- | --- |`n| ``RISK-0043`` | Publication authority can drift |`n"
+                )
+            )
         }
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$launcherSourcePath`?ref=$commit") {
@@ -410,6 +935,7 @@ function Invoke-PostPublicationScenario {
             ExpectedCommit = $commit
             FeaturePath = $featurePath
             IssueNumber = $issueNumber
+            PullRequestNumber = $pullRequestNumber
             OwnedBranch = $ownedBranch
             ApiBaseUri = 'https://api.test'
             Token = 'test-token'
@@ -463,7 +989,12 @@ try {
             "/compare/$commit...main",
             '/git/matching-refs/heads/codex/feat-0042-release-evidence',
             '/issues/42', '/issues/42/comments?per_page=100&page=1',
-            "/contents/$featurePath`?ref=$commit"
+            '/pulls/43', '/issues/43/comments?per_page=100&page=1',
+            '/pulls/43/reviews?per_page=100&page=1',
+            '/pulls/43/comments?per_page=100&page=1',
+            "/commits/$commit/comments?per_page=100&page=1",
+            "/contents/$featurePath`?ref=$commit",
+            "/contents/$decisionPath`?ref=$commit"
         )) {
             if (@($global:MeAndAIPostPublicationRequests | Where-Object {
                 $_.EndsWith($requiredPath, [StringComparison]::Ordinal)
@@ -481,17 +1012,167 @@ try {
             $commentPageRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=2') {
             Add-Failure "TEST-0083 verifier did not find evidence located only in the second issue-comment page: $($pageTwoEvidence.Error)"
         }
+        $referenceStyleEvidence = Invoke-PostPublicationScenario `
+            -Mode 'ReferenceStyleLinks'
+        if ($referenceStyleEvidence.Threw) {
+            Add-Failure "TEST-0176 valid reference-style Markdown links failed: $($referenceStyleEvidence.Error)"
+        }
+        foreach ($positiveMode in @(
+            'IssueCommentOnlyPullLink',
+            'ParentIssueCommentLabel',
+            'FeatureIssueIdentityTitle',
+            'FeatureSubjectPullTitle',
+            'ReferenceStyleFeatureDecision',
+            'OwnIssueIdentity',
+            'OwnPullIdentity',
+            'OwnCommentIdentity',
+            'OwnIssueShorthand',
+            'OwnPullShorthand',
+            'OwnCommentShorthand',
+            'OwnReviewShorthand',
+            'SameArtifactAndMailLinks',
+            'CodeLiteralMarkdown',
+            'BareExactAutolinks',
+            'ExactVisibleUrlLink',
+            'TildeAngleAutolink',
+            'UnderscoreAngleAutolink',
+            'StarQueryAutolink',
+            'BalancedInlineDestination',
+            'AngleInlineDestination',
+            'EscapedInlineDestination',
+            'NestedInlineLabel',
+            'PunctuatedAutolinks',
+            'EvenEscapeFeatureLink'
+        )) {
+            $positive = Invoke-PostPublicationScenario -Mode $positiveMode
+            if ($positive.Threw) {
+                Add-Failure "TEST-0176 valid $positiveMode evidence failed: $($positive.Error)"
+            }
+        }
 
         foreach ($negative in @(
             @{ Mode = 'MutableRelease'; Error = '*release is not immutable*' },
             @{ Mode = 'DivergedDefaultBranch'; Error = '*not the default-branch head or one of its ancestors*' },
             @{ Mode = 'OwnedBranchExists'; Error = '*owned working branch still exists*' },
-            @{ Mode = 'MissingFeatureEvidence'; Error = '*does not link the canonical feature*' },
-            @{ Mode = 'IssueBodyOnlyEvidence'; Error = '*does not link the canonical feature*' }
+            @{ Mode = 'MissingReleaseEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'UnusedDefinitionEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'WrappedReleaseUri'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'IssueBodyOnlyEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'MissingIssueDecision'; Error = '*does not link canonical decision*' },
+            @{ Mode = 'FreeTextIssueFeature'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextPullDecision'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'WrongPullFeatureTarget'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'FreeTextIssueComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextCommentHash'; Error = '*without an exact permalink*' },
+            @{ Mode = 'WrongCommentTarget'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'WrongParentCommentLabel'; Error = '*comment parent label*does not match*' },
+            @{ Mode = 'FreeTextPullConversation'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextPullOwnIdInComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextReviewDecision'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextInlineComment'; Error = '*without an exact permalink*' },
+            @{ Mode = 'FreeTextCommitComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'WrongAndCorrectPullFeatureTarget'; Error = '*other than its exact canonical target*' },
+            @{ Mode = 'CodeFormattedFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'CodeFormattedDocumentPath'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'FreeTextDocumentTitle'; Error = '*free-text document-title reference*' },
+            @{ Mode = 'CodeFormattedDocumentTitle'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'WrongDocumentTitleTarget'; Error = '*document title*other than its exact canonical target*' },
+            @{ Mode = 'NonPermalinkCommentLabel'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'NonPermalinkReviewLabel'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'WrongIssueIdentityTarget'; Error = '*BUG-0042*other than its exact canonical target*' },
+            @{ Mode = 'WrongTestTarget'; Error = '*TEST-0175*other than its exact canonical target*' },
+            @{ Mode = 'RelativeGitHubLink'; Error = '*relative repository-document link*' },
+            @{ Mode = 'UnresolvedReferenceLink'; Error = '*unresolved reference-style link*' },
+            @{ Mode = 'BareIssueHash'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongNumericIssueLabel'; Error = '*numeric link label*does not match*' },
+            @{ Mode = 'RawDocumentPath'; Error = '*free-text repository document path*' },
+            @{ Mode = 'FreeTextPullBug'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'PullTitleRecord'; Error = '*cross-record identifier on a non-rendering title surface*' },
+            @{ Mode = 'WrongKindOwnIssueIdentity'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongKindOwnPullIdentity'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongKindOwnIssueShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongNestedDecisionRecordTarget'; Error = '*RISK-0043*other than its exact canonical target*' },
+            @{ Mode = 'PullLinkPrefixCollision'; Error = '*does not link the delivery pull request*' },
+            @{ Mode = 'HiddenFeatureLink'; Error = '*hides a cross-record reference*' },
+            @{ Mode = 'EscapedFeatureLink'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'OddEscapeFeatureLink'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'EscapedReferenceFeatureLink'; Error = '*unused reference-link definition*' },
+            @{ Mode = 'IssueLabelToCommentTarget'; Error = '*numeric label for a comment target*' },
+            @{ Mode = 'StableIdToCommentTarget'; Error = '*BUG-0042*other than its exact canonical target*' },
+            @{ Mode = 'DoubleBacktickFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'TildeFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'CodeFormattedDocumentPseudoLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'IndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'BlockquoteIndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'ListIndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'SpacedFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'BlockquoteFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'ListFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'MultilineInlineCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'EscapedStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'HtmlEntityStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'EscapedIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'GitHubShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'RepositoryShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'QualifiedRepositoryShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'IssueHyphenShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'PullHyphenShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongCommentShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongReviewShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongShorthandTarget'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'WrongShorthandRepository'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'WrongOwnerRepositoryShorthand'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'EscapedLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'HtmlEntityLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'LinkedRecordInIssueTitle'; Error = '*titles do not render clickable links*' },
+            @{ Mode = 'IssueTitleUrlPrefixCollision'; Error = '*URL on a non-rendering title surface*' },
+            @{ Mode = 'NonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingBlockHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingCustomHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingAttributedCustomHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingProcessingInstructionFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingCdataFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingDeclarationFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'BlockquoteNonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'ListNonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'InlineHtmlStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'InlineHtmlAttributeStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'InlineHtmlWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'InlineCommentLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'InlineCodeLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'BoldStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'BoldWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'BoldIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'SplitStableIdWrongTarget'; Error = '*not wholly covered by one clickable link*' },
+            @{ Mode = 'SplitIssueNumber'; Error = '*not wholly covered by one clickable link*' },
+            @{ Mode = 'VisibleUrlWrongTarget'; Error = '*links visible URL*different target*' },
+            @{ Mode = 'VisiblePathWrongTarget'; Error = '*links visible repository-document path*different target*' },
+            @{ Mode = 'SplitUrlWrongTarget'; Error = '*composes a visible URL across a partial Markdown link*' },
+            @{ Mode = 'SplitReferenceUrlWrongTarget'; Error = '*composes a visible URL across a partial Markdown link*' },
+            @{ Mode = 'SplitInlineCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitInlineTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitSchemeCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitSchemeTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitEntityUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitEmphasisUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitStrikeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitUnderscoreUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitDecimalEntitySchemeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitHexEntitySchemeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateInlineTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateSchemeCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateEmphasisUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'InvalidBareAutolinkBoundary'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'InvalidBareAutolinkDomain'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'UnclosedHtmlCommentFeatureLink'; Error = '*hides a cross-record reference*' },
+            @{ Mode = 'FootnoteFreeTextFeature'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'UnusedCrossRecordDefinition'; Error = '*unused reference-link definition*' },
+            @{ Mode = 'CapitalizedIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongDecisionLabel'; Error = '*label does not match*' }
         )) {
             $result = Invoke-PostPublicationScenario -Mode $negative.Mode
             if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
-                Add-Failure "TEST-0076 $($negative.Mode) did not fail closed: $($result.Error)"
+                Add-Failure "TEST-0176 $($negative.Mode) did not fail closed: $($result.Error)"
             }
         }
 

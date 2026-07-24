@@ -39,7 +39,7 @@ history, or an untagged or moved release fails closed.
 Exactly one trusted issue, pull request, branch, base head, reviewed head,
 merged result, and marker must agree. The exact reviewed head must satisfy the
 current review-authority contract: either a trusted independent exact-head
-approval or, only under DEC-0025's boundary, the canonical exact-head personal-
+approval or, only under [DEC-0025](DEC-0025-exact-head-personal-owner-attestation.md)'s boundary, the canonical exact-head personal-
 owner attestation. Ready state, merge alone, cached authority, and issue prose
 are not evidence.
 

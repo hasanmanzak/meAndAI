@@ -21,9 +21,9 @@ cycle. Consumer projects receive the mandate through a reviewed exact protocol
 pin; their instructions, memory, feature/decision records, and tests remain
 consumer-owned.
 
-Local evidence on 2026-07-16: TEST-0096 through TEST-0099 passed in the
+Local evidence on 2026-07-16: [TEST-0096](../../../docs/features/FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0097](../../../docs/features/FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0098](../../../docs/features/FEAT-0015-stability-consistency-mandate/test-cases.md), and [TEST-0099](../../../docs/features/FEAT-0015-stability-consistency-mandate/test-cases.md) passed in the
 structural owner, the quick-adoption suite passed in 372.3 seconds, and the
 complete suite passed in 560.1 seconds. The initial scan and correction queue
-resolved FIND-0133 through FIND-0139; the bounded confirmation and final
+resolved [FIND-0133](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), [FIND-0134](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), [FIND-0135](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), [FIND-0136](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), [FIND-0137](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), [FIND-0138](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md), and [FIND-0139](../../../docs/features/FEAT-0015-stability-consistency-mandate/README.md); the bounded confirmation and final
 evidence-only structural verification found no unresolved `Blocking` finding.
 Exact converged-push evidence remains external until the push exists.

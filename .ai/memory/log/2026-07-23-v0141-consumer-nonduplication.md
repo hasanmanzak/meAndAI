@@ -3,8 +3,8 @@
 ## Context
 
 [FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md),
-`BUG-0028`, [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112),
-and `SUBF-0088` correct an ownership ambiguity left after v0.14.0. The common
+[BUG-0028](https://github.com/hasanmanzak/meAndAI/issues/112), [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112),
+and [SUBF-0088](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md) correct an ownership ambiguity left after v0.14.0. The common
 upstream rule assigned reusable corrections to meAndAI but did not explicitly
 prohibit recreating protocol-provided code or generic regression evidence in a
 consumer.
@@ -26,8 +26,8 @@ consumer.
 
 ## Verification and continuation
 
-TEST-0174 owns the common protocol, DEC-0028, and local-instruction regression.
+[TEST-0174](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/test-cases.md) owns the common protocol, [DEC-0028](../../../docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md), and local-instruction regression.
 Publish the reviewed branch through one PR and immutable v0.14.1 release under
-issue #112, including both required runtime assets and post-publication checks.
+[issue #112](https://github.com/hasanmanzak/meAndAI/issues/112), including both required runtime assets and post-publication checks.
 Only after that release may a consumer migration be evaluated, beginning with
 a read-only proposal diff and no consumer-local copy of common assets.

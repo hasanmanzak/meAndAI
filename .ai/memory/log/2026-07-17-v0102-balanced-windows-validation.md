@@ -3,7 +3,7 @@
 ## Canonical records
 
 - Feature: [FEAT-0025](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md)
-- Tests: [TEST-0117 and TEST-0118](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md)
+- Tests: [TEST-0117](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md) and [TEST-0118](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md)
 - Tracking and post-publication authority: [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67)
 
 ## Durable facts
@@ -22,18 +22,18 @@
   contracts. The corrected structure and all four focused PowerShell 5.1
   shards passed in 40.4, 81.2, 105.8, and 76.5 seconds.
 - The complete local run passed every executable test body, then caught a stale
-  `TEST-0115` source anchor in final evidence aggregation. The binding was
+  [TEST-0115](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md) source anchor in final evidence aggregation. The binding was
   corrected to the superseding layout assertion and the production evidence
   builder directly returned the complete root set.
 - Pull-request run [29576425693](https://github.com/hasanmanzak/meAndAI/actions/runs/29576425693)
   passed: Linux full 153 seconds, Windows base 160, and the four new integrity
   children 53, 96, 103, and 103 seconds. The hosted Windows critical path was
   160 seconds versus the prior 326-second observation.
-- Durations are observations, not gates. Issue #67 owns hosted ordinary-CI,
+- Durations are observations, not gates. [Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) owns hosted ordinary-CI,
   immutable-release, exact merge, branch deletion, and post-publication proof.
 
 ## Continuation
 
-If delivery is still open, continue from issue #67 and the FEAT-0025 DoD. Do
+If delivery is still open, continue from [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) and the [FEAT-0025](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md) DoD. Do
 not broaden this work into production-launcher refactoring, mutable fixture
 sharing, a test scheduler, or reduced PowerShell 5.1 coverage.

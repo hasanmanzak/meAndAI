@@ -7,6 +7,8 @@
 - Related features:
 - Related decisions:
 
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+
 ## Context
 
 State the forces, constraints, and problem.

@@ -55,7 +55,7 @@ already authenticated `nameWithOwner` returned by `gh repo view`.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0088` | External contract fidelity | A test double can drift from the GitHub CLI JSON contract and produce another false green | Mitigated by launcher maintainer | `TEST-0102` uses the observed object shape, asserts the requested fields, and removes `nameWithOwner` from the PR fixture |
+| `RISK-0088` | External contract fidelity | A test double can drift from the GitHub CLI JSON contract and produce another false green | Mitigated by launcher maintainer | [TEST-0102](test-cases.md) uses the observed object shape, asserts the requested fields, and removes `nameWithOwner` from the PR fixture |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
@@ -71,12 +71,12 @@ confirmation scan is used only if remediation changes the tree.
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0018` and `BUG-0006` identifiers and linked issue #53 exist.
+- [x] Stable `FEAT-0018` and [BUG-0006](https://github.com/hasanmanzak/meAndAI/issues/53) identifiers and linked [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) exist.
 - [x] Problem, outcome, scope, non-goals, consumers, compatibility, errors,
       ownership, lifecycle, and external JSON type contracts are explicit.
 - [x] Existing decisions remain sufficient; no architecture change is needed.
 - [x] The change is one bounded independently testable slice.
-- [x] `TEST-0102` covers live-shape success and identity/type failures.
+- [x] [TEST-0102](test-cases.md) covers live-shape success and identity/type failures.
 - [x] Test-code and baseline states and the finite validation budget are
       recorded before production implementation.
 
@@ -100,7 +100,7 @@ confirmation scan is used only if remediation changes the tree.
 ## Implementation and verification approach
 
 First replace the pull-request test double with the observed GitHub CLI shape
-and demonstrate the existing launcher fails `TEST-0102`. Then update only the
+and demonstrate the existing launcher fails [TEST-0102](test-cases.md). Then update only the
 existing PR metadata validator and requested field list, advance active pins,
 and update canonical records. No generalized GitHub model or validator is
 introduced.
@@ -130,7 +130,7 @@ confirmation only after remediation. Candidate completion is reopened by any
 failed complete-suite, hosted-CI, or review evidence.
 
 The complete repository suite passed all discovered suites in 474.6 seconds,
-including machine-readable `TEST-0102` evidence. The post-development scan
+including machine-readable [TEST-0102](test-cases.md) evidence. The post-development scan
 found no unresolved `Blocking` observation after the two pre-scan corrections.
 That clean initial scan is the convergence evidence; an unchanged confirmation
 scan is prohibited. Hosted CI and publication remain external delivery gates.
@@ -146,7 +146,7 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and `TEST-0102` pass.
+- [x] Acceptance criteria and [TEST-0102](test-cases.md) pass.
 - [x] Existing quick-adoption scenarios and the complete repository suite pass.
 - [x] Fresh-diff review and the bounded project scan leave no unresolved
       `Blocking` finding.
@@ -155,6 +155,6 @@ scan is prohibited. Hosted CI and publication remain external delivery gates.
 
 ## Post-merge publication gate
 
-Issue #53 is the external authority for the exact merged commit, immutable
+[Issue #53](https://github.com/hasanmanzak/meAndAI/issues/53) is the external authority for the exact merged commit, immutable
 `v0.9.3` release, launcher asset digest, hosted checks, and the affected-consumer
 continuation result after those facts exist.

@@ -6,12 +6,12 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related feature: [FEAT-0028](../features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
 - Related decisions: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md), [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md), and [DEC-0018](DEC-0018-release-declared-consumer-migrations.md)
-- Supersedes: the mandatory two-proposal legacy-capability handoff in DEC-0018
+- Supersedes: the mandatory two-proposal legacy-capability handoff in [DEC-0018](DEC-0018-release-declared-consumer-migrations.md)
   when a separately invoked, verified current launcher is available
 
 ## Context
 
-DEC-0018 correctly states that immutable old updater code cannot interpret a
+[DEC-0018](DEC-0018-release-declared-consumer-migrations.md) correctly states that immutable old updater code cannot interpret a
 future migration catalog. Its fallback installs the new engine in one proposal
 and creates migration output in a second proposal. The first affected consumer demonstrates that a
 consumer's required validator can reject the first core-only tree, making the

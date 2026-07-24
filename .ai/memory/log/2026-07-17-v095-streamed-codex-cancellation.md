@@ -14,18 +14,18 @@
 
 ## Current evidence
 
-- `TEST-0105` and `TEST-0106` are owned by
+- [TEST-0105](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md) and [TEST-0106](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md) are owned by
   [`tests/quick-adoption-streaming.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1).
 - The expected-red run proved the v0.9.4 overlay, buffered stdout, and weak
   exceptional-finalizer boundary. The focused implementation run passed on
   Windows PowerShell 5.1.
 - The completed reviewed working tree passed the complete repository suite in
   517.2 seconds, including all 34 existing quick-adoption scenarios,
-  `TEST-0105`, `TEST-0106`, and scenario-ownership gates.
+  [TEST-0105](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md), [TEST-0106](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md), and scenario-ownership gates.
 - [Pull request #58](https://github.com/hasanmanzak/meAndAI/pull/58) owns the
   review branch and links the canonical feature, tests, decisions, and issue.
   Merge, immutable-release, and hosted-check evidence remain pending and belong
-  in issue #57 when those facts exist.
+  in [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) when those facts exist.
 
 ## Continuation
 

@@ -9,7 +9,7 @@ These instructions apply to the consuming repository.
    `.ai/protocol` gitlink. Resolve its current version from
    [the checkout's `VERSION`](.ai/protocol/VERSION); do not duplicate a literal
    current tag or commit in consumer-owned instructions or records.
-3. Read this project's `.ai/memory/README.md`.
+3. Read this project's [local project memory](.ai/memory/README.md).
 4. Read the relevant project-owned feature and decision documents before work.
 5. Apply project-specific rules below. A relaxation of the common protocol
    requires a numbered project decision.

@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related feature: [FEAT-0011](../features/FEAT-0011-stability-closure/README.md)
 - Related decisions: [DEC-0004](DEC-0004-bounded-completion-convergence.md), [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0008](DEC-0008-local-codex-execution.md), and [DEC-0010](DEC-0010-stable-automation-invariants.md)
-- Clarifies: DEC-0010 evidence identity, causality, and canonical-state clauses
+- Clarifies: [DEC-0010](DEC-0010-stable-automation-invariants.md) evidence identity, causality, and canonical-state clauses
 
 ## Context
 

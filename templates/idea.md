@@ -4,6 +4,8 @@ Status: **Exploring**
 Created: **YYYY-MM-DD**
 Promoted record: **None**
 
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+
 This idea does not authorize implementation and does not satisfy Definition of
 Ready.
 

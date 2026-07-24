@@ -78,7 +78,8 @@ function New-TestCapabilityReviewBody {
         [Parameter(Mandatory)][string]$IssueActorLogin,
         [ValidateRange(0, 2147483647)][int]$IssueNumber = 0,
         [string]$HandoffHead = 'pending',
-        [string]$BaseLedgerDigest = 'missing'
+        [string]$BaseLedgerDigest = 'missing',
+        [switch]$LegacyTrackingIssue
     )
 
     $tick = [string][char]96
@@ -101,9 +102,16 @@ function New-TestCapabilityReviewBody {
     $lines.Add("Issue actor ID: $tick$IssueActorId$tick")
     $lines.Add("Issue actor login: $tick$IssueActorLogin$tick")
     if ($IssueNumber -gt 0) {
-        $lines.Add("Tracking issue: $tick$IssueNumber$tick")
-        $lines.Add('')
-        $lines.Add("Tracking issue: #$IssueNumber")
+        if ($LegacyTrackingIssue) {
+            $lines.Add("Tracking issue: $tick$IssueNumber$tick")
+            $lines.Add('')
+            $lines.Add("Tracking issue: #$IssueNumber")
+        }
+        else {
+            $lines.Add(
+                "Tracking issue: [#$IssueNumber](https://github.com/$($Plan.Repository)/issues/$IssueNumber)"
+            )
+        }
     }
     $lines.Add('')
     $lines.Add('Capability batch:')
@@ -114,6 +122,7 @@ function New-TestCapabilityReviewBody {
     }
     return ($lines -join "`n") + "`n"
 }
+$newTestCapabilityReviewBody = ${function:New-TestCapabilityReviewBody}
 
 $catalogDigest = 'a' * 64
 $definitionBlob = 'b' * 40
@@ -442,6 +451,17 @@ Assert-Equal $finalization.State 'Finalize' `
 Assert-Equal ($finalization.Operations.Kind -join ',') `
     'DeleteBranch,CloseIssue' `
     'TEST-0140 finalization did not preserve branch-first/issue-last order.'
+$finalizationLink = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+    -Repository 'hasanmanzak/consumer' -Number 88
+Assert-True ($finalization.ClosureMarker -cmatch (
+        '^<!-- meandai-capability-review-closed:v2:' +
+        'hasanmanzak/consumer:[0-9a-f]{64}:head-[0-9a-f]{40}:' +
+        'merge-[0-9a-f]{40}:link-' + $finalizationLink.Digest + ' -->$'
+    )) 'TEST-0175 capability-review closure writer retained a bare pull-request identity.'
+Assert-True (-not $finalization.ClosureMarker.Contains(':pr-')) `
+    'TEST-0175 capability-review closure marker retained a free-text PR number.'
+Assert-Equal ([int]$finalization.Operations[-1].PullRequestNumber) 88 `
+    'TEST-0175 closure operation did not carry the PR identity outside its marker.'
 
 $calls = [System.Collections.Generic.List[string]]::new()
 $handlers = @{
@@ -473,6 +493,22 @@ Assert-Equal $completed.State 'Completed' `
     'TEST-0140 exact completed state was not recognized.'
 Assert-Equal $completed.Operations.Count 0 `
     'TEST-0140 completed rerun was not an exact no-op.'
+
+$legacyClosedIssue = $closedIssue.PSObject.Copy()
+$legacyClosedIssue.ClosureMarker =
+    "<!-- meandai-capability-review-closed:v1:hasanmanzak/consumer:${catalogDigest}:pr-88:merge-${mergeCommit} -->"
+$legacyCompleted = Resolve-MeAndAICapabilityReviewFinalization `
+    -Catalog $catalog -Ledger $terminalLedger `
+    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+    -Marker $freshPlan.Marker -ExpectedBranch $freshPlan.Branch `
+    -ExpectedBaseHead $baseHead `
+    -ExpectedReviewHead $reviewHead -Issue $legacyClosedIssue -Branch $null `
+    -PullRequest $mergedPullRequest -DefaultContainsMerge:$true `
+    -ManifestPresentOnDefault:$false
+Assert-Equal $legacyCompleted.State 'Completed' `
+    'TEST-0140 bounded legacy closure marker compatibility was lost.'
+Assert-Equal $legacyCompleted.ClosureMarker $legacyClosedIssue.ClosureMarker `
+    'TEST-0140 legacy closure compatibility rewrote historical evidence.'
 
 Assert-ThrowsLike -Action {
     Resolve-MeAndAICapabilityReviewFinalization `
@@ -1620,6 +1656,9 @@ try {
         'TEST-0140 production manifest commit targeted another path.'
     Assert-True ([bool]$apiState.PullBody.draft) `
         'TEST-0140 production handoff did not open a draft pull request.'
+    Assert-True $apiState.PullBody.body.Contains(
+        '[#91](https://github.com/hasanmanzak/consumer/issues/91)'
+    ) 'TEST-0175 generated capability-review PR body did not link its tracking issue.'
     Assert-True ($apiState.IssueBody.Contains('Proposal actor ID: `101`') -and
         $apiState.IssueBody.Contains('Issue actor ID: `41898282`') -and
         $apiState.PullBody.body.Contains('Proposal actor login: `meandai-bot`') -and
@@ -1878,10 +1917,14 @@ try {
     }).Count 0 `
         'TEST-0163 independent approval unnecessarily read owner attestations.'
 
+    $ownerAttestationLink = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository 'hasanmanzak/consumer' -Number 92
     $ownerAttestationMarker =
-        "<!-- meandai-capability-review-attestation:v1:hasanmanzak/consumer:pr-92:head-$finalReviewHead -->"
+        "<!-- meandai-capability-review-attestation:v2:hasanmanzak/consumer:head-$finalReviewHead`:link-$($ownerAttestationLink.Digest) -->"
     $ownerAttestationBody = $ownerAttestationMarker + ' ' +
-        'I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.'
+        "I reviewed the semantic capability changes in $($ownerAttestationLink.Markdown) at this exact head and attest that they are ready for finalization."
+    Assert-True (-not $ownerAttestationMarker.Contains(':pr-')) `
+        'TEST-0175 owner-attestation writer retained a bare pull-request identity.'
 
     $apiState.Reviews[0].commit_id = '7' * 40
     $apiState.AttestationComments.Add([pscustomobject]@{
@@ -1966,24 +2009,37 @@ try {
             -PlanOnly
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 stale owner attestation authorized another review head.'
-    foreach ($wrongBinding in @(
+    $apiState.AttestationComments[0].body = $ownerAttestationBody.Replace(
+        'hasanmanzak/consumer',
+        'hasanmanzak/another-consumer'
+    )
+    Assert-ThrowsLike -Action {
+        & $runnerPath -ConsumerRoot $fixtureRoot `
+            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+            -DefaultBranch main -TargetVersion v0.12.0 `
+            -DiscoveryContext AlreadyCurrent `
+            -FinalizePullRequestNumber $finalPullNumber `
+            -Runtime $reviewRuntime -PlanOnly
+    } -Pattern '*exact-head personal-owner attestation*' `
+        -Message 'TEST-0163 wrong repository attestation binding was accepted.'
+    foreach ($invalidLinkedBody in @(
         $ownerAttestationBody.Replace(
-            'hasanmanzak/consumer',
-            'hasanmanzak/another-consumer'
+            'https://github.com/hasanmanzak/consumer/pull/92',
+            'https://github.com/hasanmanzak/consumer/pull/93'
         ),
-        $ownerAttestationBody.Replace(':pr-92:', ':pr-93:')
+        ($ownerAttestationMarker +
+            ' I reviewed the semantic capability changes in pull request #92 at this exact head and attest that they are ready for finalization.')
     )) {
-        $apiState.AttestationComments[0].body = $wrongBinding
+        $apiState.AttestationComments[0].body = $invalidLinkedBody
         Assert-ThrowsLike -Action {
             & $runnerPath -ConsumerRoot $fixtureRoot `
                 -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
                 -DefaultBranch main -TargetVersion v0.12.0 `
                 -DiscoveryContext AlreadyCurrent `
                 -FinalizePullRequestNumber $finalPullNumber `
-        -Runtime $reviewRuntime `
-                -PlanOnly
-        } -Pattern '*exact-head personal-owner attestation*' `
-            -Message 'TEST-0163 wrong repository or pull-request attestation binding was accepted.'
+                -Runtime $reviewRuntime -PlanOnly
+        } -Pattern '*not exact canonical evidence*' `
+            -Message 'TEST-0175 new owner marker accepted a missing or wrong pull-request link.'
     }
     $apiState.AttestationComments[0].body =
         $ownerAttestationMarker + "`nnoncanonical trusted content`n"
@@ -2114,20 +2170,30 @@ try {
     $apiState.ForceLedgerMismatch = $false
 
     $trustedClosureMarker = [string]$finalResult.Plan.ClosureMarker
-    $apiState.ClosureComments.Add([pscustomobject]@{
-        body = "$trustedClosureMarker`nnoncanonical trusted content`n"
-        user = $apiState.IssueActor
-    })
-    Assert-ThrowsLike -Action {
-        & $runnerPath -ConsumerRoot $fixtureRoot `
-            -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
-            -DefaultBranch main -TargetVersion v0.12.0 `
-            -DiscoveryContext AlreadyCurrent `
-            -FinalizePullRequestNumber $finalPullNumber `
-            -Runtime $reviewRuntime
-    } -Pattern '*not exact canonical evidence*' `
-        -Message 'TEST-0140 trusted closure marker accepted noncanonical comment bytes.'
-    $apiState.ClosureComments.Clear()
+    $closurePullRequestLink =
+        '[pull request #92](https://github.com/hasanmanzak/consumer/pull/92)'
+    $canonicalClosureBody =
+        "$trustedClosureMarker`n`nVerified the merged review for $closurePullRequestLink, terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
+    foreach ($invalidClosureBody in @(
+        "$trustedClosureMarker`nnoncanonical trusted content`n",
+        "$trustedClosureMarker`n`nVerified the merged review for pull request #92, terminal ledger, default-branch containment, and exact-head branch cleanup.`n",
+        "$trustedClosureMarker`n`nVerified the merged review for [pull request #92](https://github.com/hasanmanzak/consumer/pull/93), terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
+    )) {
+        $apiState.ClosureComments.Add([pscustomobject]@{
+            body = $invalidClosureBody
+            user = $apiState.IssueActor
+        })
+        Assert-ThrowsLike -Action {
+            & $runnerPath -ConsumerRoot $fixtureRoot `
+                -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
+                -DefaultBranch main -TargetVersion v0.12.0 `
+                -DiscoveryContext AlreadyCurrent `
+                -FinalizePullRequestNumber $finalPullNumber `
+                -Runtime $reviewRuntime
+        } -Pattern '*not exact canonical evidence*' `
+            -Message 'TEST-0175 new closure marker accepted a missing or wrong pull-request link.'
+        $apiState.ClosureComments.Clear()
+    }
 
     $apiState.DriftDefaultHeadAfterReadCount =
         $apiState.DefaultHeadReadCount + 1
@@ -2171,6 +2237,12 @@ try {
         'TEST-0140 production finalization did not close its issue last.'
     Assert-Equal $apiState.ClosureComments.Count 1 `
         'TEST-0140 production finalization did not write one closure marker.'
+    Assert-Equal ([string]$apiState.ClosureComments[0].body) `
+        $canonicalClosureBody `
+        'TEST-0175 generated closure evidence is not the exact linked canonical body.'
+    Assert-True (-not ([string]$apiState.ClosureComments[0].body).Contains(
+        ':pr-92:'
+    )) 'TEST-0175 generated closure evidence retained a bare marker PR identity.'
     Assert-True ((@($apiState.Calls | Where-Object {
         $_ -ceq "Proposal GET $canonicalReadRefEndpoint"
     }).Count - $finalizationRefReadCount) -ge 3) `
@@ -2197,6 +2269,24 @@ try {
         'TEST-0140 production completed rerun was not an exact no-op.'
     Assert-Equal $apiState.ClosureComments.Count 1 `
         'TEST-0140 completed rerun duplicated closure evidence.'
+
+    $canonicalClosureCommentBody = [string]$apiState.ClosureComments[0].body
+    $legacyClosureMarker =
+        "<!-- meandai-capability-review-closed:v1:hasanmanzak/consumer:$($releaseCatalog.CatalogDigest):pr-92:merge-$('5' * 40) -->"
+    $apiState.ClosureComments[0].body =
+        "$legacyClosureMarker`n`nVerified merged review, terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
+    $legacyCompletedExecution = & $runnerPath `
+        -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -TargetVersion v0.12.0 -DiscoveryContext AlreadyCurrent `
+        -FinalizePullRequestNumber $finalPullNumber `
+        -Runtime $reviewRuntime -PlanOnly
+    Assert-Equal $legacyCompletedExecution.State 'Completed' `
+        'TEST-0140 explicit legacy closure compatibility did not recognize historical evidence.'
+    Assert-Equal $legacyCompletedExecution.Plan.ClosureMarker `
+        $legacyClosureMarker `
+        'TEST-0140 legacy closure compatibility replaced historical evidence.'
+    $apiState.ClosureComments[0].body = $canonicalClosureCommentBody
 
     # TEST-0165: a trusted historical review may be retired only after its
     # original release catalog is reconstructed from immutable repository
@@ -2307,18 +2397,19 @@ try {
             -DefaultHead $historicalBaseHead -TargetVersion v0.12.0 `
             -DiscoveryContext AlreadyCurrent `
             -Assessments @($sourceAssessment)
-        $sourceIssueBody = New-TestCapabilityReviewBody `
+        $sourceIssueBody = & $newTestCapabilityReviewBody `
             -Plan $sourcePlan -LedgerPrefixCount 0 `
             -ProposalActorId 101 -ProposalActorLogin 'meandai-bot' `
             -IssueActorId 41898282 `
             -IssueActorLogin 'github-actions[bot]'
-        $sourcePullBody = New-TestCapabilityReviewBody `
+        $sourcePullBody = & $newTestCapabilityReviewBody `
             -Plan $sourcePlan -LedgerPrefixCount 0 `
             -ProposalActorId 101 -ProposalActorLogin 'meandai-bot' `
             -IssueActorId 41898282 `
             -IssueActorLogin 'github-actions[bot]' `
             -IssueNumber $historicalIssueNumber `
-            -HandoffHead $historicalHandoffHead
+            -HandoffHead $historicalHandoffHead `
+            -LegacyTrackingIssue
         $manifest = [ordered]@{
             schema = 1
             marker = [string]$sourcePlan.Marker
@@ -2641,6 +2732,9 @@ try {
 
     # TEST-0166: anything other than one provable immutable historical merge
     # blocks before successful branch, issue, or current-catalog mutation.
+    $assertTrueAction = ${function:Assert-True}
+    $assertEqualAction = ${function:Assert-Equal}
+    $assertThrowsLikeAction = ${function:Assert-ThrowsLike}
     $assertHistoricalBlock = {
         param(
             [Parameter(Mandatory)][string]$Name,
@@ -2651,23 +2745,23 @@ try {
         & $Arrange $apiState.HistoricalReview
         $beforeBranch = [bool]$apiState.HistoricalReview.BranchExists
         $beforeIssue = [bool]$apiState.HistoricalReview.IssueClosed
-        Assert-ThrowsLike -Action {
+        & $assertThrowsLikeAction -Action {
             & $runnerPath -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
                 -Repository 'hasanmanzak/consumer' -DefaultBranch main `
                 -TargetVersion v0.13.5 -DiscoveryContext AlreadyCurrent `
                 -Runtime $historicalRuntime
         } -Pattern $Pattern -Message "TEST-0166 $Name did not fail closed."
-        Assert-Equal $apiState.HistoricalMutationCalls.Count 0 `
+        & $assertEqualAction $apiState.HistoricalMutationCalls.Count 0 `
             "TEST-0166 $Name mutated historical state before proof."
-        Assert-Equal @($apiState.Calls | Where-Object {
+        & $assertEqualAction @($apiState.Calls | Where-Object {
             $_ -match '^(?:Proposal|Issue|Protocol) (?:POST|PATCH|DELETE) '
         }).Count 0 `
             "TEST-0166 $Name reached a GitHub mutation request."
-        Assert-Equal $apiState.HistoricalReview.BranchExists $beforeBranch `
+        & $assertEqualAction $apiState.HistoricalReview.BranchExists $beforeBranch `
             "TEST-0166 $Name changed the historical branch."
-        Assert-Equal $apiState.HistoricalReview.IssueClosed $beforeIssue `
+        & $assertEqualAction $apiState.HistoricalReview.IssueClosed $beforeIssue `
             "TEST-0166 $Name changed the historical issue."
-        Assert-True (-not $apiState.IssueCreated -and
+        & $assertTrueAction (-not $apiState.IssueCreated -and
             -not $apiState.PullCreated) `
             "TEST-0166 $Name created current work after failed recovery."
     }.GetNewClosure()

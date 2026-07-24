@@ -45,7 +45,7 @@ Finite scope, evidence-based repetition, and a blocked exit prevent blind loops.
   completion cannot be inferred from validation-budget exhaustion.
 - Consumers and dependencies: this repository and consumers that intentionally
   adopt `v0.3.0`; consumers on earlier exact pins remain unchanged.
-- Verification: `TEST-0019`, the existing structural/link suite, one fresh-diff
+- Verification: [TEST-0019](test-cases.md), the existing structural/link suite, one fresh-diff
   self-review, and one final relevant verification command.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
@@ -94,7 +94,7 @@ decomposition is not applicable.
    within a declared finite budget.
 5. Budget exhaustion or missing authority produces a documented blocked state,
    never a successful completion claim.
-6. The repository enforces the contract through executable `TEST-0019`.
+6. The repository enforces the contract through executable [TEST-0019](test-cases.md).
 
 ## Self-review
 
@@ -111,7 +111,7 @@ remediation slice, one confirmation review, and one blocker-driven test retry.
 | `FIND-0042` | Loop risk / High / High | Literal repetition could be unbounded; added finite budget, progress, and blocked conditions. | Resolved |
 | `FIND-0045` | Semantic contract / High / High | Severity was incorrectly used as a synonym for priority; priority now uses severity, impact, and dependency order. | Resolved |
 | `FIND-0046` | Process conflict / High / High | Gate 5 said ordinary work did not imply a project scan; aligned it with the single default convergence scan. | Resolved |
-| `FIND-0043` | Regression risk / Medium / High | The new contract could drift; added template alignment and `TEST-0019`. | Resolved |
+| `FIND-0043` | Regression risk / Medium / High | The new contract could drift; added template alignment and [TEST-0019](test-cases.md). | Resolved |
 | `FIND-0044` | Test defect / Medium / High | The first run matched a line-wrapped sentence literally and failed falsely; narrowed the assertion without weakening semantics. | Resolved; retry passed |
 
 Shared finding scope is `FEAT-0003`; impact is protocol execution behavior;

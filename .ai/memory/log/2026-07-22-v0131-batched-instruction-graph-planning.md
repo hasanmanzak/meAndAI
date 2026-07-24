@@ -7,12 +7,12 @@
 - Branch: `codex/task-0002-batched-instruction-graph-transport`
 - Baseline: immutable [v0.13.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.0),
   commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`
-- Planned tests: [TEST-0161 and TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md)
+- Planned tests: [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md)
 
 ## Verified starting state
 
-- PR #99 completed every deterministic fixture/operation ratchet and merged as
-  the exact tree later published in immutable v0.13.0. Issue #95 retains PR,
+- [PR #99](https://github.com/hasanmanzak/meAndAI/pull/99) completed every deterministic fixture/operation ratchet and merged as
+  the exact tree later published in immutable v0.13.0. [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) retains PR,
   hosted, release, asset, cleanup, and post-publication evidence.
 - Final released-tree hosted observations were Ubuntu 5:33 total and Windows
   20:33 total. Windows PowerShell 5.1 hotspots were quick adoption 723.326
@@ -20,20 +20,20 @@
 - Reusable fixture construction is no longer the unexplained residual. Both
   production graph adapters still start one `git cat-file blob <sha>` process
   per parsed blob.
-- FEAT-0040 proposes a lazy binary-safe `git cat-file --batch` session per
+- [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) proposes a lazy binary-safe `git cat-file --batch` session per
   graph acquisition as the first candidate bounded correction. Pure graph policy,
   topology, semantic capability definitions, and mutation authority stay fixed.
 
 ## Gate 1 continuation
 
-- FEAT-0040, SUBF-0078/0079, TEST-0161/0162, and RISK-0190..0192 are
+- [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [SUBF-0078](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) and [SUBF-0079](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md), and [RISK-0190](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [RISK-0191](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), and [RISK-0192](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) are
   collision-free and defined.
 - `0.13.1` is the backward-compatible target; no version surface changes during
   planning.
 - No new capability or decision is required while the session remains actor-
   local and acquisition-local. Shared cache/state, a daemon, policy-module I/O,
   or hosted topology change remains outside scope.
-- Operation-budget schema 2 preserves FEAT-0039's exact v0.12.7 measurement as
+- Operation-budget schema 2 preserves [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)'s exact v0.12.7 measurement as
   one identified entry and appends a distinct v0.13.0 graph-transport
   measurement; every closure target binds one measurement identity. The new
   stable route counts only the existing small real-Git fixture's two production
@@ -47,8 +47,8 @@
   acquisition target is one blob process with all 175 requests and graph
   evidence unchanged.
 - Focused Windows PowerShell 5.1 expected-red is frozen before production:
-  TEST-0161 reports exactly six actor-contract findings in 146.507 seconds with
-  TEST-0151/0152 intact; TEST-0162 reports 25 schema-2/batch-ratchet findings in
+  [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) reports exactly six actor-contract findings in 146.507 seconds with
+  [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) intact; [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) reports 25 schema-2/batch-ratchet findings in
   8.3 seconds without parse/null failure. The final 6.0-second `StructureOnly`
   run accepts both canonical owners. Gate 1 is complete.
 - The private session factory may receive exact transport/monotonic-clock hooks
@@ -56,10 +56,10 @@
   retain literal 120-second/5-second deadlines, allowing hung/unreapable N/N+1
   paths to run without real waits. Real-Git default transport and active
   replace-ref isolation remain required.
-- Issue #98's prior local quick/bootstrap/graph timings remain historical
+- [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)'s prior local quick/bootstrap/graph timings remain historical
   observations; its unproven 333.1-second WindowsNative value is superseded by
-  the verified 341.0-second FEAT-0039 record. Final v0.13.0 hosted values and the
-  exact observer are FEAT-0040's comparison authority.
+  the verified 341.0-second [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md) record. Final v0.13.0 hosted values and the
+  exact observer are [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)'s comparison authority.
 - The first Windows PowerShell 5.1 `StructureOnly` run produced exactly the two
-  planned missing-authority findings for `TEST-0161` and `TEST-0162`; no other
+  planned missing-authority findings for [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md); no other
   structural problem was reported.

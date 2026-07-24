@@ -3,13 +3,13 @@
 - Feature: [FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
 - Decisions: [DEC-0019](../../../docs/decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../../docs/decisions/DEC-0022-release-declared-semantic-capabilities.md)
 - Tracking and external publication authority: [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
-- Delivery pull request: `Pending`; record through issue #87 after creation
+- Delivery pull request: `Pending`; record through [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) after creation
 - Target version: `0.12.3`
 
 ## Durable continuation
 
-- `FEAT-0035` is `Ready`; no production or executable-test implementation has
-  started. `TEST-0144` through `TEST-0146` are the required test-first
+- [FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) is `Ready`; no production or executable-test implementation has
+  started. [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), [TEST-0145](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), and [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md) are the required test-first
   scenarios and must receive executable ownership before implementation.
 - Preserve every active scenario ID and declared variant. Change the evidence
   level, not the behavior inventory: deterministic combinations belong in
@@ -49,10 +49,10 @@
 ## Next action on the stronger computer
 
 1. Fetch and switch to `codex/feat-0035-test-runtime-efficiency`.
-2. Confirm issue #87 and this feature record still satisfy Gate 1.
+2. Confirm [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) and this feature record still satisfy Gate 1.
 3. Capture same-commit per-suite and expensive-boundary baselines without a
    short outer measurement timeout.
-4. Add expected-red executable ownership for `TEST-0144` and implement
-   `SUBF-0064`; run its focused tests and fresh-diff review before `SUBF-0065`.
+4. Add expected-red executable ownership for [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md) and implement
+   [SUBF-0064](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md); run its focused tests and fresh-diff review before [SUBF-0065](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md).
 5. Continue the dependency-ordered slices and record exact evidence in the
    feature ledger. Do not open a pull request until local convergence.

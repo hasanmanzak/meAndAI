@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.14.1',
+    [string]$TargetTag = 'v0.14.2',
     [string]$BranchPrefix = 'automation/meandai-capabilities-',
     [ValidateSet('Auto', 'FreshAdoption', 'FullMigration',
         'HybridReconciliation', 'CleanStart', 'Abort')]
@@ -1314,6 +1314,45 @@ function Test-ExactAdoptionPullRequestMarker {
         -ExpectedPhase $ExpectedPhase
 }
 
+function Test-ExactAdoptionPullRequestBodyEvidence {
+    param(
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$BaseHead,
+        [Parameter(Mandatory)][string]$ProposalHead,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$TargetSha,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Collisions
+    )
+
+    $body = [string]$PullRequest.body
+    $manifestLink = New-MeAndAIGitHubBlobLink -Repository $Repository `
+        -Commit $ProposalHead -Path $ManifestPath
+    $requiredLines = @(
+        "- Protocol release: [$TargetTag](https://github.com/$ProtocolRepository/releases/tag/$TargetTag)",
+        "- Protocol commit: [$TargetSha](https://github.com/$ProtocolRepository/commit/$TargetSha)",
+        "- Source graph base: [$BaseHead](https://github.com/$Repository/commit/$BaseHead)",
+        "An agent or maintainer must complete the tasks in $manifestLink and remove the manifest before this pull request can become ready or merge."
+    )
+    foreach ($line in $requiredLines) {
+        if (@([regex]::Matches(
+                $body.Replace("`r`n", "`n").Replace("`r", "`n"),
+                '(?m)^' + [regex]::Escape($line) + '$',
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+            )).Count -ne 1) {
+            return $false
+        }
+    }
+    return (Test-MeAndAIExactLinkedPathSection -Body $body `
+            -Heading '### Detected protocol and governance surfaces' `
+            -Repository $Repository -Commit $BaseHead `
+            -Paths @($ProtocolSurfaces)) -and
+        (Test-MeAndAIExactLinkedPathSection -Body $body `
+            -Heading '### Detected collisions' -Repository $Repository `
+            -Commit $BaseHead -Paths @($Collisions))
+}
+
 function Test-ExactAdoptionTree {
     param(
         [string]$RemoteHead,
@@ -1503,6 +1542,14 @@ function Test-ExactAdoptionProposal {
         -ExpectedSourceGraph $ExpectedSourceGraph)) {
         return $false
     }
+    if (-not (Test-ExactAdoptionPullRequestBodyEvidence `
+        -PullRequest $pullRequest -Repository $Repository `
+        -BaseHead $BaseHead -ProposalHead $RemoteHead `
+        -TargetTag $TargetTag -TargetSha $TargetSha `
+        -ProtocolSurfaces @($ProtocolSurfaces) `
+        -Collisions @($Collisions))) {
+        return $false
+    }
     if (-not (Test-ExactAdoptionTree -RemoteHead $RemoteHead -Branch $Branch `
         -BaseHead $BaseHead -TargetSha $TargetSha -ProposalMode $ProposalMode `
         -SourcePath $SourcePath -MigrationBaseline $MigrationBaseline)) {
@@ -1582,6 +1629,14 @@ function Test-ExactCompletedAdoptionProposal {
         return $false
     }
     $proposalHead = [string]$ancestry[1]
+    if (-not (Test-ExactAdoptionPullRequestBodyEvidence `
+        -PullRequest $pullRequest -Repository $Repository `
+        -BaseHead $BaseHead -ProposalHead $proposalHead `
+        -TargetTag $TargetTag -TargetSha $TargetSha `
+        -ProtocolSurfaces @($ProtocolSurfaces) `
+        -Collisions @($Collisions))) {
+        return $false
+    }
     if (-not (Test-ExactAdoptionTree -RemoteHead $proposalHead -Branch $Branch `
         -BaseHead $BaseHead -TargetSha $TargetSha -ProposalMode $ProposalMode `
         -SourcePath $SourcePath -MigrationBaseline $MigrationBaseline `
@@ -2388,7 +2443,7 @@ if (-not $postPushBaseValid) {
 }
 
 $marker = [ordered]@{
-    schema = 7
+    schema = 9
     phase = 'Proposed'
     state = [string]$plan.State
     target = $TargetTag
@@ -2396,7 +2451,6 @@ $marker = [ordered]@{
     head = $headSha
     branch = $branch
     adoptionStrategy = [string]$plan.AdoptionStrategy
-    protocolSurfaces = @($plan.ProtocolSurfaces)
     protocolRecordLossAcknowledged = [bool]$plan.ProtocolRecordLossAcknowledged
     graphBase = [string]$sourceGraphIdentity.graphBase
     graphDigest = [string]$sourceGraphIdentity.graphDigest
@@ -2406,20 +2460,30 @@ $marker = [ordered]@{
     actor = $actor
 } | ConvertTo-Json -Depth 8 -Compress
 $collisionText = if (@($plan.Collisions).Count -gt 0) {
-    @($plan.Collisions | ForEach-Object { "- ``$_``" }) -join [Environment]::NewLine
+    @($plan.Collisions | ForEach-Object {
+        '- ' + (New-MeAndAIGitHubBlobLink `
+            -Repository $env:GITHUB_REPOSITORY -Commit $baseHead `
+            -Path ([string]$_))
+    }) -join [Environment]::NewLine
 }
 else { '- None' }
 $protocolSurfaceText = if (@($plan.ProtocolSurfaces).Count -gt 0) {
-    @($plan.ProtocolSurfaces | ForEach-Object { "- ``$_``" }) -join [Environment]::NewLine
+    @($plan.ProtocolSurfaces | ForEach-Object {
+        '- ' + (New-MeAndAIGitHubBlobLink `
+            -Repository $env:GITHUB_REPOSITORY -Commit $baseHead `
+            -Path ([string]$_))
+    }) -join [Environment]::NewLine
 }
 else { '- None' }
+$manifestLink = New-MeAndAIGitHubBlobLink `
+    -Repository $env:GITHUB_REPOSITORY -Commit $headSha -Path $ManifestPath
 $body = @(
     "<!-- meandai-capabilities-adoption:$marker -->",
     '## AI capabilities adoption proposal', '',
     "- Lifecycle state: ``$($plan.State)``",
-    "- Protocol release: ``$TargetTag``",
-    "- Protocol commit: ``$targetSha``",
-    "- Source graph base: ``$([string]$sourceGraphIdentity.graphBase)``",
+    "- Protocol release: [$TargetTag](https://github.com/$ProtocolRepository/releases/tag/$TargetTag)",
+    "- Protocol commit: [$targetSha](https://github.com/$ProtocolRepository/commit/$targetSha)",
+    "- Source graph base: [$([string]$sourceGraphIdentity.graphBase)](https://github.com/$($env:GITHUB_REPOSITORY)/commit/$([string]$sourceGraphIdentity.graphBase))",
     "- Source graph digest: ``$([string]$sourceGraphIdentity.graphDigest)``",
     "- Source graph nodes/edges/candidates: ``$([int]$sourceGraphIdentity.graphCounts.nodes)/$([int]$sourceGraphIdentity.graphCounts.edges)/$([int]$sourceGraphIdentity.graphCounts.candidates)``",
     "- Adoption strategy: ``$($plan.AdoptionStrategy)``",
@@ -2427,7 +2491,7 @@ $body = @(
     '### Detected protocol and governance surfaces', '', $protocolSurfaceText, '',
     '### Detected collisions', '', $collisionText, '',
     'This workflow does not start an AI agent. It creates a review-only draft handoff.',
-    "An agent or maintainer must complete the tasks in ``$ManifestPath`` and remove the manifest before this pull request can become ready or merge.", '',
+    "An agent or maintainer must complete the tasks in $manifestLink and remove the manifest before this pull request can become ready or merge.", '',
     'The proposal never merges itself.'
 ) -join [Environment]::NewLine
 $url = (Invoke-Native -Command 'gh' -Arguments @(

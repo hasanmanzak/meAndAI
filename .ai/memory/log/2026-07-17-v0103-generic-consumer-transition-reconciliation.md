@@ -2,7 +2,7 @@
 
 ## Scope
 
-- [FEAT-0026 / BUG-0012](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
+- [FEAT-0026](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) and [BUG-0012](https://github.com/hasanmanzak/meAndAI/issues/69)
 - [DEC-0018](../../../docs/decisions/DEC-0018-release-declared-consumer-migrations.md)
 - [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69)
 
@@ -32,7 +32,7 @@
   issue after maintainer merge. Later compatible transitions are single-draft.
 - The first-observed duplicated-live-pin state is regression data, not a
   control-flow exception.
-  `MIG-0001` changes its eight active duplicated-live-pin fragments while
+  [MIG-0001](../../../migrations/MIG-0001.json) changes its eight active duplicated-live-pin fragments while
   preserving dated adoption memory, the completed adoption feature, and other
   historical version evidence.
 - Customized, partial, mixed, linked, escaping, and otherwise ambiguous states
@@ -50,10 +50,10 @@
 
 ## Evidence state
 
-- [TEST-0119 through TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md)
+- [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md)
   define the project-neutral state-based regression, negative/atomic engine matrix,
   single-draft lifecycle, and generic pre-engine handoff.
-- Focused `TEST-0119` through `TEST-0122` evidence passes, including cumulative
+- Focused [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md) evidence passes, including cumulative
   catalog removal/rewrite negatives, linked-leaf containment, rollback,
   one-draft engine-era updates, generic pre-engine handoff, and independent
   schema-2 merge-finalization recomputation.
@@ -61,7 +61,7 @@
   every discovered child suite and root scenario aggregation green.
 - [Draft PR #71](https://github.com/hasanmanzak/meAndAI/pull/71) on
   `codex/bug-0012-generic-consumer-transitions` owns delivery. GitHub closed
-  superseded draft #70 when its obsolete version-specific branch was renamed;
+  superseded draft [#70](https://github.com/hasanmanzak/meAndAI/pull/70) when its obsolete version-specific branch was renamed;
   the old remote branch no longer exists.
 - Hosted and post-publication evidence remain separate external gates.
 

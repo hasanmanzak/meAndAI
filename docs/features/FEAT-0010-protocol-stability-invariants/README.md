@@ -66,7 +66,7 @@ fail the same regression boundary instead of reappearing in later scans.
   until the requested tag has a published immutable release.
 - Verification: focused PowerShell fixtures per slice, real-Git rename and
   history fixtures, structural release checks, one complete repository suite,
-  and the bounded convergence budget in DEC-0004.
+  and the bounded convergence budget in [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md).
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
@@ -80,17 +80,17 @@ fail the same regression boundary instead of reappearing in later scans.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0052 through TEST-0059](test-cases.md) |
-| Test code | Green locally and hosted | `TEST-0052` through `TEST-0059` passed; hosted Ubuntu, Windows, and GitGuardian checks passed on PR #35 |
-| Baseline run | Passed | `v0.7.3` passed `TEST-0001` through `TEST-0051` on Windows, Ubuntu, and GitGuardian before this work |
+| Scenarios | Defined | [TEST-0052](test-cases.md), [TEST-0053](test-cases.md), [TEST-0054](test-cases.md), [TEST-0055](test-cases.md), [TEST-0056](test-cases.md), [TEST-0057](test-cases.md), [TEST-0058](test-cases.md), and [TEST-0059](test-cases.md) |
+| Test code | Green locally and hosted | [TEST-0052](test-cases.md), [TEST-0053](test-cases.md), [TEST-0054](test-cases.md), [TEST-0055](test-cases.md), [TEST-0056](test-cases.md), [TEST-0057](test-cases.md), [TEST-0058](test-cases.md), and [TEST-0059](test-cases.md) passed; hosted Ubuntu, Windows, and GitGuardian checks passed on [PR #35](https://github.com/hasanmanzak/meAndAI/pull/35) |
+| Baseline run | Passed | `v0.7.3` passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0043](../FEAT-0008-idea-incubation/test-cases.md) and [TEST-0044](../FEAT-0008-idea-incubation/test-cases.md), [TEST-0045](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0046](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0047](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0048](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0049](../FEAT-0009-adoption-integrity/test-cases.md), and [TEST-0050](../FEAT-0009-adoption-integrity/test-cases.md), and [TEST-0051](../FEAT-0007-local-codex-adoption/test-cases.md) on Windows, Ubuntu, and GitGuardian before this work |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0021` | Launcher proposal, path, run, and history invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0052` through `TEST-0056`; local and hosted pass, 2026-07-15 | `FIND-0076`, `FIND-0077`, `FIND-0080`, `FIND-0082`, `FIND-0092`; resolved | Complete |
-| `SUBF-0022` | Immutable release, bootstrap, and supersession invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0056` through `TEST-0058`; local and hosted pass | `FIND-0078`, `FIND-0079`, `FIND-0081`; resolved | Complete |
-| `SUBF-0023` | Durable validation and release evidence | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | `TEST-0059`; local and hosted pass | `FIND-0083` through `FIND-0091`; resolved | Complete |
+| `SUBF-0021` | Launcher proposal, path, run, and history invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | [TEST-0052](test-cases.md), [TEST-0053](test-cases.md), [TEST-0054](test-cases.md), [TEST-0055](test-cases.md), and [TEST-0056](test-cases.md); local and hosted pass, 2026-07-15 | `FIND-0076`, `FIND-0077`, `FIND-0080`, `FIND-0082`, `FIND-0092`; resolved | Complete |
+| `SUBF-0022` | Immutable release, bootstrap, and supersession invariants | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | [TEST-0056](test-cases.md), [TEST-0057](test-cases.md), and [TEST-0058](test-cases.md); local and hosted pass | `FIND-0078`, `FIND-0079`, `FIND-0081`; resolved | Complete |
+| `SUBF-0023` | Durable validation and release evidence | [Issue #34](https://github.com/hasanmanzak/meAndAI/issues/34) | [TEST-0059](test-cases.md); local and hosted pass | `FIND-0083` through `FIND-0091`; resolved | Complete |
 
 ## Decisions and relationships
 
@@ -108,7 +108,7 @@ fail the same regression boundary instead of reappearing in later scans.
 - [x] Problem, outcome, scope, and non-goals.
 - [x] Measurable acceptance criteria.
 - [x] State, path, release, concurrency, history, and evidence contracts.
-- [x] Numbered risks and DEC-0010.
+- [x] Numbered risks and [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md).
 - [x] Three bounded, independently reviewable slices.
 - [x] Numbered test scenarios and verification approach.
 - [x] Focused test code and expected red evidence recorded.
@@ -150,12 +150,12 @@ fail the same regression boundary instead of reappearing in later scans.
 | `FIND-0080` | Workflow concurrency / Medium / High | Dispatch inventories prior run IDs and binds exactly one unseen run ID | Resolved |
 | `FIND-0081` | Supersession continuity / Medium / High | Replacement and old proposal are revalidated around close/delete with verified compensation | Resolved |
 | `FIND-0082` | Security assurance / Medium / High | Local ref/reflog checks reject shallow history and documentation states the unavailable-remote limit | Resolved |
-| `FIND-0083` | Release traceability / Medium / High | BUG-0003 now records PR #33, exact commit, tag object, and historical authority boundary | Resolved |
+| `FIND-0083` | Release traceability / Medium / High | [BUG-0003](https://github.com/hasanmanzak/meAndAI/issues/32) now records [PR #33](https://github.com/hasanmanzak/meAndAI/pull/33), exact commit, tag object, and historical authority boundary | Resolved |
 | `FIND-0084` | Test reliability / Low / High | Record/test coverage derives from canonical indexes and root Git inventory excludes nested repositories | Resolved |
 | `FIND-0085` | Bounded execution / Low / High | Repository CI has an explicit 20-minute job timeout | Resolved |
 | `FIND-0086` | Documentation routing / Low / High | Documentation router links adoption, quick adoption, records, memory, overview, protocol, and changelog | Resolved |
 | `FIND-0087` | Release evidence / Low / High | Feature template defines one post-merge evidence schema and legacy tags no longer overclaim immutability | Resolved |
-| `FIND-0088` | Finding traceability / Low / High | FIND-0048 is recorded in FEAT-0001 with its bounded fix evidence | Resolved |
+| `FIND-0088` | Finding traceability / Low / High | [FIND-0048](../FEAT-0001-common-development-protocol/README.md) is recorded in [FEAT-0001](../FEAT-0001-common-development-protocol/README.md) with its bounded fix evidence | Resolved |
 | `FIND-0089` | Validator cohesion / Medium / High | Split the oversized exact-adoption validator into cohesive evidence helpers and guard the production seam structurally | Resolved |
 | `FIND-0090` | Active-version drift / Medium / High | Derive project-template version coverage dynamically and assert the behavior-bearing test fixture uses the current adoption branch | Resolved |
 | `FIND-0091` | Release evidence / Medium / High | Store exact target evidence externally after publication instead of requiring a repository commit to identify itself | Resolved |
@@ -166,9 +166,9 @@ fail the same regression boundary instead of reappearing in later scans.
 The implementation uses four reusable boundaries rather than thirteen
 independent patches: release authority, exact proposal state, complete path and
 history provenance, and canonical repository evidence. The launcher suite
-passed `TEST-0033` through `TEST-0056` on Windows PowerShell in 115 seconds.
-Bootstrap and updater adapter suites passed `TEST-0057` and `TEST-0058`; the
-repository structure-only gate passed `TEST-0059`. The immutable-release
+passed [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0043](../FEAT-0008-idea-incubation/test-cases.md) and [TEST-0044](../FEAT-0008-idea-incubation/test-cases.md), [TEST-0045](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0046](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0047](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0048](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0049](../FEAT-0009-adoption-integrity/test-cases.md), and [TEST-0050](../FEAT-0009-adoption-integrity/test-cases.md), [TEST-0051](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0052](test-cases.md), [TEST-0053](test-cases.md), [TEST-0054](test-cases.md), [TEST-0055](test-cases.md), and [TEST-0056](test-cases.md) on Windows PowerShell in 115 seconds.
+Bootstrap and updater adapter suites passed [TEST-0057](test-cases.md) and [TEST-0058](test-cases.md); the
+repository structure-only gate passed [TEST-0059](test-cases.md). The immutable-release
 repository setting was enabled and re-read as `enabled: true` through GitHub's
 2026-03-10 API. The bounded fresh-diff scan found three derivative risks: a
 monolithic bootstrap validator, active `v0.7.3` pins, and a self-referential
@@ -180,11 +180,11 @@ child suite and exposed one structural blocker: the new active-pin check treated
 absent versions and an action dependency release comment as protocol pins. The
 same check also found the hidden bootstrap adapter's genuinely stale default.
 The default and predicate were corrected; the final structure-only confirmation
-passed `TEST-0059`.
+passed [TEST-0059](test-cases.md).
 The first hosted run then passed Windows but exposed a Linux-only empty file URI
 in the shallow-history fixture. One cross-platform URI helper replaced the
 platform-dependent cast; no production behavior changed. The corrected hosted
-run passed Ubuntu, Windows, and GitGuardian on PR #35.
+run passed Ubuntu, Windows, and GitGuardian on [PR #35](https://github.com/hasanmanzak/meAndAI/pull/35).
 
 ## Definition of Done
 
@@ -204,4 +204,4 @@ run passed Ubuntu, Windows, and GitGuardian on PR #35.
 | Release authority | Published immutable GitHub Release |
 | Release identifier | [`v0.8.0`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.0) |
 | Target commit | [`a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821`](https://github.com/hasanmanzak/meAndAI/commit/a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821) |
-| Verification evidence | Release and locked tag target verified after PR #35 merged on 2026-07-15 |
+| Verification evidence | Release and locked tag target verified after [PR #35](https://github.com/hasanmanzak/meAndAI/pull/35) merged on 2026-07-15 |

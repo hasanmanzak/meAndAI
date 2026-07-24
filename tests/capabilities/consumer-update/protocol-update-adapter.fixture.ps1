@@ -2,7 +2,8 @@
 param(
     [switch]$NativeStderrOnly,
     [switch]$SuccessOnly,
-    [switch]$CreatedIssueLagOnly
+    [switch]$CreatedIssueLagOnly,
+    [switch]$ManagedEvidenceOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -1220,7 +1221,14 @@ function New-TestProtocolUpdateIssue {
         [string]$Branch,
         [int]$PullRequestNumber,
         [string]$HeadSha,
-        [string]$State = 'open'
+        [string]$State = 'open',
+        [ValidateSet(
+            'Canonical', 'MarkerOnly', 'WrongTarget', 'LegacyBare',
+            'LeadingSpace', 'SecondLine'
+        )]
+        [string]$ProposalEvidenceMode = 'Canonical',
+        [ValidateSet('Canonical', 'LeadingSpace', 'SecondLine')]
+        [string]$IssueMarkerMode = 'Canonical'
     )
     $markerJson = [ordered]@{
         schema = 1; target = $TargetTag; protocolSha = $ProtocolSha
@@ -1235,6 +1243,31 @@ function New-TestProtocolUpdateIssue {
         'This issue is the canonical same-repository work record for the managed protocol proposal.',
         'The workflow creates or reuses it, the maintainer reviews and merges the draft, and post-merge finalization closes it only after exact branch convergence.'
     ) -join [Environment]::NewLine
+    $body = switch ($IssueMarkerMode) {
+        'LeadingSpace' { ' ' + $body }
+        'SecondLine' { "Unmanaged preface`n$body" }
+        default { $body }
+    }
+    $proposalEvidence = switch ($ProposalEvidenceMode) {
+        'MarkerOnly' {
+            "<!-- meandai-protocol-update-proposal:head-$HeadSha -->"
+        }
+        'WrongTarget' {
+            "<!-- meandai-protocol-update-proposal:head-$HeadSha -->`nManaged protocol proposal: [pull request #$PullRequestNumber](https://github.com/owner/consumer/pull/999)`nExact proposal head: ``$HeadSha``"
+        }
+        'LegacyBare' {
+            "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->`nManaged protocol proposal: #$PullRequestNumber`nExact proposal head: ``$HeadSha``"
+        }
+        'LeadingSpace' {
+            " <!-- meandai-protocol-update-proposal:head-$HeadSha -->`nManaged protocol proposal: [pull request #$PullRequestNumber](https://github.com/owner/consumer/pull/$PullRequestNumber)`nExact proposal head: ``$HeadSha``"
+        }
+        'SecondLine' {
+            "Unmanaged preface`n<!-- meandai-protocol-update-proposal:head-$HeadSha -->`nManaged protocol proposal: [pull request #$PullRequestNumber](https://github.com/owner/consumer/pull/$PullRequestNumber)`nExact proposal head: ``$HeadSha``"
+        }
+        default {
+            "<!-- meandai-protocol-update-proposal:head-$HeadSha -->`nManaged protocol proposal: [pull request #$PullRequestNumber](https://github.com/owner/consumer/pull/$PullRequestNumber)`nExact proposal head: ``$HeadSha``"
+        }
+    }
     [pscustomobject]@{
         number = $Number; title = "Track meAndAI protocol update to $TargetTag"
         body = $body; state = $State
@@ -1244,7 +1277,7 @@ function New-TestProtocolUpdateIssue {
             [pscustomobject]@{ name = 'status:needs-review' }
         )
         comments = [System.Collections.Generic.List[object]]@(
-            [pscustomobject]@{ body = "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->`nManaged protocol proposal: #$PullRequestNumber" }
+            [pscustomobject]@{ body = $proposalEvidence }
         )
     }
 }
@@ -1512,6 +1545,15 @@ function global:gh {
         }
         $script:Scenario.NewBody = Get-FakeGhBodyFileContent `
             -Arguments $arguments -PullRequest
+        if ([bool]$script:Scenario.RawManagedPathEvidence) {
+            $rawLine = '- Managed paths: ``' +
+                (@($script:Scenario.ExpectedStagedPaths) -join ', ') + '``'
+            $script:Scenario.NewBody = [regex]::Replace(
+                [string]$script:Scenario.NewBody,
+                '(?m)^- Managed paths:.*$',
+                [Text.RegularExpressions.MatchEvaluator]{ param($match) $rawLine }
+            )
+        }
         Add-ScenarioEvent 'create-new-pr'
         'https://github.com/owner/consumer/pull/30'
         return
@@ -2049,7 +2091,20 @@ function Invoke-AdapterScenario {
         [bool]$MigrationRequired = $false,
         [bool]$MigrationWithUpgrade = $false,
         [ValidateSet('None', 'InventoryRename', 'RevalidationRename')]
-        [string]$RenameMode = 'None'
+        [string]$RenameMode = 'None',
+        [ValidateSet(
+            'Canonical', 'MarkerOnly', 'WrongTarget', 'LegacyBare',
+            'LeadingSpace', 'SecondLine'
+        )]
+        [string]$ProposalEvidenceMode = 'Canonical',
+        [ValidateSet(
+            'None', 'MarkerOnly', 'WrongTarget', 'LegacyBare',
+            'LeadingSpace', 'SecondLine'
+        )]
+        [string]$SupersessionEvidenceMode = 'None',
+        [ValidateSet('Canonical', 'LeadingSpace', 'SecondLine')]
+        [string]$IssueMarkerMode = 'Canonical',
+        [bool]$RawManagedPathEvidence = $false
     )
 
     $tempRoot = Join-Path ([IO.Path]::GetTempPath()) "meandai-adapter-$Name-$([guid]::NewGuid().ToString('N'))"
@@ -2168,7 +2223,7 @@ function Invoke-AdapterScenario {
         head = 'b' * 40; repository = 'owner/consumer'
     } | ConvertTo-Json -Compress
     $initialNewBody = if ($ExistingReplacement) {
-        "<!-- meandai-protocol-update:$newMarker -->`n`nTracking issue: #130"
+        "<!-- meandai-protocol-update:$newMarker -->`n`nTracking issue: [#130](https://github.com/owner/consumer/issues/130)"
     } else { '' }
     $currentWorkflowBlob = '1' * 40
     $currentModuleBlob = '2' * 40
@@ -2303,12 +2358,38 @@ function Invoke-AdapterScenario {
     if ($OldCandidateExists) {
         $issues.Add((New-TestProtocolUpdateIssue -Number 121 -TargetTag 'v0.2.0' `
             -ProtocolSha ('2' * 40) -Branch 'automation/meandai-protocol-v0.2.0' `
-            -PullRequestNumber 21 -HeadSha $oldHead))
+            -PullRequestNumber 21 -HeadSha $oldHead `
+            -ProposalEvidenceMode $ProposalEvidenceMode `
+            -IssueMarkerMode $IssueMarkerMode))
     }
     if ($ExistingReplacement) {
         $issues.Add((New-TestProtocolUpdateIssue -Number 130 -TargetTag 'v0.3.0' `
             -ProtocolSha ('3' * 40) -Branch 'automation/meandai-protocol-v0.3.0' `
-            -PullRequestNumber 30 -HeadSha ('b' * 40)))
+            -PullRequestNumber 30 -HeadSha ('b' * 40) `
+            -ProposalEvidenceMode $ProposalEvidenceMode `
+            -IssueMarkerMode $IssueMarkerMode))
+    }
+    if ($OldCandidateExists -and $SupersessionEvidenceMode -cne 'None') {
+        $oldIssue = @($issues | Where-Object { [int]$_.number -eq 121 })[0]
+        $replacementHead = 'b' * 40
+        $supersessionBody = switch ($SupersessionEvidenceMode) {
+            'MarkerOnly' {
+                "<!-- meandai-protocol-update-supersession:head-$oldHead`:replacement-head-$replacementHead -->"
+            }
+            'WrongTarget' {
+                "<!-- meandai-protocol-update-supersession:head-$oldHead`:replacement-head-$replacementHead -->`nManaged protocol proposal [pull request #21](https://github.com/owner/consumer/pull/999) was superseded after its exact branch was removed.`nVerified replacement proposal: [pull request #30](https://github.com/owner/consumer/pull/30)"
+            }
+            'LegacyBare' {
+                "<!-- meandai-protocol-update-supersession:pr-21:head-$oldHead`:replacement-pr-30 -->`nManaged protocol proposal #21 was superseded after its exact branch was removed.`nVerified replacement proposal: #30"
+            }
+            'LeadingSpace' {
+                " <!-- meandai-protocol-update-supersession:head-$oldHead`:replacement-head-$replacementHead -->`nManaged protocol proposal [pull request #21](https://github.com/owner/consumer/pull/21) was superseded after its exact branch was removed.`nVerified replacement proposal: [pull request #30](https://github.com/owner/consumer/pull/30)"
+            }
+            'SecondLine' {
+                "Unmanaged preface`n<!-- meandai-protocol-update-supersession:head-$oldHead`:replacement-head-$replacementHead -->`nManaged protocol proposal [pull request #21](https://github.com/owner/consumer/pull/21) was superseded after its exact branch was removed.`nVerified replacement proposal: [pull request #30](https://github.com/owner/consumer/pull/30)"
+            }
+        }
+        $oldIssue.comments.Add([pscustomobject]@{ body = $supersessionBody })
     }
     $script:Scenario = [pscustomobject]@{
         Name = $Name
@@ -2399,6 +2480,7 @@ function Invoke-AdapterScenario {
         ReleaseMode = $ReleaseMode
         ReleaseTagMode = $ReleaseTagMode
         RenameMode = $RenameMode
+        RawManagedPathEvidence = $RawManagedPathEvidence
         NewFilesCalls = 0
         RemoveOldBeforeDelete = $RemoveOldBeforeDelete
         OldProbeCalls = 0
@@ -2488,6 +2570,7 @@ if ($CreatedIssueLagOnly) {
     exit 0
 }
 
+$managedEvidenceFailureStart = $failures.Count
 $success = Invoke-AdapterScenario -Name 'success'
 if ($SuccessOnly) {
     if ($success.Threw) {
@@ -2502,20 +2585,134 @@ if ($success.Threw) {
 }
 $successOldIssue = @($success.Issues | Where-Object { [int]$_.number -eq 121 })
 $successNewIssue = @($success.Issues | Where-Object { [int]$_.number -eq 130 })
+$successProposalComments = @(
+    if ($successNewIssue.Count -eq 1) {
+        $successNewIssue[0].comments | Where-Object {
+            ([string]$_.body).StartsWith(
+                "<!-- meandai-protocol-update-proposal:head-$('b' * 40) -->",
+                [StringComparison]::Ordinal
+            )
+        }
+    }
+)
+$successSupersessionComments = @(
+    if ($successOldIssue.Count -eq 1) {
+        $successOldIssue[0].comments | Where-Object {
+            ([string]$_.body).StartsWith(
+                '<!-- meandai-protocol-update-supersession:',
+                [StringComparison]::Ordinal
+            )
+        }
+    }
+)
+$successManagedPaths = [string[]]@($success.ExpectedStagedPaths)
+[Array]::Sort($successManagedPaths, [StringComparer]::Ordinal)
+$successManagedPathLinks = @($successManagedPaths | ForEach-Object {
+    "[``$([string]$_)``](https://github.com/owner/consumer/blob/$('b' * 40)/$([string]$_))"
+})
+$successManagedPathLine = "- Managed paths: $($successManagedPathLinks -join ', ')"
 if ($successOldIssue.Count -ne 1 -or [string]$successOldIssue[0].state -cne 'closed' -or
     $successNewIssue.Count -ne 1 -or [string]$successNewIssue[0].state -cne 'open' -or
-    $success.NewBody -cnotmatch '(?m)^Tracking issue: #130$' -or
+    $success.NewBody -cnotmatch '(?m)^Tracking issue: \[#130\]\(https://github\.com/owner/consumer/issues/130\)$' -or
+    -not $success.NewBody.Contains(
+        '[pull request #21](https://github.com/owner/consumer/pull/21)'
+    ) -or
     $success.NewBody.Contains('Tracking issue: #REQUIRED') -or
-    @($successNewIssue[0].comments | Where-Object {
-        ([string]$_.body).StartsWith(
-            "<!-- meandai-protocol-update-proposal:pr-30`:head-$('b' * 40) -->",
-            [StringComparison]::Ordinal
-        )
-    }).Count -ne 1 -or
+    -not $success.NewBody.Contains($successManagedPathLine) -or
+    $success.NewBody -cmatch '(?m)^- Managed paths: ``' -or
+    $successProposalComments.Count -ne 1 -or
+    ([string]$successProposalComments[0].body).Contains(
+        'meandai-protocol-update-proposal:pr-'
+    ) -or
+    -not ([string]$successProposalComments[0].body).Contains(
+        '[pull request #30](https://github.com/owner/consumer/pull/30)'
+    ) -or
+    $successSupersessionComments.Count -ne 1 -or
+    ([string]$successSupersessionComments[0].body).Contains(
+        'meandai-protocol-update-supersession:pr-'
+    ) -or
+    ([string]$successSupersessionComments[0].body).Contains('replacement-pr-') -or
+    -not ([string]$successSupersessionComments[0].body).Contains(
+        '[pull request #21](https://github.com/owner/consumer/pull/21)'
+    ) -or
+    -not ([string]$successSupersessionComments[0].body).Contains(
+        '[pull request #30](https://github.com/owner/consumer/pull/30)'
+    ) -or
     (Get-EventIndex $success 'close-update-issue-121') -le
         (Get-EventIndex $success 'delete-old-branch')) {
     Add-Failure 'TEST-0111 automatic issue/link/supersession lifecycle did not converge in branch-first order.'
 }
+
+$legacyEvidence = Invoke-AdapterScenario -Name 'bounded-legacy-comment-evidence' `
+    -ExistingReplacement $true -ProposalEvidenceMode LegacyBare `
+    -SupersessionEvidenceMode LegacyBare
+if ($legacyEvidence.Threw -or [string]$legacyEvidence.OldPullRequestState -cne 'closed') {
+    Add-Failure "TEST-0176 bounded legacy proposal/supersession comment evidence was not readable: $($legacyEvidence.Error)"
+}
+
+foreach ($proposalMode in @(
+    'MarkerOnly', 'WrongTarget', 'LeadingSpace', 'SecondLine'
+)) {
+    $invalidProposal = Invoke-AdapterScenario `
+        -Name "proposal-evidence-$proposalMode" -ExistingReplacement $true `
+        -ProposalEvidenceMode $proposalMode
+    if (-not $invalidProposal.Threw -or
+        (Get-EventIndex $invalidProposal 'close-old-pr') -ge 0 -or
+        (Get-EventIndex $invalidProposal 'delete-old-branch') -ge 0) {
+        Add-Failure "TEST-0176 $proposalMode proposal evidence did not fail closed before cleanup: $($invalidProposal.Error)"
+    }
+}
+
+foreach ($supersessionMode in @(
+    'MarkerOnly', 'WrongTarget', 'LeadingSpace', 'SecondLine'
+)) {
+    $invalidSupersession = Invoke-AdapterScenario `
+        -Name "supersession-evidence-$supersessionMode" `
+        -ExistingReplacement $true -SupersessionEvidenceMode $supersessionMode
+    if (-not $invalidSupersession.Threw -or
+        (Get-EventIndex $invalidSupersession 'close-old-pr') -ge 0 -or
+        (Get-EventIndex $invalidSupersession 'delete-old-branch') -ge 0) {
+        Add-Failure "TEST-0176 $supersessionMode supersession evidence did not fail closed before cleanup: $($invalidSupersession.Error)"
+    }
+}
+
+foreach ($issueMarkerMode in @('LeadingSpace', 'SecondLine')) {
+    $invalidIssueMarker = Invoke-AdapterScenario `
+        -Name "issue-marker-$issueMarkerMode" -ExistingReplacement $true `
+        -IssueMarkerMode $issueMarkerMode
+    if (-not $invalidIssueMarker.Threw -or
+        (Get-EventIndex $invalidIssueMarker 'create-update-issue') -ge 0 -or
+        (Get-EventIndex $invalidIssueMarker 'close-old-pr') -ge 0 -or
+        (Get-EventIndex $invalidIssueMarker 'delete-old-branch') -ge 0) {
+        Add-Failure "TEST-0176 $issueMarkerMode update-issue marker did not fail closed before duplicate creation or cleanup: $($invalidIssueMarker.Error)"
+    }
+}
+
+$rawManagedPaths = Invoke-AdapterScenario -Name 'raw-managed-path-evidence' `
+    -RawManagedPathEvidence $true
+if (-not $rawManagedPaths.Threw -or
+    $rawManagedPaths.Error -notlike '*managed-path evidence*' -or
+    (Get-EventIndex $rawManagedPaths 'close-old-pr') -ge 0 -or
+    (Get-EventIndex $rawManagedPaths 'delete-old-branch') -ge 0) {
+    Add-Failure "TEST-0176 raw managed-path text was not rejected before cleanup: $($rawManagedPaths.Error)"
+}
+
+if ($ManagedEvidenceOnly) {
+    $managedEvidenceFailures = @($failures | Select-Object `
+        -Skip $managedEvidenceFailureStart)
+    if ($managedEvidenceFailures.Count -gt 0) {
+        Write-Host "Focused managed-evidence tests failed with $($managedEvidenceFailures.Count) problem(s):" `
+            -ForegroundColor Red
+        $managedEvidenceFailures | ForEach-Object {
+            Write-Host " - $_" -ForegroundColor Red
+        }
+        exit 1
+    }
+    Write-Host 'Focused TEST-0111/TEST-0176 managed-evidence scenarios passed.' `
+        -ForegroundColor Green
+    exit 0
+}
+
 $createdIssueLag = Invoke-AdapterScenario -Name 'created-issue-inventory-lag' `
     -CreatedIssueInventoryLag $true
 $laggedIssue = @($createdIssueLag.Issues | Where-Object {
@@ -2815,8 +3012,8 @@ if ((Get-EventIndex $wrongTargetAsset 'close-old-pr') -ge 0 -or
 }
 $successOrder = @(
     'create-new-pr', 'verify-new-pr-1', 'read-old-pr-2', 'verify-new-pr-2',
-    'close-old-pr', 'read-old-pr-3', 'verify-new-pr-3',
-    'delete-old-branch', 'read-old-pr-4', 'verify-new-pr-4', 'comment-old-pr'
+    'read-old-pr-3', 'close-old-pr', 'read-old-pr-4', 'verify-new-pr-3',
+    'delete-old-branch', 'read-old-pr-5', 'verify-new-pr-4', 'comment-old-pr'
 )
 $previous = -1
 foreach ($event in $successOrder) {
@@ -2831,6 +3028,11 @@ foreach ($event in $successOrder) {
 $cleanupCompletedText = 'Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease.'
 if (-not $success.OldPullRequestComment.Contains($cleanupCompletedText)) {
     Add-Failure "TEST-0021 emitted cleanup comment is missing '$cleanupCompletedText'"
+}
+if (-not $success.OldPullRequestComment.Contains(
+        '[pull request #30](https://github.com/owner/consumer/pull/30)'
+    )) {
+    Add-Failure 'TEST-0175 cleanup comment does not link its exact replacement pull request.'
 }
 if ([regex]::Matches($adapterContent, [regex]::Escape($cleanupCompletedText)).Count -ne 2) {
     Add-Failure "TEST-0021 both cleanup comment paths must contain '$cleanupCompletedText'"
@@ -3066,7 +3268,7 @@ foreach ($requiredLifecycleText in @(
     'Set-ProtocolUpdateIssuePullRequestLink',
     'Complete-SupersededProtocolUpdateIssue',
     'ISSUE_TOKEN',
-    'Tracking issue: #$($updateIssue.Number)'
+    'Tracking issue: $(New-GitHubIssueLink -Repository $repository'
 )) {
     if (-not $adapterContent.Contains($requiredLifecycleText)) {
         Add-Failure "TEST-0111 adapter lacks automatic update lifecycle contract '$requiredLifecycleText'."

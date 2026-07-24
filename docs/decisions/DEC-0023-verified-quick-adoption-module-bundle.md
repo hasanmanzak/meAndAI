@@ -6,7 +6,7 @@
 - Decision owners: meAndAI release maintainers and consumer maintainers
 - Related feature: [FEAT-0036](../features/FEAT-0036-modular-quick-adoption-reliability/README.md)
 - Related decisions: [DEC-0007](DEC-0007-local-quick-adoption-boundary.md), [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md), [DEC-0019](DEC-0019-hosted-runner-efficiency.md), and [DEC-0020](DEC-0020-target-bound-current-launcher-recovery.md)
-- Supersedes: DEC-0007's prospective requirement that the complete quick-adoption implementation and sole adoption release asset be one monolithic source file; the one-command local trust and credential boundary remains authoritative
+- Supersedes: [DEC-0007](DEC-0007-local-quick-adoption-boundary.md)'s prospective requirement that the complete quick-adoption implementation and sole adoption release asset be one monolithic source file; the one-command local trust and credential boundary remains authoritative
 
 ## Context
 
@@ -73,8 +73,8 @@ complete runtime bundle has been verified and imported.
 - Runtime release and requested protocol release are explicit semantic types,
   preventing an older target selection from looking for a bundle in that older
   release.
-- Historical v0.9.2 single-file releases and TEST-0101 remain truthful for the
-  versions that used them. FEAT-0036/TEST-0147 own the new prospective contract.
+- Historical v0.9.2 single-file releases and [TEST-0101](../features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md) remain truthful for the
+  versions that used them. [FEAT-0036](../features/FEAT-0036-modular-quick-adoption-reliability/README.md)/[TEST-0147](../features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md) own the new prospective contract.
 - Publication must build and upload both exact assets before the GitHub Release
   becomes immutable and must record both digests externally.
 

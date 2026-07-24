@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible distribution architecture and correctness correction / `BUG-0018`, `BUG-0019`, `BUG-0020`, `BUG-0021` |
+| Classification | Backward-compatible distribution architecture and correctness correction / [BUG-0018](https://github.com/hasanmanzak/meAndAI/issues/89), [BUG-0019](https://github.com/hasanmanzak/meAndAI/issues/89), [BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89), [BUG-0021](https://github.com/hasanmanzak/meAndAI/issues/89) |
 | Status | Complete |
 | Target version | 0.12.5 |
 | Issue | [#89](https://github.com/hasanmanzak/meAndAI/issues/89) |
 | Pull request | [#90](https://github.com/hasanmanzak/meAndAI/pull/90), [#91](https://github.com/hasanmanzak/meAndAI/pull/91); v0.12.5 hotfix recorded through [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) after creation |
 | Decision | [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md) |
-| Tests | [TEST-0147 through TEST-0150](test-cases.md) |
+| Tests | [TEST-0147](test-cases.md), [TEST-0148](test-cases.md), [TEST-0149](test-cases.md), and [TEST-0150](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -28,7 +28,7 @@ structured-body argv corruption, and reconcile only the exact historical
 malformed record that this defect could produce.
 
 The first released v0.12.4 replay then exposed a separate convergence defect:
-GitHub accepted and returned exact canonical issue #8, while the immediately
+GitHub accepted and returned exact canonical [issue #8](https://github.com/hasanmanzak/Derdini/issues/8), while the immediately
 following all-issues inventory had not exposed it yet. v0.12.5 must bind the
 successful creation response to its direct identity without weakening visible
 duplicate/race detection.
@@ -131,43 +131,43 @@ duplicate/race detection.
 
 | ID | Classification | Risk | Owner / response and evidence |
 | --- | --- | --- | --- |
-| `RISK-0163` | Supply chain | A small launcher loads a bundle that is movable, substituted, partial, or from the wrong release | Release maintainer / exact immutable release, API digest, archive manifest, per-file digest, and negative trust table in `TEST-0147` |
-| `RISK-0164` | Compatibility | Mechanical splitting changes parameter binding, script state, execution order, or cleanup | Launcher maintainer / public-contract parity plus representative direct-module and thin-bootstrap slices in `TEST-0147` |
-| `RISK-0165` | Archive safety | ZIP traversal, collision, link, or expansion abuse writes outside the owned temp root | Launcher maintainer / pre-extraction inventory and bounded archive negatives in `TEST-0147` |
-| `RISK-0166` | Retry safety | A generic retry duplicates a mutation or conceals a permanent failure | Updater maintainer / explicit read-only declaration, three-attempt cap, non-retry matrix, and mutation sentinel in `TEST-0148` |
-| `RISK-0167` | Native transport | PowerShell 5.1 corrupts another issue, comment, or pull-request body | Updater maintainer / real native executable boundary and byte-exact round trip in `TEST-0149` |
-| `RISK-0168` | Ownership | Broad legacy repair claims or rewrites an ambiguous/foreign issue | Updater maintainer / exact contract, trusted actor, absent branch/PR proof, near-match negatives, refetch validation in `TEST-0149` |
+| `RISK-0163` | Supply chain | A small launcher loads a bundle that is movable, substituted, partial, or from the wrong release | Release maintainer / exact immutable release, API digest, archive manifest, per-file digest, and negative trust table in [TEST-0147](test-cases.md) |
+| `RISK-0164` | Compatibility | Mechanical splitting changes parameter binding, script state, execution order, or cleanup | Launcher maintainer / public-contract parity plus representative direct-module and thin-bootstrap slices in [TEST-0147](test-cases.md) |
+| `RISK-0165` | Archive safety | ZIP traversal, collision, link, or expansion abuse writes outside the owned temp root | Launcher maintainer / pre-extraction inventory and bounded archive negatives in [TEST-0147](test-cases.md) |
+| `RISK-0166` | Retry safety | A generic retry duplicates a mutation or conceals a permanent failure | Updater maintainer / explicit read-only declaration, three-attempt cap, non-retry matrix, and mutation sentinel in [TEST-0148](test-cases.md) |
+| `RISK-0167` | Native transport | PowerShell 5.1 corrupts another issue, comment, or pull-request body | Updater maintainer / real native executable boundary and byte-exact round trip in [TEST-0149](test-cases.md) |
+| `RISK-0168` | Ownership | Broad legacy repair claims or rewrites an ambiguous/foreign issue | Updater maintainer / exact contract, trusted actor, absent branch/PR proof, near-match negatives, refetch validation in [TEST-0149](test-cases.md) |
 | `RISK-0169` | Validation cost | Repeated full suites consume disproportionate local and hosted resources | Test maintainer / focused slice owners, one structure pass, one converged push, and one final hosted full run |
-| `RISK-0170` | Eventual consistency | A successful issue creation is reported as failed because the all-issues list lags, or a visible concurrent duplicate is ignored | Updater maintainer / POST identity, direct read, zero-match success, different-identity and duplicate negatives in `TEST-0150` |
+| `RISK-0170` | Eventual consistency | A successful issue creation is reported as failed because the all-issues list lags, or a visible concurrent duplicate is ignored | Updater maintainer / POST identity, direct read, zero-match success, different-identity and duplicate negatives in [TEST-0150](test-cases.md) |
 
 ## Test readiness
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0147 through TEST-0150](test-cases.md) |
+| Scenarios | Defined | [TEST-0147](test-cases.md), [TEST-0148](test-cases.md), [TEST-0149](test-cases.md), and [TEST-0150](test-cases.md) |
 | Test code | Implemented / focused green | Expected-red evidence and Windows PowerShell 5.1 green runs are recorded in the scenario log |
-| Baseline run | Green | Immutable v0.12.4 / `main` at `edf443744e3a72bcc951008bf1b3ba4727104a27`; PR #91 Ubuntu, Windows PowerShell 5.1, and GitGuardian evidence is green |
+| Baseline run | Green | Immutable v0.12.4 / `main` at `edf443744e3a72bcc951008bf1b3ba4727104a27`; [PR #91](https://github.com/hasanmanzak/meAndAI/pull/91) Ubuntu, Windows PowerShell 5.1, and GitGuardian evidence is green |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0067` | Mechanical module extraction, thin verified bootstrapper, deterministic bundle, and publication contract | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | Final `TEST-0147` passed on PS5.1 in 17.7 seconds and again in 18.1 seconds after its Unix temp-environment correction; its direct-builder regression passed in 21.3 seconds; the affected `AdoptionLifecycle` shard passed in 170 seconds after current-version and native-clone fixture corrections; the v0.12.5 `ContractsPreflight` shard passed in 17.1 seconds; focused publication owner passed in 1.7 seconds | Public parity, exact Git-blob builder, trust order, archive containment, token environment, import, publication binding, cleanup, and cross-platform fixture parity reviewed; `FIND-0184` through `FIND-0190` and `FIND-0193` through `FIND-0196` plus `FIND-0199` resolved | Complete; hosted evidence pending externally |
-| `SUBF-0068` | Explicit bounded retry for idempotent GitHub API reads | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0148` passed with `TEST-0149` on PS5.1 in 23.4 seconds | GET-only declaration, classification, attempt cap, delay, paged-attempt reset, final diagnostics, and single-attempt mutations reviewed | Complete; hosted evidence pending externally |
-| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | `TEST-0149` passed with `TEST-0148` on PS5.1 in 23.5 seconds for v0.12.5; focused `TEST-0150` passed in 12.0 and 11.6 seconds; all 28 canonical updater behavior scenarios passed in 64.0 seconds and their registry binding passed in 0.7 seconds; the corrected finalization owner passed in 13.0 seconds | Exact UTF-8 bytes, argv exclusion, temp cleanup, separate historical/updater/issue actors and token boundaries, controlled missing-author failure, repository/duplicate/ref/PR/backlink proofs, exact created identity, true zero-list tolerance, different-identity race failure, ordinal near matches, and idempotency reviewed; `FIND-0197` and `FIND-0198` resolved | Complete; hosted evidence pending externally |
+| `SUBF-0067` | Mechanical module extraction, thin verified bootstrapper, deterministic bundle, and publication contract | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | Final [TEST-0147](test-cases.md) passed on PS5.1 in 17.7 seconds and again in 18.1 seconds after its Unix temp-environment correction; its direct-builder regression passed in 21.3 seconds; the affected `AdoptionLifecycle` shard passed in 170 seconds after current-version and native-clone fixture corrections; the v0.12.5 `ContractsPreflight` shard passed in 17.1 seconds; focused publication owner passed in 1.7 seconds | Public parity, exact Git-blob builder, trust order, archive containment, token environment, import, publication binding, cleanup, and cross-platform fixture parity reviewed; `FIND-0184` through `FIND-0190` and `FIND-0193` through `FIND-0196` plus `FIND-0199` resolved | Complete; hosted evidence pending externally |
+| `SUBF-0068` | Explicit bounded retry for idempotent GitHub API reads | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | [TEST-0148](test-cases.md) passed with [TEST-0149](test-cases.md) on PS5.1 in 23.4 seconds | GET-only declaration, classification, attempt cap, delay, paged-attempt reset, final diagnostics, and single-attempt mutations reviewed | Complete; hosted evidence pending externally |
+| `SUBF-0069` | Safe structured-body transport and exact malformed-issue reconciliation | [Issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) | [TEST-0149](test-cases.md) passed with [TEST-0148](test-cases.md) on PS5.1 in 23.5 seconds for v0.12.5; focused [TEST-0150](test-cases.md) passed in 12.0 and 11.6 seconds; all 28 canonical updater behavior scenarios passed in 64.0 seconds and their registry binding passed in 0.7 seconds; the corrected finalization owner passed in 13.0 seconds | Exact UTF-8 bytes, argv exclusion, temp cleanup, separate historical/updater/issue actors and token boundaries, controlled missing-author failure, repository/duplicate/ref/PR/backlink proofs, exact created identity, true zero-list tolerance, different-identity race failure, ordinal near matches, and idempotency reviewed; `FIND-0197` and `FIND-0198` resolved | Complete; hosted evidence pending externally |
 
 ## Definition of Ready
 
-- [x] Stable IDs and linked issue #89 exist.
+- [x] Stable IDs and linked [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) exist.
 - [x] Problem, outcome, scope, and explicit non-goals are recorded.
 - [x] Acceptance criteria are measurable.
 - [x] Runtime, archive, retry, body, ownership, lifecycle, error, cleanup, and
       compatibility contracts identify affected consumers and dependencies.
-- [x] `RISK-0163` through `RISK-0170` and DEC-0023 record the architectural
+- [x] `RISK-0163` through `RISK-0170` and [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md) record the architectural
       and operational choices.
 - [x] `SUBF-0067` through `SUBF-0069` preserve the requested implementation
       order and have independent review gates.
-- [x] `TEST-0147` through `TEST-0150` cover success, failure, boundaries,
+- [x] [TEST-0147](test-cases.md), [TEST-0148](test-cases.md), [TEST-0149](test-cases.md), and [TEST-0150](test-cases.md) cover success, failure, boundaries,
       regression, native-runtime behavior, and fail-closed near matches.
 - [x] Test-first expected-red evidence, executable owners, and the bounded
       verification approach are explicit.
@@ -209,11 +209,11 @@ duplicate/race detection.
 
 ## Implementation and verification approach
 
-The slices were implemented in the user-required order. `TEST-0147` first
+The slices were implemented in the user-required order. [TEST-0147](test-cases.md) first
 recorded the expected-red distribution/structure result, then the existing
 behavior was mechanically moved into one module scope before the thin
-bootstrap/builder was accepted. `TEST-0148` preceded the explicit read retry,
-and `TEST-0149` preceded safe body transport and exact legacy repair. Focused
+bootstrap/builder was accepted. [TEST-0148](test-cases.md) preceded the explicit read retry,
+and [TEST-0149](test-cases.md) preceded safe body transport and exact legacy repair. Focused
 owners passed without intermediate publication. After convergence, run the
 canonical consumer-update suite once, only the affected quick-adoption shards,
 one structure pass, `git diff --check`, one fresh-diff review, and the single
@@ -248,9 +248,9 @@ observations before the focused green evidence:
 | `FIND-0194` | `SUBF-0067` | The full adoption-lifecycle fixture still wrote `VERSION` as `0.12.3` while labeling its immutable mock snapshot `v0.12.4`, so the exact source-version gate correctly rejected it. | `Blocking` -> resolved by advancing the sole stale fixture value to `0.12.4` and confirming no current launcher/adoption fixture retains `v0.12.3`. |
 | `FIND-0195` | `SUBF-0067` | After the version correction exposed the next path, the in-process mock `gh repo clone` invoked raw Git under stop-on-stderr semantics, so ordinary clone progress could be misclassified as failure on Windows PowerShell 5.1. | `Blocking` -> resolved by isolating the mock native call, restoring error preference, and deciding from the captured exit code; the exact `AdoptionLifecycle` shard passed. |
 | `FIND-0196` | `SUBF-0067` | The builder computed its omitted `SourceRoot` from `$PSScriptRoot` inside the parameter-default expression, before Windows PowerShell 5.1 initialized that automatic variable, so the documented direct release-build command failed before execution. | `Blocking` -> resolved by computing the default after parameter binding only when the caller omitted it; the focused test now invokes the fixture builder through a real Windows PowerShell 5.1 `-File` process without `-SourceRoot` and compares its archive to explicit-root builds. |
-| `FIND-0197` | `SUBF-0069` | The first released v0.12.4 Derdini replay repaired issue #7 and created exact canonical issue #8, but immediately re-read the eventually consistent all-issues inventory instead of binding the successful POST response; the list had not exposed #8 yet and produced a false convergence failure. | `Blocking` -> resolved for v0.12.5 by validating the created issue number, exact direct identity read, canonical body/title/state and nonempty response author independently of the updater PAT actor, then using list inventory only for visible duplicates; an intentionally lagging list must reach draft-PR creation while one different visible identity fails closed. |
-| `FIND-0198` | `SUBF-0069` | PR #92's first hosted Ubuntu and Windows runs reached managed-merge finalization but its legacy issue-creation fixture returned no `user` object, so the new response-author shape gate stopped before the intended assertions on both hosts. | `Blocking` -> resolved by separating historical owner, authenticated updater, and issue-token actor identities across distinct updater/issue credentials; the negative fixture omits `user` and proves one creation is followed by the exact controlled convergence error with no tracking repair, branch deletion, comment, close, or label-removal mutation. The focused finalization owner passed in 13.0 seconds. |
-| `FIND-0199` | `SUBF-0067` | PR #92 run `29757563950` passed the corrected finalization and all canonical updater scenarios on Ubuntu, then the quick-adoption fixture tried to create a second no-change `v0.12.5` commit because the current-version bump had also made its synthetic future tag `v0.12.5`. | `Blocking` -> resolved by retaining v0.12.5 as the current immutable fixture and advancing only the synthetic next-revision release to v0.12.6; the focused `ContractsPreflight` shard rebuilt the complete fixture and passed in 17.1 seconds outside the known sandbox-only Git signal-pipe boundary. The still-running Windows job was cancelled after the deterministic Ubuntu failure to avoid wasting runner time. |
+| `FIND-0197` | `SUBF-0069` | The first released v0.12.4 Derdini replay repaired [issue #7](https://github.com/hasanmanzak/Derdini/issues/7) and created exact canonical [issue #8](https://github.com/hasanmanzak/Derdini/issues/8), but immediately re-read the eventually consistent all-issues inventory instead of binding the successful POST response; the list had not exposed [#8](https://github.com/hasanmanzak/Derdini/issues/8) yet and produced a false convergence failure. | `Blocking` -> resolved for v0.12.5 by validating the created issue number, exact direct identity read, canonical body/title/state and nonempty response author independently of the updater PAT actor, then using list inventory only for visible duplicates; an intentionally lagging list must reach draft-PR creation while one different visible identity fails closed. |
+| `FIND-0198` | `SUBF-0069` | [PR #92](https://github.com/hasanmanzak/meAndAI/pull/92)'s first hosted Ubuntu and Windows runs reached managed-merge finalization but its legacy issue-creation fixture returned no `user` object, so the new response-author shape gate stopped before the intended assertions on both hosts. | `Blocking` -> resolved by separating historical owner, authenticated updater, and issue-token actor identities across distinct updater/issue credentials; the negative fixture omits `user` and proves one creation is followed by the exact controlled convergence error with no tracking repair, branch deletion, comment, close, or label-removal mutation. The focused finalization owner passed in 13.0 seconds. |
+| `FIND-0199` | `SUBF-0067` | [PR #92](https://github.com/hasanmanzak/meAndAI/pull/92) run `29757563950` passed the corrected finalization and all canonical updater scenarios on Ubuntu, then the quick-adoption fixture tried to create a second no-change `v0.12.5` commit because the current-version bump had also made its synthetic future tag `v0.12.5`. | `Blocking` -> resolved by retaining v0.12.5 as the current immutable fixture and advancing only the synthetic next-revision release to v0.12.6; the focused `ContractsPreflight` shard rebuilt the complete fixture and passed in 17.1 seconds outside the known sandbox-only Git signal-pipe boundary. The still-running Windows job was cancelled after the deterministic Ubuntu failure to avoid wasting runner time. |
 
 Fresh-diff review for `SUBF-0067` also bound both release assets to the exact
 released source commit, aligned publication archive checks with the runtime
@@ -289,7 +289,7 @@ cross-suite dependency.
 
 ## Delivery gates
 
-- [ ] The v0.12.5 hotfix PR and issue #89 cross-link the canonical records.
+- [ ] The v0.12.5 hotfix PR and [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89) cross-link the canonical records.
 - [ ] Applicable hosted Windows and Ubuntu checks pass before merge.
 
 ## Post-merge release evidence

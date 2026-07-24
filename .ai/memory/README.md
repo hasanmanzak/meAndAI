@@ -1,21 +1,24 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-23**<br>
-Protocol version: **0.14.1** (candidate)<br>
-Latest immutable release: **0.14.0**
+Last reviewed: **2026-07-24**<br>
+Protocol version: **0.14.2** (candidate)<br>
+Latest immutable release: **0.14.1**
 
-The immutable [v0.14.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.0)
-release targets commit `a2a987b322f5ea8d705ad6c5325cffc662a60978`;
-[PR #111](https://github.com/hasanmanzak/meAndAI/pull/111) and
-[issue #110](https://github.com/hasanmanzak/meAndAI/issues/110) retain its
+The immutable [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
+release targets commit `f153e21a3098945a1b669563046f875ef6fb8b60`;
+[PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
+[issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) retain its
 delivery and publication evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
-[FEAT-0046](../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md)
-/ `BUG-0028`, [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112),
-and `SUBF-0088` own the bounded v0.14.1 consumer non-duplication mandate.
-Follow the [v0.14.1 handoff](log/2026-07-23-v0141-consumer-nonduplication.md).
+[FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
+/ [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
+[SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
+[TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md),
+and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) own the
+bounded v0.14.2 clickable cross-record reference correction. Follow the
+[v0.14.2 handoff](log/2026-07-24-v0142-clickable-cross-record-references.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

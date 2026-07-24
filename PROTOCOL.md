@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.14.1**<br>
+Protocol version: **0.14.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -95,7 +95,7 @@ Promotion creates and links the appropriate `EPIC-NNNN`, `FEAT-NNNN`,
 normal planning and delivery gates; the idea contributes history, not readiness
 evidence. Promoted and rejected records remain indexed with their rationale and
 bidirectional links instead of being deleted or silently rewritten. Use the
-pinned `templates/idea.md` when creating a record.
+pinned [templates/idea.md](templates/idea.md) when creating a record.
 
 ## 4. Delivery lifecycle and review gates
 
@@ -451,6 +451,12 @@ increase detail.
 
 ## 6. Documentation graph
 
+- A document (repository-local or external), GitHub issue, pull request, or
+  GitHub comment of any kind that references another document
+  (repository-local or external), issue, pull request, or GitHub comment MUST
+  express each such reference as a clickable link to the exact referenced
+  target. A free-text identifier, number, title, or path does not satisfy this
+  requirement.
 - Every durable pre-work idea is indexed under `docs/ideas` and links any
   promoted work or decision.
 - Every feature has `docs/features/FEAT-NNNN-slug/README.md` and
@@ -492,7 +498,7 @@ especially important for private repositories, where GitHub's current form
 schema does not enforce `required` validation.
 
 Branches use a short category and work description, for example
-`feature/FEAT-0042-customer-credit-limit` or an automation-specific equivalent.
+`feature/work-id-customer-credit-limit` or an automation-specific equivalent.
 Commits are focused and describe intent. Pull requests close or reference their
 primary issue and list all related records. Completed changes MUST be pushed.
 If an authorized publication target has no repository, create a private GitHub
@@ -551,7 +557,7 @@ does not invalidate a consumer correctly pinned to an earlier release. A forced
 migration of already conforming consumers is incompatible and increments `M`.
 
 Every released version updates `VERSION`, relevant current-release metadata,
-and `CHANGELOG.md`. Historical feature target versions remain unchanged.
+and [CHANGELOG.md](CHANGELOG.md). Historical feature target versions remain unchanged.
 Consumers SHOULD pin the tag of a verified immutable release or an explicitly
 reviewed commit, never an unqualified moving branch. A consuming project
 versions its own product independently.
@@ -1075,9 +1081,10 @@ The updater MUST:
   update issue, place its real tracking line in the initial draft, and record an
   exact pull-request/head backlink;
 - bind each managed adoption or update proposal to exactly one same-repository
-  issue through one canonical, non-closing `Tracking issue: #N` body line before
-  maintainer merge; native closing keywords are forbidden because issue closure
-  must follow verified branch convergence;
+  issue through one canonical, non-closing
+  `Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)` body
+  line before maintainer merge; native closing keywords are forbidden because
+  issue closure must follow verified branch convergence;
 - react to an exact merged, same-repository managed proposal through the
   consumer workflow, revalidate the live pull request, current default branch
   containment, canonical marker, changed paths, tracking issue, open-PR branch

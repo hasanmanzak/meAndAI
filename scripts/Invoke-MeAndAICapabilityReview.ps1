@@ -26,8 +26,11 @@ Import-Module (Join-Path $PSScriptRoot 'MeAndAI.RepositoryEvidence.psm1') -Force
 $script:LedgerRelativePath = '.ai/meandai-capabilities-state.json'
 $script:ManifestRelativePath = '.ai/adoption/meandai-capability-review.json'
 $script:MarkerPrefix = '<!-- meandai-capability-review:v1:'
-$script:ClosurePrefix = '<!-- meandai-capability-review-closed:v1:'
-$script:AttestationPrefix = '<!-- meandai-capability-review-attestation:v1:'
+$script:ClosurePrefix = '<!-- meandai-capability-review-closed:v2:'
+$script:LegacyClosurePrefix = '<!-- meandai-capability-review-closed:v1:'
+$script:AttestationPrefix = '<!-- meandai-capability-review-attestation:v2:'
+$script:LegacyAttestationPrefix = `
+    '<!-- meandai-capability-review-attestation:v1:'
 $script:ProtocolRepository = 'hasanmanzak/meAndAI'
 $script:ProposalActor = $null
 $script:IssueActor = $null
@@ -600,8 +603,34 @@ function Get-ReviewBinding {
         CapabilityBatch = @()
     }
     if ($PullRequest) {
-        $binding.IssueNumber = [int](Get-SingleBodyField -Body $Body `
-            -Name 'Tracking issue')
+        $escapedRepository = [regex]::Escape($Repository)
+        $linkedIssueMatches = [regex]::Matches(
+            $Body,
+            '(?m)^Tracking issue: \[#(?<number>[1-9][0-9]*)\]' +
+                '\(https://github\.com/' + $escapedRepository +
+                '/issues/\k<number>\)\r?$'
+        )
+        $legacyIssueMatches = [regex]::Matches(
+            $Body,
+            '(?m)^Tracking issue: `(?<number>[1-9][0-9]*)`\r?$'
+        )
+        if ($linkedIssueMatches.Count -eq 1 -and
+            $legacyIssueMatches.Count -eq 0) {
+            $binding.IssueNumber = [int]$linkedIssueMatches[0].Groups['number'].Value
+        }
+        elseif ($linkedIssueMatches.Count -eq 0 -and
+            $legacyIssueMatches.Count -eq 1) {
+            $binding.IssueNumber = [int]$legacyIssueMatches[0].Groups['number'].Value
+            if ([regex]::Matches(
+                $Body,
+                "(?m)^Tracking issue: #$($binding.IssueNumber)\r?$"
+            ).Count -ne 1) {
+                throw 'Capability review body has no canonical legacy tracking-issue autolink.'
+            }
+        }
+        else {
+            throw 'Capability review body has no unique canonical tracking-issue link.'
+        }
     }
     Assert-GitSha -Value $binding.BaseHead -Label 'Review base head'
     if ($binding.CatalogDigest -cnotmatch '^[0-9a-f]{64}$' -or
@@ -648,7 +677,8 @@ function New-ReviewBody {
         [long]$ProposalActorId = [long]$script:ProposalActor.Id,
         [string]$ProposalActorLogin = [string]$script:ProposalActor.Login,
         [long]$IssueActorId = [long]$script:IssueActor.Id,
-        [string]$IssueActorLogin = [string]$script:IssueActor.Login
+        [string]$IssueActorLogin = [string]$script:IssueActor.Login,
+        [switch]$LegacyTrackingIssue
     )
 
     $tick = [string][char]96
@@ -671,9 +701,16 @@ function New-ReviewBody {
     $lines.Add("Issue actor ID: $tick$IssueActorId$tick")
     $lines.Add("Issue actor login: $tick$IssueActorLogin$tick")
     if ($IssueNumber -gt 0) {
-        $lines.Add("Tracking issue: $tick$IssueNumber$tick")
-        $lines.Add('')
-        $lines.Add("Tracking issue: #$IssueNumber")
+        if ($LegacyTrackingIssue) {
+            $lines.Add("Tracking issue: $tick$IssueNumber$tick")
+            $lines.Add('')
+            $lines.Add("Tracking issue: #$IssueNumber")
+        }
+        else {
+            $lines.Add(
+                "Tracking issue: [#$IssueNumber](https://github.com/$Repository/issues/$IssueNumber)"
+            )
+        }
     }
     $lines.Add('')
     $lines.Add('Capability batch:')
@@ -752,7 +789,21 @@ function Assert-CanonicalReviewBody {
         -ProposalActorLogin ([string]$Binding.ProposalActorLogin) `
         -IssueActorId ([long]$Binding.IssueActorId) `
         -IssueActorLogin ([string]$Binding.IssueActorLogin)
-    if ($Body -cne $expectedBody) {
+    $legacyExpectedBody = if ($PullRequest) {
+        New-ReviewBody -Plan $pseudoPlan `
+            -LedgerPrefixCount $prefixCount `
+            -IssueNumber ([int]$Binding.IssueNumber) `
+            -HandoffHead ([string]$Binding.HandoffHead) `
+            -BaseLedgerDigest ([string]$Binding.BaseLedgerDigest) `
+            -ProposalActorId ([long]$Binding.ProposalActorId) `
+            -ProposalActorLogin ([string]$Binding.ProposalActorLogin) `
+            -IssueActorId ([long]$Binding.IssueActorId) `
+            -IssueActorLogin ([string]$Binding.IssueActorLogin) `
+            -LegacyTrackingIssue
+    }
+    else { '' }
+    if ($Body -cne $expectedBody -and
+        (-not $PullRequest -or $Body -cne $legacyExpectedBody)) {
         throw 'Capability review body is not the exact canonical handoff content.'
     }
 }
@@ -974,8 +1025,63 @@ function Assert-CanonicalManifest {
 }
 
 function New-CanonicalClosureCommentBody {
+    param(
+        [Parameter(Mandatory)][string]$Marker,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)]
+        [int]$PullRequestNumber
+    )
+
+    $match = [regex]::Match(
+        $Marker,
+        '^' + [regex]::Escape($script:ClosurePrefix) +
+            '(?<repository>[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+):' +
+            '[0-9a-f]{64}:head-[0-9a-f]{40}:merge-[0-9a-f]{40}:' +
+            'link-(?<digest>[0-9a-f]{64}) -->$'
+    )
+    if (-not $match.Success) {
+        throw 'Capability review closure marker is not canonical.'
+    }
+    $link = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository $match.Groups['repository'].Value `
+        -Number $PullRequestNumber
+    if ([string]$link.Digest -cne $match.Groups['digest'].Value) {
+        throw 'Capability review closure marker does not bind its visible pull-request link.'
+    }
+    return "$Marker`n`nVerified the merged review for $($link.Markdown), terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
+}
+
+function Get-LegacyClosureMarkerBinding {
     param([Parameter(Mandatory)][string]$Marker)
 
+    $match = [regex]::Match(
+        $Marker,
+        '^' + [regex]::Escape($script:LegacyClosurePrefix) +
+            '(?<repository>[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+):' +
+            '[0-9a-f]{64}:pr-(?<number>[1-9][0-9]*):' +
+            'merge-[0-9a-f]{40} -->$'
+    )
+    if (-not $match.Success) {
+        throw 'Legacy capability review closure marker is not canonical.'
+    }
+    return [pscustomobject][ordered]@{
+        Repository = $match.Groups['repository'].Value
+        PullRequestNumber = [int]$match.Groups['number'].Value
+    }
+}
+
+function New-LegacyLinkedClosureCommentBody {
+    param([Parameter(Mandatory)][string]$Marker)
+
+    $binding = Get-LegacyClosureMarkerBinding -Marker $Marker
+    $link = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository $binding.Repository -Number $binding.PullRequestNumber
+    return "$Marker`n`nVerified the merged review for $($link.Markdown), terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
+}
+
+function New-LegacyUnlinkedClosureCommentBody {
+    param([Parameter(Mandatory)][string]$Marker)
+
+    [void](Get-LegacyClosureMarkerBinding -Marker $Marker)
     return "$Marker`n`nVerified merged review, terminal ledger, default-branch containment, and exact-head branch cleanup.`n"
 }
 
@@ -991,7 +1097,45 @@ function New-CanonicalOwnerAttestationCommentBody {
         throw 'Owner attestation identity is not canonical.'
     }
     Assert-GitSha -Value $HeadSha -Label 'Owner attestation review head'
-    $marker = $script:AttestationPrefix + $Repository + ':pr-' +
+    $link = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository $Repository -Number $PullRequestNumber
+    $marker = $script:AttestationPrefix + $Repository + ':head-' +
+        $HeadSha + ':link-' + $link.Digest + ' -->'
+    return $marker + " I reviewed the semantic capability changes in $($link.Markdown) at this exact head and attest that they are ready for finalization."
+}
+
+function New-LegacyLinkedOwnerAttestationCommentBody {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][long]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    if ($Repository -cnotmatch '^[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+$' -or
+        $PullRequestNumber -le 0) {
+        throw 'Owner attestation identity is not canonical.'
+    }
+    Assert-GitSha -Value $HeadSha -Label 'Owner attestation review head'
+    $marker = $script:LegacyAttestationPrefix + $Repository + ':pr-' +
+        $PullRequestNumber + ':head-' + $HeadSha + ' -->'
+    $link = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository $Repository -Number $PullRequestNumber
+    return $marker + " I reviewed the semantic capability changes in $($link.Markdown) at this exact head and attest that they are ready for finalization."
+}
+
+function New-LegacyUnlinkedOwnerAttestationCommentBody {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][long]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    if ($Repository -cnotmatch '^[a-z0-9](?:[a-z0-9-]{0,38})/[a-z0-9._-]+$' -or
+        $PullRequestNumber -le 0) {
+        throw 'Legacy owner attestation identity is not canonical.'
+    }
+    Assert-GitSha -Value $HeadSha -Label 'Legacy owner attestation review head'
+    $marker = $script:LegacyAttestationPrefix + $Repository + ':pr-' +
         $PullRequestNumber + ':head-' + $HeadSha + ' -->'
     return $marker + ' I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.'
 }
@@ -1012,9 +1156,23 @@ function Get-ExactHeadOwnerAttestation {
         -Repository $Repository `
         -PullRequestNumber ([long]$PullRequest.Number) `
         -HeadSha ([string]$PullRequest.HeadSha)
+    $legacyLinkedExpectedBody = New-LegacyLinkedOwnerAttestationCommentBody `
+        -Repository $Repository `
+        -PullRequestNumber ([long]$PullRequest.Number) `
+        -HeadSha ([string]$PullRequest.HeadSha)
+    $legacyUnlinkedExpectedBody = New-LegacyUnlinkedOwnerAttestationCommentBody `
+        -Repository $Repository `
+        -PullRequestNumber ([long]$PullRequest.Number) `
+        -HeadSha ([string]$PullRequest.HeadSha)
     $expectedMarker = $expectedBody.Substring(
         0,
         $expectedBody.IndexOf(' -->', [StringComparison]::Ordinal) + 4
+    )
+    $legacyExpectedMarker = $legacyLinkedExpectedBody.Substring(
+        0,
+        $legacyLinkedExpectedBody.IndexOf(
+            ' -->', [StringComparison]::Ordinal
+        ) + 4
     )
     $comments = @(Get-PagedGitHubCollection `
         -Endpoint "repos/$Repository/issues/$($PullRequest.Number)/comments" `
@@ -1034,13 +1192,16 @@ function Get-ExactHeadOwnerAttestation {
             -Right $script:RepositoryOwner)) {
             continue
         }
-        if ($body -ceq $expectedBody) {
+        if ($body -ceq $expectedBody -or
+            $body -ceq $legacyLinkedExpectedBody -or
+            $body -ceq $legacyUnlinkedExpectedBody) {
             $matches.Add([pscustomobject][ordered]@{
                 Actor = $actor
                 Body = $body
             })
         }
-        elseif ($body.Contains($expectedMarker)) {
+        elseif ($body.Contains($expectedMarker) -or
+            $body.Contains($legacyExpectedMarker)) {
             throw 'Trusted capability review owner attestation is not exact canonical evidence.'
         }
     }
@@ -1078,6 +1239,9 @@ function Get-ClosureMarkerFromComments {
     $prefix = [regex]::Escape(
         "$($script:ClosurePrefix)$Repository`:$CatalogDigest`:"
     )
+    $legacyPrefix = [regex]::Escape(
+        "$($script:LegacyClosurePrefix)$Repository`:$CatalogDigest`:"
+    )
     $matches = [System.Collections.Generic.List[string]]::new()
     foreach ($comment in $comments) {
         $body = [string](Get-PropertyValue -Value $comment -Name body `
@@ -1092,16 +1256,51 @@ function Get-ClosureMarkerFromComments {
         if (-not (Test-IsIssueActor -Actor $actor)) {
             continue
         }
-        foreach ($match in [regex]::Matches(
+        $hasCanonicalSignal = [regex]::IsMatch($body, $prefix)
+        $hasLegacySignal = [regex]::IsMatch($body, $legacyPrefix)
+        if (-not $hasCanonicalSignal -and -not $hasLegacySignal) {
+            continue
+        }
+        $canonicalMarkers = @([regex]::Matches(
             $body,
-            $prefix + 'pr-[1-9][0-9]*:merge-[0-9a-f]{40} -->'
-        )) {
-            $marker = [string]$match.Value
-            if ($body -cne (New-CanonicalClosureCommentBody -Marker $marker)) {
+            $prefix + 'head-[0-9a-f]{40}:merge-[0-9a-f]{40}:' +
+                'link-[0-9a-f]{64} -->'
+        ))
+        $legacyMarkers = @([regex]::Matches(
+            $body,
+            $legacyPrefix + 'pr-[1-9][0-9]*:merge-[0-9a-f]{40} -->'
+        ))
+        if (($canonicalMarkers.Count + $legacyMarkers.Count) -ne 1 -or
+            ($hasCanonicalSignal -and $canonicalMarkers.Count -ne 1) -or
+            ($hasLegacySignal -and $legacyMarkers.Count -ne 1)) {
+            throw 'Trusted capability review closure comment contains a malformed or ambiguous marker.'
+        }
+        if ($canonicalMarkers.Count -eq 1) {
+            $marker = [string]$canonicalMarkers[0].Value
+            $escapedRepository = [regex]::Escape($Repository)
+            $linkMatches = @([regex]::Matches(
+                $body,
+                '\[pull request #(?<number>[1-9][0-9]*)\]' +
+                    '\(https://github\.com/' + $escapedRepository +
+                    '/pull/\k<number>\)'
+            ))
+            if ($linkMatches.Count -ne 1 -or
+                $body -cne (New-CanonicalClosureCommentBody `
+                    -Marker $marker `
+                    -PullRequestNumber ([int]$linkMatches[0].Groups['number'].Value))) {
                 throw 'Trusted capability review closure comment is not exact canonical evidence.'
             }
             $matches.Add($marker)
+            continue
         }
+        $legacyMarker = [string]$legacyMarkers[0].Value
+        if ($body -cne (New-LegacyLinkedClosureCommentBody `
+                -Marker $legacyMarker) -and
+            $body -cne (New-LegacyUnlinkedClosureCommentBody `
+                -Marker $legacyMarker)) {
+            throw 'Trusted legacy capability review closure comment is not exact compatibility evidence.'
+        }
+        $matches.Add($legacyMarker)
     }
     $unique = @($matches | Sort-Object -Unique -CaseSensitive)
     if ($unique.Count -gt 1 -or $matches.Count -gt 1) {
@@ -2326,6 +2525,8 @@ function Close-VerifiedReviewIssue {
         [Parameter(Mandatory)][string]$Marker,
         [Parameter(Mandatory)][string]$Branch,
         [Parameter(Mandatory)][long]$IssueNumber,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)]
+        [int]$PullRequestNumber,
         [Parameter(Mandatory)][string]$ClosureMarker
     )
 
@@ -2363,7 +2564,8 @@ function Close-VerifiedReviewIssue {
         -IssueNumber $IssueNumber -Repository $Repository `
         -CatalogDigest $Catalog.CatalogDigest
     if ([string]::IsNullOrEmpty($existingClosure)) {
-        $closureBody = New-CanonicalClosureCommentBody -Marker $ClosureMarker
+        $closureBody = New-CanonicalClosureCommentBody `
+            -Marker $ClosureMarker -PullRequestNumber $PullRequestNumber
         $comment = Invoke-ReviewGitHub -Method POST `
             -Endpoint "$issueEndpoint/comments" -Body ([ordered]@{
                 body = $closureBody
@@ -2402,6 +2604,7 @@ function Invoke-HistoricalCapabilityReviewRecovery {
                 -Catalog $Recovery.Catalog -Marker $Recovery.Plan.Marker `
                 -Branch ([string]$Recovery.PullRequest.HeadBranch) `
                 -IssueNumber ([long]$operation.IssueNumber) `
+                -PullRequestNumber ([int]$operation.PullRequestNumber) `
                 -ClosureMarker ([string]$operation.ClosureMarker)
         }
         else {
@@ -3008,6 +3211,7 @@ $handlers = @{
             -Catalog $catalog -Marker ([string]$Operation.Marker) `
             -Branch $expectedBranch `
             -IssueNumber ([long]$Operation.IssueNumber) `
+            -PullRequestNumber ([int]$Operation.PullRequestNumber) `
             -ClosureMarker ([string]$Operation.ClosureMarker)
     }
 }

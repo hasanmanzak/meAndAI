@@ -244,6 +244,14 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     $proposalMarkerValidator = Get-Command `
         -Name 'Test-MeAndAIExactAdoptionPullRequestMarker' `
         -CommandType Function -ErrorAction SilentlyContinue
+    $blobLinkBuilder = Get-Command -Name 'New-MeAndAIGitHubBlobLink' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $linkedSectionValidator = Get-Command `
+        -Name 'Test-MeAndAIExactLinkedPathSection' `
+        -CommandType Function -ErrorAction SilentlyContinue
+    $linkedPathDigestGetter = Get-Command `
+        -Name 'Get-MeAndAILinkedPathIdentityDigest' `
+        -CommandType Function -ErrorAction SilentlyContinue
     $completedChangeValidator = Get-Command `
         -Name 'Test-MeAndAICompletedAdoptionChangeSet' `
         -CommandType Function -ErrorAction SilentlyContinue
@@ -283,7 +291,9 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $null -eq $legacyGovernanceClassifier -or
          $null -eq $legacyCommonAuthorityClassifier -or
          $null -eq $consumerGovernanceClassifier -or
-         $null -eq $cleanStartClassifier -or
+         $null -eq $cleanStartClassifier -or $null -eq $blobLinkBuilder -or
+         $null -eq $linkedSectionValidator -or
+         $null -eq $linkedPathDigestGetter -or
          $null -eq $proposalMarkerValidator -or
          $null -eq $completedChangeValidator -or
          $null -eq $reservedSubmoduleValidator) {
@@ -827,7 +837,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         }
 
         $graphMarker = [pscustomobject][ordered]@{
-            schema = 7
+            schema = 9
             phase = 'Proposed'
             state = 'BootstrapReady'
             target = 'v0.9.7'
@@ -835,7 +845,6 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             head = $proposalHead
             branch = 'automation/meandai-capabilities-v0.9.7'
             adoptionStrategy = 'FullMigration'
-            protocolSurfaces = @($sourceGraphIdentity.protocolSurfaces)
             protocolRecordLossAcknowledged = $false
             graphBase = [string]$sourceGraphIdentity.graphBase
             graphDigest = [string]$sourceGraphIdentity.graphDigest
@@ -846,8 +855,21 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         }
         $graphPullRequest = $validPullRequest | ConvertTo-Json -Depth 30 |
             ConvertFrom-Json
-        $graphPullRequest.body = '<!-- meandai-capabilities-adoption:' +
+        $linkedSurfaceLines = @($sourceGraphIdentity.protocolSurfaces |
+            ForEach-Object {
+                '- ' + (& $blobLinkBuilder -Repository 'owner/consumer' `
+                    -Commit ([string]$sourceGraphIdentity.graphBase) `
+                    -Path ([string]$_))
+            })
+        $graphMarkerText = '<!-- meandai-capabilities-adoption:' +
             ($graphMarker | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+        $graphPullRequest.body = ((@(
+            $graphMarkerText,
+            '## AI capabilities adoption proposal',
+            '',
+            '### Detected protocol and governance surfaces',
+            ''
+        ) + @($linkedSurfaceLines)) -join "`n")
         $graphMarkerParameters = @{
             RemoteHead = $proposalHead
             Repository = 'owner/consumer'
@@ -863,9 +885,16 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             ExpectedSourceGraph = $sourceGraph
             ExpectedPhase = 'Proposed'
         }
+        if (-not (& $linkedSectionValidator -Body $graphPullRequest.body `
+                -Heading '### Detected protocol and governance surfaces' `
+                -Repository 'owner/consumer' `
+                -Commit ([string]$sourceGraphIdentity.graphBase) `
+                -Paths @($sourceGraphIdentity.protocolSurfaces))) {
+            Add-Failure 'TEST-0176 canonical linked-surface section helper rejected exact immutable targets.'
+        }
         if (-not (& $proposalMarkerValidator `
                 -PullRequest $graphPullRequest @graphMarkerParameters)) {
-            Add-Failure 'TEST-0153 schema-7 Proposed marker rejected exact graph evidence.'
+            Add-Failure 'TEST-0153 schema-9 Proposed marker rejected exact graph and linked-surface evidence.'
         }
 
         $completedGraphMarker = $graphMarker | ConvertTo-Json -Depth 30 |
@@ -874,10 +903,16 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $completedGraphPullRequest = $graphPullRequest |
             ConvertTo-Json -Depth 30 | ConvertFrom-Json
         $completedGraphPullRequest.isDraft = $false
-        $completedGraphPullRequest.body =
-            '<!-- meandai-capabilities-adoption:' +
+        $completedMarkerText = '<!-- meandai-capabilities-adoption:' +
             ($completedGraphMarker | ConvertTo-Json -Depth 30 -Compress) +
             ' -->'
+        $completedGraphPullRequest.body = [regex]::Replace(
+            $graphPullRequest.body,
+            '<!-- meandai-capabilities-adoption:\{[^\r\n]*\} -->',
+            [Text.RegularExpressions.MatchEvaluator]{ param($unused) $completedMarkerText },
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant,
+            [TimeSpan]::FromSeconds(1)
+        )
         $completedGraphMarkerParameters = @{}
         foreach ($entry in $graphMarkerParameters.GetEnumerator()) {
             if ($entry.Key -cne 'ExpectedSourceGraph') {
@@ -890,7 +925,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         if (-not (& $proposalMarkerValidator `
                 -PullRequest $completedGraphPullRequest `
                 @completedGraphMarkerParameters)) {
-            Add-Failure 'TEST-0153 schema-7 Completed marker rejected exact graph-identity evidence.'
+            Add-Failure 'TEST-0153 schema-9 Completed marker rejected exact graph-identity and linked-surface evidence.'
         }
 
         $graphMarkerVariants = [ordered]@{}
@@ -910,19 +945,197 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
         $graphMarkerVariants['limit drift'] = $markerLimitDrift
         $markerSurfaceDrift = $graphMarker | ConvertTo-Json -Depth 30 |
             ConvertFrom-Json
-        $markerSurfaceDrift.protocolSurfaces = @('AGENTS.md')
-        $graphMarkerVariants['surface drift'] = $markerSurfaceDrift
+        $markerSurfaceDrift | Add-Member -NotePropertyName protocolSurfaces `
+            -NotePropertyValue @('AGENTS.md')
+        $graphMarkerVariants['hidden raw-path property'] = $markerSurfaceDrift
         foreach ($entry in $graphMarkerVariants.GetEnumerator()) {
             $variantPullRequest = $graphPullRequest |
                 ConvertTo-Json -Depth 30 | ConvertFrom-Json
-            $variantPullRequest.body =
-                '<!-- meandai-capabilities-adoption:' +
-                ($entry.Value | ConvertTo-Json -Depth 30 -Compress) +
-                ' -->'
+            $variantMarkerText = '<!-- meandai-capabilities-adoption:' +
+                ($entry.Value | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+            $variantPullRequest.body = [regex]::Replace(
+                $graphPullRequest.body,
+                '<!-- meandai-capabilities-adoption:\{[^\r\n]*\} -->',
+                [Text.RegularExpressions.MatchEvaluator]{
+                    param($unused) $variantMarkerText
+                },
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant,
+                [TimeSpan]::FromSeconds(1)
+            )
             if (& $proposalMarkerValidator -PullRequest $variantPullRequest `
                     @graphMarkerParameters) {
-                Add-Failure "TEST-0153 schema-7 marker accepted $($entry.Key)."
+                Add-Failure "TEST-0153 schema-9 marker accepted $($entry.Key)."
             }
+        }
+
+        $linkedBodyVariants = [ordered]@{
+            'marker-only evidence' = $graphMarkerText
+            'raw-path evidence' = @(
+                $graphMarkerText,
+                '### Detected protocol and governance surfaces',
+                '',
+                @($sourceGraphIdentity.protocolSurfaces | ForEach-Object {
+                    "- ``$_``"
+                }) -join "`n"
+            ) -join "`n"
+            'wrong immutable target' = $graphPullRequest.body.Replace(
+                "/blob/$([string]$sourceGraphIdentity.graphBase)/",
+                "/blob/$('f' * 40)/"
+            )
+            'missing linked target' = $graphPullRequest.body.Replace(
+                "`n$([string]$linkedSurfaceLines[-1])", ''
+            )
+        }
+        foreach ($entry in $linkedBodyVariants.GetEnumerator()) {
+            $variantPullRequest = $graphPullRequest |
+                ConvertTo-Json -Depth 30 | ConvertFrom-Json
+            $variantPullRequest.body = [string]$entry.Value
+            if (& $proposalMarkerValidator -PullRequest $variantPullRequest `
+                    @graphMarkerParameters) {
+                Add-Failure "TEST-0176 schema-9 marker accepted $($entry.Key)."
+            }
+        }
+
+        $linkedPathMarker = [pscustomobject][ordered]@{
+            schema = 11
+            phase = 'Proposed'
+            state = 'BootstrapReady'
+            target = 'v0.9.7'
+            protocolSha = $protocolSha
+            head = $proposalHead
+            branch = 'automation/meandai-capabilities-v0.9.7'
+            adoptionStrategy = 'FullMigration'
+            surfaceBase = [string]$sourceGraphIdentity.graphBase
+            surfaceDigest = [string](& $linkedPathDigestGetter `
+                -Paths @($sourceGraphIdentity.protocolSurfaces))
+            protocolRecordLossAcknowledged = $false
+            repository = 'owner/consumer'
+            actor = 'owner'
+        }
+        $linkedPathMarkerText = '<!-- meandai-capabilities-adoption:' +
+            ($linkedPathMarker | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+        $linkedPathPullRequest = $validPullRequest |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $linkedPathPullRequest.body = ((@(
+            $linkedPathMarkerText,
+            '## AI capabilities adoption proposal',
+            '',
+            '### Detected protocol and governance surfaces',
+            ''
+        ) + @($linkedSurfaceLines)) -join "`n")
+        $linkedPathMarkerParameters = @{}
+        foreach ($entry in $graphMarkerParameters.GetEnumerator()) {
+            if ($entry.Key -cne 'ExpectedSourceGraph') {
+                $linkedPathMarkerParameters[$entry.Key] = $entry.Value
+            }
+        }
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $linkedPathPullRequest `
+                @linkedPathMarkerParameters)) {
+            Add-Failure 'TEST-0176 schema-11 Proposed marker rejected exact visible linked-surface identity.'
+        }
+
+        $completedLinkedPathMarker = $linkedPathMarker |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $completedLinkedPathMarker.phase = 'Completed'
+        $completedLinkedPathPullRequest = $linkedPathPullRequest |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $completedLinkedPathPullRequest.isDraft = $false
+        $completedLinkedPathMarkerText =
+            '<!-- meandai-capabilities-adoption:' +
+            ($completedLinkedPathMarker | ConvertTo-Json -Depth 30 -Compress) +
+            ' -->'
+        $completedLinkedPathPullRequest.body = [regex]::Replace(
+            $linkedPathPullRequest.body,
+            '<!-- meandai-capabilities-adoption:\{[^\r\n]*\} -->',
+            [Text.RegularExpressions.MatchEvaluator]{
+                param($unused) $completedLinkedPathMarkerText
+            },
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant,
+            [TimeSpan]::FromSeconds(1)
+        )
+        $completedLinkedPathMarkerParameters = @{}
+        foreach ($entry in $linkedPathMarkerParameters.GetEnumerator()) {
+            $completedLinkedPathMarkerParameters[$entry.Key] = $entry.Value
+        }
+        $completedLinkedPathMarkerParameters.ExpectedPhase = 'Completed'
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $completedLinkedPathPullRequest `
+                @completedLinkedPathMarkerParameters)) {
+            Add-Failure 'TEST-0176 schema-11 Completed marker rejected exact visible linked-surface identity.'
+        }
+
+        $linkedPathMarkerVariants = [ordered]@{}
+        $linkedPathDigestDrift = $linkedPathMarker |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $linkedPathDigestDrift.surfaceDigest = ('f' * 64)
+        $linkedPathMarkerVariants['digest drift'] = $linkedPathDigestDrift
+        $linkedPathHiddenPaths = $linkedPathMarker |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $linkedPathHiddenPaths | Add-Member -NotePropertyName protocolSurfaces `
+            -NotePropertyValue @($sourceGraphIdentity.protocolSurfaces)
+        $linkedPathMarkerVariants['hidden raw-path property'] =
+            $linkedPathHiddenPaths
+        foreach ($entry in $linkedPathMarkerVariants.GetEnumerator()) {
+            $variantPullRequest = $linkedPathPullRequest |
+                ConvertTo-Json -Depth 30 | ConvertFrom-Json
+            $variantMarkerText = '<!-- meandai-capabilities-adoption:' +
+                ($entry.Value | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+            $variantPullRequest.body = [regex]::Replace(
+                $linkedPathPullRequest.body,
+                '<!-- meandai-capabilities-adoption:\{[^\r\n]*\} -->',
+                [Text.RegularExpressions.MatchEvaluator]{
+                    param($unused) $variantMarkerText
+                },
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant,
+                [TimeSpan]::FromSeconds(1)
+            )
+            if (& $proposalMarkerValidator -PullRequest $variantPullRequest `
+                    @linkedPathMarkerParameters) {
+                Add-Failure "TEST-0176 schema-11 marker accepted $($entry.Key)."
+            }
+        }
+        $linkedPathBodyVariants = [ordered]@{
+            'marker-only evidence' = $linkedPathMarkerText
+            'raw-path evidence' = @(
+                $linkedPathMarkerText,
+                '### Detected protocol and governance surfaces',
+                '',
+                @($sourceGraphIdentity.protocolSurfaces | ForEach-Object {
+                    "- ``$_``"
+                }) -join "`n"
+            ) -join "`n"
+            'wrong immutable target' = $linkedPathPullRequest.body.Replace(
+                "/blob/$([string]$sourceGraphIdentity.graphBase)/",
+                "/blob/$('f' * 40)/"
+            )
+            'missing linked target' = $linkedPathPullRequest.body.Replace(
+                "`n$([string]$linkedSurfaceLines[-1])", ''
+            )
+        }
+        foreach ($entry in $linkedPathBodyVariants.GetEnumerator()) {
+            $variantPullRequest = $linkedPathPullRequest |
+                ConvertTo-Json -Depth 30 | ConvertFrom-Json
+            $variantPullRequest.body = [string]$entry.Value
+            if (& $proposalMarkerValidator -PullRequest $variantPullRequest `
+                    @linkedPathMarkerParameters) {
+                Add-Failure "TEST-0176 schema-11 marker accepted $($entry.Key)."
+            }
+        }
+
+        $legacyGraphMarker = $graphMarker | ConvertTo-Json -Depth 30 |
+            ConvertFrom-Json
+        $legacyGraphMarker.schema = 7
+        $legacyGraphMarker | Add-Member -NotePropertyName protocolSurfaces `
+            -NotePropertyValue @($sourceGraphIdentity.protocolSurfaces)
+        $legacyGraphPullRequest = $graphPullRequest |
+            ConvertTo-Json -Depth 30 | ConvertFrom-Json
+        $legacyGraphPullRequest.body =
+            '<!-- meandai-capabilities-adoption:' +
+            ($legacyGraphMarker | ConvertTo-Json -Depth 30 -Compress) + ' -->'
+        if (-not (& $proposalMarkerValidator `
+                -PullRequest $legacyGraphPullRequest @graphMarkerParameters)) {
+            Add-Failure 'TEST-0153 bounded legacy reader rejected exact schema-7 graph evidence.'
         }
 
         $protocolEntry = [pscustomobject]@{
@@ -1297,7 +1510,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.14.1',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.14.2',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',

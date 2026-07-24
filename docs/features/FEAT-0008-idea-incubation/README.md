@@ -32,7 +32,9 @@ collision-free submodule adoptions also receive an absent idea index.
 - Define the `IDEA-NNNN` identifier, statuses, minimum record, and promotion
   lifecycle.
 - Add a canonical idea index, reusable template, and the first repository idea
-  for role-based multi-agent protocol integration.
+  for
+  [role-based multi-agent protocol](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md)
+  integration.
 - Add an absent-only `docs/ideas/README.md` target to collision-safe initial
   submodule adoption.
 - Document how existing consumers create the index and idea records from their
@@ -74,16 +76,16 @@ collision-free submodule adoptions also receive an absent idea index.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0043 and TEST-0044](test-cases.md) |
+| Scenarios | Defined | [TEST-0043](test-cases.md) and [TEST-0044](test-cases.md) |
 | Test code | Automated and green | `tests/idea-incubation.tests.ps1` and the existing real-Git bootstrap fixture |
-| Baseline run | Passed | `TEST-0001` through `TEST-0042` in 90.9 seconds on Windows PowerShell 5.1, 2026-07-15 |
+| Baseline run | Passed | [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md) in 90.9 seconds on Windows PowerShell 5.1, 2026-07-15 |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0015` | Idea lifecycle, decision, repository index, and template | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | `TEST-0043`; passed 2026-07-15 | `FIND-0063`; resolved | Reviewed |
-| `SUBF-0016` | Consumer adoption mapping, guidance, and regression closure | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | `TEST-0044` and full suite; passed 2026-07-15 | `FIND-0062`; resolved | Reviewed |
+| `SUBF-0015` | Idea lifecycle, decision, repository index, and template | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | [TEST-0043](test-cases.md); passed 2026-07-15 | `FIND-0063`; resolved | Reviewed |
+| `SUBF-0016` | Consumer adoption mapping, guidance, and regression closure | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | [TEST-0044](test-cases.md) and full suite; passed 2026-07-15 | `FIND-0062`; resolved | Reviewed |
 
 ## Decisions and relationships
 
@@ -99,7 +101,7 @@ collision-free submodule adoptions also receive an absent idea index.
 - [x] Problem, outcome, scope, and non-goals.
 - [x] Measurable acceptance criteria.
 - [x] Lifecycle, status, ownership, promotion, consumer, and compatibility contracts.
-- [x] Numbered risks and DEC-0009.
+- [x] Numbered risks and [DEC-0009](../../decisions/DEC-0009-repository-native-idea-incubation.md).
 - [x] Two bounded, reviewable slices.
 - [x] Numbered test scenarios and verification approach.
 - [x] Test-code state and successful pre-change baseline recorded.
@@ -116,7 +118,8 @@ collision-free submodule adoptions also receive an absent idea index.
 4. Promotion creates and links the appropriate `EPIC`, `FEAT`, `TASK`, or
    `DEC` record; implementation still waits for the normal delivery gates.
 5. The protocol repository has an indexed first idea for the deferred
-   role-based multi-agent protocol, without implementing that feature.
+   [role-based multi-agent protocol](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md),
+   without implementing that feature.
 6. Consumers can use the lifecycle and template from their immutable protocol
    pin. A new collision-free submodule adoption receives an absent idea index;
    an existing index is never overwritten.
@@ -141,7 +144,7 @@ confirmation after blocker remediation.
 | `FIND-0063` | Documentation usability / Medium / High | The consumer index named the pinned template path without a clickable immutable source; added the exact `v0.7.0` template link without making the updater own consumer idea files. | Resolved |
 | `FIND-0064` | Repository hygiene / Low / High | The staged-diff check exposed Markdown hard-break trailing spaces in two newly added, previously untracked files; removed them before commit and repeated the staged check. | Resolved |
 
-The convergence run passed `TEST-0001` through `TEST-0044` in 114.4 seconds;
+The convergence run passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md), and [TEST-0043](test-cases.md) and [TEST-0044](test-cases.md) in 114.4 seconds;
 the final post-record confirmation passed the same suite in 101.1 seconds. No
 unresolved actionable in-scope finding remains, so the bounded scan stops.
 

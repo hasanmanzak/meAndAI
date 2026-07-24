@@ -32,22 +32,22 @@
 
 ## Evidence and continuation
 
-- Launcher integration passed through `TEST-0056` in 115 seconds on Windows
+- Launcher integration passed through [TEST-0056](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md) in 115 seconds on Windows
   PowerShell 5.1 after bounded test-fixture corrections.
-- Bootstrap and updater adapter suites passed `TEST-0057` and `TEST-0058`.
-- The structure-only repository gate passed `TEST-0059`.
-- The bounded fresh-diff scan resolved `FIND-0089` through `FIND-0091` without
+- Bootstrap and updater adapter suites passed [TEST-0057](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md) and [TEST-0058](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md).
+- The structure-only repository gate passed [TEST-0059](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md).
+- The bounded fresh-diff scan resolved [FIND-0089](../../../docs/features/FEAT-0010-protocol-stability-invariants/README.md), [FIND-0090](../../../docs/features/FEAT-0010-protocol-stability-invariants/README.md), and [FIND-0091](../../../docs/features/FEAT-0010-protocol-stability-invariants/README.md) without
   adding another bootstrap layer.
 - The complete parent command passed all child suites, then exposed an
   over-broad active-pin predicate and the hidden bootstrap adapter's stale
   default. The minimal correction passed `git diff --check` and the final
-  structure-only `TEST-0059` confirmation.
-- PR #35's first hosted run passed Windows and exposed a Linux-only empty
-  file-URI conversion in the shallow-history fixture. `FIND-0092` replaced the
+  structure-only [TEST-0059](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md) confirmation.
+- [PR #35](https://github.com/hasanmanzak/meAndAI/pull/35)'s first hosted run passed Windows and exposed a Linux-only empty
+  file-URI conversion in the shallow-history fixture. [FIND-0092](../../../docs/features/FEAT-0010-protocol-stability-invariants/README.md) replaced the
   path cast with one cross-platform `UriBuilder` boundary; production code was
   unaffected.
 - The focused quick-adoption suite and structure gate passed locally after the
-  portability fix. The corrected PR #35 run passed Ubuntu, Windows, and
+  portability fix. The corrected [PR #35](https://github.com/hasanmanzak/meAndAI/pull/35) run passed Ubuntu, Windows, and
   GitGuardian; it is the authoritative cross-platform confirmation.
 - Remaining gates: pull-request merge and an immutable `v0.8.0` release
   targeting the exact merge commit. Release identifier and commit evidence must

@@ -23,7 +23,7 @@
   outside the approved boundary.
 - After publication, record the release asset name, API-reported SHA-256
   digest, merged-file SHA-256 digest, exact release commit, and hosted check in
-  issue #51. Do not predict those values in repository documents.
+  [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51). Do not predict those values in repository documents.
 - Local confirmation passed every discovered suite in 460 seconds, including
-  the existing quick-adoption regressions and source-bound `TEST-0101`. No
+  the existing quick-adoption regressions and source-bound [TEST-0101](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md). No
   unresolved local `Blocking` finding remains.

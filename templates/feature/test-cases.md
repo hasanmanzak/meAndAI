@@ -2,9 +2,11 @@
 
 Test implementation: replace with a clickable repository-relative link.
 
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-NNNN` | `FEAT/SUBF-NNNN` | Behavior or risk | Observable result | Unit | Planned | Test name |
+| `TEST-NNNN` | [FEAT/SUBF-NNNN](README.md) | Behavior or risk | Observable result | Unit | Planned | Test name |
 
 ## Required coverage
 

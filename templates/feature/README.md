@@ -7,7 +7,10 @@
 | Target version | M.m.rev |
 | Issue | Replace with clickable link |
 | Pull request | Replace with clickable link |
+| Decisions | Replace with clickable links, or N/A with rationale |
 | Tests | [Test scenarios](test-cases.md) |
+
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
 
 ## Problem
 

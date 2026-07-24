@@ -8,7 +8,7 @@
 | Issue | [#65](https://github.com/hasanmanzak/meAndAI/issues/65) |
 | Pull request | [#66](https://github.com/hasanmanzak/meAndAI/pull/66) |
 | Related decisions | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md), [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
-| Tests | [TEST-0115 and TEST-0116](test-cases.md) |
+| Tests | [TEST-0115](test-cases.md) and [TEST-0116](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -63,9 +63,9 @@ reset all mutable scenario state independently.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0106` | Evidence integrity | A partial shard falsely claims the full scenario set passed | Mitigating / test maintainer | Compatibility-only result schema, Linux full authority, workflow/runner assertions, `TEST-0115` |
-| `RISK-0107` | Test isolation | Shared mutable Git or mock state makes cases order-dependent | Mitigating / test maintainer | Share only the fingerprinted protocol fixture and archive; create fresh mutable state; `TEST-0116` |
-| `RISK-0108` | CI continuity | Renamed checks or incomplete aggregation weaken branch protection | Mitigating / repository maintainer | Preserve `Validate on windows-latest` as an aggregate that requires the base job and all four shards; `TEST-0115` |
+| `RISK-0106` | Evidence integrity | A partial shard falsely claims the full scenario set passed | Mitigating / test maintainer | Compatibility-only result schema, Linux full authority, workflow/runner assertions, [TEST-0115](test-cases.md) |
+| `RISK-0107` | Test isolation | Shared mutable Git or mock state makes cases order-dependent | Mitigating / test maintainer | Share only the fingerprinted protocol fixture and archive; create fresh mutable state; [TEST-0116](test-cases.md) |
+| `RISK-0108` | CI continuity | Renamed checks or incomplete aggregation weaken branch protection | Mitigating / repository maintainer | Preserve `Validate on windows-latest` as an aggregate that requires the base job and all four shards; [TEST-0115](test-cases.md) |
 
 ## Definition of Ready
 
@@ -99,8 +99,8 @@ reset all mutable scenario state independently.
 
 | ID | Slice | Tracking | Tests | Self-review / findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0042` | Four-shard Windows compatibility orchestration with canonical evidence separation | [Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) | `TEST-0115`; expected-red then structure and four focused shard passes | Workflow routing, aggregate check identity, partial-result boundary, and PowerShell 5.1 syntax reviewed; no open finding | Complete |
-| `SUBF-0043` | Process-local immutable protocol fixture and archive reuse | [Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) | `TEST-0116`; expected-red then focused integration pass | Immutable refs/archive fingerprint, fresh mutable state, and independent archive outputs reviewed; `FIND-0157` resolved | Complete |
+| `SUBF-0042` | Four-shard Windows compatibility orchestration with canonical evidence separation | [Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) | [TEST-0115](test-cases.md); expected-red then structure and four focused shard passes | Workflow routing, aggregate check identity, partial-result boundary, and PowerShell 5.1 syntax reviewed; no open finding | Complete |
+| `SUBF-0043` | Process-local immutable protocol fixture and archive reuse | [Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) | [TEST-0116](test-cases.md); expected-red then focused integration pass | Immutable refs/archive fingerprint, fresh mutable state, and independent archive outputs reviewed; `FIND-0157` resolved | Complete |
 
 ## Verification approach
 
@@ -138,7 +138,7 @@ evidence before final validation.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and `TEST-0115` / `TEST-0116` pass.
+- [x] Acceptance criteria and [TEST-0115](test-cases.md) / [TEST-0116](test-cases.md) pass.
 - [x] Existing complete local suite passes.
 - [x] Hosted Linux and Windows compatibility checks pass.
 - [x] Both subfeature reviews and the bounded completion scan have no unresolved
@@ -148,6 +148,6 @@ evidence before final validation.
 
 ## Post-merge publication gate
 
-Issue #65 is the external authority for the exact merged commit, immutable
+[Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) is the external authority for the exact merged commit, immutable
 `v0.10.1` release, launcher asset digest, hosted checks, observed Windows
 critical path, branch deletion, and post-publication verification.

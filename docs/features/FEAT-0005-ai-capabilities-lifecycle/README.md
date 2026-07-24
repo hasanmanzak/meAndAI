@@ -123,16 +123,16 @@ evidence of collision and are never changed.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0027 through TEST-0032](test-cases.md) |
-| Test code | Green | PowerShell planner, structural, and real-Git adapter fixtures pass for `TEST-0027` through `TEST-0032` |
+| Scenarios | Defined | [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), [TEST-0029](test-cases.md), [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md) |
+| Test code | Green | PowerShell planner, structural, and real-Git adapter fixtures pass for [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), [TEST-0029](test-cases.md), [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md) |
 | Baseline run | Passed | Windows PowerShell 5.1 repository suite on 2026-07-15 before FEAT-0005 changes |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0009` | Seed routing and collision-free deterministic bootstrap | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | `TEST-0027` through `TEST-0029`; passed | Fresh-diff review complete; no slice finding | Reviewed |
-| `SUBF-0010` | Collision handoff, idempotency, and updater transition | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | `TEST-0030` through `TEST-0032`; passed | Fresh-diff review complete; no slice finding | Reviewed |
+| `SUBF-0009` | Seed routing and collision-free deterministic bootstrap | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), and [TEST-0029](test-cases.md); passed | Fresh-diff review complete; no slice finding | Reviewed |
+| `SUBF-0010` | Collision handoff, idempotency, and updater transition | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md); passed | Fresh-diff review complete; no slice finding | Reviewed |
 
 ## Decisions and relationships
 
@@ -149,7 +149,7 @@ evidence of collision and are never changed.
 - [x] Problem, outcome, scope, and non-goals.
 - [x] Measurable lifecycle acceptance criteria.
 - [x] State, path, ownership, credential, compatibility, and handoff contracts identified.
-- [x] Numbered risks and DEC-0006.
+- [x] Numbered risks and [DEC-0006](../../decisions/DEC-0006-seed-workflow-adoption-handoff.md).
 - [x] Two reviewable slices with a gate ledger.
 - [x] Numbered test scenarios and verification approach.
 - [x] Planned red test state and successful pre-change baseline recorded.
@@ -190,7 +190,7 @@ unchanged review loop or extra bootstrap layer was added.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0052` | Version consistency / High / High | The full suite found `templates/project/AGENTS.repository-reference.md` still pinned to `v0.4.0`; updated the current reference to `v0.5.0` and confirmed the complete suite. | Resolved |
+| `FIND-0052` | Version consistency / High / High | The full suite found [templates/project/AGENTS.repository-reference.md](../../../templates/project/AGENTS.repository-reference.md) still pinned to `v0.4.0`; updated the current reference to `v0.5.0` and confirmed the complete suite. | Resolved |
 
 No unresolved actionable in-scope finding remains. Explicitly owned residual
 risks remain `RISK-0022` through `RISK-0028`.

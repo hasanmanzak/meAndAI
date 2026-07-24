@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible capability-finalization correction / `BUG-0023` |
+| Classification | Backward-compatible capability-finalization correction / [BUG-0023](https://github.com/hasanmanzak/meAndAI/issues/102) |
 | Status | Complete |
 | Target version | 0.13.2 |
 | Issue | [#102](https://github.com/hasanmanzak/meAndAI/issues/102) |
 | Pull request | [#103](https://github.com/hasanmanzak/meAndAI/pull/103) |
 | Decision | [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md) |
-| Tests | [TEST-0163 and TEST-0164](test-cases.md) |
+| Tests | [TEST-0163](test-cases.md) and [TEST-0164](test-cases.md) |
 
 ## Problem
 
@@ -69,24 +69,24 @@ merge events remain non-evidence.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0163 and TEST-0164](test-cases.md) |
-| Test code | Expected red complete | TEST-0163 reaches the canonical empty-review owner-attestation case and the unchanged v0.13.1 runner rejects it at the exact-head approval gate |
-| Baseline run | Green | 2026-07-23 Windows PowerShell 5.1 focused owner passed with TEST-0139/0140 before the new scenarios |
+| Scenarios | Defined | [TEST-0163](test-cases.md) and [TEST-0164](test-cases.md) |
+| Test code | Expected red complete | [TEST-0163](test-cases.md) reaches the canonical empty-review owner-attestation case and the unchanged v0.13.1 runner rejects it at the exact-head approval gate |
+| Baseline run | Green | 2026-07-23 Windows PowerShell 5.1 focused owner passed with [TEST-0139](../FEAT-0032-general-capability-test-architecture/test-cases.md) and [TEST-0140](../FEAT-0032-general-capability-test-architecture/test-cases.md) before the new scenarios |
 
 ## Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
 | `RISK-0193` | Review authority | A generic self-comment silently replaces or bypasses an existing review | Protocol maintainer / fallback requires an empty review collection plus one canonical exact-head comment from the personal repository owner, PR creator, and exact admin actor |
-| `RISK-0194` | Evidence integrity | A stale, malformed, duplicate, or spoofed marker is accepted | Capability-review maintainer / strict canonical bytes, complete bounded pagination, exact repository/PR/head binding, actor ID/login equality, and negative TEST-0163 coverage |
-| `RISK-0195` | Recovery safety | Historical recovery bypasses merged-tree or cleanup gates | Consumer lifecycle maintainer / reuse the existing finalization state machine and prove no mutation for rejected evidence in TEST-0164 |
+| `RISK-0194` | Evidence integrity | A stale, malformed, duplicate, or spoofed marker is accepted | Capability-review maintainer / strict canonical bytes, complete bounded pagination, exact repository/PR/head binding, actor ID/login equality, and negative [TEST-0163](test-cases.md) coverage |
+| `RISK-0195` | Recovery safety | Historical recovery bypasses merged-tree or cleanup gates | Consumer lifecycle maintainer / reuse the existing finalization state machine and prove no mutation for rejected evidence in [TEST-0164](test-cases.md) |
 | `RISK-0196` | Runner efficiency | The correction adds repeated API work or hosted fan-out | Workflow maintainer / comments are read only after independent approval is unavailable; no new job or workflow and one bounded collection read per fallback attempt |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0080` | Canonical personal-owner attestation, exact-head authorization, and merged recovery | [Issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) | `TEST-0163`, `TEST-0164`; expected red reproduced, corrected focused owner green | `FIND-0207` resolved during the bounded review | Complete |
+| `SUBF-0080` | Canonical personal-owner attestation, exact-head authorization, and merged recovery | [Issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) | [TEST-0163](test-cases.md), [TEST-0164](test-cases.md); expected red reproduced, corrected focused owner green | `FIND-0207` resolved during the bounded review | Complete |
 
 ## Decisions and relationships
 
@@ -97,13 +97,13 @@ merge events remain non-evidence.
 
 ## Definition of Ready
 
-- [x] Stable IDs and linked issue #102 exist.
+- [x] Stable IDs and linked [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102) exist.
 - [x] Problem, outcome, scope, and non-goals are explicit.
 - [x] Acceptance criteria and exact authority/error contracts are defined.
 - [x] Consumers, dependencies, compatibility, and token boundaries are known.
-- [x] `RISK-0193` through `RISK-0196` and DEC-0025 are recorded.
+- [x] `RISK-0193` through `RISK-0196` and [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md) are recorded.
 - [x] One independently reviewable slice has a gate ledger.
-- [x] TEST-0163/0164 and the bounded verification approach are defined.
+- [x] [TEST-0163](test-cases.md) and [TEST-0164](test-cases.md) and the bounded verification approach are defined.
 - [x] Test-code and current-baseline states are recorded before implementation.
 
 ## Acceptance criteria
@@ -126,7 +126,7 @@ merge events remain non-evidence.
 
 ## Verification approach
 
-Register TEST-0163/0164 in the existing capability-adoption owner and first run
+Register [TEST-0163](test-cases.md) and [TEST-0164](test-cases.md) in the existing capability-adoption owner and first run
 them against the unchanged v0.13.1 runner to record the intended failure. Add
 the smallest production fallback, rerun the focused owner, then run structural
 and release-pin checks. Perform one bounded fresh-diff review and one final
@@ -146,7 +146,7 @@ capability-review scenarios; no unresolved Blocking finding remains.
 
 | ID | Classification | Finding | Disposition |
 | --- | --- | --- | --- |
-| `FIND-0207` | Blocking / review-authority bypass | A fallback based only on the absence of a trusted approval could bypass an existing non-authorizing review submission. | Resolved: owner attestation is evaluated only when the complete review collection is literally empty; TEST-0163 proves nonempty stale and creator-authored collections never read comments. |
+| `FIND-0207` | Blocking / review-authority bypass | A fallback based only on the absence of a trusted approval could bypass an existing non-authorizing review submission. | Resolved: owner attestation is evaluated only when the complete review collection is literally empty; [TEST-0163](test-cases.md) proves nonempty stale and creator-authored collections never read comments. |
 
 ## Definition of Done
 

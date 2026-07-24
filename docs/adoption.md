@@ -47,8 +47,8 @@ or through their own reviewed provider adapter.
 Maintainers may optionally copy or reference the canonical
 [stability and consistency cycle agent prompt](agent-prompts/stability-and-consistency-cycle.md)
 for one deliberately invoked cycle. Submodule consumers resolve it at
-`.ai/protocol/docs/agent-prompts/stability-and-consistency-cycle.md`;
-repository-reference consumers resolve `docs/agent-prompts/stability-and-consistency-cycle.md`
+the pinned [`.ai/protocol/docs/agent-prompts/stability-and-consistency-cycle.md`](agent-prompts/stability-and-consistency-cycle.md);
+repository-reference consumers resolve [`docs/agent-prompts/stability-and-consistency-cycle.md`](agent-prompts/stability-and-consistency-cycle.md)
 at their provider-configured immutable ref. Adoption and updates do not copy,
 install, schedule, or activate this non-normative prompt in consumer-owned
 files.
@@ -87,9 +87,9 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.14.1`, the only repository file required
+For a new submodule consumer on `v0.14.2`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.1/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.2/templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires
@@ -142,8 +142,8 @@ Before proposal reuse or mutation, the acting boundary rebuilds the graph from
 the bound base and rejects path, blob, mode, role, edge, count, digest, or
 projection drift. Completion separately builds the candidate final graph.
 `FullMigration` is complete only when the root instruction graph reaches the
-canonical `.ai/protocol/PROTOCOL.md` authority and no required legacy or newly
-introduced noncanonical authority remains. Graph evidence never grants write
+canonical [`.ai/protocol/PROTOCOL.md`](../PROTOCOL.md) authority and no required
+legacy or newly introduced noncanonical authority remains. Graph evidence never grants write
 or deletion authority: protected product/application/source/binary content and
 unknown formats remain outside the existing completion envelope.
 
@@ -204,7 +204,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.14.1'
+$tag = 'v0.14.2'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -227,7 +227,7 @@ Copy or merge the
 [submodule root adapter](../templates/project/AGENTS.submodule.md) into the
 consuming repository's root `AGENTS.md`. If that file already exists, keep its
 project-specific rules and add an explicit instruction to read
-`.ai/protocol/PROTOCOL.md`.
+[`.ai/protocol/PROTOCOL.md`](../PROTOCOL.md).
 
 Initialize project-local memory beside, never inside, the submodule. The
 command below is intentionally fail-closed so an existing project memory is
@@ -254,12 +254,12 @@ following source-to-target mapping from the pinned protocol ref:
 | Pinned source | Consumer-owned target |
 | --- | --- |
 | `templates/project/.ai/memory/` | `.ai/memory/` |
-| `templates/project/docs/ideas/README.md` | `docs/ideas/README.md` |
-| `templates/idea.md` | A new `docs/ideas/IDEA-NNNN-*.md` record |
+| [templates/project/docs/ideas/README.md](../templates/project/docs/ideas/README.md) | `docs/ideas/README.md` |
+| [templates/idea.md](../templates/idea.md) | A new `docs/ideas/IDEA-NNNN-*.md` record |
 | `.github/ISSUE_TEMPLATE/{bug,epic,feature,finding,subfeature,task}.yml` | `.github/ISSUE_TEMPLATE/` |
-| `.github/PULL_REQUEST_TEMPLATE.md` | `.github/PULL_REQUEST_TEMPLATE.md` |
+| [.github/PULL_REQUEST_TEMPLATE.md](../.github/PULL_REQUEST_TEMPLATE.md) | `.github/PULL_REQUEST_TEMPLATE.md` |
 | `templates/feature/` | A new `docs/features/FEAT-NNNN-*/` record |
-| `templates/decision.md` | A new `docs/decisions/DEC-NNNN-*.md` record |
+| [templates/decision.md](../templates/decision.md) | A new `docs/decisions/DEC-NNNN-*.md` record |
 | Validated target `migrations/index.json` and definition blobs | Generated `.ai/meandai-update-state.json` satisfied baseline; never copied from another consumer |
 
 The idea index is an absent-only initial-adoption target. Automation never
@@ -468,8 +468,9 @@ change only when an immutable migration definition names their exact path and
 deterministic state. Maintainers still apply the project's normal DoR, DoD, CI,
 and review gates. The workflow creates or reuses one target/SHA/repository-
 marker-owned issue, creates only missing standard labels, writes exactly one
-real `Tracking issue: #N` line into the draft, and adds the exact pull-request/
-head backlink. The maintainer does not prepare that tracking state. `Closes`,
+real `Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)`
+line into the draft, and adds the exact pull-request/head backlink. The
+maintainer does not prepare that tracking state. `Closes`,
 `Fixes`, and `Resolves` references are not used: the finalizer closes the issue
 only after exact branch deletion succeeds.
 
@@ -533,13 +534,13 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.14.1`
+- ref: `v0.14.2`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
 [repository-reference adapter](../templates/project/AGENTS.repository-reference.md)
 into the consumer root. Configure it for the provider that resolves the three
-fields above; it MUST NOT point to `.ai/protocol/PROTOCOL.md` when no submodule
+fields above; it MUST NOT point to [`.ai/protocol/PROTOCOL.md`](../PROTOCOL.md) when no submodule
 exists.
 
 The reference MUST resolve to a tag or commit and MUST be readable in every
@@ -581,11 +582,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.14.1`:
+before checkout; the current example then installs `v0.14.2`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.14.1
+git -C .ai/protocol checkout v0.14.2
 git add .ai/protocol
 ```
 
@@ -637,7 +638,7 @@ three values below, use the lowercase repository identity and lowercase head,
 and do not change spaces, punctuation, or wording:
 
 ```text
-<!-- meandai-capability-review-attestation:v1:<owner>/<repository>:pr-<number>:head-<40-character-lowercase-head-sha> --> I reviewed the semantic capability changes at this exact pull-request head and attest that they are ready for finalization.
+<!-- meandai-capability-review-attestation:v1:<owner>/<repository>:pr-<number>:head-<40-character-lowercase-head-sha> --> I reviewed the semantic capability changes in [pull request #<number>](https://github.com/<owner>/<repository>/pull/<number>) at this exact head and attest that they are ready for finalization.
 ```
 
 Ready and merge actions do not create this evidence, and the workflow never

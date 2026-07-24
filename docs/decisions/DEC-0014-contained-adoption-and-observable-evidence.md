@@ -61,8 +61,8 @@ these ownership boundaries.
 7. **Canonical and hosted projections converge.** Counts and scenario wording
    match their owning records. Closed issues do not retain an in-progress state;
    issues and pull requests link the canonical feature and decision; unresolved
-   external `FIND-0120` receives a durable active finding record. These changes
-   do not claim that `RISK-0076` itself is resolved.
+   external [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) receives a durable active finding record. These changes
+   do not claim that [RISK-0076](../features/FEAT-0013-v084-correction/README.md) itself is resolved.
 8. **Validation remains finite.** Delivery uses one correction pass over the
    three declared slices, one fresh-diff self-review and complete suite, review
    branch and pull-request publication, and one fresh confirmation scan. A pass
@@ -83,7 +83,7 @@ these ownership boundaries.
   and inaccurate durable wording become observable failures.
 - Private-repository `main` protection remains an external maintainer-owned risk
   with its existing visibility/plan review condition.
-- Exact merge, release, commit, and hosted-check facts remain in issue #43 and
+- Exact merge, release, commit, and hosted-check facts remain in [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) and
   the GitHub Release after publication rather than being predicted here.
 
 ## Alternatives considered

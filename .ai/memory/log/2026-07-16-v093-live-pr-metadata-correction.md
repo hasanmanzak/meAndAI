@@ -15,7 +15,7 @@
 - Live GitHub CLI evidence exposes `headRepository.name`,
   `headRepositoryOwner.login`, and Boolean `isCrossRepository`; the corrected
   launcher validates those fields as one canonical repository identity.
-- `TEST-0102` replaces the synthetic fixture shape, asserts the requested JSON
+- [TEST-0102](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md) replaces the synthetic fixture shape, asserts the requested JSON
   fields, accepts the same-repository draft, and rejects name, owner,
   cross-repository, and type drift before local Codex or Git mutation.
 - The affected consumer's secrets, seed, successful workflow run, adoption branch, and draft
@@ -26,5 +26,5 @@
 - The launcher remains the sole quick-adoption script. No wrapper, workflow,
   bootstrap layer, credential change, or automatic merge is introduced.
 - Exact `v0.9.3` release, commit, asset digest, hosted checks, and affected-consumer
-  continuation evidence remain pending until publication and belong in issue
-  #53 and the GitHub Release.
+  continuation evidence remain pending until publication and belong in [issue
+  #53](https://github.com/hasanmanzak/meAndAI/issues/53) and the GitHub Release.

@@ -6,7 +6,7 @@
 - Decision: [DEC-0016](../../../docs/decisions/DEC-0016-managed-post-merge-finalization.md)
 - Tracking: [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61)
 - Delivery: [pull request #62](https://github.com/hasanmanzak/meAndAI/pull/62)
-- Tests: [`TEST-0108` through `TEST-0110`](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md)
+- Tests: [TEST-0108](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md), [TEST-0109](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md), and [TEST-0110](../../../docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md)
 
 ## Durable handoff
 
@@ -35,6 +35,6 @@
 
 ## Publication boundary
 
-The repository files describe the intended `v0.9.7` release, but issue #61 and
+The repository files describe the intended `v0.9.7` release, but [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) and
 GitHub Releases remain authoritative for exact merge, tag, asset, hosted-check,
 and branch-cleanup evidence after publication.

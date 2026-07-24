@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible capability-finalization correction / `BUG-0025` |
+| Classification | Backward-compatible capability-finalization correction / [BUG-0025](https://github.com/hasanmanzak/meAndAI/issues/106) |
 | Status | Complete |
 | Target version | 0.13.4 |
 | Issue | [#106](https://github.com/hasanmanzak/meAndAI/issues/106) |
 | Pull request | [#107](https://github.com/hasanmanzak/meAndAI/pull/107) |
 | Decisions | [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md) and [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) |
-| Tests | [TEST-0167 and TEST-0168](test-cases.md) |
+| Tests | [TEST-0167](test-cases.md) and [TEST-0168](test-cases.md) |
 
 ## Problem
 
@@ -43,7 +43,7 @@ gate unchanged and fail closed for any difference beyond permitted casing.
 - Apply the same repository-identity contract to current and historical
   review-authority evidence where those paths compare canonical repository
   bindings.
-- Preserve DEC-0025 owner-attestation and DEC-0026 historical recovery
+- Preserve [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md) owner-attestation and [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) historical recovery
   authority, provenance, mutation ordering, and idempotency.
 - Add focused project-neutral regression coverage to the existing capability-
   review owner.
@@ -81,22 +81,22 @@ gate unchanged and fail closed for any difference beyond permitted casing.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0167 and TEST-0168](test-cases.md) |
-| Test code | Implemented | TEST-0167/0168 extend the existing capability-review production fixture without consumer-specific names and are registered in the capability evidence authority |
+| Scenarios | Defined | [TEST-0167](test-cases.md) and [TEST-0168](test-cases.md) |
+| Test code | Implemented | [TEST-0167](test-cases.md) and [TEST-0168](test-cases.md) extend the existing capability-review production fixture without consumer-specific names and are registered in the capability evidence authority |
 | Baseline run | Failed as intended | [Derdini run 30004752646](https://github.com/hasanmanzak/Derdini/actions/runs/30004752646) and the 10.3-second test-first run reproduce the v0.13.3 mixed-case false rejection |
 
 ## Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0201` | Identity and authorization | Broad case folding makes a different host, path, pull-request number, or malformed URL appear equivalent | Capability-review maintainer / parse the canonical GitHub PR URL, fold only owner and repository-name components, retain exact validation for all other binding fields, and prove negative variants in TEST-0168 |
-| `RISK-0202` | Recovery safety and compatibility | Fixing the false rejection weakens historical proof, rewrites consumer state, or changes cleanup ordering | Consumer lifecycle maintainer / reuse the unchanged DEC-0025/DEC-0026 authority and mutation path; TEST-0167 proves exact branch-first/issue-last recovery and idempotent rerun while TEST-0168 proves zero mutation on mismatch |
+| `RISK-0201` | Identity and authorization | Broad case folding makes a different host, path, pull-request number, or malformed URL appear equivalent | Capability-review maintainer / parse the canonical GitHub PR URL, fold only owner and repository-name components, retain exact validation for all other binding fields, and prove negative variants in [TEST-0168](test-cases.md) |
+| `RISK-0202` | Recovery safety and compatibility | Fixing the false rejection weakens historical proof, rewrites consumer state, or changes cleanup ordering | Consumer lifecycle maintainer / reuse the unchanged [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md)/[DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) authority and mutation path; [TEST-0167](test-cases.md) proves exact branch-first/issue-last recovery and idempotent rerun while [TEST-0168](test-cases.md) proves zero mutation on mismatch |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0082` | Structured case-safe GitHub repository identity comparison with unchanged historical authority and cleanup gates | [Issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) | `TEST-0167`, `TEST-0168`; expected-red 10.3 seconds, corrected confirmation 14.5 seconds | One bounded review found three coverage gaps and one stale-record item; all corrected without production-scope expansion | Complete |
+| `SUBF-0082` | Structured case-safe GitHub repository identity comparison with unchanged historical authority and cleanup gates | [Issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) | [TEST-0167](test-cases.md), [TEST-0168](test-cases.md); expected-red 10.3 seconds, corrected confirmation 14.5 seconds | One bounded review found three coverage gaps and one stale-record item; all corrected without production-scope expansion | Complete |
 
 ## Decisions and relationships
 
@@ -107,14 +107,14 @@ gate unchanged and fail closed for any difference beyond permitted casing.
 
 ## Definition of Ready
 
-- [x] `BUG-0025`, `FEAT-0043`, `SUBF-0082`, and linked issue #106 exist.
+- [x] [BUG-0025](https://github.com/hasanmanzak/meAndAI/issues/106), `FEAT-0043`, `SUBF-0082`, and linked [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) exist.
 - [x] Problem, outcome, scope, and non-goals are explicit.
 - [x] Acceptance criteria and case-safe repository-identity contracts are
       defined.
 - [x] Consumers, dependencies, compatibility, and token boundaries are known.
-- [x] `RISK-0201`, `RISK-0202`, DEC-0025, and DEC-0026 are recorded.
+- [x] `RISK-0201`, `RISK-0202`, [DEC-0025](../../decisions/DEC-0025-exact-head-personal-owner-attestation.md), and [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) are recorded.
 - [x] One independently reviewable slice has a gate ledger.
-- [x] TEST-0167/0168 and the bounded verification approach are defined.
+- [x] [TEST-0167](test-cases.md) and [TEST-0168](test-cases.md) and the bounded verification approach are defined.
 - [x] Test-code and current-baseline states are recorded before implementation.
 
 ## Acceptance criteria
@@ -138,7 +138,7 @@ gate unchanged and fail closed for any difference beyond permitted casing.
 
 ## Verification approach
 
-Register TEST-0167/0168 in the existing capability-adoption owner and run them
+Register [TEST-0167](test-cases.md) and [TEST-0168](test-cases.md) in the existing capability-adoption owner and run them
 against the unchanged v0.13.3 runner to capture the intended mixed-case
 failure. Implement the smallest structured identity comparison, rerun the
 focused owner, then run structural and release-pin checks. Perform one bounded
@@ -150,9 +150,9 @@ proven Blocking finding reopens SUBF-0082.
 One bounded fresh-diff review found no production defect and confirmed
 PowerShell 5.1 compatibility. It found missing independent positive casing
 variants, deceptive near-match negatives, an ineffective historical inventory
-count assertion, and stale record states. TEST-0167 now covers owner-only,
+count assertion, and stale record states. [TEST-0167](test-cases.md) now covers owner-only,
 repository-only, and combined casing plus rerun and exact inventory behavior;
-TEST-0168 rejects eleven foreign or malformed variants; TEST-0165 now binds the
+[TEST-0168](test-cases.md) rejects eleven foreign or malformed variants; [TEST-0165](../FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md) now binds the
 actual current/historical/fresh inventory sequence; records were refreshed.
 No URL, authorization, provenance, ledger, or cleanup boundary was widened.
 

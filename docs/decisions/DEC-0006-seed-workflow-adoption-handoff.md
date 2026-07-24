@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related features: [FEAT-0005](../features/FEAT-0005-ai-capabilities-lifecycle/README.md), [FEAT-0004](../features/FEAT-0004-self-updating-consumer-updater/README.md)
 - Related decisions: [DEC-0001](DEC-0001-portable-protocol-reference.md), [DEC-0002](DEC-0002-project-local-memory.md), [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md), [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md)
-- Supersedes: the manual-only bootstrap assumption in DEC-0003 and DEC-0005; update supersession, credential scope, and project-local ownership remain unchanged
+- Supersedes: the manual-only bootstrap assumption in [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md) and [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md); update supersession, credential scope, and project-local ownership remain unchanged
 
 ## Context
 
@@ -59,7 +59,7 @@ delete adoption work and does not supersede an adoption proposal; those more
 complex controls remain exclusive to the post-adoption updater.
 
 The bootstrap workflow does not create labels or issues. Doing so would expand
-the consumer mutation token beyond the DEC-0005 boundary and would still not
+the consumer mutation token beyond the [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) boundary and would still not
 provide semantic project integration. GitHub Actions never calls an AI service
 in this feature.
 

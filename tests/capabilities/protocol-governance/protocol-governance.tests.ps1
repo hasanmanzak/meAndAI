@@ -457,7 +457,7 @@ if (-not $normalizedV084Memory.Contains($canonicalDisposition) -or
     Add-Failure 'TEST-0092 v0.8.4 durable records do not use the canonical finding disposition counts.'
 }
 if ($protocolFeatureScenarios -notmatch [regex]::Escape(
-    '| `TEST-0002` | `SUBF-0001` | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`.'
+    '| `TEST-0002` | [SUBF-0001](README.md) | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`.'
 )) {
     Add-Failure 'TEST-0088/TEST-0092 TEST-0002 does not state the canonical ASCII/no-leading-zero grammar.'
 }
@@ -1343,6 +1343,3060 @@ if (-not $managedAutomationSection.Success -or
     )) {
     Add-Failure 'TEST-0174 adoption guide does not classify exact updater assets as consumer-resident managed projections.'
 }
+
+# TEST-0175: every cross-record reference authored in a document or
+# GitHub issue, pull request, or comment is a clickable link to its exact target.
+$originalLinkValidationCulture =
+    [Threading.Thread]::CurrentThread.CurrentCulture
+[Threading.Thread]::CurrentThread.CurrentCulture =
+    [Globalization.CultureInfo]::InvariantCulture
+foreach ($requiredText in @(
+    'document (repository-local or external), GitHub issue, pull request, or GitHub comment of any kind',
+    'another document (repository-local or external), issue, pull request, or GitHub comment',
+    'MUST express each such reference as a clickable link to the exact referenced target',
+    'A free-text identifier, number, title, or path does not satisfy this requirement'
+)) {
+    if (-not $normalizedProtocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0175 clickable cross-record reference rule is missing '$requiredText'."
+    }
+}
+$referencePrompt = 'Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.'
+foreach ($formName in $formExpectations.Keys) {
+    $formContent = Get-Content -LiteralPath (
+        Join-Path $root ".github/ISSUE_TEMPLATE/$formName"
+    ) -Raw
+    if (-not $formContent.Contains($referencePrompt)) {
+        Add-Failure "TEST-0175 $formName does not require clickable exact-target references."
+    }
+}
+if (-not $pullRequestTemplate.Contains($referencePrompt)) {
+    Add-Failure 'TEST-0175 pull-request template does not require clickable exact-target references.'
+}
+foreach ($templatePath in @(
+    'templates/feature/README.md',
+    'templates/feature/test-cases.md',
+    'templates/decision.md',
+    'templates/idea.md'
+)) {
+    $templateContent = Get-Content -LiteralPath (Join-Path $root $templatePath) -Raw
+    if (-not $templateContent.Contains($referencePrompt)) {
+        Add-Failure "TEST-0175 $templatePath does not require clickable exact-target references."
+    }
+}
+foreach ($requiredWorkflowText in @(
+    'pull_request_number:',
+    'pull-requests: read',
+    'MEANDAI_PULL_REQUEST_NUMBER: ${{ inputs.pull_request_number }}',
+    'PullRequestNumber = $env:MEANDAI_PULL_REQUEST_NUMBER'
+)) {
+    if (-not $ciWorkflow.Contains($requiredWorkflowText)) {
+        Add-Failure "TEST-0175 post-publication workflow is missing '$requiredWorkflowText'."
+    }
+}
+$proposalOwnershipSource = Get-Content -LiteralPath (Join-Path $root `
+    'scripts/quick-adoption/Private/ProposalOwnership.ps1') -Raw
+if (-not $proposalOwnershipSource.Contains(
+        'Tracking issue: [#$IssueNumber](https://github.com/$Repository/issues/$IssueNumber)'
+    )) {
+    Add-Failure 'TEST-0175 quick-adoption proposal writer does not emit an exact linked tracking issue.'
+}
+$managedUpdaterSource = Get-Content -LiteralPath (Join-Path $root `
+    'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1') -Raw
+foreach ($requiredWriterText in @(
+    'Tracking issue: $(New-GitHubIssueLink',
+    'Managed protocol proposal: $(New-GitHubPullRequestLink',
+    'Finalized managed $($Kind.ToLowerInvariant()) merge $(New-GitHubPullRequestLink',
+    'Verified replacement proposal: $(New-GitHubPullRequestLink',
+    'Superseded by $(New-GitHubPullRequestLink',
+    '[meAndAI changelog entry](https://github.com/$ProtocolRepository/blob/$targetTag/CHANGELOG.md)'
+)) {
+    if (-not $managedUpdaterSource.Contains($requiredWriterText)) {
+        Add-Failure "TEST-0175 protocol-update writer lacks linked artifact output '$requiredWriterText'."
+    }
+}
+foreach ($forbiddenWriterText in @(
+    '"Managed protocol proposal: #$PullRequestNumber"',
+    '"Tracking issue: #$([int]$issue.number)"',
+    '"Tracking issue: #$($updateIssue.Number)"',
+    '"Verified replacement proposal: #$ReplacementPullRequestNumber"',
+    '"Superseded by #$replacementPullRequestNumber',
+    'Read every intervening meAndAI changelog entry.'
+)) {
+    if ($managedUpdaterSource.Contains($forbiddenWriterText)) {
+        Add-Failure "TEST-0175 protocol-update writer retains free-text artifact output '$forbiddenWriterText'."
+    }
+}
+$documentRecordTargets = @{}
+function Add-DocumentRecordTarget {
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    if ($documentRecordTargets.ContainsKey($Id) -and
+        [string]$documentRecordTargets[$Id] -cne $Path) {
+        Add-Failure "TEST-0175 $Id is defined in both '$($documentRecordTargets[$Id])' and '$Path'."
+        return
+    }
+    $documentRecordTargets[$Id] = $Path
+}
+foreach ($featureDirectory in $featureDirectories) {
+    $featureId = $featureDirectory.Name.Substring(0, 9)
+    $featureReadmePath = "docs/features/$($featureDirectory.Name)/README.md"
+    Add-DocumentRecordTarget -Id $featureId -Path $featureReadmePath
+    $featureReadme = Get-Content -LiteralPath (
+        Join-Path $featureDirectory.FullName 'README.md'
+    ) -Raw
+    foreach ($match in [regex]::Matches(
+        $featureReadme,
+        '(?m)^\|\s*`(?<id>(?:SUBF|FIND|RISK)-\d{4})`[^|]*\|'
+    )) {
+        Add-DocumentRecordTarget -Id $match.Groups['id'].Value `
+            -Path $featureReadmePath
+    }
+    foreach ($match in [regex]::Matches(
+        $featureReadme,
+        '(?m)^-\s+(?:\[[ xX]\]\s+`(?<checklistId>(?:SUBF|FIND|RISK)-\d{4})`\s*:|(?:Fresh-diff review found|The first hosted PR run found)\s+`(?<reviewId>FIND-\d{4})`)'
+    )) {
+        $embeddedId = if ($match.Groups['checklistId'].Success) {
+            $match.Groups['checklistId'].Value
+        }
+        else {
+            $match.Groups['reviewId'].Value
+        }
+        Add-DocumentRecordTarget -Id $embeddedId -Path $featureReadmePath
+    }
+    foreach ($match in [regex]::Matches(
+        $featureReadme,
+        '(?m)^##\s+(?<id>BUG-\d{4})\b'
+    )) {
+        Add-DocumentRecordTarget -Id $match.Groups['id'].Value `
+            -Path $featureReadmePath
+    }
+    $testCasesPath = "docs/features/$($featureDirectory.Name)/test-cases.md"
+    $testCases = Get-Content -LiteralPath (
+        Join-Path $featureDirectory.FullName 'test-cases.md'
+    ) -Raw
+    foreach ($match in [regex]::Matches(
+        $testCases,
+        '(?m)^\|\s*`(?<id>TEST-\d{4})`\s*\|'
+    )) {
+        Add-DocumentRecordTarget -Id $match.Groups['id'].Value `
+            -Path $testCasesPath
+    }
+}
+foreach ($decisionFile in $decisionFiles) {
+    Add-DocumentRecordTarget -Id $decisionFile.BaseName.Substring(0, 8) `
+        -Path "docs/decisions/$($decisionFile.Name)"
+}
+Get-ChildItem -LiteralPath (Join-Path $root 'docs/ideas') -File `
+    -Filter 'IDEA-*.md' | ForEach-Object {
+        Add-DocumentRecordTarget -Id $_.BaseName.Substring(0, 9) `
+            -Path "docs/ideas/$($_.Name)"
+    }
+Get-ChildItem -LiteralPath (Join-Path $root 'migrations') -File `
+    -Filter 'MIG-*.json' | ForEach-Object {
+        Add-DocumentRecordTarget -Id $_.BaseName.Substring(0, 8) `
+            -Path "migrations/$($_.Name)"
+    }
+$documentRecordTargets['FIND-0047'] = 'https://github.com/hasanmanzak/meAndAI/issues/9'
+$documentRecordTargets['FIND-0049'] = 'https://github.com/hasanmanzak/meAndAI/issues/11'
+$documentRecordTargets['FIND-0050'] = 'https://github.com/hasanmanzak/meAndAI/issues/13'
+$documentRecordTargets['FIND-0120'] = 'https://github.com/hasanmanzak/meAndAI/issues/44'
+$documentRecordTargets['TASK-0001'] = 'https://github.com/hasanmanzak/meAndAI/issues/95'
+$documentRecordTargets['TASK-0002'] = 'https://github.com/hasanmanzak/meAndAI/issues/98'
+foreach ($entry in @{
+    'BUG-0001' = 24; 'BUG-0002' = 27; 'BUG-0003' = 32
+    'BUG-0005' = 49; 'BUG-0006' = 53; 'BUG-0007' = 55
+    'BUG-0008' = 57; 'BUG-0009' = 59; 'BUG-0010' = 61
+    'BUG-0011' = 63; 'BUG-0012' = 69; 'BUG-0013' = 74
+    'BUG-0014' = 83; 'BUG-0015' = 85; 'BUG-0016' = 85
+    'BUG-0017' = 87; 'BUG-0018' = 89; 'BUG-0019' = 89
+    'BUG-0020' = 89; 'BUG-0021' = 89; 'BUG-0022' = 96
+    'BUG-0023' = 102; 'BUG-0024' = 104; 'BUG-0025' = 106
+    'BUG-0026' = 108; 'BUG-0027' = 110; 'BUG-0028' = 112
+    'BUG-0029' = 114
+}.GetEnumerator()) {
+    $documentRecordTargets[$entry.Key] =
+        "https://github.com/hasanmanzak/meAndAI/issues/$($entry.Value)"
+}
+$recordIdPattern = '(?<![A-Za-z0-9_-])(?:EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-\d{4}(?![A-Za-z0-9_-])'
+$githubNumberPattern = '(?i)(?<![A-Za-z0-9_])(?<source>(?:(?<kind>issue|pull request|PR)\s+#?|#)(?<number>\d+))(?![A-Za-z0-9_-])'
+$commentPermalinkPattern = '^https://github\.com/[^/]+/[^/]+/(?:(?<parentKind>issues|pull)/(?<parentNumber>\d+)#(?:(?:issuecomment|pullrequestreview)-(?<id>\d+)|discussion_r(?<id>\d+))|commit/[0-9a-f]{40}#commitcomment-(?<id>\d+)|discussions/\d+#discussioncomment-(?<id>\d+))$'
+$commentNumberedLabelPattern = '(?i)\b(?:comment|review)\s+#?\d+\b'
+$commentGenericLabelPattern = '(?i)\bcomment\b|\b(?:submitted|inline)\s+review\b'
+$commentNodeLabelPattern = '(?i)\b(?:comment|review)\s+#?(?<id>\d+)\b'
+$commentParentLabelPattern = '(?i)\b(?<kind>issue|PR|pull request)\s+#?(?<number>\d+)\s+(?:comment|(?:submitted|inline)\s+review)\b'
+function Get-DocumentCommentLinkStatus {
+    param(
+        [AllowEmptyString()][string]$Label,
+        [AllowEmptyString()][string]$Target
+    )
+
+    $targetMatch = [regex]::Match($Target, $commentPermalinkPattern)
+    $isGitHubRecordTarget = [regex]::IsMatch(
+        $Target,
+        '^https://github\.com/[^/]+/[^/]+/(?:issues|pull|commit|discussions)/'
+    )
+    [pscustomobject]@{
+        IsReference = $targetMatch.Success -or
+            [regex]::IsMatch($Label, $commentNumberedLabelPattern) -or
+            ($isGitHubRecordTarget -and
+                [regex]::IsMatch($Label, $commentGenericLabelPattern))
+        Target = $targetMatch
+        LabelId = [regex]::Match($Label, $commentNodeLabelPattern)
+        Parent = [regex]::Match($Label, $commentParentLabelPattern)
+    }
+}
+function Get-DocumentMarkdownCodeSpans {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $spans = [System.Collections.Generic.List[object]]::new()
+    $lines = @([regex]::Matches(
+        $text,
+        '(?m)^(?<content>[^\r\n]*)(?<eol>\r?\n|$)'
+    ) | Where-Object { $_.Length -gt 0 })
+    for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
+        $openingLine = [string]$lines[$lineIndex].Groups['content'].Value
+        $opening = [regex]::Match(
+            $openingLine,
+            '^(?: {0,3}>[ \t]?)*(?:[ \t]*(?:[-+*]|\d+[.)])[ \t]+)?[ \t]*(?<marker>`{3,}|~{3,})(?<info>.*)$'
+        )
+        if (-not $opening.Success) { continue }
+        $marker = [string]$opening.Groups['marker'].Value
+        $markerCharacter = [string]$marker[0]
+        if ($markerCharacter -ceq '`' -and
+            $opening.Groups['info'].Value.Contains('`')) { continue }
+        $closingPattern =
+            '^(?: {0,3}>[ \t]?)*[ \t]*(?:' +
+            [regex]::Escape($markerCharacter) + '){' +
+            $marker.Length + ',}[ \t]*$'
+        $closingLineIndex = -1
+        for ($candidateIndex = $lineIndex + 1;
+            $candidateIndex -lt $lines.Count;
+            $candidateIndex++) {
+            if ([regex]::IsMatch(
+                [string]$lines[$candidateIndex].Groups['content'].Value,
+                $closingPattern
+            )) {
+                $closingLineIndex = $candidateIndex
+                break
+            }
+        }
+        $spanEnd = if ($closingLineIndex -ge 0) {
+            $lines[$closingLineIndex].Index +
+                $lines[$closingLineIndex].Length
+        }
+        else { $text.Length }
+        $contentStart = $lines[$lineIndex].Index +
+            $lines[$lineIndex].Length
+        $contentEnd = if ($closingLineIndex -ge 0) {
+            $lines[$closingLineIndex].Index
+        }
+        else { $text.Length }
+        $spans.Add([pscustomobject]@{
+            Index = $lines[$lineIndex].Index
+            Length = $spanEnd - $lines[$lineIndex].Index
+            Value = $text.Substring(
+                $lines[$lineIndex].Index,
+                $spanEnd - $lines[$lineIndex].Index
+            )
+            Content = $text.Substring(
+                $contentStart,
+                [Math]::Max(0, $contentEnd - $contentStart)
+            )
+            Kind = 'Fenced'
+        })
+        if ($closingLineIndex -ge 0) {
+            $lineIndex = $closingLineIndex
+        }
+        else { break }
+    }
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?m)(?:\A|\r?\n\r?\n)(?<code>(?:(?: {4}|\t)[^\r\n]+(?:\r?\n|$))+)'
+    )) {
+        $codeGroup = $match.Groups['code']
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index $codeGroup.Index -Length 1 -Spans @($spans)) { continue }
+        $spans.Add([pscustomobject]@{
+            Index = $codeGroup.Index
+            Length = $codeGroup.Length
+            Value = $codeGroup.Value
+            Content = [regex]::Replace(
+                $codeGroup.Value, '(?m)^(?: {4}|\t)', ''
+            )
+            Kind = 'Indented'
+        })
+    }
+    foreach ($line in [regex]::Matches(
+        $text,
+        '(?m)^(?<content>[^\r\n]*)(?<eol>\r?\n|$)'
+    ) | Where-Object { $_.Length -gt 0 }) {
+        $rawLine = [string]$line.Groups['content'].Value
+        $containerCode = [regex]::Match(
+            $rawLine,
+            '^(?:(?: {0,3}>[ \t]?)+)(?<indent> {4}|\t)(?<content>[^\r\n]+)$'
+        )
+        if (-not $containerCode.Success) {
+            $containerCode = [regex]::Match(
+                $rawLine,
+                '^(?:(?: {0,3}>[ \t]?)* {0,3}(?:[-+*]|\d{1,9}[.)]))(?<indent> {5,}|\t+)(?<content>[^\r\n]+)$'
+            )
+        }
+        if (-not $containerCode.Success -or
+            (Test-DocumentMarkdownSpanOverlap -Index $line.Index `
+                -Length 1 -Spans @($spans))) { continue }
+        $spans.Add([pscustomobject]@{
+            Index = $line.Index
+            Length = $line.Length
+            Value = $line.Value
+            Content = $containerCode.Groups['content'].Value
+            Kind = 'Indented'
+        })
+    }
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?s)(?<!`)(?<ticks>`+)(?!`)(?<content>.*?)(?<!`)\k<ticks>(?!`)'
+    )) {
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index $match.Index -Length 1 -Spans @($spans)) { continue }
+        $spans.Add([pscustomobject]@{
+            Index = $match.Index
+            Length = $match.Length
+            Value = $match.Value
+            Content = $match.Groups['content'].Value
+            Kind = 'Inline'
+        })
+    }
+    return @($spans | Sort-Object Index)
+}
+function Get-DocumentMarkdownHtmlCommentSpans {
+    param([AllowEmptyString()][string]$Markdown)
+
+    return @([regex]::Matches(
+        [string]$Markdown,
+        '(?s)<!--.*?(?:-->|\z)'
+    ))
+}
+function Remove-DocumentMarkdownBlockContainerPrefix {
+    param([AllowEmptyString()][string]$Line)
+
+    $remaining = [string]$Line
+    do {
+        $before = $remaining
+        $remaining = [regex]::Replace(
+            $remaining,
+            '^(?: {0,3}>[ \t]?)+',
+            ''
+        )
+        $remaining = [regex]::Replace(
+            $remaining,
+            '^ {0,3}(?:[-+*]|\d{1,9}[.)])[ \t]+',
+            ''
+        )
+    } while ($remaining -cne $before)
+    return $remaining
+}
+function Get-DocumentMarkdownNonRenderingHtmlSpans {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $spans = [System.Collections.Generic.List[object]]::new()
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?is)<(?<tag>pre|script|style|textarea)(?:\s[^>]*)?>.*?(?:</\k<tag>\s*>|\z)'
+    )) {
+        $spans.Add([pscustomobject]@{
+            Index = $match.Index; Length = $match.Length
+            Value = $match.Value; Kind = 'HtmlType1'
+        })
+    }
+    $lines = @([regex]::Matches(
+        $text,
+        '(?m)^(?<content>[^\r\n]*)(?<eol>\r?\n|$)'
+    ) | Where-Object { $_.Length -gt 0 })
+    for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
+        $containerLine = Remove-DocumentMarkdownBlockContainerPrefix `
+            -Line ([string]$lines[$lineIndex].Groups['content'].Value)
+        $htmlType = $null
+        if ($containerLine -cmatch '^ {0,3}<\?') {
+            $htmlType = [pscustomobject]@{ Kind = 'HtmlType3'; End = '\?>' }
+        }
+        elseif ($containerLine -cmatch '^ {0,3}<![A-Z]') {
+            $htmlType = [pscustomobject]@{ Kind = 'HtmlType4'; End = '>' }
+        }
+        elseif ($containerLine -cmatch '^ {0,3}<!\[CDATA\[') {
+            $htmlType = [pscustomobject]@{ Kind = 'HtmlType5'; End = '\]\]>' }
+        }
+        if ($null -eq $htmlType -or
+            (Test-DocumentMarkdownSpanOverlap `
+                -Index $lines[$lineIndex].Index -Length 1 `
+                -Spans @($spans))) { continue }
+        $lastLineIndex = $lineIndex
+        $normalizedBlock = $containerLine
+        while (-not [regex]::IsMatch($normalizedBlock, $htmlType.End) -and
+            $lastLineIndex + 1 -lt $lines.Count) {
+            $lastLineIndex++
+            $normalizedBlock += "`n" +
+                (Remove-DocumentMarkdownBlockContainerPrefix -Line `
+                    ([string]$lines[$lastLineIndex].Groups['content'].Value))
+        }
+        $spanEnd = $lines[$lastLineIndex].Index +
+            $lines[$lastLineIndex].Length
+        $spans.Add([pscustomobject]@{
+            Index = $lines[$lineIndex].Index
+            Length = $spanEnd - $lines[$lineIndex].Index
+            Value = $text.Substring(
+                $lines[$lineIndex].Index,
+                $spanEnd - $lines[$lineIndex].Index
+            )
+            Kind = [string]$htmlType.Kind
+        })
+        $lineIndex = $lastLineIndex
+    }
+    $blockTags =
+        'address|article|aside|base|basefont|blockquote|body|caption|center|' +
+        'col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|' +
+        'figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|' +
+        'iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|' +
+        'optgroup|option|p|param|search|section|summary|table|tbody|td|' +
+        'tfoot|th|thead|title|tr|track|ul'
+    for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
+        $line = [string]$lines[$lineIndex].Groups['content'].Value
+        $containerLine = Remove-DocumentMarkdownBlockContainerPrefix `
+            -Line $line
+        $isType6Block = [regex]::IsMatch(
+            $containerLine,
+            '(?i)^ {0,3}</?(?:' + $blockTags + ')(?:[ \t]+|/?>|$)'
+        )
+        $isType7Block = [regex]::IsMatch(
+            $containerLine,
+            '^ {0,3}</?[A-Za-z]'
+        ) -and [string]::IsNullOrWhiteSpace(
+            (Remove-DocumentMarkdownInlineHtmlTags -Text $containerLine)
+        )
+        if (-not $isType6Block -and -not $isType7Block) { continue }
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index $lines[$lineIndex].Index -Length 1 `
+            -Spans @($spans)) { continue }
+        $lastLineIndex = $lineIndex
+        for ($candidateIndex = $lineIndex + 1;
+            $candidateIndex -lt $lines.Count;
+            $candidateIndex++) {
+            $candidateLine = Remove-DocumentMarkdownBlockContainerPrefix `
+                -Line ([string]$lines[$candidateIndex].Groups['content'].Value)
+            if ($candidateLine -match '^[ \t]*$') { break }
+            $lastLineIndex = $candidateIndex
+        }
+        $spanEnd = $lines[$lastLineIndex].Index +
+            $lines[$lastLineIndex].Length
+        $spans.Add([pscustomobject]@{
+            Index = $lines[$lineIndex].Index
+            Length = $spanEnd - $lines[$lineIndex].Index
+            Value = $text.Substring(
+                $lines[$lineIndex].Index,
+                $spanEnd - $lines[$lineIndex].Index
+            )
+            Kind = if ($isType6Block) { 'HtmlType6' } else { 'HtmlType7' }
+        })
+        $lineIndex = $lastLineIndex
+    }
+    return @($spans | Sort-Object Index)
+}
+function Test-DocumentMarkdownCharacterEscaped {
+    param(
+        [Parameter(Mandatory)][string]$Text,
+        [Parameter(Mandatory)][int]$Index
+    )
+
+    $backslashes = 0
+    for ($position = $Index - 1;
+        $position -ge 0 -and $Text[$position] -ceq '\';
+        $position--) {
+        $backslashes++
+    }
+    return ($backslashes % 2) -eq 1
+}
+function Get-DocumentMarkdownEscapedLinkSpans {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $spans = [System.Collections.Generic.List[object]]::new()
+    foreach ($match in @(Get-DocumentMarkdownInlineLinkEvidence `
+        -Markdown $text -EscapedOpeningOnly)) {
+        $spans.Add([pscustomobject]@{
+            Index = $match.Index
+            Length = $match.Length
+            Value = $text.Substring($match.Index, $match.Length)
+        })
+    }
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?<!\!)\[[^\]]+\][ \t]*\[[^\]]*\]'
+    )) {
+        if ((Test-DocumentMarkdownCharacterEscaped `
+                -Text $text -Index $match.Index) -and
+            @($spans | Where-Object {
+                $_.Index -eq $match.Index -and $_.Length -eq $match.Length
+            }).Count -eq 0) {
+            $spans.Add([pscustomobject]@{
+                Index = $match.Index
+                Length = $match.Length
+                Value = $match.Value
+            })
+        }
+    }
+    return @($spans)
+}
+function Test-DocumentMarkdownSpanOverlap {
+    param(
+        [Parameter(Mandatory)][int]$Index,
+        [Parameter(Mandatory)][int]$Length,
+        [object[]]$Spans = @()
+    )
+
+    foreach ($span in $Spans) {
+        if ($Index -lt ([int]$span.Index + [int]$span.Length) -and
+            ($Index + $Length) -gt [int]$span.Index) {
+            return $true
+        }
+    }
+    return $false
+}
+function Test-DocumentMarkdownAsciiPunctuationCharacter {
+    param([Parameter(Mandatory)][char]$Character)
+
+    $code = [int]$Character
+    return ($code -ge 33 -and $code -le 47) -or
+        ($code -ge 58 -and $code -le 64) -or
+        ($code -ge 91 -and $code -le 96) -or
+        ($code -ge 123 -and $code -le 126)
+}
+function ConvertFrom-DocumentMarkdownLinkDestination {
+    param([AllowEmptyString()][string]$Destination)
+
+    $decoded = [Net.WebUtility]::HtmlDecode([string]$Destination)
+    $result = [Text.StringBuilder]::new($decoded.Length)
+    for ($index = 0; $index -lt $decoded.Length; $index++) {
+        if ($decoded[$index] -ceq '\' -and
+            $index + 1 -lt $decoded.Length -and
+            (Test-DocumentMarkdownAsciiPunctuationCharacter `
+                -Character $decoded[$index + 1])) {
+            [void]$result.Append($decoded[$index + 1])
+            $index++
+            continue
+        }
+        [void]$result.Append($decoded[$index])
+    }
+    return $result.ToString()
+}
+function Get-DocumentMarkdownInlineLinkEvidence {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [object[]]$ProtectedSpans = @(),
+        [switch]$EscapedOpeningOnly
+    )
+
+    $text = [string]$Markdown
+    $links = [System.Collections.Generic.List[object]]::new()
+    for ($start = 0; $start -lt $text.Length; $start++) {
+        if ($text[$start] -cne '[') { continue }
+        $openingEscaped = Test-DocumentMarkdownCharacterEscaped `
+            -Text $text -Index $start
+        if (($EscapedOpeningOnly -and -not $openingEscaped) -or
+            (-not $EscapedOpeningOnly -and $openingEscaped)) { continue }
+        $isImage = $start -gt 0 -and $text[$start - 1] -ceq '!' -and
+            -not (Test-DocumentMarkdownCharacterEscaped `
+                -Text $text -Index ($start - 1))
+        if ($isImage -or (Test-DocumentMarkdownSpanOverlap `
+                -Index $start -Length 1 -Spans $ProtectedSpans)) { continue }
+
+        $depth = 1
+        $cursor = $start + 1
+        $labelEnd = -1
+        while ($cursor -lt $text.Length) {
+            $protected = @($ProtectedSpans | Where-Object {
+                $cursor -ge [int]$_.Index -and
+                    $cursor -lt ([int]$_.Index + [int]$_.Length)
+            } | Sort-Object Index | Select-Object -First 1)
+            if ($protected.Count -eq 1) {
+                $cursor = [int]$protected[0].Index +
+                    [int]$protected[0].Length
+                continue
+            }
+            if ($text[$cursor] -ceq '\' -and
+                $cursor + 1 -lt $text.Length -and
+                (Test-DocumentMarkdownAsciiPunctuationCharacter `
+                    -Character $text[$cursor + 1])) {
+                $cursor += 2
+                continue
+            }
+            if ($text[$cursor] -ceq '[') { $depth++ }
+            elseif ($text[$cursor] -ceq ']') {
+                $depth--
+                if ($depth -eq 0) {
+                    $labelEnd = $cursor
+                    break
+                }
+            }
+            $cursor++
+        }
+        if ($labelEnd -lt 0 -or $labelEnd + 1 -ge $text.Length -or
+            $text[$labelEnd + 1] -cne '(') { continue }
+
+        $cursor = $labelEnd + 2
+        while ($cursor -lt $text.Length -and
+            [char]::IsWhiteSpace($text[$cursor])) { $cursor++ }
+        $destinationStart = $cursor
+        $destinationEnd = -1
+        if ($cursor -lt $text.Length -and $text[$cursor] -ceq '<') {
+            $destinationStart = ++$cursor
+            while ($cursor -lt $text.Length) {
+                if ($text[$cursor] -ceq "`r" -or
+                    $text[$cursor] -ceq "`n" -or
+                    $text[$cursor] -ceq '<') { break }
+                if ($text[$cursor] -ceq '\' -and
+                    $cursor + 1 -lt $text.Length -and
+                    (Test-DocumentMarkdownAsciiPunctuationCharacter `
+                        -Character $text[$cursor + 1])) {
+                    $cursor += 2
+                    continue
+                }
+                if ($text[$cursor] -ceq '>') {
+                    $destinationEnd = $cursor
+                    $cursor++
+                    break
+                }
+                $cursor++
+            }
+            if ($destinationEnd -lt 0) { continue }
+        }
+        else {
+            $parenthesisDepth = 0
+            while ($cursor -lt $text.Length) {
+                if ([char]::IsWhiteSpace($text[$cursor])) { break }
+                if ($text[$cursor] -ceq '\' -and
+                    $cursor + 1 -lt $text.Length -and
+                    (Test-DocumentMarkdownAsciiPunctuationCharacter `
+                        -Character $text[$cursor + 1])) {
+                    $cursor += 2
+                    continue
+                }
+                if ($text[$cursor] -ceq '(') {
+                    $parenthesisDepth++
+                }
+                elseif ($text[$cursor] -ceq ')') {
+                    if ($parenthesisDepth -eq 0) { break }
+                    $parenthesisDepth--
+                }
+                $cursor++
+            }
+            if ($parenthesisDepth -ne 0) { continue }
+            $destinationEnd = $cursor
+        }
+
+        $whitespaceStart = $cursor
+        while ($cursor -lt $text.Length -and
+            [char]::IsWhiteSpace($text[$cursor])) { $cursor++ }
+        if ($cursor -ge $text.Length) { continue }
+        if ($text[$cursor] -cne ')') {
+            if ($cursor -eq $whitespaceStart -or
+                $text[$cursor] -notin @('"', "'", '(')) { continue }
+            $titleCloser = if ($text[$cursor] -ceq '(') { ')' } else {
+                $text[$cursor]
+            }
+            $cursor++
+            $titleClosed = $false
+            while ($cursor -lt $text.Length) {
+                if ($text[$cursor] -ceq '\' -and
+                    $cursor + 1 -lt $text.Length -and
+                    (Test-DocumentMarkdownAsciiPunctuationCharacter `
+                        -Character $text[$cursor + 1])) {
+                    $cursor += 2
+                    continue
+                }
+                if ($text[$cursor] -ceq $titleCloser) {
+                    $titleClosed = $true
+                    $cursor++
+                    break
+                }
+                $cursor++
+            }
+            if (-not $titleClosed) { continue }
+            while ($cursor -lt $text.Length -and
+                [char]::IsWhiteSpace($text[$cursor])) { $cursor++ }
+            if ($cursor -ge $text.Length -or
+                $text[$cursor] -cne ')') { continue }
+        }
+
+        $rawDestination = $text.Substring(
+            $destinationStart,
+            $destinationEnd - $destinationStart
+        )
+        $links.Add([pscustomobject]@{
+            Index = $start
+            Length = $cursor - $start + 1
+            Label = $text.Substring($start + 1, $labelEnd - $start - 1)
+            Target = ConvertFrom-DocumentMarkdownLinkDestination `
+                -Destination $rawDestination
+            Style = 'Inline'
+            ReferenceKey = ''
+        })
+        $start = $cursor
+    }
+    return @($links)
+}
+function Get-DocumentMarkdownHttpAutolinkSpans {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $spans = [System.Collections.Generic.List[object]]::new()
+    foreach ($angle in [regex]::Matches(
+        $text,
+        '(?i)<(?<url>https?://[^\s<>]+)>'
+    )) {
+        $spans.Add([pscustomobject]@{
+            Index = $angle.Index
+            Length = $angle.Length
+            Value = $angle.Groups['url'].Value
+            RawValue = $angle.Groups['url'].Value
+            IsAngle = $true
+            HasMarkupContinuation = $false
+        })
+    }
+    foreach ($scheme in [regex]::Matches($text, '(?i)https?://')) {
+        $start = $scheme.Index
+        if (@($spans | Where-Object {
+            -not $_.IsAngle -and $start -ge [int]$_.Index -and
+                $start -lt ([int]$_.Index + [int]$_.Length)
+        }).Count -gt 0) { continue }
+        if ($start -gt 0) {
+            $previous = $text[$start - 1]
+            if (-not [char]::IsWhiteSpace($previous) -and
+                $previous -notin @('*', '_', '~', '(')) { continue }
+        }
+        $domainStart = $start + $scheme.Length
+        $domainMatch = [regex]::Match(
+            $text.Substring($domainStart),
+            '^(?<domain>[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)+)'
+        )
+        if (-not $domainMatch.Success) { continue }
+        $segments = @($domainMatch.Groups['domain'].Value.Split('.'))
+        if ($segments[-1].Contains('_') -or
+            $segments[-2].Contains('_')) { continue }
+
+        $domainEnd = $domainStart + $domainMatch.Length
+        $maximumEnd = $domainEnd
+        while ($maximumEnd -lt $text.Length -and
+            -not [char]::IsWhiteSpace($text[$maximumEnd]) -and
+            $text[$maximumEnd] -cne '<' -and
+            $text[$maximumEnd] -cne '`') { $maximumEnd++ }
+        $rawCandidate = $text.Substring($start, $maximumEnd - $start)
+        $end = $maximumEnd
+        while ($end -gt $domainEnd -and
+            '?!. ,:*_~'.Replace(' ', '').Contains(
+                [string]$text[$end - 1]
+            )) { $end-- }
+        while ($end -gt $domainEnd -and $text[$end - 1] -ceq ')') {
+            $candidate = $text.Substring($start, $end - $start)
+            $openCount = @($candidate.ToCharArray() | Where-Object {
+                $_ -ceq '('
+            }).Count
+            $closeCount = @($candidate.ToCharArray() | Where-Object {
+                $_ -ceq ')'
+            }).Count
+            if ($closeCount -le $openCount) { break }
+            $end--
+        }
+        $candidate = $text.Substring($start, $end - $start)
+        $entitySuffix = [regex]::Match($candidate, '&[A-Za-z0-9]+;$')
+        if ($entitySuffix.Success) {
+            $end = $start + $entitySuffix.Index
+            $candidate = $text.Substring($start, $end - $start)
+        }
+        if ($end -lt $domainEnd) { continue }
+        $continuation = if ($maximumEnd -lt $text.Length) {
+            $text.Substring($maximumEnd)
+        } else { '' }
+        $spans.Add([pscustomobject]@{
+            Index = $start
+            Length = $end - $start
+            Value = $candidate
+            RawValue = $rawCandidate
+            IsAngle = $false
+            HasMarkupContinuation = $continuation -match
+                '^(?:<!--|</?[A-Za-z]|`)'
+        })
+    }
+    return @($spans | Sort-Object Index, Length -Unique)
+}
+function Get-DocumentMarkdownVisibleHttpUrlSpans {
+    param([AllowEmptyString()][string]$Text)
+
+    $spans = [System.Collections.Generic.List[object]]::new()
+    foreach ($scheme in [regex]::Matches([string]$Text, '(?i)https?://')) {
+        $start = $scheme.Index
+        if (@($spans | Where-Object {
+            $start -ge [int]$_.Index -and
+                $start -lt ([int]$_.Index + [int]$_.Length)
+        }).Count -gt 0) { continue }
+        $end = $start + $scheme.Length
+        while ($end -lt $Text.Length -and
+            -not [char]::IsWhiteSpace($Text[$end]) -and
+            $Text[$end] -notin @('<', '>', '[', ']', '{', '}', '"', "'", '`')) {
+            $end++
+        }
+        while ($end -gt ($start + $scheme.Length) -and
+            '.,;:!?'.Contains([string]$Text[$end - 1])) { $end-- }
+        while ($end -gt ($start + $scheme.Length) -and
+            $Text[$end - 1] -ceq ')') {
+            $candidate = $Text.Substring($start, $end - $start)
+            $openCount = @($candidate.ToCharArray() | Where-Object {
+                $_ -ceq '('
+            }).Count
+            $closeCount = @($candidate.ToCharArray() | Where-Object {
+                $_ -ceq ')'
+            }).Count
+            if ($closeCount -le $openCount) { break }
+            $end--
+        }
+        $spans.Add([pscustomobject]@{
+            Index = $start
+            Length = $end - $start
+            Value = $Text.Substring($start, $end - $start)
+        })
+    }
+    return @($spans)
+}
+function Remove-DocumentMarkdownInlineHtmlTags {
+    param([AllowEmptyString()][string]$Text)
+
+    $result = [Text.StringBuilder]::new($Text.Length)
+    for ($index = 0; $index -lt $Text.Length;) {
+        if ($Text[$index] -cne '<') {
+            [void]$result.Append($Text[$index])
+            $index++
+            continue
+        }
+        $cursor = $index + 1
+        if ($cursor -lt $Text.Length -and $Text[$cursor] -ceq '/') {
+            $cursor++
+        }
+        if ($cursor -ge $Text.Length -or
+            -not [char]::IsLetter($Text[$cursor])) {
+            [void]$result.Append('<')
+            $index++
+            continue
+        }
+        $cursor++
+        while ($cursor -lt $Text.Length -and
+            ([char]::IsLetterOrDigit($Text[$cursor]) -or
+                $Text[$cursor] -ceq '-')) { $cursor++ }
+        if ($cursor -ge $Text.Length -or
+            (-not [char]::IsWhiteSpace($Text[$cursor]) -and
+                $Text[$cursor] -cne '/' -and $Text[$cursor] -cne '>')) {
+            [void]$result.Append('<')
+            $index++
+            continue
+        }
+        $quote = [char]0
+        $tagEnd = -1
+        for (; $cursor -lt $Text.Length; $cursor++) {
+            $character = $Text[$cursor]
+            if ($quote -ne [char]0) {
+                if ($character -ceq $quote) { $quote = [char]0 }
+                continue
+            }
+            if ($character -ceq '"' -or $character -ceq "'") {
+                $quote = $character
+                continue
+            }
+            if ($character -ceq '>') {
+                $tagEnd = $cursor
+                break
+            }
+        }
+        if ($tagEnd -lt 0) {
+            [void]$result.Append('<')
+            $index++
+            continue
+        }
+        $index = $tagEnd + 1
+    }
+    return $result.ToString()
+}
+
+function ConvertTo-DocumentMarkdownRenderedText {
+    param([AllowEmptyString()][string]$Text)
+
+    $decoded = [Net.WebUtility]::HtmlDecode([string]$Text)
+    $decoded = [regex]::Replace($decoded, '(?s)<!--.*?(?:-->|\z)', '')
+    $decoded = Remove-DocumentMarkdownInlineHtmlTags -Text $decoded
+    $decoded = $decoded -replace '[*~`]', ''
+    $decoded = [regex]::Replace(
+        $decoded,
+        '(?<![A-Za-z0-9])_+|_+(?![A-Za-z0-9])',
+        ''
+    )
+    $rendered = [Text.StringBuilder]::new($decoded.Length)
+    for ($index = 0; $index -lt $decoded.Length;) {
+        if ($decoded[$index] -cne '\') {
+            [void]$rendered.Append($decoded[$index])
+            $index++
+            continue
+        }
+        $runStart = $index
+        while ($index -lt $decoded.Length -and $decoded[$index] -ceq '\') {
+            $index++
+        }
+        $runLength = $index - $runStart
+        for ($pair = 0; $pair -lt [Math]::Floor($runLength / 2); $pair++) {
+            [void]$rendered.Append('\')
+        }
+        $hasOddEscape = ($runLength % 2) -eq 1
+        $nextIsAsciiPunctuation = $false
+        if ($index -lt $decoded.Length) {
+            $characterCode = [int][char]$decoded[$index]
+            $nextIsAsciiPunctuation =
+                ($characterCode -ge 33 -and $characterCode -le 47) -or
+                ($characterCode -ge 58 -and $characterCode -le 64) -or
+                ($characterCode -ge 91 -and $characterCode -le 96) -or
+                ($characterCode -ge 123 -and $characterCode -le 126)
+        }
+        if ($hasOddEscape -and $nextIsAsciiPunctuation) {
+            [void]$rendered.Append($decoded[$index])
+            $index++
+        }
+        elseif ($hasOddEscape) {
+            [void]$rendered.Append('\')
+        }
+    }
+    return $rendered.ToString()
+}
+function Get-DocumentGitHubShorthandReferences {
+    param([AllowEmptyString()][string]$Text)
+
+    $references = [System.Collections.Generic.List[object]]::new()
+    foreach ($match in [regex]::Matches(
+        [string]$Text,
+        '(?i)(?<![A-Za-z0-9_])(?<kind>GH|PR|issue|comment|review)-(?<number>[1-9][0-9]*)(?![A-Za-z0-9_-])'
+    )) {
+        $references.Add([pscustomobject]@{
+            Index = $match.Index; Length = $match.Length
+            Value = $match.Value
+            Kind = $match.Groups['kind'].Value.ToLowerInvariant()
+            Number = [long]$match.Groups['number'].Value
+            Owner = ''; RepositoryName = ''
+        })
+    }
+    foreach ($match in [regex]::Matches(
+        [string]$Text,
+        '(?i)(?<![A-Za-z0-9_./-])(?:(?<owner>[A-Za-z0-9_.-]+)/)?(?<repository>[A-Za-z0-9_.-]{2,})#(?<number>[1-9][0-9]*)(?![A-Za-z0-9_-])'
+    )) {
+        if (Test-DocumentMarkdownSpanOverlap -Index $match.Index `
+            -Length $match.Length -Spans @($references)) { continue }
+        $references.Add([pscustomobject]@{
+            Index = $match.Index; Length = $match.Length
+            Value = $match.Value; Kind = 'repository'
+            Number = [long]$match.Groups['number'].Value
+            Owner = $match.Groups['owner'].Value
+            RepositoryName = $match.Groups['repository'].Value
+        })
+    }
+    return @($references | Sort-Object Index)
+}
+function Test-DocumentExactGitHubShorthandTarget {
+    param(
+        [Parameter(Mandatory)]$Reference,
+        [Parameter(Mandatory)][string]$Target
+    )
+
+    $currentOwner = 'hasanmanzak'
+    $currentRepositoryName = 'meAndAI'
+    $cleanTarget = $Target.Trim().Trim('<', '>')
+    if ([string]$Reference.Kind -in @('comment', 'review')) {
+        $commentTarget = [regex]::Match(
+            $cleanTarget,
+            '^https://github\.com/(?<owner>[^/]+)/(?<repository>[^/]+)/(?:(?:issues|pull)/\d+#(?:(?:issuecomment|pullrequestreview)-(?<id>\d+)|discussion_r(?<id>\d+))|commit/[0-9a-f]{40}#commitcomment-(?<id>\d+)|discussions/\d+#discussioncomment-(?<id>\d+))$'
+        )
+        return $commentTarget.Success -and
+            [long]$commentTarget.Groups['id'].Value -eq
+                [long]$Reference.Number -and
+            $commentTarget.Groups['owner'].Value -ieq $currentOwner -and
+            $commentTarget.Groups['repository'].Value -ieq
+                $currentRepositoryName
+    }
+    $artifactTarget = [regex]::Match(
+        $cleanTarget,
+        '^https://github\.com/(?<owner>[^/]+)/(?<repository>[^/]+)/(?<kind>issues|pull)/(?<number>[1-9][0-9]*)$'
+    )
+    if (-not $artifactTarget.Success -or
+        [long]$artifactTarget.Groups['number'].Value -ne
+            [long]$Reference.Number) { return $false }
+    switch ([string]$Reference.Kind) {
+        'pr' {
+            return $artifactTarget.Groups['kind'].Value -ceq 'pull' -and
+                $artifactTarget.Groups['owner'].Value -ieq $currentOwner -and
+                $artifactTarget.Groups['repository'].Value -ieq
+                    $currentRepositoryName
+        }
+        'issue' {
+            return $artifactTarget.Groups['kind'].Value -ceq 'issues' -and
+                $artifactTarget.Groups['owner'].Value -ieq $currentOwner -and
+                $artifactTarget.Groups['repository'].Value -ieq
+                    $currentRepositoryName
+        }
+        'repository' {
+            $expectedOwner = if ([string]::IsNullOrEmpty(
+                [string]$Reference.Owner
+            )) { $currentOwner } else { [string]$Reference.Owner }
+            return $artifactTarget.Groups['owner'].Value -ieq $expectedOwner -and
+                $artifactTarget.Groups['repository'].Value -ieq
+                    [string]$Reference.RepositoryName
+        }
+        default {
+            return $artifactTarget.Groups['owner'].Value -ieq $currentOwner -and
+                $artifactTarget.Groups['repository'].Value -ieq
+                    $currentRepositoryName
+        }
+    }
+}
+function Get-DocumentMarkdownLinkEvidence {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    $codeSpans = @(Get-DocumentMarkdownCodeSpans -Markdown $Markdown)
+    $htmlCommentSpans = @(
+        Get-DocumentMarkdownHtmlCommentSpans -Markdown $Markdown
+    )
+    $nonRenderingHtmlSpans = @(
+        Get-DocumentMarkdownNonRenderingHtmlSpans `
+            -Markdown $Markdown | Where-Object {
+                -not (Test-DocumentMarkdownSpanOverlap `
+                    -Index $_.Index -Length $_.Length `
+                    -Spans (@($codeSpans) + @($htmlCommentSpans)))
+            }
+    )
+    $escapedLinkSpans = @(
+        Get-DocumentMarkdownEscapedLinkSpans -Markdown $Markdown
+    )
+    $ignoredSpans = @($codeSpans) + @($htmlCommentSpans) +
+        @($nonRenderingHtmlSpans)
+    $ignoredSpans += @($escapedLinkSpans)
+    $definitions = [Collections.Generic.Dictionary[string, object]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    $definitionMatches = @([regex]::Matches(
+        [string]$Markdown,
+        '(?m)^[ \t]{0,3}\[(?<key>(?!\^)[^\]]+)\]:[ \t]*(?:<(?<angle>[^>]+)>|(?<plain>\S+))(?:[ \t]+(?:"[^"]*"|''[^'']*''|\([^)]*\)))?[ \t]*$'
+    ) | Where-Object {
+        -not (Test-DocumentMarkdownCharacterEscaped `
+            -Text ([string]$Markdown) `
+            -Index ($_.Groups['key'].Index - 1)) -and
+        -not (Test-DocumentMarkdownSpanOverlap `
+            -Index $_.Index -Length 1 -Spans $ignoredSpans)
+    })
+    foreach ($definition in $definitionMatches) {
+        $key = $definition.Groups['key'].Value.Trim()
+        $target = if ($definition.Groups['angle'].Success) {
+            $definition.Groups['angle'].Value
+        } else { $definition.Groups['plain'].Value }
+        $target = ConvertFrom-DocumentMarkdownLinkDestination `
+            -Destination $target
+        if ([string]::IsNullOrWhiteSpace($key) -or
+            [string]::IsNullOrWhiteSpace($target) -or
+            $definitions.ContainsKey($key)) {
+            Add-Failure "TEST-0175 $Path has an empty or duplicate reference-link definition."
+            continue
+        }
+        $definitions.Add($key, [pscustomobject]@{ Target = $target })
+    }
+    $links = [System.Collections.Generic.List[object]]::new()
+    $unresolvedReferences = [System.Collections.Generic.List[object]]::new()
+    $occupied = [System.Collections.Generic.List[object]]::new()
+    foreach ($definition in $definitionMatches) {
+        $occupied.Add([pscustomobject]@{
+            Index = $definition.Index; Length = $definition.Length
+        })
+    }
+    foreach ($link in @(Get-DocumentMarkdownInlineLinkEvidence `
+        -Markdown ([string]$Markdown) -ProtectedSpans $ignoredSpans)) {
+        if (Test-DocumentMarkdownSpanOverlap -Index $link.Index `
+            -Length $link.Length -Spans @($occupied)) { continue }
+        $links.Add($link); $occupied.Add($link)
+    }
+    foreach ($match in [regex]::Matches(
+        [string]$Markdown,
+        '(?<!\!)\[(?<label>[^\]]+)\][ \t]*\[(?<key>[^\]]*)\]'
+    )) {
+        if (Test-DocumentMarkdownCharacterEscaped `
+            -Text ([string]$Markdown) -Index $match.Index) { continue }
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index $match.Index -Length 1 -Spans $ignoredSpans) {
+            continue
+        }
+        if (@($occupied | Where-Object {
+            $match.Index -lt ($_.Index + $_.Length) -and
+                ($match.Index + $match.Length) -gt $_.Index
+        }).Count -ne 0) { continue }
+        $key = $match.Groups['key'].Value.Trim()
+        if ([string]::IsNullOrEmpty($key)) { $key = $match.Groups['label'].Value.Trim() }
+        if (-not $definitions.ContainsKey($key)) {
+            $unresolvedReferences.Add([pscustomobject]@{
+                Label = $match.Groups['label'].Value
+                Key = $key
+            })
+            $occupied.Add([pscustomobject]@{
+                Index = $match.Index; Length = $match.Length
+            })
+            continue
+        }
+        $link = [pscustomobject]@{
+            Index = $match.Index; Length = $match.Length
+            Label = $match.Groups['label'].Value
+            Target = [string]$definitions[$key].Target
+            Style = 'Reference'; ReferenceKey = $key
+        }
+        $links.Add($link); $occupied.Add($link)
+    }
+    foreach ($match in [regex]::Matches(
+        [string]$Markdown, '(?<![!\]])\[(?<label>[^\]]+)\]'
+    )) {
+        if (Test-DocumentMarkdownCharacterEscaped `
+            -Text ([string]$Markdown) -Index $match.Index) { continue }
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index $match.Index -Length 1 -Spans $ignoredSpans) {
+            continue
+        }
+        if (@($occupied | Where-Object {
+            $match.Index -lt ($_.Index + $_.Length) -and
+                ($match.Index + $match.Length) -gt $_.Index
+        }).Count -ne 0) { continue }
+        $key = $match.Groups['label'].Value.Trim()
+        if (-not $definitions.ContainsKey($key)) { continue }
+        $link = [pscustomobject]@{
+            Index = $match.Index; Length = $match.Length
+            Label = $match.Groups['label'].Value
+            Target = [string]$definitions[$key].Target
+            Style = 'Reference'; ReferenceKey = $key
+        }
+        $links.Add($link); $occupied.Add($link)
+    }
+    [pscustomobject]@{
+        Links = @($links)
+        Definitions = @($definitionMatches)
+        Unresolved = @($unresolvedReferences)
+        CodeSpans = @($codeSpans)
+        HtmlComments = @($htmlCommentSpans)
+        NonRenderingHtml = @($nonRenderingHtmlSpans)
+        EscapedLinks = @($escapedLinkSpans)
+    }
+}
+function Get-DocumentUnlinkedMarkdown {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [Parameter(Mandatory)]$LinkEvidence
+    )
+
+    $remaining = [string]$Markdown
+    $spans = @($LinkEvidence.Links) + @($LinkEvidence.Definitions | ForEach-Object {
+        [pscustomobject]@{ Index = $_.Index; Length = $_.Length }
+    }) + @($LinkEvidence.CodeSpans | ForEach-Object {
+        [pscustomobject]@{ Index = $_.Index; Length = $_.Length }
+    }) + @($LinkEvidence.HtmlComments | ForEach-Object {
+        [pscustomobject]@{ Index = $_.Index; Length = $_.Length }
+    }) + @($LinkEvidence.NonRenderingHtml | ForEach-Object {
+        [pscustomobject]@{ Index = $_.Index; Length = $_.Length }
+    })
+    foreach ($span in @($spans | Sort-Object Index -Descending)) {
+        $remaining = $remaining.Remove([int]$span.Index, [int]$span.Length).Insert(
+            [int]$span.Index, (' ' * [int]$span.Length)
+        )
+    }
+    $withoutUris = [regex]::Replace($remaining, 'https?://[^\s)>]+', '')
+    ConvertTo-DocumentMarkdownRenderedText -Text $withoutUris
+}
+$rawDocumentPathPattern = '(?i)(?<![A-Za-z0-9_./-])(?:\.{0,2}/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.md(?:#[A-Za-z0-9_.:-]+)?(?![A-Za-z0-9_.-])'
+$hiddenCrossRecordReferencePattern = $recordIdPattern + '|' +
+    $rawDocumentPathPattern +
+    '|(?i:https?://github\.com/[^/]+/[^/]+/(?:(?:issues|pull)/[1-9][0-9]*|blob/[^<>\s]+))' +
+    '|(?i:(?<![A-Za-z0-9_])(?:issue|PR|pull request|comment|review)\s+#?[1-9][0-9]*)' +
+    '|(?i:(?<![A-Za-z0-9_])(?:GH|issue|pr|comment|review)-[1-9][0-9]*(?![A-Za-z0-9_-]))'
+function Test-CodeFormattedDocumentReference {
+    param(
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)]$CodeSpan
+    )
+
+    if (-not [regex]::IsMatch([string]$CodeSpan.Value, $rawDocumentPathPattern)) {
+        return $false
+    }
+    $beforeStart = [Math]::Max(0, [int]$CodeSpan.Index - 80)
+    $before = $Markdown.Substring(
+        $beforeStart,
+        [int]$CodeSpan.Index - $beforeStart
+    )
+    $afterStart = [int]$CodeSpan.Index + [int]$CodeSpan.Length
+    $after = $Markdown.Substring(
+        $afterStart,
+        [Math]::Min(80, $Markdown.Length - $afterStart)
+    )
+    return [regex]::IsMatch(
+        $before,
+        '(?i)\b(?:see|read|open|consult|reference(?:d)?(?:\s+to)?|recorded\s+in|documented\s+in|defined\s+in|described\s+in|according\s+to|details\s+in)\s*$'
+    ) -or [regex]::IsMatch(
+        $after,
+        '(?i)^\s+for\s+(?:details|context|more\s+information)\b'
+    )
+}
+
+function Get-RenderedDocumentReferenceText {
+    param(
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)]$LinkEvidence
+    )
+
+    $rendered = $Markdown
+    $spans = @($LinkEvidence.Links | ForEach-Object {
+        [pscustomobject]@{
+            Index = $_.Index
+            Length = $_.Length
+            Replacement = [string]$_.Label
+        }
+    }) + @($LinkEvidence.Definitions | ForEach-Object {
+        [pscustomobject]@{
+            Index = $_.Index
+            Length = $_.Length
+            Replacement = ''
+        }
+    }) + @($LinkEvidence.CodeSpans | Where-Object {
+        $codeSpan = $_
+        @($LinkEvidence.Links | Where-Object {
+            $codeSpan.Index -ge $_.Index -and
+                ($codeSpan.Index + $codeSpan.Length) -le
+                    ($_.Index + $_.Length)
+        }).Count -eq 0
+    } | ForEach-Object {
+        [pscustomobject]@{
+            Index = $_.Index
+            Length = $_.Length
+            Replacement = ''
+        }
+    }) + @($LinkEvidence.HtmlComments | ForEach-Object {
+        [pscustomobject]@{
+            Index = $_.Index
+            Length = $_.Length
+            Replacement = ''
+        }
+    }) + @($LinkEvidence.NonRenderingHtml | ForEach-Object {
+        [pscustomobject]@{
+            Index = $_.Index
+            Length = $_.Length
+            Replacement = ''
+        }
+    })
+    foreach ($span in @($spans | Sort-Object Index -Descending)) {
+        $rendered = $rendered.Remove([int]$span.Index, [int]$span.Length).Insert(
+            [int]$span.Index, [string]$span.Replacement
+        )
+    }
+    return ConvertTo-DocumentMarkdownRenderedText `
+        -Text $rendered.Replace('`', '')
+}
+
+function Get-DocumentRenderedReferenceEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)]$LinkEvidence
+    )
+
+    $rendered = $Markdown
+    $replacementSpans = [System.Collections.Generic.List[object]]::new()
+    for ($linkIndex = 0; $linkIndex -lt @($LinkEvidence.Links).Count;
+        $linkIndex++) {
+        $link = @($LinkEvidence.Links)[$linkIndex]
+        $replacementSpans.Add([pscustomobject]@{
+            Index = [int]$link.Index
+            Length = [int]$link.Length
+            Replacement = ([string][char]0xE000) + $linkIndex +
+                ([string][char]0xE001) + [string]$link.Label +
+                ([string][char]0xE002)
+        })
+    }
+    foreach ($span in @($LinkEvidence.Definitions) +
+        @($LinkEvidence.CodeSpans) + @($LinkEvidence.HtmlComments) +
+        @($LinkEvidence.NonRenderingHtml)) {
+        if (Test-DocumentMarkdownSpanOverlap `
+            -Index ([int]$span.Index) -Length ([int]$span.Length) `
+            -Spans @($LinkEvidence.Links)) { continue }
+        $replacementSpans.Add([pscustomobject]@{
+            Index = [int]$span.Index
+            Length = [int]$span.Length
+            Replacement = ''
+        })
+    }
+    $bareUrlIgnoredSpans = @($LinkEvidence.Links) +
+        @($LinkEvidence.Definitions) + @($LinkEvidence.CodeSpans) +
+        @($LinkEvidence.HtmlComments) + @($LinkEvidence.NonRenderingHtml)
+    foreach ($bareUrl in @(Get-DocumentMarkdownHttpAutolinkSpans `
+        -Markdown ([string]$Markdown))) {
+        if (Test-DocumentMarkdownSpanOverlap -Index $bareUrl.Index `
+            -Length $bareUrl.Length -Spans $bareUrlIgnoredSpans) { continue }
+        $hasDecoratedNumericSegment = -not $bareUrl.IsAngle -and
+            [regex]::IsMatch(
+                [string]$bareUrl.RawValue,
+                '(?:\*{1,3}[0-9]+\*{1,3}|~~[0-9]+~~|_{1,2}[0-9]+_{1,2})(?=$|[(/?#&.,;:!])'
+            )
+        if ($bareUrl.HasMarkupContinuation -or
+            $hasDecoratedNumericSegment) { continue }
+        $replacementSpans.Add([pscustomobject]@{
+            Index = $bareUrl.Index
+            Length = $bareUrl.Length
+            Replacement = ''
+        })
+    }
+    foreach ($span in @($replacementSpans | Sort-Object Index -Descending)) {
+        $rendered = $rendered.Remove($span.Index, $span.Length).Insert(
+            $span.Index,
+            [string]$span.Replacement
+        )
+    }
+    $rendered = ConvertTo-DocumentMarkdownRenderedText `
+        -Text $rendered.Replace('`', '')
+
+    $visible = [Text.StringBuilder]::new($rendered.Length)
+    $linkSpans = [System.Collections.Generic.List[object]]::new()
+    $activeLinkIndex = -1
+    $activeStart = -1
+    for ($index = 0; $index -lt $rendered.Length;) {
+        if ([int][char]$rendered[$index] -eq 0xE000) {
+            $markerEnd = $rendered.IndexOf([char]0xE001, $index + 1)
+            if ($markerEnd -lt 0) {
+                Add-Failure 'TEST-0175 rendered Markdown link marker is malformed.'
+                break
+            }
+            $activeLinkIndex = [int]$rendered.Substring(
+                $index + 1,
+                $markerEnd - $index - 1
+            )
+            $activeStart = $visible.Length
+            $index = $markerEnd + 1
+            continue
+        }
+        if ([int][char]$rendered[$index] -eq 0xE002) {
+            if ($activeLinkIndex -lt 0) {
+                Add-Failure 'TEST-0175 rendered Markdown link marker is unbalanced.'
+                $index++
+                continue
+            }
+            $linkSpans.Add([pscustomobject]@{
+                Index = $activeStart
+                Length = $visible.Length - $activeStart
+                Link = @($LinkEvidence.Links)[$activeLinkIndex]
+            })
+            $activeLinkIndex = -1
+            $activeStart = -1
+            $index++
+            continue
+        }
+        [void]$visible.Append($rendered[$index])
+        $index++
+    }
+    if ($activeLinkIndex -ge 0) {
+        Add-Failure 'TEST-0175 rendered Markdown link marker is unclosed.'
+    }
+    return [pscustomobject]@{
+        Text = $visible.ToString()
+        Links = @($linkSpans)
+    }
+}
+
+function Test-DocumentRenderedReferenceCoveredByLink {
+    param(
+        [Parameter(Mandatory)][int]$Index,
+        [Parameter(Mandatory)][int]$Length,
+        [Parameter(Mandatory)]$RenderedEvidence
+    )
+
+    return @($RenderedEvidence.Links | Where-Object {
+        $Index -ge [int]$_.Index -and
+            ($Index + $Length) -le ([int]$_.Index + [int]$_.Length)
+    }).Count -eq 1
+}
+
+function Test-ContainsExactDocumentTitle {
+    param(
+        [AllowEmptyString()][string]$Text,
+        [Parameter(Mandatory)][string]$Title
+    )
+
+    return [regex]::IsMatch(
+        $Text,
+        '(?i)(?<![A-Za-z0-9])' + [regex]::Escape($Title) +
+            '(?![A-Za-z0-9])'
+    )
+}
+
+function Test-DocumentHeadingOwnsTitle {
+    param(
+        [AllowEmptyString()][string]$Heading,
+        [Parameter(Mandatory)][string]$Title
+    )
+
+    $escapedTitle = [regex]::Escape($Title)
+    return [regex]::IsMatch(
+        $Heading.Trim(),
+        '(?i)^(?:\d{4}-\d{2}-\d{2}\s+-\s+)?' +
+            '(?:(?:EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-\d{4}\s+-\s+|v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\s+(?:-\s+)?)?' +
+            $escapedTitle + '$'
+    )
+}
+
+function Resolve-DocumentLinkTarget {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Target
+    )
+
+    $cleanTarget = $Target.Trim()
+    if ($cleanTarget.StartsWith('<') -and $cleanTarget.EndsWith('>')) {
+        $cleanTarget = $cleanTarget.Substring(1, $cleanTarget.Length - 2)
+    }
+    if ($cleanTarget -match '^https://github\.com/hasanmanzak/meAndAI/(?:blob|tree)/[^/]+/(?<path>[^#?]+)(?<fragment>#[^?]*)?$') {
+        return [pscustomobject]@{
+            Kind = 'Repository'
+            Value = [uri]::UnescapeDataString($Matches['path']).Replace('\', '/')
+            Fragment = [string]$Matches['fragment']
+        }
+    }
+    if ($cleanTarget -match '^https?://') {
+        return [pscustomobject]@{
+            Kind = 'External'
+            Value = $cleanTarget.TrimEnd('/')
+            Fragment = ''
+        }
+    }
+    $fragment = ''
+    $pathPart = $cleanTarget
+    $fragmentIndex = $pathPart.IndexOf('#')
+    if ($fragmentIndex -ge 0) {
+        $fragment = $pathPart.Substring($fragmentIndex)
+        $pathPart = $pathPart.Substring(0, $fragmentIndex)
+    }
+    $queryIndex = $pathPart.IndexOf('?')
+    if ($queryIndex -ge 0) {
+        $pathPart = $pathPart.Substring(0, $queryIndex)
+    }
+    $sourceFullPath = Join-Path $root $SourcePath
+    $targetFullPath = if ([string]::IsNullOrWhiteSpace($pathPart)) {
+        [IO.Path]::GetFullPath($sourceFullPath)
+    }
+    else {
+        [IO.Path]::GetFullPath((Join-Path (
+            Split-Path -Parent $sourceFullPath
+        ) ([uri]::UnescapeDataString($pathPart))))
+    }
+    $rootPrefix = $root.TrimEnd([IO.Path]::DirectorySeparatorChar) +
+        [IO.Path]::DirectorySeparatorChar
+    if ($targetFullPath -cne $root -and
+        -not $targetFullPath.StartsWith(
+            $rootPrefix,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        return [pscustomobject]@{
+            Kind = 'Invalid'; Value = ''; Fragment = $fragment
+        }
+    }
+    return [pscustomobject]@{
+        Kind = 'Repository'
+        Value = $targetFullPath.Substring($root.Length + 1).Replace('\', '/')
+        Fragment = $fragment
+    }
+}
+function Test-DocumentRecordLinkTarget {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Target,
+        [Parameter(Mandatory)][string]$ExpectedTarget
+    )
+
+    $actual = Resolve-DocumentLinkTarget -SourcePath $SourcePath -Target $Target
+    if ($ExpectedTarget.StartsWith('https://')) {
+        return $actual.Kind -ceq 'External' -and
+            $actual.Value -ceq $ExpectedTarget.TrimEnd('/')
+    }
+    $expectedPath = $ExpectedTarget
+    $expectedFragment = ''
+    $fragmentIndex = $expectedPath.IndexOf('#')
+    if ($fragmentIndex -ge 0) {
+        $expectedFragment = $expectedPath.Substring($fragmentIndex)
+        $expectedPath = $expectedPath.Substring(0, $fragmentIndex)
+    }
+    return $actual.Kind -ceq 'Repository' -and
+        $actual.Value -ceq $expectedPath -and
+        ([string]::IsNullOrEmpty($expectedFragment) -or
+            $actual.Fragment -ceq $expectedFragment)
+}
+function Test-DocumentVisiblePathMatchesLinkTarget {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$VisiblePath,
+        [Parameter(Mandatory)][string]$Target
+    )
+
+    $actual = Resolve-DocumentLinkTarget `
+        -SourcePath $SourcePath -Target $Target
+    if ($actual.Kind -cne 'Repository') { return $false }
+    $visibleCandidates = [System.Collections.Generic.List[object]]::new()
+    $sourceRelative = Resolve-DocumentLinkTarget `
+        -SourcePath $SourcePath -Target $VisiblePath
+    if ($sourceRelative.Kind -ceq 'Repository') {
+        $sourceRelativeFile = Join-Path $root (
+            [string]$sourceRelative.Value -replace '/',
+                [IO.Path]::DirectorySeparatorChar
+        )
+        if (Test-Path -LiteralPath $sourceRelativeFile -PathType Leaf) {
+            $visibleCandidates.Add($sourceRelative)
+        }
+    }
+    $cleanVisible = $VisiblePath.Trim().Trim('<', '>')
+    if ($cleanVisible -cnotmatch '^(?:\.\./|https?://)') {
+        $visibleFragment = ''
+        if ($cleanVisible.Contains('#')) {
+            $visibleFragment = '#' + ($cleanVisible -split '#', 2)[1]
+        }
+        $rootRelativeValue = [uri]::UnescapeDataString(
+            ($cleanVisible -replace '[?#].*$', '')
+        ).Replace('\', '/').TrimStart([char[]]'./')
+        $rootRelativeFile = Join-Path $root (
+            $rootRelativeValue -replace '/', [IO.Path]::DirectorySeparatorChar
+        )
+        if (Test-Path -LiteralPath $rootRelativeFile -PathType Leaf) {
+            $visibleCandidates.Add([pscustomobject]@{
+                Kind = 'Repository'
+                Value = $rootRelativeValue
+                Fragment = $visibleFragment
+            })
+        }
+    }
+    if ($visibleCandidates.Count -eq 0) {
+        return $true
+    }
+    return @($visibleCandidates | Where-Object {
+        $_.Value -ceq $actual.Value -and
+            ([string]::IsNullOrEmpty([string]$_.Fragment) -or
+                $_.Fragment -ceq $actual.Fragment)
+    }).Count -gt 0
+}
+function Test-DocumentResolvedTargetExists {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Target
+    )
+
+    $cleanTarget = $Target.Trim().Trim('<', '>')
+    if ($cleanTarget -match '^(?:https?://|mailto:)' -or
+        $cleanTarget.StartsWith('{{')) {
+        return $true
+    }
+    $resolved = Resolve-DocumentLinkTarget `
+        -SourcePath $SourcePath -Target $cleanTarget
+    if ($resolved.Kind -cne 'Repository') { return $false }
+    $targetFile = Join-Path $root (
+        [string]$resolved.Value -replace '/', [IO.Path]::DirectorySeparatorChar
+    )
+    if (-not (Test-Path -LiteralPath $targetFile)) { return $false }
+    if (-not [string]::IsNullOrEmpty([string]$resolved.Fragment) -and
+        (Test-Path -LiteralPath $targetFile -PathType Leaf) -and
+        [IO.Path]::GetExtension($targetFile) -ieq '.md') {
+        $anchors = Get-MarkdownAnchors (
+            Get-Content -LiteralPath $targetFile -Raw
+        )
+        if (-not $anchors.Contains(
+            ([string]$resolved.Fragment).TrimStart('#')
+        )) { return $false }
+    }
+    return $true
+}
+$documentMarkdownPaths = @(& git -C $root ls-files --cached --others `
+    --exclude-standard -- '*.md')
+if ($LASTEXITCODE -ne 0) {
+    Add-Failure 'TEST-0175 tracked Markdown inventory failed.'
+    $documentMarkdownPaths = @()
+}
+$documentTitleCandidates = @{}
+$documentHeadingTitles = @{}
+$stableDocumentTitleNames = [Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::Ordinal
+)
+foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
+    $titleMarkdown = Get-Content -LiteralPath (
+        Join-Path $root $relativeMarkdownPath
+    ) -Raw
+    $heading = [regex]::Match($titleMarkdown, '(?m)^#\s+(?<title>.+?)\s*$')
+    if (-not $heading.Success) { continue }
+    $headingTitle = $heading.Groups['title'].Value.Trim()
+    $documentHeadingTitles[$relativeMarkdownPath] = $headingTitle
+    $descriptive = [regex]::Match(
+        $headingTitle,
+        '^(?:EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-\d{4}\s+-\s+(?<title>.+)$'
+    )
+    $title = if ($descriptive.Success) {
+        $descriptive.Groups['title'].Value.Trim()
+    }
+    else { $headingTitle }
+    if ($descriptive.Success) {
+        [void]$stableDocumentTitleNames.Add($title)
+    }
+    foreach ($title in @($title)) {
+        if ($title.Length -lt 12) { continue }
+        if (-not $documentTitleCandidates.ContainsKey($title)) {
+            $documentTitleCandidates[$title] = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::Ordinal
+            )
+        }
+        [void]$documentTitleCandidates[$title].Add($relativeMarkdownPath)
+    }
+}
+$documentTitleTargets = @{}
+foreach ($title in $documentTitleCandidates.Keys) {
+    if ($documentTitleCandidates[$title].Count -eq 1) {
+        $documentTitleTargets[$title] = @($documentTitleCandidates[$title])[0]
+    }
+}
+$allDocumentTitleAlternation = @($documentTitleTargets.Keys |
+    Sort-Object Length -Descending |
+    ForEach-Object { [regex]::Escape($_) }) -join '|'
+$documentTitleReferenceParts = [Collections.Generic.List[string]]::new()
+if (-not [string]::IsNullOrEmpty($allDocumentTitleAlternation)) {
+    $documentTitleReferenceParts.Add(
+        '\b(?:see|read|open|consult|reference(?:d)?(?:\s+to)?|according\s+to|described\s+in|documented\s+in)\s+(?:(?:the|a)\s+)?(?<title>' +
+            $allDocumentTitleAlternation + ')(?![A-Za-z0-9])'
+    )
+    $documentTitleReferenceParts.Add(
+        '(?<![A-Za-z0-9])(?:(?:the|a)\s+)?(?<title>' +
+            $allDocumentTitleAlternation +
+            ')\s+(?:guide|document|record|for\s+(?:details|context)|is\s+authoritative|governs|defines)\b'
+    )
+}
+$documentTitleReferencePattern = if ($documentTitleReferenceParts.Count -eq 0) {
+    '(?!)'
+}
+else { '(?i)(?:' + ($documentTitleReferenceParts -join '|') + ')' }
+$documentTitleLinkPattern = if ([string]::IsNullOrEmpty(
+    $allDocumentTitleAlternation
+)) { '(?!)' }
+else {
+    '(?i)(?:' + ($documentTitleReferenceParts -join '|') + ')'
+}
+function Test-DocumentTitleIsOwnIdentity {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Title
+    )
+
+    if ($documentTitleTargets.ContainsKey($Title) -and
+        [string]$documentTitleTargets[$Title] -ceq $SourcePath) {
+        return $true
+    }
+    return $documentHeadingTitles.ContainsKey($SourcePath) -and
+        (Test-DocumentHeadingOwnsTitle `
+            -Heading ([string]$documentHeadingTitles[$SourcePath]) `
+            -Title $Title)
+}
+function Get-CodeFormattedDocumentTitleReferences {
+    param(
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)]$CodeSpan,
+        [Parameter(Mandatory)][string[]]$Titles
+    )
+
+    $beforeStart = [Math]::Max(0, [int]$CodeSpan.Index - 80)
+    $before = $Markdown.Substring(
+        $beforeStart,
+        [int]$CodeSpan.Index - $beforeStart
+    )
+    $afterStart = [int]$CodeSpan.Index + [int]$CodeSpan.Length
+    $after = $Markdown.Substring(
+        $afterStart,
+        [Math]::Min(80, $Markdown.Length - $afterStart)
+    )
+    $hasReferentialContext = [regex]::IsMatch(
+        $before,
+        '(?i)\b(?:see|read|open|consult|reference(?:d)?(?:\s+to)?|according\s+to|documented\s+in|described\s+in)\s*$'
+    ) -or [regex]::IsMatch(
+        $after,
+        '(?i)^\s+(?:document|record|guide|is\s+authoritative|governs|defines|for\s+(?:details|context))\b'
+    )
+    $hasMarkdownLinkSyntax = [regex]::IsMatch(
+        [string]$CodeSpan.Content,
+        '(?i)(?<![!\\])\[[^\]]+\]\([^)]+\)'
+    )
+    if (-not $hasReferentialContext -and -not $hasMarkdownLinkSyntax) {
+        return @()
+    }
+    $references = [System.Collections.Generic.List[string]]::new()
+    foreach ($title in $Titles) {
+        if ((Test-ContainsExactDocumentTitle `
+                -Text ([string]$CodeSpan.Content) -Title $title) -and
+            ($hasReferentialContext -or [regex]::IsMatch(
+                [string]$CodeSpan.Content,
+                '(?i)(?<![!\\])\[[^\]]*' + [regex]::Escape($title) +
+                    '[^\]]*\]\([^)]+\)'
+            ))) {
+            $references.Add($title)
+        }
+    }
+    return @($references)
+}
+function Get-CrossDocumentAggregateRanges {
+    param(
+        [Parameter(Mandatory)][string]$RenderedReferenceText,
+        [Parameter(Mandatory)][string]$SourcePath
+    )
+
+    $results = [Collections.Generic.List[object]]::new()
+    foreach ($range in [regex]::Matches(
+        $RenderedReferenceText,
+        '(?i)(?<prefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-(?<first>\d{4})\s*(?:through|to|\.\.|-|\u2013|\u2014)\s*(?:(?<lastPrefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-)?(?<last>\d{4})'
+    )) {
+        $beforeStart = [Math]::Max(0, $range.Index - 80)
+        $beforeRange = $RenderedReferenceText.Substring(
+            $beforeStart,
+            $range.Index - $beforeStart
+        )
+        if ($range.Value -match '(?i)\s+to\s+' -and
+            $beforeRange -match '(?i)\bfrom(?:\s+the\s+pre-existing)?\s*$') {
+            continue
+        }
+        $prefix = $range.Groups['prefix'].Value.ToUpperInvariant()
+        $lastPrefix = $range.Groups['lastPrefix'].Value
+        if (-not [string]::IsNullOrEmpty($lastPrefix) -and
+            $lastPrefix.ToUpperInvariant() -cne $prefix) { continue }
+        $first = [int]$range.Groups['first'].Value
+        $last = [int]$range.Groups['last'].Value
+        if ($last -le $first -or $last -gt ($first + 1000)) { continue }
+        for ($number = $first; $number -le $last; $number++) {
+            $id = '{0}-{1:D4}' -f $prefix, $number
+            if ($documentRecordTargets.ContainsKey($id) -and
+                [string]$documentRecordTargets[$id] -cne $SourcePath) {
+                $results.Add($range)
+                break
+            }
+        }
+    }
+    return @($results)
+}
+foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
+    $markdownPath = Join-Path $root $relativeMarkdownPath
+    $markdown = Get-Content -LiteralPath $markdownPath -Raw
+    if ([regex]::IsMatch(
+        $markdown,
+        '(?i)https?://[^\s\[\]<>()]*\[[^\]]+\](?:\([^)]+\)|[ \t]*\[[^\]]*\])[^\s<>()]*'
+    )) {
+        Add-Failure "TEST-0175 $relativeMarkdownPath composes a visible URL across a partial Markdown link."
+    }
+    $linkEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $markdown -Path $relativeMarkdownPath
+    foreach ($composedLink in @($linkEvidence.Links)) {
+        $prefix = $markdown.Substring(0, [int]$composedLink.Index)
+        if ([regex]::IsMatch(
+            $prefix,
+            '(?i)https?://[^\s<>()\[\]]*$'
+        )) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath composes a visible URL across a partial Markdown link."
+        }
+    }
+    foreach ($definition in @($linkEvidence.Definitions)) {
+        $definitionKey = $definition.Groups['key'].Value.Trim()
+        $isUsed = @($linkEvidence.Links | Where-Object {
+            $_.Style -ceq 'Reference' -and
+                $_.ReferenceKey -ieq $definitionKey
+        }).Count -gt 0
+        if ($isUsed) { continue }
+        $definitionText = ConvertTo-DocumentMarkdownRenderedText `
+            -Text ([string]$definition.Value)
+        if ([regex]::IsMatch(
+            $definitionText,
+            $hiddenCrossRecordReferencePattern
+        ) -or @(Get-DocumentGitHubShorthandReferences `
+            -Text $definitionText).Count -gt 0) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains an unused reference-link definition with a non-clickable cross-record reference."
+        }
+    }
+    $codeSpans = @($linkEvidence.CodeSpans)
+    foreach ($unresolvedReference in @($linkEvidence.Unresolved)) {
+        Add-Failure "TEST-0175 $relativeMarkdownPath contains unresolved reference-style link '$($unresolvedReference.Label)' -> '$($unresolvedReference.Key)'."
+    }
+    foreach ($htmlComment in @($linkEvidence.HtmlComments)) {
+        $commentContent = [regex]::Replace(
+            [string]$htmlComment.Value,
+            '(?s)^<!--|-->$',
+            ''
+        )
+        $hiddenText = ConvertTo-DocumentMarkdownRenderedText `
+            -Text $commentContent
+        if ([regex]::IsMatch(
+            $hiddenText,
+            $hiddenCrossRecordReferencePattern
+        ) -or @(Get-DocumentGitHubShorthandReferences `
+            -Text $hiddenText).Count -gt 0) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath hides a cross-record reference in a non-clickable HTML comment."
+        }
+    }
+    foreach ($htmlBlock in @($linkEvidence.NonRenderingHtml)) {
+        $literalHtmlText = ConvertTo-DocumentMarkdownRenderedText `
+            -Text ([string]$htmlBlock.Value)
+        if ([regex]::IsMatch(
+            $literalHtmlText,
+            $hiddenCrossRecordReferencePattern
+        ) -or @(Get-DocumentGitHubShorthandReferences `
+            -Text $literalHtmlText).Count -gt 0) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a cross-record reference inside non-rendering HTML."
+        }
+    }
+    foreach ($codeSpan in $codeSpans) {
+        $codeIsInsideClickableLink = @($linkEvidence.Links | Where-Object {
+            $codeSpan.Index -ge $_.Index -and
+                ($codeSpan.Index + $codeSpan.Length) -le
+                    ($_.Index + $_.Length)
+        }).Count -gt 0
+        if ($codeIsInsideClickableLink) { continue }
+        if (Test-CodeFormattedDocumentReference `
+            -Markdown $markdown -CodeSpan $codeSpan) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted repository-document reference that is not clickable."
+        }
+        if ([regex]::IsMatch(
+            [string]$codeSpan.Content,
+            '(?i)(?<![!\\])\[[^\]]+\]\((?:[^)\s]+\.md(?:#[A-Za-z0-9_.:-]+)?|https?://github\.com/[^/]+/[^/]+/blob/[^)\s]+)\)'
+        )) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted repository-document pseudo-link that is not clickable."
+        }
+        foreach ($knownTitle in Get-CodeFormattedDocumentTitleReferences `
+            -Markdown $markdown -CodeSpan $codeSpan `
+            -Titles @($documentTitleTargets.Keys)) {
+            if (-not (Test-DocumentTitleIsOwnIdentity `
+                    -SourcePath $relativeMarkdownPath `
+                    -Title $knownTitle)) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted document-title reference '$knownTitle' that is not clickable."
+            }
+        }
+        foreach ($codeId in @([regex]::Matches(
+            [string]$codeSpan.Content,
+            $recordIdPattern
+        ) | ForEach-Object { $_.Value } | Select-Object -Unique)) {
+            $isFeatureCompanionIdentity = $codeId.StartsWith('FEAT-') -and
+                $relativeMarkdownPath -match
+                    "^docs/features/$codeId-[^/]+/(?:README|test-cases)\.md$"
+            $isCanonicalIdentity = $documentRecordTargets.ContainsKey($codeId) -and
+                [string]$documentRecordTargets[$codeId] -ceq
+                    $relativeMarkdownPath
+            if (-not $isFeatureCompanionIdentity -and
+                -not $isCanonicalIdentity) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted cross-record identifier $codeId that is not clickable."
+            }
+        }
+        $codeContainsGitHubReference = [regex]::IsMatch(
+            [string]$codeSpan.Content,
+            $githubNumberPattern
+        ) -or [regex]::IsMatch(
+            [string]$codeSpan.Content,
+            '(?i)https?://github\.com/[^/]+/[^/]+/(?:(?:issues|pull)/[1-9][0-9]*|blob/[^<>\s]+)|\b(?:comment|review)\s+#?\d+\b'
+        ) -or @(Get-DocumentGitHubShorthandReferences `
+            -Text ([string]$codeSpan.Content)).Count -gt 0
+        $isSyntheticFixture =
+            $relativeMarkdownPath -ceq
+                'docs/features/FEAT-0034-ci-evidence-hygiene/README.md' -and
+            @([regex]::Matches(
+                [string]$codeSpan.Content,
+                $githubNumberPattern
+            ) | Where-Object {
+                [int]$_.Groups['number'].Value -in @(9, 42)
+            }).Count -gt 0
+        if ($codeContainsGitHubReference -and -not $isSyntheticFixture) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted GitHub cross-record reference that is not clickable."
+        }
+    }
+    foreach ($link in @($linkEvidence.Links)) {
+        $label = ConvertTo-DocumentMarkdownRenderedText `
+            -Text ([string]$link.Label)
+        $target = [string]$link.Target
+        foreach ($visibleUrl in @(
+            Get-DocumentMarkdownVisibleHttpUrlSpans -Text $label
+        )) {
+            $expectedUrl = [string]$visibleUrl.Value
+            if ($target.Trim().Trim('<', '>') -cne $expectedUrl) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links visible URL '$expectedUrl' to a different target '$target'."
+            }
+        }
+        foreach ($visiblePath in [regex]::Matches(
+            $label,
+            $rawDocumentPathPattern
+        )) {
+            if (-not (Test-DocumentVisiblePathMatchesLinkTarget `
+                    -SourcePath $relativeMarkdownPath `
+                    -VisiblePath ([string]$visiblePath.Value) `
+                    -Target $target)) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links visible repository-document path '$($visiblePath.Value)' to a different target '$target'."
+            }
+        }
+        if ($link.Style -ceq 'Reference' -and
+            -not (Test-DocumentResolvedTargetExists `
+                -SourcePath $relativeMarkdownPath -Target $target)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a broken reference-style link target '$target'."
+        }
+        $commentStatus = Get-DocumentCommentLinkStatus `
+            -Label $label -Target $target
+        if ($commentStatus.IsReference) {
+            if (-not $commentStatus.Target.Success) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath contains a comment link that is not an exact GitHub comment permalink."
+            }
+            if ($commentStatus.Target.Success -and
+                $commentStatus.LabelId.Success -and
+                $commentStatus.LabelId.Groups['id'].Value -cne
+                    $commentStatus.Target.Groups['id'].Value) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath contains a comment label that does not match its permalink target."
+            }
+            if ($commentStatus.Target.Success -and
+                $commentStatus.Parent.Success) {
+                $expectedParentKind = if (
+                    $commentStatus.Parent.Groups['kind'].Value -ieq 'issue'
+                ) { 'issues' } else { 'pull' }
+                if ($commentStatus.Target.Groups['parentKind'].Value -cne
+                        $expectedParentKind -or
+                    $commentStatus.Target.Groups['parentNumber'].Value -cne
+                        $commentStatus.Parent.Groups['number'].Value) {
+                    Add-Failure "TEST-0175 $relativeMarkdownPath contains a comment parent label that does not match its permalink target."
+                }
+            }
+            $numericArtifactOrBareLabel = [regex]::Match(
+                $label,
+                '(?i)(?<![A-Za-z0-9_])(?:(?:issue|PR|pull request)\s+#?|#)[1-9][0-9]*(?![A-Za-z0-9_-])'
+            )
+            if ($numericArtifactOrBareLabel.Success -and
+                -not $commentStatus.Parent.Success -and
+                -not $commentStatus.LabelId.Success) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath uses an issue, pull-request, or bare numeric label for a comment target."
+            }
+        }
+        else {
+        $githubReferences = @([regex]::Matches(
+            $label,
+            $githubNumberPattern
+        ))
+        $numberOnlyReference = [regex]::Match(
+            $label.Trim(), '^(?<source>(?<number>\d+))$'
+        )
+        if ($numberOnlyReference.Success -and [regex]::IsMatch(
+            $target.Trim().Trim('<', '>'),
+            '^https://github\.com/[^/]+/[^/]+/(?:issues|pull)/\d+$'
+        )) {
+            $githubReferences += $numberOnlyReference
+        }
+        foreach ($githubReference in $githubReferences) {
+            $cleanTarget = $target.Trim().Trim('<', '>')
+            if ($cleanTarget -notmatch '^https://github\.com/[^/]+/[^/]+/(?<kind>issues|pull)/(?<number>\d+)$') {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links '$($githubReference.Value)' to a non-record target '$target'."
+                continue
+            }
+            $targetKind = [string]$Matches['kind']
+            $targetNumber = [int]$Matches['number']
+            if ($targetNumber -ne
+                [int]$githubReference.Groups['number'].Value) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links '$($githubReference.Value)' to the wrong GitHub number '$target'."
+            }
+            $declaredKind = $githubReference.Groups['kind'].Value
+            if ($declaredKind -match '^(?i:PR|pull request)$' -and
+                $targetKind -cne 'pull') {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links PR reference '$($githubReference.Value)' to an issue URL."
+            }
+            if ($declaredKind -match '^(?i:issue)$' -and
+                $targetKind -cne 'issues') {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links issue reference '$($githubReference.Value)' to a pull-request URL."
+            }
+        }
+        }
+        $linkedTitles = @([regex]::Matches(
+            $label,
+            $documentTitleLinkPattern
+        ) | ForEach-Object { $_.Groups['title'].Value } | Select-Object -Unique)
+        foreach ($linkedTitle in $linkedTitles) {
+            $matchesCanonicalTitleTarget = Test-DocumentRecordLinkTarget `
+                    -SourcePath $relativeMarkdownPath -Target $target `
+                    -ExpectedTarget ([string]$documentTitleTargets[$linkedTitle])
+            $resolvedTitleTarget = Resolve-DocumentLinkTarget `
+                -SourcePath $relativeMarkdownPath -Target $target
+            $matchesTargetOwnTitle =
+                $resolvedTitleTarget.Kind -ceq 'Repository' -and
+                $documentHeadingTitles.ContainsKey(
+                    [string]$resolvedTitleTarget.Value
+                ) -and
+                (Test-DocumentHeadingOwnsTitle `
+                    -Heading ([string]$documentHeadingTitles[[string]$resolvedTitleTarget.Value]) `
+                    -Title $linkedTitle)
+            if (-not $matchesCanonicalTitleTarget -and
+                -not $matchesTargetOwnTitle) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links document title '$linkedTitle' to the wrong target '$target'."
+            }
+        }
+        $shorthandReferences = @(
+            Get-DocumentGitHubShorthandReferences -Text $label
+        )
+        if ($shorthandReferences.Count -gt 1) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath combines multiple GitHub shorthand references in one link."
+        }
+        foreach ($shorthandReference in $shorthandReferences) {
+            if (-not (Test-DocumentExactGitHubShorthandTarget `
+                    -Reference $shorthandReference -Target $target)) {
+                Add-Failure "TEST-0175 $relativeMarkdownPath links GitHub shorthand '$($shorthandReference.Value)' to a target other than its exact GitHub record."
+            }
+        }
+        $linkIds = @([regex]::Matches(
+            $label,
+            $recordIdPattern
+        ) | ForEach-Object { $_.Value } | Select-Object -Unique)
+        if ($linkIds.Count -eq 0) {
+            continue
+        }
+        if (@($codeSpans | Where-Object {
+            $link.Index -ge $_.Index -and $link.Index -lt ($_.Index + $_.Length)
+        }).Count -gt 0) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath wraps a record link in code, so it is not clickable."
+        }
+        if ($linkIds.Count -ne 1) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath combines multiple record references in one link."
+            continue
+        }
+        $id = $linkIds[0]
+        if (-not $documentRecordTargets.ContainsKey($id)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath links unregistered record $id."
+            continue
+        }
+        $expectedTargets = @([string]$documentRecordTargets[$id])
+        if ($id.StartsWith('FEAT-') -and
+            $expectedTargets[0].EndsWith('/README.md', [StringComparison]::Ordinal)) {
+            $expectedTargets += $expectedTargets[0].Substring(
+                0, $expectedTargets[0].Length - 'README.md'.Length
+            ) + 'test-cases.md'
+        }
+        $matchesExpectedTarget = @($expectedTargets | Where-Object {
+            Test-DocumentRecordLinkTarget -SourcePath $relativeMarkdownPath `
+                -Target $target -ExpectedTarget $_
+        }).Count -gt 0
+        if (-not $matchesExpectedTarget) {
+            $resolvedTarget = Resolve-DocumentLinkTarget `
+                -SourcePath $relativeMarkdownPath -Target $target
+            $matchesExpectedTarget =
+                $relativeMarkdownPath -ceq '.ai/memory/log/README.md' -and
+                $resolvedTarget.Kind -ceq 'Repository' -and
+                ([string]$resolvedTarget.Value).StartsWith(
+                    '.ai/memory/log/', [StringComparison]::Ordinal
+                ) -and
+                $label -match '^\d{4}-\d{2}-\d{2}\s+-\s+' -and
+                [regex]::IsMatch(
+                    [string]$resolvedTarget.Value,
+                    '(?i)^\.ai/memory/log/\d{4}-\d{2}-\d{2}-.*(?<![A-Za-z0-9])' +
+                        [regex]::Escape($id) + '(?![A-Za-z0-9]).*\.md$'
+                )
+        }
+        if (-not $matchesExpectedTarget) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath links $id to '$target' instead of one of its exact canonical targets."
+        }
+    }
+    foreach ($shorthand in [regex]::Matches(
+        $markdown,
+        '\]\([^)]+\)(?:\s*/\s*`?(?:[A-Z]+-)?\d{4}`?)+'
+    )) {
+        Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked shorthand after a record link: '$($shorthand.Value)'."
+    }
+    $unlinkedMarkdown = Get-DocumentUnlinkedMarkdown `
+        -Markdown $markdown -LinkEvidence $linkEvidence
+    foreach ($titleReference in [regex]::Matches(
+        $unlinkedMarkdown,
+        $documentTitleReferencePattern
+    )) {
+        $title = $titleReference.Groups['title'].Value
+        if (-not (Test-DocumentTitleIsOwnIdentity `
+                -SourcePath $relativeMarkdownPath -Title $title)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains an unlinked document-title reference '$title'."
+        }
+    }
+    $renderedReferenceText = Get-RenderedDocumentReferenceText `
+        -Markdown $markdown -LinkEvidence $linkEvidence
+    foreach ($range in Get-CrossDocumentAggregateRanges `
+        -RenderedReferenceText $renderedReferenceText `
+        -SourcePath $relativeMarkdownPath) {
+        Add-Failure "TEST-0175 $relativeMarkdownPath contains a cross-document aggregate range '$($range.Value)' whose implied records are not individually linked."
+    }
+    foreach ($match in [regex]::Matches($unlinkedMarkdown, $recordIdPattern)) {
+        $id = $match.Value
+        $isFeatureCompanionIdentity = $id.StartsWith('FEAT-') -and
+            $relativeMarkdownPath -match "^docs/features/$id-[^/]+/(?:README|test-cases)\.md$"
+        $isCanonicalIdentity = $documentRecordTargets.ContainsKey($id) -and
+            [string]$documentRecordTargets[$id] -ceq $relativeMarkdownPath
+        if (-not $isFeatureCompanionIdentity -and -not $isCanonicalIdentity) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked cross-record identifier $id."
+        }
+    }
+    foreach ($githubReference in [regex]::Matches(
+        $unlinkedMarkdown,
+        $githubNumberPattern
+    )) {
+        $number = [int]$githubReference.Groups['number'].Value
+        $isSyntheticFixture =
+            $relativeMarkdownPath -ceq 'docs/features/FEAT-0034-ci-evidence-hygiene/README.md' -and
+            $number -in @(9, 42)
+        if (-not $isSyntheticFixture) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked GitHub reference '$($githubReference.Value)'."
+        }
+    }
+    foreach ($shorthandReference in @(
+        Get-DocumentGitHubShorthandReferences -Text $unlinkedMarkdown
+    )) {
+        Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked GitHub shorthand '$($shorthandReference.Value)'."
+    }
+    $proseUnlinkedMarkdown = [regex]::Replace(
+        $unlinkedMarkdown,
+        '(?ms)^```[^\r\n]*\r?\n.*?^```\s*$|(?m)(?<!`)`[^`\r\n]+`(?!`)',
+        ''
+    )
+    foreach ($rawPath in [regex]::Matches(
+        $proseUnlinkedMarkdown, $rawDocumentPathPattern
+    )) {
+        $resolvedRawPath = Resolve-DocumentLinkTarget `
+            -SourcePath $relativeMarkdownPath `
+            -Target ([string]$rawPath.Value)
+        if ($resolvedRawPath.Kind -ceq 'Repository' -and
+            [string]$resolvedRawPath.Value -ceq $relativeMarkdownPath) {
+            continue
+        }
+        Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked repository document path '$($rawPath.Value)'."
+    }
+    $renderedEvidence = Get-DocumentRenderedReferenceEvidence `
+        -Markdown $markdown -LinkEvidence $linkEvidence
+    foreach ($renderedUrl in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        '(?i)https?://[^\s<>()\[\]{}"''`]+'
+    )) {
+        $urlLength = ([string]$renderedUrl.Value).TrimEnd(
+            [char[]]'.,;:!?'
+        ).Length
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedUrl.Index -Length $urlLength `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible URL that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedId in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        $recordIdPattern
+    )) {
+        $id = [string]$renderedId.Value
+        $isFeatureCompanionIdentity = $id.StartsWith('FEAT-') -and
+            $relativeMarkdownPath -match
+                "^docs/features/$id-[^/]+/(?:README|test-cases)\.md$"
+        $isCanonicalIdentity = $documentRecordTargets.ContainsKey($id) -and
+            [string]$documentRecordTargets[$id] -ceq $relativeMarkdownPath
+        if ($isFeatureCompanionIdentity -or $isCanonicalIdentity) { continue }
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedId.Index -Length $renderedId.Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible cross-record identifier $id that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedGitHubReference in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        $githubNumberPattern
+    )) {
+        $number = [int]$renderedGitHubReference.Groups['number'].Value
+        $isSyntheticFixture =
+            $relativeMarkdownPath -ceq
+                'docs/features/FEAT-0034-ci-evidence-hygiene/README.md' -and
+            $number -in @(9, 42)
+        if ($isSyntheticFixture) { continue }
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedGitHubReference.Index `
+                -Length $renderedGitHubReference.Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains visible GitHub record '$($renderedGitHubReference.Value)' that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedComment in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        '(?i)\b(?:comment|review)\s+#?[1-9][0-9]*\b'
+    )) {
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedComment.Index -Length $renderedComment.Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible GitHub comment reference that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedShorthand in @(
+        Get-DocumentGitHubShorthandReferences `
+            -Text ([string]$renderedEvidence.Text)
+    )) {
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedShorthand.Index `
+                -Length $renderedShorthand.Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible GitHub shorthand that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedTitle in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        $documentTitleReferencePattern
+    )) {
+        $title = [string]$renderedTitle.Groups['title'].Value
+        if (Test-DocumentTitleIsOwnIdentity `
+            -SourcePath $relativeMarkdownPath -Title $title) { continue }
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedTitle.Groups['title'].Index `
+                -Length $renderedTitle.Groups['title'].Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible document-title reference '$title' that is not wholly covered by one clickable link."
+        }
+    }
+    foreach ($renderedPath in [regex]::Matches(
+        [string]$renderedEvidence.Text,
+        $rawDocumentPathPattern
+    )) {
+        $resolvedRenderedPath = Resolve-DocumentLinkTarget `
+            -SourcePath $relativeMarkdownPath `
+            -Target ([string]$renderedPath.Value)
+        if ($resolvedRenderedPath.Kind -ceq 'Repository' -and
+            [string]$resolvedRenderedPath.Value -ceq
+                $relativeMarkdownPath) { continue }
+        if (-not (Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $renderedPath.Index -Length $renderedPath.Length `
+                -RenderedEvidence $renderedEvidence)) {
+            Add-Failure "TEST-0175 $relativeMarkdownPath contains a visible repository-document path that is not wholly covered by one clickable link."
+        }
+    }
+}
+if (-not (Test-CodeFormattedDocumentReference `
+    -Markdown 'See `docs/notes/release-evidence.md` for details.' `
+    -CodeSpan ([regex]::Match(
+        'See `docs/notes/release-evidence.md` for details.',
+        '(?<!`)`[^`\r\n]+`(?!`)'
+    )))) {
+    Add-Failure 'TEST-0175 code-formatted document-reference fixture was not rejected.'
+}
+foreach ($titleFixture in @(
+    'Clickable Cross-Record References is authoritative.',
+    'See Clickable Cross-Record References for context.',
+    'Common Development Protocol is authoritative.'
+)) {
+    $expectedFixtureTitle = if ($titleFixture -match 'Common Development') {
+        'Common Development Protocol'
+    }
+    else { 'Clickable Cross-Record References' }
+    if (-not (Test-ContainsExactDocumentTitle `
+            -Text $titleFixture -Title $expectedFixtureTitle) -or
+        @([regex]::Matches(
+            $titleFixture,
+            $documentTitleReferencePattern
+        )).Count -ne 1) {
+        Add-Failure "TEST-0175 free-text document-title fixture was not rejected: '$titleFixture'."
+    }
+}
+foreach ($ownHeadingFixture in @(
+    [pscustomobject]@{
+        Heading = 'FEAT-0047 - Clickable Cross-Record References'
+        Title = 'Clickable Cross-Record References'
+    },
+    [pscustomobject]@{
+        Heading = '2026-07-24 - v0.14.2 Clickable Cross-Record References'
+        Title = 'Clickable Cross-Record References'
+    }
+)) {
+    if (-not (Test-DocumentHeadingOwnsTitle `
+            -Heading $ownHeadingFixture.Heading `
+            -Title $ownHeadingFixture.Title)) {
+        Add-Failure "TEST-0175 exact own-heading fixture was not recognized: '$($ownHeadingFixture.Heading)'."
+    }
+}
+if (Test-DocumentHeadingOwnsTitle `
+        -Heading 'Guide to Common Development Protocol' `
+        -Title 'Common Development Protocol') {
+    Add-Failure 'TEST-0175 a heading that merely contains another document title was treated as that document identity.'
+}
+if (-not (Test-DocumentTitleIsOwnIdentity `
+        -SourcePath 'docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md' `
+        -Title 'Clickable Cross-Record References') -or
+    (Test-DocumentTitleIsOwnIdentity `
+        -SourcePath 'CHANGELOG.md' `
+        -Title 'Clickable Cross-Record References')) {
+    Add-Failure 'TEST-0175 exact own-document title identity was not distinguished from a cross-document title reference.'
+}
+foreach ($rangeFixture in @(
+    [pscustomobject]@{
+        Text = 'TEST-0163 through TEST-0168'
+        Source = 'docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md'
+    },
+    [pscustomobject]@{
+        Text = 'RISK-0190..0192'
+        Source = '.ai/memory/log/2026-07-22-v0131-batched-instruction-graph-planning.md'
+    },
+    [pscustomobject]@{
+        Text = 'RISK-0190..0191'
+        Source = '.ai/memory/log/2026-07-22-v0131-batched-instruction-graph-planning.md'
+    },
+    [pscustomobject]@{
+        Text = 'TEST-0022-TEST-0026'
+        Source = 'CHANGELOG.md'
+    },
+    [pscustomobject]@{
+        Text = 'TEST-0096 to TEST-0099'
+        Source = 'CHANGELOG.md'
+    }
+)) {
+    if (@(Get-CrossDocumentAggregateRanges `
+        -RenderedReferenceText $rangeFixture.Text `
+        -SourcePath $rangeFixture.Source).Count -ne 1) {
+        Add-Failure "TEST-0175 aggregate-range fixture '$($rangeFixture.Text)' was not rejected."
+    }
+}
+if (@(Get-CrossDocumentAggregateRanges `
+    -RenderedReferenceText 'TEST-0167 through TEST-0168' `
+    -SourcePath 'docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md').Count -ne 0) {
+    Add-Failure 'TEST-0175 same-document adjacent identity fixture was rejected as a cross-document range.'
+}
+if (-not (Test-DocumentRecordLinkTarget `
+    -SourcePath 'CHANGELOG.md' `
+    -Target 'docs/features/FEAT-0032-general-capability-test-architecture/README.md' `
+    -ExpectedTarget 'docs/features/FEAT-0032-general-capability-test-architecture/README.md')) {
+    Add-Failure 'TEST-0175 exact-target fixture rejected a valid local record link.'
+}
+if (Test-DocumentRecordLinkTarget `
+    -SourcePath 'CHANGELOG.md' `
+    -Target 'docs/features/FEAT-0001-common-development-protocol/README.md' `
+    -ExpectedTarget 'docs/features/FEAT-0032-general-capability-test-architecture/README.md') {
+    Add-Failure 'TEST-0175 exact-target fixture accepted a wrong local record link.'
+}
+if (Test-DocumentRecordLinkTarget `
+    -SourcePath 'CHANGELOG.md' `
+    -Target 'https://github.com/hasanmanzak/meAndAI/issues/1' `
+    -ExpectedTarget 'https://github.com/hasanmanzak/meAndAI/issues/110') {
+    Add-Failure 'TEST-0175 exact-target fixture accepted a wrong GitHub record link.'
+}
+foreach ($numberFixture in @(
+    'issue 110', 'Issue #110', 'issue #110', 'PR 113', 'pull request #113'
+)) {
+    if (@([regex]::Matches($numberFixture, $githubNumberPattern)).Count -ne 1) {
+        Add-Failure "TEST-0175 free-text GitHub-number fixture was not detected: '$numberFixture'."
+    }
+}
+$parentIssueCommentStatus = Get-DocumentCommentLinkStatus `
+    -Label 'issue #114 comment' `
+    -Target 'https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103'
+if (-not $parentIssueCommentStatus.IsReference -or
+    -not $parentIssueCommentStatus.Target.Success -or
+    $parentIssueCommentStatus.LabelId.Success -or
+    -not $parentIssueCommentStatus.Parent.Success -or
+    $parentIssueCommentStatus.Parent.Groups['number'].Value -cne '114') {
+    Add-Failure 'TEST-0175 valid parent-issue comment label was not accepted as an exact permalink.'
+}
+$wrongParentCommentStatus = Get-DocumentCommentLinkStatus `
+    -Label 'issue #99 comment' `
+    -Target 'https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103'
+if (-not $wrongParentCommentStatus.Target.Success -or
+    -not $wrongParentCommentStatus.Parent.Success -or
+    ($wrongParentCommentStatus.Target.Groups['parentNumber'].Value -ceq
+        $wrongParentCommentStatus.Parent.Groups['number'].Value)) {
+    Add-Failure 'TEST-0175 wrong parent-issue comment label bypassed exact-parent validation.'
+}
+$artifactLabelCommentStatus = Get-DocumentCommentLinkStatus `
+    -Label 'issue #114' `
+    -Target 'https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103'
+$artifactNumericLabel = [regex]::Match(
+    'issue #114',
+    '(?i)(?<![A-Za-z0-9_])(?:(?:issue|PR|pull request)\s+#?|#)[1-9][0-9]*(?![A-Za-z0-9_-])'
+)
+if (-not $artifactLabelCommentStatus.Target.Success -or
+    -not $artifactNumericLabel.Success -or
+    $artifactLabelCommentStatus.Parent.Success -or
+    $artifactLabelCommentStatus.LabelId.Success) {
+    Add-Failure 'TEST-0175 an issue-number label targeting a comment was not classified as a target-kind mismatch.'
+}
+if (Test-DocumentRecordLinkTarget `
+        -SourcePath 'CHANGELOG.md' `
+        -Target 'https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103' `
+        -ExpectedTarget 'https://github.com/hasanmanzak/meAndAI/issues/114') {
+    Add-Failure 'TEST-0175 a stable issue identity incorrectly accepted a comment permalink as its exact target.'
+}
+foreach ($invalidCommentFixture in @(
+    [pscustomobject]@{
+        Label = 'comment'
+        Target = 'https://github.com/hasanmanzak/meAndAI/issues/114'
+    },
+    [pscustomobject]@{
+        Label = 'review #123'
+        Target = 'https://github.com/hasanmanzak/meAndAI/pull/114'
+    },
+    [pscustomobject]@{
+        Label = 'inline review #456'
+        Target = 'https://github.com/hasanmanzak/meAndAI/pull/114'
+    }
+)) {
+    $invalidCommentStatus = Get-DocumentCommentLinkStatus `
+        -Label $invalidCommentFixture.Label `
+        -Target $invalidCommentFixture.Target
+    if (-not $invalidCommentStatus.IsReference -or
+        $invalidCommentStatus.Target.Success) {
+        Add-Failure "TEST-0175 non-permalink comment fixture bypassed validation: '$($invalidCommentFixture.Label)'."
+    }
+}
+$wrongTitleFixture = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[See Clickable Cross-Record References](PROTOCOL.md)' `
+    -Path '<wrong-title-target-fixture>'
+$wrongTitleMatches = @([regex]::Matches(
+    [string]$wrongTitleFixture.Links[0].Label,
+    $documentTitleLinkPattern
+))
+if (@($wrongTitleFixture.Links).Count -ne 1 -or
+    $wrongTitleMatches.Count -ne 1 -or
+    (Test-DocumentRecordLinkTarget `
+        -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$wrongTitleFixture.Links[0].Target) `
+        -ExpectedTarget 'docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md')) {
+    Add-Failure 'TEST-0175 contextual document-title fixture bypassed exact-target validation.'
+}
+$wrongOrdinaryTitleFixture = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[read the Common Development Protocol](README.md)' `
+    -Path '<wrong-ordinary-title-target-fixture>'
+$wrongOrdinaryTitleMatches = @([regex]::Matches(
+    [string]$wrongOrdinaryTitleFixture.Links[0].Label,
+    $documentTitleLinkPattern
+))
+if (@($wrongOrdinaryTitleFixture.Links).Count -ne 1 -or
+    $wrongOrdinaryTitleMatches.Count -ne 1 -or
+    (Test-DocumentRecordLinkTarget `
+        -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$wrongOrdinaryTitleFixture.Links[0].Target) `
+        -ExpectedTarget 'PROTOCOL.md')) {
+    Add-Failure 'TEST-0175 ordinary document-title fixture bypassed exact-target validation.'
+}
+$referenceStyleFixture = @"
+[See FEAT-0032 architecture][feature]
+
+[feature]: docs/features/FEAT-0032-general-capability-test-architecture/README.md
+"@
+$referenceStyleEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $referenceStyleFixture -Path '<reference-style-fixture>'
+if (@($referenceStyleEvidence.Links).Count -ne 1 -or
+    $referenceStyleEvidence.Links[0].Style -cne 'Reference' -or
+    -not (Test-DocumentRecordLinkTarget -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$referenceStyleEvidence.Links[0].Target) `
+        -ExpectedTarget 'docs/features/FEAT-0032-general-capability-test-architecture/README.md')) {
+    Add-Failure 'TEST-0175 valid reference-style Markdown fixture did not resolve to its exact target.'
+}
+if (-not (Test-DocumentResolvedTargetExists `
+        -SourcePath 'CHANGELOG.md' `
+        -Target 'docs/features/FEAT-0032-general-capability-test-architecture/README.md') -or
+    (Test-DocumentResolvedTargetExists `
+        -SourcePath 'CHANGELOG.md' `
+        -Target 'docs/features/FEAT-9999-missing/README.md')) {
+    Add-Failure 'TEST-0175 broken generic reference-style target fixture did not fail closed.'
+}
+$unresolvedReferenceFixture = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[guide][missing-guide]' `
+    -Path '<unresolved-reference-style-fixture>'
+if (@($unresolvedReferenceFixture.Links).Count -ne 0 -or
+    @($unresolvedReferenceFixture.Unresolved).Count -ne 1 -or
+    $unresolvedReferenceFixture.Unresolved[0].Key -cne 'missing-guide') {
+    Add-Failure 'TEST-0175 unresolved reference-style usage fixture did not fail closed.'
+}
+$codeLiteralMarkdown = @'
+``[string][int] [label][key] [x](y)``
+
+~~~text
+[string][int] [label][key] [x](y)
+~~~
+
+    [string][int] [label][key] [x](y)
+'@
+$codeLiteralEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $codeLiteralMarkdown `
+    -Path '<code-literal-fixture>'
+if (@($codeLiteralEvidence.Links).Count -ne 0 -or
+    @($codeLiteralEvidence.Unresolved).Count -ne 0 -or
+    @($codeLiteralEvidence.CodeSpans).Count -ne 3) {
+    Add-Failure 'TEST-0175 a non-reference code literal was parsed as Markdown link evidence.'
+}
+$codePseudoLinkMarkdown = @'
+``[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)``
+
+~~~text
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+~~~
+'@
+$codePseudoLinkEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $codePseudoLinkMarkdown `
+    -Path '<code-pseudo-link-fixture>'
+if (@($codePseudoLinkEvidence.Links).Count -ne 0 -or
+    @($codePseudoLinkEvidence.CodeSpans).Count -ne 2 -or
+    @($codePseudoLinkEvidence.CodeSpans | Where-Object {
+        [regex]::IsMatch([string]$_.Content, $recordIdPattern)
+    }).Count -ne 2) {
+    Add-Failure 'TEST-0175 multi-backtick or tilde-fenced cross-record pseudo-link bypassed code classification.'
+}
+$contextualCodePseudoLinks = @'
+   ```md
+   [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+   ```
+
+> ```md
+> [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+> ```
+
+- ```md
+  [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+  ```
+
+`[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+continued`
+'@
+$contextualCodeEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $contextualCodePseudoLinks `
+    -Path '<contextual-code-pseudo-link-fixture>'
+if (@($contextualCodeEvidence.Links).Count -ne 0 -or
+    @($contextualCodeEvidence.CodeSpans).Count -ne 4 -or
+    @($contextualCodeEvidence.CodeSpans | Where-Object {
+        [regex]::IsMatch([string]$_.Content, $recordIdPattern)
+    }).Count -ne 4) {
+    Add-Failure 'TEST-0175 spaced, quoted, list-contained, or multiline-inline code pseudo-link bypassed code classification.'
+}
+$documentPseudoLinkMarkdown = '``[guide](docs/guide.md)``'
+$documentPseudoLinkEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $documentPseudoLinkMarkdown `
+    -Path '<document-pseudo-link-fixture>'
+if (@($documentPseudoLinkEvidence.Links).Count -ne 0 -or
+    @($documentPseudoLinkEvidence.CodeSpans).Count -ne 1 -or
+    -not [regex]::IsMatch(
+        [string]$documentPseudoLinkEvidence.CodeSpans[0].Content,
+        '(?i)(?<!\!)\[[^\]]+\]\([^)\s]+\.md\)'
+    )) {
+    Add-Failure 'TEST-0175 a standalone code-formatted repository-document pseudo-link bypassed classification.'
+}
+$indentedPseudoLinkMarkdown = @'
+Paragraph.
+
+    [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+'@
+$indentedPseudoLinkEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $indentedPseudoLinkMarkdown `
+    -Path '<indented-pseudo-link-fixture>'
+if (@($indentedPseudoLinkEvidence.Links).Count -ne 0 -or
+    @($indentedPseudoLinkEvidence.CodeSpans).Count -ne 1 -or
+    $indentedPseudoLinkEvidence.CodeSpans[0].Kind -cne 'Indented' -or
+    -not [regex]::IsMatch(
+        [string]$indentedPseudoLinkEvidence.CodeSpans[0].Content,
+        $recordIdPattern
+    )) {
+    Add-Failure 'TEST-0175 an indented-code cross-record pseudo-link bypassed code classification.'
+}
+foreach ($containerIndentedMarkdown in @(
+    '>     [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)',
+    '-     [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)'
+)) {
+    $containerIndentedEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $containerIndentedMarkdown `
+        -Path '<container-indented-pseudo-link-fixture>'
+    if (@($containerIndentedEvidence.Links).Count -ne 0 -or
+        @($containerIndentedEvidence.CodeSpans).Count -ne 1 -or
+        $containerIndentedEvidence.CodeSpans[0].Kind -cne 'Indented' -or
+        -not [regex]::IsMatch(
+            [string]$containerIndentedEvidence.CodeSpans[0].Content,
+            $recordIdPattern
+        )) {
+        Add-Failure 'TEST-0175 a blockquote- or list-contained indented-code cross-record pseudo-link bypassed classification.'
+    }
+}
+$escapedLinkFixtures = @(
+    '\[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)',
+    '\\\[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)',
+    "\[FEAT-0032][feature]`n`n[feature]: docs/features/FEAT-0032-general-capability-test-architecture/README.md",
+    "\[FEAT-0032]`n`n[FEAT-0032]: docs/features/FEAT-0032-general-capability-test-architecture/README.md"
+)
+foreach ($escapedLinkFixture in $escapedLinkFixtures) {
+    $escapedLinkEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $escapedLinkFixture `
+        -Path '<escaped-link-fixture>'
+    if (@($escapedLinkEvidence.Links).Count -ne 0) {
+        Add-Failure 'TEST-0175 an odd-parity backslash-escaped pseudo-link was treated as clickable Markdown evidence.'
+    }
+}
+$evenEscapeEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '\\[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)' `
+    -Path '<even-escape-link-fixture>'
+if (@($evenEscapeEvidence.Links).Count -ne 1) {
+    Add-Failure 'TEST-0175 an even-parity backslash prefix incorrectly escaped a clickable Markdown link.'
+}
+$codeTitleMarkdown = 'See `Common Development Protocol` for context.'
+$codeTitleEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $codeTitleMarkdown -Path '<code-title-fixture>'
+if (@($codeTitleEvidence.CodeSpans).Count -ne 1 -or
+    @(
+        Get-CodeFormattedDocumentTitleReferences `
+            -Markdown $codeTitleMarkdown `
+            -CodeSpan $codeTitleEvidence.CodeSpans[0] `
+            -Titles @('Common Development Protocol')
+    ).Count -ne 1) {
+    Add-Failure 'TEST-0175 a code-formatted known document-title reference bypassed classification.'
+}
+$hiddenReferenceEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '<!-- [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md) pr-42 -->' `
+    -Path '<hidden-reference-fixture>'
+if (@($hiddenReferenceEvidence.Links).Count -ne 0 -or
+    @($hiddenReferenceEvidence.HtmlComments).Count -ne 1 -or
+    -not [regex]::IsMatch(
+        [string]$hiddenReferenceEvidence.HtmlComments[0].Value,
+        $hiddenCrossRecordReferencePattern
+    )) {
+    Add-Failure 'TEST-0175 a hidden HTML-comment cross-record reference bypassed non-clickable classification.'
+}
+$benignCommentEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '<!-- lifecycle:v2:digest-abcdef -->' `
+    -Path '<benign-html-comment-fixture>'
+if (@($benignCommentEvidence.HtmlComments).Count -ne 1 -or
+    [regex]::IsMatch(
+        [string]$benignCommentEvidence.HtmlComments[0].Value,
+        $hiddenCrossRecordReferencePattern
+    )) {
+    Add-Failure 'TEST-0175 a non-referential lifecycle marker was treated as a cross-record reference.'
+}
+$nonRenderingHtmlEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '<pre>[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)</pre>' `
+    -Path '<non-rendering-html-fixture>'
+if (@($nonRenderingHtmlEvidence.Links).Count -ne 0 -or
+    @($nonRenderingHtmlEvidence.NonRenderingHtml).Count -ne 1 -or
+    -not [regex]::IsMatch(
+        [string]$nonRenderingHtmlEvidence.NonRenderingHtml[0].Value,
+        $recordIdPattern
+    )) {
+    Add-Failure 'TEST-0175 a pseudo-link inside non-rendering HTML bypassed classification.'
+}
+$nonRenderingBlockHtml = @'
+<table>
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+</table>
+'@
+$nonRenderingBlockHtmlEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $nonRenderingBlockHtml `
+    -Path '<non-rendering-block-html-fixture>'
+if (@($nonRenderingBlockHtmlEvidence.Links).Count -ne 0 -or
+    @($nonRenderingBlockHtmlEvidence.NonRenderingHtml).Count -ne 1 -or
+    -not [regex]::IsMatch(
+        [string]$nonRenderingBlockHtmlEvidence.NonRenderingHtml[0].Value,
+        $recordIdPattern
+    )) {
+    Add-Failure 'TEST-0175 a pseudo-link inside a block HTML tag bypassed classification.'
+}
+$containerHtmlFixtures = @(
+    @'
+> <x-panel>
+> [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+> </x-panel>
+'@,
+    @'
+- <div>
+  [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+  </div>
+'@,
+    @'
+> <?process
+> [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+> ?>
+'@,
+    @'
+- <!DECLARATION
+  [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+  >
+'@,
+    @'
+> <![CDATA[
+> [FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+> ]]>
+'@
+)
+foreach ($containerHtmlFixture in $containerHtmlFixtures) {
+    $containerHtmlEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $containerHtmlFixture `
+        -Path '<container-html-fixture>'
+    if (@($containerHtmlEvidence.Links).Count -ne 0 -or
+        @($containerHtmlEvidence.NonRenderingHtml).Count -ne 1 -or
+        -not [regex]::IsMatch(
+            [string]$containerHtmlEvidence.NonRenderingHtml[0].Value,
+            $recordIdPattern
+        )) {
+        Add-Failure 'TEST-0175 a blockquote- or list-contained raw HTML cross-record pseudo-link bypassed classification.'
+    }
+}
+foreach ($nonRenderingHtmlFixture in @(
+    @'
+<x-panel>
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+</x-panel>
+'@,
+    @'
+<x-panel title=">">
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+</x-panel>
+'@,
+    @'
+<?process
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+?>
+'@,
+    @'
+<![CDATA[
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+]]>
+'@,
+    @'
+<!DECLARATION
+[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)
+>
+'@
+)) {
+    $remainingHtmlEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $nonRenderingHtmlFixture `
+        -Path '<remaining-non-rendering-html-fixture>'
+    if (@($remainingHtmlEvidence.Links).Count -ne 0 -or
+        @($remainingHtmlEvidence.NonRenderingHtml).Count -ne 1 -or
+        -not [regex]::IsMatch(
+            [string]$remainingHtmlEvidence.NonRenderingHtml[0].Value,
+            $recordIdPattern
+        )) {
+        Add-Failure 'TEST-0175 a type 3, 4, 5, or 7 HTML-block pseudo-link bypassed classification.'
+    }
+}
+$renderedReferenceFixtures = @(
+    'FEAT\-0032',
+    'FEAT&#45;0032'
+)
+foreach ($renderedReferenceFixture in $renderedReferenceFixtures) {
+    $normalizedReference = ConvertTo-DocumentMarkdownRenderedText `
+        -Text $renderedReferenceFixture
+    if (-not [regex]::IsMatch($normalizedReference, $recordIdPattern)) {
+        Add-Failure "TEST-0175 rendered stable-ID fixture bypassed normalization: '$renderedReferenceFixture'."
+    }
+}
+$escapedNumberReference = ConvertTo-DocumentMarkdownRenderedText `
+    -Text 'issue \#110'
+if (@([regex]::Matches(
+        $escapedNumberReference,
+        $githubNumberPattern
+    )).Count -ne 1) {
+    Add-Failure 'TEST-0175 a Markdown-escaped issue number bypassed rendered-text normalization.'
+}
+$encodedWrongLabelEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[FEAT&#45;0032](docs/features/FEAT-0001-common-development-protocol/README.md)' `
+    -Path '<encoded-wrong-label-fixture>'
+$encodedWrongLabel = ConvertTo-DocumentMarkdownRenderedText `
+    -Text ([string]$encodedWrongLabelEvidence.Links[0].Label)
+if (@($encodedWrongLabelEvidence.Links).Count -ne 1 -or
+    -not [regex]::IsMatch($encodedWrongLabel, $recordIdPattern) -or
+    (Test-DocumentRecordLinkTarget -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$encodedWrongLabelEvidence.Links[0].Target) `
+        -ExpectedTarget 'docs/features/FEAT-0032-general-capability-test-architecture/README.md')) {
+    Add-Failure 'TEST-0175 an HTML-entity record label bypassed exact-target classification.'
+}
+$escapedWrongLabelEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[FEAT\-0032](docs/features/FEAT-0001-common-development-protocol/README.md)' `
+    -Path '<escaped-wrong-label-fixture>'
+$escapedWrongLabel = ConvertTo-DocumentMarkdownRenderedText `
+    -Text ([string]$escapedWrongLabelEvidence.Links[0].Label)
+if (@($escapedWrongLabelEvidence.Links).Count -ne 1 -or
+    -not [regex]::IsMatch($escapedWrongLabel, $recordIdPattern)) {
+    Add-Failure 'TEST-0175 a Markdown-escaped record label bypassed exact-target classification.'
+}
+foreach ($presentationFixture in @(
+    'FEAT-<em>0032</em>',
+    'FEAT-<span title=''>''>0032</span>',
+    'FEAT-**0032**',
+    'FEAT-<!--x-->0032',
+    'FEAT-`0032`',
+    'issue **#110**'
+)) {
+    $normalizedPresentation = ConvertTo-DocumentMarkdownRenderedText `
+        -Text $presentationFixture
+    $detected = [regex]::IsMatch(
+        $normalizedPresentation,
+        $recordIdPattern
+    ) -or [regex]::IsMatch(
+        $normalizedPresentation,
+        $githubNumberPattern
+    )
+    if (-not $detected) {
+        Add-Failure "TEST-0175 inline HTML or presentation Markdown bypassed rendered-reference normalization: '$presentationFixture'."
+    }
+}
+$formattedWrongLabelEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[FEAT-**0032**](docs/features/FEAT-0001-common-development-protocol/README.md)' `
+    -Path '<formatted-wrong-label-fixture>'
+$formattedWrongLabel = ConvertTo-DocumentMarkdownRenderedText `
+    -Text ([string]$formattedWrongLabelEvidence.Links[0].Label)
+if (@($formattedWrongLabelEvidence.Links).Count -ne 1 -or
+    -not [regex]::IsMatch($formattedWrongLabel, $recordIdPattern)) {
+    Add-Failure 'TEST-0175 a presentation-formatted record label bypassed exact-target classification.'
+}
+$splitStableIdMarkdown =
+    'FEAT-[0032](docs/features/FEAT-0001-common-development-protocol/README.md)'
+$splitStableIdEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $splitStableIdMarkdown -Path '<split-stable-id-fixture>'
+$splitStableIdRendered = Get-DocumentRenderedReferenceEvidence `
+    -Markdown $splitStableIdMarkdown -LinkEvidence $splitStableIdEvidence
+$splitStableIdMatch = [regex]::Match(
+    [string]$splitStableIdRendered.Text,
+    $recordIdPattern
+)
+if (-not $splitStableIdMatch.Success -or
+    (Test-DocumentRenderedReferenceCoveredByLink `
+        -Index $splitStableIdMatch.Index -Length $splitStableIdMatch.Length `
+        -RenderedEvidence $splitStableIdRendered)) {
+    Add-Failure 'TEST-0175 a stable identifier assembled across a partial link bypassed rendered coverage.'
+}
+$splitIssueMarkdown =
+    'issue [#110](https://github.com/hasanmanzak/meAndAI/issues/110)'
+$splitIssueEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $splitIssueMarkdown -Path '<split-issue-number-fixture>'
+$splitIssueRendered = Get-DocumentRenderedReferenceEvidence `
+    -Markdown $splitIssueMarkdown -LinkEvidence $splitIssueEvidence
+$splitIssueMatch = [regex]::Match(
+    [string]$splitIssueRendered.Text,
+    $githubNumberPattern
+)
+if (-not $splitIssueMatch.Success -or
+    (Test-DocumentRenderedReferenceCoveredByLink `
+        -Index $splitIssueMatch.Index -Length $splitIssueMatch.Length `
+        -RenderedEvidence $splitIssueRendered)) {
+    Add-Failure 'TEST-0175 a GitHub number assembled across a partial link bypassed rendered coverage.'
+}
+$visibleUrlWrongTarget = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[https://github.com/hasanmanzak/meAndAI/issues/42](https://github.com/evil/other/issues/99)' `
+    -Path '<visible-url-wrong-target-fixture>'
+if (@($visibleUrlWrongTarget.Links).Count -ne 1 -or
+    [string]$visibleUrlWrongTarget.Links[0].Label -ceq
+        [string]$visibleUrlWrongTarget.Links[0].Target) {
+    Add-Failure 'TEST-0175 a visible GitHub URL wrong-target fixture was not classified.'
+}
+if (Test-DocumentVisiblePathMatchesLinkTarget `
+        -SourcePath 'CHANGELOG.md' `
+        -VisiblePath 'docs/adoption.md' `
+        -Target 'PROTOCOL.md') {
+    Add-Failure 'TEST-0175 a visible repository-document path accepted a different link target.'
+}
+$splitUrlFixtures = @(
+    'https://github.com/hasanmanzak/meAndAI/issues/[42](https://github.com/evil/other/issues/99)',
+    "https://github.com/hasanmanzak/meAndAI/issues/[42][wrong]`n`n[wrong]: https://github.com/evil/other/issues/99"
+)
+foreach ($splitUrlFixture in $splitUrlFixtures) {
+    if (-not [regex]::IsMatch(
+            $splitUrlFixture,
+            '(?i)https?://[^\s\[\]<>()]*\[[^\]]+\](?:\([^)]+\)|[ \t]*\[[^\]]*\])[^\s<>()]*'
+        )) {
+        Add-Failure 'TEST-0175 a visible URL assembled across a partial inline or reference link bypassed classification.'
+    }
+}
+$inlineMarkupUrlFixtures = @(
+    'https://github.com/hasanmanzak/meAndAI/issues/<!-- -->42',
+    'https://github.com/hasanmanzak/meAndAI/issues/<em>42</em>',
+    'https<!-- -->://github.com/hasanmanzak/meAndAI/issues/42',
+    'htt<em>ps</em>://github.com/hasanmanzak/meAndAI/issues/42',
+    'https&#58;//github.com/hasanmanzak/meAndAI/issues/42',
+    'https://github.com/hasanmanzak/meAndAI/issues/**42**',
+    'https://github.com/hasanmanzak/meAndAI/issues/~~42~~',
+    'https://github.com/hasanmanzak/meAndAI/issues/__42__',
+    '&#104;ttps://github.com/hasanmanzak/meAndAI/issues/42',
+    '&#x68;ttps://github.com/hasanmanzak/meAndAI/issues/42',
+    'https://github.com/hasanmanzak/meAndAI/issues/<em>42</em>(https://github.com/hasanmanzak/meAndAI/issues/42)',
+    'https<!-- -->://github.com/hasanmanzak/meAndAI/issues/42(https://github.com/hasanmanzak/meAndAI/issues/42)',
+    'https://github.com/hasanmanzak/meAndAI/issues/**42**(https://github.com/hasanmanzak/meAndAI/issues/42)',
+    'xhttps://github.com/hasanmanzak/meAndAI/issues/42',
+    '-https://github.com/hasanmanzak/meAndAI/issues/42',
+    ']https://github.com/hasanmanzak/meAndAI/issues/42',
+    'https://localhost/doc.md',
+    'https://example/doc.md',
+    'https://foo.example_com/doc.md'
+)
+foreach ($inlineMarkupUrlFixture in $inlineMarkupUrlFixtures) {
+    $inlineMarkupUrlEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $inlineMarkupUrlFixture `
+        -Path '<inline-markup-url-fixture>'
+    $inlineMarkupRenderedEvidence = Get-DocumentRenderedReferenceEvidence `
+        -Markdown $inlineMarkupUrlFixture `
+        -LinkEvidence $inlineMarkupUrlEvidence
+    $inlineMarkupRenderedUrls = @([regex]::Matches(
+        [string]$inlineMarkupRenderedEvidence.Text,
+        '(?i)https?://[^\s<>()\[\]{}"''`]+'
+    ))
+    if ($inlineMarkupRenderedUrls.Count -eq 0 -or
+        @($inlineMarkupRenderedUrls | Where-Object {
+            Test-DocumentRenderedReferenceCoveredByLink `
+                -Index $_.Index -Length $_.Length `
+                -RenderedEvidence $inlineMarkupRenderedEvidence
+        }).Count -ne 0) {
+        Add-Failure 'TEST-0175 a visible URL assembled across inline markup bypassed rendered-link classification.'
+    }
+}
+$exactVisibleUrlMarkdown = '[https://github.com/hasanmanzak/meAndAI/issues/42](https://github.com/hasanmanzak/meAndAI/issues/42)'
+$exactVisibleUrlEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $exactVisibleUrlMarkdown `
+    -Path '<exact-visible-url-link-fixture>'
+$exactVisibleUrlRendered = Get-DocumentRenderedReferenceEvidence `
+    -Markdown $exactVisibleUrlMarkdown -LinkEvidence $exactVisibleUrlEvidence
+$exactVisibleUrlMatch = [regex]::Match(
+    [string]$exactVisibleUrlRendered.Text,
+    '(?i)https?://[^\s<>()\[\]{}"''`]+'
+)
+if (-not $exactVisibleUrlMatch.Success -or
+    -not (Test-DocumentRenderedReferenceCoveredByLink `
+        -Index $exactVisibleUrlMatch.Index `
+        -Length $exactVisibleUrlMatch.Length `
+        -RenderedEvidence $exactVisibleUrlRendered)) {
+    Add-Failure 'TEST-0175 an exact visible-URL link was not preserved as one clickable rendered reference.'
+}
+foreach ($validSpecialCharacterAutolink in @(
+    '<https://example.com/~user/doc.md>',
+    '<https://github.com/hasanmanzak/meAndAI/blob/abcdef0123456789abcdef0123456789abcdef01/__init__.md>',
+    'https://example.com/foo__bar.md',
+    'https://example.com/doc.md?x=a*b'
+)) {
+    $specialAutolinkEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $validSpecialCharacterAutolink `
+        -Path '<special-character-autolink-fixture>'
+    $specialAutolinkRendered = Get-DocumentRenderedReferenceEvidence `
+        -Markdown $validSpecialCharacterAutolink `
+        -LinkEvidence $specialAutolinkEvidence
+    if ([regex]::IsMatch(
+            [string]$specialAutolinkRendered.Text,
+            '(?i)https?://'
+        )) {
+        Add-Failure 'TEST-0175 a valid special-character bare or angle autolink was not suppressed as clickable evidence.'
+    }
+}
+$validInlineDestinationFixtures = @(
+    [pscustomobject]@{
+        Markdown = '[doc](https://example.com/foo(and(bar)).md)'
+        Target = 'https://example.com/foo(and(bar)).md'
+    },
+    [pscustomobject]@{
+        Markdown = '[doc](<https://example.com/foo(bar).md>)'
+        Target = 'https://example.com/foo(bar).md'
+    },
+    [pscustomobject]@{
+        Markdown = '[doc](https://example.com/foo\(bar\).md)'
+        Target = 'https://example.com/foo(bar).md'
+    },
+    [pscustomobject]@{
+        Markdown = '[https://example.com/foo(bar).md](https://example.com/foo(bar).md)'
+        Target = 'https://example.com/foo(bar).md'
+    },
+    [pscustomobject]@{
+        Markdown = '[see [issue #42]](https://github.com/hasanmanzak/meAndAI/issues/42)'
+        Target = 'https://github.com/hasanmanzak/meAndAI/issues/42'
+    }
+)
+foreach ($validInlineDestinationFixture in $validInlineDestinationFixtures) {
+    $inlineDestinationEvidence = Get-DocumentMarkdownLinkEvidence `
+        -Markdown $validInlineDestinationFixture.Markdown `
+        -Path '<inline-destination-fixture>'
+    if (@($inlineDestinationEvidence.Links).Count -ne 1 -or
+        [string]$inlineDestinationEvidence.Links[0].Target -cne
+            [string]$validInlineDestinationFixture.Target) {
+        Add-Failure "TEST-0175 a valid balanced, escaped, angle-delimited, or nested-label inline link was not parsed exactly: '$($validInlineDestinationFixture.Markdown)'."
+    }
+}
+$unclosedCommentEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown "<!--`n[FEAT-0032](docs/features/FEAT-0032-general-capability-test-architecture/README.md)" `
+    -Path '<unclosed-comment-fixture>'
+if (@($unclosedCommentEvidence.Links).Count -ne 0 -or
+    @($unclosedCommentEvidence.HtmlComments).Count -ne 1 -or
+    -not [regex]::IsMatch(
+        [string]$unclosedCommentEvidence.HtmlComments[0].Value,
+        $recordIdPattern
+    )) {
+    Add-Failure 'TEST-0175 an unclosed HTML-comment pseudo-link bypassed classification.'
+}
+$footnoteMarkdown = "Text[^1]`n`n[^1]: FEAT-0032"
+$footnoteEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $footnoteMarkdown -Path '<footnote-fixture>'
+$footnoteUnlinked = Get-DocumentUnlinkedMarkdown `
+    -Markdown $footnoteMarkdown -LinkEvidence $footnoteEvidence
+if (@($footnoteEvidence.Definitions).Count -ne 0 -or
+    -not [regex]::IsMatch($footnoteUnlinked, $recordIdPattern)) {
+    Add-Failure 'TEST-0175 a GitHub footnote body was removed as a reference-link definition.'
+}
+$unusedDefinitionMarkdown =
+    '[FEAT-0032]: docs/features/FEAT-0032-general-capability-test-architecture/README.md'
+$unusedDefinitionEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $unusedDefinitionMarkdown -Path '<unused-definition-fixture>'
+if (@($unusedDefinitionEvidence.Definitions).Count -ne 1 -or
+    @($unusedDefinitionEvidence.Links).Count -ne 0 -or
+    -not [regex]::IsMatch(
+        [string]$unusedDefinitionEvidence.Definitions[0].Value,
+        $recordIdPattern
+    )) {
+    Add-Failure 'TEST-0175 an unused cross-record reference definition bypassed classification.'
+}
+$shorthandFixtures = @(
+    [pscustomobject]@{ Text = 'GH-110'; Target = 'https://github.com/hasanmanzak/meAndAI/issues/110'; Valid = $true },
+    [pscustomobject]@{ Text = 'PR-110'; Target = 'https://github.com/hasanmanzak/meAndAI/pull/110'; Valid = $true },
+    [pscustomobject]@{ Text = 'issue-110'; Target = 'https://github.com/hasanmanzak/meAndAI/issues/110'; Valid = $true },
+    [pscustomobject]@{ Text = 'comment-9001'; Target = 'https://github.com/hasanmanzak/meAndAI/issues/110#issuecomment-9001'; Valid = $true },
+    [pscustomobject]@{ Text = 'review-9001'; Target = 'https://github.com/hasanmanzak/meAndAI/pull/110#pullrequestreview-9001'; Valid = $true },
+    [pscustomobject]@{ Text = 'meAndAI#110'; Target = 'https://github.com/hasanmanzak/meAndAI/issues/110'; Valid = $true },
+    [pscustomobject]@{ Text = 'hasanmanzak/meAndAI#110'; Target = 'https://github.com/hasanmanzak/meAndAI/issues/110'; Valid = $true },
+    [pscustomobject]@{ Text = 'GH-110'; Target = 'https://github.com/evil/other/issues/110'; Valid = $false },
+    [pscustomobject]@{ Text = 'meAndAI#110'; Target = 'https://github.com/evil/meAndAI/issues/110'; Valid = $false }
+)
+foreach ($shorthandFixture in $shorthandFixtures) {
+    $shorthandReferences = @(
+        Get-DocumentGitHubShorthandReferences -Text $shorthandFixture.Text
+    )
+    $accepted = $shorthandReferences.Count -eq 1 -and
+        (Test-DocumentExactGitHubShorthandTarget `
+            -Reference $shorthandReferences[0] `
+            -Target $shorthandFixture.Target)
+    if ($accepted -ne [bool]$shorthandFixture.Valid) {
+        Add-Failure "TEST-0175 GitHub shorthand exact-target fixture was misclassified: '$($shorthandFixture.Text)' -> '$($shorthandFixture.Target)'."
+    }
+}
+$descriptiveFixture = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[See FEAT-0032 architecture](docs/features/FEAT-0001-common-development-protocol/README.md)' `
+    -Path '<descriptive-label-fixture>'
+if (@($descriptiveFixture.Links).Count -ne 1 -or
+    @([regex]::Matches(
+        [string]$descriptiveFixture.Links[0].Label, $recordIdPattern
+    )).Count -ne 1 -or
+    (Test-DocumentRecordLinkTarget -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$descriptiveFixture.Links[0].Target) `
+        -ExpectedTarget 'docs/features/FEAT-0032-general-capability-test-architecture/README.md')) {
+    Add-Failure 'TEST-0175 descriptive stable-ID fixture bypassed exact-target validation.'
+}
+$rawPathFixture = 'See docs/notes/release-evidence.md for details.'
+$rawPathEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $rawPathFixture -Path '<raw-path-fixture>'
+$rawPathUnlinked = Get-DocumentUnlinkedMarkdown `
+    -Markdown $rawPathFixture -LinkEvidence $rawPathEvidence
+if (-not [regex]::IsMatch($rawPathUnlinked, $rawDocumentPathPattern)) {
+    Add-Failure 'TEST-0175 raw repository document-path fixture was not detected.'
+}
+$ownPathResolution = Resolve-DocumentLinkTarget `
+    -SourcePath 'docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md' `
+    -Target 'README.md'
+if ($ownPathResolution.Kind -cne 'Repository' -or
+    [string]$ownPathResolution.Value -cne
+        'docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md') {
+    Add-Failure 'TEST-0175 a current document own-path fixture did not resolve to the source artifact.'
+}
+[Threading.Thread]::CurrentThread.CurrentCulture =
+    $originalLinkValidationCulture
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',
@@ -1523,8 +4577,7 @@ if ($copyReadyPromptBlocks.Count -ne 1) {
     Add-Failure 'TEST-0131 canonical stability-cycle guidance must contain exactly one copy-ready text prompt.'
 }
 foreach ($requiredText in @(
-    'exact pinned PROTOCOL.md',
-    'DEC-0015',
+    'every normative source supplied by the invoking context',
     'Trigger context',
     'material development',
     'new failed evidence',
@@ -1554,6 +4607,14 @@ foreach ($requiredText in @(
 )) {
     if (-not $normalizedStabilityCyclePrompt.Contains($requiredText)) {
         Add-Failure "TEST-0131 canonical stability-cycle prompt is missing '$requiredText'."
+    }
+}
+foreach ($requiredLink in @(
+    '[PROTOCOL.md](../../PROTOCOL.md)',
+    '[DEC-0015](../decisions/DEC-0015-event-triggered-stability-cycles.md)'
+)) {
+    if (-not $stabilityCyclePrompt.Contains($requiredLink)) {
+        Add-Failure "TEST-0131 canonical stability-cycle guidance is missing '$requiredLink'."
     }
 }
 foreach ($requiredText in @(
@@ -1754,7 +4815,7 @@ if (($actualManagedAssets -join '|') -cne ($expectedManagedAssets -join '|')) {
 }
 foreach ($testId in @('TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099')) {
     if (-not $mandateTestCases.Contains("``$testId``") -or
-        -not $mandateFeature.Contains("``$testId")) {
+        -not $mandateFeature.Contains("[$testId](test-cases.md)")) {
         Add-Failure "TEST-0099 canonical FEAT-0015 records do not link $testId."
     }
 }
@@ -1804,7 +4865,8 @@ $postPublicationVerifier = Get-Content -LiteralPath (
 ) -Raw
 foreach ($requiredText in @(
     'releases/tags/', 'git/ref/tags/', 'compare/',
-    'git/matching-refs/heads/', 'issues/', 'contents/',
+    'git/matching-refs/heads/', 'issues/',
+    'commits/$ExpectedCommit/comments', 'contents/',
     "'immutable'", 'ExternalPostPublication'
 )) {
     $combinedEvidenceContract = $postPublicationVerifier + "`n" +

@@ -26,7 +26,7 @@
 
 ## Verification and continuation
 
-- `TEST-0027` through `TEST-0032` cover routing, bootstrap, populated consumer
+- [TEST-0027](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0028](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0029](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0030](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0031](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), and [TEST-0032](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md) cover routing, bootstrap, populated consumer
   preservation, collision handoff, ownership recovery, and updater regression.
-- Complete the bounded FEAT-0005 review, merge its delivery pull request, then
+- Complete the bounded [FEAT-0005](../../../docs/features/FEAT-0005-ai-capabilities-lifecycle/README.md) review, merge its delivery pull request, then
   tag the merged `main` commit as `v0.5.0`.

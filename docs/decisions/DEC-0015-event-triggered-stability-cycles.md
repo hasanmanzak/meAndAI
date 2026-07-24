@@ -66,7 +66,7 @@ is an ordinary Git push and does not create a tag or GitHub Release. Protocol
 version publication remains a separate post-merge event governed by Gate 7 and
 Section 8.
 
-The mandate is normative in `PROTOCOL.md`. It is not duplicated as a second
+The mandate is normative in [PROTOCOL.md](../../PROTOCOL.md). It is not duplicated as a second
 contract in consumer instructions. A consumer receives it by adopting or
 upgrading its immutable protocol pin; consumer-owned instructions, memory,
 features, decisions, and tests remain under consumer ownership.
@@ -86,7 +86,7 @@ features, decisions, and tests remain under consumer ownership.
   re-enters the mandate; unchanged state does not consume more scan budget.
 - Earlier consumer pins remain valid. Consumers receive the new mandatory
   control prospectively through a reviewed exact commit pin or the immutable
-  protocol release that contains FEAT-0015.
+  protocol release that contains [FEAT-0015](../features/FEAT-0015-stability-consistency-mandate/README.md).
 - Distribution of v0.9.0 MUST use the immutable GitHub Release required by Gate
   7 because that is the protocol's separate exact-pin distribution mechanism.
   This does not change the mandate's converged final push into a release or tag.

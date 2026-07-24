@@ -26,4 +26,4 @@ blocked exit, and aligned feature-template evidence.
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
 | 2026-07-14 | `30c6e54` plus working diff | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Expected blocker: `TEST-0019` exact-string assertion crossed a Markdown line wrap |
-| 2026-07-14 | `30c6e54` plus corrected working diff | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: `TEST-0001` through `TEST-0019` |
+| 2026-07-14 | `30c6e54` plus corrected working diff | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Pass: [complete protocol suite](../../../tests/protocol.tests.ps1) |

@@ -95,6 +95,51 @@ function Get-Sha256Text {
     }
 }
 
+function Get-MeAndAICapabilityReviewPullRequestLinkContract {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$Number
+    )
+
+    Assert-CanonicalRepository -Repository $Repository
+    $url = "https://github.com/$Repository/pull/$Number"
+    return [pscustomobject][ordered]@{
+        Url = $url
+        Markdown = "[pull request #$Number]($url)"
+        Digest = Get-Sha256Text -Text $url
+    }
+}
+
+function Get-CanonicalClosureMarker {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$CatalogDigest,
+        [Parameter(Mandatory)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$PullRequestHead,
+        [Parameter(Mandatory)][string]$MergeCommit
+    )
+
+    Assert-CanonicalRepository -Repository $Repository
+    Assert-GitSha -Sha $CatalogDigest -Label 'Capability catalog digest' -Length 64
+    Assert-GitSha -Sha $PullRequestHead -Label 'Merged review head'
+    Assert-GitSha -Sha $MergeCommit -Label 'Capability review merge commit'
+    $link = Get-MeAndAICapabilityReviewPullRequestLinkContract `
+        -Repository $Repository -Number $PullRequestNumber
+    return "<!-- meandai-capability-review-closed:v2:${Repository}:${CatalogDigest}:head-${PullRequestHead}:merge-${MergeCommit}:link-$($link.Digest) -->"
+}
+
+function Get-LegacyClosureMarker {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$CatalogDigest,
+        [Parameter(Mandatory)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$MergeCommit
+    )
+
+    return "<!-- meandai-capability-review-closed:v1:${Repository}:${CatalogDigest}:pr-${PullRequestNumber}:merge-${MergeCommit} -->"
+}
+
 function Get-CatalogContract {
     param([Parameter(Mandatory)]$Catalog)
 
@@ -714,21 +759,35 @@ function Resolve-MeAndAICapabilityReviewFinalization {
         throw 'Finalization pull request is not the exact reviewed merge.'
     }
 
-    $closureMarker = `
-        "<!-- meandai-capability-review-closed:v1:${Repository}:$($contract.CatalogDigest):pr-${pullNumber}:merge-${mergeCommit} -->"
+    $closureMarker = Get-CanonicalClosureMarker -Repository $Repository `
+        -CatalogDigest $contract.CatalogDigest `
+        -PullRequestNumber $pullNumber -PullRequestHead $pullHead `
+        -MergeCommit $mergeCommit
+    $legacyClosureMarker = Get-LegacyClosureMarker -Repository $Repository `
+        -CatalogDigest $contract.CatalogDigest `
+        -PullRequestNumber $pullNumber -MergeCommit $mergeCommit
+    $rawActualClosure = Get-ObjectPropertyValue -Value $Issue `
+        -Name 'ClosureMarker' -Label 'Finalization issue' -AllowMissing
+    $actualClosure = if ($null -eq $rawActualClosure) {
+        ''
+    }
+    else { [string]$rawActualClosure }
+    if (-not [string]::IsNullOrEmpty($actualClosure) -and
+        $actualClosure -cne $closureMarker -and
+        $actualClosure -cne $legacyClosureMarker) {
+        throw 'Capability-review issue has closure evidence for another reviewed merge.'
+    }
     if ($issueState -ceq 'Closed') {
         if ($null -ne $Branch) {
             throw 'Capability-review issue was closed before branch deletion.'
         }
-        $actualClosure = [string](Get-ObjectPropertyValue -Value $Issue `
-            -Name 'ClosureMarker' -Label 'Closed capability-review issue')
-        if ($actualClosure -cne $closureMarker) {
+        if ([string]::IsNullOrEmpty($actualClosure)) {
             throw 'Closed capability-review issue lacks exact completion evidence.'
         }
         return [pscustomobject][ordered]@{
             State = 'Completed'
             Marker = $Marker
-            ClosureMarker = $closureMarker
+            ClosureMarker = $actualClosure
             SemanticWritePaths = @()
             Operations = @()
         }
@@ -757,17 +816,23 @@ function Resolve-MeAndAICapabilityReviewFinalization {
             Marker = $Marker
         })
     }
+    $effectiveClosureMarker = if ([string]::IsNullOrEmpty($actualClosure)) {
+        $closureMarker
+    }
+    else { $actualClosure }
+
     $operations.Add([pscustomobject][ordered]@{
         Kind = 'CloseIssue'
         IssueNumber = $issueNumber
-        ClosureMarker = $closureMarker
+        PullRequestNumber = $pullNumber
+        ClosureMarker = $effectiveClosureMarker
         Marker = $Marker
     })
 
     return [pscustomobject][ordered]@{
         State = 'Finalize'
         Marker = $Marker
-        ClosureMarker = $closureMarker
+        ClosureMarker = $effectiveClosureMarker
         SemanticWritePaths = @()
         Operations = @($operations)
     }
@@ -826,6 +891,7 @@ function Invoke-MeAndAICapabilityReviewPlan {
 
 Export-ModuleMember -Function @(
     'Get-MeAndAICapabilityReviewMarker',
+    'Get-MeAndAICapabilityReviewPullRequestLinkContract',
     'Resolve-MeAndAICapabilityReview',
     'Resolve-MeAndAICapabilityReviewFinalization',
     'Invoke-MeAndAICapabilityReviewPlan'

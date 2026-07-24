@@ -3,7 +3,7 @@
 - Date: 2026-07-16
 - Status: Complete; publication pending
 - Feature: [FEAT-0019](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md)
-- Tests: [TEST-0103 and TEST-0104](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md)
+- Tests: [TEST-0103](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md) and [TEST-0104](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md)
 - Issue: [#55](https://github.com/hasanmanzak/meAndAI/issues/55)
 - Pull request: [#56](https://github.com/hasanmanzak/meAndAI/pull/56)
 
@@ -33,4 +33,4 @@ passed all 34 owned scenarios in 359.1 seconds, and the complete protocol suite
 passed every discovered suite and scenario-ownership gate in 526.4 seconds.
 
 Merge, immutable release, asset digest, hosted checks, and consumer rerun
-evidence remain external facts owned by issue #55 until they occur.
+evidence remain external facts owned by [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55) until they occur.

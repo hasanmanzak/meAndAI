@@ -8,7 +8,7 @@
 | Issue | [#57](https://github.com/hasanmanzak/meAndAI/issues/57) |
 | Pull request | [#58](https://github.com/hasanmanzak/meAndAI/pull/58) |
 | Decisions | [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md), [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
-| Tests | [TEST-0105 and TEST-0106](test-cases.md) |
+| Tests | [TEST-0105](test-cases.md) and [TEST-0106](test-cases.md) |
 
 ## Problem and intended outcome
 
@@ -64,27 +64,27 @@ Cancellation safety is ordered: stop the active child tree, wait for bounded
 termination, dispose the process wrapper, and only then let the outer adoption
 boundary remove its unpredictable owned temporary root. Before the validated
 completion push, the consumer checkout and remote proposal are not mutated by
-Codex. If interruption occurs in the later push/marker window, DEC-0013's exact
+Codex. If interruption occurs in the later push/marker window, [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md)'s exact
 persisted-intent recovery remains authoritative.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0093` | Output confidentiality | A raw event field exposes command output, hidden reasoning, or credential material | Prevented / launcher maintainer | Render an allowlist of user-facing messages and safe activity metadata; never render raw reasoning or command output; `TEST-0105` |
-| `RISK-0094` | Cancellation cleanup | Ctrl+C leaves Codex or its descendants running against a temporary clone | Mitigating / launcher maintainer | Invoke one child-tree stop helper from timeout and `finally`, then verify owned-root cleanup; `TEST-0106` |
-| `RISK-0095` | Readiness authority | A streamed ready-looking message bypasses final-result or repository validation | Prevented / launcher maintainer | Preserve `--output-last-message`, manifest, head, change-set, credential, and lease checks as the only completion path; `TEST-0105` |
-| `RISK-0096` | Console usability | Frequent events recreate noisy or overlapping output | Mitigating / launcher maintainer | Normal line output, event deduplication, bounded length, and throttled heartbeats; `TEST-0105` |
+| `RISK-0093` | Output confidentiality | A raw event field exposes command output, hidden reasoning, or credential material | Prevented / launcher maintainer | Render an allowlist of user-facing messages and safe activity metadata; never render raw reasoning or command output; [TEST-0105](test-cases.md) |
+| `RISK-0094` | Cancellation cleanup | Ctrl+C leaves Codex or its descendants running against a temporary clone | Mitigating / launcher maintainer | Invoke one child-tree stop helper from timeout and `finally`, then verify owned-root cleanup; [TEST-0106](test-cases.md) |
+| `RISK-0095` | Readiness authority | A streamed ready-looking message bypasses final-result or repository validation | Prevented / launcher maintainer | Preserve `--output-last-message`, manifest, head, change-set, credential, and lease checks as the only completion path; [TEST-0105](test-cases.md) |
+| `RISK-0096` | Console usability | Frequent events recreate noisy or overlapping output | Mitigating / launcher maintainer | Normal line output, event deduplication, bounded length, and throttled heartbeats; [TEST-0105](test-cases.md) |
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0020` and `BUG-0008` identifiers and linked issue #57 exist.
+- [x] Stable `FEAT-0020` and [BUG-0008](https://github.com/hasanmanzak/meAndAI/issues/57) identifiers and linked [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) exist.
 - [x] Problem, outcome, scope, non-goals, entry points, compatibility,
       presentation, cancellation, cleanup, remote-state, and error contracts are
       explicit.
-- [x] DEC-0008 continues to own local Codex isolation and DEC-0013 continues to
+- [x] [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) continues to own local Codex isolation and [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) continues to
       own push/marker recovery; no new architectural decision is required.
 - [x] The change is one bounded launcher correction with no consumer reset or
       protocol retargeting.
-- [x] `TEST-0105` and `TEST-0106` define streaming, false-readiness,
+- [x] [TEST-0105](test-cases.md) and [TEST-0106](test-cases.md) define streaming, false-readiness,
       presentation, timeout, cancellation-finalizer, process-tree, temporary
       cleanup, and remote-unchanged evidence before production changes.
 - [x] Verification is bounded to one expected-red focused run, one focused
@@ -113,7 +113,7 @@ persisted-intent recovery remains authoritative.
 
 ## Implementation and verification approach
 
-Add `TEST-0105` and `TEST-0106` first. The red run must prove the current
+Add [TEST-0105](test-cases.md) and [TEST-0106](test-cases.md) first. The red run must prove the current
 launcher still uses the native overlay, lacks `--json` and incremental line
 consumption, and does not stop an active process from its finalizer. Implement
 only the existing launcher presentation and bounded-process seams, extend the
@@ -157,7 +157,7 @@ remaining `Blocking` observation and was not repeated unchanged.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and `TEST-0105` / `TEST-0106` pass.
+- [x] Acceptance criteria and [TEST-0105](test-cases.md) / [TEST-0106](test-cases.md) pass.
 - [x] Existing quick-adoption scenarios and complete repository suite pass.
 - [x] Fresh-diff review and bounded project scan leave no unresolved
       `Blocking` finding.
@@ -167,6 +167,6 @@ remaining `Blocking` observation and was not repeated unchanged.
 
 ## Post-merge publication gate
 
-Issue #57 is the external authority for the exact merged commit, immutable
+[Issue #57](https://github.com/hasanmanzak/meAndAI/issues/57) is the external authority for the exact merged commit, immutable
 v0.9.5 release, launcher asset digest, hosted checks, branch cleanup, and
 retained affected-consumer continuation evidence after those facts exist.
