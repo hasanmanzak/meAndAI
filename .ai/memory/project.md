@@ -9,31 +9,21 @@ Last verified: **2026-07-24**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.14.2` candidate. Latest immutable release:
-  [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
-  targets commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60).
-  [PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
-  [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) retain its
-  hosted, merge, release, asset, cleanup, and post-publication evidence.
-- Current scope: [FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
-  [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-  [BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
-  [SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089),
-  [SUBF-0090](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090),
-  [SUBF-0091](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091),
-  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
-  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) govern the
-  v0.14.2 correction on `codex/bug-0029-clickable-cross-references`.
-  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
-  [TEST-0176](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
-  [TEST-0177](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and
-  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  passed their local direct-link, exact embedded-record fragment,
-  historical-snapshot, and commit-permalink regressions across repository and
-  GitHub text surfaces. Exact-head hosted and live-reconciliation evidence
-  remains external under [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114),
-  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116), and
-  [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
+- Current protocol version: `0.14.3` candidate. Latest immutable release:
+  [v0.14.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.2)
+  targets commit [`671f678c8811ea715caceaabf2fd73b0933e8515`](https://github.com/hasanmanzak/meAndAI/commit/671f678c8811ea715caceaabf2fd73b0933e8515).
+  [PR #115](https://github.com/hasanmanzak/meAndAI/pull/115) retains its
+  delivery evidence; [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114)
+  remains open for the corrected publication-evidence rerun.
+- Current scope: [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
+  [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
+  [SUBF-0092](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
+  [TEST-0179](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0179),
+  [TEST-0180](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0180),
+  and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) govern the
+  v0.14.3 correction on `codex/bug-0031-shared-merge-evidence`. It propagates
+  the already accepted API-2026 merged-event contract to every live reader;
+  consumers remain outside the correction.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -90,13 +80,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Publish [FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
-  through one reviewed pull request and immutable v0.14.2 release under
-  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), with the
-  pre-merge exact-fragment and commit-permalink blocker owned by
-  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116). Reconcile
-  repository documents and editable meAndAI GitHub records without reopening
-  completed delivery or mutating a consumer.
+- Publish [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
+  through one reviewed pull request and immutable v0.14.3 release under
+  [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117). Then rerun
+  the failed v0.14.2 publication gate with the corrected verifier and close
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) only after
+  that evidence passes. Do not mutate a consumer as part of this correction.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and

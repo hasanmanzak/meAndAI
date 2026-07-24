@@ -190,7 +190,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.2' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.3' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
@@ -1099,11 +1099,39 @@ git show $commit
             }
             else { 'Publish release evidence' }
             merged_at = '2026-07-16T00:00:00Z'
-            merge_commit_sha = $commit
             base = [pscustomobject]@{ ref = 'main' }
             head = [pscustomobject]@{ sha = $pullHeadCommit }
             body = $body
         }
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/43/events\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        $page = [int]$Matches.page
+        if ($global:MeAndAIPostPublicationMode -ceq 'MergeEventMissing') {
+            return @()
+        }
+        if ($page -eq 1) {
+            return @(1..100 | ForEach-Object {
+                [pscustomobject]@{ event = 'labeled'; commit_id = $null; ordinal = $_ }
+            })
+        }
+        if ($page -eq 2) {
+            if ($global:MeAndAIPostPublicationMode -ceq 'MergeEventDuplicate') {
+                return @(
+                    [pscustomobject]@{ event = 'merged'; commit_id = $commit },
+                    [pscustomobject]@{ event = 'merged'; commit_id = $commit }
+                )
+            }
+            $eventCommit = switch ($global:MeAndAIPostPublicationMode) {
+                'MergeEventMalformed' { 'D' * 40 }
+                'MergeEventWrongCommit' { $wrongCommit }
+                default { $commit }
+            }
+            return ,([pscustomobject]@{
+                event = 'merged'
+                commit_id = $eventCommit
+            })
+        }
+        return @()
     }
     if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/43/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
         if ([int]$Matches.page -eq 1) {
@@ -1612,7 +1640,9 @@ try {
             "/compare/$commit...main",
             '/git/matching-refs/heads/codex/feat-0042-release-evidence',
             '/issues/42', '/issues/42/comments?per_page=100&page=1',
-            '/pulls/43', '/issues/43/comments?per_page=100&page=1',
+            '/pulls/43', '/issues/43/events?per_page=100&page=1',
+            '/issues/43/events?per_page=100&page=2',
+            '/issues/43/comments?per_page=100&page=1',
             '/pulls/43/reviews?per_page=100&page=1',
             '/pulls/43/comments?per_page=100&page=1',
             "/commits/$commit/comments?per_page=100&page=1",
@@ -1635,6 +1665,17 @@ try {
             $commentPageRequests[0] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=1' -or
             $commentPageRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=2') {
             Add-Failure "TEST-0083 verifier did not find evidence located only in the second issue-comment page: $($pageTwoEvidence.Error)"
+        }
+        foreach ($negative in @(
+            @{ Mode = 'MergeEventMissing'; Error = '*one exact merged event*' },
+            @{ Mode = 'MergeEventDuplicate'; Error = '*one exact merged event*' },
+            @{ Mode = 'MergeEventMalformed'; Error = '*invalid commit identity*' },
+            @{ Mode = 'MergeEventWrongCommit'; Error = '*delivery pull request does not resolve to the exact released commit*' }
+        )) {
+            $result = Invoke-PostPublicationScenario -Mode $negative.Mode
+            if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
+                Add-Failure "TEST-0180 $($negative.Mode) did not fail closed: $($result.Error)"
+            }
         }
         $referenceStyleEvidence = Invoke-PostPublicationScenario `
             -Mode 'ReferenceStyleLinks'
@@ -1959,6 +2000,34 @@ finally {
     Remove-Variable MeAndAIPostPublicationLauncherSourceBytes -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationBundleBytes -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationSourceBytes -Scope Global -ErrorAction SilentlyContinue
+}
+
+$api2026ProductionRoots = @(
+    (Join-Path $root 'scripts'),
+    (Join-Path $root 'templates/project/.github/scripts'),
+    (Join-Path $root 'templates/project/.github/workflows')
+)
+$api2026ProductionFiles = [System.Collections.Generic.List[string]]::new()
+foreach ($productionRoot in $api2026ProductionRoots) {
+    foreach ($file in @(Get-ChildItem -LiteralPath $productionRoot -Recurse -File |
+        Where-Object { $_.Extension -in @('.ps1', '.psm1', '.yml', '.yaml') })) {
+        $api2026ProductionFiles.Add($file.FullName)
+    }
+}
+$api2026ProductionFiles.Add($verifierPath)
+$managedUpdateWorkflowPath = Join-Path $root `
+    'templates/project/.github/workflows/meandai-protocol-update.yml'
+if (-not (@($api2026ProductionFiles) -ccontains $managedUpdateWorkflowPath)) {
+    Add-Failure 'TEST-0180 API-2026 inventory omits the managed updater workflow.'
+}
+$rawRemovedFieldPattern = '(?i)(?:\.\s*merge_commit_sha\b|\[\s*["'']merge_commit_sha["'']\s*\])'
+foreach ($productionFile in @($api2026ProductionFiles | Sort-Object -Unique)) {
+    $source = Get-Content -LiteralPath $productionFile -Raw
+    if ($source.Contains('2026-03-10') -and
+        [regex]::IsMatch($source, $rawRemovedFieldPattern)) {
+        $relative = $productionFile.Substring($root.Length + 1).Replace('\', '/')
+        Add-Failure "TEST-0180 API-2026 production reader '$relative' directly accesses the removed pull-request merge field."
+    }
 }
 
 if ($failures.Count -gt 0) {

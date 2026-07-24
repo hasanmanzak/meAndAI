@@ -16,6 +16,12 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+$managedResolverModulePath = Join-Path $PSScriptRoot 'MeAndAI.ProtocolUpdate.psm1'
+if (-not (Test-Path -LiteralPath $managedResolverModulePath -PathType Leaf)) {
+    throw "Pure resolver is missing: $managedResolverModulePath"
+}
+Import-Module $managedResolverModulePath -Force
+
 $ManagedUpdaterAssets = @(
     [pscustomobject]@{
         ConsumerPath = '.github/workflows/meandai-protocol-update.yml'
@@ -3508,23 +3514,8 @@ function Get-ExactPullRequestMergedEventCommitSha {
     $events = @(Invoke-GhPagedJson -Endpoint (
         "repos/$Repository/issues/$Number/events?per_page=100"
     ))
-    $mergedEvents = @($events | Where-Object {
-        if ($null -eq $_) { return $false }
-        $eventProperty = $_.PSObject.Properties['event']
-        return $null -ne $eventProperty -and
-            $eventProperty.Value -is [string] -and
-            [string]$eventProperty.Value -ceq 'merged'
-    })
-    if ($mergedEvents.Count -ne 1) {
-        throw "Pull request #$Number does not have one exact merged event."
-    }
-    $commitProperty = $mergedEvents[0].PSObject.Properties['commit_id']
-    if ($null -eq $commitProperty -or
-        $commitProperty.Value -isnot [string] -or
-        [string]$commitProperty.Value -cnotmatch '^[0-9a-f]{40}$') {
-        throw "Pull request #$Number merged event has an invalid commit identity."
-    }
-    return [string]$commitProperty.Value
+    return Resolve-MeAndAIMergedCommitEvidence -Events $events `
+        -EvidenceLabel "Pull request #$Number"
 }
 
 function Repair-LegacyInstallingUpdateTracking {
@@ -4334,7 +4325,6 @@ if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath (Join-Path $sourcePath '.git'))) {
     throw "Pinned protocol source checkout is missing: $sourcePath"
 }
-Import-Module $modulePath -Force
 if (-not (Test-Path -LiteralPath $consumerMigrationModule -PathType Leaf)) {
     throw 'Installed updater declares consumer-migration capability but its pinned protocol source lacks the pure migration engine.'
 }

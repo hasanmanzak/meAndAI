@@ -5,32 +5,25 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
-completed [FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md)
-at commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60);
-[PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
-[issue #112](https://github.com/hasanmanzak/meAndAI/issues/112)
-retain its delivery and publication evidence. [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains separately
-owned by [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) / [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+Immutable [v0.14.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.2)
+targets commit [`671f678c8811ea715caceaabf2fd73b0933e8515`](https://github.com/hasanmanzak/meAndAI/commit/671f678c8811ea715caceaabf2fd73b0933e8515);
+[PR #115](https://github.com/hasanmanzak/meAndAI/pull/115) retains delivery
+evidence and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114)
+remains open for its corrected publication-evidence rerun.
 
-[FEAT-0047](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
-[BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-[BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
-[SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089),
-[SUBF-0090](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090),
-[SUBF-0091](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091),
-[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
-[TEST-0176](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
-[TEST-0177](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177),
-[TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
-[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
-[issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) govern the
-bounded v0.14.2 exact-reference correction. Follow the
-[v0.14.2 handoff](2026-07-24-v0142-clickable-cross-record-references.md).
+[FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
+[BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
+[SUBF-0092](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
+[TEST-0179](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0179),
+[TEST-0180](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0180),
+and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) govern the
+bounded v0.14.3 propagation correction. Follow the
+[v0.14.3 handoff](2026-07-24-v0143-shared-merge-evidence.md).
 [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains the separate open follow-up in [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
 
 ## History
 
+- [2026-07-24 - v0.14.3 shared API-2026 merge evidence](2026-07-24-v0143-shared-merge-evidence.md)
 - [2026-07-24 - v0.14.2 clickable cross-record references](2026-07-24-v0142-clickable-cross-record-references.md)
 - [2026-07-23 - v0.14.1 consumer non-duplication mandate](2026-07-23-v0141-consumer-nonduplication.md)
 - [2026-07-23 - v0.14.0 canonical repository evidence](2026-07-23-v0140-canonical-repository-evidence.md)
