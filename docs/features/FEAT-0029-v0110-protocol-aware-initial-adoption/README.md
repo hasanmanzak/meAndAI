@@ -8,7 +8,7 @@
 | Issue and post-publication authority | [#76](https://github.com/hasanmanzak/meAndAI/issues/76) |
 | Pull request | [#78](https://github.com/hasanmanzak/meAndAI/pull/78) |
 | Decision | [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md) |
-| Tests | [TEST-0127](test-cases.md), [TEST-0128](test-cases.md), [TEST-0129](test-cases.md), and [TEST-0130](test-cases.md); compatibility regression [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) |
+| Tests | [TEST-0127](test-cases.md#test-0127), [TEST-0128](test-cases.md#test-0128), [TEST-0129](test-cases.md#test-0129), and [TEST-0130](test-cases.md#test-0130); compatibility regression [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) |
 
 ## Problem and intended outcome
 
@@ -162,19 +162,19 @@ changing application behavior or inventing project facts.
 
 | ID | Classification | Risk | Response and required evidence |
 | --- | --- | --- | --- |
-| `RISK-0129` | Destructive loss | `CleanStart` removes product or application content | Separate loss acknowledgement, governance-only allowlist, change-set validation, and [TEST-0129](test-cases.md) |
-| `RISK-0130` | Authorization drift | The agent or a rerun changes the selected strategy | Strategy-bound manifest/marker/issue/prompt identity and mismatch rejection in [TEST-0128](test-cases.md) / [TEST-0130](test-cases.md) |
-| `RISK-0131` | Event race | The seed push creates a proposal before interactive selection | Initial push/schedule no-proposal gate and explicit dispatch evidence in [TEST-0128](test-cases.md) |
-| `RISK-0132` | Dual authority | Hybrid mode leaves contradictory protocols active | Mandatory precedence decision and semantic conflict evidence in [TEST-0129](test-cases.md) |
-| `RISK-0133` | Semantic loss | Full migration deletes legacy records before preserving valid meaning | Mapping-first prompt contract, review boundary, and full-migration fixture in [TEST-0129](test-cases.md) |
-| `RISK-0134` | False freshness | A known legacy protocol surface is missed and `Auto` chooses fresh adoption | Shared bounded classifier contract, positive/negative fixtures, and fail-closed unknown discovery in [TEST-0127](test-cases.md) / [TEST-0130](test-cases.md) |
-| `RISK-0138` | Credential exposure | A linked token input or consumer Git hook observes plaintext credential material | Exact root regular-file validation, read-time revalidation, invocation-scoped hook suppression, and [TEST-0130](test-cases.md) |
+| `RISK-0129` <a name="risk-0129"></a> | Destructive loss | `CleanStart` removes product or application content | Separate loss acknowledgement, governance-only allowlist, change-set validation, and [TEST-0129](test-cases.md#test-0129) |
+| `RISK-0130` <a name="risk-0130"></a> | Authorization drift | The agent or a rerun changes the selected strategy | Strategy-bound manifest/marker/issue/prompt identity and mismatch rejection in [TEST-0128](test-cases.md#test-0128) / [TEST-0130](test-cases.md#test-0130) |
+| `RISK-0131` <a name="risk-0131"></a> | Event race | The seed push creates a proposal before interactive selection | Initial push/schedule no-proposal gate and explicit dispatch evidence in [TEST-0128](test-cases.md#test-0128) |
+| `RISK-0132` <a name="risk-0132"></a> | Dual authority | Hybrid mode leaves contradictory protocols active | Mandatory precedence decision and semantic conflict evidence in [TEST-0129](test-cases.md#test-0129) |
+| `RISK-0133` <a name="risk-0133"></a> | Semantic loss | Full migration deletes legacy records before preserving valid meaning | Mapping-first prompt contract, review boundary, and full-migration fixture in [TEST-0129](test-cases.md#test-0129) |
+| `RISK-0134` <a name="risk-0134"></a> | False freshness | A known legacy protocol surface is missed and `Auto` chooses fresh adoption | Shared bounded classifier contract, positive/negative fixtures, and fail-closed unknown discovery in [TEST-0127](test-cases.md#test-0127) / [TEST-0130](test-cases.md#test-0130) |
+| `RISK-0138` <a name="risk-0138"></a> | Credential exposure | A linked token input or consumer Git hook observes plaintext credential material | Exact root regular-file validation, read-time revalidation, invocation-scoped hook suppression, and [TEST-0130](test-cases.md#test-0130) |
 
 ## Readiness evidence
 
 | Field | Declaration |
 | --- | --- |
-| Baseline | Clean synchronized `main` at `e226293`, protocol `0.10.4`; the merged v0.10.4 complete suite is green |
+| Baseline | Clean synchronized `main` at [`e226293`](https://github.com/hasanmanzak/meAndAI/commit/e226293acc5967f8b4e3049c54f206ed78bc9fd4), protocol `0.10.4`; the merged v0.10.4 complete suite is green |
 | Entry points | Single-file launcher, consumer lifecycle workflow, pure capabilities resolver, bootstrap adapter, local Codex prompt |
 | Consumers | New/protocol-free repositories, repositories with legacy governance, completed meAndAI consumers, submodule consumers, and repository-reference consumers |
 | Semantic types | Strategy enum, bounded canonical path inventory, Boolean loss acknowledgement, exact proposal-parent/head identities, and manifest/marker schema identities |
@@ -184,24 +184,24 @@ changing application behavior or inventing project facts.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0127](test-cases.md), [TEST-0128](test-cases.md), [TEST-0129](test-cases.md), and [TEST-0130](test-cases.md) |
-| Test code | Passed locally and on replacement Ubuntu; replacement Windows run pending after its bounded timeout correction | Pure policy, adapter, launcher, and structural suites own [TEST-0127](test-cases.md), [TEST-0128](test-cases.md), [TEST-0129](test-cases.md), and [TEST-0130](test-cases.md); the target updater adapter owns the amended [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) regression and [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) owns the Windows job boundary |
+| Scenarios | Defined | [TEST-0127](test-cases.md#test-0127), [TEST-0128](test-cases.md#test-0128), [TEST-0129](test-cases.md#test-0129), and [TEST-0130](test-cases.md#test-0130) |
+| Test code | Passed locally and on replacement Ubuntu; replacement Windows run pending after its bounded timeout correction | Pure policy, adapter, launcher, and structural suites own [TEST-0127](test-cases.md#test-0127), [TEST-0128](test-cases.md#test-0128), [TEST-0129](test-cases.md#test-0129), and [TEST-0130](test-cases.md#test-0130); the target updater adapter owns the amended [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) regression and [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) owns the Windows job boundary |
 | Baseline run | Green inherited baseline | v0.10.4 complete suite recorded by [FEAT-0028](../FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md); branch baseline is clean |
 
 ## Decomposition and review gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0053` | Pure strategy/inventory resolver, workflow event gate, manifest and proposal identity | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | [TEST-0127](test-cases.md), [TEST-0128](test-cases.md); passed | Exact enum/path/schema/event diff and negative matrix; no open `Blocking` finding | Complete |
-| `SUBF-0054` | Launcher selection, strategy-specific semantic prompt, deletion boundary, recovery, and guidance | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | [TEST-0129](test-cases.md), [TEST-0130](test-cases.md); passed | Parameter/prompt/change-set/recovery diff and negative matrix; no open `Blocking` finding | Complete |
+| `SUBF-0053` <a name="subf-0053"></a> | Pure strategy/inventory resolver, workflow event gate, manifest and proposal identity | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | [TEST-0127](test-cases.md#test-0127), [TEST-0128](test-cases.md#test-0128); passed | Exact enum/path/schema/event diff and negative matrix; no open `Blocking` finding | Complete |
+| `SUBF-0054` <a name="subf-0054"></a> | Launcher selection, strategy-specific semantic prompt, deletion boundary, recovery, and guidance | [Issue #76](https://github.com/hasanmanzak/meAndAI/issues/76) | [TEST-0129](test-cases.md#test-0129), [TEST-0130](test-cases.md#test-0130); passed | Parameter/prompt/change-set/recovery diff and negative matrix; no open `Blocking` finding | Complete |
 
 ## Corrective finding
 
 | ID | Classification / status | Priority / impact | Resolution and evidence |
 | --- | --- | --- | --- |
-| `FIND-0158` | Windows PowerShell 5.1 compatibility defect / `Blocking` then resolved | `p1` / the immutable v0.10.4 target adapter completed its detached checkout but the latest launcher aborted before creating the atomic recovery proposal | `Invoke-Native` now scopes `ErrorActionPreference=Continue` only around the native process, captures its exit code, restores the caller preference in `finally`, and throws unless the code is explicitly accepted. Every adapter Git call uses that boundary; ancestry false and missing-ref exits 1/2 remain typed control flow, while unexpected failures stop. The catalog checkout is also quiet. The real-Git [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) fixture and final updater family pass after two expected-red corrections. |
-| `FIND-0159` | PowerShell 7 / Linux empty-inventory compatibility defect / `Blocking` then resolved | `p1` / Ubuntu rejected an otherwise valid empty initial-adoption marker before quick adoption could reuse its deterministic draft | The pure classifier now normalizes only a sole null/empty-collection sentinel to an empty inventory; a null mixed with any real path remains invalid. [TEST-0127](test-cases.md) covers scalar null, empty array, singleton-null, and mixed-null inputs; the [TEST-0130](test-cases.md) adoption marker round trip and full capabilities adapter pass. The original Ubuntu run is the expected-red cross-platform evidence and replacement run `29653339317` passed. |
-| `FIND-0160` | Windows `Full`-profile timeout under-provisioning / `Blocking` then resolved locally | `p1` / the correct serial Windows profile passed the capabilities and updater families but GitHub canceled the still-running suite at the stale 20-minute job limit | Only the Windows job bound is 35 minutes, giving the measured 1576-second local `Full` run about 33 percent headroom. Linux remains 20 minutes, post-publication remains 5, and no job, matrix, setup, or coverage route is added. [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) failed first against 20 and passes against the exact Windows job boundary; replacement hosted evidence remains required. |
+| `FIND-0158` <a name="find-0158"></a> | Windows PowerShell 5.1 compatibility defect / `Blocking` then resolved | `p1` / the immutable v0.10.4 target adapter completed its detached checkout but the latest launcher aborted before creating the atomic recovery proposal | `Invoke-Native` now scopes `ErrorActionPreference=Continue` only around the native process, captures its exit code, restores the caller preference in `finally`, and throws unless the code is explicitly accepted. Every adapter Git call uses that boundary; ancestry false and missing-ref exits 1/2 remain typed control flow, while unexpected failures stop. The catalog checkout is also quiet. The real-Git [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) fixture and final updater family pass after two expected-red corrections. |
+| `FIND-0159` <a name="find-0159"></a> | PowerShell 7 / Linux empty-inventory compatibility defect / `Blocking` then resolved | `p1` / Ubuntu rejected an otherwise valid empty initial-adoption marker before quick adoption could reuse its deterministic draft | The pure classifier now normalizes only a sole null/empty-collection sentinel to an empty inventory; a null mixed with any real path remains invalid. [TEST-0127](test-cases.md#test-0127) covers scalar null, empty array, singleton-null, and mixed-null inputs; the [TEST-0130](test-cases.md#test-0130) adoption marker round trip and full capabilities adapter pass. The original Ubuntu run is the expected-red cross-platform evidence and replacement run `29653339317` passed. |
+| `FIND-0160` <a name="find-0160"></a> | Windows `Full`-profile timeout under-provisioning / `Blocking` then resolved locally | `p1` / the correct serial Windows profile passed the capabilities and updater families but GitHub canceled the still-running suite at the stale 20-minute job limit | Only the Windows job bound is 35 minutes, giving the measured 1576-second local `Full` run about 33 percent headroom. Linux remains 20 minutes, post-publication remains 5, and no job, matrix, setup, or coverage route is added. [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) failed first against 20 and passes against the exact Windows job boundary; replacement hosted evidence remains required. |
 
 ## Relationships
 

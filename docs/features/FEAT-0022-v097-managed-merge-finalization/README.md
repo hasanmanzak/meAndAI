@@ -78,14 +78,14 @@ manual dispatch reconciles an exact missed event idempotently.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0098` | Data loss / identity | A foreign, reused, or moved branch is deleted as managed work | Mitigating / consumer workflow | Exact first-line marker, repository/base/head/path checks, current merge containment, open-PR reuse rejection, live-ref equality, expected-head lease, and [TEST-0110](test-cases.md) |
-| `RISK-0099` | Consistency | Branch deletion and issue closure cannot be atomic | Mitigating / consumer workflow | Validate all state first, delete and verify the branch before issue mutation, then use an idempotent evidence marker and recovery dispatch |
-| `RISK-0100` | Availability | A missed event or restricted job token leaves cleanup incomplete | Mitigating / consumer maintainer | Explicit pull-request recovery input, idempotent absent-branch handling, and actionable failure evidence |
-| `RISK-0101` | Traceability | An update merge has no authoritative issue to close | Mitigating / consumer maintainer | Exactly one same-repository tracking issue is a pre-merge requirement for managed updates; native closing keywords are forbidden so finalization ordering stays deterministic |
+| `RISK-0098` <a name="risk-0098"></a> | Data loss / identity | A foreign, reused, or moved branch is deleted as managed work | Mitigating / consumer workflow | Exact first-line marker, repository/base/head/path checks, current merge containment, open-PR reuse rejection, live-ref equality, expected-head lease, and [TEST-0110](test-cases.md#test-0110) |
+| `RISK-0099` <a name="risk-0099"></a> | Consistency | Branch deletion and issue closure cannot be atomic | Mitigating / consumer workflow | Validate all state first, delete and verify the branch before issue mutation, then use an idempotent evidence marker and recovery dispatch |
+| `RISK-0100` <a name="risk-0100"></a> | Availability | A missed event or restricted job token leaves cleanup incomplete | Mitigating / consumer maintainer | Explicit pull-request recovery input, idempotent absent-branch handling, and actionable failure evidence |
+| `RISK-0101` <a name="risk-0101"></a> | Traceability | An update merge has no authoritative issue to close | Mitigating / consumer maintainer | Exactly one same-repository tracking issue is a pre-merge requirement for managed updates; native closing keywords are forbidden so finalization ordering stays deterministic |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0108](test-cases.md), [TEST-0109](test-cases.md), and [TEST-0110](test-cases.md) |
+| Scenarios | Defined | [TEST-0108](test-cases.md#test-0108), [TEST-0109](test-cases.md#test-0109), and [TEST-0110](test-cases.md#test-0110) |
 | Test code | Implemented | The focused fixture failed first on the absent adapter/workflow route, then passed after production implementation |
 | Baseline run | Green | `v0.9.6` complete local suite and hosted Ubuntu/Windows validation recorded in [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59) |
 
@@ -93,7 +93,7 @@ manual dispatch reconciles an exact missed event idempotently.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0038` | Event-routed, issue-aware, lease-safe managed merge finalization | [Issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) | [TEST-0108](test-cases.md), [TEST-0109](test-cases.md), and [TEST-0110](test-cases.md); focused pass | `FIND-0153` through `FIND-0155` resolved; bounded confirmation clean | Complete |
+| `SUBF-0038` <a name="subf-0038"></a> | Event-routed, issue-aware, lease-safe managed merge finalization | [Issue #61](https://github.com/hasanmanzak/meAndAI/issues/61) | [TEST-0108](test-cases.md#test-0108), [TEST-0109](test-cases.md#test-0109), and [TEST-0110](test-cases.md#test-0110); focused pass | `FIND-0153` through `FIND-0155` resolved; bounded confirmation clean | Complete |
 
 ## Decisions and relationships
 
@@ -114,7 +114,7 @@ manual dispatch reconciles an exact missed event idempotently.
       recovery, and compatibility contracts are identified.
 - [x] `RISK-0098` through `RISK-0101` and [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md) are recorded.
 - [x] The bounded correction is one independently reviewable slice.
-- [x] [TEST-0108](test-cases.md), [TEST-0109](test-cases.md), and [TEST-0110](test-cases.md) and the verification approach are defined.
+- [x] [TEST-0108](test-cases.md#test-0108), [TEST-0109](test-cases.md#test-0109), and [TEST-0110](test-cases.md#test-0110) and the verification approach are defined.
 - [x] Test-code and baseline states are recorded.
 
 ## Acceptance criteria
@@ -155,12 +155,12 @@ generalized validator.
 
 | ID | Classification / disposition | Priority / impact | Evidence and action | Status |
 | --- | --- | --- | --- | --- |
-| `FIND-0153` | Lifecycle defect / `Blocking` | `p1` / issue could close before destructive convergence | Independent design review showed that native `Closes #N` semantics contradict branch-first finalization. Replaced them with one exact non-closing `Tracking issue: #N` line and reject every native closing keyword before readiness/finalization. | Resolved |
-| `FIND-0154` | Identity and consistency gap / `Blocking` | `p1` / stale or reused branch could be finalized | Added fresh default-head containment, same-repository API head, open-PR branch-reuse, repeated live-state, exact-ref, and expected-head lease checks before issue mutation. | Resolved |
-| `FIND-0155` | Regression-evidence defect / `Blocking` | `p1` / release-boundary tests entered an unrelated API failure | Three escaped `v0\.9\.6` fixture matchers survived the ordinary version search, repeating the class recorded by historical [FIND-0152](../FEAT-0021-v096-github-cli-prerequisite/README.md). Updated the fixtures and added a version-derived structural scan over escaped release references so the class now fails at the root protocol gate. | Resolved |
+| `FIND-0153` <a name="find-0153"></a> | Lifecycle defect / `Blocking` | `p1` / issue could close before destructive convergence | Independent design review showed that native `Closes #N` semantics contradict branch-first finalization. Replaced them with one exact non-closing `Tracking issue: #N` line and reject every native closing keyword before readiness/finalization. | Resolved |
+| `FIND-0154` <a name="find-0154"></a> | Identity and consistency gap / `Blocking` | `p1` / stale or reused branch could be finalized | Added fresh default-head containment, same-repository API head, open-PR branch-reuse, repeated live-state, exact-ref, and expected-head lease checks before issue mutation. | Resolved |
+| `FIND-0155` <a name="find-0155"></a> | Regression-evidence defect / `Blocking` | `p1` / release-boundary tests entered an unrelated API failure | Three escaped `v0\.9\.6` fixture matchers survived the ordinary version search, repeating the class recorded by historical [FIND-0152](../FEAT-0021-v096-github-cli-prerequisite/README.md#find-0152). Updated the fixtures and added a version-derived structural scan over escaped release references so the class now fails at the root protocol gate. | Resolved |
 
 The bounded confirmation parsed every changed PowerShell file, found one exact
-scenario owner for [TEST-0108](test-cases.md), [TEST-0109](test-cases.md), and [TEST-0110](test-cases.md), passed `git diff --check`,
+scenario owner for [TEST-0108](test-cases.md#test-0108), [TEST-0109](test-cases.md#test-0109), and [TEST-0110](test-cases.md#test-0110), passed `git diff --check`,
 found no stale ordinary or escaped active release pin, and completed the full
 repository suite in 543.1 seconds with all discovered scenario evidence. No
 unresolved `Blocking` finding remains.

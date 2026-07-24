@@ -54,12 +54,10 @@ function Get-IndexedMarkdownTargets {
     return @($targets)
 }
 
-function Get-MarkdownAnchors {
+function Get-MarkdownAnchorEvidence {
     param([string]$Markdown)
 
-    $anchors = [System.Collections.Generic.HashSet[string]]::new(
-        [System.StringComparer]::OrdinalIgnoreCase
-    )
+    $anchors = [System.Collections.Generic.List[object]]::new()
     $counts = @{}
 
     foreach ($match in [regex]::Matches($Markdown, '(?m)^#{1,6}\s+(.+?)\s*$')) {
@@ -78,10 +76,98 @@ function Get-MarkdownAnchors {
             $counts[$slug] = 0
         }
 
-        [void]$anchors.Add($slug)
+        $anchors.Add([pscustomobject]@{
+            Name = $slug
+            Kind = 'Heading'
+            Index = $match.Index
+            Length = $match.Length
+        })
     }
 
+    foreach ($match in [regex]::Matches(
+        $Markdown,
+        '<a[ \t]+name[ \t]*=[ \t]*"(?<name>[^"<>\s]+)"[ \t]*></a>'
+    )) {
+        $anchors.Add([pscustomobject]@{
+            Name = [string]$match.Groups['name'].Value
+            Kind = 'Custom'
+            Index = $match.Index
+            Length = $match.Length
+        })
+    }
+
+    return @($anchors | Sort-Object Index)
+}
+
+function Get-MarkdownAnchors {
+    param([string]$Markdown)
+
+    $anchors = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($anchor in @(Get-MarkdownAnchorEvidence -Markdown $Markdown)) {
+        [void]$anchors.Add([string]$anchor.Name)
+    }
     return ,$anchors
+}
+
+function Test-CanonicalGitHubLineFragment {
+    param(
+        [Parameter(Mandatory)][string]$Fragment,
+        [Parameter(Mandatory)][long]$LineCount
+    )
+
+    $lineMatch = [regex]::Match(
+        $Fragment,
+        '^L(?<start>[1-9][0-9]*)(?:-L(?<end>[1-9][0-9]*))?$'
+    )
+    if (-not $lineMatch.Success -or $LineCount -lt 1) { return $false }
+    [long]$start = 0
+    if (-not [long]::TryParse(
+            [string]$lineMatch.Groups['start'].Value,
+            [ref]$start
+        )) { return $false }
+    [long]$end = $start
+    if ($lineMatch.Groups['end'].Success -and
+        -not [long]::TryParse(
+            [string]$lineMatch.Groups['end'].Value,
+            [ref]$end
+        )) { return $false }
+    return $start -ge 1 -and $end -ge $start -and $end -le $LineCount
+}
+
+function Get-Utf8TextEvidence {
+    param([Parameter(Mandatory)][byte[]]$Bytes)
+
+    try {
+        $utf8 = [Text.UTF8Encoding]::new($false, $true)
+        $text = $utf8.GetString($Bytes)
+    }
+    catch [Text.DecoderFallbackException] {
+        return [pscustomobject]@{
+            IsText = $false; Text = ''; LineCount = 0
+        }
+    }
+    if ([regex]::IsMatch($text, '[\x00-\x08\x0B\x0C\x0E-\x1F]')) {
+        return [pscustomobject]@{
+            IsText = $false; Text = ''; LineCount = 0
+        }
+    }
+    $lineCount = if ($text.Length -eq 0) {
+        0
+    }
+    else {
+        $breakCount = [regex]::Matches($text, "\r\n|\r|\n").Count
+        if ($text -match "(?:\r\n|\r|\n)$") {
+            $breakCount
+        }
+        else {
+            $breakCount + 1
+        }
+    }
+    return [pscustomobject]@{
+        IsText = $true; Text = $text; LineCount = [long]$lineCount
+    }
 }
 
 $requiredFiles = @(
@@ -208,7 +294,7 @@ foreach ($testCaseFile in @(Get-ChildItem -LiteralPath (Join-Path $root 'docs/fe
     $lineNumber = 0
     foreach ($line in @(Get-Content -LiteralPath $testCaseFile.FullName)) {
         $lineNumber++
-        if ($line -notmatch '^\|\s*`(?<id>TEST-\d{4})`\s*\|') {
+        if ($line -notmatch '^\|\s*`(?<id>TEST-\d{4})`[^|]*\|') {
             continue
         }
 
@@ -457,7 +543,7 @@ if (-not $normalizedV084Memory.Contains($canonicalDisposition) -or
     Add-Failure 'TEST-0092 v0.8.4 durable records do not use the canonical finding disposition counts.'
 }
 if ($protocolFeatureScenarios -notmatch [regex]::Escape(
-    '| `TEST-0002` | [SUBF-0001](README.md) | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`.'
+    '| `TEST-0002` <a name="test-0002"></a> | [SUBF-0001](README.md#subf-0001) | `VERSION` is evaluated against `M.m.rev`. | Exactly three ASCII decimal components are accepted, with no leading zero unless the component is exactly `0`.'
 )) {
     Add-Failure 'TEST-0088/TEST-0092 TEST-0002 does not state the canonical ASCII/no-leading-zero grammar.'
 }
@@ -1056,12 +1142,26 @@ foreach ($file in $markdownFiles) {
             }
         }
 
-        if ($fragment -and (Test-Path -LiteralPath $targetFile -PathType Leaf) -and
-            ([System.IO.Path]::GetExtension($targetFile) -ieq '.md')) {
-            $targetMarkdown = Get-Content -LiteralPath $targetFile -Raw
-            $anchors = Get-MarkdownAnchors $targetMarkdown
-            if (-not $anchors.Contains($fragment)) {
-                Add-Failure "TEST-0003 missing anchor in $display -> $target"
+        if ($fragment) {
+            if (-not (Test-Path -LiteralPath $targetFile -PathType Leaf)) {
+                Add-Failure "TEST-0003 unsupported fragment target in $display -> $target"
+            }
+            elseif ([System.IO.Path]::GetExtension($targetFile) -ieq '.md') {
+                $targetMarkdown = Get-Content -LiteralPath $targetFile -Raw
+                $anchors = Get-MarkdownAnchors $targetMarkdown
+                if (-not $anchors.Contains($fragment)) {
+                    Add-Failure "TEST-0003 missing anchor in $display -> $target"
+                }
+            }
+            else {
+                $targetTextEvidence = Get-Utf8TextEvidence `
+                    -Bytes ([IO.File]::ReadAllBytes($targetFile))
+                if (-not $targetTextEvidence.IsText -or
+                    -not (Test-CanonicalGitHubLineFragment `
+                        -Fragment $fragment `
+                        -LineCount $targetTextEvidence.LineCount)) {
+                    Add-Failure "TEST-0003 invalid non-Markdown line fragment in $display -> $target"
+                }
             }
         }
     }
@@ -1352,15 +1452,30 @@ $originalLinkValidationCulture =
     [Globalization.CultureInfo]::InvariantCulture
 foreach ($requiredText in @(
     'document (repository-local or external), GitHub issue, pull request, or GitHub comment of any kind',
-    'another document (repository-local or external), issue, pull request, or GitHub comment',
-    'MUST express each such reference as a clickable link to the exact referenced target',
-    'A free-text identifier, number, title, or path does not satisfy this requirement'
+    'another document (repository-local or external), issue, pull request, GitHub comment, or commit',
+    'MUST express each human-facing reference as a clickable link to the exact referenced target',
+    'A free-text identifier, number, title, path, or commit hash does not satisfy this requirement',
+    'Governed clickable references MUST use a renderer-active Markdown inline link, reference-style link, or absolute HTTP(S) autolink',
+    'Raw HTML `href` elements are not a supported reference-authoring form'
 )) {
     if (-not $normalizedProtocolContent.Contains($requiredText)) {
         Add-Failure "TEST-0175 clickable cross-record reference rule is missing '$requiredText'."
     }
 }
-$referencePrompt = 'Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.'
+foreach ($requiredText in @(
+    'the link MUST include a stable fragment that positions the reader at that record or location',
+    'Every canonical embedded stable-ID record, including each `TEST-NNNN`, `SUBF-NNNN`, `FIND-NNNN`, and `RISK-NNNN` record',
+    'MUST expose one unique, renderer-active custom anchor within its canonical declaration whose name is the exact lowercase identifier',
+    'Cross-document references to that record MUST target that anchor',
+    'A link authored in a repository file to a current canonical repository record or location MUST be repository-relative and include any required fragment',
+    'A fragment on a Markdown document targets one unique renderer-active anchor',
+    'A fragment on a non-Markdown repository blob uses GitHub''s exact `#Lstart` or `#Lstart-Lend` form and MUST identify lines within that blob'
+)) {
+    if (-not $normalizedProtocolContent.Contains($requiredText)) {
+        Add-Failure "TEST-0177 embedded-record anchor/fragment rule is missing '$requiredText'."
+    }
+}
+$referencePrompt = 'Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.'
 foreach ($formName in $formExpectations.Keys) {
     $formContent = Get-Content -LiteralPath (
         Join-Path $root ".github/ISSUE_TEMPLATE/$formName"
@@ -1381,6 +1496,35 @@ foreach ($templatePath in @(
     $templateContent = Get-Content -LiteralPath (Join-Path $root $templatePath) -Raw
     if (-not $templateContent.Contains($referencePrompt)) {
         Add-Failure "TEST-0175 $templatePath does not require clickable exact-target references."
+    }
+}
+foreach ($embeddedTemplateExpectation in @(
+    [pscustomobject]@{
+        Path = 'templates/feature/README.md'
+        Text = '| `SUBF-NNNN` <a name="subf-nnnn"></a> |'
+    },
+    [pscustomobject]@{
+        Path = 'templates/feature/README.md'
+        Text = '| `RISK-NNNN` <a name="risk-nnnn"></a> |'
+    },
+    [pscustomobject]@{
+        Path = 'templates/feature/README.md'
+        Text = '| `FIND-NNNN` <a name="find-nnnn"></a> |'
+    },
+    [pscustomobject]@{
+        Path = 'templates/feature/test-cases.md'
+        Text = '| `TEST-NNNN` <a name="test-nnnn"></a> |'
+    },
+    [pscustomobject]@{
+        Path = 'templates/feature/test-cases.md'
+        Text = '[SUBF-NNNN](README.md#subf-nnnn)'
+    }
+)) {
+    $embeddedTemplate = Get-Content -LiteralPath (
+        Join-Path $root $embeddedTemplateExpectation.Path
+    ) -Raw
+    if (-not $embeddedTemplate.Contains($embeddedTemplateExpectation.Text)) {
+        Add-Failure "TEST-0177 $($embeddedTemplateExpectation.Path) is missing required embedded-record anchor/link structure '$($embeddedTemplateExpectation.Text)'."
     }
 }
 foreach ($requiredWorkflowText in @(
@@ -1427,6 +1571,27 @@ foreach ($forbiddenWriterText in @(
     }
 }
 $documentRecordTargets = @{}
+$embeddedRecordDeclarations = [System.Collections.Generic.List[object]]::new()
+$embeddedRecordDeclarationKeys = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::Ordinal
+)
+$embeddedFeatureTableRecordDeclarationPattern =
+    '(?m)^\|\s*`(?<id>(?:SUBF|FIND|RISK)-\d{4})`[^|]*\|'
+$embeddedTestTableRecordDeclarationPattern =
+    '(?m)^\|\s*`(?<id>TEST-\d{4})`[^|]*\|'
+$embeddedHeadingRecordDeclarationPattern =
+    '(?m)^#{1,6}[ \t]+`?(?<id>(?:TEST|SUBF|FIND|RISK)-\d{4})`?(?=[ \t]|$)[^\r\n]*$'
+$embeddedFeatureChecklistDeclarationPattern =
+    '(?m)^-\s+(?:\[[ xX]\]\s+`(?<checklistId>(?:SUBF|FIND|RISK)-\d{4})`[^:\r\n]*:|(?:Fresh-diff review found|The first hosted PR run found)\s+`(?<reviewId>FIND-\d{4})`[^\r\n]*)'
+function Add-EmbeddedRecordDeclarationKey {
+    param(
+        [Parameter(Mandatory)]$Registry,
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    return [bool]$Registry.Add("$Path`n$Id")
+}
 function Add-DocumentRecordTarget {
     param(
         [Parameter(Mandatory)][string]$Id,
@@ -1440,6 +1605,93 @@ function Add-DocumentRecordTarget {
     }
     $documentRecordTargets[$Id] = $Path
 }
+function Get-DocumentRecordTargetPath {
+    param([Parameter(Mandatory)][string]$Target)
+
+    if ($Target.StartsWith('https://')) { return $Target }
+    $fragmentIndex = $Target.IndexOf('#')
+    if ($fragmentIndex -lt 0) { return $Target }
+    return $Target.Substring(0, $fragmentIndex)
+}
+function Get-EmbeddedRecordAnchorProblems {
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)][string]$DeclarationText,
+        [AllowEmptyCollection()][object[]]$DocumentAnchors
+    )
+
+    $expectedAnchor = $Id.ToLowerInvariant()
+    $problems = [System.Collections.Generic.List[string]]::new()
+    $activeDocumentAnchors = if (
+        $PSBoundParameters.ContainsKey('DocumentAnchors')
+    ) { @($DocumentAnchors) } else {
+        @(Get-RendererActiveMarkdownAnchorEvidence -Markdown $Markdown)
+    }
+    $matchingAnchors = @($activeDocumentAnchors | Where-Object {
+        [string]$_.Name -ieq $expectedAnchor
+    })
+    $exactAnchors = @($matchingAnchors | Where-Object {
+        [string]$_.Name -ceq $expectedAnchor
+    })
+    $declarationAnchors = @(
+        Get-RendererActiveMarkdownAnchorEvidence `
+            -Markdown $DeclarationText | Where-Object {
+            [string]$_.Kind -ceq 'Custom'
+        }
+    )
+    $exactDeclarationAnchors = @($declarationAnchors | Where-Object {
+        [string]$_.Name -ceq $expectedAnchor
+    })
+
+    if ($declarationAnchors.Count -eq 0) {
+        if ($exactAnchors.Count -gt 0) {
+            $problems.Add('Wrong')
+        }
+        else {
+            $problems.Add('Missing')
+        }
+    }
+    elseif ($declarationAnchors.Count -ne 1 -or
+        $exactDeclarationAnchors.Count -ne 1) {
+        $problems.Add('Wrong')
+    }
+
+    if ($matchingAnchors.Count -gt 0 -and $exactAnchors.Count -eq 0) {
+        $problems.Add('WrongCase')
+    }
+    if ($exactAnchors.Count -gt 1) {
+        $problems.Add('Duplicate')
+    }
+    if (@($matchingAnchors | Where-Object {
+            [string]$_.Name -cne $expectedAnchor
+        }).Count -gt 0 -and $exactAnchors.Count -gt 0) {
+        $problems.Add('CaseCollision')
+    }
+
+    return @($problems | Select-Object -Unique)
+}
+function Add-EmbeddedDocumentRecordTarget {
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Markdown,
+        [Parameter(Mandatory)][string]$DeclarationText
+    )
+
+    if (-not (Add-EmbeddedRecordDeclarationKey `
+            -Registry $embeddedRecordDeclarationKeys -Id $Id -Path $Path)) {
+        Add-Failure "TEST-0177 $Path contains more than one declaration-shaped plain occurrence of $Id. Secondary occurrences must be exact links to '#$($Id.ToLowerInvariant())'."
+    }
+    $embeddedRecordDeclarations.Add([pscustomobject]@{
+        Id = $Id
+        Path = $Path
+        Markdown = $Markdown
+        DeclarationText = $DeclarationText
+    })
+    Add-DocumentRecordTarget -Id $Id `
+        -Path "$Path#$($Id.ToLowerInvariant())"
+}
 foreach ($featureDirectory in $featureDirectories) {
     $featureId = $featureDirectory.Name.Substring(0, 9)
     $featureReadmePath = "docs/features/$($featureDirectory.Name)/README.md"
@@ -1449,14 +1701,15 @@ foreach ($featureDirectory in $featureDirectories) {
     ) -Raw
     foreach ($match in [regex]::Matches(
         $featureReadme,
-        '(?m)^\|\s*`(?<id>(?:SUBF|FIND|RISK)-\d{4})`[^|]*\|'
+        $embeddedFeatureTableRecordDeclarationPattern
     )) {
-        Add-DocumentRecordTarget -Id $match.Groups['id'].Value `
-            -Path $featureReadmePath
+        Add-EmbeddedDocumentRecordTarget `
+            -Id $match.Groups['id'].Value -Path $featureReadmePath `
+            -Markdown $featureReadme -DeclarationText $match.Value
     }
     foreach ($match in [regex]::Matches(
         $featureReadme,
-        '(?m)^-\s+(?:\[[ xX]\]\s+`(?<checklistId>(?:SUBF|FIND|RISK)-\d{4})`\s*:|(?:Fresh-diff review found|The first hosted PR run found)\s+`(?<reviewId>FIND-\d{4})`)'
+        $embeddedFeatureChecklistDeclarationPattern
     )) {
         $embeddedId = if ($match.Groups['checklistId'].Success) {
             $match.Groups['checklistId'].Value
@@ -1464,7 +1717,17 @@ foreach ($featureDirectory in $featureDirectories) {
         else {
             $match.Groups['reviewId'].Value
         }
-        Add-DocumentRecordTarget -Id $embeddedId -Path $featureReadmePath
+        Add-EmbeddedDocumentRecordTarget -Id $embeddedId `
+            -Path $featureReadmePath -Markdown $featureReadme `
+            -DeclarationText $match.Value
+    }
+    foreach ($match in [regex]::Matches(
+        $featureReadme,
+        $embeddedHeadingRecordDeclarationPattern
+    )) {
+        Add-EmbeddedDocumentRecordTarget `
+            -Id $match.Groups['id'].Value -Path $featureReadmePath `
+            -Markdown $featureReadme -DeclarationText $match.Value
     }
     foreach ($match in [regex]::Matches(
         $featureReadme,
@@ -1479,10 +1742,19 @@ foreach ($featureDirectory in $featureDirectories) {
     ) -Raw
     foreach ($match in [regex]::Matches(
         $testCases,
-        '(?m)^\|\s*`(?<id>TEST-\d{4})`\s*\|'
+        $embeddedTestTableRecordDeclarationPattern
     )) {
-        Add-DocumentRecordTarget -Id $match.Groups['id'].Value `
-            -Path $testCasesPath
+        Add-EmbeddedDocumentRecordTarget `
+            -Id $match.Groups['id'].Value -Path $testCasesPath `
+            -Markdown $testCases -DeclarationText $match.Value
+    }
+    foreach ($match in [regex]::Matches(
+        $testCases,
+        $embeddedHeadingRecordDeclarationPattern
+    )) {
+        Add-EmbeddedDocumentRecordTarget `
+            -Id $match.Groups['id'].Value -Path $testCasesPath `
+            -Markdown $testCases -DeclarationText $match.Value
     }
 }
 foreach ($decisionFile in $decisionFiles) {
@@ -1515,7 +1787,7 @@ foreach ($entry in @{
     'BUG-0020' = 89; 'BUG-0021' = 89; 'BUG-0022' = 96
     'BUG-0023' = 102; 'BUG-0024' = 104; 'BUG-0025' = 106
     'BUG-0026' = 108; 'BUG-0027' = 110; 'BUG-0028' = 112
-    'BUG-0029' = 114
+    'BUG-0029' = 114; 'BUG-0030' = 116
 }.GetEnumerator()) {
     $documentRecordTargets[$entry.Key] =
         "https://github.com/hasanmanzak/meAndAI/issues/$($entry.Value)"
@@ -2132,6 +2404,31 @@ function Get-DocumentMarkdownHttpAutolinkSpans {
     }
     return @($spans | Sort-Object Index, Length -Unique)
 }
+function Get-DocumentRendererActiveHttpAutolinkSpans {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [Parameter(Mandatory)]$LinkEvidence
+    )
+
+    $ignoredSpans = @($LinkEvidence.Links) +
+        @($LinkEvidence.Definitions) + @($LinkEvidence.CodeSpans) +
+        @($LinkEvidence.HtmlComments) + @($LinkEvidence.NonRenderingHtml)
+    $activeSpans = [System.Collections.Generic.List[object]]::new()
+    foreach ($autolink in @(Get-DocumentMarkdownHttpAutolinkSpans `
+        -Markdown ([string]$Markdown))) {
+        if (Test-DocumentMarkdownSpanOverlap -Index $autolink.Index `
+            -Length $autolink.Length -Spans $ignoredSpans) { continue }
+        $hasDecoratedNumericSegment = -not $autolink.IsAngle -and
+            [regex]::IsMatch(
+                [string]$autolink.RawValue,
+                '(?:\*{1,3}[0-9]+\*{1,3}|~~[0-9]+~~|_{1,2}[0-9]+_{1,2})(?=$|[(/?#&.,;:!])'
+            )
+        if ($autolink.HasMarkupContinuation -or
+            $hasDecoratedNumericSegment) { continue }
+        $activeSpans.Add($autolink)
+    }
+    return @($activeSpans)
+}
 function Get-DocumentMarkdownVisibleHttpUrlSpans {
     param([AllowEmptyString()][string]$Text)
 
@@ -2496,6 +2793,69 @@ function Get-DocumentMarkdownLinkEvidence {
         EscapedLinks = @($escapedLinkSpans)
     }
 }
+function Get-RendererActiveMarkdownAnchorEvidence {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $ignoredSpans = @(Get-DocumentMarkdownCodeSpans -Markdown $Markdown) +
+        @(Get-DocumentMarkdownHtmlCommentSpans -Markdown $Markdown) +
+        @(Get-DocumentMarkdownNonRenderingHtmlSpans -Markdown $Markdown)
+    return @(Get-MarkdownAnchorEvidence -Markdown $Markdown | Where-Object {
+        -not (Test-DocumentMarkdownSpanOverlap `
+            -Index ([int]$_.Index) -Length ([int]$_.Length) `
+            -Spans $ignoredSpans)
+    })
+}
+$activeEmbeddedAnchorsByPath = @{}
+$validatedEmbeddedRecordAnchors = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::Ordinal
+)
+foreach ($declaration in $embeddedRecordDeclarations) {
+    if (-not $validatedEmbeddedRecordAnchors.Add(
+            [string]$declaration.Id
+        )) { continue }
+    $declarationPath = [string]$declaration.Path
+    if (-not $activeEmbeddedAnchorsByPath.ContainsKey($declarationPath)) {
+        $activeEmbeddedAnchorsByPath[$declarationPath] = @(
+            Get-RendererActiveMarkdownAnchorEvidence `
+                -Markdown ([string]$declaration.Markdown)
+        )
+    }
+    $anchorProblems = @(Get-EmbeddedRecordAnchorProblems `
+        -Id ([string]$declaration.Id) `
+        -Markdown ([string]$declaration.Markdown) `
+        -DeclarationText ([string]$declaration.DeclarationText) `
+        -DocumentAnchors @($activeEmbeddedAnchorsByPath[$declarationPath]))
+    foreach ($problem in $anchorProblems) {
+        $id = [string]$declaration.Id
+        switch ($problem) {
+            'Missing' {
+                Add-Failure "TEST-0177 $declarationPath is missing canonical anchor '<a name=`"$($id.ToLowerInvariant())`"></a>' for $id."
+            }
+            'Wrong' {
+                Add-Failure "TEST-0177 $declarationPath does not place the exact canonical anchor for $id in its declaration."
+            }
+            'WrongCase' {
+                Add-Failure "TEST-0177 $declarationPath uses a non-lowercase anchor for $id."
+            }
+            'Duplicate' {
+                Add-Failure "TEST-0177 $declarationPath defines duplicate '$($id.ToLowerInvariant())' anchors for $id."
+            }
+            'CaseCollision' {
+                Add-Failure "TEST-0177 $declarationPath defines case-colliding anchors for $id."
+            }
+        }
+    }
+}
+function Test-DocumentRecordOwnIdentity {
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [Parameter(Mandatory)][string]$SourcePath
+    )
+
+    if (-not $documentRecordTargets.ContainsKey($Id)) { return $false }
+    $target = [string]$documentRecordTargets[$Id]
+    return (Get-DocumentRecordTargetPath -Target $target) -ceq $SourcePath
+}
 function Get-DocumentUnlinkedMarkdown {
     param(
         [AllowEmptyString()][string]$Markdown,
@@ -2639,20 +2999,8 @@ function Get-DocumentRenderedReferenceEvidence {
             Replacement = ''
         })
     }
-    $bareUrlIgnoredSpans = @($LinkEvidence.Links) +
-        @($LinkEvidence.Definitions) + @($LinkEvidence.CodeSpans) +
-        @($LinkEvidence.HtmlComments) + @($LinkEvidence.NonRenderingHtml)
-    foreach ($bareUrl in @(Get-DocumentMarkdownHttpAutolinkSpans `
-        -Markdown ([string]$Markdown))) {
-        if (Test-DocumentMarkdownSpanOverlap -Index $bareUrl.Index `
-            -Length $bareUrl.Length -Spans $bareUrlIgnoredSpans) { continue }
-        $hasDecoratedNumericSegment = -not $bareUrl.IsAngle -and
-            [regex]::IsMatch(
-                [string]$bareUrl.RawValue,
-                '(?:\*{1,3}[0-9]+\*{1,3}|~~[0-9]+~~|_{1,2}[0-9]+_{1,2})(?=$|[(/?#&.,;:!])'
-            )
-        if ($bareUrl.HasMarkupContinuation -or
-            $hasDecoratedNumericSegment) { continue }
+    foreach ($bareUrl in @(Get-DocumentRendererActiveHttpAutolinkSpans `
+        -Markdown ([string]$Markdown) -LinkEvidence $LinkEvidence)) {
         $replacementSpans.Add([pscustomobject]@{
             Index = $bareUrl.Index
             Length = $bareUrl.Length
@@ -2825,6 +3173,11 @@ function Test-DocumentRecordLinkTarget {
     )
 
     $actual = Resolve-DocumentLinkTarget -SourcePath $SourcePath -Target $Target
+    if (-not $ExpectedTarget.StartsWith('https://') -and
+        $Target.Trim().Trim('<', '>') -match
+            '^https://github\.com/hasanmanzak/meAndAI/(?:blob|tree)/') {
+        return $false
+    }
     if ($ExpectedTarget.StartsWith('https://')) {
         return $actual.Kind -ceq 'External' -and
             $actual.Value -ceq $ExpectedTarget.TrimEnd('/')
@@ -2910,23 +3263,275 @@ function Test-DocumentResolvedTargetExists {
         [string]$resolved.Value -replace '/', [IO.Path]::DirectorySeparatorChar
     )
     if (-not (Test-Path -LiteralPath $targetFile)) { return $false }
-    if (-not [string]::IsNullOrEmpty([string]$resolved.Fragment) -and
-        (Test-Path -LiteralPath $targetFile -PathType Leaf) -and
-        [IO.Path]::GetExtension($targetFile) -ieq '.md') {
-        $anchors = Get-MarkdownAnchors (
-            Get-Content -LiteralPath $targetFile -Raw
-        )
-        if (-not $anchors.Contains(
-            ([string]$resolved.Fragment).TrimStart('#')
-        )) { return $false }
+    if (-not [string]::IsNullOrEmpty([string]$resolved.Fragment)) {
+        if (-not (Test-Path -LiteralPath $targetFile -PathType Leaf)) {
+            return $false
+        }
+        $fragment = ([string]$resolved.Fragment).TrimStart('#')
+        if ([IO.Path]::GetExtension($targetFile) -ieq '.md') {
+            $anchors = Get-MarkdownAnchors (
+                Get-Content -LiteralPath $targetFile -Raw
+            )
+            if (-not $anchors.Contains($fragment)) { return $false }
+        }
+        else {
+            $textEvidence = Get-Utf8TextEvidence `
+                -Bytes ([IO.File]::ReadAllBytes($targetFile))
+            if (-not $textEvidence.IsText -or
+                -not (Test-CanonicalGitHubLineFragment `
+                    -Fragment $fragment `
+                    -LineCount $textEvidence.LineCount)) {
+                return $false
+            }
+        }
     }
     return $true
+}
+$historicalRepositoryBlobTargetValidity = @{}
+$historicalRepositoryFragmentValidity = @{}
+$historicalRepositoryBlobContentEvidence = @{}
+$repositoryTagRootValidity = @{}
+$historicalRepositoryBlobFetchedBytes = [long]0
+$historicalRepositoryBlobMaxUnique = 64
+$historicalRepositoryBlobMaxBytes = 1MB
+$historicalRepositoryBlobMaxAggregateBytes = 16MB
+function Test-HistoricalBlobFetchWithinBudget {
+    param(
+        [Parameter(Mandatory)][long]$UniqueCount,
+        [Parameter(Mandatory)][long]$AggregateBytes,
+        [Parameter(Mandatory)][long]$BlobBytes
+    )
+
+    return $UniqueCount -lt $historicalRepositoryBlobMaxUnique -and
+        $BlobBytes -ge 0 -and
+        $BlobBytes -le $historicalRepositoryBlobMaxBytes -and
+        $AggregateBytes -le
+            ($historicalRepositoryBlobMaxAggregateBytes - $BlobBytes)
+}
+function Get-GitBlobBytes {
+    param([Parameter(Mandatory)][string]$ObjectSpec)
+
+    if ($root.Contains('"') -or $ObjectSpec.Contains('"')) {
+        return [pscustomobject]@{ Success = $false; Bytes = [byte[]]@() }
+    }
+    $startInfo = [Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = 'git'
+    $startInfo.Arguments = '-C "' + $root + '" cat-file blob "' +
+        $ObjectSpec + '"'
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    $memory = [IO.MemoryStream]::new()
+    try {
+        if (-not $process.Start()) {
+            return [pscustomobject]@{ Success = $false; Bytes = [byte[]]@() }
+        }
+        $standardError = $process.StandardError.ReadToEndAsync()
+        $process.StandardOutput.BaseStream.CopyTo($memory)
+        $process.WaitForExit()
+        [void]$standardError.Result
+        if ($process.ExitCode -ne 0) {
+            return [pscustomobject]@{ Success = $false; Bytes = [byte[]]@() }
+        }
+        return [pscustomobject]@{
+            Success = $true; Bytes = [byte[]]$memory.ToArray()
+        }
+    }
+    catch {
+        return [pscustomobject]@{ Success = $false; Bytes = [byte[]]@() }
+    }
+    finally {
+        $memory.Dispose()
+        $process.Dispose()
+    }
+}
+function Get-HistoricalRepositoryBlobContentEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Ref,
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$ValidityKey
+    )
+
+    if ($historicalRepositoryBlobContentEvidence.ContainsKey($ValidityKey)) {
+        return $historicalRepositoryBlobContentEvidence[$ValidityKey]
+    }
+    $failedEvidence = [pscustomobject]@{
+        Success = $false; IsText = $false; Text = ''; LineCount = 0
+    }
+    $sizeOutput = @(& git -C $root cat-file -s "$Ref`:$Path" 2>&1)
+    $sizeExitCode = $LASTEXITCODE
+    [long]$blobSize = -1
+    if ($sizeExitCode -ne 0 -or
+        -not [long]::TryParse(($sizeOutput -join '').Trim(), [ref]$blobSize) -or
+        -not (Test-HistoricalBlobFetchWithinBudget `
+            -UniqueCount $historicalRepositoryBlobContentEvidence.Count `
+            -AggregateBytes $historicalRepositoryBlobFetchedBytes `
+            -BlobBytes $blobSize)) {
+        $historicalRepositoryBlobContentEvidence[$ValidityKey] = $failedEvidence
+        return $failedEvidence
+    }
+    $blobResult = Get-GitBlobBytes -ObjectSpec "$Ref`:$Path"
+    if (-not $blobResult.Success -or
+        [long]$blobResult.Bytes.Length -ne $blobSize) {
+        $historicalRepositoryBlobContentEvidence[$ValidityKey] = $failedEvidence
+        return $failedEvidence
+    }
+    $script:historicalRepositoryBlobFetchedBytes += $blobSize
+    $textEvidence = Get-Utf8TextEvidence -Bytes $blobResult.Bytes
+    $evidence = [pscustomobject]@{
+        Success = $true
+        IsText = [bool]$textEvidence.IsText
+        Text = [string]$textEvidence.Text
+        LineCount = [long]$textEvidence.LineCount
+    }
+    $historicalRepositoryBlobContentEvidence[$ValidityKey] = $evidence
+    return $evidence
+}
+function Test-DocumentNonCanonicalSameRepositoryTarget {
+    param(
+        [Parameter(Mandatory)][string]$Target,
+        [Parameter(Mandatory)]$TrackedRepositoryPaths
+    )
+
+    $cleanTarget = $Target.Trim().Trim('<', '>')
+    $targetMatch = [regex]::Match(
+        $cleanTarget,
+        '(?i)^https://github\.com/hasanmanzak/meAndAI/(?<kind>blob|tree)/(?<remainder>[^?#]+)(?<suffix>[?#].*)?$'
+    )
+    if (-not $targetMatch.Success) { return $false }
+    $remainder = [uri]::UnescapeDataString(
+        [string]$targetMatch.Groups['remainder'].Value
+    ).Replace('\', '/')
+    $targetKind = [string]$targetMatch.Groups['kind'].Value
+    $ref = ''
+    $path = ''
+    $exactHistoricalBlob = [regex]::Match(
+        $remainder,
+        '^(?<ref>[0-9a-f]{40})/(?<path>.+)$'
+    )
+    if ($targetKind -ieq 'blob' -and $exactHistoricalBlob.Success) {
+        $ref = [string]$exactHistoricalBlob.Groups['ref'].Value
+        $path = [string]$exactHistoricalBlob.Groups['path'].Value
+    }
+    else {
+        for ($separatorIndex = $remainder.IndexOf('/');
+            $separatorIndex -ge 0;
+            $separatorIndex = $remainder.IndexOf('/', $separatorIndex + 1)) {
+            $candidatePath = $remainder.Substring($separatorIndex + 1)
+            if (-not $TrackedRepositoryPaths.Contains($candidatePath)) {
+                continue
+            }
+            $ref = $remainder.Substring(0, $separatorIndex)
+            $path = $candidatePath
+            break
+        }
+    }
+    if ($targetKind -ieq 'tree') {
+        if (-not [string]::IsNullOrEmpty($path) -or
+            $targetMatch.Groups['suffix'].Success) {
+            return $true
+        }
+        $tagRef = "refs/tags/$remainder"
+        if (-not $repositoryTagRootValidity.ContainsKey($tagRef)) {
+            & git -C $root show-ref --verify --quiet $tagRef 2>&1 | Out-Null
+            $repositoryTagRootValidity[$tagRef] = $LASTEXITCODE -eq 0
+        }
+        return -not [bool]$repositoryTagRootValidity[$tagRef]
+    }
+    if ([string]::IsNullOrEmpty($path) -or
+        $ref -cnotmatch '^[0-9a-f]{40}$') {
+        return $true
+    }
+    $validityKey = "$ref`n$path"
+    if (-not $historicalRepositoryBlobTargetValidity.ContainsKey(
+            $validityKey
+        )) {
+        $previousProbeErrorPreference = $ErrorActionPreference
+        $commitTypeOutput = @()
+        $commitTypeExitCode = -1
+        $pathTypeOutput = @()
+        $pathTypeExitCode = -1
+        try {
+            $ErrorActionPreference = 'Continue'
+            $commitTypeOutput = @(& git -C $root cat-file -t $ref 2>$null)
+            $commitTypeExitCode = $LASTEXITCODE
+            if ($commitTypeExitCode -eq 0 -and
+                ($commitTypeOutput -join '').Trim() -ceq 'commit') {
+                $pathTypeOutput = @(
+                    & git -C $root cat-file -t "$ref`:$path" 2>$null
+                )
+                $pathTypeExitCode = $LASTEXITCODE
+            }
+        }
+        finally {
+            $ErrorActionPreference = $previousProbeErrorPreference
+        }
+        $historicalRepositoryBlobTargetValidity[$validityKey] =
+            $commitTypeExitCode -eq 0 -and
+            ($commitTypeOutput -join '').Trim() -ceq 'commit' -and
+            $pathTypeExitCode -eq 0 -and
+            ($pathTypeOutput -join '').Trim() -ceq 'blob'
+    }
+    if (-not [bool]$historicalRepositoryBlobTargetValidity[$validityKey]) {
+        return $true
+    }
+    $fragmentMatch = [regex]::Match(
+        $cleanTarget,
+        '#(?<name>[^?]*)'
+    )
+    if (-not $fragmentMatch.Success) { return $false }
+    $rawFragmentName = [string]$fragmentMatch.Groups['name'].Value
+    $fragmentName = [uri]::UnescapeDataString($rawFragmentName)
+    $fragmentValidityKey = "$validityKey`n$rawFragmentName"
+    if (-not $historicalRepositoryFragmentValidity.ContainsKey(
+            $fragmentValidityKey
+        )) {
+        $contentEvidence = Get-HistoricalRepositoryBlobContentEvidence `
+            -Ref $ref -Path $path -ValidityKey $validityKey
+        $isValidFragment = $false
+        if ($contentEvidence.Success -and $contentEvidence.IsText) {
+            if ([IO.Path]::GetExtension($path) -ieq '.md') {
+                $matchingHistoricalAnchors = @(
+                    Get-RendererActiveMarkdownAnchorEvidence `
+                        -Markdown $contentEvidence.Text |
+                        Where-Object {
+                            [string]$_.Name -ceq $fragmentName
+                        }
+                )
+                $isValidFragment = $matchingHistoricalAnchors.Count -eq 1
+            }
+            else {
+                $isValidFragment = Test-CanonicalGitHubLineFragment `
+                    -Fragment $rawFragmentName `
+                    -LineCount $contentEvidence.LineCount
+            }
+        }
+        $historicalRepositoryFragmentValidity[$fragmentValidityKey] =
+            $isValidFragment
+    }
+    return -not [bool]$historicalRepositoryFragmentValidity[
+        $fragmentValidityKey
+    ]
 }
 $documentMarkdownPaths = @(& git -C $root ls-files --cached --others `
     --exclude-standard -- '*.md')
 if ($LASTEXITCODE -ne 0) {
     Add-Failure 'TEST-0175 tracked Markdown inventory failed.'
     $documentMarkdownPaths = @()
+}
+$trackedRepositoryPaths = @(& git -C $root ls-files --cached)
+if ($LASTEXITCODE -ne 0) {
+    Add-Failure 'TEST-0177 tracked repository inventory failed.'
+    $trackedRepositoryPaths = @()
+}
+$trackedRepositoryPathSet = [System.Collections.Generic.HashSet[string]]::new(
+    [System.StringComparer]::Ordinal
+)
+foreach ($trackedRepositoryPath in $trackedRepositoryPaths) {
+    [void]$trackedRepositoryPathSet.Add([string]$trackedRepositoryPath)
 }
 $documentTitleCandidates = @{}
 $documentHeadingTitles = @{}
@@ -3062,7 +3667,7 @@ function Get-CrossDocumentAggregateRanges {
     $results = [Collections.Generic.List[object]]::new()
     foreach ($range in [regex]::Matches(
         $RenderedReferenceText,
-        '(?i)(?<prefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-(?<first>\d{4})\s*(?:through|to|\.\.|-|\u2013|\u2014)\s*(?:(?<lastPrefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-)?(?<last>\d{4})'
+        '(?i)(?<prefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-(?<first>\d{4})[ \t]*(?:through|to|\.\.|-|\u2013|\u2014)[ \t]*(?:(?<lastPrefix>EPIC|FEAT|SUBF|TASK|BUG|FIND|DEC|TEST|RISK|IDEA|MIG)-)?(?<last>\d{4})'
     )) {
         $beforeStart = [Math]::Max(0, $range.Index - 80)
         $beforeRange = $RenderedReferenceText.Substring(
@@ -3083,7 +3688,9 @@ function Get-CrossDocumentAggregateRanges {
         for ($number = $first; $number -le $last; $number++) {
             $id = '{0}-{1:D4}' -f $prefix, $number
             if ($documentRecordTargets.ContainsKey($id) -and
-                [string]$documentRecordTargets[$id] -cne $SourcePath) {
+                (Get-DocumentRecordTargetPath `
+                    -Target ([string]$documentRecordTargets[$id])) -cne
+                    $SourcePath) {
                 $results.Add($range)
                 break
             }
@@ -3192,9 +3799,8 @@ foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
             $isFeatureCompanionIdentity = $codeId.StartsWith('FEAT-') -and
                 $relativeMarkdownPath -match
                     "^docs/features/$codeId-[^/]+/(?:README|test-cases)\.md$"
-            $isCanonicalIdentity = $documentRecordTargets.ContainsKey($codeId) -and
-                [string]$documentRecordTargets[$codeId] -ceq
-                    $relativeMarkdownPath
+            $isCanonicalIdentity = Test-DocumentRecordOwnIdentity `
+                -Id $codeId -SourcePath $relativeMarkdownPath
             if (-not $isFeatureCompanionIdentity -and
                 -not $isCanonicalIdentity) {
                 Add-Failure "TEST-0175 $relativeMarkdownPath contains a code-formatted cross-record identifier $codeId that is not clickable."
@@ -3225,6 +3831,11 @@ foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
         $label = ConvertTo-DocumentMarkdownRenderedText `
             -Text ([string]$link.Label)
         $target = [string]$link.Target
+        if (Test-DocumentNonCanonicalSameRepositoryTarget `
+                -Target $target `
+                -TrackedRepositoryPaths $trackedRepositoryPathSet) {
+            Add-Failure "TEST-0177 $relativeMarkdownPath links a current tracked repository path through a mutable or unverifiable same-repository blob/tree target '$target'."
+        }
         foreach ($visibleUrl in @(
             Get-DocumentMarkdownVisibleHttpUrlSpans -Text $label
         )) {
@@ -3407,6 +4018,14 @@ foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
             Add-Failure "TEST-0175 $relativeMarkdownPath links $id to '$target' instead of one of its exact canonical targets."
         }
     }
+    foreach ($autolink in @(Get-DocumentRendererActiveHttpAutolinkSpans `
+        -Markdown $markdown -LinkEvidence $linkEvidence)) {
+        if (Test-DocumentNonCanonicalSameRepositoryTarget `
+                -Target ([string]$autolink.Value) `
+                -TrackedRepositoryPaths $trackedRepositoryPathSet) {
+            Add-Failure "TEST-0177 $relativeMarkdownPath exposes a current tracked repository path through a mutable or unverifiable same-repository blob/tree autolink '$($autolink.Value)'."
+        }
+    }
     foreach ($shorthand in [regex]::Matches(
         $markdown,
         '\]\([^)]+\)(?:\s*/\s*`?(?:[A-Z]+-)?\d{4}`?)+'
@@ -3436,8 +4055,8 @@ foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
         $id = $match.Value
         $isFeatureCompanionIdentity = $id.StartsWith('FEAT-') -and
             $relativeMarkdownPath -match "^docs/features/$id-[^/]+/(?:README|test-cases)\.md$"
-        $isCanonicalIdentity = $documentRecordTargets.ContainsKey($id) -and
-            [string]$documentRecordTargets[$id] -ceq $relativeMarkdownPath
+        $isCanonicalIdentity = Test-DocumentRecordOwnIdentity `
+            -Id $id -SourcePath $relativeMarkdownPath
         if (-not $isFeatureCompanionIdentity -and -not $isCanonicalIdentity) {
             Add-Failure "TEST-0175 $relativeMarkdownPath contains unlinked cross-record identifier $id."
         }
@@ -3499,8 +4118,8 @@ foreach ($relativeMarkdownPath in $documentMarkdownPaths) {
         $isFeatureCompanionIdentity = $id.StartsWith('FEAT-') -and
             $relativeMarkdownPath -match
                 "^docs/features/$id-[^/]+/(?:README|test-cases)\.md$"
-        $isCanonicalIdentity = $documentRecordTargets.ContainsKey($id) -and
-            [string]$documentRecordTargets[$id] -ceq $relativeMarkdownPath
+        $isCanonicalIdentity = Test-DocumentRecordOwnIdentity `
+            -Id $id -SourcePath $relativeMarkdownPath
         if ($isFeatureCompanionIdentity -or $isCanonicalIdentity) { continue }
         if (-not (Test-DocumentRenderedReferenceCoveredByLink `
                 -Index $renderedId.Index -Length $renderedId.Length `
@@ -3665,6 +4284,16 @@ if (@(Get-CrossDocumentAggregateRanges `
     -SourcePath 'docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md').Count -ne 0) {
     Add-Failure 'TEST-0175 same-document adjacent identity fixture was rejected as a cross-document range.'
 }
+foreach ($adjacentListFixture in @(
+    "SUBF-0089`n- SUBF-0090",
+    "TEST-0176`n- TEST-0177"
+)) {
+    if (@(Get-CrossDocumentAggregateRanges `
+        -RenderedReferenceText $adjacentListFixture `
+        -SourcePath '.ai/memory/SESSION_HANDOFF.md').Count -ne 0) {
+        Add-Failure 'TEST-0175 adjacent list items were treated as a cross-document aggregate range.'
+    }
+}
 if (-not (Test-DocumentRecordLinkTarget `
     -SourcePath 'CHANGELOG.md' `
     -Target 'docs/features/FEAT-0032-general-capability-test-architecture/README.md' `
@@ -3682,6 +4311,207 @@ if (Test-DocumentRecordLinkTarget `
     -Target 'https://github.com/hasanmanzak/meAndAI/issues/1' `
     -ExpectedTarget 'https://github.com/hasanmanzak/meAndAI/issues/110') {
     Add-Failure 'TEST-0175 exact-target fixture accepted a wrong GitHub record link.'
+}
+foreach ($absoluteRepositoryFixture in @(
+    [pscustomobject]@{
+        Kind = 'FEAT'
+        Target = 'https://github.com/hasanmanzak/meAndAI/blob/main/' +
+            'docs/features/FEAT-0032-general-capability-test-architecture/README.md'
+        Expected =
+            'docs/features/FEAT-0032-general-capability-test-architecture/README.md'
+    },
+    [pscustomobject]@{
+        Kind = 'DEC'
+        Target = 'https://github.com/hasanmanzak/meAndAI/blob/main/' +
+            'docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md'
+        Expected =
+            'docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md'
+    }
+)) {
+    if (Test-DocumentRecordLinkTarget `
+            -SourcePath 'CHANGELOG.md' `
+            -Target $absoluteRepositoryFixture.Target `
+            -ExpectedTarget $absoluteRepositoryFixture.Expected) {
+        Add-Failure "TEST-0177 same-repository absolute $($absoluteRepositoryFixture.Kind) fixture was accepted as a current canonical record link."
+    }
+}
+foreach ($embeddedAnchorId in @(
+    'TEST-9991', 'SUBF-9991', 'FIND-9991', 'RISK-9991'
+)) {
+    $embeddedAnchorName = $embeddedAnchorId.ToLowerInvariant()
+    $embeddedAnchorDeclaration =
+        "| ``$embeddedAnchorId`` <a name=`"$embeddedAnchorName`"></a> | fixture |"
+    $embeddedAnchorProblems = @(Get-EmbeddedRecordAnchorProblems `
+        -Id $embeddedAnchorId -Markdown $embeddedAnchorDeclaration `
+        -DeclarationText $embeddedAnchorDeclaration)
+    $embeddedAnchors = Get-MarkdownAnchors `
+        -Markdown $embeddedAnchorDeclaration
+    if ($embeddedAnchorProblems.Count -ne 0 -or
+        -not $embeddedAnchors.Contains($embeddedAnchorName)) {
+        Add-Failure "TEST-0177 canonical $embeddedAnchorId custom-anchor fixture was not accepted."
+    }
+}
+$canonicalAnchorDeclaration =
+    '| `TEST-9991` <a name="test-9991"></a> | fixture |'
+foreach ($anchorProblemFixture in @(
+    [pscustomobject]@{
+        Name = 'missing'; Declaration = '| `TEST-9991` | fixture |'
+        Markdown = '| `TEST-9991` | fixture |'; Expected = 'Missing'
+    },
+    [pscustomobject]@{
+        Name = 'wrong';
+        Declaration = '| `TEST-9991` <a name="test-9992"></a> | fixture |'
+        Markdown = '| `TEST-9991` <a name="test-9992"></a> | fixture |'
+        Expected = 'Wrong'
+    },
+    [pscustomobject]@{
+        Name = 'misplaced'; Declaration = '| `TEST-9991` | fixture |'
+        Markdown = 'Extra <a name="test-9991"></a> anchor.' + "`n`n" +
+            '| `TEST-9991` | fixture |'
+        Expected = 'Wrong'
+    },
+    [pscustomobject]@{
+        Name = 'duplicate'; Declaration = $canonicalAnchorDeclaration
+        Markdown = "$canonicalAnchorDeclaration`n" +
+            'Extra <a name="test-9991"></a> anchor.'
+        Expected = 'Duplicate'
+    },
+    [pscustomobject]@{
+        Name = 'non-lowercase'
+        Declaration = '| `TEST-9991` <a name="TEST-9991"></a> | fixture |'
+        Markdown = '| `TEST-9991` <a name="TEST-9991"></a> | fixture |'
+        Expected = 'Wrong,WrongCase'
+    },
+    [pscustomobject]@{
+        Name = 'case-colliding'; Declaration = $canonicalAnchorDeclaration
+        Markdown = "$canonicalAnchorDeclaration`n" +
+            'Extra <a name="TEST-9991"></a> anchor.'
+        Expected = 'CaseCollision'
+    },
+    [pscustomobject]@{
+        Name = 'inline-code';
+        Declaration = '| `TEST-9991` ``<a name="test-9991"></a>`` | fixture |'
+        Markdown = '| `TEST-9991` ``<a name="test-9991"></a>`` | fixture |'
+        Expected = 'Missing'
+    },
+    [pscustomobject]@{
+        Name = 'HTML-comment';
+        Declaration = '| `TEST-9991` <!-- <a name="test-9991"></a> --> | fixture |'
+        Markdown = '| `TEST-9991` <!-- <a name="test-9991"></a> --> | fixture |'
+        Expected = 'Missing'
+    },
+    [pscustomobject]@{
+        Name = 'fenced-code'; Declaration = '| `TEST-9991` | fixture |'
+        Markdown = '| `TEST-9991` | fixture |' + "`n`n" +
+            '```html' + "`n" + '<a name="test-9991"></a>' +
+            "`n" + '```'
+        Expected = 'Missing'
+    },
+    [pscustomobject]@{
+        Name = 'non-rendering HTML'
+        Declaration = '| `TEST-9991` | fixture |'
+        Markdown = '| `TEST-9991` | fixture |' + "`n`n" +
+            '<script><a name="test-9991"></a></script>'
+        Expected = 'Missing'
+    }
+)) {
+    $actualProblems = @(Get-EmbeddedRecordAnchorProblems `
+        -Id 'TEST-9991' -Markdown $anchorProblemFixture.Markdown `
+        -DeclarationText $anchorProblemFixture.Declaration | Sort-Object)
+    if (($actualProblems -join ',') -cne $anchorProblemFixture.Expected) {
+        Add-Failure "TEST-0177 $($anchorProblemFixture.Name) embedded-record anchor fixture was misclassified."
+    }
+}
+$duplicateDeclarationFixturePath =
+    'docs/features/FEAT-9991-fixture/test-cases.md'
+$duplicateDeclarationFixtureDeclaration =
+    '| `TEST-9991` <a name="test-9991"></a> | fixture |'
+foreach ($duplicateDeclarationFixture in @(
+    [pscustomobject]@{
+        Name = 'linked secondary'
+        Markdown = $duplicateDeclarationFixtureDeclaration + "`n" +
+            '| [TEST-9991](#test-9991) | linked secondary |'
+        ExpectedDuplicate = $false
+    },
+    [pscustomobject]@{
+        Name = 'plain secondary declaration'
+        Markdown = $duplicateDeclarationFixtureDeclaration + "`n" +
+            '| `TEST-9991` | plain secondary |'
+        ExpectedDuplicate = $true
+    },
+    [pscustomobject]@{
+        Name = 'linked secondary heading'
+        Markdown = $duplicateDeclarationFixtureDeclaration + "`n`n" +
+            '## [TEST-9991](#test-9991) - linked secondary'
+        ExpectedDuplicate = $false
+    },
+    [pscustomobject]@{
+        Name = 'plain secondary heading'
+        Markdown = $duplicateDeclarationFixtureDeclaration + "`n`n" +
+            '## TEST-9991 - plain secondary'
+        ExpectedDuplicate = $true
+    }
+)) {
+    $fixtureDeclarationKeys =
+        [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::Ordinal
+        )
+    $duplicateDetected = $false
+    $fixtureDeclarations = @([regex]::Matches(
+            [string]$duplicateDeclarationFixture.Markdown,
+            $embeddedTestTableRecordDeclarationPattern
+        )) + @([regex]::Matches(
+            [string]$duplicateDeclarationFixture.Markdown,
+            $embeddedHeadingRecordDeclarationPattern
+        ))
+    foreach ($fixtureDeclaration in $fixtureDeclarations) {
+        if (-not (Add-EmbeddedRecordDeclarationKey `
+                -Registry $fixtureDeclarationKeys `
+                -Id $fixtureDeclaration.Groups['id'].Value `
+                -Path $duplicateDeclarationFixturePath)) {
+            $duplicateDetected = $true
+        }
+    }
+    if ($duplicateDetected -ne
+        [bool]$duplicateDeclarationFixture.ExpectedDuplicate) {
+        Add-Failure "TEST-0177 $($duplicateDeclarationFixture.Name) declaration fixture was misclassified."
+    }
+}
+if (-not (Test-DocumentRecordLinkTarget `
+        -SourcePath $duplicateDeclarationFixturePath `
+        -Target '#test-9991' `
+        -ExpectedTarget "$duplicateDeclarationFixturePath#test-9991")) {
+    Add-Failure 'TEST-0177 same-document linked secondary declaration fixture did not target its exact canonical fragment.'
+}
+$embeddedRecordTarget =
+    'docs/features/FEAT-9991-fixture/test-cases.md#test-9991'
+foreach ($fragmentFixture in @(
+    [pscustomobject]@{ Target = $embeddedRecordTarget; Accepted = $true },
+    [pscustomobject]@{
+        Target = 'docs/features/FEAT-9991-fixture/test-cases.md'
+        Accepted = $false
+    },
+    [pscustomobject]@{
+        Target = 'docs/features/FEAT-9991-fixture/test-cases.md#test-9992'
+        Accepted = $false
+    },
+    [pscustomobject]@{
+        Target = 'docs/features/FEAT-9991-fixture/test-cases.md#TEST-9991'
+        Accepted = $false
+    },
+    [pscustomobject]@{
+        Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+            'abcdef0123456789abcdef0123456789abcdef01/' +
+            'docs/features/FEAT-9991-fixture/test-cases.md#test-9991'
+        Accepted = $false
+    }
+)) {
+    $fragmentAccepted = Test-DocumentRecordLinkTarget `
+        -SourcePath 'CHANGELOG.md' -Target $fragmentFixture.Target `
+        -ExpectedTarget $embeddedRecordTarget
+    if ($fragmentAccepted -ne [bool]$fragmentFixture.Accepted) {
+        Add-Failure "TEST-0177 embedded-record fragment fixture '$($fragmentFixture.Target)' was misclassified."
+    }
 }
 foreach ($numberFixture in @(
     'issue 110', 'Issue #110', 'issue #110', 'PR 113', 'pull request #113'
@@ -3801,6 +4631,15 @@ if (-not (Test-DocumentResolvedTargetExists `
         -SourcePath 'CHANGELOG.md' `
         -Target 'docs/features/FEAT-9999-missing/README.md')) {
     Add-Failure 'TEST-0175 broken generic reference-style target fixture did not fail closed.'
+}
+$genericFragmentFixture = Get-DocumentMarkdownLinkEvidence `
+    -Markdown '[protocol section](PROTOCOL.md#Common-development-protocol)' `
+    -Path '<generic-wrong-case-fragment-fixture>'
+if (@($genericFragmentFixture.Links).Count -ne 1 -or
+    (Test-DocumentResolvedTargetExists `
+        -SourcePath 'CHANGELOG.md' `
+        -Target ([string]$genericFragmentFixture.Links[0].Target))) {
+    Add-Failure 'TEST-0175 generic-label wrong-case relative Markdown fragment fixture did not fail closed.'
 }
 $unresolvedReferenceFixture = Get-DocumentMarkdownLinkEvidence `
     -Markdown '[guide][missing-guide]' `
@@ -3959,6 +4798,22 @@ if (@($hiddenReferenceEvidence.Links).Count -ne 0 -or
     )) {
     Add-Failure 'TEST-0175 a hidden HTML-comment cross-record reference bypassed non-clickable classification.'
 }
+$rawHtmlHrefMarkdown = '<a href="docs/features/FEAT-0032-general-capability-test-architecture/README.md">FEAT-0032</a>'
+$rawHtmlHrefEvidence = Get-DocumentMarkdownLinkEvidence `
+    -Markdown $rawHtmlHrefMarkdown -Path '<raw-html-href-fixture>'
+$rawHtmlHrefRendered = Get-DocumentRenderedReferenceEvidence `
+    -Markdown $rawHtmlHrefMarkdown -LinkEvidence $rawHtmlHrefEvidence
+$rawHtmlHrefId = [regex]::Match(
+    [string]$rawHtmlHrefRendered.Text,
+    $recordIdPattern
+)
+if (@($rawHtmlHrefEvidence.Links).Count -ne 0 -or
+    -not $rawHtmlHrefId.Success -or
+    (Test-DocumentRenderedReferenceCoveredByLink `
+        -Index $rawHtmlHrefId.Index -Length $rawHtmlHrefId.Length `
+        -RenderedEvidence $rawHtmlHrefRendered)) {
+    Add-Failure 'TEST-0175 a raw HTML href was accepted as a governed clickable-reference authoring form.'
+}
 $benignCommentEvidence = Get-DocumentMarkdownLinkEvidence `
     -Markdown '<!-- lifecycle:v2:digest-abcdef -->' `
     -Path '<benign-html-comment-fixture>'
@@ -4114,6 +4969,289 @@ $escapedWrongLabel = ConvertTo-DocumentMarkdownRenderedText `
 if (@($escapedWrongLabelEvidence.Links).Count -ne 1 -or
     -not [regex]::IsMatch($escapedWrongLabel, $recordIdPattern)) {
     Add-Failure 'TEST-0175 a Markdown-escaped record label bypassed exact-target classification.'
+}
+$currentCommitOutput = @(& git -C $root rev-parse --verify HEAD 2>&1)
+$currentCommitExitCode = $LASTEXITCODE
+$currentCommit = ($currentCommitOutput -join '').Trim()
+if ($currentCommitExitCode -ne 0 -or
+    $currentCommit -cnotmatch '^[0-9a-f]{40}$') {
+    Add-Failure 'TEST-0177 historical snapshot fixtures could not resolve the current local commit.'
+}
+else {
+    $missingHistoricalPath =
+        'docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md'
+    $introductionCommitOutput = @(
+        & git -C $root log -1 --format=%H --diff-filter=A -- `
+            $missingHistoricalPath 2>&1
+    )
+    $introductionCommitExitCode = $LASTEXITCODE
+    $introductionCommit = ($introductionCommitOutput -join '').Trim()
+    $preIntroductionCommitOutput = @()
+    $preIntroductionCommitExitCode = -1
+    if ($introductionCommitExitCode -eq 0 -and
+        $introductionCommit -cmatch '^[0-9a-f]{40}$') {
+        $preIntroductionCommitOutput = @(
+            & git -C $root rev-parse --verify "$introductionCommit^" 2>&1
+        )
+        $preIntroductionCommitExitCode = $LASTEXITCODE
+    }
+    $preIntroductionCommit =
+        ($preIntroductionCommitOutput -join '').Trim()
+    if ($preIntroductionCommitExitCode -ne 0 -or
+        $preIntroductionCommit -cnotmatch '^[0-9a-f]{40}$') {
+        Add-Failure 'TEST-0177 missing historical path fixture could not resolve the feature pre-introduction commit.'
+    }
+    $deletedHistoricalPath = 'tests/v092-live-pin-migration.tests.ps1'
+    $deletionCommitOutput = @(
+        & git -C $root log --all --full-history -1 --format=%H `
+            --diff-filter=D -- `
+            $deletedHistoricalPath 2>&1
+    )
+    $deletionCommitExitCode = $LASTEXITCODE
+    $deletionCommit = ($deletionCommitOutput -join '').Trim()
+    $deletedPathCommitOutput = @()
+    $deletedPathCommitExitCode = -1
+    if ($deletionCommitExitCode -eq 0 -and
+        $deletionCommit -cmatch '^[0-9a-f]{40}$') {
+        $deletedPathCommitOutput = @(
+            & git -C $root rev-parse --verify "$deletionCommit^" 2>&1
+        )
+        $deletedPathCommitExitCode = $LASTEXITCODE
+    }
+    $deletedPathCommit = ($deletedPathCommitOutput -join '').Trim()
+    if ($trackedRepositoryPathSet.Contains($deletedHistoricalPath) -or
+        $deletedPathCommitExitCode -ne 0 -or
+        $deletedPathCommit -cnotmatch '^[0-9a-f]{40}$') {
+        Add-Failure 'TEST-0177 deleted historical path fixture precondition failed.'
+    }
+    $nonMarkdownFixturePath =
+        'scripts/Build-MeAndAIQuickAdoptionBundle.ps1'
+    if (-not $trackedRepositoryPathSet.Contains($nonMarkdownFixturePath)) {
+        Add-Failure 'TEST-0177 non-Markdown repository-target fixture path is not tracked.'
+    }
+    $historicalTargetFixtures = @(
+        [pscustomobject]@{
+            Name = 'verified tag root'
+            Target = 'https://github.com/hasanmanzak/meAndAI/tree/v0.2.0'
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'tag tree with tracked file'
+            Target = 'https://github.com/hasanmanzak/meAndAI/tree/' +
+                'v0.2.0/PROTOCOL.md'
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'mutable branch'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/main/' +
+                'PROTOCOL.md'
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'case-insensitive repository and kind'
+            Target = 'https://github.com/HASANMANZAK/MEANDAI/BLOB/main/' +
+                'PROTOCOL.md'
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'mutable non-Markdown branch target'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/main/' +
+                $nonMarkdownFixturePath
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'slash-qualified mutable branch target'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                'codex/example/PROTOCOL.md'
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'tree full SHA'
+            Target = 'https://github.com/hasanmanzak/meAndAI/tree/' +
+                "$currentCommit/PROTOCOL.md"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'uppercase full SHA'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$($currentCommit.ToUpperInvariant())/PROTOCOL.md"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'unresolved full SHA'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$('0' * 40)/$nonMarkdownFixturePath"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'untracked repository path'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/not-tracked.ps1"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'verified historical blob'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/PROTOCOL.md"
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'verified historical fragment'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/PROTOCOL.md#common-development-protocol"
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'missing historical fragment'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/PROTOCOL.md#does-not-exist"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'verified historical non-Markdown blob'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath"
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'verified historical single line'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath#L1"
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'verified historical line range'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath#L1-L2"
+            Rejected = $false
+        },
+        [pscustomobject]@{
+            Name = 'out-of-range historical line'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath#L999999"
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'malformed historical line range'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath#L1-2"
+            Rejected = $true
+        }
+    )
+    if ($preIntroductionCommit -cmatch '^[0-9a-f]{40}$') {
+        $historicalTargetFixtures += [pscustomobject]@{
+            Name = 'path absent at historical commit'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$preIntroductionCommit/$missingHistoricalPath"
+            Rejected = $true
+        }
+    }
+    if ($deletedPathCommit -cmatch '^[0-9a-f]{40}$') {
+        $historicalTargetFixtures += [pscustomobject]@{
+            Name = 'historical path deleted at current HEAD'
+            Target = 'https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$deletedPathCommit/$deletedHistoricalPath"
+            Rejected = $false
+        }
+    }
+    foreach ($historicalTargetFixture in $historicalTargetFixtures) {
+        $fixtureEvidence = Get-DocumentMarkdownLinkEvidence `
+            -Markdown "[Feature]($($historicalTargetFixture.Target))" `
+            -Path '<same-repository-historical-target-fixture>'
+        $actualRejected = @($fixtureEvidence.Links).Count -eq 1 -and
+            (Test-DocumentNonCanonicalSameRepositoryTarget `
+                -Target ([string]$fixtureEvidence.Links[0].Target) `
+                -TrackedRepositoryPaths $trackedRepositoryPathSet)
+        if (@($fixtureEvidence.Links).Count -ne 1 -or
+            $actualRejected -ne [bool]$historicalTargetFixture.Rejected) {
+            Add-Failure "TEST-0177 same-repository target fixture '$($historicalTargetFixture.Name)' was misclassified."
+        }
+    }
+    foreach ($relativeLineFixture in @(
+        [pscustomobject]@{
+            Fragment = 'L1'; Accepted = $true
+        },
+        [pscustomobject]@{
+            Fragment = 'L1-L2'; Accepted = $true
+        },
+        [pscustomobject]@{
+            Fragment = 'L999999'; Accepted = $false
+        },
+        [pscustomobject]@{
+            Fragment = 'L1-2'; Accepted = $false
+        }
+    )) {
+        $relativeLineAccepted = Test-DocumentResolvedTargetExists `
+            -SourcePath 'CHANGELOG.md' `
+            -Target "$nonMarkdownFixturePath#$($relativeLineFixture.Fragment)"
+        if ($relativeLineAccepted -ne [bool]$relativeLineFixture.Accepted) {
+            Add-Failure "TEST-0177 current relative non-Markdown line fixture '$($relativeLineFixture.Fragment)' was misclassified."
+        }
+    }
+    $validTextEvidence = Get-Utf8TextEvidence `
+        -Bytes ([Text.Encoding]::UTF8.GetBytes("one`ntwo`n"))
+    $invalidUtf8Evidence = Get-Utf8TextEvidence `
+        -Bytes ([byte[]]@(0xFF, 0xFE, 0xFD))
+    $binaryControlEvidence = Get-Utf8TextEvidence `
+        -Bytes ([byte[]]@(0x61, 0x00, 0x62))
+    if (-not $validTextEvidence.IsText -or
+        $validTextEvidence.LineCount -ne 2 -or
+        $invalidUtf8Evidence.IsText -or $binaryControlEvidence.IsText) {
+        Add-Failure 'TEST-0177 UTF-8 text/blob classification fixtures were misclassified.'
+    }
+    foreach ($budgetFixture in @(
+        [pscustomobject]@{
+            Unique = 63; Aggregate = 0; Bytes = 1MB; Accepted = $true
+        },
+        [pscustomobject]@{
+            Unique = 64; Aggregate = 0; Bytes = 1; Accepted = $false
+        },
+        [pscustomobject]@{
+            Unique = 0; Aggregate = 0; Bytes = 1MB + 1; Accepted = $false
+        },
+        [pscustomobject]@{
+            Unique = 0; Aggregate = 16MB - 1; Bytes = 2; Accepted = $false
+        }
+    )) {
+        $withinBudget = Test-HistoricalBlobFetchWithinBudget `
+            -UniqueCount $budgetFixture.Unique `
+            -AggregateBytes $budgetFixture.Aggregate `
+            -BlobBytes $budgetFixture.Bytes
+        if ($withinBudget -ne [bool]$budgetFixture.Accepted) {
+            Add-Failure 'TEST-0177 historical fragment fetch budget fixture was misclassified.'
+        }
+    }
+    foreach ($repositoryAutolinkFixture in @(
+        [pscustomobject]@{
+            Name = 'mutable bare autolink'
+            Markdown = 'https://github.com/hasanmanzak/meAndAI/blob/main/' +
+                $nonMarkdownFixturePath
+            Rejected = $true
+        },
+        [pscustomobject]@{
+            Name = 'verified historical angle autolink with fragment'
+            Markdown = '<https://github.com/hasanmanzak/meAndAI/blob/' +
+                "$currentCommit/$nonMarkdownFixturePath#L1>"
+            Rejected = $false
+        }
+    )) {
+        $autolinkEvidence = Get-DocumentMarkdownLinkEvidence `
+            -Markdown $repositoryAutolinkFixture.Markdown `
+            -Path '<same-repository-autolink-fixture>'
+        $activeAutolinks = @(
+            Get-DocumentRendererActiveHttpAutolinkSpans `
+                -Markdown $repositoryAutolinkFixture.Markdown `
+                -LinkEvidence $autolinkEvidence
+        )
+        $actualRejected = $activeAutolinks.Count -eq 1 -and
+            (Test-DocumentNonCanonicalSameRepositoryTarget `
+                -Target ([string]$activeAutolinks[0].Value) `
+                -TrackedRepositoryPaths $trackedRepositoryPathSet)
+        if ($activeAutolinks.Count -ne 1 -or
+            $actualRejected -ne [bool]$repositoryAutolinkFixture.Rejected) {
+            Add-Failure "TEST-0177 same-repository autolink fixture '$($repositoryAutolinkFixture.Name)' was misclassified."
+        }
+    }
 }
 foreach ($presentationFixture in @(
     'FEAT-<em>0032</em>',
@@ -4815,7 +5953,9 @@ if (($actualManagedAssets -join '|') -cne ($expectedManagedAssets -join '|')) {
 }
 foreach ($testId in @('TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099')) {
     if (-not $mandateTestCases.Contains("``$testId``") -or
-        -not $mandateFeature.Contains("[$testId](test-cases.md)")) {
+        -not $mandateFeature.Contains(
+            "[$testId](test-cases.md#$($testId.ToLowerInvariant()))"
+        )) {
         Add-Failure "TEST-0099 canonical FEAT-0015 records do not link $testId."
     }
 }

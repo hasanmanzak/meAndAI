@@ -20,11 +20,29 @@ This project uses the `M.m.rev` version format defined in the
   kinds.
 - Reconcile proven historical repository-document and editable meAndAI GitHub
   references without changing their meaning or reopening completed delivery.
+- Give every canonical embedded test, subfeature, finding, and risk a unique
+  lowercase custom anchor; require repository references to use relative
+  path-plus-fragment targets and GitHub references to use immutable
+  blob-plus-fragment targets.
+- Require human-facing commit evidence to use an owning-repository full-SHA
+  commit permalink while preserving command, source, structured-data, fixture,
+  digest, Git-object, and opaque-marker literals.
+- Validate current and historical full-SHA blob targets at their exact paths
+  and fragments, retain verified historical tag-root links, and reject mutable
+  branch or file-targeting tree links.
+- Make post-publication commit-link validation scan the clean exact expected
+  tree, prove external commit ownership through bounded API queries, and fail
+  closed when that request bound is exceeded.
 
 Related work: [FEAT-0047](docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
 [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-[TEST-0175](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md),
-and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114).
+[BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
+[TEST-0175](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+[TEST-0176](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
+[TEST-0177](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177),
+[TEST-0178](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
+[issue #116](https://github.com/hasanmanzak/meAndAI/issues/116).
 
 ## 0.14.1 - 2026-07-23
 
@@ -163,7 +181,7 @@ and [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102).
   and bootstrap expected-evidence fixtures without making expected evidence
   depend on either production transport implementation.
 - Keep the separately implemented self-HEAD expected reader on one local batch
-  process and make [TEST-0162](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) reject a restored per-blob path in any of the
+  process and make [TEST-0162](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162) reject a restored per-blob path in any of the
   three expected-evidence readers.
 - Harden every repository-owned instruction-graph batch transport against the
   Windows PowerShell 5.1 stdin preamble hazard: production and test readers
@@ -303,7 +321,7 @@ and [issue #93](https://github.com/hasanmanzak/meAndAI/issues/93).
   fails closed.
 
 Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md),
-[BUG-0021](https://github.com/hasanmanzak/meAndAI/issues/89), [FIND-0197](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md), and
+[BUG-0021](https://github.com/hasanmanzak/meAndAI/issues/89), [FIND-0197](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md#find-0197), and
 [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89).
 
 ## 0.12.4 - 2026-07-20
@@ -345,7 +363,7 @@ Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliabi
 
 Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliability/README.md),
 [DEC-0023](docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md),
-[TEST-0147](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md), [TEST-0148](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md), and [TEST-0149](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md),
+[TEST-0147](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147), [TEST-0148](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0148), and [TEST-0149](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0149),
 [BUG-0018](https://github.com/hasanmanzak/meAndAI/issues/89), [BUG-0019](https://github.com/hasanmanzak/meAndAI/issues/89), [BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89), and
 [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89).
 
@@ -355,7 +373,7 @@ Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliabi
 
 - Emit one non-authoritative, owner-bound elapsed-millisecond observation for
   every suite process without changing child result or exit-code authority.
-- Add executable [TEST-0144](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), [TEST-0145](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), and [TEST-0146](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md) ownership for runtime
+- Add executable [TEST-0144](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144), [TEST-0145](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145), and [TEST-0146](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) ownership for runtime
   observations, evidence-preserving hotspot optimization, and hosted topology.
 
 ### Changed
@@ -381,7 +399,7 @@ Related work: [FEAT-0036](docs/features/FEAT-0036-modular-quick-adoption-reliabi
 Related work: [FEAT-0035](docs/features/FEAT-0035-test-runtime-efficiency/README.md),
 [DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
 [DEC-0022](docs/decisions/DEC-0022-release-declared-semantic-capabilities.md),
-[TEST-0144](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), [TEST-0145](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), and [TEST-0146](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md),
+[TEST-0144](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144), [TEST-0145](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145), and [TEST-0146](docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
 
 ## 0.12.2 - 2026-07-19
@@ -407,7 +425,7 @@ and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
 
 ### Added
 
-- Add capability-owned [TEST-0142](docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md) summary-isolation coverage and [TEST-0143](docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md)
+- Add capability-owned [TEST-0142](docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0142) summary-isolation coverage and [TEST-0143](docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0143)
   exact-tree routing, fail-closed negative, workflow, and evidence-discipline
   coverage.
 
@@ -423,7 +441,7 @@ and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
 
 ### Added
 
-- Add capability-owned [TEST-0141](docs/features/FEAT-0033-canonical-base-blob-migration-planning/test-cases.md) coverage for canonical LF blobs, CRLF
+- Add capability-owned [TEST-0141](docs/features/FEAT-0033-canonical-base-blob-migration-planning/test-cases.md#test-0141) coverage for canonical LF blobs, CRLF
   worktrees, present-ledger planning, genuine committed input and ledger drift,
   exact staged blobs, and an applied-state no-op rerun.
 
@@ -464,13 +482,13 @@ and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
 - Replace the named pre-engine consumer fixture with a minimal project-neutral
   legacy-consumer fixture using reserved `example.invalid` evidence links.
 - Keep immutable [MIG-0001](migrations/MIG-0001.json) and updater runtime behavior unchanged while making
-  [TEST-0125](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) execute its documented exact no-op second plan.
+  [TEST-0125](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) execute its documented exact no-op second plan.
 - Neutralize canonical documentation and project memory through state-based
   terminology and protocol-owned issue evidence instead of consumer identity.
 
 ### Added
 
-- Add bounded [TEST-0133](docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/test-cases.md) coverage for the project-neutral fixture path,
+- Add bounded [TEST-0133](docs/features/FEAT-0031-v0111-project-neutral-legacy-fixture/test-cases.md#test-0133) coverage for the project-neutral fixture path,
   reserved-link contract, and absence of a live consumer GitHub URL.
 
 ## 0.11.0 - 2026-07-18
@@ -543,14 +561,14 @@ and [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87).
 Related work: [FEAT-0029](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
 [FEAT-0030](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/README.md),
 [DEC-0021](docs/decisions/DEC-0021-explicit-initial-adoption-strategy.md),
-[TEST-0127](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md), [TEST-0128](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md), [TEST-0129](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md), [TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md), [TEST-0131](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md), and [TEST-0132](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md),
+[TEST-0127](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0127), [TEST-0128](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0128), [TEST-0129](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0129), [TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0130), [TEST-0131](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md#test-0131), and [TEST-0132](docs/features/FEAT-0030-v0110-stability-cycle-agent-prompt/test-cases.md#test-0132),
 [issue #76](https://github.com/hasanmanzak/meAndAI/issues/76), and
 [issue #77](https://github.com/hasanmanzak/meAndAI/issues/77). The resolved
-PowerShell and validation corrections are [FIND-0158](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md), [FIND-0159](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md), and [FIND-0160](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md),
+PowerShell and validation corrections are [FIND-0158](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0158), [FIND-0159](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0159), and [FIND-0160](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0160),
 with amended
-[TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md)
-plus [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md)
-and [TEST-0127](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md) and [TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md)
+[TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126)
+plus [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+and [TEST-0127](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0127) and [TEST-0130](docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/test-cases.md#test-0130)
 in [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78).
 
 ## 0.10.4 - 2026-07-18
@@ -570,7 +588,7 @@ in [PR #78](https://github.com/hasanmanzak/meAndAI/pull/78).
 
 Related correction: [FEAT-0028](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md),
 [DEC-0020](docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md),
-[TEST-0125](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) and [TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md),
+[TEST-0125](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) and [TEST-0126](docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126),
 and [issue #74](https://github.com/hasanmanzak/meAndAI/issues/74).
 
 ### Changed
@@ -592,7 +610,7 @@ and [issue #74](https://github.com/hasanmanzak/meAndAI/issues/74).
 
 Related work: [FEAT-0027](docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md),
 [DEC-0019](docs/decisions/DEC-0019-hosted-runner-efficiency.md),
-[TEST-0123](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) and [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md),
+[TEST-0123](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0123) and [TEST-0124](docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124),
 and [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72).
 
 ## 0.10.3 - 2026-07-17
@@ -620,7 +638,7 @@ and [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72).
 
 Related work: [FEAT-0026](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md),
 [DEC-0018](docs/decisions/DEC-0018-release-declared-consumer-migrations.md),
-[TEST-0119](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0120](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md),
+[TEST-0119](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0119), [TEST-0120](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0120), [TEST-0121](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121), and [TEST-0122](docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0122),
 and [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69).
 
 ## 0.10.2 - 2026-07-17
@@ -636,7 +654,7 @@ and [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69).
   Linux and Windows validation matrix and run only the read-only verifier.
 
 Related work: [FEAT-0025](docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md),
-[TEST-0117](docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md) and [TEST-0118](docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md),
+[TEST-0117](docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md#test-0117) and [TEST-0118](docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md#test-0118),
 and [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67).
 
 ## 0.10.1 - 2026-07-17
@@ -653,7 +671,7 @@ and [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67).
   full canonical `TEST-*` scenario set.
 
 Related work: [FEAT-0024](docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md),
-[TEST-0115](docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md) and [TEST-0116](docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md),
+[TEST-0115](docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0115) and [TEST-0116](docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116),
 and [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65).
 
 ## 0.10.0 - 2026-07-17
@@ -680,7 +698,7 @@ and [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65).
   ambiguous adoption/update state before the corresponding mutation boundary.
 
 Related work: [FEAT-0023](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) and [BUG-0011](https://github.com/hasanmanzak/meAndAI/issues/63),
-[TEST-0111](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), [TEST-0112](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), [TEST-0113](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), and [TEST-0114](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md),
+[TEST-0111](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0111), [TEST-0112](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0112), [TEST-0113](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0113), and [TEST-0114](docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0114),
 [DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md), and
 [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63).
 
@@ -700,7 +718,7 @@ Related work: [FEAT-0023](docs/features/FEAT-0023-v0100-idempotent-consumer-life
   schedule/update discovery on the existing consumer-scoped updater PAT.
 
 Related work: [FEAT-0022](docs/features/FEAT-0022-v097-managed-merge-finalization/README.md) and [BUG-0010](https://github.com/hasanmanzak/meAndAI/issues/61),
-[TEST-0108](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md), [TEST-0109](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md), and [TEST-0110](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md),
+[TEST-0108](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md#test-0108), [TEST-0109](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md#test-0109), and [TEST-0110](docs/features/FEAT-0022-v097-managed-merge-finalization/test-cases.md#test-0110),
 [DEC-0016](docs/decisions/DEC-0016-managed-post-merge-finalization.md), and
 [issue #61](https://github.com/hasanmanzak/meAndAI/issues/61).
 
@@ -717,7 +735,7 @@ Related work: [FEAT-0022](docs/features/FEAT-0022-v097-managed-merge-finalizatio
   fail-closed side-effect ordering in the existing quick-adoption suite.
 
 Related work: [FEAT-0021](docs/features/FEAT-0021-v096-github-cli-prerequisite/README.md) and [BUG-0009](https://github.com/hasanmanzak/meAndAI/issues/59),
-[TEST-0107](docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md), and
+[TEST-0107](docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107), and
 [issue #59](https://github.com/hasanmanzak/meAndAI/issues/59).
 
 ## 0.9.5 - 2026-07-17
@@ -734,7 +752,7 @@ Related work: [FEAT-0021](docs/features/FEAT-0021-v096-github-cli-prerequisite/R
   cleanup, while retaining exact interrupted-publication recovery.
 
 Related work: [FEAT-0020](docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md) and [BUG-0008](https://github.com/hasanmanzak/meAndAI/issues/57),
-[TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md) and [TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md), and
+[TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) and [TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106), and
 [issue #57](https://github.com/hasanmanzak/meAndAI/issues/57).
 
 ## 0.9.4 - 2026-07-16
@@ -753,7 +771,7 @@ Related work: [FEAT-0020](docs/features/FEAT-0020-v095-streamed-codex-cancellati
   deterministic cleanup, with `-NoProgress` available for noninteractive use.
 
 Related work: [FEAT-0019](docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md) and [BUG-0007](https://github.com/hasanmanzak/meAndAI/issues/55),
-[TEST-0103](docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md) and [TEST-0104](docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md), and
+[TEST-0103](docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md#test-0103) and [TEST-0104](docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md#test-0104), and
 [issue #55](https://github.com/hasanmanzak/meAndAI/issues/55).
 
 ## 0.9.3 - 2026-07-16
@@ -771,7 +789,7 @@ Related work: [FEAT-0019](docs/features/FEAT-0019-v094-sandbox-progress-correcti
   affected `v0.9.2` adoption can continue with the corrected launcher.
 
 Related work: [FEAT-0018](docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md) and [BUG-0006](https://github.com/hasanmanzak/meAndAI/issues/53),
-[TEST-0102](docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md), and
+[TEST-0102](docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md#test-0102), and
 [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53).
 
 ## 0.9.2 - 2026-07-16
@@ -787,7 +805,7 @@ Related work: [FEAT-0018](docs/features/FEAT-0018-v093-live-pr-metadata-correcti
   credential handling, lifecycle orchestration, and maintainer-owned merge.
 
 Related work: [FEAT-0017](docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md),
-[TEST-0101](docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md), and
+[TEST-0101](docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md#test-0101), and
 [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51).
 
 ## 0.9.1 - 2026-07-16
@@ -804,7 +822,7 @@ Related work: [FEAT-0017](docs/features/FEAT-0017-v092-single-file-quick-adoptio
   or mutating secrets.
 
 Related work: [FEAT-0016](docs/features/FEAT-0016-v091-quick-adoption-correction/README.md) and [BUG-0005](https://github.com/hasanmanzak/meAndAI/issues/49),
-[TEST-0100](docs/features/FEAT-0016-v091-quick-adoption-correction/test-cases.md), and
+[TEST-0100](docs/features/FEAT-0016-v091-quick-adoption-correction/test-cases.md#test-0100), and
 [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49).
 
 ## 0.9.0 - 2026-07-16
@@ -835,13 +853,13 @@ Related work: [FEAT-0015](docs/features/FEAT-0015-stability-consistency-mandate/
 - Keep post-publication work outside the pre-merge Definition of Done and
   require every feature targeting the current release to be `Complete` before
   publication.
-- Extend [TEST-0092](docs/features/FEAT-0014-v085-convergence/test-cases.md) so the complete local gate rejects the exact projection
-  mismatch that made immutable v0.8.5 ineligible for [TEST-0065](docs/features/FEAT-0011-stability-closure/test-cases.md) evidence.
+- Extend [TEST-0092](docs/features/FEAT-0014-v085-convergence/test-cases.md#test-0092) so the complete local gate rejects the exact projection
+  mismatch that made immutable v0.8.5 ineligible for [TEST-0065](docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065) evidence.
 - Advance current adoption pins to the corrective release without changing the
   v0.8.5 runtime behavior or weakening the post-publication verifier.
 
 The v0.8.5 Release remains an immutable historical record. Its first
-post-publication preflight exposed [FIND-0132](docs/features/FEAT-0014-v085-convergence/README.md); v0.8.6 closes that verified
+post-publication preflight exposed [FIND-0132](docs/features/FEAT-0014-v085-convergence/README.md#find-0132); v0.8.6 closes that verified
 finding rather than rewriting or overstating the earlier release.
 
 Related work: [FEAT-0014](docs/features/FEAT-0014-v085-convergence/README.md),
@@ -863,7 +881,7 @@ and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
   GitHub links, and the durable external follow-up projection.
 
 The unavailable private-repository `main` protection remains open as
-[RISK-0076](docs/features/FEAT-0013-v084-correction/README.md) / [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44); this correction tracks it separately and does not
+[RISK-0076](docs/features/FEAT-0013-v084-correction/README.md#risk-0076) / [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44); this correction tracks it separately and does not
 change repository visibility.
 
 Related work: [FEAT-0014](docs/features/FEAT-0014-v085-convergence/README.md),
@@ -887,7 +905,7 @@ and [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43).
   the external authority.
 
 The unavailable private-repository `main` protection remains maintainer-owned
-[RISK-0076](docs/features/FEAT-0013-v084-correction/README.md), with review required when public visibility or a supporting GitHub
+[RISK-0076](docs/features/FEAT-0013-v084-correction/README.md#risk-0076), with review required when public visibility or a supporting GitHub
 plan makes the control available. This release does not change visibility.
 
 Related work: [FEAT-0013](docs/features/FEAT-0013-v084-correction/README.md),
@@ -1054,7 +1072,7 @@ and [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27).
   idea without implementing that feature.
 - Added a pinned consumer idea template and absent-only idea-index installation
   during collision-free initial submodule adoption.
-- Added executable [TEST-0043](docs/features/FEAT-0008-idea-incubation/test-cases.md) and [TEST-0044](docs/features/FEAT-0008-idea-incubation/test-cases.md) lifecycle, ownership, and
+- Added executable [TEST-0043](docs/features/FEAT-0008-idea-incubation/test-cases.md#test-0043) and [TEST-0044](docs/features/FEAT-0008-idea-incubation/test-cases.md#test-0044) lifecycle, ownership, and
   bootstrap regression coverage.
 
 ### Changed
@@ -1129,7 +1147,7 @@ Related work: [FEAT-0007](docs/features/FEAT-0007-local-codex-adoption/README.md
   token-history, exact-staging, and updater-token-access gates.
 - Added a concise [quick adoption guide](docs/quick-adoption.md), consumer
   Codex handoff prompt, and
-  executable [TEST-0033](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0034](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0035](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md), [TEST-0036](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md), and [TEST-0037](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md) coverage.
+  executable [TEST-0033](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037) coverage.
 - Added bounded post-publication lifecycle dispatch and a marker-protected
   Codex Cloud task on the deterministic adoption draft.
 
@@ -1158,7 +1176,7 @@ Related work: [FEAT-0006](docs/features/FEAT-0006-quick-adoption-launcher/README
 - Added a transient adoption manifest for project-specific labels, records,
   memory, semantic merge, tests, links, and explicit completion by an invoked
   agent or maintainer.
-- Added executable [TEST-0027](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0028](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0029](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0030](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), [TEST-0031](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md), and [TEST-0032](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md) coverage for workflow
+- Added executable [TEST-0027](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032) coverage for workflow
   routing, empty and populated consumers, collisions, idempotency, orphan
   recovery boundaries, credentials, and updater regression.
 
@@ -1185,7 +1203,7 @@ Related work: [FEAT-0005](docs/features/FEAT-0005-ai-capabilities-lifecycle/READ
   and the exact target-different updater workflow/script subset in one draft PR.
 - Added current-template drift detection and target path/mode/blob validation
   before proposal creation or supersession cleanup.
-- Added executable [TEST-0022](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0023](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0024](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md), [TEST-0025](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md), and [TEST-0026](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md) coverage for authentication,
+- Added executable [TEST-0022](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](docs/features/FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026) coverage for authentication,
   actor rotation, deterministic asset staging, drift, and multi-path proposals.
 
 ### Changed
@@ -1209,7 +1227,7 @@ Related work: [FEAT-0004](docs/features/FEAT-0004-self-updating-consumer-updater
   to explain the reopen/preserve compensation path when branch deletion fails.
 - Preserved the existing replacement-first ordering, live safety gates, branch
   leases, and cleanup failure behavior.
-- Added executable [TEST-0021](docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md) coverage for the emitted audit message contract.
+- Added executable [TEST-0021](docs/features/FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021) coverage for the emitted audit message contract.
 
 Related work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and
 [pull request #12](https://github.com/hasanmanzak/meAndAI/pull/12).
@@ -1223,7 +1241,7 @@ Related work: [issue #11](https://github.com/hasanmanzak/meAndAI/issues/11) and
 - Required concise evidence to exist before its gate and routed real deviations
   through the existing numbered-decision process instead of retrospective
   evidence.
-- Added executable [TEST-0020](docs/features/FEAT-0001-common-development-protocol/test-cases.md) coverage for the urgent-work contract.
+- Added executable [TEST-0020](docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0020) coverage for the urgent-work contract.
 
 Related work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9) and
 [pull request #10](https://github.com/hasanmanzak/meAndAI/pull/10).
@@ -1239,7 +1257,7 @@ Related work: [issue #9](https://github.com/hasanmanzak/meAndAI/issues/9) and
   so repeated scans cannot become an unchanged review loop.
 - Added [FEAT-0003](docs/features/FEAT-0003-convergent-completion-scan/README.md),
   [DEC-0004](docs/decisions/DEC-0004-bounded-completion-convergence.md), and
-  executable [TEST-0019](docs/features/FEAT-0003-convergent-completion-scan/test-cases.md) contract coverage.
+  executable [TEST-0019](docs/features/FEAT-0003-convergent-completion-scan/test-cases.md#test-0019) contract coverage.
 
 Related work: [issue #7](https://github.com/hasanmanzak/meAndAI/issues/7) and
 [pull request #8](https://github.com/hasanmanzak/meAndAI/pull/8).

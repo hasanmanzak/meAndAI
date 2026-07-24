@@ -8,7 +8,7 @@
 | Issue | [#95](https://github.com/hasanmanzak/meAndAI/issues/95) |
 | Pull request | Recorded through [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) after creation |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
-| Tests | [TEST-0157](test-cases.md), [TEST-0158](test-cases.md), [TEST-0159](test-cases.md), and [TEST-0160](test-cases.md) |
+| Tests | [TEST-0157](test-cases.md#test-0157), [TEST-0158](test-cases.md#test-0158), [TEST-0159](test-cases.md#test-0159), and [TEST-0160](test-cases.md#test-0160) |
 
 ## Problem
 
@@ -143,10 +143,10 @@ no such setup may record `NotApplicable`.
 ### Baseline state
 
 - Regression trigger: [PR #94](https://github.com/hasanmanzak/meAndAI/pull/94) head
-  `327a832f24c981c9f55c34a8ec8d9859667ffb06` and hosted run
+  [`327a832f24c981c9f55c34a8ec8d9859667ffb06`](https://github.com/hasanmanzak/meAndAI/commit/327a832f24c981c9f55c34a8ec8d9859667ffb06) and hosted run
   [29874703292](https://github.com/hasanmanzak/meAndAI/actions/runs/29874703292).
 - Measurement base: immutable v0.12.7 commit
-  `6b01299cfe484c900944b7435d4fef43b11fc38d`.
+  [`6b01299cfe484c900944b7435d4fef43b11fc38d`](https://github.com/hasanmanzak/meAndAI/commit/6b01299cfe484c900944b7435d4fef43b11fc38d).
 - Historical [PR #94](https://github.com/hasanmanzak/meAndAI/pull/94) full command-discovery capture was stopped because the
   observer itself produced prohibitive overhead. The hosted durations remain
   regression-trigger evidence; they are not operation-count authority.
@@ -184,30 +184,30 @@ only immutable preparation is shared.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0157](test-cases.md), [TEST-0158](test-cases.md), [TEST-0159](test-cases.md), and [TEST-0160](test-cases.md) |
-| Test code | Complete | [TEST-0157](test-cases.md) passed after its planned catalog-count red result; [TEST-0158](test-cases.md) and [TEST-0159](test-cases.md) pass with owner-specific fixture identity/isolation, cleanup, strict observation parsing, recursive bypass preflight, and parent-authoritative budget evidence; the local/structural portion of [TEST-0160](test-cases.md) is green while candidate hosted execution remains external delivery evidence |
+| Scenarios | Defined | [TEST-0157](test-cases.md#test-0157), [TEST-0158](test-cases.md#test-0158), [TEST-0159](test-cases.md#test-0159), and [TEST-0160](test-cases.md#test-0160) |
+| Test code | Complete | [TEST-0157](test-cases.md#test-0157) passed after its planned catalog-count red result; [TEST-0158](test-cases.md#test-0158) and [TEST-0159](test-cases.md#test-0159) pass with owner-specific fixture identity/isolation, cleanup, strict observation parsing, recursive bypass preflight, and parent-authoritative budget evidence; the local/structural portion of [TEST-0160](test-cases.md#test-0160) is green while candidate hosted execution remains external delivery evidence |
 | Baseline run | Ready | Exact logical construction baselines and lower targets are frozen above; the 30-minute observer ceiling and diagnostic Trace2 lower bound are recorded without turning elapsed time or raw child plumbing into authority |
 
 ### Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0184` | Evidence integrity | Moving variants below real infrastructure removes material Git/process/security evidence | Test maintainer / explicit evidence-level inventory plus retained representative vertical slices in [TEST-0159](test-cases.md) and existing scenarios |
-| `RISK-0185` | Fixture isolation | Reuse leaks mutable refs, bytes, paths, mock state, credentials, or environment between cases | Fixture owner / immutable fingerprint, distinct derivative identity, link-safe cleanup, and mutation/isolation negatives in [TEST-0158](test-cases.md) |
-| `RISK-0186` | Instrumentation bypass | Direct construction or an alias wrapper avoids the budget | Test-runtime maintainer / canonical wrappers, recursive AST preflight, declared identities, and bypass negatives in [TEST-0159](test-cases.md) |
-| `RISK-0187` | Budget validity | A stale commit, route, or runtime class makes the ratchet misleading | Workflow maintainer / exact base and observer digest, explicit owner/route/runtime keys, deterministic focused rerun, and review-required deltas |
-| `RISK-0188` | Capability applicability | A simple consumer is burdened with infrastructure it does not need | Protocol maintainer / narrow expensive-setup applicability and reviewed `NotApplicable` evidence under [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
-| `RISK-0189` | Observer cost and gaming | Per-operation I/O slows tests or broad counters conceal expensive substitutions | Test-runtime maintainer / in-memory counters, one nested-process summary, stable logical identities, focused overhead observation, and exact negative coverage |
+| `RISK-0184` <a name="risk-0184"></a> | Evidence integrity | Moving variants below real infrastructure removes material Git/process/security evidence | Test maintainer / explicit evidence-level inventory plus retained representative vertical slices in [TEST-0159](test-cases.md#test-0159) and existing scenarios |
+| `RISK-0185` <a name="risk-0185"></a> | Fixture isolation | Reuse leaks mutable refs, bytes, paths, mock state, credentials, or environment between cases | Fixture owner / immutable fingerprint, distinct derivative identity, link-safe cleanup, and mutation/isolation negatives in [TEST-0158](test-cases.md#test-0158) |
+| `RISK-0186` <a name="risk-0186"></a> | Instrumentation bypass | Direct construction or an alias wrapper avoids the budget | Test-runtime maintainer / canonical wrappers, recursive AST preflight, declared identities, and bypass negatives in [TEST-0159](test-cases.md#test-0159) |
+| `RISK-0187` <a name="risk-0187"></a> | Budget validity | A stale commit, route, or runtime class makes the ratchet misleading | Workflow maintainer / exact base and observer digest, explicit owner/route/runtime keys, deterministic focused rerun, and review-required deltas |
+| `RISK-0188` <a name="risk-0188"></a> | Capability applicability | A simple consumer is burdened with infrastructure it does not need | Protocol maintainer / narrow expensive-setup applicability and reviewed `NotApplicable` evidence under [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
+| `RISK-0189` <a name="risk-0189"></a> | Observer cost and gaming | Per-operation I/O slows tests or broad counters conceal expensive substitutions | Test-runtime maintainer / in-memory counters, one nested-process summary, stable logical identities, focused overhead observation, and exact negative coverage |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0073` | Protocol/capability contract and append-only catalog entry | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0157](test-cases.md); planned red (`expected 2, observed 1`), then capability-catalog and capability-review green | Existing tuple/blob preserved; one-entry ledger remains a valid prefix; applicability and immutable definition reviewed | Complete |
-| `SUBF-0074` | Minimal operation contract, owner observations, parent enforcement, and bypass guardrails | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0158](test-cases.md), [TEST-0159](test-cases.md); focused runtime and negative checks passed on Windows PowerShell 5.1 | Generic fixture framework rejected; strict route/counter schema, canonical observation order, and parent authority reviewed | Complete |
-| `SUBF-0075` | Quick-adoption reuse-first conversion and evidence-level reduction | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | `RepositoryRoutes` passed in 173.8 seconds; final `All` passed in 776.2 seconds with init 11 | Security/recovery/TOCTOU/link/native evidence retained; repeated family init reduced from 47 to its reviewed maximum of 11 | Complete |
-| `SUBF-0076` | Capabilities-bootstrap, instruction-graph, and remaining expensive-owner conversion | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | Final bootstrap `All` passed in 267.6 seconds with exact owner observation | Adapter/graph fidelity retained; exact closure was init 3, clone 2, bundle 2, push 36, child process 4, and graph acquisition 3 | Complete |
-| `SUBF-0077` | Cross-runtime, hosted-topology, protocol, documentation, and measured closure | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0160](test-cases.md); local Full passed in 1,340.2 seconds and the final `WindowsNative` rerun passed in 341.0 seconds | Same-job Windows PowerShell 7 focused coverage and existing Linux PowerShell 7 Full coverage are configured without hosted fan-out; candidate hosted execution remains delivery evidence; residual wall time is owned by [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | Complete |
+| `SUBF-0073` <a name="subf-0073"></a> | Protocol/capability contract and append-only catalog entry | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0157](test-cases.md#test-0157); planned red (`expected 2, observed 1`), then capability-catalog and capability-review green | Existing tuple/blob preserved; one-entry ledger remains a valid prefix; applicability and immutable definition reviewed | Complete |
+| `SUBF-0074` <a name="subf-0074"></a> | Minimal operation contract, owner observations, parent enforcement, and bypass guardrails | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0158](test-cases.md#test-0158), [TEST-0159](test-cases.md#test-0159); focused runtime and negative checks passed on Windows PowerShell 5.1 | Generic fixture framework rejected; strict route/counter schema, canonical observation order, and parent authority reviewed | Complete |
+| `SUBF-0075` <a name="subf-0075"></a> | Quick-adoption reuse-first conversion and evidence-level reduction | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | `RepositoryRoutes` passed in 173.8 seconds; final `All` passed in 776.2 seconds with init 11 | Security/recovery/TOCTOU/link/native evidence retained; repeated family init reduced from 47 to its reviewed maximum of 11 | Complete |
+| `SUBF-0076` <a name="subf-0076"></a> | Capabilities-bootstrap, instruction-graph, and remaining expensive-owner conversion | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | Final bootstrap `All` passed in 267.6 seconds with exact owner observation | Adapter/graph fidelity retained; exact closure was init 3, clone 2, bundle 2, push 36, child process 4, and graph acquisition 3 | Complete |
+| `SUBF-0077` <a name="subf-0077"></a> | Cross-runtime, hosted-topology, protocol, documentation, and measured closure | [Issue #95](https://github.com/hasanmanzak/meAndAI/issues/95) | [TEST-0160](test-cases.md#test-0160); local Full passed in 1,340.2 seconds and the final `WindowsNative` rerun passed in 341.0 seconds | Same-job Windows PowerShell 7 focused coverage and existing Linux PowerShell 7 Full coverage are configured without hosted fan-out; candidate hosted execution remains delivery evidence; residual wall time is owned by [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | Complete |
 
 ## Decisions and relationships
 
@@ -240,9 +240,9 @@ decision before implementation.
 - [x] Consumers, dependencies, existing decisions, related features, and version boundary are identified.
 - [x] `RISK-0184` through `RISK-0189` have owners and responses.
 - [x] Five independently reviewable slices and gates are defined.
-- [x] [TEST-0157](test-cases.md), [TEST-0158](test-cases.md), [TEST-0159](test-cases.md), and [TEST-0160](test-cases.md) and the verification approach are defined.
+- [x] [TEST-0157](test-cases.md#test-0157), [TEST-0158](test-cases.md#test-0158), [TEST-0159](test-cases.md#test-0159), and [TEST-0160](test-cases.md#test-0160) and the verification approach are defined.
 - [x] Exact `6b01299...` owner-owned logical counts, the bounded dynamic observer result, per-owner budgets, and lower quick-adoption/bootstrap closure targets are frozen.
-- [x] Test-code state, the initial four-ID structural red result, and the [TEST-0157](test-cases.md) red-to-green result are recorded; implementation is authorized by the satisfied numeric baseline gate.
+- [x] Test-code state, the initial four-ID structural red result, and the [TEST-0157](test-cases.md#test-0157) red-to-green result are recorded; implementation is authorized by the satisfied numeric baseline gate.
 
 ## Acceptance criteria
 

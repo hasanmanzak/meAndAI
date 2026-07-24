@@ -6,18 +6,25 @@ Protocol version: **0.14.2** (candidate)<br>
 Latest immutable release: **0.14.1**
 
 The immutable [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
-release targets commit `f153e21a3098945a1b669563046f875ef6fb8b60`;
+release targets commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60);
 [PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
 [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) retain its
 delivery and publication evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
 [FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
-/ [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-[SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
-[TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md),
-and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) own the
-bounded v0.14.2 clickable cross-record reference correction. Follow the
+/ [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114) and
+[BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
+[SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089),
+[SUBF-0090](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090),
+[SUBF-0091](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091),
+[TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+[TEST-0176](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
+[TEST-0177](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177),
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
+[issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) own the bounded
+v0.14.2 clickable exact-record and commit-reference correction. Follow the
 [v0.14.2 handoff](log/2026-07-24-v0142-clickable-cross-record-references.md).
 
 This directory is the portable, curated handoff between the maintainer and AI

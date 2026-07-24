@@ -7,18 +7,25 @@ and follow its canonical links.
 
 Immutable [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
 completed [FEAT-0046](../../../docs/features/FEAT-0046-v0141-consumer-nonduplication-mandate/README.md)
-at commit `f153e21a3098945a1b669563046f875ef6fb8b60`;
+at commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60);
 [PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
 [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112)
-retain its delivery and publication evidence. [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) remains separately
+retain its delivery and publication evidence. [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains separately
 owned by [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) / [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
 
 [FEAT-0047](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
 [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-[SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
-[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md),
-and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) govern the
-bounded v0.14.2 correction. Follow the
+[BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
+[SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089),
+[SUBF-0090](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090),
+[SUBF-0091](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091),
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+[TEST-0176](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
+[TEST-0177](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177),
+[TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
+[issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) govern the
+bounded v0.14.2 exact-reference correction. Follow the
 [v0.14.2 handoff](2026-07-24-v0142-clickable-cross-record-references.md).
 [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains the separate open follow-up in [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
 

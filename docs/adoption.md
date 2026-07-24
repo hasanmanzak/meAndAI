@@ -89,7 +89,7 @@ publication transition.
 
 For a new submodule consumer on `v0.14.2`, the only repository file required
 before the lifecycle runs is the exact canonical
-[AI capabilities lifecycle workflow](https://github.com/hasanmanzak/meAndAI/blob/v0.14.2/templates/project/.github/workflows/meandai-protocol-update.yml)
+[AI capabilities lifecycle workflow](../templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
 [credentials](#update-workflow-prerequisites-and-behavior), then use quick
 adoption or run the workflow manually. Before checkout, the workflow requires

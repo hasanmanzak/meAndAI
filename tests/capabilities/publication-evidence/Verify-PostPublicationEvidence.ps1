@@ -14,7 +14,9 @@ param(
     [string]$ExpectedLauncherAssetName = 'Invoke-MeAndAIQuickAdoption.ps1',
     [string]$ExpectedLauncherSourcePath = 'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     [string]$ExpectedBundleAssetName = '',
-    [string]$ExpectedBundleSourceInventoryPath = 'scripts/quick-adoption/bundle.sources.json'
+    [string]$ExpectedBundleSourceInventoryPath = 'scripts/quick-adoption/bundle.sources.json',
+    [switch]$RepositoryMarkdownOnly,
+    [switch]$ValidateRepositoryMarkdownExternalCommits
 )
 
 $ErrorActionPreference = 'Stop'
@@ -22,6 +24,19 @@ $originalValidationCulture = [Threading.Thread]::CurrentThread.CurrentCulture
 try {
     [Threading.Thread]::CurrentThread.CurrentCulture =
         [Globalization.CultureInfo]::InvariantCulture
+    $localCommitResolutionCache = @{}
+    $githubSurfaceAllowedBlobRefs =
+        [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+    [void]$githubSurfaceAllowedBlobRefs.Add($ExpectedCommit)
+    $externalCommitTargetCache = @{}
+    $externalCommitTargetRequestCounter = [pscustomobject]@{ Count = 0 }
+    $githubSurfaceRepositoryContentTargets =
+        [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+    $githubRepositoryContentSnapshotCache = @{}
 
 function Assert-PostPublicationCondition {
     param(
@@ -1119,6 +1134,21 @@ function Test-MarkdownCollectionContainsExactVisibleUri {
     return $false
 }
 
+function Test-MarkdownCollectionContainsAnyExactVisibleUri {
+    param(
+        [object[]]$MarkdownItems = @(),
+        [string[]]$ExpectedUris = @()
+    )
+
+    foreach ($expectedUri in $ExpectedUris) {
+        if (Test-MarkdownCollectionContainsExactVisibleUri `
+            -MarkdownItems $MarkdownItems -ExpectedUri $expectedUri) {
+            return $true
+        }
+    }
+    return $false
+}
+
 function Test-ContainsExactDocumentTitle {
     param(
         [AllowEmptyString()][string]$Text,
@@ -1130,6 +1160,159 @@ function Test-ContainsExactDocumentTitle {
         '(?i)(?<![A-Za-z0-9])' + [regex]::Escape($Title) +
             '(?![A-Za-z0-9])'
     )
+}
+
+function Get-RendererActiveMarkdownAnchorEvidence {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $ignoredSpans = @(Get-MarkdownCodeSpans -Markdown $text) +
+        @(Get-MarkdownHtmlCommentSpans -Markdown $text) +
+        @(Get-MarkdownNonRenderingHtmlSpans -Markdown $text)
+    $anchors = [System.Collections.Generic.List[object]]::new()
+    $headingCounts = @{}
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?m)^#{1,6}[ \t]+(?<heading>.+?)[ \t]*#*[ \t]*$'
+    )) {
+        if (Test-MarkdownSpanOverlap -Index $match.Index `
+            -Length $match.Length -Spans $ignoredSpans) { continue }
+        $heading = [string]$match.Groups['heading'].Value
+        $heading = [regex]::Replace($heading, '<[^>]+>', '')
+        $heading = [regex]::Replace(
+            $heading,
+            '\[([^\]]+)\]\([^)]+\)',
+            '$1'
+        )
+        $heading = ConvertTo-MarkdownRenderedText -Text $heading
+        $slug = $heading.ToLowerInvariant()
+        $slug = [regex]::Replace($slug, '[^\p{L}\p{Nd}\s_-]', '')
+        $slug = [regex]::Replace($slug, '\s', '-')
+        if ($headingCounts.ContainsKey($slug)) {
+            $headingCounts[$slug]++
+            $slug = "$slug-$($headingCounts[$slug])"
+        }
+        else {
+            $headingCounts[$slug] = 0
+        }
+        $anchors.Add([pscustomobject]@{
+            Name = $slug
+            Kind = 'Heading'
+            Index = $match.Index
+            Length = $match.Length
+        })
+    }
+    foreach ($match in [regex]::Matches(
+        $text,
+        '(?i)<a[ \t]+name[ \t]*=[ \t]*"(?<name>[^"<>\s]+)"[ \t]*></a>'
+    )) {
+        if (Test-MarkdownSpanOverlap -Index $match.Index `
+            -Length $match.Length -Spans $ignoredSpans) { continue }
+        $anchors.Add([pscustomobject]@{
+            Name = [string]$match.Groups['name'].Value
+            Kind = 'Custom'
+            Index = $match.Index
+            Length = $match.Length
+        })
+    }
+    return @($anchors | Sort-Object Index)
+}
+
+function Get-CanonicalEmbeddedRecordDeclarations {
+    param([AllowEmptyString()][string]$Markdown)
+
+    $text = [string]$Markdown
+    $ignoredSpans = @(Get-MarkdownCodeSpans -Markdown $text | Where-Object {
+        [string]$_.Kind -cne 'Inline'
+    }) +
+        @(Get-MarkdownHtmlCommentSpans -Markdown $text) +
+        @(Get-MarkdownNonRenderingHtmlSpans -Markdown $text)
+    $declarations = [System.Collections.Generic.List[object]]::new()
+    $seenRanges = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($pattern in @(
+        '(?m)^\|\s*\x60(?<id>(?:TEST|SUBF|FIND|RISK)-\d{4})\x60[^|]*\|',
+        '(?m)^#{1,6}[ \t]+\x60?(?<id>(?:TEST|SUBF|FIND|RISK)-\d{4})\x60?(?=[ \t]|$)[^\r\n]*$',
+        '(?m)^-\s+(?:\[[ xX]\]\s+\x60(?<checklistId>(?:SUBF|FIND|RISK)-\d{4})\x60[^:\r\n]*:|(?:Fresh-diff review found|The first hosted PR run found)\s+\x60(?<reviewId>FIND-\d{4})\x60[^\r\n]*)'
+    )) {
+        foreach ($match in [regex]::Matches($text, $pattern)) {
+            $identityGroup = if ($match.Groups['id'].Success) {
+                $match.Groups['id']
+            }
+            elseif ($match.Groups['checklistId'].Success) {
+                $match.Groups['checklistId']
+            }
+            else {
+                $match.Groups['reviewId']
+            }
+            if (Test-MarkdownSpanOverlap -Index $identityGroup.Index `
+                -Length $identityGroup.Length -Spans $ignoredSpans) {
+                continue
+            }
+            $id = [string]$identityGroup.Value
+            $key = "$($match.Index):$($match.Length):$id"
+            if (-not $seenRanges.Add($key)) { continue }
+            $declarations.Add([pscustomobject]@{
+                Id = $id
+                Index = $match.Index
+                Length = $match.Length
+                Value = $match.Value
+            })
+        }
+    }
+    return @($declarations | Sort-Object Index)
+}
+
+function Assert-CanonicalEmbeddedRecordAnchors {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [Parameter(Mandatory)][string]$Surface
+    )
+
+    $declarations = @(Get-CanonicalEmbeddedRecordDeclarations `
+        -Markdown $Markdown)
+    $anchors = @(Get-RendererActiveMarkdownAnchorEvidence `
+        -Markdown $Markdown)
+    foreach ($declarationGroup in @($declarations | Group-Object Id)) {
+        $id = [string]$declarationGroup.Name
+        Assert-PostPublicationCondition `
+            ($declarationGroup.Count -eq 1) `
+            "$Surface declares embedded canonical record $id more than once."
+        $declaration = @($declarationGroup.Group)[0]
+        $expected = $id.ToLowerInvariant()
+        $matchingCustom = @($anchors | Where-Object {
+            [string]$_.Kind -ceq 'Custom' -and
+                [string]$_.Name -ieq $expected
+        })
+        $exactCustom = @($matchingCustom | Where-Object {
+            [string]$_.Name -ceq $expected
+        })
+        $exactTarget = @($anchors | Where-Object {
+            [string]$_.Name -ceq $expected
+        })
+        Assert-PostPublicationCondition `
+            ($matchingCustom.Count -gt 0) `
+            "$Surface embedded record $id has no renderer-active custom anchor."
+        Assert-PostPublicationCondition `
+            ($exactCustom.Count -gt 0) `
+            "$Surface embedded record $id custom anchor is not exact lowercase '$expected'."
+        Assert-PostPublicationCondition `
+            ($matchingCustom.Count -eq 1 -and $exactCustom.Count -eq 1) `
+            "$Surface embedded record $id custom anchor is not unique."
+        Assert-PostPublicationCondition `
+            ($exactTarget.Count -eq 1) `
+            "$Surface embedded record $id renderer-active anchor target '$expected' is not unique."
+        $anchor = $exactCustom[0]
+        Assert-PostPublicationCondition `
+            ([int]$anchor.Index -ge [int]$declaration.Index -and
+                ([int]$anchor.Index + [int]$anchor.Length) -le
+                    ([int]$declaration.Index + [int]$declaration.Length)) `
+            "$Surface embedded record $id custom anchor is outside its declaration."
+    }
+    return @($declarations | ForEach-Object {
+        [string]$_.Id
+    } | Select-Object -Unique)
 }
 
 function Get-CanonicalDocumentTitles {
@@ -1162,8 +1345,21 @@ function Get-CanonicalDocumentOwnedIds {
     }
     $ownedIds += @([regex]::Matches(
         $Markdown,
-        "(?m)^\|\s*``(?<id>$recordPattern)``\s*\|"
+        "(?m)^\|\s*``(?<id>$recordPattern)``(?:\s*<a\s+name=`"[^`"]+`"></a>)?\s*\|"
     ) | ForEach-Object { $_.Groups['id'].Value })
+    $ownedIds += @([regex]::Matches(
+        $Markdown,
+        '(?m)^-\s+(?:\[[ xX]\]\s+`(?<checklistId>(?:SUBF|FIND|RISK)-\d{4})`[^:\r\n]*:|(?:Fresh-diff review found|The first hosted PR run found)\s+`(?<reviewId>FIND-\d{4})`[^\r\n]*)'
+    ) | ForEach-Object {
+        if ($_.Groups['checklistId'].Success) {
+            $_.Groups['checklistId'].Value
+        }
+        else {
+            $_.Groups['reviewId'].Value
+        }
+    })
+    $ownedIds += @(Assert-CanonicalEmbeddedRecordAnchors `
+        -Markdown $Markdown -Surface 'canonical Markdown document')
     return @($ownedIds | Select-Object -Unique)
 }
 
@@ -1206,10 +1402,12 @@ function Resolve-RepositoryDocumentPath {
     )
 
     $cleanTarget = $Target.Trim().Trim('<', '>') -replace '[?#].*$', ''
+    $supportedBlobRef = '(?:' + [regex]::Escape($DefaultBranch) +
+        '|[0-9a-f]{40})'
     $absolute = [regex]::Match(
         $cleanTarget,
         '^https://github\.com/' + [regex]::Escape($Repository) +
-            '/blob/' + [regex]::Escape($DefaultBranch) + '/(?<path>.+)$'
+            '/blob/' + $supportedBlobRef + '/(?<path>.+)$'
     )
     if ($absolute.Success) {
         return [uri]::UnescapeDataString($absolute.Groups['path'].Value).Replace('\', '/')
@@ -1250,13 +1448,51 @@ function Test-ExactCrossRecordTarget {
 
     $cleanTarget = $Target.Trim().Trim('<', '>')
     if ($cleanTarget -ceq $ExpectedTarget) { return $true }
+    $expectedFragment = if ($ExpectedTarget.Contains('#')) {
+        '#' + ($ExpectedTarget -split '#', 2)[1]
+    }
+    else { '' }
+    $actualFragment = if ($cleanTarget.Contains('#')) {
+        '#' + ($cleanTarget -split '#', 2)[1]
+    }
+    else { '' }
+    $expectedImmutableTarget = [regex]::Match(
+        $ExpectedTarget,
+        '^https://github\.com/' + [regex]::Escape($Repository) +
+            '/blob/' + [regex]::Escape($ExpectedCommit) +
+            '/(?<path>[^?#]+)(?<fragment>#[^?#]+)?$',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    if ($expectedImmutableTarget.Success -and
+        $cleanTarget -cmatch '^https?://') {
+        $actualImmutableTarget = [regex]::Match(
+            $cleanTarget,
+            '^https://github\.com/' + [regex]::Escape($Repository) +
+                '/blob/(?<ref>[0-9a-f]{40})/(?<path>[^?#]+)' +
+                '(?<fragment>#[^?#]+)?$',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        if (-not $actualImmutableTarget.Success -or
+            $actualImmutableTarget.Groups['ref'].Value -cnotmatch
+                '^[0-9a-f]{40}$') {
+            return $false
+        }
+        return [uri]::UnescapeDataString(
+            $actualImmutableTarget.Groups['path'].Value
+        ) -ceq [uri]::UnescapeDataString(
+            $expectedImmutableTarget.Groups['path'].Value
+        ) -and
+            $actualImmutableTarget.Groups['fragment'].Value -ceq
+                $expectedImmutableTarget.Groups['fragment'].Value
+    }
     $expectedPath = Resolve-RepositoryDocumentPath `
         -SourceRepositoryPath '' -Target $ExpectedTarget
     if ([string]::IsNullOrEmpty($expectedPath)) { return $false }
     $actualPath = Resolve-RepositoryDocumentPath `
         -SourceRepositoryPath $SourceRepositoryPath -Target $cleanTarget
     return -not [string]::IsNullOrEmpty($actualPath) -and
-        $actualPath -ceq $expectedPath
+        $actualPath -ceq $expectedPath -and
+        $actualFragment -ceq $expectedFragment
 }
 
 function Test-VisibleRepositoryPathMatchesLinkTarget {
@@ -1293,6 +1529,430 @@ function Test-VisibleRepositoryPathMatchesLinkTarget {
         $actualPath -ceq $visiblePath -and
         ([string]::IsNullOrEmpty($visibleFragment) -or
             $actualFragment -ceq $visibleFragment)
+}
+
+function Get-PotentialCommitIdentityMatches {
+    param([AllowEmptyString()][string]$Text)
+
+    $commitMatches = [System.Collections.Generic.List[object]]::new()
+    foreach ($match in [regex]::Matches(
+        [string]$Text,
+        '(?i)(?<![0-9a-f])(?<sha>[0-9a-f]{7,40})(?![0-9a-f])'
+    )) {
+        $sha = [string]$match.Groups['sha'].Value
+        if ($sha.Length -lt 40 -and $sha -cnotmatch '[A-Fa-f]') {
+            $contextStart = [Math]::Max(0, $match.Index - 32)
+            $contextBefore = $Text.Substring(
+                $contextStart,
+                $match.Index - $contextStart
+            )
+            if ($contextBefore -cnotmatch
+                '(?i)\b(?:commit|head|sha|oid)(?:\s+(?:id|hash))?\s*[:=#]?\s*$') {
+                continue
+            }
+        }
+        $commitMatches.Add($match)
+    }
+    return @($commitMatches)
+}
+
+function Test-ExactCommitPermalink {
+    param(
+        [Parameter(Mandatory)][string]$Target,
+        [AllowEmptyString()][string]$VisibleSha = '',
+        [AllowEmptyString()][string]$ResolvedSha = ''
+    )
+
+    $commitTarget = [regex]::Match(
+        $Target.Trim().Trim('<', '>'),
+        '^https://github\.com/(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/commit/(?<sha>[0-9a-f]{40})$'
+    )
+    if (-not $commitTarget.Success) { return $false }
+    if ([string]::IsNullOrEmpty($VisibleSha) -and
+        [string]::IsNullOrEmpty($ResolvedSha)) {
+        return $true
+    }
+    if ($commitTarget.Groups['repository'].Value -ine $Repository) {
+        if (-not [string]::IsNullOrEmpty($ResolvedSha) -or
+            $VisibleSha -ieq $ExpectedCommit) {
+            return $false
+        }
+        return $commitTarget.Groups['sha'].Value.StartsWith(
+            $VisibleSha,
+            [StringComparison]::OrdinalIgnoreCase
+        )
+    }
+    if (-not [string]::IsNullOrEmpty($ResolvedSha)) {
+        return $commitTarget.Groups['sha'].Value -ceq $ResolvedSha
+    }
+    if ($ExpectedCommit.StartsWith(
+        $VisibleSha,
+        [StringComparison]::OrdinalIgnoreCase
+    )) {
+        return $commitTarget.Groups['sha'].Value -ceq $ExpectedCommit
+    }
+    return $commitTarget.Groups['sha'].Value.StartsWith(
+        $VisibleSha,
+        [StringComparison]::OrdinalIgnoreCase
+    )
+}
+
+function Test-CommitReferenceHasExplicitContext {
+    param(
+        [Parameter(Mandatory)][string]$Text,
+        [Parameter(Mandatory)]$Match
+    )
+
+    $lineStart = $Text.LastIndexOf("`n", [Math]::Max(0, $Match.Index - 1))
+    if ($lineStart -lt 0) { $lineStart = 0 } else { $lineStart++ }
+    $lineEnd = $Text.IndexOf("`n", $Match.Index)
+    if ($lineEnd -lt 0) { $lineEnd = $Text.Length }
+    $before = $Text.Substring($lineStart, $Match.Index - $lineStart)
+    $afterStart = $Match.Index + $Match.Length
+    $after = $Text.Substring($afterStart, $lineEnd - $afterStart)
+    return $before -cmatch
+        '(?i)\b(?:commit|merge\s+commit|commit\s+(?:sha|hash)|head\s+commit)\b[^\r\n]{0,32}$' -or
+        $after -cmatch '(?i)^\s*(?:commit|merge\s+commit)\b'
+}
+
+function Resolve-LocalCommitIdentity {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryRoot,
+        [Parameter(Mandatory)][string]$Sha
+    )
+
+    $cacheKey = $RepositoryRoot + "`n" + $Sha.ToLowerInvariant()
+    if ($localCommitResolutionCache.ContainsKey($cacheKey)) {
+        return [string]$localCommitResolutionCache[$cacheKey]
+    }
+    $candidates = @(& git -C $RepositoryRoot rev-parse `
+        "--disambiguate=$Sha" 2>$null | Where-Object {
+            $_ -cmatch '^[0-9a-f]{40}$' -and
+                (@(& git -C $RepositoryRoot cat-file -t $_ 2>$null) -join '') `
+                    -ceq 'commit'
+        } | Select-Object -Unique)
+    if ($candidates.Count -gt 1) {
+        throw "TEST-0065 local commit identity '$Sha' is ambiguous."
+    }
+    if ($candidates.Count -eq 1) {
+        $localCommitResolutionCache[$cacheKey] = [string]$candidates[0]
+        return [string]$candidates[0]
+    }
+    $localCommitResolutionCache[$cacheKey] = ''
+    return ''
+}
+
+function Test-CommitLiteralIsExcluded {
+    param(
+        [Parameter(Mandatory)][string]$Text,
+        [Parameter(Mandatory)]$Match,
+        [object[]]$CodeSpans = @()
+    )
+
+    $lineStart = $Text.LastIndexOf("`n", [Math]::Max(0, $Match.Index - 1))
+    if ($lineStart -lt 0) { $lineStart = 0 } else { $lineStart++ }
+    $lineEnd = $Text.IndexOf("`n", $Match.Index)
+    if ($lineEnd -lt 0) { $lineEnd = $Text.Length }
+    $line = $Text.Substring($lineStart, $lineEnd - $lineStart)
+    $localIndex = $Match.Index - $lineStart
+    $prefix = $line.Substring(0, $localIndex)
+
+    $codeSpan = @($CodeSpans | Where-Object {
+        $Match.Index -ge [int]$_.Index -and
+            ($Match.Index + $Match.Length) -le
+                ([int]$_.Index + [int]$_.Length)
+    } | Select-Object -First 1)
+    if ($codeSpan.Count -gt 0) {
+        if ([string]$codeSpan[0].Kind -cne 'Inline') { return $true }
+        $inlineContent = (ConvertTo-MarkdownRenderedText `
+            -Text ([string]$codeSpan[0].Content)).Trim()
+        if ($inlineContent -cnotmatch
+            '(?i)^(?:(?:commit|head|sha|oid)(?:\s+(?:id|hash))?\s*[:#]?\s*)?[0-9a-f]{7,40}$') {
+            return $true
+        }
+    }
+
+    if ($prefix -cmatch
+        '(?i)\b(?:tag\s+object|git\s+blob)(?:\s+(?:identity|oid|sha))?\s*[:=]?\s*[`"'']*\s*$') {
+        return $true
+    }
+
+    if ($prefix -cmatch
+        '(?i)\b(?:(?:fixture|placeholder|synthetic)(?:\s+(?:commit|sha|value|literal)){0,3}|machine\s+literal|sample\s+value|test\s+vector|source\s+(?:example|value)|git\s+object(?:\s+input)?|git\s+blob(?:\s+(?:identity|oid|sha))?|tag\s+object(?:\s+(?:identity|oid|sha))?|opaque\s+(?:machine\s+)?marker|checksum|digest|(?:sha-?(?:1|224|256|384|512)|md5)(?:\s+digest)?)\s*[:=]\s*[`"'']*\s*$') {
+        return $true
+    }
+    if ($prefix -cmatch
+        '(?i)["''](?:commit|sha|oid|objectId|sourceCommit|expectedCommit|mergeCommitSha|commitSha|commitOid|treeSha|digest)["'']\s*:\s*["'']?\s*$') {
+        return $true
+    }
+    if ($prefix -cmatch
+        '(?i)\b(?:sourceCommit|expectedCommit|mergeCommitSha|commitSha|commitOid|objectId|treeSha|sha1|sha256|digest)\s*[:=]\s*["'']?\s*$') {
+        return $true
+    }
+    $commandLine = (Remove-MarkdownBlockContainerPrefix -Line $line).TrimStart()
+    if ($commandLine -cmatch
+        '(?i)^(?:\$|PS>|git\s|gh\s|curl\s|pwsh\s|powershell\s|dotnet\s|npm\s|npx\s)') {
+        return $true
+    }
+    return $false
+}
+
+function Add-CommitReferenceProblem {
+    param(
+        [AllowNull()][System.Collections.Generic.List[object]]$Problems,
+        [Parameter(Mandatory)][string]$Surface,
+        [Parameter(Mandatory)][string]$Kind,
+        [int]$Index = -1,
+        [AllowEmptyString()][string]$Sha = '',
+        [AllowEmptyString()][string]$Target = '',
+        [Parameter(Mandatory)][string]$Message
+    )
+
+    if ($null -eq $Problems) { throw "TEST-0065 $Message" }
+    $Problems.Add([pscustomobject][ordered]@{
+        surface = $Surface
+        kind = $Kind
+        index = $Index
+        sha = $Sha
+        target = $Target
+        message = $Message
+    })
+}
+
+function Assert-ExactHumanFacingCommitReferences {
+    param(
+        [AllowEmptyString()][string]$Markdown,
+        [Parameter(Mandatory)][string]$Surface,
+        [Parameter(Mandatory)]$Evidence,
+        [switch]$ResolveLocalCommits,
+        [switch]$ValidateExternalCommits,
+        [AllowEmptyString()][string]$RepositoryRoot = '',
+        [AllowNull()][System.Collections.Generic.List[object]]$Problems = $null
+    )
+
+    $exactCommitCommentPattern =
+        '^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/commit/[0-9a-f]{40}#commitcomment-[1-9][0-9]*$'
+    foreach ($link in @($Evidence.Links)) {
+        $target = ([string]$link.Target).Trim().Trim('<', '>')
+        if ($target -cmatch
+            '^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/commit/' -and
+            -not (Test-ExactCommitPermalink -Target $target) -and
+            $target -cnotmatch $exactCommitCommentPattern) {
+            Add-CommitReferenceProblem -Problems $Problems `
+                -Surface $Surface -Kind 'InvalidCommitTarget' `
+                -Index ([int]$link.Index) -Target $target `
+                -Message "$Surface contains a commit link that is not an exact full-SHA GitHub commit permalink."
+        }
+        $targetCommit = [regex]::Match(
+            $target,
+            '^https://github\.com/' + [regex]::Escape($Repository) +
+                '/commit/(?<sha>[0-9a-f]{40})$'
+        )
+        if ($ResolveLocalCommits -and $targetCommit.Success) {
+            $resolvedTarget = Resolve-LocalCommitIdentity `
+                -RepositoryRoot $RepositoryRoot `
+                -Sha $targetCommit.Groups['sha'].Value
+            if ([string]::IsNullOrEmpty($resolvedTarget)) {
+                Add-CommitReferenceProblem -Problems $Problems `
+                    -Surface $Surface -Kind 'UnresolvedCommitTarget' `
+                    -Index ([int]$link.Index) `
+                    -Sha $targetCommit.Groups['sha'].Value -Target $target `
+                    -Message "$Surface links a commit target that does not resolve to a local commit object."
+            }
+        }
+        $label = ConvertTo-MarkdownRenderedText -Text ([string]$link.Label)
+        $exactTarget = [regex]::Match(
+            $target,
+            '^https://github\.com/(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/commit/(?<sha>[0-9a-f]{40})$'
+        )
+        foreach ($commitMatch in @(Get-PotentialCommitIdentityMatches `
+            -Text $label)) {
+            if (Test-CommitLiteralIsExcluded -Text $label `
+                -Match $commitMatch) { continue }
+            $visibleSha = [string]$commitMatch.Groups['sha'].Value
+            $resolvedSha = ''
+            if ($ResolveLocalCommits) {
+                $resolvedSha = Resolve-LocalCommitIdentity `
+                    -RepositoryRoot $RepositoryRoot -Sha $visibleSha
+            }
+            if (-not (Test-ExactCommitPermalink `
+                -Target $target -VisibleSha $visibleSha `
+                -ResolvedSha $resolvedSha)) {
+                Add-CommitReferenceProblem -Problems $Problems `
+                    -Surface $Surface -Kind 'WrongCommitTarget' `
+                    -Index ([int]$link.Index) -Sha $visibleSha `
+                    -Target $target `
+                    -Message "$Surface links human-facing commit reference '$visibleSha' to a target other than its exact full-SHA commit permalink."
+            }
+        }
+        if ($ValidateExternalCommits -and $exactTarget.Success -and
+            $exactTarget.Groups['repository'].Value -ine $Repository -and
+            -not (Test-GitHubRepositoryContainsCommit `
+                -RepositoryIdentity $exactTarget.Groups['repository'].Value `
+                -Sha $exactTarget.Groups['sha'].Value)) {
+                Add-CommitReferenceProblem -Problems $Problems `
+                    -Surface $Surface `
+                    -Kind 'UnverifiedExternalCommitRepository' `
+                    -Index ([int]$link.Index) `
+                    -Sha $exactTarget.Groups['sha'].Value `
+                    -Target $target `
+                    -Message "$Surface links an external commit through a repository that the authenticated GitHub API cannot prove contains that exact commit."
+        }
+    }
+
+    $autolinks = @(Get-MarkdownHttpAutolinkSpans -Markdown $Markdown)
+    foreach ($autolink in $autolinks) {
+        if (Test-MarkdownSpanOverlap -Index $autolink.Index `
+            -Length $autolink.Length -Spans (
+                @($Evidence.Links) + @($Evidence.Definitions) +
+                @($Evidence.CodeSpans) + @($Evidence.HtmlComments) +
+                @($Evidence.NonRenderingHtml)
+            )) { continue }
+        $target = ([string]$autolink.Value).Trim().Trim('<', '>')
+        if ($target -cmatch
+            '^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/commit/' -and
+            -not (Test-ExactCommitPermalink -Target $target) -and
+            $target -cnotmatch $exactCommitCommentPattern) {
+            Add-CommitReferenceProblem -Problems $Problems `
+                -Surface $Surface -Kind 'InvalidCommitAutolink' `
+                -Index ([int]$autolink.Index) -Target $target `
+                -Message "$Surface contains a commit autolink that is not an exact full-SHA GitHub commit permalink."
+        }
+        $exactAutolinkTarget = [regex]::Match(
+            $target,
+            '^https://github\.com/(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/commit/(?<sha>[0-9a-f]{40})$'
+        )
+        if ($ValidateExternalCommits -and $exactAutolinkTarget.Success -and
+            $exactAutolinkTarget.Groups['repository'].Value -ine $Repository -and
+            -not (Test-GitHubRepositoryContainsCommit `
+                -RepositoryIdentity $exactAutolinkTarget.Groups['repository'].Value `
+                -Sha $exactAutolinkTarget.Groups['sha'].Value)) {
+            Add-CommitReferenceProblem -Problems $Problems `
+                -Surface $Surface `
+                -Kind 'UnverifiedExternalCommitRepository' `
+                -Index ([int]$autolink.Index) `
+                -Sha $exactAutolinkTarget.Groups['sha'].Value `
+                -Target $target `
+                -Message "$Surface contains an external commit autolink whose repository the authenticated GitHub API cannot prove contains that exact commit."
+        }
+        if ($ResolveLocalCommits) {
+            $targetCommit = [regex]::Match(
+                $target,
+                '^https://github\.com/' + [regex]::Escape($Repository) +
+                    '/commit/(?<sha>[0-9a-f]{40})$'
+            )
+            if ($targetCommit.Success) {
+                $resolvedTarget = Resolve-LocalCommitIdentity `
+                    -RepositoryRoot $RepositoryRoot `
+                    -Sha $targetCommit.Groups['sha'].Value
+                if ([string]::IsNullOrEmpty($resolvedTarget)) {
+                    Add-CommitReferenceProblem -Problems $Problems `
+                        -Surface $Surface `
+                        -Kind 'UnresolvedCommitAutolink' `
+                        -Index ([int]$autolink.Index) `
+                        -Sha $targetCommit.Groups['sha'].Value `
+                        -Target $target `
+                        -Message "$Surface contains a commit autolink that does not resolve to a local commit object."
+                }
+            }
+        }
+    }
+
+    $protectedSpans = @($Evidence.Links) + @($Evidence.Definitions) +
+        @($Evidence.HtmlComments) + @($Evidence.NonRenderingHtml) +
+        @($autolinks)
+    foreach ($commitMatch in @(Get-PotentialCommitIdentityMatches `
+        -Text $Markdown)) {
+        if (Test-MarkdownSpanOverlap -Index $commitMatch.Index `
+            -Length $commitMatch.Length -Spans $protectedSpans) { continue }
+        if (Test-CommitLiteralIsExcluded -Text $Markdown `
+            -Match $commitMatch -CodeSpans @($Evidence.CodeSpans)) { continue }
+        $visibleSha = [string]$commitMatch.Groups['sha'].Value
+        if ($ResolveLocalCommits) {
+            $resolvedSha = Resolve-LocalCommitIdentity `
+                -RepositoryRoot $RepositoryRoot -Sha $visibleSha
+            if ($visibleSha.Length -lt 40 -and
+                [string]::IsNullOrEmpty($resolvedSha) -and
+                -not (Test-CommitReferenceHasExplicitContext `
+                    -Text $Markdown -Match $commitMatch)) { continue }
+        }
+        Add-CommitReferenceProblem -Problems $Problems `
+            -Surface $Surface -Kind 'UnlinkedCommitReference' `
+            -Index ([int]$commitMatch.Index) -Sha $visibleSha `
+            -Message "$Surface contains human-facing commit reference '$visibleSha' without a clickable exact full-SHA commit permalink."
+    }
+}
+
+function Assert-TrackedRepositoryMarkdownCommitReferences {
+    param([switch]$ValidateExternalCommits)
+
+    $repositoryRoot = (@(& git rev-parse --show-toplevel 2>$null) -join '').Trim()
+    Assert-PostPublicationCondition `
+        ($LASTEXITCODE -eq 0 -and
+            -not [string]::IsNullOrEmpty($repositoryRoot) -and
+            [IO.Path]::IsPathRooted($repositoryRoot)) `
+        'tracked-Markdown commit validation requires one Git repository root.'
+    $repositoryRoot = [IO.Path]::GetFullPath($repositoryRoot)
+    $trackedPaths = @(& git -C $repositoryRoot -c core.quotepath=false `
+        ls-files -- '*.md')
+    Assert-PostPublicationCondition ($LASTEXITCODE -eq 0) `
+        'tracked Markdown inventory could not be read from Git.'
+    Assert-PostPublicationCondition ($trackedPaths.Count -le 2048) `
+        'tracked Markdown inventory exceeds the bounded 2,048-file limit.'
+
+    [long]$totalBytes = 0
+    $problems = [System.Collections.Generic.List[object]]::new()
+    foreach ($repositoryPath in $trackedPaths) {
+        Assert-PostPublicationCondition `
+            (-not [string]::IsNullOrWhiteSpace($repositoryPath) -and
+                $repositoryPath -cnotmatch '(^|/|\\)\.\.($|/|\\)') `
+            'tracked Markdown inventory contains an unsafe path.'
+        $fullPath = [IO.Path]::GetFullPath(
+            (Join-Path $repositoryRoot $repositoryPath)
+        )
+        $rootPrefix = $repositoryRoot.TrimEnd(
+            [IO.Path]::DirectorySeparatorChar,
+            [IO.Path]::AltDirectorySeparatorChar
+        ) + [IO.Path]::DirectorySeparatorChar
+        Assert-PostPublicationCondition `
+            ($fullPath.StartsWith(
+                $rootPrefix,
+                [StringComparison]::OrdinalIgnoreCase
+            ) -and [IO.File]::Exists($fullPath)) `
+            "tracked Markdown path '$repositoryPath' escapes or is not one regular file."
+        $fileInfo = [IO.FileInfo]::new($fullPath)
+        Assert-PostPublicationCondition `
+            (($fileInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0) `
+            "tracked Markdown path '$repositoryPath' is not one direct regular file."
+        $fileLength = $fileInfo.Length
+        Assert-PostPublicationCondition ($fileLength -le 1048576) `
+            "tracked Markdown path '$repositoryPath' exceeds the 1 MiB file limit."
+        $totalBytes += $fileLength
+        Assert-PostPublicationCondition ($totalBytes -le 16777216) `
+            'tracked Markdown inventory exceeds the 16 MiB aggregate limit.'
+        $markdown = [IO.File]::ReadAllText(
+            $fullPath,
+            [Text.UTF8Encoding]::new($false, $true)
+        )
+        $evidence = Get-MarkdownLinkEvidence -Markdown $markdown
+        Assert-ExactHumanFacingCommitReferences `
+            -Markdown $markdown `
+            -Surface "tracked Markdown '$repositoryPath'" `
+            -Evidence $evidence -ResolveLocalCommits `
+            -ValidateExternalCommits:$ValidateExternalCommits `
+            -RepositoryRoot $repositoryRoot -Problems $problems
+    }
+    if ($problems.Count -gt 0) {
+        $payload = [ordered]@{
+            schema = 1
+            repository = $Repository
+            count = $problems.Count
+            problems = @($problems | Sort-Object surface, index, kind)
+        }
+        Write-Output ('MEANDAI_COMMIT_REFERENCE_PROBLEMS=' +
+            ($payload | ConvertTo-Json -Depth 5 -Compress))
+        throw "TEST-0065 tracked Markdown contains $($problems.Count) human-facing commit-reference problem(s)."
+    }
 }
 
 function Test-ExactGitHubShorthandTarget {
@@ -1433,6 +2093,12 @@ function Assert-NoCrossRecordReferenceInNonRenderingTitle {
             '(?i)(?<![A-Za-z0-9_])(?:(?:issue|PR|pull request)\s+#?|#)[1-9][0-9]*(?![A-Za-z0-9_-])|\b(?:(?:issue|PR|pull request|commit|discussion)\s+)?comment\s+#?\d+\b|\breview\s+#?\d+\b'
         )) `
         "$Surface contains a GitHub record number on a non-rendering title surface."
+    foreach ($commitMatch in @(Get-PotentialCommitIdentityMatches `
+        -Text $remaining)) {
+        if (Test-CommitLiteralIsExcluded -Text $remaining `
+            -Match $commitMatch) { continue }
+        throw "TEST-0065 $Surface contains a commit reference on a non-rendering title surface."
+    }
     Assert-PostPublicationCondition `
         (-not [regex]::IsMatch($remaining, '(?i)https?://')) `
         "$Surface contains a URL on a non-rendering title surface."
@@ -1463,6 +2129,20 @@ function Assert-NoFreeTextCrossRecordReference {
         )) `
         "$Surface composes a visible URL across a partial Markdown link."
     $linkEvidence = Get-MarkdownLinkEvidence -Markdown $Markdown
+    if ($RequireAbsoluteTargets) {
+        if (-not [string]::IsNullOrEmpty($localSurfaceRepositoryRoot)) {
+            Assert-ExactHumanFacingCommitReferences `
+                -Markdown $Markdown -Surface $Surface -Evidence $linkEvidence `
+                -ResolveLocalCommits `
+                -ValidateExternalCommits `
+                -RepositoryRoot $localSurfaceRepositoryRoot
+        }
+        else {
+            Assert-ExactHumanFacingCommitReferences `
+                -Markdown $Markdown -Surface $Surface -Evidence $linkEvidence `
+                -ValidateExternalCommits
+        }
+    }
     foreach ($composedLink in @($linkEvidence.Links)) {
         $prefix = $Markdown.Substring(0, [int]$composedLink.Index)
         Assert-PostPublicationCondition `
@@ -1753,6 +2433,54 @@ function Assert-NoFreeTextCrossRecordReference {
         }
     }
 
+    if ($RequireAbsoluteTargets) {
+        $repositoryContentTargets = [System.Collections.Generic.List[string]]::new()
+        foreach ($link in @($linkEvidence.Links)) {
+            $repositoryContentTargets.Add(
+                ([string]$link.Target).Trim().Trim('<', '>')
+            )
+        }
+        foreach ($autolink in @(Get-MarkdownHttpAutolinkSpans `
+            -Markdown $Markdown)) {
+            if (Test-MarkdownSpanOverlap -Index $autolink.Index `
+                -Length $autolink.Length -Spans (
+                    @($linkEvidence.Links) + @($linkEvidence.Definitions) +
+                    @($linkEvidence.CodeSpans) + @($linkEvidence.HtmlComments) +
+                    @($linkEvidence.NonRenderingHtml)
+                )) { continue }
+            $repositoryContentTargets.Add(
+                ([string]$autolink.Value).Trim().Trim('<', '>')
+            )
+        }
+        foreach ($repositoryContentTarget in $repositoryContentTargets) {
+            $sameRepositoryContentPrefix = [regex]::IsMatch(
+                $repositoryContentTarget,
+                '(?i)^https://github\.com/' + [regex]::Escape($Repository) +
+                    '/(?:blob|tree)/'
+            )
+            if (-not $sameRepositoryContentPrefix) { continue }
+            $contentTarget = [regex]::Match(
+                $repositoryContentTarget,
+                '^https://github\.com/' + [regex]::Escape($Repository) +
+                    '/(?<kind>blob|tree)/(?<ref>[0-9a-f]{40})/' +
+                    '(?<path>[^?#]+)(?:#(?<fragment>[^?#]+))?$',
+                [Text.RegularExpressions.RegexOptions]::IgnoreCase
+            )
+            Assert-PostPublicationCondition `
+                ($contentTarget.Success -and
+                    $contentTarget.Groups['kind'].Value -ceq 'blob' -and
+                    $contentTarget.Groups['ref'].Value -cmatch
+                        '^[0-9a-f]{40}$') `
+                "$Surface contains a same-repository content link that is not an immutable full-SHA blob target."
+            [void]$githubSurfaceRepositoryContentTargets.Add(
+                $repositoryContentTarget
+            )
+            Assert-PostPublicationCondition `
+                ($githubSurfaceRepositoryContentTargets.Count -le 64) `
+                'GitHub surfaces exceed the bounded 64 unique same-repository blob targets.'
+        }
+    }
+
     $unlinked = Get-UnlinkedReferenceText -Markdown $Markdown -Evidence $linkEvidence
     $numericRemaining = $unlinked
     if ($OwnGitHubIdentityNumber -gt 0) {
@@ -1971,8 +2699,23 @@ function Assert-NoFreeTextCrossRecordReference {
     }
 }
 
+if ($RepositoryMarkdownOnly -and
+    -not $ValidateRepositoryMarkdownExternalCommits) {
+    Assert-PostPublicationCondition `
+        ($Repository -cmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') `
+        'repository must be an exact owner/name identity.'
+    Assert-TrackedRepositoryMarkdownCommitReferences
+    Write-Host "TEST-0178 tracked Markdown commit references verified for $Repository." `
+        -ForegroundColor Green
+    return
+}
+
 Assert-PostPublicationCondition ($Repository -cmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') `
     'repository must be an exact owner/name identity.'
+Assert-PostPublicationCondition `
+    (-not $ValidateRepositoryMarkdownExternalCommits -or
+        $RepositoryMarkdownOnly) `
+    'external tracked-Markdown validation requires RepositoryMarkdownOnly.'
 Assert-PostPublicationCondition ($Tag -cmatch '^v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$') `
     'release tag must be canonical.'
 Assert-PostPublicationCondition ($ExpectedCommit -cmatch '^[0-9a-f]{40}$') `
@@ -1986,6 +2729,26 @@ Assert-PostPublicationCondition `
     'feature path must identify one canonical feature record.'
 Assert-PostPublicationCondition (-not [string]::IsNullOrWhiteSpace($Token)) `
     'GitHub API token is required for authoritative post-publication evidence.'
+
+$localSurfaceRepositoryRoot = ''
+$candidateRepositoryRoot = (@(
+    & git rev-parse --show-toplevel 2>$null
+) -join '').Trim()
+if ($LASTEXITCODE -eq 0 -and
+    -not [string]::IsNullOrEmpty($candidateRepositoryRoot) -and
+    [IO.Path]::IsPathRooted($candidateRepositoryRoot)) {
+    $candidateRepositoryRoot = [IO.Path]::GetFullPath($candidateRepositoryRoot)
+    $originUrl = (@(
+        & git -C $candidateRepositoryRoot config --get remote.origin.url 2>$null
+    ) -join '').Trim()
+    $repositoryParts = @($Repository.Split('/'))
+    $originPattern = '(?i)(?:github\.com[/:])' +
+        [regex]::Escape($repositoryParts[0]) + '/' +
+        [regex]::Escape($repositoryParts[1]) + '(?:\.git)?/?$'
+    if ($LASTEXITCODE -eq 0 -and $originUrl -cmatch $originPattern) {
+        $localSurfaceRepositoryRoot = $candidateRepositoryRoot
+    }
+}
 
 $expectedAssetNames = @($ExpectedReleaseAssetNames)
 Assert-PostPublicationCondition ($expectedAssetNames.Count -le 16) `
@@ -2041,6 +2804,66 @@ function Invoke-GitHubGet {
     return Invoke-RestMethod -Method Get -Uri $uri -Headers $headers
 }
 
+function Test-GitHubRepositoryContainsCommit {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryIdentity,
+        [Parameter(Mandatory)][string]$Sha
+    )
+
+    Assert-PostPublicationCondition `
+        ($RepositoryIdentity -cmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$' -and
+            $Sha -cmatch '^[0-9a-f]{40}$') `
+        'external commit target contains an unsafe repository identity or SHA.'
+    $cacheKey = $RepositoryIdentity.ToLowerInvariant() + "`n" + $Sha
+    if ($externalCommitTargetCache.ContainsKey($cacheKey)) {
+        return [bool]$externalCommitTargetCache[$cacheKey]
+    }
+    Assert-PostPublicationCondition `
+        ($externalCommitTargetRequestCounter.Count -lt 32) `
+        'external commit verification exceeds the bounded 32-target limit.'
+    $externalCommitTargetRequestCounter.Count++
+    $verified = $false
+    try {
+        $encodedRepository = ConvertTo-ApiPath $RepositoryIdentity
+        $record = Invoke-RestMethod -Method Get `
+            -Uri "$apiRoot/repos/$encodedRepository/commits/$Sha" `
+            -Headers $headers
+        $canonicalUrl = "https://github.com/$RepositoryIdentity/commit/$Sha"
+        $verified = [string]$record.sha -ceq $Sha -and
+            ([string]$record.html_url).TrimEnd('/') -ieq $canonicalUrl
+    }
+    catch { $verified = $false }
+    $externalCommitTargetCache[$cacheKey] = $verified
+    return $verified
+}
+
+if ($RepositoryMarkdownOnly) {
+    Assert-PostPublicationCondition `
+        (-not [string]::IsNullOrEmpty($localSurfaceRepositoryRoot)) `
+        'external tracked-Markdown validation requires a checkout whose origin matches the repository identity.'
+    Assert-TrackedRepositoryMarkdownCommitReferences -ValidateExternalCommits
+    Write-Host "TEST-0178 tracked Markdown and external commit targets verified for $Repository." `
+        -ForegroundColor Green
+    return
+}
+
+if (-not [string]::IsNullOrEmpty($localSurfaceRepositoryRoot)) {
+    $localSurfaceHead = (@(
+        & git -C $localSurfaceRepositoryRoot rev-parse HEAD 2>$null
+    ) -join '').Trim()
+    Assert-PostPublicationCondition `
+        ($LASTEXITCODE -eq 0 -and $localSurfaceHead -ceq $ExpectedCommit) `
+        'tracked-Markdown post-publication validation requires the checkout HEAD to equal the expected commit.'
+    $trackedCheckoutChanges = @(
+        & git -C $localSurfaceRepositoryRoot status --porcelain=v1 `
+            --untracked-files=no 2>$null
+    )
+    Assert-PostPublicationCondition `
+        ($LASTEXITCODE -eq 0 -and $trackedCheckoutChanges.Count -eq 0) `
+        'tracked-Markdown post-publication validation requires a clean tracked checkout.'
+    Assert-TrackedRepositoryMarkdownCommitReferences -ValidateExternalCommits
+}
+
 function Invoke-GitHubPagedGet {
     param(
         [Parameter(Mandatory)][string]$Path,
@@ -2060,6 +2883,149 @@ function Invoke-GitHubPagedGet {
         }
     }
     throw "TEST-0065 GitHub pagination exceeded the bounded $MaximumPages-page evidence limit."
+}
+
+function Get-GitHubRepositoryContentSnapshot {
+    param(
+        [Parameter(Mandatory)][string]$Ref,
+        [Parameter(Mandatory)][string]$RepositoryPath
+    )
+
+    $cacheKey = "$Ref`n$RepositoryPath"
+    if ($githubRepositoryContentSnapshotCache.ContainsKey($cacheKey)) {
+        return $githubRepositoryContentSnapshotCache[$cacheKey]
+    }
+    $encodedPath = ConvertTo-ApiPath $RepositoryPath
+    $contentRecord = Invoke-GitHubGet "contents/$encodedPath`?ref=$Ref"
+    Assert-PostPublicationCondition `
+        ($null -ne $contentRecord -and
+            $contentRecord.type -ceq 'file') `
+        "repository snapshot '$RepositoryPath' at '$Ref' is not one file."
+    Assert-PostPublicationCondition `
+        ([string]$contentRecord.path -ceq $RepositoryPath) `
+        "repository snapshot returned path '$($contentRecord.path)' instead of exact requested path '$RepositoryPath'."
+    Assert-PostPublicationCondition `
+        ([string]$contentRecord.sha -cmatch '^[0-9a-f]{40}$') `
+        "repository snapshot '$RepositoryPath' at '$Ref' has no exact lowercase blob SHA."
+    Assert-PostPublicationCondition `
+        ($contentRecord.encoding -ceq 'base64') `
+        "repository snapshot '$RepositoryPath' at '$Ref' was not returned as base64 content."
+    try {
+        $bytes = [Convert]::FromBase64String(
+            ([string]$contentRecord.content -replace '\s', '')
+        )
+    }
+    catch {
+        throw "TEST-0065 repository snapshot '$RepositoryPath' at '$Ref' contains invalid base64 content."
+    }
+    Assert-PostPublicationCondition `
+        ($bytes.LongLength -le 1048576) `
+        "repository snapshot '$RepositoryPath' at '$Ref' exceeds the bounded 1 MiB content limit."
+    $snapshot = [pscustomobject]@{
+        Ref = $Ref
+        Path = $RepositoryPath
+        BlobSha = [string]$contentRecord.sha
+        Bytes = [byte[]]$bytes
+    }
+    $githubRepositoryContentSnapshotCache[$cacheKey] = $snapshot
+    return $snapshot
+}
+
+function Get-GitHubRepositoryContentSnapshotText {
+    param(
+        [Parameter(Mandatory)]$Snapshot,
+        [Parameter(Mandatory)][string]$Purpose
+    )
+
+    try {
+        return [Text.UTF8Encoding]::new($false, $true).GetString(
+            [byte[]]$Snapshot.Bytes
+        )
+    }
+    catch {
+        throw "TEST-0065 $Purpose is not strict UTF-8 text."
+    }
+}
+
+function Assert-GitHubSurfaceRepositoryContentTargets {
+    foreach ($target in @($githubSurfaceRepositoryContentTargets | Sort-Object)) {
+        $targetMatch = [regex]::Match(
+            $target,
+            '^https://github\.com/' + [regex]::Escape($Repository) +
+                '/blob/(?<ref>[0-9a-f]{40})/(?<path>[^?#]+)' +
+                '(?:#(?<fragment>[^?#]+))?$',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase
+        )
+        Assert-PostPublicationCondition $targetMatch.Success `
+            "collected same-repository blob target '$target' is not canonical."
+        try {
+            $repositoryPath = [uri]::UnescapeDataString(
+                $targetMatch.Groups['path'].Value
+            ).Replace('\', '/')
+            $fragment = if ($targetMatch.Groups['fragment'].Success) {
+                [uri]::UnescapeDataString(
+                    $targetMatch.Groups['fragment'].Value
+                )
+            }
+            else { '' }
+        }
+        catch {
+            throw "TEST-0065 same-repository blob target '$target' contains invalid URI escaping."
+        }
+        $pathSegments = @($repositoryPath -split '/')
+        Assert-PostPublicationCondition `
+            (-not [string]::IsNullOrWhiteSpace($repositoryPath) -and
+                -not $repositoryPath.StartsWith('/') -and
+                -not $repositoryPath.Contains('\') -and
+                @($pathSegments | Where-Object {
+                    [string]::IsNullOrEmpty($_) -or $_ -in @('.', '..')
+                }).Count -eq 0) `
+            "same-repository blob target '$target' contains an unsafe repository path."
+        $snapshot = Get-GitHubRepositoryContentSnapshot `
+            -Ref $targetMatch.Groups['ref'].Value `
+            -RepositoryPath $repositoryPath
+        if ([string]::IsNullOrEmpty($fragment)) { continue }
+
+        $snapshotText = Get-GitHubRepositoryContentSnapshotText `
+            -Snapshot $snapshot `
+            -Purpose "repository snapshot '$repositoryPath' fragment source"
+        if ($repositoryPath -cmatch '(?i)\.(?:md|markdown)$') {
+            $matchingAnchors = @(
+                Get-RendererActiveMarkdownAnchorEvidence `
+                    -Markdown $snapshotText |
+                    Where-Object { [string]$_.Name -ceq $fragment }
+            )
+            Assert-PostPublicationCondition `
+                ($matchingAnchors.Count -eq 1) `
+                "same-repository Markdown fragment '$fragment' does not resolve to exactly one renderer-active anchor in '$repositoryPath'."
+            continue
+        }
+
+        $lineFragment = [regex]::Match(
+            $fragment,
+            '^L(?<start>[1-9][0-9]*)(?:-L(?<end>[1-9][0-9]*))?$'
+        )
+        Assert-PostPublicationCondition $lineFragment.Success `
+            "same-repository non-Markdown fragment '$fragment' is not a canonical GitHub line fragment."
+        $startLine = [long]$lineFragment.Groups['start'].Value
+        $endLine = if ($lineFragment.Groups['end'].Success) {
+            [long]$lineFragment.Groups['end'].Value
+        }
+        else { $startLine }
+        $lineCount = if ($snapshotText.Length -eq 0) {
+            [long]0
+        }
+        else {
+            [long]([regex]::Split($snapshotText, "`r`n|`n|`r").Count)
+        }
+        if ($lineCount -gt 0 -and
+            ($snapshotText.EndsWith("`n") -or $snapshotText.EndsWith("`r"))) {
+            $lineCount--
+        }
+        Assert-PostPublicationCondition `
+            ($endLine -ge $startLine -and $endLine -le $lineCount) `
+            "same-repository line fragment '$fragment' is outside the $lineCount-line snapshot '$repositoryPath'."
+    }
 }
 
 function Get-Sha256Hex {
@@ -2451,6 +3417,10 @@ Assert-PostPublicationCondition ($pullRequest.merge_commit_sha -ceq $ExpectedCom
     'delivery pull request does not resolve to the exact released commit.'
 Assert-PostPublicationCondition ($pullRequest.base.ref -ceq $DefaultBranch) `
     'delivery pull request does not target the default branch.'
+Assert-PostPublicationCondition `
+    ([string]$pullRequest.head.sha -cmatch '^[0-9a-f]{40}$') `
+    'delivery pull request head is not an exact lowercase full SHA.'
+[void]$githubSurfaceAllowedBlobRefs.Add([string]$pullRequest.head.sha)
 $pullConversationComments = @(
     Invoke-GitHubPagedGet "issues/$PullRequestNumber/comments"
 )
@@ -2462,11 +3432,10 @@ $commitComments = @(
     Invoke-GitHubPagedGet "commits/$ExpectedCommit/comments"
 )
 
-$featureRecord = Invoke-GitHubGet "contents/$encodedFeaturePath`?ref=$ExpectedCommit"
-Assert-PostPublicationCondition ($featureRecord.encoding -ceq 'base64') `
-    'canonical feature record was not returned as base64 content.'
-$featureBytes = [Convert]::FromBase64String(($featureRecord.content -replace '\s', ''))
-$featureContent = [Text.Encoding]::UTF8.GetString($featureBytes)
+$featureSnapshot = Get-GitHubRepositoryContentSnapshot `
+    -Ref $ExpectedCommit -RepositoryPath $FeaturePath
+$featureContent = Get-GitHubRepositoryContentSnapshotText `
+    -Snapshot $featureSnapshot -Purpose 'canonical feature record'
 $featureLinkEvidence = Get-MarkdownLinkEvidence -Markdown $featureContent
 $decisionRow = [regex]::Match(
     $featureContent,
@@ -2512,23 +3481,61 @@ $issueUrl = "$webRoot/issues/$IssueNumber"
 $pullRequestUrl = "$webRoot/pull/$PullRequestNumber"
 $releaseUrl = "$webRoot/releases/tag/$Tag"
 $commitUrl = "$webRoot/commit/$ExpectedCommit"
-$featureUrl = "$webRoot/blob/$DefaultBranch/$FeaturePath"
-$decisionUrls = @($decisionPaths | ForEach-Object {
-    "$webRoot/blob/$DefaultBranch/$_"
+$featureUrl = "$webRoot/blob/$ExpectedCommit/$FeaturePath"
+$immutableFeatureUrl = $featureUrl
+$allowedFeatureUrls = @($githubSurfaceAllowedBlobRefs | ForEach-Object {
+    "$webRoot/blob/$_/$FeaturePath"
 })
+$decisionUrls = @($decisionPaths | ForEach-Object {
+    "$webRoot/blob/$ExpectedCommit/$_"
+})
+$immutableDecisionUrls = @($decisionUrls)
 $decisionContents = @{}
 foreach ($decisionPath in $decisionPaths) {
-    $encodedDecisionPath = ConvertTo-ApiPath $decisionPath
-    $decisionRecord = Invoke-GitHubGet `
-        "contents/$encodedDecisionPath`?ref=$ExpectedCommit"
-    Assert-PostPublicationCondition ($decisionRecord.encoding -ceq 'base64') `
-        "canonical decision '$decisionPath' was not returned as base64 content."
-    $decisionBytes = [Convert]::FromBase64String(
-        ([string]$decisionRecord.content -replace '\s', '')
-    )
-    $decisionContents[$decisionPath] = [Text.Encoding]::UTF8.GetString(
-        $decisionBytes
-    )
+    $decisionSnapshot = Get-GitHubRepositoryContentSnapshot `
+        -Ref $ExpectedCommit -RepositoryPath $decisionPath
+    $decisionContents[$decisionPath] =
+        Get-GitHubRepositoryContentSnapshotText `
+            -Snapshot $decisionSnapshot `
+            -Purpose "canonical decision '$decisionPath'"
+}
+$featureDirectory = $FeaturePath.Substring(
+    0,
+    $FeaturePath.LastIndexOf('/') + 1
+)
+$testRow = [regex]::Match(
+    $featureContent,
+    '(?m)^\|\s*Tests?\s*\|(?<value>.*?)\|\s*$'
+)
+$testDocumentPathSet = [Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::Ordinal
+)
+[void]$testDocumentPathSet.Add("${featureDirectory}test-cases.md")
+if ($testRow.Success) {
+    foreach ($testLink in @($featureLinkEvidence.Links | Where-Object {
+        $_.Index -ge $testRow.Index -and
+            $_.Index -lt ($testRow.Index + $testRow.Length)
+    })) {
+        $linkedTestPath = Resolve-RepositoryDocumentPath `
+            -SourceRepositoryPath $FeaturePath `
+            -Target ([string]$testLink.Target)
+        if (-not [string]::IsNullOrEmpty($linkedTestPath) -and
+            $linkedTestPath.EndsWith('.md', [StringComparison]::Ordinal)) {
+            [void]$testDocumentPathSet.Add($linkedTestPath)
+        }
+    }
+}
+Assert-PostPublicationCondition ($testDocumentPathSet.Count -le 32) `
+    'canonical feature links more than the bounded 32 test documents.'
+$testDocumentPaths = @($testDocumentPathSet | Sort-Object)
+$testDocumentContents = @{}
+foreach ($testDocumentPath in $testDocumentPaths) {
+    $testDocumentSnapshot = Get-GitHubRepositoryContentSnapshot `
+        -Ref $ExpectedCommit -RepositoryPath $testDocumentPath
+    $testDocumentContents[$testDocumentPath] =
+        Get-GitHubRepositoryContentSnapshotText `
+            -Snapshot $testDocumentSnapshot `
+            -Purpose "canonical test document '$testDocumentPath'"
 }
 $titleTargetCandidates = @{}
 $documentTitleSources = @(
@@ -2537,6 +3544,11 @@ $documentTitleSources = @(
     [pscustomobject]@{
         Content = [string]$decisionContents[$decisionPaths[$index]]
         Target = $decisionUrls[$index]
+    }
+}) + @($testDocumentPaths | ForEach-Object {
+    [pscustomobject]@{
+        Content = [string]$testDocumentContents[$_]
+        Target = "$webRoot/blob/$ExpectedCommit/$_"
     }
 })
 foreach ($source in $documentTitleSources) {
@@ -2572,46 +3584,47 @@ $expectedRecordTargets = @{
 }
 foreach ($ownedId in $featureOwnedIds) {
     if (-not $expectedRecordTargets.ContainsKey($ownedId)) {
-        $expectedRecordTargets[$ownedId] = $featureUrl
+        $expectedRecordTargets[$ownedId] =
+            "$immutableFeatureUrl#$($ownedId.ToLowerInvariant())"
     }
 }
 foreach ($index in 0..($decisionPaths.Count - 1)) {
     if ($decisionPaths.Count -eq 0) { break }
     foreach ($decisionOwnedId in Get-CanonicalDocumentOwnedIds `
         -Markdown ([string]$decisionContents[$decisionPaths[$index]])) {
+        $decisionId = [regex]::Match(
+            $decisionPaths[$index],
+            '(?:^|/)(?<id>DEC-\d{4})-'
+        ).Groups['id'].Value
+        $decisionTarget = if ($decisionOwnedId -ceq $decisionId) {
+            $decisionUrls[$index]
+        }
+        else {
+            "$($immutableDecisionUrls[$index])#$($decisionOwnedId.ToLowerInvariant())"
+        }
         Assert-PostPublicationCondition `
             (-not $expectedRecordTargets.ContainsKey($decisionOwnedId) -or
                 [string]$expectedRecordTargets[$decisionOwnedId] -ceq
-                    $decisionUrls[$index]) `
+                    $decisionTarget) `
             "canonical record identity $decisionOwnedId has conflicting document targets."
-        $expectedRecordTargets[$decisionOwnedId] = $decisionUrls[$index]
+        $expectedRecordTargets[$decisionOwnedId] = $decisionTarget
     }
 }
 if (-not [string]::IsNullOrEmpty($issuePrimaryId) -and
     -not $expectedRecordTargets.ContainsKey($issuePrimaryId)) {
     $expectedRecordTargets[$issuePrimaryId] = $issueUrl
 }
-$testRow = [regex]::Match(
-    $featureContent,
-    '(?m)^\|\s*Tests?\s*\|(?<value>.*?)\|\s*$'
-)
-if ($testRow.Success) {
-    $featureDirectory = $FeaturePath.Substring(
-        0,
-        $FeaturePath.LastIndexOf('/') + 1
-    )
-    $featureTestUrl =
-        "$webRoot/blob/$DefaultBranch/${featureDirectory}test-cases.md"
-    foreach ($testLink in @($featureLinkEvidence.Links | Where-Object {
-        $_.Index -ge $testRow.Index -and
-            $_.Index -lt ($testRow.Index + $testRow.Length)
-    })) {
-        foreach ($testId in @([regex]::Matches(
-            [string]$testLink.Label,
-            '(?<![A-Za-z0-9_-])TEST-\d{4}(?![A-Za-z0-9_-])'
-        ) | ForEach-Object { $_.Value } | Select-Object -Unique)) {
-            $expectedRecordTargets[$testId] = $featureTestUrl
-        }
+foreach ($testDocumentPath in $testDocumentPaths) {
+    $testDocumentUrl = "$webRoot/blob/$ExpectedCommit/$testDocumentPath"
+    foreach ($testId in @(Get-CanonicalDocumentOwnedIds `
+        -Markdown ([string]$testDocumentContents[$testDocumentPath]) |
+        Where-Object { $_ -cmatch '^TEST-\d{4}$' })) {
+        $testTarget = "$testDocumentUrl#$($testId.ToLowerInvariant())"
+        Assert-PostPublicationCondition `
+            (-not $expectedRecordTargets.ContainsKey($testId) -or
+                [string]$expectedRecordTargets[$testId] -ceq $testTarget) `
+            "canonical record identity $testId has conflicting document targets."
+        $expectedRecordTargets[$testId] = $testTarget
     }
 }
 $issueOwnTitles = @(Get-OwnSurfaceTitles `
@@ -2732,9 +3745,10 @@ for ($index = 0; $index -lt $commitComments.Count; $index++) {
         -RequireAbsoluteTargets
 }
 Assert-PostPublicationCondition `
-    (Test-MarkdownCollectionContainsExactVisibleUri `
-        -MarkdownItems $issueMarkdownBodies -ExpectedUri $featureUrl) `
-    'delivery issue does not link the canonical feature record on the default branch.'
+    (Test-MarkdownCollectionContainsAnyExactVisibleUri `
+        -MarkdownItems $issueMarkdownBodies `
+        -ExpectedUris $allowedFeatureUrls) `
+    'delivery issue does not link the canonical feature record at an allowed immutable commit.'
 Assert-PostPublicationCondition `
     (Test-MarkdownCollectionContainsExactVisibleUri `
         -MarkdownItems $issueMarkdownBodies `
@@ -2745,13 +3759,17 @@ Assert-PostPublicationCondition `
         -MarkdownItems $pullRequestBodies -ExpectedUri $issueUrl) `
     'delivery pull request does not link its delivery issue.'
 Assert-PostPublicationCondition `
-    (Test-MarkdownCollectionContainsExactVisibleUri `
-        -MarkdownItems $pullRequestBodies -ExpectedUri $featureUrl) `
-    'delivery pull request does not link the canonical feature record on the default branch.'
+    (Test-MarkdownCollectionContainsAnyExactVisibleUri `
+        -MarkdownItems $pullRequestBodies `
+        -ExpectedUris $allowedFeatureUrls) `
+    'delivery pull request does not link the canonical feature record at an allowed immutable commit.'
 foreach ($index in 0..($decisionPaths.Count - 1)) {
     if ($decisionPaths.Count -eq 0) { break }
     $decisionPath = $decisionPaths[$index]
     $decisionUrl = $decisionUrls[$index]
+    $allowedDecisionUrls = @($githubSurfaceAllowedBlobRefs | ForEach-Object {
+        "$webRoot/blob/$_/$decisionPath"
+    })
     $decisionContent = [string]$decisionContents[$decisionPath]
     $decisionId = [regex]::Match(
         $decisionPath,
@@ -2776,14 +3794,14 @@ foreach ($index in 0..($decisionPaths.Count - 1)) {
         -ExpectedRecordTitles $decisionExpectedTitles `
         -SourceRepositoryPath $decisionPath
     Assert-PostPublicationCondition `
-        (Test-MarkdownCollectionContainsExactVisibleUri `
+        (Test-MarkdownCollectionContainsAnyExactVisibleUri `
             -MarkdownItems $issueMarkdownBodies `
-            -ExpectedUri $decisionUrl) `
+            -ExpectedUris $allowedDecisionUrls) `
         "delivery issue does not link canonical decision '$decisionPath'."
     Assert-PostPublicationCondition `
-        (Test-MarkdownCollectionContainsExactVisibleUri `
+        (Test-MarkdownCollectionContainsAnyExactVisibleUri `
             -MarkdownItems $pullRequestBodies `
-            -ExpectedUri $decisionUrl) `
+            -ExpectedUris $allowedDecisionUrls) `
         "delivery pull request does not link canonical decision '$decisionPath'."
 }
 Assert-PostPublicationCondition `
@@ -2794,6 +3812,8 @@ Assert-PostPublicationCondition `
     (Test-MarkdownCollectionContainsExactVisibleUri `
         -MarkdownItems $issueCommentBodies -ExpectedUri $commitUrl) `
     'delivery issue does not contain the exact released commit link.'
+
+Assert-GitHubSurfaceRepositoryContentTargets
 
 # Keep the larger asset downloads last so inexpensive metadata and governance
 # failures stop before consuming release bandwidth.

@@ -24,7 +24,7 @@
 
 ## Verification authority
 
-- [TEST-0111](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), [TEST-0112](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), [TEST-0113](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md), and [TEST-0114](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md)
+- [TEST-0111](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0111), [TEST-0112](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0112), [TEST-0113](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0113), and [TEST-0114](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0114)
   own automatic tracking, legacy finalization, repeat-launch routing, and
   version-neutral consumer evidence.
 - The feature record owns local focused/full-suite and bounded-review evidence.

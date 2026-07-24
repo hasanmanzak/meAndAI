@@ -50,10 +50,10 @@
 
 ## Evidence state
 
-- [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md)
+- [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0119), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0120), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0122)
   define the project-neutral state-based regression, negative/atomic engine matrix,
   single-draft lifecycle, and generic pre-engine handoff.
-- Focused [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md) evidence passes, including cumulative
+- Focused [TEST-0119](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0119), [TEST-0120](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0120), [TEST-0121](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121), and [TEST-0122](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0122) evidence passes, including cumulative
   catalog removal/rewrite negatives, linked-leaf containment, rollback,
   one-draft engine-era updates, generic pre-engine handoff, and independent
   schema-2 merge-finalization recomputation.

@@ -36,6 +36,6 @@ body:
     id: references
     attributes:
       label: Related records
-      description: Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+      description: Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
     validations:
       required: true

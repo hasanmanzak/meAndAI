@@ -8,7 +8,7 @@
 | Delivery and external evidence authority | [#101](https://github.com/hasanmanzak/meAndAI/issues/101) |
 | Pull request | [#100](https://github.com/hasanmanzak/meAndAI/pull/100) |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md), [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
-| Tests | [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md) |
+| Tests | [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162) |
 
 ## Problem
 
@@ -99,10 +99,10 @@ envelope, semantic capability catalog, and consumer ledger remain unchanged.
 ### Released baseline
 
 - Immutable baseline: [v0.13.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.0),
-  merge commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`.
+  merge commit [`299b8982cd57961e2b3a6136b07af3bfb49a16d1`](https://github.com/hasanmanzak/meAndAI/commit/299b8982cd57961e2b3a6136b07af3bfb49a16d1).
 - Exact-tree candidate run:
   [29921546402](https://github.com/hasanmanzak/meAndAI/actions/runs/29921546402),
-  head `88005e5b7b0b095044197d2c5513f2cd708faeec`. The merge tree is byte-identical
+  head [`88005e5b7b0b095044197d2c5513f2cd708faeec`](https://github.com/hasanmanzak/meAndAI/commit/88005e5b7b0b095044197d2c5513f2cd708faeec). The merge tree is byte-identical
   to that tested head, and exact-main run
   [29923220827](https://github.com/hasanmanzak/meAndAI/actions/runs/29923220827)
   independently accepted the exact validated-tree reuse route.
@@ -249,11 +249,11 @@ The production correction applies to
 `instruction-graph-discovery.tests.ps1` deliberately do not call the
 production reader to calculate expected evidence. `SUBF-0079` replaced their
 material per-blob subprocess loops with separate test-owned binary batch
-readers in commit `55764442820c884e8c3115726bb010a0a9004d77`; this preserves
+readers in commit [`55764442820c884e8c3115726bb010a0a9004d77`](https://github.com/hasanmanzak/meAndAI/commit/55764442820c884e8c3115726bb010a0a9004d77); this preserves
 expected-side independence and does not count as production process reduction.
 The shared full-HEAD fixture returned the same graph digest under PowerShell 7
 and Windows PowerShell 5.1 for 178 parsed blobs and 1,371,315 parsed bytes.
-[TEST-0161](test-cases.md) continues to inventory this test work separately from the production
+[TEST-0161](test-cases.md#test-0161) continues to inventory this test work separately from the production
 operation ratchet.
 
 ### Prior local timing dispositions
@@ -274,25 +274,25 @@ observer and final tree-identical run above.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md) |
-| Test code | Expected red complete | [TEST-0161](test-cases.md) reports exactly six missing batch-contract findings in 146.507 seconds with [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) intact; [TEST-0162](test-cases.md) reports 25 schema-2/batch-ratchet findings in 8.3 seconds without parse/null failure; final `StructureOnly` accepts both canonical owners |
+| Scenarios | Defined | [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162) |
+| Test code | Expected red complete | [TEST-0161](test-cases.md#test-0161) reports exactly six missing batch-contract findings in 146.507 seconds with [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) intact; [TEST-0162](test-cases.md#test-0162) reports 25 schema-2/batch-ratchet findings in 8.3 seconds without parse/null failure; final `StructureOnly` accepts both canonical owners |
 | Baseline run | Complete | Exact released hosted/tree timings plus per-actor observer identity, 175 process/request baseline, and process-start maximum 1 are frozen |
 
 ### Implementation evidence
 
-- Commit `78c8706e9d4d4f4c020d983b22114165687b475e` implements the two
+- Commit [`78c8706e9d4d4f4c020d983b22114165687b475e`](https://github.com/hasanmanzak/meAndAI/commit/78c8706e9d4d4f4c020d983b22114165687b475e) implements the two
   actor-local lazy binary batch transports and the schema-2 operation ratchet.
-  [TEST-0161](test-cases.md) passed under PowerShell 7 in 84.1 seconds and Windows PowerShell
+  [TEST-0161](test-cases.md#test-0161) passed under PowerShell 7 in 84.1 seconds and Windows PowerShell
   5.1 in 147.6 seconds. Both runs observed exactly two of two allowed batch
   process starts and four of four required blob requests across the quick and
   hosted actors.
-- Commit `55764442820c884e8c3115726bb010a0a9004d77` converts the three
+- Commit [`55764442820c884e8c3115726bb010a0a9004d77`](https://github.com/hasanmanzak/meAndAI/commit/55764442820c884e8c3115726bb010a0a9004d77) converts the three
   independent expected-graph readers to separate test-owned batch sessions.
   The full-HEAD identity fixture passed under PowerShell 7 in 22.2 seconds and
   Windows PowerShell 5.1 in 34.8 seconds with identical digest
   `d0a03bde53b7652706059b5faf74ad9f748da9c0a3401df44eeea6ee365fe091`,
   178 parsed blobs, and 1,371,315 parsed bytes.
-- [TEST-0162](test-cases.md) passed under PowerShell 7 in 5.3 seconds and Windows PowerShell
+- [TEST-0162](test-cases.md#test-0162) passed under PowerShell 7 in 5.3 seconds and Windows PowerShell
   5.1 in 6.5 seconds. Structural validation passed in 4.8 seconds. Supporting
   source dispatch, bundle, final quick closure, and local hosted-bootstrap
   vertical-slice
@@ -300,16 +300,16 @@ observer and final tree-identical run above.
 - The immutable actor boundary is deterministically reduced from 175 blob
   processes and 175 requests to one process and the same 175 requests per
   positive acquisition. No wall-clock improvement is claimed: the local
-  Windows PowerShell 5.1 [TEST-0161](test-cases.md) result, 147.6 seconds, is above the
+  Windows PowerShell 5.1 [TEST-0161](test-cases.md#test-0161) result, 147.6 seconds, is above the
   immutable hosted observation of 130.214 seconds and the environments are not
   interchangeable.
 - `WindowsNative` passed in 343.0 seconds; its streaming owner took 6.493
   seconds and its quick-adoption owner took 331.854 seconds. The Windows
   PowerShell 5.1 Full profile passed in 1,306.9 seconds. Its largest owners
   were quick adoption at 742.281 seconds, hosted bootstrap at 253.297 seconds,
-  and instruction-graph discovery at 145.462 seconds; [TEST-0161](test-cases.md) again emitted
+  and instruction-graph discovery at 145.462 seconds; [TEST-0161](test-cases.md#test-0161) again emitted
   exact `2/2` process and `4/4` request observations.
-- The post-Full regression correction added exact [TEST-0162](test-cases.md) ownership for the
+- The post-Full regression correction added exact [TEST-0162](test-cases.md#test-0162) ownership for the
   third independent expected-graph reader: exactly one local
   `cat-file --batch` and no `cat-file blob` inside
   `Get-TestCommittedGraphFixture`. Focused PS5.1 and PS7 confirmations passed
@@ -322,10 +322,10 @@ observer and final tree-identical run above.
 - The `FIND-0206` correction reuses the existing self-HEAD fixture under an
   explicit preamble-bearing ambient encoding, captures the independent
   reader's raw stdin under UTF-8 without a BOM, restores ambient encoding, and
-  makes one [TEST-0162](test-cases.md) source-contract helper guard both test-owned batch
-  readers. After AST-scoped guard review, [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0161](test-cases.md) passed under
+  makes one [TEST-0162](test-cases.md#test-0162) source-contract helper guard both test-owned batch
+  readers. After AST-scoped guard review, [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) and [TEST-0161](test-cases.md#test-0161) passed under
   PS5.1 and PS7 in 163.6 and 97.7 seconds with exact `2/2` process and `4/4`
-  request observations; [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md) and [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md) and [TEST-0162](test-cases.md) passed in 9.2 and 8.5 seconds.
+  request observations; [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158) and [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) and [TEST-0162](test-cases.md#test-0162) passed in 9.2 and 8.5 seconds.
 - Hosted Windows/Linux jobs, the pull request, merge, and immutable release
   evidence remain pending external delivery facts.
 
@@ -333,16 +333,16 @@ observer and final tree-identical run above.
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0190` | Evidence integrity | Lower process count removes material real-Git, security, recovery, or exact-blob evidence | Test maintainer / preserve scenario authority and evidence-level inventory; retain representative real-Git adapter parity in [TEST-0161](test-cases.md) and complete compatibility closure in [TEST-0162](test-cases.md) |
-| `RISK-0191` | Cross-runtime and process correctness | Batch framing misreads binary bytes, deadlocks, leaks, reorders, buffers stderr without bound, or diverges across PS5/PS7 | Git actor owners / byte framing, exact OID/type/size/hash checks, common deadline, concurrent bounded stderr drain, private virtual-clock/transport seam, fault cleanup, malformed/truncated/non-zero/hung-child variants, and cross-runtime execution |
-| `RISK-0192` | Measurement and topology validity | Observer cost, host noise, hidden fan-out, or mixed baseline identity creates a false improvement | Workflow/test-runtime owner / exact release/tree/observer/route identities, deterministic counts as gates, unchanged topology, and elapsed time as observation only |
+| `RISK-0190` <a name="risk-0190"></a> | Evidence integrity | Lower process count removes material real-Git, security, recovery, or exact-blob evidence | Test maintainer / preserve scenario authority and evidence-level inventory; retain representative real-Git adapter parity in [TEST-0161](test-cases.md#test-0161) and complete compatibility closure in [TEST-0162](test-cases.md#test-0162) |
+| `RISK-0191` <a name="risk-0191"></a> | Cross-runtime and process correctness | Batch framing misreads binary bytes, deadlocks, leaks, reorders, buffers stderr without bound, or diverges across PS5/PS7 | Git actor owners / byte framing, exact OID/type/size/hash checks, common deadline, concurrent bounded stderr drain, private virtual-clock/transport seam, fault cleanup, malformed/truncated/non-zero/hung-child variants, and cross-runtime execution |
+| `RISK-0192` <a name="risk-0192"></a> | Measurement and topology validity | Observer cost, host noise, hidden fan-out, or mixed baseline identity creates a false improvement | Workflow/test-runtime owner / exact release/tree/observer/route identities, deterministic counts as gates, unchanged topology, and elapsed time as observation only |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0078` | Actor-local lazy binary-safe batch transport, exact parity, and operation ratchet | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [TEST-0161](test-cases.md); PS7 84.1s, PS5.1 147.6s and Full 145.462s; process 2/2 and request 4/4 | Framing, lifecycle, budget, hashing, parity, cleanup, and final transport review complete | Complete; hosted confirmation pending externally |
-| `SUBF-0079` | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [TEST-0162](test-cases.md); PS7/PS5.1 focused, BOM-ambient, and post-review confirmations, WindowsNative 343.0s, Full 1,306.9s | Independent-reader framing correction, complete four-owner transport inventory, cross-runtime review, and bounded local convergence complete | Complete; replacement hosted delivery evidence pending externally |
+| `SUBF-0078` <a name="subf-0078"></a> | Actor-local lazy binary-safe batch transport, exact parity, and operation ratchet | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [TEST-0161](test-cases.md#test-0161); PS7 84.1s, PS5.1 147.6s and Full 145.462s; process 2/2 and request 4/4 | Framing, lifecycle, budget, hashing, parity, cleanup, and final transport review complete | Complete; hosted confirmation pending externally |
+| `SUBF-0079` <a name="subf-0079"></a> | Cross-runtime, scenario-authority, version, hosted topology, and measured closure | [Issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [TEST-0162](test-cases.md#test-0162); PS7/PS5.1 focused, BOM-ambient, and post-review confirmations, WindowsNative 343.0s, Full 1,306.9s | Independent-reader framing correction, complete four-owner transport inventory, cross-runtime review, and bounded local convergence complete | Complete; replacement hosted delivery evidence pending externally |
 
 ## Decisions and relationships
 
@@ -375,7 +375,7 @@ feature and require a new decision.
 - [x] Consumers, dependencies, decisions, capability boundary, and risks are identified.
 - [x] `RISK-0190` through `RISK-0192` have owners and required evidence.
 - [x] Two dependency-ordered reviewable slices and gates are defined.
-- [x] [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md) plus the bounded verification approach are defined.
+- [x] [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162) plus the bounded verification approach are defined.
 - [x] Exact v0.13.0 process/request baseline, observer identity, and strictly lower target are frozen.
 - [x] Expected-red executable test authority exists and fails only for the missing batch/schema-2 contracts; structural ownership is green.
 
@@ -402,7 +402,7 @@ feature and require a new decision.
 7. Deterministic operation ratchets reject a restored per-blob process, an
    undeclared alternate Git path, a missing observation, or a budget increase
    before canonical success publication.
-8. Every active `TEST-NNNN` authority, including [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), and [TEST-0154](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0155](../FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md) and [TEST-0156](../FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md), and [TEST-0157](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md), [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md), and [TEST-0160](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md), and every representative security/recovery/TOCTOU/link/native
+8. Every active `TEST-NNNN` authority, including [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151), [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152), [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153), and [TEST-0154](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154), [TEST-0155](../FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md#test-0155) and [TEST-0156](../FEAT-0038-v0127-api-safe-merge-finalization/test-cases.md#test-0156), and [TEST-0157](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0157), [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), and [TEST-0160](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0160), and every representative security/recovery/TOCTOU/link/native
    evidence slice remains active.
 9. Focused PS5 and PS7, Linux and Windows hosted jobs, `WindowsNative`, one Full
    suite, structural validation, and the unchanged one-Windows/one-Ubuntu
@@ -414,7 +414,7 @@ feature and require a new decision.
 ## Verification approach
 
 1. Freeze the released-tree process/request measurement and observer identity.
-2. Register [TEST-0161](test-cases.md)/[TEST-0162](test-cases.md), add focused batch-lifecycle and operation-
+2. Register [TEST-0161](test-cases.md#test-0161)/[TEST-0162](test-cases.md#test-0162), add focused batch-lifecycle and operation-
    ratchet tests, and record one expected-red run before production changes.
 3. Implement and review `SUBF-0078`; run its focused owner once after the
    planned red and once after remediation.
@@ -432,7 +432,7 @@ Planning review confirms that the selected correction stays in the two Git
 actors, retains [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md)'s pure-policy separation, does not append or rewrite a
 semantic capability, and does not introduce the cache/service/fan-out patterns
 excluded by [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98). The first `StructureOnly` run produced exactly the
-planned [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md) missing-authority findings and no unrelated
+planned [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162) missing-authority findings and no unrelated
 problem. Independent review required exact route/counter units, a bounded
 deadline test seam, replace-object coverage, and explicit issue-timing
 dispositions; the contracts above resolve those planning findings without
@@ -460,7 +460,7 @@ changed PowerShell files parsed, normalized actor factories matched, local
 links and `git diff --check origin/main` passed, and the confirmation found no
 unresolved `Blocking` finding. The pre-delivery audit then found `FIND-0205`:
 [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) could not remain the open `FIND-0204` owner and also satisfy the
-closed-delivery-issue contract in [TEST-0065](../FEAT-0011-stability-closure/test-cases.md). [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) now owns delivery and
+closed-delivery-issue contract in [TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065). [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) now owns delivery and
 publication evidence while [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) remains open for the residual; the
 correction changes no runtime behavior or test topology.
 
@@ -468,23 +468,23 @@ The first exact-head hosted candidate then exposed `FIND-0206`. The Ubuntu job
 passed, while Windows PowerShell 5.1 inherited a BOM-emitting stdin encoding in
 the independent self-HEAD reader and corrupted its first raw Git request. The
 same transport invariant already protected both production actors, but the
-earlier [TEST-0162](test-cases.md) addition guarded the third reader only against per-blob
+earlier [TEST-0162](test-cases.md#test-0162) addition guarded the third reader only against per-blob
 process restoration. The correction inventories all four repository-owned
-batch transports: [TEST-0161](test-cases.md) retains production source and preamble-bearing
-runtime coverage, while one reusable [TEST-0162](test-cases.md) source contract now covers both
-test-owned readers and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) runs the existing self-HEAD fixture under a
+batch transports: [TEST-0161](test-cases.md#test-0161) retains production source and preamble-bearing
+runtime coverage, while one reusable [TEST-0162](test-cases.md#test-0162) source contract now covers both
+test-owned readers and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) runs the existing self-HEAD fixture under a
 preamble-bearing ambient encoding. No new fixture, production behavior, graph
 policy, or hosted fan-out was added.
 
 | ID | Classification / disposition | Dependencies | Priority / severity / impact / confidence | Evidence, affected scope, and impact | Recommended action / status | Links |
 | --- | --- | --- | --- | --- | --- | --- |
-| `FIND-0200` | Test-coverage defect / `Blocking` | None | `p1` / medium / high / high | [TEST-0162](test-cases.md) guarded the quick and bootstrap expected readers but not `Get-TestCommittedGraphFixture`; that third reader could have regressed to per-blob Git while production counters stayed green. | Require exactly one local `cat-file --batch` and zero `cat-file blob` in the sole function; PS5.1/PS7 focused and structural confirmations passed. / `Resolved` | `SUBF-0079`; [TEST-0162](test-cases.md) |
-| `FIND-0201` | Documentation-state defect / `Blocking` | `FIND-0200` | `p1` / medium / high / high | The temporary version-gate state used exact `Status | Complete` while the index, evidence, and DoD still said `WindowsNative`, Full, and convergence were pending. A committed candidate would have overstated closure. | Record the actual local gates, reconcile the index/subfeatures/test status/memory, and retain hosted/PR/release facts as external pending evidence. / `Resolved` | [TEST-0092](../FEAT-0014-v085-convergence/test-cases.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) |
-| `FIND-0202` | Cross-runtime concurrency risk / `OptionalImprovement` | None | `p3` / low / medium / medium | The Windows PowerShell 5.1 no-BOM stdin workaround briefly changes process-global `Console.InputEncoding` while each private actor captures redirected stdin. Supported actor paths start sessions serially, so no current call path races. | Preserve serial actor acquisition; require synchronization or a replacement capture mechanism before same-process parallel acquisition is introduced. / `OptionalImprovement` | `RISK-0191`; [TEST-0161](test-cases.md) |
-| `FIND-0203` | Test-runtime reliability risk / `OptionalImprovement` | None | `p3` / low / low / high | The deliberately independent self-HEAD expected reader uses synchronous, simplified test-only batch I/O. It is one exact-tree/hash-checked process, is outside production authority, and is now regression-guarded, but does not duplicate the production lifecycle machinery. | Retain independence; harden only if this exact reader exhibits a measured hang or leak. / `OptionalImprovement` | `SUBF-0079`; [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md) |
-| `FIND-0204` | Performance residual / `ExternalOrLegacyFollowUp` | None | `p2` / medium / medium / high | Local Full remained 1,306.9 seconds: quick adoption 742.281 seconds, hosted bootstrap 253.297 seconds, and graph discovery 145.462 seconds. Environments differ from immutable hosted evidence, so no regression or gain is inferred, but the Windows critical path remains material. | Keep elapsed time observational and continue lower faithful boundary work through [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) without weakening evidence or adding hosted fan-out. / `Open`, owned by [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0162](test-cases.md) |
-| `FIND-0205` | Publication-authority conflict / `Blocking` | `FIND-0204` | `p1` / medium / high / high | [TEST-0065](../FEAT-0011-stability-closure/test-cases.md) requires the canonical delivery issue to be closed after publication, while [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) must remain open as the explicit owner of FIND-0204. One issue could not satisfy both lifecycle contracts, so post-publication closure would fail or erase the residual owner. | Use [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) as the closeable FEAT-0040 delivery/publication authority and retain [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) solely for implementation history and residual runtime work; PS5.1 StructureOnly and the focused verifier fixture pass. / `Resolved` | [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0065](../FEAT-0011-stability-closure/test-cases.md) |
-| `FIND-0206` | Hosted cross-runtime test-transport defect / `Blocking` | None | `p1` / medium / high / high | Exact-head hosted run 29963388824 passed on Ubuntu but failed on Windows because `Get-TestCommittedGraphFixture` let PowerShell 5.1 prefix its first raw OID with a UTF-8 BOM. Earlier production and shared-test corrections had not extended the complete framing invariant to this independently implemented reader. | Capture and use its BOM-free raw stdin pipe, restore ambient encoding, reuse the self-HEAD fixture under a preamble-bearing ambient encoding, and apply one [TEST-0162](test-cases.md) framing guard to both test-owned readers; focused PS5.1/PS7 owners pass. / `Resolved locally`; replacement exact-head hosted evidence pending externally | [Run 29963388824](https://github.com/hasanmanzak/meAndAI/actions/runs/29963388824); [TEST-0161](test-cases.md) and [TEST-0162](test-cases.md); [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) |
+| `FIND-0200` <a name="find-0200"></a> | Test-coverage defect / `Blocking` | None | `p1` / medium / high / high | [TEST-0162](test-cases.md#test-0162) guarded the quick and bootstrap expected readers but not `Get-TestCommittedGraphFixture`; that third reader could have regressed to per-blob Git while production counters stayed green. | Require exactly one local `cat-file --batch` and zero `cat-file blob` in the sole function; PS5.1/PS7 focused and structural confirmations passed. / `Resolved` | `SUBF-0079`; [TEST-0162](test-cases.md#test-0162) |
+| `FIND-0201` <a name="find-0201"></a> | Documentation-state defect / `Blocking` | `FIND-0200` | `p1` / medium / high / high | The temporary version-gate state used exact `Status | Complete` while the index, evidence, and DoD still said `WindowsNative`, Full, and convergence were pending. A committed candidate would have overstated closure. | Record the actual local gates, reconcile the index/subfeatures/test status/memory, and retain hosted/PR/release facts as external pending evidence. / `Resolved` | [TEST-0092](../FEAT-0014-v085-convergence/test-cases.md#test-0092); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) |
+| `FIND-0202` <a name="find-0202"></a> | Cross-runtime concurrency risk / `OptionalImprovement` | None | `p3` / low / medium / medium | The Windows PowerShell 5.1 no-BOM stdin workaround briefly changes process-global `Console.InputEncoding` while each private actor captures redirected stdin. Supported actor paths start sessions serially, so no current call path races. | Preserve serial actor acquisition; require synchronization or a replacement capture mechanism before same-process parallel acquisition is introduced. / `OptionalImprovement` | `RISK-0191`; [TEST-0161](test-cases.md#test-0161) |
+| `FIND-0203` <a name="find-0203"></a> | Test-runtime reliability risk / `OptionalImprovement` | None | `p3` / low / low / high | The deliberately independent self-HEAD expected reader uses synchronous, simplified test-only batch I/O. It is one exact-tree/hash-checked process, is outside production authority, and is now regression-guarded, but does not duplicate the production lifecycle machinery. | Retain independence; harden only if this exact reader exhibits a measured hang or leak. / `OptionalImprovement` | `SUBF-0079`; [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162) |
+| `FIND-0204` <a name="find-0204"></a> | Performance residual / `ExternalOrLegacyFollowUp` | None | `p2` / medium / medium / high | Local Full remained 1,306.9 seconds: quick adoption 742.281 seconds, hosted bootstrap 253.297 seconds, and graph discovery 145.462 seconds. Environments differ from immutable hosted evidence, so no regression or gain is inferred, but the Windows critical path remains material. | Keep elapsed time observational and continue lower faithful boundary work through [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) without weakening evidence or adding hosted fan-out. / `Open`, owned by [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0162](test-cases.md#test-0162) |
+| `FIND-0205` <a name="find-0205"></a> | Publication-authority conflict / `Blocking` | `FIND-0204` | `p1` / medium / high / high | [TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065) requires the canonical delivery issue to be closed after publication, while [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) must remain open as the explicit owner of FIND-0204. One issue could not satisfy both lifecycle contracts, so post-publication closure would fail or erase the residual owner. | Use [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) as the closeable FEAT-0040 delivery/publication authority and retain [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) solely for implementation history and residual runtime work; PS5.1 StructureOnly and the focused verifier fixture pass. / `Resolved` | [Issue #101](https://github.com/hasanmanzak/meAndAI/issues/101); [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065) |
+| `FIND-0206` <a name="find-0206"></a> | Hosted cross-runtime test-transport defect / `Blocking` | None | `p1` / medium / high / high | Exact-head hosted run 29963388824 passed on Ubuntu but failed on Windows because `Get-TestCommittedGraphFixture` let PowerShell 5.1 prefix its first raw OID with a UTF-8 BOM. Earlier production and shared-test corrections had not extended the complete framing invariant to this independently implemented reader. | Capture and use its BOM-free raw stdin pipe, restore ambient encoding, reuse the self-HEAD fixture under a preamble-bearing ambient encoding, and apply one [TEST-0162](test-cases.md#test-0162) framing guard to both test-owned readers; focused PS5.1/PS7 owners pass. / `Resolved locally`; replacement exact-head hosted evidence pending externally | [Run 29963388824](https://github.com/hasanmanzak/meAndAI/actions/runs/29963388824); [TEST-0161](test-cases.md#test-0161) and [TEST-0162](test-cases.md#test-0162); [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101) |
 
 ## Definition of Done
 

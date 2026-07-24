@@ -6,7 +6,7 @@
 - Decision: [DEC-0023](../../../docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md)
 - Delivery and post-publication authority: [issue #89](https://github.com/hasanmanzak/meAndAI/issues/89)
 - Candidate version: `0.12.4`
-- State: [PR #90](https://github.com/hasanmanzak/meAndAI/pull/90) merged at `bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`;
+- State: [PR #90](https://github.com/hasanmanzak/meAndAI/pull/90) merged at [`bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`](https://github.com/hasanmanzak/meAndAI/commit/bb18a4ac697a9c1e07f26f9e26bfcc35643f9972);
   the focused [BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89) release-builder hotfix is locally validated. Its
   hotfix PR, hosted checks, merge, immutable release, live Derdini replay,
   superseded [PR #6](https://github.com/hasanmanzak/Derdini/pull/6), stale [issue #7](https://github.com/hasanmanzak/Derdini/issues/7), and branch/issue cleanup evidence remain
@@ -32,7 +32,7 @@
   GitHub API GET reads. [BUG-0019](https://github.com/hasanmanzak/meAndAI/issues/89) is corrected by UTF-8-no-BOM body-file
   transport and a fail-closed repair for only the exact historical
   quote-stripped schema-2 issue.
-- After [PR #90](https://github.com/hasanmanzak/meAndAI/pull/90) merged at `bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`,
+- After [PR #90](https://github.com/hasanmanzak/meAndAI/pull/90) merged at [`bb18a4ac697a9c1e07f26f9e26bfcc35643f9972`](https://github.com/hasanmanzak/meAndAI/commit/bb18a4ac697a9c1e07f26f9e26bfcc35643f9972),
   the first exact release build exposed [BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89): Windows PowerShell 5.1
   evaluated the builder's `$PSScriptRoot` parameter default before initializing
   it. The default is now resolved after binding only when `SourceRoot` is
@@ -40,11 +40,11 @@
 
 ## Focused evidence
 
-- Final [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md): Windows PowerShell 5.1 passed in 17.7 seconds.
-- Post-[BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89) [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md): Windows PowerShell 5.1 passed in 21.3 seconds,
+- Final [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147): Windows PowerShell 5.1 passed in 17.7 seconds.
+- Post-[BUG-0020](https://github.com/hasanmanzak/meAndAI/issues/89) [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147): Windows PowerShell 5.1 passed in 21.3 seconds,
   including a real child `powershell.exe -File` builder invocation without
   `SourceRoot` and byte equality with explicit-root builds.
-- [TEST-0148](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md) and [TEST-0149](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md): Windows PowerShell 5.1 passed together in 23.4
+- [TEST-0148](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0148) and [TEST-0149](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0149): Windows PowerShell 5.1 passed together in 23.4
   seconds, including repair of the stale v0.12.1 poisoned issue while targeting
   v0.12.4.
 - Focused publication-evidence verification passed in 1.7 seconds. The

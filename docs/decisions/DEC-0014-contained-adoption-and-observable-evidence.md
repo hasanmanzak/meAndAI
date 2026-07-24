@@ -62,7 +62,7 @@ these ownership boundaries.
    match their owning records. Closed issues do not retain an in-progress state;
    issues and pull requests link the canonical feature and decision; unresolved
    external [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) receives a durable active finding record. These changes
-   do not claim that [RISK-0076](../features/FEAT-0013-v084-correction/README.md) itself is resolved.
+   do not claim that [RISK-0076](../features/FEAT-0013-v084-correction/README.md#risk-0076) itself is resolved.
 8. **Validation remains finite.** Delivery uses one correction pass over the
    three declared slices, one fresh-diff self-review and complete suite, review
    branch and pull-request publication, and one fresh confirmation scan. A pass

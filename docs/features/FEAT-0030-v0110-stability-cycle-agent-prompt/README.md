@@ -8,7 +8,7 @@
 | Issue and post-publication authority | [#77](https://github.com/hasanmanzak/meAndAI/issues/77) |
 | Pull request | [#78](https://github.com/hasanmanzak/meAndAI/pull/78) |
 | Decisions | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md); [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
-| Tests | [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
+| Tests | [TEST-0131](test-cases.md#test-0131) and [TEST-0132](test-cases.md#test-0132) |
 
 ## Problem and intended outcome
 
@@ -80,9 +80,9 @@ final-push authority.
 
 | ID | Classification | Risk | Response and required evidence |
 | --- | --- | --- | --- |
-| `RISK-0135` | Autonomous-loop ambiguity | A reusable prompt is mistaken for a self-running goal | Explicit opt-in/non-scheduling contract and [TEST-0132](test-cases.md) |
-| `RISK-0136` | Authority expansion | The prompt assumes push or release authority | Report-only default, explicit publication mode, no-tag/release wording, and [TEST-0131](test-cases.md) |
-| `RISK-0137` | Normative drift | Prompt wording diverges from [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) | Section-bound structural assertions and direct authority links in [TEST-0131](test-cases.md) |
+| `RISK-0135` <a name="risk-0135"></a> | Autonomous-loop ambiguity | A reusable prompt is mistaken for a self-running goal | Explicit opt-in/non-scheduling contract and [TEST-0132](test-cases.md#test-0132) |
+| `RISK-0136` <a name="risk-0136"></a> | Authority expansion | The prompt assumes push or release authority | Report-only default, explicit publication mode, no-tag/release wording, and [TEST-0131](test-cases.md#test-0131) |
+| `RISK-0137` <a name="risk-0137"></a> | Normative drift | Prompt wording diverges from [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) | Section-bound structural assertions and direct authority links in [TEST-0131](test-cases.md#test-0131) |
 
 ## Readiness evidence
 
@@ -96,15 +96,15 @@ final-push authority.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
-| Test code | Passed | Repository structural suite owns and passes [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) |
-| Baseline run | Green inherited baseline | Existing [TEST-0096](../FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0097](../FEAT-0015-stability-consistency-mandate/test-cases.md), [TEST-0098](../FEAT-0015-stability-consistency-mandate/test-cases.md), and [TEST-0099](../FEAT-0015-stability-consistency-mandate/test-cases.md) prove the normative cycle |
+| Scenarios | Defined | [TEST-0131](test-cases.md#test-0131) and [TEST-0132](test-cases.md#test-0132) |
+| Test code | Passed | Repository structural suite owns and passes [TEST-0131](test-cases.md#test-0131) and [TEST-0132](test-cases.md#test-0132) |
+| Baseline run | Green inherited baseline | Existing [TEST-0096](../FEAT-0015-stability-consistency-mandate/test-cases.md#test-0096), [TEST-0097](../FEAT-0015-stability-consistency-mandate/test-cases.md#test-0097), [TEST-0098](../FEAT-0015-stability-consistency-mandate/test-cases.md#test-0098), and [TEST-0099](../FEAT-0015-stability-consistency-mandate/test-cases.md#test-0099) prove the normative cycle |
 
 ## Decomposition and review gate
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0055` | Optional prompt, index, consumer reachability, and structural contract | [Issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) | [TEST-0131](test-cases.md), [TEST-0132](test-cases.md); passed | Fidelity, authority, reachability, and no-activation diff; no open `Blocking` finding | Complete |
+| `SUBF-0055` <a name="subf-0055"></a> | Optional prompt, index, consumer reachability, and structural contract | [Issue #77](https://github.com/hasanmanzak/meAndAI/issues/77) | [TEST-0131](test-cases.md#test-0131), [TEST-0132](test-cases.md#test-0132); passed | Fidelity, authority, reachability, and no-activation diff; no open `Blocking` finding | Complete |
 
 ## Relationships
 
@@ -157,7 +157,7 @@ states now match the normative final-push boundary. Shared
 ## Definition of Done
 
 - [x] Acceptance criteria met in the focused structural scope.
-- [x] [TEST-0131](test-cases.md) and [TEST-0132](test-cases.md) have executable ownership and pass structure-only validation.
+- [x] [TEST-0131](test-cases.md#test-0131) and [TEST-0132](test-cases.md#test-0132) have executable ownership and pass structure-only validation.
 - [x] Fresh-diff review and bounded full-project convergence complete.
 - [x] Documentation, links, changelog, version, and memory agree.
 - [ ] Pull request, hosted checks, review, merge, branch cleanup, immutable

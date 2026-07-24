@@ -9,7 +9,7 @@
 | Maintainer disposition | [Accepted on 2026-07-21](https://github.com/hasanmanzak/meAndAI/issues/93#issuecomment-5033653638) |
 | Pull request | [#94](https://github.com/hasanmanzak/meAndAI/pull/94) (Merged) |
 | Decision | [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) (Accepted) |
-| Tests | [TEST-0151](test-cases.md), [TEST-0152](test-cases.md), [TEST-0153](test-cases.md), and [TEST-0154](test-cases.md) |
+| Tests | [TEST-0151](test-cases.md#test-0151), [TEST-0152](test-cases.md#test-0152), [TEST-0153](test-cases.md#test-0153), and [TEST-0154](test-cases.md#test-0154) |
 
 ## Problem
 
@@ -271,31 +271,31 @@ exact N/N+1 evidence; no published graph schema is being revised.
 
 | ID | Classification | Risk | Owner / response and evidence |
 | --- | --- | --- | --- |
-| `RISK-0171` | Discovery completeness | Linked authority omission causes false freshness or partial FullMigration closure | Protocol maintainer / recursive graph plus independent final closure in [TEST-0151](test-cases.md) and [TEST-0154](test-cases.md) |
-| `RISK-0172` | Authority classification | Ordinary product or architecture documentation is overclassified, or graph membership becomes mutation authority | Protocol maintainer / exact reachable-or-versioned-seed candidate universe, benign controls, evidence-only default, and [TEST-0151](test-cases.md) / [TEST-0154](test-cases.md) |
-| `RISK-0173` | Committed-state integrity | Worktree bytes or a moved base produce a graph different from the maintainer-authorized tree | Launcher/workflow maintainers / exact base tree/blob reads and graph rebinding in [TEST-0152](test-cases.md) / [TEST-0153](test-cases.md) |
-| `RISK-0174` | Path containment | Symlink, gitlink, reparse, path escape, case alias, or Unicode alias crosses the repository boundary | Protocol maintainer / no dereference, lexical resolution, alias rejection, and [TEST-0152](test-cases.md) |
-| `RISK-0175` | Resource exhaustion | Cycles, depth, node, edge, or byte volume consume unbounded resources | Protocol maintainer / visited set, inclusive release limits, N/N+1 fixtures, and [TEST-0151](test-cases.md) / [TEST-0152](test-cases.md) |
-| `RISK-0176` | Policy duplication | Launcher, workflow, and completion acquire divergent graph classifiers | Protocol maintainer / one pure contract authority, I/O-only adapters, structural duplicate-policy checks, and [TEST-0153](test-cases.md) |
-| `RISK-0177` | Compatibility and recovery | Graph schema/digest changes strand existing proposals or alter completed-consumer behavior | Lifecycle maintainer / prospective schemas, immutable legacy recovery, close-and-reassess, and [TEST-0153](test-cases.md) |
-| `RISK-0178` | Closure integrity | A bound base graph passes while unresolved/new final authority or protected-content mutation is published | Completion maintainer / independent final graph rebuild, closure predicate, exact protected-tree diff, and [TEST-0154](test-cases.md) |
+| `RISK-0171` <a name="risk-0171"></a> | Discovery completeness | Linked authority omission causes false freshness or partial FullMigration closure | Protocol maintainer / recursive graph plus independent final closure in [TEST-0151](test-cases.md#test-0151) and [TEST-0154](test-cases.md#test-0154) |
+| `RISK-0172` <a name="risk-0172"></a> | Authority classification | Ordinary product or architecture documentation is overclassified, or graph membership becomes mutation authority | Protocol maintainer / exact reachable-or-versioned-seed candidate universe, benign controls, evidence-only default, and [TEST-0151](test-cases.md#test-0151) / [TEST-0154](test-cases.md#test-0154) |
+| `RISK-0173` <a name="risk-0173"></a> | Committed-state integrity | Worktree bytes or a moved base produce a graph different from the maintainer-authorized tree | Launcher/workflow maintainers / exact base tree/blob reads and graph rebinding in [TEST-0152](test-cases.md#test-0152) / [TEST-0153](test-cases.md#test-0153) |
+| `RISK-0174` <a name="risk-0174"></a> | Path containment | Symlink, gitlink, reparse, path escape, case alias, or Unicode alias crosses the repository boundary | Protocol maintainer / no dereference, lexical resolution, alias rejection, and [TEST-0152](test-cases.md#test-0152) |
+| `RISK-0175` <a name="risk-0175"></a> | Resource exhaustion | Cycles, depth, node, edge, or byte volume consume unbounded resources | Protocol maintainer / visited set, inclusive release limits, N/N+1 fixtures, and [TEST-0151](test-cases.md#test-0151) / [TEST-0152](test-cases.md#test-0152) |
+| `RISK-0176` <a name="risk-0176"></a> | Policy duplication | Launcher, workflow, and completion acquire divergent graph classifiers | Protocol maintainer / one pure contract authority, I/O-only adapters, structural duplicate-policy checks, and [TEST-0153](test-cases.md#test-0153) |
+| `RISK-0177` <a name="risk-0177"></a> | Compatibility and recovery | Graph schema/digest changes strand existing proposals or alter completed-consumer behavior | Lifecycle maintainer / prospective schemas, immutable legacy recovery, close-and-reassess, and [TEST-0153](test-cases.md#test-0153) |
+| `RISK-0178` <a name="risk-0178"></a> | Closure integrity | A bound base graph passes while unresolved/new final authority or protected-content mutation is published | Completion maintainer / independent final graph rebuild, closure predicate, exact protected-tree diff, and [TEST-0154](test-cases.md#test-0154) |
 
 ## Test readiness
 
 | Test readiness | Current state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined and registered | [TEST-0151](test-cases.md), [TEST-0152](test-cases.md), [TEST-0153](test-cases.md), and [TEST-0154](test-cases.md) have canonical capability-owned executable owners |
+| Scenarios | Defined and registered | [TEST-0151](test-cases.md#test-0151), [TEST-0152](test-cases.md#test-0152), [TEST-0153](test-cases.md#test-0153), and [TEST-0154](test-cases.md#test-0154) have canonical capability-owned executable owners |
 | Test code | Locally complete | Graph, exact-Git acquisition, lifecycle identity, local and hosted-adapter closure, and test-architecture fixtures are present on `codex/feat-0037-instruction-graph-containment` |
 | Local evidence | Complete for the corrected parser and prior candidate | The corrected graph owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2; the local Windows execution of the complete hosted-adapter fixture passed in 316.2 seconds. Prior focused closure, capability-bootstrap `All`, quick-adoption `All`, `StructureOnly`, `WindowsNative`, and complete-suite evidence remains recorded in the test ledger |
-| Hosted evidence | Complete | Replacement checks passed before [PR #94](https://github.com/hasanmanzak/meAndAI/pull/94) merged at commit `6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e` |
+| Hosted evidence | Complete | Replacement checks passed before [PR #94](https://github.com/hasanmanzak/meAndAI/pull/94) merged at commit [`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`](https://github.com/hasanmanzak/meAndAI/commit/6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0070` | Canonical instruction-graph contract and deterministic discovery | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0151](test-cases.md), [TEST-0152](test-cases.md); corrected focused owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2 | Parser, lexical-path, culture, budget, cycle, reason, role, exact-validator, and cross-runtime physical-line findings were corrected and rerun | Locally complete |
-| `SUBF-0071` | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0153](test-cases.md); the local Windows execution of the corrected complete hosted-adapter fixture passed in 316.2 seconds; prior capability-bootstrap `All` and complete-suite evidence remains recorded | Trust-boundary, schema, drift, target dispatch, dynamic-module, and completed-proposal fixture findings were corrected and rerun | Complete |
-| `SUBF-0072` | Independent completion containment and authority closure | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0154](test-cases.md); final focused closure passed in 40.202 seconds, quick-adoption `All` passed in 948.236 seconds, and the complete suite reran it in 928.828 seconds | Fail-closed omission, canonical-retirement, protected-terminal, and out-of-envelope cases were corrected and rerun | Locally complete |
+| `SUBF-0070` <a name="subf-0070"></a> | Canonical instruction-graph contract and deterministic discovery | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0151](test-cases.md#test-0151), [TEST-0152](test-cases.md#test-0152); corrected focused owner passed in 168.6 seconds on Windows PowerShell 5.1 and 167.1 seconds on containerized PowerShell 7.4.2 | Parser, lexical-path, culture, budget, cycle, reason, role, exact-validator, and cross-runtime physical-line findings were corrected and rerun | Locally complete |
+| `SUBF-0071` <a name="subf-0071"></a> | Exact-base graph acquisition and lifecycle identity binding | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0153](test-cases.md#test-0153); the local Windows execution of the corrected complete hosted-adapter fixture passed in 316.2 seconds; prior capability-bootstrap `All` and complete-suite evidence remains recorded | Trust-boundary, schema, drift, target dispatch, dynamic-module, and completed-proposal fixture findings were corrected and rerun | Complete |
+| `SUBF-0072` <a name="subf-0072"></a> | Independent completion containment and authority closure | [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) | [TEST-0154](test-cases.md#test-0154); final focused closure passed in 40.202 seconds, quick-adoption `All` passed in 948.236 seconds, and the complete suite reran it in 928.828 seconds | Fail-closed omission, canonical-retirement, protected-terminal, and out-of-envelope cases were corrected and rerun | Locally complete |
 
 ## Decisions and relationships
 
@@ -371,11 +371,11 @@ exact N/N+1 evidence; no published graph schema is being revised.
 1. Add the capability-owned graph and lifecycle fixtures before production
    behavior and record the expected-red current path-only inventory and partial
    completion acceptance.
-2. Implement `SUBF-0070`, run [TEST-0151](test-cases.md)/[TEST-0152](test-cases.md), and perform one fresh-diff
+2. Implement `SUBF-0070`, run [TEST-0151](test-cases.md#test-0151)/[TEST-0152](test-cases.md#test-0152), and perform one fresh-diff
    contract/security review.
-3. Implement `SUBF-0071`, run [TEST-0153](test-cases.md) plus affected initial-adoption and
+3. Implement `SUBF-0071`, run [TEST-0153](test-cases.md#test-0153) plus affected initial-adoption and
    quick-launcher compatibility owners, and review schema/identity drift.
-4. Implement `SUBF-0072`, run [TEST-0154](test-cases.md), affected recovery/completion owners,
+4. Implement `SUBF-0072`, run [TEST-0154](test-cases.md#test-0154), affected recovery/completion owners,
    PowerShell 5.1/7 fixtures, and protected-tree checks.
 5. Run `tests/protocol.tests.ps1 -StructureOnly`, affected focused suites, the
    declared native compatibility profile, one complete suite, one fresh-diff
@@ -443,6 +443,6 @@ delivery gate rather than an unresolved local code finding.
 
 [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93) is the stable
 external evidence authority. [Pull request #94](https://github.com/hasanmanzak/meAndAI/pull/94) merged as
-`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e` on 2026-07-22. Immutable release
+[`6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e`](https://github.com/hasanmanzak/meAndAI/commit/6de31e0c318666bfa1fb884f2f5a791ecaf0fd3e) on 2026-07-22. Immutable release
 [v0.12.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.12.6) targets
 that exact commit, and the owned work branch is absent.

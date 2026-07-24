@@ -11,40 +11,51 @@ Last verified: **2026-07-24**
 - Default branch: `main`
 - Current protocol version: `0.14.2` candidate. Latest immutable release:
   [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1)
-  targets commit `f153e21a3098945a1b669563046f875ef6fb8b60`.
+  targets commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60).
   [PR #113](https://github.com/hasanmanzak/meAndAI/pull/113) and
   [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) retain its
   hosted, merge, release, asset, cleanup, and post-publication evidence.
 - Current scope: [FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md),
   [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114),
-  [SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md), and
-  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) govern the
+  [BUG-0030](https://github.com/hasanmanzak/meAndAI/issues/116),
+  [SUBF-0089](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089),
+  [SUBF-0090](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090),
+  [SUBF-0091](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091),
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and
+  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) govern the
   v0.14.2 correction on `codex/bug-0029-clickable-cross-references`.
-  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md)
-  owns the direct rule, exact-target, generated-surface, and historical-debt
-  regression evidence.
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+  [TEST-0176](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176),
+  [TEST-0177](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  passed their local direct-link, exact embedded-record fragment,
+  historical-snapshot, and commit-permalink regressions across repository and
+  GitHub text surfaces. Exact-head hosted and live-reconciliation evidence
+  remains external under [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114),
+  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116), and
+  [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
-- Recent historical work: immutable v0.13.4 completed [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md), [SUBF-0082](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md),
-  [TEST-0167](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md), [TEST-0168](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md), [RISK-0201](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md), and [RISK-0202](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md). [FEAT-0044](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) defines
-  [SUBF-0083](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md), [SUBF-0084](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md), [TEST-0169](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md), [TEST-0170](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md), [RISK-0203](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md), [RISK-0204](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md), [RISK-0205](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md), and [RISK-0206](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md).
+- Recent historical work: immutable v0.13.4 completed [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md), [SUBF-0082](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#subf-0082),
+  [TEST-0167](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0167), [TEST-0168](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168), [RISK-0201](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#risk-0201), and [RISK-0202](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#risk-0202). [FEAT-0044](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) defines
+  [SUBF-0083](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#subf-0083), [SUBF-0084](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#subf-0084), [TEST-0169](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md#test-0169), [TEST-0170](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md#test-0170), [RISK-0203](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#risk-0203), [RISK-0204](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#risk-0204), [RISK-0205](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#risk-0205), and [RISK-0206](../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md#risk-0206).
   The external failures are retained by Derdini runs 30011058590,
   30011059451, and 30011271796.
 - Historical v0.9.0 delivery: [FEAT-0015](../../docs/features/FEAT-0015-stability-consistency-mandate/README.md)
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
   [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48).
-- Open external follow-up: [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) / [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md) is tracked by
+- Open external follow-up: [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) / [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md#risk-0076) is tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). [Issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) remains the historical [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md) delivery and publication authority.
 - Historical v0.8.6 delivery: immutable release
   [`v0.8.6`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.6)
-  targets commit `a3d58a9cee00b9914c40adcd8e93dff53bed235a` and closed
-  [FIND-0132](../../docs/features/FEAT-0014-v085-convergence/README.md); [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) remains its external publication authority.
+  targets commit [`a3d58a9cee00b9914c40adcd8e93dff53bed235a`](https://github.com/hasanmanzak/meAndAI/commit/a3d58a9cee00b9914c40adcd8e93dff53bed235a) and closed
+  [FIND-0132](../../docs/features/FEAT-0014-v085-convergence/README.md#find-0132); [issue #43](https://github.com/hasanmanzak/meAndAI/issues/43) remains its external publication authority.
 - Historical v0.8.5 delivery: immutable release
   [`v0.8.5`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.5)
-  targets merge commit `7c06dfad75ab7b327d46c7b8f8d7cb541bab3896`.
-  Its failed completion projection is retained as [FIND-0132](../../docs/features/FEAT-0014-v085-convergence/README.md), not rewritten.
+  targets merge commit [`7c06dfad75ab7b327d46c7b8f8d7cb541bab3896`](https://github.com/hasanmanzak/meAndAI/commit/7c06dfad75ab7b327d46c7b8f8d7cb541bab3896).
+  Its failed completion projection is retained as [FIND-0132](../../docs/features/FEAT-0014-v085-convergence/README.md#find-0132), not rewritten.
 - Historical v0.8.4 delivery: completed
   [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md) retains
   [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) as its delivery
@@ -54,7 +65,7 @@ Last verified: **2026-07-24**
   The release and issue retain the exact pull request, target commit, checks,
   and post-publication verification. The [FEAT-0011](../../docs/features/FEAT-0011-stability-closure/README.md) pre-merge commit had already
   described that release as published; [FEAT-0012](../../docs/features/FEAT-0012-v082-correction/README.md)
-  records this premature claim as [FIND-0108](../../docs/features/FEAT-0012-v082-correction/README.md) rather than treating later valid
+  records this premature claim as [FIND-0108](../../docs/features/FEAT-0012-v082-correction/README.md#find-0108) rather than treating later valid
   publication as retroactive evidence.
 
 ## Collaboration constraints
@@ -81,10 +92,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - Publish [FEAT-0047](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
   through one reviewed pull request and immutable v0.14.2 release under
-  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114). Reconcile
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), with the
+  pre-merge exact-fragment and commit-permalink blocker owned by
+  [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116). Reconcile
   repository documents and editable meAndAI GitHub records without reopening
   completed delivery or mutating a consumer.
-- [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
+- [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
@@ -246,7 +259,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   old adapter may propose the ordinary v0.8.1 review PR; that proposal installs
   the new workflow and adapter together. After merge, later runs pass the
   separate `PROTOCOL_TOKEN` without a manual seed replacement.
-- `v0.8.2` closes [FIND-0102](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0103](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0104](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0105](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0106](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0107](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0108](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0109](../../docs/features/FEAT-0012-v082-correction/README.md), [FIND-0110](../../docs/features/FEAT-0012-v082-correction/README.md), and [FIND-0111](../../docs/features/FEAT-0012-v082-correction/README.md) with exact issue ownership,
+- `v0.8.2` closes [FIND-0102](../../docs/features/FEAT-0012-v082-correction/README.md#find-0102), [FIND-0103](../../docs/features/FEAT-0012-v082-correction/README.md#find-0103), [FIND-0104](../../docs/features/FEAT-0012-v082-correction/README.md#find-0104), [FIND-0105](../../docs/features/FEAT-0012-v082-correction/README.md#find-0105), [FIND-0106](../../docs/features/FEAT-0012-v082-correction/README.md#find-0106), [FIND-0107](../../docs/features/FEAT-0012-v082-correction/README.md#find-0107), [FIND-0108](../../docs/features/FEAT-0012-v082-correction/README.md#find-0108), [FIND-0109](../../docs/features/FEAT-0012-v082-correction/README.md#find-0109), [FIND-0110](../../docs/features/FEAT-0012-v082-correction/README.md#find-0110), and [FIND-0111](../../docs/features/FEAT-0012-v082-correction/README.md#find-0111) with exact issue ownership,
   repository-scoped secret serialization, completed-proposal retention, full
   reserved-branch inventory, contract-bearing test evidence, recurring
   actionlint, auditable scan records, external publication evidence, and the
@@ -254,11 +267,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - `v0.8.3` corrects the post-publication verifier's repository-root URL after
   the immutable v0.8.2 external run exposed an invalid trailing slash. The
   focused mock now rejects that URL shape.
-- `v0.8.4` is the bounded correction for [FIND-0112](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0113](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0114](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0115](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0116](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0117](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0118](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0119](../../docs/features/FEAT-0013-v084-correction/README.md), [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44), [FIND-0121](../../docs/features/FEAT-0013-v084-correction/README.md), and [FIND-0122](../../docs/features/FEAT-0013-v084-correction/README.md):
+- `v0.8.4` is the bounded correction for [FIND-0112](../../docs/features/FEAT-0013-v084-correction/README.md#find-0112), [FIND-0113](../../docs/features/FEAT-0013-v084-correction/README.md#find-0113), [FIND-0114](../../docs/features/FEAT-0013-v084-correction/README.md#find-0114), [FIND-0115](../../docs/features/FEAT-0013-v084-correction/README.md#find-0115), [FIND-0116](../../docs/features/FEAT-0013-v084-correction/README.md#find-0116), [FIND-0117](../../docs/features/FEAT-0013-v084-correction/README.md#find-0117), [FIND-0118](../../docs/features/FEAT-0013-v084-correction/README.md#find-0118), [FIND-0119](../../docs/features/FEAT-0013-v084-correction/README.md#find-0119), [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44), [FIND-0121](../../docs/features/FEAT-0013-v084-correction/README.md#find-0121), and [FIND-0122](../../docs/features/FEAT-0013-v084-correction/README.md#find-0122):
   trusted updater preflight, pre-mutation seed validation, recoverable
   completion publication, one exact manifest contract, honest and paginated
   evidence, stable traceability, finding taxonomy, and version boundaries.
-  [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md) retains the unavailable private-repository `main` protection as a
+  [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md#risk-0076) retains the unavailable private-repository `main` protection as a
   maintainer-owned external follow-up tracked by
   [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44), with a
   visibility/plan review condition.
@@ -267,5 +280,5 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   explicitly invoked agent or maintainer completes and removes the manifest.
 - [FEAT-0002](../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)'s historical post-merge gate was reconciled on 2026-07-15 against
   merged [PR #4](https://github.com/hasanmanzak/meAndAI/pull/4) and remote tag
-  [`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0); this evidence
+[`v0.2.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.2.0); this evidence
   correction does not create a new protocol release.

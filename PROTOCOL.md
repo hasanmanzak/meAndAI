@@ -453,10 +453,26 @@ increase detail.
 
 - A document (repository-local or external), GitHub issue, pull request, or
   GitHub comment of any kind that references another document
-  (repository-local or external), issue, pull request, or GitHub comment MUST
-  express each such reference as a clickable link to the exact referenced
-  target. A free-text identifier, number, title, or path does not satisfy this
-  requirement.
+  (repository-local or external), issue, pull request, GitHub comment, or
+  commit MUST express each human-facing reference as a clickable link to the
+  exact referenced target. When the target is an addressable record or location
+  within a document, the link MUST include a stable fragment that positions the
+  reader at that record or location; linking only the containing document does
+  not satisfy the reference. A free-text identifier, number, title, path, or
+  commit hash does not satisfy this requirement.
+- Governed clickable references MUST use a renderer-active Markdown inline
+  link, reference-style link, or absolute HTTP(S) autolink. Raw HTML `href`
+  elements are not a supported reference-authoring form; custom HTML anchors
+  are target locations only.
+- Every canonical embedded stable-ID record, including each `TEST-NNNN`,
+  `SUBF-NNNN`, `FIND-NNNN`, and `RISK-NNNN` record, MUST expose one unique,
+  renderer-active custom anchor within its canonical declaration whose name is
+  the exact lowercase identifier (for example,
+  `<a name="test-0163"></a>`). Cross-document references to that record MUST
+  target that anchor. Its canonical declaration and ordinary
+  non-navigational prose repetition inside the declaring document are not
+  cross-document references; a second declaration-shaped occurrence is
+  invalid unless it is an exact link to the canonical anchor.
 - Every durable pre-work idea is indexed under `docs/ideas` and links any
   promoted work or decision.
 - Every feature has `docs/features/FEAT-NNNN-slug/README.md` and
@@ -474,10 +490,27 @@ increase detail.
   also links the pull request and the stable external authority for any
   post-publication evidence. Pull requests link the same canonical records and
   related issues, pull requests, wiki pages, or external documentation.
-- Links MUST be relative for repository files and absolute for GitHub or
-  external resources. They MUST be clickable and validated before completion;
-  record automated local-link results and manual or automated external-link
-  evidence separately.
+- A link authored in a repository file to a current canonical repository
+  record or location MUST be repository-relative and include any required
+  fragment. An immutable historical snapshot MAY remain an absolute full-SHA
+  blob link only when the referenced blob and any fragment exist, but it does
+  not replace the relative link to the current canonical record. A durable
+  link authored on a GitHub issue, pull request, or comment to a repository
+  record MUST use the immutable absolute blob URL for the exact commit; the
+  referenced blob and any required fragment MUST exist at that commit. Links
+  to GitHub or other external resources MUST be absolute. A fragment on a
+  Markdown document targets one unique renderer-active anchor. A fragment on a
+  non-Markdown repository blob uses GitHub's exact `#Lstart` or
+  `#Lstart-Lend` form and MUST identify lines within that blob.
+- A human-facing commit reference MUST link to the absolute commit permalink in
+  the commit's owning repository, and its target MUST contain the exact full
+  40-character commit hash; the visible label MAY use a short hash when the
+  target can be resolved unambiguously. A hash used only as a command
+  argument, source or fixture value, structured-data field, digest, Git object
+  input, or opaque machine marker is a literal rather than a human-facing
+  reference and does not require a link.
+- Links MUST be clickable and validated before completion; record automated
+  local-link results and manual or automated external-link evidence separately.
 - An automated external-evidence query MUST exhaust the provider's pagination
   contract or fail at a declared finite page limit. A focused fixture MUST place
   qualifying evidence after the first page when closure depends on comments or

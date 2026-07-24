@@ -6,8 +6,8 @@
 - Task and tracking authority: [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 - Branch: `codex/task-0002-batched-instruction-graph-transport`
 - Baseline: immutable [v0.13.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.0),
-  commit `299b8982cd57961e2b3a6136b07af3bfb49a16d1`
-- Planned tests: [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md)
+  commit [`299b8982cd57961e2b3a6136b07af3bfb49a16d1`](https://github.com/hasanmanzak/meAndAI/commit/299b8982cd57961e2b3a6136b07af3bfb49a16d1)
+- Planned tests: [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162)
 
 ## Verified starting state
 
@@ -26,7 +26,7 @@
 
 ## Gate 1 continuation
 
-- [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [SUBF-0078](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) and [SUBF-0079](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md), and [RISK-0190](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [RISK-0191](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), and [RISK-0192](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) are
+- [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md), [SUBF-0078](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#subf-0078) and [SUBF-0079](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#subf-0079), [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162), and [RISK-0190](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#risk-0190), [RISK-0191](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#risk-0191), and [RISK-0192](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#risk-0192) are
   collision-free and defined.
 - `0.13.1` is the backward-compatible target; no version surface changes during
   planning.
@@ -47,8 +47,8 @@
   acquisition target is one blob process with all 175 requests and graph
   evidence unchanged.
 - Focused Windows PowerShell 5.1 expected-red is frozen before production:
-  [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) reports exactly six actor-contract findings in 146.507 seconds with
-  [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) intact; [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) reports 25 schema-2/batch-ratchet findings in
+  [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161) reports exactly six actor-contract findings in 146.507 seconds with
+  [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) and [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) intact; [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162) reports 25 schema-2/batch-ratchet findings in
   8.3 seconds without parse/null failure. The final 6.0-second `StructureOnly`
   run accepts both canonical owners. Gate 1 is complete.
 - The private session factory may receive exact transport/monotonic-clock hooks
@@ -61,5 +61,5 @@
   the verified 341.0-second [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md) record. Final v0.13.0 hosted values and the
   exact observer are [FEAT-0040](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md)'s comparison authority.
 - The first Windows PowerShell 5.1 `StructureOnly` run produced exactly the two
-  planned missing-authority findings for [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md); no other
+  planned missing-authority findings for [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161) and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162); no other
   structural problem was reported.

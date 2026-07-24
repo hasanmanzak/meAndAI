@@ -9,7 +9,7 @@
 ## Durable continuation
 
 - [FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) is `Ready`; no production or executable-test implementation has
-  started. [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), [TEST-0145](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md), and [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md) are the required test-first
+  started. [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144), [TEST-0145](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145), and [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) are the required test-first
   scenarios and must receive executable ownership before implementation.
 - Preserve every active scenario ID and declared variant. Change the evidence
   level, not the behavior inventory: deterministic combinations belong in
@@ -31,7 +31,7 @@
 
 ## Environment and baseline handoff
 
-- Repository `main` was synchronized to `3f1072d` (`v0.12.2`) before planning.
+- Repository `main` was synchronized to [`3f1072d`](https://github.com/hasanmanzak/meAndAI/commit/3f1072da05636ab428430954dbf5dc5f31f9cc6b) (`v0.12.2`) before planning.
 - This machine verified Windows PowerShell 5.1.19041.7548, Windows PowerShell
   7.6.3, WSL2 Ubuntu 24.04.1, Linux PowerShell 7.6.3, Git 2.43.0, and repository
   access.
@@ -52,7 +52,7 @@
 2. Confirm [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) and this feature record still satisfy Gate 1.
 3. Capture same-commit per-suite and expensive-boundary baselines without a
    short outer measurement timeout.
-4. Add expected-red executable ownership for [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md) and implement
-   [SUBF-0064](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md); run its focused tests and fresh-diff review before [SUBF-0065](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md).
+4. Add expected-red executable ownership for [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144) and implement
+   [SUBF-0064](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#subf-0064); run its focused tests and fresh-diff review before [SUBF-0065](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#subf-0065).
 5. Continue the dependency-ordered slices and record exact evidence in the
    feature ledger. Do not open a pull request until local convergence.

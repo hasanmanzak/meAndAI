@@ -8,7 +8,7 @@
 | Issue | [#49](https://github.com/hasanmanzak/meAndAI/issues/49) |
 | Pull request | [#50](https://github.com/hasanmanzak/meAndAI/pull/50) |
 | Decision | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) |
-| Tests | [TEST-0100](test-cases.md) |
+| Tests | [TEST-0100](test-cases.md#test-0100) |
 
 ## Problem and outcome
 
@@ -51,7 +51,7 @@ the later local Codex step; no new architectural decision is required.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0085` | Repository identity | A derived repository exists with history that cannot be reconciled safely with a no-head local target | Mitigated / launcher maintainer | Read-only head inspection and fail before adding the remote; [TEST-0100](test-cases.md) |
+| `RISK-0085` <a name="risk-0085"></a> | Repository identity | A derived repository exists with history that cannot be reconciled safely with a no-head local target | Mitigated / launcher maintainer | Read-only head inspection and fail before adding the remote; [TEST-0100](test-cases.md#test-0100) |
 
 - [x] Stable `FEAT-0016`, [BUG-0005](https://github.com/hasanmanzak/meAndAI/issues/49), and linked [issue #49](https://github.com/hasanmanzak/meAndAI/issues/49) exist.
 - [x] Problem, outcome, scope, non-goals, identity, credential ownership,
@@ -59,7 +59,7 @@ the later local Codex step; no new architectural decision is required.
 - [x] Existing [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md) and [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) boundaries remain sufficient and linked.
 - [x] One bounded implementation slice is sufficient; no subfeature or new
       runtime layer is needed.
-- [x] [TEST-0100](test-cases.md) covers existing-empty success, missing-secret/missing-file,
+- [x] [TEST-0100](test-cases.md#test-0100) covers existing-empty success, missing-secret/missing-file,
       existing-non-empty rejection, and unchanged absent-repository behavior.
 - [x] Validation is bounded to focused red/green evidence, one fresh-diff
       review, one full repository gate, and confirmation only after remediation.
@@ -83,7 +83,7 @@ the later local Codex step; no new architectural decision is required.
 
 The executable regression first reproduced the incorrect early
 `FG_PAT.txt` requirement. The quick-adoption suite then passed all declared
-scenarios, including [TEST-0100](test-cases.md), in 351.3 seconds outside the restricted Git
+scenarios, including [TEST-0100](test-cases.md#test-0100), in 351.3 seconds outside the restricted Git
 signal-pipe sandbox. The success fixture proves zero `gh secret set` calls with
 both files absent and both mapped names present. Negative fixtures prove the
 missing updater mapping and non-empty derived repository stop before secret or
@@ -91,18 +91,18 @@ local-remote mutation.
 
 | ID | Classification / priority | Finding and resolution | Status |
 | --- | --- | --- | --- |
-| `FIND-0140` | Test fixture contract / P1 | Early fixture revisions did not model every GitHub transition and used one unsupported helper parameter. The fixture now models repository creation, first-push default-branch assignment, and explicit derived identity with supported helpers. | `Blocking` / Resolved before final green evidence |
-| `FIND-0141` | Security gate ordering / P1 | The first implementation moved no-remote/local-commit rejection ahead of credential reflog validation, and [TEST-0055](../FEAT-0010-protocol-stability-invariants/test-cases.md) failed. Tracked/history validation is again unconditional and file presence is evaluated after identity. | `Blocking` / Resolved by the green suite |
-| `FIND-0142` | Scenario evidence ownership / P1 | The new fixture executed before the machine-readable authority owned [TEST-0100](test-cases.md). The scenario is now source-bound and listed in `tests/scenario-ownership.psd1`. | `Blocking` / Resolved by focused ownership verification |
-| `FIND-0143` | Decision traceability / P1 | The first feature draft named only [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) even though no-remote repository resolution is governed by [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md). Both decision relationships and [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md)'s refined empty-existing-repository rule are now explicit. | `Blocking` / Resolved during fresh-diff review |
-| `FIND-0144` | Test contract / P1 | The first success assertion proved zero secret writes but did not independently require repository secret-name inventory, so an implementation that skipped reconciliation entirely could look green. [TEST-0100](test-cases.md) now requires exactly one `gh secret list` call before accepting the file-free success path. | `Blocking` / Resolved during fresh-diff review |
-| `FIND-0145` | Semantic cross-link / P2 | After [TEST-0100](test-cases.md) moved into FEAT-0016, the changelog still linked the historical [FEAT-0007](../FEAT-0007-local-codex-adoption/README.md) scenario file. The link now resolves to the canonical FEAT-0016 scenario record. | `Blocking` / Resolved during fresh-diff review |
-| `FIND-0146` | Escaped active pin / P1 | The first full suite found three regex-escaped v0.9.0 quick-adoption mock matchers that plain active-pin replacement did not change, causing real API fallback. The exact escaped matchers now target v0.9.1, and both plain and escaped stale-pin searches are part of the final confirmation. | `Blocking` / Resolved after failed full-suite evidence |
+| `FIND-0140` <a name="find-0140"></a> | Test fixture contract / P1 | Early fixture revisions did not model every GitHub transition and used one unsupported helper parameter. The fixture now models repository creation, first-push default-branch assignment, and explicit derived identity with supported helpers. | `Blocking` / Resolved before final green evidence |
+| `FIND-0141` <a name="find-0141"></a> | Security gate ordering / P1 | The first implementation moved no-remote/local-commit rejection ahead of credential reflog validation, and [TEST-0055](../FEAT-0010-protocol-stability-invariants/test-cases.md#test-0055) failed. Tracked/history validation is again unconditional and file presence is evaluated after identity. | `Blocking` / Resolved by the green suite |
+| `FIND-0142` <a name="find-0142"></a> | Scenario evidence ownership / P1 | The new fixture executed before the machine-readable authority owned [TEST-0100](test-cases.md#test-0100). The scenario is now source-bound and listed in `tests/scenario-ownership.psd1`. | `Blocking` / Resolved by focused ownership verification |
+| `FIND-0143` <a name="find-0143"></a> | Decision traceability / P1 | The first feature draft named only [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) even though no-remote repository resolution is governed by [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md). Both decision relationships and [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md)'s refined empty-existing-repository rule are now explicit. | `Blocking` / Resolved during fresh-diff review |
+| `FIND-0144` <a name="find-0144"></a> | Test contract / P1 | The first success assertion proved zero secret writes but did not independently require repository secret-name inventory, so an implementation that skipped reconciliation entirely could look green. [TEST-0100](test-cases.md#test-0100) now requires exactly one `gh secret list` call before accepting the file-free success path. | `Blocking` / Resolved during fresh-diff review |
+| `FIND-0145` <a name="find-0145"></a> | Semantic cross-link / P2 | After [TEST-0100](test-cases.md#test-0100) moved into FEAT-0016, the changelog still linked the historical [FEAT-0007](../FEAT-0007-local-codex-adoption/README.md) scenario file. The link now resolves to the canonical FEAT-0016 scenario record. | `Blocking` / Resolved during fresh-diff review |
+| `FIND-0146` <a name="find-0146"></a> | Escaped active pin / P1 | The first full suite found three regex-escaped v0.9.0 quick-adoption mock matchers that plain active-pin replacement did not change, causing real API fallback. The exact escaped matchers now target v0.9.1, and both plain and escaped stale-pin searches are part of the final confirmation. | `Blocking` / Resolved after failed full-suite evidence |
 
 The fresh diff contains no secret value, broad repository synchronizer,
 duplicate owner/name validation, new workflow, or AI bootstrap layer. The full
 repository gate passed all discovered suites in 473.8 seconds and reported
-[TEST-0100](test-cases.md) in the quick-adoption suite's machine-readable scenario result.
+[TEST-0100](test-cases.md#test-0100) in the quick-adoption suite's machine-readable scenario result.
 
 ## Relationships
 
@@ -115,7 +115,7 @@ repository gate passed all discovered suites in 473.8 seconds and reported
 
 ## Definition of Done
 
-- [x] Acceptance criteria and [TEST-0100](test-cases.md) pass.
+- [x] Acceptance criteria and [TEST-0100](test-cases.md#test-0100) pass.
 - [x] Existing quick-adoption scenarios pass in the same executable suite.
 - [x] The complete repository suite passes with exact scenario ownership.
 - [x] Fresh-diff findings are resolved with no open `Blocking` item.

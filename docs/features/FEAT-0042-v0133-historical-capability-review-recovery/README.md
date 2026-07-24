@@ -8,7 +8,7 @@
 | Issue | [#104](https://github.com/hasanmanzak/meAndAI/issues/104) |
 | Pull request | [#105](https://github.com/hasanmanzak/meAndAI/pull/105) |
 | Decision | [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) |
-| Tests | [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md) |
+| Tests | [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166) |
 
 ## Problem
 
@@ -83,24 +83,24 @@ fail-closed.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md) |
-| Test code | Automated | [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md) run under the existing capability-adoption owner with a project-neutral historical-release fixture |
+| Scenarios | Defined | [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166) |
+| Test code | Automated | [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166) run under the existing capability-adoption owner with a project-neutral historical-release fixture |
 | Baseline run | Expected red recorded | The unchanged v0.13.2 runner rejected the trusted merged predecessor as a stale catalog before production correction |
 
 ## Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0197` | Historical provenance | A stale marker or consumer-controlled tree redirects recovery to an unrelated or mutable protocol snapshot | Capability-review maintainer / resolve the base-head gitlink from canonical Git objects and require one exact immutable tagged release whose catalog digest and definition blobs match the retained marker |
-| `RISK-0198` | Work preservation and authority | Automation retires active or unauthorized semantic work because a PR or issue merely resembles a historical record | Consumer lifecycle maintainer / require a unique trusted issue/PR/branch binding, merged state, exact reviewed head, current review or owner-attestation authority, and fail closed for every active, unmerged, duplicate, or ambiguous state |
-| `RISK-0199` | Ledger integrity | Historical cleanup rewrites or truncates valid assessments added after the merged review | Capability catalog maintainer / require the historical merged ledger to be exact and the current ledger to preserve it as an exact prefix; cleanup is metadata-only and [TEST-0165](test-cases.md) proves later entries remain byte-identical |
-| `RISK-0200` | Race and runner cost | Branch movement between proof and deletion destroys new work, or repeated reconciliation consumes unbounded runner minutes | Workflow maintainer / use true expected-OID force-with-lease deletion, revalidate mutable state before mutation, close the issue last, and permit one cleanup plus one fresh inventory per invocation |
+| `RISK-0197` <a name="risk-0197"></a> | Historical provenance | A stale marker or consumer-controlled tree redirects recovery to an unrelated or mutable protocol snapshot | Capability-review maintainer / resolve the base-head gitlink from canonical Git objects and require one exact immutable tagged release whose catalog digest and definition blobs match the retained marker |
+| `RISK-0198` <a name="risk-0198"></a> | Work preservation and authority | Automation retires active or unauthorized semantic work because a PR or issue merely resembles a historical record | Consumer lifecycle maintainer / require a unique trusted issue/PR/branch binding, merged state, exact reviewed head, current review or owner-attestation authority, and fail closed for every active, unmerged, duplicate, or ambiguous state |
+| `RISK-0199` <a name="risk-0199"></a> | Ledger integrity | Historical cleanup rewrites or truncates valid assessments added after the merged review | Capability catalog maintainer / require the historical merged ledger to be exact and the current ledger to preserve it as an exact prefix; cleanup is metadata-only and [TEST-0165](test-cases.md#test-0165) proves later entries remain byte-identical |
+| `RISK-0200` <a name="risk-0200"></a> | Race and runner cost | Branch movement between proof and deletion destroys new work, or repeated reconciliation consumes unbounded runner minutes | Workflow maintainer / use true expected-OID force-with-lease deletion, revalidate mutable state before mutation, close the issue last, and permit one cleanup plus one fresh inventory per invocation |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0081` | Strict-predecessor historical proof, exact leased cleanup, and bounded current rediscovery | [Issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) | [TEST-0165](test-cases.md), [TEST-0166](test-cases.md); expected red and corrected focused green | `FIND-0208` and `FIND-0209` resolved; no Blocking finding remains | Complete |
+| `SUBF-0081` <a name="subf-0081"></a> | Strict-predecessor historical proof, exact leased cleanup, and bounded current rediscovery | [Issue #104](https://github.com/hasanmanzak/meAndAI/issues/104) | [TEST-0165](test-cases.md#test-0165), [TEST-0166](test-cases.md#test-0166); expected red and corrected focused green | `FIND-0208` and `FIND-0209` resolved; no Blocking finding remains | Complete |
 
 ## Decisions and relationships
 
@@ -117,7 +117,7 @@ fail-closed.
 - [x] Consumers, dependencies, compatibility, and token boundaries are known.
 - [x] `RISK-0197` through `RISK-0200` and [DEC-0026](../../decisions/DEC-0026-historical-capability-review-recovery.md) are recorded.
 - [x] One independently reviewable slice has a gate ledger.
-- [x] [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md) and the bounded verification approach are defined.
+- [x] [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166) and the bounded verification approach are defined.
 - [x] Test-code and current-baseline states are recorded before implementation.
 
 ## Acceptance criteria
@@ -146,7 +146,7 @@ fail-closed.
 
 ## Verification approach
 
-Register [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md) in the existing capability-adoption owner and first run
+Register [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166) in the existing capability-adoption owner and first run
 them against the unchanged v0.13.2 runner to capture the intended stale-catalog
 failure. Implement the smallest historical proof and cleanup boundary, rerun
 the focused owner, then run structural and release-pin checks. Perform one
@@ -170,8 +170,8 @@ no unresolved Blocking finding remains.
 
 | ID | Classification | Finding | Disposition |
 | --- | --- | --- | --- |
-| `FIND-0208` | Blocking / explicit recovery routing | `FinalizePullRequestNumber` was applied to the current inventory before historical resolution and again after cleanup. | Resolved: validate the requested number once against the selected current or historical PR; fresh inventory does not reuse it. [TEST-0165](test-cases.md) covers explicit historical finalization. |
-| `FIND-0209` | High / test-evidence completeness | The initial fixture did not distinguish the historical merged ledger from the current ledger with later entries and allowed more than one fresh inventory. | Resolved: distinct exact byte streams, appended-entry preservation, no-write and mutation assertions, exact inventory count, duplicate-PR rejection, and branch-already-absent issue-last recovery are automated in [TEST-0165](test-cases.md) and [TEST-0166](test-cases.md). |
+| `FIND-0208` <a name="find-0208"></a> | Blocking / explicit recovery routing | `FinalizePullRequestNumber` was applied to the current inventory before historical resolution and again after cleanup. | Resolved: validate the requested number once against the selected current or historical PR; fresh inventory does not reuse it. [TEST-0165](test-cases.md#test-0165) covers explicit historical finalization. |
+| `FIND-0209` <a name="find-0209"></a> | High / test-evidence completeness | The initial fixture did not distinguish the historical merged ledger from the current ledger with later entries and allowed more than one fresh inventory. | Resolved: distinct exact byte streams, appended-entry preservation, no-write and mutation assertions, exact inventory count, duplicate-PR rejection, and branch-already-absent issue-last recovery are automated in [TEST-0165](test-cases.md#test-0165) and [TEST-0166](test-cases.md#test-0166). |
 
 ## Definition of Done
 

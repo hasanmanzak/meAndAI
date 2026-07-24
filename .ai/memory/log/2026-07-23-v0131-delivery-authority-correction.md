@@ -11,9 +11,9 @@
 
 ## Correction
 
-The pre-delivery audit found [FIND-0205](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md). [TEST-0065](../../../docs/features/FEAT-0011-stability-closure/test-cases.md) requires the canonical
+The pre-delivery audit found [FIND-0205](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0205). [TEST-0065](../../../docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065) requires the canonical
 delivery issue to be closed before post-publication verification can succeed,
-but [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) must remain open as the explicit owner of [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md) and further
+but [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) must remain open as the explicit owner of [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) and further
 measured runtime work. Treating one issue as both authorities would either make
 publication closure impossible or erase the durable residual owner.
 
@@ -32,4 +32,4 @@ Push the documentation correction to [PR #100](https://github.com/hasanmanzak/me
 Windows/Ubuntu hosted run. After final review, merge without bypass, validate
 exact main, publish immutable v0.13.1 with both required assets, complete exact
 owned-branch cleanup, write release evidence to [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101), close [issue #101](https://github.com/hasanmanzak/meAndAI/issues/101),
-and run [TEST-0065](../../../docs/features/FEAT-0011-stability-closure/test-cases.md). Keep [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) open for [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md).
+and run [TEST-0065](../../../docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065). Keep [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98) open for [FIND-0204](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204).

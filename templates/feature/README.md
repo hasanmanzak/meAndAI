@@ -10,7 +10,7 @@
 | Decisions | Replace with clickable links, or N/A with rationale |
 | Tests | [Test scenarios](test-cases.md) |
 
-Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
 
 ## Problem
 
@@ -37,6 +37,12 @@ Describe independently valuable behavior.
 - Risks: numbered `RISK-NNNN` records with owner and response.
 - Verification approach: test levels, commands, manual checks, and review scope.
 
+## Risks
+
+| ID | Risk | Owner / response |
+| --- | --- | --- |
+| `RISK-NNNN` <a name="risk-nnnn"></a> | Concrete risk | Named owner and bounded response |
+
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | Link numbered scenarios |
@@ -47,7 +53,7 @@ Describe independently valuable behavior.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-NNNN` | Reviewable slice | Issue link | Test links and latest result | Review link and findings | Proposed |
+| `SUBF-NNNN` <a name="subf-nnnn"></a> | Reviewable slice | Issue link | Test links and latest result | Review link and findings | Proposed |
 
 ## Decisions and relationships
 
@@ -77,6 +83,9 @@ Record date, reviewed diff/scope, findings, fixes, residual risks, and evidence
 for the feature and for every declared subfeature. Number and classify each
 finding, including findings fixed in the same slice.
 
+| ID | Severity | Disposition | Finding | Resolution |
+| --- | --- | --- | --- | --- |
+| `FIND-NNNN` <a name="find-nnnn"></a> | Critical / High / Medium / Low / Info | `Blocking` / `AcceptedResidual` / `ExternalOrLegacyFollowUp` / `OptionalImprovement` | Concrete observation | Verified fix or required evidence |
 
 Default to one bounded fresh-diff pass and one final relevant verification
 command. Assign each observation exactly one protocol disposition: `Blocking`,
@@ -130,5 +139,5 @@ documentation-only pull request.
 | External evidence authority | Stable issue or PR link selected before merge |
 | Release authority | `Pending`; after publication, recorded externally as an immutable GitHub Release, historical annotated tag, or explicit N/A rationale |
 | Release identifier | `Pending`; exact tag/release link is written to the external authority after publication |
-| Target commit | `Pending`; exact full commit SHA/link is written to the external authority after publication |
+| Target commit | `Pending`; clickable exact full-SHA commit permalink is written to the external authority after publication |
 | Verification evidence | `Pending`; release API/ref/check result and date are written to the external authority after publication |

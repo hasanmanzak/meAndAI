@@ -4,17 +4,29 @@
 
 - [FEAT-0047](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
 - [BUG-0029 / issue #114](https://github.com/hasanmanzak/meAndAI/issues/114)
-- [SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md)
-- [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md)
+- [BUG-0030 / issue #116](https://github.com/hasanmanzak/meAndAI/issues/116)
+- [SUBF-0089](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0089)
+- [SUBF-0090](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0090)
+- [SUBF-0091](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#subf-0091)
+- [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+- [TEST-0176](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176)
+- [TEST-0177](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177)
+- [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
 
 ## Current state
 
 - The candidate protocol version is `0.14.2`; the latest immutable release is
   [v0.14.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.1) at
-  commit `f153e21a3098945a1b669563046f875ef6fb8b60`.
+  commit [`f153e21a3098945a1b669563046f875ef6fb8b60`](https://github.com/hasanmanzak/meAndAI/commit/f153e21a3098945a1b669563046f875ef6fb8b60).
 - The common rule directly requires every cross-record reference created in a
   repository-local or external document, GitHub issue, pull request, or GitHub
   comment to be a clickable link to its exact target.
+- The pre-merge [BUG-0030 / issue #116](https://github.com/hasanmanzak/meAndAI/issues/116)
+  correction gives canonical embedded test, subfeature, finding, and risk
+  records stable lowercase custom anchors and requires exact fragments.
+- Human-facing commit references use owning-repository full-SHA commit
+  permalinks; commands, source and structured values, fixtures, digests, Git
+  object inputs, and opaque machine markers remain literals.
 - Repository templates, production text generators, static governance checks,
   and publication-evidence fixtures now agree on that one rule.
 - The bounded repository-document audit and initial hash-protected GitHub
@@ -36,7 +48,7 @@
   drift is the current-candidate blob pin, which must be rebound once to the
   final pull-request head after all code fixes are committed.
 - A final repository scan found and corrected three code-formatted numeric
-  shorthands that the first shorthand fixture did not reject; [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md)
+  shorthands that the first shorthand fixture did not reject; [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
   now covers that combined form. Completed records stayed closed and consumer
   repositories remained outside this correction.
 - Fresh diff review then closed the external-document wording, free-text
@@ -82,12 +94,27 @@
   [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and
   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) are
   their stable external authority.
+- The reopened correction is locally converged: 719 embedded records and
+  3,218 canonical-path label links produce no remaining deterministic
+  anchor/fragment edit, and the repository commit-reference migration produces
+  no remaining edit.
+- Historical full-SHA blob links remain valid when their exact snapshot,
+  path, and fragment resolve; current feature and decision closure still
+  requires the exact pull-request head or expected commit. Seven historical
+  tag-only versions have no GitHub Release page, so their 13 verified links
+  remain exact `/tree/<tag>` roots rather than dead Release URLs.
+- Post-publication validation checks out and scans the clean expected commit,
+  verifies external commit targets through a bounded API contract, and retains
+  exact prior-draft-head evidence without binding it to a moving branch.
 
 ## Continuation
 
-1. Require exact-head hosted validation for the converged branch under
+1. Publish the converged candidate branch, apply the hash-protected live
+   GitHub correction against that exact head, and record its evidence under
+   [issue #116](https://github.com/hasanmanzak/meAndAI/issues/116) and
    [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
-2. Promote the draft only after that final gate passes.
+2. Require exact-head Ubuntu and Windows hosted validation, then merge only
+   after that final gate passes.
 3. After merge, publish immutable `v0.14.2`, write exact evidence to
    [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and remove
    only the owned delivery branch.

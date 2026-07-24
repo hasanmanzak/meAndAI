@@ -73,8 +73,8 @@ complete runtime bundle has been verified and imported.
 - Runtime release and requested protocol release are explicit semantic types,
   preventing an older target selection from looking for a bundle in that older
   release.
-- Historical v0.9.2 single-file releases and [TEST-0101](../features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md) remain truthful for the
-  versions that used them. [FEAT-0036](../features/FEAT-0036-modular-quick-adoption-reliability/README.md)/[TEST-0147](../features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md) own the new prospective contract.
+- Historical v0.9.2 single-file releases and [TEST-0101](../features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md#test-0101) remain truthful for the
+  versions that used them. [FEAT-0036](../features/FEAT-0036-modular-quick-adoption-reliability/README.md)/[TEST-0147](../features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147) own the new prospective contract.
 - Publication must build and upload both exact assets before the GitHub Release
   becomes immutable and must record both digests externally.
 

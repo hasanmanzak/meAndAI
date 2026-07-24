@@ -3,7 +3,7 @@
 ## Canonical records
 
 - Feature: [FEAT-0025](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/README.md)
-- Tests: [TEST-0117](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md) and [TEST-0118](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md)
+- Tests: [TEST-0117](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md#test-0117) and [TEST-0118](../../../docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md#test-0118)
 - Tracking and post-publication authority: [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67)
 
 ## Durable facts
@@ -22,7 +22,7 @@
   contracts. The corrected structure and all four focused PowerShell 5.1
   shards passed in 40.4, 81.2, 105.8, and 76.5 seconds.
 - The complete local run passed every executable test body, then caught a stale
-  [TEST-0115](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md) source anchor in final evidence aggregation. The binding was
+  [TEST-0115](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0115) source anchor in final evidence aggregation. The binding was
   corrected to the superseding layout assertion and the production evidence
   builder directly returned the complete root set.
 - Pull-request run [29576425693](https://github.com/hasanmanzak/meAndAI/actions/runs/29576425693)

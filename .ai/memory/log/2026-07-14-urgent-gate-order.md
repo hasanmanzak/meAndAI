@@ -16,7 +16,7 @@
 - A real deviation uses the existing numbered-decision process with an owner,
   risk, tests, deferred evidence, linked follow-up, and review or expiry
   condition.
-- [TEST-0020](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md) and the existing repository suite passed on Windows PowerShell 5.1.
-- [FIND-0048](../../../docs/features/FEAT-0001-common-development-protocol/README.md) identified a line-wrap-sensitive [TEST-0020](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md) assertion; the test now
+- [TEST-0020](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0020) and the existing repository suite passed on Windows PowerShell 5.1.
+- [FIND-0048](../../../docs/features/FEAT-0001-common-development-protocol/README.md#find-0048) identified a line-wrap-sensitive [TEST-0020](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0020) assertion; the test now
   normalizes Markdown whitespace before checking the contract.
 - No separate emergency framework or retrospective-evidence path was added.

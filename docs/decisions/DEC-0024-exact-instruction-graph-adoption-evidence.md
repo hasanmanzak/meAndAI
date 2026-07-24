@@ -149,7 +149,7 @@ the graph-node path limit so a pre-terminator tree record cannot grow without
 bound. Reaching a limit is valid; exceeding one blocks before external or
 semantic mutation.
 
-The accepted planning draft used a 1,024-edge ceiling. During [SUBF-0070](../features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md), the
+The accepted planning draft used a 1,024-edge ceiling. During [SUBF-0070](../features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md#subf-0070), the
 required all-reference traversal over meAndAI's own exact baseline produced
 1,108 canonical edges from 318 tree entries and 185 nodes. Retaining 1,024
 would therefore violate both transitive traversal and the decision that

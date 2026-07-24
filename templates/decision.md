@@ -7,7 +7,7 @@
 - Related features:
 - Related decisions:
 
-Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, or paths do not satisfy a reference.
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
 
 ## Context
 

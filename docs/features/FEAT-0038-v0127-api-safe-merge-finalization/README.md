@@ -8,7 +8,7 @@
 | Issue | [#96](https://github.com/hasanmanzak/meAndAI/issues/96) |
 | Pull request | [#97](https://github.com/hasanmanzak/meAndAI/pull/97) |
 | Decisions | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md) |
-| Tests | [TEST-0155](test-cases.md) and [TEST-0156](test-cases.md) |
+| Tests | [TEST-0155](test-cases.md#test-0155) and [TEST-0156](test-cases.md#test-0156) |
 
 ## Problem and intended outcome
 
@@ -69,11 +69,11 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
 
 | ID | Classification | Risk | Owner / response and evidence |
 | --- | --- | --- | --- |
-| `RISK-0179` | API compatibility | A removed pull-request field blocks every post-merge recovery | Updater maintainer / one event-based helper and a structural no-dependency assertion in [TEST-0155](test-cases.md) |
-| `RISK-0180` | Evidence completeness | A first-page-only or ambiguous event read selects incomplete merge evidence | Updater maintainer / paginated project-neutral fixture plus zero, duplicate, and malformed event negatives in [TEST-0155](test-cases.md) |
-| `RISK-0181` | Lifecycle safety | Replacing the merge source weakens containment or permits mutation on unrelated evidence | Updater maintainer / unchanged identity gates, compare containment, and no-mutation negatives in [TEST-0155](test-cases.md) |
-| `RISK-0182` | Runner efficiency | The correction adds unbounded network calls or new hosted jobs | Updater maintainer / one event read is retained across the existing four-state pre/post-mutation checks, legacy repair keeps one mutation-bound read, unmanaged no-op proof, and no workflow fan-out |
-| `RISK-0183` | Recovery ordering | A retained merged branch blocks current-launcher namespace inventory before the corrected updater can be installed | Quick-adoption maintainer / the exact target adapter runs bounded merged-branch recovery before current planning in one isolated clone; [TEST-0156](test-cases.md) proves ordering, GitHub host/token restoration, adapter/location failure cleanup, and maintainer-checkout identity/status preservation |
+| `RISK-0179` <a name="risk-0179"></a> | API compatibility | A removed pull-request field blocks every post-merge recovery | Updater maintainer / one event-based helper and a structural no-dependency assertion in [TEST-0155](test-cases.md#test-0155) |
+| `RISK-0180` <a name="risk-0180"></a> | Evidence completeness | A first-page-only or ambiguous event read selects incomplete merge evidence | Updater maintainer / paginated project-neutral fixture plus zero, duplicate, and malformed event negatives in [TEST-0155](test-cases.md#test-0155) |
+| `RISK-0181` <a name="risk-0181"></a> | Lifecycle safety | Replacing the merge source weakens containment or permits mutation on unrelated evidence | Updater maintainer / unchanged identity gates, compare containment, and no-mutation negatives in [TEST-0155](test-cases.md#test-0155) |
+| `RISK-0182` <a name="risk-0182"></a> | Runner efficiency | The correction adds unbounded network calls or new hosted jobs | Updater maintainer / one event read is retained across the existing four-state pre/post-mutation checks, legacy repair keeps one mutation-bound read, unmanaged no-op proof, and no workflow fan-out |
+| `RISK-0183` <a name="risk-0183"></a> | Recovery ordering | A retained merged branch blocks current-launcher namespace inventory before the corrected updater can be installed | Quick-adoption maintainer / the exact target adapter runs bounded merged-branch recovery before current planning in one isolated clone; [TEST-0156](test-cases.md#test-0156) proves ordering, GitHub host/token restoration, adapter/location failure cleanup, and maintainer-checkout identity/status preservation |
 
 ## Definition of Ready
 
@@ -82,7 +82,7 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
       explicit.
 - [x] Existing decisions remain applicable; no new architectural decision is
       required.
-- [x] [TEST-0155](test-cases.md) and [TEST-0156](test-cases.md) define success, pagination,
+- [x] [TEST-0155](test-cases.md#test-0155) and [TEST-0156](test-cases.md#test-0156) define success, pagination,
       legacy recovery, local launcher ordering, idempotency,
       malformed/ambiguous evidence, containment, and no-mutation coverage.
 - [x] Test-first expected-red evidence is recorded before production changes.
@@ -118,7 +118,7 @@ release, changed-path, schema-2, branch-head, and issue gate remains intact.
 
 ## Definition of Done
 
-- [x] Acceptance criteria pass with canonical [TEST-0155](test-cases.md) and [TEST-0156](test-cases.md)
+- [x] Acceptance criteria pass with canonical [TEST-0155](test-cases.md#test-0155) and [TEST-0156](test-cases.md#test-0156)
       evidence.
 - [x] Focused and structural validation pass on the exact candidate tree.
 - [x] Bounded self-review and one convergence scan have no unresolved

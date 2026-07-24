@@ -30,15 +30,15 @@
 - PR numbers, exact push/check/merge/release facts, and cleanup evidence belong
   in [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) or the delivery pull request. A converged candidate does not get
   a commit whose only purpose is copying those later external facts.
-- [TEST-0142](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md) stays with the consumer-update finalization owner. [TEST-0143](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md)
+- [TEST-0142](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0142) stays with the consumer-update finalization owner. [TEST-0143](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0143)
   uses the workflow-efficiency capability with real isolated Git graphs and an
   injected project-neutral GitHub evidence provider.
 
 ## Current evidence
 
-- Before correction, [TEST-0142](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md) reproduced eight synthetic finalization lines
+- Before correction, [TEST-0142](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0142) reproduced eight synthetic finalization lines
   in its inherited outer summary and had no per-invocation capture.
-- Before correction, [TEST-0143](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md) reported the missing resolver, short route,
+- Before correction, [TEST-0143](../../../docs/features/FEAT-0034-ci-evidence-hygiene/test-cases.md#test-0143) reported the missing resolver, short route,
   and external-evidence rule.
 - After correction, both focused capability owners, recursive discovery,
   test-architecture isolation, protocol governance, and the Windows profile

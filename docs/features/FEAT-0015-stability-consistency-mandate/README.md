@@ -8,7 +8,7 @@
 | Issue and post-publication authority | [#47](https://github.com/hasanmanzak/meAndAI/issues/47) |
 | Pull request | [#48](https://github.com/hasanmanzak/meAndAI/pull/48) |
 | Decisions | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md); [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
-| Tests | [TEST-0096](test-cases.md), [TEST-0097](test-cases.md), [TEST-0098](test-cases.md), and [TEST-0099](test-cases.md) |
+| Tests | [TEST-0096](test-cases.md#test-0096), [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098), and [TEST-0099](test-cases.md#test-0099) |
 
 ## Problem
 
@@ -103,10 +103,10 @@ wording that weakens the contract.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0081` | Unbounded execution | A persistent mandate is read as a continuous autonomous loop or unchanged re-scan | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / protocol owner | Material-change trigger, waiting state, finite budget, and unchanged-scan prohibition; [TEST-0096](test-cases.md), [TEST-0099](test-cases.md) |
-| `RISK-0082` | Disposition drift | "No findings" is read literally and hides or endlessly retries accepted residual, legacy, external, or optional observations | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / review owner | Convergence means no unresolved `Blocking`; every observation keeps one Gate 5 disposition; [TEST-0096](test-cases.md) |
-| `RISK-0083` | Publication and reachability | A converged push is confused with a GitHub Release, or maintainers assume an old consumer pin changed | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / release and consumer owners | Separate push and protocol-version publication contracts plus prospective exact-pin adoption; [TEST-0099](test-cases.md) |
-| `RISK-0084` | Remediation atomicity | Strict one-row execution breaks an inseparable dependency change, or broad batching defeats focused review | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / implementation owner | One finding by default with only the smallest recorded dependency-coherent group exception; [TEST-0097](test-cases.md), [TEST-0098](test-cases.md) |
+| `RISK-0081` <a name="risk-0081"></a> | Unbounded execution | A persistent mandate is read as a continuous autonomous loop or unchanged re-scan | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / protocol owner | Material-change trigger, waiting state, finite budget, and unchanged-scan prohibition; [TEST-0096](test-cases.md#test-0096), [TEST-0099](test-cases.md#test-0099) |
+| `RISK-0082` <a name="risk-0082"></a> | Disposition drift | "No findings" is read literally and hides or endlessly retries accepted residual, legacy, external, or optional observations | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / review owner | Convergence means no unresolved `Blocking`; every observation keeps one Gate 5 disposition; [TEST-0096](test-cases.md#test-0096) |
+| `RISK-0083` <a name="risk-0083"></a> | Publication and reachability | A converged push is confused with a GitHub Release, or maintainers assume an old consumer pin changed | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / release and consumer owners | Separate push and protocol-version publication contracts plus prospective exact-pin adoption; [TEST-0099](test-cases.md#test-0099) |
+| `RISK-0084` <a name="risk-0084"></a> | Remediation atomicity | Strict one-row execution breaks an inseparable dependency change, or broad batching defeats focused review | Mitigated by [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) / implementation owner | One finding by default with only the smallest recorded dependency-coherent group exception; [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098) |
 
 ## Active finding register
 
@@ -116,19 +116,19 @@ separate issue because each is resolved inside [issue #47](https://github.com/ha
 
 | ID | Classification | Severity | Dependencies | Priority / impact rank | Evidence and required action | Disposition / status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `FIND-0133` | Lifecycle contradiction | High | None | P1 / High | The zero-blocker path required a second unchanged confirmation while the bounded contract prohibited it. Make the initial clean scan sufficient and require confirmation only after remediation changes the tree. | `Blocking` / Resolved with [TEST-0096](test-cases.md) red/green evidence and fresh-diff review |
-| `FIND-0134` | State-transition ambiguity | Medium | None | P1 / Medium | Failed evidence was both a re-entry trigger and an unconditional blocked outcome. Distinguish correctable failed evidence from evidence that cannot be corrected within authority or budget. | `Blocking` / Resolved with explicit re-entry/blocked transition and [TEST-0096](test-cases.md) red/green evidence |
-| `FIND-0135` | Finding-schema gap | High | None | P1 / High | The queue requires explicit dependency, priority, severity, and impact-rank ordering, but canonical finding records did not require enough structured inputs. Extend the schema and structural contract. | `Blocking` / Resolved with canonical schema, finding form, and [TEST-0097](test-cases.md) red/green evidence |
-| `FIND-0136` | Version-publication wording conflict | Medium | None | P1 / Medium | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) said v0.9.0 distribution may use a GitHub Release even though Gate 7 requires one for v0.8.0+. Make the separate immutable release requirement explicit without changing the mandate's final-push meaning. | `Blocking` / Resolved with mandatory Gate 7 distribution wording and [TEST-0099](test-cases.md) red/green evidence |
-| `FIND-0137` | Structural evidence false positive | High | `FIND-0135` | P1 / High | [TEST-0096](test-cases.md), [TEST-0097](test-cases.md), [TEST-0098](test-cases.md), and [TEST-0099](test-cases.md) could satisfy related fragments outside the mandate section, combine independent consumer pin surfaces, or omit declared transition and ownership relationships. Bind assertions to the mandate section and independently prove each surface and relation. | `Blocking` / Resolved with section-bounded clauses, independent adapter pins, exact updater set, and structural evidence |
-| `FIND-0138` | Change-caused documentation drift | Low | None | P2 / Low | The active-register introduction still said "all three findings" after review expanded the register to five rows. Record this change-caused observation and make the count match the six-row register including this correction. | `Blocking` / Resolved in the same documentation correction; confirmation scan required |
-| `FIND-0139` | Push-evidence self-reference | High | None | P1 / High | FEAT-0015 required its own final push while claiming pre-push completion, so the repository record could not carry exact proof without predicting its containing commit. Separate local push eligibility from externally written exact push evidence. | `Blocking` / Resolved with external issue/PR evidence boundary and [TEST-0099](test-cases.md) red/green evidence |
+| `FIND-0133` <a name="find-0133"></a> | Lifecycle contradiction | High | None | P1 / High | The zero-blocker path required a second unchanged confirmation while the bounded contract prohibited it. Make the initial clean scan sufficient and require confirmation only after remediation changes the tree. | `Blocking` / Resolved with [TEST-0096](test-cases.md#test-0096) red/green evidence and fresh-diff review |
+| `FIND-0134` <a name="find-0134"></a> | State-transition ambiguity | Medium | None | P1 / Medium | Failed evidence was both a re-entry trigger and an unconditional blocked outcome. Distinguish correctable failed evidence from evidence that cannot be corrected within authority or budget. | `Blocking` / Resolved with explicit re-entry/blocked transition and [TEST-0096](test-cases.md#test-0096) red/green evidence |
+| `FIND-0135` <a name="find-0135"></a> | Finding-schema gap | High | None | P1 / High | The queue requires explicit dependency, priority, severity, and impact-rank ordering, but canonical finding records did not require enough structured inputs. Extend the schema and structural contract. | `Blocking` / Resolved with canonical schema, finding form, and [TEST-0097](test-cases.md#test-0097) red/green evidence |
+| `FIND-0136` <a name="find-0136"></a> | Version-publication wording conflict | Medium | None | P1 / Medium | [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) said v0.9.0 distribution may use a GitHub Release even though Gate 7 requires one for v0.8.0+. Make the separate immutable release requirement explicit without changing the mandate's final-push meaning. | `Blocking` / Resolved with mandatory Gate 7 distribution wording and [TEST-0099](test-cases.md#test-0099) red/green evidence |
+| `FIND-0137` <a name="find-0137"></a> | Structural evidence false positive | High | `FIND-0135` | P1 / High | [TEST-0096](test-cases.md#test-0096), [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098), and [TEST-0099](test-cases.md#test-0099) could satisfy related fragments outside the mandate section, combine independent consumer pin surfaces, or omit declared transition and ownership relationships. Bind assertions to the mandate section and independently prove each surface and relation. | `Blocking` / Resolved with section-bounded clauses, independent adapter pins, exact updater set, and structural evidence |
+| `FIND-0138` <a name="find-0138"></a> | Change-caused documentation drift | Low | None | P2 / Low | The active-register introduction still said "all three findings" after review expanded the register to five rows. Record this change-caused observation and make the count match the six-row register including this correction. | `Blocking` / Resolved in the same documentation correction; confirmation scan required |
+| `FIND-0139` <a name="find-0139"></a> | Push-evidence self-reference | High | None | P1 / High | FEAT-0015 required its own final push while claiming pre-push completion, so the repository record could not carry exact proof without predicting its containing commit. Separate local push eligibility from externally written exact push evidence. | `Blocking` / Resolved with external issue/PR evidence boundary and [TEST-0099](test-cases.md#test-0099) red/green evidence |
 
 ## Readiness evidence
 
 | Field | Declaration |
 | --- | --- |
-| Baseline commit | Immutable v0.8.6 commit `a3d58a9cee00b9914c40adcd8e93dff53bed235a` |
+| Baseline commit | Immutable v0.8.6 commit [`a3d58a9cee00b9914c40adcd8e93dff53bed235a`](https://github.com/hasanmanzak/meAndAI/commit/a3d58a9cee00b9914c40adcd8e93dff53bed235a) |
 | Baseline suite | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` passed in 561.6 seconds for the v0.8.6 review tree; immutable publication was verified separately on 2026-07-16 |
 | Scan and validation budget | One test-first contract pass, one implementation pass, one fresh-diff self-review, the existing initial full-project scan, one correction queue if needed, and one confirmation scan; repeat only for changed evidence or a new `Blocking` finding |
 | Stop condition | Declared tests and acceptance criteria pass, no unresolved `Blocking` remains, and the review tree is locally eligible for the converged final push; exact push evidence is written externally after it exists |
@@ -138,7 +138,7 @@ separate issue because each is resolved inside [issue #47](https://github.com/ha
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0037` | Normative mandate, consumer reachability, evidence templates, and structural contract | [Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) | [TEST-0096](test-cases.md), [TEST-0097](test-cases.md), [TEST-0098](test-cases.md), and [TEST-0099](test-cases.md); structure and complete suite passed | Fresh-diff review complete; `FIND-0133` through `FIND-0139` resolved | Complete and confirmed locally |
+| `SUBF-0037` <a name="subf-0037"></a> | Normative mandate, consumer reachability, evidence templates, and structural contract | [Issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) | [TEST-0096](test-cases.md#test-0096), [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098), and [TEST-0099](test-cases.md#test-0099); structure and complete suite passed | Fresh-diff review complete; `FIND-0133` through `FIND-0139` resolved | Complete and confirmed locally |
 
 ## Acceptance criteria
 
@@ -173,7 +173,7 @@ separate issue because each is resolved inside [issue #47](https://github.com/ha
       waiting, re-entry, blocked, and consumer-ownership contracts defined.
 - [x] [DEC-0015](../../decisions/DEC-0015-event-triggered-stability-cycles.md) accepted and related bounded-convergence decisions linked.
 - [x] `RISK-0081` through `RISK-0084` assigned owners and responses.
-- [x] One coherent review slice and [TEST-0096](test-cases.md), [TEST-0097](test-cases.md), [TEST-0098](test-cases.md), and [TEST-0099](test-cases.md) defined.
+- [x] One coherent review slice and [TEST-0096](test-cases.md#test-0096), [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098), and [TEST-0099](test-cases.md#test-0099) defined.
 - [x] Baseline, test-first approach, finite validation budget, compatibility,
       repeat rule, and stop condition recorded.
 - [x] Test code is planned and absent; the structural suite will capture the
@@ -209,7 +209,7 @@ finding. [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains t
 Focused evidence: all PowerShell files parse, `git diff --check` passes, the
 quick-adoption suite passed in 372.3 seconds, the structural suite passed, and
 the complete suite passed in 560.1 seconds with exact observed results for
-[TEST-0096](test-cases.md), [TEST-0097](test-cases.md), [TEST-0098](test-cases.md), and [TEST-0099](test-cases.md). The bounded confirmation covered structure, links,
+[TEST-0096](test-cases.md#test-0096), [TEST-0097](test-cases.md#test-0097), [TEST-0098](test-cases.md#test-0098), and [TEST-0099](test-cases.md#test-0099). The bounded confirmation covered structure, links,
 IDs, PowerShell parsing, active pins, finding-register state, and Git hygiene;
 it found no repository blocker. Two diagnostic matches were narrowed after they
 correctly proved to be historical v0.8.6 and FIND-0138 evidence rather than

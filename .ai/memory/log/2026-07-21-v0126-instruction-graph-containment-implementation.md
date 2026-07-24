@@ -15,14 +15,14 @@
 
 ## Implemented boundary
 
-- [SUBF-0070](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) supplies one canonical exact-base instruction-graph contract,
+- [SUBF-0070](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md#subf-0070) supplies one canonical exact-base instruction-graph contract,
   deterministic roots and reference traversal, compatibility-seed projection,
   finite acquisition and traversal limits, canonical serialization and digest,
   special-entry containment, and project-neutral real-Git fixtures.
-- [SUBF-0071](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) binds graph identity through local assessment, target-aware
+- [SUBF-0071](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md#subf-0071) binds graph identity through local assessment, target-aware
   dispatch, workflow reconstruction, manifest schema 3, proposal marker schema
   7, publishing/recovery marker schema 8, and exact source-drift rejection.
-- [SUBF-0072](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) independently rebuilds source and final graphs, preserves the
+- [SUBF-0072](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md#subf-0072) independently rebuilds source and final graphs, preserves the
   existing bounded mutation envelope, protects non-authorized content, and
   blocks completion when live or newly introduced authority remains unresolved.
 - Current-runtime dispatch feature-detects immutable older target workflows and
@@ -38,16 +38,16 @@ and deletions.
 
 ## Confirmed local evidence
 
-- [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) have canonical executable ownership in
+- [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) and [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) have canonical executable ownership in
   `tests/capabilities/instruction-graph-discovery/`. Their final focused owner
   passed in 137.452 seconds after culture, encoding/line-ending, lexical-path,
   authority grammar, command/URI negative-control, cycle-depth, discovery-reason,
   protected-terminal, and exact-validator review corrections.
-- [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) current graph-aware versus immutable v0.12.5 graph-unaware target
+- [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153) current graph-aware versus immutable v0.12.5 graph-unaware target
   dispatch passed. Capability-bootstrap `All` passed with exit 0 in 322.254
   seconds and emitted canonical `MEANDAI_SCENARIO_RESULTS` including
-  [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md). The expanded hosted-adapter fixture also passed with exit 0.
-- [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) local `InstructionGraphClosure` passed in a final 40.202-second
+  [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153). The expanded hosted-adapter fixture also passed with exit 0.
+- [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154) local `InstructionGraphClosure` passed in a final 40.202-second
   rerun. The actual local launcher/Codex temporary-commit path rejected the
   exact four live custom authorities before publication-marker, push, or
   readiness mutation. The
@@ -60,8 +60,8 @@ and deletions.
   only; the exact production validator was not relaxed.
 - `StructureOnly` passed in 5.989 seconds, `WindowsNative` passed in 374.494
   seconds, and the complete discovered protocol suite passed with exit 0 in
-  1,582.88 seconds. The final suite includes canonical [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), and [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0059](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md), and [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md) evidence on one tree.
-- Scenario ownership is registered for [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md), and [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) without
+  1,582.88 seconds. The final suite includes canonical [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151), [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152), [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153), and [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154), [TEST-0059](../../../docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md#test-0059), and [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0138) evidence on one tree.
+- Scenario ownership is registered for [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151), [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152), [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153), and [TEST-0154](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154) without
   adding consumer-specific production paths.
 
 These results are working-tree evidence, not immutable release or hosted-CI

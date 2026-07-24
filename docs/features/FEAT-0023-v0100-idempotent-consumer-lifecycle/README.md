@@ -95,18 +95,18 @@ owns generic transition reconciliation for release-declared derived state.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0102` | Identity / traceability | Automation reuses or closes an unrelated issue | Mitigated / consumer workflow | Repository-bound first-line issue marker, exact target/SHA identity, backlink checks, and passing [TEST-0111](test-cases.md) |
-| `RISK-0103` | Compatibility | A legacy installing update cannot enter managed finalization safely | Mitigated / consumer workflow | One bounded bridge requiring merged same-repository proposal, marker/head/base/path/gitlink proof, and passing [TEST-0112](test-cases.md) |
-| `RISK-0104` | State classification | Repeat adoption overwrites a seed or dispatches from drifted state | Mitigated / quick launcher | Complete-footprint classifier, installed-release blob verification, no-downgrade/cross-major rejection, and passing [TEST-0113](test-cases.md) |
-| `RISK-0105` | Consistency | Consumer-owned files retain a stale second protocol pin | Corrected prospectively / templates and root validation; transition reconciliation gap tracked by [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | Sole-authority rule and version-neutral templates remain covered by [TEST-0114](test-cases.md); the duplicated-live-pin state is the [MIG-0001](../../../migrations/MIG-0001.json) regression under [TEST-0119](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), while generic transition and handoff evidence are [TEST-0120](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), [TEST-0121](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md), and [TEST-0122](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md) |
+| `RISK-0102` <a name="risk-0102"></a> | Identity / traceability | Automation reuses or closes an unrelated issue | Mitigated / consumer workflow | Repository-bound first-line issue marker, exact target/SHA identity, backlink checks, and passing [TEST-0111](test-cases.md#test-0111) |
+| `RISK-0103` <a name="risk-0103"></a> | Compatibility | A legacy installing update cannot enter managed finalization safely | Mitigated / consumer workflow | One bounded bridge requiring merged same-repository proposal, marker/head/base/path/gitlink proof, and passing [TEST-0112](test-cases.md#test-0112) |
+| `RISK-0104` <a name="risk-0104"></a> | State classification | Repeat adoption overwrites a seed or dispatches from drifted state | Mitigated / quick launcher | Complete-footprint classifier, installed-release blob verification, no-downgrade/cross-major rejection, and passing [TEST-0113](test-cases.md#test-0113) |
+| `RISK-0105` <a name="risk-0105"></a> | Consistency | Consumer-owned files retain a stale second protocol pin | Corrected prospectively / templates and root validation; transition reconciliation gap tracked by [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) | Sole-authority rule and version-neutral templates remain covered by [TEST-0114](test-cases.md#test-0114); the duplicated-live-pin state is the [MIG-0001](../../../migrations/MIG-0001.json) regression under [TEST-0119](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0119), while generic transition and handoff evidence are [TEST-0120](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0120), [TEST-0121](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121), and [TEST-0122](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0122) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0039` | Automatic update issue ownership, supersession, and merge cleanup | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0111](test-cases.md); expected-red then focused pass | Exact token boundary, backlinks, reuse, supersession, and branch-first closure reviewed; no open finding | Complete |
-| `SUBF-0040` | Repeat-launch routing and bounded legacy transition | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0112](test-cases.md) and [TEST-0113](test-cases.md); expected-red then focused pass | Legacy proof, repeat-route ordering, interrupted state, and `FIND-0156` correction reviewed | Complete |
-| `SUBF-0041` | Version-neutral consumer pin authority | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0114](test-cases.md); expected-red then focused pass | Template destinations, links, and dynamic pin authority reviewed; no open finding | Complete |
+| `SUBF-0039` <a name="subf-0039"></a> | Automatic update issue ownership, supersession, and merge cleanup | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0111](test-cases.md#test-0111); expected-red then focused pass | Exact token boundary, backlinks, reuse, supersession, and branch-first closure reviewed; no open finding | Complete |
+| `SUBF-0040` <a name="subf-0040"></a> | Repeat-launch routing and bounded legacy transition | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0112](test-cases.md#test-0112) and [TEST-0113](test-cases.md#test-0113); expected-red then focused pass | Legacy proof, repeat-route ordering, interrupted state, and `FIND-0156` correction reviewed | Complete |
+| `SUBF-0041` <a name="subf-0041"></a> | Version-neutral consumer pin authority | [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) | [TEST-0114](test-cases.md#test-0114); expected-red then focused pass | Template destinations, links, and dynamic pin authority reviewed; no open finding | Complete |
 
 ## Decisions and relationships
 
@@ -126,7 +126,7 @@ owns generic transition reconciliation for release-declared derived state.
       live pin authority, and fail-closed error contracts are defined.
 - [x] `RISK-0102` through `RISK-0105` have owners and planned evidence.
 - [x] Work is decomposed into three independently reviewable subfeatures.
-- [x] [TEST-0111](test-cases.md), [TEST-0112](test-cases.md), [TEST-0113](test-cases.md), and [TEST-0114](test-cases.md) and the verification approach are defined.
+- [x] [TEST-0111](test-cases.md#test-0111), [TEST-0112](test-cases.md#test-0112), [TEST-0113](test-cases.md#test-0113), and [TEST-0114](test-cases.md#test-0114) and the verification approach are defined.
 - [x] Baseline is the green published `v0.9.7` repository state.
 
 ## Acceptance criteria
@@ -166,7 +166,7 @@ Consumer template links were reviewed in their copied destination context.
 
 | ID | Classification | Priority / impact | Finding | Disposition |
 | --- | --- | --- | --- | --- |
-| `FIND-0156` | Mutation-order defect / `Blocking` | `p1` / an unsupported completed installation could receive a local Git identity write before classification | The first implementation initialized `user.name` and `user.email` before `Get-ExistingAdoptionRoute`. The initialization now runs only after the classifier returns `InitialAdoption`; current, compatible, and rejected completed states do not receive that write. | Resolved in the same bounded review; PowerShell parsing and the 615.1-second complete suite confirmed the correction |
+| `FIND-0156` <a name="find-0156"></a> | Mutation-order defect / `Blocking` | `p1` / an unsupported completed installation could receive a local Git identity write before classification | The first implementation initialized `user.name` and `user.email` before `Get-ExistingAdoptionRoute`. The initialization now runs only after the classifier returns `InitialAdoption`; current, compatible, and rejected completed states do not receive that write. | Resolved in the same bounded review; PowerShell parsing and the 615.1-second complete suite confirmed the correction |
 
 No unresolved in-scope `Blocking` finding remains. Focused test fixture
 corrections initialized the synthetic submodule from its local immutable mock

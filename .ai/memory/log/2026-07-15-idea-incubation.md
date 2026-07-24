@@ -24,13 +24,13 @@
 
 ## Verification contract
 
-- [TEST-0043](../../../docs/features/FEAT-0008-idea-incubation/test-cases.md) covers lifecycle, index, template, and first-idea semantics.
-- [TEST-0044](../../../docs/features/FEAT-0008-idea-incubation/test-cases.md) covers consumer source access, absent-only bootstrap, collision
+- [TEST-0043](../../../docs/features/FEAT-0008-idea-incubation/test-cases.md#test-0043) covers lifecycle, index, template, and first-idea semantics.
+- [TEST-0044](../../../docs/features/FEAT-0008-idea-incubation/test-cases.md#test-0044) covers consumer source access, absent-only bootstrap, collision
   preservation, and updater managed-path non-expansion.
 
 ## Release evidence
 
-[Pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28) merged at `1b420322058d73a974ccb61d8b7f828eb38cce8e`,
+[Pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28) merged at [`1b420322058d73a974ccb61d8b7f828eb38cce8e`](https://github.com/hasanmanzak/meAndAI/commit/1b420322058d73a974ccb61d8b7f828eb38cce8e),
 and annotated tag
 [`v0.7.0`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0) resolves to that
 exact release commit. [FEAT-0008](../../../docs/features/FEAT-0008-idea-incubation/README.md) is complete.

@@ -8,7 +8,7 @@
 | Issue | [#67](https://github.com/hasanmanzak/meAndAI/issues/67) |
 | Pull request | [#68](https://github.com/hasanmanzak/meAndAI/pull/68) |
 | Related decisions | [DEC-0010](../../decisions/DEC-0010-stable-automation-invariants.md) |
-| Tests | [TEST-0117](test-cases.md) and [TEST-0118](test-cases.md) |
+| Tests | [TEST-0117](test-cases.md#test-0117) and [TEST-0118](test-cases.md#test-0118) |
 
 ## Problem and intended outcome
 
@@ -58,13 +58,13 @@ publication verification from ordinary CI without reducing coverage.
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0109` | State isolation | A new partial shard depends on mutable state produced by another shard | Mitigating / test maintainer | Independent completed baseline per partial shard and focused execution of all four groups; [TEST-0117](test-cases.md) |
-| `RISK-0110` | Evidence integrity | Sharding drops, duplicates, or falsely canonicalizes an existing scenario | Mitigating / test maintainer | Preserve `Shard=All`, compatibility-only partial results, exact seven-name structural contract, and full suite; [TEST-0117](test-cases.md) |
-| `RISK-0111` | Event routing | Release-only gating accidentally suppresses ordinary CI or revives the aggregate after skipped dependencies | Mitigating / workflow maintainer | Inverse guards on normal jobs, `always()` plus the same inverse guard on aggregate, positive verifier guard; [TEST-0118](test-cases.md) |
+| `RISK-0109` <a name="risk-0109"></a> | State isolation | A new partial shard depends on mutable state produced by another shard | Mitigating / test maintainer | Independent completed baseline per partial shard and focused execution of all four groups; [TEST-0117](test-cases.md#test-0117) |
+| `RISK-0110` <a name="risk-0110"></a> | Evidence integrity | Sharding drops, duplicates, or falsely canonicalizes an existing scenario | Mitigating / test maintainer | Preserve `Shard=All`, compatibility-only partial results, exact seven-name structural contract, and full suite; [TEST-0117](test-cases.md#test-0117) |
+| `RISK-0111` <a name="risk-0111"></a> | Event routing | Release-only gating accidentally suppresses ordinary CI or revives the aggregate after skipped dependencies | Mitigating / workflow maintainer | Inverse guards on normal jobs, `always()` plus the same inverse guard on aggregate, positive verifier guard; [TEST-0118](test-cases.md#test-0118) |
 
 ## Definition of Ready
 
-- [x] `FEAT-0025`, `SUBF-0044`, `SUBF-0045`, [TEST-0117](test-cases.md), [TEST-0118](test-cases.md),
+- [x] `FEAT-0025`, `SUBF-0044`, `SUBF-0045`, [TEST-0117](test-cases.md#test-0117), [TEST-0118](test-cases.md#test-0118),
       `RISK-0109` through `RISK-0111`, and linked [issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) exist.
 - [x] Problem, outcome, scope, non-goals, compatibility, isolation, event, and
       evidence contracts are explicit.
@@ -93,8 +93,8 @@ publication verification from ordinary CI without reducing coverage.
 
 | ID | Slice | Tracking | Tests | Self-review / findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0044` | Four semantic integrity shards with independent partial baselines and unchanged canonical order | [Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) | [TEST-0117](test-cases.md) | Focused structure and all four partial modes passed; no blocking finding | Implemented |
-| `SUBF-0045` | Mutually correct ordinary-validation and release-evidence dispatch routing | [Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) | [TEST-0118](test-cases.md) | Exact inverse and positive guards passed structure review; hosted evidence pending | Implemented |
+| `SUBF-0044` <a name="subf-0044"></a> | Four semantic integrity shards with independent partial baselines and unchanged canonical order | [Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) | [TEST-0117](test-cases.md#test-0117) | Focused structure and all four partial modes passed; no blocking finding | Implemented |
+| `SUBF-0045` <a name="subf-0045"></a> | Mutually correct ordinary-validation and release-evidence dispatch routing | [Issue #67](https://github.com/hasanmanzak/meAndAI/issues/67) | [TEST-0118](test-cases.md#test-0118) | Exact inverse and positive guards passed structure review; hosted evidence pending | Implemented |
 
 ## Verification approach
 
@@ -130,7 +130,7 @@ children, and the stable aggregate.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and [TEST-0117](test-cases.md) / [TEST-0118](test-cases.md) pass.
+- [x] Acceptance criteria and [TEST-0117](test-cases.md#test-0117) / [TEST-0118](test-cases.md#test-0118) pass.
 - [x] Focused local shards, complete test bodies, corrected root evidence, and
       the hosted canonical full suite pass.
 - [x] Hosted ordinary validation passes.

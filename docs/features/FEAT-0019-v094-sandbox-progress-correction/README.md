@@ -8,7 +8,7 @@
 | Issue | [#55](https://github.com/hasanmanzak/meAndAI/issues/55) |
 | Pull request | [#56](https://github.com/hasanmanzak/meAndAI/pull/56) |
 | Decisions | [DEC-0007](../../decisions/DEC-0007-local-quick-adoption-boundary.md), [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md) |
-| Tests | [TEST-0103](test-cases.md) and [TEST-0104](test-cases.md) |
+| Tests | [TEST-0103](test-cases.md#test-0103) and [TEST-0104](test-cases.md#test-0104) |
 
 ## Problem and intended outcome
 
@@ -74,10 +74,10 @@ a misleading percentage from its timeout. Progress records are completed in a
 
 | ID | Classification | Risk | Status / owner | Response and evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0089` | Sandbox fidelity | Ignoring user config silently selects a Windows implementation that cannot provide workspace writes | Mitigating / launcher maintainer | Carry only a validated implementation, run [TEST-0103](test-cases.md) probe variants before model execution, and retain `workspace-write` plus network denial |
-| `RISK-0090` | Isolation regression | Recovery broadens local Codex to full host access | Prevented / launcher maintainer | Reject values outside `elevated` and `unelevated`; structural tests prohibit `danger-full-access` and sandbox bypass |
-| `RISK-0091` | False progress | A timeout percentage is presented as actual work completion | Mitigating / launcher maintainer | Phase completion is discrete; long local Codex work is indeterminate with elapsed time; [TEST-0104](test-cases.md) |
-| `RISK-0092` | Empty-repository fabrication | Adoption invents product facts merely to satisfy project records | Mitigating / consumer maintainer | Record unknown product facts explicitly and limit evidence to adoption structure until product work defines them |
+| `RISK-0089` <a name="risk-0089"></a> | Sandbox fidelity | Ignoring user config silently selects a Windows implementation that cannot provide workspace writes | Mitigating / launcher maintainer | Carry only a validated implementation, run [TEST-0103](test-cases.md#test-0103) probe variants before model execution, and retain `workspace-write` plus network denial |
+| `RISK-0090` <a name="risk-0090"></a> | Isolation regression | Recovery broadens local Codex to full host access | Prevented / launcher maintainer | Reject values outside `elevated` and `unelevated`; structural tests prohibit `danger-full-access` and sandbox bypass |
+| `RISK-0091` <a name="risk-0091"></a> | False progress | A timeout percentage is presented as actual work completion | Mitigating / launcher maintainer | Phase completion is discrete; long local Codex work is indeterminate with elapsed time; [TEST-0104](test-cases.md#test-0104) |
+| `RISK-0092` <a name="risk-0092"></a> | Empty-repository fabrication | Adoption invents product facts merely to satisfy project records | Mitigating / consumer maintainer | Record unknown product facts explicitly and limit evidence to adoption structure until product work defines them |
 
 ## Definition of Ready
 
@@ -88,7 +88,7 @@ a misleading percentage from its timeout. Progress records are completed in a
       their Windows implementation and empty-consumer behavior without adding
       a new architectural boundary.
 - [x] The change is one small independently testable launcher correction.
-- [x] [TEST-0103](test-cases.md) and [TEST-0104](test-cases.md) define success, failure, fallback, cleanup,
+- [x] [TEST-0103](test-cases.md#test-0103) and [TEST-0104](test-cases.md#test-0104) define success, failure, fallback, cleanup,
       empty-repository, and progress variants before production changes.
 - [x] Verification is bounded to one expected-red focused run, one focused
       green run, one fresh-diff review, one complete suite, and the protocol's
@@ -120,7 +120,7 @@ a misleading percentage from its timeout. Progress records are completed in a
 
 ## Implementation and verification approach
 
-Add [TEST-0103](test-cases.md) and [TEST-0104](test-cases.md) assertions first and demonstrate the current
+Add [TEST-0103](test-cases.md#test-0103) and [TEST-0104](test-cases.md#test-0104) assertions first and demonstrate the current
 launcher lacks the sandbox selection/probe, empty-repository distinction, and
 progress contract. Then change only the existing launcher and its governing
 records. Use the live host's model-free `codex sandbox` evidence as the external
@@ -160,7 +160,7 @@ asserts that no Windows sandbox selection or probe is attempted.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and [TEST-0103](test-cases.md) / [TEST-0104](test-cases.md) pass.
+- [x] Acceptance criteria and [TEST-0103](test-cases.md#test-0103) / [TEST-0104](test-cases.md#test-0104) pass.
 - [x] Existing quick-adoption scenarios and complete repository suite pass.
 - [x] Fresh-diff review and bounded project scan leave no unresolved
       `Blocking` finding.

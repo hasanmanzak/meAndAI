@@ -28,14 +28,14 @@
 
 ## Evidence state
 
-- [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) freezes a minimal project-neutral pre-migration validator by exact Git blob.
+- [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) freezes a minimal project-neutral pre-migration validator by exact Git blob.
   It proves core-only red and the production 13-path atomic proposal green.
-- [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) covers requested-target ceiling, invalid target forms, recovery
+- [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) covers requested-target ceiling, invalid target forms, recovery
   branch separation, legacy cleanup identity, isolated-clone cleanup, and
   maintainer checkout preservation.
 - Focused resolver, adapter, current-launcher recovery, and merge-finalization
   suites pass locally. The complete discovered suite passed in 589.1 seconds
-  and emitted canonical [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) and [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md) evidence.
+  and emitted canonical [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) and [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) evidence.
 - The bounded fresh-diff review found two lifecycle gaps, both corrected before
   publication; exact re-review found no unresolved Blocking/High issue.
 - Hosted, merge, branch cleanup, immutable release, and post-publication

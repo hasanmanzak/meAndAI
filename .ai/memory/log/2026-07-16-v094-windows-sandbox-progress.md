@@ -3,7 +3,7 @@
 - Date: 2026-07-16
 - Status: Complete; publication pending
 - Feature: [FEAT-0019](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/README.md)
-- Tests: [TEST-0103](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md) and [TEST-0104](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md)
+- Tests: [TEST-0103](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md#test-0103) and [TEST-0104](../../../docs/features/FEAT-0019-v094-sandbox-progress-correction/test-cases.md#test-0104)
 - Issue: [#55](https://github.com/hasanmanzak/meAndAI/issues/55)
 - Pull request: [#56](https://github.com/hasanmanzak/meAndAI/pull/56)
 

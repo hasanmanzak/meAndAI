@@ -113,26 +113,26 @@ evidence of collision and are never changed.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0022` | Supply chain | Workflow-only bootstrap executes code not yet stored in the consumer | Mitigated; protocol maintainers | Execute only from the workflow's exact protocol release and verify release/tag/checkout identity |
-| `RISK-0023` | Integrity | A populated repository is misclassified as safe and consumer content is overwritten | Mitigated; bootstrap adapter | Exact target collision inventory, copy-only-when-absent behavior, staged-path validation, and negative fixtures |
-| `RISK-0024` | Semantics | “AI capabilities” is mistaken for an automatically running AI agent | Mitigated; maintainers | Explicit manifest handoff and non-goal; workflow never calls an AI service |
-| `RISK-0025` | Interruption | Branch creation succeeds before PR creation and leaves an orphan | Managed; consumer maintainer | Expected-absent lease, deterministic branch, no overwrite on later runs, and documented recovery |
-| `RISK-0026` | Compatibility | Existing v0.4 consumers stop updating after lifecycle routing changes | Mitigated; protocol maintainers | Complete local-updater presence delegates unchanged behavior; full updater regression suite |
-| `RISK-0027` | Authorization | Bootstrap expands the updater token into issue/label administration | Avoided; consumer admin | Labels remain agent/maintainer work; token permissions do not change |
-| `RISK-0028` | Handoff | A draft adoption proposal is merged before semantic completion | Mitigated; consumer maintainer | Transient manifest, draft-only proposal, explicit readiness tasks, and protocol gate |
+| `RISK-0022` <a name="risk-0022"></a> | Supply chain | Workflow-only bootstrap executes code not yet stored in the consumer | Mitigated; protocol maintainers | Execute only from the workflow's exact protocol release and verify release/tag/checkout identity |
+| `RISK-0023` <a name="risk-0023"></a> | Integrity | A populated repository is misclassified as safe and consumer content is overwritten | Mitigated; bootstrap adapter | Exact target collision inventory, copy-only-when-absent behavior, staged-path validation, and negative fixtures |
+| `RISK-0024` <a name="risk-0024"></a> | Semantics | “AI capabilities” is mistaken for an automatically running AI agent | Mitigated; maintainers | Explicit manifest handoff and non-goal; workflow never calls an AI service |
+| `RISK-0025` <a name="risk-0025"></a> | Interruption | Branch creation succeeds before PR creation and leaves an orphan | Managed; consumer maintainer | Expected-absent lease, deterministic branch, no overwrite on later runs, and documented recovery |
+| `RISK-0026` <a name="risk-0026"></a> | Compatibility | Existing v0.4 consumers stop updating after lifecycle routing changes | Mitigated; protocol maintainers | Complete local-updater presence delegates unchanged behavior; full updater regression suite |
+| `RISK-0027` <a name="risk-0027"></a> | Authorization | Bootstrap expands the updater token into issue/label administration | Avoided; consumer admin | Labels remain agent/maintainer work; token permissions do not change |
+| `RISK-0028` <a name="risk-0028"></a> | Handoff | A draft adoption proposal is merged before semantic completion | Mitigated; consumer maintainer | Transient manifest, draft-only proposal, explicit readiness tasks, and protocol gate |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), [TEST-0029](test-cases.md), [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md) |
-| Test code | Green | PowerShell planner, structural, and real-Git adapter fixtures pass for [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), [TEST-0029](test-cases.md), [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md) |
+| Scenarios | Defined | [TEST-0027](test-cases.md#test-0027), [TEST-0028](test-cases.md#test-0028), [TEST-0029](test-cases.md#test-0029), [TEST-0030](test-cases.md#test-0030), [TEST-0031](test-cases.md#test-0031), and [TEST-0032](test-cases.md#test-0032) |
+| Test code | Green | PowerShell planner, structural, and real-Git adapter fixtures pass for [TEST-0027](test-cases.md#test-0027), [TEST-0028](test-cases.md#test-0028), [TEST-0029](test-cases.md#test-0029), [TEST-0030](test-cases.md#test-0030), [TEST-0031](test-cases.md#test-0031), and [TEST-0032](test-cases.md#test-0032) |
 | Baseline run | Passed | Windows PowerShell 5.1 repository suite on 2026-07-15 before FEAT-0005 changes |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0009` | Seed routing and collision-free deterministic bootstrap | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0027](test-cases.md), [TEST-0028](test-cases.md), and [TEST-0029](test-cases.md); passed | Fresh-diff review complete; no slice finding | Reviewed |
-| `SUBF-0010` | Collision handoff, idempotency, and updater transition | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0030](test-cases.md), [TEST-0031](test-cases.md), and [TEST-0032](test-cases.md); passed | Fresh-diff review complete; no slice finding | Reviewed |
+| `SUBF-0009` <a name="subf-0009"></a> | Seed routing and collision-free deterministic bootstrap | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0027](test-cases.md#test-0027), [TEST-0028](test-cases.md#test-0028), and [TEST-0029](test-cases.md#test-0029); passed | Fresh-diff review complete; no slice finding | Reviewed |
+| `SUBF-0010` <a name="subf-0010"></a> | Collision handoff, idempotency, and updater transition | [Issue #17](https://github.com/hasanmanzak/meAndAI/issues/17) | [TEST-0030](test-cases.md#test-0030), [TEST-0031](test-cases.md#test-0031), and [TEST-0032](test-cases.md#test-0032); passed | Fresh-diff review complete; no slice finding | Reviewed |
 
 ## Decisions and relationships
 
@@ -190,7 +190,7 @@ unchanged review loop or extra bootstrap layer was added.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0052` | Version consistency / High / High | The full suite found [templates/project/AGENTS.repository-reference.md](../../../templates/project/AGENTS.repository-reference.md) still pinned to `v0.4.0`; updated the current reference to `v0.5.0` and confirmed the complete suite. | Resolved |
+| `FIND-0052` <a name="find-0052"></a> | Version consistency / High / High | The full suite found [templates/project/AGENTS.repository-reference.md](../../../templates/project/AGENTS.repository-reference.md) still pinned to `v0.4.0`; updated the current reference to `v0.5.0` and confirmed the complete suite. | Resolved |
 
 No unresolved actionable in-scope finding remains. Explicitly owned residual
 risks remain `RISK-0022` through `RISK-0028`.

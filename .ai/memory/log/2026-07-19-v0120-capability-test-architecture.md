@@ -31,14 +31,14 @@
 
 ## Current evidence
 
-- [TEST-0134](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), [TEST-0135](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), [TEST-0136](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), [TEST-0137](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md), and [TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md) have executable capability-owned suites and
+- [TEST-0134](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0134), [TEST-0135](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0135), [TEST-0136](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0136), [TEST-0137](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0137), [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0138), [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0139), and [TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140) have executable capability-owned suites and
   focused catalog, discovery, topology, lifecycle, and workflow evidence.
 - The unrestricted Windows-native profile passed in 412.8 seconds. The first
   complete suite then found the stale already-current zero-dispatch fixture
   expectation after 1576.3 seconds; its exact `Auto` dispatch correction passed
   the focused adoption-lifecycle shard in 165.4 seconds and the complete suite
   passed in 1652.5 seconds with every recursively discovered owner green.
-- Draft [PR #82](https://github.com/hasanmanzak/meAndAI/pull/82)'s first two Ubuntu jobs found and narrowed [FIND-0170](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md). The
+- Draft [PR #82](https://github.com/hasanmanzak/meAndAI/pull/82)'s first two Ubuntu jobs found and narrowed [FIND-0170](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0170). The
   exact UTC parser was not the final failing boundary: PowerShell 7.4.2
   `ConvertFrom-Json` materialized canonical `reviewedAt` JSON as
   `System.DateTime`, then a direct string cast applied culture formatting.
@@ -46,21 +46,21 @@
   still requires exact source-to-canonical byte equality. Canonical round-trip
   and fraction/offset/zone negatives pass on Windows PowerShell 5.1 and the
   matching Linux PowerShell 7.4.2 container.
-- The corrected Linux catalog slice then exposed [FIND-0171](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md): both shared
+- The corrected Linux catalog slice then exposed [FIND-0171](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0171): both shared
   property accessors used `Write-Output -NoEnumerate`, which represented scalar
   evidence and a null fixture binding as `List<object>` values on PowerShell
   7.4. They now return through unary comma, preserving scalar, null, empty,
   singleton, and multi-value shapes on Windows PowerShell 5.1 and PowerShell
-  7.4.2. Focused [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md)/[TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md) pass on both hosts.
-- Hosted Ubuntu then reached [TEST-0136](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md) and exposed [FIND-0172](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md): Linux
+  7.4.2. Focused [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0139)/[TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140) pass on both hosts.
+- Hosted Ubuntu then reached [TEST-0136](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0136) and exposed [FIND-0172](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0172): Linux
   PowerShell returned from `New-Item -ItemType Junction` without creating a
   path, while the fixture treated call completion as link creation and skipped
   its `SymbolicLink` fallback. The fixture now requires the link path to exist
   before accepting an item type. Focused discovery passes with an actual link
   on Windows PowerShell 5.1 and Linux PowerShell 7.4.2.
 - Replacement hosted run 29670698209 passed on exact candidate commit
-  `773a415`: Ubuntu completed in 6 minutes 57 seconds and Windows completed in
-  31 minutes 26 seconds. [FIND-0170](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md), [FIND-0171](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md), and [FIND-0172](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md) are resolved.
+  [`773a415`](https://github.com/hasanmanzak/meAndAI/commit/773a415844d56ac3b96be99390dd3e17d1aa5140): Ubuntu completed in 6 minutes 57 seconds and Windows completed in
+  31 minutes 26 seconds. [FIND-0170](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0170), [FIND-0171](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0171), and [FIND-0172](../../../docs/features/FEAT-0032-general-capability-test-architecture/README.md#find-0172) are resolved.
 - Windows Git-heavy focused tests may require an unrestricted rerun when the
   sandbox reproduces the known `sh.exe` signal-pipe ACL error; this is a harness
   boundary, not product evidence.

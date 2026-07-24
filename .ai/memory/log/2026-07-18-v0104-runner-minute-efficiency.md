@@ -29,7 +29,7 @@
 
 ## Evidence state
 
-- [TEST-0123](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) selector fixtures and [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md) structure validation pass.
+- [TEST-0123](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0123) selector fixtures and [TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) structure validation pass.
 - The PowerShell 5.1 `WindowsNative` profile passed in 187.1 seconds outside
   the restricted local Git signal-pipe sandbox.
 - The complete PowerShell 5.1 suite passed in 577.7 seconds outside the

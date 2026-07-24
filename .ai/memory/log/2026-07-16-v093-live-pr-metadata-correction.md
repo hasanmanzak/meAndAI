@@ -4,7 +4,7 @@
 
 - Work item: [FEAT-0018](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/README.md)
 - Defect and post-publication authority: [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53)
-- Test: [`TEST-0102`](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md)
+- Test: [`TEST-0102`](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md#test-0102)
 - Target version: `0.9.3`
 - Consumer reproduction: affected external proposal recorded in [issue #53](https://github.com/hasanmanzak/meAndAI/issues/53)
 
@@ -15,7 +15,7 @@
 - Live GitHub CLI evidence exposes `headRepository.name`,
   `headRepositoryOwner.login`, and Boolean `isCrossRepository`; the corrected
   launcher validates those fields as one canonical repository identity.
-- [TEST-0102](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md) replaces the synthetic fixture shape, asserts the requested JSON
+- [TEST-0102](../../../docs/features/FEAT-0018-v093-live-pr-metadata-correction/test-cases.md#test-0102) replaces the synthetic fixture shape, asserts the requested JSON
   fields, accepts the same-repository draft, and rejects name, owner,
   cross-repository, and type drift before local Codex or Git mutation.
 - The affected consumer's secrets, seed, successful workflow run, adoption branch, and draft
