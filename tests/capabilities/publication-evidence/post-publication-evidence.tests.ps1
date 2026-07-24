@@ -10,6 +10,7 @@ $failures = [System.Collections.Generic.List[string]]::new()
 $global:MeAndAIPostPublicationMode = 'Valid'
 $global:MeAndAIPostPublicationRequests = [System.Collections.Generic.List[string]]::new()
 $global:MeAndAIPostPublicationDownloadRequests = [System.Collections.Generic.List[string]]::new()
+$global:MeAndAIPostPublicationEventArrayResponses = 0
 
 function Add-Failure {
     param([string]$Message)
@@ -207,7 +208,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.3' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.4' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
@@ -1126,27 +1127,67 @@ git show $commit
         if ($global:MeAndAIPostPublicationMode -ceq 'MergeEventMissing') {
             return @()
         }
-        if ($page -eq 1) {
-            return @(1..100 | ForEach-Object {
-                [pscustomobject]@{ event = 'labeled'; commit_id = $null; ordinal = $_ }
+        if ($global:MeAndAIPostPublicationMode -ceq
+            'MergeEventPaginationOverflow') {
+            $events = [object[]]@(1..100 | ForEach-Object {
+                [pscustomobject]@{
+                    event = 'labeled'
+                    commit_id = $null
+                    ordinal = (($page - 1) * 100) + $_
+                }
             })
+            $global:MeAndAIPostPublicationEventArrayResponses++
+            Write-Output -NoEnumerate $events
+            return
+        }
+        if ($page -eq 1) {
+            if ($global:MeAndAIPostPublicationMode -ceq
+                'MergeEventNullItem') {
+                $events = [object[]]::new(100)
+                for ($index = 0; $index -lt 99; $index++) {
+                    $events[$index] = [pscustomobject]@{
+                        event = 'labeled'
+                        commit_id = $null
+                        ordinal = $index + 1
+                    }
+                }
+                $events[99] = $null
+            }
+            else {
+                $events = [object[]]@(1..100 | ForEach-Object {
+                    [pscustomobject]@{
+                        event = 'labeled'
+                        commit_id = $null
+                        ordinal = $_
+                    }
+                })
+            }
+            $global:MeAndAIPostPublicationEventArrayResponses++
+            Write-Output -NoEnumerate $events
+            return
         }
         if ($page -eq 2) {
             if ($global:MeAndAIPostPublicationMode -ceq 'MergeEventDuplicate') {
-                return @(
+                $events = [object[]]@(
                     [pscustomobject]@{ event = 'merged'; commit_id = $commit },
                     [pscustomobject]@{ event = 'merged'; commit_id = $commit }
                 )
+                $global:MeAndAIPostPublicationEventArrayResponses++
+                Write-Output -NoEnumerate $events
+                return
             }
             $eventCommit = switch ($global:MeAndAIPostPublicationMode) {
                 'MergeEventMalformed' { 'D' * 40 }
                 'MergeEventWrongCommit' { $wrongCommit }
                 default { $commit }
             }
-            return ,([pscustomobject]@{
+            $events = [object[]]@([pscustomobject]@{
                 event = 'merged'
                 commit_id = $eventCommit
             })
+            $global:MeAndAIPostPublicationEventArrayResponses++
+            Write-Output -NoEnumerate $events
+            return
         }
         return @()
     }
@@ -1412,6 +1453,7 @@ function Invoke-PostPublicationScenario {
     $global:MeAndAIPostPublicationMode = $Mode
     $global:MeAndAIPostPublicationRequests.Clear()
     $global:MeAndAIPostPublicationDownloadRequests.Clear()
+    $global:MeAndAIPostPublicationEventArrayResponses = 0
     Set-TestAssetFixture -Mode $Mode
     try {
         $parameters = @{
@@ -1634,6 +1676,15 @@ try {
         if ($valid.Threw) {
             Add-Failure "TEST-0076 valid published evidence failed: $($valid.Error)"
         }
+        if ($global:MeAndAIPostPublicationEventArrayResponses -ne 2) {
+            Add-Failure 'TEST-0181 valid publication evidence did not consume exactly two unenumerated event-array responses.'
+        }
+        $nullItemEvidence = Invoke-PostPublicationScenario `
+            -Mode 'MergeEventNullItem'
+        if ($nullItemEvidence.Threw -or
+            $global:MeAndAIPostPublicationEventArrayResponses -ne 2) {
+            Add-Failure "TEST-0181 null page items were not filtered without weakening exact two-page merge evidence: $($nullItemEvidence.Error)"
+        }
         if ($global:MeAndAIPostPublicationDownloadRequests.Count -ne 0 -or
             @($global:MeAndAIPostPublicationRequests | Where-Object {
                 $_ -match '/contents/scripts/quick-adoption/'
@@ -1687,7 +1738,8 @@ try {
             @{ Mode = 'MergeEventMissing'; Error = '*one exact merged event*' },
             @{ Mode = 'MergeEventDuplicate'; Error = '*one exact merged event*' },
             @{ Mode = 'MergeEventMalformed'; Error = '*invalid commit identity*' },
-            @{ Mode = 'MergeEventWrongCommit'; Error = '*delivery pull request does not resolve to the exact released commit*' }
+            @{ Mode = 'MergeEventWrongCommit'; Error = '*delivery pull request does not resolve to the exact released commit*' },
+            @{ Mode = 'MergeEventPaginationOverflow'; Error = '*pagination exceeded the bounded 100-page evidence limit*' }
         )) {
             $result = Invoke-PostPublicationScenario -Mode $negative.Mode
             if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
@@ -2013,6 +2065,7 @@ finally {
     Remove-Variable MeAndAIPostPublicationMode -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationRequests -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationDownloadRequests -Scope Global -ErrorAction SilentlyContinue
+    Remove-Variable MeAndAIPostPublicationEventArrayResponses -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationLauncherBytes -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationLauncherSourceBytes -Scope Global -ErrorAction SilentlyContinue
     Remove-Variable MeAndAIPostPublicationBundleBytes -Scope Global -ErrorAction SilentlyContinue

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Backward-compatible propagation correction / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117) |
-| Status | Complete |
+| Status | Complete; publication evidence reopened |
 | Target version | 0.14.3 |
 | Issue | [#117](https://github.com/hasanmanzak/meAndAI/issues/117) |
 | Pull request | [#118](https://github.com/hasanmanzak/meAndAI/pull/118) |
@@ -116,6 +116,7 @@ exact event-selection rule.
 | --- | --- | --- |
 | `FIND-0240` <a name="find-0240"></a> | [PR run 30111807614](https://github.com/hasanmanzak/meAndAI/actions/runs/30111807614) proved that the correct traceability graph grew from 2,039 to 2,061 edges and exceeded the published 2,048 ceiling on both hosted runtimes | Revise [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md), the release contract, and exact boundary test to 4,096; do not remove valid links |
 | `FIND-0241` <a name="find-0241"></a> | The post-publication workflow checked verifier code out at `expected_commit`, so a historical `v0.14.2` rerun would execute the same obsolete field reader | Separate exact current verifier authority from the detached immutable evidence worktree and enforce the lifecycle in [TEST-0180](test-cases.md#test-0180) |
+| `FIND-0242` <a name="find-0242"></a> | Dedicated [v0.14.3 post-publication run 30117735612](https://github.com/hasanmanzak/meAndAI/actions/runs/30117735612) proved that real `Invoke-RestMethod` top-level JSON arrays arrive as one unenumerated `System.Object[]`, while the verifier pagination helper and its mock assumed enumerated page items | Reopen publication closure and correct the distinct runtime-shape gap under [FEAT-0049](../FEAT-0049-v0144-paged-array-response-normalization/README.md) / [BUG-0032](https://github.com/hasanmanzak/meAndAI/issues/119) without mutating immutable `v0.14.3` |
 
 ## Self-review
 
@@ -165,6 +166,12 @@ The bounded implementation review found no unresolved blocking item:
 
 ## Post-merge release evidence
 
-[Issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) is the external
-authority. Release identifier, target commit, verification run, and cleanup
-remain pending until they occur.
+Immutable [v0.14.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.3)
+targets exact merged [PR #118](https://github.com/hasanmanzak/meAndAI/pull/118)
+commit [`2d6cfc27418209c26cf9c27225c37938bac14dd9`](https://github.com/hasanmanzak/meAndAI/commit/2d6cfc27418209c26cf9c27225c37938bac14dd9),
+and its exact owned branch is absent. Dedicated
+[run 30117735612](https://github.com/hasanmanzak/meAndAI/actions/runs/30117735612)
+then exposed [FIND-0242](#find-0242), so
+[issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) is reopened
+until [FEAT-0049](../FEAT-0049-v0144-paged-array-response-normalization/README.md)
+publishes and the same immutable release passes current verifier authority.

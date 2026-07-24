@@ -3,6 +3,27 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.14.4 - 2026-07-24
+
+### Fixed
+
+- Normalize each paged GitHub response after one explicit local assignment so
+  a real PowerShell `Invoke-RestMethod` top-level JSON array becomes its exact
+  page items rather than one nested `System.Object[]` event.
+- Make the project-neutral publication fixture emit the same unenumerated array
+  shape as the real transport, preserving page bounds, null filtering, exact
+  merge-event selection, and all fail-closed negatives.
+- Retain the shared resolver, consumer updater, API version, workflow topology,
+  and two-asset release contract unchanged.
+
+Related work: [FEAT-0049](docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md),
+[BUG-0032](https://github.com/hasanmanzak/meAndAI/issues/119),
+[TEST-0181](docs/features/FEAT-0049-v0144-paged-array-response-normalization/test-cases.md#test-0181),
+[FEAT-0048](docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
+[issue #119](https://github.com/hasanmanzak/meAndAI/issues/119), and the
+retained publication closures in [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
+and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114).
+
 ## 0.14.3 - 2026-07-24
 
 ### Fixed
