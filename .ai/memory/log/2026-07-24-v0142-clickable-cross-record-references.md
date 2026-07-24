@@ -49,6 +49,11 @@
   It also confirmed PowerShell 7 native date deserialization in updater,
   quick-adoption, and capability-review GitHub timestamp paths; all are routed
   through semantic or invariant cross-runtime checks before the hosted rerun.
+- The next full hosted route exposed one missed compatibility allowlist in
+  local adoption completion: the canonical reader understood path-free linked
+  marker schemas while manifest validation still stopped at the prior schema
+  generation. Completion now admits the same strategy and graph-aware schema
+  sets, with its existing direct schema-9 boundary acting as the regression.
 
 ## Continuation
 
