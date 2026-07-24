@@ -76,13 +76,18 @@
   authority-shaped replacement output as JSON string payload. Non-root JSON
   strings are now opaque to instruction semantics, while JSON instruction
   roots retain full discovery and containment checks.
+- The corrected exact code head at
+  [commit 014b089](https://github.com/hasanmanzak/meAndAI/commit/014b0896bb0742aff5365516c4ac4af95c8100eb)
+  passed [hosted run 30080257096](https://github.com/hasanmanzak/meAndAI/actions/runs/30080257096)
+  on Ubuntu and Windows. The final evidence-only head still requires its own
+  exact-head hosted confirmation before draft promotion.
 
 ## Continuation
 
-1. Complete the remaining local and hosted validation under
-   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
-2. Complete one final fresh review and promote the draft only after all gates
-   pass.
-3. After review and merge, publish immutable `v0.14.2`, write exact evidence to
+1. Publish the evidence-only closure commit under
+   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) and
+   require its exact-head hosted validation.
+2. Promote the draft only after that final gate passes.
+3. After merge, publish immutable `v0.14.2`, write exact evidence to
    [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and remove
    only the owned delivery branch.

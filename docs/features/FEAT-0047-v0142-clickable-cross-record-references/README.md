@@ -137,7 +137,7 @@ rule.
 - [x] Acceptance criteria, [TEST-0175](test-cases.md), and
   [TEST-0176](test-cases.md) pass.
 - [x] Focused protocol-governance and publication-evidence owners pass.
-- [ ] Structural and required aggregate validation pass.
+- [x] Structural and required aggregate validation pass.
 - [x] One bounded fresh-diff review has no unresolved `Blocking` finding.
 - [x] Historical reconciliation evidence is recorded in [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103).
 - [x] Version, changelog, feature index, project memory, and links are current.
