@@ -65,6 +65,11 @@
   seven closed issue and pull-request titles. Because titles cannot render
   links, each now keeps only its leading owned feature identity; body hashes,
   linked relationships, and closed states were preserved exactly.
+- The next clean hosted aggregate reached the new issue-link assertion on both
+  runtimes and exposed an expected-value bug for a legitimate zero-surface
+  graph. The assertion and its integrity variants now preserve graph identity
+  across resets, require all detected links or the exact `- None`
+  representation, and reject empty link labels independently.
 
 ## Continuation
 

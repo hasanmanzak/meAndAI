@@ -4886,17 +4886,24 @@ try {
         $issueGraphIdentity =
             $global:QuickAdoptionDispatchedSourceGraphIdentity
         $issueGraphBase = [string]$issueGraphIdentity.graphBase
-        $issueSurface = [string]@($issueGraphIdentity.protocolSurfaces)[0]
-        $encodedIssueSurface = (@($issueSurface.Split('/') | ForEach-Object {
-            [Uri]::EscapeDataString([string]$_)
-        }) -join '/')
+        $issueSurfaces = @($issueGraphIdentity.protocolSurfaces)
+        $expectedIssueSurfaceReferences = if ($issueSurfaces.Count -gt 0) {
+            @($issueSurfaces | ForEach-Object {
+                $issueSurface = [string]$_
+                $encodedIssueSurface = (@($issueSurface.Split('/') |
+                    ForEach-Object {
+                        [Uri]::EscapeDataString([string]$_)
+                    }) -join '/')
+                "- [``$issueSurface``](https://github.com/$($global:QuickAdoptionRepoName)/blob/$issueGraphBase/$encodedIssueSurface)"
+            })
+        }
+        else { @('- None') }
         $expectedIssueReferences = @(
             "- Protocol release: [v0.14.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.2)",
             "- Protocol commit: [$($global:QuickAdoptionProtocolSha)](https://github.com/hasanmanzak/meAndAI/commit/$($global:QuickAdoptionProtocolSha))",
             $expectedVisiblePullRequestLink,
-            "- Source graph base: [$issueGraphBase](https://github.com/$($global:QuickAdoptionRepoName)/commit/$issueGraphBase)",
-            "- [``$issueSurface``](https://github.com/$($global:QuickAdoptionRepoName)/blob/$issueGraphBase/$encodedIssueSurface)"
-        )
+            "- Source graph base: [$issueGraphBase](https://github.com/$($global:QuickAdoptionRepoName)/commit/$issueGraphBase)"
+        ) + @($expectedIssueSurfaceReferences)
         $missingIssueReferences = @($expectedIssueReferences | Where-Object {
             -not ([string]$openMarkedIssues[0].body).Contains([string]$_)
         })
@@ -4904,6 +4911,7 @@ try {
                 $expectedVisiblePullRequestLink
             ) -or
             ([string]$openMarkedIssues[0].body).Contains(':pr-42 -->') -or
+            ([string]$openMarkedIssues[0].body).Contains('- [``](') -or
             $missingIssueReferences.Count -ne 0) {
             Add-Failure "TEST-0176 canonical adoption issue exposed a cross-artifact marker identity or omitted exact immutable release/commit/PR/graph/surface links: $($missingIssueReferences -join ', ')"
         }
@@ -7042,10 +7050,12 @@ try {
 
     if ($runIntegrityShards -and
         (Test-QuickAdoptionShard -Name 'IntegrityManifestIssue')) {
+        $canonicalIssueGraphIdentity =
+            $global:QuickAdoptionDispatchedSourceGraphIdentity
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
             -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.14.2' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
-            -GraphDigest ([string]$global:QuickAdoptionDispatchedSourceGraphIdentity.graphDigest) `
+            -GraphDigest ([string]$canonicalIssueGraphIdentity.graphDigest) `
             -PullRequestUrl "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
         $manifestContractModes = @(
             'AdditionalProperty', 'MissingProperty', 'WrongRequiredTasks',
@@ -7121,13 +7131,24 @@ try {
         }
         else {
             $canonicalOwnedBody = [string]$canonicalOwnedIssue[0].body
-            $firstIssueSurface = @(
-                $global:QuickAdoptionDispatchedSourceGraphIdentity.protocolSurfaces
-            )[0]
-            $encodedIssueSurface = (@(([string]$firstIssueSurface).Split('/') |
-                ForEach-Object { [Uri]::EscapeDataString([string]$_) }) -join '/')
-            $exactIssueSurfaceLink =
-                "- [``$firstIssueSurface``](https://github.com/$($global:QuickAdoptionRepoName)/blob/$([string]$global:QuickAdoptionDispatchedSourceGraphIdentity.graphBase)/$encodedIssueSurface)"
+            $canonicalIssueSurfaces = @(
+                $canonicalIssueGraphIdentity.protocolSurfaces
+            )
+            $rawIssueSurfaceBody = if ($canonicalIssueSurfaces.Count -gt 0) {
+                $firstIssueSurface = [string]$canonicalIssueSurfaces[0]
+                $encodedIssueSurface = (@($firstIssueSurface.Split('/') |
+                    ForEach-Object {
+                        [Uri]::EscapeDataString([string]$_)
+                    }) -join '/')
+                $exactIssueSurfaceLink =
+                    "- [``$firstIssueSurface``](https://github.com/$($global:QuickAdoptionRepoName)/blob/$([string]$canonicalIssueGraphIdentity.graphBase)/$encodedIssueSurface)"
+                $canonicalOwnedBody.Replace(
+                    $exactIssueSurfaceLink, "- ``$firstIssueSurface``"
+                )
+            }
+            else {
+                $canonicalOwnedBody.Replace('- None', '- ``AGENTS.md``')
+            }
             $markerVariants = [ordered]@{
                 malformed = $canonicalOwnedBody.Replace(
                     $canonicalIssueMarker,
@@ -7149,9 +7170,7 @@ try {
                     "[PR #42](https://github.com/$($global:QuickAdoptionRepoName)/pull/42)",
                     'PR #42'
                 )
-                'raw-surface-reference' = $canonicalOwnedBody.Replace(
-                    $exactIssueSurfaceLink, "- ``$firstIssueSurface``"
-                )
+                'raw-surface-reference' = $rawIssueSurfaceBody
             }
             $markerVariantIndex = 0
             foreach ($variant in $markerVariants.GetEnumerator()) {
@@ -7192,8 +7211,7 @@ try {
                 '<!-- meandai-local-adoption:v0.14.2:pr-42 -->'
             $pullRequestUrl =
                 "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
-            $graphIdentity =
-                $global:QuickAdoptionDispatchedSourceGraphIdentity
+            $graphIdentity = $canonicalIssueGraphIdentity
             $legacyOwnedBody = [string]$canonicalOwnedIssue[0].body
             $legacyOwnedBody = $legacyOwnedBody.Replace(
                 $canonicalIssueMarker, $legacyIssueMarker
