@@ -26,7 +26,7 @@
   records stable lowercase custom anchors and requires exact fragments.
 - Human-facing commit references use owning-repository full-SHA commit
   permalinks; commands, source and structured values, fixtures, digests, Git
-  object inputs, and opaque machine markers remain literals.
+  object identities or inputs, and opaque machine markers remain literals.
 - Repository templates, production text generators, static governance checks,
   and publication-evidence fixtures now agree on that one rule.
 - The bounded repository-document audit and initial hash-protected GitHub
@@ -94,8 +94,8 @@
   [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and
   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) are
   their stable external authority.
-- The reopened correction is locally converged: 719 embedded records and
-  3,218 canonical-path label links produce no remaining deterministic
+- The reopened correction is locally converged: the full canonical embedded-
+  record registry and its label links produce no remaining deterministic
   anchor/fragment edit, and the repository commit-reference migration produces
   no remaining edit.
 - Historical full-SHA blob links remain valid when their exact snapshot,
@@ -106,6 +106,12 @@
 - Post-publication validation checks out and scans the clean expected commit,
   verifies external commit targets through a bounded API contract, and retains
   exact prior-draft-head evidence without binding it to a moving branch.
+- The first [commit 679b82c](https://github.com/hasanmanzak/meAndAI/commit/679b82c61c7714f20cb7fa4c358f868c19cd1f3e)
+  exact-head live dry run found 1,290 deterministic edits
+  across 160 of 340 surfaces and stopped on ten SHA ambiguities. Review proved
+  five Git blob/tree or structured-field literals and five Derdini commit
+  occurrences; the final plan keeps the literals unchanged and API-verifies
+  four exact Derdini commit targets before mutation.
 
 ## Continuation
 

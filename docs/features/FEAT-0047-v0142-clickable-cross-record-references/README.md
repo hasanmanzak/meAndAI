@@ -54,7 +54,7 @@ rule.
   validator framework.
 - Require an artifact's own identifier to link to itself.
 - Treat command arguments, source examples, structured data, fixtures, Git
-  object inputs, digests, or opaque machine markers as commit references merely
+  object identities or inputs, digests, or opaque machine markers as commit references merely
   because they contain SHA-shaped text.
 - Mutate a consumer repository.
 - Weaken existing external-evidence, pagination, or exact-release checks.
@@ -143,7 +143,7 @@ rule.
     is permitted when it resolves unambiguously, but plain, wrong-repository,
     wrong-SHA, branch, tree, or blob targets fail.
 12. Commands, source examples, structured fields, fixtures, digests, Git object
-    inputs, and opaque machine markers retain literal SHA values without being
+    identities or inputs, and opaque machine markers retain literal SHA values without being
     misclassified as commit references.
 
 ## Self-review findings
@@ -174,6 +174,7 @@ rule.
 | `FIND-0234` <a name="find-0234"></a> | Final validator review found case-insensitive fragment existence, a post-publication working-tree identity gap, a function-local scalar that defeated the external-commit request bound, and PowerShell 5.1 promotion of expected negative Git-probe stderr | Fragment existence is ordinal; post-publication checkout and validation require the clean exact expected commit with full history; a mutable counter and the 33-target negative fixture enforce the bound; expected native misses use a scoped non-terminating probe with immediate preference restoration |
 | `FIND-0235` <a name="find-0235"></a> | GitHub validation treated every earlier immutable draft-head blob as stale even when its exact path and fragment still resolved | Required current feature and decision closure links remain bound to the pull-request head or expected commit, while historical full-SHA blobs are snapshot-validated; a prior-head [TEST-0175](test-cases.md#test-0175) fixture passes |
 | `FIND-0236` <a name="find-0236"></a> | A generic tree-link rejection briefly rewrote 13 valid tag-root links to Release pages that do not exist for those historical tags | Live and local tag evidence restored all 13 `/tree/<tag>` roots; governance permits only an existing exact tag root and still rejects tree links to repository files, queries, or fragments |
+| `FIND-0237` <a name="find-0237"></a> | The final exact-head live dry run failed closed on ten SHA-shaped values whose owning object or repository could not be inferred mechanically | Five Git blob/tree and structured-field values remain literals under focused fixtures; five Derdini commit occurrences use four API-proven owning-repository permalinks in the hash-protected live plan |
 
 ## Definition of Done
 

@@ -507,7 +507,7 @@ increase detail.
   40-character commit hash; the visible label MAY use a short hash when the
   target can be resolved unambiguously. A hash used only as a command
   argument, source or fixture value, structured-data field, digest, Git object
-  input, or opaque machine marker is a literal rather than a human-facing
+  identity or input, or opaque machine marker is a literal rather than a human-facing
   reference and does not require a link.
 - Links MUST be clickable and validated before completion; record automated
   local-link results and manual or automated external-link evidence separately.

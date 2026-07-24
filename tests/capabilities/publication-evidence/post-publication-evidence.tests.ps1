@@ -752,6 +752,10 @@ Source example: ``$commit``
 Git object input: ``$commit``
 Tag object identity: $wrongCommit
 Git blob identity: $externalCommit
+Neutral fixture blob: $wrongCommit
+migrations/index.json: $externalCommit
+Merge tree: $wrongCommit
+Reviewed commit; its tree $externalCommit
 Opaque machine marker: ``MEANDAI_HEAD_SHA=$commit``
 
 ~~~console

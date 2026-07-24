@@ -1673,12 +1673,16 @@ function Test-CommitLiteralIsExcluded {
     }
 
     if ($prefix -cmatch
-        '(?i)\b(?:tag\s+object|git\s+blob)(?:\s+(?:identity|oid|sha))?\s*[:=]?\s*[`"'']*\s*$') {
+        '(?i)\b(?:tag\s+object|git\s+blob|git\s+tree|merge\s+tree|its\s+tree|fixture\s+blob)(?:\s+(?:identity|oid|sha))?\s*[:=]?\s*[`"'']*\s*$') {
+        return $true
+    }
+
+    if ($prefix -cmatch '(?i)\.json\s*:\s*[`"'']*\s*$') {
         return $true
     }
 
     if ($prefix -cmatch
-        '(?i)\b(?:(?:fixture|placeholder|synthetic)(?:\s+(?:commit|sha|value|literal)){0,3}|machine\s+literal|sample\s+value|test\s+vector|source\s+(?:example|value)|git\s+object(?:\s+input)?|git\s+blob(?:\s+(?:identity|oid|sha))?|tag\s+object(?:\s+(?:identity|oid|sha))?|opaque\s+(?:machine\s+)?marker|checksum|digest|(?:sha-?(?:1|224|256|384|512)|md5)(?:\s+digest)?)\s*[:=]\s*[`"'']*\s*$') {
+        '(?i)\b(?:(?:fixture|placeholder|synthetic)(?:\s+(?:commit|sha|value|literal|blob)){0,3}|machine\s+literal|sample\s+value|test\s+vector|source\s+(?:example|value)|git\s+object(?:\s+input)?|git\s+(?:blob|tree)(?:\s+(?:identity|oid|sha))?|(?:tag\s+object|merge\s+tree|its\s+tree)(?:\s+(?:identity|oid|sha))?|opaque\s+(?:machine\s+)?marker|checksum|digest|(?:sha-?(?:1|224|256|384|512)|md5)(?:\s+digest)?)\s*[:=]\s*[`"'']*\s*$') {
         return $true
     }
     if ($prefix -cmatch

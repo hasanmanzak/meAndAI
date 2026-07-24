@@ -26,7 +26,7 @@ This project uses the `M.m.rev` version format defined in the
   blob-plus-fragment targets.
 - Require human-facing commit evidence to use an owning-repository full-SHA
   commit permalink while preserving command, source, structured-data, fixture,
-  digest, Git-object, and opaque-marker literals.
+  digest, Git-object identity/input, and opaque-marker literals.
 - Validate current and historical full-SHA blob targets at their exact paths
   and fragments, retain verified historical tag-root links, and reject mutable
   branch or file-targeting tree links.
