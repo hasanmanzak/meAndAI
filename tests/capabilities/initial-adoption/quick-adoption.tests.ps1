@@ -1219,6 +1219,67 @@ function Get-MockConsumerMigrationBaseline {
     }
 }
 
+function Test-QuickAdoptionGitHubTimestampContract {
+    $protocolReleasePath = Join-Path $root `
+        'scripts/quick-adoption/Private/ProtocolReleaseAndAssets.ps1'
+    $timestampModule = New-Module `
+        -Name "MeAndAI.TimestampContract.$([guid]::NewGuid().ToString('N'))" `
+        -ScriptBlock {
+            param([string]$SourcePath)
+            . $SourcePath
+            Export-ModuleMember -Function 'ConvertTo-MeAndAIGitHubTimestamp'
+        } -ArgumentList $protocolReleasePath
+    Import-Module -ModuleInfo $timestampModule -Scope Local -Force
+    try {
+        $nativeRecord = '{"published_at":"2026-07-15T00:00:00Z"}' |
+            ConvertFrom-Json
+        if ($PSVersionTable.PSVersion.Major -ge 7 -and
+            $nativeRecord.published_at -isnot [DateTime] -and
+            $nativeRecord.published_at -isnot [DateTimeOffset]) {
+            Add-Failure 'TEST-0056 PS7 ConvertFrom-Json did not produce native timestamp evidence.'
+        }
+        $positiveValues = @(
+            $nativeRecord.published_at,
+            [DateTimeOffset]::ParseExact(
+                '2026-07-15T03:00:00+03:00',
+                "yyyy-MM-dd'T'HH:mm:sszzz",
+                [Globalization.CultureInfo]::InvariantCulture
+            ),
+            '2026-07-15T03:00:00+03:00'
+        )
+        foreach ($value in $positiveValues) {
+            $normalized = ConvertTo-MeAndAIGitHubTimestamp -Value $value
+            if ($normalized.ToString('o') -cne
+                    '2026-07-15T00:00:00.0000000+00:00') {
+                Add-Failure "TEST-0056 GitHub timestamp normalization drifted for '$($value.GetType().FullName)'."
+            }
+        }
+
+        $negativeValues = @(
+            '07/15/2026 00:00:00',
+            [DateTime]::SpecifyKind(
+                [DateTime]::new(2026, 7, 15, 0, 0, 0),
+                [DateTimeKind]::Unspecified
+            )
+        )
+        foreach ($value in $negativeValues) {
+            $accepted = $false
+            try {
+                ConvertTo-MeAndAIGitHubTimestamp -Value $value | Out-Null
+                $accepted = $true
+            }
+            catch { }
+            if ($accepted) {
+                Add-Failure "TEST-0056 GitHub timestamp contract accepted '$($value.GetType().FullName)' without exact timezone evidence."
+            }
+        }
+    }
+    finally {
+        Remove-Module -ModuleInfo $timestampModule -Force `
+            -ErrorAction SilentlyContinue
+    }
+}
+
 function Save-MockProtocolAssetSnapshot {
     param(
         [Parameter(Mandatory)][string]$Tag,
@@ -2400,8 +2461,21 @@ function global:Invoke-RestMethod {
             tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { $tag }
             draft = $false
             prerelease = $false
-            immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
-            published_at = '2026-07-15T00:00:00Z'
+            immutable = $global:QuickAdoptionReleaseMode -cin @(
+                'Immutable', 'MalformedTimestamp', 'UnspecifiedTimestamp'
+            )
+            published_at = if ($global:QuickAdoptionReleaseMode -ceq
+                    'MalformedTimestamp') {
+                '07/15/2026 00:00:00'
+            }
+            elseif ($global:QuickAdoptionReleaseMode -ceq
+                    'UnspecifiedTimestamp') {
+                [DateTime]::SpecifyKind(
+                    [DateTime]::new(2026, 7, 15, 0, 0, 0),
+                    [DateTimeKind]::Unspecified
+                )
+            }
+            else { '2026-07-15T00:00:00Z' }
         }
     }
 
@@ -2719,8 +2793,21 @@ function global:gh {
             tag_name = if ($global:QuickAdoptionReleaseMode -ceq 'WrongTag') { 'v0.7.2' } else { $tag }
             draft = $false
             prerelease = $false
-            immutable = $global:QuickAdoptionReleaseMode -ceq 'Immutable'
-            published_at = '2026-07-15T00:00:00Z'
+            immutable = $global:QuickAdoptionReleaseMode -cin @(
+                'Immutable', 'MalformedTimestamp', 'UnspecifiedTimestamp'
+            )
+            published_at = if ($global:QuickAdoptionReleaseMode -ceq
+                    'MalformedTimestamp') {
+                '07/15/2026 00:00:00'
+            }
+            elseif ($global:QuickAdoptionReleaseMode -ceq
+                    'UnspecifiedTimestamp') {
+                [DateTime]::SpecifyKind(
+                    [DateTime]::new(2026, 7, 15, 0, 0, 0),
+                    [DateTimeKind]::Unspecified
+                )
+            }
+            else { '2026-07-15T00:00:00Z' }
         } | ConvertTo-Json -Compress)
     }
     if ($apiEndpoint.Count -eq 1 -and
@@ -3466,6 +3553,7 @@ try {
 
     if (Test-QuickAdoptionShard -Name 'ContractsPreflight') {
         Reset-Mocks
+        Test-QuickAdoptionGitHubTimestampContract
         $firstFixtureRepository = $global:QuickAdoptionProtocolRepository
         $firstFixtureArchive = $script:QuickAdoptionProtocolFixture.ArchivePath
         $firstMutableCalls = $global:QuickAdoptionGhCalls
@@ -4331,7 +4419,10 @@ try {
     }
 
     if ($failures.Count -eq 0) {
-        foreach ($releaseMode in @('Mutable', 'Missing')) {
+        foreach ($releaseMode in @(
+            'Mutable', 'Missing', 'MalformedTimestamp',
+            'UnspecifiedTimestamp'
+        )) {
             Reset-Mocks
             $releaseRoot = New-TempRoot -Name "release-$($releaseMode.ToLowerInvariant())"
             $releaseRepo = Join-Path $releaseRoot 'consumer'

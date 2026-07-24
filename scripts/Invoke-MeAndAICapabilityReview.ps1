@@ -1855,6 +1855,36 @@ function Get-HistoricalProtocolEvidence {
         -Endpoint "repos/$($script:ProtocolRepository)/releases/tags/$escapedTag" `
         -Authority Protocol
     [DateTimeOffset]$publishedAt = [DateTimeOffset]::MinValue
+    $publishedAtValue = Get-PropertyValue -Value $release `
+        -Name published_at -Label 'Historical protocol release'
+    $publishedAtValid = if ($publishedAtValue -is [DateTimeOffset]) {
+        $publishedAt = [DateTimeOffset]$publishedAtValue
+        $true
+    }
+    elseif ($publishedAtValue -is [DateTime]) {
+        $publishedDateTime = [DateTime]$publishedAtValue
+        if ($publishedDateTime.Kind -eq [DateTimeKind]::Unspecified) {
+            $false
+        }
+        else {
+            $publishedAt = [DateTimeOffset]$publishedDateTime
+            $true
+        }
+    }
+    elseif ($publishedAtValue -is [string]) {
+        [DateTimeOffset]::TryParseExact(
+            [string]$publishedAtValue,
+            [string[]]@(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF'Z'"
+            ),
+            [Globalization.CultureInfo]::InvariantCulture,
+            [Globalization.DateTimeStyles]::AssumeUniversal -bor
+                [Globalization.DateTimeStyles]::AdjustToUniversal,
+            [ref]$publishedAt
+        )
+    }
+    else { $false }
     if ([string](Get-PropertyValue -Value $release -Name tag_name `
             -Label 'Historical protocol release') -cne $protocolTag -or
         (Get-PropertyValue -Value $release -Name draft `
@@ -1866,11 +1896,7 @@ function Get-HistoricalProtocolEvidence {
         (Get-PropertyValue -Value $release -Name immutable `
             -Label 'Historical protocol release') -isnot [bool] -or
         -not [bool]$release.immutable -or
-        -not [DateTimeOffset]::TryParse(
-            [string](Get-PropertyValue -Value $release -Name published_at `
-                -Label 'Historical protocol release'),
-            [ref]$publishedAt
-        )) {
+        -not $publishedAtValid) {
         throw 'Historical protocol tag is not one exact published immutable release.'
     }
 

@@ -1319,6 +1319,7 @@ function Test-ExactAdoptionPullRequestBodyEvidence {
         [Parameter(Mandatory)]$PullRequest,
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][string]$BaseHead,
+        [Parameter(Mandatory)][string]$SourceGraphBase,
         [Parameter(Mandatory)][string]$ProposalHead,
         [Parameter(Mandatory)][string]$TargetTag,
         [Parameter(Mandatory)][string]$TargetSha,
@@ -1332,7 +1333,7 @@ function Test-ExactAdoptionPullRequestBodyEvidence {
     $requiredLines = @(
         "- Protocol release: [$TargetTag](https://github.com/$ProtocolRepository/releases/tag/$TargetTag)",
         "- Protocol commit: [$TargetSha](https://github.com/$ProtocolRepository/commit/$TargetSha)",
-        "- Source graph base: [$BaseHead](https://github.com/$Repository/commit/$BaseHead)",
+        "- Source graph base: [$SourceGraphBase](https://github.com/$Repository/commit/$SourceGraphBase)",
         "An agent or maintainer must complete the tasks in $manifestLink and remove the manifest before this pull request can become ready or merge."
     )
     foreach ($line in $requiredLines) {
@@ -1346,7 +1347,7 @@ function Test-ExactAdoptionPullRequestBodyEvidence {
     }
     return (Test-MeAndAIExactLinkedPathSection -Body $body `
             -Heading '### Detected protocol and governance surfaces' `
-            -Repository $Repository -Commit $BaseHead `
+            -Repository $Repository -Commit $SourceGraphBase `
             -Paths @($ProtocolSurfaces)) -and
         (Test-MeAndAIExactLinkedPathSection -Body $body `
             -Heading '### Detected collisions' -Repository $Repository `
@@ -1531,6 +1532,16 @@ function Test-ExactAdoptionProposal {
         return $false
     }
     $pullRequest = $PullRequests[0]
+    $sourceGraphBase = $BaseHead
+    if ($null -ne $ExpectedSourceGraph) {
+        if ($null -eq $ExpectedSourceGraph.PSObject.Properties['baseHead']) {
+            return $false
+        }
+        $sourceGraphBase = [string]$ExpectedSourceGraph.baseHead
+    }
+    if ($sourceGraphBase -cnotmatch '^[0-9a-f]{40}$') {
+        return $false
+    }
     if (-not (Test-ExactAdoptionPullRequestMarker -PullRequest $pullRequest `
         -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch `
         -BaseBranch $BaseBranch -TargetTag $TargetTag -TargetSha $TargetSha `
@@ -1544,7 +1555,8 @@ function Test-ExactAdoptionProposal {
     }
     if (-not (Test-ExactAdoptionPullRequestBodyEvidence `
         -PullRequest $pullRequest -Repository $Repository `
-        -BaseHead $BaseHead -ProposalHead $RemoteHead `
+        -BaseHead $BaseHead -SourceGraphBase $sourceGraphBase `
+        -ProposalHead $RemoteHead `
         -TargetTag $TargetTag -TargetSha $TargetSha `
         -ProtocolSurfaces @($ProtocolSurfaces) `
         -Collisions @($Collisions))) {
@@ -1598,6 +1610,16 @@ function Test-ExactCompletedAdoptionProposal {
         return $false
     }
     $pullRequest = $PullRequests[0]
+    $sourceGraphBase = $BaseHead
+    if ($null -ne $ExpectedSourceGraph) {
+        if ($null -eq $ExpectedSourceGraph.PSObject.Properties['baseHead']) {
+            return $false
+        }
+        $sourceGraphBase = [string]$ExpectedSourceGraph.baseHead
+    }
+    if ($sourceGraphBase -cnotmatch '^[0-9a-f]{40}$') {
+        return $false
+    }
     if (-not (Test-ExactAdoptionPullRequestMarker -PullRequest $pullRequest `
         -RemoteHead $RemoteHead -Repository $Repository -Branch $Branch `
         -BaseBranch $BaseBranch -TargetTag $TargetTag -TargetSha $TargetSha `
@@ -1631,7 +1653,8 @@ function Test-ExactCompletedAdoptionProposal {
     $proposalHead = [string]$ancestry[1]
     if (-not (Test-ExactAdoptionPullRequestBodyEvidence `
         -PullRequest $pullRequest -Repository $Repository `
-        -BaseHead $BaseHead -ProposalHead $proposalHead `
+        -BaseHead $BaseHead -SourceGraphBase $sourceGraphBase `
+        -ProposalHead $proposalHead `
         -TargetTag $TargetTag -TargetSha $TargetSha `
         -ProtocolSurfaces @($ProtocolSurfaces) `
         -Collisions @($Collisions))) {
@@ -2470,7 +2493,8 @@ else { '- None' }
 $protocolSurfaceText = if (@($plan.ProtocolSurfaces).Count -gt 0) {
     @($plan.ProtocolSurfaces | ForEach-Object {
         '- ' + (New-MeAndAIGitHubBlobLink `
-            -Repository $env:GITHUB_REPOSITORY -Commit $baseHead `
+            -Repository $env:GITHUB_REPOSITORY `
+            -Commit ([string]$sourceGraphIdentity.graphBase) `
             -Path ([string]$_))
     }) -join [Environment]::NewLine
 }

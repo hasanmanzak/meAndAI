@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Backward-compatible protocol correction / [BUG-0029](https://github.com/hasanmanzak/meAndAI/issues/114) |
-| Status | In progress |
+| Status | Complete |
 | Target version | 0.14.2 |
 | Issue | [#114](https://github.com/hasanmanzak/meAndAI/issues/114) |
 | Pull request | [#115](https://github.com/hasanmanzak/meAndAI/pull/115) |
@@ -63,7 +63,7 @@ rule.
 
 | ID | Slice | Tracking | Tests | Review gate | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0089` | Direct rule, compact enforcement, and bounded historical reconciliation | [Issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) | [TEST-0175](test-cases.md), [TEST-0176](test-cases.md) | Protocol, templates, validators, current delivery records, and historical corrections agree | In progress |
+| `SUBF-0089` | Direct rule, compact enforcement, and bounded historical reconciliation | [Issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) | [TEST-0175](test-cases.md), [TEST-0176](test-cases.md) | Protocol, templates, validators, current delivery records, and historical corrections agree | Complete |
 
 ## Definition of Ready
 
@@ -122,15 +122,17 @@ rule.
 | `FIND-0220` | Reusable update and adoption evidence retained pull-request identities or managed repository paths in opaque markers and plain text that could not satisfy the direct link rule | Current writers use opaque ownership markers plus exact pull-request and immutable blob links; bounded legacy readers remain compatible and malformed or displaced marker signals fail closed |
 | `FIND-0221` | Fresh parser review found that flat inline-link and bare-URL regular expressions rejected valid balanced destinations while accepting non-rendering URL substrings, invalid boundaries, and bare localhost-style domains | Mirrored balanced Markdown parsers and GFM-compatible HTTP autolink recognition now cover nested labels, escaped or angle-delimited destinations, exact visible-URL targets, boundaries, domains, and punctuation |
 | `FIND-0222` | A fully paginated confirmation audit found no remaining free-text GitHub reference, but found 21 clickable spans in 15 records whose combined, stale-branch, directory, or wrong-kind targets were not exact | Hash-protected corrections split every combined identity and replace every proven target; the final two current-delivery links were replaced with exact pushed-commit targets after the first branch publication |
-| `FIND-0223` | Cross-runtime closure exposed helper-function scope loss and culture-dependent GitHub release timestamp parsing in existing update test paths | Required helpers are captured into isolated scopes and release evidence normalizes native date values without culture-dependent string round-tripping |
+| `FIND-0223` | Cross-runtime closure exposed helper-function scope loss and PowerShell 7 native date deserialization in updater, quick-adoption, and capability-review GitHub timestamp paths | Required helpers are captured into isolated scopes; native date values are normalized directly and string fallbacks use invariant exact formats with cross-runtime regressions |
+| `FIND-0224` | The first hosted run found a stale runtime-invocation inventory and source-graph proposal links bound to the current base rather than the graph evidence base; three fixture assertions also mistook a nested counter name for a forbidden top-level marker property | The reviewed invocation inventory includes the new legacy-convergence slice, proposal links bind the proven graph base, and fixtures inspect the parsed top-level marker property set instead of raw substrings |
+| `FIND-0225` | The final live audit found one Markdown pseudo-link hidden inside inline code and two secondary record IDs in GitHub title fields that cannot render links | The issue body now renders one exact path link; the issue and pull-request titles retain only their own identity while their bodies retain linked related records |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria, [TEST-0175](test-cases.md), and
+- [x] Acceptance criteria, [TEST-0175](test-cases.md), and
   [TEST-0176](test-cases.md) pass.
-- [ ] Focused protocol-governance and publication-evidence owners pass.
+- [x] Focused protocol-governance and publication-evidence owners pass.
 - [ ] Structural and required aggregate validation pass.
-- [ ] One bounded fresh-diff review has no unresolved `Blocking` finding.
+- [x] One bounded fresh-diff review has no unresolved `Blocking` finding.
 - [x] Historical reconciliation evidence is recorded in [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103).
 - [x] Version, changelog, feature index, project memory, and links are current.
 - [x] [Issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) link each other and this feature record.

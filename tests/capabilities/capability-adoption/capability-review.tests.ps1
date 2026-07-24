@@ -996,7 +996,7 @@ try {
                 draft = $false
                 prerelease = $false
                 immutable = -not $apiState.HistoricalReview.ReleaseNotImmutable
-                published_at = '2026-07-19T00:00:00Z'
+                published_at = $apiState.HistoricalReview.PublishedAt
             }
         }
         if ($Method -ceq 'GET' -and
@@ -2378,6 +2378,13 @@ try {
     $historicalIssueNumber = 93
     $historicalPullNumber = 94
 
+    $nativeHistoricalPublishedAt = (
+        '{"published_at":"2026-07-19T00:00:00Z"}' | ConvertFrom-Json
+    ).published_at
+    if ($PSVersionTable.PSVersion.Major -ge 7 -and
+        $nativeHistoricalPublishedAt -isnot [DateTime]) {
+        throw 'TEST-0165 PowerShell 7 did not expose the native JSON DateTime release fixture.'
+    }
     $newHistoricalReviewState = {
         param(
             [Parameter(Mandatory)]$SourceCatalog,
@@ -2479,6 +2486,7 @@ try {
             )
             ProtocolCommit = $historicalProtocolCommit
             ProtocolTag = 'v0.12.0'
+            PublishedAt = $nativeHistoricalPublishedAt
             BaseHead = $historicalBaseHead
             HandoffHead = $historicalHandoffHead
             ReviewHead = $historicalReviewHead
@@ -2800,6 +2808,10 @@ try {
     & $assertHistoricalBlock 'non-immutable historical release' {
         param($state)
         $state.ReleaseNotImmutable = $true
+    } '*immutable*release*'
+    & $assertHistoricalBlock 'malformed historical release timestamp' {
+        param($state)
+        $state.PublishedAt = '07/19/2026 00:00:00'
     } '*immutable*release*'
     & $assertHistoricalBlock 'historical protocol outside current ancestry' {
         param($state)

@@ -29,6 +29,12 @@
   [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103)
   were replaced with exact pushed-commit targets and verified by post-apply
   hash.
+- After [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115)
+  expanded the inventory to 221 GitHub text records, the final audit found and
+  corrected one inline-code-hidden migration link plus two secondary record
+  identities in title fields that cannot render links. The only expected live
+  drift is the current-candidate blob pin, which must be rebound once to the
+  final pull-request head after all code fixes are committed.
 - A final repository scan found and corrected three code-formatted numeric
   shorthands that the first shorthand fixture did not reject; [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md)
   now covers that combined form. Completed records stayed closed and consumer
@@ -38,6 +44,11 @@
   cross-document range, GFM autolink, and balanced Markdown-destination gaps.
   Twenty-one historical aggregate ranges now link their exact suite authority
   or each intended record.
+- The first hosted run exposed a stale dynamic-invocation inventory,
+  source-graph links bound to the wrong base, and raw-substring fixture checks.
+  It also confirmed PowerShell 7 native date deserialization in updater,
+  quick-adoption, and capability-review GitHub timestamp paths; all are routed
+  through semantic or invariant cross-runtime checks before the hosted rerun.
 
 ## Continuation
 

@@ -48,7 +48,7 @@
 | [FEAT-0044](FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) | [Slash-safe ref and single-owner consumer lifecycle](FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md) | Complete | 0.13.5 |
 | [FEAT-0045](FEAT-0045-v0140-canonical-repository-evidence/README.md) | [Canonical repository evidence and upstream-owned corrections](FEAT-0045-v0140-canonical-repository-evidence/README.md) | Complete | 0.14.0 |
 | [FEAT-0046](FEAT-0046-v0141-consumer-nonduplication-mandate/README.md) | [Consumer non-duplication mandate](FEAT-0046-v0141-consumer-nonduplication-mandate/README.md) | Complete | 0.14.1 |
-| [FEAT-0047](FEAT-0047-v0142-clickable-cross-record-references/README.md) | [Clickable cross-record references](FEAT-0047-v0142-clickable-cross-record-references/README.md) | In progress | 0.14.2 |
+| [FEAT-0047](FEAT-0047-v0142-clickable-cross-record-references/README.md) | [Clickable cross-record references](FEAT-0047-v0142-clickable-cross-record-references/README.md) | Complete | 0.14.2 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

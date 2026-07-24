@@ -1261,6 +1261,26 @@ function Get-RemoteChangedPaths {
     ))
 }
 
+function Test-Schema9MarkerOmitsProtocolSurfacePaths {
+    param([Parameter(Mandatory)][string]$Body)
+
+    $markerMatches = [regex]::Matches(
+        $Body,
+        '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->'
+    )
+    if ($markerMatches.Count -ne 1) {
+        return $false
+    }
+    try {
+        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
+    }
+    catch {
+        return $false
+    }
+    return [long]$marker.schema -eq 9 -and
+        @($marker.PSObject.Properties.Name) -cnotcontains 'protocolSurfaces'
+}
+
 function Set-ExistingSchema9AdoptionMarker {
     param(
         [Parameter(Mandatory)][string]$Head,
@@ -2225,7 +2245,8 @@ try {
         if ($global:PullRequestCreateCalls -ne 1 -or
             -not $global:LastPullRequestBody.Contains('BootstrapReady') -or
             -not $global:LastPullRequestBody.Contains('"schema":9') -or
-            $global:LastPullRequestBody.Contains('"protocolSurfaces"') -or
+            -not (Test-Schema9MarkerOmitsProtocolSurfacePaths `
+                -Body $global:LastPullRequestBody) -or
             -not $global:LastPullRequestBody.Contains('"phase":"Proposed"') -or
             -not $global:LastPullRequestBody.Contains('"adoptionStrategy":"FreshAdoption"') -or
             -not $global:LastPullRequestBody.Contains('"actor":"owner"') -or
@@ -2702,7 +2723,8 @@ try {
         if (-not $global:LastPullRequestBody.Contains(
                 $expectedCollisionLink
             ) -or
-            $global:LastPullRequestBody.Contains('"protocolSurfaces"')) {
+            -not (Test-Schema9MarkerOmitsProtocolSurfacePaths `
+                -Body $global:LastPullRequestBody)) {
             Add-Failure 'TEST-0176 hosted collision proposal did not expose its surface and collision as exact immutable blob links outside the marker.'
         }
         $agents = (Invoke-Git -Repository $collision.Consumer -Arguments @(
@@ -2722,7 +2744,8 @@ try {
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1 -or
         -not $global:LastPullRequestBody.Contains('"adoptionStrategy":"CleanStart"') -or
-        $global:LastPullRequestBody.Contains('"protocolSurfaces"') -or
+        -not (Test-Schema9MarkerOmitsProtocolSurfacePaths `
+            -Body $global:LastPullRequestBody) -or
         -not $global:LastPullRequestBody.Contains(
             '[`AGENTS.md`](https://github.com/owner/consumer/blob/'
         ) -or

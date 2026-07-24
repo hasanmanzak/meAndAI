@@ -88,7 +88,8 @@ function Invoke-LifecycleWorkflow {
                     throw 'GitHub CLI returned incomplete workflow-run metadata.'
                 }
                 try {
-                    $createdAt = [DateTimeOffset]::Parse([string]$run.createdAt)
+                    $createdAt = ConvertTo-MeAndAIGitHubTimestamp `
+                        -Value $run.createdAt
                 }
                 catch {
                     throw 'GitHub CLI returned an invalid workflow-run timestamp.'
