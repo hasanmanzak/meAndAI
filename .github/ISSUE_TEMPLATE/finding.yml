@@ -96,7 +96,7 @@ body:
     id: dependencies
     attributes:
       label: Finding dependencies
-      description: List prerequisite FIND-NNNN identifiers, or write None.
+      description: Link prerequisite FIND-NNNN records, or write None.
       placeholder: None
     validations:
       required: true
@@ -118,6 +118,6 @@ body:
     id: references
     attributes:
       label: Related records
-      description: Link related issues, pull requests, features, decisions, tests, wiki pages, or docs.
+      description: Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
     validations:
       required: true

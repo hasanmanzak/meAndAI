@@ -7,7 +7,8 @@ This memory belongs only to this consuming project. Read
 [project.md](project.md), then the newest relevant record in
 [log](log/README.md).
 
-The common-protocol authority is the integration recorded in `project.md`.
+The common-protocol authority is the integration recorded in the
+[project snapshot](project.md).
 For the recommended submodule, resolve the current commit from the repository's
 `.ai/protocol` gitlink and its version from `.ai/protocol/VERSION`. Do not copy
 either value into memory as a separately maintained live fact. A

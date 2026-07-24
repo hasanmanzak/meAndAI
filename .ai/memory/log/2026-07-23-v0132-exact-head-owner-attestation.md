@@ -5,7 +5,7 @@
 - Feature: [FEAT-0041](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/README.md)
 - Decision: [DEC-0025](../../../docs/decisions/DEC-0025-exact-head-personal-owner-attestation.md)
 - Tracking: [issue #102](https://github.com/hasanmanzak/meAndAI/issues/102)
-- Tests: [TEST-0163 and TEST-0164](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md)
+- Tests: [TEST-0163](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163) and [TEST-0164](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0164)
 
 ## Verified problem
 
@@ -32,20 +32,20 @@ finalization recovery. Ready and merge are deliberately not review evidence.
 
 ## Evidence
 
-- Baseline focused owner passed TEST-0139/0140 on v0.13.1.
+- Baseline focused owner passed [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0139) and [TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140) on v0.13.1.
 - Test-first execution then failed at the absent owner fallback with
   `Merged capability review lacks an approval for the exact review head.`
-- Corrected focused execution passed TEST-0139, TEST-0140, TEST-0163, and
-  TEST-0164, including a valid page-two attestation after 100 ordinary
+- Corrected focused execution passed [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0139), [TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140), [TEST-0163](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163), and
+  [TEST-0164](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0164), including a valid page-two attestation after 100 ordinary
   comments, nonempty-review non-fallback, identity/permission negatives,
   branch-first issue-last recovery, and completed-rerun no-op behavior.
 - Structural validation passed all discovered contracts and current-release
-  metadata; the v0.13.2 release-bundle contract passed TEST-0147.
+  metadata; the v0.13.2 release-bundle contract passed [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147).
 
 ## Continuation
 
-Complete the one bounded fresh-diff review, then publish v0.13.2 through issue
-#102 and retain hosted evidence there.
+Complete the one bounded fresh-diff review, then publish v0.13.2 through [issue
+#102](https://github.com/hasanmanzak/meAndAI/issues/102) and retain hosted evidence there.
 Do not mutate the affected consumer from this branch. After the immutable
 release is installed there, the personal owner adds the exact canonical
 attestation to the retained merged pull request and explicitly reruns

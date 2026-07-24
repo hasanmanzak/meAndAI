@@ -7,7 +7,7 @@
   and [DEC-0026](../../../docs/decisions/DEC-0026-historical-capability-review-recovery.md)
 - Tracking: [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106)
 - Delivery: [PR #107](https://github.com/hasanmanzak/meAndAI/pull/107)
-- Tests: [TEST-0167 and TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md)
+- Tests: [TEST-0167](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0167) and [TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168)
 
 ## Verified problem
 
@@ -27,26 +27,26 @@ retains the external failure evidence.
   immutable release, catalog, ledger, and cleanup evidence strict.
 - Preserve exact ledger bytes, expected-OID branch deletion, issue-last
   closure, one fresh inventory, and completed-rerun idempotency.
-- Use only project-neutral TEST-0167/0168 fixtures in the existing capability-
+- Use only project-neutral [TEST-0167](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0167) and [TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168) fixtures in the existing capability-
   review owner; add no workflow or hosted fan-out.
 
 ## Readiness and evidence
 
-- `BUG-0025`, `FEAT-0043`, `SUBF-0082`, `RISK-0201`, `RISK-0202`, and issue
-  #106 define the bounded correction.
-- DEC-0025 already defines lowercase repository identity for owner
-  attestation; DEC-0026 remains authoritative for historical proof and cleanup.
-- TEST-0167 covers mixed-case equivalent recovery and idempotency. TEST-0168
+- [BUG-0025](https://github.com/hasanmanzak/meAndAI/issues/106), [FEAT-0043](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md), [SUBF-0082](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#subf-0082), [RISK-0201](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#risk-0201), [RISK-0202](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#risk-0202), and [issue
+  #106](https://github.com/hasanmanzak/meAndAI/issues/106) define the bounded correction.
+- [DEC-0025](../../../docs/decisions/DEC-0025-exact-head-personal-owner-attestation.md) already defines lowercase repository identity for owner
+  attestation; [DEC-0026](../../../docs/decisions/DEC-0026-historical-capability-review-recovery.md) remains authoritative for historical proof and cleanup.
+- [TEST-0167](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0167) covers mixed-case equivalent recovery and idempotency. [TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168)
   covers non-case identity, host, path, number, and malformed binding rejection.
 - The focused test-first run failed as intended in 10.3 seconds. After the
   structured authority correction and bounded review fixes, the capability-
-  review owner passed in 14.5 seconds with TEST-0167/0168 in scenario evidence.
+  review owner passed in 14.5 seconds with [TEST-0167](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0167) and [TEST-0168](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168) in scenario evidence.
 - Final local StructureOnly validation passed in 13.6 seconds. Hosted checks,
   pull request, and immutable v0.13.4 publication remain pending.
 
 ## Continuation
 
-Publish SUBF-0082 through issue #106 and record immutable v0.13.4 evidence. Do
+Publish [SUBF-0082](../../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md#subf-0082) through [issue #106](https://github.com/hasanmanzak/meAndAI/issues/106) and record immutable v0.13.4 evidence. Do
 not mutate Derdini from this branch.
 After the immutable release is installed there, rerun the separately
 authorized historical finalization and verify exact cleanup.

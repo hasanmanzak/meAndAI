@@ -2,7 +2,7 @@
 
 ## Current state
 
-- [FEAT-0023 / BUG-0011](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)
+- [FEAT-0023](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) and [BUG-0011](https://github.com/hasanmanzak/meAndAI/issues/63)
   and [DEC-0017](../../../docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md)
   define the delivery.
 - [Issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) owns the external
@@ -20,21 +20,21 @@
 - This release's prospective template rule did not prove every older consumer
   shape. [FEAT-0026](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
   later defines release-declared, state-based migrations and the generic
-  pre-engine capability handoff without changing FEAT-0023's historical scope.
+  pre-engine capability handoff without changing [FEAT-0023](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)'s historical scope.
 
 ## Verification authority
 
-- [TEST-0111 through TEST-0114](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md)
+- [TEST-0111](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0111), [TEST-0112](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0112), [TEST-0113](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0113), and [TEST-0114](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/test-cases.md#test-0114)
   own automatic tracking, legacy finalization, repeat-launch routing, and
   version-neutral consumer evidence.
 - The feature record owns local focused/full-suite and bounded-review evidence.
 - This handoff does not predict a merge commit, tag target, release, or hosted
-  check result. Those facts become authoritative only in issue #63 and GitHub
+  check result. Those facts become authoritative only in [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) and GitHub
   Releases after publication.
 
 ## Resume rule
 
-If delivery is still open, continue from issue #63 and the FEAT-0023 DoD. Do
+If delivery is still open, continue from [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) and the [FEAT-0023](../../../docs/features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md) DoD. Do
 not expand its legacy finalization bridge. If publication is complete, treat
-the immutable v0.10.0 release plus issue #63 as the external authority; generic
-consumer-state transition work belongs to FEAT-0026 and DEC-0018.
+the immutable v0.10.0 release plus [issue #63](https://github.com/hasanmanzak/meAndAI/issues/63) as the external authority; generic
+consumer-state transition work belongs to [FEAT-0026](../../../docs/features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md) and [DEC-0018](../../../docs/decisions/DEC-0018-release-declared-consumer-migrations.md).

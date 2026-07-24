@@ -77,27 +77,27 @@ lease. The maintainer retains the final pull-request review and merge gate.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0036` | Credential confidentiality | Codex reads or emits consumer PAT values | Mitigated by launcher | Token values are absent from prompt/clone/environment; fixed filenames are rejected in the clone; output is never used as secret input |
-| `RISK-0037` | Repository integrity | Codex commits, pushes, or changes an unexpected head | Mitigated by launcher | Detached execution contract, unchanged-head check, launcher-owned commit, exact remote-head lease, no merge |
-| `RISK-0038` | Concurrency | The adoption branch changes during the local run | Mitigated by launcher | PR `headRefOid`, live ref recheck, and `--force-with-lease` expected head |
-| `RISK-0039` | Tool availability | Codex is absent, unauthenticated, or a temporary download fails | Managed by maintainer | Installed CLI preference, pinned `npx` fallback, login-status gate, actionable failure, explicit skip path |
-| `RISK-0040` | Semantic completion | Codex reports success but leaves the manifest or no reviewable change | Mitigated by launcher | Require zero Codex-created commits, manifest removal, non-empty diff, `git diff --check`, and explicit result capture before publication |
-| `RISK-0041` | Unbounded execution | Local authentication or semantic work stalls indefinitely | Mitigated by launcher | Both calls use the finite `CodexTimeoutMinutes` process boundary and terminate the process tree on expiry |
-| `RISK-0042` | Publication authority | Codex uses inherited GitHub credentials to mutate or merge remote state | Mitigated by launcher | Launcher owns labels, issue, commit, push, and readiness; Codex spawned commands have network disabled and receive no GitHub task |
+| `RISK-0036` <a name="risk-0036"></a> | Credential confidentiality | Codex reads or emits consumer PAT values | Mitigated by launcher | Token values are absent from prompt/clone/environment; fixed filenames are rejected in the clone; output is never used as secret input |
+| `RISK-0037` <a name="risk-0037"></a> | Repository integrity | Codex commits, pushes, or changes an unexpected head | Mitigated by launcher | Detached execution contract, unchanged-head check, launcher-owned commit, exact remote-head lease, no merge |
+| `RISK-0038` <a name="risk-0038"></a> | Concurrency | The adoption branch changes during the local run | Mitigated by launcher | PR `headRefOid`, live ref recheck, and `--force-with-lease` expected head |
+| `RISK-0039` <a name="risk-0039"></a> | Tool availability | Codex is absent, unauthenticated, or a temporary download fails | Managed by maintainer | Installed CLI preference, pinned `npx` fallback, login-status gate, actionable failure, explicit skip path |
+| `RISK-0040` <a name="risk-0040"></a> | Semantic completion | Codex reports success but leaves the manifest or no reviewable change | Mitigated by launcher | Require zero Codex-created commits, manifest removal, non-empty diff, `git diff --check`, and explicit result capture before publication |
+| `RISK-0041` <a name="risk-0041"></a> | Unbounded execution | Local authentication or semantic work stalls indefinitely | Mitigated by launcher | Both calls use the finite `CodexTimeoutMinutes` process boundary and terminate the process tree on expiry |
+| `RISK-0042` <a name="risk-0042"></a> | Publication authority | Codex uses inherited GitHub credentials to mutate or merge remote state | Mitigated by launcher | Launcher owns labels, issue, commit, push, and readiness; Codex spawned commands have network disabled and receive no GitHub task |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0038 through TEST-0041](test-cases.md) |
+| Scenarios | Defined | [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), and [TEST-0041](test-cases.md#test-0041) |
 | Test code | Automated and green | `tests/quick-adoption.tests.ps1`; the v0.6.0 implementation first failed 19 targeted FEAT-0007 assertions |
-| Baseline run | Passed | v0.6.0 Windows PowerShell 5.1 suite passed TEST-0001 through TEST-0037 before this correction |
-| Feature and regression run | Passed | Windows PowerShell 5.1 passed TEST-0001 through TEST-0041 in 94.4 seconds on 2026-07-15 |
+| Baseline run | Passed | v0.6.0 Windows PowerShell 5.1 suite passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), and [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037) before this correction |
+| Feature and regression run | Passed | Windows PowerShell 5.1 passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), and [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), and [TEST-0041](test-cases.md#test-0041) in 94.4 seconds on 2026-07-15 |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0013` | Local CLI resolution and isolated semantic completion | [Issue #21](https://github.com/hasanmanzak/meAndAI/issues/21) | `TEST-0038`, `TEST-0039`, `TEST-0040`; pass | `FIND-0056` through `FIND-0058`; resolved | Implemented |
-| `SUBF-0014` | v0.6.1 contract, guidance, and regression closure | [Issue #21](https://github.com/hasanmanzak/meAndAI/issues/21) | `TEST-0041` and full suite; pass | `FIND-0059`; resolved | Implemented |
+| `SUBF-0013` <a name="subf-0013"></a> | Local CLI resolution and isolated semantic completion | [Issue #21](https://github.com/hasanmanzak/meAndAI/issues/21) | [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040); pass | `FIND-0056` through `FIND-0058`; resolved | Implemented |
+| `SUBF-0014` <a name="subf-0014"></a> | v0.6.1 contract, guidance, and regression closure | [Issue #21](https://github.com/hasanmanzak/meAndAI/issues/21) | [TEST-0041](test-cases.md#test-0041) and full suite; pass | `FIND-0059`; resolved | Implemented |
 
 ## Decisions and relationships
 
@@ -116,7 +116,7 @@ lease. The maintainer retains the final pull-request review and merge gate.
 - [x] Problem, outcome, scope, and non-goals.
 - [x] Measurable acceptance criteria.
 - [x] Process, credential, Git, CLI, lifecycle, and error contracts.
-- [x] Numbered risks and DEC-0008.
+- [x] Numbered risks and [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md).
 - [x] Two bounded, reviewable slices.
 - [x] Numbered test scenarios and verification approach.
 - [x] Baseline and planned red-test state recorded.
@@ -156,12 +156,12 @@ items without opening a second review loop:
 
 | ID | Priority | Finding | Resolution |
 | --- | --- | --- | --- |
-| `FIND-0056` | P0 | Local Codex had no execution deadline. | Added a finite process boundary, captured output, and process-tree termination. |
-| `FIND-0057` | P1 | A manifest-free draft could be marked ready without launcher-owned evidence. | Such a draft is now left unchanged for explicit maintainer review. |
-| `FIND-0058` | P1 | Prompt-only instructions did not enforce the remote publication boundary. | Launcher owns deterministic labels and issue; Codex-spawned commands have network disabled. |
-| `FIND-0059` | P2 | The new unverified-draft test tried to capture `Write-Host` through the success stream on Windows PowerShell 5.1. | The executable gate now asserts zero readiness calls and unchanged Codex-call count; the user-facing message is checked structurally. |
+| `FIND-0056` <a name="find-0056"></a> | P0 | Local Codex had no execution deadline. | Added a finite process boundary, captured output, and process-tree termination. |
+| `FIND-0057` <a name="find-0057"></a> | P1 | A manifest-free draft could be marked ready without launcher-owned evidence. | Such a draft is now left unchanged for explicit maintainer review. |
+| `FIND-0058` <a name="find-0058"></a> | P1 | Prompt-only instructions did not enforce the remote publication boundary. | Launcher owns deterministic labels and issue; Codex-spawned commands have network disabled. |
+| `FIND-0059` <a name="find-0059"></a> | P2 | The new unverified-draft test tried to capture `Write-Host` through the success stream on Windows PowerShell 5.1. | The executable gate now asserts zero readiness calls and unchanged Codex-call count; the user-facing message is checked structurally. |
 
-The final full protocol verification passed `TEST-0001` through `TEST-0041` in
+The final full protocol verification passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), and [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), and [TEST-0041](test-cases.md#test-0041) in
 94.4 seconds. No unresolved actionable in-scope finding remains, so the bounded
 scan stops here.
 
@@ -179,12 +179,12 @@ scan stops here.
 ## Release evidence
 
 [Pull request #22](https://github.com/hasanmanzak/meAndAI/pull/22) merged as
-`a4ffefa698b079815edebda86204150b03707957`. The remote annotated
+[`a4ffefa698b079815edebda86204150b03707957`](https://github.com/hasanmanzak/meAndAI/commit/a4ffefa698b079815edebda86204150b03707957). The remote annotated
 [`v0.6.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.6.1) resolves to
 that exact merge commit. The owned delivery branch was deleted locally and
 remotely after merge verification.
 
-## BUG-0001 correction for v0.6.2
+## [BUG-0001](https://github.com/hasanmanzak/meAndAI/issues/24) correction for v0.6.2
 
 | Field | Value |
 | --- | --- |
@@ -193,7 +193,7 @@ remotely after merge verification.
 | Target version | 0.6.2 |
 | Issue | [#24](https://github.com/hasanmanzak/meAndAI/issues/24) |
 | Pull request | [#25](https://github.com/hasanmanzak/meAndAI/pull/25) |
-| Test | [`TEST-0042`](test-cases.md) |
+| Test | [`TEST-0042`](test-cases.md#test-0042) |
 
 ### Problem and outcome
 
@@ -234,30 +234,30 @@ a new architectural decision.
 - [x] Stable ID and linked issue exist.
 - [x] Problem, outcome, scope, non-goals, credential ownership, ordering, and
       failure behavior are explicit.
-- [x] `RISK-0043`: a present secret may contain an invalid or stale value.
+- [x] `RISK-0043` <a name="risk-0043"></a>: a present secret may contain an invalid or stale value.
       Owner: consumer maintainer. Response: preserve it by name, make no claim
       about its value, and let the bounded lifecycle expose an unusable secret.
-- [x] `TEST-0042` covers existing-secret preservation, missing-secret creation,
+- [x] [TEST-0042](test-cases.md#test-0042) covers existing-secret preservation, missing-secret creation,
       omitted updater source input, and new-repository regression behavior.
 - [x] Verification is bounded to one focused red/green run, one fresh-diff
       review, and one complete protocol run.
 
 Acceptance requires zero `gh secret set` calls for already-present mapped
 names, exactly one call for each missing mapped name, unchanged credential
-redaction and history gates, and a green `TEST-0001` through `TEST-0042` suite.
+redaction and history gates, and a green [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), and [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), [TEST-0041](test-cases.md#test-0041), and [TEST-0042](test-cases.md#test-0042) suite.
 
 ### Verification and self-review
 
 | ID | Priority | Finding | Resolution |
 | --- | --- | --- | --- |
-| `FIND-0060` | P2 | The first documentation assertion treated Markdown line wrapping as semantic content and failed twice on one correctly worded sentence. | Normalized guide whitespace before checking the complete sentence; the next full run passed. |
-| `FIND-0061` | P1 | Making `FG_PAT.txt` optional initially skipped its Git-history check when the file was absent. | Moved required-file presence evaluation after unconditional tracked-path and history checks; added an absent-but-historical regression fixture. |
+| `FIND-0060` <a name="find-0060"></a> | P2 | The first documentation assertion treated Markdown line wrapping as semantic content and failed twice on one correctly worded sentence. | Normalized guide whitespace before checking the complete sentence; the next full run passed. |
+| `FIND-0061` <a name="find-0061"></a> | P1 | Making `FG_PAT.txt` optional initially skipped its Git-history check when the file was absent. | Moved required-file presence evaluation after unconditional tracked-path and history checks; added an absent-but-historical regression fixture. |
 
 The focused pre-implementation run failed because the launcher had no
 `gh secret list` contract. The first focused green run passed in 43.3 seconds.
 After `FIND-0060` was resolved, the complete Windows PowerShell 5.1 suite passed
-`TEST-0001` through `TEST-0042` in 91.7 seconds. The post-review focused
-confirmation for `FIND-0061` passed `TEST-0033` through `TEST-0042` in 44.9
+[TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), and [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), [TEST-0041](test-cases.md#test-0041), and [TEST-0042](test-cases.md#test-0042) in 91.7 seconds. The post-review focused
+confirmation for `FIND-0061` passed [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037) and [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), [TEST-0041](test-cases.md#test-0041), and [TEST-0042](test-cases.md#test-0042) in 44.9
 seconds. `git diff --check` reported no whitespace error.
 
 ### Definition of Done
@@ -266,12 +266,12 @@ seconds. `git diff --check` reported no whitespace error.
 - [x] Only missing mappings read their required mutation input and are created.
 - [x] Credential redaction, tracked-path, and history gates remain intact.
 - [x] New-repository provisioning remains backward compatible.
-- [x] `TEST-0042`, the complete regression suite, and bounded self-review pass.
+- [x] [TEST-0042](test-cases.md#test-0042), the complete regression suite, and bounded self-review pass.
 - [x] Protocol, guides, changelog, version metadata, feature record, and project
       memory are synchronized.
 - [x] No unresolved blocking or actionable in-scope finding remains.
 
-## BUG-0002 correction for v0.7.1
+## [BUG-0002](https://github.com/hasanmanzak/meAndAI/issues/27) correction for v0.7.1
 
 | Field | Value |
 | --- | --- |
@@ -280,7 +280,7 @@ seconds. `git diff --check` reported no whitespace error.
 | Target version | 0.7.1 |
 | Issue | [#27](https://github.com/hasanmanzak/meAndAI/issues/27) |
 | Pull request | [#29](https://github.com/hasanmanzak/meAndAI/pull/29) |
-| Test | [`TEST-0045`](test-cases.md) |
+| Test | [`TEST-0045`](test-cases.md#test-0045) |
 
 ### Problem and outcome
 
@@ -321,14 +321,14 @@ architectural boundary.
 
 ### Readiness and acceptance
 
-- [x] Stable `BUG-0002` ID and linked issue #27 exist.
+- [x] Stable [BUG-0002](https://github.com/hasanmanzak/meAndAI/issues/27) ID and linked [issue #27](https://github.com/hasanmanzak/meAndAI/issues/27) exist.
 - [x] Problem, outcome, scope, non-goals, ownership, ordering, and failure
       behavior are explicit.
-- [x] `RISK-0048`: the authenticated `gh` identity may lack private meAndAI
+- [x] `RISK-0048` <a name="risk-0048"></a>: the authenticated `gh` identity may lack private meAndAI
       source access even though the target secret name exists. Owner: consumer
       maintainer. Response: fail with an actionable source-access error; never
       request or recover the stored secret value.
-- [x] `TEST-0045` covers both files absent with both secrets present, a missing
+- [x] [TEST-0045](test-cases.md#test-0045) covers both files absent with both secrets present, a missing
       secret with its file absent, recovery with the required file, and the
       unchanged new-repository requirement.
 - [x] Verification is bounded to one focused red/green line, one fresh-diff
@@ -336,13 +336,13 @@ architectural boundary.
 
 Acceptance requires a configured existing target to proceed with both local
 files absent, while every missing target secret still requires its own file and
-all `TEST-0001` through `TEST-0045` scenarios pass.
+all [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), [TEST-0041](test-cases.md#test-0041), and [TEST-0042](test-cases.md#test-0042), [TEST-0043](../FEAT-0008-idea-incubation/test-cases.md#test-0043) and [TEST-0044](../FEAT-0008-idea-incubation/test-cases.md#test-0044), and [TEST-0045](test-cases.md#test-0045) scenarios pass.
 
 ### Integration finding
 
 | ID | Classification | Finding | Resolution | Status |
 | --- | --- | --- | --- | --- |
-| `FIND-0065` | Integration / High | `main` advanced to `v0.7.0` through PR #28 while BUG-0002 was based on `v0.6.2`, claiming the provisional `TEST-0043` and `RISK-0044` identifiers. | Merged the complete `v0.7.0` delivery, retargeted this correction to `v0.7.1`, and renumbered its unmerged records after `TEST-0044` and `RISK-0047` to `TEST-0045` and `RISK-0048`. | Resolved |
+| `FIND-0065` <a name="find-0065"></a> | Integration / High | `main` advanced to `v0.7.0` through [PR #28](https://github.com/hasanmanzak/meAndAI/pull/28) while [BUG-0002](https://github.com/hasanmanzak/meAndAI/issues/27) was based on `v0.6.2`, claiming the provisional [TEST-0043](../FEAT-0008-idea-incubation/test-cases.md#test-0043) and [RISK-0044](../FEAT-0008-idea-incubation/README.md#risk-0044) identifiers. | Merged the complete `v0.7.0` delivery, retargeted this correction to `v0.7.1`, and renumbered its unmerged records after [TEST-0044](../FEAT-0008-idea-incubation/test-cases.md#test-0044) and [RISK-0047](../FEAT-0008-idea-incubation/README.md#risk-0047) to [TEST-0045](test-cases.md#test-0045) and `RISK-0048`. | Resolved |
 
 ### Definition of Done
 
@@ -350,7 +350,7 @@ all `TEST-0001` through `TEST-0045` scenarios pass.
 - [x] File-free workflow and semantic-source retrieval preserve exact source
       verification without reading stored secret values.
 - [x] Missing-secret and new-repository credential gates remain fail-closed.
-- [x] `TEST-0045` passes its focused real-Git regression suite on the integrated
+- [x] [TEST-0045](test-cases.md#test-0045) passes its focused real-Git regression suite on the integrated
       `v0.7.1` working tree.
 - [x] The complete `v0.7.1` protocol suite and bounded fresh-diff review pass.
 - [x] Documentation, project memory, pull-request evidence, merge, and the
@@ -359,11 +359,11 @@ all `TEST-0001` through `TEST-0045` scenarios pass.
 ### Release evidence
 
 [Pull request #29](https://github.com/hasanmanzak/meAndAI/pull/29) merged the
-correction at commit `42e653e23ccb11034a735b8c3c420accf5f19964`. The annotated
+correction at commit [`42e653e23ccb11034a735b8c3c420accf5f19964`](https://github.com/hasanmanzak/meAndAI/commit/42e653e23ccb11034a735b8c3c420accf5f19964). The annotated
 [`v0.7.1` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.1) resolves to
 that exact release commit.
 
-## BUG-0003 documentation clarification for v0.7.3
+## [BUG-0003](https://github.com/hasanmanzak/meAndAI/issues/32) documentation clarification for v0.7.3
 
 | Field | Value |
 | --- | --- |
@@ -372,7 +372,7 @@ that exact release commit.
 | Target version | 0.7.3 |
 | Issue | [#32](https://github.com/hasanmanzak/meAndAI/issues/32) |
 | Pull request | [#33](https://github.com/hasanmanzak/meAndAI/pull/33) |
-| Test | [`TEST-0051`](test-cases.md) |
+| Test | [`TEST-0051`](test-cases.md#test-0051) |
 
 ### Problem and outcome
 
@@ -407,15 +407,15 @@ is out of scope.
 
 ### Readiness and acceptance
 
-- [x] Stable `BUG-0003` ID and linked issue #32 exist.
+- [x] Stable [BUG-0003](https://github.com/hasanmanzak/meAndAI/issues/32) ID and linked [issue #32](https://github.com/hasanmanzak/meAndAI/issues/32) exist.
 - [x] Problem, intended outcome, scope, non-goals, affected entry point, and
       original-target/clone/network/publication ownership contracts are explicit.
 - [x] Existing [DEC-0008](../../decisions/DEC-0008-local-codex-execution.md)
       already governs the boundary; no new decision is required.
-- [x] `RISK-0053`: a maintainer may omit required new-target files or expect
+- [x] `RISK-0053` <a name="risk-0053"></a>: a maintainer may omit required new-target files or expect
       Codex to provision GitHub state. Owner: documentation maintainers.
-      Response: explicit execution-order explanation plus `TEST-0051`.
-- [x] `TEST-0051` is defined and the pre-change focused suite passed in 85.7
+      Response: explicit execution-order explanation plus [TEST-0051](test-cases.md#test-0051).
+- [x] [TEST-0051](test-cases.md#test-0051) is defined and the pre-change focused suite passed in 85.7
       seconds after one environment-only ACL retry.
 - [x] Verification is bounded to one focused red/green run, one complete suite,
       one fresh-diff review, and one final relevant confirmation after blockers.
@@ -435,11 +435,11 @@ complete confirmation only after a blocking changed fixture.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0075` | Test fixture / Medium / High | The first complete run reached the real API fallback because one escaped workflow-source matcher still named `v0.7.2`; updated that exact mock boundary to `v0.7.3` and used the allowed complete confirmation. | Resolved |
+| `FIND-0075` <a name="find-0075"></a> | Test fixture / Medium / High | The first complete run reached the real API fallback because one escaped workflow-source matcher still named `v0.7.2`; updated that exact mock boundary to `v0.7.3` and used the allowed complete confirmation. | Resolved |
 
-`TEST-0051` first failed on six absent boundary statements and then passed with
+[TEST-0051](test-cases.md#test-0051) first failed on six absent boundary statements and then passed with
 the existing quick-adoption regressions in 84.7 seconds. The complete
-confirmation passed `TEST-0001` through `TEST-0051` in 143.7 seconds. The
+confirmation passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), [TEST-0038](test-cases.md#test-0038), [TEST-0039](test-cases.md#test-0039), [TEST-0040](test-cases.md#test-0040), [TEST-0041](test-cases.md#test-0041), and [TEST-0042](test-cases.md#test-0042), [TEST-0043](../FEAT-0008-idea-incubation/test-cases.md#test-0043) and [TEST-0044](../FEAT-0008-idea-incubation/test-cases.md#test-0044), [TEST-0045](test-cases.md#test-0045), [TEST-0046](../FEAT-0009-adoption-integrity/test-cases.md#test-0046), [TEST-0047](../FEAT-0009-adoption-integrity/test-cases.md#test-0047), [TEST-0048](../FEAT-0009-adoption-integrity/test-cases.md#test-0048), [TEST-0049](../FEAT-0009-adoption-integrity/test-cases.md#test-0049), and [TEST-0050](../FEAT-0009-adoption-integrity/test-cases.md#test-0050), and [TEST-0051](test-cases.md#test-0051) in 143.7 seconds. The
 fresh-diff review found no credential-like value, whitespace error, PowerShell
 parse error, behavior change, or unclassified active `v0.7.2` reference. The
 only executable changes are exact `v0.7.3` pin defaults and matching test
@@ -448,10 +448,10 @@ finding remains and validation stops.
 
 ### Definition of Done
 
-- [x] `TEST-0051` failed on all six missing boundary statements before the
+- [x] [TEST-0051](test-cases.md#test-0051) failed on all six missing boundary statements before the
       clarification and passed with the existing quick-adoption regressions in
       84.7 seconds afterward.
-- [x] The complete protocol suite and link checks pass through `TEST-0051`.
+- [x] The complete protocol suite and link checks pass through [TEST-0051](test-cases.md#test-0051).
 - [x] Fresh-diff review finds no behavior or security-boundary drift.
 - [x] Documentation, version, changelog, project memory, issue, and pull request
       links are synchronized.
@@ -460,7 +460,7 @@ finding remains and validation stops.
       on Ubuntu and Windows; GitGuardian also passed. The final evidence commit
       must retain those checks before merge.
 
-### Post-merge release evidence for BUG-0003
+### Post-merge release evidence for [BUG-0003](https://github.com/hasanmanzak/meAndAI/issues/32)
 
 [Pull request #33](https://github.com/hasanmanzak/meAndAI/pull/33) is the reviewed
 delivery record. `v0.7.3` predates the external immutable-release authority in
@@ -470,7 +470,7 @@ historical annotated tag remains a release record without an external lock.
 | Field | Evidence |
 | --- | --- |
 | Release authority | Historical annotated tag; no external immutability claim |
-| Release identifier | [`v0.7.3`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3), tag object `2f74f1f4b28bd63bb04a1b9f9f30b1603d0b164e` |
+| Release identifier | [`v0.7.3`](https://github.com/hasanmanzak/meAndAI/tree/v0.7.3), tag object: `2f74f1f4b28bd63bb04a1b9f9f30b1603d0b164e` |
 | Target commit | [`45afd8c15c155fb3f7cb0e5abb4876a3d44b27af`](https://github.com/hasanmanzak/meAndAI/commit/45afd8c15c155fb3f7cb0e5abb4876a3d44b27af) |
 | Verification evidence | Local annotated-tag dereference and remote `refs/tags/v0.7.3` publication verified on 2026-07-15 |
 
@@ -478,5 +478,5 @@ historical annotated tag remains a release record without an external lock.
 
 The v0.9.1 no-remote existing-repository case is owned by
 [FEAT-0016](../FEAT-0016-v091-quick-adoption-correction/README.md) and
-`BUG-0005`; this historical feature retains its original v0.6.1 target and
+[BUG-0005](https://github.com/hasanmanzak/meAndAI/issues/49); this historical feature retains its original v0.6.1 target and
 v0.7.x correction evidence.

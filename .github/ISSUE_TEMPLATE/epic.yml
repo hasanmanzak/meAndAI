@@ -36,6 +36,6 @@ body:
     id: references
     attributes:
       label: Related records
-      description: Link related issues, pull requests, features, decisions, wiki pages, or docs.
+      description: Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
     validations:
       required: true

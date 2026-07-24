@@ -1,4 +1,46 @@
 # Mechanically extracted from the reviewed v0.12.4 quick-adoption launcher.
+function ConvertTo-MeAndAIGitHubTimestamp {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowNull()][object]$Value
+    )
+
+    if ($Value -is [DateTimeOffset]) {
+        return ([DateTimeOffset]$Value).ToUniversalTime()
+    }
+    if ($Value -is [DateTime]) {
+        $dateTime = [DateTime]$Value
+        if ($dateTime.Kind -eq [DateTimeKind]::Unspecified) {
+            throw 'GitHub timestamp has no timezone identity.'
+        }
+        return ([DateTimeOffset]$dateTime).ToUniversalTime()
+    }
+    if ($Value -isnot [string] -or
+        [string]::IsNullOrWhiteSpace([string]$Value)) {
+        throw 'GitHub timestamp has an unsupported representation.'
+    }
+
+    $formats = [string[]]@(
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF'Z'",
+        "yyyy-MM-dd'T'HH:mm:sszzz",
+        "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFzzz"
+    )
+    $styles = [Globalization.DateTimeStyles]::AssumeUniversal -bor
+        [Globalization.DateTimeStyles]::AdjustToUniversal
+    $parsed = [DateTimeOffset]::MinValue
+    if (-not [DateTimeOffset]::TryParseExact(
+            [string]$Value,
+            $formats,
+            [Globalization.CultureInfo]::InvariantCulture,
+            $styles,
+            [ref]$parsed
+        )) {
+        throw 'GitHub timestamp is not an exact RFC 3339 value.'
+    }
+    return $parsed.ToUniversalTime()
+}
+
 function Get-GitHubSlugFromRemote {
     param([Parameter(Mandatory)][string]$RemoteUrl)
 
@@ -226,12 +268,17 @@ function Get-ValidatedImmutableProtocolRelease {
             throw "The published immutable GitHub Release response is missing '$property'."
         }
     }
-    $publishedAt = [DateTimeOffset]::MinValue
+    try {
+        $publishedAt = ConvertTo-MeAndAIGitHubTimestamp `
+            -Value $release.published_at
+    }
+    catch {
+        throw "Protocol source '$Tag' is not an exact published immutable GitHub Release."
+    }
     if ([string]$release.tag_name -cne $Tag -or
         $release.draft -isnot [bool] -or $release.draft -or
         $release.prerelease -isnot [bool] -or $release.prerelease -or
-        $release.immutable -isnot [bool] -or -not $release.immutable -or
-        -not [DateTimeOffset]::TryParse([string]$release.published_at, [ref]$publishedAt)) {
+        $release.immutable -isnot [bool] -or -not $release.immutable) {
         throw "Protocol source '$Tag' is not an exact published immutable GitHub Release."
     }
 
@@ -388,14 +435,18 @@ function Import-CanonicalInitialAdoptionPolicy {
             'ConvertTo-MeAndAIInstructionGraphRecord',
             'Get-MeAndAIInstructionGraphIdentity',
             'Get-MeAndAIInstructionGraphLimits',
+            'Get-MeAndAILinkedPathIdentityDigest',
             'Get-MeAndAIProtocolAssessmentLimits',
             'Get-MeAndAIProtocolSurfaceInventory',
+            'New-MeAndAIGitHubBlobLink',
             'New-MeAndAIInstructionGraph',
             'Resolve-MeAndAIAdoptionStrategy',
             'Resolve-MeAndAIInstructionGraphClosure',
             'Test-MeAndAICompletedAdoptionChangeSet',
+            'Test-MeAndAICanonicalRepositoryPath',
             'Test-MeAndAIConsumerGovernancePath',
             'Test-MeAndAIExactAdoptionPullRequestMarker',
+            'Test-MeAndAIExactLinkedPathSection',
             'Test-MeAndAIExactInstructionGraph',
             'Test-MeAndAIExactInstructionGraphIdentity',
             'Test-MeAndAIExactInstructionGraphIdentityRecord',

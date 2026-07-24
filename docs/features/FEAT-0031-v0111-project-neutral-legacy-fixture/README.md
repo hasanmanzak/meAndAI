@@ -8,7 +8,7 @@
 | Issue | [#79](https://github.com/hasanmanzak/meAndAI/issues/79) |
 | Pull request | [#80](https://github.com/hasanmanzak/meAndAI/pull/80) |
 | Decisions | [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), [DEC-0020](../../decisions/DEC-0020-target-bound-current-launcher-recovery.md) |
-| Tests | [TEST-0125 and TEST-0133](test-cases.md) |
+| Tests | [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) and [TEST-0133](test-cases.md#test-0133) |
 
 ## Problem
 
@@ -17,7 +17,7 @@ test, and canonical records retain the identity and live URLs of one consumer
 repository. That coupling is unnecessary: the updater contract depends on a
 legacy repository state, not on a product identity.
 
-The `TEST-0125` record also claims an exact no-op rerun, while the executable
+The [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) record also claims an exact no-op rerun, while the executable
 scenario stops after validating the first atomic proposal. The compatibility
 claim therefore needs one direct second-plan assertion.
 
@@ -25,25 +25,25 @@ claim therefore needs one direct second-plan assertion.
 
 Canonical meAndAI content uses a minimal synthetic legacy-consumer fixture with
 reserved example links. The existing migration and updater behavior remains
-unchanged, `TEST-0125` proves the documented no-op rerun, and one bounded
+unchanged, [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) proves the documented no-op rerun, and one bounded
 structural assertion prevents the fixture/test surface from regaining a named
 consumer dependency.
 
 ## Scope
 
 - Rename and neutralize the frozen pre-engine consumer fixture and test symbols.
-- Preserve the exact legacy fragment recognized by immutable `MIG-0001`.
+- Preserve the exact legacy fragment recognized by immutable [MIG-0001](../../../migrations/MIG-0001.json).
 - Execute a second migration plan over the applied atomic tree and assert exact
   satisfied/no-change semantics.
 - Replace named-consumer references in canonical documentation and project
   memory with state-based wording and protocol-owned evidence links.
-- Add `TEST-0133` inside the existing adapter suite.
+- Add [TEST-0133](test-cases.md#test-0133) inside the existing adapter suite.
 - Publish the backward-compatible correction as `0.11.1`.
 
 ## Non-goals
 
 - Changing updater, workflow, or migration-engine production behavior.
-- Modifying `migrations/MIG-0001.json`, its catalog entry, or historical
+- Modifying [migrations/MIG-0001.json](../../../migrations/MIG-0001.json), its catalog entry, or historical
   release state.
 - Changing any consumer repository.
 - Adding a bootstrapper, recursive validator, service, or new test framework.
@@ -53,8 +53,8 @@ consumer dependency.
 - Domain and contracts: applicability remains repository-state based; the
   legacy protocol SHA and migration-recognition fragment are preserved; only
   fixture identity and evidence wording change.
-- Consumers and dependencies: `TEST-0125` calls the production planner and
-  proposal stager; `MIG-0001` and `migrations/index.json` remain immutable.
+- Consumers and dependencies: [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) calls the production planner and
+  proposal stager; [MIG-0001](../../../migrations/MIG-0001.json) and `migrations/index.json` remain immutable.
 - Compatibility: this is a test/documentation maintenance correction with no
   consumer-managed asset or runtime behavior change.
 - Verification: focused adapter and migration suites, one complete protocol
@@ -62,23 +62,23 @@ consumer dependency.
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0139` | Compatibility | Neutralization changes the exact fragment recognized by `MIG-0001` | Protocol maintainer / keep the fragment byte-identical and run migration plus adapter regressions |
-| `RISK-0140` | Traceability | Removing consumer identity erases historical evidence | Protocol maintainer / retain dates and failure modes through protocol-owned issues and records |
-| `RISK-0141` | Immutability | Historical migration data drifts during cleanup | Protocol maintainer / do not edit migration files and verify existing integrity gates |
-| `RISK-0142` | Complexity | The correction grows another validator chain | Protocol maintainer / keep `TEST-0133` in the existing suite and prohibit a new framework |
+| `RISK-0139` <a name="risk-0139"></a> | Compatibility | Neutralization changes the exact fragment recognized by [MIG-0001](../../../migrations/MIG-0001.json) | Protocol maintainer / keep the fragment byte-identical and run migration plus adapter regressions |
+| `RISK-0140` <a name="risk-0140"></a> | Traceability | Removing consumer identity erases historical evidence | Protocol maintainer / retain dates and failure modes through protocol-owned issues and records |
+| `RISK-0141` <a name="risk-0141"></a> | Immutability | Historical migration data drifts during cleanup | Protocol maintainer / do not edit migration files and verify existing integrity gates |
+| `RISK-0142` <a name="risk-0142"></a> | Complexity | The correction grows another validator chain | Protocol maintainer / keep [TEST-0133](test-cases.md#test-0133) in the existing suite and prohibit a new framework |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0125 and TEST-0133](test-cases.md) |
-| Test code | Implemented and focused green | Existing `TEST-0125` strengthened; `TEST-0133` added to the same adapter suite |
+| Scenarios | Defined | [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) and [TEST-0133](test-cases.md#test-0133) |
+| Test code | Implemented and focused green | Existing [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) strengthened; [TEST-0133](test-cases.md#test-0133) added to the same adapter suite |
 | Baseline run | Green release with evidence gap | `v0.11.0`; named fixture exists and direct no-op rerun is absent |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0056` | Synthetic fixture and exact no-op rerun proof | [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) | `TEST-0125`; focused pass in 33.7 seconds | `FIND-0161` resolved; fixture and immutable migration blobs reviewed | Complete |
-| `SUBF-0057` | Canonical documentation/memory neutralization and regression guard | [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) | `TEST-0133`; focused pass in 33.7 seconds | `FIND-0162` through `FIND-0164` resolved in bounded review | Complete |
+| `SUBF-0056` <a name="subf-0056"></a> | Synthetic fixture and exact no-op rerun proof | [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) | [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125); focused pass in 33.7 seconds | `FIND-0161` resolved; fixture and immutable migration blobs reviewed | Complete |
+| `SUBF-0057` <a name="subf-0057"></a> | Canonical documentation/memory neutralization and regression guard | [Issue #79](https://github.com/hasanmanzak/meAndAI/issues/79) | [TEST-0133](test-cases.md#test-0133); focused pass in 33.7 seconds | `FIND-0162` through `FIND-0164` resolved in bounded review | Complete |
 
 ## Decisions and relationships
 
@@ -89,7 +89,7 @@ consumer dependency.
 - [FEAT-0026](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
   introduced the generic migration engine.
 - [FEAT-0028](../FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
-  owns `TEST-0125`.
+  owns [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125).
 
 ## Definition of Ready
 
@@ -107,11 +107,11 @@ consumer dependency.
    memory contain no real consumer-project identity or live consumer URL.
 2. The project-neutral frozen fixture uses reserved synthetic URLs and keeps the
    migration-recognition fragment and legacy protocol SHA unchanged.
-3. The core-only tree still fails only `TEST-0001`, while the atomic exact
+3. The core-only tree still fails only [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), while the atomic exact
    13-path proposal passes the frozen validator.
 4. Replanning the applied atomic result returns `Satisfied`, zero changed paths,
    and an unchanged ledger.
-5. `TEST-0133`, migration tests, adapter tests, and the complete protocol suite
+5. [TEST-0133](test-cases.md#test-0133), migration tests, adapter tests, and the complete protocol suite
    pass without a production updater change.
 6. Version, changelog, feature index, links, and project memory agree on
    maintenance release `0.11.1`.
@@ -122,17 +122,16 @@ The 2026-07-18 fresh-diff review covered the fixture byte delta, migration
 recognition fragment, legacy SHA, adapter symbols/messages/paths, second-plan
 semantics, version pins, historical evidence links, project memory, and
 immutable migration/catalog blobs. The fixture differs from its predecessor
-only by the two reserved URL substitutions. Its Git blob is
-`1dffab9c6b6d6f22aedb83c313b95d7b0f275183`; `MIG-0001` remains
-`1b46c79f76703631688f85a5a2dfcee5128d9548` and the catalog index remains
-`8fa228fc5fa66ff5017e4bc9560c19ac75a3839e`.
+only by the two reserved URL substitutions. Fixture Git blob: `1dffab9c6b6d6f22aedb83c313b95d7b0f275183`;
+[MIG-0001](../../../migrations/MIG-0001.json) Git blob: `1b46c79f76703631688f85a5a2dfcee5128d9548`;
+catalog-index Git blob: `8fa228fc5fa66ff5017e4bc9560c19ac75a3839e`.
 
 | ID | Classification / disposition | Priority | Finding and resolution | Status |
 | --- | --- | --- | --- | --- |
-| `FIND-0161` | Evidence defect / `Blocking` | p1 | `TEST-0125` documented an exact no-op rerun but did not execute it. The scenario now replans the applied ledger and requires `Satisfied`, no pending migration/path/change, and an unchanged ledger blob. | Resolved |
-| `FIND-0162` | Change-caused pin consistency / `Blocking` | p1 | The initial `0.11.1` mechanical alignment left one escaped `v0\.11\.0` matcher and reused the new current tag as a future-tag fixture. The matcher now targets `v0.11.1`; the future fixture uses `v0.11.2`. | Resolved before the final suite |
-| `FIND-0163` | Regression-scope defect / `Blocking` | p1 | The first `TEST-0133` draft inspected only fixture URLs. It now bounds the exact adapter surface with unique markers and requires the neutral path, function, variable, messages, commit text, reserved URLs, and absence of a live consumer GitHub URL. | Resolved; focused adapter suite passed |
-| `FIND-0164` | Canonical coupling / `Blocking` | p2 | A bounded broad-name scan found two unrelated product examples in DEC-0021 after the original regression references were removed. They were replaced with state-based migration outcomes; the confirmation scan found no known project identity or external owner-repository URL. | Resolved |
+| `FIND-0161` <a name="find-0161"></a> | Evidence defect / `Blocking` | p1 | [TEST-0125](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) documented an exact no-op rerun but did not execute it. The scenario now replans the applied ledger and requires `Satisfied`, no pending migration/path/change, and an unchanged ledger blob. | Resolved |
+| `FIND-0162` <a name="find-0162"></a> | Change-caused pin consistency / `Blocking` | p1 | The initial `0.11.1` mechanical alignment left one escaped `v0\.11\.0` matcher and reused the new current tag as a future-tag fixture. The matcher now targets `v0.11.1`; the future fixture uses `v0.11.2`. | Resolved before the final suite |
+| `FIND-0163` <a name="find-0163"></a> | Regression-scope defect / `Blocking` | p1 | The first [TEST-0133](test-cases.md#test-0133) draft inspected only fixture URLs. It now bounds the exact adapter surface with unique markers and requires the neutral path, function, variable, messages, commit text, reserved URLs, and absence of a live consumer GitHub URL. | Resolved; focused adapter suite passed |
+| `FIND-0164` <a name="find-0164"></a> | Canonical coupling / `Blocking` | p2 | A bounded broad-name scan found two unrelated product examples in [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md) after the original regression references were removed. They were replaced with state-based migration outcomes; the confirmation scan found no known project identity or external owner-repository URL. | Resolved |
 
 The post-development project scan covered every tracked and intended file,
 PowerShell parseability, current and escaped release pins, canonical Markdown

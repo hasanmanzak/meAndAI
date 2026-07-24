@@ -70,17 +70,17 @@ blanket range message.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0061` | Credential confidentiality | A hostless GitHub identity redirects PAT values | Mitigated; launcher owner | Host-qualified identity and multi-host regression fixture |
-| `RISK-0062` | Release integrity | A target uses the wrong token or a stale pre-lock tag commit | Mitigated; updater owner | Protocol-token API boundary and exact locked-commit evidence |
-| `RISK-0063` | Repository integrity | Bootstrap validation hides a rename-away deletion | Mitigated; bootstrap owner | Rename inference disabled for exact path sets plus a real-Git rename fixture |
-| `RISK-0064` | Concurrency | Another run or issue creation is mistaken for this launcher session | Mitigated; launcher owner | Dispatch correlation and post-create issue convergence |
-| `RISK-0065` | Process safety | Conflicting completion terms cause a blind loop or false completion | Mitigated; protocol owner | One disposition taxonomy and finite budget |
-| `RISK-0066` | Evidence integrity | Declared test/status/link evidence outlives executed or published state | Mitigated; maintainers | Executable scenario inventory and post-publication reconciliation |
-| `RISK-0067` | Test isolation | A suite deletes another run's temporary workspace | Mitigated; test owner | Cleanup only from an owned temp-root ledger |
+| `RISK-0061` <a name="risk-0061"></a> | Credential confidentiality | A hostless GitHub identity redirects PAT values | Mitigated; launcher owner | Host-qualified identity and multi-host regression fixture |
+| `RISK-0062` <a name="risk-0062"></a> | Release integrity | A target uses the wrong token or a stale pre-lock tag commit | Mitigated; updater owner | Protocol-token API boundary and exact locked-commit evidence |
+| `RISK-0063` <a name="risk-0063"></a> | Repository integrity | Bootstrap validation hides a rename-away deletion | Mitigated; bootstrap owner | Rename inference disabled for exact path sets plus a real-Git rename fixture |
+| `RISK-0064` <a name="risk-0064"></a> | Concurrency | Another run or issue creation is mistaken for this launcher session | Mitigated; launcher owner | Dispatch correlation and post-create issue convergence |
+| `RISK-0065` <a name="risk-0065"></a> | Process safety | Conflicting completion terms cause a blind loop or false completion | Mitigated; protocol owner | One disposition taxonomy and finite budget |
+| `RISK-0066` <a name="risk-0066"></a> | Evidence integrity | Declared test/status/link evidence outlives executed or published state | Mitigated; maintainers | Executable scenario inventory and post-publication reconciliation |
+| `RISK-0067` <a name="risk-0067"></a> | Test isolation | A suite deletes another run's temporary workspace | Mitigated; test owner | Cleanup only from an owned temp-root ledger |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0060 through TEST-0068](test-cases.md) |
+| Scenarios | Defined | [TEST-0060](test-cases.md#test-0060), [TEST-0061](test-cases.md#test-0061), [TEST-0062](test-cases.md#test-0062), [TEST-0063](test-cases.md#test-0063), [TEST-0064](test-cases.md#test-0064), [TEST-0065](test-cases.md#test-0065), [TEST-0066](test-cases.md#test-0066), [TEST-0067](test-cases.md#test-0067), and [TEST-0068](test-cases.md#test-0068) |
 | Test code | Planned before production changes | Existing suites receive focused regression cases; no new framework |
 | Baseline run | Passed | v0.8.0 complete suite passed locally before this correction; the new scenarios are expected to expose the recorded gaps |
 
@@ -88,7 +88,7 @@ blanket range message.
 
 This section reconstructs the FEAT-0011 scan declaration that its original
 record should have contained. It describes the evidence available to that
-delivery; it does not claim that the later FEAT-0012 findings were absent.
+delivery; it does not claim that the later [FEAT-0012](../FEAT-0012-v082-correction/README.md) findings were absent.
 
 | Field | Historical declaration |
 | --- | --- |
@@ -96,15 +96,15 @@ delivery; it does not claim that the later FEAT-0012 findings were absent.
 | Exclusions | External consumer repositories and their runtime state. No tracked generated or binary files existed. PSScriptAnalyzer was unavailable; hosted Windows/Ubuntu CI and PowerShell parsing supplied the declared portability evidence. Publication state did not yet exist during the pre-merge review. |
 | Budget | One initial full-project scan, remediation of its blocking findings, and one confirmation scan. The later hosted `matrix.shell` failure was new failed evidence and reopened only its affected CI slice; it did not authorize another unchanged scan. |
 | Initial result | `FIND-0093` through `FIND-0101` were prioritized and resolved in the slices below. |
-| Historical stop claim | The local suite, slice reviews, and confirmation were reported green; hosted CI then exposed the fifth in-slice blocker. FEAT-0012 later proved that the evidence model still allowed `FIND-0102` through `FIND-0111`. |
+| Historical stop claim | The local suite, slice reviews, and confirmation were reported green; hosted CI then exposed the fifth in-slice blocker. [FEAT-0012](../FEAT-0012-v082-correction/README.md) later proved that the evidence model still allowed [FIND-0102](../FEAT-0012-v082-correction/README.md#find-0102), [FIND-0103](../FEAT-0012-v082-correction/README.md#find-0103), [FIND-0104](../FEAT-0012-v082-correction/README.md#find-0104), [FIND-0105](../FEAT-0012-v082-correction/README.md#find-0105), [FIND-0106](../FEAT-0012-v082-correction/README.md#find-0106), [FIND-0107](../FEAT-0012-v082-correction/README.md#find-0107), [FIND-0108](../FEAT-0012-v082-correction/README.md#find-0108), [FIND-0109](../FEAT-0012-v082-correction/README.md#find-0109), [FIND-0110](../FEAT-0012-v082-correction/README.md#find-0110), and [FIND-0111](../FEAT-0012-v082-correction/README.md#find-0111). |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0024` | Qualified repository, release, path, and dispatch evidence | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | `TEST-0060` through `TEST-0063`; passed | `FIND-0093` through `FIND-0095`, `FIND-0097`; resolved | Complete |
-| `SUBF-0025` | Bounded governance and post-publication closure | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | `TEST-0064`, `TEST-0065`; passed | `FIND-0096`, `FIND-0098`; resolved | Complete |
-| `SUBF-0026` | Executable test evidence, isolation, and CI least privilege | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | `TEST-0066` through `TEST-0068`; passed | `FIND-0099` through `FIND-0101`; resolved | Complete |
+| `SUBF-0024` <a name="subf-0024"></a> | Qualified repository, release, path, and dispatch evidence | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | [TEST-0060](test-cases.md#test-0060), [TEST-0061](test-cases.md#test-0061), [TEST-0062](test-cases.md#test-0062), and [TEST-0063](test-cases.md#test-0063); passed | `FIND-0093` through `FIND-0095`, `FIND-0097`; resolved | Complete |
+| `SUBF-0025` <a name="subf-0025"></a> | Bounded governance and post-publication closure | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | [TEST-0064](test-cases.md#test-0064), [TEST-0065](test-cases.md#test-0065); passed | `FIND-0096`, `FIND-0098`; resolved | Complete |
+| `SUBF-0026` <a name="subf-0026"></a> | Executable test evidence, isolation, and CI least privilege | [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) | [TEST-0066](test-cases.md#test-0066), [TEST-0067](test-cases.md#test-0067), and [TEST-0068](test-cases.md#test-0068); passed | `FIND-0099` through `FIND-0101`; resolved | Complete |
 
 ## Decisions and relationships
 
@@ -123,7 +123,7 @@ delivery; it does not claim that the later FEAT-0012 findings were absent.
 - [x] Measurable acceptance criteria.
 - [x] Identity, credential, release, path, concurrency, process, evidence, and
       cleanup contracts and consumers identified.
-- [x] Numbered risks and DEC-0011.
+- [x] Numbered risks and [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md).
 - [x] Three independently reviewable slices.
 - [x] Numbered test scenarios and verification approach.
 - [x] Test-code and baseline states recorded.
@@ -161,15 +161,15 @@ the later derivative evidence gaps are owned by
 
 | ID | Classification | Severity / confidence | Evidence and affected scope | Impact | Required action | Status and links |
 | --- | --- | --- | --- | --- | --- | --- |
-| `FIND-0093` | Verified defect - credential identity | High / High | Host identity was dropped before launcher GitHub operations in the [source launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A configured alternate CLI host could receive metadata or secret operations | Preserve and enforce `github.com` through every launcher-owned operation | Resolved by `TEST-0060`; [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) |
-| `FIND-0094` | Verified defect - release authority | High / High | Updater release checks did not bind source credential, immutable state, and fetched commit in the [updater adapter](../../../templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1) | A wrong authority or moved pre-publication tag could drive mutation | Use the protocol credential and exact locked-commit evidence | Resolved by `TEST-0061`; [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
-| `FIND-0095` | Verified defect - path integrity | High / High | Bootstrap evidence could omit a rename-away source in the [bootstrap adapter](../../../templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1) | An unrelated consumer path could be removed while the destination appeared allowed | Validate complete source/destination provenance | Resolved by `TEST-0062` |
-| `FIND-0096` | Verified process defect | High / High | Review and scan completion used conflicting actionable/blocking terminology in the [protocol](../../../PROTOCOL.md) | Relabeling could hide a blocker or trigger an unchanged loop | Use one mutually exclusive disposition taxonomy and finite stop condition | Resolved by `TEST-0064`; [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
-| `FIND-0097` | Verified defect - workflow causality | Medium / High | Workflow-run selection used an insufficient time/commit window and issue creation lacked convergence in the [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A concurrent run or issue could be mistaken for the launcher session | Add dispatch correlation and post-create issue convergence | Resolved by `TEST-0063` |
-| `FIND-0098` | Verified governance defect | Medium / High | Feature/index/memory/issue projections and branch-bound links could drift after publication | Canonical records could report inconsistent completion state | Reconcile current projections and use durable links | Resolved by historical `TEST-0065`; current v0.8.1 facts are retained by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and [release v0.8.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1) |
-| `FIND-0099` | Verified evidence defect | Medium / High | Test-range text, asset counts, timeout claims, YAML parsing, and runtime labels exceeded the assertions in the repository suites | Green tests could overstate executed coverage | Couple each claim to focused executable evidence and supported boundaries | Partially corrected by historical `TEST-0066`/`TEST-0067`; the remaining semantic ownership gap is `FIND-0104` in [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
-| `FIND-0100` | Verified defect - test isolation | Medium / High | Cleanup selected same-prefix temporary paths not proven to belong to the current run | One suite could delete another run's workspace | Maintain an owned temporary-root ledger | Resolved by `TEST-0068` |
-| `FIND-0101` | Verified risk - CI least privilege | Low / High | Root checkout persisted a credential unnecessary to read-only validation in [protocol CI](../../../.github/workflows/protocol-tests.yml) | A later step had broader credential availability than required | Set checkout credential persistence to false | Resolved by `TEST-0068` |
+| `FIND-0093` <a name="find-0093"></a> | Verified defect - credential identity | High / High | Host identity was dropped before launcher GitHub operations in the [source launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A configured alternate CLI host could receive metadata or secret operations | Preserve and enforce `github.com` through every launcher-owned operation | Resolved by [TEST-0060](test-cases.md#test-0060); [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) |
+| `FIND-0094` <a name="find-0094"></a> | Verified defect - release authority | High / High | Updater release checks did not bind source credential, immutable state, and fetched commit in the [updater adapter](../../../templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1) | A wrong authority or moved pre-publication tag could drive mutation | Use the protocol credential and exact locked-commit evidence | Resolved by [TEST-0061](test-cases.md#test-0061); [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
+| `FIND-0095` <a name="find-0095"></a> | Verified defect - path integrity | High / High | Bootstrap evidence could omit a rename-away source in the [bootstrap adapter](../../../templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1) | An unrelated consumer path could be removed while the destination appeared allowed | Validate complete source/destination provenance | Resolved by [TEST-0062](test-cases.md#test-0062) |
+| `FIND-0096` <a name="find-0096"></a> | Verified process defect | High / High | Review and scan completion used conflicting actionable/blocking terminology in the [protocol](../../../PROTOCOL.md) | Relabeling could hide a blocker or trigger an unchanged loop | Use one mutually exclusive disposition taxonomy and finite stop condition | Resolved by [TEST-0064](test-cases.md#test-0064); [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md) |
+| `FIND-0097` <a name="find-0097"></a> | Verified defect - workflow causality | Medium / High | Workflow-run selection used an insufficient time/commit window and issue creation lacked convergence in the [launcher](../../../scripts/Invoke-MeAndAIQuickAdoption.ps1) | A concurrent run or issue could be mistaken for the launcher session | Add dispatch correlation and post-create issue convergence | Resolved by [TEST-0063](test-cases.md#test-0063) |
+| `FIND-0098` <a name="find-0098"></a> | Verified governance defect | Medium / High | Feature/index/memory/issue projections and branch-bound links could drift after publication | Canonical records could report inconsistent completion state | Reconcile current projections and use durable links | Resolved by historical [TEST-0065](test-cases.md#test-0065); current v0.8.1 facts are retained by [issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) and [release v0.8.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.1) |
+| `FIND-0099` <a name="find-0099"></a> | Verified evidence defect | Medium / High | Test-range text, asset counts, timeout claims, YAML parsing, and runtime labels exceeded the assertions in the repository suites | Green tests could overstate executed coverage | Couple each claim to focused executable evidence and supported boundaries | Partially corrected by historical [TEST-0066](test-cases.md#test-0066)/[TEST-0067](test-cases.md#test-0067); the remaining semantic ownership gap is [FIND-0104](../FEAT-0012-v082-correction/README.md#find-0104) in [FEAT-0012](../FEAT-0012-v082-correction/README.md) |
+| `FIND-0100` <a name="find-0100"></a> | Verified defect - test isolation | Medium / High | Cleanup selected same-prefix temporary paths not proven to belong to the current run | One suite could delete another run's workspace | Maintain an owned temporary-root ledger | Resolved by [TEST-0068](test-cases.md#test-0068) |
+| `FIND-0101` <a name="find-0101"></a> | Verified risk - CI least privilege | Low / High | Root checkout persisted a credential unnecessary to read-only validation in [protocol CI](../../../.github/workflows/protocol-tests.yml) | A later step had broader credential availability than required | Set checkout credential persistence to false | Resolved by [TEST-0068](test-cases.md#test-0068) |
 
 ## In-slice blocking observations
 
@@ -198,7 +198,7 @@ layer.
 
 **2026-07-16 correction:** the confirmation claim was too strong because the
 test-evidence model could still accept identifier substrings and contract-poor
-mocks. The later full-project scan recorded `FIND-0102` through `FIND-0111` in
+mocks. The later full-project scan recorded [FIND-0102](../FEAT-0012-v082-correction/README.md#find-0102), [FIND-0103](../FEAT-0012-v082-correction/README.md#find-0103), [FIND-0104](../FEAT-0012-v082-correction/README.md#find-0104), [FIND-0105](../FEAT-0012-v082-correction/README.md#find-0105), [FIND-0106](../FEAT-0012-v082-correction/README.md#find-0106), [FIND-0107](../FEAT-0012-v082-correction/README.md#find-0107), [FIND-0108](../FEAT-0012-v082-correction/README.md#find-0108), [FIND-0109](../FEAT-0012-v082-correction/README.md#find-0109), [FIND-0110](../FEAT-0012-v082-correction/README.md#find-0110), and [FIND-0111](../FEAT-0012-v082-correction/README.md#find-0111) in
 [FEAT-0012](../FEAT-0012-v082-correction/README.md). That correction does not
 rewrite the commands that passed; it limits what those commands proved.
 
@@ -220,11 +220,11 @@ rewrite the commands that passed; it limits what those commands proved.
 
 This section was authored in the FEAT-0011 pre-merge commit as though the
 immutable release already existed. That was incorrect evidence timing and is
-recorded as `FIND-0108` in
+recorded as [FIND-0108](../FEAT-0012-v082-correction/README.md#find-0108) in
 [FEAT-0012](../FEAT-0012-v082-correction/README.md). The release was later
 published validly; the current facts below come from its external records and
-do not retroactively validate the premature claim. Issue #36 also omitted direct
-links back to FEAT-0011 and DEC-0011; future delivery issues must satisfy the
+do not retroactively validate the premature claim. [Issue #36](https://github.com/hasanmanzak/meAndAI/issues/36) also omitted direct
+links back to FEAT-0011 and [DEC-0011](../../decisions/DEC-0011-qualified-evidence-and-closure.md); future delivery issues must satisfy the
 bidirectional link rule before closure.
 
 | Field | Evidence |

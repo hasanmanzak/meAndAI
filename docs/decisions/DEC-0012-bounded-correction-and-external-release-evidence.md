@@ -65,10 +65,10 @@ not add a service, recursive validator, or additional full-project scan.
 - Test evidence becomes more explicit, but the repository keeps its existing
   compact PowerShell test surface rather than adding a framework.
 - Release records cannot be complete before publication. The stable external
-  authority for FEAT-0012 is
+  authority for [FEAT-0012](../features/FEAT-0012-v082-correction/README.md) is
   [issue #38](https://github.com/hasanmanzak/meAndAI/issues/38); publication will
   add the exact release, commit, and check evidence there.
-- The historical timing defect in FEAT-0011 remains visible as a correction
+- The historical timing defect in [FEAT-0011](../features/FEAT-0011-stability-closure/README.md) remains visible as a correction
   record even though the current v0.8.1 release itself is valid.
 - The finite validation budget is one initial scan and one confirmation scan
   after remediation. Only changed evidence or a blocking result may reopen the

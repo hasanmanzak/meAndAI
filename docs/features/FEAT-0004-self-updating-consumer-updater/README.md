@@ -88,24 +88,24 @@ insufficient.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0017` | Availability | PAT expiry, revocation, or permission loss interrupts updates | Managed; consumer admin | Explicit prerequisite, fail-closed validation, and documented rotation |
-| `RISK-0018` | Identity | PAT activity shares its human owner's GitHub identity | Accepted; consumer admin | Runtime `/user` resolution, exact candidate invariants, and App reconsideration trigger in DEC-0005 |
-| `RISK-0019` | Integrity | Automatic reconciliation overwrites consumer customization | Mitigated; maintainers | All current managed assets must equal the pinned templates before mutation |
-| `RISK-0020` | Migration | Pre-v0.4 updater cannot bootstrap this capability | Accepted transition; maintainers | One-time reviewed migration with no automatic ownership transfer |
-| `RISK-0021` | Credential scope | Workflow-write credential can change executable automation | Mitigated; consumer admin | One-repository selection, minimum permissions, secret isolation, draft-only output, and branch review |
+| `RISK-0017` <a name="risk-0017"></a> | Availability | PAT expiry, revocation, or permission loss interrupts updates | Managed; consumer admin | Explicit prerequisite, fail-closed validation, and documented rotation |
+| `RISK-0018` <a name="risk-0018"></a> | Identity | PAT activity shares its human owner's GitHub identity | Accepted; consumer admin | Runtime `/user` resolution, exact candidate invariants, and App reconsideration trigger in [DEC-0005](../../decisions/DEC-0005-consumer-scoped-fine-grained-pat.md) |
+| `RISK-0019` <a name="risk-0019"></a> | Integrity | Automatic reconciliation overwrites consumer customization | Mitigated; maintainers | All current managed assets must equal the pinned templates before mutation |
+| `RISK-0020` <a name="risk-0020"></a> | Migration | Pre-v0.4 updater cannot bootstrap this capability | Accepted transition; maintainers | One-time reviewed migration with no automatic ownership transfer |
+| `RISK-0021` <a name="risk-0021"></a> | Credential scope | Workflow-write credential can change executable automation | Mitigated; consumer admin | One-repository selection, minimum permissions, secret isolation, draft-only output, and branch review |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0022 through TEST-0026](test-cases.md) |
-| Test code | Green | `TEST-0022` through `TEST-0026` pass in the repository suite |
+| Scenarios | Defined | [TEST-0022](test-cases.md#test-0022), [TEST-0023](test-cases.md#test-0023), [TEST-0024](test-cases.md#test-0024), [TEST-0025](test-cases.md#test-0025), and [TEST-0026](test-cases.md#test-0026) |
+| Test code | Green | [TEST-0022](test-cases.md#test-0022), [TEST-0023](test-cases.md#test-0023), [TEST-0024](test-cases.md#test-0024), [TEST-0025](test-cases.md#test-0025), and [TEST-0026](test-cases.md#test-0026) pass in the repository suite |
 | Baseline run | Passed | Windows PowerShell 5.1 repository suite on 2026-07-15 before feature changes |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0007` | Fine-grained PAT and authenticated-actor boundary | [Issue #15](https://github.com/hasanmanzak/meAndAI/issues/15) | `TEST-0022`, `TEST-0023`; red/green evidence recorded | Fresh-diff review complete; no unresolved finding | Complete |
-| `SUBF-0008` | Deterministic updater-asset reconciliation and migration | [Issue #15](https://github.com/hasanmanzak/meAndAI/issues/15) | `TEST-0024` through `TEST-0026`; red/green evidence recorded | Fresh-diff review complete; `FIND-0051` resolved | Complete |
+| `SUBF-0007` <a name="subf-0007"></a> | Fine-grained PAT and authenticated-actor boundary | [Issue #15](https://github.com/hasanmanzak/meAndAI/issues/15) | [TEST-0022](test-cases.md#test-0022), [TEST-0023](test-cases.md#test-0023); red/green evidence recorded | Fresh-diff review complete; no unresolved finding | Complete |
+| `SUBF-0008` <a name="subf-0008"></a> | Deterministic updater-asset reconciliation and migration | [Issue #15](https://github.com/hasanmanzak/meAndAI/issues/15) | [TEST-0024](test-cases.md#test-0024), [TEST-0025](test-cases.md#test-0025), and [TEST-0026](test-cases.md#test-0026); red/green evidence recorded | Fresh-diff review complete; `FIND-0051` resolved | Complete |
 
 ## Decisions and relationships
 
@@ -123,7 +123,7 @@ insufficient.
 - [x] Measurable acceptance criteria.
 - [x] Credential, actor, path, blob, lifecycle, failure, consumer, and
   compatibility contracts identified.
-- [x] Numbered risks and DEC-0005.
+- [x] Numbered risks and [DEC-0005](../../decisions/DEC-0005-consumer-scoped-fine-grained-pat.md).
 - [x] Two independently reviewable slices with a gate ledger.
 - [x] Numbered test scenarios and verification approach.
 - [x] Test-code next state and successful pre-change baseline recorded.
@@ -157,7 +157,7 @@ test after a blocking fix.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0051` | Test gap / Medium / High | Staged target-blob validation had success coverage but no negative fixture; added a wrong-staged-blob scenario that proves failure occurs before push or PR creation. | Resolved |
+| `FIND-0051` <a name="find-0051"></a> | Test gap / Medium / High | Staged target-blob validation had success coverage but no negative fixture; added a wrong-staged-blob scenario that proves failure occurs before push or PR creation. | Resolved |
 
 No unresolved actionable in-scope finding remains. PAT expiry, human actor
 attribution, and the one-time pre-v0.4 migration remain explicitly owned risks

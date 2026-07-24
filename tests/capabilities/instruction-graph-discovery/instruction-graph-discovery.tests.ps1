@@ -2655,6 +2655,94 @@ Required reading: `type README.md`.
             @($inlineCodeExampleGraph.edges).Count -eq 0
         ) -Message 'TEST-0151 Markdown, command, or finding syntax inside inline code created graph edges.'
 
+        $structuredPayloadFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' = @'
+See [migration definition](migrations/MIG-0001.json).
+'@
+            'migrations/MIG-0001.json' = @'
+{
+  "after": "[pinned canonical idea template](../../.ai/protocol/templates/idea.md)",
+  "directive": "Required reading: `docs/STRUCTURED-AUTHORITY.md`."
+}
+'@
+            '.github/instructions/root.json' = @'
+{
+  "directive": "Required reading: [root authority](../../docs/ROOT-JSON-AUTHORITY.md)."
+}
+'@
+            'docs/ROOT-JSON-AUTHORITY.md' =
+                'Authority linked by a declared JSON instruction root.'
+        })
+        $structuredPayloadGraph = & $graphBuilder -BaseHead ('0' * 40) `
+            -TreeEntries $structuredPayloadFixture.Entries `
+            -ReadBlob $structuredPayloadFixture.Reader
+        Assert-True -Condition (
+            @($structuredPayloadGraph.nodes.path) -ccontains
+                'migrations/MIG-0001.json' -and
+            @($structuredPayloadGraph.nodes.path) -cnotcontains
+                'docs/STRUCTURED-AUTHORITY.md' -and
+            @($structuredPayloadGraph.edges | Where-Object {
+                $_.source -ceq '.github/instructions/root.json' -and
+                $_.target -ceq 'docs/ROOT-JSON-AUTHORITY.md' -and
+                $_.kind -ceq 'RequiresRead' -and
+                $_.reason -ceq 'MarkdownLink'
+            }).Count -eq 1 -and
+            @($structuredPayloadGraph.edges | Where-Object {
+                $_.source -ceq 'migrations/MIG-0001.json' -and
+                $_.target -like '*templates/idea.md*'
+            }).Count -eq 0
+        ) -Message 'TEST-0151 structured JSON payload masking promoted inert data or suppressed root instructions.'
+
+        $jsonMarkdownEscapeFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' =
+                'See [ordinary Markdown](docs/JSON-looking.md).'
+            'docs/JSON-looking.md' =
+                '{ "after": [escape](../../outside.md) }'
+        })
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $jsonMarkdownEscapeFixture.Entries `
+                -ReadBlob $jsonMarkdownEscapeFixture.Reader
+        } -Pattern '*escapes the repository root*' `
+            -Message 'TEST-0152 JSON-looking prose in Markdown bypassed path-containment validation.'
+
+        $rootJsonEscapeFixture = New-TestGraphFixture -Files ([ordered]@{
+            '.github/instructions/root.json' = @'
+{
+  "directive": "Required reading: [escape](../../../outside.md)."
+}
+'@
+        })
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $rootJsonEscapeFixture.Entries `
+                -ReadBlob $rootJsonEscapeFixture.Reader
+        } -Pattern '*escapes the repository root*' `
+            -Message 'TEST-0152 JSON instruction-root masking bypassed path-containment validation.'
+
+        $unterminatedJsonFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' = 'See [data](docs/data.json).'
+            'docs/data.json' = '{ "after": "unterminated'
+        })
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $unterminatedJsonFixture.Entries `
+                -ReadBlob $unterminatedJsonFixture.Reader
+        } -Pattern '*Instruction JSON string*unterminated*' `
+            -Message 'TEST-0152 malformed JSON string masking did not fail closed.'
+
+        $controlJsonFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' = 'See [data](docs/data.json).'
+            'docs/data.json' =
+                '{ "after": "raw' + [char]0x09 + 'control" }'
+        })
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $controlJsonFixture.Entries `
+                -ReadBlob $controlJsonFixture.Reader
+        } -Pattern '*Instruction JSON string*unescaped control character*' `
+            -Message 'TEST-0152 unescaped JSON control character did not fail closed.'
+
         $uppercaseRawFixture = New-TestGraphFixture -Files ([ordered]@{
             'AGENTS.md' = 'Required reading: docs/UPPER.MD'
             'docs/UPPER.MD' = 'Uppercase extension authority.'

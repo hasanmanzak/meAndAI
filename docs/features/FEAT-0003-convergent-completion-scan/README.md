@@ -45,18 +45,18 @@ Finite scope, evidence-based repetition, and a blocked exit prevent blind loops.
   completion cannot be inferred from validation-budget exhaustion.
 - Consumers and dependencies: this repository and consumers that intentionally
   adopt `v0.3.0`; consumers on earlier exact pins remain unchanged.
-- Verification: `TEST-0019`, the existing structural/link suite, one fresh-diff
+- Verification: [TEST-0019](test-cases.md#test-0019), the existing structural/link suite, one fresh-diff
   self-review, and one final relevant verification command.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0014` | Process | Literal zero-observation wording creates a blind loop | Mitigated; maintainers | Finite budget and blocked outcome in [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
-| `RISK-0015` | Quality | Findings are hidden by relabeling rather than resolved | Mitigated; maintainers | Residual risk requires ownership, rationale, and a link |
-| `RISK-0016` | Scope | Self-application expands into unrelated hardening | Mitigated; maintainer/user | Explicit non-goals and one declared validation slice |
+| `RISK-0014` <a name="risk-0014"></a> | Process | Literal zero-observation wording creates a blind loop | Mitigated; maintainers | Finite budget and blocked outcome in [DEC-0004](../../decisions/DEC-0004-bounded-completion-convergence.md) |
+| `RISK-0015` <a name="risk-0015"></a> | Quality | Findings are hidden by relabeling rather than resolved | Mitigated; maintainers | Residual risk requires ownership, rationale, and a link |
+| `RISK-0016` <a name="risk-0016"></a> | Scope | Self-application expands into unrelated hardening | Mitigated; maintainer/user | Explicit non-goals and one declared validation slice |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0019](test-cases.md#test-0019---post-development-convergence-contract) |
+| Scenarios | Defined | [TEST-0019](test-cases.md#test-0019) |
 | Test code | Implemented in the same slice | [Structural test](../../../tests/protocol.tests.ps1) |
 | Baseline run | N/A by explicit one-run validation budget | The contract assertion is added before final verification; no separate red run |
 
@@ -94,7 +94,7 @@ decomposition is not applicable.
    within a declared finite budget.
 5. Budget exhaustion or missing authority produces a documented blocked state,
    never a successful completion claim.
-6. The repository enforces the contract through executable `TEST-0019`.
+6. The repository enforces the contract through executable [TEST-0019](test-cases.md#test-0019).
 
 ## Self-review
 
@@ -107,12 +107,12 @@ remediation slice, one confirmation review, and one blocker-driven test retry.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0041` | Process gap / High / High | Completion scanning lacked a convergence contract; added the protocol subsection. | Resolved |
-| `FIND-0042` | Loop risk / High / High | Literal repetition could be unbounded; added finite budget, progress, and blocked conditions. | Resolved |
-| `FIND-0045` | Semantic contract / High / High | Severity was incorrectly used as a synonym for priority; priority now uses severity, impact, and dependency order. | Resolved |
-| `FIND-0046` | Process conflict / High / High | Gate 5 said ordinary work did not imply a project scan; aligned it with the single default convergence scan. | Resolved |
-| `FIND-0043` | Regression risk / Medium / High | The new contract could drift; added template alignment and `TEST-0019`. | Resolved |
-| `FIND-0044` | Test defect / Medium / High | The first run matched a line-wrapped sentence literally and failed falsely; narrowed the assertion without weakening semantics. | Resolved; retry passed |
+| `FIND-0041` <a name="find-0041"></a> | Process gap / High / High | Completion scanning lacked a convergence contract; added the protocol subsection. | Resolved |
+| `FIND-0042` <a name="find-0042"></a> | Loop risk / High / High | Literal repetition could be unbounded; added finite budget, progress, and blocked conditions. | Resolved |
+| `FIND-0045` <a name="find-0045"></a> | Semantic contract / High / High | Severity was incorrectly used as a synonym for priority; priority now uses severity, impact, and dependency order. | Resolved |
+| `FIND-0046` <a name="find-0046"></a> | Process conflict / High / High | Gate 5 said ordinary work did not imply a project scan; aligned it with the single default convergence scan. | Resolved |
+| `FIND-0043` <a name="find-0043"></a> | Regression risk / Medium / High | The new contract could drift; added template alignment and [TEST-0019](test-cases.md#test-0019). | Resolved |
+| `FIND-0044` <a name="find-0044"></a> | Test defect / Medium / High | The first run matched a line-wrapped sentence literally and failed falsely; narrowed the assertion without weakening semantics. | Resolved; retry passed |
 
 Shared finding scope is `FEAT-0003`; impact is protocol execution behavior;
 canonical evidence is the linked protocol section, decision, and test scenario.

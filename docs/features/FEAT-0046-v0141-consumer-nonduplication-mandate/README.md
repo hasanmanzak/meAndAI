@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible protocol correction / `BUG-0028` |
+| Classification | Backward-compatible protocol correction / [BUG-0028](https://github.com/hasanmanzak/meAndAI/issues/112) |
 | Status | Complete |
 | Target version | 0.14.1 |
 | Issue | [#112](https://github.com/hasanmanzak/meAndAI/issues/112) |
 | Pull request | To be recorded in [issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) |
 | Decisions | [DEC-0028](../../decisions/DEC-0028-upstream-owned-reusable-corrections.md) |
-| Tests | [TEST-0174](test-cases.md) |
+| Tests | [TEST-0174](test-cases.md#test-0174) |
 
 ## Problem and outcome
 
@@ -26,7 +26,7 @@ regression are corrected once in meAndAI and published before consumer recovery.
 
 ## Scope
 
-- Strengthen `PROTOCOL.md`, repository instructions, and DEC-0028 with the
+- Strengthen [PROTOCOL.md](../../../PROTOCOL.md), repository instructions, and [DEC-0028](../../decisions/DEC-0028-upstream-owned-reusable-corrections.md) with the
   explicit non-duplication boundary.
 - Add one focused structural scenario to the existing protocol-governance
   suite.
@@ -44,21 +44,21 @@ regression are corrected once in meAndAI and published before consumer recovery.
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0211` | Ownership ambiguity | A renamed or slightly adapted protocol asset is treated as project-specific | Protocol maintainers / prohibit copy, reimplementation, port, shadow, fork, and consumer-local equivalent forms |
-| `RISK-0212` | Consumer overreach | Common correction work mutates a named consumer before an upstream release exists | Protocol maintainers / require upstream issue, project-neutral regression, correction, and immutable release first |
+| `RISK-0211` <a name="risk-0211"></a> | Ownership ambiguity | A renamed or slightly adapted protocol asset is treated as project-specific | Protocol maintainers / prohibit copy, reimplementation, port, shadow, fork, and consumer-local equivalent forms |
+| `RISK-0212` <a name="risk-0212"></a> | Consumer overreach | Common correction work mutates a named consumer before an upstream release exists | Protocol maintainers / require upstream issue, project-neutral regression, correction, and immutable release first |
 
 ## Decomposition and gate
 
 | ID | Slice | Tracking | Tests | Review gate | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0088` | Explicit single-owner reusable-asset mandate | [Issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) | [TEST-0174](test-cases.md) | Protocol, DEC, local instruction, version, and memory agree; no consumer mutation | Complete |
+| `SUBF-0088` <a name="subf-0088"></a> | Explicit single-owner reusable-asset mandate | [Issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) | [TEST-0174](test-cases.md#test-0174) | Protocol, DEC, local instruction, version, and memory agree; no consumer mutation | Complete |
 
 ## Definition of Ready
 
-- [x] `BUG-0028`, `FEAT-0046`, `SUBF-0088`, `TEST-0174`, and risks exist.
-- [x] Issue #112 is the delivery authority.
+- [x] [BUG-0028](https://github.com/hasanmanzak/meAndAI/issues/112), `FEAT-0046`, `SUBF-0088`, [TEST-0174](test-cases.md#test-0174), and risks exist.
+- [x] [Issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) is the delivery authority.
 - [x] Problem, outcome, scope, non-goals, ownership, and compatibility are explicit.
-- [x] DEC-0028 remains the architectural authority; no new decision is needed.
+- [x] [DEC-0028](../../decisions/DEC-0028-upstream-owned-reusable-corrections.md) remains the architectural authority; no new decision is needed.
 - [x] One focused existing-suite scenario owns the normative regression.
 
 ## Acceptance criteria
@@ -76,28 +76,28 @@ regression are corrected once in meAndAI and published before consumer recovery.
    by meAndAI, deterministic protocol automation alone installs or updates it,
    and it grants no test/fixture exception.
 5. Repository-local instructions repeat the rule for work performed in meAndAI.
-6. TEST-0174 fails without the mandate and passes after the smallest coherent
+6. [TEST-0174](test-cases.md#test-0174) fails without the mandate and passes after the smallest coherent
    protocol, decision, and instruction change.
 7. No consumer repository, workflow, branch, pull request, fixture, or test is
    changed by this feature.
 
 ## Definition of Done
 
-- [x] Acceptance criteria and TEST-0174 pass.
+- [x] Acceptance criteria and [TEST-0174](test-cases.md#test-0174) pass.
 - [x] Focused verification evidence is recorded; final structure verification
   is the publication gate.
 - [x] One bounded fresh-diff review has no unresolved `Blocking` finding.
 - [x] Version, changelog, feature links, and project memory are current.
-- [x] Issue #112 owns the PR, merge, immutable release, two-asset, verification,
+- [x] [Issue #112](https://github.com/hasanmanzak/meAndAI/issues/112) owns the PR, merge, immutable release, two-asset, verification,
   and branch-cleanup evidence that can exist only after this tree is merged.
 
 ## Self-review
 
 | Finding | Severity | Disposition | Resolution |
 | --- | --- | --- | --- |
-| `FIND-0205` | Blocking | Resolved | The initial categorical prohibition and legacy `consumer-owned updater` terminology conflicted with resident workflow hooks. All active updater contracts now call the hook a consumer-resident, protocol-owned managed projection. The exception pins source, target, digest/blob, lifecycle, and deterministic installation; TEST-0174 protects both the positive boundary and absence of the conflicting legacy term. |
-| `FIND-0206` | Blocking | Resolved | Feature, subfeature, test, evidence, version, links, and memory completion records were reconciled before publication. |
-| `FIND-0207` | Blocking | Resolved | Mechanical current-version propagation collapsed the quick-adoption fixture's current and future same-major releases into one tag. The future node is again `v0.14.2`, and fixture construction now rejects duplicate release identities before attempting a commit. |
+| `FIND-0210` <a name="find-0210"></a> | Blocking | Resolved | The initial categorical prohibition and legacy `consumer-owned updater` terminology conflicted with resident workflow hooks. All active updater contracts now call the hook a consumer-resident, protocol-owned managed projection. The exception pins source, target, digest/blob, lifecycle, and deterministic installation; [TEST-0174](test-cases.md#test-0174) protects both the positive boundary and absence of the conflicting legacy term. |
+| `FIND-0211` <a name="find-0211"></a> | Blocking | Resolved | Feature, subfeature, test, evidence, version, links, and memory completion records were reconciled before publication. |
+| `FIND-0212` <a name="find-0212"></a> | Blocking | Resolved | Mechanical current-version propagation collapsed the quick-adoption fixture's current and future same-major releases into one tag. The future node is again `v0.14.2`, and fixture construction now rejects duplicate release identities before attempting a commit. |
 
 ## Post-merge release evidence
 

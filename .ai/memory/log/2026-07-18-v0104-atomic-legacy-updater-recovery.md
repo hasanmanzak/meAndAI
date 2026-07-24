@@ -2,7 +2,7 @@
 
 ## Scope
 
-- [FEAT-0028 / BUG-0013](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md)
+- [FEAT-0028](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/README.md) and [BUG-0013](https://github.com/hasanmanzak/meAndAI/issues/74)
 - [DEC-0020](../../../docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md)
 - [Issue #74](https://github.com/hasanmanzak/meAndAI/issues/74)
 
@@ -28,14 +28,14 @@
 
 ## Evidence state
 
-- `TEST-0125` freezes a minimal project-neutral pre-migration validator by exact Git blob.
+- [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) freezes a minimal project-neutral pre-migration validator by exact Git blob.
   It proves core-only red and the production 13-path atomic proposal green.
-- `TEST-0126` covers requested-target ceiling, invalid target forms, recovery
+- [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) covers requested-target ceiling, invalid target forms, recovery
   branch separation, legacy cleanup identity, isolated-clone cleanup, and
   maintainer checkout preservation.
 - Focused resolver, adapter, current-launcher recovery, and merge-finalization
   suites pass locally. The complete discovered suite passed in 589.1 seconds
-  and emitted canonical `TEST-0125` and `TEST-0126` evidence.
+  and emitted canonical [TEST-0125](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0125) and [TEST-0126](../../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) evidence.
 - The bounded fresh-diff review found two lifecycle gaps, both corrected before
   publication; exact re-review found no unresolved Blocking/High issue.
 - Hosted, merge, branch cleanup, immutable release, and post-publication
@@ -43,5 +43,5 @@
 
 ## Continuation
 
-Publish the converged branch once. Issue #74 owns external delivery facts after
-they exist; issue #72 co-owns the shared v0.10.4 release.
+Publish the converged branch once. [Issue #74](https://github.com/hasanmanzak/meAndAI/issues/74) owns external delivery facts after
+they exist; [issue #72](https://github.com/hasanmanzak/meAndAI/issues/72) co-owns the shared v0.10.4 release.

@@ -5,7 +5,7 @@
 - Work item: [FEAT-0017](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/README.md)
 - Tracking and post-publication authority: [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51)
 - Delivery review: [pull request #52](https://github.com/hasanmanzak/meAndAI/pull/52)
-- Test: [`TEST-0101`](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md)
+- Test: [`TEST-0101`](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md#test-0101)
 - Target version: `0.9.2`
 
 ## Durable continuation
@@ -23,7 +23,7 @@
   outside the approved boundary.
 - After publication, record the release asset name, API-reported SHA-256
   digest, merged-file SHA-256 digest, exact release commit, and hosted check in
-  issue #51. Do not predict those values in repository documents.
+  [issue #51](https://github.com/hasanmanzak/meAndAI/issues/51). Do not predict those values in repository documents.
 - Local confirmation passed every discovered suite in 460 seconds, including
-  the existing quick-adoption regressions and source-bound `TEST-0101`. No
+  the existing quick-adoption regressions and source-bound [TEST-0101](../../../docs/features/FEAT-0017-v092-single-file-quick-adoption/test-cases.md#test-0101). No
   unresolved local `Blocking` finding remains.

@@ -1,5 +1,7 @@
 ## Classification and links
 
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
+
 - Work ID:
 - Closes:
 - Parent/related issues:
@@ -21,7 +23,7 @@ consumers, boundaries, compatibility, dependencies, and duplication review.
 
 | Test ID | Date/commit | Environment | Level | Command or test | Result |
 | --- | --- | --- | --- | --- | --- |
-| `TEST-NNNN` | Date / SHA | Runtime and OS | Unit/integration/e2e/structural | Command | Pass |
+| TEST-NNNN (replace with clickable exact-target link) | Date / clickable exact full-SHA commit permalink | Runtime and OS | Unit/integration/e2e/structural | Command | Pass |
 
 ## Self-review
 

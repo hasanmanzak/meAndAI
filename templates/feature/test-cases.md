@@ -2,9 +2,11 @@
 
 Test implementation: replace with a clickable repository-relative link.
 
+Use clickable links to the exact referenced records; free-text identifiers, numbers, titles, paths, or commit hashes do not satisfy a reference.
+
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-NNNN` | `FEAT/SUBF-NNNN` | Behavior or risk | Observable result | Unit | Planned | Test name |
+| `TEST-NNNN` <a name="test-nnnn"></a> | [Owning FEAT-NNNN](README.md) or [SUBF-NNNN](README.md#subf-nnnn) | Behavior or risk | Observable result | Unit | Planned | Test name |
 
 ## Required coverage
 
@@ -19,4 +21,4 @@ Test implementation: replace with a clickable repository-relative link.
 
 | Date | Commit | Environment | Command | Result |
 | --- | --- | --- | --- | --- |
-| YYYY-MM-DD | SHA | Environment | Command | Pass/fail and notes |
+| YYYY-MM-DD | Clickable exact full-SHA commit permalink | Environment | Command | Pass/fail and notes |

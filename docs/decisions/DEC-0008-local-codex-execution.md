@@ -108,7 +108,7 @@ marks the draft ready.
   measurable fraction receives no invented percentage.
 - Ctrl+C before the validated completion push leaves the live proposal head
   unchanged. The deterministic seed, draft, labels, and issue remain safe to
-  reuse; interruption after the push uses DEC-0013 recovery.
+  reuse; interruption after the push uses [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md) recovery.
 - Existing v0.6.0 consumers and the manual workflow-only path remain valid.
 
 ## Alternatives considered

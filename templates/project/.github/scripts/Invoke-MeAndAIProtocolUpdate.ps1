@@ -49,6 +49,74 @@ $ManagedUpdateLabels = @(
     [pscustomobject]@{ Name = 'status:blocked'; Color = 'b60205'; Description = 'Blocked by an unresolved dependency' }
 )
 
+function Test-ContainsManagedMarkerSignal {
+    param(
+        [AllowNull()][string]$Body,
+        [Parameter(Mandatory)][string]$Prefix
+    )
+
+    if ([string]::IsNullOrEmpty($Body)) { return [bool]$false }
+    return [bool](([string]$Body).IndexOf(
+        $Prefix, [StringComparison]::OrdinalIgnoreCase
+    ) -ge 0)
+}
+
+function New-GitHubIssueLink {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$Number
+    )
+
+    "[#$Number](https://github.com/$Repository/issues/$Number)"
+}
+
+function New-GitHubPullRequestLink {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$Number
+    )
+
+    "[pull request #$Number](https://github.com/$Repository/pull/$Number)"
+}
+
+function New-GitHubBlobLink {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit,
+        [Parameter(Mandatory)][string]$Path
+    )
+
+    if ($Commit -cnotmatch '^[0-9a-f]{40}$') {
+        throw "Cannot link managed path '$Path' without an exact commit SHA."
+    }
+    $encodedPath = (@($Path.Split('/') | ForEach-Object {
+        [Uri]::EscapeDataString([string]$_)
+    }) -join '/')
+    "[``$Path``](https://github.com/$Repository/blob/$Commit/$encodedPath)"
+}
+
+function Test-ExactManagedPathEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][string[]]$Paths
+    )
+
+    $links = @($Paths | ForEach-Object {
+        New-GitHubBlobLink -Repository $Repository -Commit $HeadSha `
+            -Path ([string]$_)
+    })
+    $expected = "- Managed paths: $($links -join ', ')"
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n")
+    $candidates = @([regex]::Matches(
+        $normalized, '(?im)^-[ \t]+managed[ \t]+paths[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    return $candidates.Count -eq 1 -and
+        [string]$candidates[0].Value -ceq $expected
+}
+
 function Invoke-Native {
     param(
         [string]$Command,
@@ -364,13 +432,40 @@ function Get-ImmutableProtocolReleaseEvidence {
         }
     }
     $publishedAt = [DateTimeOffset]::MinValue
+    $publishedAtValue = $release.published_at
+    $publishedAtValid = if ($publishedAtValue -is [DateTimeOffset]) {
+        $publishedAt = [DateTimeOffset]$publishedAtValue
+        $true
+    }
+    elseif ($publishedAtValue -is [DateTime]) {
+        $publishedDateTime = [DateTime]$publishedAtValue
+        if ($publishedDateTime.Kind -eq [DateTimeKind]::Unspecified) {
+            $false
+        }
+        else {
+            $publishedAt = [DateTimeOffset]$publishedDateTime
+            $true
+        }
+    }
+    elseif ($publishedAtValue -is [string]) {
+        [DateTimeOffset]::TryParseExact(
+            [string]$publishedAtValue,
+            [string[]]@(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF'Z'"
+            ),
+            [Globalization.CultureInfo]::InvariantCulture,
+            [Globalization.DateTimeStyles]::AssumeUniversal -bor
+                [Globalization.DateTimeStyles]::AdjustToUniversal,
+            [ref]$publishedAt
+        )
+    }
+    else { $false }
     if ([string]$release.tag_name -cne $Tag -or
         $release.draft -isnot [bool] -or [bool]$release.draft -or
         $release.prerelease -isnot [bool] -or [bool]$release.prerelease -or
         $release.immutable -isnot [bool] -or -not [bool]$release.immutable -or
-        -not [DateTimeOffset]::TryParse(
-            [string]$release.published_at, [ref]$publishedAt
-        )) {
+        -not $publishedAtValid) {
         throw "Protocol target '$Tag' is not an exact published, non-prerelease, immutable GitHub Release."
     }
 
@@ -630,6 +725,43 @@ function Get-Sha256Text {
     finally {
         $algorithm.Dispose()
     }
+}
+
+function Test-CanonicalRepositoryPath {
+    param([AllowNull()][string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or
+        $Path.StartsWith('/', [StringComparison]::Ordinal) -or
+        $Path -match '^[A-Za-z]:' -or $Path.Contains('\') -or
+        $Path -match '[\x00-\x1f]') {
+        return [bool]$false
+    }
+    $segments = @($Path.Split('/'))
+    return [bool]($segments.Count -gt 0 -and
+        @($segments | Where-Object {
+            $_ -ceq '' -or $_ -ceq '.' -or $_ -ceq '..'
+        }).Count -eq 0)
+}
+
+function Get-LinkedPathIdentityDigest {
+    param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
+
+    $seen = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    $builder = [Text.StringBuilder]::new()
+    [void]$builder.Append("schema=1`ncount=$(@($Paths).Count)`n")
+    foreach ($value in @($Paths)) {
+        if ($value -isnot [string] -or
+            -not (Test-CanonicalRepositoryPath -Path ([string]$value)) -or
+            -not $seen.Add([string]$value)) {
+            throw 'Cannot derive a linked-path identity from invalid paths.'
+        }
+        $path = [string]$value
+        $length = [Text.Encoding]::UTF8.GetByteCount($path)
+        [void]$builder.Append("$length`:$path`n")
+    }
+    return Get-Sha256Text -Text $builder.ToString()
 }
 
 function Get-MigrationPathSetSha256 {
@@ -1328,7 +1460,7 @@ function Get-ManagedUpdateIssueMarker {
     if (-not $Body) { return $empty }
     $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
     $prefix = '<!-- meandai-protocol-update-issue:'
-    if (-not $normalized.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+    if (-not (Test-ContainsManagedMarkerSignal -Body $normalized -Prefix $prefix)) {
         return $empty
     }
     $signals = [regex]::Matches(
@@ -1618,10 +1750,9 @@ function Repair-LegacyQuoteStrippedProtocolUpdateIssue {
         }
         $body = [string]$issue.body
         $normalizedBody = $body.Replace("`r`n", "`n").Replace("`r", "`n")
-        $hasManagedSignal = $normalizedBody.StartsWith(
-            '<!-- meandai-protocol-update-issue:',
-            [StringComparison]::OrdinalIgnoreCase
-        )
+        $hasManagedSignal = Test-ContainsManagedMarkerSignal `
+            -Body $normalizedBody `
+            -Prefix '<!-- meandai-protocol-update-issue:'
         if ($hasManagedSignal) {
             $lines = @($normalizedBody.Split([char]"`n"))
             $legacyMatch = if ($lines.Count -gt 0) {
@@ -1744,9 +1875,8 @@ function Repair-LegacyQuoteStrippedProtocolUpdateIssue {
     $commentsEndpoint = "repos/$Repository/issues/$([int]$issue.number)/comments?per_page=100"
     $comments = @(Invoke-GhPagedReadJson -Endpoint $commentsEndpoint -Token $token)
     if (@($comments | Where-Object {
-        ([string]$_.body).StartsWith(
-            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
-        )
+        Test-ContainsManagedMarkerSignal -Body ([string]$_.body) `
+            -Prefix '<!-- meandai-protocol-update-proposal:'
     }).Count -ne 0) {
         throw 'Legacy malformed protocol-update issue already has managed proposal evidence.'
     }
@@ -1764,9 +1894,8 @@ function Repair-LegacyQuoteStrippedProtocolUpdateIssue {
         $null -ne (Get-RemoteBranchHead -Branch $repairBranch) -or
         $freshPulls.Count -ne 0 -or
         @($freshComments | Where-Object {
-            ([string]$_.body).StartsWith(
-                '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
-            )
+            Test-ContainsManagedMarkerSignal -Body ([string]$_.body) `
+                -Prefix '<!-- meandai-protocol-update-proposal:'
         }).Count -ne 0) {
         throw 'Legacy malformed protocol-update issue evidence changed before repair.'
     }
@@ -1908,9 +2037,79 @@ function Ensure-ProtocolUpdateIssue {
         -Token ([string]$env:ISSUE_TOKEN)
 }
 
-function Get-ManagedUpdateProposalEvidenceMarker {
-    param([int]$PullRequestNumber, [string]$HeadSha)
-    "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->"
+function Get-CanonicalLinkedPullRequestNumber {
+    param(
+        [Parameter(Mandatory)][string]$Line,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Prefix,
+        [string]$Suffix = ''
+    )
+
+    $match = [regex]::Match(
+        $Line,
+        '^' + [regex]::Escape($Prefix) +
+            '\[pull request #(?<number>[1-9][0-9]*)\]\(https://github\.com/' +
+            [regex]::Escape($Repository) + '/pull/\k<number>\)' +
+            [regex]::Escape($Suffix) + '$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $number = 0
+    if (-not $match.Success -or -not [int]::TryParse(
+            [string]$match.Groups['number'].Value, [ref]$number
+        ) -or $number -lt 1) {
+        return 0
+    }
+    return $number
+}
+
+function Get-ManagedUpdateProposalEvidenceContract {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    if ($HeadSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Managed proposal evidence requires an exact head SHA.'
+    }
+    $marker = "<!-- meandai-protocol-update-proposal:head-$HeadSha -->"
+    $body = @(
+        $marker,
+        "Managed protocol proposal: $(New-GitHubPullRequestLink `
+            -Repository $Repository -Number $PullRequestNumber)",
+        "Exact proposal head: ``$HeadSha``"
+    ) -join [Environment]::NewLine
+    [pscustomobject]@{ Marker = $marker; Body = $body }
+}
+
+function Test-ExactManagedUpdateProposalEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha
+    )
+
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd([char[]]"`n")
+    $lines = @($normalized.Split("`n"))
+    if ($lines.Count -ne 3) { return $false }
+
+    $contract = Get-ManagedUpdateProposalEvidenceContract `
+        -Repository $Repository -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
+    $legacyMarker = "<!-- meandai-protocol-update-proposal:pr-$PullRequestNumber`:head-$HeadSha -->"
+    $markerIsBound = [string]$lines[0] -ceq [string]$contract.Marker -or
+        [string]$lines[0] -ceq $legacyMarker
+    $linkedNumber = Get-CanonicalLinkedPullRequestNumber -Line ([string]$lines[1]) `
+        -Repository $Repository -Prefix 'Managed protocol proposal: '
+    if ($markerIsBound -and $linkedNumber -eq $PullRequestNumber -and
+        [string]$lines[2] -ceq "Exact proposal head: ``$HeadSha``") {
+        return $true
+    }
+
+    # Bounded compatibility for the exact body emitted by the previous writer.
+    return [string]$lines[0] -ceq $legacyMarker -and
+        [string]$lines[1] -ceq ('Managed protocol proposal: ' + "#$PullRequestNumber") -and
+        [string]$lines[2] -ceq "Exact proposal head: ``$HeadSha``"
 }
 
 function Set-ProtocolUpdateIssuePullRequestLink {
@@ -1922,35 +2121,32 @@ function Set-ProtocolUpdateIssuePullRequestLink {
     )
 
     $token = [string]$env:ISSUE_TOKEN
-    $marker = Get-ManagedUpdateProposalEvidenceMarker `
-        -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
+    $contract = Get-ManagedUpdateProposalEvidenceContract `
+        -Repository $Repository -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
     $comments = @(Invoke-GhPagedJson -Endpoint (
         "repos/$Repository/issues/$IssueNumber/comments?per_page=100"
     ) -Token $token)
     $managed = @($comments | Where-Object {
-        ([string]$_.body).StartsWith(
-            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
-        )
+        Test-ContainsManagedMarkerSignal -Body ([string]$_.body) `
+            -Prefix '<!-- meandai-protocol-update-proposal:'
     })
     $exact = @($managed | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $marker
+        Test-ExactManagedUpdateProposalEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $PullRequestNumber `
+            -HeadSha $HeadSha
     })
     $malformed = @($managed | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -cnotmatch
-            '^<!-- meandai-protocol-update-proposal:pr-[1-9][0-9]*:head-[0-9a-f]{40} -->$'
+        -not (Test-ExactManagedUpdateProposalEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $PullRequestNumber `
+            -HeadSha $HeadSha)
     })
     if ($malformed.Count -ne 0 -or $exact.Count -gt 1) {
         throw 'The managed protocol-update issue has ambiguous proposal-link evidence.'
     }
     if ($exact.Count -eq 0) {
-        $body = @(
-            $marker,
-            "Managed protocol proposal: #$PullRequestNumber",
-            "Exact proposal head: ``$HeadSha``"
-        ) -join [Environment]::NewLine
         Invoke-GhMutationWithBodyFile -Method POST `
             -Endpoint "repos/$Repository/issues/$IssueNumber/comments" `
-            -Body $body -Token $token | Out-Null
+            -Body ([string]$contract.Body) -Token $token | Out-Null
     }
 }
 
@@ -1969,7 +2165,8 @@ function Get-ValidatedManagedUpdateIssue {
         [bool]$RequireOpen = $true
     )
 
-    $issueNumber = Get-CanonicalTrackingIssueNumber -Body $PullRequestBody
+    $issueNumber = Get-CanonicalTrackingIssueNumber -Body $PullRequestBody `
+        -Repository $Repository
     $issue = Invoke-GhReadJson -Endpoint "repos/$Repository/issues/$issueNumber" `
         -Token ([string]$env:ISSUE_TOKEN)
     if ($null -eq $issue -or [int]$issue.number -ne $issueNumber -or
@@ -1989,22 +2186,22 @@ function Get-ValidatedManagedUpdateIssue {
         ($RequireOpen -and [string]$issue.state -cne 'open')) {
         throw "Managed update pull request #$PullRequestNumber has no exact canonical tracking issue."
     }
-    $evidenceMarker = Get-ManagedUpdateProposalEvidenceMarker `
-        -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha
     $comments = @(Invoke-GhPagedJson -Endpoint (
         "repos/$Repository/issues/$issueNumber/comments?per_page=100"
     ) -Token ([string]$env:ISSUE_TOKEN))
     $managedEvidence = @($comments | Where-Object {
-        ([string]$_.body).StartsWith(
-            '<!-- meandai-protocol-update-proposal:', [StringComparison]::Ordinal
-        )
+        Test-ContainsManagedMarkerSignal -Body ([string]$_.body) `
+            -Prefix '<!-- meandai-protocol-update-proposal:'
     })
     $exactEvidence = @($managedEvidence | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $evidenceMarker
+        Test-ExactManagedUpdateProposalEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $PullRequestNumber `
+            -HeadSha $HeadSha
     })
     $malformedEvidence = @($managedEvidence | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -cnotmatch
-            '^<!-- meandai-protocol-update-proposal:pr-[1-9][0-9]*:head-[0-9a-f]{40} -->$'
+        -not (Test-ExactManagedUpdateProposalEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $PullRequestNumber `
+            -HeadSha $HeadSha)
     })
     if ($malformedEvidence.Count -ne 0 -or $exactEvidence.Count -ne 1) {
         throw "Managed update pull request #$PullRequestNumber has no exact issue-to-proposal backlink."
@@ -2592,6 +2789,11 @@ function Assert-ManagedPullRequestSafe {
         [string]$marker.PathsSha -ceq $expectedPathsSha
     }
     else { $marker.Schema -eq 1 -and $proposalKind -ceq 'Update' }
+    if ($marker.Schema -eq 2 -and -not (Test-ExactManagedPathEvidence `
+            -Body ([string]$details.body) -Repository $Repository `
+            -HeadSha ([string]$details.head.sha) -Paths $expectedChangedPaths)) {
+        throw "Managed PR #$number changed after planning: managed-path evidence is not exact head-bound GitHub blob links."
+    }
     $state = [string]$details.state
     $candidate = [pscustomobject]@{
         PullRequestState = if ($state) {
@@ -2644,7 +2846,8 @@ function Assert-ManagedPullRequestSafe {
         throw "Managed PR #$number changed after planning: $($problems -join '; ')."
     }
     if ($unboundIssue) {
-        if (-not (Test-LegacyUnboundTrackingBody -Body ([string]$details.body))) {
+        if (-not (Test-LegacyUnboundTrackingBody -Body ([string]$details.body) `
+                -Repository $Repository)) {
             throw "Supersede-only PR #$number unexpectedly owns a canonical tracking issue."
         }
     }
@@ -2668,7 +2871,8 @@ function Get-CanonicalAdoptionMarker {
 
     $empty = [pscustomobject]@{
         Schema = 0; Phase = ''; State = ''; Target = ''; ProtocolSha = ''
-        Head = ''; Repository = ''; Actor = ''; CanonicalLine = ''
+        Head = ''; Branch = ''; Repository = ''; Actor = ''; GraphDigest = ''
+        GraphBase = ''; SurfaceBase = ''; SurfaceDigest = ''; CanonicalLine = ''
     }
     if ([string]::IsNullOrWhiteSpace($Body)) {
         return $empty
@@ -2700,10 +2904,47 @@ function Get-CanonicalAdoptionMarker {
     try {
         $json = [string]$matches[0].Groups['json'].Value
         $marker = $json | ConvertFrom-Json
-        $expectedNames = @(
-            'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
-            'repository', 'actor'
-        )
+        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long])) {
+            return $empty
+        }
+        $schema = [long]$marker.schema
+        $expectedNames = if ($schema -eq 3) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 5) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'adoptionStrategy', 'protocolSurfaces',
+                'protocolRecordLossAcknowledged', 'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 7) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'branch', 'adoptionStrategy', 'protocolSurfaces',
+                'protocolRecordLossAcknowledged', 'graphBase', 'graphDigest',
+                'graphCounts', 'graphLimits', 'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 9) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'branch', 'adoptionStrategy', 'protocolRecordLossAcknowledged',
+                'graphBase', 'graphDigest', 'graphCounts', 'graphLimits',
+                'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 11) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'branch', 'adoptionStrategy', 'surfaceBase', 'surfaceDigest',
+                'protocolRecordLossAcknowledged', 'repository', 'actor'
+            )
+        }
+        else { return $empty }
         $properties = @($marker.PSObject.Properties)
         if ($properties.Count -ne $expectedNames.Count) {
             return $empty
@@ -2717,9 +2958,7 @@ function Get-CanonicalAdoptionMarker {
                 return $empty
             }
         }
-        if (($marker.schema -isnot [int] -and $marker.schema -isnot [long]) -or
-            [long]$marker.schema -ne 3 -or
-            $marker.phase -isnot [string] -or
+        if ($marker.phase -isnot [string] -or
             [string]$marker.phase -cne 'Completed' -or
             $marker.state -isnot [string] -or
             [string]::IsNullOrWhiteSpace([string]$marker.state) -or
@@ -2731,28 +2970,152 @@ function Get-CanonicalAdoptionMarker {
             [string]::IsNullOrWhiteSpace([string]$marker.actor)) {
             return $empty
         }
-        $canonicalJson = [ordered]@{
-            schema = 3
-            phase = 'Completed'
-            state = [string]$marker.state
-            target = [string]$marker.target
-            protocolSha = [string]$marker.protocolSha
-            head = [string]$marker.head
-            repository = [string]$marker.repository
-            actor = [string]$marker.actor
-        } | ConvertTo-Json -Compress
+        if ($schema -eq 5 -and (
+            $marker.adoptionStrategy -isnot [string] -or
+            $marker.protocolSurfaces -isnot [array] -or
+            $marker.protocolRecordLossAcknowledged -isnot [bool])) {
+            return $empty
+        }
+        if ($schema -in @(7, 9) -and (
+            $marker.branch -isnot [string] -or
+            $marker.adoptionStrategy -isnot [string] -or
+            $marker.protocolRecordLossAcknowledged -isnot [bool] -or
+            $marker.graphBase -isnot [string] -or
+            $marker.graphDigest -isnot [string] -or
+            [string]$marker.graphDigest -cnotmatch '^[0-9a-f]{64}$' -or
+            $null -eq $marker.graphCounts -or $null -eq $marker.graphLimits)) {
+            return $empty
+        }
+        if ($schema -eq 7 -and $marker.protocolSurfaces -isnot [array]) {
+            return $empty
+        }
+        if ($schema -eq 11 -and (
+            $marker.branch -isnot [string] -or
+            [string]::IsNullOrWhiteSpace([string]$marker.branch) -or
+            $marker.adoptionStrategy -isnot [string] -or
+            [string]$marker.adoptionStrategy -cnotin @(
+                'FreshAdoption', 'FullMigration', 'HybridReconciliation',
+                'CleanStart'
+            ) -or
+            $marker.surfaceBase -isnot [string] -or
+            [string]$marker.surfaceBase -cnotmatch '^[0-9a-f]{40}$' -or
+            $marker.surfaceDigest -isnot [string] -or
+            [string]$marker.surfaceDigest -cnotmatch '^[0-9a-f]{64}$' -or
+            $marker.protocolRecordLossAcknowledged -isnot [bool] -or
+            ([bool]$marker.protocolRecordLossAcknowledged) -ne
+                ([string]$marker.adoptionStrategy -ceq 'CleanStart') -or
+            [string]$marker.state -cnotin @(
+                'BootstrapReady', 'AdoptionReviewRequired'
+            ))) {
+            return $empty
+        }
+        $canonicalObject = if ($schema -eq 3) {
+            [ordered]@{
+                schema = 3
+                phase = 'Completed'
+                state = [string]$marker.state
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                repository = [string]$marker.repository
+                actor = [string]$marker.actor
+            }
+        }
+        elseif ($schema -eq 5) {
+            [ordered]@{
+                schema = 5
+                phase = 'Completed'
+                state = [string]$marker.state
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                adoptionStrategy = [string]$marker.adoptionStrategy
+                protocolSurfaces = @($marker.protocolSurfaces)
+                protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+                repository = [string]$marker.repository
+                actor = [string]$marker.actor
+            }
+        }
+        elseif ($schema -eq 7) {
+            [ordered]@{
+                schema = 7
+                phase = 'Completed'
+                state = [string]$marker.state
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                branch = [string]$marker.branch
+                adoptionStrategy = [string]$marker.adoptionStrategy
+                protocolSurfaces = @($marker.protocolSurfaces)
+                protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+                graphBase = [string]$marker.graphBase
+                graphDigest = [string]$marker.graphDigest
+                graphCounts = $marker.graphCounts
+                graphLimits = $marker.graphLimits
+                repository = [string]$marker.repository
+                actor = [string]$marker.actor
+            }
+        }
+        elseif ($schema -eq 9) {
+            [ordered]@{
+                schema = 9
+                phase = 'Completed'
+                state = [string]$marker.state
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                branch = [string]$marker.branch
+                adoptionStrategy = [string]$marker.adoptionStrategy
+                protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+                graphBase = [string]$marker.graphBase
+                graphDigest = [string]$marker.graphDigest
+                graphCounts = $marker.graphCounts
+                graphLimits = $marker.graphLimits
+                repository = [string]$marker.repository
+                actor = [string]$marker.actor
+            }
+        }
+        else {
+            [ordered]@{
+                schema = 11
+                phase = 'Completed'
+                state = [string]$marker.state
+                target = [string]$marker.target
+                protocolSha = [string]$marker.protocolSha
+                head = [string]$marker.head
+                branch = [string]$marker.branch
+                adoptionStrategy = [string]$marker.adoptionStrategy
+                surfaceBase = [string]$marker.surfaceBase
+                surfaceDigest = [string]$marker.surfaceDigest
+                protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
+                repository = [string]$marker.repository
+                actor = [string]$marker.actor
+            }
+        }
+        $canonicalJson = $canonicalObject | ConvertTo-Json -Depth 8 -Compress
         if ($json -cne $canonicalJson) {
             return $empty
         }
         return [pscustomobject]@{
-            Schema = 3
+            Schema = [int]$schema
             Phase = 'Completed'
             State = [string]$marker.state
             Target = [string]$marker.target
             ProtocolSha = [string]$marker.protocolSha
             Head = [string]$marker.head
+            Branch = if ($schema -in @(7, 9, 11)) { [string]$marker.branch } else { '' }
             Repository = [string]$marker.repository
             Actor = [string]$marker.actor
+            GraphDigest = if ($schema -in @(7, 9)) { [string]$marker.graphDigest } else { '' }
+            GraphBase = if ($schema -in @(7, 9)) { [string]$marker.graphBase } else { '' }
+            SurfaceBase = if ($schema -eq 11) {
+                [string]$marker.surfaceBase
+            } elseif ($schema -in @(7, 9)) {
+                [string]$marker.graphBase
+            } else { '' }
+            SurfaceDigest = if ($schema -eq 11) {
+                [string]$marker.surfaceDigest
+            } else { '' }
             CanonicalLine = "<!-- meandai-capabilities-adoption:$canonicalJson -->"
         }
     }
@@ -2762,7 +3125,10 @@ function Get-CanonicalAdoptionMarker {
 }
 
 function Get-CanonicalTrackingIssueNumber {
-    param([string]$Body)
+    param(
+        [string]$Body,
+        [Parameter(Mandatory)][string]$Repository
+    )
 
     $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
     $candidateLines = [regex]::Matches(
@@ -2770,14 +3136,21 @@ function Get-CanonicalTrackingIssueNumber {
         '(?im)^tracking[ \t]+issue[ \t]*:.*$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
-    $matches = [regex]::Matches(
+    $linkedMatches = [regex]::Matches(
+        $normalized,
+        '(?m)^Tracking issue: \[#(?<number>[1-9][0-9]*)\]\(https://github\.com/' +
+            [regex]::Escape($Repository) + '/issues/\k<number>\)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $legacyMatches = [regex]::Matches(
         $normalized,
         '(?m)^Tracking issue: #(?<number>[1-9][0-9]*)$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
+    $matches = @($linkedMatches) + @($legacyMatches)
     if ($candidateLines.Count -ne 1 -or $matches.Count -ne 1 -or
         [string]$candidateLines[0].Value -cne [string]$matches[0].Value) {
-        throw 'Managed pull request must contain exactly one canonical Tracking issue: #N line.'
+        throw 'Managed pull request must contain exactly one linked Tracking issue line for the same repository and issue number.'
     }
     if ([regex]::IsMatch(
         $normalized,
@@ -2795,8 +3168,177 @@ function Get-CanonicalTrackingIssueNumber {
     return $number
 }
 
+function Test-ExactAdoptionIssueBinding {
+    param(
+        [Parameter(Mandatory)][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$ProtocolRepository,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$ProtocolSha,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [string]$GraphDigest = '',
+        [string]$GraphBase = '',
+        [string]$SurfaceDigest = '',
+        [string]$SurfaceBase = ''
+    )
+
+    if ($TargetTag -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
+        $ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+        ($GraphDigest.Length -ne 0 -and $GraphDigest -cnotmatch '^[0-9a-f]{64}$') -or
+        ($GraphDigest.Length -ne 0 -and $GraphBase -cnotmatch '^[0-9a-f]{40}$') -or
+        ($GraphDigest.Length -eq 0 -and $GraphBase.Length -ne 0) -or
+        ($SurfaceDigest.Length -ne 0 -and
+            $SurfaceDigest -cnotmatch '^[0-9a-f]{64}$') -or
+        ($SurfaceBase.Length -ne 0 -and
+            $SurfaceBase -cnotmatch '^[0-9a-f]{40}$') -or
+        ($SurfaceDigest.Length -ne 0 -and $SurfaceBase.Length -eq 0)) {
+        return $false
+    }
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd([char[]]"`n")
+    $lines = @($normalized.Split("`n"))
+    if ($lines.Count -lt 4) { return $false }
+    $pullRequestUrl = "https://github.com/$Repository/pull/$PullRequestNumber"
+    $payload = @(
+        'schema=2',
+        "repository=$Repository",
+        "target=$TargetTag",
+        "protocolSha=$ProtocolSha",
+        "graphDigest=$GraphDigest",
+        "pullRequestUrl=$pullRequestUrl"
+    ) -join "`n"
+    $canonicalMarker = "<!-- meandai-local-adoption:v2:$(Get-Sha256Text -Text $payload) -->"
+    $legacyMarker = "<!-- meandai-local-adoption:$TargetTag`:pr-$PullRequestNumber -->"
+    $markerIsCanonical = [string]$lines[0] -ceq $canonicalMarker
+    $markerIsLegacy = [string]$lines[0] -ceq $legacyMarker
+    if (-not $markerIsCanonical -and -not $markerIsLegacy) { return $false }
+
+    $markerCandidates = @([regex]::Matches(
+        $normalized, '(?im)^<!--[ \t]+meandai-local-adoption:.*-->$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    $headingCandidates = @([regex]::Matches(
+        $normalized, '(?m)^## AI capabilities adoption tracking$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    $releaseCandidates = @([regex]::Matches(
+        $normalized, '(?im)^-[ \t]+protocol[ \t]+release[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    $draftCandidates = @([regex]::Matches(
+        $normalized, '(?im)^-[ \t]+adoption[ \t]+draft[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    $commitCandidates = @([regex]::Matches(
+        $normalized, '(?im)^-[ \t]+protocol[ \t]+commit[ \t]*:.*$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    if ($markerCandidates.Count -ne 1 -or $headingCandidates.Count -ne 1 -or
+        $releaseCandidates.Count -ne 1 -or $draftCandidates.Count -ne 1) {
+        return $false
+    }
+    $linkedDraft = "- Adoption draft: [PR #$PullRequestNumber]($pullRequestUrl)"
+    if ($markerIsCanonical) {
+        $linkedRelease = "- Protocol release: [$TargetTag](https://github.com/$ProtocolRepository/releases/tag/$TargetTag)"
+        $linkedCommit = "- Protocol commit: [$ProtocolSha](https://github.com/$ProtocolRepository/commit/$ProtocolSha)"
+        if ($commitCandidates.Count -ne 1 -or
+            [string]$releaseCandidates[0].Value -cne $linkedRelease -or
+            [string]$commitCandidates[0].Value -cne $linkedCommit -or
+            [string]$draftCandidates[0].Value -cne $linkedDraft) {
+            return $false
+        }
+
+        $graphBaseCandidates = @([regex]::Matches(
+            $normalized, '(?im)^-[ \t]+source[ \t]+graph[ \t]+base[ \t]*:.*$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        ))
+        $graphDigestCandidates = @([regex]::Matches(
+            $normalized, '(?im)^-[ \t]+source[ \t]+graph[ \t]+digest[ \t]*:.*$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        ))
+        if ($GraphDigest.Length -gt 0) {
+            if ($graphBaseCandidates.Count -ne 1 -or $graphDigestCandidates.Count -ne 1 -or
+                [string]$graphBaseCandidates[0].Value -cne
+                    "- Source graph base: [$GraphBase](https://github.com/$Repository/commit/$GraphBase)" -or
+                [string]$graphDigestCandidates[0].Value -cne
+                    "- Source graph digest: ``$GraphDigest``") {
+                return $false
+            }
+        }
+        elseif ($graphBaseCandidates.Count -ne 0 -or $graphDigestCandidates.Count -ne 0) {
+            return $false
+        }
+
+        $surfaceHeadingIndexes = @(
+            for ($index = 0; $index -lt $lines.Count; $index++) {
+                if ([string]$lines[$index] -ceq
+                    '### Detected protocol and governance surfaces') {
+                    $index
+                }
+            }
+        )
+        if ($surfaceHeadingIndexes.Count -ne 1) { return $false }
+        $surfaceIndex = [int]$surfaceHeadingIndexes[0] + 1
+        if ($surfaceIndex -ge $lines.Count -or [string]$lines[$surfaceIndex] -cne '') {
+            return $false
+        }
+        $surfaceIndex++
+        $surfaceLines = [System.Collections.Generic.List[string]]::new()
+        while ($surfaceIndex -lt $lines.Count -and
+            -not [string]::IsNullOrEmpty([string]$lines[$surfaceIndex])) {
+            $surfaceLines.Add([string]$lines[$surfaceIndex])
+            $surfaceIndex++
+        }
+        if ($surfaceLines.Count -eq 0) { return $false }
+        if ($surfaceLines.Count -eq 1 -and [string]$surfaceLines[0] -ceq '- None') {
+            return $SurfaceDigest.Length -eq 0 -or
+                [string]$SurfaceDigest -ceq
+                    (Get-LinkedPathIdentityDigest -Paths @())
+        }
+        if ($SurfaceBase.Length -eq 0) { return $false }
+        $seenSurfacePaths = [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+        $surfacePaths = [System.Collections.Generic.List[string]]::new()
+        foreach ($surfaceLine in $surfaceLines) {
+            $surfaceMatch = [regex]::Match(
+                $surfaceLine,
+                '^- \[`(?<path>[^`\r\n]+)`\]\(https://github\.com/' +
+                [regex]::Escape($Repository) + '/blob/' +
+                [regex]::Escape($SurfaceBase) + '/(?<target>[^)\s]+)\)$',
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+            )
+            if (-not $surfaceMatch.Success) {
+                return $false
+            }
+            $surfacePath = [string]$surfaceMatch.Groups['path'].Value
+            if (-not (Test-CanonicalRepositoryPath -Path $surfacePath)) {
+                return $false
+            }
+            $encodedSurfacePath = (@($surfacePath.Split('/') | ForEach-Object {
+                [Uri]::EscapeDataString([string]$_)
+            }) -join '/')
+            if (-not $seenSurfacePaths.Add($surfacePath) -or
+                [string]$surfaceMatch.Groups['target'].Value -cne $encodedSurfacePath) {
+                return $false
+            }
+            $surfacePaths.Add($surfacePath)
+        }
+        return $SurfaceDigest.Length -eq 0 -or
+            [string]$SurfaceDigest -ceq
+                (Get-LinkedPathIdentityDigest -Paths @($surfacePaths))
+    }
+
+    # Bounded compatibility for the exact core fields emitted with the legacy marker.
+    return $markerIsLegacy -and $commitCandidates.Count -eq 0 -and
+        [string]$releaseCandidates[0].Value -ceq "- Protocol release: ``$TargetTag``" -and
+        [string]$draftCandidates[0].Value -ceq "- Adoption draft: $pullRequestUrl"
+}
+
 function Test-LegacyUnboundTrackingBody {
-    param([string]$Body)
+    param(
+        [string]$Body,
+        [Parameter(Mandatory)][string]$Repository
+    )
 
     $normalized = ([string]$Body).Replace("`r`n", "`n").Replace("`r", "`n")
     if ([regex]::IsMatch(
@@ -2811,13 +3353,20 @@ function Test-LegacyUnboundTrackingBody {
         '(?im)^tracking[ \t]+issue[ \t]*:.*$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
-    $canonical = [regex]::Matches(
+    $linked = [regex]::Matches(
+        $normalized,
+        '(?m)^Tracking issue: \[#(?<number>[1-9][0-9]*)\]\(https://github\.com/' +
+            [regex]::Escape($Repository) + '/issues/\k<number>\)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $legacy = [regex]::Matches(
         $normalized,
         '(?m)^Tracking issue: #[1-9][0-9]*$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
-    if ($canonical.Count -eq 1 -and $candidateLines.Count -eq 1 -and
-        [string]$canonical[0].Value -ceq [string]$candidateLines[0].Value) {
+    $bound = @($linked) + @($legacy)
+    if ($bound.Count -eq 1 -and $candidateLines.Count -eq 1 -and
+        [string]$bound[0].Value -ceq [string]$candidateLines[0].Value) {
         return $false
     }
     if ($candidateLines.Count -eq 0) {
@@ -2858,27 +3407,96 @@ function Get-ExistingReplacementCandidates {
     })
 }
 
+function Get-ManagedFinalizationEvidenceContract {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$Kind,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][string]$Branch
+    )
+
+    if ($HeadSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Managed finalization evidence requires an exact head SHA.'
+    }
+    $marker = "<!-- meandai-managed-merge-finalization:head-$HeadSha -->"
+    $body = @(
+        $marker,
+        "Finalized managed $($Kind.ToLowerInvariant()) merge $(New-GitHubPullRequestLink `
+            -Repository $Repository -Number $PullRequestNumber) at head ``$HeadSha``.",
+        "The deterministic branch ``$Branch`` is absent and the tracking issue can close as completed."
+    ) -join [Environment]::NewLine
+    [pscustomobject]@{ Marker = $marker; Body = $body }
+}
+
+function Test-ExactManagedFinalizationEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$Kind,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][string]$Branch
+    )
+
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd([char[]]"`n")
+    $lines = @($normalized.Split("`n"))
+    if ($lines.Count -ne 3) { return $false }
+
+    $contract = Get-ManagedFinalizationEvidenceContract -Repository $Repository `
+        -PullRequestNumber $PullRequestNumber -Kind $Kind -HeadSha $HeadSha `
+        -Branch $Branch
+    $legacyMarker = "<!-- meandai-managed-merge-finalization:pr-$PullRequestNumber`:head-$HeadSha -->"
+    $markerIsBound = [string]$lines[0] -ceq [string]$contract.Marker -or
+        [string]$lines[0] -ceq $legacyMarker
+    $prefix = "Finalized managed $($Kind.ToLowerInvariant()) merge "
+    $suffix = " at head ``$HeadSha``."
+    $linkedNumber = Get-CanonicalLinkedPullRequestNumber -Line ([string]$lines[1]) `
+        -Repository $Repository -Prefix $prefix -Suffix $suffix
+    $branchLine = "The deterministic branch ``$Branch`` is absent and the tracking issue can close as completed."
+    if ($markerIsBound -and $linkedNumber -eq $PullRequestNumber -and
+        [string]$lines[2] -ceq $branchLine) {
+        return $true
+    }
+
+    # Bounded compatibility for the exact body emitted by the previous writer.
+    return [string]$lines[0] -ceq $legacyMarker -and
+        [string]$lines[1] -ceq "$prefix#$PullRequestNumber$suffix" -and
+        [string]$lines[2] -ceq $branchLine
+}
+
 function Get-FinalizationIssueEvidence {
     param(
         [object[]]$Comments,
-        [string]$ExpectedMarker
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$Kind,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [Parameter(Mandatory)][string]$Branch
     )
 
+    $contract = Get-ManagedFinalizationEvidenceContract -Repository $Repository `
+        -PullRequestNumber $PullRequestNumber -Kind $Kind -HeadSha $HeadSha `
+        -Branch $Branch
     $managed = @($Comments | Where-Object {
         $bodyProperty = if ($null -ne $_) { $_.PSObject.Properties['body'] } else { $null }
         $null -ne $bodyProperty -and
-            ([string]$bodyProperty.Value).StartsWith(
-                '<!-- meandai-managed-merge-finalization:',
-                [StringComparison]::Ordinal
-            )
+            (Test-ContainsManagedMarkerSignal -Body ([string]$bodyProperty.Value) `
+                -Prefix '<!-- meandai-managed-merge-finalization:')
     })
     $exact = @($managed | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $ExpectedMarker
+        Test-ExactManagedFinalizationEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $PullRequestNumber `
+            -Kind $Kind -HeadSha $HeadSha -Branch $Branch
     })
     if ($managed.Count -ne $exact.Count -or $exact.Count -gt 1) {
         throw 'Tracking issue has ambiguous managed merge finalization evidence.'
     }
-    return [pscustomobject]@{ Exists = $exact.Count -eq 1 }
+    return [pscustomobject]@{
+        Exists = $exact.Count -eq 1
+        Marker = [string]$contract.Marker
+        Body = [string]$contract.Body
+    }
 }
 
 function Get-ExactPullRequestMergedEventCommitSha {
@@ -2926,10 +3544,17 @@ function Repair-LegacyInstallingUpdateTracking {
         $normalized, '(?im)^tracking[ \t]+issue[ \t]*:.*$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
-    $canonical = [regex]::Matches(
+    $linkedCanonical = [regex]::Matches(
+        $normalized,
+        '(?m)^Tracking issue: \[#(?<number>[1-9][0-9]*)\]\(https://github\.com/' +
+            [regex]::Escape($Repository) + '/issues/\k<number>\)$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $legacyCanonical = [regex]::Matches(
         $normalized, '(?m)^Tracking issue: #[1-9][0-9]*$',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
+    $canonical = @($linkedCanonical) + @($legacyCanonical)
     if ($candidateLines.Count -eq 1 -and $canonical.Count -eq 1 -and
         [string]$candidateLines[0].Value -ceq [string]$canonical[0].Value) {
         return
@@ -3048,7 +3673,8 @@ function Repair-LegacyInstallingUpdateTracking {
     Set-ProtocolUpdateIssuePullRequestLink -Repository $Repository `
         -IssueNumber ([int]$issue.number) -PullRequestNumber $Number `
         -HeadSha ([string]$marker.Head)
-    $trackingLine = "Tracking issue: #$([int]$issue.number)"
+    $trackingLine = "Tracking issue: $(New-GitHubIssueLink `
+        -Repository $Repository -Number ([int]$issue.number))"
     $repairedBody = if ($legacyPlaceholder) {
         $normalized.Substring(0, $candidateLines[0].Index) + $trackingLine +
             $normalized.Substring($candidateLines[0].Index + $candidateLines[0].Length)
@@ -3061,7 +3687,8 @@ function Repair-LegacyInstallingUpdateTracking {
         -Endpoint "repos/$Repository/pulls/$Number" -Body $repairedBody `
         -Token ([string]$env:ISSUE_TOKEN) | Out-Null
     $repaired = Invoke-GhReadJson -Endpoint "repos/$Repository/pulls/$Number"
-    if ((Get-CanonicalTrackingIssueNumber -Body ([string]$repaired.body)) -ne
+    if ((Get-CanonicalTrackingIssueNumber -Body ([string]$repaired.body) `
+            -Repository $Repository) -ne
         [int]$issue.number) {
         throw "Managed installing update #$Number tracking repair did not converge."
     }
@@ -3103,7 +3730,7 @@ function Get-ManagedMergedPullRequestState {
     $kind = ''
     $marker = $null
     $canonicalLine = ''
-    if ($adoptionMarker.Schema -eq 3) {
+    if ($adoptionMarker.Schema -in @(3, 5, 7, 9, 11)) {
         $kind = 'Adoption'
         $marker = $adoptionMarker
         $canonicalLine = [string]$adoptionMarker.CanonicalLine
@@ -3157,6 +3784,8 @@ function Get-ManagedMergedPullRequestState {
     else { @("$BranchPrefix$target") }
     if ($target -cnotmatch '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' -or
         $headRef -cnotin $expectedBranches -or
+        ($kind -ceq 'Adoption' -and $marker.Schema -in @(7, 9, 11) -and
+         [string]$marker.Branch -cne $headRef) -or
         [string]$marker.Repository -cne $Repository -or
         [string]$marker.ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
         [string]$marker.Head -cnotmatch '^[0-9a-f]{40}$') {
@@ -3188,7 +3817,8 @@ function Get-ManagedMergedPullRequestState {
         throw "Managed adoption pull request #$Number author does not match its canonical actor."
     }
 
-    $trackingIssueNumber = Get-CanonicalTrackingIssueNumber -Body $body
+    $trackingIssueNumber = Get-CanonicalTrackingIssueNumber -Body $body `
+        -Repository $Repository
     $files = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/pulls/$Number/files?per_page=100")
     $changedPaths = @(Get-ValidatedPullRequestChangedPaths -Files $files)
     if ($changedPaths.Count -eq 0) {
@@ -3259,14 +3889,24 @@ function Get-ManagedMergedPullRequestState {
 
     $issue = $null
     if ($kind -ceq 'Adoption') {
-        $issueMarker = "<!-- meandai-local-adoption:$target`:pr-$Number -->"
         $issueTitle = "Track meAndAI AI capabilities adoption from $target"
+        $graphDigest = if ($null -ne $marker.PSObject.Properties['GraphDigest']) {
+            [string]$marker.GraphDigest
+        }
+        else { '' }
         $matches = @(Invoke-GhPagedJson -Endpoint "repos/$Repository/issues?state=all&per_page=100" |
             Where-Object {
                 $null -eq $_.PSObject.Properties['pull_request'] -and
                 [int]$_.number -eq $trackingIssueNumber -and
                 [string]$_.title -ceq $issueTitle -and
-                ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $issueMarker
+                (Test-ExactAdoptionIssueBinding -Body ([string]$_.body) `
+                    -Repository $Repository -ProtocolRepository $ProtocolRepository `
+                    -TargetTag $target `
+                    -ProtocolSha ([string]$marker.ProtocolSha) `
+                    -PullRequestNumber $Number -GraphDigest $graphDigest `
+                    -GraphBase ([string]$marker.GraphBase) `
+                    -SurfaceDigest ([string]$marker.SurfaceDigest) `
+                    -SurfaceBase ([string]$marker.SurfaceBase))
             })
         if ($matches.Count -ne 1) {
             throw "Managed adoption pull request #$Number has no single canonical tracking issue."
@@ -3288,9 +3928,9 @@ function Get-ManagedMergedPullRequestState {
     $comments = @(Invoke-GhPagedJson -Endpoint (
         "repos/$Repository/issues/$trackingIssueNumber/comments?per_page=100"
     ))
-    $evidenceMarker = "<!-- meandai-managed-merge-finalization:pr-$Number`:head-$([string]$marker.Head) -->"
     $evidence = Get-FinalizationIssueEvidence -Comments $comments `
-        -ExpectedMarker $evidenceMarker
+        -Repository $Repository -PullRequestNumber $Number -Kind $kind `
+        -HeadSha ([string]$marker.Head) -Branch $headRef
     $branchHead = Get-RemoteBranchHead -Branch $headRef
     if ([string]$issue.state -cnotin @('open', 'closed')) {
         throw "Managed tracking issue #$trackingIssueNumber has an invalid state."
@@ -3319,7 +3959,8 @@ function Get-ManagedMergedPullRequestState {
         BranchHead = $branchHead
         Issue = $issue
         IssueNumber = $trackingIssueNumber
-        EvidenceMarker = $evidenceMarker
+        EvidenceMarker = [string]$evidence.Marker
+        EvidenceBody = [string]$evidence.Body
         EvidenceExists = [bool]$evidence.Exists
         MergeCommitSha = $mergeCommitSha
     }
@@ -3357,7 +3998,8 @@ function Invoke-ManagedMergedPullRequestFinalization {
         -DefaultBranch $defaultBranch -Number $Number `
         -ExpectedMergeCommitSha ([string]$state.MergeCommitSha)
     foreach ($property in @(
-        'Kind', 'Branch', 'Head', 'IssueNumber', 'EvidenceMarker', 'MergeCommitSha'
+        'Kind', 'Branch', 'Head', 'IssueNumber', 'EvidenceMarker', 'EvidenceBody',
+        'MergeCommitSha'
     )) {
         if ([string]$fresh.$property -cne [string]$state.$property) {
             throw "Managed pull request #$Number changed before finalization mutation."
@@ -3383,14 +4025,9 @@ function Invoke-ManagedMergedPullRequestFinalization {
     }
 
     if (-not [bool]$afterBranch.EvidenceExists) {
-        $comment = @(
-            [string]$afterBranch.EvidenceMarker,
-            "Finalized managed $($afterBranch.Kind.ToLowerInvariant()) merge #$Number at head ``$($afterBranch.Head)``.",
-            "The deterministic branch ``$($afterBranch.Branch)`` is absent and the tracking issue can close as completed."
-        ) -join [Environment]::NewLine
         Invoke-GhMutationWithBodyFile -Method POST `
             -Endpoint "repos/$repository/issues/$($afterBranch.IssueNumber)/comments" `
-            -Body $comment | Out-Null
+            -Body ([string]$afterBranch.EvidenceBody) | Out-Null
     }
 
     $liveIssue = Invoke-GhReadJson `
@@ -3429,7 +4066,11 @@ function Invoke-ManagedMergedPullRequestFinalization {
         $remainingTransient.Count -ne 0) {
         throw "Managed pull request #$Number finalization postcondition failed."
     }
-    Add-RunSummary "Managed merge #$Number finalized at ``$($complete.Head)``; exact branch absent and issue #$($complete.IssueNumber) closed."
+    $summaryPullRequest = New-GitHubPullRequestLink `
+        -Repository $repository -Number $Number
+    $summaryIssue = New-GitHubIssueLink `
+        -Repository $repository -Number ([int]$complete.IssueNumber)
+    Add-RunSummary "Managed merge for $summaryPullRequest finalized at ``$($complete.Head)``; exact branch absent and issue $summaryIssue closed."
     Write-Host "Managed merge #$Number finalized; issue #$($complete.IssueNumber) closed and exact branch absent."
 }
 
@@ -3468,11 +4109,96 @@ function Invoke-LegacyInstallingUpdateRecovery {
     Write-Host "Managed merge recovery completed; finalized $recovered exact retained branch(es)."
 }
 
+function Get-ManagedSupersessionEvidenceContract {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [int]$ReplacementPullRequestNumber = 0,
+        [string]$ReplacementHeadSha = ''
+    )
+
+    if ($HeadSha -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Managed supersession evidence requires an exact superseded head SHA.'
+    }
+    $replacementBinding = if ($ReplacementPullRequestNumber -gt 0) {
+        if ($ReplacementHeadSha -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'Managed supersession evidence requires an exact replacement head SHA.'
+        }
+        "replacement-head-$ReplacementHeadSha"
+    }
+    else { 'default-branch-current' }
+    $marker = "<!-- meandai-protocol-update-supersession:head-$HeadSha`:$replacementBinding -->"
+    $body = @(
+        $marker,
+        "Managed protocol proposal $(New-GitHubPullRequestLink `
+            -Repository $Repository -Number $PullRequestNumber) was superseded after its exact branch was removed.",
+        $(if ($ReplacementPullRequestNumber -gt 0) {
+            "Verified replacement proposal: $(New-GitHubPullRequestLink `
+                -Repository $Repository -Number $ReplacementPullRequestNumber)"
+        } else { 'The consumer default branch already contains the target protocol.' })
+    ) -join [Environment]::NewLine
+    [pscustomobject]@{ Marker = $marker; Body = $body }
+}
+
+function Test-ExactManagedSupersessionEvidence {
+    param(
+        [Parameter(Mandatory)][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$PullRequestNumber,
+        [Parameter(Mandatory)][string]$HeadSha,
+        [int]$ReplacementPullRequestNumber = 0,
+        [string]$ReplacementHeadSha = ''
+    )
+
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n").TrimEnd([char[]]"`n")
+    $lines = @($normalized.Split("`n"))
+    if ($lines.Count -ne 3) { return $false }
+
+    $contract = Get-ManagedSupersessionEvidenceContract -Repository $Repository `
+        -PullRequestNumber $PullRequestNumber -HeadSha $HeadSha `
+        -ReplacementPullRequestNumber $ReplacementPullRequestNumber `
+        -ReplacementHeadSha $ReplacementHeadSha
+    $legacyReplacement = if ($ReplacementPullRequestNumber -gt 0) {
+        "replacement-pr-$ReplacementPullRequestNumber"
+    }
+    else { 'default-branch-current' }
+    $legacyMarker = "<!-- meandai-protocol-update-supersession:pr-$PullRequestNumber`:head-$HeadSha`:$legacyReplacement -->"
+    $markerIsBound = [string]$lines[0] -ceq [string]$contract.Marker -or
+        [string]$lines[0] -ceq $legacyMarker
+    $firstNumber = Get-CanonicalLinkedPullRequestNumber -Line ([string]$lines[1]) `
+        -Repository $Repository -Prefix 'Managed protocol proposal ' `
+        -Suffix ' was superseded after its exact branch was removed.'
+    $thirdLineMatches = if ($ReplacementPullRequestNumber -gt 0) {
+        (Get-CanonicalLinkedPullRequestNumber -Line ([string]$lines[2]) `
+            -Repository $Repository -Prefix 'Verified replacement proposal: ') -eq
+            $ReplacementPullRequestNumber
+    }
+    else {
+        [string]$lines[2] -ceq 'The consumer default branch already contains the target protocol.'
+    }
+    if ($markerIsBound -and $firstNumber -eq $PullRequestNumber -and $thirdLineMatches) {
+        return $true
+    }
+
+    # Bounded compatibility for the exact body emitted by the previous writer.
+    $legacyThirdLine = if ($ReplacementPullRequestNumber -gt 0) {
+        'Verified replacement proposal: ' + "#$ReplacementPullRequestNumber"
+    }
+    else { 'The consumer default branch already contains the target protocol.' }
+    return [string]$lines[0] -ceq $legacyMarker -and
+        [string]$lines[1] -ceq ('Managed protocol proposal ' +
+            "#$PullRequestNumber was superseded after its exact branch was removed.") -and
+        [string]$lines[2] -ceq $legacyThirdLine
+}
+
 function Complete-SupersededProtocolUpdateIssue {
     param(
         [string]$Repository,
         $Operation,
-        [int]$ReplacementPullRequestNumber = 0
+        [int]$ReplacementPullRequestNumber = 0,
+        [string]$ReplacementHeadSha = '',
+        [switch]$ValidateOnly
     )
 
     if ($null -ne $Operation.PSObject.Properties['UnboundIssue'] -and
@@ -3493,36 +4219,35 @@ function Complete-SupersededProtocolUpdateIssue {
             [string]$Operation.MigrationPlanSha
         } else { '' }) `
         -RequireOpen $true
-    $replacementIdentity = if ($ReplacementPullRequestNumber -gt 0) {
-        "replacement-pr-$ReplacementPullRequestNumber"
-    }
-    else { 'default-branch-current' }
-    $marker = "<!-- meandai-protocol-update-supersession:pr-$pullNumber`:head-$([string]$Operation.ExpectedHeadSha)`:$replacementIdentity -->"
+    $contract = Get-ManagedSupersessionEvidenceContract -Repository $Repository `
+        -PullRequestNumber $pullNumber `
+        -HeadSha ([string]$Operation.ExpectedHeadSha) `
+        -ReplacementPullRequestNumber $ReplacementPullRequestNumber `
+        -ReplacementHeadSha $ReplacementHeadSha
     $comments = @(Invoke-GhPagedJson -Endpoint (
         "repos/$Repository/issues/$([int]$issue.number)/comments?per_page=100"
     ) -Token ([string]$env:ISSUE_TOKEN))
     $managed = @($comments | Where-Object {
-        ([string]$_.body).StartsWith(
-            '<!-- meandai-protocol-update-supersession:', [StringComparison]::Ordinal
-        )
+        Test-ContainsManagedMarkerSignal -Body ([string]$_.body) `
+            -Prefix '<!-- meandai-protocol-update-supersession:'
     })
     $exact = @($managed | Where-Object {
-        ([string]$_.body).Replace("`r`n", "`n").Split("`n")[0] -ceq $marker
+        Test-ExactManagedSupersessionEvidence -Body ([string]$_.body) `
+            -Repository $Repository -PullRequestNumber $pullNumber `
+            -HeadSha ([string]$Operation.ExpectedHeadSha) `
+            -ReplacementPullRequestNumber $ReplacementPullRequestNumber `
+            -ReplacementHeadSha $ReplacementHeadSha
     })
     if ($managed.Count -ne $exact.Count -or $exact.Count -gt 1) {
         throw "Managed update issue #$([int]$issue.number) has ambiguous supersession evidence."
     }
+    if ($ValidateOnly) {
+        return
+    }
     if ($exact.Count -eq 0) {
-        $body = @(
-            $marker,
-            "Managed protocol proposal #$pullNumber was superseded after its exact branch was removed.",
-            $(if ($ReplacementPullRequestNumber -gt 0) {
-                "Verified replacement proposal: #$ReplacementPullRequestNumber"
-            } else { 'The consumer default branch already contains the target protocol.' })
-        ) -join [Environment]::NewLine
         Invoke-GhMutationWithBodyFile -Method POST `
             -Endpoint "repos/$Repository/issues/$([int]$issue.number)/comments" `
-            -Body $body -Token ([string]$env:ISSUE_TOKEN) | Out-Null
+            -Body ([string]$contract.Body) -Token ([string]$env:ISSUE_TOKEN) | Out-Null
     }
     $labels = @($issue.labels | ForEach-Object { [string]$_.name })
     foreach ($label in @('status:in-progress', 'status:needs-review', 'status:blocked')) {
@@ -3826,7 +4551,8 @@ foreach ($pull in $pulls) {
     $schemaOneRecoveryCandidate = $CurrentLauncher -and
         $marker.Schema -eq 1 -and $proposalKind -ceq 'Update'
     $unboundLegacyIssue = $schemaOneRecoveryCandidate -and
-        (Test-LegacyUnboundTrackingBody -Body ([string]$details.body))
+        (Test-LegacyUnboundTrackingBody -Body ([string]$details.body) `
+            -Repository $repository)
     $migrationPlan = if ($schemaOneRecoveryCandidate) {
         New-EmptyConsumerMigrationPlan
     }
@@ -4094,8 +4820,15 @@ if ($create.Count -eq 1) {
             repository = $repository
         } | ConvertTo-Json -Compress
         $supersededNumbers = @($plan.Operations | Where-Object Kind -eq 'ClosePullRequest' |
-            ForEach-Object { "#$($_.PullRequestNumber)" })
+            ForEach-Object {
+                New-GitHubPullRequestLink -Repository $repository `
+                    -Number ([int]$_.PullRequestNumber)
+            })
         $supersedes = if ($supersededNumbers.Count -gt 0) { $supersededNumbers -join ', ' } else { 'none' }
+        $managedPathLinks = @($expectedManagedPaths | ForEach-Object {
+            New-GitHubBlobLink -Repository $repository -Commit $headSha `
+                -Path ([string]$_)
+        })
         $proposalHeading = if ($proposalKind -ceq 'Update') {
             '## Automated protocol dependency update'
         }
@@ -4112,16 +4845,17 @@ if ($create.Count -eq 1) {
             "- Target release: ``$targetTag``",
             "- Protocol commit: ``$targetSha``",
             "- Migration plan: ``$([string]$migrationPlan.PlanSha256)``",
-            "- Managed paths: ``$($expectedManagedPaths -join ', ')``",
+            "- Managed paths: $($managedPathLinks -join ', ')",
             "- Supersedes: $supersedes", '',
             'This draft is review-only and will never merge itself.', '',
             '## Maintainer gates', '',
-            '- [ ] Read every intervening meAndAI changelog entry.',
+            "- [ ] Read every intervening [meAndAI changelog entry](https://github.com/$ProtocolRepository/blob/$targetTag/CHANGELOG.md).",
             '- [ ] Review incompatible or newly mandatory rules.',
             '- [ ] Review every catalog-declared consumer migration in this proposal.',
             '- [ ] Review the managed updater asset changes when present.',
             '- [ ] Run project tests and complete DoR/DoD review.', '',
-            "Tracking issue: #$($updateIssue.Number)"
+            "Tracking issue: $(New-GitHubIssueLink -Repository $repository `
+                -Number ([int]$updateIssue.Number))"
         )) {
             $bodyLines.Add([string]$line)
         }
@@ -4290,6 +5024,15 @@ foreach ($operation in $closeOperations) {
             -SourcePath $sourcePath -BaseCommit $baseHeadSha `
             -ManagedAssets $ManagedUpdaterAssets -ManagedPaths $ManagedPaths
     }
+    Complete-SupersededProtocolUpdateIssue -Repository $repository `
+        -Operation $operation `
+        -ReplacementPullRequestNumber $(if ($null -ne $replacementPullRequestNumber) {
+            [int]$replacementPullRequestNumber
+        } else { 0 }) `
+        -ReplacementHeadSha $(if ($null -ne $replacementOperation) {
+            [string]$replacementOperation.ExpectedHeadSha
+        } else { '' }) `
+        -ValidateOnly
     Invoke-Native -Command 'gh' -Arguments @('api', '--method', 'PATCH', "repos/$repository/pulls/$($operation.PullRequestNumber)", '-f', 'state=closed') | Out-Null
 
     try {
@@ -4340,9 +5083,13 @@ foreach ($operation in $closeOperations) {
         -Operation $operation `
         -ReplacementPullRequestNumber $(if ($null -ne $replacementPullRequestNumber) {
             [int]$replacementPullRequestNumber
-        } else { 0 })
+        } else { 0 }) `
+        -ReplacementHeadSha $(if ($null -ne $replacementOperation) {
+            [string]$replacementOperation.ExpectedHeadSha
+        } else { '' })
     $comment = if ($null -ne $replacementPullRequestNumber) {
-        "Superseded by #$replacementPullRequestNumber, the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
+        "Superseded by $(New-GitHubPullRequestLink -Repository $repository `
+            -Number ([int]$replacementPullRequestNumber)), the verified ``$($plan.LatestCompatibleTag)`` protocol proposal. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."
     }
     else {
         "The default branch already contains ``$($operation.TargetTag)``. Automated cleanup closed this PR and deleted its unchanged branch using an exact-head lease."

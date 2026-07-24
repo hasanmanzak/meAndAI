@@ -32,7 +32,9 @@ collision-free submodule adoptions also receive an absent idea index.
 - Define the `IDEA-NNNN` identifier, statuses, minimum record, and promotion
   lifecycle.
 - Add a canonical idea index, reusable template, and the first repository idea
-  for role-based multi-agent protocol integration.
+  for
+  [role-based multi-agent protocol](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md)
+  integration.
 - Add an absent-only `docs/ideas/README.md` target to collision-safe initial
   submodule adoption.
 - Document how existing consumers create the index and idea records from their
@@ -67,23 +69,23 @@ collision-free submodule adoptions also receive an absent idea index.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0044` | Lifecycle | An idea is mistaken for approved implementation scope | Mitigated; maintainers | Explicit non-authorizing contract and promotion gate |
-| `RISK-0045` | Consumer ownership | Adoption overwrites a consumer idea index | Mitigated; bootstrap adapter | Exact collision inventory and manifest-only proposal on collision |
-| `RISK-0046` | Process weight | Every passing thought creates protocol bureaucracy | Mitigated; idea author | Minimal record, no issue/DoR/test requirement, and explicit value threshold |
-| `RISK-0047` | Traceability | Promotion or rejection erases the reasoning history | Mitigated; maintainers | Preserve terminal idea records and add bidirectional links on promotion |
+| `RISK-0044` <a name="risk-0044"></a> | Lifecycle | An idea is mistaken for approved implementation scope | Mitigated; maintainers | Explicit non-authorizing contract and promotion gate |
+| `RISK-0045` <a name="risk-0045"></a> | Consumer ownership | Adoption overwrites a consumer idea index | Mitigated; bootstrap adapter | Exact collision inventory and manifest-only proposal on collision |
+| `RISK-0046` <a name="risk-0046"></a> | Process weight | Every passing thought creates protocol bureaucracy | Mitigated; idea author | Minimal record, no issue/DoR/test requirement, and explicit value threshold |
+| `RISK-0047` <a name="risk-0047"></a> | Traceability | Promotion or rejection erases the reasoning history | Mitigated; maintainers | Preserve terminal idea records and add bidirectional links on promotion |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0043 and TEST-0044](test-cases.md) |
+| Scenarios | Defined | [TEST-0043](test-cases.md#test-0043) and [TEST-0044](test-cases.md#test-0044) |
 | Test code | Automated and green | `tests/idea-incubation.tests.ps1` and the existing real-Git bootstrap fixture |
-| Baseline run | Passed | `TEST-0001` through `TEST-0042` in 90.9 seconds on Windows PowerShell 5.1, 2026-07-15 |
+| Baseline run | Passed | [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), and [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md#test-0038), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md#test-0039), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md#test-0040), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md#test-0041), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md#test-0042) in 90.9 seconds on Windows PowerShell 5.1, 2026-07-15 |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0015` | Idea lifecycle, decision, repository index, and template | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | `TEST-0043`; passed 2026-07-15 | `FIND-0063`; resolved | Reviewed |
-| `SUBF-0016` | Consumer adoption mapping, guidance, and regression closure | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | `TEST-0044` and full suite; passed 2026-07-15 | `FIND-0062`; resolved | Reviewed |
+| `SUBF-0015` <a name="subf-0015"></a> | Idea lifecycle, decision, repository index, and template | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | [TEST-0043](test-cases.md#test-0043); passed 2026-07-15 | `FIND-0063`; resolved | Reviewed |
+| `SUBF-0016` <a name="subf-0016"></a> | Consumer adoption mapping, guidance, and regression closure | [Issue #26](https://github.com/hasanmanzak/meAndAI/issues/26) | [TEST-0044](test-cases.md#test-0044) and full suite; passed 2026-07-15 | `FIND-0062`; resolved | Reviewed |
 
 ## Decisions and relationships
 
@@ -99,7 +101,7 @@ collision-free submodule adoptions also receive an absent idea index.
 - [x] Problem, outcome, scope, and non-goals.
 - [x] Measurable acceptance criteria.
 - [x] Lifecycle, status, ownership, promotion, consumer, and compatibility contracts.
-- [x] Numbered risks and DEC-0009.
+- [x] Numbered risks and [DEC-0009](../../decisions/DEC-0009-repository-native-idea-incubation.md).
 - [x] Two bounded, reviewable slices.
 - [x] Numbered test scenarios and verification approach.
 - [x] Test-code state and successful pre-change baseline recorded.
@@ -116,7 +118,8 @@ collision-free submodule adoptions also receive an absent idea index.
 4. Promotion creates and links the appropriate `EPIC`, `FEAT`, `TASK`, or
    `DEC` record; implementation still waits for the normal delivery gates.
 5. The protocol repository has an indexed first idea for the deferred
-   role-based multi-agent protocol, without implementing that feature.
+   [role-based multi-agent protocol](../../ideas/IDEA-0001-role-based-multi-agent-protocol.md),
+   without implementing that feature.
 6. Consumers can use the lifecycle and template from their immutable protocol
    pin. A new collision-free submodule adoption receives an absent idea index;
    an existing index is never overwritten.
@@ -137,11 +140,11 @@ confirmation after blocker remediation.
 
 | ID | Classification / severity / confidence | Evidence and action | Status |
 | --- | --- | --- | --- |
-| `FIND-0062` | Test fixture / High / High | The first full run found one escaped `v0.6.2` API-ref matcher after active fixtures moved to `v0.7.0`; updated the exact mock boundary and reran its focused and full suites. | Resolved |
-| `FIND-0063` | Documentation usability / Medium / High | The consumer index named the pinned template path without a clickable immutable source; added the exact `v0.7.0` template link without making the updater own consumer idea files. | Resolved |
-| `FIND-0064` | Repository hygiene / Low / High | The staged-diff check exposed Markdown hard-break trailing spaces in two newly added, previously untracked files; removed them before commit and repeated the staged check. | Resolved |
+| `FIND-0062` <a name="find-0062"></a> | Test fixture / High / High | The first full run found one escaped `v0.6.2` API-ref matcher after active fixtures moved to `v0.7.0`; updated the exact mock boundary and reran its focused and full suites. | Resolved |
+| `FIND-0063` <a name="find-0063"></a> | Documentation usability / Medium / High | The consumer index named the pinned template path without a clickable immutable source; added the exact `v0.7.0` template link without making the updater own consumer idea files. | Resolved |
+| `FIND-0064` <a name="find-0064"></a> | Repository hygiene / Low / High | The staged-diff check exposed Markdown hard-break trailing spaces in two newly added, previously untracked files; removed them before commit and repeated the staged check. | Resolved |
 
-The convergence run passed `TEST-0001` through `TEST-0044` in 114.4 seconds;
+The convergence run passed [TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), [TEST-0002](../FEAT-0001-common-development-protocol/test-cases.md#test-0002), [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003), [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0006](../FEAT-0001-common-development-protocol/test-cases.md#test-0006), [TEST-0007](../FEAT-0001-common-development-protocol/test-cases.md#test-0007), and [TEST-0008](../FEAT-0001-common-development-protocol/test-cases.md#test-0008), [TEST-0009](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0009), [TEST-0010](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0010), [TEST-0011](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0011), [TEST-0012](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0012), [TEST-0013](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0013), [TEST-0014](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0014), [TEST-0015](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0015), [TEST-0016](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0016), and [TEST-0017](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0017), [TEST-0018](../FEAT-0001-common-development-protocol/test-cases.md#test-0018), [TEST-0019](../FEAT-0003-convergent-completion-scan/test-cases.md#test-0019), [TEST-0020](../FEAT-0001-common-development-protocol/test-cases.md#test-0020), [TEST-0021](../FEAT-0002-semi-automatic-consumer-updates/test-cases.md#test-0021), [TEST-0022](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0022), [TEST-0023](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0023), [TEST-0024](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0024), [TEST-0025](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0025), and [TEST-0026](../FEAT-0004-self-updating-consumer-updater/test-cases.md#test-0026), [TEST-0027](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0027), [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0029](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0029), [TEST-0030](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0030), [TEST-0031](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0031), and [TEST-0032](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0032), [TEST-0033](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0033), [TEST-0034](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0034), [TEST-0035](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0035), [TEST-0036](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0036), and [TEST-0037](../FEAT-0006-quick-adoption-launcher/test-cases.md#test-0037), [TEST-0038](../FEAT-0007-local-codex-adoption/test-cases.md#test-0038), [TEST-0039](../FEAT-0007-local-codex-adoption/test-cases.md#test-0039), [TEST-0040](../FEAT-0007-local-codex-adoption/test-cases.md#test-0040), [TEST-0041](../FEAT-0007-local-codex-adoption/test-cases.md#test-0041), and [TEST-0042](../FEAT-0007-local-codex-adoption/test-cases.md#test-0042), and [TEST-0043](test-cases.md#test-0043) and [TEST-0044](test-cases.md#test-0044) in 114.4 seconds;
 the final post-record confirmation passed the same suite in 101.1 seconds. No
 unresolved actionable in-scope finding remains, so the bounded scan stops.
 
@@ -161,6 +164,6 @@ unresolved actionable in-scope finding remains, so the bounded scan stops.
 ## Release evidence
 
 [Pull request #28](https://github.com/hasanmanzak/meAndAI/pull/28) merged the
-feature at commit `1b420322058d73a974ccb61d8b7f828eb38cce8e`. The annotated
+feature at commit [`1b420322058d73a974ccb61d8b7f828eb38cce8e`](https://github.com/hasanmanzak/meAndAI/commit/1b420322058d73a974ccb61d8b7f828eb38cce8e). The annotated
 [`v0.7.0` tag](https://github.com/hasanmanzak/meAndAI/tree/v0.7.0) resolves to
 that exact release commit.

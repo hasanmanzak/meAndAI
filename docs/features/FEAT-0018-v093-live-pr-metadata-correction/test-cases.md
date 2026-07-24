@@ -4,7 +4,7 @@ Implementation: [`tests/capabilities/initial-adoption/quick-adoption.tests.ps1`]
 
 | ID | Related work | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0102` | `FEAT-0018` / `BUG-0006` | Resolve the deterministic adoption draft using the live GitHub CLI repository metadata shape, then vary repository name, repository owner, cross-repository state, and its Boolean type. | The matching same-repository draft passes; every identity or type mismatch fails before local Codex or Git mutation; the command requests the real fields and the fixture exposes no synthetic `headRepository.nameWithOwner`. | Contract / real-shape regression | Passed locally | Quick-adoption integration fixture |
+| `TEST-0102` <a name="test-0102"></a> | `FEAT-0018` / [BUG-0006](https://github.com/hasanmanzak/meAndAI/issues/53) | Resolve the deterministic adoption draft using the live GitHub CLI repository metadata shape, then vary repository name, repository owner, cross-repository state, and its Boolean type. | The matching same-repository draft passes; every identity or type mismatch fails before local Codex or Git mutation; the command requests the real fields and the fixture exposes no synthetic `headRepository.nameWithOwner`. | Contract / real-shape regression | Passed locally | Quick-adoption integration fixture |
 
 ## Required coverage
 

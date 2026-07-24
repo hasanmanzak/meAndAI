@@ -45,7 +45,7 @@ would duplicate ownership rather than repair these boundaries.
 6. Finding classification and the four protocol dispositions remain separate
    fields. Version grammar is executable boundary evidence, not only a current
    literal match.
-7. Exact release, commit, and hosted-check facts remain in issue #41 and the
+7. Exact release, commit, and hosted-check facts remain in [issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) and the
    GitHub Release after publication. Canonical repository documents link stable
    merged PRs and do not depend on deleted work branches or predict their own
    release commit.
@@ -63,7 +63,7 @@ validator, bootstrapper, service, or scan phase.
 - Tests and external evidence state precisely what they prove, at the cost of a
   small number of focused negative and pagination fixtures.
 - The private repository's currently unavailable `main` protection remains
-  [RISK-0076](../features/FEAT-0013-v084-correction/README.md#risks), classified
+  [RISK-0076](../features/FEAT-0013-v084-correction/README.md#risk-0076), classified
   `ExternalOrLegacyFollowUp`, owned by the maintainer, and reviewed if the
   repository becomes public or the account gains a supporting GitHub plan.
 - Validation remains finite: the completed initial scan and one confirmation
@@ -88,5 +88,5 @@ validator, bootstrapper, service, or scan phase.
 
 Review this decision if GitHub provides an atomic workflow/secret transaction,
 signed immutable workflow artifacts directly executable by consumers, or an
-atomic pull-request head-plus-metadata update. Review `RISK-0076` separately
+atomic pull-request head-plus-metadata update. Review [RISK-0076](../features/FEAT-0013-v084-correction/README.md#risk-0076) separately
 when repository visibility or plan capability changes.

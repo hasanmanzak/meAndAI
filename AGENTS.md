@@ -25,6 +25,6 @@ These instructions apply to the entire `meAndAI` repository.
    bounded consumer recovery.
 
 The protocol is recursively applied to this repository. Project-specific facts
-belong in `.ai/memory`; reusable rules belong in `PROTOCOL.md`. A project rule
+belong in `.ai/memory`; reusable rules belong in [PROTOCOL.md](PROTOCOL.md). A project rule
 may override a common default only through a numbered decision record that
 explains the reason and scope.

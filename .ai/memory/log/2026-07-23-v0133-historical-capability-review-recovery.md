@@ -6,7 +6,7 @@
 - Decision: [DEC-0026](../../../docs/decisions/DEC-0026-historical-capability-review-recovery.md)
 - Tracking: [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104)
 - Delivery: [PR #105](https://github.com/hasanmanzak/meAndAI/pull/105)
-- Tests: [TEST-0165 and TEST-0166](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md)
+- Tests: [TEST-0165](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0165) and [TEST-0166](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0166)
 
 ## Verified problem
 
@@ -33,10 +33,10 @@ rejects it before proving that the historical work already merged.
 ## Evidence
 
 - The unchanged v0.13.2 runner produced the expected stale-catalog rejection
-  after TEST-0165/0166 were registered.
-- The corrected, version-pinned capability-review owner passes TEST-0139,
-  TEST-0140, TEST-0163, TEST-0164, TEST-0165, and TEST-0166.
-- StructureOnly and the v0.13.3 TEST-0147 two-asset release bundle pass. The
+  after [TEST-0165](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0165) and [TEST-0166](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0166) were registered.
+- The corrected, version-pinned capability-review owner passes [TEST-0139](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0139),
+  [TEST-0140](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140), [TEST-0163](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163), [TEST-0164](../../../docs/features/FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0164), [TEST-0165](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0165), and [TEST-0166](../../../docs/features/FEAT-0042-v0133-historical-capability-review-recovery/test-cases.md#test-0166).
+- StructureOnly and the v0.13.3 [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147) two-asset release bundle pass. The
   updater owner also passes outside the restricted sandbox after the sandboxed
   run reproduced Git for Windows `Win32 error 5` signal-pipe failures.
 - The local aggregate runner reached its existing 15-minute process limit
@@ -46,6 +46,6 @@ rejects it before proving that the historical work already merged.
 ## Continuation
 
 Complete the bounded blocker correction, final validation, PR, merge, and
-immutable v0.13.3 release through issue #104. Do not mutate an affected
+immutable v0.13.3 release through [issue #104](https://github.com/hasanmanzak/meAndAI/issues/104). Do not mutate an affected
 consumer from this protocol branch; install the released updater there and let
 the consumer lifecycle perform the separately authorized recovery.

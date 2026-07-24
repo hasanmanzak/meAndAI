@@ -19,7 +19,7 @@
   fail closed.
 - The remote finalizer already reads canonical GitHub blob bytes and is not
   routed through the local worktree reader.
-- `TEST-0141` lives in the consumer-update capability, uses project-neutral
+- [TEST-0141](../../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/test-cases.md#test-0141) lives in the consumer-update capability, uses project-neutral
   isolated real Git repositories, and covers `core.autocrlf=true`, absent
   `.gitattributes`, LF committed blobs, CRLF worktree files, present-ledger
   planning, genuine committed input and ledger drift, exact staged blobs, and
@@ -34,11 +34,11 @@
   `Consumer migration ledger must use LF line endings.` in a clean filtered
   checkout.
 - After the binary base-blob correction, the complete focused adapter fixture,
-  including all existing scenarios and `TEST-0141`, passed in 52.2 seconds on
+  including all existing scenarios and [TEST-0141](../../../docs/features/FEAT-0033-canonical-base-blob-migration-planning/test-cases.md#test-0141), passed in 52.2 seconds on
   Windows PowerShell 5.1.
 - The complete consumer-update owner suite passed all 27 scenarios in 56.2
   seconds after the bounded self-review correction.
-- Candidate `3eff1b0048bbc3371c4a028a198717598d1bff66` passed [hosted run
+- Candidate [`3eff1b0048bbc3371c4a028a198717598d1bff66`](https://github.com/hasanmanzak/meAndAI/commit/3eff1b0048bbc3371c4a028a198717598d1bff66) passed [hosted run
   29686946514](https://github.com/hasanmanzak/meAndAI/actions/runs/29686946514):
   Ubuntu in 7m41s, Windows PowerShell 5.1 in 29m37s, and GitGuardian in 2s.
 - Merge, immutable-release, cleanup, and post-publication evidence remains

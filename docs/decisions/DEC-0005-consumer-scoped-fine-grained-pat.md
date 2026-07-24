@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer administrators
 - Related features: [FEAT-0004](../features/FEAT-0004-self-updating-consumer-updater/README.md), [FEAT-0002](../features/FEAT-0002-semi-automatic-consumer-updates/README.md)
 - Related decisions: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md)
-- Supersedes: DEC-0003 only where it assigns consumer mutation to `GITHUB_TOKEN`, restricts managed proposals to one `.ai/protocol` path, or leaves copied updater reconciliation manual
+- Supersedes: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md) only where it assigns consumer mutation to `GITHUB_TOKEN`, restricts managed proposals to one `.ai/protocol` path, or leaves copied updater reconciliation manual
 
 ## Context
 
@@ -45,7 +45,7 @@ The same reviewed proposal may change `.ai/protocol` and the deterministic
 target-different subset of the three canonical updater assets. Before mutation,
 all current copies must equal the current pinned templates. Creation and live
 validation require exact expected paths plus target modes and blobs. All other
-DEC-0003 review-only, same-major, marker, replacement-first, lease,
+[DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md) review-only, same-major, marker, replacement-first, lease,
 revalidation, and compensation controls remain in force.
 
 ## Consequences

@@ -10,7 +10,7 @@ rules.
 Using a prompt is opt-in. Merely adopting, pinning, or updating the protocol
 does not install, create, schedule, or activate a goal, recurring task,
 automation, workflow, scheduler, background loop, or next invocation. The
-consumer's pinned `PROTOCOL.md` and applicable repository-local instructions
+consumer's pinned [PROTOCOL.md](../../PROTOCOL.md) and applicable repository-local instructions
 remain authoritative.
 
 The default report-only mode may establish local convergence evidence, but it

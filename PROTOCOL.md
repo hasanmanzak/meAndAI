@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.14.1**<br>
+Protocol version: **0.14.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -95,7 +95,7 @@ Promotion creates and links the appropriate `EPIC-NNNN`, `FEAT-NNNN`,
 normal planning and delivery gates; the idea contributes history, not readiness
 evidence. Promoted and rejected records remain indexed with their rationale and
 bidirectional links instead of being deleted or silently rewritten. Use the
-pinned `templates/idea.md` when creating a record.
+pinned [templates/idea.md](templates/idea.md) when creating a record.
 
 ## 4. Delivery lifecycle and review gates
 
@@ -451,6 +451,28 @@ increase detail.
 
 ## 6. Documentation graph
 
+- A document (repository-local or external), GitHub issue, pull request, or
+  GitHub comment of any kind that references another document
+  (repository-local or external), issue, pull request, GitHub comment, or
+  commit MUST express each human-facing reference as a clickable link to the
+  exact referenced target. When the target is an addressable record or location
+  within a document, the link MUST include a stable fragment that positions the
+  reader at that record or location; linking only the containing document does
+  not satisfy the reference. A free-text identifier, number, title, path, or
+  commit hash does not satisfy this requirement.
+- Governed clickable references MUST use a renderer-active Markdown inline
+  link, reference-style link, or absolute HTTP(S) autolink. Raw HTML `href`
+  elements are not a supported reference-authoring form; custom HTML anchors
+  are target locations only.
+- Every canonical embedded stable-ID record, including each `TEST-NNNN`,
+  `SUBF-NNNN`, `FIND-NNNN`, and `RISK-NNNN` record, MUST expose one unique,
+  renderer-active custom anchor within its canonical declaration whose name is
+  the exact lowercase identifier (for example,
+  `<a name="test-0163"></a>`). Cross-document references to that record MUST
+  target that anchor. Its canonical declaration and ordinary
+  non-navigational prose repetition inside the declaring document are not
+  cross-document references; a second declaration-shaped occurrence is
+  invalid unless it is an exact link to the canonical anchor.
 - Every durable pre-work idea is indexed under `docs/ideas` and links any
   promoted work or decision.
 - Every feature has `docs/features/FEAT-NNNN-slug/README.md` and
@@ -468,10 +490,27 @@ increase detail.
   also links the pull request and the stable external authority for any
   post-publication evidence. Pull requests link the same canonical records and
   related issues, pull requests, wiki pages, or external documentation.
-- Links MUST be relative for repository files and absolute for GitHub or
-  external resources. They MUST be clickable and validated before completion;
-  record automated local-link results and manual or automated external-link
-  evidence separately.
+- A link authored in a repository file to a current canonical repository
+  record or location MUST be repository-relative and include any required
+  fragment. An immutable historical snapshot MAY remain an absolute full-SHA
+  blob link only when the referenced blob and any fragment exist, but it does
+  not replace the relative link to the current canonical record. A durable
+  link authored on a GitHub issue, pull request, or comment to a repository
+  record MUST use the immutable absolute blob URL for the exact commit; the
+  referenced blob and any required fragment MUST exist at that commit. Links
+  to GitHub or other external resources MUST be absolute. A fragment on a
+  Markdown document targets one unique renderer-active anchor. A fragment on a
+  non-Markdown repository blob uses GitHub's exact `#Lstart` or
+  `#Lstart-Lend` form and MUST identify lines within that blob.
+- A human-facing commit reference MUST link to the absolute commit permalink in
+  the commit's owning repository, and its target MUST contain the exact full
+  40-character commit hash; the visible label MAY use a short hash when the
+  target can be resolved unambiguously. A hash used only as a command
+  argument, source or fixture value, structured-data field, digest, Git object
+  identity or input, or opaque machine marker is a literal rather than a human-facing
+  reference and does not require a link.
+- Links MUST be clickable and validated before completion; record automated
+  local-link results and manual or automated external-link evidence separately.
 - An automated external-evidence query MUST exhaust the provider's pagination
   contract or fail at a declared finite page limit. A focused fixture MUST place
   qualifying evidence after the first page when closure depends on comments or
@@ -492,7 +531,7 @@ especially important for private repositories, where GitHub's current form
 schema does not enforce `required` validation.
 
 Branches use a short category and work description, for example
-`feature/FEAT-0042-customer-credit-limit` or an automation-specific equivalent.
+`feature/work-id-customer-credit-limit` or an automation-specific equivalent.
 Commits are focused and describe intent. Pull requests close or reference their
 primary issue and list all related records. Completed changes MUST be pushed.
 If an authorized publication target has no repository, create a private GitHub
@@ -551,7 +590,7 @@ does not invalidate a consumer correctly pinned to an earlier release. A forced
 migration of already conforming consumers is incompatible and increments `M`.
 
 Every released version updates `VERSION`, relevant current-release metadata,
-and `CHANGELOG.md`. Historical feature target versions remain unchanged.
+and [CHANGELOG.md](CHANGELOG.md). Historical feature target versions remain unchanged.
 Consumers SHOULD pin the tag of a verified immutable release or an explicitly
 reviewed commit, never an unqualified moving branch. A consuming project
 versions its own product independently.
@@ -1075,9 +1114,10 @@ The updater MUST:
   update issue, place its real tracking line in the initial draft, and record an
   exact pull-request/head backlink;
 - bind each managed adoption or update proposal to exactly one same-repository
-  issue through one canonical, non-closing `Tracking issue: #N` body line before
-  maintainer merge; native closing keywords are forbidden because issue closure
-  must follow verified branch convergence;
+  issue through one canonical, non-closing
+  `Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)` body
+  line before maintainer merge; native closing keywords are forbidden because
+  issue closure must follow verified branch convergence;
 - react to an exact merged, same-repository managed proposal through the
   consumer workflow, revalidate the live pull request, current default branch
   containment, canonical marker, changed paths, tracking issue, open-PR branch

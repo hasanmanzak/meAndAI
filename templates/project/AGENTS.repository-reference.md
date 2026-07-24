@@ -9,7 +9,7 @@ These instructions apply to the consuming repository.
      that configuration is the sole current pin authority, so do not duplicate
      its literal tag or commit here
    - entry point: `PROTOCOL.md`
-2. Read this project's local `.ai/memory/README.md`.
+2. Read this project's [local project memory](.ai/memory/README.md).
 3. Read the relevant project-owned feature and decision documents before work.
 4. If the immutable protocol reference cannot be resolved, report the blocked
    dependency. Do not silently substitute `main` or a local submodule path.

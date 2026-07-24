@@ -215,14 +215,17 @@ function Get-ValidatedAdoptionManifest {
         }
         if ($usesStrategyContract) {
             $markerSchema = [long]$PullRequest.meAndAIMarker.schema
-            $graphAwareProposal = $markerSchema -in @(7, 8)
-            if ($markerSchema -notin @(5, 6, 7, 8)) {
+            $graphAwareProposal = $markerSchema -in @(7, 8, 9, 10)
+            if ($markerSchema -notin @(5, 6, 7, 8, 9, 10, 11, 12)) {
                 throw 'The strategy-aware protocol source requires a strategy-bound proposal marker.'
             }
             if ($graphAwareProposal -ne ([long]$manifest.schema -eq 3)) {
                 throw 'The adoption manifest and ownership marker mix graph-aware and legacy schemas.'
             }
             $sourceGraph = $null
+            $proposalProtocolSurfaces = @(
+                $PullRequest.meAndAIMarker.protocolSurfaces
+            )
             if ($graphAwareProposal) {
                 if (-not $validator.Parameters.ContainsKey('ExpectedSourceGraph') -or
                     $null -eq $manifest.PSObject.Properties['sourceGraph'] -or
@@ -233,6 +236,9 @@ function Get-ValidatedAdoptionManifest {
                 $sourceGraph = Get-QuickAdoptionInstructionGraph `
                     -Repository $ProposalRepository `
                     -Commit ([string]$manifest.sourceGraph.baseHead)
+                if ($markerSchema -in @(9, 10)) {
+                    $proposalProtocolSurfaces = @($sourceGraph.protocolSurfaces)
+                }
                 $identityValidator = Get-InitialAdoptionPolicyCommand `
                     -Name 'Test-MeAndAIExactInstructionGraphIdentity'
                 $markerIdentity = [pscustomobject][ordered]@{
@@ -241,9 +247,7 @@ function Get-ValidatedAdoptionManifest {
                     graphDigest = [string]$PullRequest.meAndAIMarker.graphDigest
                     graphCounts = $PullRequest.meAndAIMarker.graphCounts
                     graphLimits = $PullRequest.meAndAIMarker.graphLimits
-                    protocolSurfaces = @(
-                        $PullRequest.meAndAIMarker.protocolSurfaces
-                    )
+                    protocolSurfaces = @($proposalProtocolSurfaces)
                 }
                 if (-not [bool](& $identityValidator `
                     -Identity $markerIdentity -Graph $sourceGraph)) {
@@ -274,7 +278,7 @@ function Get-ValidatedAdoptionManifest {
                     -Repository $ProposalRepository `
                     -Commit ([string]$contract.BaseHead)
                 if ((@($reassessmentGraph.protocolSurfaces) -join "`n") -cne
-                    (@($PullRequest.meAndAIMarker.protocolSurfaces) -join "`n")) {
+                    (@($proposalProtocolSurfaces) -join "`n")) {
                     throw 'The legacy adoption proposal now has expanded instruction authority; close it and rerun exact graph assessment.'
                 }
             }
@@ -324,7 +328,7 @@ function Get-ValidatedAdoptionManifest {
             if ([string]$plan.AdoptionStrategy -cne
                     [string]$PullRequest.meAndAIMarker.adoptionStrategy -or
                 ((@($plan.ProtocolSurfaces) -join "`n") -cne
-                    (@($PullRequest.meAndAIMarker.protocolSurfaces) -join "`n")) -or
+                    (@($proposalProtocolSurfaces) -join "`n")) -or
                 [bool]$plan.ProtocolRecordLossAcknowledged -ne
                     [bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged) {
                 throw 'The independently derived lifecycle plan does not match the proposal strategy identity.'

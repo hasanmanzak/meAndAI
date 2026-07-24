@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related feature: [FEAT-0023](../features/FEAT-0023-v0100-idempotent-consumer-lifecycle/README.md)
 - Related decisions: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md), [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md), [DEC-0007](DEC-0007-local-quick-adoption-boundary.md), [DEC-0008](DEC-0008-local-codex-execution.md), [DEC-0010](DEC-0010-stable-automation-invariants.md), [DEC-0011](DEC-0011-qualified-evidence-and-closure.md), [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md), and [DEC-0016](DEC-0016-managed-post-merge-finalization.md)
-- Supersedes: DEC-0003 only where an update issue was prepared manually; DEC-0006 only where a repeat launcher invocation could not route an already adopted repository; and DEC-0016 only where a qualifying installing legacy update lacks machine-created tracking evidence. Maintainer review and merge, replacement-first ordering, exact ownership checks, and fail-closed mutation remain unchanged.
+- Supersedes: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md) only where an update issue was prepared manually; [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md) only where a repeat launcher invocation could not route an already adopted repository; and [DEC-0016](DEC-0016-managed-post-merge-finalization.md) only where a qualifying installing legacy update lacks machine-created tracking evidence. Maintainer review and merge, replacement-first ordering, exact ownership checks, and fail-closed mutation remain unchanged.
 
 ## Context
 
@@ -42,8 +42,10 @@ The proposal job grants its job-scoped consumer `GITHUB_TOKEN` `issues: write`.
 That token owns issue and label mutations. `MEANDAI_UPDATER_TOKEN` remains the
 separate credential for contents, pull-request, and workflow mutations, so no
 new fine-grained PAT permission is required. The adapter writes exactly one
-non-closing `Tracking issue: #N` line into the draft pull request and records an
-idempotent pull-request backlink on the issue.
+non-closing
+`Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)` line
+into the draft pull request and records an idempotent pull-request backlink on
+the issue.
 
 When a newer verified release supersedes an older open managed proposal, the
 adapter closes the old pull request and deletes the unchanged old branch first.
@@ -123,4 +125,3 @@ Review if GitHub supplies a safer atomic issue/branch/pull-request lifecycle
 primitive, protocol major-version migration is defined, the consumer update
 surface expands beyond the current managed paths, or job-token policy prevents
 same-repository issue reconciliation in common consumers.
-

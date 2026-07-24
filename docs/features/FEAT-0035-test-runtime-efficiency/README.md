@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Test-architecture and performance correction / `BUG-0017` |
+| Classification | Test-architecture and performance correction / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) |
 | Status | Complete |
 | Target version | 0.12.3 |
 | Issue | [#87](https://github.com/hasanmanzak/meAndAI/issues/87) |
 | Pull request | Recorded through [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) after creation |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
-| Tests | [TEST-0144 through TEST-0146](test-cases.md) |
+| Tests | [TEST-0144](test-cases.md#test-0144), [TEST-0145](test-cases.md#test-0145), and [TEST-0146](test-cases.md#test-0146) |
 
 ## Problem
 
@@ -71,7 +71,7 @@ successful run that exceeds the goal by a small amount.
 - Adding a hosted matrix, aggregate runner, reusable-workflow fan-out, cache
   service, scheduler, persistent fixture service, or self-hosted runner.
 - Combining canonical suites into one process or weakening capability-local
-  fixture ownership required by DEC-0022.
+  fixture ownership required by [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md).
 - Changing consumer-visible adoption/updater behavior except for
   behavior-preserving boundary extraction required for testability.
 - Changing repository visibility as part of the implementation. The temporary
@@ -109,27 +109,27 @@ successful run that exceeds the goal by a small amount.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0144 through TEST-0146](test-cases.md) |
-| Test code | Implemented | Executable ownership for `TEST-0144` through `TEST-0146` is present in the capability-based architecture |
-| Baseline run | Established and refreshed | Exact same-machine `e6ff32d` Windows PowerShell 5.1 baselines: quick-adoption 1055.028 seconds and capabilities-bootstrap 444.284 seconds |
+| Scenarios | Defined | [TEST-0144](test-cases.md#test-0144), [TEST-0145](test-cases.md#test-0145), and [TEST-0146](test-cases.md#test-0146) |
+| Test code | Implemented | Executable ownership for [TEST-0144](test-cases.md#test-0144), [TEST-0145](test-cases.md#test-0145), and [TEST-0146](test-cases.md#test-0146) is present in the capability-based architecture |
+| Baseline run | Established and refreshed | Exact same-machine [`e6ff32d`](https://github.com/hasanmanzak/meAndAI/commit/e6ff32daa0ef655dd0a8881822fc5b75027b830b) Windows PowerShell 5.1 baselines: quick-adoption 1055.028 seconds and capabilities-bootstrap 444.284 seconds |
 
 ### Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0158` | Evidence integrity | Moving variants below end-to-end execution weakens behavior evidence | Test maintainer / exact variant-to-level inventory, production-owned contracts, and retained representative vertical slices in `TEST-0145` |
-| `RISK-0159` | Boundary fidelity | Injected Git, GitHub, Codex, or process adapters diverge from production behavior | Launcher maintainer / typed production-owned boundaries plus real success/failure integration slices on PowerShell 5.1 and 7 |
-| `RISK-0160` | Measurement | Host noise turns elapsed time into a flaky gate | Workflow maintainer / monotonic observations, same-host comparisons, soft 2/3-minute goals, and no elapsed-only failure or cancellation |
-| `RISK-0161` | Fixture isolation | Shared baselines leak mutable state or conceal link/identity drift | Test maintainer / fingerprinted immutable owner, fresh scenario copy, link-safe verification, and cleanup evidence |
-| `RISK-0162` | Runner consumption | A workflow-only shortcut reintroduces fan-out or hides incomplete coverage | Workflow maintainer / retain DEC-0019 topology, exact scenario ownership, and report both job count and runner consumption in `TEST-0146` |
+| `RISK-0158` <a name="risk-0158"></a> | Evidence integrity | Moving variants below end-to-end execution weakens behavior evidence | Test maintainer / exact variant-to-level inventory, production-owned contracts, and retained representative vertical slices in [TEST-0145](test-cases.md#test-0145) |
+| `RISK-0159` <a name="risk-0159"></a> | Boundary fidelity | Injected Git, GitHub, Codex, or process adapters diverge from production behavior | Launcher maintainer / typed production-owned boundaries plus real success/failure integration slices on PowerShell 5.1 and 7 |
+| `RISK-0160` <a name="risk-0160"></a> | Measurement | Host noise turns elapsed time into a flaky gate | Workflow maintainer / monotonic observations, same-host comparisons, soft 2/3-minute goals, and no elapsed-only failure or cancellation |
+| `RISK-0161` <a name="risk-0161"></a> | Fixture isolation | Shared baselines leak mutable state or conceal link/identity drift | Test maintainer / fingerprinted immutable owner, fresh scenario copy, link-safe verification, and cleanup evidence |
+| `RISK-0162` <a name="risk-0162"></a> | Runner consumption | A workflow-only shortcut reintroduces fan-out or hides incomplete coverage | Workflow maintainer / retain [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md) topology, exact scenario ownership, and report both job count and runner consumption in [TEST-0146](test-cases.md#test-0146) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0064` | Suite/boundary observability and same-commit baseline inventory | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0144`; focused runtime and runner tests green | Observation schema is owner-bound and non-authoritative; timing cannot change result authority | Complete |
-| `SUBF-0065` | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0145`; focused hotspot owners and retained real slices green | Variant inventory, adapter fidelity, fixture identity, security/recovery paths reviewed; `FIND-0176` through `FIND-0183` resolved | Complete |
-| `SUBF-0066` | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | `TEST-0146`; focused workflow topology and local final full candidate green; exact hosted revalidation tracked in [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88) | One Ubuntu/one Windows ordinary topology retained with no matrix, fan-in, or timing gate | Complete / hosted gate pending |
+| `SUBF-0064` <a name="subf-0064"></a> | Suite/boundary observability and same-commit baseline inventory | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | [TEST-0144](test-cases.md#test-0144); focused runtime and runner tests green | Observation schema is owner-bound and non-authoritative; timing cannot change result authority | Complete |
+| `SUBF-0065` <a name="subf-0065"></a> | Quick-adoption/bootstrap contract extraction and immutable fixture reuse | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | [TEST-0145](test-cases.md#test-0145); focused hotspot owners and retained real slices green | Variant inventory, adapter fidelity, fixture identity, security/recovery paths reviewed; `FIND-0176` through `FIND-0183` resolved | Complete |
+| `SUBF-0066` <a name="subf-0066"></a> | Cross-runtime full proof, hosted topology, and documentation closure | [Issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) | [TEST-0146](test-cases.md#test-0146); focused workflow topology and local final full candidate green; exact hosted revalidation tracked in [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88) | One Ubuntu/one Windows ordinary topology retained with no matrix, fan-in, or timing gate | Complete / hosted gate pending |
 
 ## Decisions and relationships
 
@@ -139,20 +139,20 @@ successful run that exceeds the goal by a small amount.
 - Tracking and post-publication authority: [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
 
 No new architectural decision is required: this correction implements the
-existing DEC-0019 review condition after measured full-suite consumption became
-materially worse, while preserving DEC-0022's separate-suite and fixture
+existing [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md) review condition after measured full-suite consumption became
+materially worse, while preserving [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md)'s separate-suite and fixture
 ownership contracts.
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0035`, `BUG-0017`, `SUBF-0064` through `SUBF-0066`, and linked issue #87 exist.
+- [x] Stable `FEAT-0035`, [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87), `SUBF-0064` through `SUBF-0066`, and linked [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) exist.
 - [x] Problem, outcome, scope, and non-goals are explicit.
 - [x] Acceptance criteria are measurable without turning elapsed time into a gate.
 - [x] Observation, evidence-level, boundary, fixture, compatibility, and lifecycle contracts are explicit.
 - [x] Consumers, dependencies, governing decisions, and related features are identified.
 - [x] `RISK-0158` through `RISK-0162` have owners and required evidence.
 - [x] Three independently reviewable slices and gates are defined.
-- [x] `TEST-0144` through `TEST-0146` and the verification approach are defined.
+- [x] [TEST-0144](test-cases.md#test-0144), [TEST-0145](test-cases.md#test-0145), and [TEST-0146](test-cases.md#test-0146) and the verification approach are defined.
 - [x] Test-code and baseline states are recorded before implementation.
 
 ## Acceptance criteria
@@ -192,14 +192,14 @@ and the pull request after they exist.
 
 | ID | Classification | Finding | Resolution |
 | --- | --- | --- | --- |
-| `FIND-0176` | Correctness | An unrelated empty Git configuration was rejected as adoption drift. | Preserve empty unrelated configuration while retaining exact managed-surface checks. |
-| `FIND-0177` | Evidence integrity | Adapter-only proposal-tree, asset, and `.gitmodules` cases were over-collapsed. | Restore representative real adapter slices for those material boundaries. |
-| `FIND-0178` | Correctness | Hybrid reconciliation decision enforcement was missing after extraction. | Enforce the exact Hybrid decision through the production-owned contract and retained adapter proof. |
-| `FIND-0179` | Compatibility | `LegacyUnspecified` completion fallback drifted from the established behavior. | Restore the legacy fallback and lock it with executable contract coverage. |
-| `FIND-0180` | Evidence integrity | Legacy marker validation no longer required the expected-surface list to be empty. | Restore the empty expected-surface requirement without changing newer marker schemas. |
-| `FIND-0181` | Test reliability | Two independently selectable shard paths used the completion contract without shard-local initialization. | Initialize the contract in each shard before its first use. |
-| `FIND-0182` | Test reliability | `RepositoryRoutes` resolved a contract before fixture initialization. | Initialize the fixture before resolving the contract and retain the focused shard proof. |
-| `FIND-0183` | Cross-runtime contract reliability | PowerShell splatting can bind a semantically empty collection as null at predicate boundaries, causing negative completion evidence to throw instead of returning false. | Accept null-equivalent empty collections at both completion-predicate boundaries, normalize them inside the production-owned predicate, and retain direct plus adapter-level fail-closed regression cases. |
+| `FIND-0176` <a name="find-0176"></a> | Correctness | An unrelated empty Git configuration was rejected as adoption drift. | Preserve empty unrelated configuration while retaining exact managed-surface checks. |
+| `FIND-0177` <a name="find-0177"></a> | Evidence integrity | Adapter-only proposal-tree, asset, and `.gitmodules` cases were over-collapsed. | Restore representative real adapter slices for those material boundaries. |
+| `FIND-0178` <a name="find-0178"></a> | Correctness | Hybrid reconciliation decision enforcement was missing after extraction. | Enforce the exact Hybrid decision through the production-owned contract and retained adapter proof. |
+| `FIND-0179` <a name="find-0179"></a> | Compatibility | `LegacyUnspecified` completion fallback drifted from the established behavior. | Restore the legacy fallback and lock it with executable contract coverage. |
+| `FIND-0180` <a name="find-0180"></a> | Evidence integrity | Legacy marker validation no longer required the expected-surface list to be empty. | Restore the empty expected-surface requirement without changing newer marker schemas. |
+| `FIND-0181` <a name="find-0181"></a> | Test reliability | Two independently selectable shard paths used the completion contract without shard-local initialization. | Initialize the contract in each shard before its first use. |
+| `FIND-0182` <a name="find-0182"></a> | Test reliability | `RepositoryRoutes` resolved a contract before fixture initialization. | Initialize the fixture before resolving the contract and retain the focused shard proof. |
+| `FIND-0183` <a name="find-0183"></a> | Cross-runtime contract reliability | PowerShell splatting can bind a semantically empty collection as null at predicate boundaries, causing negative completion evidence to throw instead of returning false. | Accept null-equivalent empty collections at both completion-predicate boundaries, normalize them inside the production-owned predicate, and retain direct plus adapter-level fail-closed regression cases. |
 
 ## Definition of Done
 

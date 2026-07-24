@@ -4,10 +4,10 @@
 
 - Feature: [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md)
 - Tracking authority: [issue #95](https://github.com/hasanmanzak/meAndAI/issues/95)
-- Task: `TASK-0001`
-- Test authority: [TEST-0157 through TEST-0160](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md)
+- Task: [TASK-0001](https://github.com/hasanmanzak/meAndAI/issues/95)
+- Test authority: [TEST-0157](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0157), [TEST-0158](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), and [TEST-0160](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0160)
 - Measurement base: immutable v0.12.7 commit
-  `6b01299cfe484c900944b7435d4fef43b11fc38d`
+  [`6b01299cfe484c900944b7435d4fef43b11fc38d`](https://github.com/hasanmanzak/meAndAI/commit/6b01299cfe484c900944b7435d4fef43b11fc38d)
 
 ## Implemented candidate
 
@@ -30,8 +30,8 @@
 
 ## Current evidence and continuation
 
-- `TEST-0157` through `TEST-0159` pass; the local/structural portion of
-  `TEST-0160` is green. Candidate hosted execution remains external delivery
+- [TEST-0157](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0157), [TEST-0158](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), and [TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) pass; the local/structural portion of
+  [TEST-0160](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0160) is green. Candidate hosted execution remains external delivery
   evidence.
 - The Windows PowerShell 5.1 Full route passes in 1,340.2 seconds. Quick-
   adoption `All` takes 776.2 seconds with init 11 versus exact-base 47;
@@ -41,7 +41,7 @@
 - The final `WindowsNative` rerun passes in 341.0 seconds, including a 329.2-
   second quick-adoption native route.
 - PowerShell AST parsing, `StructureOnly`, catalog/review, runtime-contract,
-  and diff-whitespace checks pass at the focused gates recorded by FEAT-0039.
+  and diff-whitespace checks pass at the focused gates recorded by [FEAT-0039](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/README.md).
 - The first review found incomplete bypass inventory, cleanup leakage, mode-
   blind fingerprints, and an under-bound input digest. Test-first remediation
   now ratchets all owner-source operation and cleanup call sites, verifies no
@@ -59,15 +59,15 @@
   request/release delivery, and post-publication evidence remain pending.
 - Corrected hosted run 29919821489 reached every expensive Ubuntu owner:
   quick-adoption 188.0 seconds, bootstrap 62.2 seconds, and instruction graph
-  70.7 seconds. It then exposed TEST-0138 because inline operation enforcement
+  70.7 seconds. It then exposed [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0138) because inline operation enforcement
   grew the stable root runner beyond 180 lines. The limit was not raised;
   enforcement moved into one shared-runtime assertion and the root returned to
-  167 lines. Focused TEST-0138 and runtime contracts pass under PS5 and PS7.
+  167 lines. Focused [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0138) and runtime contracts pass under PS5 and PS7.
 - The same run's Windows step reached quick-adoption 821.5 seconds, bootstrap
   236.0 seconds, and instruction graph 129.8 seconds before the identical final
-  TEST-0138 failure. Approximate test-step totals were Windows 22:08 and Ubuntu
+  [TEST-0138](../../../docs/features/FEAT-0032-general-capability-test-architecture/test-cases.md#test-0138) failure. Approximate test-step totals were Windows 22:08 and Ubuntu
   6:51. Bootstrap improved, but total Windows, quick-adoption, and graph time did
-  not; v0.13.0 therefore makes no wall-clock improvement claim and TASK-0002
+  not; v0.13.0 therefore makes no wall-clock improvement claim and [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98)
   owns the measured residual regression.
 - The 2/3-minute soft goals were missed without violating a correctness gate.
   Residual wall-clock work is owned by

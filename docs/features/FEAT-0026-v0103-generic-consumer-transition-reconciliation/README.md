@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Compatibility architecture correction / `BUG-0012` |
+| Classification | Compatibility architecture correction / [BUG-0012](https://github.com/hasanmanzak/meAndAI/issues/69) |
 | Status | Complete |
 | Target version | 0.10.3 |
 | Issue | [#69](https://github.com/hasanmanzak/meAndAI/issues/69) |
 | Pull request | [#71](https://github.com/hasanmanzak/meAndAI/pull/71) |
 | Decision | [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md) |
-| Tests | [TEST-0119 through TEST-0122](test-cases.md) |
+| Tests | [TEST-0119](test-cases.md#test-0119), [TEST-0120](test-cases.md#test-0120), [TEST-0121](test-cases.md#test-0121), and [TEST-0122](test-cases.md#test-0122) |
 
 ## Problem and intended outcome
 
@@ -48,7 +48,7 @@ use that same path for every later compatible transition.
 - Detect pre-engine consumers by missing capability/ledger rather than by a
   source tag. After their ordinary updater-installing proposal merges, have the
   newly installed engine open one same-target reconciliation draft.
-- Express the duplicated-live-pin regression only as `MIG-0001` data and prove that it
+- Express the duplicated-live-pin regression only as [MIG-0001](../../../migrations/MIG-0001.json) data and prove that it
   applies to matching state even after an intermediate gitlink update.
 - Keep the executable adoption prompt version-neutral so new consumers do not
   recreate duplicated live protocol identity.
@@ -101,7 +101,7 @@ use that same path for every later compatible transition.
   plus that proposal's exact catalog-derived changed paths and ledger. This is
   temporary release-declared authority, not permanent ownership of consumer
   files.
-- Historical event records may preserve exact tags and commits. `MIG-0001`
+- Historical event records may preserve exact tags and commits. [MIG-0001](../../../migrations/MIG-0001.json)
   changes only the eight active duplicated-live-pin current-authority fragments.
 
 ### Lifecycle behavior
@@ -123,18 +123,18 @@ use that same path for every later compatible transition.
 
 | ID | Classification | Risk | Response and required evidence |
 | --- | --- | --- | --- |
-| `RISK-0112` | Atomicity | A rejected or interrupted migration leaves a partial tree | Pure full-plan computation, byte snapshots, rollback, and `TEST-0120` |
-| `RISK-0113` | Ownership | Release migration authority becomes an unrestricted consumer overwrite surface | Immutable exact paths, exact state preconditions, plan digest, and `TEST-0120` |
-| `RISK-0114` | Retroactivity | Documentation promises same-PR behavior from code installed before the engine | Explicit generic legacy handoff and `TEST-0122` |
-| `RISK-0115` | Recurrence | A future transition needs another version-named repair | Append-only generic catalog, state-based applicability, and `TEST-0119` / `TEST-0121` |
-| `RISK-0116` | Provenance | A changed or reordered definition is treated as previously satisfied | Exact definition-blob ledger prefix and `TEST-0121` |
-| `RISK-0117` | Proposal integrity | Candidate validation accepts migration paths not produced by the target catalog | Recomputed exact path/output/ledger/plan evidence and `TEST-0121` |
-| `RISK-0118` | Historical accuracy | Live-pin cleanup erases legitimate adoption evidence | Explicit `MIG-0001` preservation set and project-neutral regression in `TEST-0119` |
+| `RISK-0112` <a name="risk-0112"></a> | Atomicity | A rejected or interrupted migration leaves a partial tree | Pure full-plan computation, byte snapshots, rollback, and [TEST-0120](test-cases.md#test-0120) |
+| `RISK-0113` <a name="risk-0113"></a> | Ownership | Release migration authority becomes an unrestricted consumer overwrite surface | Immutable exact paths, exact state preconditions, plan digest, and [TEST-0120](test-cases.md#test-0120) |
+| `RISK-0114` <a name="risk-0114"></a> | Retroactivity | Documentation promises same-PR behavior from code installed before the engine | Explicit generic legacy handoff and [TEST-0122](test-cases.md#test-0122) |
+| `RISK-0115` <a name="risk-0115"></a> | Recurrence | A future transition needs another version-named repair | Append-only generic catalog, state-based applicability, and [TEST-0119](test-cases.md#test-0119) / [TEST-0121](test-cases.md#test-0121) |
+| `RISK-0116` <a name="risk-0116"></a> | Provenance | A changed or reordered definition is treated as previously satisfied | Exact definition-blob ledger prefix and [TEST-0121](test-cases.md#test-0121) |
+| `RISK-0117` <a name="risk-0117"></a> | Proposal integrity | Candidate validation accepts migration paths not produced by the target catalog | Recomputed exact path/output/ledger/plan evidence and [TEST-0121](test-cases.md#test-0121) |
+| `RISK-0118` <a name="risk-0118"></a> | Historical accuracy | Live-pin cleanup erases legitimate adoption evidence | Explicit [MIG-0001](../../../migrations/MIG-0001.json) preservation set and project-neutral regression in [TEST-0119](test-cases.md#test-0119) |
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0026`, `BUG-0012`, `SUBF-0046` through `SUBF-0048`,
-      `MIG-0001`, `TEST-0119` through `TEST-0122`, and issue #69 exist.
+- [x] Stable `FEAT-0026`, [BUG-0012](https://github.com/hasanmanzak/meAndAI/issues/69), `SUBF-0046` through `SUBF-0048`,
+      [MIG-0001](../../../migrations/MIG-0001.json), [TEST-0119](test-cases.md#test-0119), [TEST-0120](test-cases.md#test-0120), [TEST-0121](test-cases.md#test-0121), and [TEST-0122](test-cases.md#test-0122), and [issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) exist.
 - [x] Catalog, definition, ledger, state classification, temporary path
       authority, proposal identity, and fail-closed contracts are explicit.
 - [x] Same-PR engine-era behavior and immutable pre-engine handoff are separated
@@ -158,10 +158,10 @@ use that same path for every later compatible transition.
    changed updater assets, exact required migration paths, and ledger.
 5. Candidate validation, supersession, and merge finalization independently
    prove the catalog, ordered IDs, definition blobs, changed paths, and plan.
-6. The real duplicated-live-pin stale state is reconciled by `MIG-0001` both at its
+6. The real duplicated-live-pin stale state is reconciled by [MIG-0001](../../../migrations/MIG-0001.json) both at its
    original pin and after a simulated update to an intermediate pin. The eight
    active fragments change and dated historical evidence does not.
-7. A directly adopted version-neutral consumer records `MIG-0001` as satisfied
+7. A directly adopted version-neutral consumer records [MIG-0001](../../../migrations/MIG-0001.json) as satisfied
    without rewriting unrelated consumer files.
 8. Missing, duplicated, reordered, mixed, drifted, unsupported-schema, linked,
    out-of-root, or write-failure states stop without remote mutation and do not
@@ -177,14 +177,14 @@ use that same path for every later compatible transition.
 
 | ID | Slice | Tracking | Tests | Review gate | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0046` | Immutable catalog, pure engine, ledger model, and project-neutral `MIG-0001` data | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0119`, `TEST-0120` | Exact state/bytes, cumulative catalog chain, leaf-link rejection, historical preservation, and rollback passed | Implemented |
-| `SUBF-0047` | Engine-era one-draft updater, candidate, supersession, and finalization integration | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0121` | Exact ledger/path/plan evidence and independent schema-2 base-to-head finalization passed, including fabricated-output rejection | Implemented |
-| `SUBF-0048` | Generic pre-engine capability handoff and prospective adoption prevention | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | `TEST-0122` and `TEST-0119` | Capability-based automatic handoff, adoption baseline, and absence of tag-specific control flow passed | Implemented |
+| `SUBF-0046` <a name="subf-0046"></a> | Immutable catalog, pure engine, ledger model, and project-neutral [MIG-0001](../../../migrations/MIG-0001.json) data | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | [TEST-0119](test-cases.md#test-0119), [TEST-0120](test-cases.md#test-0120) | Exact state/bytes, cumulative catalog chain, leaf-link rejection, historical preservation, and rollback passed | Implemented |
+| `SUBF-0047` <a name="subf-0047"></a> | Engine-era one-draft updater, candidate, supersession, and finalization integration | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | [TEST-0121](test-cases.md#test-0121) | Exact ledger/path/plan evidence and independent schema-2 base-to-head finalization passed, including fabricated-output rejection | Implemented |
+| `SUBF-0048` <a name="subf-0048"></a> | Generic pre-engine capability handoff and prospective adoption prevention | [Issue #69](https://github.com/hasanmanzak/meAndAI/issues/69) | [TEST-0122](test-cases.md#test-0122) and [TEST-0119](test-cases.md#test-0119) | Capability-based automatic handoff, adoption baseline, and absence of tag-specific control flow passed | Implemented |
 
 ## Verification approach
 
 Use a minimal project-neutral legacy-consumer fixture and an independent expected-byte oracle for
-`MIG-0001`. Exercise that same consumer state under both its original gitlink
+[MIG-0001](../../../migrations/MIG-0001.json). Exercise that same consumer state under both its original gitlink
 and a simulated intermediate gitlink; also exercise a direct version-neutral
 consumer. Add catalog/ledger contract fixtures, skipped releases, supersession,
 idempotent reruns, exact candidate/finalizer proof, and the pre-engine two-draft

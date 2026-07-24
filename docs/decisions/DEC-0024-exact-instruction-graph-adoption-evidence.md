@@ -8,11 +8,11 @@
 - Tracking and post-publication authority: [Issue #93](https://github.com/hasanmanzak/meAndAI/issues/93)
 - Disposition evidence: [accepted by the maintainer on 2026-07-21](https://github.com/hasanmanzak/meAndAI/issues/93#issuecomment-5033653638)
 - Related decisions: [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md)
-- Narrow supersession: supersedes DEC-0021 only where its fixed known-surface inventory limits instruction-authority discovery; maintainer-owned strategy selection, semantic-mutation boundaries, and compatibility rules remain authoritative
+- Narrow supersession: supersedes [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) only where its fixed known-surface inventory limits instruction-authority discovery; maintainer-owned strategy selection, semantic-mutation boundaries, and compatibility rules remain authoritative
 
 ## Context
 
-DEC-0021 intentionally chose a small, inspectable path inventory instead of a
+[DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) intentionally chose a small, inspectable path inventory instead of a
 universal semantic parser. That inventory safely identifies known layouts but
 cannot discover a consumer's custom memory or governance files merely because
 `AGENTS.md` transitively requires them. The semantic prompt tells an agent to
@@ -83,6 +83,12 @@ Repository path tokens are accepted only in an instruction root or on an
 explicit required-reading, authority, or index line. This prevents historical
 prose, JSON values, API endpoints, and examples from silently becoming live
 authority while retaining root bootstrap discovery.
+Within a traversed JSON file that is not itself an instruction root, JSON
+string scalars are opaque payload: Markdown syntax, authority wording, and path
+tokens inside them produce no graph edge. A JSON file designated as an
+instruction root retains the full instruction grammar. An unterminated string
+or unescaped control character encountered by the scalar masker fails closed;
+the instruction-graph parser does not otherwise validate JSON syntax.
 An extensionless flat code-span token additionally requires an explicit
 required-reading/order item, an imperative read/load/consult form, or a
 colon-form authority/index declaration; ordinary command and finding-ID code
@@ -143,7 +149,7 @@ the graph-node path limit so a pre-terminator tree record cannot grow without
 bound. Reaching a limit is valid; exceeding one blocks before external or
 semantic mutation.
 
-The accepted planning draft used a 1,024-edge ceiling. During `SUBF-0070`, the
+The accepted planning draft used a 1,024-edge ceiling. During [SUBF-0070](../features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md#subf-0070), the
 required all-reference traversal over meAndAI's own exact baseline produced
 1,108 canonical edges from 318 tree entries and 185 nodes. Retaining 1,024
 would therefore violate both transitive traversal and the decision that
@@ -155,13 +161,13 @@ change to a published graph schema.
 ### Evidence is not mutation authority
 
 The existing `protocolSurfaces` representation remains only as a graph-derived
-compatibility projection for DEC-0021 strategy resolution. It is the union of
+compatibility projection for [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) strategy resolution. It is the union of
 reachable graph evidence and the versioned known-surface compatibility seeds,
 and must reproduce every current known-surface result. Canonical target
 collisions remain separate. Graph membership, reachability, candidate status,
 or semantic-capability type does not authorize a write or deletion.
 
-FEAT-0037 leaves the current initial-adoption mutation envelope unchanged. A
+[FEAT-0037](../features/FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) leaves the current initial-adoption mutation envelope unchanged. A
 discovered node outside that envelope is evidence-only and protected by its
 base blob and mode. If FullMigration, HybridReconciliation, or CleanStart would
 require changing or retiring it, the manifest is retained and completion
@@ -202,7 +208,7 @@ completion. No permanent graph ledger, path compatibility map, redirect, or
 second common authority remains in the consumer tree.
 
 The meAndAI repository is itself a consumer of this contract. Its own
-`AGENTS.md`, `PROTOCOL.md`, project-local memory, and linked records are assessed
+[AGENTS.md](../../AGENTS.md), [PROTOCOL.md](../../PROTOCOL.md), project-local memory, and linked records are assessed
 through the same roots, graph, limits, and closure rules; repository identity
 does not grant an exception.
 

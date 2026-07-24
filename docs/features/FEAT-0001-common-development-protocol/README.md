@@ -61,23 +61,23 @@ linked through GitHub.
 
 | ID | Classification | Risk | Status and owner | Response/evidence |
 | --- | --- | --- | --- | --- |
-| `RISK-0001` | Adoption | An adapter resolves the wrong protocol entry point | Mitigated; maintainers | Separate adapters in [DEC-0001](../../decisions/DEC-0001-portable-protocol-reference.md) and `TEST-0008` |
-| `RISK-0002` | Privacy/context | Memory leaks across consuming projects | Mitigated; maintainers | Isolation boundary in [DEC-0002](../../decisions/DEC-0002-project-local-memory.md) and `TEST-0008` |
-| `RISK-0003` | Maintainability | Protocol grows into a universal framework | Accepted with control; maintainers | Explicit non-goals and [minimalism rule](../../../PROTOCOL.md#10-minimalism-and-exceptions) |
+| `RISK-0001` <a name="risk-0001"></a> | Adoption | An adapter resolves the wrong protocol entry point | Mitigated; maintainers | Separate adapters in [DEC-0001](../../decisions/DEC-0001-portable-protocol-reference.md) and [TEST-0008](test-cases.md#test-0008) |
+| `RISK-0002` <a name="risk-0002"></a> | Privacy/context | Memory leaks across consuming projects | Mitigated; maintainers | Isolation boundary in [DEC-0002](../../decisions/DEC-0002-project-local-memory.md) and [TEST-0008](test-cases.md#test-0008) |
+| `RISK-0003` <a name="risk-0003"></a> | Maintainability | Protocol grows into a universal framework | Accepted with control; maintainers | Explicit non-goals and [minimalism rule](../../../PROTOCOL.md#10-minimalism-and-exceptions) |
 
 | Test readiness | Gate 1 state | Current evidence |
 | --- | --- | --- |
-| Scenarios | Defined before the test implementation | [TEST-0001 through TEST-0008](test-cases.md) |
+| Scenarios | Defined before the test implementation | [TEST-0001](test-cases.md#test-0001), [TEST-0002](test-cases.md#test-0002), [TEST-0003](test-cases.md#test-0003), [TEST-0004](test-cases.md#test-0004), [TEST-0005](test-cases.md#test-0005), [TEST-0006](test-cases.md#test-0006), [TEST-0007](test-cases.md#test-0007), and [TEST-0008](test-cases.md#test-0008) |
 | Test code | Planned; not started at DoR | [Implemented structural test](../../../tests/protocol.tests.ps1) |
-| Baseline run | Reproduced against commit `a6e3064`; failed at `TEST-0001` because protocol files were absent | Windows PowerShell 5.1 run passes |
+| Baseline run | Reproduced against commit [`a6e3064`](https://github.com/hasanmanzak/meAndAI/commit/a6e306459e4926a44b06d91d65b5832fb389b501); failed at [TEST-0001](test-cases.md#test-0001) because protocol files were absent | Windows PowerShell 5.1 run passes |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/latest run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0001` | Core lifecycle, quality, scan, and version rules | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | `TEST-0002`, `TEST-0006`; passed 2026-07-14 | Reviewed; `FIND-0003`, `FIND-0005`, `FIND-0011`, `FIND-0012` resolved or release-gated | Complete |
-| `SUBF-0002` | Portable reference and isolated project memory | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | `TEST-0001`, `TEST-0003`, `TEST-0008`; passed 2026-07-14 | Reviewed; `FIND-0001`, `FIND-0002`, `FIND-0010`, `FIND-0014`, `FIND-0015`, `FIND-0017`, `FIND-0018` fixed | Complete |
-| `SUBF-0003` | Templates and executable structural validation | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | `TEST-0004`, `TEST-0005`, `TEST-0007`; passed 2026-07-14 | Reviewed; `FIND-0004`, `FIND-0006` through `FIND-0009`, `FIND-0013`, `FIND-0016` fixed | Complete |
+| `SUBF-0001` <a name="subf-0001"></a> | Core lifecycle, quality, scan, and version rules | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | [TEST-0002](test-cases.md#test-0002), [TEST-0006](test-cases.md#test-0006); passed 2026-07-14 | Reviewed; `FIND-0003`, `FIND-0005`, `FIND-0011`, `FIND-0012` resolved or release-gated | Complete |
+| `SUBF-0002` <a name="subf-0002"></a> | Portable reference and isolated project memory | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | [TEST-0001](test-cases.md#test-0001), [TEST-0003](test-cases.md#test-0003), [TEST-0008](test-cases.md#test-0008); passed 2026-07-14 | Reviewed; `FIND-0001`, `FIND-0002`, `FIND-0010`, `FIND-0014`, `FIND-0015`, `FIND-0017`, `FIND-0018` fixed | Complete |
+| `SUBF-0003` <a name="subf-0003"></a> | Templates and executable structural validation | [Issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) | [TEST-0004](test-cases.md#test-0004), [TEST-0005](test-cases.md#test-0005), [TEST-0007](test-cases.md#test-0007); passed 2026-07-14 | Reviewed; `FIND-0004`, `FIND-0006` through `FIND-0009`, `FIND-0013`, `FIND-0016` fixed | Complete |
 
 ## Decisions
 
@@ -119,26 +119,26 @@ this feature.
 
 | ID | Classification / severity / confidence | Scope and impact | Resolution and status |
 | --- | --- | --- | --- |
-| `FIND-0001` | Defect / High / High | Repo-ref consumers could not load the protocol | Added distinct [submodule](../../../templates/project/AGENTS.submodule.md) and [repository-reference](../../../templates/project/AGENTS.repository-reference.md) adapters; fixed. |
-| `FIND-0002` | Defect / High / High | Consumers missed root GitHub assets and labels | Adoption now copies assets and lists labels; fixed. |
-| `FIND-0003` | Defect / High / High | Future releases could rewrite historical feature versions | Current and historical version checks separated; fixed. |
-| `FIND-0004` | Process defect / Medium / High | Subfeatures lacked independent gate evidence | Added the subfeature ledger above; fixed. |
-| `FIND-0005` | Process defect / Medium / High | DoR omitted contract, risk, and test-state evidence | Added readiness and risk tables; fixed. |
-| `FIND-0006` | Defect / Medium / High | Subfeatures received feature title/label semantics | Added the [subfeature form](../../../.github/ISSUE_TEMPLATE/subfeature.yml); fixed. |
-| `FIND-0007` | Defect / Medium / High | Finding categories mixed independent axes | Split disposition, category, severity, and confidence; fixed. |
-| `FIND-0008` | Test gap / Medium / High | Core adapter isolation was not tested | Added `TEST-0008`; fixed. |
-| `FIND-0009` | Test gap / Medium / High | Generic checks missed consumer/template semantics | Added required paths and targeted assertions; fixed. |
-| `FIND-0010` | Test/risk / Medium / High | Links could escape the repo or external links remain unverified | Enforced root containment and separated external evidence; fixed/release-gated. |
-| `FIND-0011` | Release blocker / Medium / High | Documented `pwsh` command was unavailable and CI was unconditional | Added Windows PowerShell 5.1 evidence and CI N/A rationale; fixed. |
-| `FIND-0012` | Release blocker / Medium / High | Pre-merge DoD depended on a post-merge tag | Added a separate post-merge release gate; fixed. |
-| `FIND-0013` | Privacy risk / Low / High | Evidence prompts could invite sensitive logs | Added general and form-level redaction rules; fixed. |
-| `FIND-0014` | Documentation defect / Low / High | Memory log reference was not clickable | Linked [the memory log](../../../.ai/memory/log/README.md); fixed. |
-| `FIND-0015` | Adoption defect / Medium / High | Repo-ref consumers lacked safe template/materialization guidance and copy commands could overwrite project assets | Scoped commands to empty submodule targets and added provider/manual alternatives; fixed. |
-| `FIND-0016` | Process defect / High / High | TDD red-phase evidence was inferred instead of executed | Made missing-file failure deterministic and reproduced `TEST-0001` against baseline commit `a6e3064`; fixed. |
-| `FIND-0017` | Test gap / High / High | `TEST-0008` named memory isolation without checking memory ownership and placement | Added adapter, adoption mapping, template-set, and consumer-layout assertions; fixed. |
-| `FIND-0018` | Adoption defect / Medium / High | Copied issue configuration followed moving `main`, and copy commands could replace consumer files | Excluded repository-specific config and made submodule/repository-reference initialization collision-safe; fixed. |
-| `FIND-0019` | Traceability gate / High / High | Acceptance and DoD cannot close before the delivery PR exists | Published [PR #2](https://github.com/hasanmanzak/meAndAI/pull/2) and linked it to issue #1 plus the canonical records; fixed. |
-| `FIND-0048` | Test reliability / Medium / High | `TEST-0020` matched an exact phrase across a Markdown line wrap and failed after an otherwise clean confirmation | Normalized insignificant whitespace in the assertion and reran the bounded confirmation; fixed. |
+| `FIND-0001` <a name="find-0001"></a> | Defect / High / High | Repo-ref consumers could not load the protocol | Added distinct [submodule](../../../templates/project/AGENTS.submodule.md) and [repository-reference](../../../templates/project/AGENTS.repository-reference.md) adapters; fixed. |
+| `FIND-0002` <a name="find-0002"></a> | Defect / High / High | Consumers missed root GitHub assets and labels | Adoption now copies assets and lists labels; fixed. |
+| `FIND-0003` <a name="find-0003"></a> | Defect / High / High | Future releases could rewrite historical feature versions | Current and historical version checks separated; fixed. |
+| `FIND-0004` <a name="find-0004"></a> | Process defect / Medium / High | Subfeatures lacked independent gate evidence | Added the subfeature ledger above; fixed. |
+| `FIND-0005` <a name="find-0005"></a> | Process defect / Medium / High | DoR omitted contract, risk, and test-state evidence | Added readiness and risk tables; fixed. |
+| `FIND-0006` <a name="find-0006"></a> | Defect / Medium / High | Subfeatures received feature title/label semantics | Added the [subfeature form](../../../.github/ISSUE_TEMPLATE/subfeature.yml); fixed. |
+| `FIND-0007` <a name="find-0007"></a> | Defect / Medium / High | Finding categories mixed independent axes | Split disposition, category, severity, and confidence; fixed. |
+| `FIND-0008` <a name="find-0008"></a> | Test gap / Medium / High | Core adapter isolation was not tested | Added [TEST-0008](test-cases.md#test-0008); fixed. |
+| `FIND-0009` <a name="find-0009"></a> | Test gap / Medium / High | Generic checks missed consumer/template semantics | Added required paths and targeted assertions; fixed. |
+| `FIND-0010` <a name="find-0010"></a> | Test/risk / Medium / High | Links could escape the repo or external links remain unverified | Enforced root containment and separated external evidence; fixed/release-gated. |
+| `FIND-0011` <a name="find-0011"></a> | Release blocker / Medium / High | Documented `pwsh` command was unavailable and CI was unconditional | Added Windows PowerShell 5.1 evidence and CI N/A rationale; fixed. |
+| `FIND-0012` <a name="find-0012"></a> | Release blocker / Medium / High | Pre-merge DoD depended on a post-merge tag | Added a separate post-merge release gate; fixed. |
+| `FIND-0013` <a name="find-0013"></a> | Privacy risk / Low / High | Evidence prompts could invite sensitive logs | Added general and form-level redaction rules; fixed. |
+| `FIND-0014` <a name="find-0014"></a> | Documentation defect / Low / High | Memory log reference was not clickable | Linked [the memory log](../../../.ai/memory/log/README.md); fixed. |
+| `FIND-0015` <a name="find-0015"></a> | Adoption defect / Medium / High | Repo-ref consumers lacked safe template/materialization guidance and copy commands could overwrite project assets | Scoped commands to empty submodule targets and added provider/manual alternatives; fixed. |
+| `FIND-0016` <a name="find-0016"></a> | Process defect / High / High | TDD red-phase evidence was inferred instead of executed | Made missing-file failure deterministic and reproduced [TEST-0001](test-cases.md#test-0001) against baseline commit [`a6e3064`](https://github.com/hasanmanzak/meAndAI/commit/a6e306459e4926a44b06d91d65b5832fb389b501); fixed. |
+| `FIND-0017` <a name="find-0017"></a> | Test gap / High / High | [TEST-0008](test-cases.md#test-0008) named memory isolation without checking memory ownership and placement | Added adapter, adoption mapping, template-set, and consumer-layout assertions; fixed. |
+| `FIND-0018` <a name="find-0018"></a> | Adoption defect / Medium / High | Copied issue configuration followed moving `main`, and copy commands could replace consumer files | Excluded repository-specific config and made submodule/repository-reference initialization collision-safe; fixed. |
+| `FIND-0019` <a name="find-0019"></a> | Traceability gate / High / High | Acceptance and DoD cannot close before the delivery PR exists | Published [PR #2](https://github.com/hasanmanzak/meAndAI/pull/2) and linked it to [issue #1](https://github.com/hasanmanzak/meAndAI/issues/1) plus the canonical records; fixed. |
+| `FIND-0048` <a name="find-0048"></a> | Test reliability / Medium / High | [TEST-0020](test-cases.md#test-0020) matched an exact phrase across a Markdown line wrap and failed after an otherwise clean confirmation | Normalized insignificant whitespace in the assertion and reran the bounded confirmation; fixed. |
 
 No unresolved blocking finding or known new debt remains. The issue, pull
 request, feature, decisions, and tests form a clickable graph. External tag

@@ -3,7 +3,7 @@
 ## Canonical records
 
 - Feature: [FEAT-0024](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md)
-- Tests: [TEST-0115 and TEST-0116](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md)
+- Tests: [TEST-0115](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0115) and [TEST-0116](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116)
 - Tracking and post-publication authority: [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65)
 
 ## Durable facts
@@ -20,19 +20,19 @@
   seconds on Windows and 117 seconds on Linux. Timing is observational, not a
   pass/fail gate.
 - Focused Windows PowerShell 5.1 shards passed in 11.5, 57.8, 246.8, and 39.7
-  seconds. `FIND-0157` corrected the release-archive helper's script-scope
+  seconds. [FIND-0157](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md#find-0157) corrected the release-archive helper's script-scope
   dependency before completion; the fixture now exposes an explicit immutable
   archive path to every reset without sharing consumer state.
 - The Windows base profile passed in 162.3 seconds, and the single final local
-  full suite passed every canonical scenario through `TEST-0116` in 507.6
+  full suite passed every canonical scenario through [TEST-0116](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116) in 507.6
   seconds.
 - Pull-request run 29573099890 passed: Linux full 158 seconds, Windows base 151
   seconds, and the four Windows shard jobs 23, 75, 326, and 47 seconds. The
   Windows critical path was 326 seconds versus the 558-second baseline; this is
-  an observation, not a timing gate. Issue #65 owns later publication evidence.
+  an observation, not a timing gate. [Issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) owns later publication evidence.
 
 ## Continuation
 
-If delivery is still open, continue from issue #65 and the FEAT-0024 DoD. Do
+If delivery is still open, continue from [issue #65](https://github.com/hasanmanzak/meAndAI/issues/65) and the [FEAT-0024](../../../docs/features/FEAT-0024-v0101-parallel-windows-validation/README.md) DoD. Do
 not broaden this work into a general test scheduler, cross-runner Git cache, or
 narrowing of Windows PowerShell 5.1 coverage.

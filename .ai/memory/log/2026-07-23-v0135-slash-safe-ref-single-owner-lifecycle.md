@@ -3,13 +3,13 @@
 - Feature: [FEAT-0044](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/README.md)
 - Issue: [#108](https://github.com/hasanmanzak/meAndAI/issues/108)
 - Branch: `codex/bug-0026-slash-safe-single-owner-lifecycle`
-- Tests: [TEST-0169 and TEST-0170](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md)
+- Tests: [TEST-0169](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md#test-0169) and [TEST-0170](../../../docs/features/FEAT-0044-v0135-slash-safe-ref-single-owner-lifecycle/test-cases.md#test-0170)
 - Governing decisions: [DEC-0016](../../../docs/decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../../docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0019](../../../docs/decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../../docs/decisions/DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0027](../../../docs/decisions/DEC-0027-single-owner-consumer-merge-events.md)
 
 ## Durable context
 
 Immutable v0.13.4 is the verified base at commit
-`089c63d2aeca2d8188bdaeeced5e33be8d01c256`. A consumer merge exposed two
+[`089c63d2aeca2d8188bdaeeced5e33be8d01c256`](https://github.com/hasanmanzak/meAndAI/commit/089c63d2aeca2d8188bdaeeced5e33be8d01c256). A consumer merge exposed two
 generic defects: the capability-review runner encoded a complete slash-bearing
 branch as one URI component, and the consumer workflow let the same merged PR
 and default-branch push both own follow-on discovery. A self-created review

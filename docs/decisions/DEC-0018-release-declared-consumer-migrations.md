@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related feature: [FEAT-0026](../features/FEAT-0026-v0103-generic-consumer-transition-reconciliation/README.md)
 - Related decisions: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md), [DEC-0010](DEC-0010-stable-automation-invariants.md), [DEC-0011](DEC-0011-qualified-evidence-and-closure.md), and [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md)
-- Corrects: DEC-0017 only where prospective version-neutral templates were
+- Corrects: [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md) only where prospective version-neutral templates were
   treated as sufficient evidence for consumers created by an earlier release
 
 ## Context
@@ -114,7 +114,7 @@ all later compatible transitions use the normal single-proposal path.
 
 ### First catalog entry
 
-`MIG-0001` represents the first-observed duplicated-live-pin state as data,
+[MIG-0001](../../migrations/MIG-0001.json) represents the first-observed duplicated-live-pin state as data,
 not as version-specific control flow. It recognizes the exact eight active
 current-authority fragments and replaces them with gitlink/`VERSION`-derived
 forms. It explicitly leaves the dated adoption memory log, completed adoption

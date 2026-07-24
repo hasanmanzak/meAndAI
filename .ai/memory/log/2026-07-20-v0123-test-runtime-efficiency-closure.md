@@ -1,7 +1,7 @@
 # 2026-07-20 - v0.12.3 Test Runtime Efficiency Closure
 
 - Feature: [FEAT-0035](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md)
-- Tests: [TEST-0144 through TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md)
+- Tests: [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144), [TEST-0145](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145), and [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 - Decisions: [DEC-0019](../../../docs/decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../../docs/decisions/DEC-0022-release-declared-semantic-capabilities.md)
 - Tracking and external publication authority: [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87)
 - Delivery pull request, merge, release, cleanup, and hosted evidence: `Pending`
@@ -9,7 +9,7 @@
 
 ## Completed candidate
 
-- `TEST-0144` through `TEST-0146` have executable capability ownership.
+- [TEST-0144](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0144), [TEST-0145](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145), and [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) have executable capability ownership.
 - The stable parent runner emits one owner-bound integer-millisecond
   observation after each suite process without changing child result or exit
   authority.
@@ -25,7 +25,7 @@
 
 ## Performance evidence
 
-- Exact same-machine Windows PowerShell 5.1 baseline at `e6ff32d`:
+- Exact same-machine Windows PowerShell 5.1 baseline at [`e6ff32d`](https://github.com/hasanmanzak/meAndAI/commit/e6ff32daa0ef655dd0a8881822fc5b75027b830b):
   capabilities-bootstrap 444.284 seconds; quick-adoption 1055.028 seconds and
   166 real launcher invocations.
 - Final quick-adoption `Shard All`: green in 643.7 seconds with 113 real
@@ -40,16 +40,16 @@
 
 ## Resolved bounded-review findings
 
-- `FIND-0176`: preserve unrelated empty Git configuration.
-- `FIND-0177`: retain proposal-tree, asset, and `.gitmodules` adapter slices.
-- `FIND-0178`: restore Hybrid decision enforcement.
-- `FIND-0179`: restore `LegacyUnspecified` fallback behavior.
-- `FIND-0180`: restore the legacy marker's empty expected-surface rule.
-- `FIND-0181`: initialize the completion contract in both independently
+- [FIND-0176](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0176): preserve unrelated empty Git configuration.
+- [FIND-0177](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0177): retain proposal-tree, asset, and `.gitmodules` adapter slices.
+- [FIND-0178](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0178): restore Hybrid decision enforcement.
+- [FIND-0179](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0179): restore `LegacyUnspecified` fallback behavior.
+- [FIND-0180](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0180): restore the legacy marker's empty expected-surface rule.
+- [FIND-0181](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0181): initialize the completion contract in both independently
   selectable shards before first use.
-- `FIND-0182`: initialize the `RepositoryRoutes` fixture before contract
+- [FIND-0182](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0182): initialize the `RepositoryRoutes` fixture before contract
   resolution.
-- `FIND-0183`: normalize null-equivalent empty completion evidence at both
+- [FIND-0183](../../../docs/features/FEAT-0035-test-runtime-efficiency/README.md#find-0183): normalize null-equivalent empty completion evidence at both
   predicate boundaries so Windows PowerShell 5.1 and PowerShell 7 return the
   same fail-closed result instead of throwing during parameter binding.
 
@@ -61,5 +61,5 @@ The local final full candidate passed in 944.2 seconds and the converged branch
 is under review in [PR #88](https://github.com/hasanmanzak/meAndAI/pull/88).
 Let the normal hosted jobs revalidate the exact corrected pull-request tree. Record the exact pull
 request, checks, merge, immutable release, branch cleanup, and post-publication
-facts through issue #87 only after they exist. Do not add an evidence-only
+facts through [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87) only after they exist. Do not add an evidence-only
 candidate commit or predict publication facts in repository memory.

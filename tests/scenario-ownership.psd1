@@ -13,7 +13,8 @@
                 'TEST-0084', 'TEST-0085', 'TEST-0091', 'TEST-0092',
                 'TEST-0096', 'TEST-0097', 'TEST-0098', 'TEST-0099',
                 'TEST-0101', 'TEST-0114', 'TEST-0118', 'TEST-0131',
-                'TEST-0132', 'TEST-0173', 'TEST-0174'
+                'TEST-0132', 'TEST-0173', 'TEST-0174', 'TEST-0175',
+                'TEST-0177'
             )
         }
         @{
@@ -90,7 +91,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1'
-            TestIds = @('TEST-0083')
+            TestIds = @('TEST-0083', 'TEST-0176', 'TEST-0178')
         }
         @{
             Evidence = 'ExecutableSuite'

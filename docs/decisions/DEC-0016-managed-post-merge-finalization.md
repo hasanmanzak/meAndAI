@@ -6,7 +6,7 @@
 - Decision owners: meAndAI maintainers and consumer maintainers
 - Related feature: [FEAT-0022](../features/FEAT-0022-v097-managed-merge-finalization/README.md)
 - Related decisions: [DEC-0003](DEC-0003-reviewed-consumer-update-supersession.md), [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md), [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md), [DEC-0008](DEC-0008-local-codex-execution.md), [DEC-0010](DEC-0010-stable-automation-invariants.md), [DEC-0011](DEC-0011-qualified-evidence-and-closure.md), and [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md)
-- Supersedes: DEC-0006 only where it prohibits cleanup of an adoption proposal after that exact proposal has been completed, reviewed, and merged; and DEC-0005 only for the post-merge finalization job's job-scoped `GITHUB_TOKEN` writes; pre-merge retention, maintainer-owned merge, proposal creation, and workflow self-update remain unchanged
+- Supersedes: [DEC-0006](DEC-0006-seed-workflow-adoption-handoff.md) only where it prohibits cleanup of an adoption proposal after that exact proposal has been completed, reviewed, and merged; and [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) only for the post-merge finalization job's job-scoped `GITHUB_TOKEN` writes; pre-merge retention, maintainer-owned merge, proposal creation, and workflow self-update remain unchanged
 
 ## Context
 
@@ -49,7 +49,8 @@ proves all applicable evidence:
    provenance; and
 6. there is exactly one same-repository tracking issue: the canonical
    adoption-marker issue for adoption, or the one issue named by an exact
-   `Tracking issue: #N` pull-request body line for an update; and
+   `Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)`
+   pull-request body line for an update; and
 7. no open pull request currently reuses the exact head branch.
 
 A normal merged pull request with neither a reserved branch nor a canonical
@@ -68,15 +69,16 @@ work after branch deletion but never closes the issue before a failed
 destructive operation.
 
 Before the launcher marks an adoption pull request ready, it adds one exact
-`Tracking issue: #N` line for the canonical adoption issue. Managed update pull
-requests must similarly acquire exactly one same-repository tracking line during
-their ordinary DoR work before merge. A native closing keyword is forbidden for
+`Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)` line
+for the canonical adoption issue. Managed update pull requests must similarly
+acquire exactly one same-repository tracking line during their ordinary DoR
+work before merge. A native closing keyword is forbidden for
 this managed lifecycle because GitHub would close the issue during merge, before
 the finalizer proves branch convergence. Missing or multiple links are not
 guessed after merge.
 
 The finalization job uses a job-scoped consumer `GITHUB_TOKEN` with `contents:
-write`, `pull-requests: read`, and `issues: write`. DEC-0005 remains unchanged
+write`, `pull-requests: read`, and `issues: write`. [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) remains unchanged
 for proposal creation and workflow self-update: `MEANDAI_UPDATER_TOKEN` retains
 that separate authority, and no source credential enters finalization.
 
@@ -106,7 +108,7 @@ that separate authority, and no source credential enters finalization.
   ownership evidence.
 - Use the updater PAT for issue cleanup: rejected because job-scoped
   `GITHUB_TOKEN` can express the narrower same-repository authority and preserves
-  DEC-0005 separation.
+  [DEC-0005](DEC-0005-consumer-scoped-fine-grained-pat.md) separation.
 - Add another consumer script or hosted cleanup service: rejected because the
   existing mutation adapter owns the same marker/ref/lease responsibility and a
   new deployment surface is unnecessary.

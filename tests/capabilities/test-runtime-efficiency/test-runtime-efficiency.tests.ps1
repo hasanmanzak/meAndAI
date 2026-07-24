@@ -1057,7 +1057,9 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$graphRecordConverter|<script>' = 1
     '$graphRecordConverter|global:gh' = 1
     '$identityValidator|global:gh' = 1
-    '$launcherPath|<script>' = 79
+    # TEST-0176 retains one real launcher slice that converges an exact legacy
+    # adoption issue to the opaque marker plus visible exact-target links.
+    '$launcherPath|<script>' = 80
     '$launcherPath|New-MockCompletedAdoptionConsumer' = 1
     '$manifestValidationModule|<script>' = 1
     '$manifestValidator|<script>' = 2

@@ -80,6 +80,7 @@ function Get-AdapterFunctionDefinition {
 }
 
 $requiredFunctions = @(
+    'Test-ContainsManagedMarkerSignal',
     'Invoke-Native',
     'Get-GhReadFailureClassification',
     'Invoke-GhReadNative',

@@ -16,14 +16,162 @@ function Add-Failure {
     $failures.Add($Message)
 }
 
+function Get-RequiredTemplateText {
+    param([Parameter(Mandatory)][string]$RepositoryPath)
+
+    $path = Join-Path $root $RepositoryPath
+    if (-not [IO.File]::Exists($path)) {
+        Add-Failure "TEST-0178 required producer template '$RepositoryPath' is missing."
+        return ''
+    }
+    try {
+        return [IO.File]::ReadAllText(
+            $path,
+            [Text.UTF8Encoding]::new($false, $true)
+        )
+    }
+    catch {
+        Add-Failure "TEST-0178 required producer template '$RepositoryPath' is not strict UTF-8: $($_.Exception.Message)"
+        return ''
+    }
+}
+
+function Test-CommitPermalinkPromptContract {
+    param([AllowEmptyString()][string]$Text)
+
+    return $Text -match '(?i)\bclickable\b' -and
+        $Text -match '(?i)\bexact\b' -and
+        $Text -match '(?i)\bfull-SHA\b' -and
+        $Text -match '(?i)\bcommit\s+permalinks?\b'
+}
+
+function Assert-CommitReferenceProducerTemplates {
+    $bugTemplate = Get-RequiredTemplateText `
+        -RepositoryPath '.github/ISSUE_TEMPLATE/bug.yml'
+    $reproduction = [regex]::Match(
+        $bugTemplate,
+        '(?ms)^[ \t]*-[ \t]+type:[ \t]+textarea[ \t]*\r?\n[ \t]+id:[ \t]+reproduction[ \t]*\r?\n(?<block>.*?)(?=^[ \t]*-[ \t]+type:|\z)'
+    )
+    $reproductionDescription = if ($reproduction.Success) {
+        [regex]::Match(
+            $reproduction.Groups['block'].Value,
+            '(?im)^[ \t]+description:[ \t]*(?<value>[^\r\n]+)$'
+        ).Groups['value'].Value
+    }
+    else { '' }
+    if (-not (Test-CommitPermalinkPromptContract `
+        -Text $reproductionDescription)) {
+        Add-Failure 'TEST-0178 bug reproduction prompt must require clickable exact full-SHA commit permalinks.'
+    }
+
+    $pullTemplate = Get-RequiredTemplateText `
+        -RepositoryPath '.github/PULL_REQUEST_TEMPLATE.md'
+    $pullEvidence = [regex]::Match(
+        $pullTemplate,
+        '(?ms)^## Test evidence[ \t]*\r?\n(?<section>.*?)(?=^##[ \t]|\z)'
+    )
+    $pullCommitCell = if ($pullEvidence.Success) {
+        [regex]::Match(
+            $pullEvidence.Groups['section'].Value,
+            '(?im)^\|[ \t]*TEST-NNNN\b[^|]*\|[ \t]*(?<value>[^|\r\n]+)\|'
+        ).Groups['value'].Value
+    }
+    else { '' }
+    if (-not (Test-CommitPermalinkPromptContract -Text $pullCommitCell)) {
+        Add-Failure 'TEST-0178 PR test-evidence commit cell must require a clickable exact full-SHA commit permalink.'
+    }
+
+    $testCasesTemplate = Get-RequiredTemplateText `
+        -RepositoryPath 'templates/feature/test-cases.md'
+    $featureEvidence = [regex]::Match(
+        $testCasesTemplate,
+        '(?ms)^## Evidence[ \t]*\r?\n(?<section>.*?)(?=^##[ \t]|\z)'
+    )
+    $featureEvidenceCommitCell = if ($featureEvidence.Success) {
+        [regex]::Match(
+            $featureEvidence.Groups['section'].Value,
+            '(?im)^\|[ \t]*YYYY-MM-DD[ \t]*\|[ \t]*(?<value>[^|\r\n]+)\|'
+        ).Groups['value'].Value
+    }
+    else { '' }
+    if (-not (Test-CommitPermalinkPromptContract `
+        -Text $featureEvidenceCommitCell)) {
+        Add-Failure 'TEST-0178 feature test-evidence commit cell must require a clickable exact full-SHA commit permalink.'
+    }
+
+    $featureTemplate = Get-RequiredTemplateText `
+        -RepositoryPath 'templates/feature/README.md'
+    $postMergeEvidence = [regex]::Match(
+        $featureTemplate,
+        '(?ms)^## Post-merge release evidence[ \t]*\r?\n(?<section>.*?)(?=^##[ \t]|\z)'
+    )
+    $targetCommitCell = if ($postMergeEvidence.Success) {
+        [regex]::Match(
+            $postMergeEvidence.Groups['section'].Value,
+            '(?im)^\|[ \t]*Target commit[ \t]*\|[ \t]*(?<value>[^|\r\n]+)\|'
+        ).Groups['value'].Value
+    }
+    else { '' }
+    if (-not (Test-CommitPermalinkPromptContract -Text $targetCommitCell)) {
+        Add-Failure 'TEST-0178 feature post-merge Target commit cell must require a clickable exact full-SHA commit permalink.'
+    }
+}
+
+function Assert-PostPublicationCheckoutContract {
+    $workflow = Get-RequiredTemplateText `
+        -RepositoryPath '.github/workflows/protocol-tests.yml'
+    $postPublicationJob = [regex]::Match(
+        $workflow,
+        '(?ms)^  post-publication:\s*\r?\n(?<job>.*?)(?=^  [A-Za-z0-9_-]+:\s*\r?\n|\z)'
+    )
+    $checkout = if ($postPublicationJob.Success) {
+        [regex]::Match(
+            $postPublicationJob.Groups['job'].Value,
+            '(?ms)^      - name: Check out verifier\s*\r?\n(?<step>.*?)(?=^      - name:|\z)'
+        )
+    }
+    else { [regex]::Match('', 'never') }
+    if (-not $checkout.Success -or
+        -not $checkout.Groups['step'].Value.Contains(
+            'ref: ${{ inputs.expected_commit }}'
+        ) -or
+        $checkout.Groups['step'].Value -cnotmatch
+            '(?m)^\s+fetch-depth:\s+0\s*$') {
+        Add-Failure 'TEST-0178 post-publication checkout must use the exact expected commit with full history.'
+    }
+}
+
 $repository = 'example/meandai-consumer'
 $tag = 'v1.2.3'
 $commit = '0123456789abcdef0123456789abcdef01234567'
+$shortCommit = $commit.Substring(0, 12)
+$wrongCommit = 'ffffffffffffffffffffffffffffffffffffffff'
+$pullHeadCommit = '89abcdef89abcdef89abcdef89abcdef89abcdef'
+$priorHeadCommit = '7654321076543210765432107654321076543210'
+$featureBlobSha = '1111111111111111111111111111111111111111'
+$testCasesBlobSha = '2222222222222222222222222222222222222222'
+$decisionBlobSha = '3333333333333333333333333333333333333333'
+$sourceBlobSha = '4444444444444444444444444444444444444444'
+$externalCommit = '96a9902e8f035bac2f638182efd3c940d72cc101'
 $featurePath = 'docs/features/FEAT-0042-release-evidence/README.md'
 $issueNumber = 42
+$pullRequestNumber = 43
 $ownedBranch = 'codex/feat-0042-release-evidence'
-$featureUrl = "https://github.com/$repository/blob/main/$featurePath"
+$mutableFeatureUrl = "https://github.com/$repository/blob/main/$featurePath"
+$featureUrl = "https://github.com/$repository/blob/$commit/$featurePath"
+$immutableFeatureUrl = $featureUrl
+$pullHeadFeatureUrl = "https://github.com/$repository/blob/$pullHeadCommit/$featurePath"
 $issueUrl = "https://github.com/$repository/issues/$issueNumber"
+$pullRequestUrl = "https://github.com/$repository/pull/$pullRequestNumber"
+$decisionPath = 'docs/decisions/DEC-0042-release-evidence.md'
+$mutableDecisionUrl = "https://github.com/$repository/blob/main/$decisionPath"
+$decisionUrl = "https://github.com/$repository/blob/$commit/$decisionPath"
+$immutableDecisionUrl = $decisionUrl
+$testCasesPath = 'docs/features/FEAT-0042-release-evidence/test-cases.md'
+$immutableTestCasesUrl = "https://github.com/$repository/blob/$commit/$testCasesPath"
+$priorHeadTestCasesUrl = "https://github.com/$repository/blob/$priorHeadCommit/$testCasesPath"
+$sourcePath = 'scripts/example.ps1'
+$pullHeadSourceUrl = "https://github.com/$repository/blob/$pullHeadCommit/$sourcePath"
 $releaseUrl = "https://github.com/$repository/releases/tag/$tag"
 $commitUrl = "https://github.com/$repository/commit/$commit"
 $launcherAssetName = 'Invoke-MeAndAIQuickAdoption.ps1'
@@ -42,7 +190,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.1' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.2' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
@@ -307,53 +455,843 @@ function global:Invoke-RestMethod {
         return @()
     }
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/issues/42') {
-        $body = 'Publication evidence is recorded in issue comments.'
+        $body = "## Canonical records`n`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`nPublication evidence is recorded in issue comments."
         if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
-            $body = 'Publication evidence is recorded in a paginated issue comment.'
+            $body = "## Canonical records`n`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`nPublication evidence is recorded in a paginated issue comment."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullHeadRepositoryTarget') {
+            $body = "## Canonical records`n`n- [Feature]($pullHeadFeatureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`nPublication evidence is recorded in issue comments."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextIssueFeature') {
+            $body = "Feature: FEAT-0042`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MissingIssueDecision') {
+            $body = "- [Feature]($featureUrl)`n- [Pull request]($pullRequestUrl)"
         }
         elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueBodyOnlyEvidence') {
-            $body = "$featureUrl`n$releaseUrl`n$commitUrl"
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n$releaseUrl`n$commitUrl"
         }
-        return [pscustomobject]@{ state = 'closed'; body = $body }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnIssueIdentity') {
+            $body += "`nThis is issue #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnIssueShorthand') {
+            $body += "`nThis is issue-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnIssueIdentity') {
+            $body += "`nThis is PR #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnIssueShorthand') {
+            $body += "`nThis is PR-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedStableId') {
+            $body += "`nRelated record: FEAT\-0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HtmlEntityStableId') {
+            $body += "`nRelated record: FEAT&#45;0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareExactAutolinks') {
+            $body = "$featureUrl`n$decisionUrl`n$pullRequestUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullLinkPrefixCollision') {
+            $body = "- [Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request](https://github.com/example/meandai-consumer/pull/430)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HiddenFeatureLink') {
+            $body = "<!-- [Feature]($featureUrl) -->`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedFeatureLink') {
+            $body = "\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OddEscapeFeatureLink') {
+            $body = "\\\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedReferenceFeatureLink') {
+            $body = "\[Feature][feature]`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)`n`n[feature]: $featureUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EvenEscapeFeatureLink') {
+            $body = "\\[Feature]($featureUrl)`n- [Decision]($decisionUrl)`n- [Pull request]($pullRequestUrl)"
+        }
+        return [pscustomobject]@{
+            state = 'closed'
+            title = if ($global:MeAndAIPostPublicationMode -ceq 'FeatureIssueIdentityTitle') {
+                '[FEAT-0042] Immutable Release Evidence Contract'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'LinkedRecordInIssueTitle') {
+                "[DEC-0042]($decisionUrl)"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueTitleUrlPrefixCollision') {
+                "https://github.com/$repository/issues/420"
+            }
+            else { '[BUG-0042] Release evidence' }
+            body = $body
+        }
     }
     if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/42/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
         $page = [int]$Matches.page
         if ($global:MeAndAIPostPublicationMode -ceq 'PageTwoCommentEvidence') {
             if ($page -eq 1) {
                 return @(1..100 | ForEach-Object {
-                    [pscustomobject]@{ body = "unrelated comment $_" }
+                    [pscustomobject]@{
+                        id = 10000 + $_
+                        body = "unrelated discussion item $_"
+                    }
                 })
             }
             if ($page -eq 2) {
                 return ,([pscustomobject]@{
+                    id = 10101
                     body = "$featureUrl`n$releaseUrl`n$commitUrl"
                 })
             }
         }
         if ($page -eq 1 -and
             $global:MeAndAIPostPublicationMode -cne 'IssueBodyOnlyEvidence') {
-            $commentBody = if ($global:MeAndAIPostPublicationMode -ceq 'MissingFeatureEvidence') {
-                "$releaseUrl`n$commitUrl"
+            $commentBody = if ($global:MeAndAIPostPublicationMode -ceq 'MissingReleaseEvidence') {
+                $commitUrl
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextIssueComment') {
+                "See issue $issueNumber.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextCommentHash') {
+                "See comment #9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongCommentTarget') {
+                "See [comment #9001]($issueUrl).`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+                "[Pull request]($pullRequestUrl)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'ParentIssueCommentLabel') {
+                "[issue #42 comment]($issueUrl#issuecomment-9001)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongParentCommentLabel') {
+                "[issue #99 comment]($issueUrl#issuecomment-9001)`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnCommentIdentity') {
+                "This is comment #9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnCommentShorthand') {
+                "This is comment-9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnReviewShorthand') {
+                "This is review-9001.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongCommentShorthand') {
+                "See comment-9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongReviewShorthand') {
+                "See review-9002.`n$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'UnusedDefinitionEvidence') {
+                "[release]: $releaseUrl`n[commit]: $commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'WrappedReleaseUri') {
+                "https://evidence.example/?next=$releaseUrl`n$commitUrl"
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'PunctuatedAutolinks') {
+                "$releaseUrl.`n$commitUrl."
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq
+                'SameRepositoryCommitApiRejected') {
+                "[commit $shortCommit]($commitUrl)"
             }
             else {
-                "$featureUrl`n$releaseUrl`n$commitUrl"
+                "$releaseUrl`n$commitUrl"
             }
-            return ,([pscustomobject]@{ body = $commentBody })
+            return ,([pscustomobject]@{ id = 9001; body = $commentBody })
         }
         return @()
     }
-    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$commit") {
+    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/pulls/43') {
+        $body = "- [Issue]($issueUrl)`n- [Feature]($featureUrl)`n- [Decision]($decisionUrl)"
+        if ($global:MeAndAIPostPublicationMode -ceq 'PullHeadRepositoryTarget') {
+            $body = "- [Issue]($issueUrl)`n- [Feature]($pullHeadFeatureUrl)`n- [Decision]($decisionUrl)"
+        }
+        if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullDecision') {
+            $body = "- [Issue]($issueUrl)`n- [Feature]($featureUrl)`nDecision: DEC-0042"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongPullFeatureTarget') {
+            $body = "- [Issue]($issueUrl)`n- [Feature](https://github.com/example/meandai-consumer/blob/$commit/docs/features/FEAT-9999-wrong/README.md)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MutableFeatureTarget') {
+            $body = "- [Issue]($issueUrl)`n- [FEAT-0042]($mutableFeatureUrl)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MutableDecisionTarget') {
+            $body = "- [Issue]($issueUrl)`n- [Feature]($featureUrl)`n- [DEC-0042]($mutableDecisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MutableGenericRepositoryTarget') {
+            $body += "`n[documentation]($mutableFeatureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UppercaseMutableGenericRepositoryTarget') {
+            $body += "`n[documentation](https://github.com/EXAMPLE/MEANDAI-CONSUMER/blob/main/$featurePath)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'TreeGenericRepositoryTarget') {
+            $body += "`n[documentation](https://github.com/$repository/tree/$commit/$featurePath)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullHeadRepositoryTarget') {
+            $body += "`n[RISK-0042]($pullHeadFeatureUrl#risk-0042)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HistoricalEmbeddedRecordTarget') {
+            $body += "`n[TEST-0175]($priorHeadTestCasesUrl#test-0175)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonMarkdownLineFragment') {
+            $body += "`n[source lines]($pullHeadSourceUrl#L2-L3)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MissingHistoricalRepositoryTarget') {
+            $body += "`n[documentation](https://github.com/$repository/blob/$wrongCommit/$featurePath)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositorySnapshotPathMismatch') {
+            $body += "`n[documentation]($pullHeadFeatureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositorySnapshotMissingFragment') {
+            $body += "`n[documentation]($pullHeadFeatureUrl#missing-anchor)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositorySnapshotWrongCaseFragment') {
+            $body += "`n[documentation]($pullHeadFeatureUrl#RISK-0042)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonMarkdownMalformedFragment') {
+            $body += "`n[source lines]($pullHeadSourceUrl#line-2)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonMarkdownOutOfRangeFragment') {
+            $body += "`n[source lines]($pullHeadSourceUrl#L2-L99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositoryContentTargetLimit') {
+            foreach ($targetIndex in 1..65) {
+                $targetPath = 'docs/generated/evidence-{0:d2}.md' -f $targetIndex
+                $body += "`n[evidence $targetIndex](https://github.com/$repository/blob/$pullHeadCommit/$targetPath)"
+            }
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongAndCorrectPullFeatureTarget') {
+            $body = "- [Issue]($issueUrl)`n- [FEAT-0042](https://github.com/example/meandai-consumer/blob/main/docs/features/FEAT-9999-wrong/README.md)`n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedFeatureLink') {
+            $body = "- [Issue]($issueUrl)`n- ``[FEAT-0042]($featureUrl)```n- [Decision]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleLinks') {
+            $body = @"
+- [Issue][delivery-issue]
+- [Feature][]
+- [Decision]
+
+[delivery-issue]: $issueUrl
+[Feature]: <$featureUrl>
+[Decision]: $decisionUrl
+"@
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareIssueHash') {
+            $body += "`nRelated delivery record: #$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongNumericIssueLabel') {
+            $body += "`n- [issue #$issueNumber](https://github.com/example/meandai-consumer/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RawDocumentPath') {
+            $body += "`nSee docs/notes/release-evidence.md for context."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentPath') {
+            $body += "`nSee ``docs/notes/release-evidence.md`` for details."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextDocumentTitle') {
+            $body += "`nImmutable Release Evidence Contract is authoritative."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongDocumentTitleTarget') {
+            $body += "`n[See Immutable Release Evidence Contract]($decisionUrl)."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentTitle') {
+            $body += "`n``Immutable Release Evidence Contract`` is authoritative."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonPermalinkCommentLabel') {
+            $body += "`n[comment]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonPermalinkReviewLabel') {
+            $body += "`n[review #123]($pullRequestUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongIssueIdentityTarget') {
+            $body += "`n[BUG-0042](https://github.com/example/meandai-consumer/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongTestTarget') {
+            $body += "`n[TEST-0175](https://github.com/example/meandai-consumer/blob/main/docs/features/FEAT-9999-wrong/test-cases.md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnlistedTestMissingFragment') {
+            $body += "`n[TEST-0199]($immutableTestCasesUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonTableEmbeddedMissingFragment') {
+            $body += "`n[FIND-0044]($immutableFeatureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactEmbeddedRecordTargets') {
+            $body += "`n[TEST-0175]($immutableTestCasesUrl#test-0175)"
+            $body += "`n[RISK-0042]($immutableFeatureUrl#risk-0042)"
+            $body += "`n[RISK-0043]($immutableDecisionUrl#risk-0043)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MissingEmbeddedRecordFragment') {
+            $body += "`n[TEST-0175]($immutableTestCasesUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongEmbeddedRecordFragment') {
+            $body += "`n[TEST-0175]($immutableTestCasesUrl#test-9999)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UppercaseEmbeddedRecordFragment') {
+            $body += "`n[TEST-0175]($immutableTestCasesUrl#TEST-0175)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MutableEmbeddedRecordTarget') {
+            $body += "`n[TEST-0175](https://github.com/$repository/blob/main/$testCasesPath#test-0175)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactCommitPermalinks') {
+            $body += "`n[commit $shortCommit]($commitUrl)"
+            $body += "`n[$commit]($commitUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactExternalCommitPermalink') {
+            $body += "`n[external commit $externalCommit](https://github.com/hasanmanzak/Derdini/commit/$externalCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactExternalCommitAutolink') {
+            $body += "`nhttps://github.com/hasanmanzak/Derdini/commit/$externalCommit"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CommitLiteralExclusions') {
+            $body += @"
+
+Fixture commit literal: $commit
+SHA-1 digest: $commit
+``sourceCommit=$commit``
+Source example: ``$commit``
+Git object input: ``$commit``
+Tag object identity: $wrongCommit
+Git blob identity: $externalCommit
+Neutral fixture blob: $wrongCommit
+migrations/index.json: $externalCommit
+Merge tree: $wrongCommit
+Reviewed commit; its tree $externalCommit
+Opaque machine marker: ``MEANDAI_HEAD_SHA=$commit``
+
+~~~console
+git show $commit
+~~~
+
+~~~json
+{"sourceCommit":"$commit"}
+~~~
+"@
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextShortCommit') {
+            $body += "`nReleased at commit $shortCommit."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextFullCommit') {
+            $body += "`nReleased at $commit."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextExternalFullCommit') {
+            $body += "`nDerdini fix: $externalCommit."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedHumanCommit') {
+            $body += "`nReleased at commit ``$shortCommit``."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongCommitPermalink') {
+            $body += "`n[commit $shortCommit](https://github.com/$repository/commit/$wrongCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongRepositoryCommitPermalink') {
+            $body += "`n[commit $commit](https://github.com/example/other/commit/$commit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ShortExternalCommitPermalink') {
+            $body += "`n[external commit $($externalCommit.Substring(0, 12))](https://github.com/hasanmanzak/Derdini/commit/$externalCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MismatchedExternalFullCommitPermalink') {
+            $body += "`n[external commit $externalCommit](https://github.com/hasanmanzak/Derdini/commit/$wrongCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnownedExternalCommitRepository') {
+            $body += "`n[external commit $externalCommit](https://github.com/hasanmanzak/not-a-commit-owner/commit/$externalCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnownedExternalCommitAutolink') {
+            $body += "`nhttps://github.com/hasanmanzak/not-a-commit-owner/commit/$externalCommit"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExternalCommitTargetLimit') {
+            foreach ($targetIndex in 1..33) {
+                $targetSha = $targetIndex.ToString('x').PadLeft(40, '0')
+                $body += "`n[external commit $targetSha](https://github.com/hasanmanzak/Derdini/commit/$targetSha)"
+            }
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RawHtmlHrefFeatureLink') {
+            $body += "`n<a href=`"$mutableFeatureUrl`">FEAT-0042</a>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ShortCommitPermalink') {
+            $body += "`n[commit $shortCommit](https://github.com/$repository/commit/$shortCommit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CommitBranchTarget') {
+            $body += "`n[commit $shortCommit](https://github.com/$repository/tree/main)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CommitTreeTarget') {
+            $body += "`n[commit $shortCommit](https://github.com/$repository/tree/$commit)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CommitBlobTarget') {
+            $body += "`n[commit $shortCommit](https://github.com/$repository/blob/$commit/README.md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RelativeGitHubLink') {
+            $body += "`n[documentation](docs/features/FEAT-0042-release-evidence/README.md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnresolvedReferenceLink') {
+            $body += "`n[guide][missing-guide]"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullBug') {
+            $body += "`nRegression for BUG-0042."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnPullIdentity') {
+            $body += "`nThis is PR #$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'OwnPullShorthand') {
+            $body += "`nThis is PR-$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongKindOwnPullIdentity') {
+            $body += "`nThis is issue #$pullRequestNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SameArtifactAndMailLinks') {
+            $body += "`n[Details](#details) and [email](mailto:test@example.com)."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeLiteralMarkdown') {
+            $body += @"
+``[string][int] [label][key] [x](y)``
+
+~~~text
+[string][int] [label][key] [x](y)
+~~~
+
+    [string][int] [label][key] [x](y)
+"@
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongNestedDecisionRecordTarget') {
+            $body += "`n[RISK-0043]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BareExactAutolinks') {
+            $body = "$issueUrl`n$featureUrl`n$decisionUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ExactVisibleUrlLink') {
+            $body += "`n[$issueUrl]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'TildeAngleAutolink') {
+            $body += "`n<https://example.com/~user/doc.md>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnderscoreAngleAutolink') {
+            $body += "`n<https://github.com/example/meandai-consumer/blob/$commit/__init__.md>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'StarQueryAutolink') {
+            $body += "`nhttps://example.com/doc.md?x=a*b"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BalancedInlineDestination') {
+            $body += "`n[guide](https://example.com/foo(and(bar)).md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'AngleInlineDestination') {
+            $body += "`n[guide](<https://example.com/foo(bar).md>)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedInlineDestination') {
+            $body += "`n[guide](https://example.com/foo\(bar\).md)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NestedInlineLabel') {
+            $body += "`n[see [issue #42]]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InvalidBareAutolinkBoundary') {
+            $body += "`nx$issueUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InvalidBareAutolinkDomain') {
+            $body += "`nhttps://localhost/doc.md"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueLabelToCommentTarget') {
+            $body += "`n[issue #42]($issueUrl#issuecomment-9001)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'StableIdToCommentTarget') {
+            $body += "`n[BUG-0042]($issueUrl#issuecomment-9001)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DoubleBacktickFeatureLink') {
+            $body += "`n``[FEAT-0042]($featureUrl)``"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'TildeFenceFeatureLink') {
+            $body += "`n~~~text`n[FEAT-0042]($featureUrl)`n~~~"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CodeFormattedDocumentPseudoLink') {
+            $body += "`n``[guide](docs/guide.md)``"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IndentedCodeFeatureLink') {
+            $body += "`n`n    [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteIndentedCodeFeatureLink') {
+            $body += "`n>     [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListIndentedCodeFeatureLink') {
+            $body += "`n-     [FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SpacedFenceFeatureLink') {
+            $body += "`n" + '   ```md' +
+                "`n   [FEAT-0042]($featureUrl)`n   " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteFenceFeatureLink') {
+            $body += "`n" + '> ```md' +
+                "`n> [FEAT-0042]($featureUrl)`n> " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListFenceFeatureLink') {
+            $body += "`n" + '- ```md' +
+                "`n  [FEAT-0042]($featureUrl)`n  " + '```'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'MultilineInlineCodeFeatureLink') {
+            $body += "`n" + '`[FEAT-0042](' + $featureUrl +
+                ")`ncontinued" + '`'
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedIssueNumber') {
+            $body += "`nRelated issue \#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'GitHubShorthand') {
+            $body += "`nRelated GH-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'RepositoryShorthand') {
+            $body += "`nRelated meandai-consumer#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'QualifiedRepositoryShorthand') {
+            $body += "`nRelated example/meandai-consumer#$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'IssueHyphenShorthand') {
+            $body += "`nRelated issue-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'PullHyphenShorthand') {
+            $body += "`nRelated PR-$issueNumber."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongShorthandTarget') {
+            $body += "`n[PR-$pullRequestNumber]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongShorthandRepository') {
+            $body += "`n[GH-$issueNumber](https://github.com/evil/other/issues/$issueNumber)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'WrongOwnerRepositoryShorthand') {
+            $body += "`n[meandai-consumer#$issueNumber](https://github.com/evil/meandai-consumer/issues/$issueNumber)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'EscapedLabelWrongTarget') {
+            $body += "`n[FEAT\-0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'HtmlEntityLabelWrongTarget') {
+            $body += "`n[FEAT&#45;0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingHtmlFeatureLink') {
+            $body += "`n<pre>[FEAT-0042]($featureUrl)</pre>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingBlockHtmlFeatureLink') {
+            $body += "`n<table>`n[FEAT-0042]($featureUrl)`n</table>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingCustomHtmlFeatureLink') {
+            $body += "`n<x-panel>`n[FEAT-0042]($featureUrl)`n</x-panel>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingAttributedCustomHtmlFeatureLink') {
+            $body += "`n<x-panel title='>'>`n[FEAT-0042]($featureUrl)`n</x-panel>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingProcessingInstructionFeatureLink') {
+            $body += "`n<?process`n[FEAT-0042]($featureUrl)`n?>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingCdataFeatureLink') {
+            $body += "`n<![CDATA[`n[FEAT-0042]($featureUrl)`n]]>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'NonRenderingDeclarationFeatureLink') {
+            $body += "`n<!DECLARATION`n[FEAT-0042]($featureUrl)`n>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BlockquoteNonRenderingHtmlFeatureLink') {
+            $body += "`n> <x-panel>`n> [FEAT-0042]($featureUrl)`n>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'ListNonRenderingHtmlFeatureLink') {
+            $body += "`n- <div>`n  [FEAT-0042]($featureUrl)`n  </div>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlStableId') {
+            $body += "`nRelated FEAT-<em>0042</em>."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlAttributeStableId') {
+            $body += "`nRelated FEAT-<span title='>'>0042</span>."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineHtmlWrongTarget') {
+            $body += "`n[FEAT-<em>0042</em>]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineCommentLabelWrongTarget') {
+            $body += "`n[FEAT-<!--x-->0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'InlineCodeLabelWrongTarget') {
+            $body += "`n[FEAT-``0042``]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldStableId') {
+            $body += "`nRelated FEAT-**0042**."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldWrongTarget') {
+            $body += "`n[FEAT-**0042**]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'BoldIssueNumber') {
+            $body += "`nRelated issue **#$issueNumber**."
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitStableIdWrongTarget') {
+            $body += "`nFEAT-[0042]($decisionUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitIssueNumber') {
+            $body += "`nissue [#$issueNumber]($issueUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'VisibleUrlWrongTarget') {
+            $body += "`n[$issueUrl](https://github.com/evil/other/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'VisiblePathWrongTarget') {
+            $body += "`n[$decisionPath]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitUrlWrongTarget') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/[42](https://github.com/evil/other/issues/99)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitReferenceUrlWrongTarget') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/[42][wrong]`n`n[wrong]: https://github.com/evil/other/issues/99"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitInlineCommentUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<!-- -->42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitInlineTagUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<em>42</em>"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitSchemeCommentUrl') {
+            $body += "`nhttps<!-- -->://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitSchemeTagUrl') {
+            $body += "`nhtt<em>ps</em>://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitEntityUrl') {
+            $body += "`nhttps&#58;//github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitEmphasisUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/**42**"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitStrikeUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/~~42~~"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitUnderscoreUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/__42__"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitDecimalEntitySchemeUrl') {
+            $body += "`n&#104;ttps://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'SplitHexEntitySchemeUrl') {
+            $body += "`n&#x68;ttps://github.com/example/meandai-consumer/issues/42"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateInlineTagUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/<em>42</em>(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateSchemeCommentUrl') {
+            $body += "`nhttps<!-- -->://github.com/example/meandai-consumer/issues/42(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'DuplicateEmphasisUrl') {
+            $body += "`nhttps://github.com/example/meandai-consumer/issues/**42**(https://github.com/example/meandai-consumer/issues/42)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnclosedHtmlCommentFeatureLink') {
+            $body += "`n<!--`n[FEAT-0042]($featureUrl)"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'FootnoteFreeTextFeature') {
+            $body += "`nText[^1]`n`n[^1]: FEAT-0042"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'UnusedCrossRecordDefinition') {
+            $body += "`n`n[FEAT-0042]: $featureUrl"
+        }
+        elseif ($global:MeAndAIPostPublicationMode -ceq 'CapitalizedIssueNumber') {
+            $body += "`nRelated Issue #$issueNumber."
+        }
+        return [pscustomobject]@{
+            state = 'closed'
+            title = if ($global:MeAndAIPostPublicationMode -ceq 'PullTitleRecord') {
+                'Implement BUG-0042'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FeatureSubjectPullTitle') {
+                'Immutable Release Evidence Contract'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullOwnIdInComment') {
+                '[FEAT-0042] Immutable Release Evidence Contract'
+            }
+            elseif ($global:MeAndAIPostPublicationMode -ceq 'CommitInPullTitle') {
+                "Release commit $shortCommit"
+            }
+            else { 'Publish release evidence' }
+            merged_at = '2026-07-16T00:00:00Z'
+            merge_commit_sha = $commit
+            base = [pscustomobject]@{ ref = 'main' }
+            head = [pscustomobject]@{ sha = $pullHeadCommit }
+            body = $body
+        }
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/issues/43/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1) {
+            if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullConversation') {
+                return ,([pscustomobject]@{
+                    id = 9101
+                    body = "See PR $pullRequestNumber."
+                })
+            }
+            if ($global:MeAndAIPostPublicationMode -ceq 'WrongAndCorrectPullFeatureTarget') {
+                return ,([pscustomobject]@{ id = 9101; body = $featureUrl })
+            }
+            if ($global:MeAndAIPostPublicationMode -ceq 'FreeTextPullOwnIdInComment') {
+                return ,([pscustomobject]@{ id = 9101; body = 'FEAT-0042' })
+            }
+        }
+        return @()
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/pulls/43/reviews\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextReviewDecision') {
+            return ,([pscustomobject]@{ id = 9201; body = 'Review follows DEC-0042.' })
+        }
+        return @()
+    }
+    if ($Uri -match '^https://api\.test/repos/example/meandai-consumer/pulls/43/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$') {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextInlineComment') {
+            return ,([pscustomobject]@{ id = 9301; body = 'See comment #9001 and docs/decisions/DEC-0042-release-evidence.md.' })
+        }
+        return @()
+    }
+    if ($Uri -match "^https://api\.test/repos/example/meandai-consumer/commits/$commit/comments\?per_page=100&page=(?<page>[1-9][0-9]*)$") {
+        if ([int]$Matches.page -eq 1 -and
+            $global:MeAndAIPostPublicationMode -ceq 'FreeTextCommitComment') {
+            return ,([pscustomobject]@{
+                id = 9401
+                body = 'The released commit follows DEC-0042.'
+            })
+        }
+        return @()
+    }
+    if ($Uri -in @(
+        "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$commit",
+        "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$pullHeadCommit",
+        "https://api.test/repos/example/meandai-consumer/contents/$featurePath`?ref=$wrongCommit"
+    )) {
+        if ($global:MeAndAIPostPublicationMode -ceq
+            'MissingHistoricalRepositoryTarget' -and
+            $Uri.EndsWith("?ref=$wrongCommit", [StringComparison]::Ordinal)) {
+            return [pscustomobject]@{
+                type = 'dir'
+                path = $featurePath
+                sha = $featureBlobSha
+                encoding = 'none'
+                content = ''
+            }
+        }
+        $decisionLabel = if ($global:MeAndAIPostPublicationMode -ceq 'WrongDecisionLabel') {
+            'DEC-0043'
+        }
+        else { 'DEC-0042' }
+        $pullRequestField = if ($global:MeAndAIPostPublicationMode -ceq 'IssueCommentOnlyPullLink') {
+            "Recorded through [$issueNumber]($issueUrl)"
+        }
+        else { "[$pullRequestNumber]($pullRequestUrl)" }
+        $decisionField = if ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleFeatureDecision') {
+            "[$decisionLabel][decision]"
+        }
+        else { "[$decisionLabel](../../decisions/DEC-0042-release-evidence.md)" }
+        $referenceDefinition = if ($global:MeAndAIPostPublicationMode -ceq 'ReferenceStyleFeatureDecision') {
+            "`n[decision]: ../../decisions/DEC-0042-release-evidence.md"
+        }
+        else { '' }
         $content = @"
-# FEAT-0042 - Release evidence
+# FEAT-0042 - Immutable Release Evidence Contract
 
 | Field | Value |
 | --- | --- |
 | Status | Complete |
 | Issue | [$issueNumber]($issueUrl) |
+| Pull request | $pullRequestField |
+| Decisions | $decisionField |
+| Tests | [TEST-0175](test-cases.md#test-0175) |
+
+## Risks
+
+| ID | Risk |
+| --- | --- |
+| ``RISK-0042`` <a name="risk-0042"></a> | Release evidence can drift |
+
+- [x] ``FIND-0044`` <a name="find-0044"></a>: Non-table declaration coverage is verified.
+- [x] ``SUBF-0045`` <a name="subf-0045"></a>: Subfeature declaration coverage is verified.
+$referenceDefinition
 "@
         return [pscustomobject]@{
+            type = 'file'
+            path = if (
+                $global:MeAndAIPostPublicationMode -ceq
+                    'RepositorySnapshotPathMismatch' -and
+                $Uri.EndsWith("?ref=$pullHeadCommit", [StringComparison]::Ordinal)
+            ) {
+                'docs/features/FEAT-9999-wrong/README.md'
+            }
+            else { $featurePath }
+            sha = $featureBlobSha
             encoding = 'base64'
             content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($content))
+        }
+    }
+    if ($Uri -in @(
+        "https://api.test/repos/example/meandai-consumer/contents/$testCasesPath`?ref=$commit",
+        "https://api.test/repos/example/meandai-consumer/contents/$testCasesPath`?ref=$priorHeadCommit"
+    )) {
+        $test0175Anchor = switch ($global:MeAndAIPostPublicationMode) {
+            'EmbeddedAnchorMissing' { '' }
+            'EmbeddedAnchorDuplicate' {
+                '<a name="test-0175"></a> <a name="test-0175"></a>'
+            }
+            'EmbeddedAnchorWrongCase' { '<a name="TEST-0175"></a>' }
+            'EmbeddedAnchorCodeOnly' { '`<a name="test-0175"></a>`' }
+            'EmbeddedAnchorCommentOnly' {
+                '<!-- <a name="test-0175"></a> -->'
+            }
+            'EmbeddedAnchorNonRenderingOnly' {
+                '<script><a name="test-0175"></a></script>'
+            }
+            default { '<a name="test-0175"></a>' }
+        }
+        $headingCollision = if (
+            $global:MeAndAIPostPublicationMode -ceq
+                'EmbeddedAnchorHeadingCollision'
+        ) {
+            "`n## test-0175"
+        }
+        else { '' }
+        $content = @"
+# FEAT-0042 Test Scenarios
+
+| ID | Scenario |
+| --- | --- |
+| ``TEST-0175`` $test0175Anchor | Listed exact-target scenario |
+| ``TEST-0199`` <a name="test-0199"></a> | Companion scenario absent from README metadata |
+$headingCollision
+"@
+        return [pscustomobject]@{
+            type = 'file'
+            path = $testCasesPath
+            sha = $testCasesBlobSha
+            encoding = 'base64'
+            content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($content))
+        }
+    }
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$decisionPath`?ref=$commit") {
+        return [pscustomobject]@{
+            type = 'file'
+            path = $decisionPath
+            sha = $decisionBlobSha
+            encoding = 'base64'
+            content = [Convert]::ToBase64String(
+                [Text.Encoding]::UTF8.GetBytes(
+                    "# DEC-0042 - Release Evidence Authority`n`nRelated feature: [FEAT-0042](../features/FEAT-0042-release-evidence/README.md).`n`n| ID | Risk |`n| --- | --- |`n| ``RISK-0043`` <a name=`"risk-0043`"></a> | Publication authority can drift |`n"
+                )
+            )
+        }
+    }
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$sourcePath`?ref=$pullHeadCommit") {
+        $content = "first line`nsecond line`nthird line`n"
+        return [pscustomobject]@{
+            type = 'file'
+            path = $sourcePath
+            sha = $sourceBlobSha
+            encoding = 'base64'
+            content = [Convert]::ToBase64String(
+                [Text.Encoding]::UTF8.GetBytes($content)
+            )
+        }
+    }
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/__init__.md`?ref=$commit") {
+        $content = "# Package initialization`n"
+        return [pscustomobject]@{
+            type = 'file'
+            path = '__init__.md'
+            sha = $sourceBlobSha
+            encoding = 'base64'
+            content = [Convert]::ToBase64String(
+                [Text.Encoding]::UTF8.GetBytes($content)
+            )
         }
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$launcherSourcePath`?ref=$commit") {
@@ -389,6 +1327,33 @@ function global:Invoke-RestMethod {
             }
         }
     }
+    if ($Uri -ceq "https://api.test/repos/$repository/commits/$commit") {
+        if ($global:MeAndAIPostPublicationMode -ceq
+            'SameRepositoryCommitApiRejected') {
+            throw 'TEST-0178 same-repository commit is unavailable.'
+        }
+        return [pscustomobject]@{
+            sha = $commit
+            html_url = "https://github.com/$repository/commit/$commit"
+        }
+    }
+    if ($Uri -in @(
+        "https://api.test/repos/hasanmanzak/Derdini/commits/$externalCommit",
+        "https://api.test/repos/hasanmanzak/Derdini/commits/$wrongCommit"
+    )) {
+        $resolvedExternalSha = ([uri]$Uri).Segments[-1].TrimEnd('/')
+        return [pscustomobject]@{
+            sha = $resolvedExternalSha
+            html_url = "https://github.com/hasanmanzak/Derdini/commit/$resolvedExternalSha"
+        }
+    }
+    if ($global:MeAndAIPostPublicationMode -ceq 'ExternalCommitTargetLimit' -and
+        $Uri -cmatch '^https://api\.test/repos/hasanmanzak/Derdini/commits/(?<sha>[0-9a-f]{40})$') {
+        return [pscustomobject]@{
+            sha = $Matches.sha
+            html_url = "https://github.com/hasanmanzak/Derdini/commit/$($Matches.sha)"
+        }
+    }
 
     throw "TEST-0076 unexpected verifier request: $Uri"
 }
@@ -410,6 +1375,7 @@ function Invoke-PostPublicationScenario {
             ExpectedCommit = $commit
             FeaturePath = $featurePath
             IssueNumber = $issueNumber
+            PullRequestNumber = $pullRequestNumber
             OwnedBranch = $ownedBranch
             ApiBaseUri = 'https://api.test'
             Token = 'test-token'
@@ -431,11 +1397,194 @@ function Invoke-PostPublicationScenario {
     }
 }
 
+function Invoke-TrackedMarkdownScenario {
+    try {
+        & $verifierPath `
+            -Repository 'hasanmanzak/meAndAI' `
+            -Tag $tag -ExpectedCommit $commit `
+            -FeaturePath $featurePath `
+            -IssueNumber $issueNumber `
+            -PullRequestNumber $pullRequestNumber `
+            -OwnedBranch $ownedBranch `
+            -RepositoryMarkdownOnly 6>&1 | Out-Null
+        return [pscustomobject]@{ Threw = $false; Error = '' }
+    }
+    catch {
+        return [pscustomobject]@{
+            Threw = $true
+            Error = $_.Exception.Message
+        }
+    }
+}
+
+function Invoke-TemporaryTrackedMarkdownApiScenario {
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Markdown,
+        [string]$Mode = 'Valid',
+        [bool]$ValidateApi = $true,
+        [switch]$TargetLocalBlob
+    )
+
+    $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) (
+        'meandai-commit-reference-' + [Guid]::NewGuid().ToString('N')
+    )
+    $locationPushed = $false
+    $global:MeAndAIPostPublicationMode = $Mode
+    $global:MeAndAIPostPublicationRequests.Clear()
+    $global:MeAndAIPostPublicationDownloadRequests.Clear()
+    try {
+        [void][IO.Directory]::CreateDirectory($fixtureRoot)
+        & git -C $fixtureRoot init --quiet --object-format=sha1 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'temporary tracked-Markdown fixture could not initialize Git.'
+        }
+        if ($TargetLocalBlob) {
+            $blobSourceName = 'local-blob-source.bin'
+            [IO.File]::WriteAllBytes(
+                (Join-Path $fixtureRoot $blobSourceName),
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    'deterministic non-commit Git object'
+                )
+            )
+            $blobSha = (@(& git -C $fixtureRoot hash-object -w -- `
+                $blobSourceName 2>&1) -join '').Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $blobSha -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'temporary tracked-Markdown fixture could not create its local blob object.'
+            }
+            $Markdown = "[commit $blobSha]" +
+                "(https://github.com/$repository/commit/$blobSha)"
+        }
+        [IO.File]::WriteAllText(
+            (Join-Path $fixtureRoot 'fixture.md'),
+            $Markdown,
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $fixtureRoot remote add origin `
+            'https://github.com/example/meandai-consumer.git' 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'temporary tracked-Markdown fixture could not set its origin.'
+        }
+        & git -C $fixtureRoot add -- fixture.md 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'temporary tracked-Markdown fixture could not track its document.'
+        }
+        Push-Location $fixtureRoot
+        $locationPushed = $true
+        $parameters = @{
+            Repository = $repository
+            Tag = $tag
+            ExpectedCommit = $commit
+            FeaturePath = $featurePath
+            IssueNumber = $issueNumber
+            PullRequestNumber = $pullRequestNumber
+            OwnedBranch = $ownedBranch
+            ApiBaseUri = 'https://api.test'
+            Token = 'test-token'
+            RepositoryMarkdownOnly = $true
+        }
+        if ($ValidateApi) {
+            $parameters.ValidateRepositoryMarkdownExternalCommits = $true
+        }
+        & $verifierPath @parameters 6>&1 | Out-Null
+        return [pscustomobject]@{
+            Threw = $false
+            Error = ''
+            Requests = @($global:MeAndAIPostPublicationRequests)
+        }
+    }
+    catch {
+        return [pscustomobject]@{
+            Threw = $true
+            Error = $_.Exception.Message
+            Requests = @($global:MeAndAIPostPublicationRequests)
+        }
+    }
+    finally {
+        if ($locationPushed) { Pop-Location }
+        if ([IO.Directory]::Exists($fixtureRoot)) {
+            Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
+        }
+    }
+}
+
 try {
+    Assert-CommitReferenceProducerTemplates
+    Assert-PostPublicationCheckoutContract
     if (-not (Test-Path -LiteralPath $verifierPath -PathType Leaf)) {
         Add-Failure 'TEST-0076 post-publication verifier is missing.'
     }
     else {
+        $trackedMarkdown = Invoke-TrackedMarkdownScenario
+        if ($trackedMarkdown.Threw) {
+            Add-Failure "TEST-0178 tracked repository Markdown failed: $($trackedMarkdown.Error)"
+        }
+        $sameRepositoryCommitMarkdown =
+            "[commit $shortCommit]" +
+            "(https://github.com/$repository/commit/$commit)"
+        $sameRepositoryLocalOnly =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown -ValidateApi $false
+        if ($sameRepositoryLocalOnly.Threw -or
+            $sameRepositoryLocalOnly.Requests.Count -ne 0) {
+            Add-Failure "TEST-0178 tracked Markdown did not retain exact canonical same-repository commit links when an unreferenced historical object was absent from local Git: $($sameRepositoryLocalOnly.Error)"
+        }
+        $localBlobCommitTarget =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown '' -TargetLocalBlob
+        if (-not $localBlobCommitTarget.Threw -or
+            $localBlobCommitTarget.Error -notlike
+                '*contains 1 human-facing commit-reference problem*' -or
+            $localBlobCommitTarget.Requests.Count -ne 0) {
+            Add-Failure "TEST-0178 tracked Markdown did not reject a locally present blob before commit-target API fallback: $($localBlobCommitTarget.Error)"
+        }
+        $sameRepositoryTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown
+        $sameRepositoryTrackedRequest =
+            "https://api.test/repos/$repository/commits/$commit"
+        if ($sameRepositoryTrackedMarkdown.Threw -or
+            @($sameRepositoryTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $sameRepositoryTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not fall back to authenticated API proof for a same-repository commit absent from local Git: $($sameRepositoryTrackedMarkdown.Error)"
+        }
+        $invalidSameRepositoryTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown `
+                -Mode 'SameRepositoryCommitApiRejected'
+        if (-not $invalidSameRepositoryTrackedMarkdown.Threw -or
+            @($invalidSameRepositoryTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $sameRepositoryTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not fail closed after API rejection of a same-repository commit absent from local Git: $($invalidSameRepositoryTrackedMarkdown.Error)"
+        }
+        $externalTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario -Markdown (
+                "[external commit $externalCommit]" +
+                "(https://github.com/hasanmanzak/Derdini/commit/$externalCommit)"
+            )
+        $externalTrackedRequest =
+            "https://api.test/repos/hasanmanzak/Derdini/commits/$externalCommit"
+        if ($externalTrackedMarkdown.Threw -or
+            @($externalTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $externalTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not validate its external commit through the authenticated API: $($externalTrackedMarkdown.Error)"
+        }
+        $invalidExternalTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario -Markdown (
+                "[external commit $externalCommit]" +
+                "(https://github.com/hasanmanzak/not-a-commit-owner/commit/$externalCommit)"
+            )
+        $invalidExternalTrackedRequest =
+            "https://api.test/repos/hasanmanzak/not-a-commit-owner/commits/$externalCommit"
+        if (-not $invalidExternalTrackedMarkdown.Threw -or
+            @($invalidExternalTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $invalidExternalTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not fail closed after API rejection of an external commit target: $($invalidExternalTrackedMarkdown.Error)"
+        }
         $valid = Invoke-PostPublicationScenario -Mode 'Valid'
         if ($valid.Threw) {
             Add-Failure "TEST-0076 valid published evidence failed: $($valid.Error)"
@@ -463,7 +1612,13 @@ try {
             "/compare/$commit...main",
             '/git/matching-refs/heads/codex/feat-0042-release-evidence',
             '/issues/42', '/issues/42/comments?per_page=100&page=1',
-            "/contents/$featurePath`?ref=$commit"
+            '/pulls/43', '/issues/43/comments?per_page=100&page=1',
+            '/pulls/43/reviews?per_page=100&page=1',
+            '/pulls/43/comments?per_page=100&page=1',
+            "/commits/$commit/comments?per_page=100&page=1",
+            "/contents/$featurePath`?ref=$commit",
+            "/contents/$testCasesPath`?ref=$commit",
+            "/contents/$decisionPath`?ref=$commit"
         )) {
             if (@($global:MeAndAIPostPublicationRequests | Where-Object {
                 $_.EndsWith($requiredPath, [StringComparison]::Ordinal)
@@ -481,17 +1636,264 @@ try {
             $commentPageRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=2') {
             Add-Failure "TEST-0083 verifier did not find evidence located only in the second issue-comment page: $($pageTwoEvidence.Error)"
         }
+        $referenceStyleEvidence = Invoke-PostPublicationScenario `
+            -Mode 'ReferenceStyleLinks'
+        if ($referenceStyleEvidence.Threw) {
+            Add-Failure "TEST-0176 valid reference-style Markdown links failed: $($referenceStyleEvidence.Error)"
+        }
+        foreach ($positiveMode in @(
+            'IssueCommentOnlyPullLink',
+            'ParentIssueCommentLabel',
+            'FeatureIssueIdentityTitle',
+            'FeatureSubjectPullTitle',
+            'ReferenceStyleFeatureDecision',
+            'OwnIssueIdentity',
+            'OwnPullIdentity',
+            'OwnCommentIdentity',
+            'OwnIssueShorthand',
+            'OwnPullShorthand',
+            'OwnCommentShorthand',
+            'OwnReviewShorthand',
+            'SameArtifactAndMailLinks',
+            'CodeLiteralMarkdown',
+            'BareExactAutolinks',
+            'ExactVisibleUrlLink',
+            'TildeAngleAutolink',
+            'UnderscoreAngleAutolink',
+            'StarQueryAutolink',
+            'BalancedInlineDestination',
+            'AngleInlineDestination',
+            'EscapedInlineDestination',
+            'NestedInlineLabel',
+            'PunctuatedAutolinks',
+            'EvenEscapeFeatureLink'
+        )) {
+            $positive = Invoke-PostPublicationScenario -Mode $positiveMode
+            if ($positive.Threw) {
+                Add-Failure "TEST-0176 valid $positiveMode evidence failed: $($positive.Error)"
+            }
+        }
+
+        foreach ($positiveMode in @(
+            'ExactEmbeddedRecordTargets',
+            'PullHeadRepositoryTarget',
+            'HistoricalEmbeddedRecordTarget',
+            'NonMarkdownLineFragment',
+            'ExactCommitPermalinks',
+            'ExactExternalCommitPermalink',
+            'ExactExternalCommitAutolink',
+            'ShortExternalCommitPermalink',
+            'CommitLiteralExclusions'
+        )) {
+            $positive = Invoke-PostPublicationScenario -Mode $positiveMode
+            if ($positive.Threw) {
+                Add-Failure "TEST-0178 valid $positiveMode evidence failed: $($positive.Error)"
+            }
+            $expectedSnapshotPath = if (
+                $positiveMode -ceq 'PullHeadRepositoryTarget'
+            ) {
+                "/contents/$featurePath`?ref=$pullHeadCommit"
+            }
+            elseif ($positiveMode -ceq 'HistoricalEmbeddedRecordTarget') {
+                "/contents/$testCasesPath`?ref=$priorHeadCommit"
+            }
+            elseif ($positiveMode -ceq 'NonMarkdownLineFragment') {
+                "/contents/$sourcePath`?ref=$pullHeadCommit"
+            }
+            elseif ($positiveMode -ceq 'ExactCommitPermalinks') {
+                "/repos/$repository/commits/$commit"
+            }
+            elseif ($positiveMode -in @(
+                'ExactExternalCommitPermalink',
+                'ExactExternalCommitAutolink',
+                'ShortExternalCommitPermalink'
+            )) {
+                "/repos/hasanmanzak/Derdini/commits/$externalCommit"
+            }
+            else { '' }
+            if (-not [string]::IsNullOrEmpty($expectedSnapshotPath) -and
+                @($global:MeAndAIPostPublicationRequests | Where-Object {
+                    $_.EndsWith(
+                        $expectedSnapshotPath,
+                        [StringComparison]::Ordinal
+                    )
+                }).Count -ne 1) {
+                Add-Failure "TEST-0178 $positiveMode did not validate its exact immutable repository snapshot."
+            }
+        }
+        foreach ($negative in @(
+            @{ Mode = 'EmbeddedAnchorMissing'; Error = '*TEST-0175*no renderer-active custom anchor*' },
+            @{ Mode = 'EmbeddedAnchorDuplicate'; Error = '*TEST-0175*custom anchor is not unique*' },
+            @{ Mode = 'EmbeddedAnchorWrongCase'; Error = '*TEST-0175*not exact lowercase*' },
+            @{ Mode = 'EmbeddedAnchorCodeOnly'; Error = '*TEST-0175*no renderer-active custom anchor*' },
+            @{ Mode = 'EmbeddedAnchorCommentOnly'; Error = '*TEST-0175*no renderer-active custom anchor*' },
+            @{ Mode = 'EmbeddedAnchorNonRenderingOnly'; Error = '*TEST-0175*no renderer-active custom anchor*' },
+            @{ Mode = 'EmbeddedAnchorHeadingCollision'; Error = '*TEST-0175*renderer-active anchor target*not unique*' },
+            @{ Mode = 'MissingEmbeddedRecordFragment'; Error = '*TEST-0175*exact canonical target*' },
+            @{ Mode = 'WrongEmbeddedRecordFragment'; Error = '*TEST-0175*exact canonical target*' },
+            @{ Mode = 'UppercaseEmbeddedRecordFragment'; Error = '*TEST-0175*exact canonical target*' },
+            @{ Mode = 'MutableEmbeddedRecordTarget'; Error = '*TEST-0175*exact canonical target*' },
+            @{ Mode = 'FreeTextShortCommit'; Error = '*human-facing commit reference*without a clickable exact full-SHA*' },
+            @{ Mode = 'FreeTextFullCommit'; Error = '*human-facing commit reference*without a clickable exact full-SHA*' },
+            @{ Mode = 'FreeTextExternalFullCommit'; Error = '*human-facing commit reference*without a clickable exact full-SHA*' },
+            @{ Mode = 'CodeFormattedHumanCommit'; Error = '*human-facing commit reference*without a clickable exact full-SHA*' },
+            @{ Mode = 'WrongCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'WrongRepositoryCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'MismatchedExternalFullCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'SameRepositoryCommitApiRejected'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
+            @{ Mode = 'UnownedExternalCommitRepository'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
+            @{ Mode = 'UnownedExternalCommitAutolink'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
+            @{ Mode = 'ExternalCommitTargetLimit'; Error = '*exceeds the bounded 32-target limit*' },
+            @{ Mode = 'RawHtmlHrefFeatureLink'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'ShortCommitPermalink'; Error = '*commit link*not an exact full-SHA*' },
+            @{ Mode = 'CommitBranchTarget'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'CommitTreeTarget'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'CommitBlobTarget'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'MissingHistoricalRepositoryTarget'; Error = '*is not one file*' },
+            @{ Mode = 'RepositorySnapshotPathMismatch'; Error = '*returned path*instead of exact requested path*' },
+            @{ Mode = 'RepositorySnapshotMissingFragment'; Error = '*fragment*does not resolve to exactly one renderer-active anchor*' },
+            @{ Mode = 'RepositorySnapshotWrongCaseFragment'; Error = '*fragment*does not resolve to exactly one renderer-active anchor*' },
+            @{ Mode = 'NonMarkdownMalformedFragment'; Error = '*not a canonical GitHub line fragment*' },
+            @{ Mode = 'NonMarkdownOutOfRangeFragment'; Error = '*outside the 3-line snapshot*' },
+            @{ Mode = 'RepositoryContentTargetLimit'; Error = '*exceed the bounded 64 unique*' },
+            @{ Mode = 'CommitInPullTitle'; Error = '*commit reference on a non-rendering title surface*' }
+        )) {
+            $result = Invoke-PostPublicationScenario -Mode $negative.Mode
+            if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
+                Add-Failure "TEST-0178 $($negative.Mode) did not fail closed: $($result.Error)"
+            }
+        }
 
         foreach ($negative in @(
             @{ Mode = 'MutableRelease'; Error = '*release is not immutable*' },
             @{ Mode = 'DivergedDefaultBranch'; Error = '*not the default-branch head or one of its ancestors*' },
             @{ Mode = 'OwnedBranchExists'; Error = '*owned working branch still exists*' },
-            @{ Mode = 'MissingFeatureEvidence'; Error = '*does not link the canonical feature*' },
-            @{ Mode = 'IssueBodyOnlyEvidence'; Error = '*does not link the canonical feature*' }
+            @{ Mode = 'MissingReleaseEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'UnusedDefinitionEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'WrappedReleaseUri'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'IssueBodyOnlyEvidence'; Error = '*does not contain the immutable release link*' },
+            @{ Mode = 'MissingIssueDecision'; Error = '*does not link canonical decision*' },
+            @{ Mode = 'FreeTextIssueFeature'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextPullDecision'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'WrongPullFeatureTarget'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'MutableFeatureTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'MutableDecisionTarget'; Error = '*DEC-0042*other than its exact canonical target*' },
+            @{ Mode = 'MutableGenericRepositoryTarget'; Error = '*not an immutable full-SHA blob target*' },
+            @{ Mode = 'UppercaseMutableGenericRepositoryTarget'; Error = '*not an immutable full-SHA blob target*' },
+            @{ Mode = 'TreeGenericRepositoryTarget'; Error = '*not an immutable full-SHA blob target*' },
+            @{ Mode = 'FreeTextIssueComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextCommentHash'; Error = '*without an exact permalink*' },
+            @{ Mode = 'WrongCommentTarget'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'WrongParentCommentLabel'; Error = '*comment parent label*does not match*' },
+            @{ Mode = 'FreeTextPullConversation'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextPullOwnIdInComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextReviewDecision'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'FreeTextInlineComment'; Error = '*without an exact permalink*' },
+            @{ Mode = 'FreeTextCommitComment'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'WrongAndCorrectPullFeatureTarget'; Error = '*other than its exact canonical target*' },
+            @{ Mode = 'CodeFormattedFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'CodeFormattedDocumentPath'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'FreeTextDocumentTitle'; Error = '*free-text document-title reference*' },
+            @{ Mode = 'CodeFormattedDocumentTitle'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'WrongDocumentTitleTarget'; Error = '*document title*other than its exact canonical target*' },
+            @{ Mode = 'NonPermalinkCommentLabel'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'NonPermalinkReviewLabel'; Error = '*not an exact GitHub comment permalink*' },
+            @{ Mode = 'WrongIssueIdentityTarget'; Error = '*BUG-0042*other than its exact canonical target*' },
+            @{ Mode = 'WrongTestTarget'; Error = '*TEST-0175*other than its exact canonical target*' },
+            @{ Mode = 'UnlistedTestMissingFragment'; Error = '*TEST-0199*other than its exact canonical target*' },
+            @{ Mode = 'NonTableEmbeddedMissingFragment'; Error = '*FIND-0044*other than its exact canonical target*' },
+            @{ Mode = 'RelativeGitHubLink'; Error = '*relative repository-document link*' },
+            @{ Mode = 'UnresolvedReferenceLink'; Error = '*unresolved reference-style link*' },
+            @{ Mode = 'BareIssueHash'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongNumericIssueLabel'; Error = '*numeric link label*does not match*' },
+            @{ Mode = 'RawDocumentPath'; Error = '*free-text repository document path*' },
+            @{ Mode = 'FreeTextPullBug'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'PullTitleRecord'; Error = '*cross-record identifier on a non-rendering title surface*' },
+            @{ Mode = 'WrongKindOwnIssueIdentity'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongKindOwnPullIdentity'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongKindOwnIssueShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongNestedDecisionRecordTarget'; Error = '*RISK-0043*other than its exact canonical target*' },
+            @{ Mode = 'PullLinkPrefixCollision'; Error = '*does not link the delivery pull request*' },
+            @{ Mode = 'HiddenFeatureLink'; Error = '*hides a cross-record reference*' },
+            @{ Mode = 'EscapedFeatureLink'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'OddEscapeFeatureLink'; Error = '*does not link the canonical feature*' },
+            @{ Mode = 'EscapedReferenceFeatureLink'; Error = '*unused reference-link definition*' },
+            @{ Mode = 'IssueLabelToCommentTarget'; Error = '*numeric label for a comment target*' },
+            @{ Mode = 'StableIdToCommentTarget'; Error = '*BUG-0042*other than its exact canonical target*' },
+            @{ Mode = 'DoubleBacktickFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'TildeFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'CodeFormattedDocumentPseudoLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'IndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'BlockquoteIndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'ListIndentedCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'SpacedFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'BlockquoteFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'ListFenceFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'MultilineInlineCodeFeatureLink'; Error = '*code-formatted cross-record reference*' },
+            @{ Mode = 'EscapedStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'HtmlEntityStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'EscapedIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'GitHubShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'RepositoryShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'QualifiedRepositoryShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'IssueHyphenShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'PullHyphenShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongCommentShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongReviewShorthand'; Error = '*free-text GitHub shorthand reference*' },
+            @{ Mode = 'WrongShorthandTarget'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'WrongShorthandRepository'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'WrongOwnerRepositoryShorthand'; Error = '*other than its exact GitHub record*' },
+            @{ Mode = 'EscapedLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'HtmlEntityLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'LinkedRecordInIssueTitle'; Error = '*titles do not render clickable links*' },
+            @{ Mode = 'IssueTitleUrlPrefixCollision'; Error = '*URL on a non-rendering title surface*' },
+            @{ Mode = 'NonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingBlockHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingCustomHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingAttributedCustomHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingProcessingInstructionFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingCdataFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'NonRenderingDeclarationFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'BlockquoteNonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'ListNonRenderingHtmlFeatureLink'; Error = '*inside non-rendering HTML*' },
+            @{ Mode = 'InlineHtmlStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'InlineHtmlAttributeStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'InlineHtmlWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'InlineCommentLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'InlineCodeLabelWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'BoldStableId'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'BoldWrongTarget'; Error = '*FEAT-0042*other than its exact canonical target*' },
+            @{ Mode = 'BoldIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'SplitStableIdWrongTarget'; Error = '*not wholly covered by one clickable link*' },
+            @{ Mode = 'SplitIssueNumber'; Error = '*not wholly covered by one clickable link*' },
+            @{ Mode = 'VisibleUrlWrongTarget'; Error = '*links visible URL*different target*' },
+            @{ Mode = 'VisiblePathWrongTarget'; Error = '*links visible repository-document path*different target*' },
+            @{ Mode = 'SplitUrlWrongTarget'; Error = '*composes a visible URL across a partial Markdown link*' },
+            @{ Mode = 'SplitReferenceUrlWrongTarget'; Error = '*composes a visible URL across a partial Markdown link*' },
+            @{ Mode = 'SplitInlineCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitInlineTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitSchemeCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitSchemeTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitEntityUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitEmphasisUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitStrikeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitUnderscoreUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitDecimalEntitySchemeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'SplitHexEntitySchemeUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateInlineTagUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateSchemeCommentUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'DuplicateEmphasisUrl'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'InvalidBareAutolinkBoundary'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'InvalidBareAutolinkDomain'; Error = '*visible URL*not wholly covered*' },
+            @{ Mode = 'UnclosedHtmlCommentFeatureLink'; Error = '*hides a cross-record reference*' },
+            @{ Mode = 'FootnoteFreeTextFeature'; Error = '*free-text cross-record reference*' },
+            @{ Mode = 'UnusedCrossRecordDefinition'; Error = '*unused reference-link definition*' },
+            @{ Mode = 'CapitalizedIssueNumber'; Error = '*free-text cross-record reference by number*' },
+            @{ Mode = 'WrongDecisionLabel'; Error = '*label does not match*' }
         )) {
             $result = Invoke-PostPublicationScenario -Mode $negative.Mode
             if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
-                Add-Failure "TEST-0076 $($negative.Mode) did not fail closed: $($result.Error)"
+                Add-Failure "TEST-0176 $($negative.Mode) did not fail closed: $($result.Error)"
             }
         }
 

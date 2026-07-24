@@ -122,8 +122,8 @@ secret remains untouched and is not a credential source for the local process.
 
 ## Quick command
 
-After GitHub marks `v0.14.1` as an immutable release, download only the thin
-[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.14.1/Invoke-MeAndAIQuickAdoption.ps1)
+After GitHub marks `v0.14.2` as an immutable release, download only the thin
+[`Invoke-MeAndAIQuickAdoption.ps1` release asset](https://github.com/hasanmanzak/meAndAI/releases/download/v0.14.2/Invoke-MeAndAIQuickAdoption.ps1)
 from that exact release with an authenticated browser. Until that condition is
 true, use the latest release that GitHub already marks immutable rather than a
 candidate tag or a moving branch.
@@ -140,11 +140,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\Invoke-MeAn
 ```
 
 If the browser saved the asset elsewhere, change only the `-File` path. The
-launcher itself verifies that its runtime `v0.14.1` is an exact published
+launcher itself verifies that its runtime `v0.14.2` is an exact published
 immutable release, downloads the unique bundle, validates its archive manifest
 and every payload digest, and imports it only from an owned temporary directory
 outside the consumer. It never executes a moving `main` file. Omitting
-`-ProtocolTag` selects the runtime-compatible default `v0.14.1`; explicitly
+`-ProtocolTag` selects the runtime-compatible default `v0.14.2`; explicitly
 choosing another compatible target does not change the runtime bundle source.
 
 ## Target behavior and options
@@ -286,7 +286,7 @@ Codex gate blocks, do not delete or reset anything. Resolve the reported
 condition and rerun. Exact seed and completed-adoption states are idempotent.
 
 If `v0.9.2` already created the deterministic draft but stopped with
-`BUG-0006`, download the corrected `v0.9.7` launcher asset and retain the
+[BUG-0006](https://github.com/hasanmanzak/meAndAI/issues/53), download the corrected `v0.9.7` launcher asset and retain the
 proposal's original protocol target while resuming:
 
 ```powershell
@@ -327,8 +327,9 @@ created—and the seed commit is pushed, the launcher:
    worktree must be clean before any push.
 10. Creates the adoption completion commit, pushes it with an exact
    `--force-with-lease`, binds the canonical issue through exactly one
-   non-closing `Tracking issue: #N` body line, and marks the pull request ready
-   without merging it.
+   non-closing
+   `Tracking issue: [#N](https://github.com/<owner>/<repository>/issues/N)`
+   body line, and marks the pull request ready without merging it.
 
 An empty consumer receives a deterministic bootstrap proposal. A populated
 consumer with target collisions receives

@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible consumer-lifecycle correction / `BUG-0026` |
+| Classification | Backward-compatible consumer-lifecycle correction / [BUG-0026](https://github.com/hasanmanzak/meAndAI/issues/108) |
 | Status | Complete |
 | Target version | 0.13.5 |
 | Issue | [#108](https://github.com/hasanmanzak/meAndAI/issues/108) |
 | Pull request | [#109](https://github.com/hasanmanzak/meAndAI/pull/109) |
 | Decisions | [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md), [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0027](../../decisions/DEC-0027-single-owner-consumer-merge-events.md) |
-| Tests | [TEST-0169 and TEST-0170](test-cases.md) |
+| Tests | [TEST-0169](test-cases.md#test-0169) and [TEST-0170](test-cases.md#test-0170) |
 
 ## Problem
 
@@ -61,10 +61,10 @@ schedule and manual dispatch retain bounded repository-evidence recovery.
 
 ## Readiness evidence
 
-- Domain and contracts: DEC-0016 owns exact merged-PR finalization; DEC-0017
-  owns idempotent repository-evidence recovery; DEC-0019 requires bounded
-  runner use; DEC-0022 owns the semantic review issue/branch/PR lifecycle;
-  DEC-0027 assigns one workflow event per managed merge.
+- Domain and contracts: [DEC-0016](../../decisions/DEC-0016-managed-post-merge-finalization.md) owns exact merged-PR finalization; [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md)
+  owns idempotent repository-evidence recovery; [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md) requires bounded
+  runner use; [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) owns the semantic review issue/branch/PR lifecycle;
+  [DEC-0027](../../decisions/DEC-0027-single-owner-consumer-merge-events.md) assigns one workflow event per managed merge.
 - Consumers and dependencies: the source-only capability-review runner, the
   canonical consumer workflow, GitHub Git refs API, and the existing injected
   production fixtures.
@@ -74,34 +74,34 @@ schedule and manual dispatch retain bounded repository-evidence recovery.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0169 and TEST-0170](test-cases.md) |
+| Scenarios | Defined | [TEST-0169](test-cases.md#test-0169) and [TEST-0170](test-cases.md#test-0170) |
 | Test code | Implemented | Existing capability-review and managed-finalization owners; no new suite |
-| Baseline run | Failed as intended | Derdini run 30011058590 recorded the escaped-ref 404; runs 30011059451/30011271796 recorded pending-run displacement; focused TEST-0169/0170 runs rejected `%2F`, absent event filtering, and duplicate proposal ownership |
+| Baseline run | Failed as intended | Derdini run 30011058590 recorded the escaped-ref 404; runs 30011059451/30011271796 recorded pending-run displacement; focused [TEST-0169](test-cases.md#test-0169) and [TEST-0170](test-cases.md#test-0170) runs rejected `%2F`, absent event filtering, and duplicate proposal ownership |
 
 ## Risks
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0203` | Ref identity | Encoding the branch as one URI token or failing to encode an individual segment targets another endpoint | Capability-review maintainer / encode segments independently, preserve literal separators, and require exact endpoints in TEST-0169 |
-| `RISK-0204` | Duplicate mutation and cost | PR merge and default push start separate hosted lifecycle runs | Consumer lifecycle maintainer / PR merge alone owns the lifecycle; schedule/manual own recovery in TEST-0170 |
-| `RISK-0205` | Concurrency | A merge-caused or self-created push replaces the pending exact-PR run before job guards execute | Workflow maintainer / remove push admission entirely and retain non-canceling lifecycle concurrency |
-| `RISK-0206` | Recovery safety | Recovery deletes a moved, foreign, ambiguous, or merely prefix-matching branch | Capability-review maintainer / retain exact repository, branch, expected-OID, PR/issue, and lease gates; no generic orphan cleanup |
+| `RISK-0203` <a name="risk-0203"></a> | Ref identity | Encoding the branch as one URI token or failing to encode an individual segment targets another endpoint | Capability-review maintainer / encode segments independently, preserve literal separators, and require exact endpoints in [TEST-0169](test-cases.md#test-0169) |
+| `RISK-0204` <a name="risk-0204"></a> | Duplicate mutation and cost | PR merge and default push start separate hosted lifecycle runs | Consumer lifecycle maintainer / PR merge alone owns the lifecycle; schedule/manual own recovery in [TEST-0170](test-cases.md#test-0170) |
+| `RISK-0205` <a name="risk-0205"></a> | Concurrency | A merge-caused or self-created push replaces the pending exact-PR run before job guards execute | Workflow maintainer / remove push admission entirely and retain non-canceling lifecycle concurrency |
+| `RISK-0206` <a name="risk-0206"></a> | Recovery safety | Recovery deletes a moved, foreign, ambiguous, or merely prefix-matching branch | Capability-review maintainer / retain exact repository, branch, expected-OID, PR/issue, and lease gates; no generic orphan cleanup |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0083` | Slash-safe exact Git-ref lifecycle and branch-only recovery | [Issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) | `TEST-0169`; passed in 14.5 seconds with its capability owner | Bounded review found no production defect; literal-slash, no-duplicate, finalization, and rerun evidence are explicit | Complete |
-| `SUBF-0084` | Single-owner merge routing and push exclusion | [Issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) | `TEST-0170`; passed in 18.3 seconds with its managed-finalization owner | Bounded review first rejected recovery-only push because it still created a second hosted run; refined test and DEC-0027 require no push admission | Complete |
+| `SUBF-0083` <a name="subf-0083"></a> | Slash-safe exact Git-ref lifecycle and branch-only recovery | [Issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) | [TEST-0169](test-cases.md#test-0169); passed in 14.5 seconds with its capability owner | Bounded review found no production defect; literal-slash, no-duplicate, finalization, and rerun evidence are explicit | Complete |
+| `SUBF-0084` <a name="subf-0084"></a> | Single-owner merge routing and push exclusion | [Issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) | [TEST-0170](test-cases.md#test-0170); passed in 18.3 seconds with its managed-finalization owner | Bounded review first rejected recovery-only push because it still created a second hosted run; refined test and [DEC-0027](../../decisions/DEC-0027-single-owner-consumer-merge-events.md) require no push admission | Complete |
 
 ## Definition of Ready
 
-- [x] `BUG-0026`, `FEAT-0044`, `SUBF-0083`, `SUBF-0084`, and issue #108 exist.
+- [x] [BUG-0026](https://github.com/hasanmanzak/meAndAI/issues/108), `FEAT-0044`, `SUBF-0083`, `SUBF-0084`, and [issue #108](https://github.com/hasanmanzak/meAndAI/issues/108) exist.
 - [x] Problem, outcome, scope, non-goals, API route, and event ownership are explicit.
 - [x] Consumers, dependencies, credential boundaries, and compatibility are known.
 - [x] `RISK-0203` through `RISK-0206` and governing decisions are recorded.
 - [x] Independently testable slices and their gate ledger are defined.
-- [x] TEST-0169/0170 and the bounded verification approach are defined.
+- [x] [TEST-0169](test-cases.md#test-0169) and [TEST-0170](test-cases.md#test-0170) and the bounded verification approach are defined.
 
 ## Acceptance criteria
 
@@ -122,7 +122,7 @@ schedule and manual dispatch retain bounded repository-evidence recovery.
 
 ## Verification approach
 
-Add TEST-0169 and TEST-0170 to their existing capability owners and capture the
+Add [TEST-0169](test-cases.md#test-0169) and [TEST-0170](test-cases.md#test-0170) to their existing capability owners and capture the
 expected failures against v0.13.4. Implement the two minimal corrections, rerun
 the focused owners, run structural checks, review one fresh diff, and execute
 one final relevant protocol validation. After immutable publication, install
@@ -137,7 +137,7 @@ five capability-review ref call sites use the helper; exact OID/lease,
 branch-first/issue-last, authority, and credential paths remain unchanged.
 The review rejected the initial recovery-only push design because it still
 created a second hosted run and could compete for the single pending
-concurrency slot. DEC-0027 and TEST-0170 now remove push admission entirely;
+concurrency slot. [DEC-0027](../../decisions/DEC-0027-single-owner-consumer-merge-events.md) and [TEST-0170](test-cases.md#test-0170) now remove push admission entirely;
 schedule/manual routes retain recovery. Structural validation also found one
 stale escaped current-release fixture and the intermediate feature status;
 both record/test defects were corrected. No blocking production finding
@@ -160,5 +160,5 @@ remains.
 | Pull request | [#109](https://github.com/hasanmanzak/meAndAI/pull/109) |
 | Release authority | [Immutable v0.13.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.13.5) |
 | Release identifier | `v0.13.5` |
-| Target commit | `014f9bbe30074a742c84e3915ebcf94b9fe9cc3e` |
+| Target commit | [`014f9bbe30074a742c84e3915ebcf94b9fe9cc3e`](https://github.com/hasanmanzak/meAndAI/commit/014f9bbe30074a742c84e3915ebcf94b9fe9cc3e) |
 | Consumer recovery | No consumer mutation is claimed by this feature; later shared byte-evidence work is owned by [FEAT-0045](../FEAT-0045-v0140-canonical-repository-evidence/README.md) |

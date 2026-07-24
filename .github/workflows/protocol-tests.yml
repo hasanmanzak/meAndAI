@@ -29,6 +29,10 @@ on:
         description: Closed delivery issue number
         required: false
         type: string
+      pull_request_number:
+        description: Merged delivery pull request number
+        required: false
+        type: string
       owned_branch:
         description: Owned work branch that must have been deleted
         required: false
@@ -204,10 +208,13 @@ jobs:
     permissions:
       contents: read
       issues: read
+      pull-requests: read
     steps:
       - name: Check out verifier
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          ref: ${{ inputs.expected_commit }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Verify authoritative post-publication evidence
         shell: pwsh
@@ -217,6 +224,7 @@ jobs:
           MEANDAI_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
           MEANDAI_FEATURE_PATH: ${{ inputs.feature_path }}
           MEANDAI_ISSUE_NUMBER: ${{ inputs.issue_number }}
+          MEANDAI_PULL_REQUEST_NUMBER: ${{ inputs.pull_request_number }}
           MEANDAI_OWNED_BRANCH: ${{ inputs.owned_branch }}
         run: |
           $arguments = @{
@@ -225,6 +233,7 @@ jobs:
             ExpectedCommit = $env:MEANDAI_EXPECTED_COMMIT
             FeaturePath = $env:MEANDAI_FEATURE_PATH
             IssueNumber = $env:MEANDAI_ISSUE_NUMBER
+            PullRequestNumber = $env:MEANDAI_PULL_REQUEST_NUMBER
             OwnedBranch = $env:MEANDAI_OWNED_BRANCH
           }
           if ([version]$env:MEANDAI_RELEASE_TAG.Substring(1) -ge [version]'0.12.4') {

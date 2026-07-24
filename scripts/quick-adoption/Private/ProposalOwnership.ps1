@@ -88,7 +88,8 @@ function Invoke-LifecycleWorkflow {
                     throw 'GitHub CLI returned incomplete workflow-run metadata.'
                 }
                 try {
-                    $createdAt = [DateTimeOffset]::Parse([string]$run.createdAt)
+                    $createdAt = ConvertTo-MeAndAIGitHubTimestamp `
+                        -Value $run.createdAt
                 }
                 catch {
                     throw 'GitHub CLI returned an invalid workflow-run timestamp.'
@@ -225,7 +226,7 @@ function Get-ValidatedAdoptionMarker {
         throw 'The deterministic adoption pull request ownership marker has an invalid schema type.'
     }
     $schema = [long]$schemaProperty.Value
-    if ($schema -notin @(2, 3, 4, 5, 6, 7, 8)) {
+    if ($schema -notin @(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) {
         throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
     }
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
@@ -253,6 +254,23 @@ function Get-ValidatedAdoptionMarker {
                 'repository', 'actor'
             )
         }
+        elseif ($schema -eq 10) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'previousHead', 'plannedHead', 'branch', 'adoptionStrategy',
+                'protocolRecordLossAcknowledged',
+                'graphBase', 'graphDigest', 'graphCounts', 'graphLimits',
+                'repository', 'actor'
+            )
+        }
+        elseif ($schema -eq 12) {
+            @(
+                'schema', 'phase', 'state', 'target', 'protocolSha', 'head',
+                'previousHead', 'plannedHead', 'branch', 'adoptionStrategy',
+                'surfaceBase', 'surfaceDigest',
+                'protocolRecordLossAcknowledged', 'repository', 'actor'
+            )
+        }
         else { @() }
         $actualPublishingProperties = @(
             $marker.PSObject.Properties | ForEach-Object { $_.Name }
@@ -278,8 +296,11 @@ function Get-ValidatedAdoptionMarker {
             )) {
             throw 'The deterministic adoption pull request ownership marker does not match its live identity.'
         }
-        if ($schema -in @(6, 8)) {
-            $markerSurfaces = if ($marker.protocolSurfaces -is [array]) {
+        if ($schema -in @(6, 8, 10, 12)) {
+            $markerSurfaces = if ($schema -in @(10, 12)) {
+                @($ExpectedProtocolSurfaces | ForEach-Object { [string]$_ })
+            }
+            elseif ($marker.protocolSurfaces -is [array]) {
                 @($marker.protocolSurfaces | ForEach-Object { [string]$_ })
             }
             else { @() }
@@ -289,7 +310,7 @@ function Get-ValidatedAdoptionMarker {
             }
             else { @($markerSurfaces) }
             $graphIdentityValid = $true
-            if ($schema -eq 8) {
+            if ($schema -in @(8, 10)) {
                 $identityValidator = Get-InitialAdoptionPolicyCommand `
                     -Name 'Test-MeAndAIExactInstructionGraphIdentityRecord'
                 $graphIdentityValid = [bool](& $identityValidator -Identity `
@@ -299,20 +320,47 @@ function Get-ValidatedAdoptionMarker {
                         graphDigest = [string]$marker.graphDigest
                         graphCounts = $marker.graphCounts
                         graphLimits = $marker.graphLimits
-                        protocolSurfaces = @($marker.protocolSurfaces)
+                        protocolSurfaces = @($markerSurfaces)
                     }))
+                if ($schema -eq 10) {
+                    $sectionValidator = Get-InitialAdoptionPolicyCommand `
+                        -Name 'Test-MeAndAIExactLinkedPathSection'
+                    $graphIdentityValid = $graphIdentityValid -and
+                        [bool](& $sectionValidator -Body $body `
+                            -Heading '### Detected protocol and governance surfaces' `
+                            -Repository $Repository `
+                            -Commit ([string]$marker.graphBase) `
+                            -Paths @($markerSurfaces))
+                }
+            }
+            if ($schema -eq 12) {
+                $digestCommand = Get-InitialAdoptionPolicyCommand `
+                    -Name 'Get-MeAndAILinkedPathIdentityDigest'
+                $sectionValidator = Get-InitialAdoptionPolicyCommand `
+                    -Name 'Test-MeAndAIExactLinkedPathSection'
+                $graphIdentityValid =
+                    [string]$marker.surfaceBase -cmatch '^[0-9a-f]{40}$' -and
+                    [string]$marker.surfaceDigest -ceq
+                        [string](& $digestCommand -Paths @($markerSurfaces)) -and
+                    [bool](& $sectionValidator -Body $body `
+                        -Heading '### Detected protocol and governance surfaces' `
+                        -Repository $Repository `
+                        -Commit ([string]$marker.surfaceBase) `
+                        -Paths @($markerSurfaces))
             }
             if ([string]$marker.adoptionStrategy -cnotin @(
                 'FreshAdoption', 'FullMigration', 'HybridReconciliation',
                 'CleanStart'
-            ) -or $marker.protocolSurfaces -isnot [array] -or
+            ) -or ($schema -notin @(10, 12) -and
+                    $marker.protocolSurfaces -isnot [array]) -or
                 $marker.protocolRecordLossAcknowledged -isnot [bool] -or
                 -not (([bool]$marker.protocolRecordLossAcknowledged) -eq
                     ([string]$marker.adoptionStrategy -ceq 'CleanStart')) -or
                 (($markerSurfaces -join "`n") -cne
                     ($classifiedMarkerSurfaces -join "`n")) -or
                 -not $graphIdentityValid -or
-                ($schema -eq 8 -and [string]$marker.branch -cne $Branch) -or
+                ($schema -in @(8, 10, 12) -and
+                 [string]$marker.branch -cne $Branch) -or
                 ($ExpectedAdoptionStrategy -and
                  ([string]$marker.adoptionStrategy -cne
                     $ExpectedAdoptionStrategy -or
@@ -329,7 +377,7 @@ function Get-ValidatedAdoptionMarker {
             )) {
             throw 'A legacy adoption marker cannot satisfy the expected strategy identity.'
         }
-        if ($schema -notin @(4, 6, 8) -or
+        if ($schema -notin @(4, 6, 8, 10, 12) -or
             [string]$marker.previousHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.plannedHead -cnotmatch '^[0-9a-f]{40}$' -or
             [string]$marker.previousHead -ceq [string]$marker.plannedHead -or
@@ -342,7 +390,7 @@ function Get-ValidatedAdoptionMarker {
         }
     }
     else {
-        if ($schema -in @(4, 6, 8)) {
+        if ($schema -in @(4, 6, 8, 10, 12)) {
             throw 'The deterministic adoption pull request uses the publishing schema outside its publishing phase.'
         }
         $requiredMarkerHead = if ($ExpectedMarkerHead) {
@@ -361,7 +409,7 @@ function Get-ValidatedAdoptionMarker {
         $contractStrategy = if ($ExpectedAdoptionStrategy) {
             $ExpectedAdoptionStrategy
         }
-        elseif ($schema -in @(5, 7)) { [string]$marker.adoptionStrategy }
+        elseif ($schema -in @(5, 7, 9, 11)) { [string]$marker.adoptionStrategy }
         else { 'LegacyUnspecified' }
         [object[]]$contractSurfaces = [object[]]::new(0)
         if ($ExpectedAdoptionStrategy) {
@@ -373,19 +421,19 @@ function Get-ValidatedAdoptionMarker {
         $contractLossAcknowledgement = if ($ExpectedAdoptionStrategy) {
             $ExpectedProtocolRecordLossAcknowledgement
         }
-        elseif ($schema -in @(5, 7) -and
+        elseif ($schema -in @(5, 7, 9, 11) -and
             $marker.protocolRecordLossAcknowledged -is [bool]) {
             [bool]$marker.protocolRecordLossAcknowledged
         }
         else { $false }
-        $contractGraphIdentity = if ($schema -eq 7) {
+        $contractGraphIdentity = if ($schema -in @(7, 9)) {
             [pscustomobject][ordered]@{
                 schema = 1
                 graphBase = [string]$marker.graphBase
                 graphDigest = [string]$marker.graphDigest
                 graphCounts = $marker.graphCounts
                 graphLimits = $marker.graphLimits
-                protocolSurfaces = @($marker.protocolSurfaces)
+                protocolSurfaces = @($contractSurfaces)
             }
         }
         else { $null }
@@ -435,6 +483,10 @@ function Get-ValidatedAdoptionMarker {
             -NotePropertyValue @() -Force
         $marker | Add-Member -NotePropertyName protocolRecordLossAcknowledged `
             -NotePropertyValue $false -Force
+    }
+    if ($schema -in @(9, 10, 11, 12)) {
+        $marker | Add-Member -NotePropertyName protocolSurfaces `
+            -NotePropertyValue @($ExpectedProtocolSurfaces) -Force
     }
     return $marker
 }
@@ -506,10 +558,12 @@ function Get-AdoptionPullRequest {
 function Get-AdoptionPullRequestTrackingBody {
     param(
         [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)][ValidateRange(1, 2147483647)][int]$IssueNumber
     )
 
-    $trackingLine = "Tracking issue: #$IssueNumber"
+    $trackingLine = "Tracking issue: [#$IssueNumber](https://github.com/$Repository/issues/$IssueNumber)"
+    $legacyTrackingLine = "Tracking issue: #$IssueNumber"
     $trackingStarts = [regex]::Matches(
         $Body, '^[ \t]*Tracking[ \t]+issue[ \t]*:',
         [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
@@ -518,6 +572,11 @@ function Get-AdoptionPullRequestTrackingBody {
     )
     $exactTrackingLines = [regex]::Matches(
         $Body, "^$([regex]::Escape($trackingLine))`r?$",
+        [Text.RegularExpressions.RegexOptions]::Multiline -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $legacyTrackingLines = [regex]::Matches(
+        $Body, "^$([regex]::Escape($legacyTrackingLine))`r?$",
         [Text.RegularExpressions.RegexOptions]::Multiline -bor
             [Text.RegularExpressions.RegexOptions]::CultureInvariant
     )
@@ -533,7 +592,20 @@ function Get-AdoptionPullRequestTrackingBody {
     if ($trackingStarts.Count -eq 1 -and $exactTrackingLines.Count -eq 1) {
         return [pscustomobject]@{ Body = $Body; Changed = $false }
     }
-    if ($trackingStarts.Count -ne 0 -or $exactTrackingLines.Count -ne 0) {
+    if ($trackingStarts.Count -eq 1 -and $legacyTrackingLines.Count -eq 1) {
+        $legacy = $legacyTrackingLines[0]
+        $lineEnding = if (
+            $legacy.Value.EndsWith("`r", [StringComparison]::Ordinal)
+        ) { "`r" } else { '' }
+        $replacement = $trackingLine + $lineEnding
+        return [pscustomobject]@{
+            Body = $Body.Substring(0, $legacy.Index) + $replacement +
+                $Body.Substring($legacy.Index + $legacy.Length)
+            Changed = $true
+        }
+    }
+    if ($trackingStarts.Count -ne 0 -or $exactTrackingLines.Count -ne 0 -or
+        $legacyTrackingLines.Count -ne 0) {
         throw 'The adoption pull request contains duplicate or conflicting tracking-issue lines.'
     }
 
@@ -574,6 +646,159 @@ function Set-AdoptionPullRequestBody {
     return $Body
 }
 
+function Convert-AdoptionPullRequestPathSectionToLinks {
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][string]$Heading,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$Commit,
+        [AllowNull()][object[]]$ExpectedPaths = $null,
+        [switch]$Required
+    )
+
+    $normalized = $Body.Replace("`r`n", "`n").Replace("`r", "`n")
+    $headingMatches = @([regex]::Matches(
+        $normalized, '(?m)^' + [regex]::Escape($Heading) + '$',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    ))
+    if ($headingMatches.Count -eq 0 -and -not $Required) {
+        return $normalized
+    }
+    if ($headingMatches.Count -ne 1) {
+        throw "The adoption pull request must contain one '$Heading' section."
+    }
+    $contentStart = [int]$headingMatches[0].Index +
+        [int]$headingMatches[0].Length
+    if ($contentStart + 2 -gt $normalized.Length -or
+        $normalized.Substring($contentStart, 2) -cne "`n`n") {
+        throw "The adoption pull request '$Heading' section is malformed."
+    }
+    $contentStart += 2
+    $contentEnd = $normalized.IndexOf(
+        "`n`n", $contentStart, [StringComparison]::Ordinal
+    )
+    if ($contentEnd -lt 0) { $contentEnd = $normalized.Length }
+    $content = $normalized.Substring(
+        $contentStart, $contentEnd - $contentStart
+    )
+    $paths = [System.Collections.Generic.List[string]]::new()
+    $seenPaths = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    if ($content -cne '- None') {
+        foreach ($line in @($content.Split("`n"))) {
+            $raw = [regex]::Match($line, '^- `(?<path>[^`]+)`$')
+            $linked = [regex]::Match(
+                $line, '^- \[`(?<path>[^`]+)`\]\((?<url>https://github\.com/[^\s)]+)\)$'
+            )
+            if (-not $raw.Success -and -not $linked.Success) {
+                throw "The adoption pull request '$Heading' section contains noncanonical path evidence."
+            }
+            $path = if ($raw.Success) {
+                [string]$raw.Groups['path'].Value
+            }
+            else { [string]$linked.Groups['path'].Value }
+            $pathValidator = Get-InitialAdoptionPolicyCommand `
+                -Name 'Test-MeAndAICanonicalRepositoryPath'
+            if (-not [bool](& $pathValidator -Path $path) -or
+                -not $seenPaths.Add($path)) {
+                throw "The adoption pull request '$Heading' section contains an invalid or duplicate path."
+            }
+            $paths.Add($path)
+        }
+    }
+    if ($null -ne $ExpectedPaths -and
+        (($paths.Count -ne @($ExpectedPaths).Count) -or
+         (($paths -join "`n") -cne
+            (@($ExpectedPaths | ForEach-Object { [string]$_ }) -join "`n")))) {
+        throw "The adoption pull request '$Heading' section differs from its ownership evidence."
+    }
+    $linkBuilder = Get-InitialAdoptionPolicyCommand `
+        -Name 'New-MeAndAIGitHubBlobLink'
+    $linkedLines = if ($paths.Count -eq 0) {
+        @('- None')
+    }
+    else {
+        @($paths | ForEach-Object {
+            '- ' + (& $linkBuilder -Repository $Repository -Commit $Commit `
+                -Path ([string]$_))
+        })
+    }
+    $replacement = @($linkedLines) -join "`n"
+    return $normalized.Substring(0, $contentStart) + $replacement +
+        $normalized.Substring($contentEnd)
+}
+
+function Convert-AdoptionPullRequestBodyToCurrentLinks {
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Body,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$SurfaceCommit,
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ProtocolSurfaces,
+        [Parameter(Mandatory)][string]$ManifestCommit,
+        [Parameter(Mandatory)][string]$ProtocolSha,
+        [AllowEmptyString()][string]$GraphBase = ''
+    )
+
+    $updated = Convert-AdoptionPullRequestPathSectionToLinks -Body $Body `
+        -Heading '### Detected protocol and governance surfaces' `
+        -Repository $Repository -Commit $SurfaceCommit `
+        -ExpectedPaths @($ProtocolSurfaces) -Required
+    $updated = Convert-AdoptionPullRequestPathSectionToLinks -Body $updated `
+        -Heading '### Detected collisions' -Repository $Repository `
+        -Commit $SurfaceCommit
+    $linkBuilder = Get-InitialAdoptionPolicyCommand `
+        -Name 'New-MeAndAIGitHubBlobLink'
+    $manifestLink = & $linkBuilder -Repository $Repository `
+        -Commit $ManifestCommit -Path $adoptionManifestPath
+    $manifestReferencePattern = '(?:\[' +
+        [regex]::Escape("``$adoptionManifestPath``") +
+        '\]\([^\r\n)]+\)|' +
+        [regex]::Escape("``$adoptionManifestPath``") + ')'
+    $updated = [regex]::Replace(
+        $updated, $manifestReferencePattern,
+        [Text.RegularExpressions.MatchEvaluator]{ param($match) $manifestLink },
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $releaseLine = "- Protocol release: [$ProtocolTag](https://github.com/$ProtocolRepository/releases/tag/$ProtocolTag)"
+    $protocolCommitLine = "- Protocol commit: [$ProtocolSha](https://github.com/$ProtocolRepository/commit/$ProtocolSha)"
+    foreach ($reference in @(
+        [pscustomobject]@{ Prefix = '- Protocol release:'; Line = $releaseLine },
+        [pscustomobject]@{ Prefix = '- Protocol commit:'; Line = $protocolCommitLine }
+    )) {
+        $matches = @([regex]::Matches(
+            $updated, '(?m)^' + [regex]::Escape([string]$reference.Prefix) +
+                '[^\r\n]*$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        ))
+        if ($matches.Count -gt 1) {
+            throw "The adoption pull request contains duplicate '$([string]$reference.Prefix)' references."
+        }
+        if ($matches.Count -eq 1) {
+            $match = $matches[0]
+            $updated = $updated.Substring(0, $match.Index) +
+                [string]$reference.Line +
+                $updated.Substring($match.Index + $match.Length)
+        }
+    }
+    if ($GraphBase -cmatch '^[0-9a-f]{40}$') {
+        $matches = @([regex]::Matches(
+            $updated, '(?m)^- Source graph base:[^\r\n]*$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        ))
+        if ($matches.Count -gt 1) {
+            throw 'The adoption pull request contains duplicate source-graph references.'
+        }
+        if ($matches.Count -eq 1) {
+            $match = $matches[0]
+            $graphLine = "- Source graph base: [$GraphBase](https://github.com/$Repository/commit/$GraphBase)"
+            $updated = $updated.Substring(0, $match.Index) + $graphLine +
+                $updated.Substring($match.Index + $match.Length)
+        }
+    }
+    return $updated
+}
+
 function Set-AdoptionPullRequestMarkerBody {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -581,10 +806,22 @@ function Set-AdoptionPullRequestMarkerBody {
         [Parameter(Mandatory)][string]$MarkerJson,
         [Parameter(Mandatory)][string]$TemporaryDirectory,
         [Parameter(Mandatory)][string]$FileName,
-        [ValidateRange(0, 2147483647)][int]$TrackingIssueNumber = 0
+        [ValidateRange(0, 2147483647)][int]$TrackingIssueNumber = 0,
+        [string]$SurfaceCommit = '',
+        [AllowEmptyCollection()][object[]]$ProtocolSurfaces = @(),
+        [string]$ManifestCommit = '',
+        [string]$ProtocolSha = '',
+        [string]$GraphBase = ''
     )
 
     $body = [string]$PullRequest.body
+    if ($SurfaceCommit) {
+        $body = Convert-AdoptionPullRequestBodyToCurrentLinks -Body $body `
+            -Repository $Repository -SurfaceCommit $SurfaceCommit `
+            -ProtocolSurfaces @($ProtocolSurfaces) `
+            -ManifestCommit $ManifestCommit -ProtocolSha $ProtocolSha `
+            -GraphBase $GraphBase
+    }
     $matches = [regex]::Matches(
         $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
         [Text.RegularExpressions.RegexOptions]::CultureInvariant
@@ -598,6 +835,7 @@ function Set-AdoptionPullRequestMarkerBody {
         $body.Substring($match.Index + $match.Length)
     if ($TrackingIssueNumber -gt 0) {
         $tracking = Get-AdoptionPullRequestTrackingBody -Body $updatedBody `
+            -Repository $Repository `
             -IssueNumber $TrackingIssueNumber
         $updatedBody = [string]$tracking.Body
     }
@@ -621,9 +859,29 @@ function Set-AdoptionPullRequestPublishingMarker {
         throw 'The adoption publishing transition has invalid commit identities.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $publishingMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+    $markerSchema = [long]$marker.schema
+    $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
+    $surfaceBase = if ($graphAware) {
+        [string]$marker.graphBase
+    }
+    elseif ($markerSchema -in @(11, 12)) {
+        [string]$marker.surfaceBase
+    }
+    else { $PreviousHead }
+    $branch = if ($null -ne $marker.PSObject.Properties['branch']) {
+        [string]$marker.branch
+    }
+    else { [string]$PullRequest.headRefName }
+    $surfaceDigest = if ($surfaceAware -and -not $graphAware) {
+        $digestCommand = Get-InitialAdoptionPolicyCommand `
+            -Name 'Get-MeAndAILinkedPathIdentityDigest'
+        [string](& $digestCommand -Paths @($marker.protocolSurfaces))
+    }
+    else { '' }
+    $publishingMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 8
+            schema = 10
             phase = 'Publishing'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -633,7 +891,6 @@ function Set-AdoptionPullRequestPublishingMarker {
             plannedHead = $PlannedHead
             branch = [string]$marker.branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             graphBase = [string]$marker.graphBase
             graphDigest = [string]$marker.graphDigest
@@ -643,9 +900,9 @@ function Set-AdoptionPullRequestPublishingMarker {
             actor = [string]$marker.actor
         }
     }
-    elseif ([long]$marker.schema -in @(5, 6)) {
+    elseif ($markerSchema -in @(5, 6, 11, 12)) {
         [ordered]@{
-            schema = 6
+            schema = 12
             phase = 'Publishing'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -653,8 +910,10 @@ function Set-AdoptionPullRequestPublishingMarker {
             head = $PreviousHead
             previousHead = $PreviousHead
             plannedHead = $PlannedHead
+            branch = $branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
+            surfaceBase = $surfaceBase
+            surfaceDigest = $surfaceDigest
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             repository = [string]$marker.repository
             actor = [string]$marker.actor
@@ -678,7 +937,11 @@ function Set-AdoptionPullRequestPublishingMarker {
         ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $publishingMarker `
-        -TemporaryDirectory $TemporaryDirectory -FileName 'publishing-adoption-pr.md'
+        -TemporaryDirectory $TemporaryDirectory -FileName 'publishing-adoption-pr.md' `
+        -SurfaceCommit $(if ($surfaceAware) { $surfaceBase } else { '' }) `
+        -ProtocolSurfaces @($marker.protocolSurfaces) `
+        -ManifestCommit $PreviousHead -ProtocolSha ([string]$marker.protocolSha) `
+        -GraphBase $(if ($graphAware) { [string]$marker.graphBase } else { '' })
 }
 
 function Set-AdoptionPullRequestProposedMarker {
@@ -693,9 +956,29 @@ function Set-AdoptionPullRequestProposedMarker {
         throw 'The restored adoption proposal head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $proposedMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+    $markerSchema = [long]$marker.schema
+    $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
+    $surfaceBase = if ($graphAware) {
+        [string]$marker.graphBase
+    }
+    elseif ($markerSchema -in @(11, 12)) {
+        [string]$marker.surfaceBase
+    }
+    else { $PreviousHead }
+    $branch = if ($null -ne $marker.PSObject.Properties['branch']) {
+        [string]$marker.branch
+    }
+    else { [string]$PullRequest.headRefName }
+    $surfaceDigest = if ($surfaceAware -and -not $graphAware) {
+        $digestCommand = Get-InitialAdoptionPolicyCommand `
+            -Name 'Get-MeAndAILinkedPathIdentityDigest'
+        [string](& $digestCommand -Paths @($marker.protocolSurfaces))
+    }
+    else { '' }
+    $proposedMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 7
+            schema = 9
             phase = 'Proposed'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -703,7 +986,6 @@ function Set-AdoptionPullRequestProposedMarker {
             head = $PreviousHead
             branch = [string]$marker.branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             graphBase = [string]$marker.graphBase
             graphDigest = [string]$marker.graphDigest
@@ -713,16 +995,18 @@ function Set-AdoptionPullRequestProposedMarker {
             actor = [string]$marker.actor
         }
     }
-    elseif ([long]$marker.schema -in @(5, 6)) {
+    elseif ($markerSchema -in @(5, 6, 11, 12)) {
         [ordered]@{
-            schema = 5
+            schema = 11
             phase = 'Proposed'
             state = [string]$marker.state
             target = [string]$marker.target
             protocolSha = [string]$marker.protocolSha
             head = $PreviousHead
+            branch = $branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
+            surfaceBase = $surfaceBase
+            surfaceDigest = $surfaceDigest
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             repository = [string]$marker.repository
             actor = [string]$marker.actor
@@ -744,7 +1028,11 @@ function Set-AdoptionPullRequestProposedMarker {
         ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $proposedMarker `
-        -TemporaryDirectory $TemporaryDirectory -FileName 'proposed-adoption-pr.md'
+        -TemporaryDirectory $TemporaryDirectory -FileName 'proposed-adoption-pr.md' `
+        -SurfaceCommit $(if ($surfaceAware) { $surfaceBase } else { '' }) `
+        -ProtocolSurfaces @($marker.protocolSurfaces) `
+        -ManifestCommit $PreviousHead -ProtocolSha ([string]$marker.protocolSha) `
+        -GraphBase $(if ($graphAware) { [string]$marker.graphBase } else { '' })
 }
 
 function Set-AdoptionPullRequestCompletedMarker {
@@ -760,9 +1048,37 @@ function Set-AdoptionPullRequestCompletedMarker {
         throw 'The completed adoption head is invalid.'
     }
     $marker = $PullRequest.meAndAIMarker
-    $completedMarkerRecord = if ([long]$marker.schema -in @(7, 8)) {
+    $markerSchema = [long]$marker.schema
+    $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
+    $surfaceBase = if ($graphAware) {
+        [string]$marker.graphBase
+    }
+    elseif ($markerSchema -in @(11, 12)) {
+        [string]$marker.surfaceBase
+    }
+    elseif ($markerSchema -eq 6) {
+        [string]$marker.previousHead
+    }
+    else { [string]$marker.head }
+    $manifestCommit = if ($null -ne $marker.PSObject.Properties['previousHead'] -and
+        [string]$marker.previousHead -cmatch '^[0-9a-f]{40}$') {
+        [string]$marker.previousHead
+    }
+    else { [string]$marker.head }
+    $branch = if ($null -ne $marker.PSObject.Properties['branch']) {
+        [string]$marker.branch
+    }
+    else { [string]$PullRequest.headRefName }
+    $surfaceDigest = if ($surfaceAware -and -not $graphAware) {
+        $digestCommand = Get-InitialAdoptionPolicyCommand `
+            -Name 'Get-MeAndAILinkedPathIdentityDigest'
+        [string](& $digestCommand -Paths @($marker.protocolSurfaces))
+    }
+    else { '' }
+    $completedMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 7
+            schema = 9
             phase = 'Completed'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -770,7 +1086,6 @@ function Set-AdoptionPullRequestCompletedMarker {
             head = $PublishedHead
             branch = [string]$marker.branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             graphBase = [string]$marker.graphBase
             graphDigest = [string]$marker.graphDigest
@@ -780,16 +1095,18 @@ function Set-AdoptionPullRequestCompletedMarker {
             actor = [string]$marker.actor
         }
     }
-    elseif ([long]$marker.schema -in @(5, 6)) {
+    elseif ($markerSchema -in @(5, 6, 11, 12)) {
         [ordered]@{
-            schema = 5
+            schema = 11
             phase = 'Completed'
             state = [string]$marker.state
             target = [string]$marker.target
             protocolSha = [string]$marker.protocolSha
             head = $PublishedHead
+            branch = $branch
             adoptionStrategy = [string]$marker.adoptionStrategy
-            protocolSurfaces = @($marker.protocolSurfaces)
+            surfaceBase = $surfaceBase
+            surfaceDigest = $surfaceDigest
             protocolRecordLossAcknowledged = [bool]$marker.protocolRecordLossAcknowledged
             repository = [string]$marker.repository
             actor = [string]$marker.actor
@@ -812,7 +1129,11 @@ function Set-AdoptionPullRequestCompletedMarker {
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
         -PullRequest $PullRequest -MarkerJson $completedMarker `
         -TemporaryDirectory $TemporaryDirectory -FileName 'completed-adoption-pr.md' `
-        -TrackingIssueNumber $IssueNumber
+        -TrackingIssueNumber $IssueNumber `
+        -SurfaceCommit $(if ($surfaceAware) { $surfaceBase } else { '' }) `
+        -ProtocolSurfaces @($marker.protocolSurfaces) `
+        -ManifestCommit $manifestCommit -ProtocolSha ([string]$marker.protocolSha) `
+        -GraphBase $(if ($graphAware) { [string]$marker.graphBase } else { '' })
 }
 
 function Get-RevalidatedAdoptionPullRequest {
@@ -882,6 +1203,7 @@ function Complete-AdoptionReviewTransition {
             -MarkerHead $PublishedHead -Body $body -Draft $true
     }
     $tracking = Get-AdoptionPullRequestTrackingBody -Body $body `
+        -Repository $Repository `
         -IssueNumber $issueNumber
     if ([bool]$tracking.Changed) {
         $body = Set-AdoptionPullRequestBody -Repository $Repository `
@@ -1000,33 +1322,161 @@ function Get-AdoptionIssueInventory {
     }
 }
 
+function Get-AdoptionIssueOwnershipMarker {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$ProtocolSha,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$GraphDigest,
+        [Parameter(Mandatory)][string]$PullRequestUrl
+    )
+
+    if ($Repository -cnotmatch '^[^/\s]+/[^/\s]+$' -or
+        $TargetTag -cnotmatch '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$' -or
+        $ProtocolSha -cnotmatch '^[0-9a-f]{40}$' -or
+        ($GraphDigest -and $GraphDigest -cnotmatch '^[0-9a-f]{64}$') -or
+        $PullRequestUrl -cnotmatch ('^https://github\.com/' +
+            [regex]::Escape($Repository) + '/pull/[1-9][0-9]*/?$')) {
+        throw 'Cannot derive the canonical adoption-issue ownership marker from invalid identity evidence.'
+    }
+    $payload = @(
+        'schema=2',
+        "repository=$Repository",
+        "target=$TargetTag",
+        "protocolSha=$ProtocolSha",
+        "graphDigest=$GraphDigest",
+        "pullRequestUrl=$($PullRequestUrl.TrimEnd('/'))"
+    ) -join "`n"
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        $digest = ([BitConverter]::ToString($algorithm.ComputeHash(
+            [Text.UTF8Encoding]::new($false).GetBytes($payload)
+        ))).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $algorithm.Dispose() }
+    return "<!-- meandai-local-adoption:v2:$digest -->"
+}
+
+function New-AdoptionIssueBody {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)][string]$Marker,
+        [switch]$Legacy
+    )
+
+    $markerRecord = $PullRequest.meAndAIMarker
+    $graphAware = [long]$markerRecord.schema -in @(7, 8, 9, 10)
+    $surfaceCommit = if ($graphAware -and
+        [string]$markerRecord.graphBase -match
+            '^[0-9a-f]{40}$') {
+        [string]$markerRecord.graphBase
+    }
+    elseif ([long]$markerRecord.schema -in @(11, 12) -and
+        [string]$markerRecord.surfaceBase -match '^[0-9a-f]{40}$') {
+        [string]$markerRecord.surfaceBase
+    }
+    else { [string]$markerRecord.head }
+    if ($Legacy) {
+        $surfaceLines = if (@($markerRecord.protocolSurfaces).Count -gt 0) {
+            @($markerRecord.protocolSurfaces | ForEach-Object { "- ``$_``" })
+        }
+        else { @('- None') }
+        $graphLines = if ($graphAware) {
+            @(
+                "- Source graph base: ``$([string]$markerRecord.graphBase)``",
+                "- Source graph digest: ``$([string]$markerRecord.graphDigest)``",
+                "- Source graph nodes/edges/candidates: ``$([int]$markerRecord.graphCounts.nodes)/$([int]$markerRecord.graphCounts.edges)/$([int]$markerRecord.graphCounts.candidates)``"
+            )
+        }
+        else { @() }
+        return (@(
+            $Marker,
+            '## AI capabilities adoption tracking',
+            '',
+            "- Protocol release: ``$ProtocolTag``",
+            "- Adoption draft: $($PullRequest.url)",
+            "- Adoption strategy: ``$($markerRecord.adoptionStrategy)``",
+            "- Protocol-record loss acknowledged: ``$(([bool]$markerRecord.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``"
+        ) + @($graphLines) + @(
+            '',
+            '### Detected protocol and governance surfaces',
+            ''
+        ) + @($surfaceLines) + @(
+            '',
+            'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+            '',
+            'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+        )) -join [Environment]::NewLine
+    }
+
+    $linkCommand = Get-InitialAdoptionPolicyCommand `
+        -Name 'New-MeAndAIGitHubBlobLink'
+    $surfaceLines = if (@($markerRecord.protocolSurfaces).Count -gt 0) {
+        @($markerRecord.protocolSurfaces | ForEach-Object {
+            '- ' + (& $linkCommand -Repository $Repository `
+                -Commit $surfaceCommit -Path ([string]$_))
+        })
+    }
+    else { @('- None') }
+    $graphLines = if ($graphAware) {
+        @(
+            "- Source graph base: [$([string]$markerRecord.graphBase)](https://github.com/$Repository/commit/$([string]$markerRecord.graphBase))",
+            "- Source graph digest: ``$([string]$markerRecord.graphDigest)``",
+            "- Source graph nodes/edges/candidates: ``$([int]$markerRecord.graphCounts.nodes)/$([int]$markerRecord.graphCounts.edges)/$([int]$markerRecord.graphCounts.candidates)``"
+        )
+    }
+    else { @() }
+    return (@(
+        $Marker,
+        '## AI capabilities adoption tracking',
+        '',
+        "- Protocol release: [$ProtocolTag](https://github.com/$ProtocolRepository/releases/tag/$ProtocolTag)",
+        "- Protocol commit: [$([string]$markerRecord.protocolSha)](https://github.com/$ProtocolRepository/commit/$([string]$markerRecord.protocolSha))",
+        "- Adoption draft: [PR #$([int]$PullRequest.number)]($([string]$PullRequest.url))",
+        "- Adoption strategy: ``$($markerRecord.adoptionStrategy)``",
+        "- Protocol-record loss acknowledged: ``$(([bool]$markerRecord.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``"
+    ) + @($graphLines) + @(
+        '',
+        '### Detected protocol and governance surfaces',
+        ''
+    ) + @($surfaceLines) + @(
+        '',
+        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+        '',
+        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+    )) -join [Environment]::NewLine
+}
+
 function Get-MarkedAdoptionIssues {
     param(
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Issues,
         [Parameter(Mandatory)][string]$Marker,
         [Parameter(Mandatory)][string]$ExpectedTitle,
-        [Parameter(Mandatory)][string]$ExpectedBody
+        [Parameter(Mandatory)][string]$ExpectedBody,
+        [Parameter(Mandatory)][string]$LegacyMarker,
+        [Parameter(Mandatory)][string]$LegacyExpectedBody
     )
 
     $numbers = [System.Collections.Generic.HashSet[int]]::new()
-    $canonicalMarkerPattern = '\A' + [regex]::Escape($Marker) + '(?:\r?\n|\z)'
-    $ownershipPrefix = $Marker.Substring(0, $Marker.Length - ' -->'.Length)
     $matching = [System.Collections.Generic.List[object]]::new()
     $normalizedExpectedBody = $ExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    $normalizedLegacyBody = $LegacyExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
     foreach ($issue in $Issues) {
         if ($null -eq $issue.PSObject.Properties['body']) {
             continue
         }
         $body = [string]$issue.body
-        $hasOwnedPrefix = $body.StartsWith(
-            $ownershipPrefix, [StringComparison]::OrdinalIgnoreCase
-        )
-        $canonicalLines = [regex]::Matches(
-            $body,
-            '(?m)^' + [regex]::Escape($Marker) + '\r?$'
-        )
-        if (-not [regex]::IsMatch($body, $canonicalMarkerPattern)) {
-            if ($hasOwnedPrefix) {
+        $normalizedBody = $body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+        $firstLine = @($normalizedBody.Split("`n"))[0]
+        $kind = if ($firstLine -ceq $Marker) { 'Canonical' }
+            elseif ($firstLine -ceq $LegacyMarker) { 'Legacy' }
+            else { '' }
+        if (-not $kind) {
+            if ($normalizedBody.IndexOf(
+                    '<!-- meandai-local-adoption:',
+                    [StringComparison]::OrdinalIgnoreCase
+                ) -ge 0) {
                 throw 'A project-owned adoption issue contains a malformed ownership marker; manual review is required.'
             }
             continue
@@ -1036,10 +1486,12 @@ function Get-MarkedAdoptionIssues {
                 throw 'A project-owned adoption issue has incomplete identity metadata.'
             }
         }
-        $normalizedBody = $body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
-        if ($canonicalLines.Count -ne 1 -or
-            [string]$issue.title -cne $ExpectedTitle -or
-            $normalizedBody -cne $normalizedExpectedBody) {
+        $expected = if ($kind -ceq 'Canonical') {
+            $normalizedExpectedBody
+        }
+        else { $normalizedLegacyBody }
+        if ([string]$issue.title -cne $ExpectedTitle -or
+            $normalizedBody -cne $expected) {
             throw 'A canonically marked adoption issue has drifted from its exact owned record; manual review is required.'
         }
         if ([string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
@@ -1048,7 +1500,14 @@ function Get-MarkedAdoptionIssues {
             -not $numbers.Add([int]$issue.number)) {
             throw 'A project-owned adoption issue has invalid or duplicate identity metadata.'
         }
-        $matching.Add($issue)
+        $matching.Add([pscustomobject]@{
+            number = $issue.number
+            url = $issue.url
+            title = $issue.title
+            body = $issue.body
+            state = $issue.state
+            markerKind = $kind
+        })
     }
     return @($matching | Sort-Object { [int]$_.number })
 }
@@ -1060,42 +1519,22 @@ function Ensure-AdoptionIssue {
         [Parameter(Mandatory)][string]$TemporaryDirectory
     )
 
-    $marker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
+    $graphDigest = if ([long]$PullRequest.meAndAIMarker.schema -in
+            @(7, 8, 9, 10)) {
+        [string]$PullRequest.meAndAIMarker.graphDigest
+    }
+    else { '' }
+    $marker = Get-AdoptionIssueOwnershipMarker -Repository $Repository `
+        -TargetTag $ProtocolTag `
+        -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
+        -GraphDigest $graphDigest -PullRequestUrl ([string]$PullRequest.url)
+    $legacyMarker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
         $ProtocolTag, [string]$PullRequest.number
     $issueTitle = "Track meAndAI AI capabilities adoption from $ProtocolTag"
-    $surfaceLines = if (@($PullRequest.meAndAIMarker.protocolSurfaces).Count -gt 0) {
-        @($PullRequest.meAndAIMarker.protocolSurfaces | ForEach-Object {
-            "- ``$_``"
-        })
-    }
-    else { @('- None') }
-    $graphLines = if ([long]$PullRequest.meAndAIMarker.schema -in @(7, 8)) {
-        @(
-            "- Source graph base: ``$([string]$PullRequest.meAndAIMarker.graphBase)``",
-            "- Source graph digest: ``$([string]$PullRequest.meAndAIMarker.graphDigest)``",
-            "- Source graph nodes/edges/candidates: ``$([int]$PullRequest.meAndAIMarker.graphCounts.nodes)/$([int]$PullRequest.meAndAIMarker.graphCounts.edges)/$([int]$PullRequest.meAndAIMarker.graphCounts.candidates)``"
-        )
-    }
-    else { @() }
-    $issueBodyLines = @(
-        $marker,
-        '## AI capabilities adoption tracking',
-        '',
-        "- Protocol release: ``$ProtocolTag``",
-        "- Adoption draft: $($PullRequest.url)",
-        "- Adoption strategy: ``$($PullRequest.meAndAIMarker.adoptionStrategy)``",
-        "- Protocol-record loss acknowledged: ``$(([bool]$PullRequest.meAndAIMarker.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``"
-    ) + @($graphLines) + @(
-        '',
-        '### Detected protocol and governance surfaces',
-        ''
-    ) + @($surfaceLines) + @(
-        '',
-        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
-        '',
-        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
-    )
-    $issueBody = $issueBodyLines -join [Environment]::NewLine
+    $issueBody = New-AdoptionIssueBody -Repository $Repository `
+        -PullRequest $PullRequest -Marker $marker
+    $legacyIssueBody = New-AdoptionIssueBody -Repository $Repository `
+        -PullRequest $PullRequest -Marker $legacyMarker -Legacy
     $completed = [string]$PullRequest.meAndAIMarker.phase -ceq 'Completed'
     $desiredStatusLabel = if ($completed) {
         'status:needs-review'
@@ -1107,9 +1546,39 @@ function Ensure-AdoptionIssue {
     else { 'status:needs-review' }
     $matchingIssues = @(Get-MarkedAdoptionIssues `
         -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-        -ExpectedTitle $issueTitle -ExpectedBody $issueBody)
+        -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
+        -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody)
 
-    if ($matchingIssues.Count -eq 0) {
+    $canonicalIssues = @($matchingIssues | Where-Object {
+        [string]$_.markerKind -ceq 'Canonical'
+    })
+    if ($canonicalIssues.Count -eq 0) {
+        $legacyIssues = @($matchingIssues | Where-Object {
+            [string]$_.markerKind -ceq 'Legacy'
+        })
+        if ($legacyIssues.Count -gt 0) {
+            $bodyPath = Join-Path $TemporaryDirectory `
+                'canonical-adoption-issue.md'
+            [IO.File]::WriteAllText(
+                $bodyPath, $issueBody + [Environment]::NewLine,
+                [Text.UTF8Encoding]::new($false)
+            )
+            Invoke-External -Command 'gh' -Arguments @(
+                'issue', 'edit', [string]$legacyIssues[0].number,
+                '--repo', $Repository, '--body-file', $bodyPath
+            ) | Out-Null
+            $matchingIssues = @(Get-MarkedAdoptionIssues `
+                -Issues @(Get-AdoptionIssueInventory -Repository $Repository) `
+                -Marker $marker -ExpectedTitle $issueTitle `
+                -ExpectedBody $issueBody -LegacyMarker $legacyMarker `
+                -LegacyExpectedBody $legacyIssueBody)
+            $canonicalIssues = @($matchingIssues | Where-Object {
+                [string]$_.markerKind -ceq 'Canonical'
+            })
+        }
+    }
+
+    if ($canonicalIssues.Count -eq 0) {
         $bodyPath = Join-Path $TemporaryDirectory 'adoption-issue.md'
         [IO.File]::WriteAllText(
             $bodyPath, $issueBody + [Environment]::NewLine,
@@ -1128,19 +1597,25 @@ function Ensure-AdoptionIssue {
         }
         $matchingIssues = @(Get-MarkedAdoptionIssues `
             -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-            -ExpectedTitle $issueTitle -ExpectedBody $issueBody)
+            -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
+            -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody)
+        $canonicalIssues = @($matchingIssues | Where-Object {
+            [string]$_.markerKind -ceq 'Canonical'
+        })
     }
 
-    if ($matchingIssues.Count -eq 0) {
+    if ($canonicalIssues.Count -eq 0) {
         throw 'The created adoption issue was not observable during convergence.'
     }
-    $canonicalNumber = [int]$matchingIssues[0].number
-    if ([string]$matchingIssues[0].state -ceq 'CLOSED') {
+    $canonicalNumber = [int]$canonicalIssues[0].number
+    if ([string]$canonicalIssues[0].state -ceq 'CLOSED') {
         Invoke-External -Command 'gh' -Arguments @(
             'issue', 'reopen', [string]$canonicalNumber, '--repo', $Repository
         ) | Out-Null
     }
-    foreach ($duplicate in @($matchingIssues | Select-Object -Skip 1)) {
+    foreach ($duplicate in @($matchingIssues | Where-Object {
+        [int]$_.number -ne $canonicalNumber
+    })) {
         if ([string]$duplicate.state -ceq 'OPEN') {
             Invoke-External -Command 'gh' -Arguments @(
                 'issue', 'close', [string]$duplicate.number, '--repo', $Repository
@@ -1150,8 +1625,12 @@ function Ensure-AdoptionIssue {
 
     $converged = @(Get-MarkedAdoptionIssues `
         -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-        -ExpectedTitle $issueTitle -ExpectedBody $issueBody |
-        Where-Object { [string]$_.state -ceq 'OPEN' })
+        -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
+        -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody |
+        Where-Object {
+            [string]$_.state -ceq 'OPEN' -and
+            [string]$_.markerKind -ceq 'Canonical'
+        })
     if ($converged.Count -ne 1 -or [int]$converged[0].number -ne $canonicalNumber) {
         throw 'Project-owned adoption issues did not converge to one canonical open identity.'
     }

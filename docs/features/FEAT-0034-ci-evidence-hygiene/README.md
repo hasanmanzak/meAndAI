@@ -2,13 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| Classification | Backward-compatible CI and test-isolation correction / `BUG-0015`, `BUG-0016` |
+| Classification | Backward-compatible CI and test-isolation correction / [BUG-0015](https://github.com/hasanmanzak/meAndAI/issues/85), [BUG-0016](https://github.com/hasanmanzak/meAndAI/issues/85) |
 | Status | Complete |
 | Target version | 0.12.2 |
 | Issue | [#85](https://github.com/hasanmanzak/meAndAI/issues/85) |
 | Pull request | Recorded in [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) after creation; no evidence-only candidate commit |
 | Decisions | [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), [DEC-0022](../../decisions/DEC-0022-release-declared-semantic-capabilities.md) |
-| Tests | [TEST-0142 and TEST-0143](test-cases.md) |
+| Tests | [TEST-0142](test-cases.md#test-0142) and [TEST-0143](test-cases.md#test-0143) |
 
 ## Problem
 
@@ -72,7 +72,7 @@ complete fail-safe route.
 - Consumers and dependencies: the affected surfaces are the canonical
   consumer-update finalization fixture, `protocol-tests.yml`, the new
   workflow-efficiency capability owner, common protocol evidence rules, and
-  DEC-0019. GitHub REST evidence and local Git are read-only dependencies.
+  [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md). GitHub REST evidence and local Git are read-only dependencies.
 - Compatibility: pull-request, merge-queue, ordinary manual, direct-push, and
   post-publication routes retain their existing authority. The stable job names
   and PR-only cancellation contract remain unchanged.
@@ -83,23 +83,23 @@ complete fail-safe route.
 
 | ID | Classification | Risk | Owner / response |
 | --- | --- | --- | --- |
-| `RISK-0154` | Evidence isolation | Fixture identities leak into a caller-owned GitHub summary or cleanup loses the prior environment value | Test maintainer / per-invocation temp file, `finally` restoration, exact success/no-output assertions, and inherited sentinel in `TEST-0142` |
-| `RISK-0155` | Validation integrity | A direct, synthetic, stale, wrong-head, or partially green push is incorrectly classified as reusable | Workflow maintainer / joint Git and paginated GitHub proof, exact tree and parent identity, exact stable jobs, and fail-closed negatives in `TEST-0143` |
-| `RISK-0156` | Runner efficiency | Conservative routing or external-evidence commits continue to repeat complete suites | Workflow maintainer / exact-tree positive cases plus a protocol prohibition on commits made solely to copy live external facts, verified by `TEST-0143` |
-| `RISK-0157` | Required-check continuity | Optimization removes a trigger/job identity or lets publication and cancellation routes interfere | Workflow maintainer / retain `push: main`, both stable jobs, PR-only cancellation, and isolated publication structure in `TEST-0143` and `TEST-0124` |
+| `RISK-0154` <a name="risk-0154"></a> | Evidence isolation | Fixture identities leak into a caller-owned GitHub summary or cleanup loses the prior environment value | Test maintainer / per-invocation temp file, `finally` restoration, exact success/no-output assertions, and inherited sentinel in [TEST-0142](test-cases.md#test-0142) |
+| `RISK-0155` <a name="risk-0155"></a> | Validation integrity | A direct, synthetic, stale, wrong-head, or partially green push is incorrectly classified as reusable | Workflow maintainer / joint Git and paginated GitHub proof, exact tree and parent identity, exact stable jobs, and fail-closed negatives in [TEST-0143](test-cases.md#test-0143) |
+| `RISK-0156` <a name="risk-0156"></a> | Runner efficiency | Conservative routing or external-evidence commits continue to repeat complete suites | Workflow maintainer / exact-tree positive cases plus a protocol prohibition on commits made solely to copy live external facts, verified by [TEST-0143](test-cases.md#test-0143) |
+| `RISK-0157` <a name="risk-0157"></a> | Required-check continuity | Optimization removes a trigger/job identity or lets publication and cancellation routes interfere | Workflow maintainer / retain `push: main`, both stable jobs, PR-only cancellation, and isolated publication structure in [TEST-0143](test-cases.md#test-0143) and [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [TEST-0142 and TEST-0143](test-cases.md) |
-| Test code | Implemented and focused green | `TEST-0142` is owned by the consumer-update finalization suite; `TEST-0143` is owned by the recursively discovered workflow-efficiency capability suite |
+| Scenarios | Defined | [TEST-0142](test-cases.md#test-0142) and [TEST-0143](test-cases.md#test-0143) |
+| Test code | Implemented and focused green | [TEST-0142](test-cases.md#test-0142) is owned by the consumer-update finalization suite; [TEST-0143](test-cases.md#test-0143) is owned by the recursively discovered workflow-efficiency capability suite |
 | Baseline run | Green | Immutable `v0.12.1`; [main run 29688880377](https://github.com/hasanmanzak/meAndAI/actions/runs/29688880377) passed before this correction |
 
 ## Decomposition and review gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0062` | Managed-merge job-summary isolation | [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) | `TEST-0142`; expected red then focused owner green | Exact output, no-output, restoration, and cleanup paths reviewed | Complete |
-| `SUBF-0063` | Exact-tree main routing and external-evidence discipline | [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) | `TEST-0143`, retained `TEST-0124`; expected red then focused owner green | Git/GitHub identity, pagination, failure, permissions, and workflow routes reviewed | Complete |
+| `SUBF-0062` <a name="subf-0062"></a> | Managed-merge job-summary isolation | [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) | [TEST-0142](test-cases.md#test-0142); expected red then focused owner green | Exact output, no-output, restoration, and cleanup paths reviewed | Complete |
+| `SUBF-0063` <a name="subf-0063"></a> | Exact-tree main routing and external-evidence discipline | [Issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) | [TEST-0143](test-cases.md#test-0143), retained [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124); expected red then focused owner green | Git/GitHub identity, pagination, failure, permissions, and workflow routes reviewed | Complete |
 
 ## Decisions and relationships
 
@@ -110,8 +110,8 @@ complete fail-safe route.
 
 ## Definition of Ready
 
-- [x] Stable `FEAT-0034`, `BUG-0015`, `BUG-0016`, `TEST-0142`,
-      `TEST-0143`, and linked issue #85 exist.
+- [x] Stable `FEAT-0034`, [BUG-0015](https://github.com/hasanmanzak/meAndAI/issues/85), [BUG-0016](https://github.com/hasanmanzak/meAndAI/issues/85), [TEST-0142](test-cases.md#test-0142),
+      [TEST-0143](test-cases.md#test-0143), and linked [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) exist.
 - [x] Problem, outcome, scope, and non-goals are explicit.
 - [x] Acceptance criteria are measurable.
 - [x] Summary ownership, route enum, Git/GitHub identity, compatibility,
@@ -138,14 +138,14 @@ complete fail-safe route.
 5. PR number, pushed SHA, hosted result, merge SHA, release, and cleanup facts
    are written to the linked issue or pull request and do not require a commit
    whose sole purpose is copying external evidence.
-6. `TEST-0142`, `TEST-0143`, retained workflow contracts, full validation, and
+6. [TEST-0142](test-cases.md#test-0142), [TEST-0143](test-cases.md#test-0143), retained workflow contracts, full validation, and
    the bounded review/scan pass with no unresolved `Blocking` finding.
 
 ## Self-review
 
 The review was bounded to the two declared slices, their workflow, test,
 protocol, version, and memory call sites, one fresh diff, and one final scan.
-It did not expand into consumer updater behavior or unrelated issue #44.
+It did not expand into consumer updater behavior or unrelated [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
 
 - `SUBF-0062`: every invocation replaces `GITHUB_STEP_SUMMARY` with a unique
   file, captures only that file, restores the exact prior environment value,
@@ -157,17 +157,17 @@ It did not expand into consumer updater behavior or unrelated issue #44.
   identities are checked. Provider lookups are paginated, permissions are
   read-only, stable job names and triggers remain intact, and the publication
   route remains isolated.
-- Fresh-diff review found `FIND-0174` (`Blocking`): the initial default GitHub
+- Fresh-diff review found `FIND-0174` <a name="find-0174"></a> (`Blocking`): the initial default GitHub
   provider retained the outer array produced by `gh api --slurp`, so live
   paginated response properties were not reached and every eligible push fell
   back to `Full`. The provider now flattens exactly one page-envelope level;
   a multi-page fake-CLI regression and a read-only lookup against historical
-  PR #84 both prove the exact-tree route. `FIND-0174` is resolved.
-- The first hosted PR run found `FIND-0175` (`Blocking`): GitHub does not expose
+  [PR #84](https://github.com/hasanmanzak/meAndAI/pull/84) both prove the exact-tree route. `FIND-0174` is resolved.
+- The first hosted PR run found `FIND-0175` <a name="find-0175"></a> (`Blocking`): GitHub does not expose
   `event.before` for a `pull_request`, and PowerShell rejected the resulting
   empty string at parameter binding before the resolver could select `Full`.
   Externally supplied route strings now accept empty values and validate them
-  inside the fail-closed boundary; `TEST-0143` reproduces the exact hosted
+  inside the fail-closed boundary; [TEST-0143](test-cases.md#test-0143) reproduces the exact hosted
   empty-before call. `FIND-0175` is resolved.
 - The post-development inventory covered architecture, correctness, negative
   paths, test discovery, documentation links, least-privilege permissions, and
@@ -181,10 +181,10 @@ It did not expand into consumer updater behavior or unrelated issue #44.
 - [x] Bounded self-review and post-development scan complete.
 - [x] No unresolved `Blocking` finding.
 - [x] Documentation, links, version, changelog, and project memory current.
-- [x] Delivery pull request is cross-linked through issue #85 without an
+- [x] Delivery pull request is cross-linked through [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) without an
       evidence-only candidate commit.
 - [x] Applicable hosted CI remains a mandatory pre-merge external gate whose
-      exact result is recorded in issue #85 or its linked pull request.
+      exact result is recorded in [issue #85](https://github.com/hasanmanzak/meAndAI/issues/85) or its linked pull request.
 
 ## Post-merge release evidence
 
