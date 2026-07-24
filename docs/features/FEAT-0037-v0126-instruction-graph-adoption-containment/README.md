@@ -188,7 +188,7 @@ pull-request, or semantic-model mutation.
 | Tracked tree entries inspected | 65,536 |
 | Aggregate tracked-tree path inventory | 4,194,304 UTF-8 bytes |
 | Graph nodes | 256 |
-| Directed edges | 2,048 |
+| Directed edges | 4,096 |
 | Traversal depth | 32 |
 | One parsed blob | 262,144 bytes |
 | Aggregate parsed blobs | 4,194,304 bytes |
@@ -196,8 +196,11 @@ pull-request, or semantic-model mutation.
 
 The planning draft's 1,024-edge value was corrected before release after the
 required full-transitive self-consumer fixture produced 1,108 canonical edges.
-The 2,048 ceiling and the new aggregate tree-path acquisition bound both have
-exact N/N+1 evidence; no published graph schema is being revised.
+The first published ceiling was 2,048. By `v0.14.2`, the exact self-consumer
+graph used 2,039 edges; required `v0.14.3` traceability raised it to 2,061.
+The release-declared ceiling is therefore 4,096 from `v0.14.3` onward. The
+aggregate tree-path and current edge bounds retain exact N/N+1 evidence, and
+older immutable releases retain their encoded limits.
 
 ### Lifecycle, schemas, and compatibility
 

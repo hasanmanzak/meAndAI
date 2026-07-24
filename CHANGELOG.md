@@ -15,6 +15,12 @@ This project uses the `M.m.rev` version format defined in the
   wrong-case merge evidence.
 - Add a version-qualified production-reader guard so the API-2026 contract
   cannot diverge again without rejecting unaffected API-2022 callers.
+- Execute current post-publication verifier authority from a detached clean
+  worktree of the requested immutable release, so historical reruns do not
+  reload obsolete verifier code.
+- Raise the exact bounded instruction-graph edge ceiling from 2,048 to 4,096
+  after self-consumer evidence grew legitimately from 2,039 to 2,061 edges;
+  retain the existing fail-closed exact-boundary tests.
 
 Related work: [FEAT-0048](docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

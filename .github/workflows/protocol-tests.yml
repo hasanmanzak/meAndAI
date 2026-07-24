@@ -210,10 +210,10 @@ jobs:
       issues: read
       pull-requests: read
     steps:
-      - name: Check out verifier
+      - name: Check out current verifier authority
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          ref: ${{ inputs.expected_commit }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Verify authoritative post-publication evidence
@@ -227,6 +227,10 @@ jobs:
           MEANDAI_PULL_REQUEST_NUMBER: ${{ inputs.pull_request_number }}
           MEANDAI_OWNED_BRANCH: ${{ inputs.owned_branch }}
         run: |
+          $verifierRoot = (Get-Location).Path
+          $targetWorktree = Join-Path $env:RUNNER_TEMP `
+            ('meandai-release-evidence-' + [guid]::NewGuid().ToString('N'))
+          $worktreeAdded = $false
           $arguments = @{
             Repository = '${{ github.repository }}'
             Tag = $env:MEANDAI_RELEASE_TAG
@@ -245,4 +249,28 @@ jobs:
             $arguments.ExpectedBundleSourceInventoryPath = `
               'scripts/quick-adoption/bundle.sources.json'
           }
-          & ./tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1 @arguments
+          try {
+            & git -C $verifierRoot worktree add --detach -- `
+              $targetWorktree $env:MEANDAI_EXPECTED_COMMIT
+            if ($LASTEXITCODE -ne 0) {
+              throw 'The immutable release-evidence worktree could not be created.'
+            }
+            $worktreeAdded = $true
+            Push-Location $targetWorktree
+            try {
+              $verifierPath = Join-Path $verifierRoot `
+                'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'
+              & $verifierPath @arguments
+            }
+            finally {
+              Pop-Location
+            }
+          }
+          finally {
+            if ($worktreeAdded) {
+              & git -C $verifierRoot worktree remove --force -- $targetWorktree
+              if ($LASTEXITCODE -ne 0) {
+                throw 'The immutable release-evidence worktree could not be removed.'
+              }
+            }
+          }

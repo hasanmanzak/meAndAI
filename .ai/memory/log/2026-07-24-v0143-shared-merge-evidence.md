@@ -29,12 +29,19 @@
   quick-adoption repository-route gates pass. The one local aggregate run
   exposed a stale future-release fixture expectation after the version bump;
   the exact current/legacy/future shard passes after its bounded correction.
+- [PR run 30111807614](https://github.com/hasanmanzak/meAndAI/actions/runs/30111807614)
+  deterministically exposed the self-consumer edge ceiling on both hosted
+  runtimes: immutable v0.14.2 used 2,039/2,048 edges and the required candidate
+  evidence uses 2,061. The release-declared ceiling is corrected to 4,096 with
+  its existing exact N/N+1 boundary instead of deleting valid links.
+- Historical verification must use the exact current workflow verifier while
+  its working directory is a detached clean worktree at the immutable target;
+  otherwise a v0.14.2 rerun reloads the obsolete v0.14.2 verifier.
 
 ## Continuation
 
-1. Complete focused pure, updater-finalization, and publication-verifier tests
-   on both supported PowerShell runtimes, then run structure and one final full
-   validation after the bounded review.
+1. Complete the focused instruction-graph and publication-verifier follow-up,
+   then let the single hosted aggregate validate the exact corrected tree.
 2. Publish one reviewed pull request and immutable `v0.14.3` under
    [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117).
 3. Rerun the failed v0.14.2 publication evidence with the corrected verifier;

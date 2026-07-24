@@ -124,20 +124,37 @@ function Assert-PostPublicationCheckoutContract {
         $workflow,
         '(?ms)^  post-publication:\s*\r?\n(?<job>.*?)(?=^  [A-Za-z0-9_-]+:\s*\r?\n|\z)'
     )
+    $jobText = if ($postPublicationJob.Success) {
+        [string]$postPublicationJob.Groups['job'].Value
+    }
+    else { '' }
     $checkout = if ($postPublicationJob.Success) {
         [regex]::Match(
-            $postPublicationJob.Groups['job'].Value,
-            '(?ms)^      - name: Check out verifier\s*\r?\n(?<step>.*?)(?=^      - name:|\z)'
+            $jobText,
+            '(?ms)^      - name: Check out current verifier authority\s*\r?\n(?<step>.*?)(?=^      - name:|\z)'
         )
     }
     else { [regex]::Match('', 'never') }
     if (-not $checkout.Success -or
         -not $checkout.Groups['step'].Value.Contains(
+            'ref: ${{ github.sha }}'
+        ) -or
+        $checkout.Groups['step'].Value.Contains(
             'ref: ${{ inputs.expected_commit }}'
         ) -or
         $checkout.Groups['step'].Value -cnotmatch
-            '(?m)^\s+fetch-depth:\s+0\s*$') {
-        Add-Failure 'TEST-0178 post-publication checkout must use the exact expected commit with full history.'
+            '(?m)^\s+fetch-depth:\s+0\s*$' -or
+        -not $jobText.Contains('worktree add --detach --') -or
+        -not $jobText.Contains('$env:MEANDAI_EXPECTED_COMMIT') -or
+        -not $jobText.Contains('Push-Location $targetWorktree') -or
+        -not $jobText.Contains('$verifierPath = Join-Path $verifierRoot') -or
+        -not $jobText.Contains(
+            "'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'"
+        ) -or
+        -not $jobText.Contains('& $verifierPath @arguments') -or
+        -not $jobText.Contains('worktree remove --force -- $targetWorktree') -or
+        -not $jobText.Contains('finally {')) {
+        Add-Failure 'TEST-0180 post-publication verification must run current authority against one detached immutable target worktree and clean it.'
     }
 }
 
