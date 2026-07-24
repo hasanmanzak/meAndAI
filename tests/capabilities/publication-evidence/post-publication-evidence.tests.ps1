@@ -593,6 +593,10 @@ function global:Invoke-RestMethod {
             elseif ($global:MeAndAIPostPublicationMode -ceq 'PunctuatedAutolinks') {
                 "$releaseUrl.`n$commitUrl."
             }
+            elseif ($global:MeAndAIPostPublicationMode -ceq
+                'SameRepositoryCommitApiRejected') {
+                "[commit $shortCommit]($commitUrl)"
+            }
             else {
                 "$releaseUrl`n$commitUrl"
             }
@@ -1323,6 +1327,16 @@ $headingCollision
             }
         }
     }
+    if ($Uri -ceq "https://api.test/repos/$repository/commits/$commit") {
+        if ($global:MeAndAIPostPublicationMode -ceq
+            'SameRepositoryCommitApiRejected') {
+            throw 'TEST-0178 same-repository commit is unavailable.'
+        }
+        return [pscustomobject]@{
+            sha = $commit
+            html_url = "https://github.com/$repository/commit/$commit"
+        }
+    }
     if ($Uri -in @(
         "https://api.test/repos/hasanmanzak/Derdini/commits/$externalCommit",
         "https://api.test/repos/hasanmanzak/Derdini/commits/$wrongCommit"
@@ -1403,27 +1417,49 @@ function Invoke-TrackedMarkdownScenario {
     }
 }
 
-function Invoke-TemporaryTrackedMarkdownExternalScenario {
-    param([Parameter(Mandatory)][string]$Markdown)
+function Invoke-TemporaryTrackedMarkdownApiScenario {
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Markdown,
+        [string]$Mode = 'Valid',
+        [bool]$ValidateApi = $true,
+        [switch]$TargetLocalBlob
+    )
 
     $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) (
         'meandai-commit-reference-' + [Guid]::NewGuid().ToString('N')
     )
     $locationPushed = $false
-    $global:MeAndAIPostPublicationMode = 'Valid'
+    $global:MeAndAIPostPublicationMode = $Mode
     $global:MeAndAIPostPublicationRequests.Clear()
     $global:MeAndAIPostPublicationDownloadRequests.Clear()
     try {
         [void][IO.Directory]::CreateDirectory($fixtureRoot)
+        & git -C $fixtureRoot init --quiet --object-format=sha1 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'temporary tracked-Markdown fixture could not initialize Git.'
+        }
+        if ($TargetLocalBlob) {
+            $blobSourceName = 'local-blob-source.bin'
+            [IO.File]::WriteAllBytes(
+                (Join-Path $fixtureRoot $blobSourceName),
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    'deterministic non-commit Git object'
+                )
+            )
+            $blobSha = (@(& git -C $fixtureRoot hash-object -w -- `
+                $blobSourceName 2>&1) -join '').Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $blobSha -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'temporary tracked-Markdown fixture could not create its local blob object.'
+            }
+            $Markdown = "[commit $blobSha]" +
+                "(https://github.com/$repository/commit/$blobSha)"
+        }
         [IO.File]::WriteAllText(
             (Join-Path $fixtureRoot 'fixture.md'),
             $Markdown,
             [Text.UTF8Encoding]::new($false)
         )
-        & git -C $fixtureRoot init --quiet 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            throw 'temporary tracked-Markdown fixture could not initialize Git.'
-        }
         & git -C $fixtureRoot remote add origin `
             'https://github.com/example/meandai-consumer.git' 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) {
@@ -1435,16 +1471,22 @@ function Invoke-TemporaryTrackedMarkdownExternalScenario {
         }
         Push-Location $fixtureRoot
         $locationPushed = $true
-        & $verifierPath `
-            -Repository $repository `
-            -Tag $tag -ExpectedCommit $commit `
-            -FeaturePath $featurePath `
-            -IssueNumber $issueNumber `
-            -PullRequestNumber $pullRequestNumber `
-            -OwnedBranch $ownedBranch `
-            -ApiBaseUri 'https://api.test' -Token 'test-token' `
-            -RepositoryMarkdownOnly `
-            -ValidateRepositoryMarkdownExternalCommits 6>&1 | Out-Null
+        $parameters = @{
+            Repository = $repository
+            Tag = $tag
+            ExpectedCommit = $commit
+            FeaturePath = $featurePath
+            IssueNumber = $issueNumber
+            PullRequestNumber = $pullRequestNumber
+            OwnedBranch = $ownedBranch
+            ApiBaseUri = 'https://api.test'
+            Token = 'test-token'
+            RepositoryMarkdownOnly = $true
+        }
+        if ($ValidateApi) {
+            $parameters.ValidateRepositoryMarkdownExternalCommits = $true
+        }
+        & $verifierPath @parameters 6>&1 | Out-Null
         return [pscustomobject]@{
             Threw = $false
             Error = ''
@@ -1477,8 +1519,48 @@ try {
         if ($trackedMarkdown.Threw) {
             Add-Failure "TEST-0178 tracked repository Markdown failed: $($trackedMarkdown.Error)"
         }
+        $sameRepositoryCommitMarkdown =
+            "[commit $shortCommit]" +
+            "(https://github.com/$repository/commit/$commit)"
+        $sameRepositoryLocalOnly =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown -ValidateApi $false
+        if ($sameRepositoryLocalOnly.Threw -or
+            $sameRepositoryLocalOnly.Requests.Count -ne 0) {
+            Add-Failure "TEST-0178 tracked Markdown did not retain exact canonical same-repository commit links when an unreferenced historical object was absent from local Git: $($sameRepositoryLocalOnly.Error)"
+        }
+        $localBlobCommitTarget =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown '' -TargetLocalBlob
+        if (-not $localBlobCommitTarget.Threw -or
+            $localBlobCommitTarget.Error -notlike
+                '*contains 1 human-facing commit-reference problem*' -or
+            $localBlobCommitTarget.Requests.Count -ne 0) {
+            Add-Failure "TEST-0178 tracked Markdown did not reject a locally present blob before commit-target API fallback: $($localBlobCommitTarget.Error)"
+        }
+        $sameRepositoryTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown
+        $sameRepositoryTrackedRequest =
+            "https://api.test/repos/$repository/commits/$commit"
+        if ($sameRepositoryTrackedMarkdown.Threw -or
+            @($sameRepositoryTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $sameRepositoryTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not fall back to authenticated API proof for a same-repository commit absent from local Git: $($sameRepositoryTrackedMarkdown.Error)"
+        }
+        $invalidSameRepositoryTrackedMarkdown =
+            Invoke-TemporaryTrackedMarkdownApiScenario `
+                -Markdown $sameRepositoryCommitMarkdown `
+                -Mode 'SameRepositoryCommitApiRejected'
+        if (-not $invalidSameRepositoryTrackedMarkdown.Threw -or
+            @($invalidSameRepositoryTrackedMarkdown.Requests | Where-Object {
+                $_ -ceq $sameRepositoryTrackedRequest
+            }).Count -ne 1) {
+            Add-Failure "TEST-0178 tracked Markdown did not fail closed after API rejection of a same-repository commit absent from local Git: $($invalidSameRepositoryTrackedMarkdown.Error)"
+        }
         $externalTrackedMarkdown =
-            Invoke-TemporaryTrackedMarkdownExternalScenario -Markdown (
+            Invoke-TemporaryTrackedMarkdownApiScenario -Markdown (
                 "[external commit $externalCommit]" +
                 "(https://github.com/hasanmanzak/Derdini/commit/$externalCommit)"
             )
@@ -1491,7 +1573,7 @@ try {
             Add-Failure "TEST-0178 tracked Markdown did not validate its external commit through the authenticated API: $($externalTrackedMarkdown.Error)"
         }
         $invalidExternalTrackedMarkdown =
-            Invoke-TemporaryTrackedMarkdownExternalScenario -Markdown (
+            Invoke-TemporaryTrackedMarkdownApiScenario -Markdown (
                 "[external commit $externalCommit]" +
                 "(https://github.com/hasanmanzak/not-a-commit-owner/commit/$externalCommit)"
             )
@@ -1618,6 +1700,9 @@ try {
             elseif ($positiveMode -ceq 'NonMarkdownLineFragment') {
                 "/contents/$sourcePath`?ref=$pullHeadCommit"
             }
+            elseif ($positiveMode -ceq 'ExactCommitPermalinks') {
+                "/repos/$repository/commits/$commit"
+            }
             elseif ($positiveMode -in @(
                 'ExactExternalCommitPermalink',
                 'ExactExternalCommitAutolink',
@@ -1655,6 +1740,7 @@ try {
             @{ Mode = 'WrongCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
             @{ Mode = 'WrongRepositoryCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
             @{ Mode = 'MismatchedExternalFullCommitPermalink'; Error = '*links human-facing commit reference*other than its exact full-SHA*' },
+            @{ Mode = 'SameRepositoryCommitApiRejected'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
             @{ Mode = 'UnownedExternalCommitRepository'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
             @{ Mode = 'UnownedExternalCommitAutolink'; Error = '*authenticated GitHub API cannot prove contains that exact commit*' },
             @{ Mode = 'ExternalCommitTargetLimit'; Error = '*exceeds the bounded 32-target limit*' },

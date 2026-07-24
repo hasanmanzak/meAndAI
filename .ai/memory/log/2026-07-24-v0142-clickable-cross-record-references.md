@@ -119,6 +119,14 @@
   row syntax. The contracts selector now requires the canonical explicit anchor
   and passes on both supported PowerShell runtimes without weakening its
   serialization/recovery assertions.
+- The following clean hosted checkout exposed
+  [FIND-0239](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#find-0239):
+  four valid historical pull-request-head commit targets remained available in
+  the long-lived development clone but were absent from the clean clone because
+  no fetched branch or tag retained them. [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  now distinguishes a locally present non-commit object from a completely
+  absent historical object and requires bounded owning-repository API proof in
+  authoritative mode.
 
 ## Continuation
 

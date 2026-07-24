@@ -30,8 +30,9 @@ try {
             [StringComparer]::Ordinal
         )
     [void]$githubSurfaceAllowedBlobRefs.Add($ExpectedCommit)
-    $externalCommitTargetCache = @{}
-    $externalCommitTargetRequestCounter = [pscustomobject]@{ Count = 0 }
+    $githubCommitTargetCache = @{}
+    $githubCommitTargetRequestCounter = [pscustomobject]@{ Count = 0 }
+    $localGitObjectTypeCache = @{}
     $githubSurfaceRepositoryContentTargets =
         [System.Collections.Generic.HashSet[string]]::new(
             [StringComparer]::Ordinal
@@ -1642,6 +1643,29 @@ function Resolve-LocalCommitIdentity {
     return ''
 }
 
+function Get-LocalGitObjectType {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryRoot,
+        [Parameter(Mandatory)][string]$Sha
+    )
+
+    $cacheKey = $RepositoryRoot + "`n" + $Sha.ToLowerInvariant()
+    if ($localGitObjectTypeCache.ContainsKey($cacheKey)) {
+        return [string]$localGitObjectTypeCache[$cacheKey]
+    }
+    $typeOutput = @()
+    try {
+        $typeOutput = @(& git -C $RepositoryRoot cat-file -t $Sha 2>$null)
+    }
+    catch { $typeOutput = @() }
+    $objectType = ($typeOutput -join '').Trim()
+    if ($objectType -cnotmatch '^(?:blob|commit|tag|tree)$') {
+        $objectType = ''
+    }
+    $localGitObjectTypeCache[$cacheKey] = $objectType
+    return $objectType
+}
+
 function Test-CommitLiteralIsExcluded {
     param(
         [Parameter(Mandatory)][string]$Text,
@@ -1737,6 +1761,7 @@ function Assert-ExactHumanFacingCommitReferences {
     $exactCommitCommentPattern =
         '^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/commit/[0-9a-f]{40}#commitcomment-[1-9][0-9]*$'
     foreach ($link in @($Evidence.Links)) {
+        $sameRepositoryTargetNeedsApi = $false
         $target = ([string]$link.Target).Trim().Trim('<', '>')
         if ($target -cmatch
             '^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/commit/' -and
@@ -1757,11 +1782,19 @@ function Assert-ExactHumanFacingCommitReferences {
                 -RepositoryRoot $RepositoryRoot `
                 -Sha $targetCommit.Groups['sha'].Value
             if ([string]::IsNullOrEmpty($resolvedTarget)) {
-                Add-CommitReferenceProblem -Problems $Problems `
-                    -Surface $Surface -Kind 'UnresolvedCommitTarget' `
-                    -Index ([int]$link.Index) `
-                    -Sha $targetCommit.Groups['sha'].Value -Target $target `
-                    -Message "$Surface links a commit target that does not resolve to a local commit object."
+                $localObjectType = Get-LocalGitObjectType `
+                    -RepositoryRoot $RepositoryRoot `
+                    -Sha $targetCommit.Groups['sha'].Value
+                if (-not [string]::IsNullOrEmpty($localObjectType)) {
+                    Add-CommitReferenceProblem -Problems $Problems `
+                        -Surface $Surface -Kind 'UnresolvedCommitTarget' `
+                        -Index ([int]$link.Index) `
+                        -Sha $targetCommit.Groups['sha'].Value -Target $target `
+                        -Message "$Surface links a local '$localObjectType' object rather than a commit object."
+                }
+                elseif ($ValidateExternalCommits) {
+                    $sameRepositoryTargetNeedsApi = $true
+                }
             }
         }
         $label = ConvertTo-MarkdownRenderedText -Text ([string]$link.Label)
@@ -1790,22 +1823,25 @@ function Assert-ExactHumanFacingCommitReferences {
             }
         }
         if ($ValidateExternalCommits -and $exactTarget.Success -and
-            $exactTarget.Groups['repository'].Value -ine $Repository -and
+            ($exactTarget.Groups['repository'].Value -ine $Repository -or
+                -not $ResolveLocalCommits -or
+                $sameRepositoryTargetNeedsApi) -and
             -not (Test-GitHubRepositoryContainsCommit `
                 -RepositoryIdentity $exactTarget.Groups['repository'].Value `
                 -Sha $exactTarget.Groups['sha'].Value)) {
                 Add-CommitReferenceProblem -Problems $Problems `
                     -Surface $Surface `
-                    -Kind 'UnverifiedExternalCommitRepository' `
+                    -Kind 'UnverifiedCommitRepository' `
                     -Index ([int]$link.Index) `
                     -Sha $exactTarget.Groups['sha'].Value `
                     -Target $target `
-                    -Message "$Surface links an external commit through a repository that the authenticated GitHub API cannot prove contains that exact commit."
+                    -Message "$Surface links a commit through a repository that the authenticated GitHub API cannot prove contains that exact commit."
         }
     }
 
     $autolinks = @(Get-MarkdownHttpAutolinkSpans -Markdown $Markdown)
     foreach ($autolink in $autolinks) {
+        $sameRepositoryTargetNeedsApi = $false
         if (Test-MarkdownSpanOverlap -Index $autolink.Index `
             -Length $autolink.Length -Spans (
                 @($Evidence.Links) + @($Evidence.Definitions) +
@@ -1826,19 +1862,6 @@ function Assert-ExactHumanFacingCommitReferences {
             $target,
             '^https://github\.com/(?<repository>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/commit/(?<sha>[0-9a-f]{40})$'
         )
-        if ($ValidateExternalCommits -and $exactAutolinkTarget.Success -and
-            $exactAutolinkTarget.Groups['repository'].Value -ine $Repository -and
-            -not (Test-GitHubRepositoryContainsCommit `
-                -RepositoryIdentity $exactAutolinkTarget.Groups['repository'].Value `
-                -Sha $exactAutolinkTarget.Groups['sha'].Value)) {
-            Add-CommitReferenceProblem -Problems $Problems `
-                -Surface $Surface `
-                -Kind 'UnverifiedExternalCommitRepository' `
-                -Index ([int]$autolink.Index) `
-                -Sha $exactAutolinkTarget.Groups['sha'].Value `
-                -Target $target `
-                -Message "$Surface contains an external commit autolink whose repository the authenticated GitHub API cannot prove contains that exact commit."
-        }
         if ($ResolveLocalCommits) {
             $targetCommit = [regex]::Match(
                 $target,
@@ -1850,15 +1873,38 @@ function Assert-ExactHumanFacingCommitReferences {
                     -RepositoryRoot $RepositoryRoot `
                     -Sha $targetCommit.Groups['sha'].Value
                 if ([string]::IsNullOrEmpty($resolvedTarget)) {
-                    Add-CommitReferenceProblem -Problems $Problems `
-                        -Surface $Surface `
-                        -Kind 'UnresolvedCommitAutolink' `
-                        -Index ([int]$autolink.Index) `
-                        -Sha $targetCommit.Groups['sha'].Value `
-                        -Target $target `
-                        -Message "$Surface contains a commit autolink that does not resolve to a local commit object."
+                    $localObjectType = Get-LocalGitObjectType `
+                        -RepositoryRoot $RepositoryRoot `
+                        -Sha $targetCommit.Groups['sha'].Value
+                    if (-not [string]::IsNullOrEmpty($localObjectType)) {
+                        Add-CommitReferenceProblem -Problems $Problems `
+                            -Surface $Surface `
+                            -Kind 'UnresolvedCommitAutolink' `
+                            -Index ([int]$autolink.Index) `
+                            -Sha $targetCommit.Groups['sha'].Value `
+                            -Target $target `
+                            -Message "$Surface contains a commit autolink to a local '$localObjectType' object rather than a commit object."
+                    }
+                    elseif ($ValidateExternalCommits) {
+                        $sameRepositoryTargetNeedsApi = $true
+                    }
                 }
             }
+        }
+        if ($ValidateExternalCommits -and $exactAutolinkTarget.Success -and
+            ($exactAutolinkTarget.Groups['repository'].Value -ine $Repository -or
+                -not $ResolveLocalCommits -or
+                $sameRepositoryTargetNeedsApi) -and
+            -not (Test-GitHubRepositoryContainsCommit `
+                -RepositoryIdentity $exactAutolinkTarget.Groups['repository'].Value `
+                -Sha $exactAutolinkTarget.Groups['sha'].Value)) {
+            Add-CommitReferenceProblem -Problems $Problems `
+                -Surface $Surface `
+                -Kind 'UnverifiedCommitRepository' `
+                -Index ([int]$autolink.Index) `
+                -Sha $exactAutolinkTarget.Groups['sha'].Value `
+                -Target $target `
+                -Message "$Surface contains a commit autolink whose repository the authenticated GitHub API cannot prove contains that exact commit."
         }
     }
 
@@ -2819,13 +2865,13 @@ function Test-GitHubRepositoryContainsCommit {
             $Sha -cmatch '^[0-9a-f]{40}$') `
         'external commit target contains an unsafe repository identity or SHA.'
     $cacheKey = $RepositoryIdentity.ToLowerInvariant() + "`n" + $Sha
-    if ($externalCommitTargetCache.ContainsKey($cacheKey)) {
-        return [bool]$externalCommitTargetCache[$cacheKey]
+    if ($githubCommitTargetCache.ContainsKey($cacheKey)) {
+        return [bool]$githubCommitTargetCache[$cacheKey]
     }
     Assert-PostPublicationCondition `
-        ($externalCommitTargetRequestCounter.Count -lt 32) `
-        'external commit verification exceeds the bounded 32-target limit.'
-    $externalCommitTargetRequestCounter.Count++
+        ($githubCommitTargetRequestCounter.Count -lt 32) `
+        'GitHub commit verification exceeds the bounded 32-target limit.'
+    $githubCommitTargetRequestCounter.Count++
     $verified = $false
     try {
         $encodedRepository = ConvertTo-ApiPath $RepositoryIdentity
@@ -2837,7 +2883,7 @@ function Test-GitHubRepositoryContainsCommit {
             ([string]$record.html_url).TrimEnd('/') -ieq $canonicalUrl
     }
     catch { $verified = $false }
-    $externalCommitTargetCache[$cacheKey] = $verified
+    $githubCommitTargetCache[$cacheKey] = $verified
     return $verified
 }
 
