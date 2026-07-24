@@ -131,13 +131,16 @@ rule.
 | `FIND-0229` | A title-inclusive pass found eight secondary record IDs across closed issues [#87](https://github.com/hasanmanzak/meAndAI/issues/87), [#85](https://github.com/hasanmanzak/meAndAI/issues/85), [#83](https://github.com/hasanmanzak/meAndAI/issues/83), [#63](https://github.com/hasanmanzak/meAndAI/issues/63), and [#61](https://github.com/hasanmanzak/meAndAI/issues/61), plus closed pull requests [#62](https://github.com/hasanmanzak/meAndAI/pull/62) and [#2](https://github.com/hasanmanzak/meAndAI/pull/2); GitHub titles cannot render links | Each title retains only its leading owned feature identity, while linked related records remain in the body; all seven records kept their closed state and exact body hash |
 | `FIND-0230` | The next hosted aggregate reached [TEST-0176](test-cases.md) and found that its assertion fabricated an empty blob-link expectation when the fixture correctly detected no protocol surfaces | The assertion now snapshots graph identity before integrity-fixture resets, requires every detected surface link, requires `- None` for an empty surface set, and independently rejects an empty link label |
 | `FIND-0231` | The following hosted aggregate passed the complete quick-adoption lifecycle and then found that Markdown and authority-shaped output payloads inside immutable [MIG-0001](../../../migrations/MIG-0001.json) were being interpreted relative to the migration-definition file as live instruction edges | Non-root JSON string scalars are masked from instruction semantics while JSON instruction roots retain the full grammar; focused [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) and [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md) fixtures preserve root discovery, containment, unterminated/control-character masking failure, and the immutable migration bytes across PowerShell 5.1 and 7 |
+| `FIND-0232` | A closure pass copied an exact pushed SHA and green hosted-run facts into repository records after convergence, conflicting with the [external-evidence boundary](../../../PROTOCOL.md#post-development-convergence-scan) | The live SHA/run facts are removed from repository records; [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) remain their stable authority, and the final repository head still requires its own CI before draft promotion |
 
 ## Definition of Done
 
 - [x] Acceptance criteria, [TEST-0175](test-cases.md), and
   [TEST-0176](test-cases.md) pass.
 - [x] Focused protocol-governance and publication-evidence owners pass.
-- [x] Structural and required aggregate validation pass.
+- [x] Local focused and structural validation pass.
+- [ ] Candidate exact-head Ubuntu and Windows hosted validation passes; its
+      result remains external merge evidence.
 - [x] One bounded fresh-diff review has no unresolved `Blocking` finding.
 - [x] Historical reconciliation evidence is recorded in [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103).
 - [x] Version, changelog, feature index, project memory, and links are current.

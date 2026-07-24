@@ -76,17 +76,17 @@
   authority-shaped replacement output as JSON string payload. Non-root JSON
   strings are now opaque to instruction semantics, while JSON instruction
   roots retain full discovery and containment checks.
-- The corrected exact code head at
-  [commit 014b089](https://github.com/hasanmanzak/meAndAI/commit/014b0896bb0742aff5365516c4ac4af95c8100eb)
-  passed [hosted run 30080257096](https://github.com/hasanmanzak/meAndAI/actions/runs/30080257096)
-  on Ubuntu and Windows. The final evidence-only head still requires its own
-  exact-head hosted confirmation before draft promotion.
+- A closure pass briefly copied exact pushed-SHA and green hosted-run facts
+  into repository records after convergence. Those live facts are removed in
+  accordance with the [common protocol external-evidence boundary](../../../PROTOCOL.md#post-development-convergence-scan);
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and
+  [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) are
+  their stable external authority.
 
 ## Continuation
 
-1. Publish the evidence-only closure commit under
-   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) and
-   require its exact-head hosted validation.
+1. Require exact-head hosted validation for the converged branch under
+   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
 2. Promote the draft only after that final gate passes.
 3. After merge, publish immutable `v0.14.2`, write exact evidence to
    [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and remove
