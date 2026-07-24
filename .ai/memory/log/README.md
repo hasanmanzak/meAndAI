@@ -5,11 +5,13 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable [v0.14.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.2)
-targets commit [`671f678c8811ea715caceaabf2fd73b0933e8515`](https://github.com/hasanmanzak/meAndAI/commit/671f678c8811ea715caceaabf2fd73b0933e8515);
-[PR #115](https://github.com/hasanmanzak/meAndAI/pull/115) retains delivery
-evidence and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114)
-remains open for its corrected publication-evidence rerun.
+Immutable [v0.14.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.3)
+targets commit [`2d6cfc27418209c26cf9c27225c37938bac14dd9`](https://github.com/hasanmanzak/meAndAI/commit/2d6cfc27418209c26cf9c27225c37938bac14dd9);
+[PR #118](https://github.com/hasanmanzak/meAndAI/pull/118) retains delivery
+evidence and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
+is reopened for its corrected publication-evidence rerun. The retained
+[v0.14.2 issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remains
+open behind the same current-verifier correction.
 
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
@@ -19,10 +21,18 @@ remains open for its corrected publication-evidence rerun.
 and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) govern the
 bounded v0.14.3 propagation correction. Follow the
 [v0.14.3 handoff](2026-07-24-v0143-shared-merge-evidence.md).
+[FEAT-0049](../../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md),
+[BUG-0032](https://github.com/hasanmanzak/meAndAI/issues/119),
+[SUBF-0093](../../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md#subf-0093),
+[TEST-0181](../../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/test-cases.md#test-0181),
+and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) govern the
+bounded v0.14.4 runtime-shape correction. Follow the
+[v0.14.4 handoff](2026-07-24-v0144-paged-array-normalization.md).
 [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains the separate open follow-up in [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
 
 ## History
 
+- [2026-07-24 - v0.14.4 paged array response normalization](2026-07-24-v0144-paged-array-normalization.md)
 - [2026-07-24 - v0.14.3 shared API-2026 merge evidence](2026-07-24-v0143-shared-merge-evidence.md)
 - [2026-07-24 - v0.14.2 clickable cross-record references](2026-07-24-v0142-clickable-cross-record-references.md)
 - [2026-07-23 - v0.14.1 consumer non-duplication mandate](2026-07-23-v0141-consumer-nonduplication.md)

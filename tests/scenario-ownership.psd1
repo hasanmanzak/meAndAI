@@ -92,7 +92,10 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1'
-            TestIds = @('TEST-0083', 'TEST-0176', 'TEST-0178', 'TEST-0180')
+            TestIds = @(
+                'TEST-0083', 'TEST-0176', 'TEST-0178', 'TEST-0180',
+                'TEST-0181'
+            )
         }
         @{
             Evidence = 'ExecutableSuite'

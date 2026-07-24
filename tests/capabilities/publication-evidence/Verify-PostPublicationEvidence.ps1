@@ -2928,7 +2928,8 @@ function Invoke-GitHubPagedGet {
 
     $results = [System.Collections.Generic.List[object]]::new()
     for ($page = 1; $page -le $MaximumPages; $page++) {
-        $items = @(Invoke-GitHubGet "$Path`?per_page=100&page=$page")
+        $response = Invoke-GitHubGet "$Path`?per_page=100&page=$page"
+        $items = @($response)
         foreach ($item in $items) {
             if ($null -ne $item) {
                 $results.Add($item)

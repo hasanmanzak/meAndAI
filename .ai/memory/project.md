@@ -9,20 +9,22 @@ Last verified: **2026-07-24**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.14.3` candidate. Latest immutable release:
-  [v0.14.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.2)
-  targets commit [`671f678c8811ea715caceaabf2fd73b0933e8515`](https://github.com/hasanmanzak/meAndAI/commit/671f678c8811ea715caceaabf2fd73b0933e8515).
-  [PR #115](https://github.com/hasanmanzak/meAndAI/pull/115) retains its
-  delivery evidence; [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114)
-  remains open for the corrected publication-evidence rerun.
-- Current scope: [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
-  [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
-  [SUBF-0092](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
-  [TEST-0179](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0179),
-  [TEST-0180](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0180),
-  and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) govern the
-  v0.14.3 correction on `codex/bug-0031-shared-merge-evidence`. It propagates
-  the already accepted API-2026 merged-event contract to every live reader;
+- Current protocol version: `0.14.4` candidate. Latest immutable release:
+  [v0.14.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.3)
+  targets commit [`2d6cfc27418209c26cf9c27225c37938bac14dd9`](https://github.com/hasanmanzak/meAndAI/commit/2d6cfc27418209c26cf9c27225c37938bac14dd9).
+  [PR #118](https://github.com/hasanmanzak/meAndAI/pull/118) retains delivery
+  evidence; [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) is
+  reopened after [run 30117735612](https://github.com/hasanmanzak/meAndAI/actions/runs/30117735612)
+  exposed the real PowerShell paged-array response shape. Retained
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remains open
+  for the `v0.14.2` publication rerun.
+- Current scope: [FEAT-0049](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md),
+  [BUG-0032](https://github.com/hasanmanzak/meAndAI/issues/119),
+  [SUBF-0093](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md#subf-0093),
+  [TEST-0181](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/test-cases.md#test-0181),
+  and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) govern the
+  v0.14.4 correction on `codex/bug-0032-paged-array-normalization`. It assigns
+  each real top-level GitHub array before enumerating exact page items;
   consumers remain outside the correction.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
@@ -80,12 +82,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Publish [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
-  through one reviewed pull request and immutable v0.14.3 release under
-  [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117). Then rerun
-  the failed v0.14.2 publication gate with the corrected verifier and close
+- Publish [FEAT-0049](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md)
+  through one reviewed pull request and immutable v0.14.4 release under
+  [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119). Then rerun
+  the v0.14.4, v0.14.3, and v0.14.2 publication gates with current verifier
+  authority and close [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119),
+  [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117), and
   [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) only after
-  that evidence passes. Do not mutate a consumer as part of this correction.
+  their exact evidence passes. Do not mutate a consumer as part of this
+  correction.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
