@@ -112,6 +112,13 @@
   five Git blob/tree or structured-field literals and five Derdini commit
   occurrences; the final plan keeps the literals unchanged and API-verifies
   four exact Derdini commit targets before mutation.
+- The first exact-head hosted validation after embedded-anchor convergence
+  exposed [FIND-0238](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/README.md#find-0238):
+  [TEST-0082](../../../docs/features/FEAT-0013-v084-correction/test-cases.md#test-0082)
+  still selected the pre-anchor [TEST-0070](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0070)
+  row syntax. The contracts selector now requires the canonical explicit anchor
+  and passes on both supported PowerShell runtimes without weakening its
+  serialization/recovery assertions.
 
 ## Continuation
 

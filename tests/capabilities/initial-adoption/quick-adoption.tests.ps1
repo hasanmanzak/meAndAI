@@ -4122,7 +4122,8 @@ try {
     if (Test-Path -LiteralPath $priorScenarioPath -PathType Leaf) {
         $priorScenarios = Get-Content -LiteralPath $priorScenarioPath -Raw
         $test0070Row = [regex]::Match(
-            $priorScenarios, '(?m)^\| `TEST-0070` \|[^\r\n]+$'
+            $priorScenarios,
+            '(?m)^\| `TEST-0070` <a name="test-0070"></a> \|[^\r\n]+$'
         )
         if (-not $test0070Row.Success -or
             $test0070Row.Value.IndexOf('concurrent', [StringComparison]::OrdinalIgnoreCase) -ge 0 -or
