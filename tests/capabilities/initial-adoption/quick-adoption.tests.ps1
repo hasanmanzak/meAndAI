@@ -3772,6 +3772,18 @@ try {
                 -not $policyImportText.Contains('Get-MeAndAIProtocolAssessmentLimits')) {
                 Add-Failure 'TEST-0130 initial policy is not imported from the verified canonical release asset with its bounded contract.'
             }
+            foreach ($linkedEvidenceCommand in @(
+                'Get-MeAndAILinkedPathIdentityDigest',
+                'New-MeAndAIGitHubBlobLink',
+                'Test-MeAndAICanonicalRepositoryPath',
+                'Test-MeAndAIExactLinkedPathSection'
+            )) {
+                if (-not $policyImportText.Contains(
+                        "'$linkedEvidenceCommand'"
+                    )) {
+                    Add-Failure "TEST-0130 canonical linked-evidence command '$linkedEvidenceCommand' is not retained by the dynamic initial-policy import."
+                }
+            }
             if (-not $policyResolverText.Contains(
                     "-Name 'Resolve-MeAndAIAdoptionStrategy'"
                 ) -or

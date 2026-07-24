@@ -54,6 +54,17 @@
   marker schemas while manifest validation still stopped at the prior schema
   generation. Completion now admits the same strategy and graph-aware schema
   sets, with its existing direct schema-9 boundary acting as the regression.
+- Once that route advanced, hosted completion exposed four linked-evidence
+  helpers missing from the immutable dynamic-policy command inventory. The
+  canonical exports are now retained and the import contract checks the exact
+  set before lifecycle execution.
+- A final paginated live pass also corrected an Actions run whose label looked
+  like a pull-request identity and linked one remaining canonical idea title;
+  both historical records stayed closed.
+- A title-inclusive pass then found eight secondary cross-record IDs across
+  seven closed issue and pull-request titles. Because titles cannot render
+  links, each now keeps only its leading owned feature identity; body hashes,
+  linked relationships, and closed states were preserved exactly.
 
 ## Continuation
 
