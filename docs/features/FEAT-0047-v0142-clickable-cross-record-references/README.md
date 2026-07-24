@@ -6,7 +6,7 @@
 | Status | In progress |
 | Target version | 0.14.2 |
 | Issue | [#114](https://github.com/hasanmanzak/meAndAI/issues/114) |
-| Pull request | To be recorded in [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) |
+| Pull request | [#115](https://github.com/hasanmanzak/meAndAI/pull/115) |
 | Decisions | N/A - direct clarification of the existing clickable-link contract |
 | Tests | [TEST-0175](test-cases.md), [TEST-0176](test-cases.md) |
 
@@ -121,7 +121,7 @@ rule.
 | `FIND-0219` | Historical evidence used 21 cross-document `through` or `..` ranges whose implied records were not individually linked | The evidence now links the exact suite authority or each intended record; [TEST-0175](test-cases.md) resolves ranges through the canonical target registry and rejects cross-document shorthand, including adjacent endpoints |
 | `FIND-0220` | Reusable update and adoption evidence retained pull-request identities or managed repository paths in opaque markers and plain text that could not satisfy the direct link rule | Current writers use opaque ownership markers plus exact pull-request and immutable blob links; bounded legacy readers remain compatible and malformed or displaced marker signals fail closed |
 | `FIND-0221` | Fresh parser review found that flat inline-link and bare-URL regular expressions rejected valid balanced destinations while accepting non-rendering URL substrings, invalid boundaries, and bare localhost-style domains | Mirrored balanced Markdown parsers and GFM-compatible HTTP autolink recognition now cover nested labels, escaped or angle-delimited destinations, exact visible-URL targets, boundaries, domains, and punctuation |
-| `FIND-0222` | A fully paginated confirmation audit found no remaining free-text GitHub reference, but found 21 clickable spans in 15 records whose combined, stale-branch, directory, or wrong-kind targets were not exact | Hash-protected corrections split every combined identity and replace every proven target; the two current-delivery links remain pending until an exact pushed commit exists |
+| `FIND-0222` | A fully paginated confirmation audit found no remaining free-text GitHub reference, but found 21 clickable spans in 15 records whose combined, stale-branch, directory, or wrong-kind targets were not exact | Hash-protected corrections split every combined identity and replace every proven target; the final two current-delivery links were replaced with exact pushed-commit targets after the first branch publication |
 | `FIND-0223` | Cross-runtime closure exposed helper-function scope loss and culture-dependent GitHub release timestamp parsing in existing update test paths | Required helpers are captured into isolated scopes and release evidence normalizes native date values without culture-dependent string round-tripping |
 
 ## Definition of Done
@@ -131,9 +131,9 @@ rule.
 - [ ] Focused protocol-governance and publication-evidence owners pass.
 - [ ] Structural and required aggregate validation pass.
 - [ ] One bounded fresh-diff review has no unresolved `Blocking` finding.
-- [ ] Historical reconciliation evidence is recorded in [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103).
+- [x] Historical reconciliation evidence is recorded in [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103).
 - [x] Version, changelog, feature index, project memory, and links are current.
-- [ ] [Issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and the delivery pull request link each other and this feature record.
+- [x] [Issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) and [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115) link each other and this feature record.
 
 ## Post-merge release evidence
 

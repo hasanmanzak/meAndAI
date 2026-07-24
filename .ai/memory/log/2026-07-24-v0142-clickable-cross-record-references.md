@@ -24,10 +24,11 @@
   records and found no free-text reference, but found 21 clickable spans in 15
   records whose combined, stale-branch, directory, or wrong-kind targets were
   not exact. Fourteen records and 19 spans were corrected through fresh
-  precondition and post-apply hashes. The remaining two links in
+  precondition and post-apply hashes. After the first branch publication, the
+  final two links in
   [issue comment 5065074103](https://github.com/hasanmanzak/meAndAI/issues/114#issuecomment-5065074103)
-  require this candidate's exact pushed commit and remain pending until the
-  branch is published.
+  were replaced with exact pushed-commit targets and verified by post-apply
+  hash.
 - A final repository scan found and corrected three code-formatted numeric
   shorthands that the first shorthand fixture did not reject; [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md)
   now covers that combined form. Completed records stayed closed and consumer
@@ -40,9 +41,10 @@
 
 ## Continuation
 
-1. Publish the candidate branch, replace the two current-delivery links with
-   exact pushed-commit targets, and open one linked delivery pull request.
-2. Complete hosted Ubuntu and Windows validation and one final fresh review.
+1. Complete the remaining local and hosted validation under
+   [pull request #115](https://github.com/hasanmanzak/meAndAI/pull/115).
+2. Complete one final fresh review and promote the draft only after all gates
+   pass.
 3. After review and merge, publish immutable `v0.14.2`, write exact evidence to
    [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114), and remove
    only the owned delivery branch.
