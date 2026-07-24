@@ -480,7 +480,7 @@ function Import-CanonicalInitialAdoptionPolicy {
             [long]$graphLimits.MaximumTreeEntries -ne 65536 -or
             [long]$graphLimits.MaximumTreePathUtf8Bytes -ne 4194304 -or
             [long]$graphLimits.MaximumNodes -ne 256 -or
-            [long]$graphLimits.MaximumEdges -ne 2048 -or
+            [long]$graphLimits.MaximumEdges -ne 4096 -or
             [long]$graphLimits.MaximumDepth -ne 32 -or
             [long]$graphLimits.MaximumBlobBytes -ne 262144 -or
             [long]$graphLimits.MaximumAggregateBlobBytes -ne 4194304 -or

@@ -20,6 +20,12 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$sharedMergeEvidenceModule = Join-Path $PSScriptRoot `
+    '../../../templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+if (-not (Test-Path -LiteralPath $sharedMergeEvidenceModule -PathType Leaf)) {
+    throw "TEST-0065 shared merge-evidence resolver is missing: $sharedMergeEvidenceModule"
+}
+Import-Module $sharedMergeEvidenceModule -Force
 $originalValidationCulture = [Threading.Thread]::CurrentThread.CurrentCulture
 try {
     [Threading.Thread]::CurrentThread.CurrentCulture =
@@ -3463,7 +3469,15 @@ $pullRequest = Invoke-GitHubGet "pulls/$PullRequestNumber"
 Assert-PostPublicationCondition `
     ($pullRequest.state -ceq 'closed' -and $null -ne $pullRequest.merged_at) `
     'delivery pull request is not merged.'
-Assert-PostPublicationCondition ($pullRequest.merge_commit_sha -ceq $ExpectedCommit) `
+$pullRequestEvents = @(Invoke-GitHubPagedGet "issues/$PullRequestNumber/events")
+try {
+    $pullRequestMergeCommit = Resolve-MeAndAIMergedCommitEvidence `
+        -Events $pullRequestEvents -EvidenceLabel 'Delivery pull request'
+}
+catch {
+    throw "TEST-0065 $($_.Exception.Message)"
+}
+Assert-PostPublicationCondition ($pullRequestMergeCommit -ceq $ExpectedCommit) `
     'delivery pull request does not resolve to the exact released commit.'
 Assert-PostPublicationCondition ($pullRequest.base.ref -ceq $DefaultBranch) `
     'delivery pull request does not target the default branch.'

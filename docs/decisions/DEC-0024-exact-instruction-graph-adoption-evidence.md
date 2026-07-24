@@ -141,8 +141,8 @@ neither reachable nor matched by the versioned compatibility seed remains
 protected unknown evidence: it is not live authority, does not block freshness,
 and cannot be changed or deleted by this feature.
 
-The first schema has inclusive limits of 65,536 inspected tree entries,
-4,194,304 UTF-8 bytes across their paths, 256 nodes, 2,048 edges, depth 32,
+The current schema has inclusive limits of 65,536 inspected tree entries,
+4,194,304 UTF-8 bytes across their paths, 256 nodes, 4,096 edges, depth 32,
 262,144 bytes for one parsed blob, 4,194,304 aggregate parsed bytes, and 16,384
 UTF-8 bytes for the graph-node path inventory. One tree path is also bounded by
 the graph-node path limit so a pre-terminator tree record cannot grow without
@@ -154,9 +154,16 @@ required all-reference traversal over meAndAI's own exact baseline produced
 1,108 canonical edges from 318 tree entries and 185 nodes. Retaining 1,024
 would therefore violate both transitive traversal and the decision that
 meAndAI is an ordinary consumer. Before any schema was released, the first-
-schema ceiling was corrected to 2,048 and bound with exact N/N+1 tests; this is
-an evidence-backed pre-release implementation correction, not a compatibility
-change to a published graph schema.
+schema ceiling was corrected to 2,048 and bound with exact N/N+1 tests.
+
+After `v0.14.2`, the ordinary meAndAI self-consumer graph used 2,039 of those
+2,048 edges. The required `v0.14.3` feature, test, memory, and release-evidence
+links produced 2,061 canonical edges without changing traversal semantics.
+Deleting valid traceability would only postpone the same capacity failure, so
+`v0.14.3` raises the release-declared inclusive edge ceiling to 4,096 and keeps
+the same fail-closed exact N/N+1 boundary. Older immutable releases retain their
+encoded 2,048-edge contract; the current launcher imports and validates the
+policy owned by its exact runtime release.
 
 ### Evidence is not mutation authority
 

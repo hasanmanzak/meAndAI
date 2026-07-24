@@ -2111,14 +2111,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            '906f94ff5dcfbd41a39edbbb4f75f86798eacd96b895de27019018a333c6f6bd') `
+            'c60615ee964e1ec2a63d7642f81849e58babaa13f288eca2013a92112421700d') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
         $compactGraphJsonSha = Get-TestSha256Hex -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            '7b535df7de8e398c80e652f84cfb5ee97bce1d8be30a10d6b4e33432e9503ad3') `
+            '310ef00d7f6ffc737042b52956532431a6df74c4bad71c404f855a49e4801d17') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -4001,7 +4001,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumTreeEntries -eq 65536 -and
             [int]$limits.MaximumTreePathUtf8Bytes -eq 4194304 -and
             [int]$limits.MaximumNodes -eq 256 -and
-            [int]$limits.MaximumEdges -eq 2048 -and
+            [int]$limits.MaximumEdges -eq 4096 -and
             [int]$limits.MaximumDepth -eq 32 -and
             [int]$limits.MaximumBlobBytes -eq 262144 -and
             [int]$limits.MaximumAggregateBlobBytes -eq 4194304 -and

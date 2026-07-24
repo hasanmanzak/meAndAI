@@ -110,6 +110,33 @@ function Test-MeAndAIExactOrdinalPathSet {
     return $actualSet.SetEquals($expectedSet)
 }
 
+function Resolve-MeAndAIMergedCommitEvidence {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Events,
+        [ValidateNotNullOrEmpty()][string]$EvidenceLabel = 'Merge evidence'
+    )
+
+    $mergedEvents = @($Events | Where-Object {
+        if ($null -eq $_) { return $false }
+        $eventProperty = $_.PSObject.Properties['event']
+        return $null -ne $eventProperty -and
+            $eventProperty.Value -is [string] -and
+            [string]$eventProperty.Value -ceq 'merged'
+    })
+    if ($mergedEvents.Count -ne 1) {
+        throw "$EvidenceLabel does not have one exact merged event."
+    }
+
+    $commitProperty = $mergedEvents[0].PSObject.Properties['commit_id']
+    if ($null -eq $commitProperty -or
+        $commitProperty.Value -isnot [string] -or
+        [string]$commitProperty.Value -cnotmatch '^[0-9a-f]{40}$') {
+        throw "$EvidenceLabel merged event has an invalid commit identity."
+    }
+    return [string]$commitProperty.Value
+}
+
 function Get-MeAndAIProtocolCandidateProblems {
     [CmdletBinding()]
     param(
@@ -728,6 +755,7 @@ function Resolve-MeAndAIProtocolUpdatePlan {
 
 Export-ModuleMember -Function @(
     'Resolve-MeAndAIProtocolUpdatePlan', 'Get-MeAndAIProtocolCandidateProblems',
+    'Resolve-MeAndAIMergedCommitEvidence',
     'Test-MeAndAIProtocolTag', 'Test-MeAndAIExactOrdinalPathSet',
     'Get-MeAndAICompatibleProtocolTagsInOrder'
 )

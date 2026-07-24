@@ -3,6 +3,34 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.14.3 - 2026-07-24
+
+### Fixed
+
+- Reuse one exact merged issue-event resolver for every GitHub API
+  `2026-03-10` merge-evidence reader instead of depending on the removed pull-
+  request `merge_commit_sha` field.
+- Preserve caller-owned pagination, containment, mutation ordering, and exact
+  release-commit comparison while rejecting missing, duplicate, malformed, or
+  wrong-case merge evidence.
+- Add a version-qualified production-reader guard so the API-2026 contract
+  cannot diverge again without rejecting unaffected API-2022 callers.
+- Execute current post-publication verifier authority from a detached clean
+  worktree of the requested immutable release, so historical reruns do not
+  reload obsolete verifier code.
+- Raise the exact bounded instruction-graph edge ceiling from 2,048 to 4,096
+  after self-consumer evidence grew legitimately from 2,039 to 2,061 edges;
+  retain the existing fail-closed exact-boundary tests.
+
+Related work: [FEAT-0048](docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
+[BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
+[TEST-0179](docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0179),
+[TEST-0180](docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0180),
+[FEAT-0038](docs/features/FEAT-0038-v0127-api-safe-merge-finalization/README.md),
+[issue #117](https://github.com/hasanmanzak/meAndAI/issues/117), and the
+corrected v0.14.2 publication evidence retained by
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114).
+
 ## 0.14.2 - 2026-07-24
 
 ### Fixed

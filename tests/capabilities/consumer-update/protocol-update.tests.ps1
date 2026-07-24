@@ -28,6 +28,67 @@ function Assert-Equal {
     }
 }
 
+$mergeEvidenceResolver = Get-Command Resolve-MeAndAIMergedCommitEvidence `
+    -ErrorAction SilentlyContinue
+if ($null -eq $mergeEvidenceResolver) {
+    Add-Failure 'TEST-0179 shared merged-event evidence resolver is missing.'
+}
+else {
+    $expectedMergeCommit = 'd' * 40
+    try {
+        $resolvedMergeCommit = Resolve-MeAndAIMergedCommitEvidence -Events @(
+            [pscustomobject]@{ event = 'labeled'; commit_id = $null },
+            [pscustomobject]@{ event = 'merged'; commit_id = $expectedMergeCommit }
+        )
+        Assert-Equal $expectedMergeCommit $resolvedMergeCommit `
+            'TEST-0179 exact merged-event commit evidence is wrong'
+    }
+    catch {
+        Add-Failure "TEST-0179 exact merged-event evidence threw: $($_.Exception.Message)"
+    }
+
+    $invalidMergeEvidenceCases = @(
+        @{ Name = 'empty'; Events = @(); Error = '*one exact merged event*' },
+        @{ Name = 'wrong event'; Events = @(
+                [pscustomobject]@{ event = 'closed'; commit_id = $expectedMergeCommit }
+            ); Error = '*one exact merged event*' },
+        @{ Name = 'numeric event'; Events = @(
+                [pscustomobject]@{ event = 1; commit_id = $expectedMergeCommit }
+            ); Error = '*one exact merged event*' },
+        @{ Name = 'duplicate'; Events = @(
+                [pscustomobject]@{ event = 'merged'; commit_id = $expectedMergeCommit },
+                [pscustomobject]@{ event = 'merged'; commit_id = ('e' * 40) }
+            ); Error = '*one exact merged event*' },
+        @{ Name = 'missing commit'; Events = @(
+                [pscustomobject]@{ event = 'merged' }
+            ); Error = '*invalid commit identity*' },
+        @{ Name = 'null commit'; Events = @(
+                [pscustomobject]@{ event = 'merged'; commit_id = $null }
+            ); Error = '*invalid commit identity*' },
+        @{ Name = 'numeric commit'; Events = @(
+                [pscustomobject]@{ event = 'merged'; commit_id = 42 }
+            ); Error = '*invalid commit identity*' },
+        @{ Name = 'uppercase commit'; Events = @(
+                [pscustomobject]@{ event = 'merged'; commit_id = ('D' * 40) }
+            ); Error = '*invalid commit identity*' },
+        @{ Name = 'short commit'; Events = @(
+                [pscustomobject]@{ event = 'merged'; commit_id = ('d' * 39) }
+            ); Error = '*invalid commit identity*' }
+    )
+    foreach ($invalidCase in $invalidMergeEvidenceCases) {
+        try {
+            $unexpected = Resolve-MeAndAIMergedCommitEvidence `
+                -Events @($invalidCase.Events)
+            Add-Failure "TEST-0179 $($invalidCase.Name) evidence returned '$unexpected'."
+        }
+        catch {
+            if ($_.Exception.Message -notlike [string]$invalidCase.Error) {
+                Add-Failure "TEST-0179 $($invalidCase.Name) evidence failed with the wrong contract: $($_.Exception.Message)"
+            }
+        }
+    }
+}
+
 function New-Candidate {
     param(
         [int]$Number,
