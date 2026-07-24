@@ -1,18 +1,18 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-24**<br>
-Protocol version: **0.14.4** (candidate)<br>
-Latest immutable release: **0.14.3**
+Last reviewed: **2026-07-25**<br>
+Protocol version: **0.14.5** (candidate)<br>
+Latest immutable release: **0.14.4**
 
-The immutable [v0.14.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.3)
-release targets commit [`2d6cfc27418209c26cf9c27225c37938bac14dd9`](https://github.com/hasanmanzak/meAndAI/commit/2d6cfc27418209c26cf9c27225c37938bac14dd9);
-[PR #118](https://github.com/hasanmanzak/meAndAI/pull/118) retains delivery
-evidence. [Issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) is
-reopened because [run 30117735612](https://github.com/hasanmanzak/meAndAI/actions/runs/30117735612)
-exposed the real PowerShell paged-array shape. The earlier
-[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remains open for
-the retained `v0.14.2` rerun. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+The immutable [v0.14.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.4)
+release targets commit [`edf4c5d496df239aeb3f14c03b7109215af9128f`](https://github.com/hasanmanzak/meAndAI/commit/edf4c5d496df239aeb3f14c03b7109215af9128f);
+[PR #120](https://github.com/hasanmanzak/meAndAI/pull/120) retains delivery
+evidence and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) is
+closed. [Issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remain open
+because a valid nested [AGENTS.md](../../AGENTS.md) link exposed a common
+basename-label false positive. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
@@ -31,6 +31,14 @@ bounded v0.14.3 API-2026 merge-evidence propagation correction. Follow the
 and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) own the
 bounded `v0.14.4` runtime-shape correction. Follow the
 [v0.14.4 handoff](log/2026-07-24-v0144-paged-array-normalization.md).
+
+[FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md)
+/ [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
+[SUBF-0094](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md#subf-0094),
+[TEST-0182](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
+and [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) own the
+bounded `v0.14.5` basename-label correction. Follow the
+[v0.14.5 handoff](log/2026-07-25-v0145-bare-document-basename-links.md).
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

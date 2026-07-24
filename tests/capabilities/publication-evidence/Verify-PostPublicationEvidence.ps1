@@ -1505,6 +1505,7 @@ function Test-ExactCrossRecordTarget {
 function Test-VisibleRepositoryPathMatchesLinkTarget {
     param(
         [AllowEmptyString()][string]$SourceRepositoryPath,
+        [Parameter(Mandatory)][string]$VisibleLabel,
         [Parameter(Mandatory)][string]$VisiblePath,
         [Parameter(Mandatory)][string]$Target
     )
@@ -1519,6 +1520,16 @@ function Test-VisibleRepositoryPathMatchesLinkTarget {
     if ($actualTarget.Contains('#')) {
         $actualFragment = '#' + ($actualTarget -split '#', 2)[1]
     }
+    $visiblePathComponent = ([uri]::UnescapeDataString(
+        ($visibleTarget -replace '[?#].*$', '')
+    )).Replace('\', '/')
+    $decodedVisibleLabel = ([uri]::UnescapeDataString(
+        $VisibleLabel
+    )).Replace('\', '/')
+    $isBareVisibleDocumentName =
+        -not [string]::IsNullOrEmpty($visiblePathComponent) -and
+        -not $visiblePathComponent.Contains('/') -and
+        -not $decodedVisibleLabel.Contains('/')
     $visiblePath = Resolve-RepositoryDocumentPath `
         -SourceRepositoryPath $SourceRepositoryPath `
         -Target $visibleTarget
@@ -1532,8 +1543,14 @@ function Test-VisibleRepositoryPathMatchesLinkTarget {
     $actualPath = Resolve-RepositoryDocumentPath `
         -SourceRepositoryPath $SourceRepositoryPath `
         -Target $actualTarget
+    $pathMatches = $actualPath -ceq $visiblePath
+    if (-not $pathMatches -and $isBareVisibleDocumentName -and
+        -not [string]::IsNullOrEmpty($actualPath)) {
+        $actualDocumentName = @($actualPath -split '/')[-1]
+        $pathMatches = $actualDocumentName -ceq $visiblePathComponent
+    }
     return -not [string]::IsNullOrEmpty($visiblePath) -and
-        $actualPath -ceq $visiblePath -and
+        $pathMatches -and
         ([string]::IsNullOrEmpty($visibleFragment) -or
             $actualFragment -ceq $visibleFragment)
 }
@@ -2356,6 +2373,7 @@ function Assert-NoFreeTextCrossRecordReference {
             Assert-PostPublicationCondition `
                 (Test-VisibleRepositoryPathMatchesLinkTarget `
                     -SourceRepositoryPath $SourceRepositoryPath `
+                    -VisibleLabel $label `
                     -VisiblePath ([string]$visiblePath.Value) `
                     -Target $target) `
                 "$Surface links visible repository-document path '$($visiblePath.Value)' to a different target."
