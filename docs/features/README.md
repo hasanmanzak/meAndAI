@@ -51,6 +51,7 @@
 | [FEAT-0047](FEAT-0047-v0142-clickable-cross-record-references/README.md) | [Clickable cross-record references](FEAT-0047-v0142-clickable-cross-record-references/README.md) | Complete | 0.14.2 |
 | [FEAT-0048](FEAT-0048-v0143-shared-merge-evidence/README.md) | [Shared API-2026 merge evidence](FEAT-0048-v0143-shared-merge-evidence/README.md) | Complete; publication evidence reopened | 0.14.3 |
 | [FEAT-0049](FEAT-0049-v0144-paged-array-response-normalization/README.md) | [Paged GitHub array response normalization](FEAT-0049-v0144-paged-array-response-normalization/README.md) | Complete | 0.14.4 |
+| [FEAT-0050](FEAT-0050-v0145-bare-document-basename-links/README.md) | [Exact bare document basename links](FEAT-0050-v0145-bare-document-basename-links/README.md) | Complete | 0.14.5 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

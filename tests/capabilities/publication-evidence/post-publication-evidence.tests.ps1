@@ -208,7 +208,7 @@ $global:MeAndAIPostPublicationLauncherBytes =
     [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes.Clone()
 $global:MeAndAIPostPublicationSourceBytes = @{
     $bundleEntryPoint = [Text.UTF8Encoding]::new($false).GetBytes(
-        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.4' }`n"
+        "@{ RootModule = 'MeAndAI.QuickAdoption.psm1'; ModuleVersion = '0.14.5' }`n"
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
@@ -1344,6 +1344,32 @@ $headingCollision
         }
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$decisionPath`?ref=$commit") {
+        $relatedDocumentLine = switch (
+            $global:MeAndAIPostPublicationMode
+        ) {
+            'BareVisiblePathExactTarget' {
+                'Related document: [AGENTS.md](../../AGENTS.md).'
+            }
+            'BareVisiblePathWrongTarget' {
+                'Related document: [AGENTS.md](../../PROTOCOL.md).'
+            }
+            'BareVisiblePathWrongCase' {
+                'Related document: [agents.md](../../AGENTS.md).'
+            }
+            'BareVisiblePathMatchingFragment' {
+                'Related document: [AGENTS.md#scope](../../AGENTS.md#scope)'
+            }
+            'BareVisiblePathWrongFragment' {
+                'Related document: [AGENTS.md#scope](../../AGENTS.md#other)'
+            }
+            'BareVisiblePathEncodedForwardSeparator' {
+                'Related document: [dir%2FAGENTS.md](../../2FAGENTS.md).'
+            }
+            'BareVisiblePathEncodedBackwardSeparator' {
+                'Related document: [dir%5CAGENTS.md](../../5CAGENTS.md).'
+            }
+            default { '' }
+        }
         return [pscustomobject]@{
             type = 'file'
             path = $decisionPath
@@ -1351,7 +1377,7 @@ $headingCollision
             encoding = 'base64'
             content = [Convert]::ToBase64String(
                 [Text.Encoding]::UTF8.GetBytes(
-                    "# DEC-0042 - Release Evidence Authority`n`nRelated feature: [FEAT-0042](../features/FEAT-0042-release-evidence/README.md).`n`n| ID | Risk |`n| --- | --- |`n| ``RISK-0043`` <a name=`"risk-0043`"></a> | Publication authority can drift |`n"
+                    "# DEC-0042 - Release Evidence Authority`n`nRelated feature: [FEAT-0042](../features/FEAT-0042-release-evidence/README.md).`n`n$relatedDocumentLine`n`n| ID | Risk |`n| --- | --- |`n| ``RISK-0043`` <a name=`"risk-0043`"></a> | Publication authority can drift |`n"
                 )
             )
         }
@@ -1750,6 +1776,43 @@ try {
             -Mode 'ReferenceStyleLinks'
         if ($referenceStyleEvidence.Threw) {
             Add-Failure "TEST-0176 valid reference-style Markdown links failed: $($referenceStyleEvidence.Error)"
+        }
+        $bareVisiblePathEvidence = Invoke-PostPublicationScenario `
+            -Mode 'BareVisiblePathExactTarget'
+        if ($bareVisiblePathEvidence.Threw) {
+            Add-Failure "TEST-0182 exact bare document basename failed: $($bareVisiblePathEvidence.Error)"
+        }
+        $bareVisiblePathFragmentEvidence = Invoke-PostPublicationScenario `
+            -Mode 'BareVisiblePathMatchingFragment'
+        if ($bareVisiblePathFragmentEvidence.Threw) {
+            Add-Failure "TEST-0182 exact bare document basename with matching fragment failed: $($bareVisiblePathFragmentEvidence.Error)"
+        }
+        $wrongBareVisiblePathEvidence = Invoke-PostPublicationScenario `
+            -Mode 'BareVisiblePathWrongTarget'
+        if (-not $wrongBareVisiblePathEvidence.Threw -or
+            $wrongBareVisiblePathEvidence.Error -notlike
+                '*links visible repository-document path*different target*') {
+            Add-Failure "TEST-0182 wrong bare document basename did not fail closed: $($wrongBareVisiblePathEvidence.Error)"
+        }
+        $wrongCaseBareVisiblePathEvidence = Invoke-PostPublicationScenario `
+            -Mode 'BareVisiblePathWrongCase'
+        if (-not $wrongCaseBareVisiblePathEvidence.Threw -or
+            $wrongCaseBareVisiblePathEvidence.Error -notlike
+                '*links visible repository-document path*different target*') {
+            Add-Failure "TEST-0182 wrong-case bare document basename did not fail closed: $($wrongCaseBareVisiblePathEvidence.Error)"
+        }
+        foreach ($negativeBareVisiblePathMode in @(
+            'BareVisiblePathWrongFragment',
+            'BareVisiblePathEncodedForwardSeparator',
+            'BareVisiblePathEncodedBackwardSeparator'
+        )) {
+            $negativeBareVisiblePathEvidence = Invoke-PostPublicationScenario `
+                -Mode $negativeBareVisiblePathMode
+            if (-not $negativeBareVisiblePathEvidence.Threw -or
+                $negativeBareVisiblePathEvidence.Error -notlike
+                    '*links visible repository-document path*different target*') {
+                Add-Failure "TEST-0182 $negativeBareVisiblePathMode did not fail closed: $($negativeBareVisiblePathEvidence.Error)"
+            }
         }
         foreach ($positiveMode in @(
             'IssueCommentOnlyPullLink',

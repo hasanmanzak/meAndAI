@@ -4,17 +4,18 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.14.4** (candidate)
+Current protocol version: **0.14.5** (candidate)
 
-For v0.14.4, publication authority is the repository's
+For v0.14.5, publication authority is the repository's
 [GitHub Releases](https://github.com/hasanmanzak/meAndAI/releases) surface,
-[delivery issue #119](https://github.com/hasanmanzak/meAndAI/issues/119); this
+[delivery issue #121](https://github.com/hasanmanzak/meAndAI/issues/121); this
 file does not assert a pre-merge release state. Immutable
-[v0.14.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.3)
-remains the latest published release while its runtime-shape publication
-correction is tracked by [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119).
-The retained `v0.14.2` rerun remains tracked by
-[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114).
+[v0.14.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.4)
+remains the latest published release. The retained `v0.14.3` and `v0.14.2`
+reruns remain tracked by [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
+and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) behind the
+common basename-link correction in
+[issue #121](https://github.com/hasanmanzak/meAndAI/issues/121).
 [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains open as the separate residual runtime owner.
 

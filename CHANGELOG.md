@@ -3,6 +3,27 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.14.5 - 2026-07-25
+
+### Fixed
+
+- Accept a decoded, separator-free visible Markdown document filename only
+  when it equals the case-sensitive basename of the already-resolved link
+  target.
+- Preserve exact resolved-path equality for labels containing directory
+  syntax and retain the existing fragment, link-existence, and wrong-target
+  rejection contracts.
+- Cover the distinction in the project-neutral publication-evidence capability
+  without adding another parser, validator, fixture framework, or consumer
+  implementation.
+
+Related work: [FEAT-0050](docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
+[BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
+[TEST-0182](docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
+[issue #121](https://github.com/hasanmanzak/meAndAI/issues/121), and the
+retained publication closures in [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
+and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114).
+
 ## 0.14.4 - 2026-07-24
 
 ### Fixed
