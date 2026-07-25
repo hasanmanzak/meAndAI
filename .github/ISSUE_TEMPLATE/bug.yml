@@ -39,6 +39,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: prior_art_recurrence
+    attributes:
+      label: Prior-art and recurrence evidence
+      description: "Follow the [approved recurrence readiness evidence](https://github.com/hasanmanzak/meAndAI/blob/b55fc072caf96672a73f697002d2a2028c528da1/docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#readiness-evidence) and [canonical ownership decision](https://github.com/hasanmanzak/meAndAI/blob/b55fc072caf96672a73f697002d2a2028c528da1/docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md#decision). Matching active entry or explicit None; link the canonical owner and same-contract sibling surfaces, and record any failed route plus new evidence, an explicit retry contract, a materially different route, or a Blocked outcome."
+    validations:
+      required: true
+  - type: textarea
     id: references
     attributes:
       label: Related records

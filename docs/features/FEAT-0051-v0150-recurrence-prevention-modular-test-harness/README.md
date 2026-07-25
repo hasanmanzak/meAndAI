@@ -3,15 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed |
+| Status | In progress |
 | Target version | 0.15.0 |
 | Issue | [Issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) |
-| Pull request | Pending planning pull request; tracked through [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) |
+| Pull request | Implementation pull request pending; planning completed through [PR #129](https://github.com/hasanmanzak/meAndAI/pull/129) |
 | Decisions | [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
-This record registers approved planning scope. It does not authorize
-implementation, change the current `0.14.5` protocol, or publish `0.15.0`.
+Implementation was authorized on 2026-07-25 and is proceeding in the declared
+subfeature order. The current branch does not publish `0.15.0`; release remains
+a separate post-merge gate.
 
 ## Problem
 
@@ -135,14 +136,14 @@ runtimes, or workflow topology.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0183](test-cases.md#test-0183), [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) |
-| Test code | Not started | Exact executable owners are established in the owning subfeature before implementation. |
-| Baseline run | Planning structure passed; planned behavior not run | `tests/protocol.tests.ps1 -StructureOnly` passed on 2026-07-25; no v0.15.0 executable test code exists. |
+| Test code | Partially implemented | [TEST-0183](test-cases.md#test-0183) has an executable owner; [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) remain planned. |
+| Baseline run | [SUBF-0095](#subf-0095) focused test passed; later slices not run | `tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1` passed on Windows PowerShell 5.1 on 2026-07-25. |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0095` <a name="subf-0095"></a> | Recurrence-prevention and durable prior-solution gate | [Issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) | [TEST-0183](test-cases.md#test-0183); not started | Required after the slice | Proposed |
+| `SUBF-0095` <a name="subf-0095"></a> | Recurrence-prevention and durable prior-solution gate | [Issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) | [TEST-0183](test-cases.md#test-0183) and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0245](#find-0245) through [FIND-0254](#find-0254); all Blocking findings resolved, [FIND-0250](#find-0250) accepted | Implemented and locally reviewed; feature PR pending |
 | `SUBF-0096` <a name="subf-0096"></a> | Canonical shared test-harness and helper ownership | [Issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) | [TEST-0184](test-cases.md#test-0184); not started | Required after the slice | Proposed |
 | `SUBF-0097` <a name="subf-0097"></a> | Runner, harness, case/scenario, support, fixture, and runtime-evidence separation | [Issue #126](https://github.com/hasanmanzak/meAndAI/issues/126) | [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186); not started | Required after the slice | Proposed |
 | `SUBF-0098` <a name="subf-0098"></a> | Staged self-application, duplicate-family consolidation, append-only capability, and compatibility closure | [Issue #127](https://github.com/hasanmanzak/meAndAI/issues/127) | [TEST-0187](test-cases.md#test-0187), [TEST-0188](test-cases.md#test-0188); not started | Required after the slice | Proposed |
@@ -172,8 +173,8 @@ runtimes, or workflow topology.
 - [x] Numbered test scenarios and verification approach.
 - [x] Test-code and baseline-run states recorded.
 
-Gate 1 is documented for future implementation. A separate maintainer directive
-is still required before executable work begins.
+Gate 1 was satisfied before implementation. The maintainer authorized the
+declared implementation sequence on 2026-07-25.
 
 ## Acceptance criteria
 
@@ -199,20 +200,49 @@ is still required before executable work begins.
 
 ## Self-review
 
-Planning review date: 2026-07-25.
+Planning review date: 2026-07-25. SUBF-0095 implementation review date:
+2026-07-25.
 
-Declared review scope is this planning record, its decision, scenarios, indexes,
-issue links, and project-memory handoff. Production code, capability blobs,
-workflows, version files, and release state are excluded because implementation
-has not been authorized. The finite validation budget is `git diff --check`, one
-`StructureOnly` run, link/ID consistency, and one fresh-diff review.
-
-The first `StructureOnly` run exposed one pre-existing planning-integrity gap:
+The planning review covered the planning record, decision, scenarios, indexes,
+issue links, and planning handoff. The SUBF-0095 review covers only its
+normative recurrence contract, work templates, optional stability prompt,
+project-memory schema/example, scenario authority, and focused structural test.
+Updater behavior, workflows, capability blobs, version files, and later
+subfeatures remain excluded. The slice budget is one focused red/green cycle,
+`git diff --check`, one final `StructureOnly` confirmation, link/ID consistency,
+and one fresh-diff review.
 
 | ID | Severity | Disposition | Finding | Resolution |
 | --- | --- | --- | --- | --- |
 | `FIND-0243` <a name="find-0243"></a> | Medium | `Blocking` | The canonical scenario registry had no non-executable evidence kind for numbered scenarios that Gate 1 requires before their test code exists, so the six new planned scenarios could not be registered honestly. | Extended existing [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) with `PlannedDocumentation`: the exact owner must be a feature `test-cases.md`, its declaration must remain `Planned`, and no active `.ps1` may assert the ID. `StructureOnly` passed after the correction. Implementation must atomically replace this authority with the exact executable suite. |
 | `FIND-0244` <a name="find-0244"></a> | Medium | `Blocking` | The first `PlannedDocumentation` guard draft re-read the entire test tree once per planned ID and duplicated the historical-supersession scan family. | Built one source-to-scenario inventory and reused it for planned and superseded checks; exact source-path diagnostics remain, and [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) passed through the final `StructureOnly` confirmation. |
+| `FIND-0245` <a name="find-0245"></a> | Medium | `Blocking` | The first focused [TEST-0183](test-cases.md#test-0183) harness rejected an intentional empty-string surface before it could report the missing recurrence clauses, masking the intended red evidence. | Allowed the explicit empty-string case, reran the focused suite, and captured the meaningful 75-observation red before implementing the contract. |
+| `FIND-0246` <a name="find-0246"></a> | High | `Blocking` | The first post-implementation structural run found five non-clickable or incomplete references introduced by the slice. | Replaced each aggregate or plain identifier with its exact clickable target before the slice confirmation. |
+| `FIND-0247` <a name="find-0247"></a> | High | `Blocking` | Fresh-diff review found stale Proposed/wait memory, ambiguous Gate links, an incorrect schema-decision owner for the host failure, and guidance that would remove stale/superseded routing tombstones from the active index. | Updated the current handoff and status, linked each exact gate, assigned the project-local owner separately from [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md), and retained concise tombstones while moving only detail to dated logs. |
+| `FIND-0248` <a name="find-0248"></a> | High | `Blocking` | [TEST-0183](test-cases.md#test-0183) described runtime matching and integration behavior although its implementation is a structural contract test; its first form check also did not prove the recurrence textarea itself was required. | Narrowed the scenario to Structural / contract evidence and bound each exact form field block to exactly one `validations.required: true` clause. |
+| `FIND-0249` <a name="find-0249"></a> | High | `Blocking` | The first [TEST-0183](test-cases.md#test-0183) implementation introduced local generic read/assert helpers immediately before [SUBF-0096](#subf-0096) defines canonical harness ownership. | Replaced those helpers with declarative case tables and direct loops; the suite now defines no generic helper functions. |
+| `FIND-0250` <a name="find-0250"></a> | Low | `AcceptedResidual` | GitHub issue forms repeat the same declarative recurrence textarea in five form files because GitHub issue forms provide no reusable include primitive. | The repeated YAML is retained as provider-required declaration, not executable logic. Protocol maintainers own it under [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md); review if GitHub adds reusable form components. A generator or validator framework is explicitly out of scope. |
+| `FIND-0251` <a name="find-0251"></a> | Medium | `Blocking` | The first final StructureOnly run rejected the newly created SUBF-0095 handoff because it was not yet registered in the canonical memory-log index. | Added the exact handoff to the current continuation and History index, and kept the planning handoff as historical evidence. |
+| `FIND-0252` <a name="find-0252"></a> | High | `Blocking` | Final GitHub-surface review found that repository-relative protocol links in issue forms and the PR body template resolve from live issue/PR URLs rather than their source-file locations. | Replaced those links with immutable full-SHA permalinks to the approved readiness and decision authorities, and made [TEST-0183](test-cases.md#test-0183) require both canonical URLs in every affected work surface. |
+| `FIND-0253` <a name="find-0253"></a> | High | `Blocking` | Final protocol review found that the recurrence slice stated the new Gate 5 closure rule without mapping each of its own findings to an executable barrier or reviewed NotApplicable authority. | Added this per-finding closure ledger, including explicit authority and review conditions, and made [TEST-0183](test-cases.md#test-0183) retain the ledger. |
+| `FIND-0254` <a name="find-0254"></a> | High | `Blocking` | The first full link-policy confirmation reported 38 messages produced by three root defects: mutable same-repository guidance URLs, handoff labels that reused canonical record identities for non-canonical targets, and visible identity repetitions outside their exact links. | Replaced the guidance URLs with verified full-SHA authority permalinks, made handoff labels identity-neutral, linked every visible Gate/finding/work identity to its exact target, and reran StructureOnly successfully. The 38 messages were validation observations, not 38 independent defects. |
+
+### Gate 5 closure for the recurrence slice
+
+| Finding | Closure | Authority and review condition |
+| --- | --- | --- |
+| [FIND-0243](#find-0243) | Barrier: [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) | Scenario-authority validation must continue rejecting dishonest planned/executable state. |
+| [FIND-0244](#find-0244) | Barrier: [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) | Reopen if planned and superseded scenario checks stop sharing one source inventory. |
+| [FIND-0245](#find-0245) | Reviewed `NotApplicable` | This slice's self-review under [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md): the parameterized wrapper that caused the pre-evidence failure was removed rather than retained. Reopen if a parameterized surface reader returns. |
+| [FIND-0246](#find-0246) | Barrier: [TEST-0059](../FEAT-0010-protocol-stability-invariants/test-cases.md#test-0059) | Canonical structural validation must continue rejecting incomplete or non-clickable references. |
+| [FIND-0247](#find-0247) | Barrier: [TEST-0183](test-cases.md#test-0183) and [TEST-0059](../FEAT-0010-protocol-stability-invariants/test-cases.md#test-0059) | The recurrence scenario owns the schema/example and exact owner partition; the canonical structural scenario owns link/index integrity. |
+| [FIND-0248](#find-0248) | Barrier: [TEST-0183](test-cases.md#test-0183) | The exact recurrence field, required validation, and honest Structural / contract evidence remain mandatory. |
+| [FIND-0249](#find-0249) | Reviewed `NotApplicable` | This slice's self-review under [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md): the draft local generic helpers were removed. Reopen during [SUBF-0096](#subf-0096) if any generic local helper survives canonical-owner classification. |
+| [FIND-0250](#find-0250) | `AcceptedResidual`; no corrected-defect barrier | Protocol maintainers review when GitHub issue forms support reusable components; until then the repeated declarative fields remain provider-required surfaces. |
+| [FIND-0251](#find-0251) | Barrier: [TEST-0059](../FEAT-0010-protocol-stability-invariants/test-cases.md#test-0059) | Every new canonical memory record must remain registered in its index. |
+| [FIND-0252](#find-0252) | Barrier: [TEST-0183](test-cases.md#test-0183) and [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) | Every affected live GitHub work surface must retain both exact immutable authority URLs. |
+| [FIND-0253](#find-0253) | Barrier: [TEST-0183](test-cases.md#test-0183) | The exact recurrence-slice closure ledger and every numbered finding mapping must remain present. |
+| [FIND-0254](#find-0254) | Barrier: [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0183](test-cases.md#test-0183) | Visible identities must remain wholly linked, same-repository GitHub permalinks immutable, and required work-surface authorities exact. |
 
 ## Definition of Done
 

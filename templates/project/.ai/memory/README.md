@@ -21,6 +21,11 @@ immutable-ref authority.
   dated handoffs.
 - Link to canonical project features, decisions, issues, pull requests, tests,
   and evidence.
+- Keep current tool, environment, integration, and implementation routes in the
+  project snapshot's [Active recurrence knowledge](project.md#active-recurrence-knowledge).
+  These entries are routing evidence, never executable regression evidence.
+  Retain a concise `Stale` or `Superseded` routing tombstone in the active
+  index and move only its detailed history to dated logs.
 - Mark assumptions and stale facts.
 - Keep exact protocol tags and commits only in dated historical event records,
   never as the current pin authority.

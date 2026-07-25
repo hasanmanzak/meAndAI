@@ -81,10 +81,25 @@ are Domain-Driven Design, Rich Entity Model, and Test-Driven Development, with a
 documented project decision required when another approach better fits the
 domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
+## Active recurrence knowledge
+
+### Restricted-sandbox Git signal-pipe failure
+
+- Status: `Active`
+- Observable signature: Git for Windows cannot create local clone signal pipes (`Win32 error 5`).
+- Applicability: Git-heavy local validation or fixture setup running inside a restricted Windows workspace sandbox.
+- Affected contract and cause: the sandbox denies the Git helper's required local signal-pipe operation; the repository content and test assertion are not the failing contract.
+- Canonical owner and evidence: [SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) owns the project-local routing entry; the [recorded current evidence](log/2026-07-19-v0122-ci-evidence-hygiene.md#current-evidence) proves the host condition. [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) defines the entry schema, not the host restriction.
+- Fixed release or evidence: no protocol release owns the host restriction; use the linked environment evidence.
+- Required safe response: if the command is still required and authority exists, run it once outside the restricted workspace sandbox; otherwise stop as `Blocked`.
+- Unsafe retry boundary: Do not repeat the unchanged sandboxed Git command after this signature; a retry requires a materially different authorized execution boundary.
+- Freshness and review condition: last confirmed 2026-07-19; review after a Codex sandbox or Git for Windows execution-model change, or when the restricted route succeeds with equivalent coverage.
+- Superseded by: `None`
+
 ## Open context
 
 - [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-  is Proposed for target `0.15.0` under
+  is In progress for target `0.15.0` under
   [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). Its four
   independently tracked slices are
   [SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128),
@@ -92,8 +107,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
   and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
   [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
-  records the proposed authority boundary. No implementation is authorized;
-  follow the [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md).
+  records the accepted authority boundary. Implementation was authorized on
+  2026-07-25; follow the current [implementation handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md).
+  The [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
+  remains historical evidence.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and

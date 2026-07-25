@@ -136,11 +136,16 @@
             TestIds = @('TEST-0158', 'TEST-0159', 'TEST-0162')
         }
         @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1'
+            TestIds = @('TEST-0183')
+        }
+        @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md'
             TestIds = @(
-                'TEST-0183', 'TEST-0184', 'TEST-0185',
-                'TEST-0186', 'TEST-0187', 'TEST-0188'
+                'TEST-0184', 'TEST-0185', 'TEST-0186',
+                'TEST-0187', 'TEST-0188'
             )
         }
         @{

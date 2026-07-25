@@ -16,11 +16,12 @@ Follow the [v0.14.5 publication-closure handoff](2026-07-25-v0145-publication-cl
 for exact dated evidence.
 
 [FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-is Proposed for target `0.15.0` under
-[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). Its linked
-[planning handoff](2026-07-25-v0150-recurrence-prevention-planning.md) preserves
-the approved four-slice scope and explicitly records that implementation has
-not begun.
+is In progress for target `0.15.0` under
+[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). The current
+[implementation handoff](2026-07-25-v0150-subf-0095-recurrence-gate.md)
+records the authorized first slice; the earlier
+[planning handoff](2026-07-25-v0150-recurrence-prevention-planning.md) remains
+historical evidence.
 
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
@@ -50,6 +51,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-25 - v0.15.0 recurrence gate implementation](2026-07-25-v0150-subf-0095-recurrence-gate.md)
 - [2026-07-25 - v0.15.0 recurrence prevention and modular test harness planning](2026-07-25-v0150-recurrence-prevention-planning.md)
 - [2026-07-25 - v0.14.5 post-publication closure](2026-07-25-v0145-publication-closure.md)
 - [2026-07-25 - v0.14.5 bare document basename links](2026-07-25-v0145-bare-document-basename-links.md)
