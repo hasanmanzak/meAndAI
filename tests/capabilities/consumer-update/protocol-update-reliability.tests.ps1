@@ -10,13 +10,10 @@ $nativeHelperPath = Join-Path $root `
     'tests/capabilities/consumer-update/fixtures/Invoke-MockProtocolUpdateGh.ps1'
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-Equal {
     param($Expected, $Actual, [Parameter(Mandatory)][string]$Message)

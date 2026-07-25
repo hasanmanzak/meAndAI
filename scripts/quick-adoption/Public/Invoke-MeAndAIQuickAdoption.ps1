@@ -223,7 +223,7 @@ function Invoke-MeAndAIQuickAdoption {
     # same-major updater path and is verified by that route's pinned contract.
     if (-not $hasRemote -and (Test-Path -LiteralPath $preMutationWorkflowPath)) {
         if (-not (Test-Path -LiteralPath $preMutationWorkflowPath -PathType Leaf) -or
-            -not (Test-ByteArrayEqual `
+            -not (& $script:TestQuickAdoptionByteArrayEqual `
                 -Left ([IO.File]::ReadAllBytes($preMutationWorkflowPath)) `
                 -Right ([byte[]]$workflowBytes))) {
             throw "The existing seed workflow '$workflowTargetPath' is not the exact canonical $ProtocolTag file; no GitHub repository or remote was changed."
@@ -451,7 +451,8 @@ function Invoke-MeAndAIQuickAdoption {
             throw "The existing seed workflow path '$workflowTargetPath' is not a regular file."
         }
         $existingWorkflowBytes = [IO.File]::ReadAllBytes($workflowFullPath)
-        if (-not (Test-ByteArrayEqual -Left $existingWorkflowBytes -Right $workflowBytes)) {
+        if (-not (& $script:TestQuickAdoptionByteArrayEqual `
+            -Left $existingWorkflowBytes -Right $workflowBytes)) {
             throw "The existing seed workflow '$workflowTargetPath' differs from the canonical $ProtocolTag bytes; repository secrets were not inspected or changed."
         }
     }
@@ -652,7 +653,8 @@ function Invoke-MeAndAIQuickAdoption {
     }
     $publishedWorkflowEntry = Get-AdoptionTreeEntry -Repository $target `
         -Commit $publishedHead -Path $workflowTargetPath
-    $canonicalWorkflowBlob = Get-GitBlobSha -Bytes ([byte[]]$workflowBytes)
+    $canonicalWorkflowBlob = & $script:GetQuickAdoptionGitBlobSha1 `
+        -Bytes ([byte[]]$workflowBytes)
     if ($publishedWorkflowEntry.Mode -cne '100644' -or
         $publishedWorkflowEntry.Type -cne 'blob' -or
         $publishedWorkflowEntry.Sha -cne $canonicalWorkflowBlob) {

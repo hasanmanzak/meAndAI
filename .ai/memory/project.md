@@ -96,6 +96,132 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-19; review after a Codex sandbox or Git for Windows execution-model change, or when the restricted route succeeds with equivalent coverage.
 - Superseded by: `None`
 
+### GitHub CLI multiline issue-body argument splitting
+
+- Status: `Active`
+- Observable signature: `gh issue edit --body $body` reports an option or
+  shorthand-flag error whose apparent argument is a line from the multiline
+  Markdown body.
+- Applicability: Windows PowerShell GitHub issue or pull-request updates that
+  pass a multiline body value directly to a native `gh` argument.
+- Affected contract and cause: the multiline body is not preserved as one
+  native argument on this route, so body lines are interpreted as additional
+  CLI arguments; the GitHub issue content is not the failing contract.
+- Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
+  / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) records the
+  failed route and the successful transport replacement.
+- Fixed release or evidence: project-local tooling-route evidence confirmed on
+  2026-07-25; target release `0.15.0` will publish the durable routing record.
+- Required safe response: pipe the body to
+  `gh issue edit --body-file -`; verify the resulting work-surface content.
+- Unsafe retry boundary: do not repeat the direct multiline `--body $body`
+  route after this signature. Retry only with stdin/`--body-file -` or another
+  materially different body transport.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  GitHub CLI or Windows PowerShell native-argument transport change, or when the
+  direct route succeeds with an exact multiline-body regression.
+- Superseded by: `None`
+
+### PowerShell interpolated variable followed by a colon
+
+- Status: `Active`
+- Observable signature: PowerShell reports `Variable reference is not valid`
+  and points at a double-quoted fragment shaped like `$name:`.
+- Applicability: PowerShell commands or source that interpolate a variable
+  immediately before a colon, including generated path/line diagnostics.
+- Affected contract and cause: the parser treats the colon as part of a scoped
+  variable reference; the value being formatted is not the failing contract.
+- Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
+  / [TEST-0184](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0184)
+  owns the canonical helper/AST evidence that exposed and corrected this route.
+- Fixed release or evidence: the changed-source AST parse passed on 2026-07-25;
+  target release `0.15.0` carries the corrected `${name}:` form.
+- Required safe response: use `${name}:` for interpolation or a format
+  expression such as `'{0}:{1}' -f $name, $line`.
+- Unsafe retry boundary: do not repeat the unchanged `$name:` form after this
+  parser signature; retry only with explicit variable delimiting or formatting.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  PowerShell parser-language change or equivalent syntax succeeds in every
+  supported runtime.
+- Superseded by: `None`
+
+### Displayed full-file output used as rewrite authority
+
+- Status: `Active`
+- Observable signature: a rewritten large file contains a literal truncation
+  marker, a missing middle range, or content that was visible only in a
+  clipped tool response; a failed multi-file patch may also have changed only
+  some earlier targets.
+- Applicability: repository maintenance that reads a large file through
+  bounded tool output and then reconstructs or patches one or more files.
+- Affected contract and cause: display output is a lossy transport and patch
+  failure is not an atomicity guarantee; neither is canonical file content.
+- Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
+  / [FIND-0260](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0260)
+  records the bounded restoration and per-target verification.
+- Fixed release or evidence: the damaged ranges were restored from clean HEAD
+  in bounded slices and changed-source AST parsing passed on 2026-07-25;
+  target release `0.15.0` carries the durable route.
+- Required safe response: use the filesystem file or bounded exact ranges as
+  rewrite authority; after any patch error, inspect every intended target
+  before retrying or continuing.
+- Unsafe retry boundary: do not feed displayed full-file output back into a
+  rewrite and do not assume a failed multi-file patch changed no files.
+- Freshness and review condition: last confirmed 2026-07-25; review only when
+  the tool transport proves complete byte-preserving output and patch
+  atomicity through an executable regression.
+- Superseded by: `None`
+
+### PowerShell diagnostic parser and search expansion hazards
+
+- Status: `Active`
+- Observable signature: a diagnostic command fails because `$Error` was used
+  as a loop variable, or a double-quoted search pattern containing `$`
+  expands into an empty or unexpectedly broad pattern.
+- Applicability: Windows PowerShell diagnostics, AST checks, and repository
+  searches assembled interactively or inside maintenance scripts.
+- Affected contract and cause: PowerShell automatic variables and string
+  interpolation alter diagnostic control or search input before the intended
+  tool receives it; the inspected repository content is not the failure.
+- Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
+  / [FIND-0261](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0261)
+  records the corrected routes.
+- Fixed release or evidence: corrected diagnostic routes and changed-source
+  parsing passed on 2026-07-25; target release `0.15.0` carries this record.
+- Required safe response: use a non-reserved loop variable such as
+  `$parseError`; pass literal search patterns with single quotes or explicitly
+  escape `$` when interpolation is required.
+- Unsafe retry boundary: do not repeat the unchanged automatic-variable or
+  double-quoted literal-search form after this signature.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  supported PowerShell parsing or interpolation change, or an exact
+  executable equivalence proof.
+- Superseded by: `None`
+
+### Native command output arrays combined through comma nesting
+
+- Status: `Active`
+- Observable signature: later path processing receives one nested or
+  concatenated-looking value after multiple native command results were
+  grouped with a comma.
+- Applicability: PowerShell maintenance commands that combine path or result
+  streams from two or more native invocations.
+- Affected contract and cause: comma grouping preserves nested result shape
+  instead of forming the intended flat array, so downstream joins or path
+  validation observe false input.
+- Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
+  / [FIND-0261](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0261)
+  records the corrected composition.
+- Fixed release or evidence: the flat-array route was confirmed on
+  2026-07-25; target release `0.15.0` carries this record.
+- Required safe response: materialize and concatenate explicit arrays, for
+  example `@(command1) + @(command2)`, before downstream enumeration.
+- Unsafe retry boundary: do not repeat comma-nested native-output grouping
+  after this signature without a shape-equivalence regression.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  supported PowerShell native-output shape change.
+- Superseded by: `None`
+
 ## Open context
 
 - [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
@@ -108,9 +234,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
   [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
   records the accepted authority boundary. Implementation was authorized on
-  2026-07-25; follow the current [implementation handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md).
-  The [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
-  remains historical evidence.
+  2026-07-25; follow the current [implementation handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md).
+  The completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md)
+  and [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
+  remain historical evidence.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and

@@ -188,7 +188,8 @@ function Get-ValidatedAdoptionManifest {
         if ($null -eq $workflowBytes) {
             throw 'The independently verified canonical seed workflow bytes are unavailable.'
         }
-        $sourceWorkflowSha = Get-GitBlobSha -Bytes ([byte[]]$workflowBytes)
+        $sourceWorkflowSha = & $script:GetQuickAdoptionGitBlobSha1 `
+            -Bytes ([byte[]]$workflowBytes)
         $baseWorkflowEntry = Get-AdoptionTreeEntry -Repository $ProposalRepository `
             -Commit ([string]$contract.BaseHead) -Path $workflowTargetPath
         $seedWorkflowState = if ($baseWorkflowEntry.Mode -ceq '100644' -and

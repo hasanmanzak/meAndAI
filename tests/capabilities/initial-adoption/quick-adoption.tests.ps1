@@ -23,11 +23,15 @@ $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
 $testGitBatchPath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
+$testWorkspacePath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestWorkspace.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module $testRuntimePath -Force
 Import-Module $testGitBatchPath -Force
+Import-Module $testWorkspacePath -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = if ($Shard -ceq 'All') {
@@ -136,7 +140,10 @@ $canonicalProtocolSurfaceRoots = @(
     'docs/features/', 'docs/decisions/', 'docs/findings/',
     'docs/governance/', 'docs/ideas/', 'docs/agent-prompts/'
 )
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$testContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $testContext
+$failures = $testContext.Failures
 $tempRoots = [System.Collections.Generic.List[string]]::new()
 $originalGitHubHost = [Environment]::GetEnvironmentVariable('GH_HOST', 'Process')
 $originalCodexHome = [Environment]::GetEnvironmentVariable('CODEX_HOME', 'Process')
@@ -182,11 +189,6 @@ $script:QuickAdoptionDerivativeRoots =
     )
 $script:QuickAdoptionFixtureFamilyGitInitCount = 0
 $script:QuickAdoptionProtocolOwnerBuildCount = 0
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 function Get-TestProtocolSurfaceInventory {
     param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
@@ -1012,20 +1014,6 @@ function Assert-QuickAdoptionFixtureReuse {
     }
 }
 
-function New-TestDirectoryLink {
-    param(
-        [Parameter(Mandatory)][string]$Path,
-        [Parameter(Mandatory)][string]$Target
-    )
-
-    if ($env:OS -eq 'Windows_NT') {
-        New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
-    }
-    else {
-        New-Item -ItemType SymbolicLink -Path $Path -Target $Target | Out-Null
-    }
-}
-
 function New-TestFileLink {
     param(
         [Parameter(Mandatory)][string]$Path,
@@ -1137,6 +1125,7 @@ function Copy-CanonicalProtocolFixture {
         'scripts/MeAndAI.CapabilityCatalog.psm1',
         'scripts/MeAndAI.CapabilityReview.psm1',
         'scripts/Invoke-MeAndAICapabilityReview.ps1',
+        'scripts/MeAndAI.ContentIdentity.psm1',
         'scripts/MeAndAI.ConsumerMigrations.psm1',
         'migrations/index.json',
         'migrations/MIG-0001.json'
@@ -1180,22 +1169,6 @@ function Copy-CanonicalProtocolFixture {
         $Tag.Substring(1),
         [Text.UTF8Encoding]::new($false)
     )
-}
-
-function Get-GitBlobSha {
-    param([byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $sha = [Security.Cryptography.SHA1]::Create()
-    try {
-        return ([BitConverter]::ToString($sha.ComputeHash($payload))).Replace('-', '').ToLowerInvariant()
-    }
-    finally {
-        $sha.Dispose()
-    }
 }
 
 function Get-MockConsumerMigrationBaseline {
@@ -1297,7 +1270,7 @@ function Save-MockProtocolAssetSnapshot {
         $Snapshots["$Tag`n$($asset.TemplatePath)"] = `
             [pscustomobject]@{
                 Bytes = $bytes
-                Sha = Get-GitBlobSha -Bytes $bytes
+                Sha = Get-MeAndAIGitBlobSha1 -Bytes $bytes
             }
     }
 }
@@ -1418,7 +1391,7 @@ function Initialize-QuickAdoptionImmutableFixture {
             $assetSnapshots
         )
         WorkflowBytes = $workflowBytes
-        WorkflowSha = Get-GitBlobSha -Bytes $workflowBytes
+        WorkflowSha = Get-MeAndAIGitBlobSha1 -Bytes $workflowBytes
         RefFingerprint = $refFingerprint
         ArchivePath = $archivePath
         ArchiveSha256 = $archiveSha256
@@ -3614,8 +3587,8 @@ try {
             $global:QuickAdoptionCodexLog -ceq $firstCodexLog -or
             [object]::ReferenceEquals($firstAssetBytes, $secondAssetBytes) -or
             [object]::ReferenceEquals($secondAssetBytes, $canonicalAssetBytes) -or
-            (Get-GitBlobSha -Bytes $secondAssetBytes) -cne
-                (Get-GitBlobSha -Bytes $canonicalAssetBytes) -or
+            (Get-MeAndAIGitBlobSha1 -Bytes $secondAssetBytes) -cne
+                (Get-MeAndAIGitBlobSha1 -Bytes $canonicalAssetBytes) -or
             $firstArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
             $secondArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
             $transportArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
@@ -4484,7 +4457,8 @@ try {
         Set-TestGitIdentity -Repository $linkedRepo
         [IO.File]::WriteAllText((Join-Path $linkedRepo 'app.txt'), "consumer app`n")
         [IO.File]::WriteAllText((Join-Path $linkedExternal 'sentinel.txt'), "external sentinel`n")
-        New-TestDirectoryLink -Path (Join-Path $linkedRepo '.github') `
+        New-MeAndAITestDirectoryLink `
+            -Path (Join-Path $linkedRepo '.github') `
             -Target $linkedExternal
         Invoke-Git -Repository $linkedRepo -Arguments @('add', '.') | Out-Null
         Invoke-Git -Repository $linkedRepo -Arguments @(
@@ -8896,7 +8870,8 @@ try {
         )
         & git init -b main $noHeadLinkRepo 2>&1 | Out-Null
         Set-TestGitIdentity -Repository $noHeadLinkRepo
-        New-TestDirectoryLink -Path (Join-Path $noHeadLinkRepo 'src') `
+        New-MeAndAITestDirectoryLink `
+            -Path (Join-Path $noHeadLinkRepo 'src') `
             -Target $noHeadLinkTarget
         $noHeadLinkGhCountBefore = $global:QuickAdoptionGhCalls.Count
         $noHeadLinkExcludePath = Join-Path `
@@ -8952,7 +8927,8 @@ try {
         )
         & git init -b main $tokenLinkRepo 2>&1 | Out-Null
         Set-TestGitIdentity -Repository $tokenLinkRepo
-        New-TestDirectoryLink -Path (Join-Path $tokenLinkRepo 'FG_PAT.txt') `
+        New-MeAndAITestDirectoryLink `
+            -Path (Join-Path $tokenLinkRepo 'FG_PAT.txt') `
             -Target $tokenLinkTarget
         [IO.File]::WriteAllText(
             (Join-Path $tokenLinkRepo 'MEANDAI_RO_FG_PAT.txt'),
@@ -10420,7 +10396,7 @@ try {
         $legacyConsumer = New-MockConnectedManagedConsumer `
             -Name 'managed-legacy' -InstalledTag 'v0.9.2'
         $legacyWorkflowPath = Join-Path $legacyConsumer.Repository $workflowRelativePath
-        $legacyWorkflowShaBefore = Get-GitBlobSha `
+        $legacyWorkflowShaBefore = Get-MeAndAIGitBlobSha1 `
             -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
         $legacyCodexCallsBefore = @(Get-MockCodexCalls).Count
         $legacyError = ''
@@ -10431,7 +10407,7 @@ try {
         catch {
             $legacyError = $_.Exception.Message
         }
-        $legacyWorkflowShaAfter = Get-GitBlobSha `
+        $legacyWorkflowShaAfter = Get-MeAndAIGitBlobSha1 `
             -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
         $legacyHeadAfter = (@(Invoke-TestGit -Repository $legacyConsumer.Repository `
             -Arguments @('rev-parse', 'HEAD')))[0]

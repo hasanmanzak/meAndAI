@@ -6,15 +6,14 @@ Set-StrictMode -Version Latest
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $runtimeModulePath = Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$testContextModulePath = Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module $runtimeModulePath -Force
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module $testContextModulePath -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 $suites = @(Get-MeAndAITestSuite -RepositoryRoot $root)
 $ownerSet = [System.Collections.Generic.HashSet[string]]::new(

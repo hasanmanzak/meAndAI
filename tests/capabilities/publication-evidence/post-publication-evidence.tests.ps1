@@ -5,17 +5,20 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$contentIdentityModule = @(Import-Module `
+    (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getSha256Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAISha256'
+].ScriptBlock
 $verifierPath = Join-Path $root 'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'
-$failures = [System.Collections.Generic.List[string]]::new()
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $global:MeAndAIPostPublicationMode = 'Valid'
 $global:MeAndAIPostPublicationRequests = [System.Collections.Generic.List[string]]::new()
 $global:MeAndAIPostPublicationDownloadRequests = [System.Collections.Generic.List[string]]::new()
 $global:MeAndAIPostPublicationEventArrayResponses = 0
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 function Get-RequiredTemplateText {
     param([Parameter(Mandatory)][string]$RepositoryPath)
@@ -214,18 +217,6 @@ $global:MeAndAIPostPublicationSourceBytes = @{
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
 }
 
-function Get-TestSha256 {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $sha256 = [Security.Cryptography.SHA256]::Create()
-    try {
-        return ([BitConverter]::ToString($sha256.ComputeHash($Bytes)) -replace '-', '').ToLowerInvariant()
-    }
-    finally {
-        $sha256.Dispose()
-    }
-}
-
 function New-TestQuickAdoptionBundleBytes {
     param(
         [string]$SourceCommit = $commit,
@@ -261,7 +252,7 @@ function New-TestQuickAdoptionBundleBytes {
             [ordered]@{
                 path = $_
                 length = [long]$bytes.LongLength
-                sha256 = Get-TestSha256 -Bytes $bytes
+                sha256 = & $getSha256Action -Bytes $bytes
             }
         })
     }
@@ -388,8 +379,8 @@ function global:Invoke-RestMethod {
         return [pscustomobject]@{ default_branch = 'main' }
     }
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/releases/tags/v1.2.3') {
-        $launcherDigest = Get-TestSha256 -Bytes $global:MeAndAIPostPublicationLauncherBytes
-        $bundleDigest = Get-TestSha256 -Bytes $global:MeAndAIPostPublicationBundleBytes
+        $launcherDigest = & $getSha256Action -Bytes $global:MeAndAIPostPublicationLauncherBytes
+        $bundleDigest = & $getSha256Action -Bytes $global:MeAndAIPostPublicationBundleBytes
         if ($global:MeAndAIPostPublicationMode -ceq 'BadApiDigest') {
             $bundleDigest = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         }

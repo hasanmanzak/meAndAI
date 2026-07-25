@@ -1,5 +1,8 @@
 Set-StrictMode -Version Latest
 
+Import-Module (Join-Path $PSScriptRoot 'MeAndAI.ContentIdentity.psm1') `
+    -Force -ErrorAction Stop
+
 $script:LedgerPath = '.ai/meandai-update-state.json'
 
 function Assert-ExactProperties {
@@ -45,38 +48,6 @@ function ConvertFrom-StrictUtf8Bytes {
         throw "$Label is not strict UTF-8."
     }
     return [pscustomobject]@{ Text = $text; HasBom = $hasBom }
-}
-
-function Get-GitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Get-Sha256 {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $algorithm = [Security.Cryptography.SHA256]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($Bytes) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
 }
 
 function ConvertTo-VersionRecord {
@@ -247,7 +218,7 @@ function Import-MeAndAIConsumerMigrationCatalog {
             Id = $id
             IntroducedIn = $introducedIn
             Definition = $definitionName
-            DefinitionBlob = Get-GitBlobSha -Bytes $definitionBytes
+            DefinitionBlob = Get-MeAndAIGitBlobSha1 -Bytes $definitionBytes
             Operations = @($operations)
         })
         $previousVersion = $version
@@ -257,7 +228,7 @@ function Import-MeAndAIConsumerMigrationCatalog {
     $catalog = [pscustomobject]@{
         Schema = 1
         IndexPath = $fullIndexPath
-        IndexBlob = Get-GitBlobSha -Bytes $indexBytes
+        IndexBlob = Get-MeAndAIGitBlobSha1 -Bytes $indexBytes
         Migrations = @($migrations)
     }
     $catalog.PSObject.TypeNames.Insert(0, 'MeAndAI.ConsumerMigrationCatalog')
@@ -312,27 +283,10 @@ function ConvertFrom-LedgerBytes {
         $entries.Add([pscustomobject]@{ Id = $id; DefinitionBlob = $blob })
     }
     $canonicalBytes = ConvertTo-LedgerBytes -Entries @($entries)
-    if (-not (Test-ByteArrayEqual -Left $Bytes -Right $canonicalBytes)) {
+    if (-not (Test-MeAndAIByteArrayEqual -Left $Bytes -Right $canonicalBytes)) {
         throw 'Consumer migration ledger is not in canonical UTF-8 JSON form.'
     }
     return [pscustomobject]@{ Missing = $false; Entries = @($entries); Bytes = $Bytes }
-}
-
-function Test-ByteArrayEqual {
-    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
-
-    if ($null -eq $Left -or $null -eq $Right) {
-        return $null -eq $Left -and $null -eq $Right
-    }
-    if ($Left.Length -ne $Right.Length) {
-        return $false
-    }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) {
-            return $false
-        }
-    }
-    return $true
 }
 
 function New-MeAndAIConsumerMigrationBaseline {
@@ -346,7 +300,7 @@ function New-MeAndAIConsumerMigrationBaseline {
         Path = $script:LedgerPath
         Entries = $entries
         Bytes = $bytes
-        Blob = Get-GitBlobSha -Bytes $bytes
+        Blob = Get-MeAndAIGitBlobSha1 -Bytes $bytes
     }
 }
 
@@ -593,10 +547,10 @@ function Resolve-MeAndAIConsumerMigrationPlan {
         $resultBytes = ConvertTo-ConsumerFileBytes -File $file
         $pathEvidence.Add([pscustomobject]@{
             Path = $path
-            OriginalBlob = Get-GitBlobSha -Bytes ([byte[]]$file.OriginalBytes)
+            OriginalBlob = Get-MeAndAIGitBlobSha1 -Bytes ([byte[]]$file.OriginalBytes)
             OriginalBytes = [byte[]]$file.OriginalBytes
-            ResultBlob = Get-GitBlobSha -Bytes $resultBytes
-            Changed = -not (Test-ByteArrayEqual -Left ([byte[]]$file.OriginalBytes) `
+            ResultBlob = Get-MeAndAIGitBlobSha1 -Bytes $resultBytes
+            Changed = -not (Test-MeAndAIByteArrayEqual -Left ([byte[]]$file.OriginalBytes) `
                 -Right $resultBytes)
             ResultBytes = $resultBytes
         })
@@ -604,12 +558,12 @@ function Resolve-MeAndAIConsumerMigrationPlan {
 
     $resultLedgerBytes = ConvertTo-LedgerBytes -Entries @($resultEntries)
     $ledgerChanged = $ledger.Missing -or
-        -not (Test-ByteArrayEqual -Left $LedgerBytes -Right $resultLedgerBytes)
+        -not (Test-MeAndAIByteArrayEqual -Left $LedgerBytes -Right $resultLedgerBytes)
     $ledgerEvidence = [pscustomobject]@{
         Path = $script:LedgerPath
-        OriginalBlob = if ($ledger.Missing) { '' } else { Get-GitBlobSha -Bytes $LedgerBytes }
+        OriginalBlob = if ($ledger.Missing) { '' } else { Get-MeAndAIGitBlobSha1 -Bytes $LedgerBytes }
         OriginalBytes = if ($ledger.Missing) { $null } else { [byte[]]$LedgerBytes }
-        ResultBlob = Get-GitBlobSha -Bytes $resultLedgerBytes
+        ResultBlob = Get-MeAndAIGitBlobSha1 -Bytes $resultLedgerBytes
         Changed = $ledgerChanged
         ResultBytes = $resultLedgerBytes
     }
@@ -649,7 +603,7 @@ function Resolve-MeAndAIConsumerMigrationPlan {
         Paths = @($pathEvidence)
         Ledger = $ledgerEvidence
         ExpectedChangedPaths = $expectedChangedPaths
-        PlanSha256 = Get-Sha256 -Bytes $planBytes
+        PlanSha256 = Get-MeAndAISha256 -Bytes $planBytes
         PlanEvidenceBytes = $planBytes
     }
 }

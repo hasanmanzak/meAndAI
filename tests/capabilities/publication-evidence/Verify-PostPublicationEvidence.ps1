@@ -22,10 +22,13 @@ param(
 $ErrorActionPreference = 'Stop'
 $sharedMergeEvidenceModule = Join-Path $PSScriptRoot `
     '../../../templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
+$markdownEvidenceModule = Join-Path $PSScriptRoot `
+    '../../infrastructure/MeAndAI.MarkdownEvidence.psm1'
 if (-not (Test-Path -LiteralPath $sharedMergeEvidenceModule -PathType Leaf)) {
     throw "TEST-0065 shared merge-evidence resolver is missing: $sharedMergeEvidenceModule"
 }
 Import-Module $sharedMergeEvidenceModule -Force
+Import-Module $markdownEvidenceModule -Force
 $originalValidationCulture = [Threading.Thread]::CurrentThread.CurrentCulture
 try {
     [Threading.Thread]::CurrentThread.CurrentCulture =
@@ -1156,19 +1159,6 @@ function Test-MarkdownCollectionContainsAnyExactVisibleUri {
     return $false
 }
 
-function Test-ContainsExactDocumentTitle {
-    param(
-        [AllowEmptyString()][string]$Text,
-        [Parameter(Mandatory)][string]$Title
-    )
-
-    return [regex]::IsMatch(
-        $Text,
-        '(?i)(?<![A-Za-z0-9])' + [regex]::Escape($Title) +
-            '(?![A-Za-z0-9])'
-    )
-}
-
 function Get-RendererActiveMarkdownAnchorEvidence {
     param([AllowEmptyString()][string]$Markdown)
 
@@ -2147,7 +2137,7 @@ function Assert-NoCrossRecordReferenceInNonRenderingTitle {
     foreach ($title in $ExpectedRecordTitles.Keys) {
         if ($AllowedRecordTitles -contains [string]$title) { continue }
         Assert-PostPublicationCondition `
-            (-not (Test-ContainsExactDocumentTitle `
+            (-not (Test-MeAndAIContainsExactDocumentTitle `
                 -Text $remaining -Title ([string]$title))) `
             "$Surface contains a document-title reference on a non-rendering title surface."
     }
@@ -2324,7 +2314,7 @@ function Assert-NoFreeTextCrossRecordReference {
         $codeTitleReference = $false
         foreach ($title in $ExpectedRecordTitles.Keys) {
             if ($AllowedRecordTitles -contains [string]$title) { continue }
-            if ((Test-ContainsExactDocumentTitle `
+            if ((Test-MeAndAIContainsExactDocumentTitle `
                     -Text $codeText -Title ([string]$title)) -and
                 ([regex]::IsMatch(
                     $codeText,
@@ -2485,7 +2475,8 @@ function Assert-NoFreeTextCrossRecordReference {
             }
         }
         foreach ($title in $ExpectedRecordTitles.Keys) {
-            if (Test-ContainsExactDocumentTitle -Text $label -Title $title) {
+            if (Test-MeAndAIContainsExactDocumentTitle `
+                    -Text $label -Title $title) {
                 Assert-PostPublicationCondition `
                     (Test-ExactCrossRecordTarget `
                         -SourceRepositoryPath $SourceRepositoryPath `
@@ -2634,7 +2625,7 @@ function Assert-NoFreeTextCrossRecordReference {
     foreach ($title in $ExpectedRecordTitles.Keys) {
         if ($AllowedRecordTitles -contains [string]$title) { continue }
         Assert-PostPublicationCondition `
-            (-not (Test-ContainsExactDocumentTitle `
+            (-not (Test-MeAndAIContainsExactDocumentTitle `
                 -Text $remaining -Title $title)) `
             "$Surface contains a free-text document-title reference '$title'."
     }

@@ -22,6 +22,22 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 Import-Module (Join-Path $PSScriptRoot 'MeAndAI.RepositoryEvidence.psm1') -Force
+$contentIdentityModule = @(Import-Module `
+    (Join-Path $ProtocolRoot 'scripts/MeAndAI.ContentIdentity.psm1') `
+    -Force -PassThru)
+if ($contentIdentityModule.Count -ne 1) {
+    throw 'Capability review requires one canonical content-identity module.'
+}
+$script:GetCapabilityReviewSha256 = $contentIdentityModule[0].ExportedCommands[
+    'Get-MeAndAISha256'
+].ScriptBlock
+$script:TestCapabilityReviewBytesEqual = $contentIdentityModule[0].ExportedCommands[
+    'Test-MeAndAIByteArrayEqual'
+].ScriptBlock
+if ($null -eq $script:GetCapabilityReviewSha256 -or
+    $null -eq $script:TestCapabilityReviewBytesEqual) {
+    throw 'Capability review could not load the canonical content-identity contract.'
+}
 
 $script:LedgerRelativePath = '.ai/meandai-capabilities-state.json'
 $script:ManifestRelativePath = '.ai/adoption/meandai-capability-review.json'
@@ -123,37 +139,6 @@ function Assert-GitSha {
     if ($Value -cnotmatch '^[0-9a-f]{40}$') {
         throw "$Label must be one lowercase 40-character Git identity."
     }
-}
-
-function Get-Sha256Bytes {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $algorithm = [Security.Cryptography.SHA256]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($Bytes) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Test-BytesEqual {
-    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
-
-    if ($null -eq $Left -or $null -eq $Right) {
-        return $null -eq $Left -and $null -eq $Right
-    }
-    if ($Left.Length -ne $Right.Length) {
-        return $false
-    }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) {
-            return $false
-        }
-    }
-    return $true
 }
 
 function Invoke-NativeCapture {
@@ -729,7 +714,7 @@ function Get-CapabilityBatchDigest {
         "$([string]$_.Slug)@$([string]$_.DefinitionBlob)"
     })
     $bytes = [Text.UTF8Encoding]::new($false).GetBytes($lines -join "`n")
-    return Get-Sha256Bytes -Bytes $bytes
+    return & $script:GetCapabilityReviewSha256 -Bytes $bytes
 }
 
 function Assert-CanonicalReviewBody {
@@ -1018,8 +1003,8 @@ function Assert-CanonicalManifest {
         -ProposalActorLogin ([string]$Manifest.ProposalActorLogin) `
         -IssueActorId ([long]$Manifest.IssueActorId) `
         -IssueActorLogin ([string]$Manifest.IssueActorLogin)
-    if (-not (Test-BytesEqual -Left ([byte[]]$Manifest.Bytes) `
-        -Right $expectedBytes)) {
+    if (-not (& $script:TestCapabilityReviewBytesEqual `
+        -Left ([byte[]]$Manifest.Bytes) -Right $expectedBytes)) {
         throw 'Capability review manifest is not exact canonical JSON.'
     }
 }
@@ -2219,8 +2204,8 @@ function Assert-ExactLedgerContent {
         return
     }
     if (-not [bool]$Content.Exists -or
-        -not (Test-BytesEqual -Left ([byte[]]$Content.Bytes) `
-            -Right $ExpectedBytes)) {
+        -not (& $script:TestCapabilityReviewBytesEqual `
+            -Left ([byte[]]$Content.Bytes) -Right $ExpectedBytes)) {
         throw "$Label does not byte-match canonical ledger evidence."
     }
 }
@@ -2268,7 +2253,7 @@ function Assert-MergedTreeEvidence {
     else {
         $bytes = ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $Catalog `
             -Entries @($entries | Select-Object -First $prefixCount)
-        if ((Get-Sha256Bytes -Bytes $bytes) -cne
+        if ((& $script:GetCapabilityReviewSha256 -Bytes $bytes) -cne
             [string]$Binding.BaseLedgerDigest) {
             throw 'Merged capability review base-ledger digest changed.'
         }
@@ -2755,7 +2740,7 @@ elseif (Test-Path -LiteralPath $ledgerPath -PathType Leaf) {
 $script:BaseLedgerDigest = if ($null -eq $ledgerBytes) {
     'missing'
 } else {
-    Get-Sha256Bytes -Bytes $ledgerBytes
+    & $script:GetCapabilityReviewSha256 -Bytes $ledgerBytes
 }
 $ledger = Import-MeAndAICapabilityLedger -Catalog $catalog -Bytes $ledgerBytes
 $marker = Get-MeAndAICapabilityReviewMarker -Repository $Repository `

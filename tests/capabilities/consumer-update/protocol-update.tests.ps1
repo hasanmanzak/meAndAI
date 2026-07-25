@@ -6,7 +6,6 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
-$failures = [System.Collections.Generic.List[string]]::new()
 
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
     Write-Host 'Protocol update tests failed:' -ForegroundColor Red
@@ -15,17 +14,15 @@ if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
 }
 
 Import-Module $modulePath -Force
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-Equal {
     param($Expected, $Actual, [string]$Message)
-    if ($Expected -ne $Actual) {
-        Add-Failure "$Message; expected '$Expected', found '$Actual'"
-    }
+    Assert-MeAndAITestCollectedEqual -Context $failureContext `
+        -Expected $Expected -Actual $Actual -Message $Message
 }
 
 $mergeEvidenceResolver = Get-Command Resolve-MeAndAIMergedCommitEvidence `

@@ -6,67 +6,15 @@ $modulePath = Join-Path $root 'scripts/MeAndAI.CapabilityReview.psm1'
 $catalogModulePath = Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1'
 Import-Module $catalogModulePath -Force
 Import-Module $modulePath -Force
-
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
-}
-
-function Get-TestGitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $prefix = [Text.Encoding]::ASCII.GetBytes(
-        "blob $($Bytes.Length)$([char]0)"
-    )
-    $payload = [byte[]]::new($prefix.Length + $Bytes.Length)
-    [Array]::Copy($prefix, 0, $payload, 0, $prefix.Length)
-    [Array]::Copy($Bytes, 0, $payload, $prefix.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Test-TestBytesEqual {
-    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
-
-    if ($null -eq $Left -or $null -eq $Right) {
-        return $null -eq $Left -and $null -eq $Right
-    }
-    if ($Left.Length -ne $Right.Length) {
-        return $false
-    }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) {
-            return $false
-        }
-    }
-    return $true
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+$contentIdentityModule = @(Import-Module (Join-Path $root `
+    'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
+$testByteArrayEqualAction = $contentIdentityModule.ExportedCommands[
+    'Test-MeAndAIByteArrayEqual'
+].ScriptBlock
 
 function New-TestCapabilityReviewBody {
     param(
@@ -667,7 +615,7 @@ $fixtureCopyStart = $quickAdoptionTestText.IndexOf(
     [StringComparison]::Ordinal
 )
 $fixtureCopyEnd = $quickAdoptionTestText.IndexOf(
-    'function Get-GitBlobSha',
+    'function Get-MockConsumerMigrationBaseline',
     [StringComparison]::Ordinal
 )
 Assert-True ($fixtureCopyStart -ge 0 -and $fixtureCopyEnd -gt $fixtureCopyStart) `
@@ -676,12 +624,28 @@ $fixtureCopyText = $quickAdoptionTestText.Substring(
     $fixtureCopyStart,
     $fixtureCopyEnd - $fixtureCopyStart
 )
-$managedEnvelopeText = $quickAdoptionTestText.Substring(0, $fixtureCopyStart)
+$managedEnvelopeStart = $quickAdoptionTestText.IndexOf(
+    '$canonicalAdoptionAssets = @(',
+    [StringComparison]::Ordinal
+)
+$managedEnvelopeEnd = $quickAdoptionTestText.IndexOf(
+    '$canonicalInitialAdoptionPolicyAsset =',
+    [StringComparison]::Ordinal
+)
+Assert-True ($managedEnvelopeStart -ge 0 -and
+    $managedEnvelopeEnd -gt $managedEnvelopeStart -and
+    $managedEnvelopeEnd -lt $fixtureCopyStart) `
+    'TEST-0140 quick-adoption managed envelope boundary is absent.'
+$managedEnvelopeText = $quickAdoptionTestText.Substring(
+    $managedEnvelopeStart,
+    $managedEnvelopeEnd - $managedEnvelopeStart
+)
 foreach ($sourceOnlyPath in @(
     'capabilities/index.json',
     'capabilities/test-architecture.json',
     'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAICapabilityReview.ps1'
 )) {
@@ -2335,7 +2299,7 @@ try {
     )
     $alternateDefinitionBytes =
         [Text.UTF8Encoding]::new($false).GetBytes($alternateDefinitionText)
-    $alternateDefinitionBlob = Get-TestGitBlobSha -Bytes (
+    $alternateDefinitionBlob = & $getGitBlobSha1Action -Bytes (
         $alternateDefinitionBytes
     )
     $alternateIndex = [ordered]@{
@@ -2677,7 +2641,7 @@ try {
     $currentLedgerAfter = [IO.File]::ReadAllBytes(
         (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
     )
-    Assert-True (Test-TestBytesEqual -Left $currentLedgerBefore -Right (
+    Assert-True (& $testByteArrayEqualAction -Left $currentLedgerBefore -Right (
         $currentLedgerAfter
     )) 'TEST-0165 historical recovery rewrote current ledger content.'
     $currentLedgerAfterObject = Import-MeAndAICapabilityLedger `
@@ -2691,7 +2655,7 @@ try {
     }) -join ','
     Assert-Equal $currentSuffixAfterIdentity $currentSuffixBeforeIdentity `
         'TEST-0165 historical recovery did not preserve the appended current suffix.'
-    Assert-True (Test-TestBytesEqual `
+    Assert-True (& $testByteArrayEqualAction `
         -Left ([byte[]]$apiState.HistoricalReview.CurrentLedgerBytes) `
         -Right (
         [IO.File]::ReadAllBytes(
@@ -2740,9 +2704,9 @@ try {
 
     # TEST-0166: anything other than one provable immutable historical merge
     # blocks before successful branch, issue, or current-catalog mutation.
-    $assertTrueAction = ${function:Assert-True}
-    $assertEqualAction = ${function:Assert-Equal}
-    $assertThrowsLikeAction = ${function:Assert-ThrowsLike}
+    $assertTrueAction = ${function:Assert-MeAndAITestTrue}
+    $assertEqualAction = ${function:Assert-MeAndAITestEqual}
+    $assertThrowsLikeAction = ${function:Assert-MeAndAITestThrowsLike}
     $assertHistoricalBlock = {
         param(
             [Parameter(Mandatory)][string]$Name,
@@ -2895,7 +2859,7 @@ try {
             $_ -match 'GET repos/.+/issues\?state=all'
         }).Count 3 `
             'TEST-0167 mixed-case recovery did not perform exactly one fresh inventory.'
-        Assert-True (Test-TestBytesEqual -Left $mixedCaseLedgerBefore -Right (
+        Assert-True (& $testByteArrayEqualAction -Left $mixedCaseLedgerBefore -Right (
             [IO.File]::ReadAllBytes(
                 (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
             )

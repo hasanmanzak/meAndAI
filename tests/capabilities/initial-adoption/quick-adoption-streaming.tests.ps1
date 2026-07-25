@@ -17,16 +17,13 @@ $launcherSourcePaths = @(
 $fixturePath = Join-Path $root 'tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 if ($Shard -ceq 'WindowsNative' -and $env:OS -cne 'Windows_NT') {
     throw 'WindowsNative streaming compatibility requires Windows.'
-}
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-
-    $failures.Add($Message)
 }
 
 function ConvertTo-SingleQuotedLiteral {

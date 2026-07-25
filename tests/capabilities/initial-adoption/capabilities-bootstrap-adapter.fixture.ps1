@@ -16,9 +16,12 @@ $consumerMigrationModulePath = Join-Path $root `
 $consumerMigrationIndexPath = Join-Path $root 'migrations/index.json'
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$testWorkspacePath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestWorkspace.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module $testRuntimePath -Force
+Import-Module $testWorkspacePath -Force
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = Resolve-MeAndAITestOperationExpectation `
@@ -30,7 +33,10 @@ $consumerMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath $consumerMigrationIndexPath
 $consumerMigrationBaseline = New-MeAndAIConsumerMigrationBaseline `
     -Catalog $consumerMigrationCatalog
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$testContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $testContext
+$failures = $testContext.Failures
 $tempRoots = [System.Collections.Generic.List[string]]::new()
 $cleanupSentinel = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-capabilities-foreign-$([guid]::NewGuid().ToString('N'))"
@@ -69,11 +75,6 @@ $script:BootstrapFixtureOperations = [pscustomobject]@{
 }
 $script:BootstrapDerivativeRoots = [System.Collections.Generic.List[string]]::new()
 $script:BootstrapModeSensitivityChecked = $false
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 if (-not (Test-Path -LiteralPath $adapterPath -PathType Leaf)) {
     Write-Host 'AI capabilities bootstrap adapter tests failed:' -ForegroundColor Red
@@ -270,6 +271,7 @@ function Copy-SourceFixture {
         'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1',
         'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1',
         'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1',
+        'scripts/MeAndAI.ContentIdentity.psm1',
         'scripts/MeAndAI.ConsumerMigrations.psm1',
         'migrations/index.json',
         'migrations/MIG-0001.json',
@@ -710,20 +712,6 @@ function Assert-BootstrapFixtureOperationClosure {
     }
 }
 
-function New-TestDirectoryLink {
-    param(
-        [Parameter(Mandatory)][string]$Path,
-        [Parameter(Mandatory)][string]$Target
-    )
-
-    if ($env:OS -eq 'Windows_NT') {
-        New-Item -ItemType Junction -Path $Path -Target $Target | Out-Null
-    }
-    else {
-        New-Item -ItemType SymbolicLink -Path $Path -Target $Target | Out-Null
-    }
-}
-
 function Install-ApplicationInjectingPreCommitHook {
     param([Parameter(Mandatory)][string]$Repository)
 
@@ -1087,7 +1075,7 @@ function New-BootstrapFixture {
             (Join-Path $externalManaged 'sentinel.txt'),
             "external sentinel`n"
         )
-        New-TestDirectoryLink -Path (Join-Path $consumer '.ai') `
+        New-MeAndAITestDirectoryLink -Path (Join-Path $consumer '.ai') `
             -Target $externalManaged
     }
     if ($consumerMutated) {
@@ -2122,6 +2110,38 @@ try {
         $global:PullRequestCreateCalls -ne 0 -or
         $unexpectedMigrationModuleBranch.Count -ne 0) {
         Add-Failure "TEST-0028 full adoption did not fail closed on a missing migration module: $($result.Error)"
+    }
+
+    $global:PullRequestExists = $false
+    $global:PullRequestCreateCalls = 0
+    $missingMigrationIdentity = $missingMigrationModule
+    Copy-Item -LiteralPath $consumerMigrationModulePath -Destination (
+        Join-Path $missingMigrationIdentity.Source `
+            'scripts/MeAndAI.ConsumerMigrations.psm1'
+    ) -Force
+    Invoke-Git -Repository $missingMigrationIdentity.Source -Arguments @(
+        'add', '--', 'scripts/MeAndAI.ConsumerMigrations.psm1'
+    ) | Out-Null
+    Invoke-Git -Repository $missingMigrationIdentity.Source -Arguments @(
+        'rm', '--', 'scripts/MeAndAI.ContentIdentity.psm1'
+    ) | Out-Null
+    Invoke-Git -Repository $missingMigrationIdentity.Source -Arguments @(
+        'commit', '-m', 'Remove consumer migration identity dependency'
+    ) | Out-Null
+    Invoke-Git -Repository $missingMigrationIdentity.Source -Arguments @(
+        'tag', '-f', 'v0.5.0'
+    ) | Out-Null
+    $result = Invoke-BootstrapFixture -Fixture $missingMigrationIdentity
+    $unexpectedMigrationIdentityBranch = @(Invoke-Git `
+        -Repository $missingMigrationIdentity.Consumer -Arguments @(
+            'ls-remote', '--heads', 'origin',
+            'refs/heads/automation/meandai-capabilities-v0.5.0'
+        ))
+    if (-not $result.Threw -or
+        $result.Error -notlike '*missing consumer migration identity dependency*' -or
+        $global:PullRequestCreateCalls -ne 0 -or
+        $unexpectedMigrationIdentityBranch.Count -ne 0) {
+        Add-Failure "TEST-0028 full adoption did not fail closed on a missing migration identity dependency: $($result.Error)"
     }
 
     $global:PullRequestExists = $false

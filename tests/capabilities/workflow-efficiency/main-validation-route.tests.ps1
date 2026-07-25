@@ -8,16 +8,15 @@ $workflowPath = Join-Path $root '.github/workflows/protocol-tests.yml'
 $protocolPath = Join-Path $root 'PROTOCOL.md'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRepository.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $previousProtocolToken = $env:GH_TOKEN
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-main-route-$([guid]::NewGuid().ToString('N'))"
 $repositoryRoot = Join-Path $tempRoot 'repository'
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
 
 function Invoke-TestGit {
     param([Parameter(Mandatory)][string[]]$Arguments)
@@ -48,17 +47,6 @@ function Set-TestFile {
     [IO.File]::WriteAllText($path, $Content, [Text.UTF8Encoding]::new($false))
 }
 
-function New-TestCommit {
-    param(
-        [Parameter(Mandatory)][string]$Message,
-        [Parameter(Mandatory)][scriptblock]$Change
-    )
-
-    & $Change
-    Invoke-TestGit -Arguments @('add', '--all') | Out-Null
-    Invoke-TestGit -Arguments @('commit', '-m', $Message) | Out-Null
-    return (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
-}
 
 function New-GreenJobs {
     param([int]$RunId = 501)
@@ -187,11 +175,11 @@ try {
     Invoke-TestGit -Arguments @('config', 'core.autocrlf', 'false') | Out-Null
     Invoke-TestGit -Arguments @('config', 'commit.gpgsign', 'false') | Out-Null
 
-    $baseline = New-TestCommit -Message 'baseline' -Change {
+    $baseline = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'baseline' -Change {
         Set-TestFile -RelativePath 'README.md' -Content "baseline`n"
     }
     Invoke-TestGit -Arguments @('switch', '-c', 'feature') | Out-Null
-    $featureHead = New-TestCommit -Message 'feature' -Change {
+    $featureHead = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'feature' -Change {
         Set-TestFile -RelativePath 'feature.txt' -Content "feature`n"
     }
     Invoke-TestGit -Arguments @('switch', 'main') | Out-Null
@@ -199,18 +187,18 @@ try {
     $exactMerge = (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
 
     Invoke-TestGit -Arguments @('switch', '-c', 'base-extra', $baseline) | Out-Null
-    $advancedBase = New-TestCommit -Message 'base extra' -Change {
+    $advancedBase = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'base extra' -Change {
         Set-TestFile -RelativePath 'base.txt' -Content "base`n"
     }
     Invoke-TestGit -Arguments @('merge', '--no-ff', 'feature', '-m', 'merge with extra base') | Out-Null
     $differentTreeMerge = (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
 
     Invoke-TestGit -Arguments @('switch', 'main') | Out-Null
-    $directPush = New-TestCommit -Message 'direct push' -Change {
+    $directPush = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'direct push' -Change {
         Set-TestFile -RelativePath 'direct.txt' -Content "direct`n"
     }
     Invoke-TestGit -Arguments @('switch', '-c', 'squash', $baseline) | Out-Null
-    $squashPush = New-TestCommit -Message 'squashed feature' -Change {
+    $squashPush = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'squashed feature' -Change {
         Set-TestFile -RelativePath 'feature.txt' -Content "feature`n"
     }
 

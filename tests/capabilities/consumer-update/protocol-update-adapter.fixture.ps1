@@ -14,21 +14,20 @@ $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAnd
 $moduleSource = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $workflowSource = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $consumerMigrationModuleSource = Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$contentIdentityModuleSource = Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1'
 $consumerMigrationIndexSource = Join-Path $root 'migrations/index.json'
 $ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 Import-Module $consumerMigrationModuleSource -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
 $consumerMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath $consumerMigrationIndexSource
 $consumerMigrationBaseline = New-MeAndAIConsumerMigrationBaseline `
     -Catalog $consumerMigrationCatalog
 $adapterContent = Get-Content -LiteralPath $adapterSource -Raw
-$failures = [System.Collections.Generic.List[string]]::new()
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $script:Scenario = $null
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 function Get-AdapterFunctionDefinition {
     param([Parameter(Mandatory)][string]$Name)
@@ -891,6 +890,7 @@ try {
     }
     foreach ($sourceRecord in @(
         [pscustomobject]@{ Source = $consumerMigrationModuleSource; Path = 'scripts/MeAndAI.ConsumerMigrations.psm1' },
+        [pscustomobject]@{ Source = $contentIdentityModuleSource; Path = 'scripts/MeAndAI.ContentIdentity.psm1' },
         [pscustomobject]@{ Source = $consumerMigrationIndexSource; Path = 'migrations/index.json' },
         [pscustomobject]@{ Source = (Join-Path $root 'migrations/MIG-0001.json'); Path = 'migrations/MIG-0001.json' }
     )) {
@@ -2131,6 +2131,9 @@ function Invoke-AdapterScenario {
     Copy-Item -LiteralPath $consumerMigrationModuleSource -Destination (
         Join-Path $sourceMigrationModulePath 'MeAndAI.ConsumerMigrations.psm1'
     )
+    Copy-Item -LiteralPath $contentIdentityModuleSource -Destination (
+        Join-Path $sourceMigrationModulePath 'MeAndAI.ContentIdentity.psm1'
+    )
     Copy-Item -LiteralPath $consumerMigrationIndexSource -Destination (
         Join-Path $sourceMigrationsPath 'index.json'
     )
@@ -2266,6 +2269,7 @@ function Invoke-AdapterScenario {
         $sourceTreeEntries["$sha|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
         $sourceTreeEntries["$sha|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $currentAdapterBlob
         $sourceTreeEntries["$sha|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+        $sourceTreeEntries["$sha|scripts/MeAndAI.ContentIdentity.psm1"] = '7' * 40
         $sourceTreeEntries["$sha|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
         foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
             $sourceTreeEntries["$sha|migrations/$([string]$migration.Definition)"] = `
@@ -2276,12 +2280,14 @@ function Invoke-AdapterScenario {
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1"] = $currentModuleBlob
     $sourceTreeEntries["$('3' * 40)|templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1"] = $targetAdapterBlob
     $sourceTreeEntries["$('3' * 40)|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+    $sourceTreeEntries["$('3' * 40)|scripts/MeAndAI.ContentIdentity.psm1"] = '7' * 40
     $sourceTreeEntries["$('3' * 40)|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
     foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
         $sourceTreeEntries["$('3' * 40)|migrations/$([string]$migration.Definition)"] = `
             [string]$migration.DefinitionBlob
     }
     $sourceTreeEntries["$('6' * 40)|scripts/MeAndAI.ConsumerMigrations.psm1"] = '6' * 40
+    $sourceTreeEntries["$('6' * 40)|scripts/MeAndAI.ContentIdentity.psm1"] = '7' * 40
     $sourceTreeEntries["$('6' * 40)|migrations/index.json"] = [string]$consumerMigrationCatalog.IndexBlob
     foreach ($migration in @($consumerMigrationCatalog.Migrations)) {
         $sourceTreeEntries["$('6' * 40)|migrations/$([string]$migration.Definition)"] = `

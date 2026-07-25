@@ -7,8 +7,19 @@ $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAI
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+$contentIdentityModule = @(Import-Module `
+    (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getSha256Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAISha256'
+].ScriptBlock
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $outerSummaryPath = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-finalization-outer-$([guid]::NewGuid().ToString('N')).md"
 $outerSummarySentinel = 'outer-summary-sentinel'
@@ -30,11 +41,6 @@ $testManagedAssets = @(
 )
 $testMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath (Join-Path $root 'migrations/index.json')
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 function ConvertTo-TestBase64Json {
     param($InputObject)
@@ -66,21 +72,13 @@ function Get-TestPathSetSha256 {
     }
 }
 
-function Get-TestSha256Text {
+function Get-TestTextDigest {
     param([Parameter(Mandatory)][string]$Text)
 
-    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Text)
-    $algorithm = [Security.Cryptography.SHA256]::Create()
-    try {
-        return ([BitConverter]::ToString($algorithm.ComputeHash($bytes))).Replace(
-            '-', ''
-        ).ToLowerInvariant()
-    }
-    finally {
-        $algorithm.Dispose()
-    }
+    return & $getSha256Action -Bytes (
+        [Text.UTF8Encoding]::new($false).GetBytes($Text)
+    )
 }
-
 function Get-TestLinkedPathDigest {
     param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
 
@@ -92,7 +90,7 @@ function Get-TestLinkedPathDigest {
             "$([Text.Encoding]::UTF8.GetByteCount($path))`:$path`n"
         )
     }
-    return Get-TestSha256Text -Text $builder.ToString()
+    return Get-TestTextDigest -Text $builder.ToString()
 }
 
 function Get-TestSha1 {
@@ -107,16 +105,6 @@ function Get-TestSha1 {
     finally {
         $algorithm.Dispose()
     }
-}
-
-function Get-TestGitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    return Get-TestSha1 -Bytes $payload
 }
 
 function Get-TestSha1Text {
@@ -177,7 +165,7 @@ function Add-TestGitCommit {
         }
 
         $bytes = [byte[]]$entry.Bytes
-        $sha = Get-TestGitBlobSha -Bytes $bytes
+        $sha = & $getGitBlobSha1Action -Bytes $bytes
         if ($Graph.Blobs.ContainsKey($sha)) {
             $existing = [byte[]]$Graph.Blobs[$sha]
             if ($existing.Length -ne $bytes.Length) {
@@ -294,7 +282,8 @@ function Get-TestTargetProtocolEntries {
     $entries = [System.Collections.Generic.List[object]]::new()
     foreach ($path in @(
         'migrations/index.json',
-        'scripts/MeAndAI.ConsumerMigrations.psm1'
+        'scripts/MeAndAI.ConsumerMigrations.psm1',
+        'scripts/MeAndAI.ContentIdentity.psm1'
     ) + @($testMigrationCatalog.Migrations | ForEach-Object {
         "migrations/$([string]$_.Definition)"
     }) + @($testManagedAssets | ForEach-Object { [string]$_.TemplatePath })) {
@@ -330,6 +319,7 @@ function New-FinalizationScenario {
         [bool]$WrongLegacyAssetBlob = $false,
         [bool]$FabricatedSchema2Output = $false,
         [bool]$RecoveryBranch = $false,
+        [switch]$MissingContentIdentity,
         [switch]$MissingCreatedIssueUser
     )
 
@@ -351,8 +341,14 @@ function New-FinalizationScenario {
     else { '' }
 
     $protocolGraph = New-TestGitGraph
+    $protocolEntries = @(Get-TestTargetProtocolEntries)
+    if ($MissingContentIdentity) {
+        $protocolEntries = @($protocolEntries | Where-Object {
+            [string]$_.Path -cne 'scripts/MeAndAI.ContentIdentity.psm1'
+        })
+    }
     Add-TestGitCommit -Graph $protocolGraph -Commit $protocolSha `
-        -Entries (Get-TestTargetProtocolEntries)
+        -Entries $protocolEntries
 
     $targetManagedEntries = @(Get-TestTargetManagedConsumerEntries)
     $baseEntries = [System.Collections.Generic.List[object]]::new()
@@ -557,7 +553,7 @@ function New-FinalizationScenario {
             "graphDigest=$(if ($AdoptionSchema -in @(7, 9)) { 'c' * 64 } else { '' })",
             "pullRequestUrl=$pullRequestUrl"
         ) -join "`n"
-        $bindingDigest = Get-TestSha256Text -Text $bindingPayload
+        $bindingDigest = Get-TestTextDigest -Text $bindingPayload
         $graphIssueLines = if ($AdoptionSchema -in @(7, 9)) {
             @(
                 "- Source graph base: [$base](https://github.com/owner/consumer/commit/$base)",
@@ -1758,6 +1754,15 @@ try {
         Name = 'fabricated internally consistent schema-2 output'
         Scenario = $fabricatedSchema2Output
         ExpectedError = 'Schema-2 proposal migration output or ledger differs from the independently computed plan.'
+    })
+
+    $missingContentIdentity = New-FinalizationScenario -Kind Update `
+        -UpdateSchema 2 -MissingContentIdentity
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'immutable target missing migration identity dependency'
+        Scenario = $missingContentIdentity
+        TestId = 'TEST-0121'
+        ExpectedError = 'Immutable target release lacks the regular migration engine, identity dependency, or catalog index.'
     })
 
     $renamedPath = New-FinalizationScenario -Kind Update

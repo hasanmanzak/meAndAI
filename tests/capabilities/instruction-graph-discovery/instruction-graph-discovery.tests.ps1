@@ -14,22 +14,29 @@ Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$contentIdentityModule = @(Import-Module `
+    (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getSha256Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAISha256'
+].ScriptBlock
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
 $operationContract = Import-MeAndAITestOperationContract `
     -Path (Join-Path $root 'tests/fixture-operation-budgets.psd1')
 $operationExpectation = Resolve-MeAndAITestOperationExpectation `
     -Contract $operationContract -Owner $owner -SuiteArguments @()
 $script:InstructionGraphBlobProcessStarts = [long]0
 $script:InstructionGraphBlobRequests = [long]0
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-True {
     param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { Add-Failure $Message }
+    Assert-MeAndAITestCollectedTrue -Context $failureContext `
+        -Condition $Condition -Message $Message
 }
 
 function Assert-SequenceEqual {
@@ -117,34 +124,6 @@ function Sort-TestInstructionGraphEdges {
     return @($ordered.Values)
 }
 
-function Get-TestGitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $sha = [Security.Cryptography.SHA1]::Create()
-    try {
-        return ([BitConverter]::ToString(
-            $sha.ComputeHash($payload)
-        )).Replace('-', '').ToLowerInvariant()
-    }
-    finally { $sha.Dispose() }
-}
-
-function Get-TestSha256Hex {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $sha = [Security.Cryptography.SHA256]::Create()
-    try {
-        return ([BitConverter]::ToString(
-            $sha.ComputeHash($Bytes)
-        )).Replace('-', '').ToLowerInvariant()
-    }
-    finally { $sha.Dispose() }
-}
-
 function New-TestTreeEntry {
     param(
         [Parameter(Mandatory)][string]$Path,
@@ -173,7 +152,7 @@ function New-TestByteGraphFixture {
         [byte[]]$bytes = [byte[]]$Files[$path]
         $blobs[[string]$path] = $bytes
         $entries.Add((New-TestTreeEntry -Path ([string]$path) `
-            -Sha (Get-TestGitBlobSha -Bytes $bytes)))
+            -Sha (Get-MeAndAIGitBlobSha1 -Bytes $bytes)))
     }
     foreach ($path in @($SpecialEntries.Keys | Sort-Object)) {
         $entry = $SpecialEntries[$path]
@@ -206,7 +185,7 @@ function New-TestGraphFixture {
             Path = [string]$path
             Mode = '100644'
             Type = 'blob'
-            Sha = Get-TestGitBlobSha -Bytes $bytes
+            Sha = Get-MeAndAIGitBlobSha1 -Bytes $bytes
         })
     }
     foreach ($path in @($SpecialEntries.Keys | Sort-Object)) {
@@ -411,7 +390,7 @@ function Get-TestCommittedGraphFixture {
             $offset += $read
         }
         if ($state.OutputStream.ReadByte() -ne 10 -or
-            (Get-TestGitBlobSha -Bytes $payload) -cne [string]$entry.Sha) {
+            (Get-MeAndAIGitBlobSha1 -Bytes $payload) -cne [string]$entry.Sha) {
             throw 'Independent expected-graph batch payload identity differs.'
         }
         return ,$payload
@@ -1318,7 +1297,7 @@ function Test-InstructionGraphBatchActorBehavior {
         0, 10, 255, 35, 32, 104, 101, 97, 100, 101, 114, 32, 108,
         105, 107, 101, 10, 128, 1
     )
-    $binaryOid = Get-TestGitBlobSha -Bytes $binaryPayload
+    $binaryOid = & $getGitBlobSha1Action -Bytes $binaryPayload
     $binaryResponse = New-TestBatchResponseBytes -Oid $binaryOid `
         -Payload $binaryPayload
     $one = New-TestActorBatchSessionFixture -Actor $Actor `
@@ -1336,10 +1315,10 @@ function Test-InstructionGraphBatchActorBehavior {
         "$binaryOid`n"
     )
     Assert-True -Condition (
-        (Get-TestSha256Hex -Bytes $binaryActual) -ceq
-            (Get-TestSha256Hex -Bytes $binaryPayload) -and
-        (Get-TestSha256Hex -Bytes $oneInput) -ceq
-            (Get-TestSha256Hex -Bytes $expectedOneInput) -and
+        (& $getSha256Action -Bytes $binaryActual) -ceq
+            (& $getSha256Action -Bytes $binaryPayload) -and
+        (& $getSha256Action -Bytes $oneInput) -ceq
+            (& $getSha256Action -Bytes $expectedOneInput) -and
         $oneInput.Length -eq 41 -and $oneInput[40] -eq 10 -and
         [long]$one.Hooks.State.FactoryCalls -eq 1 -and
         [long]$oneObservation.ProcessStarts -eq 1 -and
@@ -1352,7 +1331,7 @@ function Test-InstructionGraphBatchActorBehavior {
     [byte[]]$secondPayload = [Text.UTF8Encoding]::new($false).GetBytes(
         "Required reading: [root](../AGENTS.md).`n"
     )
-    $secondOid = Get-TestGitBlobSha -Bytes $secondPayload
+    $secondOid = & $getGitBlobSha1Action -Bytes $secondPayload
     $manyOutput = Join-TestByteArrays -Arrays @(
         (New-TestBatchResponseBytes -Oid $binaryOid -Payload $binaryPayload),
         (New-TestBatchResponseBytes -Oid $secondOid -Payload $secondPayload)
@@ -1372,8 +1351,8 @@ function Test-InstructionGraphBatchActorBehavior {
     Assert-True -Condition (
         [long]$manyObservation.ProcessStarts -eq 1 -and
         [long]$manyObservation.Requests -eq 2 -and
-        (Get-TestSha256Hex -Bytes $manyInput) -ceq
-            (Get-TestSha256Hex -Bytes $expectedManyInput)
+        (& $getSha256Action -Bytes $manyInput) -ceq
+            (& $getSha256Action -Bytes $expectedManyInput)
     ) -Message "$label many-read request sequence was not one serial session."
 
     $duplicateOutput = Join-TestByteArrays -Arrays @(
@@ -1401,8 +1380,8 @@ function Test-InstructionGraphBatchActorBehavior {
     [byte[]]$cycleAuthorityBytes = [Text.UTF8Encoding]::new($false).GetBytes(
         'Reference: [root](../AGENTS.md).'
     )
-    $cycleRootOid = Get-TestGitBlobSha -Bytes $cycleRootBytes
-    $cycleAuthorityOid = Get-TestGitBlobSha -Bytes $cycleAuthorityBytes
+    $cycleRootOid = & $getGitBlobSha1Action -Bytes $cycleRootBytes
+    $cycleAuthorityOid = & $getGitBlobSha1Action -Bytes $cycleAuthorityBytes
     $cycle = New-TestActorBatchSessionFixture -Actor $Actor `
         -HostedModule $HostedModule -TransportOptions @{
             Output = (Join-TestByteArrays -Arrays @(
@@ -1605,7 +1584,7 @@ function Test-InstructionGraphBatchActorBehavior {
     try { & $aggregateAtNPlusOne.Session.Abort } catch { }
 
     [byte[]]$productionBlobPayload = [byte[]]::new(262144)
-    $productionBlobOid = Get-TestGitBlobSha -Bytes $productionBlobPayload
+    $productionBlobOid = & $getGitBlobSha1Action -Bytes $productionBlobPayload
     $productionBlobEntry = New-TestTreeEntry `
         -Path 'docs/PRODUCTION-LIMIT.md' -Sha $productionBlobOid
     [byte[]]$productionBlobResponse = New-TestBatchResponseBytes `
@@ -1621,7 +1600,7 @@ function Test-InstructionGraphBatchActorBehavior {
         -ParsedBlobs 1 -ParsedBlobBytes 262144)
 
     [byte[]]$productionBlobAtNPlusOnePayload = [byte[]]::new(262145)
-    $productionBlobAtNPlusOneOid = Get-TestGitBlobSha `
+    $productionBlobAtNPlusOneOid = & $getGitBlobSha1Action `
         -Bytes $productionBlobAtNPlusOnePayload
     $productionBlobAtNPlusOne = New-TestActorBatchSessionFixture `
         -Actor $Actor -HostedModule $HostedModule `
@@ -1669,7 +1648,7 @@ function Test-InstructionGraphBatchActorBehavior {
         -ParsedBlobs 16 -ParsedBlobBytes 4194304)
 
     [byte[]]$aggregateSentinelPayload = [byte[]]@(1)
-    $aggregateSentinelOid = Get-TestGitBlobSha `
+    $aggregateSentinelOid = & $getGitBlobSha1Action `
         -Bytes $aggregateSentinelPayload
     [byte[]]$aggregateSentinelResponse = New-TestBatchResponseBytes `
         -Oid $aggregateSentinelOid -Payload $aggregateSentinelPayload `
@@ -2111,14 +2090,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            'c60615ee964e1ec2a63d7642f81849e58babaa13f288eca2013a92112421700d') `
+            '7da1bf35db9db45dbbf70ff777c02ac4c58619dab4a2d1ad5efb969b3c6b2950') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
-        $compactGraphJsonSha = Get-TestSha256Hex -Bytes (
+        $compactGraphJsonSha = & $getSha256Action -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            '310ef00d7f6ffc737042b52956532431a6df74c4bad71c404f855a49e4801d17') `
+            '31955e351e5921cd5ee23aee4a8ef4d094d1ca0c3cecb38b5df54252b73a411e') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -3740,12 +3719,12 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                 -Arguments "cat-file blob $originalAgentsOid" `
                 -DisableReplaceObjects
             Assert-True -Condition (
-                (Get-TestSha256Hex -Bytes $replaceEnabledAgentsBlob) -ceq
-                    (Get-TestSha256Hex -Bytes (
+                (& $getSha256Action -Bytes $replaceEnabledAgentsBlob) -ceq
+                    (& $getSha256Action -Bytes (
                         $fixtureUtf8.GetBytes($replacementAgentsText)
                     )) -and
-                (Get-TestSha256Hex -Bytes $replaceDisabledAgentsBlob) -ceq
-                    (Get-TestSha256Hex -Bytes (
+                (& $getSha256Action -Bytes $replaceDisabledAgentsBlob) -ceq
+                    (& $getSha256Action -Bytes (
                         $fixtureUtf8.GetBytes($committedAgentsText)
                     ))
             ) -Message 'TEST-0161 real-Git replace ref was not active or could not be disabled at the child boundary.'
@@ -3937,10 +3916,10 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             $expectedAgentsBlob = $fixtureUtf8.GetBytes($committedAgentsText)
             Assert-True -Condition (
                 [string]$quickAgentsEntry.Sha -ceq $originalAgentsOid -and
-                (Get-TestSha256Hex -Bytes $replaceDisabledAgentsBlob) -ceq
-                    (Get-TestSha256Hex -Bytes $expectedAgentsBlob) -and
-                (Get-TestSha256Hex -Bytes $worktreeAgentsBytes) -cne
-                    (Get-TestSha256Hex -Bytes $expectedAgentsBlob)
+                (& $getSha256Action -Bytes $replaceDisabledAgentsBlob) -ceq
+                    (& $getSha256Action -Bytes $expectedAgentsBlob) -and
+                (& $getSha256Action -Bytes $worktreeAgentsBytes) -cne
+                    (& $getSha256Action -Bytes $expectedAgentsBlob)
             ) -Message 'TEST-0152 independent exact reader or tree identity used replace/filter/worktree bytes.'
             Assert-True -Condition (
                 [string]$quickGraph.digest -ceq [string]$hostedGraph.digest -and
@@ -4000,7 +3979,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
         Assert-True -Condition (
             [int]$limits.MaximumTreeEntries -eq 65536 -and
             [int]$limits.MaximumTreePathUtf8Bytes -eq 4194304 -and
-            [int]$limits.MaximumNodes -eq 256 -and
+            [int]$limits.MaximumNodes -eq 512 -and
             [int]$limits.MaximumEdges -eq 4096 -and
             [int]$limits.MaximumDepth -eq 32 -and
             [int]$limits.MaximumBlobBytes -eq 262144 -and
@@ -4019,7 +3998,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             -Message 'TEST-0152 invalid UTF-8 instruction evidence did not fail closed.'
 
         $aliasBytes = [Text.UTF8Encoding]::new($false).GetBytes('instructions')
-        $aliasSha = Get-TestGitBlobSha -Bytes $aliasBytes
+        $aliasSha = & $getGitBlobSha1Action -Bytes $aliasBytes
         $caseAliasEntries = @(
             (New-TestTreeEntry -Path 'AGENTS.md' -Sha $aliasSha),
             (New-TestTreeEntry -Path 'agents.md' -Sha $aliasSha)
@@ -4045,7 +4024,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             -Message 'TEST-0152 NFC-equivalent path aliases did not fail closed.'
 
         $treeRootBytes = [Text.UTF8Encoding]::new($false).GetBytes('instructions')
-        $treeRootSha = Get-TestGitBlobSha -Bytes $treeRootBytes
+        $treeRootSha = & $getGitBlobSha1Action -Bytes $treeRootBytes
         $treeAtLimit = [object[]]::new([int]$limits.MaximumTreeEntries)
         $treeAtLimit[0] = New-TestTreeEntry -Path 'AGENTS.md' -Sha $treeRootSha
         for ($index = 1; $index -lt $treeAtLimit.Count; $index++) {
@@ -4077,7 +4056,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
         [byte[]]$treePathRootBytes =
             [Text.UTF8Encoding]::new($false).GetBytes('Instructions.')
         $treePathAtLimit.Add((New-TestTreeEntry -Path 'AGENTS.md' `
-            -Sha (Get-TestGitBlobSha -Bytes $treePathRootBytes)))
+            -Sha (Get-MeAndAIGitBlobSha1 -Bytes $treePathRootBytes)))
         [long]$remainingTreePathBytes =
             [long]$limits.MaximumTreePathUtf8Bytes -
             [Text.Encoding]::UTF8.GetByteCount('AGENTS.md')
@@ -4145,7 +4124,9 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumNodes) `
             -Message 'TEST-0152 exact node boundary did not pass.'
         $nodeOverLimit = @($nodeAtLimit) + @(
-            New-TestTreeEntry -Path 'docs/features/N256.md'
+            New-TestTreeEntry -Path (
+                'docs/features/N{0:D3}.md' -f $nodeAtLimit.Count
+            )
         )
         Assert-ThrowsLike -Action {
             & $graphBuilder -BaseHead ('5' * 40) `

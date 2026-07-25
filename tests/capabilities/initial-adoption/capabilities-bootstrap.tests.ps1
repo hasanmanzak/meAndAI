@@ -13,6 +13,7 @@ $testRuntimePath = Join-Path $root `
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module $testRuntimePath -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = if ($Shard -ceq 'All') {
@@ -30,34 +31,15 @@ $dispatchPath = Join-Path $root `
     'scripts/quick-adoption/Private/ProposalOwnership.ps1'
 $adoptionPath = Join-Path $root 'docs/adoption.md'
 $protocolPath = Join-Path $root 'PROTOCOL.md'
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-Equal {
     param($Expected, $Actual, [string]$Message)
-    if ($Expected -ne $Actual) {
-        Add-Failure "$Message; expected '$Expected', found '$Actual'"
-    }
-}
-
-function Get-Test0153GitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $sha = [Security.Cryptography.SHA1]::Create()
-    try {
-        return ([BitConverter]::ToString(
-            $sha.ComputeHash($payload)
-        )).Replace('-', '').ToLowerInvariant()
-    }
-    finally { $sha.Dispose() }
+    Assert-MeAndAITestCollectedEqual -Context $failureContext `
+        -Expected $Expected -Actual $Actual -Message $Message
 }
 
 foreach ($path in @(
@@ -328,7 +310,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
                 Path = 'AGENTS.md'
                 Mode = '100644'
                 Type = 'blob'
-                Sha = Get-Test0153GitBlobSha -Bytes $graphBytes
+                Sha = Get-MeAndAIGitBlobSha1 -Bytes $graphBytes
             }
         )
         $graphReader = {

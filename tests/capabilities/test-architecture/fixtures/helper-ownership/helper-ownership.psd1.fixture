@@ -1,0 +1,15 @@
+@{
+    SchemaVersion = 1
+    ContractId = 'MEANDAI-TEST-HELPER-OWNERSHIP-0001'
+    ScanRoots = @('tests')
+    Owners = @(
+        @{
+            ContractId = 'THO-0001'
+            SemanticKind = 'synthetic-failure-context'
+            OwnerPath = 'tests/infrastructure/TestOwner.psm1'
+            CanonicalCommands = @('Add-Failure')
+            GuardedNames = @('Add-Failure')
+            ReviewedExceptions = @()
+        }
+    )
+}

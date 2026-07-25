@@ -7,14 +7,13 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.MarkdownEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$testContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $testContext
+$failures = $testContext.Failures
 
 function Assert-File {
     param([string]$RelativePath)
@@ -193,6 +192,7 @@ $requiredFiles = @(
     'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.RepositoryEvidence.psm1',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
@@ -3112,19 +3112,6 @@ function Test-DocumentRenderedReferenceCoveredByLink {
     }).Count -eq 1
 }
 
-function Test-ContainsExactDocumentTitle {
-    param(
-        [AllowEmptyString()][string]$Text,
-        [Parameter(Mandatory)][string]$Title
-    )
-
-    return [regex]::IsMatch(
-        $Text,
-        '(?i)(?<![A-Za-z0-9])' + [regex]::Escape($Title) +
-            '(?![A-Za-z0-9])'
-    )
-}
-
 function Test-DocumentHeadingOwnsTitle {
     param(
         [AllowEmptyString()][string]$Heading,
@@ -3682,7 +3669,7 @@ function Get-CodeFormattedDocumentTitleReferences {
     }
     $references = [System.Collections.Generic.List[string]]::new()
     foreach ($title in $Titles) {
-        if ((Test-ContainsExactDocumentTitle `
+        if ((Test-MeAndAIContainsExactDocumentTitle `
                 -Text ([string]$CodeSpan.Content) -Title $title) -and
             ($hasReferentialContext -or [regex]::IsMatch(
                 [string]$CodeSpan.Content,
@@ -4249,7 +4236,7 @@ foreach ($titleFixture in @(
         'Common Development Protocol'
     }
     else { 'Clickable Cross-Record References' }
-    if (-not (Test-ContainsExactDocumentTitle `
+    if (-not (Test-MeAndAIContainsExactDocumentTitle `
             -Text $titleFixture -Title $expectedFixtureTitle) -or
         @([regex]::Matches(
             $titleFixture,

@@ -4,30 +4,8 @@ Set-StrictMode -Version Latest
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 Import-Module (Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.RepositoryEvidence.psm1') -Force
-
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-SequenceEqual {
-    param([object[]]$Actual, [object[]]$Expected, [string]$Message)
-    if ($Actual.Count -ne $Expected.Count) {
-        throw "$Message Count differs: $($Actual.Count) != $($Expected.Count)."
-    }
-    for ($index = 0; $index -lt $Actual.Count; $index++) {
-        if ([string]$Actual[$index] -cne [string]$Expected[$index]) {
-            throw "$Message Element $index differs: '$($Actual[$index])' != '$($Expected[$index])'."
-        }
-    }
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
 
 function Assert-BytesEqual {
     param([byte[]]$Actual, [byte[]]$Expected, [string]$Message)
@@ -43,18 +21,6 @@ function Assert-BytesEqual {
             throw "$Message Byte $index differs: $($Actual[$index]) != $($Expected[$index])."
         }
     }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
 }
 
 function Invoke-TestGit {
@@ -134,24 +100,6 @@ function Assert-TestRepositoryEvidenceRerun {
     )).Text $statusBefore "$Message resolution mutated repository state."
 }
 
-function Get-TestGitBlobSha {
-    param([byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
 function ConvertTo-TestJsonBytes {
     param($Value, [bool]$Bom = $false, [bool]$CrLf = $false)
 
@@ -219,7 +167,7 @@ function New-TestCatalog {
             slug = [string]$specification.Slug
             definition = $definitionName
             type = [string]$specification.Type
-            definitionBlob = Get-TestGitBlobSha -Bytes $definitionBytes
+            definitionBlob = Get-MeAndAIGitBlobSha1 -Bytes $definitionBytes
         })
     }
     $index = [ordered]@{ schema = 1; capabilities = @($entries) }

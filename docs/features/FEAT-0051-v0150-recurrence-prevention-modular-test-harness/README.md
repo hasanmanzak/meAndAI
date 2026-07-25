@@ -136,15 +136,15 @@ runtimes, or workflow topology.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0183](test-cases.md#test-0183), [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) |
-| Test code | Partially implemented | [TEST-0183](test-cases.md#test-0183) has an executable owner; [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) remain planned. |
-| Baseline run | [SUBF-0095](#subf-0095) focused test passed; later slices not run | `tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1` passed on Windows PowerShell 5.1 on 2026-07-25. |
+| Test code | Partially implemented | [TEST-0183](test-cases.md#test-0183) and [TEST-0184](test-cases.md#test-0184) have executable owners; [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) remain planned. |
+| Baseline run | [SUBF-0095](#subf-0095) and [SUBF-0096](#subf-0096) focused tests passed; later slices not run | The recurrence gate, canonical utility ownership, affected capability suites, immutable dependency paths, and operation budgets passed on Windows PowerShell 5.1 on 2026-07-25. |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0095` <a name="subf-0095"></a> | Recurrence-prevention and durable prior-solution gate | [Issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) | [TEST-0183](test-cases.md#test-0183) and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0245](#find-0245) through [FIND-0254](#find-0254); all Blocking findings resolved, [FIND-0250](#find-0250) accepted | Implemented and locally reviewed; feature PR pending |
-| `SUBF-0096` <a name="subf-0096"></a> | Canonical shared test-harness and helper ownership | [Issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) | [TEST-0184](test-cases.md#test-0184); not started | Required after the slice | Proposed |
+| `SUBF-0096` <a name="subf-0096"></a> | Canonical shared test-harness and helper ownership | [Issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) | [TEST-0184](test-cases.md#test-0184), affected capability regressions, and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0255](#find-0255) through [FIND-0263](#find-0263); all Blocking findings resolved | Implemented and locally reviewed; feature PR pending |
 | `SUBF-0097` <a name="subf-0097"></a> | Runner, harness, case/scenario, support, fixture, and runtime-evidence separation | [Issue #126](https://github.com/hasanmanzak/meAndAI/issues/126) | [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186); not started | Required after the slice | Proposed |
 | `SUBF-0098` <a name="subf-0098"></a> | Staged self-application, duplicate-family consolidation, append-only capability, and compatibility closure | [Issue #127](https://github.com/hasanmanzak/meAndAI/issues/127) | [TEST-0187](test-cases.md#test-0187), [TEST-0188](test-cases.md#test-0188); not started | Required after the slice | Proposed |
 
@@ -200,17 +200,21 @@ declared implementation sequence on 2026-07-25.
 
 ## Self-review
 
-Planning review date: 2026-07-25. SUBF-0095 implementation review date:
-2026-07-25.
+Planning review date: 2026-07-25. SUBF-0095 and SUBF-0096 implementation
+review date: 2026-07-25.
 
 The planning review covered the planning record, decision, scenarios, indexes,
 issue links, and planning handoff. The SUBF-0095 review covers only its
 normative recurrence contract, work templates, optional stability prompt,
 project-memory schema/example, scenario authority, and focused structural test.
-Updater behavior, workflows, capability blobs, version files, and later
-subfeatures remain excluded. The slice budget is one focused red/green cycle,
-`git diff --check`, one final `StructureOnly` confirmation, link/ID consistency,
-and one fresh-diff review.
+The SUBF-0096 review covers explicit test contexts, canonical content identity,
+assertion, repository, Markdown, workspace-link, and helper-ownership utilities;
+the bounded AST owner guard; exact immutable dependency wiring; and the
+existing suites migrated to those owners. Workflow topology, release/version
+files, runtime-evidence role separation, hotspot decomposition, and later
+subfeatures remain excluded. The slice budget is focused owner and affected
+capability validation, `git diff --check`, one final `StructureOnly`
+confirmation, link/ID consistency, and one fresh-diff review.
 
 | ID | Severity | Disposition | Finding | Resolution |
 | --- | --- | --- | --- | --- |
@@ -226,6 +230,15 @@ and one fresh-diff review.
 | `FIND-0252` <a name="find-0252"></a> | High | `Blocking` | Final GitHub-surface review found that repository-relative protocol links in issue forms and the PR body template resolve from live issue/PR URLs rather than their source-file locations. | Replaced those links with immutable full-SHA permalinks to the approved readiness and decision authorities, and made [TEST-0183](test-cases.md#test-0183) require both canonical URLs in every affected work surface. |
 | `FIND-0253` <a name="find-0253"></a> | High | `Blocking` | Final protocol review found that the recurrence slice stated the new Gate 5 closure rule without mapping each of its own findings to an executable barrier or reviewed NotApplicable authority. | Added this per-finding closure ledger, including explicit authority and review conditions, and made [TEST-0183](test-cases.md#test-0183) retain the ledger. |
 | `FIND-0254` <a name="find-0254"></a> | High | `Blocking` | The first full link-policy confirmation reported 38 messages produced by three root defects: mutable same-repository guidance URLs, handoff labels that reused canonical record identities for non-canonical targets, and visible identity repetitions outside their exact links. | Replaced the guidance URLs with verified full-SHA authority permalinks, made handoff labels identity-neutral, linked every visible Gate/finding/work identity to its exact target, and reran StructureOnly successfully. The 38 messages were validation observations, not 38 independent defects. |
+| `FIND-0255` <a name="find-0255"></a> | High | `Blocking` | The first helper-ownership importer treated PowerShell data-file hashtables only as object properties and falsely reported the present `SchemaVersion` key as missing. | Added an explicit `IDictionary` key path before object-property fallback; [TEST-0184](test-cases.md#test-0184) now passes both the canonical contract and isolated unauthorized-definition fixture. |
+| `FIND-0256` <a name="find-0256"></a> | Medium | `Blocking` | The first executable owner name contained the reserved support token `helper`, so deterministic discovery correctly rejected it as a support file masquerading as a canonical suite. | Renamed the owner to [`canonical-utility-ownership.tests.ps1`](../../../tests/capabilities/test-architecture/canonical-utility-ownership.tests.ps1), updated exact scenario authority, and passed [TEST-0136](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0136) plus [TEST-0184](test-cases.md#test-0184). |
+| `FIND-0257` <a name="find-0257"></a> | Critical | `Blocking` | Moving migration hashing to `MeAndAI.ContentIdentity.psm1` initially left the remote finalizer, pinned bootstrap, quick-adoption exact-source baseline, and deterministic module-bundle oracle without one complete immutable sibling dependency edge. | Bound the identity module to every local, remote, bootstrap, and bundle source graph; added controlled missing-dependency cases to [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028) and [TEST-0121](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121); and passed [TEST-0147](../FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147). |
+| `FIND-0258` <a name="find-0258"></a> | High | `Blocking` | Removing duplicate hash/byte implementations exposed legacy callers and command-visibility assumptions in quick adoption, managed finalization, and instruction-graph tests. | Captured canonical exported scriptblocks once, injected those dependencies explicitly, removed every affected legacy call, and passed the owning focused suites plus [TEST-0184](test-cases.md#test-0184). |
+| `FIND-0259` <a name="find-0259"></a> | Medium | `Blocking` | A new bootstrap negative case created a separate fixture family member and increased publication-push, derivative, and reuse observations from 36 to 37. | Reused the already fail-closed missing-module fixture for the missing-identity case instead of raising the budget; [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158) remained exactly `36/36`. |
+| `FIND-0260` <a name="find-0260"></a> | Critical | `Blocking` | A full-file tool-output round trip truncated three large test files, and a later failed multi-file patch demonstrated that failed patch output cannot be assumed atomic. | Restored only the three damaged middle ranges from bounded clean-HEAD slices, verified every target after patch failure, prohibited displayed full-file output as rewrite input in project recurrence memory, and passed changed-source AST parsing before any commit or push. |
+| `FIND-0261` <a name="find-0261"></a> | High | `Blocking` | Diagnostic PowerShell commands reused the automatic `$Error` variable, expanded `$` inside a double-quoted search pattern, and aggregated two native-output arrays through comma nesting, producing false parser/path evidence or excessive output. | Recorded exact safe routes in project recurrence memory: non-reserved loop variables, literal/escaped search patterns, and `@(command1) + @(command2)` output composition. No unchanged failing command was repeated. |
+| `FIND-0262` <a name="find-0262"></a> | High | `Blocking` | The existing 256-node instruction-graph limit no longer admitted meAndAI's own exact consumer graph even though its 208 tracked protocol surfaces remained below the separate surface cap. | Raised only the canonical node bound to 512, retained every tree/path/blob/edge/depth limit, made the N+1 fixture limit-derived, updated deterministic graph identities, and passed [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152). |
+| `FIND-0263` <a name="find-0263"></a> | High | `Blocking` | The first final StructureOnly run reported nine link-policy messages because the new handoff used an aggregate finding range, two plain slice identities, and three slice identities linked to historical handoff files instead of canonical records. | Linked every finding individually, replaced the plain checkpoint identities with role-neutral wording, and made historical handoff labels identity-neutral before the final confirmation. |
 
 ### Gate 5 closure for the recurrence slice
 
@@ -243,6 +256,20 @@ and one fresh-diff review.
 | [FIND-0252](#find-0252) | Barrier: [TEST-0183](test-cases.md#test-0183) and [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) | Every affected live GitHub work surface must retain both exact immutable authority URLs. |
 | [FIND-0253](#find-0253) | Barrier: [TEST-0183](test-cases.md#test-0183) | The exact recurrence-slice closure ledger and every numbered finding mapping must remain present. |
 | [FIND-0254](#find-0254) | Barrier: [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0183](test-cases.md#test-0183) | Visible identities must remain wholly linked, same-repository GitHub permalinks immutable, and required work-surface authorities exact. |
+
+### Gate 5 closure for the canonical utility slice
+
+| Finding | Closure | Authority and review condition |
+| --- | --- | --- |
+| [FIND-0255](#find-0255) | Barrier: [TEST-0184](test-cases.md#test-0184) | The ownership importer must continue accepting canonical data-file dictionaries and rejecting missing required keys. |
+| [FIND-0256](#find-0256) | Barrier: [TEST-0136](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0136) and [TEST-0184](test-cases.md#test-0184) | Canonical executable owners must remain discoverable and support names must not masquerade as suites. |
+| [FIND-0257](#find-0257) | Barrier: [TEST-0028](../FEAT-0005-ai-capabilities-lifecycle/test-cases.md#test-0028), [TEST-0121](../FEAT-0026-v0103-generic-consumer-transition-reconciliation/test-cases.md#test-0121), and [TEST-0147](../FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147) | Every immutable migration execution path must retain the exact identity-module sibling or fail before mutation. |
+| [FIND-0258](#find-0258) | Barrier: [TEST-0184](test-cases.md#test-0184) and the affected capability suites recorded in [test evidence](test-cases.md#evidence) | Reopen if a guarded legacy definition returns or any migrated caller stops using the canonical captured command. |
+| [FIND-0259](#find-0259) | Barrier: [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158) | The missing-identity proof must continue reusing the fixture family without increasing exact operation maxima. |
+| [FIND-0260](#find-0260) | Reviewed `NotApplicable` plus changed-source AST gate | The transient local rewrite was removed before checkpoint and no product runtime retains the transport; reopen if displayed/truncated tool output is again used as file-rewrite authority. |
+| [FIND-0261](#find-0261) | Barrier: [TEST-0183](test-cases.md#test-0183) and reviewed project-local route evidence | Active recurrence records retain the exact signature and safe route; reopen after a supported PowerShell/tooling change proves the previously unsafe form equivalent. |
+| [FIND-0262](#find-0262) | Barrier: [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152) | The 512-node N/N+1 boundary and exact self-consumer graph must remain deterministic. |
+| [FIND-0263](#find-0263) | Barrier: [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) | Every visible record identity must remain wholly linked to its exact canonical target, and aggregate cross-record ranges remain prohibited. |
 
 ## Definition of Done
 

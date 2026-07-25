@@ -5,13 +5,10 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $owner = 'tests/capabilities/initial-adoption/quick-adoption-bundle.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Get-RelativeFileText {
     param([Parameter(Mandatory)][string]$RelativePath)
@@ -237,6 +234,7 @@ $inventoryRelativePath = 'scripts/quick-adoption/bundle.sources.json'
 $moduleRelativePaths = @(
     'scripts/quick-adoption/MeAndAI.QuickAdoption.psd1',
     'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/quick-adoption/Private/Configuration.ps1',
     'scripts/quick-adoption/Private/OutputAndNativeProcess.ps1',
     'scripts/quick-adoption/Private/RepositoryAssessment.ps1',
@@ -354,7 +352,13 @@ if ($inventoryText) {
             Add-Failure 'TEST-0147 bundle source inventory identity is invalid.'
         }
         $expectedBundleSources = @($moduleRelativePaths | ForEach-Object {
-            ($_ -replace '^scripts/quick-adoption/', 'MeAndAI.QuickAdoption/')
+            if ($_ -ceq 'scripts/MeAndAI.ContentIdentity.psm1') {
+                'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1'
+            }
+            else {
+                ($_ -replace '^scripts/quick-adoption/', `
+                    'MeAndAI.QuickAdoption/')
+            }
         })
         $actualBundleSources = @($inventory.sources | ForEach-Object { [string]$_ })
         if (($actualBundleSources -join "`n") -cne ($expectedBundleSources -join "`n")) {
@@ -368,8 +372,9 @@ if ($inventoryText) {
             "'(?<path>(?:Private|Public)/[A-Za-z0-9_.-]+\.ps1)'",
             [Text.RegularExpressions.RegexOptions]::CultureInvariant
         ) | ForEach-Object { $_.Groups['path'].Value })
-        $expectedLoaderSources = @($actualBundleSources | Select-Object -Skip 2 |
-            ForEach-Object {
+        $expectedLoaderSources = @($actualBundleSources | Where-Object {
+            $_ -match '^MeAndAI\.QuickAdoption/(?:Private|Public)/.+\.ps1$'
+        } | ForEach-Object {
                 $_.Substring('MeAndAI.QuickAdoption/'.Length)
             })
         if (($loaderSources -join "`n") -cne ($expectedLoaderSources -join "`n")) {
@@ -422,6 +427,10 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         [void](New-Item -ItemType Directory -Path $sourceScripts -Force)
         Copy-Item -LiteralPath (Join-Path $root 'scripts/quick-adoption') `
             -Destination $sourceScripts -Recurse
+        Copy-Item -LiteralPath (Join-Path $root `
+            'scripts/MeAndAI.ContentIdentity.psm1') `
+            -Destination (Join-Path $sourceScripts `
+                'MeAndAI.ContentIdentity.psm1')
         $fixtureBuilderPath = Join-Path $sourceScripts `
             'Build-MeAndAIQuickAdoptionBundle.ps1'
         Copy-Item -LiteralPath $builderPath -Destination $fixtureBuilderPath
@@ -456,7 +465,8 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             & git -C $sourceRoot config core.autocrlf false
             if ($LASTEXITCODE -ne 0) { throw 'Unable to pin fixture blob bytes.' }
             & git -C $sourceRoot add -- .gitattributes scripts/quick-adoption `
-                scripts/Build-MeAndAIQuickAdoptionBundle.ps1
+                scripts/Build-MeAndAIQuickAdoptionBundle.ps1 `
+                scripts/MeAndAI.ContentIdentity.psm1
             if ($LASTEXITCODE -ne 0) { throw 'Unable to stage bundle fixture sources.' }
             & git -C $sourceRoot commit -q -m 'TEST-0147 bundle source fixture'
             if ($LASTEXITCODE -ne 0) { throw 'Unable to commit bundle fixture sources.' }
@@ -555,8 +565,16 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 if ($entry.Count -ne 1) {
                     throw "Production payload '$($record.path)' is missing or duplicated."
                 }
-                $sourceRelative = 'scripts/quick-adoption/' +
-                    ([string]$record.path).Substring('MeAndAI.QuickAdoption/'.Length)
+                $sourceRelative = if ([string]$record.path -ceq
+                    'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
+                    'scripts/MeAndAI.ContentIdentity.psm1'
+                }
+                else {
+                    'scripts/quick-adoption/' +
+                        ([string]$record.path).Substring(
+                            'MeAndAI.QuickAdoption/'.Length
+                        )
+                }
                 $expectedBytes = Read-TestTrackedBlob -Repository $sourceRoot `
                     -Commit $sourceCommit -RelativePath $sourceRelative
                 $stream = $entry[0].Open()

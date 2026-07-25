@@ -7,6 +7,7 @@ $initialAdoptionPolicyTag = 'v0.14.5'
 $initialAdoptionPolicySourcePath =
     'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$consumerMigrationContentIdentityPath = 'scripts/MeAndAI.ContentIdentity.psm1'
 $consumerMigrationIndexPath = 'migrations/index.json'
 $consumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 $adoptionAssets = @(

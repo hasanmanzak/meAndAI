@@ -6,42 +6,7 @@ $owner = 'tests/capabilities/test-architecture/test-discovery.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-SequenceEqual {
-    param([object[]]$Actual, [object[]]$Expected, [string]$Message)
-    if ($Actual.Count -ne $Expected.Count) {
-        throw "$Message Count differs: $($Actual.Count) != $($Expected.Count)."
-    }
-    for ($index = 0; $index -lt $Actual.Count; $index++) {
-        if ([string]$Actual[$index] -cne [string]$Expected[$index]) {
-            throw "$Message Element $index differs: '$($Actual[$index])' != '$($Expected[$index])'."
-        }
-    }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
 
 function Write-TestFile {
     param([string]$Path, [string]$Content = "Set-StrictMode -Version Latest`n")

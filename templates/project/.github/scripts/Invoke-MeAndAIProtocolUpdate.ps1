@@ -40,6 +40,7 @@ $ManagedPaths = @($ProtocolPath) + @($ManagedUpdaterAssets | ForEach-Object {
     [string]$_.ConsumerPath
 })
 $ConsumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$ConsumerMigrationContentIdentityPath = 'scripts/MeAndAI.ContentIdentity.psm1'
 $ConsumerMigrationIndexPath = 'migrations/index.json'
 $ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 $MigrationBranchSuffix = '-migrations'
@@ -855,8 +856,12 @@ function Import-ConsumerMigrationCatalogAtCommit {
     }
     $moduleEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
         -Commit $Commit -Path $ConsumerMigrationModulePath
+    $contentIdentityEntry = Get-LocalTreeEntry -RepositoryPath $SourcePath `
+        -Commit $Commit -Path $ConsumerMigrationContentIdentityPath
     if ($indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob' -or
-        $moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob') {
+        $moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob' -or
+        $contentIdentityEntry.Mode -cne '100644' -or
+        $contentIdentityEntry.Type -cne 'blob') {
         throw 'Consumer migration capability is partial or not stored as regular immutable blobs.'
     }
     Invoke-Native -Command 'git' -Arguments @(
@@ -2446,12 +2451,17 @@ function Get-RemoteConsumerMigrationPlan {
     $moduleEntry = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
         -HeadSha $TargetProtocolSha -Path $ConsumerMigrationModulePath `
         -Token $ProtocolToken
+    $contentIdentityEntry = Get-RepositoryTreeEntry `
+        -Repository $ProtocolRepository -HeadSha $TargetProtocolSha `
+        -Path $ConsumerMigrationContentIdentityPath -Token $ProtocolToken
     $indexEntry = Get-RepositoryTreeEntry -Repository $ProtocolRepository `
         -HeadSha $TargetProtocolSha -Path $ConsumerMigrationIndexPath `
         -Token $ProtocolToken
     if ($moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob' -or
+        $contentIdentityEntry.Mode -cne '100644' -or
+        $contentIdentityEntry.Type -cne 'blob' -or
         $indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob') {
-        throw 'Immutable target release lacks one regular migration engine and catalog index.'
+        throw 'Immutable target release lacks the regular migration engine, identity dependency, or catalog index.'
     }
 
     $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) (
@@ -2464,11 +2474,19 @@ function Get-RemoteConsumerMigrationPlan {
         New-Item -ItemType Directory -Path $scriptsRoot, $catalogRoot -Force | Out-Null
         $moduleBytes = Get-RepositoryBlobBytes -Repository $ProtocolRepository `
             -BlobSha ([string]$moduleEntry.Sha) -Token $ProtocolToken
+        $contentIdentityBytes = Get-RepositoryBlobBytes `
+            -Repository $ProtocolRepository `
+            -BlobSha ([string]$contentIdentityEntry.Sha) -Token $ProtocolToken
         $indexBytes = Get-RepositoryBlobBytes -Repository $ProtocolRepository `
             -BlobSha ([string]$indexEntry.Sha) -Token $ProtocolToken
         $moduleFile = Join-Path $scriptsRoot 'MeAndAI.ConsumerMigrations.psm1'
+        $contentIdentityFile = Join-Path $scriptsRoot 'MeAndAI.ContentIdentity.psm1'
         $indexFile = Join-Path $catalogRoot 'index.json'
         [IO.File]::WriteAllBytes($moduleFile, [byte[]]$moduleBytes)
+        [IO.File]::WriteAllBytes(
+            $contentIdentityFile,
+            [byte[]]$contentIdentityBytes
+        )
         [IO.File]::WriteAllBytes($indexFile, [byte[]]$indexBytes)
 
         try {
@@ -4319,14 +4337,17 @@ else {
 }
 $consumerMigrationModule = Join-Path $sourcePath `
     ($ConsumerMigrationModulePath -replace '/', [IO.Path]::DirectorySeparatorChar)
+$consumerMigrationContentIdentity = Join-Path $sourcePath `
+    ($ConsumerMigrationContentIdentityPath -replace '/', [IO.Path]::DirectorySeparatorChar)
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
     throw "Pure resolver is missing: $modulePath"
 }
 if (-not (Test-Path -LiteralPath (Join-Path $sourcePath '.git'))) {
     throw "Pinned protocol source checkout is missing: $sourcePath"
 }
-if (-not (Test-Path -LiteralPath $consumerMigrationModule -PathType Leaf)) {
-    throw 'Installed updater declares consumer-migration capability but its pinned protocol source lacks the pure migration engine.'
+if (-not (Test-Path -LiteralPath $consumerMigrationModule -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $consumerMigrationContentIdentity -PathType Leaf)) {
+    throw 'Installed updater declares consumer-migration capability but its pinned protocol source lacks the pure migration engine or identity dependency.'
 }
 Import-Module $consumerMigrationModule -Force
 $TrustedActor = Get-AuthenticatedUpdaterActor

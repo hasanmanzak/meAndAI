@@ -12,20 +12,18 @@ Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-True {
     param(
         [Parameter(Mandatory)][bool]$Condition,
         [Parameter(Mandatory)][string]$Message
     )
-    if (-not $Condition) { Add-Failure $Message }
+    Assert-MeAndAITestCollectedTrue -Context $failureContext `
+        -Condition $Condition -Message $Message
 }
 
 function Assert-Equal {

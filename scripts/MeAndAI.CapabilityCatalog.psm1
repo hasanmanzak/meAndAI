@@ -1,5 +1,8 @@
 Set-StrictMode -Version Latest
 
+Import-Module (Join-Path $PSScriptRoot 'MeAndAI.ContentIdentity.psm1') `
+    -Force -ErrorAction Stop
+
 $script:LedgerPath = '.ai/meandai-capabilities-state.json'
 $script:ReviewedAtFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
 $script:CapabilityTypes = @(
@@ -73,51 +76,6 @@ function ConvertFrom-JsonBytes {
     catch {
         throw "$Label is not valid JSON: $($_.Exception.Message)"
     }
-}
-
-function Get-GitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Get-Sha256 {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $algorithm = [Security.Cryptography.SHA256]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($Bytes) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Test-ByteArrayEqual {
-    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
-
-    if ($null -eq $Left -or $null -eq $Right) {
-        return $null -eq $Left -and $null -eq $Right
-    }
-    if ($Left.Length -ne $Right.Length) { return $false }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) { return $false }
-    }
-    return $true
 }
 
 function Assert-OrdinaryLeaf {
@@ -330,7 +288,7 @@ function Import-MeAndAICapabilityCatalog {
         Assert-OrdinaryLeaf -Path $definitionPath `
             -Label "Capability definition '$definitionName'"
         $definitionBytes = [IO.File]::ReadAllBytes($definitionPath)
-        $actualBlob = Get-GitBlobSha -Bytes $definitionBytes
+        $actualBlob = Get-MeAndAIGitBlobSha1 -Bytes $definitionBytes
         if ($actualBlob -cne $definitionBlob) {
             throw "Capability '$slug' definition blob does not match '$definitionName'."
         }
@@ -363,8 +321,8 @@ function Import-MeAndAICapabilityCatalog {
     $catalog = [pscustomobject]@{
         Schema = 1
         IndexPath = $fullIndexPath
-        IndexBlob = Get-GitBlobSha -Bytes $indexBytes
-        CatalogDigest = Get-Sha256 -Bytes $indexBytes
+        IndexBlob = Get-MeAndAIGitBlobSha1 -Bytes $indexBytes
+        CatalogDigest = Get-MeAndAISha256 -Bytes $indexBytes
         Capabilities = @($capabilities)
     }
     $catalog.PSObject.TypeNames.Insert(0, 'MeAndAI.CapabilityCatalog')
@@ -649,7 +607,7 @@ function Import-MeAndAICapabilityLedger {
 
     Assert-LedgerPrefix -Catalog $Catalog -Entries @($entries)
     $canonicalBytes = ConvertTo-LedgerBytes -Entries @($entries)
-    if (-not (Test-ByteArrayEqual -Left $Bytes -Right $canonicalBytes)) {
+    if (-not (Test-MeAndAIByteArrayEqual -Left $Bytes -Right $canonicalBytes)) {
         throw 'Consumer capability ledger is not in canonical UTF-8 JSON form.'
     }
     $result = [pscustomobject]@{
