@@ -118,7 +118,10 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
-            TestIds = @('TEST-0134', 'TEST-0135', 'TEST-0157', 'TEST-0171')
+            TestIds = @(
+                'TEST-0134', 'TEST-0135', 'TEST-0157', 'TEST-0171',
+                'TEST-0188'
+            )
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -158,7 +161,7 @@
         @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md'
-            TestIds = @('TEST-0187', 'TEST-0188')
+            TestIds = @('TEST-0187')
         }
         @{
             Evidence = 'ExecutableSuite'

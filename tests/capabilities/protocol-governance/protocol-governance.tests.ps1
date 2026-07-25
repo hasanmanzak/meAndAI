@@ -196,6 +196,7 @@ $requiredFiles = @(
     'capabilities/index.json',
     'capabilities/canonical-repository-evidence.json',
     'capabilities/test-architecture.json',
+    'capabilities/test-harness-modularity.json',
     'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.RepositoryEvidence.psm1',
     'scripts/MeAndAI.CapabilityCatalog.psm1',

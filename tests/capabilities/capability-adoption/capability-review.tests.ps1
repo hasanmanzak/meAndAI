@@ -163,69 +163,146 @@ $releasePrefixPlan = Resolve-MeAndAICapabilityReview `
     -DiscoveryContext AlreadyCurrent
 Assert-Equal $releasePrefixPlan.State 'CreateReviewHandoff' `
     'TEST-0157 predecessor terminal ledger did not request appended capability review.'
-Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 2 `
+Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 3 `
     'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix size.'
 Assert-Equal ($releasePrefixPlan.CapabilityBatch.Slug -join ',') `
-    'test-runtime-efficiency,canonical-repository-evidence' `
+    'test-runtime-efficiency,canonical-repository-evidence,test-harness-modularity' `
     'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix.'
 
-$releaseEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
-    -Capability $releaseCatalog.Capabilities[1] -Outcome NotApplicable `
-    -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
-    -ReviewIdentity 'pull-request:87' `
-    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
-    -ReviewedAt '2026-07-19T00:00:00Z'
-$releasePredecessorLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-    -Catalog $releaseCatalog -Entries @($releaseEntry, $releaseEfficiencyEntry)
-$releasePredecessorLedger = Import-MeAndAICapabilityLedger `
-    -Catalog $releaseCatalog -Bytes $releasePredecessorLedgerBytes
-$releaseEvidencePlan = Resolve-MeAndAICapabilityReview `
-    -Catalog $releaseCatalog -Ledger $releasePredecessorLedger `
-    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-    -DefaultHead $baseHead -TargetVersion v0.12.0 `
-    -DiscoveryContext AlreadyCurrent
-Assert-Equal $releaseCatalog.Capabilities.Count 3 `
-    'TEST-0172 catalog does not contain exactly two immutable predecessors and one appended capability.'
-Assert-Equal (($releaseCatalog.Capabilities | ForEach-Object {
-    "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
-} | Select-Object -First 2) -join ',') `
-    'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5,test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea' `
-    'TEST-0172 immutable predecessor tuples changed.'
-Assert-Equal $releaseEvidencePlan.State 'CreateReviewHandoff' `
-    'TEST-0172 two-entry terminal ledger did not request appended capability review.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch.Count 1 `
-    'TEST-0172 two-entry terminal ledger exposed more than the appended capability.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Slug `
-    'canonical-repository-evidence' `
-    'TEST-0172 two-entry terminal ledger exposed the wrong appended capability.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Type 'Semantic' `
-    'TEST-0172 appended capability is not review-only Semantic state.'
-Assert-Equal $releaseEvidencePlan.SemanticWritePaths.Count 0 `
-    'TEST-0172 automation claimed a semantic consumer path.'
-Assert-Equal ($releaseEvidencePlan.AutomationWritePaths -join ',') `
-    '.ai/adoption/meandai-capability-review.json' `
-    'TEST-0172 review handoff writes outside its transient manifest.'
+$releaseEvidenceCatalogRoot = Join-Path ([IO.Path]::GetTempPath()) (
+    'meandai-test-0172-catalog-' + [Guid]::NewGuid().ToString('N')
+)
+[IO.Directory]::CreateDirectory($releaseEvidenceCatalogRoot) | Out-Null
+try {
+    foreach ($definitionName in @(
+        'test-architecture.json',
+        'test-runtime-efficiency.json',
+        'canonical-repository-evidence.json'
+    )) {
+        [IO.File]::Copy(
+            (Join-Path $root "capabilities/$definitionName"),
+            (Join-Path $releaseEvidenceCatalogRoot $definitionName)
+        )
+    }
+    $releaseEvidenceCatalogText = @'
+{
+  "schema": 1,
+  "capabilities": [
+    {
+      "slug": "test-architecture",
+      "definition": "test-architecture.json",
+      "type": "Semantic",
+      "definitionBlob": "9a3a999f05abbbb4ee710f14d82fb26d86de5ad5"
+    },
+    {
+      "slug": "test-runtime-efficiency",
+      "definition": "test-runtime-efficiency.json",
+      "type": "Semantic",
+      "definitionBlob": "20c6bc064d04be18ede7ab70983503feb4b799ea"
+    },
+    {
+      "slug": "canonical-repository-evidence",
+      "definition": "canonical-repository-evidence.json",
+      "type": "Semantic",
+      "definitionBlob": "5a323d1cc9b5e64564f63dc577ad0c937a1c91c0"
+    }
+  ]
+}
+'@
+    $releaseEvidenceCatalogBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        $releaseEvidenceCatalogText.Replace("`r`n", "`n") + "`n"
+    )
+    Assert-Equal (Get-MeAndAISha256 -Bytes $releaseEvidenceCatalogBytes) `
+        'adaa29aace672e40179db053b74cce3cadca77b1a320f74f49f13faaec7d8b83' `
+        'TEST-0172 exact three-entry predecessor catalog digest differs.'
+    $releaseEvidenceIndexPath = Join-Path $releaseEvidenceCatalogRoot 'index.json'
+    [IO.File]::WriteAllBytes(
+        $releaseEvidenceIndexPath,
+        $releaseEvidenceCatalogBytes
+    )
+    $releaseEvidenceCatalog = Import-MeAndAICapabilityCatalog `
+        -IndexPath $releaseEvidenceIndexPath
+    Assert-Equal $releaseEvidenceCatalog.Capabilities.Count 3 `
+        'TEST-0172 bounded predecessor catalog count differs.'
+    Assert-Equal (($releaseEvidenceCatalog.Capabilities | ForEach-Object {
+        "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
+    } | Select-Object -First 2) -join ',') `
+        'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5,test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea' `
+        'TEST-0172 immutable predecessor tuples changed.'
+    $releaseEvidenceArchitectureEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[0] -Outcome Conforming `
+        -Evidence @('Reviewed release-catalog topology evidence.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseEvidenceEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[1] -Outcome NotApplicable `
+        -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseEvidencePredecessorLedgerBytes = `
+        ConvertTo-MeAndAICapabilityLedgerBytes `
+            -Catalog $releaseEvidenceCatalog `
+            -Entries @(
+                $releaseEvidenceArchitectureEntry,
+                $releaseEvidenceEfficiencyEntry
+            )
+    $releaseEvidencePredecessorLedger = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseEvidenceCatalog `
+        -Bytes $releaseEvidencePredecessorLedgerBytes
+    $releaseEvidencePlan = Resolve-MeAndAICapabilityReview `
+        -Catalog $releaseEvidenceCatalog `
+        -Ledger $releaseEvidencePredecessorLedger `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -DefaultHead $baseHead -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent
+    Assert-Equal $releaseEvidencePlan.State 'CreateReviewHandoff' `
+        'TEST-0172 two-entry terminal ledger did not request appended capability review.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch.Count 1 `
+        'TEST-0172 two-entry terminal ledger exposed more than the appended capability.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Slug `
+        'canonical-repository-evidence' `
+        'TEST-0172 two-entry terminal ledger exposed the wrong appended capability.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Type 'Semantic' `
+        'TEST-0172 appended capability is not review-only Semantic state.'
+    Assert-Equal $releaseEvidencePlan.SemanticWritePaths.Count 0 `
+        'TEST-0172 automation claimed a semantic consumer path.'
+    Assert-Equal ($releaseEvidencePlan.AutomationWritePaths -join ',') `
+        '.ai/adoption/meandai-capability-review.json' `
+        'TEST-0172 review handoff writes outside its transient manifest.'
 
-$releaseEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
-    -Capability $releaseCatalog.Capabilities[2] -Outcome NotApplicable `
-    -Evidence @('Reviewed repository does not read byte-sensitive repository evidence.') `
-    -ReviewIdentity 'pull-request:87' `
-    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
-    -ReviewedAt '2026-07-19T00:00:00Z'
-$releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-    -Catalog $releaseCatalog `
-    -Entries @($releaseEntry, $releaseEfficiencyEntry, $releaseEvidenceEntry)
-$releaseCompleteLedger = Import-MeAndAICapabilityLedger `
-    -Catalog $releaseCatalog -Bytes $releaseCompleteLedgerBytes
-$releaseCurrent = Resolve-MeAndAICapabilityReview `
-    -Catalog $releaseCatalog -Ledger $releaseCompleteLedger `
-    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-    -DefaultHead $baseHead -TargetVersion v0.12.0 `
-    -DiscoveryContext AlreadyCurrent
-Assert-Equal $releaseCurrent.State 'Current' `
-    'TEST-0172 exact imported three-entry terminal ledger was not current.'
-Assert-Equal $releaseCurrent.Operations.Count 0 `
-    'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
+    $releaseEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[2] `
+        -Outcome NotApplicable `
+        -Evidence @('Reviewed repository does not read byte-sensitive repository evidence.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $releaseEvidenceCatalog `
+        -Entries @(
+            $releaseEvidenceArchitectureEntry,
+            $releaseEvidenceEfficiencyEntry,
+            $releaseEvidenceEntry
+        )
+    $releaseCompleteLedger = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseEvidenceCatalog -Bytes $releaseCompleteLedgerBytes
+    $releaseCurrent = Resolve-MeAndAICapabilityReview `
+        -Catalog $releaseEvidenceCatalog -Ledger $releaseCompleteLedger `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -DefaultHead $baseHead -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent
+    Assert-Equal $releaseCurrent.State 'Current' `
+        'TEST-0172 exact imported three-entry terminal ledger was not current.'
+    Assert-Equal $releaseCurrent.Operations.Count 0 `
+        'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
+}
+finally {
+    if (Test-Path -LiteralPath $releaseEvidenceCatalogRoot) {
+        Remove-Item -LiteralPath $releaseEvidenceCatalogRoot -Recurse -Force
+    }
+}
 Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
     -TestId 'TEST-0172'
 
@@ -1818,9 +1895,20 @@ try {
         -ReviewIdentity "pull-request:$finalPullNumber" `
         -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
         -ReviewedAt '2026-07-19T00:00:00Z'
+    $finalHarnessEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseCatalog.Capabilities[3] -Outcome Conforming `
+        -Evidence @('Reviewed modular exact-evidence harness ownership.') `
+        -ReviewIdentity "pull-request:$finalPullNumber" `
+        -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
+        -ReviewedAt '2026-07-19T00:00:00Z'
     $finalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
         -Catalog $releaseCatalog `
-        -Entries @($finalEntry, $finalEfficiencyEntry, $finalEvidenceEntry)
+        -Entries @(
+            $finalEntry,
+            $finalEfficiencyEntry,
+            $finalEvidenceEntry,
+            $finalHarnessEntry
+        )
     $apiState.FinalLedgerBytes = [byte[]]$finalLedgerBytes
     $fixtureAiRoot = Join-Path $fixtureRoot '.ai'
     [void](New-Item -ItemType Directory -Path $fixtureAiRoot)
@@ -2507,11 +2595,18 @@ try {
             -ReviewIdentity 'pull-request:95' `
             -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
             -ReviewedAt '2026-07-20T00:00:00Z'
+        $currentHarnessEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $releaseCatalog.Capabilities[3] -Outcome Conforming `
+            -Evidence @('Reviewed modular exact-evidence harness ownership.') `
+            -ReviewIdentity 'pull-request:95' `
+            -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
+            -ReviewedAt '2026-07-20T00:00:00Z'
         $currentLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
             -Catalog $releaseCatalog -Entries @(
                 $currentPrefixEntry,
                 $currentSuffixEntry,
-                $currentEvidenceEntry
+                $currentEvidenceEntry,
+                $currentHarnessEntry
             )
         return [pscustomobject][ordered]@{
             CatalogBytes = $SourceCatalogBytes
@@ -2656,11 +2751,11 @@ try {
     )
     $currentLedgerBeforeObject = Import-MeAndAICapabilityLedger `
         -Catalog $releaseCatalog -Bytes $currentLedgerBefore
-    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 3 `
+    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 4 `
         'TEST-0165 fixture did not start with a historical prefix plus current suffix.'
     $currentSuffixBefore = @($currentLedgerBeforeObject.Entries | Select-Object -Skip 1)
     Assert-Equal ($currentSuffixBefore.Slug -join ',') `
-        'test-runtime-efficiency,canonical-repository-evidence' `
+        'test-runtime-efficiency,canonical-repository-evidence,test-harness-modularity' `
         'TEST-0165 fixture did not preserve the complete current suffix.'
     $historicalRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `

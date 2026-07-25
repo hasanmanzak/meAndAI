@@ -18,6 +18,12 @@
       "definition": "canonical-repository-evidence.json",
       "type": "Semantic",
       "definitionBlob": "5a323d1cc9b5e64564f63dc577ad0c937a1c91c0"
+    },
+    {
+      "slug": "test-harness-modularity",
+      "definition": "test-harness-modularity.json",
+      "type": "Semantic",
+      "definitionBlob": "9b34dd3d75e4a5b832d8eb9ac77199701254f29a"
     }
   ]
 }
