@@ -106,7 +106,8 @@ Date: 2026-07-25
 
 ## Continuation
 
-1. Complete one reviewed feature pull request and its applicable checks.
+1. Complete [implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
+   and its applicable review checks.
 2. Merge, publish immutable `v0.15.0` with the exact two established release
    assets, verify post-publication evidence, close linked issues, and delete
    only the exact owned branch.

@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.15.0 |
 | Issue | [Issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) |
-| Pull request | Implementation pull request pending; planning completed through [PR #129](https://github.com/hasanmanzak/meAndAI/pull/129) |
+| Pull request | [Implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130); planning completed through [PR #129](https://github.com/hasanmanzak/meAndAI/pull/129) |
 | Decisions | [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -343,7 +343,7 @@ consistency, and one fresh-diff review.
 - [x] Bounded self-review and required convergence scan complete.
 - [x] No unresolved Blocking finding; all other dispositions have evidence.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
 
 ## Post-merge release evidence

@@ -27,9 +27,10 @@ Last verified: **2026-07-25**
   complete recurrence routing, canonical test utility ownership, exact Case
   evidence, role separation, the three bounded hotspot migrations, and the
   append-only `test-harness-modularity` capability. The final full suite passed
-  all deterministically discovered owners in 2,193.9 seconds. The reviewed pull
-  request and immutable release remain the exact continuation under
-  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
+  all deterministically discovered owners in 2,193.9 seconds. Draft
+  [implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
+  owns review and merge; immutable release publication remains the exact
+  continuation under [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
 - Most recently published correction: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
   [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
   [SUBF-0094](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md#subf-0094),
