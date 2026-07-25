@@ -1,0 +1,50 @@
+@{
+    SchemaVersion = 1
+    Authorities = @(
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/exact.tests.ps1'
+            TestIds = @('TEST-9001')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/missing.tests.ps1'
+            TestIds = @('TEST-9002')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/duplicate.tests.ps1'
+            TestIds = @('TEST-9003')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/source-string.tests.ps1'
+            TestIds = @('TEST-9004')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/test-constant.tests.ps1'
+            TestIds = @('TEST-9005')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/unexecuted.tests.ps1'
+            TestIds = @('TEST-9006')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/failed-action.tests.ps1'
+            TestIds = @('TEST-9007')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/collected-failure.tests.ps1'
+            TestIds = @('TEST-9008')
+        }
+        @{
+            Evidence = 'ExecutableSuite'
+            Owner = 'fixtures/runtime-scenario-identity/post-finalization.tests.ps1'
+            TestIds = @('TEST-9009')
+        }
+    )
+}

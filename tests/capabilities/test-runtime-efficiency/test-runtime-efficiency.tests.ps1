@@ -13,6 +13,8 @@ Import-Module (Join-Path $root `
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -437,6 +439,8 @@ function Assert-ReviewedOperationInventory {
     }
 }
 
+$test0162FailureCount = $failures.Count
+$test0159FailureCount = $failures.Count
 $contract = Import-MeAndAITestOperationContract -Path $contractPath
 Assert-Equal (Get-OptionalPropertyValue -Value $contract `
     -Name 'SchemaVersion') ([long]2) `
@@ -1008,6 +1012,10 @@ if ($instructionGraphExpectedReaders.Count -eq 1) {
         -FunctionAst $instructionGraphExpectedReaders[0] `
         -Label 'instruction-graph expected reader'
 }
+if ($failures.Count -eq $test0162FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0162'
+}
 $quickOperationInventory = Get-ReviewedOperationInventory -Ast $quickAst `
     -CommandNames @(
         'git', 'Invoke-Git', 'Invoke-TestGit',
@@ -1278,7 +1286,12 @@ if ($operationAssertions.Count -eq 1 -and $scenarioReads.Count -eq 1 -and
         $compatibilityReads[0].Extent.StartOffset) `
         'TEST-0159 root runner parses compatibility success before operation evidence.'
 }
+if ($failures.Count -eq $test0159FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0159'
+}
 
+$test0158FailureCount = $failures.Count
 $hotspotContracts = @(
     [pscustomobject]@{
         Path = $quickPath
@@ -1316,6 +1329,10 @@ foreach ($hotspot in $hotspotContracts) {
             "TEST-0158 required hotspot contract '$token' is absent."
     }
 }
+if ($failures.Count -eq $test0158FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0158'
+}
 
 $workflowPath = Join-Path $root '.github/workflows/protocol-tests.yml'
 $workflowSource = [IO.File]::ReadAllText($workflowPath)
@@ -1350,11 +1367,7 @@ $selfCounters = @([pscustomobject][ordered]@{
 $selfObservation = Format-MeAndAITestOperationObservation -Owner $owner `
     -Route $selfExpectation.Route -Runtime $selfExpectation.Runtime `
     -Counters $selfCounters
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0158'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0159'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0162'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $authorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host 'Test-runtime operation contracts passed.' -ForegroundColor Green
 Write-Host $selfObservation
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' +

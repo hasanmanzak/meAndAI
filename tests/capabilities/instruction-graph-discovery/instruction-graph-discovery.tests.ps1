@@ -32,6 +32,8 @@ $script:InstructionGraphBlobRequests = [long]0
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
+$scenarioContext = New-MeAndAIScenarioEvidenceContext -Owner $owner `
+    -AuthorityPath $scenarioAuthorityPath
 
 function Assert-True {
     param([bool]$Condition, [string]$Message)
@@ -1965,6 +1967,7 @@ function New-TestDepthBackEdgeFixture {
     return New-TestGraphFixture -Files $files
 }
 
+$instructionGraphScenarioFailureCheckpoint = $failures.Count
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf) -or
     -not (Test-Path -LiteralPath $quickAssessmentPath -PathType Leaf) -or
     -not (Test-Path -LiteralPath $hostedAdapterPath -PathType Leaf)) {
@@ -4400,6 +4403,31 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
     }
 }
 
+$instructionGraphScenarioFailures = @(
+    for ($failureIndex = $instructionGraphScenarioFailureCheckpoint;
+        $failureIndex -lt $failures.Count; $failureIndex++) {
+        [string]$failures[$failureIndex]
+    }
+)
+if (@($instructionGraphScenarioFailures | Where-Object {
+        [regex]::IsMatch(
+            [string]$_,
+            '(?<![A-Za-z0-9-])TEST-0151(?![0-9])'
+        )
+    }).Count -eq 0) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0151'
+}
+if (@($instructionGraphScenarioFailures | Where-Object {
+        [regex]::IsMatch(
+            [string]$_,
+            '(?<![A-Za-z0-9-])TEST-0152(?![0-9])'
+        )
+    }).Count -eq 0) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0152'
+}
+
 if ($failures.Count -gt 0) {
     Write-Host "Instruction-graph discovery tests failed with $($failures.Count) problem(s):" `
         -ForegroundColor Red
@@ -4407,10 +4435,9 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0161'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0161'
 Write-Host 'Instruction-graph discovery tests passed.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
 $scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +
     ($scenarioResult | ConvertTo-Json -Compress)
 $operationLine = Format-MeAndAITestOperationObservation `

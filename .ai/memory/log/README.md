@@ -18,9 +18,10 @@ for exact dated evidence.
 [FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
 is In progress for target `0.15.0` under
 [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). The current
-[implementation handoff](2026-07-25-v0150-subf-0096-canonical-utility-ownership.md)
-records the completed first two slices and the next authorized continuation;
-the completed [first-slice handoff](2026-07-25-v0150-subf-0095-recurrence-gate.md)
+[implementation handoff](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md)
+records the completed first three slices and the next authorized continuation;
+the completed [canonical-utility handoff](2026-07-25-v0150-subf-0096-canonical-utility-ownership.md),
+the completed [first-slice handoff](2026-07-25-v0150-subf-0095-recurrence-gate.md),
 and the earlier
 [planning handoff](2026-07-25-v0150-recurrence-prevention-planning.md) remain
 historical evidence.
@@ -53,6 +54,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-25 - v0.15.0 runtime evidence and test roles](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md)
 - [2026-07-25 - v0.15.0 canonical utility ownership](2026-07-25-v0150-subf-0096-canonical-utility-ownership.md)
 - [2026-07-25 - v0.15.0 recurrence gate implementation](2026-07-25-v0150-subf-0095-recurrence-gate.md)
 - [2026-07-25 - v0.15.0 recurrence prevention and modular test harness planning](2026-07-25-v0150-recurrence-prevention-planning.md)

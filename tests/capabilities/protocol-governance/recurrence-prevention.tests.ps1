@@ -5,8 +5,11 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $failures = [System.Collections.Generic.List[string]]::new()
 
 $surfacePaths = @(
@@ -314,10 +317,9 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0183'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0183'
 Write-Host 'Recurrence-prevention structural contract passed for TEST-0183.' `
     -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

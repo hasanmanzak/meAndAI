@@ -1,0 +1,1 @@
+Assert-MeAndAITestTrue -Condition $true -Message 'runner assertion'

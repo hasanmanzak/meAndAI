@@ -1,116 +1,168 @@
 Set-StrictMode -Version Latest
 
-$script:ConfirmedScenarioIds = [System.Collections.Generic.HashSet[string]]::new(
-    [System.StringComparer]::Ordinal
-)
+$script:ScenarioEvidenceContextType = 'MeAndAI.ScenarioEvidenceContext'
+$script:ScenarioEvidenceContexts =
+    [System.Collections.Generic.Dictionary[string, object]]::new(
+        [System.StringComparer]::Ordinal
+    )
 
-function Confirm-MeAndAIScenarioEvidence {
-    [CmdletBinding()]
+function Assert-MeAndAIScenarioTestId {
     param([Parameter(Mandatory)][string]$TestId)
 
     if ($TestId -cnotmatch '^TEST-[0-9]{4}$') {
         throw "Invalid scenario evidence identity '$TestId'."
     }
-    [void]$script:ConfirmedScenarioIds.Add($TestId)
 }
 
-function Get-MeAndAISourceBoundScenarioIds {
-    [CmdletBinding()]
-    param([Parameter(Mandatory)][string[]]$SourcePaths)
+function Get-MeAndAIScenarioEvidenceContextState {
+    param([Parameter(Mandatory)][object]$Context)
 
-    $ids = [System.Collections.Generic.HashSet[string]]::new(
-        [System.StringComparer]::Ordinal
-    )
-    foreach ($sourcePath in $SourcePaths) {
-        $resolvedPath = (Resolve-Path -LiteralPath $sourcePath).Path
-        $tokens = $null
-        $errors = $null
-        $ast = [System.Management.Automation.Language.Parser]::ParseFile(
-            $resolvedPath,
-            [ref]$tokens,
-            [ref]$errors
-        )
-        if ($errors.Count -gt 0) {
-            throw "Scenario evidence source '$resolvedPath' does not parse: $($errors[0].Message)"
-        }
-
-        $assertionNodes = @($ast.FindAll({
-            param($node)
-            if ($node -is [System.Management.Automation.Language.ThrowStatementAst]) {
-                return $true
-            }
-            if ($node -isnot [System.Management.Automation.Language.CommandAst]) {
-                return $false
-            }
-            return $node.GetCommandName() -cin @(
-                'Add-Failure', 'Assert-Equal'
-            )
-        }, $true))
-        foreach ($node in $assertionNodes) {
-            foreach ($match in [regex]::Matches(
-                $node.Extent.Text,
-                '(?<![A-Za-z0-9-])TEST-[0-9]{4}(?![A-Za-z0-9-])'
-            )) {
-                [void]$ids.Add([string]$match.Value)
-            }
-        }
+    if ($null -eq $Context -or
+        $Context.PSObject.TypeNames -cnotcontains
+            $script:ScenarioEvidenceContextType) {
+        throw 'The meAndAI scenario evidence context is invalid.'
     }
-    return @($ids | Sort-Object)
+
+    $idProperty = $Context.PSObject.Properties['Id']
+    if ($null -eq $idProperty -or
+        [string]::IsNullOrWhiteSpace([string]$idProperty.Value) -or
+        -not $script:ScenarioEvidenceContexts.ContainsKey(
+            [string]$idProperty.Value)) {
+        throw 'The meAndAI scenario evidence context is unknown.'
+    }
+
+    return $script:ScenarioEvidenceContexts[[string]$idProperty.Value]
 }
 
-function New-MeAndAIScenarioResult {
+function New-MeAndAIScenarioEvidenceContext {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Owner,
-        [Parameter(Mandatory)][string[]]$SourcePaths,
         [Parameter(Mandatory)][string]$AuthorityPath
     )
 
-    $authority = Import-PowerShellDataFile -LiteralPath $AuthorityPath
-    if ([long]$authority.SchemaVersion -ne 1) {
+    if ([string]::IsNullOrWhiteSpace($Owner)) {
+        throw 'Scenario evidence owner must not be empty.'
+    }
+
+    $resolvedAuthorityPath = (Resolve-Path -LiteralPath $AuthorityPath `
+        -ErrorAction Stop).Path
+    if (-not (Test-Path -LiteralPath $resolvedAuthorityPath -PathType Leaf)) {
+        throw "Scenario authority '$resolvedAuthorityPath' is not a file."
+    }
+
+    $authority = Import-PowerShellDataFile -LiteralPath $resolvedAuthorityPath
+    if ($authority -isnot [System.Collections.IDictionary] -or
+        -not $authority.Contains('SchemaVersion') -or
+        [long]$authority['SchemaVersion'] -ne 1) {
         throw 'Scenario authority schema version must be 1.'
     }
-    $ownerAuthorities = @($authority.Authorities | Where-Object {
-        [string]$_.Evidence -ceq 'ExecutableSuite' -and
-        [string]$_.Owner -ceq $Owner
-    })
+    if (-not $authority.Contains('Authorities')) {
+        throw 'Scenario authority must expose one canonical authority array.'
+    }
+
+    $ownerAuthorities = [System.Collections.Generic.List[object]]::new()
+    foreach ($entry in @($authority['Authorities'])) {
+        if ($entry -is [System.Collections.IDictionary] -and
+            [string]$entry['Evidence'] -ceq 'ExecutableSuite' -and
+            [string]$entry['Owner'] -ceq $Owner) {
+            [void]$ownerAuthorities.Add($entry)
+        }
+    }
     if ($ownerAuthorities.Count -ne 1) {
         throw "Scenario authority for '$Owner' is missing or ambiguous."
     }
 
-    $expectedIds = @($ownerAuthorities[0].TestIds | ForEach-Object {
-        [string]$_
-    } | Sort-Object)
-    $sourceIds = @(Get-MeAndAISourceBoundScenarioIds -SourcePaths $SourcePaths)
-    $evidenceIds = [System.Collections.Generic.HashSet[string]]::new(
+    $ownerAuthority = $ownerAuthorities[0]
+    if (-not $ownerAuthority.Contains('TestIds')) {
+        throw "Scenario authority for '$Owner' has no test IDs."
+    }
+
+    $expectedIds = [System.Collections.Generic.List[string]]::new()
+    $expectedIdSet = [System.Collections.Generic.HashSet[string]]::new(
         [System.StringComparer]::Ordinal
     )
-    foreach ($testId in $sourceIds) {
-        [void]$evidenceIds.Add($testId)
-    }
-    foreach ($testId in $script:ConfirmedScenarioIds) {
-        if ($expectedIds -cnotcontains $testId) {
-            throw "Runtime scenario evidence '$testId' is not owned by '$Owner'."
+    foreach ($rawTestId in @($ownerAuthority['TestIds'])) {
+        $testId = [string]$rawTestId
+        Assert-MeAndAIScenarioTestId -TestId $testId
+        if (-not $expectedIdSet.Add($testId)) {
+            throw "Scenario authority for '$Owner' duplicates '$testId'."
         }
-        [void]$evidenceIds.Add($testId)
+        [void]$expectedIds.Add($testId)
+    }
+    if ($expectedIds.Count -eq 0) {
+        throw "Scenario authority for '$Owner' has no test IDs."
     }
 
-    $missingIds = @($expectedIds | Where-Object {
-        -not $evidenceIds.Contains($_)
+    [string[]]$sortedExpectedIds = $expectedIds.ToArray()
+    [Array]::Sort($sortedExpectedIds, [StringComparer]::Ordinal)
+    $contextId = [guid]::NewGuid().ToString('N')
+    $state = [pscustomobject][ordered]@{
+        Owner = $Owner
+        ExpectedIds = $sortedExpectedIds
+        ExpectedIdSet = $expectedIdSet
+        ConfirmedIds = [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::Ordinal
+        )
+        Finalized = $false
+    }
+    $script:ScenarioEvidenceContexts.Add($contextId, $state)
+
+    $context = [pscustomobject][ordered]@{ Id = $contextId }
+    $context.PSObject.TypeNames.Insert(
+        0, $script:ScenarioEvidenceContextType)
+    return $context
+}
+
+function Confirm-MeAndAIScenarioEvidence {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][object]$Context,
+        [Parameter(Mandatory)][string]$TestId
+    )
+
+    $state = Get-MeAndAIScenarioEvidenceContextState -Context $Context
+    if ($state.Finalized) {
+        throw "Scenario evidence context for '$($state.Owner)' is already finalized."
+    }
+
+    Assert-MeAndAIScenarioTestId -TestId $TestId
+    if (-not $state.ExpectedIdSet.Contains($TestId)) {
+        throw "Runtime scenario evidence '$TestId' is not owned by '$($state.Owner)'."
+    }
+    if (-not $state.ConfirmedIds.Add($TestId)) {
+        throw "Runtime scenario evidence '$TestId' was confirmed more than once for '$($state.Owner)'."
+    }
+}
+
+function New-MeAndAIScenarioResult {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][object]$Context)
+
+    $state = Get-MeAndAIScenarioEvidenceContextState -Context $Context
+    if ($state.Finalized) {
+        throw "Scenario evidence context for '$($state.Owner)' is already finalized."
+    }
+    $state.Finalized = $true
+
+    $missingIds = @($state.ExpectedIds | Where-Object {
+        -not $state.ConfirmedIds.Contains([string]$_)
     })
     if ($missingIds.Count -gt 0) {
-        throw "Scenario evidence for '$Owner' is not source-bound: $($missingIds -join ', ')."
+        throw "Scenario evidence for '$($state.Owner)' is missing or unexecuted: $($missingIds -join ', ')."
     }
 
+    [string[]]$passedIds = @($state.ConfirmedIds)
+    [Array]::Sort($passedIds, [StringComparer]::Ordinal)
     return [ordered]@{
         schema = 1
-        owner = $Owner
-        passed = $expectedIds
+        owner = [string]$state.Owner
+        passed = $passedIds
     }
 }
 
 Export-ModuleMember -Function @(
+    'New-MeAndAIScenarioEvidenceContext',
     'Confirm-MeAndAIScenarioEvidence',
-    'Get-MeAndAISourceBoundScenarioIds',
     'New-MeAndAIScenarioResult'
 )

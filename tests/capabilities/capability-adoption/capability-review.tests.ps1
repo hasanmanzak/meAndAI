@@ -2,11 +2,17 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+$owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $modulePath = Join-Path $root 'scripts/MeAndAI.CapabilityReview.psm1'
 $catalogModulePath = Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1'
 Import-Module $catalogModulePath -Force
 Import-Module $modulePath -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$scenarioContext = New-MeAndAIScenarioEvidenceContext -Owner $owner `
+    -AuthorityPath $scenarioAuthorityPath
 $contentIdentityModule = @(Import-Module (Join-Path $root `
     'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
 $getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
@@ -220,6 +226,8 @@ Assert-Equal $releaseCurrent.State 'Current' `
     'TEST-0172 exact imported three-entry terminal ledger was not current.'
 Assert-Equal $releaseCurrent.Operations.Count 0 `
     'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+    -TestId 'TEST-0172'
 
 # TEST-0139: fresh adoption is followed by the same source-only semantic review
 # boundary, without expanding the adoption envelope or writing product paths.
@@ -293,6 +301,8 @@ Assert-Equal $adoptionPlan.State 'CreateReviewHandoff' `
     'TEST-0139 AdoptionRequired did not create review-only work.'
 Assert-Equal $adoptionPlan.Marker $freshPlan.Marker `
     'TEST-0139 open outcomes did not share canonical repository/catalog identity.'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+    -TestId 'TEST-0139'
 
 # TEST-0140: current and post-update consumers use exactly the same target
 # catalog identity; immutable pre-framework code can only request its ordinary
@@ -2112,6 +2122,8 @@ try {
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 untrusted comment author authorized owner attestation.'
     $apiState.AttestationComments[0].user = $apiState.ProposalActor
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0163'
 
     $apiState.Reviews.Add([pscustomobject]@{
         state = 'APPROVED'
@@ -2215,10 +2227,14 @@ try {
         $_ -match '/git/refs?/heads/.+%2[fF]'
     }).Count 0 `
         'TEST-0169 finalization emitted an encoded branch separator.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0169'
     Assert-Equal (@($apiState.Calls | Where-Object {
         $_ -match 'issues/92/comments'
     }).Count -gt 0) $true `
         'TEST-0164 merged recovery did not use exact-head owner attestation evidence.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0164'
 
     $completedExecution = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
@@ -2251,6 +2267,8 @@ try {
         $legacyClosureMarker `
         'TEST-0140 legacy closure compatibility replaced historical evidence.'
     $apiState.ClosureComments[0].body = $canonicalClosureCommentBody
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0140'
 
     # TEST-0165: a trusted historical review may be retired only after its
     # original release catalog is reconstructed from immutable repository
@@ -2701,6 +2719,8 @@ try {
     Assert-True ($apiState.HistoricalReview.IssueClosed -and
         -not $apiState.IssueCreated -and -not $apiState.PullCreated) `
         'TEST-0165 branch-absent partial recovery did not converge exactly once.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0165'
 
     # TEST-0166: anything other than one provable immutable historical merge
     # blocks before successful branch, issue, or current-catalog mutation.
@@ -2823,6 +2843,8 @@ try {
         param($state)
         $state.BranchLeaseRace = $true
     } '*branch*'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0166'
 
     # TEST-0167: GitHub preserves repository display case in durable ledger
     # authority URLs while the workflow canonicalizes the runtime repository to
@@ -2878,6 +2900,8 @@ try {
             $mixedCaseMutationCount `
             'TEST-0167 mixed-case completed recovery repeated cleanup.'
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0167'
 
     # TEST-0168: case-insensitive GitHub owner/repository identity does not
     # weaken the exact HTTPS GitHub pull-request authority boundary.
@@ -2951,6 +2975,8 @@ try {
     }
     Assert-Equal $invalidAuthorityCases.Count 11 `
         'TEST-0168 authority-boundary case matrix changed unexpectedly.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0168'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot -PathType Container) {
@@ -2960,20 +2986,6 @@ finally {
 
 Write-Host 'Capability review lifecycle tests passed.' -ForegroundColor Green
 
-$evidenceModule = Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
-$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-if ((Test-Path -LiteralPath $evidenceModule -PathType Leaf) -and
-    (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
-    $authority = Import-PowerShellDataFile -LiteralPath $authorityPath
-    $owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
-    if (@($authority.Authorities | Where-Object {
-        [string]$_.Owner -ceq $owner
-    }).Count -eq 1) {
-        Import-Module $evidenceModule -Force
-        $scenarioResult = New-MeAndAIScenarioResult `
-            -Owner $owner -SourcePaths @($PSCommandPath) `
-            -AuthorityPath $authorityPath
-        Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
-            ($scenarioResult | ConvertTo-Json -Compress))
-    }
-}
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
+    ($scenarioResult | ConvertTo-Json -Compress))

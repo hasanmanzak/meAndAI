@@ -6,10 +6,13 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $modulePath = Join-Path $PSScriptRoot 'MeAndAI.MainValidationRoute.psm1'
 $workflowPath = Join-Path $root '.github/workflows/protocol-tests.yml'
 $protocolPath = Join-Path $root 'PROTOCOL.md'
+$owner = 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRepository.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -167,6 +170,7 @@ function Assert-Route {
     }
 }
 
+$test0143FailureCount = $failures.Count
 try {
     [IO.Directory]::CreateDirectory($repositoryRoot) | Out-Null
     Invoke-TestGit -Arguments @('init', '-b', 'main') | Out-Null
@@ -380,6 +384,7 @@ try {
         Add-Failure 'TEST-0143 workflow uses path filtering that can remove stable check evidence.'
     }
 
+    $test0146FailureCount = $failures.Count
     $jobsIndex = $workflowSource.IndexOf("jobs:", [StringComparison]::Ordinal)
     if ($jobsIndex -lt 0) {
         Add-Failure 'TEST-0146 workflow has no canonical jobs section.'
@@ -423,6 +428,10 @@ try {
             Add-Failure "TEST-0146 workflow lost cross-runtime validation contract '$runtimeContract'."
         }
     }
+    if ($failures.Count -eq $test0146FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0146'
+    }
 
     $protocolSource = Get-Content -LiteralPath $protocolPath -Raw
     if (-not $protocolSource.Contains('sole purpose is to copy external evidence') -or
@@ -449,6 +458,10 @@ finally {
         Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
+if ($failures.Count -eq $test0143FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0143'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Main-validation route tests failed with $($failures.Count) problem(s):" `
@@ -459,8 +472,5 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'Main-validation exact-tree route and efficiency tests passed for TEST-0143 and TEST-0146.' `
     -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1' `
-    -SourcePaths @($PSCommandPath, $modulePath) `
-    -AuthorityPath $authorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

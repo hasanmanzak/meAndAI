@@ -1,0 +1,2 @@
+Assert-MeAndAITestTrue -Condition $true -Message 'case failed'
+Confirm-MeAndAIScenarioEvidence -Context $context -TestId 'TEST-0186'

@@ -27,7 +27,7 @@ $testWorkspacePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestWorkspace.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
-Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1') -Force
 Import-Module $testRuntimePath -Force
 Import-Module $testGitBatchPath -Force
 Import-Module $testWorkspacePath -Force
@@ -6784,7 +6784,7 @@ try {
             Add-Failure "TEST-0154 actual local completion did not block the exact four live custom authorities before marker, push, or readiness mutation: $liveAuthorityError"
         }
 
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0154'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0154'
     }
 
     $integrityShardNames = @(
@@ -7430,7 +7430,7 @@ try {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
             }
         }
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0053'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0053'
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
@@ -8177,7 +8177,7 @@ try {
             Reset-MockAdoptionProposal
         }
         $global:QuickAdoptionPrMetadataMode = 'Valid'
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0102'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0102'
         $global:QuickAdoptionProposalMode = 'WrongProtocolSha'
         $wrongPinBlocked = $false
         try {
@@ -10513,9 +10513,9 @@ try {
                 Add-Failure "TEST-0113/TEST-0130 $($blockedRoute.Name) adoption state did not fail at its exact route before secret/repository workflow mutation: $blockedError"
             }
         }
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0113'
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0129'
-        Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0130'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0113'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0129'
+        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0130'
     }
 }
 catch {
@@ -11163,7 +11163,7 @@ if ($failures.Count -gt 0) {
 
 if ($Shard -ceq 'All') {
     Write-Host 'Quick-adoption tests passed for all declared scenarios in this suite.' -ForegroundColor Green
-    $scenarioResult = New-MeAndAIScenarioResult `
+    $scenarioResult = New-MeAndAILegacyScenarioResult `
         -Owner 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1' -SourcePaths @($PSCommandPath) `
         -AuthorityPath $scenarioAuthorityPath
     $scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +

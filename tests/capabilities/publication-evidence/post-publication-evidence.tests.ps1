@@ -6,6 +6,9 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$owner = 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1'
+$scenarioContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $contentIdentityModule = @(Import-Module `
     (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
 $getSha256Action = $contentIdentityModule.ExportedCommands[
@@ -1613,12 +1616,28 @@ function Invoke-TemporaryTrackedMarkdownApiScenario {
 }
 
 try {
+    $test0178Passed = $true
+    $test0180Passed = $true
+
+    $failureCheckpoint = $failures.Count
     Assert-CommitReferenceProducerTemplates
+    if ($failures.Count -ne $failureCheckpoint) {
+        $test0178Passed = $false
+    }
+
+    $failureCheckpoint = $failures.Count
     Assert-PostPublicationCheckoutContract
+    if ($failures.Count -ne $failureCheckpoint) {
+        $test0178Passed = $false
+        $test0180Passed = $false
+    }
     if (-not (Test-Path -LiteralPath $verifierPath -PathType Leaf)) {
         Add-Failure 'TEST-0076 post-publication verifier is missing.'
+        $test0178Passed = $false
+        $test0180Passed = $false
     }
     else {
+        $failureCheckpoint = $failures.Count
         $trackedMarkdown = Invoke-TrackedMarkdownScenario
         if ($trackedMarkdown.Threw) {
             Add-Failure "TEST-0178 tracked repository Markdown failed: $($trackedMarkdown.Error)"
@@ -1689,10 +1708,15 @@ try {
             }).Count -ne 1) {
             Add-Failure "TEST-0178 tracked Markdown did not fail closed after API rejection of an external commit target: $($invalidExternalTrackedMarkdown.Error)"
         }
+        if ($failures.Count -ne $failureCheckpoint) {
+            $test0178Passed = $false
+        }
+
         $valid = Invoke-PostPublicationScenario -Mode 'Valid'
         if ($valid.Threw) {
             Add-Failure "TEST-0076 valid published evidence failed: $($valid.Error)"
         }
+        $failureCheckpoint = $failures.Count
         if ($global:MeAndAIPostPublicationEventArrayResponses -ne 2) {
             Add-Failure 'TEST-0181 valid publication evidence did not consume exactly two unenumerated event-array responses.'
         }
@@ -1701,6 +1725,10 @@ try {
         if ($nullItemEvidence.Threw -or
             $global:MeAndAIPostPublicationEventArrayResponses -ne 2) {
             Add-Failure "TEST-0181 null page items were not filtered without weakening exact two-page merge evidence: $($nullItemEvidence.Error)"
+        }
+        if ($failures.Count -eq $failureCheckpoint) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0181'
         }
         if ($global:MeAndAIPostPublicationDownloadRequests.Count -ne 0 -or
             @($global:MeAndAIPostPublicationRequests | Where-Object {
@@ -1742,6 +1770,7 @@ try {
             }
         }
 
+        $failureCheckpoint = $failures.Count
         $pageTwoEvidence = Invoke-PostPublicationScenario -Mode 'PageTwoCommentEvidence'
         $commentPageRequests = @($global:MeAndAIPostPublicationRequests | Where-Object {
             $_ -match '/issues/42/comments\?per_page=100&page='
@@ -1751,6 +1780,12 @@ try {
             $commentPageRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/issues/42/comments?per_page=100&page=2') {
             Add-Failure "TEST-0083 verifier did not find evidence located only in the second issue-comment page: $($pageTwoEvidence.Error)"
         }
+        if ($failures.Count -eq $failureCheckpoint) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0083'
+        }
+
+        $failureCheckpoint = $failures.Count
         foreach ($negative in @(
             @{ Mode = 'MergeEventMissing'; Error = '*one exact merged event*' },
             @{ Mode = 'MergeEventDuplicate'; Error = '*one exact merged event*' },
@@ -1763,11 +1798,19 @@ try {
                 Add-Failure "TEST-0180 $($negative.Mode) did not fail closed: $($result.Error)"
             }
         }
+        if ($failures.Count -ne $failureCheckpoint) {
+            $test0180Passed = $false
+        }
+
+        $failureCheckpoint = $failures.Count
         $referenceStyleEvidence = Invoke-PostPublicationScenario `
             -Mode 'ReferenceStyleLinks'
         if ($referenceStyleEvidence.Threw) {
             Add-Failure "TEST-0176 valid reference-style Markdown links failed: $($referenceStyleEvidence.Error)"
         }
+        $test0176Passed = $failures.Count -eq $failureCheckpoint
+
+        $failureCheckpoint = $failures.Count
         $bareVisiblePathEvidence = Invoke-PostPublicationScenario `
             -Mode 'BareVisiblePathExactTarget'
         if ($bareVisiblePathEvidence.Threw) {
@@ -1805,6 +1848,12 @@ try {
                 Add-Failure "TEST-0182 $negativeBareVisiblePathMode did not fail closed: $($negativeBareVisiblePathEvidence.Error)"
             }
         }
+        if ($failures.Count -eq $failureCheckpoint) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0182'
+        }
+
+        $failureCheckpoint = $failures.Count
         foreach ($positiveMode in @(
             'IssueCommentOnlyPullLink',
             'ParentIssueCommentLabel',
@@ -1837,7 +1886,11 @@ try {
                 Add-Failure "TEST-0176 valid $positiveMode evidence failed: $($positive.Error)"
             }
         }
+        if ($failures.Count -ne $failureCheckpoint) {
+            $test0176Passed = $false
+        }
 
+        $failureCheckpoint = $failures.Count
         foreach ($positiveMode in @(
             'ExactEmbeddedRecordTargets',
             'PullHeadRepositoryTarget',
@@ -1927,7 +1980,15 @@ try {
                 Add-Failure "TEST-0178 $($negative.Mode) did not fail closed: $($result.Error)"
             }
         }
+        if ($failures.Count -ne $failureCheckpoint) {
+            $test0178Passed = $false
+        }
+        if ($test0178Passed) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0178'
+        }
 
+        $failureCheckpoint = $failures.Count
         foreach ($negative in @(
             @{ Mode = 'MutableRelease'; Error = '*release is not immutable*' },
             @{ Mode = 'DivergedDefaultBranch'; Error = '*not the default-branch head or one of its ancestors*' },
@@ -2060,6 +2121,13 @@ try {
                 Add-Failure "TEST-0176 $($negative.Mode) did not fail closed: $($result.Error)"
             }
         }
+        if ($failures.Count -ne $failureCheckpoint) {
+            $test0176Passed = $false
+        }
+        if ($test0176Passed) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0176'
+        }
 
         $assetContract = Invoke-PostPublicationScenario -Mode 'Valid' -VerifyAssets
         if ($assetContract.Threw) {
@@ -2139,6 +2207,7 @@ foreach ($productionRoot in $api2026ProductionRoots) {
     }
 }
 $api2026ProductionFiles.Add($verifierPath)
+$failureCheckpoint = $failures.Count
 $managedUpdateWorkflowPath = Join-Path $root `
     'templates/project/.github/workflows/meandai-protocol-update.yml'
 if (-not (@($api2026ProductionFiles) -ccontains $managedUpdateWorkflowPath)) {
@@ -2153,6 +2222,13 @@ foreach ($productionFile in @($api2026ProductionFiles | Sort-Object -Unique)) {
         Add-Failure "TEST-0180 API-2026 production reader '$relative' directly accesses the removed pull-request merge field."
     }
 }
+if ($failures.Count -ne $failureCheckpoint) {
+    $test0180Passed = $false
+}
+if ($test0180Passed) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0180'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Post-publication evidence tests failed with $($failures.Count) problem(s):" `
@@ -2163,7 +2239,5 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'Post-publication verifier tests passed without claiming published-state evidence.' `
     -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

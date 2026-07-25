@@ -6,6 +6,8 @@ $owner = 'tests/capabilities/initial-adoption/quick-adoption-bundle.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -969,8 +971,8 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0147'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0147'
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Output ('MEANDAI_SCENARIO_RESULTS=' + `
     ($scenarioResult | ConvertTo-Json -Compress))

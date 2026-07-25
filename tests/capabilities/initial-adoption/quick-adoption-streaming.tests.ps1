@@ -15,9 +15,12 @@ $launcherSourcePaths = @(
     Join-Path $root ($_ -replace '/', [IO.Path]::DirectorySeparatorChar)
 }
 $fixturePath = Join-Path $root 'tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1'
+$owner = 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -48,6 +51,8 @@ function Test-OwnedProcessAlive {
     }
 }
 
+$test0105FailureCount = $failures.Count
+$test0106FailureCount = $failures.Count
 foreach ($launcherSourcePath in $launcherSourcePaths) {
     if (-not (Test-Path -LiteralPath $launcherSourcePath -PathType Leaf)) {
         Add-Failure "TEST-0105 launcher source is missing: $launcherSourcePath"
@@ -254,7 +259,11 @@ try {
         if ($quietOutput.Count -ne 0) {
             Add-Failure 'TEST-0105 -NoProgress-equivalent state did not suppress phase and Codex activity presentation.'
         }
-
+        if ($Shard -ceq 'All' -and
+            $failures.Count -eq $test0105FailureCount) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+                -TestId 'TEST-0105'
+        }
         [IO.Directory]::CreateDirectory($ownedCancellationRoot) | Out-Null
         $engineLiteral = ConvertTo-SingleQuotedLiteral -Value $engine
         $fixtureLiteral = ConvertTo-SingleQuotedLiteral -Value $fixturePath
@@ -328,6 +337,11 @@ finally {
     Remove-Variable -Scope Script -Name QuickAdoptionTestAckPath,QuickAdoptionStreamResult `
         -ErrorAction SilentlyContinue
 }
+if ($Shard -ceq 'All' -and
+    $failures.Count -eq $test0106FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0106'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Quick-adoption streaming tests failed with $($failures.Count) problem(s):" `
@@ -339,10 +353,7 @@ if ($failures.Count -gt 0) {
 if ($Shard -ceq 'All') {
     Write-Host 'Quick-adoption streaming tests passed for TEST-0105 and TEST-0106.' `
         -ForegroundColor Green
-    $scenarioResult = New-MeAndAIScenarioResult `
-        -Owner 'tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1' `
-        -SourcePaths @($PSCommandPath, $fixturePath) `
-        -AuthorityPath $scenarioAuthorityPath
+    $scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
     Write-Host ('MEANDAI_SCENARIO_RESULTS=' +
         ($scenarioResult | ConvertTo-Json -Compress))
 }

@@ -4,7 +4,7 @@ param([switch]$PureResolverOnly)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1') -Force
 $modulePath = Join-Path $root 'templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 
 if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
@@ -725,7 +725,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host 'Protocol update tests passed for all declared scenarios in this suite.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
+$scenarioResult = New-MeAndAILegacyScenarioResult `
     -Owner 'tests/capabilities/consumer-update/protocol-update.tests.ps1' `
     -SourcePaths @($PSCommandPath, $adapterTestPath) `
     -AuthorityPath $scenarioAuthorityPath

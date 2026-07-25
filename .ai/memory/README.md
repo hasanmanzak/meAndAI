@@ -24,8 +24,9 @@ is In progress for target `0.15.0` under
 [SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
 and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
 The maintainer authorized implementation on 2026-07-25. Follow the current
-[implementation handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md);
-the completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md)
+[implementation handoff](log/2026-07-25-v0150-subf-0097-runtime-evidence-roles.md);
+the completed [canonical-utility handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md),
+the completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md),
 and the earlier
 [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
 remain historical evidence. No `0.15.0` release exists yet.

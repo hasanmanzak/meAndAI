@@ -6,6 +6,13 @@ Import-Module (Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.RepositoryEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+
+$owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
+$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$scenarioContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
 
 function Assert-BytesEqual {
     param([byte[]]$Actual, [byte[]]$Expected, [string]$Message)
@@ -489,6 +496,8 @@ try {
         } -Pattern '*not the exact installed-catalog prefix*' `
             -Message "TEST-0157 $($invalidPrefix.Name) ledger prefix was accepted."
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0157'
 
     $missingLedger = Import-MeAndAICapabilityLedger -Catalog $catalog -Bytes $null
     Assert-True $missingLedger.Missing 'TEST-0134 missing ledger was not represented explicitly.'
@@ -586,6 +595,8 @@ try {
         } -Pattern '*canonical*' `
             -Message "TEST-0134 noncanonical timestamp '$($timestampCase.Name)' was accepted."
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0134'
 
     # TEST-0135: every type uses its declared authority model and returns only
     # the four assessment outcomes; only reviewed terminal evidence serializes.
@@ -664,6 +675,8 @@ try {
     Assert-SequenceEqual -Actual $outcomes -Expected @(
         'AdoptionRequired', 'Conforming', 'NotApplicable', 'ReviewRequired'
     ) -Message 'TEST-0135 resolver exposed an unexpected outcome set.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0135'
 
     # TEST-0171: repository evidence uses the exact canonical Git boundary
     # without normalizing bytes and fails closed for ambiguous repository state.
@@ -915,6 +928,8 @@ try {
             -RelativePath '../escaped.json' -Head $evidenceHead
     } -Pattern '*canonical repository-relative path*' `
         -Message 'TEST-0171 escaping path did not fail closed.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0171'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot) {
@@ -924,20 +939,6 @@ finally {
 
 Write-Host 'Capability catalog and assessment tests passed.'
 
-$evidenceModule = Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
-$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-if ((Test-Path -LiteralPath $evidenceModule -PathType Leaf) -and
-    (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
-    $authority = Import-PowerShellDataFile -LiteralPath $authorityPath
-    $owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
-    if (@($authority.Authorities | Where-Object {
-        [string]$_.Owner -ceq $owner
-    }).Count -eq 1) {
-        Import-Module $evidenceModule -Force
-        $scenarioResult = New-MeAndAIScenarioResult `
-            -Owner $owner -SourcePaths @($PSCommandPath) `
-            -AuthorityPath $authorityPath
-        Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
-            ($scenarioResult | ConvertTo-Json -Compress))
-    }
-}
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
+    ($scenarioResult | ConvertTo-Json -Compress))

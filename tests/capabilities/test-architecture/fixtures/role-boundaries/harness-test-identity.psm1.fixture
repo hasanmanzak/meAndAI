@@ -1,0 +1,1 @@
+function Complete-SyntheticCase { return 'TEST-0186' }

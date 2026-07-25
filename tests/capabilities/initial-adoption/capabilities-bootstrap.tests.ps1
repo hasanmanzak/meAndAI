@@ -7,7 +7,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1') -Force
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
 $operationContractPath = Join-Path $root `
@@ -1775,7 +1775,7 @@ elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
 }
 
 if ($Shard -ceq 'All' -and $failures.Count -eq 0) {
-    $scenarioResult = New-MeAndAIScenarioResult `
+    $scenarioResult = New-MeAndAILegacyScenarioResult `
         -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
         -SourcePaths @(
             $PSCommandPath, $adapterTestPath, $dispatchTestPath,

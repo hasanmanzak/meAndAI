@@ -1,0 +1,2 @@
+[Console]::Out.WriteLine('{"value":"simulated"}')
+exit 0

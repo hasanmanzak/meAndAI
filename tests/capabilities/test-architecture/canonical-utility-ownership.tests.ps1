@@ -19,6 +19,8 @@ Import-Module $helperOwnershipModulePath -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.MarkdownEvidence.psm1') -Force
 
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -157,7 +159,8 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $authorityPath
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0184'
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host 'Canonical helper ownership contracts passed.' -ForegroundColor Green
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

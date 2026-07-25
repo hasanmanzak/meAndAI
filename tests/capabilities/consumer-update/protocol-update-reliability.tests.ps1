@@ -11,6 +11,8 @@ $nativeHelperPath = Join-Path $root `
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
@@ -53,6 +55,8 @@ if ($failures.Count -gt 0) {
     foreach ($failure in $failures) { Write-Host "FAIL: $failure" -ForegroundColor Red }
     exit 1
 }
+$test0148FailureCount = $failures.Count
+$test0149FailureCount = $failures.Count
 
 $tokens = $null
 $parseErrors = $null
@@ -550,6 +554,10 @@ finally {
         Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
     }
 }
+if ($failures.Count -eq $test0148FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0148'
+}
 
 # Replace only the live GitHub boundaries; the repair logic remains the exact
 # production function extracted above.
@@ -952,6 +960,10 @@ foreach ($case in $nearMatchCases) {
     Assert-Equal 0 $script:RepairState.MutationCount `
         "TEST-0149 managed-looking near match '$($case.Name)' reached mutation"
 }
+if ($failures.Count -eq $test0149FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0149'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Protocol-update reliability tests failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -959,10 +971,6 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0148'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0149'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath, $nativeHelperPath) `
-    -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Output ('MEANDAI_SCENARIO_RESULTS=' + `
     ($scenarioResult | ConvertTo-Json -Compress))

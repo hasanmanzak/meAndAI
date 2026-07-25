@@ -5,10 +5,13 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
+$owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 $contentIdentityModule = @(Import-Module `
     (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
 $getSha256Action = $contentIdentityModule.ExportedCommands[
@@ -1222,6 +1225,7 @@ try {
     )
     $env:GITHUB_STEP_SUMMARY = $outerSummaryPath
 
+    $test0108FailureCount = $failures.Count
     $adoption = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Adoption)
     if ($adoption.Threw -or $adoption.Scenario.BranchExists -or
         $adoption.Scenario.IssueState -cne 'closed' -or
@@ -1277,6 +1281,7 @@ try {
             Add-Failure "TEST-0176 bounded $legacyFinalizationMode finalization evidence was not readable: $($legacyFinalization.Error)"
         }
     }
+    $test0142FailureCount = $failures.Count
     $expectedAdoptionSummary = "Managed merge for [pull request #42](https://github.com/owner/consumer/pull/42) finalized at ``$($adoption.Scenario.ExpectedHead)``; exact branch absent and issue [#9](https://github.com/owner/consumer/issues/9) closed."
     $adoptionSummaryProperty = $adoption.PSObject.Properties['SummaryLines']
     $adoptionSummaryLines = @(
@@ -1302,7 +1307,12 @@ try {
     }).Count -ne 0) {
         Add-Failure "TEST-0108 exact recovery rerun was not idempotent: $($rerun.Error)"
     }
+    if ($failures.Count -eq $test0108FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0108'
+    }
 
+    $test0109FailureCount = $failures.Count
     $update = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Update)
     if ($update.Threw -or $update.Scenario.BranchExists -or
         $update.Scenario.ExistingEvidenceComments -ne 1 -or
@@ -1328,6 +1338,7 @@ try {
         Add-Failure "TEST-0121 exact schema-2 update did not independently verify and finalize its immutable target plan: $($schema2Update.Error)"
     }
 
+    $test0155FailureCount = $failures.Count
     $pagedEventUpdate = New-FinalizationScenario -Kind Update -UpdateSchema 2
     $pagedEvents = [System.Collections.Generic.List[object]]::new()
     foreach ($index in 1..100) {
@@ -1399,7 +1410,12 @@ try {
         -not $workflow.Contains('needs: finalize-managed-merge')) {
         Add-Failure 'TEST-0109 consumer workflow does not separate update discovery from event/recovery finalization.'
     }
+    if ($failures.Count -eq $test0109FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0109'
+    }
 
+    $test0170FailureCount = $failures.Count
     $eventRouter = [regex]::Match(
         $workflow,
         '(?ms)^on:\r?\n(?<body>.*?)(?=^permissions:)'
@@ -1438,7 +1454,12 @@ try {
         -not $sharedConcurrency.Groups['body'].Value.Contains('cancel-in-progress: false')) {
         Add-Failure 'TEST-0170 consumer workflow no longer preserves one shared repository lifecycle concurrency group.'
     }
+    if ($failures.Count -eq $test0170FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0170'
+    }
 
+    $test0110FailureCount = $failures.Count
     $normal = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Normal)
     if ($normal.Threw) {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
@@ -1455,6 +1476,7 @@ try {
         Add-Failure 'TEST-0142 ordinary no-op emitted finalization summary output.'
     }
 
+    $test0112FailureCount = $failures.Count
     foreach ($legacyMode in @('Absent', 'Placeholder')) {
         $legacy = Invoke-FinalizationScenario -Scenario (
             New-FinalizationScenario -Kind Update -TrackingMode $legacyMode
@@ -1806,11 +1828,19 @@ try {
             Add-Failure "TEST-0142 rejected '$($negative.Name)' emitted finalization summary output."
         }
     }
+    if ($failures.Count -eq $test0110FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0110'
+    }
 
     $outerSummaryLines = @(Get-Content -LiteralPath $outerSummaryPath)
     if ($outerSummaryLines.Count -ne 1 -or
         [string]$outerSummaryLines[0] -cne $outerSummarySentinel) {
         Add-Failure "TEST-0142 inherited outer summary was mutated: $($outerSummaryLines -join ' | ')"
+    }
+    if ($failures.Count -eq $test0142FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0142'
     }
 }
 finally {
@@ -1826,6 +1856,10 @@ finally {
 $adapterLifecycleSource = Get-Content -LiteralPath $adapterPath -Raw
 if ($adapterLifecycleSource.Contains('merge_commit_sha')) {
     Add-Failure 'TEST-0155 API-2026 updater still depends on the removed pull-request merge_commit_sha field.'
+}
+if ($failures.Count -eq $test0155FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0155'
 }
 foreach ($requiredLegacyText in @(
     'Repair-LegacyInstallingUpdateTracking',
@@ -1843,6 +1877,10 @@ if (-not $workflow.Contains('pull_request:') -or
     -not $workflow.Contains('pull-requests: write')) {
     Add-Failure 'TEST-0112 consumer workflow cannot recover an installing legacy update from its exact merged pull-request event.'
 }
+if ($failures.Count -eq $test0112FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0112'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Managed merge finalization tests failed with $($failures.Count) problem(s):" `
@@ -1852,7 +1890,5 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'Managed merge finalization tests passed.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

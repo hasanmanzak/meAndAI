@@ -173,12 +173,13 @@
             OwnerPath = 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
             CanonicalCommands = @(
                 'Confirm-MeAndAIScenarioEvidence'
-                'Get-MeAndAISourceBoundScenarioIds'
+                'New-MeAndAIScenarioEvidenceContext'
                 'New-MeAndAIScenarioResult'
             )
             GuardedNames = @(
                 'Confirm-MeAndAIScenarioEvidence'
                 'Get-MeAndAISourceBoundScenarioIds'
+                'New-MeAndAIScenarioEvidenceContext'
                 'New-MeAndAIScenarioResult'
             )
             ReviewedExceptions = @()
@@ -256,6 +257,30 @@
                 'New-MeAndAITestCommit'
                 'New-TestCommit'
             )
+            ReviewedExceptions = @()
+        }
+        @{
+            ContractId = 'THO-0012'
+            SemanticKind = 'legacy-scenario-evidence-transition'
+            OwnerPath = 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1'
+            CanonicalCommands = @(
+                'Confirm-MeAndAILegacyScenarioEvidence'
+                'Get-MeAndAILegacySourceBoundScenarioIds'
+                'New-MeAndAILegacyScenarioResult'
+            )
+            GuardedNames = @(
+                'Confirm-MeAndAILegacyScenarioEvidence'
+                'Get-MeAndAILegacySourceBoundScenarioIds'
+                'New-MeAndAILegacyScenarioResult'
+            )
+            ReviewedExceptions = @()
+        }
+        @{
+            ContractId = 'THO-0013'
+            SemanticKind = 'test-role-boundary-inspection'
+            OwnerPath = 'tests/infrastructure/MeAndAI.TestRole.psm1'
+            CanonicalCommands = @('Test-MeAndAITestRoleSource')
+            GuardedNames = @('Test-MeAndAITestRoleSource')
             ReviewedExceptions = @()
         }
     )

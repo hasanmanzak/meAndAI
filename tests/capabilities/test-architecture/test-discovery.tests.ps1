@@ -7,6 +7,8 @@ $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 
 function Write-TestFile {
     param([string]$Path, [string]$Content = "Set-StrictMode -Version Latest`n")
@@ -260,8 +262,8 @@ finally {
     }
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0136'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0136'
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Output ('MEANDAI_SCENARIO_RESULTS=' + `
     ($scenarioResult | ConvertTo-Json -Compress))
