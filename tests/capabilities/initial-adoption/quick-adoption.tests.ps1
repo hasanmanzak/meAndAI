@@ -18,6 +18,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
@@ -27,11 +28,40 @@ $testWorkspacePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestWorkspace.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
-Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module $testRuntimePath -Force
 Import-Module $testGitBatchPath -Force
 Import-Module $testWorkspacePath -Force
-Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
+$capabilityCatalogModule = @(Import-Module (Join-Path $root `
+    'scripts/MeAndAI.CapabilityCatalog.psm1') -Force -PassThru)[0]
+$script:ImportQuickAdoptionCapabilityCatalog =
+    $capabilityCatalogModule.ExportedCommands[
+        'Import-MeAndAICapabilityCatalog'
+    ].ScriptBlock
+Remove-Module -ModuleInfo $capabilityCatalogModule -Force
+$contentIdentityModule = @(Import-Module (Join-Path $root `
+    'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$script:GetQuickAdoptionHarnessGitBlobSha1 =
+    $contentIdentityModule.ExportedCommands[
+        'Get-MeAndAIGitBlobSha1'
+    ].ScriptBlock
+$contentIdentityProbeBytes = [byte[]]::new(0)
+$contentIdentityProbeBefore =
+    & $script:GetQuickAdoptionHarnessGitBlobSha1 `
+        -Bytes $contentIdentityProbeBytes
+Remove-Module -ModuleInfo $contentIdentityModule -Force
+$contentIdentityProbeAfter =
+    & $script:GetQuickAdoptionHarnessGitBlobSha1 `
+        -Bytes $contentIdentityProbeBytes
+if ($contentIdentityProbeBefore -cne
+        'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391' -or
+    $contentIdentityProbeAfter -cne $contentIdentityProbeBefore -or
+    @(Get-Module -Name 'MeAndAI.ContentIdentity').Count -ne 0) {
+    throw 'Quick-adoption could not capture one teardown-safe canonical Git blob identity helper.'
+}
+$scenarioContext = New-MeAndAIScenarioEvidenceContext -Owner $suiteOwner `
+    -AuthorityPath $scenarioAuthorityPath
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = if ($Shard -ceq 'All') {
@@ -1102,6 +1132,16 @@ function Set-TestGitIdentity {
     Invoke-TestGit -Repository $Repository -Arguments @('config', 'core.autocrlf', 'false') | Out-Null
 }
 
+function Get-TestQuickAdoptionGitBlobSha1 {
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    return & $script:GetQuickAdoptionHarnessGitBlobSha1 -Bytes $Bytes
+}
+
 function Copy-CanonicalProtocolFixture {
     param(
         [Parameter(Mandatory)][string]$Destination,
@@ -1115,13 +1155,17 @@ function Copy-CanonicalProtocolFixture {
         [Text.UTF8Encoding]::new($false)
     )
     $capabilitiesModulePath = 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
-    foreach ($templatePath in @(
+    $capabilityCatalog = & $script:ImportQuickAdoptionCapabilityCatalog `
+        -IndexPath (Join-Path $root 'capabilities/index.json')
+    $capabilityDefinitionPaths = @($capabilityCatalog.Capabilities |
+        ForEach-Object {
+            'capabilities/' + [string]$_.DefinitionPath
+        })
+    foreach ($templatePath in (@(
         '.gitattributes',
         $capabilitiesModulePath,
         'templates/project/.github/workflows/meandai-protocol-update.yml',
         'capabilities/index.json',
-        'capabilities/test-architecture.json',
-        'capabilities/test-runtime-efficiency.json',
         'scripts/MeAndAI.CapabilityCatalog.psm1',
         'scripts/MeAndAI.CapabilityReview.psm1',
         'scripts/Invoke-MeAndAICapabilityReview.ps1',
@@ -1129,9 +1173,9 @@ function Copy-CanonicalProtocolFixture {
         'scripts/MeAndAI.ConsumerMigrations.psm1',
         'migrations/index.json',
         'migrations/MIG-0001.json'
-    ) + @(
+    ) + $capabilityDefinitionPaths + @(
         $canonicalAdoptionAssets | ForEach-Object { [string]$_.TemplatePath }
-    )) {
+    ))) {
         $sourcePath = Join-Path $root `
             ($templatePath -replace '/', [IO.Path]::DirectorySeparatorChar)
         $destinationPath = Join-Path $Destination `
@@ -1270,7 +1314,7 @@ function Save-MockProtocolAssetSnapshot {
         $Snapshots["$Tag`n$($asset.TemplatePath)"] = `
             [pscustomobject]@{
                 Bytes = $bytes
-                Sha = Get-MeAndAIGitBlobSha1 -Bytes $bytes
+                Sha = Get-TestQuickAdoptionGitBlobSha1 -Bytes $bytes
             }
     }
 }
@@ -1391,7 +1435,7 @@ function Initialize-QuickAdoptionImmutableFixture {
             $assetSnapshots
         )
         WorkflowBytes = $workflowBytes
-        WorkflowSha = Get-MeAndAIGitBlobSha1 -Bytes $workflowBytes
+        WorkflowSha = Get-TestQuickAdoptionGitBlobSha1 -Bytes $workflowBytes
         RefFingerprint = $refFingerprint
         ArchivePath = $archivePath
         ArchiveSha256 = $archiveSha256
@@ -3587,8 +3631,9 @@ try {
             $global:QuickAdoptionCodexLog -ceq $firstCodexLog -or
             [object]::ReferenceEquals($firstAssetBytes, $secondAssetBytes) -or
             [object]::ReferenceEquals($secondAssetBytes, $canonicalAssetBytes) -or
-            (Get-MeAndAIGitBlobSha1 -Bytes $secondAssetBytes) -cne
-                (Get-MeAndAIGitBlobSha1 -Bytes $canonicalAssetBytes) -or
+            (Get-TestQuickAdoptionGitBlobSha1 -Bytes $secondAssetBytes) -cne
+                (Get-TestQuickAdoptionGitBlobSha1 `
+                    -Bytes $canonicalAssetBytes) -or
             $firstArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
             $secondArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
             $transportArchiveSha -cne $script:QuickAdoptionProtocolFixture.ArchiveSha256 -or
@@ -3697,6 +3742,8 @@ try {
                 Add-Failure "TEST-0038 launcher execution contract is missing '$required'"
             }
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0038'
         if ($launcher -match '[''"]--body[''"]') {
             Add-Failure "TEST-0033 launcher contains forbidden secret body argument '--body'"
         }
@@ -4070,6 +4117,8 @@ try {
         if ($launcher -notmatch '(?s)finally\s*\{\s*Complete-QuickAdoptionProgress') {
             Add-Failure 'TEST-0104 launcher does not complete progress from a final cleanup boundary.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0104'
         if ($launcher -match '(?m)^\s*Write-Progress\b') {
             Add-Failure 'TEST-0105 launcher still uses the host-overlay progress renderer.'
         }
@@ -4171,6 +4220,10 @@ try {
             }
         }
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0041'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0051'
 
     foreach ($versionCase in @(
         [pscustomobject]@{
@@ -4245,6 +4298,8 @@ try {
             Add-Failure "TEST-0107 $($versionCase.Name) did not fail with actionable minimum-version guidance: $versionError"
         }
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0107'
 
     if ($failures.Count -eq 0) {
         Reset-Mocks
@@ -4404,6 +4459,8 @@ try {
         if (-not $shallowBlocked -or -not $shallowMessage.Contains('non-shallow repository')) {
             Add-Failure 'TEST-0055 shallow history did not fail closed before credential or remote mutation.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0055'
     }
 
     if ($failures.Count -eq 0) {
@@ -4725,6 +4782,8 @@ try {
             }).Count -ne 0) {
             Add-Failure 'TEST-0073 REST mocks did not prove both credential roles without retaining authorization values.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0073'
         $initialPolicyRestCalls = @($global:QuickAdoptionRestCalls |
             Where-Object {
                 [string]$_.Uri -ceq
@@ -4771,6 +4830,8 @@ try {
         if ($runOutput.Contains('write-token-value') -or $runOutput.Contains('read-token-value')) {
             Add-Failure 'TEST-0033 launcher output exposed a token value.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0033'
         if (-not $runOutput.Contains('meAndAI [') -or
             -not $runOutput.Contains('Codex | Inspecting project records.') -or
             -not $runOutput.Contains('Codex | Running command: git') -or
@@ -4830,6 +4891,8 @@ try {
             [string]$runViewCalls[0].Arguments[2] -cne '7001') {
             Add-Failure 'TEST-0090/TEST-0153 exact dispatch was not bound to its independently rebuilt pre-seed source graph, published repository head, and run identity.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0090'
         $unqualifiedGhCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             [string]$_.Host -cne 'github.com'
         })
@@ -4837,6 +4900,8 @@ try {
             [Environment]::GetEnvironmentVariable('GH_HOST', 'Process') -cne 'ghe.example.invalid') {
             Add-Failure 'TEST-0060 launcher GitHub operations were redirected by caller GH_HOST or did not restore it.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0060'
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
             -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.14.5' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
@@ -4899,6 +4964,8 @@ try {
             $runViewCalls.Count -ne 1) {
             Add-Failure 'TEST-0063 concurrent workflow and issue identities did not converge to the correlated run and one canonical issue.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0063'
         if ($global:QuickAdoptionPrBodyEditCalls -ne 2 -or
             @($global:QuickAdoptionEvents | Where-Object {
                 $_ -ceq 'pr-body-edit:publishing'
@@ -5036,6 +5103,10 @@ try {
             -not $global:QuickAdoptionLabelRecords.ContainsKey('meandai:secret-reconciliation-lock')) {
             Add-Failure 'TEST-0070/TEST-0082 deterministic ownership-change state was deleted or accepted instead of failing closed.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0070'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0082'
         [void]$global:QuickAdoptionLabelRecords.Remove('meandai:secret-reconciliation-lock')
         $global:QuickAdoptionSecretLockMode = 'Normal'
         $global:QuickAdoptionSecretLockViewCalls = 0
@@ -5046,6 +5117,8 @@ try {
             $adoptionPaths -notcontains 'docs/governance/ai-adoption.md') {
             Add-Failure 'TEST-0039 local Codex result was not published without the transient manifest.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0039'
 
         $remotePaths = @(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-tree', '-r', '--name-only', 'origin/main'
@@ -5058,6 +5131,10 @@ try {
         if ($status.Count -ne 0) {
             Add-Failure "TEST-0034 existing repository is not clean after adoption: $($status -join ', ')"
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0034'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0086'
 
         $global:QuickAdoptionRunListCalls = 0
         $global:QuickAdoptionPrListCalls = 0
@@ -5184,6 +5261,8 @@ try {
                 "error=$interruptedRecoveryError"
             )
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0079'
 
         Reset-MockAdoptionProposal
         $global:QuickAdoptionIssueRace = $false
@@ -5236,6 +5315,8 @@ try {
             $global:QuickAdoptionIssueLabels -cnotcontains 'status:needs-review') {
             Add-Failure "TEST-0052/TEST-0087/TEST-0089 rerun after readiness did not retain the exact Completed proposal and reconcile the issue without Codex or a new commit: error='$postReadyRecoveryError'; head=$postReadyHead->$postReadyRecoveredHead; readyCalls=$($global:QuickAdoptionPrReadyCalls); issueLabels=$($global:QuickAdoptionIssueLabels -join ',')."
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0089'
 
         $alreadyReadyBaseHead = (@(Invoke-TestGit `
             -Repository $existingRemote -Arguments @(
@@ -6539,6 +6620,8 @@ try {
                             param([byte[]]$Bytes)
                             return 'f' * 40
                         }
+                        $script:GetQuickAdoptionGitBlobSha1 =
+                            ${function:Get-GitBlobSha}
 
                         function Get-AdoptionTreeEntry {
                             param(
@@ -6634,7 +6717,8 @@ try {
                     $graphAwarePullRequest $finalHead $sourceHead
             }
             catch {
-                $manifestValidationError = $_.Exception.Message
+                $manifestValidationError =
+                    "$($_.Exception.Message) [$($_.ScriptStackTrace)]"
             }
             finally {
                 if ($null -ne $manifestValidationModule) {
@@ -6784,7 +6868,8 @@ try {
             Add-Failure "TEST-0154 actual local completion did not block the exact four live custom authorities before marker, push, or readiness mutation: $liveAuthorityError"
         }
 
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0154'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0154'
     }
 
     $integrityShardNames = @(
@@ -7023,6 +7108,8 @@ try {
             $global:QuickAdoptionPrBody = $canonicalCompletedBody
             $global:QuickAdoptionPrDraft = $false
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0087'
     }
 
     if ($runIntegrityShards -and
@@ -7252,6 +7339,10 @@ try {
             $global:QuickAdoptionIssues.Add($issue)
         }
         $global:QuickAdoptionIssue = $savedCanonicalIssue
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0069'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0081'
     }
 
     if ($runIntegrityShards -and
@@ -7355,6 +7446,8 @@ try {
             }
         }
         $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = 'Success'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0103'
 
         $completionContract = Get-TestQuickAdoptionContractCommand `
             -Name 'Test-MeAndAICompletedAdoptionChangeSet'
@@ -7430,7 +7523,12 @@ try {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
             }
         }
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0053'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0040'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0049'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0053'
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
@@ -7506,6 +7604,8 @@ try {
             $global:QuickAdoptionPrReadyCalls -ne 0) {
             Add-Failure 'TEST-0054 multiple unseen workflow runs did not block before semantic completion.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0054'
 
         $savedIntegrityContext = [pscustomobject]@{
             RepositoryName = $global:QuickAdoptionRepoName
@@ -8094,6 +8194,8 @@ try {
             $migrationBranchApplicationBlob -cne $migrationMainApplicationBlob) {
             Add-Failure "TEST-0046/TEST-0129 token-backed FullMigration did not publish the exact protocol gitlink, preserve required AGENTS.md, retire its approved legacy authorities, and preserve the representative app: $collisionError"
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0046'
         if ($null -eq $global:QuickAdoptionDispatchRecord -or
             [string]$global:QuickAdoptionDispatchRecord.AdoptionStrategy -cne
                 'FullMigration' -or
@@ -8177,7 +8279,8 @@ try {
             Reset-MockAdoptionProposal
         }
         $global:QuickAdoptionPrMetadataMode = 'Valid'
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0102'
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0102'
         $global:QuickAdoptionProposalMode = 'WrongProtocolSha'
         $wrongPinBlocked = $false
         try {
@@ -9697,6 +9800,8 @@ try {
                 }
             }
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0129'
 
         foreach ($emptyTagRaceKind in @(
             [pscustomobject]@{ Name = 'discovered'; Create = $false },
@@ -10033,6 +10138,8 @@ try {
             $global:QuickAdoptionSecrets.Count -ne $writesBeforeNonemptyProbe) {
             Add-Failure "TEST-0100 existing non-empty derived repository did not fail before local remote or secret mutation: $nonemptyProbeError"
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0100'
 
         foreach ($seedBindingCase in @(
             [pscustomobject]@{
@@ -10098,6 +10205,8 @@ try {
                 Add-Failure "TEST-0052 seed default-branch rename $($seedBindingCase.Name) did not preserve/revert the old ref exactly before workflow or secret follow-on: error='$seedBindingError'; remote=$seedBindingBaseHead->$seedBindingRemoteHead; local=$seedBindingLocalHead."
             }
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0052'
 
         Reset-Mocks
         $modifiedSeedRoot = New-TempRoot -Name 'modified-seed'
@@ -10222,6 +10331,8 @@ try {
             $global:QuickAdoptionWorkflowDispatched) {
             Add-Failure "TEST-0078 launcher-scoped hook suppression did not bypass both blocking pre-commit/pre-push hooks, publish only the seed, and restore Git config environment: $seedHookError"
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0078'
 
         Reset-Mocks
         $newRoot = New-TempRoot -Name 'new'
@@ -10277,6 +10388,8 @@ try {
             $global:QuickAdoptionSecrets.Count -ne 0) {
             Add-Failure 'TEST-0045 new-repository adoption did not require both local credential files before remote mutation.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0045'
 
         Set-Content -LiteralPath (Join-Path $newRepo 'FG_PAT.txt') -Value 'new-write-token' -NoNewline
         $global:QuickAdoptionDenyTargetAccess = $true
@@ -10291,6 +10404,8 @@ try {
         if (-not $grantBlocked -or $global:QuickAdoptionSecrets.Count -ne 0) {
             Add-Failure 'TEST-0036 missing selected-repository grant did not block before secret storage.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0036'
         $global:QuickAdoptionDenyTargetAccess = $false
         $newRefsBeforeFinal = if (Test-Path -LiteralPath $newRemote `
                 -PathType Container) {
@@ -10320,6 +10435,8 @@ try {
             @($global:QuickAdoptionSecrets.Name) -notcontains 'MEANDAI_PROTOCOL_TOKEN') {
             Add-Failure 'TEST-0042 new-repository adoption did not create both missing Actions secrets.'
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0042'
         $createCall = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'repo' -and $_.Arguments[1] -eq 'create'
         })
@@ -10340,6 +10457,8 @@ try {
         if ($newStatus.Count -ne 0) {
             Add-Failure "TEST-0035 committed local content was not preserved in a clean checkout: $($newStatus -join ', ')"
         }
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId 'TEST-0035'
 
         Reset-Mocks
         $currentConsumer = New-MockConnectedManagedConsumer `
@@ -10396,7 +10515,7 @@ try {
         $legacyConsumer = New-MockConnectedManagedConsumer `
             -Name 'managed-legacy' -InstalledTag 'v0.9.2'
         $legacyWorkflowPath = Join-Path $legacyConsumer.Repository $workflowRelativePath
-        $legacyWorkflowShaBefore = Get-MeAndAIGitBlobSha1 `
+        $legacyWorkflowShaBefore = Get-TestQuickAdoptionGitBlobSha1 `
             -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
         $legacyCodexCallsBefore = @(Get-MockCodexCalls).Count
         $legacyError = ''
@@ -10407,7 +10526,7 @@ try {
         catch {
             $legacyError = $_.Exception.Message
         }
-        $legacyWorkflowShaAfter = Get-MeAndAIGitBlobSha1 `
+        $legacyWorkflowShaAfter = Get-TestQuickAdoptionGitBlobSha1 `
             -Bytes ([IO.File]::ReadAllBytes($legacyWorkflowPath))
         $legacyHeadAfter = (@(Invoke-TestGit -Repository $legacyConsumer.Repository `
             -Arguments @('rev-parse', 'HEAD')))[0]
@@ -10513,9 +10632,6 @@ try {
                 Add-Failure "TEST-0113/TEST-0130 $($blockedRoute.Name) adoption state did not fail at its exact route before secret/repository workflow mutation: $blockedError"
             }
         }
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0113'
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0129'
-        Confirm-MeAndAILegacyScenarioEvidence -TestId 'TEST-0130'
     }
 }
 catch {
@@ -10564,6 +10680,8 @@ finally {
         Add-Failure "TEST-0158 quick-adoption fixture cleanup leaked roots: $($survivingFixtureRoots -join ', ')."
     }
 }
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+    -TestId 'TEST-0116'
 
 if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
     $launcher = Get-QuickAdoptionLauncherSource
@@ -10579,6 +10697,8 @@ if (Test-QuickAdoptionShard -Name 'CurrentLauncherRecovery') {
             Add-Failure "TEST-0113 launcher lacks repeat-adoption route '$requiredRepeatRouteText'."
         }
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0113'
 
     $launcherTokens = $null
     $launcherParseErrors = $null
@@ -11140,6 +11260,8 @@ if ($env:MEANDAI_TEST_CURRENT_LAUNCHER_FAIL -ceq 'true' -and
             }
         }
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0156'
 }
 
 if ($null -ne $script:QuickAdoptionContractModule) {
@@ -11154,6 +11276,19 @@ $survivingInitialPolicyModules = @(
 if ($survivingInitialPolicyModules.Count -ne 0) {
     Add-Failure "TEST-0130 quick-adoption suite left dynamic initial-policy modules loaded: $($survivingInitialPolicyModules.Name -join ', ')"
 }
+$survivingCanonicalHelperModules = @(Get-Module | Where-Object {
+    [string]$_.Name -cin @(
+        'MeAndAI.CapabilityCatalog',
+        'MeAndAI.ContentIdentity'
+    )
+})
+if ($survivingCanonicalHelperModules.Count -ne 0) {
+    Add-Failure "TEST-0130 quick-adoption suite left canonical helper modules loaded: $($survivingCanonicalHelperModules.Name -join ', ')"
+}
+if ($Shard -ceq 'All') {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0130'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Quick-adoption tests failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -11163,9 +11298,7 @@ if ($failures.Count -gt 0) {
 
 if ($Shard -ceq 'All') {
     Write-Host 'Quick-adoption tests passed for all declared scenarios in this suite.' -ForegroundColor Green
-    $scenarioResult = New-MeAndAILegacyScenarioResult `
-        -Owner 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1' -SourcePaths @($PSCommandPath) `
-        -AuthorityPath $scenarioAuthorityPath
+    $scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
     $scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +
         ($scenarioResult | ConvertTo-Json -Compress)
     $operationLine = Format-MeAndAITestOperationObservation `

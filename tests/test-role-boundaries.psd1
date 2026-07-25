@@ -5,7 +5,6 @@
         'Assert-MeAndAITestSuiteOperationEvidence'
     )
     Harnesses = @(
-        'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1'
         'tests/infrastructure/MeAndAI.MarkdownEvidence.psm1'
         'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
         'tests/infrastructure/MeAndAI.TestAssertions.psm1'
@@ -37,7 +36,6 @@
     InertFixtures = @(
         'tests/capabilities/test-architecture/fixtures/helper-ownership/helper-ownership.psd1.fixture'
     )
-    TransitionalExecutableFixtures = @()
     ReviewedInertExceptions = @(
         @{
             Path = 'tests/capabilities/consumer-update/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1'
@@ -69,9 +67,6 @@
             Reason = 'Inert isolated authority data for TEST-0185; its synthetic TEST identities are parsed as data and never complete repository tests.'
             ReviewAuthority = 'DEC-0029 / TEST-0185'
         }
-    )
-    LegacyScenarioEvidenceOwners = @(
-        'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
     )
     Examples = @(
         @{ Path = 'runner-positive.ps1.fixture'; Role = 'Runner'; ExpectedViolationCodes = @() }

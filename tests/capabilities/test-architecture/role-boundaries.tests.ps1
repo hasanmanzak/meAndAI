@@ -128,6 +128,8 @@ foreach ($path in @($contract.Mocks | ForEach-Object { [string]$_ })) {
 ))
 Assert-MeAndAITestSequenceEqual -Actual $actualCases -Expected $expectedCases `
     -Message 'The exact executable Case inventory changed.'
+Assert-MeAndAITestEqual -Actual $expectedCases.Count -Expected 5 `
+    -Message 'The canonical executable Case inventory must contain exactly five owners.'
 foreach ($path in $expectedCases) {
     Assert-RoleObservation -LiteralPath (Join-Path $root $path) -Role Case
 }
@@ -135,18 +137,12 @@ foreach ($path in @($contract.InertFixtures | ForEach-Object { [string]$_ })) {
     Assert-RoleObservation -LiteralPath (Join-Path $root $path) -Role Fixture
 }
 
-$transitionalEntries = @($contract.TransitionalExecutableFixtures)
-Assert-MeAndAITestEqual -Actual $transitionalEntries.Count -Expected 0 `
-    -Message 'The executable-fixture transition debt must remain empty after the bootstrap migration.'
-foreach ($entry in $transitionalEntries) {
-    Assert-MeAndAITestEqual -Actual ([string]$entry.Role) -Expected 'Case' `
-        -Message "Transitional source '$($entry.Path)' has the wrong semantic role."
-    Assert-MeAndAITestEqual -Actual ([string]$entry.RemovalSlice) `
-        -Expected 'SUBF-0098' `
-        -Message "Transitional source '$($entry.Path)' has the wrong removal slice."
-    Assert-RoleObservation -LiteralPath (Join-Path $root ([string]$entry.Path)) `
-        -Role Case
-}
+Assert-MeAndAITestTrue -Condition (
+    -not $contract.Contains('TransitionalExecutableFixtures')
+) -Message 'The completed executable-fixture transition key must not remain active.'
+Assert-MeAndAITestTrue -Condition (
+    -not $contract.Contains('LegacyScenarioEvidenceOwners')
+) -Message 'The completed legacy scenario-evidence owner key must not remain active.'
 
 foreach ($entry in @($contract.ReviewedInertExceptions)) {
     Assert-MeAndAITestTrue -Condition (
@@ -169,9 +165,6 @@ $declaredFixtureSources = @(
     @($contract.Mocks | ForEach-Object { [string]$_ })
     @($contract.Cases | ForEach-Object { [string]$_ })
     @($contract.InertFixtures | ForEach-Object { [string]$_ })
-    @($contract.TransitionalExecutableFixtures | ForEach-Object {
-        [string]$_.Path
-    })
     @($contract.ReviewedInertExceptions | ForEach-Object { [string]$_.Path })
     @($contract.Examples | ForEach-Object {
         'tests/capabilities/test-architecture/fixtures/role-boundaries/' +
@@ -200,13 +193,6 @@ $declaredFixtureSources = @(
 Assert-MeAndAITestSequenceEqual -Actual $actualFixtureSources `
     -Expected $expectedFixtureSources `
     -Message 'The exact PowerShell fixture/mock/support inventory changed.'
-
-[string[]]$expectedLegacyOwners = @(Get-OrdinalUniqueString `
-    -Value @($contract.LegacyScenarioEvidenceOwners | ForEach-Object {
-        [string]$_
-    }))
-Assert-MeAndAITestEqual -Actual $expectedLegacyOwners.Count -Expected 1 `
-    -Message 'Legacy scenario evidence must have exactly one remaining hotspot owner.'
 
 $legacyOwners = [System.Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal
@@ -245,8 +231,8 @@ foreach ($source in $testSources) {
 [string[]]$actualLegacyOwners = @($legacyOwners)
 [Array]::Sort($actualLegacyOwners, [StringComparer]::Ordinal)
 Assert-MeAndAITestSequenceEqual -Actual $actualLegacyOwners `
-    -Expected $expectedLegacyOwners `
-    -Message 'Legacy scenario-evidence owners differ from the exact hotspot allowlist.'
+    -Expected @() `
+    -Message 'Legacy scenario-evidence references must remain absent after transition closure.'
 
 Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0186'
 $scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext

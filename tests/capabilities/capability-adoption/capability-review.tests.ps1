@@ -620,6 +620,40 @@ Assert-True ($semanticFinalizationGuard -ge 0 -and
 $quickAdoptionTestPath = Join-Path $root `
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $quickAdoptionTestText = [IO.File]::ReadAllText($quickAdoptionTestPath)
+$catalogCaptureIndex = $quickAdoptionTestText.IndexOf(
+    '$script:ImportQuickAdoptionCapabilityCatalog =',
+    [StringComparison]::Ordinal
+)
+$catalogRemovalIndex = $quickAdoptionTestText.IndexOf(
+    'Remove-Module -ModuleInfo $capabilityCatalogModule -Force',
+    [StringComparison]::Ordinal
+)
+$identityCaptureIndex = $quickAdoptionTestText.IndexOf(
+    '$script:GetQuickAdoptionHarnessGitBlobSha1 =',
+    [StringComparison]::Ordinal
+)
+$identityRemovalIndex = $quickAdoptionTestText.IndexOf(
+    'Remove-Module -ModuleInfo $contentIdentityModule -Force',
+    [StringComparison]::Ordinal
+)
+$identityHelperIndex = $quickAdoptionTestText.IndexOf(
+    'function Get-TestQuickAdoptionGitBlobSha1',
+    [StringComparison]::Ordinal
+)
+Assert-True (
+    $catalogCaptureIndex -ge 0 -and
+    $catalogRemovalIndex -gt $catalogCaptureIndex -and
+    $identityCaptureIndex -gt $catalogRemovalIndex -and
+    $identityRemovalIndex -gt $identityCaptureIndex -and
+    $identityHelperIndex -gt $identityRemovalIndex -and
+    $quickAdoptionTestText.Contains(
+        '& $script:GetQuickAdoptionHarnessGitBlobSha1 -Bytes $Bytes'
+    ) -and
+    $quickAdoptionTestText.Contains(
+        "Get-Module -Name 'MeAndAI.ContentIdentity'"
+    ) -and
+    $quickAdoptionTestText.Contains('$survivingCanonicalHelperModules')
+) 'TEST-0140 quick-adoption fixture depends on mutable global helper-module exports or leaks canonical helper modules.'
 $fixtureCopyStart = $quickAdoptionTestText.IndexOf(
     'function Copy-CanonicalProtocolFixture',
     [StringComparison]::Ordinal
@@ -650,20 +684,39 @@ $managedEnvelopeText = $quickAdoptionTestText.Substring(
     $managedEnvelopeStart,
     $managedEnvelopeEnd - $managedEnvelopeStart
 )
-foreach ($sourceOnlyPath in @(
+$fixedSourceOnlyPaths = @(
     'capabilities/index.json',
-    'capabilities/test-architecture.json',
-    'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
     'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAICapabilityReview.ps1'
-)) {
+)
+foreach ($sourceOnlyPath in $fixedSourceOnlyPaths) {
     Assert-True $fixtureCopyText.Contains("'$sourceOnlyPath'") `
         "TEST-0140 quick-adoption source fixture omits '$sourceOnlyPath'."
     Assert-True (-not $managedEnvelopeText.Contains("'$sourceOnlyPath'")) `
         "TEST-0140 source-only capability asset entered the managed adoption envelope: '$sourceOnlyPath'."
 }
+$capabilityDefinitionPaths = @($releaseCatalog.Capabilities |
+    ForEach-Object { 'capabilities/' + [string]$_.DefinitionPath })
+Assert-True (
+    $quickAdoptionTestText.Contains("'Import-MeAndAICapabilityCatalog'") -and
+    $fixtureCopyText.Contains(
+        '& $script:ImportQuickAdoptionCapabilityCatalog'
+    ) -and
+    $fixtureCopyText.Contains('$capabilityCatalog.Capabilities') -and
+    $fixtureCopyText.Contains('[string]$_.DefinitionPath') -and
+    $fixtureCopyText.Contains('$capabilityDefinitionPaths')
+) 'TEST-0140 quick-adoption source fixture does not copy definitions from the validated canonical catalog in catalog order.'
+foreach ($definitionPath in $capabilityDefinitionPaths) {
+    Assert-True (-not $managedEnvelopeText.Contains("'$definitionPath'")) `
+        "TEST-0140 source-only capability definition entered the managed adoption envelope: '$definitionPath'."
+}
+Assert-True (-not [regex]::IsMatch(
+    $fixtureCopyText,
+    "'capabilities/(?!index\\.json')[^']+\\.json'",
+    [Text.RegularExpressions.RegexOptions]::CultureInvariant
+)) 'TEST-0140 quick-adoption source fixture hardcodes capability definition paths.'
 
 $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) (
     'meandai-capability-review-' + [Guid]::NewGuid().ToString('N')
