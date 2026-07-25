@@ -15,6 +15,13 @@ the `v0.14.5`, `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates; retained
 Follow the [v0.14.5 publication-closure handoff](2026-07-25-v0145-publication-closure.md)
 for exact dated evidence.
 
+[FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
+is Proposed for target `0.15.0` under
+[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). Its linked
+[planning handoff](2026-07-25-v0150-recurrence-prevention-planning.md) preserves
+the approved four-slice scope and explicitly records that implementation has
+not begun.
+
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
 [SUBF-0092](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
@@ -43,6 +50,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-25 - v0.15.0 recurrence prevention and modular test harness planning](2026-07-25-v0150-recurrence-prevention-planning.md)
 - [2026-07-25 - v0.14.5 post-publication closure](2026-07-25-v0145-publication-closure.md)
 - [2026-07-25 - v0.14.5 bare document basename links](2026-07-25-v0145-bare-document-basename-links.md)
 - [2026-07-24 - v0.14.4 paged array response normalization](2026-07-24-v0144-paged-array-normalization.md)

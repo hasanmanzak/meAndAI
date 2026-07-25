@@ -338,7 +338,8 @@ if ($null -ne $scenarioAuthorityData) {
     $scenarioAuthorities = @($scenarioAuthorityData.Authorities)
     $allowedEvidenceKinds = @(
         'ExecutableSuite', 'GitHubActionsSemantic',
-        'ExternalPostPublication', 'HistoricalSuperseded'
+        'ExternalPostPublication', 'PlannedDocumentation',
+        'HistoricalSuperseded'
     )
     $canonicalSuiteOwners = [System.Collections.Generic.HashSet[string]]::new(
         [System.StringComparer]::Ordinal
@@ -382,6 +383,11 @@ if ($null -ne $scenarioAuthorityData) {
                     Add-Failure "TEST-0074 post-publication evidence has an invalid owner: '$owner'."
                 }
             }
+            'PlannedDocumentation' {
+                if ($owner -cnotmatch '^docs/features/FEAT-\d{4}-[^/]+/test-cases\.md$') {
+                    Add-Failure "TEST-0074 planned scenario evidence has an invalid owner: '$owner'."
+                }
+            }
             'HistoricalSuperseded' {
                 if ($owner -cnotmatch '^docs/features/FEAT-\d{4}-[^/]+/test-cases\.md$') {
                     Add-Failure "TEST-0074 superseded evidence has an invalid canonical owner: '$owner'."
@@ -412,6 +418,26 @@ foreach ($testId in @($scenarioDeclarations.Keys | Sort-Object)) {
         Add-Failure "TEST-0074 declared scenario has no canonical evidence authority: $testId."
     }
 }
+
+$activeTestSourcesByScenarioId = @{}
+foreach ($activeTestSource in @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
+    -Recurse -File -Filter '*.ps1')) {
+    $activeContent = Get-Content -LiteralPath $activeTestSource.FullName -Raw
+    $relativeActivePath = $activeTestSource.FullName.Substring($root.Length + 1).Replace('\', '/')
+    foreach ($match in @([regex]::Matches(
+        $activeContent,
+        '(?<![A-Za-z0-9-])TEST-[0-9]{4}(?![A-Za-z0-9-])'
+    ))) {
+        $activeTestId = $match.Value
+        if (-not $activeTestSourcesByScenarioId.ContainsKey($activeTestId)) {
+            $activeTestSourcesByScenarioId[$activeTestId] = `
+                [System.Collections.Generic.HashSet[string]]::new(
+                    [System.StringComparer]::Ordinal
+                )
+        }
+        [void]$activeTestSourcesByScenarioId[$activeTestId].Add($relativeActivePath)
+    }
+}
 foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
     if (-not $scenarioDeclarations.ContainsKey($testId)) {
         Add-Failure "TEST-0074 scenario authority has no canonical declaration: $testId."
@@ -419,6 +445,18 @@ foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
     }
 
     $authority = $authorityByTestId[$testId]
+    if ($authority.Evidence -ceq 'PlannedDocumentation') {
+        $declaration = $scenarioDeclarations[$testId][0]
+        if ($declaration.Path -cne $authority.Owner -or
+            $declaration.Line -cnotmatch '\|\s*Planned\s*\|') {
+            Add-Failure "TEST-0074 planned scenario lacks its canonical declaration or status: $testId."
+        }
+
+        if ($activeTestSourcesByScenarioId.ContainsKey($testId)) {
+            $activeSources = @($activeTestSourcesByScenarioId[$testId] | Sort-Object) -join ', '
+            Add-Failure "TEST-0074 planned scenario is already asserted: $testId ($activeSources)."
+        }
+    }
     if ($authority.Evidence -ceq 'HistoricalSuperseded') {
         $declaration = $scenarioDeclarations[$testId][0]
         $replacementIds = @([regex]::Matches($declaration.Line, 'TEST-\d{4}') |
@@ -429,12 +467,9 @@ foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
             Add-Failure "TEST-0074 superseded scenario lacks its status or replacement identity: $testId."
         }
 
-        foreach ($activeTestSource in @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
-            -Recurse -File -Filter '*.ps1')) {
-            $activeContent = Get-Content -LiteralPath $activeTestSource.FullName -Raw
-            if ([regex]::IsMatch($activeContent, "(?<![A-Za-z0-9-])$testId(?![A-Za-z0-9-])")) {
-                Add-Failure "TEST-0074 superseded scenario is still asserted by $($activeTestSource.Name): $testId."
-            }
+        if ($activeTestSourcesByScenarioId.ContainsKey($testId)) {
+            $activeSources = @($activeTestSourcesByScenarioId[$testId] | Sort-Object) -join ', '
+            Add-Failure "TEST-0074 superseded scenario is still asserted: $testId ($activeSources)."
         }
     }
 }
