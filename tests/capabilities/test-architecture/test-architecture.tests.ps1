@@ -232,16 +232,7 @@ $adapterFixturePaths = @($adapterFixtures | ForEach-Object {
     $_.FullName.Substring($root.Length + 1).Replace('\', '/')
 })
 [Array]::Sort($adapterFixturePaths, [StringComparer]::Ordinal)
-$expectedAdapterFixturePaths = @(
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/source-graph-dispatch' +
-        '.fixture.ps1')
-)
+$expectedAdapterFixturePaths = @()
 if (($adapterFixturePaths -join "`0") -cne
     ($expectedAdapterFixturePaths -join "`0") -or
     @($adapterFixturePaths | Where-Object {

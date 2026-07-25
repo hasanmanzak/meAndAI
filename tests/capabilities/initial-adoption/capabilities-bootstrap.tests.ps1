@@ -6,14 +6,18 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.LegacyScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module $testRuntimePath -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
+$scenarioContext = New-MeAndAIScenarioEvidenceContext -Owner $suiteOwner `
+    -AuthorityPath $scenarioAuthorityPath
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = if ($Shard -ceq 'All') {
@@ -35,12 +39,6 @@ Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') 
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
 $failures = $failureContext.Failures
-
-function Assert-Equal {
-    param($Expected, $Actual, [string]$Message)
-    Assert-MeAndAITestCollectedEqual -Context $failureContext `
-        -Expected $Expected -Actual $Actual -Message $Message
-}
 
 foreach ($path in @(
     $modulePath, $adapterPath, $workflowPath, $launcherPath, $dispatchPath,
@@ -84,34 +82,34 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     }
 
     $plan = Invoke-LifecyclePlan -LocalUpdaterState 'Complete'
-    Assert-Equal 'Update' $plan.State 'TEST-0027 complete local updater should own the update path'
-    Assert-Equal 'None' $plan.ProposalMode 'TEST-0027 update path must not create an adoption proposal'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'Update' $plan.State 'TEST-0027 complete local updater should own the update path'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'None' $plan.ProposalMode 'TEST-0027 update path must not create an adoption proposal'
 
     $plan = Invoke-LifecyclePlan
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0028 collision-free seed should bootstrap'
-    Assert-Equal 'Full' $plan.ProposalMode 'TEST-0028 collision-free seed should propose full core assets'
-    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should resolve a clean tree to FreshAdoption'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0028 collision-free seed should bootstrap'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'Full' $plan.ProposalMode 'TEST-0028 collision-free seed should propose full core assets'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should resolve a clean tree to FreshAdoption'
     if ([long]$plan.SchemaVersion -ne 2 -or
         $null -ne $plan.PSObject.Properties['SourceGraph']) {
         Add-Failure 'TEST-0153 legacy schema-2 lifecycle compatibility changed when graph evidence was absent.'
     }
 
     $plan = Invoke-LifecyclePlan -Collisions @('.gitmodules')
-    Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0127 a generic target collision should require semantic review without inventing prior protocol evidence'
-    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should retain FreshAdoption for a protocol-free generic collision'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'AdoptionReviewRequired' $plan.State 'TEST-0127 a generic target collision should require semantic review without inventing prior protocol evidence'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0127 Auto should retain FreshAdoption for a protocol-free generic collision'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md')
-    Assert-Equal 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 Auto with protocol evidence should require maintainer selection'
-    Assert-Equal 'None' $plan.ProposalMode 'TEST-0127 unresolved strategy must not create a proposal'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 Auto with protocol evidence should require maintainer selection'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'None' $plan.ProposalMode 'TEST-0127 unresolved strategy must not create a proposal'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
         -AdoptionStrategy 'FreshAdoption'
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 explicit FreshAdoption must reject protocol evidence'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0127 explicit FreshAdoption must reject protocol evidence'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
         -AdoptionStrategy 'FullMigration'
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 explicit FullMigration should authorize a collision-free proposal'
-    Assert-Equal 'FullMigration' $plan.AdoptionStrategy 'TEST-0127 resolved strategy should remain exact'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0127 explicit FullMigration should authorize a collision-free proposal'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'FullMigration' $plan.AdoptionStrategy 'TEST-0127 resolved strategy should remain exact'
 
     foreach ($unsupportedEvidenceFreeStrategy in @(
         'FullMigration', 'HybridReconciliation', 'CleanStart'
@@ -121,77 +119,77 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
             -AdoptionStrategy $unsupportedEvidenceFreeStrategy `
             -AcknowledgeProtocolRecordLoss `
                 ($unsupportedEvidenceFreeStrategy -ceq 'CleanStart')
-        Assert-Equal 'BlockedManualReview' $plan.State "TEST-0127 $unsupportedEvidenceFreeStrategy must reject an evidence-free repository"
+        Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State "TEST-0127 $unsupportedEvidenceFreeStrategy must reject an evidence-free repository"
     }
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
         -AdoptionStrategy 'CleanStart'
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart without loss acknowledgement must block'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart without loss acknowledgement must block'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should authorize a proposal'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should authorize a proposal'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('.ai/protocol/legacy.md') `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow exact legacy protocol-root records'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow exact legacy protocol-root records'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('.cursor/rules') `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow an exact active-rule root'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow an exact active-rule root'
 
     $plan = Invoke-LifecyclePlan `
         -ProtocolSurfaces @('.github/instructions/api.instructions.md') `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
-    Assert-Equal 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow path-specific GitHub Copilot instructions'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BootstrapReady' $plan.State 'TEST-0127 acknowledged CleanStart should allow path-specific GitHub Copilot instructions'
 
     $plan = Invoke-LifecyclePlan `
         -ProtocolSurfaces @('.ai/meandai-update-state.json')
-    Assert-Equal 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 a pre-existing protocol ledger must not be classified as fresh'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'ProtocolMigrationReviewRequired' $plan.State 'TEST-0127 a pre-existing protocol ledger must not be classified as fresh'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('RELEASES.md') `
         -AdoptionStrategy 'CleanStart' -AcknowledgeProtocolRecordLoss $true
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart must reject ambiguous product-or-governance records before proposal mutation'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0127 CleanStart must reject ambiguous product-or-governance records before proposal mutation'
 
     $plan = Invoke-LifecyclePlan -ProtocolSurfaces @('ai/WORK_INDEX.md') `
         -AdoptionStrategy 'Abort'
-    Assert-Equal 'Aborted' $plan.State 'TEST-0127 Abort should produce an explicit no-mutation state'
-    Assert-Equal 'None' $plan.ProposalMode 'TEST-0127 Abort must not create a proposal'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'Aborted' $plan.State 'TEST-0127 Abort should produce an explicit no-mutation state'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'None' $plan.ProposalMode 'TEST-0127 Abort must not create a proposal'
 
     $plan = Invoke-LifecyclePlan -LocalUpdaterState 'Partial' -Collisions @(
         '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
     ) -ProtocolSurfaces @(
         '.github/scripts/MeAndAI.ProtocolUpdate.psm1'
     ) -AdoptionStrategy 'HybridReconciliation'
-    Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0027 partial updater must not execute as complete'
-    Assert-Equal 'ManifestOnly' $plan.ProposalMode 'TEST-0030 partial adoption should preserve existing targets'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'AdoptionReviewRequired' $plan.State 'TEST-0027 partial updater must not execute as complete'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'ManifestOnly' $plan.ProposalMode 'TEST-0030 partial adoption should preserve existing targets'
 
     $plan = Invoke-LifecyclePlan -Collisions @('AGENTS.md', '.gitmodules') `
         -ProtocolSurfaces @('AGENTS.md') `
         -AdoptionStrategy 'FullMigration'
-    Assert-Equal 'AdoptionReviewRequired' $plan.State 'TEST-0030 collisions should require semantic review'
-    Assert-Equal 'AGENTS.md,.gitmodules' (@($plan.Collisions) -join ',') 'TEST-0030 collision paths should remain exact and deterministic'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'AdoptionReviewRequired' $plan.State 'TEST-0030 collisions should require semantic review'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'AGENTS.md,.gitmodules' (@($plan.Collisions) -join ',') 'TEST-0030 collision paths should remain exact and deterministic'
 
     $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1 `
         -ExistingProposalValid $true
-    Assert-Equal 'PendingAdoption' $plan.State 'TEST-0031 one pending adoption proposal should remain idempotent'
-    Assert-Equal 'None' $plan.ProposalMode 'TEST-0031 pending work must not be replaced'
-    Assert-Equal 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0130 pending work should retain its validated strategy identity'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'PendingAdoption' $plan.State 'TEST-0031 one pending adoption proposal should remain idempotent'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'None' $plan.ProposalMode 'TEST-0031 pending work must not be replaced'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'FreshAdoption' $plan.AdoptionStrategy 'TEST-0130 pending work should retain its validated strategy identity'
 
     $plan = Invoke-LifecyclePlan -RemoteBranchExists $true -OpenPullRequestCount 1
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0047 an unverified existing proposal must block'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0047 an unverified existing proposal must block'
 
     $plan = Invoke-LifecyclePlan -RemoteBranchExists $true
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 orphan adoption branch must block'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0031 orphan adoption branch must block'
 
     $plan = Invoke-LifecyclePlan -OpenPullRequestCount 1
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 PR without deterministic branch must block'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0031 PR without deterministic branch must block'
 
     $plan = Invoke-LifecyclePlan -ManifestExists $true
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 existing manifest ownership must block'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0031 existing manifest ownership must block'
 
     $plan = Invoke-LifecyclePlan -SeedWorkflowState 'Drifted'
-    Assert-Equal 'BlockedManualReview' $plan.State 'TEST-0031 seed workflow drift must block remote execution'
+    Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $plan.State 'TEST-0031 seed workflow drift must block remote execution'
 
     $manifestValidator = Get-Command -Name 'Test-MeAndAIExactAdoptionManifest' `
         -CommandType Function -ErrorAction SilentlyContinue
@@ -389,7 +387,7 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
                 ExistingProposalValid = $false
                 SourceGraph = $sourceGraph
             })
-        Assert-Equal 'BlockedManualReview' $surfaceDriftPlan.State `
+        Assert-MeAndAITestCollectedEqual -Context $failureContext 'BlockedManualReview' $surfaceDriftPlan.State `
             'TEST-0153 schema-3 lifecycle accepted a surface projection that differs from its source graph'
 
         $expectedCollisions = @('AGENTS.md')
@@ -1489,6 +1487,9 @@ if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     }
 }
 
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0080'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0145'
+
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
@@ -1587,6 +1588,7 @@ if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
         Add-Failure 'TEST-0128 workflow must bind the checked-out event and live default head before bootstrap mutation.'
     }
 }
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0027'
 
 if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
     $module = Get-Content -LiteralPath $modulePath -Raw
@@ -1727,14 +1729,25 @@ if (Test-Path -LiteralPath $protocolPath -PathType Leaf) {
         }
     }
 }
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0032'
 
-$adapterTestPath = Join-Path $root 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1'
+$adapterCaseOwner =
+    'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.case.ps1'
+$dispatchCaseOwner =
+    'tests/capabilities/initial-adoption/source-graph-dispatch.case.ps1'
+$adapterCaseTestIds = @(
+    'TEST-0028', 'TEST-0029', 'TEST-0030', 'TEST-0031',
+    'TEST-0057', 'TEST-0062', 'TEST-0068', 'TEST-0071',
+    'TEST-0077', 'TEST-0093', 'TEST-0094', 'TEST-0095',
+    'TEST-0127', 'TEST-0128', 'TEST-0153'
+)
+$adapterTestPath = Join-Path $root $adapterCaseOwner
 $dispatchTestPath = Join-Path $root `
-    'tests/capabilities/initial-adoption/source-graph-dispatch.fixture.ps1'
+    $dispatchCaseOwner
 $graphIdentityTestPath = Join-Path $root `
-    'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.fixture.ps1'
+    'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.case.ps1'
 $graphDriftTestPath = Join-Path $root `
-    'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.fixture.ps1'
+    'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.case.ps1'
 if (-not (Test-Path -LiteralPath $adapterTestPath -PathType Leaf)) {
     Add-Failure 'TEST-0028 missing bootstrap adapter integration tests.'
 }
@@ -1745,25 +1758,51 @@ elseif (-not (Test-Path -LiteralPath $dispatchTestPath -PathType Leaf) -or
 }
 elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
     $engine = (Get-Process -Id $PID).Path
-    & $engine -NoProfile -ExecutionPolicy Bypass -File $dispatchTestPath
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
+    $dispatchProcess = Invoke-MeAndAITestCaseProcess -EnginePath $engine `
+        -CasePath $dispatchTestPath
+    if ([int]$dispatchProcess.ExitCode -ne 0) {
+        @($dispatchProcess.Output) | ForEach-Object {
+            Write-Host ([string]$_)
+        }
+        exit ([int]$dispatchProcess.ExitCode)
     }
-    $adapterOutput = @(& $engine -NoProfile -ExecutionPolicy Bypass `
-        -File $adapterTestPath 2>&1 | ForEach-Object {
-            $line = [string]$_
-            if (-not $line.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
-                    [StringComparison]::Ordinal)) {
-                Write-Host $line
-            }
-            $line
-        })
-    $adapterExitCode = $LASTEXITCODE
-    if ($adapterExitCode -ne 0) {
-        exit $adapterExitCode
+    $dispatchRecord = Read-MeAndAICaseResultRecord `
+        -Output @($dispatchProcess.Output) -ExpectedSuite $suiteOwner `
+        -ExpectedCase $dispatchCaseOwner -ExpectedTestIds @('TEST-0153')
+    if (-not $dispatchRecord.Valid) {
+        Add-Failure "TEST-0153 source-graph dispatch Case evidence is invalid: $($dispatchRecord.Message)"
     }
+    @($dispatchProcess.Output | Where-Object {
+        -not ([string]$_).StartsWith(
+            'MEANDAI_CASE_RESULTS=', [StringComparison]::Ordinal
+        )
+    }) | ForEach-Object { Write-Host ([string]$_) }
+
+    $adapterProcess = Invoke-MeAndAITestCaseProcess -EnginePath $engine `
+        -CasePath $adapterTestPath
+    if ([int]$adapterProcess.ExitCode -ne 0) {
+        @($adapterProcess.Output) | ForEach-Object {
+            Write-Host ([string]$_)
+        }
+        exit ([int]$adapterProcess.ExitCode)
+    }
+    $adapterOutput = @($adapterProcess.Output)
+    $adapterRecord = Read-MeAndAICaseResultRecord -Output $adapterOutput `
+        -ExpectedSuite $suiteOwner -ExpectedCase $adapterCaseOwner `
+        -ExpectedTestIds $adapterCaseTestIds
+    if (-not $adapterRecord.Valid) {
+        Add-Failure "Bootstrap adapter Case evidence is invalid: $($adapterRecord.Message)"
+    }
+    @($adapterOutput | Where-Object {
+        $line = [string]$_
+        -not $line.StartsWith(
+            'MEANDAI_OPERATION_OBSERVATION=', [StringComparison]::Ordinal
+        ) -and -not $line.StartsWith(
+            'MEANDAI_CASE_RESULTS=', [StringComparison]::Ordinal
+        )
+    }) | ForEach-Object { Write-Host ([string]$_) }
     $adapterOperationLines = @($adapterOutput | Where-Object {
-        $_.StartsWith('MEANDAI_OPERATION_OBSERVATION=',
+        ([string]$_).StartsWith('MEANDAI_OPERATION_OBSERVATION=',
             [StringComparison]::Ordinal)
     })
     if ($adapterOperationLines.Count -ne 1) {
@@ -1775,13 +1814,15 @@ elseif ($failures.Count -eq 0 -and $Shard -cin @('All', 'VerticalSlices')) {
 }
 
 if ($Shard -ceq 'All' -and $failures.Count -eq 0) {
-    $scenarioResult = New-MeAndAILegacyScenarioResult `
-        -Owner 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1' `
-        -SourcePaths @(
-            $PSCommandPath, $adapterTestPath, $dispatchTestPath,
-            $graphIdentityTestPath, $graphDriftTestPath
-        ) `
-        -AuthorityPath $scenarioAuthorityPath
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0153'
+    foreach ($testId in @($adapterRecord.Record.passed | Where-Object {
+        [string]$_ -cne 'TEST-0153'
+    })) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+            -TestId ([string]$testId)
+    }
+    $scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
     $scenarioLine = 'MEANDAI_SCENARIO_RESULTS=' +
         ($scenarioResult | ConvertTo-Json -Compress)
     $operationRecord = Read-MeAndAITestOperationObservationRecord `

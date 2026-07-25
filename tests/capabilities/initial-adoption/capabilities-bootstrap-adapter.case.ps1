@@ -3,14 +3,28 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$caseOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.case.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$caseTestIds = @(
+    'TEST-0028', 'TEST-0029', 'TEST-0030', 'TEST-0031',
+    'TEST-0057', 'TEST-0062', 'TEST-0068', 'TEST-0071',
+    'TEST-0077', 'TEST-0093', 'TEST-0094', 'TEST-0095',
+    'TEST-0127', 'TEST-0128', 'TEST-0153'
+)
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$caseContext = New-MeAndAICaseEvidenceContext -SuiteOwner $suiteOwner `
+    -CaseOwner $caseOwner -TestIds $caseTestIds `
+    -AuthorityPath $scenarioAuthorityPath
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $capabilitiesModulePath = Join-Path $root `
     'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $graphIdentityFixturePath = Join-Path $PSScriptRoot `
-    'capabilities-bootstrap-graph-identity.fixture.ps1'
+    'capabilities-bootstrap-graph-identity.case.ps1'
 $graphDriftFixturePath = Join-Path $PSScriptRoot `
-    'capabilities-bootstrap-adapter-drift.fixture.ps1'
+    'capabilities-bootstrap-adapter-drift.case.ps1'
 $consumerMigrationModulePath = Join-Path $root `
     'scripts/MeAndAI.ConsumerMigrations.psm1'
 $consumerMigrationIndexPath = Join-Path $root 'migrations/index.json'
@@ -117,20 +131,15 @@ function Get-FixtureInstructionGraphIdentity {
             -PathType Leaf)) {
         throw 'The TEST-0153 isolated graph-identity fixture is missing.'
     }
-    $engine = (Get-Process -Id $PID).Path
-    $previousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    try {
-        $script:BootstrapFixtureOperations.GraphChildProcess++
-        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
-            -File $graphIdentityFixturePath -Repository $Repository `
-            -Commit $Commit -ModulePath $capabilitiesModulePath 2>&1)
-        $exitCode = $LASTEXITCODE
-    }
-    finally { $ErrorActionPreference = $previousPreference }
-    if ($exitCode -ne 0) {
-        throw "The TEST-0153 isolated graph-identity fixture failed: $($output -join [Environment]::NewLine)"
-    }
+    $execution = Invoke-BootstrapChildCase `
+        -CasePath $graphIdentityFixturePath `
+        -CaseOwner 'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.case.ps1' `
+        -Arguments @(
+            '-Repository', $Repository,
+            '-Commit', $Commit,
+            '-ModulePath', $capabilitiesModulePath
+        )
+    $output = @($execution.Output)
     $records = @($output | Where-Object {
         [string]$_ -like 'MEANDAI_TEST_GRAPH_IDENTITY=*'
     })
@@ -142,6 +151,36 @@ function Get-FixtureInstructionGraphIdentity {
     ) | ConvertFrom-Json
 }
 
+function Invoke-BootstrapChildCase {
+    param(
+        [Parameter(Mandatory)][string]$CasePath,
+        [Parameter(Mandatory)][string]$CaseOwner,
+        [Parameter(Mandatory)][string[]]$Arguments
+    )
+
+    $engine = (Get-Process -Id $PID).Path
+    $script:BootstrapFixtureOperations.GraphChildProcess++
+    $process = Invoke-MeAndAITestCaseProcess -EnginePath $engine `
+        -CasePath $CasePath -Arguments $Arguments
+    if ([int]$process.ExitCode -ne 0) {
+        throw "Bootstrap child Case '$CaseOwner' failed: $(@($process.Output) -join [Environment]::NewLine)"
+    }
+    $record = Read-MeAndAICaseResultRecord -Output @($process.Output) `
+        -ExpectedSuite $suiteOwner -ExpectedCase $CaseOwner `
+        -ExpectedTestIds @('TEST-0153')
+    if (-not $record.Valid) {
+        throw "Bootstrap child Case '$CaseOwner' returned invalid evidence: $($record.Message)"
+    }
+    return [pscustomobject]@{
+        Output = @($process.Output | Where-Object {
+            -not ([string]$_).StartsWith(
+                'MEANDAI_CASE_RESULTS=', [StringComparison]::Ordinal
+            )
+        })
+        Record = $record.Record
+    }
+}
+
 function Invoke-IsolatedGraphDriftFixture {
     param(
         [Parameter(Mandatory)]$Fixture,
@@ -151,28 +190,27 @@ function Invoke-IsolatedGraphDriftFixture {
     if (-not (Test-Path -LiteralPath $graphDriftFixturePath -PathType Leaf)) {
         throw 'The TEST-0153 isolated adapter-drift fixture is missing.'
     }
-    $engine = (Get-Process -Id $PID).Path
     $encodedIdentity = [Convert]::ToBase64String(
         [Text.UTF8Encoding]::new($false).GetBytes(
             $SourceGraphIdentityJson
         )
     )
-    $previousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
     try {
-        $script:BootstrapFixtureOperations.GraphChildProcess++
         $script:BootstrapFixtureOperations.GraphIsolatedAcquisition++
-        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
-            -File $graphDriftFixturePath -AdapterPath $adapterPath `
-            -Workspace ([string]$Fixture.Consumer) `
-            -SourceGraphIdentityBase64 $encodedIdentity 2>&1)
-        $exitCode = $LASTEXITCODE
+        $execution = Invoke-BootstrapChildCase `
+            -CasePath $graphDriftFixturePath `
+            -CaseOwner 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.case.ps1' `
+            -Arguments @(
+                '-AdapterPath', $adapterPath,
+                '-Workspace', ([string]$Fixture.Consumer),
+                '-SourceGraphIdentityBase64', $encodedIdentity
+            )
+        $output = @($execution.Output)
     }
-    finally { $ErrorActionPreference = $previousPreference }
-    if ($exitCode -ne 0) {
+    catch {
         return [pscustomobject]@{
             Threw = $false
-            Error = $output -join [Environment]::NewLine
+            Error = $_.Exception.Message
         }
     }
     $records = @($output | Where-Object {
@@ -198,29 +236,28 @@ function Invoke-IsolatedGraphSuccessFixture {
         [Parameter(Mandatory)][string]$SourceGraphIdentityJson
     )
 
-    $engine = (Get-Process -Id $PID).Path
     $encodedIdentity = [Convert]::ToBase64String(
         [Text.UTF8Encoding]::new($false).GetBytes(
             $SourceGraphIdentityJson
         )
     )
-    $previousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
     try {
-        $script:BootstrapFixtureOperations.GraphChildProcess++
         $script:BootstrapFixtureOperations.GraphIsolatedAcquisition++
-        $output = @(& $engine -NoProfile -ExecutionPolicy Bypass `
-            -File $graphDriftFixturePath -AdapterPath $adapterPath `
-            -Workspace ([string]$Fixture.Consumer) `
-            -SourceGraphIdentityBase64 $encodedIdentity `
-            -ExpectSuccess 2>&1)
-        $exitCode = $LASTEXITCODE
+        $execution = Invoke-BootstrapChildCase `
+            -CasePath $graphDriftFixturePath `
+            -CaseOwner 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.case.ps1' `
+            -Arguments @(
+                '-AdapterPath', $adapterPath,
+                '-Workspace', ([string]$Fixture.Consumer),
+                '-SourceGraphIdentityBase64', $encodedIdentity,
+                '-ExpectSuccess'
+            )
+        $output = @($execution.Output)
     }
-    finally { $ErrorActionPreference = $previousPreference }
-    if ($exitCode -ne 0) {
+    catch {
         return [pscustomobject]@{
             Threw = $true
-            Error = $output -join [Environment]::NewLine
+            Error = $_.Exception.Message
             PullRequestBody = ''
         }
     }
@@ -1846,6 +1883,7 @@ try {
             Add-Failure "TEST-0153 hosted adapter accepted $($entry.Key) or mutated proposal state before rejecting it: $($result.Error)"
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0153'
 
     $global:PullRequestExists = $false
     $global:ExistingPullRequestBody = ''
@@ -1896,6 +1934,7 @@ try {
             }
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0077'
 
     foreach ($autoRuleCase in @(
         [pscustomobject]@{
@@ -2284,6 +2323,8 @@ try {
             Add-Failure 'TEST-0176 fresh hosted proposal did not link its source commit and transient manifest to exact immutable targets.'
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0028'
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0093'
 
     if (-not $result.Threw) {
         $completedBranch = 'automation/meandai-capabilities-v0.5.0'
@@ -2330,6 +2371,7 @@ try {
             [string]$global:ExistingPullRequestBody -cne $completedBody) {
             Add-Failure "TEST-0071 exact completed non-draft proposal was not retained without mutation: $($result.Error)"
         }
+        Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0071'
 
         if (-not $result.Threw) {
             $canonicalCompletedBody = [string]$global:ExistingPullRequestBody
@@ -2609,6 +2651,7 @@ try {
             }
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0094'
 
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
@@ -2659,6 +2702,7 @@ try {
             Add-Failure 'TEST-0029 application content changed in the bootstrap branch.'
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0029'
 
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
@@ -2710,6 +2754,7 @@ try {
             Add-Failure 'TEST-0127 module-recognized assessment path was omitted by an adapter-side prefilter.'
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0127'
 
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
@@ -2790,6 +2835,8 @@ try {
         $caseCollisionBranch.Count -ne 0) {
         Add-Failure "TEST-0030/TEST-0095 case-variant managed target was not rejected without proposal mutation: $($result.Error)"
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0030'
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0095'
 
     $global:PullRequestExists = $false
     $manifestCollision = New-BootstrapFixture -Name 'manifest-collision' -AddManifestCollision $true
@@ -2888,6 +2935,7 @@ try {
         $result.Error -notlike '*post-publication validation*') {
         Add-Failure "TEST-0057 post-create head race must block: $($result.Error)"
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0057'
     $global:ExistingPullRequestMetadataMode = 'Valid'
 
     $global:PullRequestExists = $false
@@ -2912,6 +2960,7 @@ try {
         $remainingBaseRaceBranch.Count -ne 0) {
         Add-Failure "TEST-0128 default-branch race was not exactly compensated: $($result.Error)"
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0128'
     $global:AdvanceDefaultBranchOnCreate = $false
 
     $global:PullRequestExists = $false
@@ -3043,6 +3092,7 @@ try {
             }
         }
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0062'
 
     $global:PullRequestExists = $false
     $global:PullRequestCreateCalls = 0
@@ -3087,6 +3137,7 @@ try {
     if (-not $result.Threw -or $result.Error -notlike '*orphan*manual review*') {
         Add-Failure "TEST-0031 orphan adoption branch must block: $($result.Error)"
     }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0031'
 }
 finally {
     Remove-Item Function:\gh -ErrorAction SilentlyContinue
@@ -3129,6 +3180,7 @@ finally {
         }
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0068'
 
 if ($failures.Count -gt 0) {
     Write-Host "AI capabilities bootstrap adapter tests failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -3170,3 +3222,6 @@ $operationLine = Format-MeAndAITestOperationObservation `
     -Runtime $operationExpectation.Runtime -Counters $operationCounters
 Write-Host 'AI capabilities bootstrap adapter tests passed for all declared scenarios in this suite.' -ForegroundColor Green
 Write-Host $operationLine
+$caseResult = New-MeAndAICaseResult -Context $caseContext
+Write-Host ('MEANDAI_CASE_RESULTS=' +
+    ($caseResult | ConvertTo-Json -Compress))

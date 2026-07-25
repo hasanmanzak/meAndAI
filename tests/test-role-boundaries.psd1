@@ -29,32 +29,15 @@
     )
     Cases = @(
         'tests/capabilities/consumer-update/protocol-update-adapter.case.ps1'
+        'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.case.ps1'
+        'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.case.ps1'
+        'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.case.ps1'
+        'tests/capabilities/initial-adoption/source-graph-dispatch.case.ps1'
     )
     InertFixtures = @(
         'tests/capabilities/test-architecture/fixtures/helper-ownership/helper-ownership.psd1.fixture'
     )
-    TransitionalExecutableFixtures = @(
-        @{
-            Path = 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1'
-            Role = 'Case'
-            RemovalSlice = 'SUBF-0098'
-        }
-        @{
-            Path = 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.fixture.ps1'
-            Role = 'Case'
-            RemovalSlice = 'SUBF-0098'
-        }
-        @{
-            Path = 'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.fixture.ps1'
-            Role = 'Case'
-            RemovalSlice = 'SUBF-0098'
-        }
-        @{
-            Path = 'tests/capabilities/initial-adoption/source-graph-dispatch.fixture.ps1'
-            Role = 'Case'
-            RemovalSlice = 'SUBF-0098'
-        }
-    )
+    TransitionalExecutableFixtures = @()
     ReviewedInertExceptions = @(
         @{
             Path = 'tests/capabilities/consumer-update/fixtures/legacy-pre-engine-consumer/Verify-MeAndAIAdoption.ps1'
@@ -88,7 +71,6 @@
         }
     )
     LegacyScenarioEvidenceOwners = @(
-        'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
         'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
     )
     Examples = @(

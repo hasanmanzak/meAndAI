@@ -5,6 +5,14 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$caseOwner = 'tests/capabilities/initial-adoption/source-graph-dispatch.case.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$caseContext = New-MeAndAICaseEvidenceContext -SuiteOwner $suiteOwner `
+    -CaseOwner $caseOwner -TestIds @('TEST-0153') `
+    -AuthorityPath $scenarioAuthorityPath
 $protocolReleasePath = Join-Path $root `
     'scripts/quick-adoption/Private/ProtocolReleaseAndAssets.ps1'
 $proposalOwnershipPath = Join-Path $root `
@@ -243,3 +251,7 @@ finally {
 }
 
 Write-Host 'TEST-0153 current/legacy dispatch and actual quick-wrapper callback passed.' -ForegroundColor Green
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0153'
+$caseResult = New-MeAndAICaseResult -Context $caseContext
+Write-Host ('MEANDAI_CASE_RESULTS=' +
+    ($caseResult | ConvertTo-Json -Compress))

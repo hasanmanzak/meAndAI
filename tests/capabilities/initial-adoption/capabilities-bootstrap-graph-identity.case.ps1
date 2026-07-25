@@ -7,6 +7,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$caseOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity.case.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$caseContext = New-MeAndAICaseEvidenceContext -SuiteOwner $suiteOwner `
+    -CaseOwner $caseOwner -TestIds @('TEST-0153') `
+    -AuthorityPath $scenarioAuthorityPath
 $testGitBatchPath = Join-Path $PSScriptRoot `
     '../../infrastructure/MeAndAI.TestGitBatch.psm1'
 Import-Module $testGitBatchPath -Force
@@ -122,3 +131,7 @@ if ($null -ne $cleanupError) { throw $cleanupError }
 $identity = & $identityGetter -Graph $graph
 Write-Output ('MEANDAI_TEST_GRAPH_IDENTITY=' +
     ($identity | ConvertTo-Json -Depth 30 -Compress))
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0153'
+$caseResult = New-MeAndAICaseResult -Context $caseContext
+Write-Output ('MEANDAI_CASE_RESULTS=' +
+    ($caseResult | ConvertTo-Json -Compress))

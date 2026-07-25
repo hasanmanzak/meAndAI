@@ -136,8 +136,8 @@ foreach ($path in @($contract.InertFixtures | ForEach-Object { [string]$_ })) {
 }
 
 $transitionalEntries = @($contract.TransitionalExecutableFixtures)
-Assert-MeAndAITestEqual -Actual $transitionalEntries.Count -Expected 4 `
-    -Message 'The SUBF-0098 transitional fixture debt must contain exactly four paths.'
+Assert-MeAndAITestEqual -Actual $transitionalEntries.Count -Expected 0 `
+    -Message 'The executable-fixture transition debt must remain empty after the bootstrap migration.'
 foreach ($entry in $transitionalEntries) {
     Assert-MeAndAITestEqual -Actual ([string]$entry.Role) -Expected 'Case' `
         -Message "Transitional source '$($entry.Path)' has the wrong semantic role."
@@ -205,8 +205,8 @@ Assert-MeAndAITestSequenceEqual -Actual $actualFixtureSources `
     -Value @($contract.LegacyScenarioEvidenceOwners | ForEach-Object {
         [string]$_
     }))
-Assert-MeAndAITestEqual -Actual $expectedLegacyOwners.Count -Expected 2 `
-    -Message 'Legacy scenario evidence must have exactly two hotspot owners.'
+Assert-MeAndAITestEqual -Actual $expectedLegacyOwners.Count -Expected 1 `
+    -Message 'Legacy scenario evidence must have exactly one remaining hotspot owner.'
 
 $legacyOwners = [System.Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal
