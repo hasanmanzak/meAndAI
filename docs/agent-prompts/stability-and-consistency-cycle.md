@@ -60,6 +60,18 @@ Trigger gate
    new failed evidence, stop without scanning or changing the tree. Report
    Waiting and the absent trigger.
 
+Prior-art and recurrence gate
+1. Before choosing a tool or correction, inspect active project-memory
+   recurrence knowledge and canonical prior evidence for the affected contract.
+   Record the matching current entry or explicit None.
+2. Identify the canonical owner and every same-contract sibling surface before
+   mutation. Similar names alone are not shared-contract evidence.
+3. Do not repeat an unchanged failed operation without new evidence that changes
+   its failed precondition or an explicit retry contract. Use a materially
+   different verified route, or report Blocked with the retained evidence.
+4. A correction must end with an executable recurrence barrier or a reviewed
+   NotApplicable rationale. Memory remains routing evidence only.
+
 Initial scan and triage
 1. Scan the entire declared tracked-project scope at the highest practical
    detail. Cover the concerns required by the applicable normative sources, and
@@ -83,7 +95,8 @@ Correction cycle
 2. For each correction, implement the smallest coherent solution, run focused
    tests and other relevant verification, and perform a fresh-diff self-review
    before starting the next independent queue item. Record the solution,
-   commands, results, review scope, and disposition of every review observation.
+   commands, results, applicable prior-art and recurrence gate outcome, review
+   scope, and disposition of every review observation.
 3. A Blocking finding caused or exposed by the correction remains in this
    cycle. Fix it in the current correction when coherent; otherwise add it to
    the queue with dependencies and priority. Do not relabel current-change debt

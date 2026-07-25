@@ -52,7 +52,7 @@
 | [FEAT-0048](FEAT-0048-v0143-shared-merge-evidence/README.md) | [Shared API-2026 merge evidence](FEAT-0048-v0143-shared-merge-evidence/README.md) | Complete; publication evidence reopened | 0.14.3 |
 | [FEAT-0049](FEAT-0049-v0144-paged-array-response-normalization/README.md) | [Paged GitHub array response normalization](FEAT-0049-v0144-paged-array-response-normalization/README.md) | Complete | 0.14.4 |
 | [FEAT-0050](FEAT-0050-v0145-bare-document-basename-links/README.md) | [Exact bare document basename links](FEAT-0050-v0145-bare-document-basename-links/README.md) | Complete | 0.14.5 |
-| [FEAT-0051](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | [Recurrence prevention and modular test harness](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | Proposed | 0.15.0 |
+| [FEAT-0051](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | [Recurrence prevention and modular test harness](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | Complete | 0.15.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

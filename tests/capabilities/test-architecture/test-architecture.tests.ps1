@@ -4,18 +4,21 @@ param()
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/test-architecture/test-architecture.tests.ps1'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $runtimeModulePath = Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$testContextModulePath = Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 Import-Module $runtimeModulePath -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module $testContextModulePath -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
-
+$test0137FailureCount = $failures.Count
 $suites = @(Get-MeAndAITestSuite -RepositoryRoot $root)
 $ownerSet = [System.Collections.Generic.HashSet[string]]::new(
     [System.StringComparer]::Ordinal
@@ -43,7 +46,12 @@ foreach ($entry in @($authority.Authorities | Where-Object {
         Add-Failure "TEST-0137 executable scenario authority is not a nested canonical suite: $($entry.Owner)."
     }
 }
+if ($failures.Count -eq $test0137FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0137'
+}
 
+$test0138FailureCount = $failures.Count
 $runnerPath = Join-Path $root 'tests/protocol.tests.ps1'
 $runnerLines = @(Get-Content -LiteralPath $runnerPath)
 $runnerSource = $runnerLines -join "`n"
@@ -84,6 +92,7 @@ if (-not $runtimeSource.Contains('& $EnginePath @processArguments') -or
     Add-Failure 'TEST-0138 canonical suites are not executed through one isolated child process each.'
 }
 
+$test0144FailureCount = $failures.Count
 $runtimeFixtureRoot = Join-Path ([IO.Path]::GetTempPath()) `
     ('meandai-test-runtime-' + [guid]::NewGuid().ToString('N'))
 try {
@@ -197,6 +206,10 @@ finally {
             -ErrorAction SilentlyContinue
     }
 }
+if ($failures.Count -eq $test0144FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0144'
+}
 $governanceSource = Get-Content -LiteralPath (Join-Path $root `
     'tests/capabilities/protocol-governance/protocol-governance.tests.ps1') -Raw
 if ($governanceSource.Contains('function Compare-ExactScenarioIds') -or
@@ -219,18 +232,7 @@ $adapterFixturePaths = @($adapterFixtures | ForEach-Object {
     $_.FullName.Substring($root.Length + 1).Replace('\', '/')
 })
 [Array]::Sort($adapterFixturePaths, [StringComparer]::Ordinal)
-$expectedAdapterFixturePaths = @(
-    ('tests/capabilities/consumer-update/protocol-update-adapter' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/capabilities-bootstrap-graph-identity' +
-        '.fixture.ps1'),
-    ('tests/capabilities/initial-adoption/source-graph-dispatch' +
-        '.fixture.ps1')
-)
+$expectedAdapterFixturePaths = @()
 if (($adapterFixturePaths -join "`0") -cne
     ($expectedAdapterFixturePaths -join "`0") -or
     @($adapterFixturePaths | Where-Object {
@@ -256,6 +258,10 @@ if ($LASTEXITCODE -ne 0 -or $shellFixtureBlob.Count -ne 1 -or
     [string]$shellFixtureIndex[0] -cnotmatch '^100755 7a1d8a42cc0492ff1511a31da6f44c389a3bf279 0\s+') {
     Add-Failure 'TEST-0138 relocated shell fixture lost its executable mode or exact bytes.'
 }
+if ($failures.Count -eq $test0138FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0138'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Test-architecture validation failed with $($failures.Count) problem(s):" `
@@ -264,8 +270,6 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/test-architecture/test-architecture.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $authorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host 'Test-architecture topology and isolation contracts passed.' -ForegroundColor Green
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

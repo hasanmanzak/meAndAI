@@ -3,6 +3,58 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.0 - 2026-07-25
+
+### Added
+
+- Add a required recurrence and prior-solution gate with freshness,
+  supersession, unsafe-retry, sibling-owner, executable-barrier, and delegated
+  task-handoff contracts.
+- Append the immutable `test-harness-modularity` semantic capability without
+  rewriting the three predecessor capability definitions or compatible
+  terminal ledgers.
+- Add exact runtime Case evidence and fail-closed missing, unexpected,
+  duplicate, inferred, unexecuted, failed, and finalized-context coverage.
+
+### Changed
+
+- Give contract-equivalent assertions, content identity, repository evidence,
+  Markdown/link parsing, and test-context mechanics one declared canonical
+  owner while leaving capability semantics local.
+- Separate runner, harness, executable case, capability support, fixture, and
+  mock roles; migrate the protocol-update, bootstrap, and quick-adoption
+  hotspots without changing their active TEST identities or workflow topology.
+- Preserve the existing hosted runner graph and approved operation budgets;
+  validation remains capability-focused with one final full-suite gate.
+
+### Fixed
+
+- Route explicit and structurally detected bare test repositories through the
+  canonical `--git-dir` owner so `safe.bareRepository=explicit` cannot create
+  false fixture failures.
+- Retain module-owned canonical test commands for their exact suite lifetime
+  and fail before dependent proposal mutation when a prerequisite does not
+  preserve its exact head identity.
+- Capture reusable-fixture owner identity once from the lexical suite path so
+  nested script lifecycles cannot create false input drift.
+- Bind canonical sibling dependencies into isolated production-function
+  harnesses instead of asserting or recreating obsolete inline mechanics.
+- Link human-facing checkpoint SHAs to exact full-SHA commit permalinks and
+  keep non-commit object identities out of commit-reference syntax.
+- Propagate applicable active recurrence safe routes and unsafe retry
+  boundaries into delegated repository tasks so a later agent does not repeat
+  a confirmed tooling failure from inherited context alone.
+- Replace source-substring scenario inference and legacy evidence adapters with
+  exact context-bound runtime confirmation.
+
+Related work: [FEAT-0051](docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md),
+[DEC-0029](docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md),
+[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124),
+[issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
+[issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
+[issue #127](https://github.com/hasanmanzak/meAndAI/issues/127), and
+[issue #128](https://github.com/hasanmanzak/meAndAI/issues/128).
+
 ## 0.14.5 - 2026-07-25
 
 ### Fixed

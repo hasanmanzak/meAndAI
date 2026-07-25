@@ -1,0 +1,9 @@
+function Assert-SyntheticCondition {
+    param([bool]$Condition)
+    if (-not $Condition) { throw 'Synthetic assertion failed.' }
+}
+
+function Complete-SyntheticResult {
+    param($Context)
+    return [ordered]@{ passed = @($Context.Passed) }
+}

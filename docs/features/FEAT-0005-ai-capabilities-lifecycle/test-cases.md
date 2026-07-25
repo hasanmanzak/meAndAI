@@ -2,7 +2,7 @@
 
 Implementations:
 `tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1`,
-`tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1`, and the existing
+`tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.case.ps1`, and the existing
 repository/updater suites.
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

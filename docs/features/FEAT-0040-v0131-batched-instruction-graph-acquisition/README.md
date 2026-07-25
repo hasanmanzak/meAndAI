@@ -245,7 +245,7 @@ The production correction applies to
 `RepositoryAssessment.ps1` and
 `Invoke-MeAndAICapabilitiesBootstrap.ps1`. Independent test readers in
 `quick-adoption.tests.ps1`,
-`capabilities-bootstrap-graph-identity.fixture.ps1`, and
+`capabilities-bootstrap-graph-identity.case.ps1`, and
 `instruction-graph-discovery.tests.ps1` deliberately do not call the
 production reader to calculate expected evidence. `SUBF-0079` replaced their
 material per-blob subprocess loops with separate test-owned binary batch

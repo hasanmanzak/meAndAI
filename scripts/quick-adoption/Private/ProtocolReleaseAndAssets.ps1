@@ -367,7 +367,7 @@ function Get-CanonicalProtocolAsset {
     catch {
         throw "Canonical protocol asset '$TemplatePath' contains invalid base64 content."
     }
-    $actualSha = Get-GitBlobSha -Bytes $bytes
+    $actualSha = & $script:GetQuickAdoptionGitBlobSha1 -Bytes $bytes
     if ($actualSha -cne ([string]$response.sha).ToLowerInvariant()) {
         throw "Canonical protocol asset '$TemplatePath' failed Git blob verification."
     }
@@ -479,7 +479,7 @@ function Import-CanonicalInitialAdoptionPolicy {
         if ($null -eq $graphLimits -or $graphLimits -is [array] -or
             [long]$graphLimits.MaximumTreeEntries -ne 65536 -or
             [long]$graphLimits.MaximumTreePathUtf8Bytes -ne 4194304 -or
-            [long]$graphLimits.MaximumNodes -ne 256 -or
+            [long]$graphLimits.MaximumNodes -ne 512 -or
             [long]$graphLimits.MaximumEdges -ne 4096 -or
             [long]$graphLimits.MaximumDepth -ne 32 -or
             [long]$graphLimits.MaximumBlobBytes -ne 262144 -or
@@ -818,7 +818,8 @@ function Write-CanonicalWorkflow {
     [IO.Directory]::CreateDirectory($directory) | Out-Null
     if (Test-Path -LiteralPath $Path -PathType Leaf) {
         $current = [IO.File]::ReadAllBytes($Path)
-        if (-not (Test-ByteArrayEqual -Left $current -Right $Bytes)) {
+        if (-not (& $script:TestQuickAdoptionByteArrayEqual `
+            -Left $current -Right $Bytes)) {
             throw "The existing '$workflowTargetPath' differs from the canonical $ProtocolTag seed; it was not overwritten."
         }
         return $false

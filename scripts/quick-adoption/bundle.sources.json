@@ -5,6 +5,7 @@
   "sources": [
     "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
     "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1",
+    "MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1",
     "MeAndAI.QuickAdoption/Private/Configuration.ps1",
     "MeAndAI.QuickAdoption/Private/OutputAndNativeProcess.ps1",
     "MeAndAI.QuickAdoption/Private/RepositoryAssessment.ps1",

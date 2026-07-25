@@ -1,0 +1,5 @@
+function Outer-Test0184 {
+    function Add-Failure {
+        param([string]$Message)
+    }
+}

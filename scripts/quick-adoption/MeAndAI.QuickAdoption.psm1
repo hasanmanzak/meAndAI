@@ -1,6 +1,27 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+$contentIdentityCandidates = @(@(
+    (Join-Path $PSScriptRoot 'MeAndAI.ContentIdentity.psm1'),
+    (Join-Path (Split-Path -Parent $PSScriptRoot) 'MeAndAI.ContentIdentity.psm1')
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf })
+if ($contentIdentityCandidates.Count -ne 1) {
+    throw 'Quick-adoption requires one unambiguous canonical content-identity module.'
+}
+$contentIdentityModule = @(Import-Module `
+    $contentIdentityCandidates[0] -Force -PassThru)
+if ($contentIdentityModule.Count -ne 1 -or
+    $null -eq $contentIdentityModule[0].ExportedCommands['Get-MeAndAIGitBlobSha1'] -or
+    $null -eq $contentIdentityModule[0].ExportedCommands['Test-MeAndAIByteArrayEqual']) {
+    throw 'Quick-adoption could not load the canonical Git blob identity contract.'
+}
+$script:GetQuickAdoptionGitBlobSha1 = $contentIdentityModule[0].ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
+$script:TestQuickAdoptionByteArrayEqual = $contentIdentityModule[0].ExportedCommands[
+    'Test-MeAndAIByteArrayEqual'
+].ScriptBlock
+
 $sourceFiles = @(
     'Private/Configuration.ps1',
     'Private/OutputAndNativeProcess.ps1',

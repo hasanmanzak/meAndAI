@@ -8,6 +8,15 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+$root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
+$caseOwner = 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift.case.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$caseContext = New-MeAndAICaseEvidenceContext -SuiteOwner $suiteOwner `
+    -CaseOwner $caseOwner -TestIds @('TEST-0153') `
+    -AuthorityPath $scenarioAuthorityPath
 
 if (-not (Test-Path -LiteralPath $AdapterPath -PathType Leaf) -or
     -not (Test-Path -LiteralPath $Workspace -PathType Container)) {
@@ -92,6 +101,7 @@ foreach ($name in @(
     $savedEnvironment[$name] = [Environment]::GetEnvironmentVariable($name)
 }
 $savedLocation = Get-Location
+$resultOutput = ''
 try {
     $env:GITHUB_REPOSITORY = 'owner/consumer'
     $env:GITHUB_WORKSPACE = $Workspace
@@ -105,22 +115,24 @@ try {
     }
     catch {
         if ($ExpectSuccess) { throw }
-        Write-Output ('MEANDAI_TEST_GRAPH_REJECTION=' +
-            $_.Exception.Message)
-        exit 0
+        $resultOutput = 'MEANDAI_TEST_GRAPH_REJECTION=' +
+            $_.Exception.Message
     }
-    if (-not $ExpectSuccess) {
+    if (-not $ExpectSuccess -and [string]::IsNullOrEmpty($resultOutput)) {
         throw 'The TEST-0153 hosted adapter accepted a drifted graph identity.'
     }
-    if (-not $global:Test0153CreatedPullRequest) {
+    if ($ExpectSuccess -and -not $global:Test0153CreatedPullRequest) {
         throw 'The TEST-0153 hosted adapter did not create its exact proposal.'
     }
-    Write-Output ('MEANDAI_TEST_PROPOSAL_BODY_BASE64=' +
-        [Convert]::ToBase64String(
-            [Text.UTF8Encoding]::new($false).GetBytes(
-                $global:Test0153CreatedPullRequestBody
+    if ($ExpectSuccess) {
+        $resultOutput = 'MEANDAI_TEST_PROPOSAL_BODY_BASE64=' +
+            [Convert]::ToBase64String(
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    $global:Test0153CreatedPullRequestBody
+                )
             )
-        ))
+    }
+    Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0153'
 }
 finally {
     Remove-Item Function:\global:gh -ErrorAction SilentlyContinue
@@ -135,3 +147,7 @@ finally {
         [Environment]::SetEnvironmentVariable($entry.Key, $entry.Value)
     }
 }
+Write-Output $resultOutput
+$caseResult = New-MeAndAICaseResult -Context $caseContext
+Write-Output ('MEANDAI_CASE_RESULTS=' +
+    ($caseResult | ConvertTo-Json -Compress))

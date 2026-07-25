@@ -189,8 +189,14 @@ try {
             $bundlePath.Contains('\') -or -not $seenPaths.Add($bundlePath)) {
             throw "Bundle source path '$bundlePath' is unsafe or duplicated."
         }
-        $sourceRelativePath = 'scripts/quick-adoption/' +
-            $bundlePath.Substring('MeAndAI.QuickAdoption/'.Length)
+        $sourceRelativePath = if ($bundlePath -ceq
+            'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
+            'scripts/MeAndAI.ContentIdentity.psm1'
+        }
+        else {
+            'scripts/quick-adoption/' +
+                $bundlePath.Substring('MeAndAI.QuickAdoption/'.Length)
+        }
         $sourcePath = Join-Path $resolvedSourceRoot `
             ($sourceRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
         $item = Get-Item -LiteralPath $sourcePath -Force -ErrorAction Stop

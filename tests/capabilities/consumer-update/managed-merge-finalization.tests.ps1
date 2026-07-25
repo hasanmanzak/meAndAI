@@ -5,10 +5,24 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $adapterPath = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 $workflowPath = Join-Path $root 'templates/project/.github/workflows/meandai-protocol-update.yml'
+$owner = 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
+$contentIdentityModule = @(Import-Module `
+    (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getSha256Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAISha256'
+].ScriptBlock
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $outerSummaryPath = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-finalization-outer-$([guid]::NewGuid().ToString('N')).md"
 $outerSummarySentinel = 'outer-summary-sentinel'
@@ -30,11 +44,6 @@ $testManagedAssets = @(
 )
 $testMigrationCatalog = Import-MeAndAIConsumerMigrationCatalog `
     -IndexPath (Join-Path $root 'migrations/index.json')
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
 
 function ConvertTo-TestBase64Json {
     param($InputObject)
@@ -66,21 +75,13 @@ function Get-TestPathSetSha256 {
     }
 }
 
-function Get-TestSha256Text {
+function Get-TestTextDigest {
     param([Parameter(Mandatory)][string]$Text)
 
-    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($Text)
-    $algorithm = [Security.Cryptography.SHA256]::Create()
-    try {
-        return ([BitConverter]::ToString($algorithm.ComputeHash($bytes))).Replace(
-            '-', ''
-        ).ToLowerInvariant()
-    }
-    finally {
-        $algorithm.Dispose()
-    }
+    return & $getSha256Action -Bytes (
+        [Text.UTF8Encoding]::new($false).GetBytes($Text)
+    )
 }
-
 function Get-TestLinkedPathDigest {
     param([Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Paths)
 
@@ -92,7 +93,7 @@ function Get-TestLinkedPathDigest {
             "$([Text.Encoding]::UTF8.GetByteCount($path))`:$path`n"
         )
     }
-    return Get-TestSha256Text -Text $builder.ToString()
+    return Get-TestTextDigest -Text $builder.ToString()
 }
 
 function Get-TestSha1 {
@@ -107,16 +108,6 @@ function Get-TestSha1 {
     finally {
         $algorithm.Dispose()
     }
-}
-
-function Get-TestGitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    return Get-TestSha1 -Bytes $payload
 }
 
 function Get-TestSha1Text {
@@ -177,7 +168,7 @@ function Add-TestGitCommit {
         }
 
         $bytes = [byte[]]$entry.Bytes
-        $sha = Get-TestGitBlobSha -Bytes $bytes
+        $sha = & $getGitBlobSha1Action -Bytes $bytes
         if ($Graph.Blobs.ContainsKey($sha)) {
             $existing = [byte[]]$Graph.Blobs[$sha]
             if ($existing.Length -ne $bytes.Length) {
@@ -294,7 +285,8 @@ function Get-TestTargetProtocolEntries {
     $entries = [System.Collections.Generic.List[object]]::new()
     foreach ($path in @(
         'migrations/index.json',
-        'scripts/MeAndAI.ConsumerMigrations.psm1'
+        'scripts/MeAndAI.ConsumerMigrations.psm1',
+        'scripts/MeAndAI.ContentIdentity.psm1'
     ) + @($testMigrationCatalog.Migrations | ForEach-Object {
         "migrations/$([string]$_.Definition)"
     }) + @($testManagedAssets | ForEach-Object { [string]$_.TemplatePath })) {
@@ -330,6 +322,7 @@ function New-FinalizationScenario {
         [bool]$WrongLegacyAssetBlob = $false,
         [bool]$FabricatedSchema2Output = $false,
         [bool]$RecoveryBranch = $false,
+        [switch]$MissingContentIdentity,
         [switch]$MissingCreatedIssueUser
     )
 
@@ -351,8 +344,14 @@ function New-FinalizationScenario {
     else { '' }
 
     $protocolGraph = New-TestGitGraph
+    $protocolEntries = @(Get-TestTargetProtocolEntries)
+    if ($MissingContentIdentity) {
+        $protocolEntries = @($protocolEntries | Where-Object {
+            [string]$_.Path -cne 'scripts/MeAndAI.ContentIdentity.psm1'
+        })
+    }
     Add-TestGitCommit -Graph $protocolGraph -Commit $protocolSha `
-        -Entries (Get-TestTargetProtocolEntries)
+        -Entries $protocolEntries
 
     $targetManagedEntries = @(Get-TestTargetManagedConsumerEntries)
     $baseEntries = [System.Collections.Generic.List[object]]::new()
@@ -557,7 +556,7 @@ function New-FinalizationScenario {
             "graphDigest=$(if ($AdoptionSchema -in @(7, 9)) { 'c' * 64 } else { '' })",
             "pullRequestUrl=$pullRequestUrl"
         ) -join "`n"
-        $bindingDigest = Get-TestSha256Text -Text $bindingPayload
+        $bindingDigest = Get-TestTextDigest -Text $bindingPayload
         $graphIssueLines = if ($AdoptionSchema -in @(7, 9)) {
             @(
                 "- Source graph base: [$base](https://github.com/owner/consumer/commit/$base)",
@@ -1226,6 +1225,7 @@ try {
     )
     $env:GITHUB_STEP_SUMMARY = $outerSummaryPath
 
+    $test0108FailureCount = $failures.Count
     $adoption = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Adoption)
     if ($adoption.Threw -or $adoption.Scenario.BranchExists -or
         $adoption.Scenario.IssueState -cne 'closed' -or
@@ -1281,6 +1281,7 @@ try {
             Add-Failure "TEST-0176 bounded $legacyFinalizationMode finalization evidence was not readable: $($legacyFinalization.Error)"
         }
     }
+    $test0142FailureCount = $failures.Count
     $expectedAdoptionSummary = "Managed merge for [pull request #42](https://github.com/owner/consumer/pull/42) finalized at ``$($adoption.Scenario.ExpectedHead)``; exact branch absent and issue [#9](https://github.com/owner/consumer/issues/9) closed."
     $adoptionSummaryProperty = $adoption.PSObject.Properties['SummaryLines']
     $adoptionSummaryLines = @(
@@ -1306,7 +1307,12 @@ try {
     }).Count -ne 0) {
         Add-Failure "TEST-0108 exact recovery rerun was not idempotent: $($rerun.Error)"
     }
+    if ($failures.Count -eq $test0108FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0108'
+    }
 
+    $test0109FailureCount = $failures.Count
     $update = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Update)
     if ($update.Threw -or $update.Scenario.BranchExists -or
         $update.Scenario.ExistingEvidenceComments -ne 1 -or
@@ -1332,6 +1338,7 @@ try {
         Add-Failure "TEST-0121 exact schema-2 update did not independently verify and finalize its immutable target plan: $($schema2Update.Error)"
     }
 
+    $test0155FailureCount = $failures.Count
     $pagedEventUpdate = New-FinalizationScenario -Kind Update -UpdateSchema 2
     $pagedEvents = [System.Collections.Generic.List[object]]::new()
     foreach ($index in 1..100) {
@@ -1403,7 +1410,12 @@ try {
         -not $workflow.Contains('needs: finalize-managed-merge')) {
         Add-Failure 'TEST-0109 consumer workflow does not separate update discovery from event/recovery finalization.'
     }
+    if ($failures.Count -eq $test0109FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0109'
+    }
 
+    $test0170FailureCount = $failures.Count
     $eventRouter = [regex]::Match(
         $workflow,
         '(?ms)^on:\r?\n(?<body>.*?)(?=^permissions:)'
@@ -1442,7 +1454,12 @@ try {
         -not $sharedConcurrency.Groups['body'].Value.Contains('cancel-in-progress: false')) {
         Add-Failure 'TEST-0170 consumer workflow no longer preserves one shared repository lifecycle concurrency group.'
     }
+    if ($failures.Count -eq $test0170FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0170'
+    }
 
+    $test0110FailureCount = $failures.Count
     $normal = Invoke-FinalizationScenario -Scenario (New-FinalizationScenario -Kind Normal)
     if ($normal.Threw) {
         Add-Failure "TEST-0110 ordinary pull request did not remain a no-op: $($normal.Error)"
@@ -1459,6 +1476,7 @@ try {
         Add-Failure 'TEST-0142 ordinary no-op emitted finalization summary output.'
     }
 
+    $test0112FailureCount = $failures.Count
     foreach ($legacyMode in @('Absent', 'Placeholder')) {
         $legacy = Invoke-FinalizationScenario -Scenario (
             New-FinalizationScenario -Kind Update -TrackingMode $legacyMode
@@ -1760,6 +1778,15 @@ try {
         ExpectedError = 'Schema-2 proposal migration output or ledger differs from the independently computed plan.'
     })
 
+    $missingContentIdentity = New-FinalizationScenario -Kind Update `
+        -UpdateSchema 2 -MissingContentIdentity
+    $negativeScenarios.Add([pscustomobject]@{
+        Name = 'immutable target missing migration identity dependency'
+        Scenario = $missingContentIdentity
+        TestId = 'TEST-0121'
+        ExpectedError = 'Immutable target release lacks the regular migration engine, identity dependency, or catalog index.'
+    })
+
     $renamedPath = New-FinalizationScenario -Kind Update
     $renamedPath.ChangedFiles[0] = [pscustomobject]@{
         filename = '.ai/protocol'; previous_filename = '.ai/old-protocol'
@@ -1801,11 +1828,19 @@ try {
             Add-Failure "TEST-0142 rejected '$($negative.Name)' emitted finalization summary output."
         }
     }
+    if ($failures.Count -eq $test0110FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0110'
+    }
 
     $outerSummaryLines = @(Get-Content -LiteralPath $outerSummaryPath)
     if ($outerSummaryLines.Count -ne 1 -or
         [string]$outerSummaryLines[0] -cne $outerSummarySentinel) {
         Add-Failure "TEST-0142 inherited outer summary was mutated: $($outerSummaryLines -join ' | ')"
+    }
+    if ($failures.Count -eq $test0142FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0142'
     }
 }
 finally {
@@ -1821,6 +1856,10 @@ finally {
 $adapterLifecycleSource = Get-Content -LiteralPath $adapterPath -Raw
 if ($adapterLifecycleSource.Contains('merge_commit_sha')) {
     Add-Failure 'TEST-0155 API-2026 updater still depends on the removed pull-request merge_commit_sha field.'
+}
+if ($failures.Count -eq $test0155FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0155'
 }
 foreach ($requiredLegacyText in @(
     'Repair-LegacyInstallingUpdateTracking',
@@ -1838,6 +1877,10 @@ if (-not $workflow.Contains('pull_request:') -or
     -not $workflow.Contains('pull-requests: write')) {
     Add-Failure 'TEST-0112 consumer workflow cannot recover an installing legacy update from its exact merged pull-request event.'
 }
+if ($failures.Count -eq $test0112FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0112'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Managed merge finalization tests failed with $($failures.Count) problem(s):" `
@@ -1847,7 +1890,5 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'Managed merge finalization tests passed.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/consumer-update/managed-merge-finalization.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

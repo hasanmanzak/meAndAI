@@ -3,7 +3,7 @@ param(
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
     [string]$ProtocolPath = '.ai/protocol',
     [string]$ProtocolSourcePath = '.meandai-update-source',
-    [string]$TargetTag = 'v0.14.5',
+    [string]$TargetTag = 'v0.15.0',
     [string]$BranchPrefix = 'automation/meandai-capabilities-',
     [ValidateSet('Auto', 'FreshAdoption', 'FullMigration',
         'HybridReconciliation', 'CleanStart', 'Abort')]
@@ -88,6 +88,7 @@ $LocalUpdaterAssets = @($AdoptionAssets | Where-Object {
 })
 $ManifestPath = '.ai/adoption/meandai-capabilities.json'
 $ConsumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'
+$ConsumerMigrationContentIdentityPath = 'scripts/MeAndAI.ContentIdentity.psm1'
 $ConsumerMigrationIndexPath = 'migrations/index.json'
 $ConsumerMigrationLedgerPath = '.ai/meandai-update-state.json'
 
@@ -1080,6 +1081,8 @@ function Import-PinnedConsumerMigrationBaseline {
 
     $moduleEntry = Get-TreeEntry -RepositoryPath $SourcePath `
         -Commit $TargetSha -Path $ConsumerMigrationModulePath
+    $contentIdentityEntry = Get-TreeEntry -RepositoryPath $SourcePath `
+        -Commit $TargetSha -Path $ConsumerMigrationContentIdentityPath
     $indexEntry = Get-TreeEntry -RepositoryPath $SourcePath `
         -Commit $TargetSha -Path $ConsumerMigrationIndexPath
     if ($moduleEntry.Mode -cne '100644' -or $moduleEntry.Type -cne 'blob') {
@@ -1088,11 +1091,18 @@ function Import-PinnedConsumerMigrationBaseline {
     if ($indexEntry.Mode -cne '100644' -or $indexEntry.Type -cne 'blob') {
         throw "Pinned release is missing consumer migration catalog '$ConsumerMigrationIndexPath'."
     }
+    if ($contentIdentityEntry.Mode -cne '100644' -or
+        $contentIdentityEntry.Type -cne 'blob') {
+        throw "Pinned release is missing consumer migration identity dependency '$ConsumerMigrationContentIdentityPath'."
+    }
     if ((Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
         -Path $ConsumerMigrationModulePath) -cne $moduleEntry.Sha -or
         (Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
+        -Path $ConsumerMigrationContentIdentityPath) -cne
+            $contentIdentityEntry.Sha -or
+        (Get-WorkingTreeBlobSha -RepositoryPath $SourcePath `
         -Path $ConsumerMigrationIndexPath) -cne $indexEntry.Sha) {
-        throw 'Pinned consumer migration module or catalog differs from the immutable target release.'
+        throw 'Pinned consumer migration engine, identity dependency, or catalog differs from the immutable target release.'
     }
 
     $moduleFile = Join-Path $SourcePath `

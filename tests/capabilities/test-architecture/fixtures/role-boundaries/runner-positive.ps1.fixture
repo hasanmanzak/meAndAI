@@ -1,0 +1,4 @@
+$suites = Get-MeAndAITestSuite -RepositoryRoot $PSScriptRoot
+foreach ($suite in $suites) {
+    Invoke-MeAndAITestSuiteProcess -SuitePath $suite.FullName
+}

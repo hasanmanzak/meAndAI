@@ -2,71 +2,25 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+$owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 $modulePath = Join-Path $root 'scripts/MeAndAI.CapabilityReview.psm1'
 $catalogModulePath = Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1'
 Import-Module $catalogModulePath -Force
 Import-Module $modulePath -Force
-
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
-}
-
-function Get-TestGitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $prefix = [Text.Encoding]::ASCII.GetBytes(
-        "blob $($Bytes.Length)$([char]0)"
-    )
-    $payload = [byte[]]::new($prefix.Length + $Bytes.Length)
-    [Array]::Copy($prefix, 0, $payload, 0, $prefix.Length)
-    [Array]::Copy($Bytes, 0, $payload, $prefix.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
-function Test-TestBytesEqual {
-    param([AllowNull()][byte[]]$Left, [AllowNull()][byte[]]$Right)
-
-    if ($null -eq $Left -or $null -eq $Right) {
-        return $null -eq $Left -and $null -eq $Right
-    }
-    if ($Left.Length -ne $Right.Length) {
-        return $false
-    }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) {
-            return $false
-        }
-    }
-    return $true
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$scenarioContext = New-MeAndAIScenarioEvidenceContext -Owner $owner `
+    -AuthorityPath $scenarioAuthorityPath
+$contentIdentityModule = @(Import-Module (Join-Path $root `
+    'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru)[0]
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
+$testByteArrayEqualAction = $contentIdentityModule.ExportedCommands[
+    'Test-MeAndAIByteArrayEqual'
+].ScriptBlock
 
 function New-TestCapabilityReviewBody {
     param(
@@ -209,69 +163,148 @@ $releasePrefixPlan = Resolve-MeAndAICapabilityReview `
     -DiscoveryContext AlreadyCurrent
 Assert-Equal $releasePrefixPlan.State 'CreateReviewHandoff' `
     'TEST-0157 predecessor terminal ledger did not request appended capability review.'
-Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 2 `
+Assert-Equal $releasePrefixPlan.CapabilityBatch.Count 3 `
     'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix size.'
 Assert-Equal ($releasePrefixPlan.CapabilityBatch.Slug -join ',') `
-    'test-runtime-efficiency,canonical-repository-evidence' `
+    'test-runtime-efficiency,canonical-repository-evidence,test-harness-modularity' `
     'TEST-0157 predecessor terminal ledger exposed the wrong pending suffix.'
 
-$releaseEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
-    -Capability $releaseCatalog.Capabilities[1] -Outcome NotApplicable `
-    -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
-    -ReviewIdentity 'pull-request:87' `
-    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
-    -ReviewedAt '2026-07-19T00:00:00Z'
-$releasePredecessorLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-    -Catalog $releaseCatalog -Entries @($releaseEntry, $releaseEfficiencyEntry)
-$releasePredecessorLedger = Import-MeAndAICapabilityLedger `
-    -Catalog $releaseCatalog -Bytes $releasePredecessorLedgerBytes
-$releaseEvidencePlan = Resolve-MeAndAICapabilityReview `
-    -Catalog $releaseCatalog -Ledger $releasePredecessorLedger `
-    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-    -DefaultHead $baseHead -TargetVersion v0.12.0 `
-    -DiscoveryContext AlreadyCurrent
-Assert-Equal $releaseCatalog.Capabilities.Count 3 `
-    'TEST-0172 catalog does not contain exactly two immutable predecessors and one appended capability.'
-Assert-Equal (($releaseCatalog.Capabilities | ForEach-Object {
-    "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
-} | Select-Object -First 2) -join ',') `
-    'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5,test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea' `
-    'TEST-0172 immutable predecessor tuples changed.'
-Assert-Equal $releaseEvidencePlan.State 'CreateReviewHandoff' `
-    'TEST-0172 two-entry terminal ledger did not request appended capability review.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch.Count 1 `
-    'TEST-0172 two-entry terminal ledger exposed more than the appended capability.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Slug `
-    'canonical-repository-evidence' `
-    'TEST-0172 two-entry terminal ledger exposed the wrong appended capability.'
-Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Type 'Semantic' `
-    'TEST-0172 appended capability is not review-only Semantic state.'
-Assert-Equal $releaseEvidencePlan.SemanticWritePaths.Count 0 `
-    'TEST-0172 automation claimed a semantic consumer path.'
-Assert-Equal ($releaseEvidencePlan.AutomationWritePaths -join ',') `
-    '.ai/adoption/meandai-capability-review.json' `
-    'TEST-0172 review handoff writes outside its transient manifest.'
+$releaseEvidenceCatalogRoot = Join-Path ([IO.Path]::GetTempPath()) (
+    'meandai-test-0172-catalog-' + [Guid]::NewGuid().ToString('N')
+)
+[IO.Directory]::CreateDirectory($releaseEvidenceCatalogRoot) | Out-Null
+try {
+    foreach ($definitionName in @(
+        'test-architecture.json',
+        'test-runtime-efficiency.json',
+        'canonical-repository-evidence.json'
+    )) {
+        [IO.File]::Copy(
+            (Join-Path $root "capabilities/$definitionName"),
+            (Join-Path $releaseEvidenceCatalogRoot $definitionName)
+        )
+    }
+    $releaseEvidenceCatalogText = @'
+{
+  "schema": 1,
+  "capabilities": [
+    {
+      "slug": "test-architecture",
+      "definition": "test-architecture.json",
+      "type": "Semantic",
+      "definitionBlob": "9a3a999f05abbbb4ee710f14d82fb26d86de5ad5"
+    },
+    {
+      "slug": "test-runtime-efficiency",
+      "definition": "test-runtime-efficiency.json",
+      "type": "Semantic",
+      "definitionBlob": "20c6bc064d04be18ede7ab70983503feb4b799ea"
+    },
+    {
+      "slug": "canonical-repository-evidence",
+      "definition": "canonical-repository-evidence.json",
+      "type": "Semantic",
+      "definitionBlob": "5a323d1cc9b5e64564f63dc577ad0c937a1c91c0"
+    }
+  ]
+}
+'@
+    $releaseEvidenceCatalogBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+        $releaseEvidenceCatalogText.Replace("`r`n", "`n") + "`n"
+    )
+    Assert-Equal (Get-MeAndAISha256 -Bytes $releaseEvidenceCatalogBytes) `
+        'adaa29aace672e40179db053b74cce3cadca77b1a320f74f49f13faaec7d8b83' `
+        'TEST-0172 exact three-entry predecessor catalog digest differs.'
+    $releaseEvidenceIndexPath = Join-Path $releaseEvidenceCatalogRoot 'index.json'
+    [IO.File]::WriteAllBytes(
+        $releaseEvidenceIndexPath,
+        $releaseEvidenceCatalogBytes
+    )
+    $releaseEvidenceCatalog = Import-MeAndAICapabilityCatalog `
+        -IndexPath $releaseEvidenceIndexPath
+    Assert-Equal $releaseEvidenceCatalog.Capabilities.Count 3 `
+        'TEST-0172 bounded predecessor catalog count differs.'
+    Assert-Equal (($releaseEvidenceCatalog.Capabilities | ForEach-Object {
+        "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
+    } | Select-Object -First 2) -join ',') `
+        'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5,test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea' `
+        'TEST-0172 immutable predecessor tuples changed.'
+    $releaseEvidenceArchitectureEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[0] -Outcome Conforming `
+        -Evidence @('Reviewed release-catalog topology evidence.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseEvidenceEfficiencyEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[1] -Outcome NotApplicable `
+        -Evidence @('Reviewed repository has no repeated expensive deterministic setup.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseEvidencePredecessorLedgerBytes = `
+        ConvertTo-MeAndAICapabilityLedgerBytes `
+            -Catalog $releaseEvidenceCatalog `
+            -Entries @(
+                $releaseEvidenceArchitectureEntry,
+                $releaseEvidenceEfficiencyEntry
+            )
+    $releaseEvidencePredecessorLedger = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseEvidenceCatalog `
+        -Bytes $releaseEvidencePredecessorLedgerBytes
+    $releaseEvidencePlan = Resolve-MeAndAICapabilityReview `
+        -Catalog $releaseEvidenceCatalog `
+        -Ledger $releaseEvidencePredecessorLedger `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -DefaultHead $baseHead -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent
+    Assert-Equal $releaseEvidencePlan.State 'CreateReviewHandoff' `
+        'TEST-0172 two-entry terminal ledger did not request appended capability review.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch.Count 1 `
+        'TEST-0172 two-entry terminal ledger exposed more than the appended capability.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Slug `
+        'canonical-repository-evidence' `
+        'TEST-0172 two-entry terminal ledger exposed the wrong appended capability.'
+    Assert-Equal $releaseEvidencePlan.CapabilityBatch[0].Type 'Semantic' `
+        'TEST-0172 appended capability is not review-only Semantic state.'
+    Assert-Equal $releaseEvidencePlan.SemanticWritePaths.Count 0 `
+        'TEST-0172 automation claimed a semantic consumer path.'
+    Assert-Equal ($releaseEvidencePlan.AutomationWritePaths -join ',') `
+        '.ai/adoption/meandai-capability-review.json' `
+        'TEST-0172 review handoff writes outside its transient manifest.'
 
-$releaseEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
-    -Capability $releaseCatalog.Capabilities[2] -Outcome NotApplicable `
-    -Evidence @('Reviewed repository does not read byte-sensitive repository evidence.') `
-    -ReviewIdentity 'pull-request:87' `
-    -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
-    -ReviewedAt '2026-07-19T00:00:00Z'
-$releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
-    -Catalog $releaseCatalog `
-    -Entries @($releaseEntry, $releaseEfficiencyEntry, $releaseEvidenceEntry)
-$releaseCompleteLedger = Import-MeAndAICapabilityLedger `
-    -Catalog $releaseCatalog -Bytes $releaseCompleteLedgerBytes
-$releaseCurrent = Resolve-MeAndAICapabilityReview `
-    -Catalog $releaseCatalog -Ledger $releaseCompleteLedger `
-    -Repository 'hasanmanzak/consumer' -DefaultBranch main `
-    -DefaultHead $baseHead -TargetVersion v0.12.0 `
-    -DiscoveryContext AlreadyCurrent
-Assert-Equal $releaseCurrent.State 'Current' `
-    'TEST-0172 exact imported three-entry terminal ledger was not current.'
-Assert-Equal $releaseCurrent.Operations.Count 0 `
-    'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
+    $releaseEvidenceEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseEvidenceCatalog.Capabilities[2] `
+        -Outcome NotApplicable `
+        -Evidence @('Reviewed repository does not read byte-sensitive repository evidence.') `
+        -ReviewIdentity 'pull-request:87' `
+        -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/87' `
+        -ReviewedAt '2026-07-19T00:00:00Z'
+    $releaseCompleteLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $releaseEvidenceCatalog `
+        -Entries @(
+            $releaseEvidenceArchitectureEntry,
+            $releaseEvidenceEfficiencyEntry,
+            $releaseEvidenceEntry
+        )
+    $releaseCompleteLedger = Import-MeAndAICapabilityLedger `
+        -Catalog $releaseEvidenceCatalog -Bytes $releaseCompleteLedgerBytes
+    $releaseCurrent = Resolve-MeAndAICapabilityReview `
+        -Catalog $releaseEvidenceCatalog -Ledger $releaseCompleteLedger `
+        -Repository 'hasanmanzak/consumer' -DefaultBranch main `
+        -DefaultHead $baseHead -TargetVersion v0.12.0 `
+        -DiscoveryContext AlreadyCurrent
+    Assert-Equal $releaseCurrent.State 'Current' `
+        'TEST-0172 exact imported three-entry terminal ledger was not current.'
+    Assert-Equal $releaseCurrent.Operations.Count 0 `
+        'TEST-0172 exact imported three-entry terminal ledger was not a no-op.'
+}
+finally {
+    if (Test-Path -LiteralPath $releaseEvidenceCatalogRoot) {
+        Remove-Item -LiteralPath $releaseEvidenceCatalogRoot -Recurse -Force
+    }
+}
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+    -TestId 'TEST-0172'
 
 # TEST-0139: fresh adoption is followed by the same source-only semantic review
 # boundary, without expanding the adoption envelope or writing product paths.
@@ -345,6 +378,8 @@ Assert-Equal $adoptionPlan.State 'CreateReviewHandoff' `
     'TEST-0139 AdoptionRequired did not create review-only work.'
 Assert-Equal $adoptionPlan.Marker $freshPlan.Marker `
     'TEST-0139 open outcomes did not share canonical repository/catalog identity.'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+    -TestId 'TEST-0139'
 
 # TEST-0140: current and post-update consumers use exactly the same target
 # catalog identity; immutable pre-framework code can only request its ordinary
@@ -662,12 +697,46 @@ Assert-True ($semanticFinalizationGuard -ge 0 -and
 $quickAdoptionTestPath = Join-Path $root `
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $quickAdoptionTestText = [IO.File]::ReadAllText($quickAdoptionTestPath)
+$catalogCaptureIndex = $quickAdoptionTestText.IndexOf(
+    '$script:ImportQuickAdoptionCapabilityCatalog =',
+    [StringComparison]::Ordinal
+)
+$catalogRemovalIndex = $quickAdoptionTestText.IndexOf(
+    'Remove-Module -ModuleInfo $capabilityCatalogModule -Force',
+    [StringComparison]::Ordinal
+)
+$identityCaptureIndex = $quickAdoptionTestText.IndexOf(
+    '$script:GetQuickAdoptionHarnessGitBlobSha1 =',
+    [StringComparison]::Ordinal
+)
+$identityRemovalIndex = $quickAdoptionTestText.IndexOf(
+    'Remove-Module -ModuleInfo $contentIdentityModule -Force',
+    [StringComparison]::Ordinal
+)
+$identityHelperIndex = $quickAdoptionTestText.IndexOf(
+    'function Get-TestQuickAdoptionGitBlobSha1',
+    [StringComparison]::Ordinal
+)
+Assert-True (
+    $catalogCaptureIndex -ge 0 -and
+    $catalogRemovalIndex -gt $catalogCaptureIndex -and
+    $identityCaptureIndex -gt $catalogRemovalIndex -and
+    $identityRemovalIndex -gt $identityCaptureIndex -and
+    $identityHelperIndex -gt $identityRemovalIndex -and
+    $quickAdoptionTestText.Contains(
+        '& $script:GetQuickAdoptionHarnessGitBlobSha1 -Bytes $Bytes'
+    ) -and
+    $quickAdoptionTestText.Contains(
+        "Get-Module -Name 'MeAndAI.ContentIdentity'"
+    ) -and
+    $quickAdoptionTestText.Contains('$survivingCanonicalHelperModules')
+) 'TEST-0140 quick-adoption fixture depends on mutable global helper-module exports or leaks canonical helper modules.'
 $fixtureCopyStart = $quickAdoptionTestText.IndexOf(
     'function Copy-CanonicalProtocolFixture',
     [StringComparison]::Ordinal
 )
 $fixtureCopyEnd = $quickAdoptionTestText.IndexOf(
-    'function Get-GitBlobSha',
+    'function Get-MockConsumerMigrationBaseline',
     [StringComparison]::Ordinal
 )
 Assert-True ($fixtureCopyStart -ge 0 -and $fixtureCopyEnd -gt $fixtureCopyStart) `
@@ -676,20 +745,55 @@ $fixtureCopyText = $quickAdoptionTestText.Substring(
     $fixtureCopyStart,
     $fixtureCopyEnd - $fixtureCopyStart
 )
-$managedEnvelopeText = $quickAdoptionTestText.Substring(0, $fixtureCopyStart)
-foreach ($sourceOnlyPath in @(
+$managedEnvelopeStart = $quickAdoptionTestText.IndexOf(
+    '$canonicalAdoptionAssets = @(',
+    [StringComparison]::Ordinal
+)
+$managedEnvelopeEnd = $quickAdoptionTestText.IndexOf(
+    '$canonicalInitialAdoptionPolicyAsset =',
+    [StringComparison]::Ordinal
+)
+Assert-True ($managedEnvelopeStart -ge 0 -and
+    $managedEnvelopeEnd -gt $managedEnvelopeStart -and
+    $managedEnvelopeEnd -lt $fixtureCopyStart) `
+    'TEST-0140 quick-adoption managed envelope boundary is absent.'
+$managedEnvelopeText = $quickAdoptionTestText.Substring(
+    $managedEnvelopeStart,
+    $managedEnvelopeEnd - $managedEnvelopeStart
+)
+$fixedSourceOnlyPaths = @(
     'capabilities/index.json',
-    'capabilities/test-architecture.json',
-    'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAICapabilityReview.ps1'
-)) {
+)
+foreach ($sourceOnlyPath in $fixedSourceOnlyPaths) {
     Assert-True $fixtureCopyText.Contains("'$sourceOnlyPath'") `
         "TEST-0140 quick-adoption source fixture omits '$sourceOnlyPath'."
     Assert-True (-not $managedEnvelopeText.Contains("'$sourceOnlyPath'")) `
         "TEST-0140 source-only capability asset entered the managed adoption envelope: '$sourceOnlyPath'."
 }
+$capabilityDefinitionPaths = @($releaseCatalog.Capabilities |
+    ForEach-Object { 'capabilities/' + [string]$_.DefinitionPath })
+Assert-True (
+    $quickAdoptionTestText.Contains("'Import-MeAndAICapabilityCatalog'") -and
+    $fixtureCopyText.Contains(
+        '& $script:ImportQuickAdoptionCapabilityCatalog'
+    ) -and
+    $fixtureCopyText.Contains('$capabilityCatalog.Capabilities') -and
+    $fixtureCopyText.Contains('[string]$_.DefinitionPath') -and
+    $fixtureCopyText.Contains('$capabilityDefinitionPaths')
+) 'TEST-0140 quick-adoption source fixture does not copy definitions from the validated canonical catalog in catalog order.'
+foreach ($definitionPath in $capabilityDefinitionPaths) {
+    Assert-True (-not $managedEnvelopeText.Contains("'$definitionPath'")) `
+        "TEST-0140 source-only capability definition entered the managed adoption envelope: '$definitionPath'."
+}
+Assert-True (-not [regex]::IsMatch(
+    $fixtureCopyText,
+    "'capabilities/(?!index\\.json')[^']+\\.json'",
+    [Text.RegularExpressions.RegexOptions]::CultureInvariant
+)) 'TEST-0140 quick-adoption source fixture hardcodes capability definition paths.'
 
 $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) (
     'meandai-capability-review-' + [Guid]::NewGuid().ToString('N')
@@ -1791,9 +1895,20 @@ try {
         -ReviewIdentity "pull-request:$finalPullNumber" `
         -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
         -ReviewedAt '2026-07-19T00:00:00Z'
+    $finalHarnessEntry = New-MeAndAICapabilityLedgerEntry `
+        -Capability $releaseCatalog.Capabilities[3] -Outcome Conforming `
+        -Evidence @('Reviewed modular exact-evidence harness ownership.') `
+        -ReviewIdentity "pull-request:$finalPullNumber" `
+        -ReviewAuthority "https://github.com/hasanmanzak/consumer/pull/$finalPullNumber" `
+        -ReviewedAt '2026-07-19T00:00:00Z'
     $finalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
         -Catalog $releaseCatalog `
-        -Entries @($finalEntry, $finalEfficiencyEntry, $finalEvidenceEntry)
+        -Entries @(
+            $finalEntry,
+            $finalEfficiencyEntry,
+            $finalEvidenceEntry,
+            $finalHarnessEntry
+        )
     $apiState.FinalLedgerBytes = [byte[]]$finalLedgerBytes
     $fixtureAiRoot = Join-Path $fixtureRoot '.ai'
     [void](New-Item -ItemType Directory -Path $fixtureAiRoot)
@@ -2148,6 +2263,8 @@ try {
     } -Pattern '*exact-head personal-owner attestation*' `
         -Message 'TEST-0163 untrusted comment author authorized owner attestation.'
     $apiState.AttestationComments[0].user = $apiState.ProposalActor
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0163'
 
     $apiState.Reviews.Add([pscustomobject]@{
         state = 'APPROVED'
@@ -2251,10 +2368,14 @@ try {
         $_ -match '/git/refs?/heads/.+%2[fF]'
     }).Count 0 `
         'TEST-0169 finalization emitted an encoded branch separator.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0169'
     Assert-Equal (@($apiState.Calls | Where-Object {
         $_ -match 'issues/92/comments'
     }).Count -gt 0) $true `
         'TEST-0164 merged recovery did not use exact-head owner attestation evidence.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0164'
 
     $completedExecution = & $runnerPath -ConsumerRoot $fixtureRoot `
         -ProtocolRoot $root -Repository 'hasanmanzak/consumer' `
@@ -2287,6 +2408,8 @@ try {
         $legacyClosureMarker `
         'TEST-0140 legacy closure compatibility replaced historical evidence.'
     $apiState.ClosureComments[0].body = $canonicalClosureCommentBody
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0140'
 
     # TEST-0165: a trusted historical review may be retired only after its
     # original release catalog is reconstructed from immutable repository
@@ -2335,7 +2458,7 @@ try {
     )
     $alternateDefinitionBytes =
         [Text.UTF8Encoding]::new($false).GetBytes($alternateDefinitionText)
-    $alternateDefinitionBlob = Get-TestGitBlobSha -Bytes (
+    $alternateDefinitionBlob = & $getGitBlobSha1Action -Bytes (
         $alternateDefinitionBytes
     )
     $alternateIndex = [ordered]@{
@@ -2472,11 +2595,18 @@ try {
             -ReviewIdentity 'pull-request:95' `
             -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
             -ReviewedAt '2026-07-20T00:00:00Z'
+        $currentHarnessEntry = New-MeAndAICapabilityLedgerEntry `
+            -Capability $releaseCatalog.Capabilities[3] -Outcome Conforming `
+            -Evidence @('Reviewed modular exact-evidence harness ownership.') `
+            -ReviewIdentity 'pull-request:95' `
+            -ReviewAuthority 'https://github.com/hasanmanzak/consumer/pull/95' `
+            -ReviewedAt '2026-07-20T00:00:00Z'
         $currentLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
             -Catalog $releaseCatalog -Entries @(
                 $currentPrefixEntry,
                 $currentSuffixEntry,
-                $currentEvidenceEntry
+                $currentEvidenceEntry,
+                $currentHarnessEntry
             )
         return [pscustomobject][ordered]@{
             CatalogBytes = $SourceCatalogBytes
@@ -2621,11 +2751,11 @@ try {
     )
     $currentLedgerBeforeObject = Import-MeAndAICapabilityLedger `
         -Catalog $releaseCatalog -Bytes $currentLedgerBefore
-    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 3 `
+    Assert-Equal @($currentLedgerBeforeObject.Entries).Count 4 `
         'TEST-0165 fixture did not start with a historical prefix plus current suffix.'
     $currentSuffixBefore = @($currentLedgerBeforeObject.Entries | Select-Object -Skip 1)
     Assert-Equal ($currentSuffixBefore.Slug -join ',') `
-        'test-runtime-efficiency,canonical-repository-evidence' `
+        'test-runtime-efficiency,canonical-repository-evidence,test-harness-modularity' `
         'TEST-0165 fixture did not preserve the complete current suffix.'
     $historicalRecovery = & $runnerPath `
         -ConsumerRoot $fixtureRoot -ProtocolRoot $root `
@@ -2677,7 +2807,7 @@ try {
     $currentLedgerAfter = [IO.File]::ReadAllBytes(
         (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
     )
-    Assert-True (Test-TestBytesEqual -Left $currentLedgerBefore -Right (
+    Assert-True (& $testByteArrayEqualAction -Left $currentLedgerBefore -Right (
         $currentLedgerAfter
     )) 'TEST-0165 historical recovery rewrote current ledger content.'
     $currentLedgerAfterObject = Import-MeAndAICapabilityLedger `
@@ -2691,7 +2821,7 @@ try {
     }) -join ','
     Assert-Equal $currentSuffixAfterIdentity $currentSuffixBeforeIdentity `
         'TEST-0165 historical recovery did not preserve the appended current suffix.'
-    Assert-True (Test-TestBytesEqual `
+    Assert-True (& $testByteArrayEqualAction `
         -Left ([byte[]]$apiState.HistoricalReview.CurrentLedgerBytes) `
         -Right (
         [IO.File]::ReadAllBytes(
@@ -2737,12 +2867,14 @@ try {
     Assert-True ($apiState.HistoricalReview.IssueClosed -and
         -not $apiState.IssueCreated -and -not $apiState.PullCreated) `
         'TEST-0165 branch-absent partial recovery did not converge exactly once.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0165'
 
     # TEST-0166: anything other than one provable immutable historical merge
     # blocks before successful branch, issue, or current-catalog mutation.
-    $assertTrueAction = ${function:Assert-True}
-    $assertEqualAction = ${function:Assert-Equal}
-    $assertThrowsLikeAction = ${function:Assert-ThrowsLike}
+    $assertTrueAction = ${function:Assert-MeAndAITestTrue}
+    $assertEqualAction = ${function:Assert-MeAndAITestEqual}
+    $assertThrowsLikeAction = ${function:Assert-MeAndAITestThrowsLike}
     $assertHistoricalBlock = {
         param(
             [Parameter(Mandatory)][string]$Name,
@@ -2859,6 +2991,8 @@ try {
         param($state)
         $state.BranchLeaseRace = $true
     } '*branch*'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0166'
 
     # TEST-0167: GitHub preserves repository display case in durable ledger
     # authority URLs while the workflow canonicalizes the runtime repository to
@@ -2895,7 +3029,7 @@ try {
             $_ -match 'GET repos/.+/issues\?state=all'
         }).Count 3 `
             'TEST-0167 mixed-case recovery did not perform exactly one fresh inventory.'
-        Assert-True (Test-TestBytesEqual -Left $mixedCaseLedgerBefore -Right (
+        Assert-True (& $testByteArrayEqualAction -Left $mixedCaseLedgerBefore -Right (
             [IO.File]::ReadAllBytes(
                 (Join-Path $fixtureAiRoot 'meandai-capabilities-state.json')
             )
@@ -2914,6 +3048,8 @@ try {
             $mixedCaseMutationCount `
             'TEST-0167 mixed-case completed recovery repeated cleanup.'
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0167'
 
     # TEST-0168: case-insensitive GitHub owner/repository identity does not
     # weaken the exact HTTPS GitHub pull-request authority boundary.
@@ -2987,6 +3123,8 @@ try {
     }
     Assert-Equal $invalidAuthorityCases.Count 11 `
         'TEST-0168 authority-boundary case matrix changed unexpectedly.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0168'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot -PathType Container) {
@@ -2996,20 +3134,6 @@ finally {
 
 Write-Host 'Capability review lifecycle tests passed.' -ForegroundColor Green
 
-$evidenceModule = Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
-$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-if ((Test-Path -LiteralPath $evidenceModule -PathType Leaf) -and
-    (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
-    $authority = Import-PowerShellDataFile -LiteralPath $authorityPath
-    $owner = 'tests/capabilities/capability-adoption/capability-review.tests.ps1'
-    if (@($authority.Authorities | Where-Object {
-        [string]$_.Owner -ceq $owner
-    }).Count -eq 1) {
-        Import-Module $evidenceModule -Force
-        $scenarioResult = New-MeAndAIScenarioResult `
-            -Owner $owner -SourcePaths @($PSCommandPath) `
-            -AuthorityPath $authorityPath
-        Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
-            ($scenarioResult | ConvertTo-Json -Compress))
-    }
-}
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
+    ($scenarioResult | ConvertTo-Json -Compress))

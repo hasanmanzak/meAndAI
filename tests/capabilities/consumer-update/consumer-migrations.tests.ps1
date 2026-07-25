@@ -2,45 +2,18 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/consumer-update/consumer-migrations.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$contentIdentityModule = Import-Module `
+    (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force -PassThru
+$testByteArrayEqualAction = $contentIdentityModule.ExportedCommands[
+    'Test-MeAndAIByteArrayEqual'
+].ScriptBlock
 Import-Module (Join-Path $root 'scripts/MeAndAI.ConsumerMigrations.psm1') -Force
-
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-SequenceEqual {
-    param([object[]]$Actual, [object[]]$Expected, [string]$Message)
-    if ($Actual.Count -ne $Expected.Count) {
-        throw "$Message Count differs: $($Actual.Count) != $($Expected.Count)."
-    }
-    for ($index = 0; $index -lt $Actual.Count; $index++) {
-        if ([string]$Actual[$index] -cne [string]$Expected[$index]) {
-            throw "$Message Element $index differs: '$($Actual[$index])' != '$($Expected[$index])'."
-        }
-    }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
 
 function ConvertTo-TestBytes {
     param([string]$Text, [ValidateSet('LF', 'CRLF')][string]$LineEnding, [bool]$Bom)
@@ -65,15 +38,6 @@ function ConvertFrom-TestBytes {
     return [Text.UTF8Encoding]::new($false, $true).GetString(
         $Bytes, $offset, $Bytes.Length - $offset
     )
-}
-
-function Test-BytesEqual {
-    param([byte[]]$Left, [byte[]]$Right)
-    if ($Left.Length -ne $Right.Length) { return $false }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) { return $false }
-    }
-    return $true
 }
 
 function New-Mig0001Files {
@@ -160,7 +124,8 @@ foreach ($snapshot in $legacySnapshots) {
     $current = @($legacyFixture.Records | Where-Object {
         [string]$_.Path -ceq [string]$snapshot.Path
     })[0]
-    Assert-True (Test-BytesEqual -Left ([byte[]]$snapshot.Bytes) -Right ([byte[]]$current.Bytes)) `
+    Assert-True (& $testByteArrayEqualAction `
+        -Left ([byte[]]$snapshot.Bytes) -Right ([byte[]]$current.Bytes)) `
         "Planner mutated caller bytes for '$($snapshot.Path)'."
 }
 
@@ -228,6 +193,8 @@ $satisfiedPlan = Resolve-MeAndAIConsumerMigrationPlan -Catalog $catalog `
 Assert-Equal $satisfiedPlan.State 'Satisfied' 'Canonical baseline was not idempotent.'
 Assert-Equal $satisfiedPlan.ExpectedChangedPaths.Count 0 `
     'Canonical baseline produced an unexpected change.'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0119'
 
 # Two generic migrations may form an ordered chain on the same consumer path.
 $chainRoot = Join-Path ([IO.Path]::GetTempPath()) ("meandai-migration-chain-" + [guid]::NewGuid().ToString('N'))
@@ -396,10 +363,8 @@ Assert-ThrowsLike -Action {
 } -Pattern '*not the exact installed-catalog prefix*' `
     -Message 'Drifted ledger did not fail closed.'
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0119'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0120'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0120'
 Write-Host 'Consumer migration tests passed.'
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/consumer-update/consumer-migrations.tests.ps1' `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

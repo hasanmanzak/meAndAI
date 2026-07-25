@@ -1,0 +1,3 @@
+function New-SyntheticRepositoryState {
+    return [ordered]@{ branch = 'main'; clean = $true }
+}

@@ -2,14 +2,15 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/idea-incubation/idea-incubation.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Read-RequiredFile {
     param([string]$RelativePath)
@@ -103,8 +104,8 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0043'
 Write-Host 'Idea-incubation tests passed for all declared scenarios in this suite.' -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/idea-incubation/idea-incubation.tests.ps1' -SourcePaths @($PSCommandPath) `
-    -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

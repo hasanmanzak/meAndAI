@@ -1,0 +1,1 @@
+Assert-MeAndAITestEqual -Actual 'a' -Expected 'a' -Message 'support assertion'

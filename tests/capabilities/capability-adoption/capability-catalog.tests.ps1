@@ -4,30 +4,15 @@ Set-StrictMode -Version Latest
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 Import-Module (Join-Path $root 'scripts/MeAndAI.CapabilityCatalog.psm1') -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.RepositoryEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1') -Force
+Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
 
-function Assert-True {
-    param([bool]$Condition, [string]$Message)
-    if (-not $Condition) { throw $Message }
-}
-
-function Assert-Equal {
-    param($Actual, $Expected, [string]$Message)
-    if ($Actual -cne $Expected) {
-        throw "$Message Expected '$Expected', observed '$Actual'."
-    }
-}
-
-function Assert-SequenceEqual {
-    param([object[]]$Actual, [object[]]$Expected, [string]$Message)
-    if ($Actual.Count -ne $Expected.Count) {
-        throw "$Message Count differs: $($Actual.Count) != $($Expected.Count)."
-    }
-    for ($index = 0; $index -lt $Actual.Count; $index++) {
-        if ([string]$Actual[$index] -cne [string]$Expected[$index]) {
-            throw "$Message Element $index differs: '$($Actual[$index])' != '$($Expected[$index])'."
-        }
-    }
-}
+$owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
+$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$scenarioContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
 
 function Assert-BytesEqual {
     param([byte[]]$Actual, [byte[]]$Expected, [string]$Message)
@@ -43,18 +28,6 @@ function Assert-BytesEqual {
             throw "$Message Byte $index differs: $($Actual[$index]) != $($Expected[$index])."
         }
     }
-}
-
-function Assert-ThrowsLike {
-    param([scriptblock]$Action, [string]$Pattern, [string]$Message)
-    try {
-        & $Action
-    }
-    catch {
-        if ($_.Exception.Message -like $Pattern) { return }
-        throw "$Message Unexpected error: $($_.Exception.Message)"
-    }
-    throw "$Message No error was thrown."
 }
 
 function Invoke-TestGit {
@@ -134,24 +107,6 @@ function Assert-TestRepositoryEvidenceRerun {
     )).Text $statusBefore "$Message resolution mutated repository state."
 }
 
-function Get-TestGitBlobSha {
-    param([byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $algorithm = [Security.Cryptography.SHA1]::Create()
-    try {
-        return -join @($algorithm.ComputeHash($payload) | ForEach-Object {
-            $_.ToString('x2', [Globalization.CultureInfo]::InvariantCulture)
-        })
-    }
-    finally {
-        $algorithm.Dispose()
-    }
-}
-
 function ConvertTo-TestJsonBytes {
     param($Value, [bool]$Bom = $false, [bool]$CrLf = $false)
 
@@ -219,7 +174,7 @@ function New-TestCatalog {
             slug = [string]$specification.Slug
             definition = $definitionName
             type = [string]$specification.Type
-            definitionBlob = Get-TestGitBlobSha -Bytes $definitionBytes
+            definitionBlob = Get-MeAndAIGitBlobSha1 -Bytes $definitionBytes
         })
     }
     $index = [ordered]@{ schema = 1; capabilities = @($entries) }
@@ -273,7 +228,6 @@ Assert-SequenceEqual -Actual @($catalog.Capabilities[0].Definition.requirements.
 
 # TEST-0157: the new Semantic capability is one append-only catalog entry;
 # the immutable predecessor remains the exact first entry.
-Assert-Equal $catalog.Capabilities.Count 3 'TEST-0157 catalog count differs.'
 Assert-Equal $catalog.Capabilities[1].Slug 'test-runtime-efficiency' `
     'TEST-0157 appended capability slug differs.'
 Assert-Equal $catalog.Capabilities[1].Type 'Semantic' `
@@ -321,6 +275,79 @@ Assert-SequenceEqual -Actual @(
     'read-only-idempotent-resolution',
     'semantic-consumer-ownership'
 ) -Message 'TEST-0171 canonical repository-evidence requirements differ.'
+
+# TEST-0188: test-harness-modularity is one exact append-only Semantic
+# capability after the immutable three-entry predecessor catalog.
+Assert-Equal $catalog.Capabilities.Count 4 'TEST-0188 catalog count differs.'
+Assert-SequenceEqual -Actual @($catalog.Capabilities | Select-Object -First 3 |
+    ForEach-Object {
+        "$($_.Slug)|$($_.DefinitionPath)|$($_.Type)|$($_.DefinitionBlob)"
+    }) -Expected @(
+        'test-architecture|test-architecture.json|Semantic|9a3a999f05abbbb4ee710f14d82fb26d86de5ad5',
+        'test-runtime-efficiency|test-runtime-efficiency.json|Semantic|20c6bc064d04be18ede7ab70983503feb4b799ea',
+        'canonical-repository-evidence|canonical-repository-evidence.json|Semantic|5a323d1cc9b5e64564f63dc577ad0c937a1c91c0'
+    ) -Message 'TEST-0188 immutable three-entry predecessor prefix differs.'
+$harnessModularity = $catalog.Capabilities[3]
+Assert-Equal $harnessModularity.Slug 'test-harness-modularity' `
+    'TEST-0188 appended capability slug differs.'
+Assert-Equal $harnessModularity.Type 'Semantic' `
+    'TEST-0188 appended capability type differs.'
+Assert-Equal $harnessModularity.DefinitionPath `
+    'test-harness-modularity.json' `
+    'TEST-0188 appended capability definition path differs.'
+Assert-Equal $harnessModularity.DefinitionBlob `
+    '9b34dd3d75e4a5b832d8eb9ac77199701254f29a' `
+    'TEST-0188 appended capability definition blob differs.'
+Assert-Equal $harnessModularity.Definition.title `
+    'Modular exact-evidence test harness' `
+    'TEST-0188 appended capability title differs.'
+Assert-Equal $harnessModularity.Definition.applicability.condition `
+    'automated-test-or-validation-surface' `
+    'TEST-0188 applicability condition differs.'
+Assert-Equal $harnessModularity.Definition.applicability.description `
+    'The repository owns an automated test, validation, verification, or policy-checking surface.' `
+    'TEST-0188 applicability description differs.'
+Assert-SequenceEqual -Actual @($harnessModularity.Definition.requirements.id) `
+    -Expected @(
+        'prior-solution-and-sibling-gate',
+        'canonical-generic-mechanic-ownership',
+        'explicit-context-and-exact-case-evidence',
+        'non-overlapping-test-roles',
+        'fail-closed-runtime-evidence',
+        'bounded-self-application'
+    ) -Message 'TEST-0188 requirement IDs differ.'
+Assert-SequenceEqual -Actual @(
+    $harnessModularity.Definition.requirements.statement
+) -Expected @(
+    'Before a correction or helper is implemented, active recurrence signatures, canonical owners, unsafe retries, and every same-contract sibling surface are resolved through reviewed repository evidence.',
+    'Contract-equivalent generic test mechanics have one declared canonical owner; capability-specific assertions, builders, adapters, and semantic evidence remain local.',
+    'Failure/result state uses explicit contexts, and runtime completion binds one canonical suite, one exact `.case.ps1` owner, and one explicit unique canonical TEST-ID subset without source inference.',
+    'Root runner, harness, executable case, documented scenario, capability support, fixture, and mock roles remain explicit and non-overlapping.',
+    'Missing, unexpected, duplicate, inferred, unexecuted, failed, or finalized evidence fails before authoritative success, and final result channels remain exact and mutually exclusive.',
+    'Adoption of the harness is a finite reviewed migration that preserves active TEST identities, behavior, process isolation, supported runtimes, workflow topology, and approved operation budgets without a second framework.'
+) -Message 'TEST-0188 requirement statements differ.'
+Assert-SequenceEqual -Actual @(
+    $harnessModularity.Definition.evidence.conforming
+) -Expected @(
+    'Reviewed recurrence and sibling-owner inventory binds every correction to canonical evidence, with executable recurrence barriers or reviewed NotApplicable rationale.',
+    'Owner, role, and authority contracts plus focused negative execution prove explicit contexts, exact child Case evidence, and rejection of unauthorized redefinition and source inference.',
+    'Transition-zero and final runner evidence preserve TEST results, process and fixture contracts, supported runtimes, workflow topology, and approved operation budgets.'
+) -Message 'TEST-0188 conforming evidence contract differs.'
+Assert-SequenceEqual -Actual @(
+    $harnessModularity.Definition.evidence.notApplicable
+) -Expected @(
+    'Reviewed repository evidence proves that no automated test, validation, verification, or policy-checking surface exists.',
+    'The review identifies the repository scope and explains why adding harness assets is outside the repository authority.'
+) -Message 'TEST-0188 NotApplicable evidence contract differs.'
+$harnessNotApplicable = Resolve-MeAndAICapabilityAssessment `
+    -Capability $harnessModularity -Applicability NotApplicable `
+    -Conformance Unknown -EvidenceKind SemanticReview `
+    -Evidence @('Reviewed repository has no automated validation surface.') `
+    -ReviewIdentity 'github:maintainer' -AdoptionPlan NotRequired
+Assert-Equal $harnessNotApplicable.Outcome 'NotApplicable' `
+    'TEST-0188 reviewed NotApplicable state did not reach a terminal outcome.'
+Assert-True $harnessNotApplicable.Terminal `
+    'TEST-0188 reviewed NotApplicable state is not terminal.'
 $efficiencyNotApplicable = Resolve-MeAndAICapabilityAssessment `
     -Capability $catalog.Capabilities[1] -Applicability NotApplicable `
     -Conformance Unknown -EvidenceKind SemanticReview `
@@ -501,30 +528,55 @@ try {
         'TEST-0134 canonical review timestamp did not survive ledger import.'
     $terminalPending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $ledgerBytes)
-    Assert-Equal $terminalPending.Count 2 `
-        'TEST-0171 one-entry predecessor did not expose both appended capabilities.'
+    Assert-Equal $terminalPending.Count 3 `
+        'TEST-0188 one-entry predecessor did not expose three appended capabilities.'
     Assert-SequenceEqual -Actual @($terminalPending.Slug) -Expected @(
         'test-runtime-efficiency',
-        'canonical-repository-evidence'
-    ) -Message 'TEST-0171 one-entry predecessor capability order differs.'
+        'canonical-repository-evidence',
+        'test-harness-modularity'
+    ) -Message 'TEST-0188 one-entry predecessor capability order differs.'
 
     $appendedEntry = New-ReviewedEntry -Catalog $catalog -CapabilityIndex 1
     $completeLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
         -Catalog $catalog -Entries @($entry, $appendedEntry)
     $completePending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
         -LedgerBytes $completeLedgerBytes)
-    Assert-Equal $completePending.Count 1 `
-        'TEST-0171 two-entry predecessor did not expose one appended capability.'
-    Assert-Equal $completePending[0].Slug 'canonical-repository-evidence' `
-        'TEST-0171 two-entry predecessor exposed the wrong capability.'
+    Assert-Equal $completePending.Count 2 `
+        'TEST-0188 two-entry predecessor did not expose two appended capabilities.'
+    Assert-SequenceEqual -Actual @($completePending.Slug) -Expected @(
+        'canonical-repository-evidence',
+        'test-harness-modularity'
+    ) -Message 'TEST-0188 two-entry predecessor capability order differs.'
     $canonicalEvidenceEntry = New-ReviewedEntry -Catalog $catalog `
         -CapabilityIndex 2
     $terminalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
         -Catalog $catalog `
         -Entries @($entry, $appendedEntry, $canonicalEvidenceEntry)
+    $legacyTerminalPending = @(Get-MeAndAICapabilityPending -Catalog $catalog `
+        -LedgerBytes $terminalLedgerBytes)
+    Assert-Equal $legacyTerminalPending.Count 1 `
+        'TEST-0188 historical three-entry terminal ledger did not remain valid.'
+    Assert-Equal $legacyTerminalPending[0].Slug 'test-harness-modularity' `
+        'TEST-0188 historical three-entry terminal ledger exposed the wrong suffix.'
+    $harnessEntry = New-ReviewedEntry -Catalog $catalog -CapabilityIndex 3 `
+        -Outcome NotApplicable
+    $currentTerminalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $catalog -Entries @(
+            $entry,
+            $appendedEntry,
+            $canonicalEvidenceEntry,
+            $harnessEntry
+        )
+    $currentTerminalLedger = Import-MeAndAICapabilityLedger -Catalog $catalog `
+        -Bytes $currentTerminalLedgerBytes
     Assert-Equal @(Get-MeAndAICapabilityPending -Catalog $catalog `
-        -LedgerBytes $terminalLedgerBytes).Count 0 `
-        'TEST-0171 complete three-entry terminal ledger was not idempotent.'
+        -LedgerBytes $currentTerminalLedgerBytes).Count 0 `
+        'TEST-0188 complete four-entry terminal ledger was not current.'
+    $rerunTerminalLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes `
+        -Catalog $catalog -Entries @($currentTerminalLedger.Entries)
+    Assert-BytesEqual -Actual $rerunTerminalLedgerBytes `
+        -Expected $currentTerminalLedgerBytes `
+        -Message 'TEST-0188 complete four-entry terminal ledger was not idempotent.'
     foreach ($invalidPrefix in @(
         [pscustomobject]@{
             Name = 'reordered'
@@ -541,17 +593,20 @@ try {
         } -Pattern '*not the exact installed-catalog prefix*' `
             -Message "TEST-0157 $($invalidPrefix.Name) ledger prefix was accepted."
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0157'
 
     $missingLedger = Import-MeAndAICapabilityLedger -Catalog $catalog -Bytes $null
     Assert-True $missingLedger.Missing 'TEST-0134 missing ledger was not represented explicitly.'
     $missingPending = @(Get-MeAndAICapabilityPending -Catalog $catalog)
-    Assert-Equal $missingPending.Count 3 `
-        'TEST-0171 missing ledger did not expose all pending capabilities.'
+    Assert-Equal $missingPending.Count 4 `
+        'TEST-0188 missing ledger did not expose all pending capabilities.'
     Assert-SequenceEqual -Actual @($missingPending.Slug) -Expected @(
         'test-architecture',
         'test-runtime-efficiency',
-        'canonical-repository-evidence'
-    ) -Message 'TEST-0171 missing-ledger capability order differs.'
+        'canonical-repository-evidence',
+        'test-harness-modularity'
+    ) -Message 'TEST-0188 missing-ledger capability order differs.'
     $emptyLedgerBytes = ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $catalog `
         -Entries @()
     $emptyLedger = Import-MeAndAICapabilityLedger -Catalog $catalog `
@@ -560,6 +615,8 @@ try {
         'TEST-0134 canonical empty ledger was treated as missing.'
     Assert-Equal $emptyLedger.Entries.Count 0 `
         'TEST-0134 canonical empty ledger did not preserve the exact prefix.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0188'
 
     $notApplicableEntry = New-ReviewedEntry -Catalog $catalog -Outcome 'NotApplicable'
     $notApplicableBytes = ConvertTo-MeAndAICapabilityLedgerBytes -Catalog $catalog `
@@ -638,6 +695,8 @@ try {
         } -Pattern '*canonical*' `
             -Message "TEST-0134 noncanonical timestamp '$($timestampCase.Name)' was accepted."
     }
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0134'
 
     # TEST-0135: every type uses its declared authority model and returns only
     # the four assessment outcomes; only reviewed terminal evidence serializes.
@@ -716,6 +775,8 @@ try {
     Assert-SequenceEqual -Actual $outcomes -Expected @(
         'AdoptionRequired', 'Conforming', 'NotApplicable', 'ReviewRequired'
     ) -Message 'TEST-0135 resolver exposed an unexpected outcome set.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0135'
 
     # TEST-0171: repository evidence uses the exact canonical Git boundary
     # without normalizing bytes and fails closed for ambiguous repository state.
@@ -967,6 +1028,8 @@ try {
             -RelativePath '../escaped.json' -Head $evidenceHead
     } -Pattern '*canonical repository-relative path*' `
         -Message 'TEST-0171 escaping path did not fail closed.'
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+        -TestId 'TEST-0171'
 }
 finally {
     if (Test-Path -LiteralPath $fixtureRoot) {
@@ -976,20 +1039,6 @@ finally {
 
 Write-Host 'Capability catalog and assessment tests passed.'
 
-$evidenceModule = Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1'
-$authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
-if ((Test-Path -LiteralPath $evidenceModule -PathType Leaf) -and
-    (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
-    $authority = Import-PowerShellDataFile -LiteralPath $authorityPath
-    $owner = 'tests/capabilities/capability-adoption/capability-catalog.tests.ps1'
-    if (@($authority.Authorities | Where-Object {
-        [string]$_.Owner -ceq $owner
-    }).Count -eq 1) {
-        Import-Module $evidenceModule -Force
-        $scenarioResult = New-MeAndAIScenarioResult `
-            -Owner $owner -SourcePaths @($PSCommandPath) `
-            -AuthorityPath $authorityPath
-        Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
-            ($scenarioResult | ConvertTo-Json -Compress))
-    }
-}
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
+Write-Host ('MEANDAI_SCENARIO_RESULTS=' + `
+    ($scenarioResult | ConvertTo-Json -Compress))

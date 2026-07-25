@@ -23,6 +23,24 @@ Last verified: **YYYY-MM-DD**
 
 - Link the project's architecture and decisions.
 
+## Active recurrence knowledge
+
+Write `None` when no confirmed recurring constraint is active. Otherwise use
+one concise entry per observable failure; keep detailed history in a dated log.
+
+### Observable failure title
+
+- Status: `Active`, `Stale`, or `Superseded`
+- Observable signature:
+- Applicability:
+- Affected contract and cause:
+- Canonical owner and evidence:
+- Fixed release or evidence:
+- Required safe response:
+- Unsafe retry boundary:
+- Freshness and review condition:
+- Superseded by: exact link or `None`
+
 ## Active context
 
 - Link active issues, features, and pull requests. Remove completed transient

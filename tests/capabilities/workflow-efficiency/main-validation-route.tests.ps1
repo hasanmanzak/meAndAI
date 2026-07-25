@@ -6,18 +6,20 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $modulePath = Join-Path $PSScriptRoot 'MeAndAI.MainValidationRoute.psm1'
 $workflowPath = Join-Path $root '.github/workflows/protocol-tests.yml'
 $protocolPath = Join-Path $root 'PROTOCOL.md'
+$owner = 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1'
 $authorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRepository.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $previousProtocolToken = $env:GH_TOKEN
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-main-route-$([guid]::NewGuid().ToString('N'))"
 $repositoryRoot = Join-Path $tempRoot 'repository'
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
 
 function Invoke-TestGit {
     param([Parameter(Mandatory)][string[]]$Arguments)
@@ -48,17 +50,6 @@ function Set-TestFile {
     [IO.File]::WriteAllText($path, $Content, [Text.UTF8Encoding]::new($false))
 }
 
-function New-TestCommit {
-    param(
-        [Parameter(Mandatory)][string]$Message,
-        [Parameter(Mandatory)][scriptblock]$Change
-    )
-
-    & $Change
-    Invoke-TestGit -Arguments @('add', '--all') | Out-Null
-    Invoke-TestGit -Arguments @('commit', '-m', $Message) | Out-Null
-    return (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
-}
 
 function New-GreenJobs {
     param([int]$RunId = 501)
@@ -179,6 +170,7 @@ function Assert-Route {
     }
 }
 
+$test0143FailureCount = $failures.Count
 try {
     [IO.Directory]::CreateDirectory($repositoryRoot) | Out-Null
     Invoke-TestGit -Arguments @('init', '-b', 'main') | Out-Null
@@ -187,11 +179,11 @@ try {
     Invoke-TestGit -Arguments @('config', 'core.autocrlf', 'false') | Out-Null
     Invoke-TestGit -Arguments @('config', 'commit.gpgsign', 'false') | Out-Null
 
-    $baseline = New-TestCommit -Message 'baseline' -Change {
+    $baseline = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'baseline' -Change {
         Set-TestFile -RelativePath 'README.md' -Content "baseline`n"
     }
     Invoke-TestGit -Arguments @('switch', '-c', 'feature') | Out-Null
-    $featureHead = New-TestCommit -Message 'feature' -Change {
+    $featureHead = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'feature' -Change {
         Set-TestFile -RelativePath 'feature.txt' -Content "feature`n"
     }
     Invoke-TestGit -Arguments @('switch', 'main') | Out-Null
@@ -199,18 +191,18 @@ try {
     $exactMerge = (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
 
     Invoke-TestGit -Arguments @('switch', '-c', 'base-extra', $baseline) | Out-Null
-    $advancedBase = New-TestCommit -Message 'base extra' -Change {
+    $advancedBase = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'base extra' -Change {
         Set-TestFile -RelativePath 'base.txt' -Content "base`n"
     }
     Invoke-TestGit -Arguments @('merge', '--no-ff', 'feature', '-m', 'merge with extra base') | Out-Null
     $differentTreeMerge = (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
 
     Invoke-TestGit -Arguments @('switch', 'main') | Out-Null
-    $directPush = New-TestCommit -Message 'direct push' -Change {
+    $directPush = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'direct push' -Change {
         Set-TestFile -RelativePath 'direct.txt' -Content "direct`n"
     }
     Invoke-TestGit -Arguments @('switch', '-c', 'squash', $baseline) | Out-Null
-    $squashPush = New-TestCommit -Message 'squashed feature' -Change {
+    $squashPush = New-MeAndAITestCommit -Repository $repositoryRoot -Message 'squashed feature' -Change {
         Set-TestFile -RelativePath 'feature.txt' -Content "feature`n"
     }
 
@@ -392,6 +384,7 @@ try {
         Add-Failure 'TEST-0143 workflow uses path filtering that can remove stable check evidence.'
     }
 
+    $test0146FailureCount = $failures.Count
     $jobsIndex = $workflowSource.IndexOf("jobs:", [StringComparison]::Ordinal)
     if ($jobsIndex -lt 0) {
         Add-Failure 'TEST-0146 workflow has no canonical jobs section.'
@@ -435,6 +428,10 @@ try {
             Add-Failure "TEST-0146 workflow lost cross-runtime validation contract '$runtimeContract'."
         }
     }
+    if ($failures.Count -eq $test0146FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0146'
+    }
 
     $protocolSource = Get-Content -LiteralPath $protocolPath -Raw
     if (-not $protocolSource.Contains('sole purpose is to copy external evidence') -or
@@ -461,6 +458,10 @@ finally {
         Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
+if ($failures.Count -eq $test0143FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0143'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Main-validation route tests failed with $($failures.Count) problem(s):" `
@@ -471,8 +472,5 @@ if ($failures.Count -gt 0) {
 
 Write-Host 'Main-validation exact-tree route and efficiency tests passed for TEST-0143 and TEST-0146.' `
     -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/workflow-efficiency/main-validation-route.tests.ps1' `
-    -SourcePaths @($PSCommandPath, $modulePath) `
-    -AuthorityPath $authorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

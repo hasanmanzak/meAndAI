@@ -12,20 +12,20 @@ Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
 Import-Module (Join-Path $root `
     'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $authorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Assert-True {
     param(
         [Parameter(Mandatory)][bool]$Condition,
         [Parameter(Mandatory)][string]$Message
     )
-    if (-not $Condition) { Add-Failure $Message }
+    Assert-MeAndAITestCollectedTrue -Context $failureContext `
+        -Condition $Condition -Message $Message
 }
 
 function Assert-Equal {
@@ -439,6 +439,8 @@ function Assert-ReviewedOperationInventory {
     }
 }
 
+$test0162FailureCount = $failures.Count
+$test0159FailureCount = $failures.Count
 $contract = Import-MeAndAITestOperationContract -Path $contractPath
 Assert-Equal (Get-OptionalPropertyValue -Value $contract `
     -Name 'SchemaVersion') ([long]2) `
@@ -926,10 +928,10 @@ $quickPath = Join-Path $root `
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $bootstrapPath = Join-Path $root `
     ('tests/capabilities/initial-adoption/' +
-     'capabilities-bootstrap-adapter' + '.fixture.ps1')
+     'capabilities-bootstrap-adapter' + '.case.ps1')
 $bootstrapGraphIdentityPath = Join-Path $root `
     ('tests/capabilities/initial-adoption/' +
-     'capabilities-bootstrap-graph-' + 'identity.fixture.ps1')
+     'capabilities-bootstrap-graph-' + 'identity.case.ps1')
 $testGitBatchPath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
 $instructionGraphPath = Join-Path $root `
@@ -1010,6 +1012,10 @@ if ($instructionGraphExpectedReaders.Count -eq 1) {
         -FunctionAst $instructionGraphExpectedReaders[0] `
         -Label 'instruction-graph expected reader'
 }
+if ($failures.Count -eq $test0162FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0162'
+}
 $quickOperationInventory = Get-ReviewedOperationInventory -Ast $quickAst `
     -CommandNames @(
         'git', 'Invoke-Git', 'Invoke-TestGit',
@@ -1072,6 +1078,9 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$rootStrategyContract|<script>' = 1
     '$rootSurfaceContract|<script>' = 1
     '$ruleGraphBuilder|<script>' = 1
+    '$script:GetQuickAdoptionHarnessGitBlobSha1|<script>' = 2
+    '$script:GetQuickAdoptionHarnessGitBlobSha1|Get-TestQuickAdoptionGitBlobSha1' = 1
+    '$script:ImportQuickAdoptionCapabilityCatalog|Copy-CanonicalProtocolFixture' = 1
     '$strategyResolver|<script>' = 4
     '$surfaceInventoryContract|<script>' = 2
     '$targetCommand|New-TestQuickAdoptionCompletionContractFixture' = 1
@@ -1086,7 +1095,6 @@ $quickUnclassifiedGitSplats =
 Assert-ReviewedOperationInventory -Actual $quickUnclassifiedGitSplats `
     -Expected ([ordered]@{
         '@Arguments|Invoke-Git|git' = 1
-        '@Arguments|Invoke-TestGit|git' = 1
     }) -Label 'quick-adoption unclassified Git splat'
 $syntheticTokens = $null
 $syntheticErrors = $null
@@ -1177,9 +1185,6 @@ $bootstrapDynamicInvocations =
     Get-ReviewedDynamicInvocationInventory -Ast $bootstrapAst
 $expectedBootstrapDynamicInvocations = [ordered]@{
     '$adapterPath|Invoke-BootstrapFixture' = 2
-    '$engine|Get-FixtureInstructionGraphIdentity' = 1
-    '$engine|Invoke-IsolatedGraphDriftFixture' = 1
-    '$engine|Invoke-IsolatedGraphSuccessFixture' = 1
 }
 Assert-ReviewedOperationInventory -Actual $bootstrapDynamicInvocations `
     -Expected $expectedBootstrapDynamicInvocations `
@@ -1189,26 +1194,35 @@ $bootstrapRecursiveCleanup =
 Assert-ReviewedOperationInventory -Actual $bootstrapRecursiveCleanup `
     -Expected ([ordered]@{ 'Remove-Item|<script>' = 2 }) `
     -Label 'bootstrap recursive cleanup'
-$bootstrapChildProcesses = @($bootstrapAst.FindAll({
+$bootstrapChildCases = @($bootstrapAst.FindAll({
     param($node)
     $node -is [System.Management.Automation.Language.CommandAst] -and
-    $node.InvocationOperator -eq
-        [System.Management.Automation.Language.TokenKind]::Ampersand -and
-    $node.CommandElements.Count -gt 0 -and
-    $node.CommandElements[0].Extent.Text -ceq '$engine'
+    $node.GetCommandName() -ceq 'Invoke-BootstrapChildCase'
 }, $true))
 $expectedBootstrapChildParents = [ordered]@{
     'Get-FixtureInstructionGraphIdentity' = 1
     'Invoke-IsolatedGraphDriftFixture' = 1
     'Invoke-IsolatedGraphSuccessFixture' = 1
 }
-Assert-Equal $bootstrapChildProcesses.Count 3 `
-    'TEST-0159 bootstrap child-process call-site count differs.'
+Assert-Equal $bootstrapChildCases.Count 3 `
+    'TEST-0159 bootstrap child-Case call-site count differs.'
 foreach ($entry in $expectedBootstrapChildParents.GetEnumerator()) {
-    Assert-Equal @($bootstrapChildProcesses | Where-Object {
+    Assert-Equal @($bootstrapChildCases | Where-Object {
         (Get-ParentFunctionName -Node $_) -ceq [string]$entry.Key
     }).Count ([int]$entry.Value) `
-        "TEST-0159 bootstrap child-process count differs for '$($entry.Key)'."
+        "TEST-0159 bootstrap child-Case count differs for '$($entry.Key)'."
+}
+$bootstrapProcessOwners = @($bootstrapAst.FindAll({
+    param($node)
+    $node -is [System.Management.Automation.Language.CommandAst] -and
+    $node.GetCommandName() -ceq 'Invoke-MeAndAITestCaseProcess'
+}, $true))
+Assert-Equal $bootstrapProcessOwners.Count 1 `
+    'TEST-0159 bootstrap canonical child-process owner count differs.'
+if ($bootstrapProcessOwners.Count -eq 1) {
+    Assert-Equal (Get-ParentFunctionName -Node $bootstrapProcessOwners[0]) `
+        'Invoke-BootstrapChildCase' `
+        'TEST-0159 bootstrap child process escaped its canonical owner.'
 }
 $bootstrapIncrements = @($bootstrapAst.FindAll({
     param($node)
@@ -1221,7 +1235,7 @@ $bootstrapIncrements = @($bootstrapAst.FindAll({
 $bootstrapParents = @(
     'New-ImmutableBootstrapBaseline',
     'New-BootstrapFixture',
-    'Get-FixtureInstructionGraphIdentity',
+    'Invoke-BootstrapChildCase',
     'Invoke-IsolatedGraphDriftFixture',
     'Invoke-IsolatedGraphSuccessFixture'
 )
@@ -1237,7 +1251,7 @@ $expectedBootstrapIncrements = [ordered]@{
     FixtureClone = 2
     FixtureBundleCreate = 2
     FixturePublicationPush = 1
-    GraphChildProcess = 3
+    GraphChildProcess = 1
     GraphIsolatedAcquisition = 2
 }
 foreach ($entry in $expectedBootstrapIncrements.GetEnumerator()) {
@@ -1280,7 +1294,12 @@ if ($operationAssertions.Count -eq 1 -and $scenarioReads.Count -eq 1 -and
         $compatibilityReads[0].Extent.StartOffset) `
         'TEST-0159 root runner parses compatibility success before operation evidence.'
 }
+if ($failures.Count -eq $test0159FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0159'
+}
 
+$test0158FailureCount = $failures.Count
 $hotspotContracts = @(
     [pscustomobject]@{
         Path = $quickPath
@@ -1318,6 +1337,10 @@ foreach ($hotspot in $hotspotContracts) {
             "TEST-0158 required hotspot contract '$token' is absent."
     }
 }
+if ($failures.Count -eq $test0158FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0158'
+}
 
 $workflowPath = Join-Path $root '.github/workflows/protocol-tests.yml'
 $workflowSource = [IO.File]::ReadAllText($workflowPath)
@@ -1352,11 +1375,7 @@ $selfCounters = @([pscustomobject][ordered]@{
 $selfObservation = Format-MeAndAITestOperationObservation -Owner $owner `
     -Route $selfExpectation.Route -Runtime $selfExpectation.Runtime `
     -Counters $selfCounters
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0158'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0159'
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0162'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $authorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host 'Test-runtime operation contracts passed.' -ForegroundColor Green
 Write-Host $selfObservation
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' +

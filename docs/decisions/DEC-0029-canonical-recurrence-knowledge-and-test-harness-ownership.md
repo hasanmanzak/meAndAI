@@ -1,7 +1,7 @@
 # DEC-0029 - Keep Recurrence Knowledge and Test Harness Roles under Canonical Owners
 
 - Classification: Decision
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-07-25
 - Decision owners: meAndAI maintainer and protocol contributors
 - Related features: [FEAT-0051](../features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)

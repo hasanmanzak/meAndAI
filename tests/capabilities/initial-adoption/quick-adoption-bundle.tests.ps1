@@ -5,13 +5,12 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $owner = 'tests/capabilities/initial-adoption/quick-adoption-bundle.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-    $failures.Add($Message)
-}
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 
 function Get-RelativeFileText {
     param([Parameter(Mandatory)][string]$RelativePath)
@@ -35,7 +34,7 @@ function New-TestRuntimeBundle {
 
     $moduleSource = @'
 function Invoke-MeAndAIQuickAdoption {
-    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.14.5')
+    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.15.0')
     [IO.File]::WriteAllText(
         $env:MEANDAI_TEST_RUNTIME_SENTINEL,
         "$TargetPath`n$ProtocolTag",
@@ -47,7 +46,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
     $moduleManifest = @'
 @{
     RootModule = 'MeAndAI.QuickAdoption.psm1'
-    ModuleVersion = '0.14.5'
+    ModuleVersion = '0.15.0'
     GUID = '04ed28e4-4f2c-4ec0-9497-d81487d114ec'
     PowerShellVersion = '5.1'
     FunctionsToExport = @('Invoke-MeAndAIQuickAdoption')
@@ -85,7 +84,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
         schema = 1
         kind = 'meandai.quick-adoption.module-bundle'
         runtimeRepository = 'hasanmanzak/meAndAI'
-        runtimeReleaseTag = 'v0.14.5'
+        runtimeReleaseTag = 'v0.15.0'
         sourceCommit = if ($ManifestSourceCommit) {
             $ManifestSourceCommit
         }
@@ -237,6 +236,7 @@ $inventoryRelativePath = 'scripts/quick-adoption/bundle.sources.json'
 $moduleRelativePaths = @(
     'scripts/quick-adoption/MeAndAI.QuickAdoption.psd1',
     'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/quick-adoption/Private/Configuration.ps1',
     'scripts/quick-adoption/Private/OutputAndNativeProcess.ps1',
     'scripts/quick-adoption/Private/RepositoryAssessment.ps1',
@@ -264,7 +264,7 @@ if ($bootstrap) {
         Add-Failure "TEST-0147 thin bootstrapper exceeds its bounded review surface: $lineCount lines."
     }
     foreach ($required in @(
-        "`$runtimeReleaseTag = 'v0.14.5'",
+        "`$runtimeReleaseTag = 'v0.15.0'",
         "`$runtimeBundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'",
         '$runtimeBundleMaximumArchiveBytes = 67108864',
         '$runtimeBundleMaximumExpandedBytes = 67108864',
@@ -354,7 +354,13 @@ if ($inventoryText) {
             Add-Failure 'TEST-0147 bundle source inventory identity is invalid.'
         }
         $expectedBundleSources = @($moduleRelativePaths | ForEach-Object {
-            ($_ -replace '^scripts/quick-adoption/', 'MeAndAI.QuickAdoption/')
+            if ($_ -ceq 'scripts/MeAndAI.ContentIdentity.psm1') {
+                'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1'
+            }
+            else {
+                ($_ -replace '^scripts/quick-adoption/', `
+                    'MeAndAI.QuickAdoption/')
+            }
         })
         $actualBundleSources = @($inventory.sources | ForEach-Object { [string]$_ })
         if (($actualBundleSources -join "`n") -cne ($expectedBundleSources -join "`n")) {
@@ -368,8 +374,9 @@ if ($inventoryText) {
             "'(?<path>(?:Private|Public)/[A-Za-z0-9_.-]+\.ps1)'",
             [Text.RegularExpressions.RegexOptions]::CultureInvariant
         ) | ForEach-Object { $_.Groups['path'].Value })
-        $expectedLoaderSources = @($actualBundleSources | Select-Object -Skip 2 |
-            ForEach-Object {
+        $expectedLoaderSources = @($actualBundleSources | Where-Object {
+            $_ -match '^MeAndAI\.QuickAdoption/(?:Private|Public)/.+\.ps1$'
+        } | ForEach-Object {
                 $_.Substring('MeAndAI.QuickAdoption/'.Length)
             })
         if (($loaderSources -join "`n") -cne ($expectedLoaderSources -join "`n")) {
@@ -422,6 +429,10 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         [void](New-Item -ItemType Directory -Path $sourceScripts -Force)
         Copy-Item -LiteralPath (Join-Path $root 'scripts/quick-adoption') `
             -Destination $sourceScripts -Recurse
+        Copy-Item -LiteralPath (Join-Path $root `
+            'scripts/MeAndAI.ContentIdentity.psm1') `
+            -Destination (Join-Path $sourceScripts `
+                'MeAndAI.ContentIdentity.psm1')
         $fixtureBuilderPath = Join-Path $sourceScripts `
             'Build-MeAndAIQuickAdoptionBundle.ps1'
         Copy-Item -LiteralPath $builderPath -Destination $fixtureBuilderPath
@@ -456,7 +467,8 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             & git -C $sourceRoot config core.autocrlf false
             if ($LASTEXITCODE -ne 0) { throw 'Unable to pin fixture blob bytes.' }
             & git -C $sourceRoot add -- .gitattributes scripts/quick-adoption `
-                scripts/Build-MeAndAIQuickAdoptionBundle.ps1
+                scripts/Build-MeAndAIQuickAdoptionBundle.ps1 `
+                scripts/MeAndAI.ContentIdentity.psm1
             if ($LASTEXITCODE -ne 0) { throw 'Unable to stage bundle fixture sources.' }
             & git -C $sourceRoot commit -q -m 'TEST-0147 bundle source fixture'
             if ($LASTEXITCODE -ne 0) { throw 'Unable to commit bundle fixture sources.' }
@@ -482,10 +494,10 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $second = Join-Path $fixtureRoot 'second.zip'
         $defaultRoot = Join-Path $fixtureRoot 'default-root.zip'
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
             -OutputPath $first)
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
             -OutputPath $second)
         if ($PSVersionTable.PSEdition -ceq 'Desktop') {
             $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
@@ -494,7 +506,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 $ErrorActionPreference = 'Continue'
                 $defaultRootOutput = @(& $windowsPowerShell -NoProfile `
                     -ExecutionPolicy Bypass -File $fixtureBuilderPath `
-                    -RuntimeReleaseTag 'v0.14.5' `
+                    -RuntimeReleaseTag 'v0.15.0' `
                     -SourceCommit $sourceCommit -OutputPath $defaultRoot 2>&1)
                 $defaultRootExitCode = $LASTEXITCODE
             }
@@ -506,7 +518,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
         }
         else {
-            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.14.5' `
+            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.15.0' `
                 -SourceCommit $sourceCommit -OutputPath $defaultRoot)
         }
         if (-not (Test-Path -LiteralPath $first -PathType Leaf) -or
@@ -538,7 +550,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json }
             finally { $reader.Dispose() }
             if ([string]$manifest.sourceCommit -cne $sourceCommit -or
-                [string]$manifest.runtimeReleaseTag -cne 'v0.14.5') {
+                [string]$manifest.runtimeReleaseTag -cne 'v0.15.0') {
                 throw 'Production bundle manifest does not bind the exact source identity.'
             }
             $expectedEntryOrder = @('manifest.json') + @(
@@ -555,8 +567,16 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 if ($entry.Count -ne 1) {
                     throw "Production payload '$($record.path)' is missing or duplicated."
                 }
-                $sourceRelative = 'scripts/quick-adoption/' +
-                    ([string]$record.path).Substring('MeAndAI.QuickAdoption/'.Length)
+                $sourceRelative = if ([string]$record.path -ceq
+                    'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
+                    'scripts/MeAndAI.ContentIdentity.psm1'
+                }
+                else {
+                    'scripts/quick-adoption/' +
+                        ([string]$record.path).Substring(
+                            'MeAndAI.QuickAdoption/'.Length
+                        )
+                }
                 $expectedBytes = Read-TestTrackedBlob -Repository $sourceRoot `
                     -Commit $sourceCommit -RelativePath $sourceRelative
                 $stream = $entry[0].Open()
@@ -619,7 +639,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
             try {
                 [void](& $builderPath -SourceRoot $sourceRoot `
-                    -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+                    -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
                     -OutputPath $partialOutput)
             }
             catch {
@@ -645,7 +665,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $dirtyRejected = $false
         try {
             [void](& $builderPath -SourceRoot $sourceRoot `
-                -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+                -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
                 -OutputPath $dirtyOutput)
         }
         catch {
@@ -837,7 +857,7 @@ exit /b %ERRORLEVEL%
                 }
             }
             if ($scenario.ShouldPass) {
-                $expectedSentinel = "$runtimeRoot`nv0.14.5"
+                $expectedSentinel = "$runtimeRoot`nv0.15.0"
                 if (-not (Test-Path -LiteralPath $sentinel -PathType Leaf) -or
                     [IO.File]::ReadAllText($sentinel) -cne $expectedSentinel) {
                     Add-Failure 'TEST-0147 verified thin bootstrap did not invoke its exact module entry point.'
@@ -951,8 +971,8 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0147'
-$scenarioResult = New-MeAndAIScenarioResult -Owner $owner `
-    -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0147'
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Output ('MEANDAI_SCENARIO_RESULTS=' + `
     ($scenarioResult | ConvertTo-Json -Compress))

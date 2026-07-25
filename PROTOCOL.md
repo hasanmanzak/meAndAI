@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.14.5**<br>
+Protocol version: **0.15.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -106,6 +106,31 @@ features, decisions, issues, pull requests, tests, and relevant call sites. Do
 not infer contracts from a single file when the repository can answer the
 question. Confirm the Git boundary and preserve unrelated user changes.
 
+Before selecting a tool, planning a correction, or mutating the tree, consult
+the project's active recurrence knowledge and canonical prior work for the
+affected contract. Apply the state and evidence rules in
+[Recurrence knowledge contract](#recurrence-knowledge-contract). A matching
+`Active` entry routes the work to its required response. No matching entry is
+recorded as explicit `None` and is not evidence that the route is safe. A
+`Stale` entry requires renewed evidence, a `Superseded` entry routes only to
+its replacement, and multiple applicable `Active` entries are ambiguous and
+block mutation.
+
+Before delegating repository work, the delegating owner MUST resolve the
+applicable active recurrence entries for the delegated contract and include
+their required safe responses and unsafe retry boundaries in the task brief.
+The delegated agent MUST re-read [repository instructions](AGENTS.md) and active
+recurrence knowledge before its first tool call. Inherited conversation context or a
+generic instruction to follow the protocol is not evidence that this handoff
+occurred.
+
+Do not repeat the same failed operation with unchanged inputs, environment,
+authority, and preconditions. A repeat requires new evidence that changes the
+failed precondition, a materially different verified route, or an explicitly
+declared idempotent retry contract such as the bounded provider-read contract
+under [consumer update proposals](#consumer-update-proposals). Otherwise stop
+as `Blocked` and preserve the failure evidence.
+
 ### Gate 1 - Definition of Ready
 
 Implementation MUST NOT start until the work item has:
@@ -119,6 +144,10 @@ Implementation MUST NOT start until the work item has:
 - identified risks and decisions;
 - a decomposition into reviewable slices when the work is not small;
 - numbered test scenarios, including failure and boundary behavior; and
+- prior-art and recurrence evidence: the matching active entry or explicit
+  `None`, canonical owner, same-contract sibling inventory, any failed route
+  and changed evidence or alternate route, and the planned executable
+  recurrence barrier or reviewed `NotApplicable` rationale; and
 - an implementation and verification approach appropriate to the repository.
 
 An automated dependency updater MAY create a deterministic, pointer-only draft
@@ -143,6 +172,12 @@ and validation semantics where applicable.
 Review ownership and invariants, dependency direction, transaction and state
 boundaries, concurrency, error behavior, compatibility, and existing extension
 points. Search for related logic before introducing a new implementation.
+Inventory every same-contract sibling surface and identify one canonical owner
+before correcting a defect or adding a helper. Similar names or syntax alone
+do not establish shared semantics or justify consolidation. A correction MUST
+trace the affected contract through every inventoried sibling so that an
+existing canonical solution is reused and a shared defect is not fixed at only
+one call site.
 
 When a defect is exposed in a consuming repository, classify its owning layer
 before correction. If the root contract, algorithm, automation, template,
@@ -226,6 +261,13 @@ A defect found in newly written code is fixed in the current slice or becomes a
 blocking issue. It MUST NOT be deferred merely so a later scan can say the new
 code should have been written differently. Legacy findings may be scheduled
 separately only when they do not invalidate the new work and are linked.
+
+A corrected defect or finding MUST close with an executable recurrence barrier
+owned by a numbered scenario, or with a reviewed `NotApplicable` rationale that
+names its authority and review condition. For a confirmed recurring failure,
+create or update its project-local recurrence entry and canonical links. Project
+memory is routing evidence, not regression evidence, and cannot satisfy this
+closure gate by itself.
 
 Every review or scan observation receives exactly one disposition:
 
@@ -752,6 +794,17 @@ contained regular-blob or ordinary-file evidence, fail-closed ambiguity, and
 read-only idempotent resolution. Automation may request the semantic review but
 does not gain ownership of the consumer's implementation.
 
+The `test-harness-modularity` semantic capability applies when a repository
+owns an automated test, validation, verification, or policy-checking surface.
+It requires reviewed recurrence and same-contract sibling routing before a
+correction or helper is implemented; one declared owner for contract-equivalent
+generic mechanics; explicit failure and result contexts; exact child Case
+evidence without source inference; non-overlapping runner, harness, case,
+scenario, support, fixture, and mock roles; fail-closed runtime evidence; and a
+finite self-application that preserves active TEST identities, behavior,
+process isolation, supported runtimes, workflow topology, and approved
+operation budgets without introducing a second framework.
+
 An applicable repository MUST record or emit machine-readable fixture and
 operation evidence that binds ownership, lifecycle, builds, reuse, mutable
 derivatives, cleanup, and reviewed count budgets. Undeclared construction,
@@ -1164,6 +1217,43 @@ Portable project memory lives in the consuming repository at `.ai/memory`,
 outside the protocol submodule. It contains durable project facts, collaboration
 constraints, active context, and concise dated handoffs needed to continue work
 on another machine.
+
+### Recurrence knowledge contract
+
+When a confirmed tool, environment, integration, or implementation failure can
+reasonably recur, the project snapshot contains a compact `Active recurrence
+knowledge` entry. The live entry routes later work; detailed historical output
+belongs in a dated memory log or canonical issue rather than the active index.
+Each entry records:
+
+- Status: `Active`, `Stale`, or `Superseded`;
+- Observable signature;
+- Applicability;
+- Affected contract and cause;
+- Canonical owner and evidence, including the applicable feature, decision,
+  work item, and executable test or reviewed `NotApplicable` authority;
+- Fixed release or evidence when no release can own the condition;
+- Required safe response;
+- Unsafe retry boundary;
+- Freshness and review condition; and
+- Superseded-by link or explicit `None`.
+
+Matching uses the observable signature, affected contract, and applicability;
+text similarity alone is insufficient. One applicable current `Active` entry
+routes to its canonical response. No matching entry is explicit `None` and
+continues through ordinary [Gate 0](#gate-0---context-and-baseline) and
+[Gate 2](#gate-2---design-and-contract-review) evidence. A `Stale` entry blocks
+automatic reuse until its review condition is satisfied. A `Superseded` entry
+cannot route work except through its exact replacement. Missing replacement
+evidence, a supersession cycle, multiple applicable `Active` entries, or
+conflicting canonical owners is ambiguous and fails closed.
+
+Reusable rules remain in this protocol. Project, tool, environment, and local
+integration facts remain in that project's memory; tool-local memory may cache
+only a pointer. The entry MUST be concise, secret-free, freshness-aware, and
+linked to canonical evidence. Memory is routing evidence, not regression
+evidence; it never replaces an executable recurrence barrier or reviewed
+`NotApplicable` result.
 
 Memory MUST:
 

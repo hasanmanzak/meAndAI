@@ -5,16 +5,21 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/protocol-governance/protocol-governance.tests.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.MarkdownEvidence.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestDiscovery.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRuntime.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
-
-function Add-Failure {
-    param([string]$Message)
-    $failures.Add($Message)
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+$scenarioEvidenceContext = $null
+if (-not $StructureOnly) {
+    $scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+        -Owner $owner -AuthorityPath $scenarioAuthorityPath
 }
+$testContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $testContext
+$failures = $testContext.Failures
 
 function Assert-File {
     param([string]$RelativePath)
@@ -170,6 +175,7 @@ function Get-Utf8TextEvidence {
     }
 }
 
+$test0001FailureCount = $failures.Count
 $requiredFiles = @(
     'AGENTS.md',
     'CHANGELOG.md',
@@ -190,9 +196,11 @@ $requiredFiles = @(
     'capabilities/index.json',
     'capabilities/canonical-repository-evidence.json',
     'capabilities/test-architecture.json',
+    'capabilities/test-harness-modularity.json',
     'capabilities/test-runtime-efficiency.json',
     'scripts/MeAndAI.RepositoryEvidence.psm1',
     'scripts/MeAndAI.CapabilityCatalog.psm1',
+    'scripts/MeAndAI.ContentIdentity.psm1',
     'scripts/MeAndAI.CapabilityReview.psm1',
     'scripts/Invoke-MeAndAIQuickAdoption.ps1',
     'templates/project/AGENTS.submodule.md',
@@ -233,6 +241,8 @@ $requiredFiles = @(
 )
 $requiredFiles | ForEach-Object { Assert-File $_ }
 
+$test0044FailureCount = $failures.Count
+$test0059FailureCount = $failures.Count
 $indexedRecords = @(
     Get-IndexedMarkdownTargets -IndexRelativePath 'docs/features/README.md' `
         -TargetPattern '^docs/features/FEAT-\d{4}-[^/]+/README\.md$'
@@ -270,7 +280,11 @@ foreach ($pattern in $recordPatterns) {
         }
     }
 }
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0044'
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0044FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0044'
+}
 
 $testSuites = @(Get-MeAndAITestSuite -RepositoryRoot $root)
 if ($testSuites.Count -eq 0) {
@@ -287,6 +301,7 @@ foreach ($adapterSuite in $adapterSuites) {
     }
 }
 
+$test0074FailureCount = $failures.Count
 $scenarioDeclarations = @{}
 foreach ($testCaseFile in @(Get-ChildItem -LiteralPath (Join-Path $root 'docs/features') `
     -Recurse -File -Filter 'test-cases.md')) {
@@ -474,34 +489,77 @@ foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
     }
 }
 
-$suppressedSourcePath = Join-Path ([IO.Path]::GetTempPath()) `
-    "meandai-suppressed-scenario-$([guid]::NewGuid().ToString('N')).ps1"
-try {
-    [IO.File]::WriteAllText(
-        $suppressedSourcePath,
-        @"
-Add-Failure 'TEST-9000 executed assertion'
-`$scenarioResult = [ordered]@{
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0074FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0074'
+}
+
+if (-not $StructureOnly) {
+    $test0091FailureCount = $failures.Count
+    $suppressedAuthorityPath = Join-Path ([IO.Path]::GetTempPath()) `
+        "meandai-suppressed-scenario-$([guid]::NewGuid().ToString('N')).psd1"
+    try {
+        [IO.File]::WriteAllText(
+            $suppressedAuthorityPath,
+            @'
+@{
+    SchemaVersion = 1
+    Authorities = @(
+        @{
+            Owner = 'tests/synthetic.tests.ps1'
+            Evidence = 'ExecutableSuite'
+            TestIds = @('TEST-9000', 'TEST-9001')
+        }
+    )
+}
+'@,
+            [Text.UTF8Encoding]::new($false)
+        )
+        $hardCodedScenarioSource = @'
+$scenarioResult = [ordered]@{
     schema = 1
     owner = 'tests/synthetic.tests.ps1'
     passed = @('TEST-9000', 'TEST-9001')
 }
-"@,
-        [Text.UTF8Encoding]::new($false)
-    )
-    $suppressedSourceIds = @(Get-MeAndAISourceBoundScenarioIds `
-        -SourcePaths @($suppressedSourcePath))
-    $suppressedComparison = Compare-MeAndAIExactScenarioId `
-        -Expected @('TEST-9000', 'TEST-9001') -Observed $suppressedSourceIds
-    if ($suppressedComparison.Valid -or
-        -not $suppressedComparison.Message.Contains('missing=[TEST-9001]')) {
-        Add-Failure 'TEST-0091 hard-coded output survived a removed scenario assertion.'
+'@
+        if (-not $hardCodedScenarioSource.Contains(
+            "passed = @('TEST-9000', 'TEST-9001')")) {
+            Add-Failure 'TEST-0091 hard-coded passed-list fixture is invalid.'
+        }
+
+        $suppressedContext = New-MeAndAIScenarioEvidenceContext `
+            -Owner 'tests/synthetic.tests.ps1' `
+            -AuthorityPath $suppressedAuthorityPath
+        Confirm-MeAndAIScenarioEvidence -Context $suppressedContext `
+            -TestId 'TEST-9000'
+        $missingExplicitEvidenceRejected = $false
+        try {
+            [void](New-MeAndAIScenarioResult -Context $suppressedContext)
+        }
+        catch {
+            $missingExplicitEvidenceRejected = $_.Exception.Message.Contains(
+                'missing or unexecuted: TEST-9001'
+            )
+            if (-not $missingExplicitEvidenceRejected) {
+                Add-Failure "TEST-0091 explicit-context rejection differed: $($_.Exception.Message)"
+            }
+        }
+        if (-not $missingExplicitEvidenceRejected) {
+            Add-Failure 'TEST-0091 hard-coded output satisfied an unconfirmed expected scenario.'
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $suppressedAuthorityPath -Force `
+            -ErrorAction SilentlyContinue
+    }
+    if ($failures.Count -eq $test0091FailureCount) {
+        Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+            -TestId 'TEST-0091'
     }
 }
-finally {
-    Remove-Item -LiteralPath $suppressedSourcePath -Force -ErrorAction SilentlyContinue
-}
 
+$test0114FailureCount = $failures.Count
 $versionNeutralConsumerFiles = @(
     'templates/project/.ai/memory/README.md',
     'templates/project/.ai/memory/project.md',
@@ -527,6 +585,11 @@ if (-not (Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw).Contain
 )) {
     Add-Failure 'TEST-0114 protocol does not define one live consumer pin authority.'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0114FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0114'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -540,6 +603,7 @@ function Test-CanonicalProtocolVersion {
     return $Value -cmatch '^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$'
 }
 
+$test0002FailureCount = $failures.Count
 foreach ($validVersion in @(
     '0.0.0', '0.8.4', '1.0.0', '10.20.300',
     '92233720368547758081234567890.2147483648.999999999999999999999999'
@@ -558,6 +622,7 @@ foreach ($invalidVersion in @(
     }
 }
 
+$test0092FailureCount = $failures.Count
 $v084Memory = Get-Content -LiteralPath (
     Join-Path $root '.ai/memory/log/2026-07-16-v084-correction.md'
 ) -Raw
@@ -594,6 +659,7 @@ foreach ($stableProjection in @(
     }
 }
 
+$test0085FailureCount = $failures.Count
 $implementedScenarioPaths = @(
     'docs/features/FEAT-0005-ai-capabilities-lifecycle/test-cases.md',
     'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md',
@@ -616,7 +682,13 @@ foreach ($stablePullRequest in @(
         Add-Failure "TEST-0085 FEAT-0012 is missing stable merged pull-request link '$stablePullRequest'."
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0085FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0085'
+}
 
+$test0006FailureCount = $failures.Count
 $versionPath = Join-Path $root 'VERSION'
 if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
     $version = (Get-Content -LiteralPath $versionPath -Raw).Trim()
@@ -731,7 +803,24 @@ if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
         }
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0002FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0002'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0006FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0006'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0092FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0092'
+}
 
+$test0050FailureCount = $failures.Count
+$test0056FailureCount = $failures.Count
 $releaseMetadataChecks = [ordered]@{
     'docs/features/FEAT-0007-local-codex-adoption/README.md' = @(
         '| Status | Complete |',
@@ -762,7 +851,16 @@ foreach ($entry in $releaseMetadataChecks.GetEnumerator()) {
         }
     }
 }
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0056'
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0050FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0050'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0056FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0056'
+}
 
 $rootRunnerPath = Join-Path $root 'tests/protocol.tests.ps1'
 $validatorSource = (Get-Content -LiteralPath $rootRunnerPath -Raw) + "`n" +
@@ -818,6 +916,11 @@ foreach ($requiredEfficiencyText in @(
     if (-not $normalizedProtocolMandateSource.Contains($requiredEfficiencyText)) {
         Add-Failure "TEST-0001 test-runtime-efficiency protocol contract is missing '$requiredEfficiencyText'."
     }
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0001FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0001'
 }
 
 $quickAdoptionSuitePath = Join-Path $root `
@@ -975,6 +1078,7 @@ foreach ($requiredSelectorText in @(
         Add-Failure "TEST-0124 fail-safe selector is missing '$requiredSelectorText'."
     }
 }
+$test0118FailureCount = $failures.Count
 $normalValidationGuard = "if: `${{ !(github.event_name == 'workflow_dispatch' && inputs.verify_post_publication) }}"
 if ([regex]::Matches(
     $ciWorkflow,
@@ -985,6 +1089,11 @@ if ([regex]::Matches(
 $postPublicationGuard = "if: github.event_name == 'workflow_dispatch' && inputs.verify_post_publication"
 if (-not $ciWorkflow.Contains($postPublicationGuard)) {
     Add-Failure 'TEST-0118 the post-publication verifier lacks its positive release-only guard.'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0118FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0118'
 }
 $quickFunctionNames = @($quickAst.FindAll({
     param($node)
@@ -1068,6 +1177,7 @@ if (-not $integrityFeature.Contains('historical annotated tag') -or
     Add-Failure 'TEST-0059 v0.7.2 release evidence overstates annotated-tag authority.'
 }
 
+$test0066FailureCount = $failures.Count
 $bootstrapAdapterPath = Join-Path $root `
     'templates/project/.github/scripts/Invoke-MeAndAICapabilitiesBootstrap.ps1'
 $bootstrapTokens = $null
@@ -1090,7 +1200,11 @@ if (@($bootstrapParseErrors).Count -gt 0 -or
     }).Count -ne 0) {
     Add-Failure 'TEST-0059 bootstrap exact-state responsibility seams are missing or invalid.'
 }
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0066'
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0066FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0066'
+}
 
 $protocolDecision = Get-Content -LiteralPath (
     Join-Path $root 'docs/decisions/DEC-0010-stable-automation-invariants.md'
@@ -1115,7 +1229,13 @@ else {
         Get-Item -LiteralPath (Join-Path $root ([string]$_))
     })
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0059FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0059'
+}
 
+$test0003FailureCount = $failures.Count
 foreach ($file in $markdownFiles) {
     $markdown = Get-Content -LiteralPath $file.FullName -Raw
     $display = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
@@ -1201,7 +1321,13 @@ foreach ($file in $markdownFiles) {
         }
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0003FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0003'
+}
 
+$test0004FailureCount = $failures.Count
 $featureRoot = Join-Path $root 'docs/features'
 $featureDirectories = Get-ChildItem -LiteralPath $featureRoot -Directory |
     Where-Object { $_.Name -match '^FEAT-\d{4}-' }
@@ -1213,7 +1339,13 @@ foreach ($directory in $featureDirectories) {
         }
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0004FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0004'
+}
 
+$test0005FailureCount = $failures.Count
 $decisionFiles = Get-ChildItem -LiteralPath (Join-Path $root 'docs/decisions') -File -Filter 'DEC-*.md'
 foreach ($file in $decisionFiles) {
     if ($file.BaseName -notmatch '^DEC-\d{4}-.+') {
@@ -1229,7 +1361,13 @@ foreach ($file in $decisionFiles) {
         }
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0005FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0005'
+}
 
+$test0007FailureCount = $failures.Count
 $formExpectations = @{
     'epic.yml' = @('[EPIC-NNNN]', 'type:epic')
     'feature.yml' = @('[FEAT-NNNN]', 'type:feature', 'test-code and baseline-run status')
@@ -1249,6 +1387,7 @@ foreach ($entry in $formExpectations.GetEnumerator()) {
     }
 }
 
+$test0084FailureCount = $failures.Count
 $findingForm = Get-Content -LiteralPath (Join-Path $root '.github/ISSUE_TEMPLATE/finding.yml') -Raw
 $dispositionBlock = [regex]::Match(
     $findingForm,
@@ -1276,6 +1415,11 @@ if (($actualDispositions -join '|') -cne ($expectedDispositions -join '|') -or
     ($actualClassifications -join '|') -cne ($expectedClassifications -join '|')) {
     Add-Failure 'TEST-0084 finding form must keep the four exact review dispositions separate from defect/risk/improvement classification.'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0084FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0084'
+}
 
 $config = Get-Content -LiteralPath (Join-Path $root '.github/ISSUE_TEMPLATE/config.yml') -Raw
 foreach ($requiredText in @('blank_issues_enabled: false', 'contact_links:', 'https://')) {
@@ -1290,7 +1434,14 @@ foreach ($requiredText in @('## Classification and links', '## Test evidence', '
         Add-Failure "TEST-0007 pull request template is missing '$requiredText'"
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0007FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0007'
+}
 
+$test0008FailureCount = $failures.Count
+$test0047FailureCount = $failures.Count
 $submoduleAdapter = Get-Content -LiteralPath (Join-Path $root 'templates/project/AGENTS.submodule.md') -Raw
 $referenceAdapter = Get-Content -LiteralPath (Join-Path $root 'templates/project/AGENTS.repository-reference.md') -Raw
 $adoption = Get-Content -LiteralPath (Join-Path $root 'docs/adoption.md') -Raw
@@ -1325,7 +1476,16 @@ $memoryTemplateFiles = @(Get-ChildItem -LiteralPath $memoryTemplateRoot -Recurse
 if ($memoryTemplateFiles.Count -lt 3) {
     Add-Failure 'TEST-0008 project-local memory template set is incomplete'
 }
-Confirm-MeAndAIScenarioEvidence -TestId 'TEST-0047'
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0008FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0008'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0047FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0047'
+}
 
 $protocolContent = Get-Content -LiteralPath (Join-Path $root 'PROTOCOL.md') -Raw
 $localInstructions = Get-Content -LiteralPath (Join-Path $root 'AGENTS.md') -Raw
@@ -1333,6 +1493,7 @@ $featureTemplate = Get-Content -LiteralPath (Join-Path $root 'templates/feature/
 $normalizedProtocolContent = [regex]::Replace($protocolContent, '\s+', ' ')
 $normalizedLocalInstructions = [regex]::Replace($localInstructions, '\s+', ' ')
 
+$test0173FailureCount = $failures.Count
 # TEST-0173: a reusable defect exposed by one consumer remains owned by the
 # common authority, and its canonical correction carries no external consumer
 # repository identity or local-machine path.
@@ -1383,7 +1544,13 @@ foreach ($relativePath in $canonicalEvidenceArtifacts) {
         Add-Failure "TEST-0173 canonical evidence artifact is consumer- or machine-coupled: $relativePath"
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0173FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0173'
+}
 
+$test0174FailureCount = $failures.Count
 # TEST-0174: protocol-provided reusable assets remain single-owned upstream;
 # consumers reuse the pinned authority and contain only project-specific work.
 foreach ($requiredText in @(
@@ -1478,7 +1645,14 @@ if (-not $managedAutomationSection.Success -or
     )) {
     Add-Failure 'TEST-0174 adoption guide does not classify exact updater assets as consumer-resident managed projections.'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0174FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0174'
+}
 
+$test0175FailureCount = $failures.Count
+$test0177FailureCount = $failures.Count
 # TEST-0175: every cross-record reference authored in a document or
 # GitHub issue, pull request, or comment is a clickable link to its exact target.
 $originalLinkValidationCulture =
@@ -3112,19 +3286,6 @@ function Test-DocumentRenderedReferenceCoveredByLink {
     }).Count -eq 1
 }
 
-function Test-ContainsExactDocumentTitle {
-    param(
-        [AllowEmptyString()][string]$Text,
-        [Parameter(Mandatory)][string]$Title
-    )
-
-    return [regex]::IsMatch(
-        $Text,
-        '(?i)(?<![A-Za-z0-9])' + [regex]::Escape($Title) +
-            '(?![A-Za-z0-9])'
-    )
-}
-
 function Test-DocumentHeadingOwnsTitle {
     param(
         [AllowEmptyString()][string]$Heading,
@@ -3682,7 +3843,7 @@ function Get-CodeFormattedDocumentTitleReferences {
     }
     $references = [System.Collections.Generic.List[string]]::new()
     foreach ($title in $Titles) {
-        if ((Test-ContainsExactDocumentTitle `
+        if ((Test-MeAndAIContainsExactDocumentTitle `
                 -Text ([string]$CodeSpan.Content) -Title $title) -and
             ($hasReferentialContext -or [regex]::IsMatch(
                 [string]$CodeSpan.Content,
@@ -4249,7 +4410,7 @@ foreach ($titleFixture in @(
         'Common Development Protocol'
     }
     else { 'Clickable Cross-Record References' }
-    if (-not (Test-ContainsExactDocumentTitle `
+    if (-not (Test-MeAndAIContainsExactDocumentTitle `
             -Text $titleFixture -Title $expectedFixtureTitle) -or
         @([regex]::Matches(
             $titleFixture,
@@ -5571,6 +5732,18 @@ if ($ownPathResolution.Kind -cne 'Repository' -or
 }
 [Threading.Thread]::CurrentThread.CurrentCulture =
     $originalLinkValidationCulture
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0175FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0175'
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0177FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0177'
+}
+$test0064FailureCount = $failures.Count
+$test0018FailureCount = $failures.Count
 foreach ($requiredText in @(
     'one fresh-diff self-review pass',
     'one final relevant verification command',
@@ -5591,7 +5764,13 @@ foreach ($requiredText in @(
 if (-not $featureTemplate.Contains('one bounded fresh-diff pass')) {
     Add-Failure 'TEST-0018 feature template is missing the bounded self-review default'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0018FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0018'
+}
 
+$test0019FailureCount = $failures.Count
 foreach ($requiredText in @(
     'After development is declared complete',
     'highest to lowest priority',
@@ -5607,6 +5786,7 @@ foreach ($requiredText in @(
     }
 }
 
+$test0096FailureCount = $failures.Count
 $mandateFeature = Get-Content -LiteralPath (
     Join-Path $root 'docs/features/FEAT-0015-stability-consistency-mandate/README.md'
 ) -Raw
@@ -5651,12 +5831,19 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0096 mandate lifecycle contract is missing '$requiredText'."
     }
 }
+$test0099FailureCount = $failures.Count
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0096FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0096'
+}
 if (-not ([regex]::Replace($mandateDecision, '\s+', ' ')).Contains(
     'Distribution of v0.9.0 MUST use the immutable GitHub Release required by Gate 7'
 )) {
     Add-Failure 'TEST-0099 DEC-0015 makes the mandatory v0.9.0 distribution release optional or ambiguous.'
 }
 
+$test0097FailureCount = $failures.Count
 foreach ($requiredText in @(
     'dependencies first',
     'ready set',
@@ -5692,7 +5879,13 @@ foreach ($requiredText in @(
 if ($findingForm.Contains('labels: ["type:finding", "priority:p2"]')) {
     Add-Failure 'TEST-0097 finding form assigns a static priority that can contradict its recorded queue priority.'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0097FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0097'
+}
 
+$test0098FailureCount = $failures.Count
 foreach ($requiredText in @(
     'one `Blocking` finding at a time',
     'focused evidence',
@@ -5706,6 +5899,11 @@ foreach ($requiredText in @(
     if (-not $normalizedMandateContract.Contains($requiredText)) {
         Add-Failure "TEST-0098 per-finding correction contract is missing '$requiredText'."
     }
+}
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0098FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0098'
 }
 
 $normalizedMandatePublication = $normalizedMandateContract
@@ -5736,6 +5934,7 @@ foreach ($requiredText in @(
     }
 }
 
+$test0131FailureCount = $failures.Count
 $agentPromptIndex = Get-Content -LiteralPath (
     Join-Path $root 'docs/agent-prompts/README.md'
 ) -Raw
@@ -5804,7 +6003,13 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0131 publication authority boundary is missing '$requiredText'."
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0131FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0131'
+}
 
+$test0132FailureCount = $failures.Count
 $docsIndexContent = Get-Content -LiteralPath (Join-Path $root 'docs/README.md') -Raw
 $agentPromptMarkdownFiles = @(Get-ChildItem -LiteralPath (
     Join-Path $root 'docs/agent-prompts'
@@ -5879,6 +6084,11 @@ foreach ($relativeRoot in $automaticPromptInstallRoots) {
 if (Test-Path -LiteralPath (Join-Path $root 'templates/project/docs/agent-prompts')) {
     Add-Failure 'TEST-0132 optional prompt must not have a consumer-owned template copy.'
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0132FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0132'
+}
 $currentProtocolVersion = (Get-Content -LiteralPath (Join-Path $root 'VERSION') -Raw).Trim()
 $currentProtocolTag = "v$currentProtocolVersion"
 $submoduleLivePinSignals = @(
@@ -5900,6 +6110,7 @@ if (-not $referenceAdapter.Contains(
     Add-Failure 'TEST-0099 repository-reference adapter duplicates or bypasses its configured immutable-ref authority.'
 }
 
+$test0101FailureCount = $failures.Count
 $quickAdoptionGuide = Get-Content -LiteralPath (
     Join-Path $root 'docs/quick-adoption.md'
 ) -Raw
@@ -5965,6 +6176,11 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0101 canonical FEAT-0017 records are missing '$requiredText'."
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0101FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0101'
+}
 $updaterScript = Get-Content -LiteralPath (
     Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
 ) -Raw
@@ -6022,6 +6238,11 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0099 pull request template is missing mandate evidence '$requiredText'."
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0099FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0099'
+}
 
 $stabilityDecision = Get-Content -LiteralPath (
     Join-Path $root 'docs/decisions/DEC-0011-qualified-evidence-and-closure.md'
@@ -6035,7 +6256,13 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0064 qualified-evidence decision is missing '$requiredText'"
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0064FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0064'
+}
 
+$test0076FailureCount = $failures.Count
 $postPublicationVerifier = Get-Content -LiteralPath (
     Join-Path $root 'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'
 ) -Raw
@@ -6068,6 +6295,11 @@ else {
         Add-Failure 'TEST-0076 post-publication authority is mixed into the pre-merge validation gate.'
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0076FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0076'
+}
 foreach ($requiredText in @(
     'post-development full-project scan',
     'finite validation budget',
@@ -6077,7 +6309,13 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0019 feature template is missing '$requiredText'"
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0019FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0019'
+}
 
+$test0020FailureCount = $failures.Count
 foreach ($requiredText in @(
     'does not change gate order',
     'authorize implementation before Gate 1',
@@ -6091,6 +6329,11 @@ foreach ($requiredText in @(
         Add-Failure "TEST-0020 urgent-work gate contract is missing '$requiredText'"
     }
 }
+if (-not $StructureOnly -and
+    $failures.Count -eq $test0020FailureCount) {
+    Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+        -TestId 'TEST-0020'
+}
 
 if ($failures.Count -gt 0) {
     Write-Host "Protocol validation failed with $($failures.Count) problem(s):" -ForegroundColor Red
@@ -6103,8 +6346,7 @@ if ($StructureOnly) {
 }
 else {
     $protocolScenarioResult = New-MeAndAIScenarioResult `
-        -Owner 'tests/capabilities/protocol-governance/protocol-governance.tests.ps1' `
-        -SourcePaths @($PSCommandPath) -AuthorityPath $scenarioAuthorityPath
+        -Context $scenarioEvidenceContext
     Write-Host 'Protocol-governance assertions passed.' -ForegroundColor Green
     Write-Host ('MEANDAI_SCENARIO_RESULTS=' +
         ($protocolScenarioResult | ConvertTo-Json -Compress))

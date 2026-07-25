@@ -1299,39 +1299,6 @@ function Resolve-QuickAdoptionStrategy {
     }
 }
 
-function Get-GitBlobSha {
-    param([Parameter(Mandatory)][byte[]]$Bytes)
-
-    $header = [Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
-    $payload = [byte[]]::new($header.Length + $Bytes.Length)
-    [Array]::Copy($header, 0, $payload, 0, $header.Length)
-    [Array]::Copy($Bytes, 0, $payload, $header.Length, $Bytes.Length)
-    $sha = [Security.Cryptography.SHA1]::Create()
-    try {
-        return ([BitConverter]::ToString($sha.ComputeHash($payload))).Replace('-', '').ToLowerInvariant()
-    }
-    finally {
-        $sha.Dispose()
-    }
-}
-
-function Test-ByteArrayEqual {
-    param(
-        [Parameter(Mandatory)][byte[]]$Left,
-        [Parameter(Mandatory)][byte[]]$Right
-    )
-
-    if ($Left.Length -ne $Right.Length) {
-        return $false
-    }
-    for ($index = 0; $index -lt $Left.Length; $index++) {
-        if ($Left[$index] -ne $Right[$index]) {
-            return $false
-        }
-    }
-    return $true
-}
-
 function Get-AdoptionTreeEntry {
     param(
         [Parameter(Mandatory)][string]$Repository,
@@ -1462,7 +1429,8 @@ function Get-ExactProtocolSourceBlobSha {
         }
         return [string]$sourceEntry.Sha
     }
-    return Get-GitBlobSha -Bytes ([IO.File]::ReadAllBytes($sourcePath))
+    return & $script:GetQuickAdoptionGitBlobSha1 `
+        -Bytes ([IO.File]::ReadAllBytes($sourcePath))
 }
 
 function Get-ExactConsumerMigrationBaseline {
@@ -1471,6 +1439,9 @@ function Get-ExactConsumerMigrationBaseline {
         [Parameter(Mandatory)][string]$ProtocolSha
     )
 
+    $contentIdentitySha = Get-ExactProtocolSourceBlobSha `
+        -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
+        -TemplatePath $consumerMigrationContentIdentityPath
     $moduleSha = Get-ExactProtocolSourceBlobSha `
         -ProtocolSource $ProtocolSource -ProtocolSha $ProtocolSha `
         -TemplatePath $consumerMigrationModulePath
@@ -1498,8 +1469,9 @@ function Get-ExactConsumerMigrationBaseline {
         }
         $catalog = & $importCatalog -IndexPath $indexPath
         if ([string]$catalog.IndexBlob -cne $indexSha -or
-            $moduleSha -cnotmatch '^[0-9a-f]{40}$') {
-            throw 'The exact protocol consumer migration catalog or module is not immutable.'
+            $moduleSha -cnotmatch '^[0-9a-f]{40}$' -or
+            $contentIdentitySha -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'The exact protocol consumer migration catalog, engine, or identity dependency is not immutable.'
         }
         foreach ($migration in @($catalog.Migrations)) {
             $definitionPath = "migrations/$([string]$migration.Definition)"
@@ -1646,7 +1618,7 @@ function Assert-ExactAdoptionProposal {
         "`turl = https://github.com/$ProtocolRepository.git",
         ''
     ) -join "`n"
-    $gitmodulesSha = Get-GitBlobSha -Bytes (
+    $gitmodulesSha = & $script:GetQuickAdoptionGitBlobSha1 -Bytes (
         [Text.UTF8Encoding]::new($false).GetBytes($gitmodulesText)
     )
     $gitmodulesEntry = Get-AdoptionTreeEntry -Repository $Repository `

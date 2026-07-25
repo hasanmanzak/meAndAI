@@ -3,7 +3,7 @@
 Implementations:
 
 - [Quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1)
-- [Bootstrap adapter fixtures](../../../tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1)
+- [Bootstrap adapter Case](../../../tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.case.ps1)
 - [Repository and evidence fixtures](../../../tests/protocol.tests.ps1)
 - [Post-publication evidence fixtures](../../../tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1)
 

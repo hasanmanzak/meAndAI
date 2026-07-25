@@ -1,6 +1,6 @@
 # FEAT-0031 Test Scenarios
 
-Implementation: [`tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1`](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1)
+Implementation: [`tests/capabilities/consumer-update/protocol-update-adapter.case.ps1`](../../../tests/capabilities/consumer-update/protocol-update-adapter.case.ps1)
 and [`tests/capabilities/consumer-update/consumer-migrations.tests.ps1`](../../../tests/capabilities/consumer-update/consumer-migrations.tests.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |

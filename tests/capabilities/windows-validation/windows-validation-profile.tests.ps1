@@ -3,19 +3,20 @@ param()
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$owner = 'tests/capabilities/windows-validation/windows-validation-profile.tests.ps1'
 $selectorPath = Join-Path $root 'tests/capabilities/windows-validation/Select-WindowsValidationProfile.ps1'
 $scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
-$failures = [System.Collections.Generic.List[string]]::new()
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestContext.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRepository.psm1') -Force
+$scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
+    -Owner $owner -AuthorityPath $scenarioAuthorityPath
+$failureContext = New-MeAndAITestContext
+Set-MeAndAITestContext -Context $failureContext
+$failures = $failureContext.Failures
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-windows-profile-$([guid]::NewGuid().ToString('N'))"
 $repository = Join-Path $tempRoot 'repository'
-
-function Add-Failure {
-    param([Parameter(Mandatory)][string]$Message)
-
-    $failures.Add($Message)
-}
 
 function Invoke-TestGit {
     param([Parameter(Mandatory)][string[]]$Arguments)
@@ -35,17 +36,6 @@ function Invoke-TestGit {
     return @($output | ForEach-Object { [string]$_ })
 }
 
-function New-TestCommit {
-    param(
-        [Parameter(Mandatory)][string]$Message,
-        [Parameter(Mandatory)][scriptblock]$Change
-    )
-
-    & $Change
-    Invoke-TestGit -Arguments @('add', '--all') | Out-Null
-    Invoke-TestGit -Arguments @('commit', '-m', $Message) | Out-Null
-    return (@(Invoke-TestGit -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
-}
 
 function Set-TestFile {
     param(
@@ -100,11 +90,11 @@ try {
     Invoke-TestGit -Arguments @('config', 'commit.gpgsign', 'false') | Out-Null
     Invoke-TestGit -Arguments @('config', 'tag.gpgsign', 'false') | Out-Null
 
-    $baseline = New-TestCommit -Message 'Baseline' -Change {
+    $baseline = New-MeAndAITestCommit -Repository $repository -Message 'Baseline' -Change {
         Set-TestFile -RelativePath 'README.md' -Content "baseline`n"
         Set-TestFile -RelativePath 'scripts/tool.ps1' -Content "'baseline'`n"
     }
-    $markdown = New-TestCommit -Message 'Documentation change' -Change {
+    $markdown = New-MeAndAITestCommit -Repository $repository -Message 'Documentation change' -Change {
         Set-TestFile -RelativePath 'README.md' -Content "documentation`n"
     }
     Assert-Profile -Name 'pull request documentation diff' `
@@ -114,41 +104,41 @@ try {
         -Expected 'WindowsNative' -EventName 'push' `
         -BaseCommit $baseline -HeadCommit $markdown
 
-    $powerShell = New-TestCommit -Message 'PowerShell change' -Change {
+    $powerShell = New-MeAndAITestCommit -Repository $repository -Message 'PowerShell change' -Change {
         Set-TestFile -RelativePath 'scripts/tool.ps1' -Content "'changed'`n"
     }
     Assert-Profile -Name 'PowerShell modification' -Expected 'Full' `
         -EventName 'pull_request' -BaseCommit $markdown -HeadCommit $powerShell
 
-    $workflow = New-TestCommit -Message 'Workflow change' -Change {
+    $workflow = New-MeAndAITestCommit -Repository $repository -Message 'Workflow change' -Change {
         Set-TestFile -RelativePath 'templates/project/.github/workflows/update.yml' `
             -Content "name: update`n"
     }
     Assert-Profile -Name 'nested workflow definition' -Expected 'Full' `
         -EventName 'pull_request' -BaseCommit $powerShell -HeadCommit $workflow
 
-    $migration = New-TestCommit -Message 'Migration change' -Change {
+    $migration = New-MeAndAITestCommit -Repository $repository -Message 'Migration change' -Change {
         Set-TestFile -RelativePath 'migrations/MIG-9000.json' -Content "{}`n"
     }
     Assert-Profile -Name 'migration definition' -Expected 'Full' `
         -EventName 'pull_request' -BaseCommit $workflow -HeadCommit $migration
 
-    $commandWrapper = New-TestCommit -Message 'Command wrapper change' -Change {
+    $commandWrapper = New-MeAndAITestCommit -Repository $repository -Message 'Command wrapper change' -Change {
         Set-TestFile -RelativePath 'tools/run.cmd' -Content "@echo off`n"
     }
     Assert-Profile -Name 'Windows command wrapper' -Expected 'Full' `
         -EventName 'pull_request' -BaseCommit $migration -HeadCommit $commandWrapper
 
-    $deleted = New-TestCommit -Message 'Delete PowerShell source' -Change {
+    $deleted = New-MeAndAITestCommit -Repository $repository -Message 'Delete PowerShell source' -Change {
         Remove-Item -LiteralPath (Join-Path $repository 'scripts/tool.ps1') -Force
     }
     Assert-Profile -Name 'sensitive deletion' -Expected 'Full' `
         -EventName 'pull_request' -BaseCommit $commandWrapper -HeadCommit $deleted
 
-    $renameBase = New-TestCommit -Message 'Add rename source' -Change {
+    $renameBase = New-MeAndAITestCommit -Repository $repository -Message 'Add rename source' -Change {
         Set-TestFile -RelativePath 'scripts/renamed.ps1' -Content "'rename'`n"
     }
-    $renamed = New-TestCommit -Message 'Rename sensitive source' -Change {
+    $renamed = New-MeAndAITestCommit -Repository $repository -Message 'Rename sensitive source' -Change {
         [IO.Directory]::CreateDirectory((Join-Path $repository 'docs')) | Out-Null
         Invoke-TestGit -Arguments @(
             'mv', 'scripts/renamed.ps1', 'docs/renamed.md'
@@ -158,7 +148,7 @@ try {
         -EventName 'pull_request' -BaseCommit $renameBase -HeadCommit $renamed
 
     $oversizedBase = $renamed
-    $oversized = New-TestCommit -Message 'Oversized documentation diff' -Change {
+    $oversized = New-MeAndAITestCommit -Repository $repository -Message 'Oversized documentation diff' -Change {
         foreach ($index in 1..301) {
             Set-TestFile -RelativePath "docs/generated/$index.md" -Content "$index`n"
         }
@@ -192,10 +182,9 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
+Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
+    -TestId 'TEST-0123'
 Write-Host 'Windows validation profile tests passed for TEST-0123.' `
     -ForegroundColor Green
-$scenarioResult = New-MeAndAIScenarioResult `
-    -Owner 'tests/capabilities/windows-validation/windows-validation-profile.tests.ps1' `
-    -SourcePaths @($PSCommandPath, $selectorPath) `
-    -AuthorityPath $scenarioAuthorityPath
+$scenarioResult = New-MeAndAIScenarioResult -Context $scenarioEvidenceContext
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' + ($scenarioResult | ConvertTo-Json -Compress))

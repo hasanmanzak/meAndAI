@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "slug": "test-harness-modularity",
+  "type": "Semantic",
+  "title": "Modular exact-evidence test harness",
+  "applicability": {
+    "condition": "automated-test-or-validation-surface",
+    "description": "The repository owns an automated test, validation, verification, or policy-checking surface."
+  },
+  "requirements": [
+    {
+      "id": "prior-solution-and-sibling-gate",
+      "statement": "Before a correction or helper is implemented, active recurrence signatures, canonical owners, unsafe retries, and every same-contract sibling surface are resolved through reviewed repository evidence."
+    },
+    {
+      "id": "canonical-generic-mechanic-ownership",
+      "statement": "Contract-equivalent generic test mechanics have one declared canonical owner; capability-specific assertions, builders, adapters, and semantic evidence remain local."
+    },
+    {
+      "id": "explicit-context-and-exact-case-evidence",
+      "statement": "Failure/result state uses explicit contexts, and runtime completion binds one canonical suite, one exact `.case.ps1` owner, and one explicit unique canonical TEST-ID subset without source inference."
+    },
+    {
+      "id": "non-overlapping-test-roles",
+      "statement": "Root runner, harness, executable case, documented scenario, capability support, fixture, and mock roles remain explicit and non-overlapping."
+    },
+    {
+      "id": "fail-closed-runtime-evidence",
+      "statement": "Missing, unexpected, duplicate, inferred, unexecuted, failed, or finalized evidence fails before authoritative success, and final result channels remain exact and mutually exclusive."
+    },
+    {
+      "id": "bounded-self-application",
+      "statement": "Adoption of the harness is a finite reviewed migration that preserves active TEST identities, behavior, process isolation, supported runtimes, workflow topology, and approved operation budgets without a second framework."
+    }
+  ],
+  "evidence": {
+    "conforming": [
+      "Reviewed recurrence and sibling-owner inventory binds every correction to canonical evidence, with executable recurrence barriers or reviewed NotApplicable rationale.",
+      "Owner, role, and authority contracts plus focused negative execution prove explicit contexts, exact child Case evidence, and rejection of unauthorized redefinition and source inference.",
+      "Transition-zero and final runner evidence preserve TEST results, process and fixture contracts, supported runtimes, workflow topology, and approved operation budgets."
+    ],
+    "notApplicable": [
+      "Reviewed repository evidence proves that no automated test, validation, verification, or policy-checking surface exists.",
+      "The review identifies the repository scope and explains why adding harness assets is outside the repository authority."
+    ]
+  }
+}

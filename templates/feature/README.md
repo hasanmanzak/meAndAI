@@ -35,6 +35,12 @@ Describe independently valuable behavior.
 - Consumers and dependencies: entry points, callers, external systems, blocking
   work, and compatibility constraints.
 - Risks: numbered `RISK-NNNN` records with owner and response.
+- Prior art and recurrence: link the matching active entry or record explicit
+  `None`; identify the canonical owner, same-contract sibling surfaces, failed
+  route evidence, materially different route or explicit retry contract, and
+  planned executable barrier or reviewed `NotApplicable` rationale under
+  [Protocol Gate 0](../../PROTOCOL.md#gate-0---context-and-baseline) and the
+  [recurrence knowledge contract](../../PROTOCOL.md#recurrence-knowledge-contract).
 - Verification approach: test levels, commands, manual checks, and review scope.
 
 ## Risks
@@ -72,6 +78,7 @@ Describe independently valuable behavior.
 - [ ] Reviewable decomposition with a gate ledger.
 - [ ] Numbered test scenarios and verification approach.
 - [ ] Test-code and baseline-run states recorded.
+- [ ] Prior-art and recurrence evidence is recorded.
 
 ## Acceptance criteria
 
