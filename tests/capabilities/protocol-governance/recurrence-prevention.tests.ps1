@@ -46,6 +46,10 @@ $sectionCases = @(
             'A `Stale` entry requires renewed evidence',
             'a `Superseded` entry routes only to its replacement',
             'multiple applicable `Active` entries are ambiguous and block mutation.',
+            'Before delegating repository work, the delegating owner MUST resolve the applicable active recurrence entries',
+            'include their required safe responses and unsafe retry boundaries in the task brief.',
+            'The delegated agent MUST re-read [repository instructions](AGENTS.md) and active recurrence knowledge before its first tool call.',
+            'Inherited conversation context or a generic instruction to follow the protocol is not evidence that this handoff occurred.',
             'A repeat requires new evidence that changes the failed precondition, a materially different verified route, or an explicitly declared idempotent retry contract',
             'Otherwise stop as `Blocked` and preserve the failure evidence.'
         )

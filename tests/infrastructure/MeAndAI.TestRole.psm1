@@ -27,14 +27,58 @@ function Test-MeAndAICaseCompletionCommandName {
         '^(?i:(?:Confirm|Complete|New)-MeAndAI.*(?:ScenarioEvidence|ScenarioResult))'
 }
 
-function Get-MeAndAIStaticStringValue {
+function Resolve-MeAndAIStaticStringExpression {
     param([Parameter(Mandatory)]$Ast)
 
-    return @($Ast.FindAll({
-        param($node)
-        $node -is [Management.Automation.Language.StringConstantExpressionAst] -or
-            $node -is [Management.Automation.Language.ExpandableStringExpressionAst]
-    }, $true) | ForEach-Object { [string]$_.Value })
+    if ($Ast -is [Management.Automation.Language.StringConstantExpressionAst]) {
+        return [pscustomobject]@{ Resolved = $true; Value = [string]$Ast.Value }
+    }
+    if ($Ast -is [Management.Automation.Language.ExpandableStringExpressionAst] -and
+        @($Ast.NestedExpressions).Count -eq 0) {
+        return [pscustomobject]@{ Resolved = $true; Value = [string]$Ast.Value }
+    }
+    if ($Ast -is [Management.Automation.Language.BinaryExpressionAst] -and
+        $Ast.Operator -eq [Management.Automation.Language.TokenKind]::Plus) {
+        $left = Resolve-MeAndAIStaticStringExpression -Ast $Ast.Left
+        $right = Resolve-MeAndAIStaticStringExpression -Ast $Ast.Right
+        if ($left.Resolved -and $right.Resolved) {
+            return [pscustomobject]@{
+                Resolved = $true
+                Value = [string]$left.Value + [string]$right.Value
+            }
+        }
+    }
+
+    return [pscustomobject]@{ Resolved = $false; Value = $null }
+}
+
+function Get-MeAndAIStaticStringValue {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)]$Ast)
+
+    $values = [System.Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($node in @($Ast.FindAll({
+        param($candidate)
+        $candidate -is
+            [Management.Automation.Language.StringConstantExpressionAst] -or
+            $candidate -is
+            [Management.Automation.Language.ExpandableStringExpressionAst] -or
+            ($candidate -is
+                [Management.Automation.Language.BinaryExpressionAst] -and
+                $candidate.Operator -eq
+                    [Management.Automation.Language.TokenKind]::Plus)
+    }, $true))) {
+        $resolved = Resolve-MeAndAIStaticStringExpression -Ast $node
+        if ($resolved.Resolved) {
+            [void]$values.Add([string]$resolved.Value)
+        }
+    }
+
+    [string[]]$ordered = @($values)
+    [Array]::Sort($ordered, [StringComparer]::Ordinal)
+    return $ordered
 }
 
 function Test-MeAndAICanonicalSuiteDispatch {
@@ -232,4 +276,7 @@ function Test-MeAndAITestRoleSource {
     }
 }
 
-Export-ModuleMember -Function 'Test-MeAndAITestRoleSource'
+Export-ModuleMember -Function @(
+    'Get-MeAndAIStaticStringValue'
+    'Test-MeAndAITestRoleSource'
+)

@@ -6,7 +6,9 @@ and follow its canonical links.
 ## Current continuation
 
 Immutable [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
-is the latest published release. [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
+is the prior published release while the completed `v0.15.0` source awaits its
+reviewed publication under [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
+[PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
 and closed [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121)
 retain its delivery and publication evidence. Current verifier authority passed
 the `v0.14.5`, `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates; retained
@@ -16,10 +18,11 @@ Follow the [v0.14.5 publication-closure handoff](2026-07-25-v0145-publication-cl
 for exact dated evidence.
 
 [FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-is In progress for target `0.15.0` under
+is implemented and locally reviewed for target `0.15.0` under
 [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). The current
-[implementation handoff](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md)
-records the completed first three slices and the next authorized continuation;
+[release-candidate handoff](2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
+records all four completed slices and the publication continuation; the
+completed [runtime-role handoff](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md),
 the completed [canonical-utility handoff](2026-07-25-v0150-subf-0096-canonical-utility-ownership.md),
 the completed [first-slice handoff](2026-07-25-v0150-subf-0095-recurrence-gate.md),
 and the earlier
@@ -54,6 +57,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-25 - v0.15.0 recurrence prevention and modular test harness release candidate](2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
 - [2026-07-25 - v0.15.0 runtime evidence and test roles](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md)
 - [2026-07-25 - v0.15.0 canonical utility ownership](2026-07-25-v0150-subf-0096-canonical-utility-ownership.md)
 - [2026-07-25 - v0.15.0 recurrence gate implementation](2026-07-25-v0150-subf-0095-recurrence-gate.md)

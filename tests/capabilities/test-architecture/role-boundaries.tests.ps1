@@ -234,7 +234,56 @@ Assert-MeAndAITestSequenceEqual -Actual $actualLegacyOwners `
     -Expected @() `
     -Message 'Legacy scenario-evidence references must remain absent after transition closure.'
 
+[string[]]$legacyExecutableCasePaths = @($expectedCases | ForEach-Object {
+    $_.Substring(0, $_.Length - '.case.ps1'.Length) + '.fixture.ps1'
+})
+$syntheticLegacyPath = $legacyExecutableCasePaths[0]
+$syntheticSplit = [Math]::Max(1, $syntheticLegacyPath.Length - 12)
+$syntheticSource = ("'{0}' + '{1}'" -f `
+    $syntheticLegacyPath.Substring(0, $syntheticSplit),
+    $syntheticLegacyPath.Substring($syntheticSplit))
+$syntheticTokens = $null
+$syntheticErrors = $null
+$syntheticAst = [Management.Automation.Language.Parser]::ParseInput(
+    $syntheticSource, [ref]$syntheticTokens, [ref]$syntheticErrors
+)
+Assert-MeAndAITestEqual -Actual @($syntheticErrors).Count -Expected 0 `
+    -Message 'The split legacy-path detection vector does not parse.'
+Assert-MeAndAITestTrue -Condition (
+    @(Get-MeAndAIStaticStringValue -Ast $syntheticAst) -ccontains
+        $syntheticLegacyPath
+) -Message 'Static string folding no longer detects split legacy paths.'
+
+$legacyCaseReferences = [System.Collections.Generic.List[string]]::new()
+$referenceSources = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
+    -Recurse -File | Where-Object { $_.Extension -cin @('.ps1', '.psm1', '.psd1') })
+foreach ($source in $referenceSources) {
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [Management.Automation.Language.Parser]::ParseFile(
+        $source.FullName, [ref]$tokens, [ref]$parseErrors
+    )
+    Assert-MeAndAITestEqual -Actual @($parseErrors).Count -Expected 0 `
+        -Message "Executable-case reference source does not parse: $($source.FullName)."
+    [string[]]$staticValues = @(Get-MeAndAIStaticStringValue -Ast $ast |
+        ForEach-Object { ([string]$_).Replace('\', '/') })
+    foreach ($legacyPath in $legacyExecutableCasePaths) {
+        if (@($staticValues | Where-Object {
+            $_.IndexOf($legacyPath,
+                [StringComparison]::OrdinalIgnoreCase) -ge 0
+        }).Count -gt 0) {
+            $legacyCaseReferences.Add(('{0} -> {1}' -f `
+                (ConvertTo-RepositoryRelativePath -LiteralPath $source.FullName),
+                $legacyPath))
+        }
+    }
+}
+Assert-MeAndAITestSequenceEqual -Actual @($legacyCaseReferences) `
+    -Expected @() `
+    -Message 'Retired executable fixture paths must remain absent from test code and contracts.'
+
 Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0186'
+Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0187'
 $scenarioResult = New-MeAndAIScenarioResult -Context $scenarioContext
 Write-Host 'Test role-boundary contracts passed.' -ForegroundColor Green
 Write-Host ('MEANDAI_SCENARIO_RESULTS=' +

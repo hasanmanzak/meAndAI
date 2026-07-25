@@ -3,20 +3,38 @@ Set-StrictMode -Version Latest
 function Invoke-MeAndAITestRepositoryGit {
     param(
         [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)][string[]]$Arguments
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [string[]]$Configuration = @(),
+        [switch]$BareRepository
     )
 
+    $isBareRepository = $BareRepository -or (
+        (Test-Path -LiteralPath (Join-Path $Repository 'HEAD') -PathType Leaf) -and
+        (Test-Path -LiteralPath (Join-Path $Repository 'config') -PathType Leaf) -and
+        (Test-Path -LiteralPath (Join-Path $Repository 'objects') -PathType Container) -and
+        -not (Test-Path -LiteralPath (Join-Path $Repository '.git'))
+    )
+    $repositoryArguments = @(
+        if ($isBareRepository) {
+            "--git-dir=$Repository"
+        }
+        else {
+            '-C'
+            $Repository
+        }
+    )
     $previousPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try {
-        $output = @(& git -C $Repository @Arguments 2>&1)
+        $output = @(& git @Configuration @repositoryArguments @Arguments 2>&1)
         $exitCode = $LASTEXITCODE
     }
     finally {
         $ErrorActionPreference = $previousPreference
     }
     if ($exitCode -ne 0) {
-        throw "git $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
+        $repositoryMode = if ($isBareRepository) { '--git-dir' } else { '-C' }
+        throw "git $repositoryMode $Repository $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
     }
     return @($output | ForEach-Object { [string]$_ })
 }
@@ -37,4 +55,7 @@ function New-MeAndAITestCommit {
         -Arguments @('rev-parse', 'HEAD'))[0]).Trim()
 }
 
-Export-ModuleMember -Function 'New-MeAndAITestCommit'
+Export-ModuleMember -Function @(
+    'Invoke-MeAndAITestRepositoryGit'
+    'New-MeAndAITestCommit'
+)

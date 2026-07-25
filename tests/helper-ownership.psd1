@@ -246,10 +246,14 @@
         }
         @{
             ContractId = 'THO-0011'
-            SemanticKind = 'test-repository-commit'
+            SemanticKind = 'test-repository-git-and-commit'
             OwnerPath = 'tests/infrastructure/MeAndAI.TestRepository.psm1'
-            CanonicalCommands = @('New-MeAndAITestCommit')
+            CanonicalCommands = @(
+                'Invoke-MeAndAITestRepositoryGit'
+                'New-MeAndAITestCommit'
+            )
             GuardedNames = @(
+                'Invoke-MeAndAITestRepositoryGit'
                 'New-MeAndAITestCommit'
                 'New-TestCommit'
             )
@@ -259,8 +263,14 @@
             ContractId = 'THO-0013'
             SemanticKind = 'test-role-boundary-inspection'
             OwnerPath = 'tests/infrastructure/MeAndAI.TestRole.psm1'
-            CanonicalCommands = @('Test-MeAndAITestRoleSource')
-            GuardedNames = @('Test-MeAndAITestRoleSource')
+            CanonicalCommands = @(
+                'Get-MeAndAIStaticStringValue'
+                'Test-MeAndAITestRoleSource'
+            )
+            GuardedNames = @(
+                'Get-MeAndAIStaticStringValue'
+                'Test-MeAndAITestRoleSource'
+            )
             ReviewedExceptions = @()
         }
     )

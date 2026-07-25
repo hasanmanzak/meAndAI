@@ -2,7 +2,7 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-25**<br>
-Protocol version: **0.14.5**<br>
+Protocol version: **0.15.0**<br>
 Latest immutable release: **0.14.5**
 
 The immutable [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
@@ -17,19 +17,22 @@ for exact dated evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanz
 remains the separate runtime residual owner.
 
 [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-is In progress for target `0.15.0` under
+is implemented and locally reviewed for target `0.15.0` under
 [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124), with
 [SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128),
 [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096) / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
 [SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
 and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
 The maintainer authorized implementation on 2026-07-25. Follow the current
-[implementation handoff](log/2026-07-25-v0150-subf-0097-runtime-evidence-roles.md);
+[release-candidate handoff](log/2026-07-25-v0150-recurrence-prevention-modular-test-harness.md);
+the completed [runtime-role handoff](log/2026-07-25-v0150-subf-0097-runtime-evidence-roles.md),
 the completed [canonical-utility handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md),
 the completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md),
 and the earlier
 [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
-remain historical evidence. No `0.15.0` release exists yet.
+remain historical evidence. The final full suite, reviewed pull request, and
+immutable `v0.15.0` release remain pending under
+[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

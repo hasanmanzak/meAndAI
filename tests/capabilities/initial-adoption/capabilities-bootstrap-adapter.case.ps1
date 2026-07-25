@@ -30,12 +30,22 @@ $consumerMigrationModulePath = Join-Path $root `
 $consumerMigrationIndexPath = Join-Path $root 'migrations/index.json'
 $testRuntimePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestRuntime.psm1'
+$testRepositoryPath = Join-Path $root `
+    'tests/infrastructure/MeAndAI.TestRepository.psm1'
 $testWorkspacePath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestWorkspace.psm1'
 $operationContractPath = Join-Path $root `
     'tests/fixture-operation-budgets.psd1'
 Import-Module $testRuntimePath -Force
 Import-Module $testWorkspacePath -Force
+$script:BootstrapTestRepositoryModule = @(
+    Import-Module $testRepositoryPath -Force -PassThru
+)[0]
+if ($null -eq $script:BootstrapTestRepositoryModule.ExportedCommands[
+        'Invoke-MeAndAITestRepositoryGit'
+    ]) {
+    throw 'Bootstrap could not retain the canonical test repository command.'
+}
 $operationContract = Import-MeAndAITestOperationContract `
     -Path $operationContractPath
 $operationExpectation = Resolve-MeAndAITestOperationExpectation `
@@ -97,7 +107,11 @@ if (-not (Test-Path -LiteralPath $adapterPath -PathType Leaf)) {
 }
 
 function Invoke-Git {
-    param([string]$Repository, [string[]]$Arguments)
+    param(
+        [string]$Repository,
+        [string[]]$Arguments,
+        [switch]$BareRepository
+    )
     $fixtureConfiguration = @(
         '-c', 'user.name=Fixture',
         '-c', 'user.email=fixture@example.invalid',
@@ -106,19 +120,10 @@ function Invoke-Git {
         '-c', 'commit.gpgsign=false',
         '-c', 'tag.gpgSign=false'
     )
-    $previousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    try {
-        $output = @(& git @fixtureConfiguration -C $Repository @Arguments 2>&1)
-        $exitCode = $LASTEXITCODE
-    }
-    finally {
-        $ErrorActionPreference = $previousPreference
-    }
-    if ($exitCode -ne 0) {
-        throw "git -C $Repository $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)"
-    }
-    return @($output)
+    return @(MeAndAI.TestRepository\Invoke-MeAndAITestRepositoryGit `
+        -Repository $Repository -Arguments $Arguments `
+        -Configuration $fixtureConfiguration `
+        -BareRepository:$BareRepository)
 }
 
 function Get-FixtureInstructionGraphIdentity {
@@ -580,7 +585,8 @@ function New-ImmutableBootstrapBaseline {
         -Arguments @('rev-parse', 'v0.5.0^{commit}')))[0]
     if ([string]$preparedConsumerHead -cne [string]$consumerHead -or
         [string]$preparedProtocolHead -cne [string]$protocolHead -or
-        @(Invoke-Git -Repository $preparedBareRemote -Arguments @(
+        @(Invoke-Git -Repository $preparedBareRemote -BareRepository `
+            -Arguments @(
             'for-each-ref', '--format=%(refname)'
         )).Count -ne 0 -or
         @(Invoke-Git -Repository $preparedConsumer -Arguments @(
@@ -960,7 +966,7 @@ function New-BootstrapFixture {
     )))[0]
     if ([IO.Path]::GetFullPath([string]$derivativeOrigin) -cne
             [IO.Path]::GetFullPath($remote) -or
-        @(Invoke-Git -Repository $remote -Arguments @(
+        @(Invoke-Git -Repository $remote -BareRepository -Arguments @(
             'for-each-ref', '--format=%(refname)'
         )).Count -ne 0) {
         throw 'TEST-0158 bootstrap derivative origin is not its fresh empty remote.'
@@ -2865,14 +2871,21 @@ try {
     $result = Invoke-BootstrapFixture -Fixture $pending
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1) {
         Add-Failure "TEST-0057 exact pending-adoption fixture creation failed: $($result.Error)"
+        throw ("TEST-0057 pending-adoption prerequisite failed before " +
+            "dependent proposal mutation: $($result.Error)")
     }
     Invoke-Git -Repository $pending.Consumer -Arguments @('switch', 'main') | Out-Null
     $result = Invoke-BootstrapFixture -Fixture $pending
     if ($result.Threw -or $global:PullRequestCreateCalls -ne 1) {
         Add-Failure "TEST-0057 exact pending draft should be retained without duplication: $($result.Error)"
+        throw ("TEST-0057 pending-draft retention prerequisite failed before " +
+            "dependent proposal mutation: $($result.Error)")
     }
 
     $pendingProposalHead = [string]$global:ExistingPullRequestHead
+    if ([string]::IsNullOrWhiteSpace($pendingProposalHead)) {
+        throw 'TEST-0057 pending proposal fixture did not retain its exact head OID.'
+    }
     Invoke-Git -Repository $pending.Consumer -Arguments @(
         'switch', 'automation/meandai-capabilities-v0.5.0'
     ) | Out-Null
@@ -3178,6 +3191,11 @@ finally {
         if (Test-Path -LiteralPath $cleanupSentinel) {
             Add-Failure 'TEST-0158 bootstrap cleanup sentinel could not be removed.'
         }
+    }
+    if ($null -ne $script:BootstrapTestRepositoryModule) {
+        Remove-Module -ModuleInfo $script:BootstrapTestRepositoryModule -Force `
+            -ErrorAction SilentlyContinue
+        $script:BootstrapTestRepositoryModule = $null
     }
 }
 Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0068'

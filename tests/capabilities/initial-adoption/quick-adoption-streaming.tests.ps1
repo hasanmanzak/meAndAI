@@ -105,6 +105,7 @@ $functionNames = @(
     'New-ExternalProcessContainment',
     'Stop-ExternalProcessTree',
     'Invoke-BoundedProcess',
+    'Remove-QuickAdoptionTemporaryRoot',
     'Invoke-LocalCodexExec',
     'Complete-AdoptionWithLocalCodex'
 )
@@ -141,9 +142,21 @@ if ($stopIndex -lt 0 -or $disposeIndex -lt 0 -or $stopIndex -gt $disposeIndex) {
     Add-Failure 'TEST-0106 bounded-process finalization does not stop the active child tree before disposal.'
 }
 $completionText = [string]$functionText['Complete-AdoptionWithLocalCodex']
+$completionFinallyIndex = $completionText.LastIndexOf(
+    'finally', [StringComparison]::Ordinal
+)
+$completionCleanupIndex = $completionText.LastIndexOf(
+    'Remove-QuickAdoptionTemporaryRoot', [StringComparison]::Ordinal
+)
+$temporaryCleanupText = [string]$functionText[
+    'Remove-QuickAdoptionTemporaryRoot'
+]
 if ($completionText.IndexOf('Invoke-AdoptionCodexCompletion', [StringComparison]::Ordinal) -lt 0 -or
-    $completionText.LastIndexOf('Remove-Item', [StringComparison]::Ordinal) -lt 0 -or
-    $completionText.LastIndexOf('finally', [StringComparison]::Ordinal) -lt 0) {
+    $completionFinallyIndex -lt 0 -or
+    $completionCleanupIndex -lt $completionFinallyIndex -or
+    $temporaryCleanupText.IndexOf('Remove-Item', [StringComparison]::Ordinal) -lt 0 -or
+    $temporaryCleanupText.IndexOf('Test-Path', [StringComparison]::Ordinal) -lt 0 -or
+    $temporaryCleanupText.IndexOf('Start-Sleep', [StringComparison]::Ordinal) -lt 0) {
     Add-Failure 'TEST-0106 adoption completion does not retain its owned temporary-root cleanup boundary.'
 }
 

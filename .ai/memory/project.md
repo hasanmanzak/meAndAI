@@ -9,8 +9,10 @@ Last verified: **2026-07-25**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.14.5`. The latest immutable release is
-  [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5).
+- Current protocol version: `0.15.0`. The latest immutable release
+  remains [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
+  until the reviewed `v0.15.0` publication under
+  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
   [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122) and closed
   [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) retain its
   delivery and publication evidence. Current verifier authority passed the
@@ -19,7 +21,16 @@ Last verified: **2026-07-25**
   [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
   Exact dated evidence is in the
   [v0.14.5 publication-closure handoff](log/2026-07-25-v0145-publication-closure.md).
-- Most recently completed scope: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
+- Most recently completed implementation scope:
+  [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
+  and [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
+  complete recurrence routing, canonical test utility ownership, exact Case
+  evidence, role separation, the three bounded hotspot migrations, and the
+  append-only `test-harness-modularity` capability. The final full suite passed
+  all deterministically discovered owners in 2,193.9 seconds. The reviewed pull
+  request and immutable release remain the exact continuation under
+  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
+- Most recently published correction: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
   [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
   [SUBF-0094](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md#subf-0094),
   [TEST-0182](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
@@ -140,9 +151,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   expression such as `'{0}:{1}' -f $name, $line`.
 - Unsafe retry boundary: do not repeat the unchanged `$name:` form after this
   parser signature; retry only with explicit variable delimiting or formatting.
-- Freshness and review condition: last confirmed 2026-07-25; review after a
-  PowerShell parser-language change or equivalent syntax succeeds in every
-  supported runtime.
+- Freshness and review condition: last confirmed 2026-07-25, including a
+  delegated review recurrence; the applicable safe route must be copied into
+  delegated task briefs. Review after a PowerShell parser-language change or
+  equivalent syntax succeeds in every supported runtime.
 - Superseded by: `None`
 
 ### Displayed full-file output used as rewrite authority
@@ -176,13 +188,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - Status: `Active`
 - Observable signature: a diagnostic command fails because `$Error` was used
-  as a loop variable, or a double-quoted search pattern containing `$`
-  expands into an empty or unexpectedly broad pattern.
+  as a loop variable, a double-quoted search pattern containing `$` expands
+  into an empty or unexpectedly broad pattern, or `rg` receives a positional
+  wildcard path such as `*.ps1` that PowerShell did not expand.
 - Applicability: Windows PowerShell diagnostics, AST checks, and repository
   searches assembled interactively or inside maintenance scripts.
-- Affected contract and cause: PowerShell automatic variables and string
-  interpolation alter diagnostic control or search input before the intended
-  tool receives it; the inspected repository content is not the failure.
+- Affected contract and cause: PowerShell automatic variables, string
+  interpolation, and non-expansion of native-command wildcard arguments alter
+  diagnostic control or search input before the intended tool receives it; the
+  inspected repository content is not the failure.
 - Canonical owner and evidence: [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096)
   / [FIND-0261](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0261)
   records the corrected routes.
@@ -190,9 +204,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   parsing passed on 2026-07-25; target release `0.15.0` carries this record.
 - Required safe response: use a non-reserved loop variable such as
   `$parseError`; pass literal search patterns with single quotes or explicitly
-  escape `$` when interpolation is required.
-- Unsafe retry boundary: do not repeat the unchanged automatic-variable or
-  double-quoted literal-search form after this signature.
+  escape `$` when interpolation is required; use `rg --glob '*.ps1'` for file
+  filtering instead of a positional wildcard path.
+- Unsafe retry boundary: do not repeat the unchanged automatic-variable,
+  double-quoted literal-search, or positional-wildcard form after this
+  signature.
 - Freshness and review condition: last confirmed 2026-07-25; review after a
   supported PowerShell parsing or interpolation change, or an exact
   executable equivalence proof.
@@ -222,24 +238,205 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   supported PowerShell native-output shape change.
 - Superseded by: `None`
 
+### Bare fixture repository rejected through implicit working-tree routing
+
+- Status: `Active`
+- Observable signature: Git reports `fatal: cannot use bare repository` and
+  names `safe.bareRepository=explicit` after a fixture command uses `git -C`.
+- Applicability: test infrastructure or maintenance helpers that receive a
+  bare repository path, including local remote fixtures.
+- Affected contract and cause: `git -C` requests implicit bare-repository
+  discovery, which the safe Git setting rejects; the repository data and test
+  scenario are not the failing contracts.
+- Canonical owner and evidence: [FIND-0280](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0280)
+  / [TEST-0184](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0184)
+  owns explicit and inferred bare-repository execution.
+- Fixed release or evidence: the canonical utility, full bootstrap owner, and
+  quick-adoption repository-route shard passed on 2026-07-25; target release
+  `0.15.0` carries the correction.
+- Required safe response: call the canonical test-repository command and let it
+  detect the bare structure, or declare `-BareRepository`; use `--git-dir`, not
+  `-C`, for a direct native Git call.
+- Unsafe retry boundary: do not repeat unchanged `git -C <bare-path>` after
+  this signature and do not copy the routing logic into individual fixtures.
+- Freshness and review condition: last confirmed 2026-07-25; review after a Git
+  safe-bare execution-model change or an equivalent supported-runtime proof.
+- Superseded by: `None`
+
+### Detached exported command loses its owning module lifetime
+
+- Status: `Active`
+- Observable signature: a captured exported command later reports that a
+  `$script:` dependency cannot be retrieved because it has not been set.
+- Applicability: PowerShell test suites that capture a module export as a
+  ScriptBlock, remove the module, and invoke the detached command later or
+  across a nested script lifecycle.
+- Affected contract and cause: the exported function still depends on its
+  owning module scope; detaching code text does not preserve that scope or its
+  exact cleanup lifetime.
+- Canonical owner and evidence: [FIND-0279](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0279)
+  and [FIND-0281](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0281)
+  own the lifetime rule and its bootstrap recurrence barrier.
+- Fixed release or evidence: mixed quick-adoption sequencing and the full
+  bootstrap owner passed on 2026-07-25; target release `0.15.0` carries the
+  durable route.
+- Required safe response: retain the exact ModuleInfo through the last use,
+  invoke the module-qualified exported command, then remove only that ModuleInfo.
+  Fail before any dependent fixture mutation when the prerequisite fails.
+- Unsafe retry boundary: do not remove the owner and retry the same detached
+  ScriptBlock, and do not continue a dependent mutation with an empty identity.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  PowerShell module-scope semantic change or exact supported-runtime proof.
+- Superseded by: `None`
+
+### Dynamic PSCommandPath changes reusable fixture identity
+
+- Status: `Active`
+- Observable signature: one suite-process fixture key reports a canonical
+  builder or input-digest conflict only after a nested or mixed script sequence.
+- Applicability: PowerShell fixture caches that recompute owner identity inside
+  a function from `$PSCommandPath`.
+- Affected contract and cause: `$PSCommandPath` is an execution-context
+  automatic variable, not a durable lexical owner identity across every nested
+  script lifecycle; the fixture content is not necessarily drifting.
+- Canonical owner and evidence: [FIND-0282](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0282)
+  / [TEST-0116](../../docs/features/FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116)
+  owns stable suite-process fixture identity.
+- Fixed release or evidence: the exact owner path/digest is captured once and
+  fixture closure requires it; target release `0.15.0` carries the correction.
+- Required safe response: capture the lexical owner path and digest at suite
+  startup, then reuse that immutable value for all cache requests.
+- Unsafe retry boundary: do not recompute owner identity from dynamic
+  `$PSCommandPath` after a nested script call and do not weaken drift rejection.
+- Freshness and review condition: last confirmed 2026-07-25; review after a
+  PowerShell automatic-variable semantic change or exact mixed-sequence proof.
+- Superseded by: `None`
+
+### Isolated production function omits a canonical sibling dependency
+
+- Status: `Active`
+- Observable signature: an isolated AST-extracted production function fails
+  because a called canonical sibling function is not recognized.
+- Applicability: test harnesses that execute one extracted FunctionDefinition
+  outside its production module or composed source.
+- Affected contract and cause: extracting one function does not carry its call
+  graph; the isolated harness silently retains an obsolete inline assumption
+  or omits the real sibling dependency.
+- Canonical owner and evidence: [FIND-0277](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0277)
+  and [FIND-0283](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0283)
+  / [TEST-0126](../../docs/features/FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126)
+  own explicit canonical dependency binding.
+- Fixed release or evidence: the focused current-launcher recovery shard passed
+  on 2026-07-25; target release `0.15.0` carries the durable route.
+- Required safe response: inventory the extracted function's direct production
+  calls, resolve each exact canonical owner from the same source AST or module,
+  and inject those definitions before the function under test.
+- Unsafe retry boundary: do not retry a single-function extraction after an
+  unrecognized sibling error, and do not copy the sibling implementation into
+  the harness.
+- Freshness and review condition: last confirmed 2026-07-25; review whenever
+  the extracted production call graph changes.
+- Superseded by: `None`
+
+### Human-facing commit reference lacks an exact commit permalink
+
+- Status: `Active`
+- Observable signature: [TEST-0065](../../docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065)
+  reports an `UnlinkedCommitReference` for a
+  short SHA or for a commit-like hexadecimal object identity in Markdown.
+- Applicability: tracked Markdown and GitHub-facing evidence that names commits,
+  checkpoints, blobs, or other Git objects.
+- Affected contract and cause: a human-facing commit identity is not navigable
+  or a non-commit object is syntactically indistinguishable from a commit; the
+  referenced implementation evidence is not itself invalid.
+- Canonical owner and evidence: [FIND-0284](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0284)
+  / [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  owns the exact reference contract.
+- Fixed release or evidence: repository-only Markdown verification is the
+  focused barrier; target release `0.15.0` carries the corrected evidence.
+- Required safe response: resolve a commit to its exact full SHA and link the
+  label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; describe a
+  non-commit object without presenting its raw identity as a commit reference,
+  or use an exact content permalink when navigation is required.
+- Unsafe retry boundary: do not leave a short SHA in code formatting, do not
+  treat an arbitrary 40-hex object as a commit, and do not split one validator
+  count into derivative findings.
+- Freshness and review condition: last confirmed 2026-07-25; review after the
+  canonical commit-reference validator contract changes.
+- Superseded by: `None`
+
+### Executable Case rename leaves a retired fixture path in a structural consumer
+
+- Status: `Active`
+- Observable signature: a structural test opens a retired `.fixture.ps1` path
+  while the exact owner inventory contains the corresponding `.case.ps1`, or a
+  literal search reports no match because the path is statically concatenated.
+- Applicability: executable test-role renames and every PowerShell test-code or
+  contract consumer of the renamed owner.
+- Affected contract and cause: the Case inventory changed atomically, but a
+  separate AST consumer retained its hand-written path and escaped literal-only
+  review by splitting the string.
+- Canonical owner and evidence: [FIND-0285](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0285)
+  / [TEST-0187](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0187)
+  owns the role-transition barrier.
+- Fixed release or evidence: focused role-boundary, canonical-helper, and
+  runtime-efficiency owners pass; target release `0.15.0` carries the route.
+- Required safe response: derive retired names from the exact current Case
+  inventory, fold static PowerShell string concatenations, update every code and
+  contract consumer in the same change, and run the structural consumer.
+- Unsafe retry boundary: do not rerun the missing path, patch only the first
+  call site, or accept a raw literal search as complete rename evidence.
+- Freshness and review condition: last confirmed 2026-07-25; review whenever an
+  executable test-role suffix or owner path changes.
+- Superseded by: `None`
+
+### Canonical helper refactor leaves a stale reviewed AST operation inventory
+
+- Status: `Active`
+- Observable signature: [TEST-0159](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  reports unreviewed or absent dynamic invocations, escaped owners, or static
+  counter-site differences immediately after a helper or process owner moves.
+- Applicability: test refactors that centralize dynamic commands, native-process
+  dispatch, Git splats, or operation-counter ownership.
+- Affected contract and cause: runtime behavior and maxima may remain correct,
+  while the review-only AST inventory still describes the pre-refactor call
+  graph.
+- Canonical owner and evidence: [FIND-0286](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0286)
+  / [TEST-0159](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  owns structural operation review independently from runtime maxima.
+- Fixed release or evidence: the focused runtime-efficiency owner passes; target
+  release `0.15.0` carries the reconciled inventory.
+- Required safe response: classify each diagnostic against the intended
+  canonical owner, update the reviewed identities and centralized call-site
+  assertions in the same slice, then prove runtime budgets remain unchanged.
+- Unsafe retry boundary: do not blindly copy observed counts, suppress the AST
+  gate, or treat derivative diagnostics as separate runtime defects.
+- Freshness and review condition: last confirmed 2026-07-25; review whenever a
+  reviewed dynamic/helper/process call graph changes.
+- Superseded by: `None`
+
 ## Open context
 
 - [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-  is In progress for target `0.15.0` under
+  is implemented and locally reviewed for target `0.15.0` under
   [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). Its four
-  independently tracked slices are
+  independently tracked slices are complete:
   [SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128),
   [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096) / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
   [SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
   and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
   [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
-  records the accepted authority boundary. Implementation was authorized on
-  2026-07-25; follow the current [implementation handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md).
+  records the accepted authority boundary. Follow the current
+  [release-candidate handoff](log/2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
+  through the final full suite, reviewed pull request, and immutable release.
   The completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md)
   and [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
   remain historical evidence.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
-  [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
+  [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98). Reevaluate its
+  scope only after `v0.15.0` publication against the completed modular test
+  architecture, including repeated tests and tests-that-test-tests; do not
+  absorb that reevaluation into [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

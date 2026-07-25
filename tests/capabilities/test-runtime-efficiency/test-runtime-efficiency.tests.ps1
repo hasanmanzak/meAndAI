@@ -928,10 +928,10 @@ $quickPath = Join-Path $root `
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
 $bootstrapPath = Join-Path $root `
     ('tests/capabilities/initial-adoption/' +
-     'capabilities-bootstrap-adapter' + '.fixture.ps1')
+     'capabilities-bootstrap-adapter' + '.case.ps1')
 $bootstrapGraphIdentityPath = Join-Path $root `
     ('tests/capabilities/initial-adoption/' +
-     'capabilities-bootstrap-graph-' + 'identity.fixture.ps1')
+     'capabilities-bootstrap-graph-' + 'identity.case.ps1')
 $testGitBatchPath = Join-Path $root `
     'tests/infrastructure/MeAndAI.TestGitBatch.psm1'
 $instructionGraphPath = Join-Path $root `
@@ -1078,6 +1078,9 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$rootStrategyContract|<script>' = 1
     '$rootSurfaceContract|<script>' = 1
     '$ruleGraphBuilder|<script>' = 1
+    '$script:GetQuickAdoptionHarnessGitBlobSha1|<script>' = 2
+    '$script:GetQuickAdoptionHarnessGitBlobSha1|Get-TestQuickAdoptionGitBlobSha1' = 1
+    '$script:ImportQuickAdoptionCapabilityCatalog|Copy-CanonicalProtocolFixture' = 1
     '$strategyResolver|<script>' = 4
     '$surfaceInventoryContract|<script>' = 2
     '$targetCommand|New-TestQuickAdoptionCompletionContractFixture' = 1
@@ -1092,7 +1095,6 @@ $quickUnclassifiedGitSplats =
 Assert-ReviewedOperationInventory -Actual $quickUnclassifiedGitSplats `
     -Expected ([ordered]@{
         '@Arguments|Invoke-Git|git' = 1
-        '@Arguments|Invoke-TestGit|git' = 1
     }) -Label 'quick-adoption unclassified Git splat'
 $syntheticTokens = $null
 $syntheticErrors = $null
@@ -1183,9 +1185,6 @@ $bootstrapDynamicInvocations =
     Get-ReviewedDynamicInvocationInventory -Ast $bootstrapAst
 $expectedBootstrapDynamicInvocations = [ordered]@{
     '$adapterPath|Invoke-BootstrapFixture' = 2
-    '$engine|Get-FixtureInstructionGraphIdentity' = 1
-    '$engine|Invoke-IsolatedGraphDriftFixture' = 1
-    '$engine|Invoke-IsolatedGraphSuccessFixture' = 1
 }
 Assert-ReviewedOperationInventory -Actual $bootstrapDynamicInvocations `
     -Expected $expectedBootstrapDynamicInvocations `
@@ -1195,26 +1194,35 @@ $bootstrapRecursiveCleanup =
 Assert-ReviewedOperationInventory -Actual $bootstrapRecursiveCleanup `
     -Expected ([ordered]@{ 'Remove-Item|<script>' = 2 }) `
     -Label 'bootstrap recursive cleanup'
-$bootstrapChildProcesses = @($bootstrapAst.FindAll({
+$bootstrapChildCases = @($bootstrapAst.FindAll({
     param($node)
     $node -is [System.Management.Automation.Language.CommandAst] -and
-    $node.InvocationOperator -eq
-        [System.Management.Automation.Language.TokenKind]::Ampersand -and
-    $node.CommandElements.Count -gt 0 -and
-    $node.CommandElements[0].Extent.Text -ceq '$engine'
+    $node.GetCommandName() -ceq 'Invoke-BootstrapChildCase'
 }, $true))
 $expectedBootstrapChildParents = [ordered]@{
     'Get-FixtureInstructionGraphIdentity' = 1
     'Invoke-IsolatedGraphDriftFixture' = 1
     'Invoke-IsolatedGraphSuccessFixture' = 1
 }
-Assert-Equal $bootstrapChildProcesses.Count 3 `
-    'TEST-0159 bootstrap child-process call-site count differs.'
+Assert-Equal $bootstrapChildCases.Count 3 `
+    'TEST-0159 bootstrap child-Case call-site count differs.'
 foreach ($entry in $expectedBootstrapChildParents.GetEnumerator()) {
-    Assert-Equal @($bootstrapChildProcesses | Where-Object {
+    Assert-Equal @($bootstrapChildCases | Where-Object {
         (Get-ParentFunctionName -Node $_) -ceq [string]$entry.Key
     }).Count ([int]$entry.Value) `
-        "TEST-0159 bootstrap child-process count differs for '$($entry.Key)'."
+        "TEST-0159 bootstrap child-Case count differs for '$($entry.Key)'."
+}
+$bootstrapProcessOwners = @($bootstrapAst.FindAll({
+    param($node)
+    $node -is [System.Management.Automation.Language.CommandAst] -and
+    $node.GetCommandName() -ceq 'Invoke-MeAndAITestCaseProcess'
+}, $true))
+Assert-Equal $bootstrapProcessOwners.Count 1 `
+    'TEST-0159 bootstrap canonical child-process owner count differs.'
+if ($bootstrapProcessOwners.Count -eq 1) {
+    Assert-Equal (Get-ParentFunctionName -Node $bootstrapProcessOwners[0]) `
+        'Invoke-BootstrapChildCase' `
+        'TEST-0159 bootstrap child process escaped its canonical owner.'
 }
 $bootstrapIncrements = @($bootstrapAst.FindAll({
     param($node)
@@ -1227,7 +1235,7 @@ $bootstrapIncrements = @($bootstrapAst.FindAll({
 $bootstrapParents = @(
     'New-ImmutableBootstrapBaseline',
     'New-BootstrapFixture',
-    'Get-FixtureInstructionGraphIdentity',
+    'Invoke-BootstrapChildCase',
     'Invoke-IsolatedGraphDriftFixture',
     'Invoke-IsolatedGraphSuccessFixture'
 )
@@ -1243,7 +1251,7 @@ $expectedBootstrapIncrements = [ordered]@{
     FixtureClone = 2
     FixtureBundleCreate = 2
     FixturePublicationPush = 1
-    GraphChildProcess = 3
+    GraphChildProcess = 1
     GraphIsolatedAcquisition = 2
 }
 foreach ($entry in $expectedBootstrapIncrements.GetEnumerator()) {

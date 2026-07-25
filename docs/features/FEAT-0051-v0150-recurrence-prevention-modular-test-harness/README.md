@@ -3,16 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In progress |
+| Status | Complete |
 | Target version | 0.15.0 |
 | Issue | [Issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) |
 | Pull request | Implementation pull request pending; planning completed through [PR #129](https://github.com/hasanmanzak/meAndAI/pull/129) |
 | Decisions | [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
-Implementation was authorized on 2026-07-25 and is proceeding in the declared
-subfeature order. The current branch does not publish `0.15.0`; release remains
-a separate post-merge gate.
+Implementation was authorized and completed in the declared subfeature order
+on 2026-07-25. The current branch does not publish `0.15.0`; the reviewed pull
+request and immutable release remain separate post-merge gates.
 
 ## Problem
 
@@ -136,17 +136,17 @@ runtimes, or workflow topology.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [TEST-0183](test-cases.md#test-0183), [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) |
-| Test code | Partially implemented | [TEST-0183](test-cases.md#test-0183), [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), and [TEST-0186](test-cases.md#test-0186) have executable owners; [TEST-0187](test-cases.md#test-0187) and [TEST-0188](test-cases.md#test-0188) remain planned. |
-| Baseline run | The first three slices' focused tests passed; [SUBF-0098](#subf-0098) not started | The recurrence gate, canonical utility ownership, exact runtime identity, role boundaries, every non-hotspot executable owner, immutable dependency paths, and operation budgets passed on Windows PowerShell 5.1 on 2026-07-25. |
+| Test code | Complete | [TEST-0183](test-cases.md#test-0183), [TEST-0184](test-cases.md#test-0184), [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), [TEST-0187](test-cases.md#test-0187), and [TEST-0188](test-cases.md#test-0188) have executable owners. |
+| Baseline run | All four slices' focused tests passed | The recurrence gate, canonical utility ownership, exact runtime identity, role boundaries, three hotspot migrations, immutable capability append, dependency paths, and operation budgets passed on Windows PowerShell 5.1 on 2026-07-25. |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0095` <a name="subf-0095"></a> | Recurrence-prevention and durable prior-solution gate | [Issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) | [TEST-0183](test-cases.md#test-0183) and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0245](#find-0245) through [FIND-0254](#find-0254); all Blocking findings resolved, [FIND-0250](#find-0250) accepted | Implemented and locally reviewed; feature PR pending |
-| `SUBF-0096` <a name="subf-0096"></a> | Canonical shared test-harness and helper ownership | [Issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) | [TEST-0184](test-cases.md#test-0184), affected capability regressions, and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0255](#find-0255) through [FIND-0263](#find-0263); all Blocking findings resolved | Implemented and locally reviewed; feature PR pending |
-| `SUBF-0097` <a name="subf-0097"></a> | Runner, harness, case/scenario, support, fixture, and runtime-evidence separation | [Issue #126](https://github.com/hasanmanzak/meAndAI/issues/126) | [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), all non-hotspot executable owners, and changed-source AST passed on Windows PowerShell 5.1 | [FIND-0264](#find-0264), [FIND-0265](#find-0265), [FIND-0266](#find-0266), [FIND-0267](#find-0267), [FIND-0268](#find-0268), [FIND-0269](#find-0269), [FIND-0270](#find-0270), and [FIND-0271](#find-0271); the exact migration debt remains owned by [SUBF-0098](#subf-0098) | Implemented and locally reviewed; feature PR pending |
-| `SUBF-0098` <a name="subf-0098"></a> | Staged self-application, duplicate-family consolidation, append-only capability, and compatibility closure | [Issue #127](https://github.com/hasanmanzak/meAndAI/issues/127) | [TEST-0187](test-cases.md#test-0187), [TEST-0188](test-cases.md#test-0188); not started | Required after the slice | Proposed |
+| `SUBF-0095` <a name="subf-0095"></a> | Recurrence-prevention and durable prior-solution gate | [Issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) | [TEST-0183](test-cases.md#test-0183) and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0245](#find-0245) through [FIND-0254](#find-0254); all Blocking findings resolved, [FIND-0250](#find-0250) accepted | Implemented and locally reviewed |
+| `SUBF-0096` <a name="subf-0096"></a> | Canonical shared test-harness and helper ownership | [Issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) | [TEST-0184](test-cases.md#test-0184), affected capability regressions, and final StructureOnly passed on Windows PowerShell 5.1 | [FIND-0255](#find-0255) through [FIND-0263](#find-0263); all Blocking findings resolved | Implemented and locally reviewed |
+| `SUBF-0097` <a name="subf-0097"></a> | Runner, harness, case/scenario, support, fixture, and runtime-evidence separation | [Issue #126](https://github.com/hasanmanzak/meAndAI/issues/126) | [TEST-0185](test-cases.md#test-0185), [TEST-0186](test-cases.md#test-0186), all non-hotspot executable owners, and changed-source AST passed on Windows PowerShell 5.1 | [FIND-0264](#find-0264), [FIND-0265](#find-0265), [FIND-0266](#find-0266), [FIND-0267](#find-0267), [FIND-0268](#find-0268), [FIND-0269](#find-0269), [FIND-0270](#find-0270), and [FIND-0271](#find-0271); the bounded migration debt was closed by [SUBF-0098](#subf-0098) | Implemented and locally reviewed |
+| `SUBF-0098` <a name="subf-0098"></a> | Staged self-application, duplicate-family consolidation, append-only capability, and compatibility closure | [Issue #127](https://github.com/hasanmanzak/meAndAI/issues/127) | [TEST-0187](test-cases.md#test-0187), [TEST-0188](test-cases.md#test-0188), all three hotspot owners, capability catalog/review, and protocol governance passed on Windows PowerShell 5.1 | [FIND-0272](#find-0272) through [FIND-0286](#find-0286); all Blocking findings resolved | Implemented and locally reviewed |
 
 ## Decisions and relationships
 
@@ -200,8 +200,7 @@ declared implementation sequence on 2026-07-25.
 
 ## Self-review
 
-Planning review date: 2026-07-25. SUBF-0095, SUBF-0096, and SUBF-0097
-implementation review date: 2026-07-25.
+Planning and all four subfeature implementation review date: 2026-07-25.
 
 The planning review covered the planning record, decision, scenarios, indexes,
 issue links, and planning handoff. The SUBF-0095 review covers only its
@@ -216,6 +215,11 @@ subfeatures remain excluded from that slice. The SUBF-0097 review covers the
 explicit exact-once evidence context, root-runner and test-role contracts,
 isolated positive/negative fixtures, every non-hotspot evidence owner, and the
 exact five-file/three-owner transition boundary for SUBF-0098. The combined
+SUBF-0098 review covers exact per-case evidence for the three declared
+hotspots, zero remaining transition or legacy owners, catalog-driven fixture
+construction, canonical helper lifetime across isolated production-module
+teardown, immutable predecessor blobs and terminal-ledger compatibility, and
+the appended capability contract. The combined
 slice budget is focused owner and affected capability validation,
 `git diff --check`, one final `StructureOnly` confirmation, link/ID
 consistency, and one fresh-diff review.
@@ -251,6 +255,21 @@ consistency, and one fresh-diff review.
 | `FIND-0269` <a name="find-0269"></a> | Low | `Blocking` | The first [TEST-0185](test-cases.md#test-0185) suite did not preserve unexpected-ID rejection or the immutability of a context after failed finalization. | Added unexpected identity, post-failure mutation, and post-failure re-finalization cases to the existing isolated missing-context fixture; no new repository scenario ID or helper layer was introduced. |
 | `FIND-0270` <a name="find-0270"></a> | High | `Blocking` | The first final StructureOnly confirmation reported 14 link-policy messages from three visible scenario identities introduced in the new slice records without exact clickable coverage. | Linked the two canonical identities to their feature test records, removed the synthetic fixture identity from prose, retained the 14 messages as one root documentation defect rather than separate findings, and passed the single confirmation StructureOnly run. |
 | `FIND-0271` <a name="find-0271"></a> | High | `Blocking` | The first issue-closing comment summarized a finding range with free-text identities even though the [documentation-graph mandate](../../../PROTOCOL.md#6-documentation-graph) requires every human-facing GitHub comment reference to be an exact clickable link. | Edited the [same closing comment](https://github.com/hasanmanzak/meAndAI/issues/126#issuecomment-5079142152) in place, removed the aggregate identities, and linked the remaining subfeature issue reference exactly before continuing. |
+| `FIND-0272` <a name="find-0272"></a> | High | `Blocking` | Executable child cases had no exact result channel of their own, so a parent could discover a case without proving that the exact case completed successfully. | Added context-bound Case evidence and migrated the protocol-update, bootstrap, and quick-adoption owners to exact expected/result sets; missing, duplicate, unexpected, and failed child evidence now fails closed under [TEST-0187](test-cases.md#test-0187). |
+| `FIND-0273` <a name="find-0273"></a> | High | `Blocking` | Delegated work inherited generic protocol context but not the applicable active recurrence safe routes, allowing known PowerShell parser and search mistakes to recur in later agent tasks. | Required the delegating owner to resolve and transmit safe responses plus unsafe retry boundaries, required the delegated agent to reread active recurrence knowledge before its first tool call, and extended [TEST-0183](test-cases.md#test-0183). |
+| `FIND-0274` <a name="find-0274"></a> | High | `Blocking` | The quick-adoption capability fixture hardcoded two definitions and silently omitted the third released predecessor capability. | Replaced the hardcoded copy with catalog-driven exact definition installation; [TEST-0140](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140) and [TEST-0187](test-cases.md#test-0187) pass with the complete catalog. |
+| `FIND-0275` <a name="find-0275"></a> | Medium | `Blocking` | The role-boundary transition assertion still expected two legacy owners after the migration had already reduced the canonical contract to one. | Corrected the exact transition expectation, completed the remaining migration, and then removed the transition key entirely; [TEST-0186](test-cases.md#test-0186) and [TEST-0187](test-cases.md#test-0187) now require zero legacy references. |
+| `FIND-0276` <a name="find-0276"></a> | Medium | `Blocking` | The first transition-zero guard called a nonexistent negative assertion helper. | Expressed the negative through the canonical truth assertion and retained zero transition keys and zero legacy evidence references under [TEST-0187](test-cases.md#test-0187). |
+| `FIND-0277` <a name="find-0277"></a> | High | `Blocking` | The isolated instruction-graph fixture did not bind the canonical Git-blob identity scriptblock after shared utility ownership moved in [SUBF-0096](#subf-0096). | Injected the exact canonical binding into the isolated fixture; [TEST-0154](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154) and the quick-adoption graph shard pass without a local hash implementation. |
+| `FIND-0278` <a name="find-0278"></a> | High | `Blocking` | Production dynamic-module teardown removed globally imported catalog and content-identity commands before later quick-adoption cases could reuse them. | Captured the canonical exported scriptblocks once, invoked those stable owners after teardown, and added a module-leak guard; [TEST-0140](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140), [TEST-0184](test-cases.md#test-0184), and [TEST-0187](test-cases.md#test-0187) pass. |
+| `FIND-0279` <a name="find-0279"></a> | High | `Blocking` | The first final full suite proved that detaching the canonical test-repository function into a scriptblock did not remain a valid invocation target after the preceding ContractsPreflight lifecycle, although the isolated shard passed. | Retained the exact `MeAndAI.TestRepository` module for the suite lifetime, invoked its exported command through the module-qualified canonical name, and removed only that exact ModuleInfo at closure. The mixed `WindowsNative` sequence and final full suite are the recurrence barrier. |
+| `FIND-0280` <a name="find-0280"></a> | High | `Blocking` | The first final full suite reached bare fixture repositories through implicit `git -C`; hosts with `safe.bareRepository=explicit` therefore rejected the otherwise valid repository operation. | Made the canonical test-repository command recognize the bare repository structure and use `--git-dir`, retained an explicit `-BareRepository` route, and covered both routes under [TEST-0184](test-cases.md#test-0184). The full bootstrap owner and quick-adoption `RepositoryRoutes` shard passed without call-site copies. |
+| `FIND-0281` <a name="find-0281"></a> | High | `Blocking` | The first bootstrap correction repeated the unsafe detached-scriptblock lifetime from [FIND-0279](#find-0279), and its dependent pending-proposal mutation masked the primary failure with a stale force-with-lease error. | Retained the exact module, called the module-qualified canonical command, removed only its ModuleInfo at closure, and added fail-fast prerequisite barriers before dependent proposal mutation. The full bootstrap owner passed all 15 exact child cases with unchanged operation budgets. |
+| `FIND-0282` <a name="find-0282"></a> | High | `Blocking` | The final mixed quick-adoption sequence recomputed reusable-fixture owner identity from dynamic `$PSCommandPath`; a nested script lifecycle could therefore make the same owner appear to have a different input digest. | Captured the exact suite owner path and SHA-256 once at startup, reused that immutable identity for every request, and made fixture closure require the exact captured digest under [TEST-0116](../FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116). |
+| `FIND-0283` <a name="find-0283"></a> | High | `Blocking` | Temporary-root cleanup had three inconsistent representations: current-launcher recovery expected a canonical sibling that its isolated harness omitted, local Codex completion performed one unverified silent removal that could remain delete-pending on Windows, and the streaming contract asserted the obsolete inline `Remove-Item` shape. | Defined one contained `Remove-QuickAdoptionTemporaryRoot` owner with bounded removal and absence confirmation, routed local completion and current-launcher recovery through it, bound the exact FunctionDefinition in isolated harnesses, and made the streaming contract verify canonical helper ownership. [TEST-0066](../FEAT-0011-stability-closure/test-cases.md#test-0066), [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106), and [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126) are the shared runtime, cancellation, and recovery barriers. |
+| `FIND-0284` <a name="find-0284"></a> | High | `Blocking` | Documentation validation grouped the same cross-record-reference root across feature evidence and project memory: four short checkpoint SHAs lacked exact links, one Git blob SHA-1 was displayed in commit-like form, and the recurrence signature named [TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065) without linking its canonical record. | Linked every checkpoint and TEST identity to its exact target and described the non-commit blob identity without commit-reference syntax. [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) remain the canonical barriers. |
+| `FIND-0285` <a name="find-0285"></a> | High | `Blocking` | The executable-Case role migration renamed bootstrap owners from `.fixture.ps1` to `.case.ps1`, but the runtime-efficiency consumer retained two pre-migration paths. One path was assembled from adjacent string fragments, so a literal old-path search incorrectly reported no match. | Updated both consumers, made the canonical PowerShell role inspector fold static string concatenations, and extended [TEST-0187](test-cases.md#test-0187) to derive every retired executable-fixture path from the exact Case inventory and reject it across all PowerShell test code and contracts. |
+| `FIND-0286` <a name="find-0286"></a> | High | `Blocking` | The same staged refactor centralized quick-adoption utilities and bootstrap child-Case dispatch, while [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) still modeled the prior dynamic-call and counter-site graph. Sixteen diagnostics represented two stale reviewed inventories, not sixteen runtime defects. | Reconciled the reviewed quick-adoption identities with the canonical captured helpers, removed the retired direct Git splat, and made bootstrap assert three calls into one `Invoke-BootstrapChildCase` owner with one canonical process invocation and one counter site. Runtime operation budgets remain unchanged and the focused runtime-efficiency owner passes. |
 
 ### Gate 5 closure for the recurrence slice
 
@@ -296,14 +315,34 @@ consistency, and one fresh-diff review.
 | [FIND-0270](#find-0270) | Barrier: [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) | Every visible cross-record identity in feature and memory closure evidence must remain wholly covered by its exact clickable link. |
 | [FIND-0271](#find-0271) | Reviewed `NotApplicable` plus exact external evidence | Repository tests cannot inspect an already-published GitHub comment; the corrected [comment](https://github.com/hasanmanzak/meAndAI/issues/126#issuecomment-5079142152) and the [documentation-graph mandate](../../../PROTOCOL.md#6-documentation-graph) are the review authorities. Reopen for any future free-text cross-record identity on a GitHub work surface. |
 
+### Gate 5 closure for the self-application and capability slice
+
+| Finding | Closure | Authority and review condition |
+| --- | --- | --- |
+| [FIND-0272](#find-0272) | Barrier: [TEST-0185](test-cases.md#test-0185) and [TEST-0187](test-cases.md#test-0187) | Every executable child Case must emit one exact successful result before its owning suite can confirm the mapped TEST identities. |
+| [FIND-0273](#find-0273) | Barrier: [TEST-0183](test-cases.md#test-0183) | Every delegated repository task must carry the applicable active recurrence safe routes and unsafe retry boundaries before the delegated agent's first tool call. |
+| [FIND-0274](#find-0274) | Barrier: [TEST-0140](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140) and [TEST-0187](test-cases.md#test-0187) | Capability fixtures must derive the complete immutable definition set from the target catalog rather than a hand-maintained subset. |
+| [FIND-0275](#find-0275) | Barrier: [TEST-0186](test-cases.md#test-0186) and [TEST-0187](test-cases.md#test-0187) | The role contract must retain zero transitional executable-fixture or legacy-owner entries after migration closure. |
+| [FIND-0276](#find-0276) | Barrier: [TEST-0187](test-cases.md#test-0187) | Transition-zero assertions must use the canonical assertion surface and fail if any removed role key or legacy evidence reference returns. |
+| [FIND-0277](#find-0277) | Barrier: [TEST-0154](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0154) | Isolated graph fixtures must receive the canonical Git-blob identity dependency explicitly and may not recreate it locally. |
+| [FIND-0278](#find-0278) | Barrier: [TEST-0140](../FEAT-0032-general-capability-test-architecture/test-cases.md#test-0140), [TEST-0184](test-cases.md#test-0184), and [TEST-0187](test-cases.md#test-0187) | Canonical imported commands required after product-module teardown must be captured explicitly, and no transient module may leak across cases. |
+| [FIND-0279](#find-0279) | Barrier: [TEST-0187](test-cases.md#test-0187) through the mixed `WindowsNative` sequence and final full suite | A module-owned canonical test command required across shard boundaries must retain its exact module lifetime and be removed by exact ModuleInfo only after its last use. |
+| [FIND-0280](#find-0280) | Barrier: [TEST-0184](test-cases.md#test-0184) and [TEST-0187](test-cases.md#test-0187) | Canonical test Git execution must route both explicit and structurally detected bare repositories through `--git-dir`; `git -C` is not a valid bare-repository retry. |
+| [FIND-0281](#find-0281) | Barrier: [TEST-0187](test-cases.md#test-0187) through the full bootstrap owner and final full suite | A dependent fixture mutation may run only after its exact proposal prerequisite succeeds and preserves a non-empty head OID; module-owned commands remain module-qualified for the complete lifetime. |
+| [FIND-0282](#find-0282) | Barrier: [TEST-0116](../FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116) and [TEST-0187](test-cases.md#test-0187) | Reusable fixture identity must derive from one captured lexical suite owner path and digest, never a dynamically re-read caller path. |
+| [FIND-0283](#find-0283) | Barrier: [TEST-0066](../FEAT-0011-stability-closure/test-cases.md#test-0066), [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106), [TEST-0126](../FEAT-0028-v0104-atomic-legacy-updater-recovery/test-cases.md#test-0126), and [TEST-0187](test-cases.md#test-0187) | Every temporary-root owner must call the one contained bounded cleanup helper, confirm absence after Windows delete-pending states, and bind that exact dependency in isolated production-function harnesses; tests may verify ownership but not require an obsolete inline implementation. |
+| [FIND-0284](#find-0284) | Barrier: [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) | Every human-facing cross-record identity requires one exact clickable target; checkpoint SHAs require full-SHA commit permalinks and non-commit object identities must not masquerade as commit references. |
+| [FIND-0285](#find-0285) | Barrier: [TEST-0187](test-cases.md#test-0187) | Every executable Case rename must update all PowerShell code and contract consumers in the same slice; the canonical static-string inspection must detect both literal and statically concatenated retired paths. |
+| [FIND-0286](#find-0286) | Barrier: [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) | A canonical helper or process-owner refactor must update its reviewed AST operation inventory in the same slice while retaining the independent runtime operation maxima. |
+
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
-- [ ] Mandatory test code and scenario mapping complete.
-- [ ] Test commands and successful results recorded.
-- [ ] Bounded self-review and required convergence scan complete.
-- [ ] No unresolved Blocking finding; all other dispositions have evidence.
-- [ ] Documentation, links, version, and project memory current.
+- [x] Acceptance criteria met.
+- [x] Mandatory test code and scenario mapping complete.
+- [x] Test commands and successful results recorded.
+- [x] Bounded self-review and required convergence scan complete.
+- [x] No unresolved Blocking finding; all other dispositions have evidence.
+- [x] Documentation, links, version, and project memory current.
 - [ ] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
 

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.14.5**<br>
+Protocol version: **0.15.0**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -115,6 +115,14 @@ recorded as explicit `None` and is not evidence that the route is safe. A
 `Stale` entry requires renewed evidence, a `Superseded` entry routes only to
 its replacement, and multiple applicable `Active` entries are ambiguous and
 block mutation.
+
+Before delegating repository work, the delegating owner MUST resolve the
+applicable active recurrence entries for the delegated contract and include
+their required safe responses and unsafe retry boundaries in the task brief.
+The delegated agent MUST re-read [repository instructions](AGENTS.md) and active
+recurrence knowledge before its first tool call. Inherited conversation context or a
+generic instruction to follow the protocol is not evidence that this handoff
+occurred.
 
 Do not repeat the same failed operation with unchanged inputs, environment,
 authority, and preconditions. A repeat requires new evidence that changes the
@@ -785,6 +793,17 @@ authority matrix above, binary-safe acquisition without normalization,
 contained regular-blob or ordinary-file evidence, fail-closed ambiguity, and
 read-only idempotent resolution. Automation may request the semantic review but
 does not gain ownership of the consumer's implementation.
+
+The `test-harness-modularity` semantic capability applies when a repository
+owns an automated test, validation, verification, or policy-checking surface.
+It requires reviewed recurrence and same-contract sibling routing before a
+correction or helper is implemented; one declared owner for contract-equivalent
+generic mechanics; explicit failure and result contexts; exact child Case
+evidence without source inference; non-overlapping runner, harness, case,
+scenario, support, fixture, and mock roles; fail-closed runtime evidence; and a
+finite self-application that preserves active TEST identities, behavior,
+process isolation, supported runtimes, workflow topology, and approved
+operation budgets without introducing a second framework.
 
 An applicable repository MUST record or emit machine-readable fixture and
 operation evidence that binds ownership, lifecycle, builds, reuse, mutable

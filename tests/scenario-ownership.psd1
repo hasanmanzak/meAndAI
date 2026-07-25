@@ -146,7 +146,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/test-architecture/role-boundaries.tests.ps1'
-            TestIds = @('TEST-0186')
+            TestIds = @('TEST-0186', 'TEST-0187')
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -157,11 +157,6 @@
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/protocol-governance/recurrence-prevention.tests.ps1'
             TestIds = @('TEST-0183')
-        }
-        @{
-            Evidence = 'PlannedDocumentation'
-            Owner = 'docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md'
-            TestIds = @('TEST-0187')
         }
         @{
             Evidence = 'ExecutableSuite'

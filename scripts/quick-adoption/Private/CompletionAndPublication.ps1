@@ -1276,8 +1276,6 @@ function Complete-AdoptionWithLocalCodex {
         }
     }
     finally {
-        if (Test-Path -LiteralPath $temporaryRoot) {
-            Remove-Item -LiteralPath $temporaryRoot -Recurse -Force -ErrorAction SilentlyContinue
-        }
+        Remove-QuickAdoptionTemporaryRoot -Path $temporaryRoot
     }
 }

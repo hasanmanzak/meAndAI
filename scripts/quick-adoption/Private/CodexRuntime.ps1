@@ -998,9 +998,7 @@ function Invoke-LocalCurrentLauncherRecovery {
             }
         }
         try {
-            if (Test-Path -LiteralPath $temporaryRoot) {
-                Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
-            }
+            Remove-QuickAdoptionTemporaryRoot -Path $temporaryRoot
         }
         catch {
             $cleanupError = $_.Exception

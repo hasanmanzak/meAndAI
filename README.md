@@ -4,13 +4,16 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.14.5**
+Current protocol version: **0.15.0**
 
 Immutable [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
-is the latest published release. [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
+is the prior published release. The `v0.15.0` source and its local evidence are
+complete under [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124);
+that issue remains the authority until the reviewed pull request and immutable
+release are published. [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
 and closed [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121)
-retain its delivery and publication evidence. Current verifier authority passed
-the [v0.14.5](https://github.com/hasanmanzak/meAndAI/actions/runs/30135901192),
+retain the prior release evidence. Current verifier authority passed the
+[v0.14.5](https://github.com/hasanmanzak/meAndAI/actions/runs/30135901192),
 [v0.14.4](https://github.com/hasanmanzak/meAndAI/actions/runs/30136054438),
 [v0.14.3](https://github.com/hasanmanzak/meAndAI/actions/runs/30136203285), and
 [v0.14.2](https://github.com/hasanmanzak/meAndAI/actions/runs/30136551195)
@@ -67,6 +70,12 @@ The appended
 definition binds byte-sensitive clean, staged, and worktree evidence to their
 exact Git authorities without normalization, and keeps reusable corrections in
 the common upstream protocol while semantic consumer changes remain reviewed.
+The appended
+[`test-harness-modularity`](capabilities/test-harness-modularity.json)
+definition requires recurrence and sibling-owner routing, one owner for generic
+test mechanics, explicit result contexts, exact executable Case evidence, and
+non-overlapping runner, harness, case, support, fixture, and mock roles without
+creating a second test framework.
 
 The protocol's stability and consistency mandate starts one bounded project
 scan after material development, resolves dependency-ready blocking findings

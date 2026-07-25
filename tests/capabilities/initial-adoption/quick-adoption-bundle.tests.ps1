@@ -34,7 +34,7 @@ function New-TestRuntimeBundle {
 
     $moduleSource = @'
 function Invoke-MeAndAIQuickAdoption {
-    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.14.5')
+    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.15.0')
     [IO.File]::WriteAllText(
         $env:MEANDAI_TEST_RUNTIME_SENTINEL,
         "$TargetPath`n$ProtocolTag",
@@ -46,7 +46,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
     $moduleManifest = @'
 @{
     RootModule = 'MeAndAI.QuickAdoption.psm1'
-    ModuleVersion = '0.14.5'
+    ModuleVersion = '0.15.0'
     GUID = '04ed28e4-4f2c-4ec0-9497-d81487d114ec'
     PowerShellVersion = '5.1'
     FunctionsToExport = @('Invoke-MeAndAIQuickAdoption')
@@ -84,7 +84,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
         schema = 1
         kind = 'meandai.quick-adoption.module-bundle'
         runtimeRepository = 'hasanmanzak/meAndAI'
-        runtimeReleaseTag = 'v0.14.5'
+        runtimeReleaseTag = 'v0.15.0'
         sourceCommit = if ($ManifestSourceCommit) {
             $ManifestSourceCommit
         }
@@ -264,7 +264,7 @@ if ($bootstrap) {
         Add-Failure "TEST-0147 thin bootstrapper exceeds its bounded review surface: $lineCount lines."
     }
     foreach ($required in @(
-        "`$runtimeReleaseTag = 'v0.14.5'",
+        "`$runtimeReleaseTag = 'v0.15.0'",
         "`$runtimeBundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'",
         '$runtimeBundleMaximumArchiveBytes = 67108864',
         '$runtimeBundleMaximumExpandedBytes = 67108864',
@@ -494,10 +494,10 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $second = Join-Path $fixtureRoot 'second.zip'
         $defaultRoot = Join-Path $fixtureRoot 'default-root.zip'
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
             -OutputPath $first)
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
             -OutputPath $second)
         if ($PSVersionTable.PSEdition -ceq 'Desktop') {
             $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
@@ -506,7 +506,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 $ErrorActionPreference = 'Continue'
                 $defaultRootOutput = @(& $windowsPowerShell -NoProfile `
                     -ExecutionPolicy Bypass -File $fixtureBuilderPath `
-                    -RuntimeReleaseTag 'v0.14.5' `
+                    -RuntimeReleaseTag 'v0.15.0' `
                     -SourceCommit $sourceCommit -OutputPath $defaultRoot 2>&1)
                 $defaultRootExitCode = $LASTEXITCODE
             }
@@ -518,7 +518,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
         }
         else {
-            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.14.5' `
+            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.15.0' `
                 -SourceCommit $sourceCommit -OutputPath $defaultRoot)
         }
         if (-not (Test-Path -LiteralPath $first -PathType Leaf) -or
@@ -550,7 +550,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json }
             finally { $reader.Dispose() }
             if ([string]$manifest.sourceCommit -cne $sourceCommit -or
-                [string]$manifest.runtimeReleaseTag -cne 'v0.14.5') {
+                [string]$manifest.runtimeReleaseTag -cne 'v0.15.0') {
                 throw 'Production bundle manifest does not bind the exact source identity.'
             }
             $expectedEntryOrder = @('manifest.json') + @(
@@ -639,7 +639,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
             try {
                 [void](& $builderPath -SourceRoot $sourceRoot `
-                    -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+                    -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
                     -OutputPath $partialOutput)
             }
             catch {
@@ -665,7 +665,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $dirtyRejected = $false
         try {
             [void](& $builderPath -SourceRoot $sourceRoot `
-                -RuntimeReleaseTag 'v0.14.5' -SourceCommit $sourceCommit `
+                -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
                 -OutputPath $dirtyOutput)
         }
         catch {
@@ -857,7 +857,7 @@ exit /b %ERRORLEVEL%
                 }
             }
             if ($scenario.ShouldPass) {
-                $expectedSentinel = "$runtimeRoot`nv0.14.5"
+                $expectedSentinel = "$runtimeRoot`nv0.15.0"
                 if (-not (Test-Path -LiteralPath $sentinel -PathType Leaf) -or
                     [IO.File]::ReadAllText($sentinel) -cne $expectedSentinel) {
                     Add-Failure 'TEST-0147 verified thin bootstrap did not invoke its exact module entry point.'

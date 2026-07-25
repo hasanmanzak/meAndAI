@@ -479,6 +479,56 @@ function Get-NormalizedPath {
     )
 }
 
+function Remove-QuickAdoptionTemporaryRoot {
+    param([Parameter(Mandatory)][string]$Path)
+
+    $normalizedPath = [IO.Path]::GetFullPath($Path)
+    $temporaryDirectory = [IO.Path]::GetFullPath(
+        [IO.Path]::GetTempPath()
+    ).TrimEnd(
+        [IO.Path]::DirectorySeparatorChar,
+        [IO.Path]::AltDirectorySeparatorChar
+    )
+    $comparison = if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        [StringComparison]::OrdinalIgnoreCase
+    }
+    else { [StringComparison]::Ordinal }
+    $temporaryPrefix = $temporaryDirectory +
+        [IO.Path]::DirectorySeparatorChar
+    $leafName = Split-Path -Leaf $normalizedPath
+    if (-not $normalizedPath.StartsWith($temporaryPrefix, $comparison) -or
+        $leafName -cnotmatch '^meandai-(?:local-adoption|update-recovery)-[0-9a-f]{32}$') {
+        throw "Quick-adoption refused to remove noncanonical temporary root '$normalizedPath'."
+    }
+
+    $lastError = $null
+    for ($attempt = 1; $attempt -le 50; $attempt++) {
+        if (-not (Test-Path -LiteralPath $normalizedPath)) {
+            return
+        }
+        try {
+            Remove-Item -LiteralPath $normalizedPath -Recurse -Force `
+                -ErrorAction Stop
+            $lastError = $null
+        }
+        catch {
+            $lastError = $_.Exception
+        }
+        if (-not (Test-Path -LiteralPath $normalizedPath)) {
+            return
+        }
+        if ($attempt -lt 50) {
+            Start-Sleep -Milliseconds 100
+        }
+    }
+
+    $detail = if ($null -eq $lastError) {
+        'The path remained visible after bounded removal confirmation.'
+    }
+    else { $lastError.Message }
+    throw "Quick-adoption temporary workspace cleanup did not converge for '$normalizedPath'. $detail"
+}
+
 function Assert-ContainedManagedDestination {
     param(
         [Parameter(Mandatory)][string]$Root,

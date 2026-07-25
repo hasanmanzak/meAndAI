@@ -18,6 +18,7 @@ Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestAssertions.psm1
 Import-Module $helperOwnershipModulePath -Force
 Import-Module (Join-Path $root 'scripts/MeAndAI.ContentIdentity.psm1') -Force
 Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.MarkdownEvidence.psm1') -Force
+Import-Module (Join-Path $root 'tests/infrastructure/MeAndAI.TestRepository.psm1') -Force
 
 $scenarioEvidenceContext = New-MeAndAIScenarioEvidenceContext `
     -Owner $owner -AuthorityPath $authorityPath
@@ -121,6 +122,26 @@ if (-not $ownershipResult.Valid) {
 $syntheticRoot = Join-Path ([IO.Path]::GetTempPath()) `
     ('meandai-test-0184-' + [guid]::NewGuid().ToString('N'))
 try {
+    [IO.Directory]::CreateDirectory($syntheticRoot) | Out-Null
+    $bareRepository = Join-Path $syntheticRoot 'explicit-bare.git'
+    Invoke-MeAndAITestRepositoryGit -Repository $syntheticRoot `
+        -Configuration @('-c', 'safe.bareRepository=explicit') `
+        -Arguments @('init', '--bare', $bareRepository) | Out-Null
+    $bareRefs = @(Invoke-MeAndAITestRepositoryGit `
+        -Repository $bareRepository -BareRepository `
+        -Configuration @('-c', 'safe.bareRepository=explicit') `
+        -Arguments @('for-each-ref', '--format=%(refname)'))
+    if ($bareRefs.Count -ne 0) {
+        Add-Failure 'TEST-0184 explicit bare-repository route returned unexpected refs.'
+    }
+    $implicitBareRefs = @(Invoke-MeAndAITestRepositoryGit `
+        -Repository $bareRepository `
+        -Configuration @('-c', 'safe.bareRepository=explicit') `
+        -Arguments @('for-each-ref', '--format=%(refname)'))
+    if ($implicitBareRefs.Count -ne 0) {
+        Add-Failure 'TEST-0184 inferred bare-repository route returned unexpected refs.'
+    }
+
     $syntheticInfrastructure = Join-Path $syntheticRoot 'tests/infrastructure'
     [IO.Directory]::CreateDirectory($syntheticInfrastructure) | Out-Null
     Copy-Item -LiteralPath (Join-Path $fixtureRoot 'owner.psm1.fixture') `
