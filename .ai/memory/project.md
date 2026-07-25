@@ -9,23 +9,24 @@ Last verified: **2026-07-25**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.14.5` candidate. Latest immutable release:
-  [v0.14.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.4)
-  targets commit [`edf4c5d496df239aeb3f14c03b7109215af9128f`](https://github.com/hasanmanzak/meAndAI/commit/edf4c5d496df239aeb3f14c03b7109215af9128f).
-  [PR #120](https://github.com/hasanmanzak/meAndAI/pull/120) retains delivery
-  evidence and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119)
-  is closed. Retained [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
-  and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remain
-  open behind the common correction in
-  [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121).
-- Current scope: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
+- Current protocol version: `0.14.5`. The latest immutable release is
+  [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5).
+  [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122) and closed
+  [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) retain its
+  delivery and publication evidence. Current verifier authority passed the
+  `v0.14.5`, `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates; retained
+  [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
+  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
+  Exact dated evidence is in the
+  [v0.14.5 publication-closure handoff](log/2026-07-25-v0145-publication-closure.md).
+- Most recently completed scope: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
   [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
   [SUBF-0094](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md#subf-0094),
   [TEST-0182](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
-  and [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) govern the
-  v0.14.5 correction on `codex/bug-0033-basename-link-semantics`. It admits
-  only a separator-free visible basename that equals the resolved target's
-  case-sensitive basename; consumers remain outside the correction.
+  and [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) govern
+  the completed v0.14.5 correction. Its exact owned branch is absent. The
+  correction admits only a separator-free visible basename that equals the
+  resolved target's case-sensitive basename; consumers remain outside it.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -82,12 +83,6 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- Publish [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md)
-  through one reviewed pull request and immutable v0.14.5 release under
-  [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121). Then run the
-  v0.14.5 gate and rerun the v0.14.4, v0.14.3, and v0.14.2 publication gates
-  with current verifier authority. Close retained issues only after their exact
-  evidence passes. Do not mutate a consumer or an immutable historical release.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98); [FEAT-0043](../../docs/features/FEAT-0043-v0134-case-safe-review-authority/README.md) does not reopen or expand that performance work.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and

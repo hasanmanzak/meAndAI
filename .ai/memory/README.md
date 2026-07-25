@@ -2,17 +2,18 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-25**<br>
-Protocol version: **0.14.5** (candidate)<br>
-Latest immutable release: **0.14.4**
+Protocol version: **0.14.5**<br>
+Latest immutable release: **0.14.5**
 
-The immutable [v0.14.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.4)
-release targets commit [`edf4c5d496df239aeb3f14c03b7109215af9128f`](https://github.com/hasanmanzak/meAndAI/commit/edf4c5d496df239aeb3f14c03b7109215af9128f);
-[PR #120](https://github.com/hasanmanzak/meAndAI/pull/120) retains delivery
-evidence and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) is
-closed. [Issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
-[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) remain open
-because a valid nested [AGENTS.md](../../AGENTS.md) link exposed a common
-basename-label false positive. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+The immutable [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
+release is complete. [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
+and closed [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121)
+retain its delivery and publication evidence. Current verifier authority also
+closed the retained `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates;
+[issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
+[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
+Follow the [v0.14.5 publication-closure handoff](log/2026-07-25-v0145-publication-closure.md)
+for exact dated evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
