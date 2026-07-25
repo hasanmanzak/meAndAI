@@ -43,6 +43,43 @@ function Compare-MeAndAIExactScenarioId {
     return [pscustomobject]@{ Valid = $true; Message = '' }
 }
 
+function Read-MeAndAIFinalResultPayload {
+    param(
+        [Parameter(Mandatory)][object[]]$Output,
+        [Parameter(Mandatory)][string]$Prefix,
+        [Parameter(Mandatory)][string]$ResultName,
+        [string[]]$DisallowedPrefixes = @()
+    )
+
+    $lines = @($Output | ForEach-Object { [string]$_ })
+    $nonEmptyLines = @($lines | Where-Object {
+        -not [string]::IsNullOrWhiteSpace($_)
+    })
+    $resultLines = @($nonEmptyLines | Where-Object {
+        $_.StartsWith($Prefix, [StringComparison]::Ordinal)
+    })
+    if ($resultLines.Count -ne 1) {
+        throw "expected exactly one $ResultName result line, found $($resultLines.Count)"
+    }
+    if ($nonEmptyLines.Count -eq 0 -or $nonEmptyLines[-1] -cne $resultLines[0]) {
+        throw "$ResultName result line is not the final successful script output"
+    }
+    foreach ($disallowedPrefix in @($DisallowedPrefixes)) {
+        if (@($nonEmptyLines | Where-Object {
+            $_.StartsWith($disallowedPrefix, [StringComparison]::Ordinal)
+        }).Count -gt 0) {
+            throw "$ResultName output contains a disallowed canonical result channel"
+        }
+    }
+
+    try {
+        return $resultLines[0].Substring($Prefix.Length) | ConvertFrom-Json
+    }
+    catch {
+        throw "$ResultName result JSON is invalid: $($_.Exception.Message)"
+    }
+}
+
 function Read-MeAndAIScenarioResultRecord {
     [CmdletBinding()]
     param(
@@ -51,32 +88,16 @@ function Read-MeAndAIScenarioResultRecord {
         [Parameter(Mandatory)][object[]]$ExpectedTestIds
     )
 
-    $lines = @($Output | ForEach-Object { [string]$_ })
-    $nonEmptyLines = @($lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    $resultLines = @($nonEmptyLines | Where-Object {
-        $_.StartsWith('MEANDAI_SCENARIO_RESULTS=', [StringComparison]::Ordinal)
-    })
-    if ($resultLines.Count -ne 1) {
-        return [pscustomobject]@{
-            Valid = $false
-            Message = "expected exactly one scenario result line, found $($resultLines.Count)"
-        }
-    }
-    if ($nonEmptyLines.Count -eq 0 -or $nonEmptyLines[-1] -cne $resultLines[0]) {
-        return [pscustomobject]@{
-            Valid = $false
-            Message = 'scenario result line is not the final successful suite output'
-        }
-    }
-
     try {
-        $json = $resultLines[0].Substring('MEANDAI_SCENARIO_RESULTS='.Length)
-        $record = $json | ConvertFrom-Json
+        $record = Read-MeAndAIFinalResultPayload -Output $Output `
+            -Prefix 'MEANDAI_SCENARIO_RESULTS=' -ResultName scenario
     }
     catch {
         return [pscustomobject]@{
             Valid = $false
-            Message = "scenario result JSON is invalid: $($_.Exception.Message)"
+            Message = $_.Exception.Message.Replace(
+                'final successful script output',
+                'final successful suite output')
         }
     }
     $properties = @($record.PSObject.Properties | ForEach-Object { $_.Name })
@@ -98,6 +119,70 @@ function Read-MeAndAIScenarioResultRecord {
         -Observed @($record.passed)
 }
 
+function Read-MeAndAICaseResultRecord {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][object[]]$Output,
+        [Parameter(Mandatory)][string]$ExpectedSuite,
+        [Parameter(Mandatory)][string]$ExpectedCase,
+        [Parameter(Mandatory)][object[]]$ExpectedTestIds
+    )
+
+    try {
+        $record = Read-MeAndAIFinalResultPayload -Output $Output `
+            -Prefix 'MEANDAI_CASE_RESULTS=' -ResultName case `
+            -DisallowedPrefixes @(
+                'MEANDAI_SCENARIO_RESULTS=',
+                'MEANDAI_COMPATIBILITY_SHARD_RESULT='
+            )
+        $properties = @($record.PSObject.Properties | ForEach-Object {
+            $_.Name
+        })
+        if ($properties.Count -ne 4 -or
+            $properties -cnotcontains 'schema' -or
+            $properties -cnotcontains 'suite' -or
+            $properties -cnotcontains 'case' -or
+            $properties -cnotcontains 'passed' -or
+            ($record.schema -isnot [int] -and $record.schema -isnot [long]) -or
+            [long]$record.schema -ne 1 -or
+            $record.suite -isnot [string] -or
+            [string]$record.suite -cne $ExpectedSuite -or
+            $record.case -isnot [string] -or
+            [string]$record.case -cne $ExpectedCase -or
+            $record.passed -isnot [array] -or
+            @($ExpectedTestIds).Count -eq 0) {
+            throw 'case result record has the wrong schema, suite, case, or property types'
+        }
+
+        $comparison = Compare-MeAndAIExactScenarioId `
+            -Expected $ExpectedTestIds -Observed @($record.passed)
+        if (-not $comparison.Valid) {
+            throw $comparison.Message
+        }
+        [string[]]$passedIds = @($record.passed | ForEach-Object {
+            [string]$_
+        })
+        [Array]::Sort($passedIds, [StringComparer]::Ordinal)
+        return [pscustomobject][ordered]@{
+            Valid = $true
+            Message = ''
+            Record = [pscustomobject][ordered]@{
+                schema = [long]1
+                suite = $ExpectedSuite
+                case = $ExpectedCase
+                passed = $passedIds
+            }
+        }
+    }
+    catch {
+        return [pscustomobject][ordered]@{
+            Valid = $false
+            Message = $_.Exception.Message
+            Record = $null
+        }
+    }
+}
+
 function Read-MeAndAICompatibilityShardResultRecord {
     [CmdletBinding()]
     param(
@@ -106,29 +191,18 @@ function Read-MeAndAICompatibilityShardResultRecord {
         [Parameter(Mandatory)][string]$ExpectedShard
     )
 
-    $lines = @($Output | ForEach-Object { [string]$_ })
-    $nonEmptyLines = @($lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    $canonicalLines = @($nonEmptyLines | Where-Object {
-        $_.StartsWith('MEANDAI_SCENARIO_RESULTS=', [StringComparison]::Ordinal)
-    })
-    $resultLines = @($nonEmptyLines | Where-Object {
-        $_.StartsWith('MEANDAI_COMPATIBILITY_SHARD_RESULT=', [StringComparison]::Ordinal)
-    })
-    if ($canonicalLines.Count -ne 0 -or $resultLines.Count -ne 1 -or
-        $nonEmptyLines.Count -eq 0 -or $nonEmptyLines[-1] -cne $resultLines[0]) {
-        return [pscustomobject]@{
-            Valid = $false
-            Message = 'partial execution must end with exactly one compatibility result and no canonical scenario result'
-        }
-    }
     try {
-        $json = $resultLines[0].Substring('MEANDAI_COMPATIBILITY_SHARD_RESULT='.Length)
-        $record = $json | ConvertFrom-Json
+        $record = Read-MeAndAIFinalResultPayload -Output $Output `
+            -Prefix 'MEANDAI_COMPATIBILITY_SHARD_RESULT=' `
+            -ResultName compatibility -DisallowedPrefixes @(
+                'MEANDAI_SCENARIO_RESULTS=',
+                'MEANDAI_CASE_RESULTS='
+            )
     }
     catch {
         return [pscustomobject]@{
             Valid = $false
-            Message = "compatibility result JSON is invalid: $($_.Exception.Message)"
+            Message = $_.Exception.Message
         }
     }
     $properties = @($record.PSObject.Properties | ForEach-Object { $_.Name })
@@ -150,16 +224,16 @@ function Read-MeAndAICompatibilityShardResultRecord {
     return [pscustomobject]@{ Valid = $true; Message = '' }
 }
 
-function Invoke-MeAndAITestSuiteProcess {
+function Invoke-MeAndAITestScriptProcess {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$EnginePath,
-        [Parameter(Mandatory)][string]$SuitePath,
+        [Parameter(Mandatory)][string]$ScriptPath,
         [string[]]$Arguments = @()
     )
 
     $processArguments = @(
-        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $SuitePath
+        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $ScriptPath
     ) + @($Arguments)
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     try {
@@ -174,6 +248,35 @@ function Invoke-MeAndAITestSuiteProcess {
         Output = $output
         ElapsedMilliseconds = [long]$stopwatch.ElapsedMilliseconds
     }
+}
+
+function Invoke-MeAndAITestSuiteProcess {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$EnginePath,
+        [Parameter(Mandatory)][string]$SuitePath,
+        [string[]]$Arguments = @()
+    )
+
+    return Invoke-MeAndAITestScriptProcess -EnginePath $EnginePath `
+        -ScriptPath $SuitePath -Arguments $Arguments
+}
+
+function Invoke-MeAndAITestCaseProcess {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$EnginePath,
+        [Parameter(Mandatory)][string]$CasePath,
+        [string[]]$Arguments = @()
+    )
+
+    if ([string]::IsNullOrWhiteSpace($CasePath) -or
+        -not $CasePath.EndsWith('.case.ps1', [StringComparison]::Ordinal)) {
+        throw "Case process path '$CasePath' must end exactly in '.case.ps1'."
+    }
+
+    return Invoke-MeAndAITestScriptProcess -EnginePath $EnginePath `
+        -ScriptPath $CasePath -Arguments $Arguments
 }
 
 function Format-MeAndAITestSuiteObservation {
@@ -819,8 +922,10 @@ function Assert-MeAndAITestSuiteOperationEvidence {
 Export-ModuleMember -Function @(
     'Compare-MeAndAIExactScenarioId',
     'Read-MeAndAIScenarioResultRecord',
+    'Read-MeAndAICaseResultRecord',
     'Read-MeAndAICompatibilityShardResultRecord',
     'Invoke-MeAndAITestSuiteProcess',
+    'Invoke-MeAndAITestCaseProcess',
     'Format-MeAndAITestSuiteObservation',
     'Get-MeAndAITestRuntimeClass',
     'Import-MeAndAITestOperationContract',
