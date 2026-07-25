@@ -8,6 +8,22 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+$suiteOwner = 'tests/capabilities/consumer-update/protocol-update.tests.ps1'
+$caseOwner = 'tests/capabilities/consumer-update/protocol-update-adapter.case.ps1'
+$scenarioAuthorityPath = Join-Path $root 'tests/scenario-ownership.psd1'
+$caseTestIds = @(
+    'TEST-0011', 'TEST-0013', 'TEST-0015', 'TEST-0017',
+    'TEST-0021', 'TEST-0022', 'TEST-0023', 'TEST-0024',
+    'TEST-0025', 'TEST-0026', 'TEST-0048', 'TEST-0058',
+    'TEST-0061', 'TEST-0072', 'TEST-0111', 'TEST-0121',
+    'TEST-0122', 'TEST-0125', 'TEST-0126', 'TEST-0133',
+    'TEST-0141', 'TEST-0150'
+)
+Import-Module (Join-Path $root `
+    'tests/infrastructure/MeAndAI.ScenarioEvidence.psm1') -Force
+$caseContext = New-MeAndAICaseEvidenceContext -SuiteOwner $suiteOwner `
+    -CaseOwner $caseOwner -TestIds $caseTestIds `
+    -AuthorityPath $scenarioAuthorityPath
 $realGitApplication = [string](@(Get-Command git -CommandType Application `
     -ErrorAction Stop | Select-Object -First 1)[0].Source)
 $adapterSource = Join-Path $root 'templates/project/.github/scripts/Invoke-MeAndAIProtocolUpdate.ps1'
@@ -351,6 +367,7 @@ if ($interruptedReplacement.Count -ne 1 -or
     [int]$interruptedReplacement[0].PullRequestNumber -ne 30) {
     Add-Failure 'TEST-0126 interrupted recovery rerun did not select only the verified schema-2 recovery replacement.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0126'
 
 $destinationGuardRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-migration-leaf-guard-$([guid]::NewGuid().ToString('N'))"
@@ -743,6 +760,7 @@ finally {
         Remove-Item -LiteralPath $canonicalBlobRoot -Recurse -Force
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0141'
 
 function Set-AtomicGateFixtureFile {
     param(
@@ -1100,6 +1118,7 @@ finally {
         Remove-Item -LiteralPath $atomicGateRoot -Recurse -Force
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0125'
 # TEST-0133-LEGACY-CONSUMER-SURFACE-END
 
 $adapterTestText = [IO.File]::ReadAllText($PSCommandPath)
@@ -1146,6 +1165,7 @@ else {
         Add-Failure 'TEST-0133 adapter surface contains a live consumer GitHub URL.'
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0133'
 
 function Add-ScenarioEvent {
     param([string]$Event)
@@ -2746,6 +2766,7 @@ if (-not $createdIssueRace.Threw -or
     (Get-EventIndex $createdIssueRace 'create-new-pr') -ge 0) {
     Add-Failure "TEST-0150 created-issue identity race did not fail closed: $($createdIssueRace.Error)"
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0150'
 $engineEraMigration = Invoke-AdapterScenario -Name 'generic-update-with-migration' `
     -MigrationRequired $true -MigrationWithUpgrade $true `
     -OldCandidateExists $false -OldBranchExists $false
@@ -2778,6 +2799,7 @@ if ($legacyHandoff.Threw -or
     (Get-EventIndex $legacyHandoff 'create-new-pr') -lt 0) {
     Add-Failure "TEST-0122 generic missing-ledger handoff did not create one exact same-target reconciliation draft: $($legacyHandoff.Error)"
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0122'
 $missingLabels = Invoke-AdapterScenario -Name 'missing-managed-labels' `
     -MissingManagedLabels $true
 if ($missingLabels.Threw -or @(
@@ -2898,6 +2920,7 @@ if ((Get-EventIndex $missingUpdaterToken 'resolve-updater-actor') -ge 0 -or
     (Get-EventIndex $missingUpdaterToken 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0022 missing updater token reached authentication or mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0022'
 
 $missingProtocolToken = Invoke-AdapterScenario -Name 'missing-protocol-token' `
     -MissingProtocolToken $true
@@ -2910,6 +2933,7 @@ if ((Get-EventIndex $missingProtocolToken 'resolve-updater-actor') -ge 0 -or
     (Get-EventIndex $missingProtocolToken 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0061 missing protocol token reached authentication or mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0061'
 
 $invalidAuthenticatedActor = Invoke-AdapterScenario -Name 'invalid-authenticated-actor' `
     -InvalidAuthenticatedActor $true
@@ -2932,6 +2956,7 @@ if ((Get-EventIndex $rotatedActor 'push-new') -ge 0 -or
     (Get-EventIndex $rotatedActor 'delete-old-branch') -ge 0) {
     Add-Failure 'TEST-0023 actor rotation mutated an ambiguously owned proposal.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0023'
 
 $driftedCurrentAsset = Invoke-AdapterScenario -Name 'drifted-current-asset' `
     -DriftCurrentAsset $true
@@ -2944,6 +2969,7 @@ if ((Get-EventIndex $driftedCurrentAsset 'push-new') -ge 0 -or
     (Get-EventIndex $driftedCurrentAsset 'close-old-pr') -ge 0) {
     Add-Failure 'TEST-0025 current managed asset drift caused a remote mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0025'
 
 $wrongStagedAsset = Invoke-AdapterScenario -Name 'wrong-staged-asset' `
     -WrongStagedAssetBlob $true
@@ -2991,6 +3017,7 @@ foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr'
         Add-Failure "TEST-0024 committed updater-asset substitution reached remote mutation '$forbiddenEvent'."
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0024'
 
 $wrongCommittedMigration = Invoke-AdapterScenario `
     -Name 'wrong-committed-migration-result' -MigrationRequired $true `
@@ -3005,6 +3032,7 @@ foreach ($forbiddenEvent in @('create-update-issue', 'push-new', 'create-new-pr'
         Add-Failure "TEST-0121 committed migration-result substitution reached remote mutation '$forbiddenEvent'."
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0121'
 
 $wrongTargetAsset = Invoke-AdapterScenario -Name 'wrong-target-asset' `
     -ExistingReplacement $true -WrongTargetAssetBlob $true
@@ -3016,6 +3044,7 @@ if ((Get-EventIndex $wrongTargetAsset 'close-old-pr') -ge 0 -or
     (Get-EventIndex $wrongTargetAsset 'close-new-pr') -ge 0) {
     Add-Failure 'TEST-0026 wrong target asset blob allowed destructive cleanup.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0026'
 $successOrder = @(
     'create-new-pr', 'verify-new-pr-1', 'read-old-pr-2', 'verify-new-pr-2',
     'read-old-pr-3', 'close-old-pr', 'read-old-pr-4', 'verify-new-pr-3',
@@ -3051,6 +3080,7 @@ if ($success.OldPullRequestComment.Contains('will be removed') -or
     $adapterContent.Contains('automation branch will be removed')) {
     Add-Failure 'TEST-0021 cleanup comments must not promise branch removal before it succeeds.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0021'
 
 $verificationFailure = Invoke-AdapterScenario -Name 'verification-failure' -NewDraft $false
 if (-not $verificationFailure.Threw) {
@@ -3064,6 +3094,7 @@ if ((Get-EventIndex $verificationFailure 'close-old-pr') -ge 0 -or
     (Get-EventIndex $verificationFailure 'delete-old-branch') -ge 0) {
     Add-Failure 'TEST-0011 failed replacement mutated the older proposal.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0011'
 
 $humanRace = Invoke-AdapterScenario -Name 'human-race' -MutateOldAfterSnapshot $true
 if (-not $humanRace.Threw -or $humanRace.Error -notlike '*changed after planning*') {
@@ -3123,6 +3154,7 @@ foreach ($renameMode in @('InventoryRename', 'RevalidationRename')) {
         }
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0048'
 
 $coordinatedHeadRace = Invoke-AdapterScenario -Name 'coordinated-head-race' `
     -ExistingReplacement $true -CoordinateNewHeadMutation $true
@@ -3160,6 +3192,7 @@ if (-not $reservedNamespaceRace.Threw -or
     (Get-EventIndex $reservedNamespaceRace 'close-old-pr') -ge 0) {
     Add-Failure 'TEST-0072 a reserved updater branch appearing after inventory did not block before publication.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0072'
 
 $missingBranch = Invoke-AdapterScenario -Name 'missing-branch' -OldBranchExists $false
 if (-not $missingBranch.Threw -or $missingBranch.Error -notlike '*manual review*') {
@@ -3214,6 +3247,7 @@ if (-not $aliasTag.Threw -or $aliasTag.Error -notlike '*exactly one canonical st
 if ((Get-EventIndex $aliasTag 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0013 ambiguous current tag caused a mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0013'
 
 $duplicateMarker = Invoke-AdapterScenario -Name 'duplicate-marker' -DuplicateOldMarker $true
 if (-not $duplicateMarker.Threw -or $duplicateMarker.Error -notlike '*manual review*') {
@@ -3242,6 +3276,7 @@ if (-not $nonCanonicalMarker.Threw -or $nonCanonicalMarker.Error -notlike '*manu
 if ((Get-EventIndex $nonCanonicalMarker 'create-new-pr') -ge 0) {
     Add-Failure 'TEST-0015 noncanonical ownership marker caused a mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0015'
 
 $invalidOrigin = Invoke-AdapterScenario -Name 'invalid-origin' -InvalidSubmoduleUrl $true
 if (-not $invalidOrigin.Threw -or $invalidOrigin.Error -notlike '*does not match*') {
@@ -3252,6 +3287,7 @@ if ((Get-EventIndex $invalidOrigin 'create-new-pr') -ge 0 -or
     (Get-EventIndex $invalidOrigin 'delete-old-branch') -ge 0) {
     Add-Failure 'TEST-0017 mismatched protocol origin caused a mutation.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0017'
 
 $wrongCaseSubmodulePath = Invoke-AdapterScenario -Name 'wrong-case-submodule-path' `
     -WrongCaseSubmodulePath $true
@@ -3267,6 +3303,7 @@ foreach ($forbiddenEvent in @(
         Add-Failure "TEST-0058 case-variant protocol path reached '$forbiddenEvent'."
     }
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0058'
 
 foreach ($requiredLifecycleText in @(
     'meandai-protocol-update-issue:',
@@ -3289,6 +3326,7 @@ if (-not $workflowContent.Contains('ISSUE_TOKEN: ${{ github.token }}') -or
     -not $workflowContent.Contains('issues: write')) {
     Add-Failure 'TEST-0111 proposal workflow does not grant the job-scoped token its narrow issue authority.'
 }
+Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0111'
 
 Remove-Item Function:\git -ErrorAction SilentlyContinue
 Remove-Item Function:\gh -ErrorAction SilentlyContinue
@@ -3301,3 +3339,6 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Host 'Protocol update adapter tests passed for all declared scenarios in this suite.' -ForegroundColor Green
+$caseResult = New-MeAndAICaseResult -Context $caseContext
+Write-Host ('MEANDAI_CASE_RESULTS=' +
+    ($caseResult | ConvertTo-Json -Compress))

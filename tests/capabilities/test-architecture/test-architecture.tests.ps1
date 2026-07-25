@@ -233,8 +233,6 @@ $adapterFixturePaths = @($adapterFixtures | ForEach-Object {
 })
 [Array]::Sort($adapterFixturePaths, [StringComparer]::Ordinal)
 $expectedAdapterFixturePaths = @(
-    ('tests/capabilities/consumer-update/protocol-update-adapter' +
-        '.fixture.ps1'),
     ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter-drift' +
         '.fixture.ps1'),
     ('tests/capabilities/initial-adoption/capabilities-bootstrap-adapter' +

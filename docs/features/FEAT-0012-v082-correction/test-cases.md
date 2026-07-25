@@ -4,7 +4,7 @@ Implementations:
 
 - [Quick-adoption fixtures](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1)
 - [Bootstrap adapter fixtures](../../../tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1)
-- [Updater adapter fixtures](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1)
+- [Updater adapter Case](../../../tests/capabilities/consumer-update/protocol-update-adapter.case.ps1)
 - [Repository validator](../../../tests/protocol.tests.ps1)
 - [Protocol validation workflow](../../../.github/workflows/protocol-tests.yml)
 

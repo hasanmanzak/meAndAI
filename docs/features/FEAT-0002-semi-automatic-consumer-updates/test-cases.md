@@ -3,7 +3,7 @@
 Implementations:
 
 - [Resolver and structural tests](../../../tests/capabilities/consumer-update/protocol-update.tests.ps1)
-- [Adapter and race fixtures](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1)
+- [Adapter and race Case](../../../tests/capabilities/consumer-update/protocol-update-adapter.case.ps1)
 - [Full repository validator](../../../tests/protocol.tests.ps1)
 - [Cross-platform CI workflow](../../../.github/workflows/protocol-tests.yml)
 

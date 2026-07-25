@@ -5,7 +5,7 @@ Test implementation: [capabilities resolver](../../../tests/capabilities/initial
 [quick launcher](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1), and
 [repository structural suite](../../../tests/protocol.tests.ps1). The inherited
 current-launcher compatibility contract is exercised by
-[the target updater adapter](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1).
+[the target updater adapter Case](../../../tests/capabilities/consumer-update/protocol-update-adapter.case.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- |

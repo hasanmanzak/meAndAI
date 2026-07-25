@@ -73,13 +73,6 @@
                     RemovalSlice = 'Permanent'
                 }
                 @{
-                    Path = 'tests/capabilities/consumer-update/protocol-update.tests.ps1'
-                    Names = @('Assert-Equal')
-                    Reason = 'This compatibility signature delegates to the canonical collected-equality contract while call-site removal remains a finite migration slice.'
-                    ReviewAuthority = 'FEAT-0051 / SUBF-0098 migration ledger'
-                    RemovalSlice = 'SUBF-0098'
-                }
-                @{
                     Path = 'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
                     Names = @('Assert-Equal')
                     Reason = 'This compatibility signature delegates to the canonical collected-equality contract while call-site removal remains a finite migration slice.'

@@ -27,15 +27,13 @@
         'tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1'
         'tests/capabilities/initial-adoption/fixtures/Invoke-MockQuickAdoptionRuntimeGh.ps1'
     )
+    Cases = @(
+        'tests/capabilities/consumer-update/protocol-update-adapter.case.ps1'
+    )
     InertFixtures = @(
         'tests/capabilities/test-architecture/fixtures/helper-ownership/helper-ownership.psd1.fixture'
     )
     TransitionalExecutableFixtures = @(
-        @{
-            Path = 'tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1'
-            Role = 'Case'
-            RemovalSlice = 'SUBF-0098'
-        }
         @{
             Path = 'tests/capabilities/initial-adoption/capabilities-bootstrap-adapter.fixture.ps1'
             Role = 'Case'
@@ -90,7 +88,6 @@
         }
     )
     LegacyScenarioEvidenceOwners = @(
-        'tests/capabilities/consumer-update/protocol-update.tests.ps1'
         'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1'
         'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
     )

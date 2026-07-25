@@ -118,13 +118,26 @@ foreach ($path in @($contract.Supports | ForEach-Object { [string]$_ })) {
 foreach ($path in @($contract.Mocks | ForEach-Object { [string]$_ })) {
     Assert-RoleObservation -LiteralPath (Join-Path $root $path) -Role Mock
 }
+[string[]]$expectedCases = @(Get-OrdinalUniqueString `
+    -Value @($contract.Cases | ForEach-Object { [string]$_ }))
+[string[]]$actualCases = @(Get-OrdinalUniqueString -Value @(
+    Get-ChildItem -LiteralPath (Join-Path $root 'tests/capabilities') `
+        -Recurse -File -Filter '*.case.ps1' | ForEach-Object {
+            ConvertTo-RepositoryRelativePath -LiteralPath $_.FullName
+        }
+))
+Assert-MeAndAITestSequenceEqual -Actual $actualCases -Expected $expectedCases `
+    -Message 'The exact executable Case inventory changed.'
+foreach ($path in $expectedCases) {
+    Assert-RoleObservation -LiteralPath (Join-Path $root $path) -Role Case
+}
 foreach ($path in @($contract.InertFixtures | ForEach-Object { [string]$_ })) {
     Assert-RoleObservation -LiteralPath (Join-Path $root $path) -Role Fixture
 }
 
 $transitionalEntries = @($contract.TransitionalExecutableFixtures)
-Assert-MeAndAITestEqual -Actual $transitionalEntries.Count -Expected 5 `
-    -Message 'The SUBF-0098 transitional fixture debt must contain exactly five paths.'
+Assert-MeAndAITestEqual -Actual $transitionalEntries.Count -Expected 4 `
+    -Message 'The SUBF-0098 transitional fixture debt must contain exactly four paths.'
 foreach ($entry in $transitionalEntries) {
     Assert-MeAndAITestEqual -Actual ([string]$entry.Role) -Expected 'Case' `
         -Message "Transitional source '$($entry.Path)' has the wrong semantic role."
@@ -154,6 +167,7 @@ foreach ($example in @($contract.Examples)) {
 $declaredFixtureSources = @(
     @($contract.Supports | ForEach-Object { [string]$_ })
     @($contract.Mocks | ForEach-Object { [string]$_ })
+    @($contract.Cases | ForEach-Object { [string]$_ })
     @($contract.InertFixtures | ForEach-Object { [string]$_ })
     @($contract.TransitionalExecutableFixtures | ForEach-Object {
         [string]$_.Path
@@ -174,6 +188,8 @@ $declaredFixtureSources = @(
             '(?i)\.(?:ps1|psm1|psd1)(?:\.fixture)?$'
         $isPowerShellSource -and (
             $relative.Contains('/fixtures/') -or
+            $_.Name.EndsWith('.case.ps1',
+                [StringComparison]::OrdinalIgnoreCase) -or
             $_.Name.EndsWith('.fixture.ps1',
                 [StringComparison]::OrdinalIgnoreCase)
         )
@@ -189,8 +205,8 @@ Assert-MeAndAITestSequenceEqual -Actual $actualFixtureSources `
     -Value @($contract.LegacyScenarioEvidenceOwners | ForEach-Object {
         [string]$_
     }))
-Assert-MeAndAITestEqual -Actual $expectedLegacyOwners.Count -Expected 3 `
-    -Message 'Legacy scenario evidence must have exactly three hotspot owners.'
+Assert-MeAndAITestEqual -Actual $expectedLegacyOwners.Count -Expected 2 `
+    -Message 'Legacy scenario evidence must have exactly two hotspot owners.'
 
 $legacyOwners = [System.Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal

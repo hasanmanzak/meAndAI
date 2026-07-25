@@ -2,7 +2,7 @@
 
 Test implementation:
 [workflow and resolver tests](../../../tests/capabilities/consumer-update/protocol-update.tests.ps1),
-[adapter fixtures](../../../tests/capabilities/consumer-update/protocol-update-adapter.fixture.ps1), and
+[adapter Case](../../../tests/capabilities/consumer-update/protocol-update-adapter.case.ps1), and
 [repository structural tests](../../../tests/protocol.tests.ps1).
 
 | ID | Related slice | Scenario | Expected result | Level | Status | Automation |
