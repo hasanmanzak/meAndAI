@@ -30,6 +30,7 @@
 | [DEC-0026](DEC-0026-historical-capability-review-recovery.md) | [Recover only proven merged strict-predecessor capability reviews](DEC-0026-historical-capability-review-recovery.md) | Accepted | 2026-07-23 |
 | [DEC-0027](DEC-0027-single-owner-consumer-merge-events.md) | [Use one consumer lifecycle event per managed merge](DEC-0027-single-owner-consumer-merge-events.md) | Accepted | 2026-07-23 |
 | [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md) | [Fix reusable consumer failures at their common upstream authority](DEC-0028-upstream-owned-reusable-corrections.md) | Accepted | 2026-07-23 |
+| [DEC-0029](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | [Keep recurrence knowledge and test harness roles under canonical owners](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | Proposed | 2026-07-25 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit
