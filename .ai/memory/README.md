@@ -2,27 +2,27 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-26**<br>
-Protocol version: **0.15.2**<br>
-Latest immutable release: **0.15.1**
+Protocol version: **0.15.3**<br>
+Latest immutable release: **0.15.2**
 
-The immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
+The immutable [v0.15.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.2)
 release is complete at
-[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
-[PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
-[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain the
+[`9bc12e394725a86d29efb745cbdfa26407ffd3d2`](https://github.com/hasanmanzak/meAndAI/commit/9bc12e394725a86d29efb745cbdfa26407ffd3d2).
+[PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) and closed
+[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md).
+[FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md).
 
-[FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
-/ [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) is the current
-`0.15.2` clarification. It requires explicit same-contract sibling review,
-preserves direct infrastructure-contract tests, removes test-derived oracles,
-and consolidates only the two duplicate identities proven by the finite active
-portfolio review. Follow the
-[current handoff](log/2026-07-26-v0152-distinct-test-intent.md).
+[FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
+/ [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) is the current
+`0.15.3` bounded runtime refinement. It batches credential containment from
+five to three Git processes per successful checkpoint and reduces the
+[TEST-0107](../../docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107)
+family from seven to two full-launcher executions while retaining all seven
+production-contract variants. Follow the
+[current handoff](log/2026-07-26-v0153-bounded-quick-adoption-runtime.md).
 [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-remains the separate runtime residual owner and follows this bounded
-publication correction.
+is the parent runtime authority.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

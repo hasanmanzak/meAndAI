@@ -87,7 +87,7 @@ publication transition.
 
 ## Workflow-only AI capabilities lifecycle
 
-For a new submodule consumer on `v0.15.2`, the only repository file required
+For a new submodule consumer on `v0.15.3`, the only repository file required
 before the lifecycle runs is the exact canonical
 [AI capabilities lifecycle workflow](../templates/project/.github/workflows/meandai-protocol-update.yml)
 at `.github/workflows/meandai-protocol-update.yml`. Configure the two
@@ -204,7 +204,7 @@ catalog-declared consumer transition through the same workflow.
 From the consuming repository root:
 
 ```powershell
-$tag = 'v0.15.2'
+$tag = 'v0.15.3'
 $release = gh api -H 'Accept: application/vnd.github+json' `
   -H 'X-GitHub-Api-Version: 2026-03-10' `
   "repos/hasanmanzak/meAndAI/releases/tags/$tag" | ConvertFrom-Json
@@ -534,7 +534,7 @@ New clones may use `git clone --recurse-submodules <consumer-repository>`.
 A tool that natively supports repository references MAY use:
 
 - repository: `https://github.com/hasanmanzak/meAndAI`
-- ref: `v0.15.2`
+- ref: `v0.15.3`
 - entry point: `PROTOCOL.md`
 
 Copy or merge the
@@ -582,11 +582,11 @@ condition.
 For a submodule without the updater, use the target release selected by the
 reviewed migration. Verify its immutable-release metadata with the same check
 shown under [Recommended: pinned Git submodule](#recommended-pinned-git-submodule)
-before checkout; the current example then installs `v0.15.2`:
+before checkout; the current example then installs `v0.15.3`:
 
 ```powershell
 git -C .ai/protocol fetch --tags
-git -C .ai/protocol checkout v0.15.2
+git -C .ai/protocol checkout v0.15.3
 git add .ai/protocol
 ```
 

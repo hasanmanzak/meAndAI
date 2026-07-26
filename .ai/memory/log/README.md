@@ -48,6 +48,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-26 - v0.15.3 bounded quick-adoption runtime](2026-07-26-v0153-bounded-quick-adoption-runtime.md)
 - [2026-07-26 - v0.15.2 distinct test intent and meta-test boundaries](2026-07-26-v0152-distinct-test-intent.md)
 - [2026-07-25 - v0.15.1 declarative bundle source mapping](2026-07-25-v0151-declarative-bundle-source-mapping.md)
 - [2026-07-25 - v0.15.0 recurrence prevention and modular test harness release candidate](2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)

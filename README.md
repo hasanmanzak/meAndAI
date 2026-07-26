@@ -4,20 +4,19 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.15.2**
+Current protocol version: **0.15.3**
 
-Immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
+Immutable [v0.15.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.2)
 is the prior published release at
-[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
-[PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
-[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain the
-[FEAT-0052](docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-delivery and publication evidence. The `v0.15.2` clarification is tracked by
-[FEAT-0053](docs/features/FEAT-0053-v0152-distinct-test-intent/README.md) and
-[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133), which remain the
-authority until the reviewed pull request and immutable release are published.
+[`9bc12e394725a86d29efb745cbdfa26407ffd3d2`](https://github.com/hasanmanzak/meAndAI/commit/9bc12e394725a86d29efb745cbdfa26407ffd3d2).
+[PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) and closed
+[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) retain the
+[FEAT-0053](docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+delivery and publication evidence. The `v0.15.3` runtime refinement is tracked
+by [FEAT-0054](docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
+and [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135).
 [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-remains open as the separate residual runtime owner.
+is its parent residual-runtime authority.
 
 ## Start here
 
