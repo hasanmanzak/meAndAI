@@ -284,13 +284,18 @@ function Invoke-External {
 
     $previousPreference = $ErrorActionPreference
     $previousGitHubHost = [Environment]::GetEnvironmentVariable('GH_HOST', 'Process')
+    $hasInputText = $PSBoundParameters.ContainsKey('InputText')
+    $previousOutputEncoding = $OutputEncoding
     $ErrorActionPreference = 'Continue'
     try {
         if ($Command -ceq 'gh') {
             [Environment]::SetEnvironmentVariable('GH_HOST', 'github.com', 'Process')
         }
+        if ($hasInputText) {
+            $OutputEncoding = [Text.UTF8Encoding]::new($false)
+        }
         $global:LASTEXITCODE = 0
-        $output = if ($PSBoundParameters.ContainsKey('InputText')) {
+        $output = if ($hasInputText) {
             @($InputText | & $Command @Arguments 2>&1)
         }
         else {
@@ -302,6 +307,9 @@ function Invoke-External {
         }
     }
     finally {
+        if ($hasInputText) {
+            $OutputEncoding = $previousOutputEncoding
+        }
         if ($Command -ceq 'gh') {
             [Environment]::SetEnvironmentVariable(
                 'GH_HOST', $previousGitHubHost, 'Process'

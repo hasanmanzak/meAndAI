@@ -3,6 +3,32 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.4 - 2026-07-26
+
+### Changed
+
+- Send the complete lifecycle workflow input map as one compact JSON document
+  through `gh workflow run --json` and UTF-8 stdin.
+- Make the shared quick-adoption native-process owner select UTF-8 without a BOM
+  for stdin calls and restore the caller's encoding afterward.
+- Require structured workflow-dispatch inputs to use JSON stdin in the common
+  protocol, alongside the existing safe GitHub body-transport mandate.
+
+### Fixed
+
+- Preserve instruction-graph JSON quotation marks and non-ASCII paths across
+  the Windows native-process boundary instead of allowing `--field` argument
+  parsing to corrupt the workflow input.
+- Keep older graph-unaware immutable workflows compatible by omitting only the
+  optional graph input while retaining the four required string inputs.
+
+Related work: [FEAT-0055](docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md),
+[BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
+[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137),
+[DEC-0023](docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md),
+[DEC-0024](docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md),
+and [TEST-0153](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153).
+
 ## 0.15.3 - 2026-07-26
 
 ### Changed

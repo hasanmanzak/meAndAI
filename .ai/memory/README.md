@@ -2,27 +2,25 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-26**<br>
-Protocol version: **0.15.3**<br>
-Latest immutable release: **0.15.2**
+Protocol version: **0.15.4**<br>
+Latest immutable release before this candidate: **0.15.3**
 
-The immutable [v0.15.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.2)
+The immutable [v0.15.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.3)
 release is complete at
-[`9bc12e394725a86d29efb745cbdfa26407ffd3d2`](https://github.com/hasanmanzak/meAndAI/commit/9bc12e394725a86d29efb745cbdfa26407ffd3d2).
-[PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) and closed
-[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) retain the
+[`164543d939ef97ec02d96499d3e5b796eed64470`](https://github.com/hasanmanzak/meAndAI/commit/164543d939ef97ec02d96499d3e5b796eed64470).
+[PR #136](https://github.com/hasanmanzak/meAndAI/pull/136) and closed
+[issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md).
+[FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md).
 
-[FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
-/ [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) is the current
-`0.15.3` bounded runtime refinement. It batches credential containment from
-five to three Git processes per successful checkpoint and reduces the
-[TEST-0107](../../docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107)
-family from seven to two full-launcher executions while retaining all seven
-production-contract variants. Follow the
-[current handoff](log/2026-07-26-v0153-bounded-quick-adoption-runtime.md).
-[`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-is the parent runtime authority.
+[FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
+/ [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
+[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
+is the current `0.15.4` correction. It sends lifecycle workflow inputs as one
+UTF-8 JSON stdin document through `gh workflow run --json`, keeps graph identity
+as an exact string input, and preserves older graph-unaware target behavior.
+Follow the [current handoff](log/2026-07-26-v0154-utf8-workflow-dispatch.md).
+No consumer-local implementation or regression belongs to this correction.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.15.3**<br>
+Protocol version: **0.15.4**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -1128,6 +1128,11 @@ The updater MUST:
   request bodies as exact UTF-8 without a BOM through an owner-scoped temporary
   file or standard input, never as native command-line body text, and remove
   temporary material on success or failure;
+- transport a workflow-dispatch input map as one UTF-8 JSON object without a
+  BOM through standard input and `gh workflow run --json`; preserve every
+  declared workflow input as its required string value, retain optional-input
+  feature detection, and never carry structured JSON through native `--field`
+  or `--raw-field` arguments;
 - treat malformed ownership text as non-canonical and fail closed, except that
   the exact historical quote-stripped schema-2 update issue MAY be rewritten
   once only after proving its complete generated title/body, trusted actor,

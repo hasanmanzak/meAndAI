@@ -53,19 +53,23 @@ function Invoke-LifecycleWorkflow {
     }
 
     $dispatchStarted = [DateTimeOffset]::UtcNow.AddSeconds(-5)
+    $dispatchInputs = [ordered]@{
+        correlation_id = [string]$correlationId
+        adoption_strategy = [string]$ResolvedAdoptionStrategy
+        acknowledge_protocol_record_loss =
+            $ProtocolRecordLossAcknowledged.ToString().ToLowerInvariant()
+        expected_base_sha = [string]$HeadSha
+    }
+    if ($SourceGraphIdentityJson) {
+        $dispatchInputs.source_graph_identity = [string]$SourceGraphIdentityJson
+    }
+    $dispatchInputJson = $dispatchInputs | ConvertTo-Json -Depth 10 -Compress
     $dispatchArguments = @(
         'workflow', 'run', $workflowName, '--repo', $Repository, '--ref', $Branch,
-        '--field', "correlation_id=$correlationId",
-        '--field', "adoption_strategy=$ResolvedAdoptionStrategy",
-        '--field', "acknowledge_protocol_record_loss=$($ProtocolRecordLossAcknowledged.ToString().ToLowerInvariant())",
-        '--field', "expected_base_sha=$HeadSha"
+        '--json'
     )
-    if ($SourceGraphIdentityJson) {
-        $dispatchArguments += @(
-            '--field', "source_graph_identity=$SourceGraphIdentityJson"
-        )
-    }
-    Invoke-External -Command 'gh' -Arguments $dispatchArguments | Out-Null
+    Invoke-External -Command 'gh' -Arguments $dispatchArguments `
+        -InputText $dispatchInputJson | Out-Null
 
     $deadline = [DateTimeOffset]::UtcNow.AddMinutes($WorkflowTimeoutMinutes)
     $observedRunId = $null
