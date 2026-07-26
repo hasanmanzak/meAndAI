@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.15.4 |
 | Bug | [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) / [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) |
-| Pull request | Pending |
+| Pull request | [PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) |
 | Decisions | [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
 | Tests | [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153); [feature evidence](test-cases.md) |
 
@@ -24,7 +24,8 @@ valid at the launcher's committed-base boundary.
 The launcher sends every workflow input as one JSON document over UTF-8 stdin
 with `gh workflow run --json`. The graph identity remains a JSON string input,
 round-trips exactly, and remains optional when the immutable target workflow
-does not declare that input.
+does not declare that input. The native boundary pins both the PowerShell
+pipeline and console input encodings for the bounded call and restores both.
 
 ## Immutable baseline
 
@@ -84,14 +85,15 @@ route without duplicating their executable owners.
 | `FIND-0305` <a name="find-0305"></a> | Launcher correctness / P1 | Structured graph JSON crosses the native argument boundary through `--field` and can lose JSON quotation marks. | `Resolved` in [SUBF-0106](#subf-0106): one typed outer input map crosses UTF-8 stdin with `--json`; graph-aware/current and graph-unaware/legacy variants pass. |
 | `FIND-0306` <a name="find-0306"></a> | Governance / P1 | The first structural review grouped an escaped prior-version fixture, incomplete current-feature status, noncanonical visible record links, and the missing BUG-to-issue registry mapping into derivative diagnostics. | `Resolved` at the common owners: current/future tags are `v0.15.4`/`v0.15.5`, every visible record uses its canonical clickable target, [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) maps once to [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137), and the final StructureOnly gate passes. |
 | `FIND-0307` <a name="find-0307"></a> | Delivery lifecycle / P1 | Independent diff review found that the first record mixed merge, release, and branch cleanup into the pre-merge acceptance/DoD boundary. | `Resolved`: the current-release projection remains `Complete` as required by [TEST-0092](../FEAT-0014-v085-convergence/test-cases.md#test-0092), pre-merge DoD contains only candidate/review gates, and publication plus cleanup are a separate post-merge gate with external evidence. |
-| `FIND-0308` <a name="find-0308"></a> | Test operation ownership / P1 | The first canonical full-suite attempt found that the new negative-dispatch fixture invoked a reusable JSON builder through an unreviewed scriptblock identity, increasing the [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) dynamic-operation inventory from 31 to 32. | `Resolved` without expanding the operation budget: the builder is a directly invoked modular test helper; focused TEST-0158/0159/0162 and the final canonical suite pass. |
+| `FIND-0308` <a name="find-0308"></a> | Test operation ownership / P1 | The first canonical full-suite attempt found that the new negative-dispatch fixture invoked a reusable JSON builder through an unreviewed scriptblock identity, increasing the [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) dynamic-operation inventory from 31 to 32. | `Resolved` without expanding the operation budget: the builder is a directly invoked modular test helper; focused [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), [TEST-0162](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162), and the final canonical suite pass. |
+| `FIND-0309` <a name="find-0309"></a> | Hosted Windows stdin framing / P1 | PR validation proved that setting only `$OutputEncoding` is insufficient when the hosted PowerShell 5.1 process starts with a BOM-bearing `[Console]::InputEncoding`; local BOM-free defaults had masked that ambient dependency. | `Resolved`: the native boundary pins and restores both encodings, while [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153) deliberately installs a BOM-bearing ambient console encoding and proves exact BOM-free bytes on PS5.1 and PS7. |
 
 ## Risks
 
 | ID | Risk | Owner / response |
 | --- | --- | --- |
 | `RISK-0247` <a name="risk-0247"></a> | Nested graph JSON is dispatched as an object rather than the workflow's required string input. | Launcher owner / serialize the graph once as a string value inside the outer input object and assert exact type and bytes. |
-| `RISK-0248` <a name="risk-0248"></a> | PowerShell 5.1 adds a BOM or uses a legacy code page that corrupts non-ASCII graph paths. | Native-process owner / explicit UTF-8 without BOM, strict byte round-trip evidence on PS5.1 and PS7, and encoding restoration. |
+| `RISK-0248` <a name="risk-0248"></a> | PowerShell 5.1 adds a BOM or uses a legacy code page that corrupts non-ASCII graph paths. | Native-process owner / pin both pipeline and console input encodings to UTF-8 without BOM, strict byte round-trip evidence under a BOM-bearing ambient console encoding on PS5.1 and PS7, and restoration of both caller values. |
 | `RISK-0249` <a name="risk-0249"></a> | Older graph-unaware workflows receive an undeclared input or lose a required input. | Lifecycle owner / retain immutable-target input detection and assert the exact legacy/current property sets in [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153). |
 
 ## Definition of Ready
@@ -118,8 +120,9 @@ route without duplicating their executable owners.
 3. A graph-aware target receives `source_graph_identity` as the exact compact
    nested JSON string, including non-ASCII content.
 4. A graph-unaware target omits only `source_graph_identity`.
-5. UTF-8 input has no BOM, round-trips under PS5.1 and PS7, and does not leak a
-   changed process encoding after invocation.
+5. UTF-8 input has no BOM, round-trips under PS5.1 and PS7 even when the
+   ambient console input encoding carries a BOM, and restores both caller
+   encodings after invocation.
 6. Existing committed-base, integrity, compatibility, recovery, packaging, and
    immutable-release behavior remains green.
 7. Documentation, project memory, version surfaces, canonical issue/PR links,
@@ -150,9 +153,9 @@ route without duplicating their executable owners.
 | Field | Evidence |
 | --- | --- |
 | Expected-red | [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153) failed as expected in 1.3 seconds against the v0.15.3 transport. |
-| Focused PS5.1 / PS7 | [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153) passed in 3.7 / 3.2 seconds; TEST-0158/0159/0162 passed in 6.8 seconds after [FIND-0308](#find-0308). |
-| Final local suite | `tests/protocol.tests.ps1` passed all discovered suites in 1,957.8 seconds. |
-| Pull request | Pending |
+| Focused PS5.1 / PS7 | [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153) passed in 3.7 / 3.2 seconds; [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), and [TEST-0162](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162) passed in 6.8 seconds after [FIND-0308](#find-0308). |
+| Final local suite | After [FIND-0309](#find-0309), `tests/protocol.tests.ps1` passed all discovered suites in 2,026.3 seconds. |
+| Pull request | [PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) |
 | Hosted validation | Pending |
 | Release | Pending immutable `v0.15.4` |
 | Branch cleanup | Pending |

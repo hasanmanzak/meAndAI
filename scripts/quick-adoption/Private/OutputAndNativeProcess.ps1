@@ -286,6 +286,10 @@ function Invoke-External {
     $previousGitHubHost = [Environment]::GetEnvironmentVariable('GH_HOST', 'Process')
     $hasInputText = $PSBoundParameters.ContainsKey('InputText')
     $previousOutputEncoding = $OutputEncoding
+    $previousConsoleInputEncoding = if ($hasInputText) {
+        [Console]::InputEncoding
+    }
+    else { $null }
     $ErrorActionPreference = 'Continue'
     try {
         if ($Command -ceq 'gh') {
@@ -293,6 +297,7 @@ function Invoke-External {
         }
         if ($hasInputText) {
             $OutputEncoding = [Text.UTF8Encoding]::new($false)
+            [Console]::InputEncoding = [Text.UTF8Encoding]::new($false)
         }
         $global:LASTEXITCODE = 0
         $output = if ($hasInputText) {
@@ -308,6 +313,7 @@ function Invoke-External {
     }
     finally {
         if ($hasInputText) {
+            [Console]::InputEncoding = $previousConsoleInputEncoding
             $OutputEncoding = $previousOutputEncoding
         }
         if ($Command -ceq 'gh') {

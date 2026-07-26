@@ -1132,7 +1132,11 @@ The updater MUST:
   BOM through standard input and `gh workflow run --json`; preserve every
   declared workflow input as its required string value, retain optional-input
   feature detection, and never carry structured JSON through native `--field`
-  or `--raw-field` arguments;
+  or `--raw-field` arguments; on PowerShell native boundaries, do not rely on
+  ambient pipeline or console input encodings: bind both `$OutputEncoding` and
+  `[Console]::InputEncoding` to UTF-8 without a BOM for the bounded call (or
+  write exact bytes through an owned raw stream), then restore both in
+  `finally`;
 - treat malformed ownership text as non-canonical and fail closed, except that
   the exact historical quote-stripped schema-2 update issue MAY be rewritten
   once only after proving its complete generated title/body, trusted actor,

@@ -130,10 +130,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Applicability: PowerShell 5.1/7 native-process calls that carry structured
   repository input through stdin or `gh workflow run`, including instruction-
   graph identities and other JSON workflow input maps.
-- Affected contract and cause: ambient `$OutputEncoding` can add a preamble or
-  use a legacy code page, while native `--field`/`--raw-field` argument parsing
-  is not a lossless structured-JSON transport. The source JSON and downstream
-  validator are not the failing contracts.
+- Affected contract and cause: ambient `$OutputEncoding` or
+  `[Console]::InputEncoding` can add a preamble or use a legacy code page,
+  while native `--field`/`--raw-field` argument parsing is not a lossless
+  structured-JSON transport. The source JSON and downstream validator are not
+  the failing contracts. A local environment with a BOM-free console input
+  encoding can mask the second dependency until a hosted Windows runner sets a
+  preamble-bearing value.
 - Canonical owner and evidence: the
   [v0.13.1 stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
   owns batch-reader framing; [SUBF-0106](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md#subf-0106)
@@ -143,10 +146,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Fixed release or evidence: immutable `v0.13.1` carries the batch framing
   correction; target `v0.15.4` carries the shared quick-adoption stdin encoder
   and workflow JSON dispatch correction.
-- Required safe response: select UTF-8 without a BOM for the bounded stdin
-  call, restore the caller encoding in `finally`, and send workflow input maps
-  as one outer JSON object through `gh workflow run --json`. Keep nested JSON as
-  the workflow's declared string value.
+- Required safe response: bind both `$OutputEncoding` and
+  `[Console]::InputEncoding` to UTF-8 without a BOM for the bounded stdin call,
+  restore both caller values in `finally`, and send workflow input maps as one
+  outer JSON object through `gh workflow run --json`. Keep nested JSON as the
+  workflow's declared string value. Regression evidence must first install a
+  preamble-bearing ambient console input encoding so local defaults cannot
+  mask the failure.
 - Unsafe retry boundary: do not retry the same structured value through native
   `--field`, `--raw-field`, or an ambient stdin encoding. Retry only after
   moving to the canonical UTF-8/no-BOM stdin route and validating exact bytes.

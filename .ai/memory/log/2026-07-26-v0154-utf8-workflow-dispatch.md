@@ -41,13 +41,31 @@ structured workflow input maps must use the same JSON-stdin route.
 - Capability Contracts passed in 4.5 seconds.
 - The full-launcher `AdoptionLifecycle` shard passed in 195 seconds with the
   shared gh fixture consuming the new stdin contract.
-- The first canonical full-suite attempt stopped only at TEST-0159 after
+- The first canonical full-suite attempt stopped only at
+  [TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  after
   2,016.9 seconds because a reusable fixture JSON builder introduced an
   unreviewed dynamic scriptblock-operation identity. The helper was changed to
   a direct modular invocation without increasing the operation budget;
-  TEST-0158/0159/0162 then passed in 6.8 seconds.
+  [TEST-0158](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158),
+  [TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159),
+  and [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162)
+  then passed in 6.8 seconds.
 - The final canonical suite passed all discovered owners in 1,957.8 seconds.
-- PR/hosted validation, immutable release, and branch cleanup remain the
+- The first [PR #138](https://github.com/hasanmanzak/meAndAI/pull/138)
+  [hosted run](https://github.com/hasanmanzak/meAndAI/actions/runs/30201366801)
+  exposed a second native boundary: hosted Windows PowerShell 5.1 began with a
+  BOM-bearing `[Console]::InputEncoding`, so changing only `$OutputEncoding`
+  still prefixed stdin. Linux independently rejected unlinked delivery-
+  evidence references.
+- [TEST-0153](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
+  now installs the preamble-bearing ambient value deterministically. It
+  reproduced the Windows failure in 3.3 seconds, then passed on Windows
+  PowerShell 5.1 / PowerShell 7 in 3.0 / 3.2 seconds after the native owner
+  pinned and restored both `$OutputEncoding` and `[Console]::InputEncoding`.
+- The final canonical suite after this hosted correction passed every
+  discovered owner in 2,026.3 seconds.
+- Final hosted validation, immutable release, and branch cleanup remain the
   bounded delivery steps.
 
 ## Continuation

@@ -325,43 +325,64 @@ $encodedChildSource = [Convert]::ToBase64String(
 )
 $unicodeInput =
     '{"source_graph_identity":"{\"path\":\"docs/özellik.md\"}"}'
-$encodingBeforeInvocation = $OutputEncoding
-$nativeResult = Invoke-External -Command $childExecutable -Arguments @(
-    '-NoProfile', '-NonInteractive', '-EncodedCommand', $encodedChildSource
-) -InputText $unicodeInput
-if (-not [object]::ReferenceEquals(
-    $encodingBeforeInvocation, $OutputEncoding
-)) {
-    throw 'TEST-0153 native stdin dispatch did not restore OutputEncoding.'
-}
-$stdinBytes = [Convert]::FromBase64String(
-    ((@($nativeResult.Output) -join '').Trim())
-)
-if ($stdinBytes.Length -ge 3 -and
-    $stdinBytes[0] -eq 0xEF -and $stdinBytes[1] -eq 0xBB -and
-    $stdinBytes[2] -eq 0xBF) {
-    throw 'TEST-0153 native stdin dispatch emitted a UTF-8 BOM.'
-}
-$payloadLength = $stdinBytes.Length
-while ($payloadLength -gt 0 -and
-    $stdinBytes[$payloadLength - 1] -in @(0x0A, 0x0D)) {
-    $payloadLength--
-}
-$payloadBytes = if ($payloadLength -eq 0) {
-    [byte[]]@()
-}
-else {
-    [byte[]]$stdinBytes[0..($payloadLength - 1)]
-}
-$strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+$originalConsoleInputEncoding = [Console]::InputEncoding
 try {
-    $decodedInput = $strictUtf8.GetString($payloadBytes)
+    [Console]::InputEncoding = [Text.UTF8Encoding]::new($true)
+    $ambientInputPreamble = [Console]::InputEncoding.GetPreamble()
+    if ($ambientInputPreamble.Length -ne 3 -or
+        $ambientInputPreamble[0] -ne 0xEF -or
+        $ambientInputPreamble[1] -ne 0xBB -or
+        $ambientInputPreamble[2] -ne 0xBF) {
+        throw 'TEST-0153 ambient stdin encoding lacks the UTF-8 BOM.'
+    }
+    $encodingBeforeInvocation = $OutputEncoding
+    $nativeResult = Invoke-External -Command $childExecutable -Arguments @(
+        '-NoProfile', '-NonInteractive', '-EncodedCommand', $encodedChildSource
+    ) -InputText $unicodeInput
+    if (-not [object]::ReferenceEquals(
+        $encodingBeforeInvocation, $OutputEncoding
+    )) {
+        throw 'TEST-0153 native stdin dispatch did not restore OutputEncoding.'
+    }
+    $restoredInputPreamble = [Console]::InputEncoding.GetPreamble()
+    if ($restoredInputPreamble.Length -ne 3 -or
+        $restoredInputPreamble[0] -ne 0xEF -or
+        $restoredInputPreamble[1] -ne 0xBB -or
+        $restoredInputPreamble[2] -ne 0xBF) {
+        throw 'TEST-0153 native stdin dispatch did not restore Console.InputEncoding.'
+    }
+    $stdinBytes = [Convert]::FromBase64String(
+        ((@($nativeResult.Output) -join '').Trim())
+    )
+    if ($stdinBytes.Length -ge 3 -and
+        $stdinBytes[0] -eq 0xEF -and $stdinBytes[1] -eq 0xBB -and
+        $stdinBytes[2] -eq 0xBF) {
+        throw 'TEST-0153 native stdin dispatch emitted a UTF-8 BOM.'
+    }
+    $payloadLength = $stdinBytes.Length
+    while ($payloadLength -gt 0 -and
+        $stdinBytes[$payloadLength - 1] -in @(0x0A, 0x0D)) {
+        $payloadLength--
+    }
+    $payloadBytes = if ($payloadLength -eq 0) {
+        [byte[]]@()
+    }
+    else {
+        [byte[]]$stdinBytes[0..($payloadLength - 1)]
+    }
+    $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+    try {
+        $decodedInput = $strictUtf8.GetString($payloadBytes)
+    }
+    catch {
+        throw 'TEST-0153 native stdin dispatch was not valid UTF-8.'
+    }
+    if ($decodedInput -cne $unicodeInput) {
+        throw 'TEST-0153 native stdin dispatch did not preserve its Unicode JSON bytes.'
+    }
 }
-catch {
-    throw 'TEST-0153 native stdin dispatch was not valid UTF-8.'
-}
-if ($decodedInput -cne $unicodeInput) {
-    throw 'TEST-0153 native stdin dispatch did not preserve its Unicode JSON bytes.'
+finally {
+    [Console]::InputEncoding = $originalConsoleInputEncoding
 }
 
 Write-Host 'TEST-0153 JSON dispatch, UTF-8 stdin, compatibility, and callback passed.' -ForegroundColor Green

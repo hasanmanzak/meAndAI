@@ -18,7 +18,9 @@ delivery, review, test, and publication evidence for
 [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
 is the current `0.15.4` correction. It sends lifecycle workflow inputs as one
 UTF-8 JSON stdin document through `gh workflow run --json`, keeps graph identity
-as an exact string input, and preserves older graph-unaware target behavior.
+as an exact string input, pins both PowerShell pipeline and console input
+encodings for the bounded native call, and preserves older graph-unaware target
+behavior.
 Follow the [current handoff](log/2026-07-26-v0154-utf8-workflow-dispatch.md).
 No consumer-local implementation or regression belongs to this correction.
 
