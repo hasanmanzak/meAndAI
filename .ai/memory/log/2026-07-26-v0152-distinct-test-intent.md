@@ -56,16 +56,20 @@ delivery and publication evidence.
 - The corrected canonical instruction-graph owner then passed in 195.6 seconds,
   including deterministic identity, exact N/N+1 aggregate and per-path limits,
   self-consumer evidence, two batch processes, and four blob requests.
+- The exact reviewed commit
+  [`dcd040b52ebcb8510568f2661814bb708d17f37f`](https://github.com/hasanmanzak/meAndAI/commit/dcd040b52ebcb8510568f2661814bb708d17f37f)
+  passed all discovered protocol suites in 1,970.8 seconds. This is the final
+  local full-suite authority; the following commit adds only this durable
+  result and will be validated by the hosted exact-head gate.
 
 ## Continuation
 
-1. Run one final canonical full suite.
-2. Complete the exact-head hosted gate for
+1. Complete the exact-head hosted gate for
    [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134).
-3. Publish the owned PR and immutable `v0.15.2` release, verify its exact
+2. Publish the owned PR and immutable `v0.15.2` release, verify its exact
    assets and current-authority evidence, close
    [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133), and clean the owned
    branch.
-4. Reevaluate [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+3. Reevaluate [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
    against the completed architecture and deliver one separately measured
    runtime reduction.
