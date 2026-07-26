@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.15.5 |
 | Bugs | [BUG-0037 / issue #140](https://github.com/hasanmanzak/meAndAI/issues/140); [BUG-0038 / issue #141](https://github.com/hasanmanzak/meAndAI/issues/141); [BUG-0039 / issue #142](https://github.com/hasanmanzak/meAndAI/issues/142); [BUG-0040 / issue #143](https://github.com/hasanmanzak/meAndAI/issues/143); [BUG-0041 / issue #144](https://github.com/hasanmanzak/meAndAI/issues/144); [BUG-0042 / issue #145](https://github.com/hasanmanzak/meAndAI/issues/145); [BUG-0043 / issue #146](https://github.com/hasanmanzak/meAndAI/issues/146); [BUG-0044 / issue #147](https://github.com/hasanmanzak/meAndAI/issues/147) |
-| Pull request | Pending |
+| Pull request | [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) |
 | Decisions | [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md), [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md), [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md), [DEC-0031](../../decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) |
 | Tests | Existing [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151), [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152), [TEST-0153](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153), and [TEST-0161](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161); [feature evidence](test-cases.md) |
 
@@ -442,7 +442,7 @@ identity is required.
 - [x] Exact consumer-tree read-only simulations pass or yield classified,
   non-MAAI blocked outcomes with no consumer writes.
 - [x] Bounded diff/self-review has no unresolved `Blocking` finding.
-- [ ] Protocol, version, changelog, feature, test, memory, and issue/PR links
+- [x] Protocol, version, changelog, feature, test, memory, and issue/PR links
   are current.
 - [ ] Applicable PR review and hosted pre-merge gates pass.
 
@@ -487,7 +487,7 @@ identity is required.
 | First canonical full-suite attempt | `tests/protocol.tests.ps1` ran for 1751.8 seconds. Every preceding production, parser, capabilities-bootstrap, quick-adoption, governance, and publication-evidence owner passed; only [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159) failed on the stale reviewed AST inventory: `$launcherPath|<script>` expected 80 instead of 84, and one helper-owned recursive-cleanup identity was absent. |
 | Focused operation-inventory correction | The runtime-efficiency owner passed [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), and [TEST-0162](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162) on PowerShell 7 / Windows PowerShell 5.1 in 7.0 / 7.7 seconds with `contract.self-check` at 1/1; only exact reviewed identities changed, `tests/fixture-operation-budgets.psd1` stayed byte-identical, and declared runtime maxima remained fixed. |
 | Final local suite | The frozen-tree `tests/protocol.tests.ps1` run passed every discovered suite in 1745.3 seconds. Exact key owner times were 304.600 seconds for capabilities bootstrap, 861.817 seconds for quick adoption, 129.069 seconds for instruction graph, 118.857 seconds for protocol governance, 96.524 seconds for publication evidence, and 6.586 seconds for runtime efficiency; [TEST-0158](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0158), [TEST-0159](../FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159), and [TEST-0162](../FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162) were green with `contract.self-check` 1/1. |
-| Pull request | Pending |
+| Pull request | Draft [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) opened from the exact owned branch; all eight owned issue bodies carry full-SHA feature/decision evidence and linked record identities. |
 | Hosted validation | Pending |
 | Release | Pending immutable `v0.15.5` |
 | Branch cleanup | Pending |

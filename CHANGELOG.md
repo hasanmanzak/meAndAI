@@ -65,7 +65,8 @@ was `Resolved`, and HAnchor's protected live authority failed closed for
 maintainer review. No consumer was modified and no GitHub simulation repository
 was created.
 
-Related work: [FEAT-0056](docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md),
+Related work: [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148),
+[FEAT-0056](docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md),
 [BUG-0037 / issue #140](https://github.com/hasanmanzak/meAndAI/issues/140),
 [BUG-0038 / issue #141](https://github.com/hasanmanzak/meAndAI/issues/141),
 [BUG-0039 / issue #142](https://github.com/hasanmanzak/meAndAI/issues/142),

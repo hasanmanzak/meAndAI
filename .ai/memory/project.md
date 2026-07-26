@@ -624,6 +624,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
   / [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
   [#147](https://github.com/hasanmanzak/meAndAI/issues/147)
+  / [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148)
   is the current `0.15.5` continuation. Close only the eight owned parser,
   batch, schema, protected-evidence, authority, and target-policy defects. The
   target-policy and earlier cross-runtime owners for
@@ -636,9 +637,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   seconds with exact operation counters; the parser-focused audit, AST parses,
   diff-check, overall bounded review, and frozen-tree canonical full suite are
   clean. The full suite passed every discovered owner in 1745.3 seconds. Later
-  gates are the owned pull request, hosted validation, exact merged-commit
-  release, post-publication verification, issue closure, and OID-bound branch
-  cleanup. Keep every reusable regression upstream and do not mutate a consumer.
+  gates are hosted validation and review on the exact pull-request head, exact
+  merged-commit release, post-publication verification, issue closure, and OID-
+  bound branch cleanup. Keep every reusable regression upstream and do not
+  mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
   and every clone clean. Derdini `e7b10ef` retained its existing older seed,
   which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema

@@ -142,11 +142,17 @@ Completed local evidence:
   [TEST-0159](../../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159),
   [TEST-0162](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0162),
   and `contract.self-check` 1/1.
+- Draft [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) was opened
+  from the exact owned branch. The bodies of [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+  [#147](https://github.com/hasanmanzak/meAndAI/issues/147) were normalized
+  without changing their open state or labels; every visible record identity is
+  linked, and the designated verifier issue carries full-SHA links to the
+  feature, pull request, and all four applicable decisions.
 
 The overall bounded diff/self-review is complete with no unresolved `Blocking`
-finding. Remaining gates are the owned pull request, hosted checks and review,
-exact merged-commit `v0.15.5` publication and two-asset verification, post-
-publication verification, closure of only
+finding. Remaining gates are hosted checks and review on the exact pull-request
+head, exact merged-commit `v0.15.5` publication and two-asset verification,
+post-publication verification, closure of only
 [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
 [#147](https://github.com/hasanmanzak/meAndAI/issues/147), and exact OID-bound
 branch cleanup.
