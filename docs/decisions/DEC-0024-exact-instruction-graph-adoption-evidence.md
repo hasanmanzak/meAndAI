@@ -9,6 +9,7 @@
 - Disposition evidence: [accepted by the maintainer on 2026-07-21](https://github.com/hasanmanzak/meAndAI/issues/93#issuecomment-5033653638)
 - Related decisions: [DEC-0013](DEC-0013-trusted-adoption-and-recoverable-evidence.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md), and [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md)
 - Narrow supersession: supersedes [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md) only where its fixed known-surface inventory limits instruction-authority discovery; maintainer-owned strategy selection, semantic-mutation boundaries, and compatibility rules remain authoritative
+- Current-schema evolution: [DEC-0031](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) narrowly supersedes this decision's schema-1 per-blob ceiling and protected-extension vocabulary for current releases; this record remains the immutable schema-1 rationale
 
 ## Context
 
@@ -141,7 +142,7 @@ neither reachable nor matched by the versioned compatibility seed remains
 protected unknown evidence: it is not live authority, does not block freshness,
 and cannot be changed or deleted by this feature.
 
-The current schema has inclusive limits of 65,536 inspected tree entries,
+The latest immutable schema-1 policy has inclusive limits of 65,536 inspected tree entries,
 4,194,304 UTF-8 bytes across their paths, 512 nodes, 4,096 edges, depth 32,
 262,144 bytes for one parsed blob, 4,194,304 aggregate parsed bytes, and 32,768
 UTF-8 bytes for the graph-node path inventory. One tree path is also bounded by
@@ -162,8 +163,9 @@ links produced 2,061 canonical edges without changing traversal semantics.
 Deleting valid traceability would only postpone the same capacity failure, so
 `v0.14.3` raises the release-declared inclusive edge ceiling to 4,096 and keeps
 the same fail-closed exact N/N+1 boundary. Older immutable releases retain their
-encoded 2,048-edge contract; the current launcher imports and validates the
-policy owned by its exact runtime release.
+encoded 2,048-edge contract. A graph-aware lifecycle imports and validates the
+policy owned by its exact target release; a historical graph-unaware workflow,
+which accepts no graph identity, retains the bounded runtime-policy fallback.
 
 The ordinary self-consumer graph later exceeded the original 256-node ceiling
 while remaining within every independent surface, edge, depth, and byte bound.

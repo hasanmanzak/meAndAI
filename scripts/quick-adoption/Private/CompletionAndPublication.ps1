@@ -243,7 +243,7 @@ function Get-ValidatedAdoptionManifest {
                 $identityValidator = Get-InitialAdoptionPolicyCommand `
                     -Name 'Test-MeAndAIExactInstructionGraphIdentity'
                 $markerIdentity = [pscustomobject][ordered]@{
-                    schema = 1
+                    schema = [int]$sourceGraph.schema
                     graphBase = [string]$PullRequest.meAndAIMarker.graphBase
                     graphDigest = [string]$PullRequest.meAndAIMarker.graphDigest
                     graphCounts = $PullRequest.meAndAIMarker.graphCounts

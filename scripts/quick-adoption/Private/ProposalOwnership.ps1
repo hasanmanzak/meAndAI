@@ -319,7 +319,7 @@ function Get-ValidatedAdoptionMarker {
                     -Name 'Test-MeAndAIExactInstructionGraphIdentityRecord'
                 $graphIdentityValid = [bool](& $identityValidator -Identity `
                     ([pscustomobject][ordered]@{
-                        schema = 1
+                        schema = [int]$script:InitialAdoptionPolicy.GraphSchema
                         graphBase = [string]$marker.graphBase
                         graphDigest = [string]$marker.graphDigest
                         graphCounts = $marker.graphCounts
@@ -432,7 +432,7 @@ function Get-ValidatedAdoptionMarker {
         else { $false }
         $contractGraphIdentity = if ($schema -in @(7, 9)) {
             [pscustomobject][ordered]@{
-                schema = 1
+                schema = [int]$script:InitialAdoptionPolicy.GraphSchema
                 graphBase = [string]$marker.graphBase
                 graphDigest = [string]$marker.graphDigest
                 graphCounts = $marker.graphCounts
@@ -865,6 +865,7 @@ function Set-AdoptionPullRequestPublishingMarker {
     $marker = $PullRequest.meAndAIMarker
     $markerSchema = [long]$marker.schema
     $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $legacyGraphMarkerFamily = $markerSchema -in @(7, 8)
     $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
     $surfaceBase = if ($graphAware) {
         [string]$marker.graphBase
@@ -885,7 +886,7 @@ function Set-AdoptionPullRequestPublishingMarker {
     else { '' }
     $publishingMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 10
+            schema = if ($legacyGraphMarkerFamily) { 8 } else { 10 }
             phase = 'Publishing'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -937,6 +938,12 @@ function Set-AdoptionPullRequestPublishingMarker {
             actor = [string]$marker.actor
         }
     }
+    if ($graphAware -and $legacyGraphMarkerFamily) {
+        $publishingMarkerRecord.Insert(
+            10, 'protocolSurfaces',
+            [object[]]@($marker.protocolSurfaces)
+        )
+    }
     $publishingMarker = $publishingMarkerRecord |
         ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
@@ -962,6 +969,7 @@ function Set-AdoptionPullRequestProposedMarker {
     $marker = $PullRequest.meAndAIMarker
     $markerSchema = [long]$marker.schema
     $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $legacyGraphMarkerFamily = $markerSchema -in @(7, 8)
     $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
     $surfaceBase = if ($graphAware) {
         [string]$marker.graphBase
@@ -982,7 +990,7 @@ function Set-AdoptionPullRequestProposedMarker {
     else { '' }
     $proposedMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 9
+            schema = if ($legacyGraphMarkerFamily) { 7 } else { 9 }
             phase = 'Proposed'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -1028,6 +1036,12 @@ function Set-AdoptionPullRequestProposedMarker {
             actor = [string]$marker.actor
         }
     }
+    if ($graphAware -and $legacyGraphMarkerFamily) {
+        $proposedMarkerRecord.Insert(
+            8, 'protocolSurfaces',
+            [object[]]@($marker.protocolSurfaces)
+        )
+    }
     $proposedMarker = $proposedMarkerRecord |
         ConvertTo-Json -Depth 8 -Compress
     return Set-AdoptionPullRequestMarkerBody -Repository $Repository `
@@ -1054,6 +1068,7 @@ function Set-AdoptionPullRequestCompletedMarker {
     $marker = $PullRequest.meAndAIMarker
     $markerSchema = [long]$marker.schema
     $graphAware = $markerSchema -in @(7, 8, 9, 10)
+    $legacyGraphMarkerFamily = $markerSchema -in @(7, 8)
     $surfaceAware = $markerSchema -in @(5, 6, 7, 8, 9, 10, 11, 12)
     $surfaceBase = if ($graphAware) {
         [string]$marker.graphBase
@@ -1082,7 +1097,7 @@ function Set-AdoptionPullRequestCompletedMarker {
     else { '' }
     $completedMarkerRecord = if ($graphAware) {
         [ordered]@{
-            schema = 9
+            schema = if ($legacyGraphMarkerFamily) { 7 } else { 9 }
             phase = 'Completed'
             state = [string]$marker.state
             target = [string]$marker.target
@@ -1127,6 +1142,12 @@ function Set-AdoptionPullRequestCompletedMarker {
             repository = [string]$marker.repository
             actor = [string]$marker.actor
         }
+    }
+    if ($graphAware -and $legacyGraphMarkerFamily) {
+        $completedMarkerRecord.Insert(
+            8, 'protocolSurfaces',
+            [object[]]@($marker.protocolSurfaces)
+        )
     }
     $completedMarker = $completedMarkerRecord |
         ConvertTo-Json -Depth 8 -Compress

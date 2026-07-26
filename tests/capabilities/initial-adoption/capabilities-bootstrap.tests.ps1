@@ -1493,7 +1493,7 @@ Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0145'
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.15.4',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.15.5',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',

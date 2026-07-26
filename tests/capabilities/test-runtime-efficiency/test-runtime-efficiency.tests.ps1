@@ -1075,7 +1075,7 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$identityValidator|global:gh' = 1
     # TEST-0176 retains one real launcher slice that converges an exact legacy
     # adoption issue to the opaque marker plus visible exact-target links.
-    '$launcherPath|<script>' = 80
+    '$launcherPath|<script>' = 84
     '$launcherPath|New-MockCompletedAdoptionConsumer' = 1
     '$manifestValidationModule|<script>' = 1
     '$manifestValidator|<script>' = 2
@@ -1123,7 +1123,10 @@ Assert-ReviewedOperationInventory -Actual $syntheticDynamicGitInventory `
     -Label 'synthetic dynamic Git negative'
 $quickRecursiveCleanup = Get-ReviewedRecursiveCleanupInventory -Ast $quickAst
 Assert-ReviewedOperationInventory -Actual $quickRecursiveCleanup `
-    -Expected ([ordered]@{ 'Remove-Item|<script>' = 3 }) `
+    -Expected ([ordered]@{
+        'Remove-Item|<script>' = 3
+        'Remove-Item|Copy-ImmutableProtocolPolicyFixture' = 1
+    }) `
     -Label 'quick-adoption recursive cleanup'
 $quickCalls = @($quickAst.FindAll({
     param($node)

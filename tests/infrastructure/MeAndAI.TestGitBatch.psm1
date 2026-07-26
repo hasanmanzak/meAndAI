@@ -4,7 +4,7 @@ function New-MeAndAITestGitBlobBatchSession {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)][string]$Repository,
-        [long]$MaximumBlobBytes = 262144,
+        [long]$MaximumBlobBytes = 524288,
         [long]$MaximumAggregateBlobBytes = 4194304,
         [int]$SessionTimeoutMilliseconds = 120000,
         [int]$AbortTimeoutMilliseconds = 5000,

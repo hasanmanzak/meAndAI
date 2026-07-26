@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.15.4',
+    [string]$ProtocolTag = 'v0.15.5',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -27,7 +27,8 @@ param(
     [ValidateSet(
         'Launcher',
         'GitHubCliVersionContract',
-        'CredentialContainmentContract'
+        'CredentialContainmentContract',
+        'InitialPolicyContract'
     )]
     [string]$SupportAction = 'Launcher',
     [AllowNull()][object[]]$SupportInput = @()
@@ -131,6 +132,119 @@ try {
                 Calls = @($script:QuickAdoptionContractCalls)
             }
         } $resolvedTarget
+    }
+
+    if ($SupportAction -ceq 'InitialPolicyContract') {
+        if ($SupportInput.Count -ne 1 -or
+            $null -eq $SupportInput[0] -or
+            $SupportInput[0].WorkflowBytes -isnot [byte[]] -or
+            $SupportInput[0].PolicyBytes -isnot [byte[]] -or
+            [string]$SupportInput[0].PolicySha -cnotmatch '^[0-9a-f]{40}$' -or
+            [string]$SupportInput[0].TargetTag -cnotmatch
+                '^v[0-9]+\.[0-9]+\.[0-9]+$' -or
+            [string]$SupportInput[0].RuntimePolicyTag -cnotmatch
+                '^v[0-9]+\.[0-9]+\.[0-9]+$') {
+            throw 'Initial-policy contract support input is invalid.'
+        }
+        $runtimePolicyBytesProperty =
+            $SupportInput[0].PSObject.Properties['RuntimePolicyBytes']
+        $runtimePolicyShaProperty =
+            $SupportInput[0].PSObject.Properties['RuntimePolicySha']
+        if (($null -eq $runtimePolicyBytesProperty) -ne
+                ($null -eq $runtimePolicyShaProperty) -or
+            ($null -ne $runtimePolicyBytesProperty -and
+             ($runtimePolicyBytesProperty.Value -isnot [byte[]] -or
+              [string]$runtimePolicyShaProperty.Value -cnotmatch
+                '^[0-9a-f]{40}$'))) {
+            throw 'Initial-policy contract runtime support input is invalid.'
+        }
+        return & $module {
+            param([pscustomobject]$Case)
+
+            $script:QuickAdoptionInitialPolicyContractCase = $Case
+            $script:QuickAdoptionInitialPolicyAssetCalls = 0
+            function script:Get-CanonicalProtocolAsset {
+                param(
+                    [Parameter(Mandatory)][string]$Tag,
+                    [Parameter(Mandatory)][string]$TemplatePath,
+                    [string]$ProtocolToken = ''
+                )
+
+                if ($TemplatePath -cne
+                        'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1' -or
+                    -not [string]::IsNullOrEmpty($ProtocolToken)) {
+                    throw 'Initial-policy contract requested an unexpected canonical asset.'
+                }
+                $isTarget = $Tag -ceq
+                    [string]$script:QuickAdoptionInitialPolicyContractCase.
+                        TargetTag
+                $isRuntime = $Tag -ceq
+                    [string]$script:QuickAdoptionInitialPolicyContractCase.
+                        RuntimePolicyTag -and
+                    $null -ne $script:QuickAdoptionInitialPolicyContractCase.
+                        PSObject.Properties['RuntimePolicyBytes']
+                if (-not $isTarget -and -not $isRuntime) {
+                    throw 'Initial-policy contract requested an unexpected canonical asset.'
+                }
+                $script:QuickAdoptionInitialPolicyAssetCalls++
+                [byte[]]$selectedBytes = if ($isTarget) {
+                    [byte[]]$script:QuickAdoptionInitialPolicyContractCase.
+                        PolicyBytes
+                }
+                else {
+                    [byte[]]$script:QuickAdoptionInitialPolicyContractCase.
+                        RuntimePolicyBytes
+                }
+                $selectedSha = if ($isTarget) {
+                    [string]$script:QuickAdoptionInitialPolicyContractCase.
+                        PolicySha
+                }
+                else {
+                    [string]$script:QuickAdoptionInitialPolicyContractCase.
+                        RuntimePolicySha
+                }
+                return [pscustomobject][ordered]@{
+                    Tag = $Tag
+                    TemplatePath = $TemplatePath
+                    Bytes = $selectedBytes
+                    Sha = $selectedSha
+                }
+            }
+
+            $policy = $null
+            try {
+                $selectedTag = Resolve-QuickAdoptionInitialPolicyTag `
+                    -WorkflowBytes ([byte[]]$Case.WorkflowBytes) `
+                    -TargetTag ([string]$Case.TargetTag) `
+                    -RuntimePolicyTag ([string]$Case.RuntimePolicyTag)
+                $policy = Import-CanonicalInitialAdoptionPolicy `
+                    -Tag $selectedTag
+                return [pscustomobject][ordered]@{
+                    SelectedTag = [string]$selectedTag
+                    ImportedTag = [string]$policy.Tag
+                    GraphSchema = [int]$policy.GraphSchema
+                    MaximumBlobBytes = [int]$policy.Limits.MaximumBlobBytes
+                    AssetCalls =
+                        [int]$script:QuickAdoptionInitialPolicyAssetCalls
+                    ModuleCount = @($policy.Modules).Count
+                    CommandSources = $policy.CommandSources
+                }
+            }
+            finally {
+                if ($null -ne $policy) {
+                    [object[]]$policyModules = @($policy.Modules)
+                    if ($policyModules.Count -eq 0 -and
+                        $null -ne $policy.Module) {
+                        $policyModules = @($policy.Module)
+                    }
+                    [array]::Reverse($policyModules)
+                    foreach ($policyModule in $policyModules) {
+                        Remove-Module -ModuleInfo $policyModule -Force `
+                            -ErrorAction SilentlyContinue
+                    }
+                }
+            }
+        } ([pscustomobject]$SupportInput[0])
     }
 
     $launcherParameters = @{}

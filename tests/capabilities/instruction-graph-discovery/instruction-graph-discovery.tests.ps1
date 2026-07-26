@@ -843,12 +843,14 @@ function New-TestVirtualClock {
         Value = if ($queue.Count -gt 0) { [long]$queue.Peek() } else { [long]0 }
         Calls = [long]0
         Queue = $queue
+        OnCall = $null
     }
     $callback = {
         $state.Calls++
         if ($state.Queue.Count -gt 0) {
             $state.Value = [long]$state.Queue.Dequeue()
         }
+        if ($state.OnCall -is [scriptblock]) { & $state.OnCall $state }
         return [long]$state.Value
     }.GetNewClosure()
     return [pscustomobject]@{
@@ -947,6 +949,8 @@ function New-TestBatchTransport {
         -Name Output -Default ([byte[]]@()))
     [byte[]]$standardError = [byte[]](Get-TestOptionValue -Options $Options `
         -Name StandardError -Default ([byte[]]@()))
+    $outputChunkSize = [int](Get-TestOptionValue -Options $Options `
+        -Name OutputChunkSize -Default 7)
     $waitQueue = [Collections.Generic.Queue[bool]]::new()
     foreach ($value in @((Get-TestOptionValue -Options $Options `
         -Name WaitForExitResults -Default @($true)))) {
@@ -967,10 +971,12 @@ function New-TestBatchTransport {
         HasExited = $false
         Output = $output
         OutputOffset = [int]0
+        OutputChunkSize = [int]$outputChunkSize
         StandardError = $standardError
         ErrorOffset = [int]0
         Input = [Collections.Generic.List[byte]]::new()
         PendingSources = [Collections.Generic.List[object]]::new()
+        SharedPendingSource = $null
         WaitQueue = $waitQueue
     }
     $startResult = [bool](Get-TestOptionValue -Options $Options `
@@ -989,18 +995,22 @@ function New-TestBatchTransport {
         -Name PendingOutput -Default $false)
     $pendingError = [bool](Get-TestOptionValue -Options $Options `
         -Name PendingError -Default $false)
+    $sharedPendingTask = [bool](Get-TestOptionValue -Options $Options `
+        -Name SharedPendingTask -Default $false)
     $completePendingOnKill = [bool](Get-TestOptionValue -Options $Options `
         -Name CompletePendingOnKill -Default $true)
+    $completePendingOnCloseInput = [bool](Get-TestOptionValue `
+        -Options $Options -Name CompletePendingOnCloseInput -Default $false)
     $killExits = [bool](Get-TestOptionValue -Options $Options `
         -Name KillExits -Default $true)
     $killThrows = [bool](Get-TestOptionValue -Options $Options `
         -Name KillThrows -Default $false)
+    $killThrowsAfterExit = [bool](Get-TestOptionValue -Options $Options `
+        -Name KillThrowsAfterExit -Default $false)
     $disposeThrows = [bool](Get-TestOptionValue -Options $Options `
         -Name DisposeThrows -Default $false)
     $exitCode = [int](Get-TestOptionValue -Options $Options `
         -Name ExitCode -Default 0)
-    $outputChunkSize = [int](Get-TestOptionValue -Options $Options `
-        -Name OutputChunkSize -Default 7)
     $errorChunkSize = [int](Get-TestOptionValue -Options $Options `
         -Name ErrorChunkSize -Default 11)
     $onWrite = Get-TestOptionValue -Options $Options -Name OnWrite -Default $null
@@ -1049,6 +1059,14 @@ function New-TestBatchTransport {
                     -Message 'synthetic stdout failure' -Integer
             }
             if ($pendingOutput) {
+                if ($sharedPendingTask) {
+                    if ($null -eq $state.SharedPendingSource) {
+                        $state.SharedPendingSource =
+                            [Threading.Tasks.TaskCompletionSource[int]]::new()
+                        $state.PendingSources.Add($state.SharedPendingSource)
+                    }
+                    return $state.SharedPendingSource.Task
+                }
                 $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
                 $state.PendingSources.Add($source)
                 return $source.Task
@@ -1056,7 +1074,7 @@ function New-TestBatchTransport {
             $remaining = $state.Output.Length - $state.OutputOffset
             if ($remaining -le 0) { return New-TestCompletedIntTask -Value 0 }
             $read = [Math]::Min($count, [Math]::Min(
-                $remaining, $outputChunkSize
+                $remaining, [int]$state.OutputChunkSize
             ))
             [Array]::Copy(
                 $state.Output, $state.OutputOffset, $buffer, $offset, $read
@@ -1073,6 +1091,14 @@ function New-TestBatchTransport {
                     -Message 'synthetic stderr failure' -Integer
             }
             if ($pendingError) {
+                if ($sharedPendingTask) {
+                    if ($null -eq $state.SharedPendingSource) {
+                        $state.SharedPendingSource =
+                            [Threading.Tasks.TaskCompletionSource[int]]::new()
+                        $state.PendingSources.Add($state.SharedPendingSource)
+                    }
+                    return $state.SharedPendingSource.Task
+                }
                 $source = [Threading.Tasks.TaskCompletionSource[int]]::new()
                 $state.PendingSources.Add($source)
                 return $source.Task
@@ -1091,6 +1117,11 @@ function New-TestBatchTransport {
         }.GetNewClosure()
         CloseInput = {
             $state.CloseInputCalls++
+            if ($completePendingOnCloseInput) {
+                foreach ($source in @($state.PendingSources)) {
+                    if (-not $source.Task.IsCompleted) { $source.SetResult(0) }
+                }
+            }
         }.GetNewClosure()
         WaitForExit = {
             param([int]$milliseconds)
@@ -1111,6 +1142,10 @@ function New-TestBatchTransport {
         }.GetNewClosure()
         Kill = {
             $state.KillCalls++
+            if ($killThrowsAfterExit) {
+                $state.HasExited = $true
+                throw 'synthetic process exited before kill'
+            }
             if ($killThrows) { throw 'synthetic kill failure' }
             if ($completePendingOnKill) {
                 foreach ($source in @($state.PendingSources)) {
@@ -1186,7 +1221,7 @@ function New-TestActorBatchSessionFixture {
         [Parameter(Mandatory)]$HostedModule,
         [System.Collections.IDictionary]$TransportOptions = @{},
         [long[]]$ClockValues = @([long]0),
-        [long]$MaximumBlobBytes = 262144,
+        [long]$MaximumBlobBytes = 524288,
         [long]$MaximumAggregateBlobBytes = 4194304,
         [int]$SessionTimeoutMilliseconds = 120000,
         [int]$AbortTimeoutMilliseconds = 5000,
@@ -1232,7 +1267,7 @@ function Test-InstructionGraphBatchActorBehavior {
     $label = "TEST-0161 $Actor batch transport"
     $baseFactoryArguments = [ordered]@{
         Repository = 'C:/synthetic/instruction-graph.git'
-        MaximumBlobBytes = [long]262144
+        MaximumBlobBytes = [long]524288
         MaximumAggregateBlobBytes = [long]4194304
         SessionTimeoutMilliseconds = [int]120000
         AbortTimeoutMilliseconds = [int]5000
@@ -1585,47 +1620,70 @@ function Test-InstructionGraphBatchActorBehavior {
         -Message "$label aggregate N+1 did not fail closed."
     try { & $aggregateAtNPlusOne.Session.Abort } catch { }
 
-    [byte[]]$productionBlobPayload = [byte[]]::new(262144)
+    [byte[]]$priorBlobAtNPlusOnePayload = [byte[]]::new(262145)
+    $priorBlobAtNPlusOneOid = & $getGitBlobSha1Action `
+        -Bytes $priorBlobAtNPlusOnePayload
+    $priorBlobAtNPlusOne = New-TestActorBatchSessionFixture `
+        -Actor $Actor -HostedModule $HostedModule `
+        -MaximumBlobBytes 524288 `
+        -TransportOptions @{
+            Output = New-TestBatchResponseBytes `
+                -Oid $priorBlobAtNPlusOneOid `
+                -Payload $priorBlobAtNPlusOnePayload
+            OutputChunkSize = 65536
+        }
+    [void](& $priorBlobAtNPlusOne.Session.ReadBlob (
+        New-TestTreeEntry -Path 'docs/PRIOR-LIMIT-PLUS-ONE.md' `
+            -Sha $priorBlobAtNPlusOneOid
+    ))
+    & $priorBlobAtNPlusOne.Session.Complete (New-TestBatchGraphCounts `
+        -ParsedBlobs 1 -ParsedBlobBytes 262145)
+
+    [byte[]]$productionBlobPayload = [byte[]]::new(524288)
     $productionBlobOid = & $getGitBlobSha1Action -Bytes $productionBlobPayload
     $productionBlobEntry = New-TestTreeEntry `
         -Path 'docs/PRODUCTION-LIMIT.md' -Sha $productionBlobOid
     [byte[]]$productionBlobResponse = New-TestBatchResponseBytes `
         -Oid $productionBlobOid -Payload $productionBlobPayload
     $productionBlobAtN = New-TestActorBatchSessionFixture -Actor $Actor `
-        -HostedModule $HostedModule -MaximumBlobBytes 262144 `
+        -HostedModule $HostedModule -MaximumBlobBytes 524288 `
         -TransportOptions @{
             Output = $productionBlobResponse
             OutputChunkSize = 65536
         }
     [void](& $productionBlobAtN.Session.ReadBlob $productionBlobEntry)
     & $productionBlobAtN.Session.Complete (New-TestBatchGraphCounts `
-        -ParsedBlobs 1 -ParsedBlobBytes 262144)
+        -ParsedBlobs 1 -ParsedBlobBytes 524288)
 
-    [byte[]]$productionBlobAtNPlusOnePayload = [byte[]]::new(262145)
+    [byte[]]$productionBlobAtNPlusOnePayload = [byte[]]::new(524289)
     $productionBlobAtNPlusOneOid = & $getGitBlobSha1Action `
         -Bytes $productionBlobAtNPlusOnePayload
     $productionBlobAtNPlusOne = New-TestActorBatchSessionFixture `
         -Actor $Actor -HostedModule $HostedModule `
-        -MaximumBlobBytes 262144 `
+        -MaximumBlobBytes 524288 `
         -TransportOptions @{
             Output = New-TestBatchResponseBytes `
                 -Oid $productionBlobAtNPlusOneOid `
                 -Payload $productionBlobAtNPlusOnePayload `
                 -PayloadBytesToEmit 0
-            OutputChunkSize = 65536
+            OutputChunkSize = 1
         }
     Assert-ThrowsLike -Action {
         & $productionBlobAtNPlusOne.Session.ReadBlob (
             New-TestTreeEntry -Path 'docs/PRODUCTION-LIMIT-PLUS-ONE.md' `
                 -Sha $productionBlobAtNPlusOneOid
         )
-    }.GetNewClosure() -Pattern '*' `
-        -Message "$label exact 262144-byte blob ceiling was not enforced."
+    }.GetNewClosure() -Pattern 'Instruction-graph batch response size exceeds its budget.' `
+        -Message "$label exact 524288-byte blob ceiling was not enforced."
+    Assert-True -Condition (
+        [int]$productionBlobAtNPlusOne.Transport.State.OutputOffset -eq
+            ([int]$productionBlobAtNPlusOne.Transport.State.Output.Length - 1)
+    ) -Message "$label read payload bytes after rejecting a 524289-byte response."
     try { & $productionBlobAtNPlusOne.Session.Abort } catch { }
 
     $productionAggregateParts =
         [Collections.Generic.List[object]]::new()
-    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
         $aggregateIndex++) {
         $productionAggregateParts.Add($productionBlobResponse)
     }
@@ -1638,7 +1696,7 @@ function Test-InstructionGraphBatchActorBehavior {
             Output = $productionAggregateResponse
             OutputChunkSize = 65536
         }
-    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
         $aggregateIndex++) {
         [void](& $productionAggregateAtN.Session.ReadBlob (
             New-TestTreeEntry `
@@ -1647,7 +1705,7 @@ function Test-InstructionGraphBatchActorBehavior {
         ))
     }
     & $productionAggregateAtN.Session.Complete (New-TestBatchGraphCounts `
-        -ParsedBlobs 16 -ParsedBlobBytes 4194304)
+        -ParsedBlobs 8 -ParsedBlobBytes 4194304)
 
     [byte[]]$aggregateSentinelPayload = [byte[]]@(1)
     $aggregateSentinelOid = & $getGitBlobSha1Action `
@@ -1665,10 +1723,10 @@ function Test-InstructionGraphBatchActorBehavior {
         -Actor $Actor -HostedModule $HostedModule `
         -MaximumAggregateBlobBytes 4194304 `
         -TransportOptions @{
-            Output = $productionAggregateNPlusOneResponse
+            Output = $productionAggregateResponse
             OutputChunkSize = 65536
         }
-    for ($aggregateIndex = 0; $aggregateIndex -lt 16;
+    for ($aggregateIndex = 0; $aggregateIndex -lt 8;
         $aggregateIndex++) {
         [void](& $productionAggregateAtNPlusOne.Session.ReadBlob (
             New-TestTreeEntry `
@@ -1676,13 +1734,20 @@ function Test-InstructionGraphBatchActorBehavior {
                 -Sha $productionBlobOid
         ))
     }
+    $productionAggregateAtNPlusOne.Transport.State.Output =
+        $productionAggregateNPlusOneResponse
+    $productionAggregateAtNPlusOne.Transport.State.OutputChunkSize = 1
     Assert-ThrowsLike -Action {
         & $productionAggregateAtNPlusOne.Session.ReadBlob (
             New-TestTreeEntry -Path 'docs/aggregate-plus/sentinel.md' `
                 -Sha $aggregateSentinelOid
         )
-    }.GetNewClosure() -Pattern '*' `
+    }.GetNewClosure() -Pattern 'Instruction-graph batch response size exceeds its budget.' `
         -Message "$label exact 4194304-byte aggregate ceiling was not enforced."
+    Assert-True -Condition (
+        [int]$productionAggregateAtNPlusOne.Transport.State.OutputOffset -eq
+            ([int]$productionAggregateAtNPlusOne.Transport.State.Output.Length - 1)
+    ) -Message "$label read payload bytes after rejecting the aggregate N+1 response."
     try { & $productionAggregateAtNPlusOne.Session.Abort } catch { }
 
     [byte[]]$stderrAtNBytes = [byte[]]::new(65536)
@@ -1771,6 +1836,136 @@ function Test-InstructionGraphBatchActorBehavior {
         -Message "$label deadline N+1 pending I/O did not fail closed."
     try { & $deadlineAtNPlusOne.Session.Abort } catch { }
 
+    $inputCloseJoin = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            PendingOutput = $true
+            PendingError = $true
+            CompletePendingOnKill = $false
+            CompletePendingOnCloseInput = $true
+            OnOutputRead = $deadlineFailOnRead
+        }
+    Assert-ThrowsLike -Action {
+        & $inputCloseJoin.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label input-close join fixture did not enter abort from pending I/O."
+    $inputCloseJoinControl = [pscustomobject]@{
+        Calls = [long]0
+    }
+    $inputCloseJoin.Clock.State.OnCall = {
+        param($clockState)
+        $inputCloseJoinControl.Calls++
+        if ($inputCloseJoinControl.Calls -ge 2) {
+            $clockState.Value = [long]125001
+        }
+    }.GetNewClosure()
+    $inputCloseJoinCleanup = $null
+    try { & $inputCloseJoin.Session.Abort }
+    catch { $inputCloseJoinCleanup = $_.Exception.Message }
+    Assert-True -Condition (
+        [string]::IsNullOrEmpty($inputCloseJoinCleanup) -and
+        [long]$inputCloseJoin.Transport.State.CloseInputCalls -eq 1 -and
+        [long]$inputCloseJoin.Transport.State.KillCalls -eq 1 -and
+        [long]$inputCloseJoin.Transport.State.DisposeCalls -eq 1 -and
+        @($inputCloseJoin.Transport.State.PendingSources | Where-Object {
+            -not $_.Task.IsCompleted -or $_.Task.IsFaulted -or
+                $_.Task.IsCanceled
+        }).Count -eq 0
+    ) -Message "$label input close did not complete and join ordinary pipe tasks before disposal."
+
+    $killExitRace = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -TransportOptions @{
+            Output = [Text.Encoding]::ASCII.GetBytes('malformed')
+            KillThrowsAfterExit = $true
+        }
+    $killExitRacePrimary = $null
+    try { & $killExitRace.Session.ReadBlob $binaryEntry }
+    catch { $killExitRacePrimary = $_.Exception.Message }
+    $killExitRaceCleanup = $null
+    try { & $killExitRace.Session.Abort }
+    catch { $killExitRaceCleanup = $_.Exception.Message }
+    Assert-True -Condition (
+        -not [string]::IsNullOrEmpty($killExitRacePrimary) -and
+        [string]::IsNullOrEmpty($killExitRaceCleanup) -and
+        [long]$killExitRace.Transport.State.CloseInputCalls -eq 1 -and
+        [long]$killExitRace.Transport.State.KillCalls -eq 1 -and
+        [long]$killExitRace.Transport.State.WaitForExitCalls -eq 1 -and
+        [long]$killExitRace.Transport.State.DisposeCalls -eq 1 -and
+        [bool]$killExitRace.Transport.State.HasExited
+    ) -Message "$label process-exit race during kill produced false cleanup evidence."
+
+    $duplicatePending = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            PendingOutput = $true
+            PendingError = $true
+            SharedPendingTask = $true
+            CompletePendingOnKill = $false
+            OnOutputRead = $deadlineFailOnRead
+        }
+    Assert-ThrowsLike -Action {
+        & $duplicatePending.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label duplicate pending-task fixture did not enter abort."
+    $duplicatePendingControl = [pscustomobject]@{ Calls = [long]0 }
+    $duplicatePending.Clock.State.OnCall = {
+        param($clockState)
+        $duplicatePendingControl.Calls++
+        if ($duplicatePendingControl.Calls -ge 2) {
+            $clockState.Value = [long]125001
+        }
+    }.GetNewClosure()
+    $duplicatePendingCleanup = $null
+    try { & $duplicatePending.Session.Abort }
+    catch { $duplicatePendingCleanup = $_.Exception.Message }
+    $unjoinedTaskMessage =
+        'Instruction-graph batch I/O task did not join after abort.'
+    Assert-True -Condition (
+        -not [string]::IsNullOrEmpty($duplicatePendingCleanup) -and
+        [regex]::Matches(
+            $duplicatePendingCleanup,
+            [regex]::Escape($unjoinedTaskMessage)
+        ).Count -eq 1 -and
+        $duplicatePending.Transport.State.PendingSources.Count -eq 1 -and
+        [long]$duplicatePending.Transport.State.DisposeCalls -eq 1
+    ) -Message "$label one pending task referenced twice was not joined exactly once."
+
+    $faultedPending = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            PendingOutput = $true
+            PendingError = $true
+            SharedPendingTask = $true
+            CompletePendingOnKill = $false
+            OnOutputRead = $deadlineFailOnRead
+        }
+    Assert-ThrowsLike -Action {
+        & $faultedPending.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label faulted pending-task fixture did not enter abort."
+    $faultedPendingControl = [pscustomobject]@{
+        Calls = [long]0
+        Source = $faultedPending.Transport.State.PendingSources[0]
+    }
+    $faultedPending.Clock.State.OnCall = {
+        param($clockState)
+        $faultedPendingControl.Calls++
+        if ($faultedPendingControl.Calls -eq 2 -and
+            -not $faultedPendingControl.Source.Task.IsCompleted) {
+            [void]$faultedPendingControl.Source.TrySetException(
+                [IO.IOException]::new('synthetic abort pipe failure')
+            )
+        }
+    }.GetNewClosure()
+    $faultedPendingCleanup = $null
+    try { & $faultedPending.Session.Abort }
+    catch { $faultedPendingCleanup = $_.Exception.Message }
+    Assert-True -Condition (
+        $faultedPendingCleanup -ceq
+            'Instruction-graph batch I/O task faulted during abort.' -and
+        [long]$faultedPending.Transport.State.DisposeCalls -eq 1
+    ) -Message "$label faulted pending I/O did not remain an explicit cleanup failure."
+
     foreach ($clockCase in @(
         [pscustomobject]@{ Values = [long[]]@(-1) },
         [pscustomobject]@{ Values = [long[]]@(0, 1, 0) }
@@ -1785,6 +1980,87 @@ function Test-InstructionGraphBatchActorBehavior {
             -Message "$label accepted a negative or decreasing clock."
         try { & $clockFault.Session.Abort } catch { }
     }
+
+    $abortClockRecovery = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]0) `
+        -TransportOptions @{
+            PendingOutput = $true
+            CompletePendingOnKill = $false
+            OnOutputRead = $deadlineFailOnRead
+        }
+    Assert-ThrowsLike -Action {
+        & $abortClockRecovery.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*' `
+        -Message "$label abort-clock recovery fixture did not enter abort."
+    $abortClockRecoveryControl = [pscustomobject]@{
+        Calls = [long]0
+        Source = $abortClockRecovery.Transport.State.PendingSources[0]
+    }
+    $abortClockRecovery.Clock.State.OnCall = {
+        param($clockState)
+        $abortClockRecoveryControl.Calls++
+        if ($abortClockRecoveryControl.Calls -eq 2) {
+            $clockState.Value = [long]120000
+        }
+        elseif ($abortClockRecoveryControl.Calls -ge 3) {
+            $clockState.Value = [long]120001
+            if (-not $abortClockRecoveryControl.Source.Task.IsCompleted) {
+                $abortClockRecoveryControl.Source.SetResult(0)
+            }
+        }
+    }.GetNewClosure()
+    $abortClockRecoveryCleanup = $null
+    try { & $abortClockRecovery.Session.Abort }
+    catch { $abortClockRecoveryCleanup = $_.Exception.Message }
+    Assert-True -Condition (
+        $abortClockRecoveryCleanup -ceq
+            'Instruction-graph batch I/O task did not join after abort.' -and
+        [long]$abortClockRecoveryControl.Calls -eq 2 -and
+        $abortClockRecovery.Transport.State.WaitForExitMilliseconds.Count -eq 1 -and
+        [int]$abortClockRecovery.Transport.State.WaitForExitMilliseconds[0] -eq 0 -and
+        -not $abortClockRecoveryControl.Source.Task.IsCompleted -and
+        [long]$abortClockRecovery.Transport.State.DisposeCalls -eq 1
+    ) -Message "$label recovered from an abort clock-integrity fault and allocated a fresh wait."
+
+    $primaryClockRecovery = New-TestActorBatchSessionFixture -Actor $Actor `
+        -HostedModule $HostedModule -ClockValues @([long]10) `
+        -TransportOptions @{
+            PendingOutput = $true
+            CompletePendingOnKill = $false
+            OnOutputRead = {
+                param($state)
+                $state.ClockState.Value = [long]9
+            }
+        }
+    Assert-ThrowsLike -Action {
+        & $primaryClockRecovery.Session.ReadBlob $binaryEntry
+    }.GetNewClosure() -Pattern '*clock is not monotonic*' `
+        -Message "$label primary clock-integrity fixture did not fail closed."
+    $primaryClockRecoveryControl = [pscustomobject]@{
+        Calls = [long]0
+        Source = $primaryClockRecovery.Transport.State.PendingSources[0]
+    }
+    $primaryClockRecovery.Clock.State.OnCall = {
+        param($clockState)
+        $primaryClockRecoveryControl.Calls++
+        $clockState.Value = [long]10
+        if ($primaryClockRecoveryControl.Calls -ge 2 -and
+            -not $primaryClockRecoveryControl.Source.Task.IsCompleted) {
+            $primaryClockRecoveryControl.Source.SetResult(0)
+        }
+    }.GetNewClosure()
+    $primaryClockRecoveryCleanup = $null
+    try { & $primaryClockRecovery.Session.Abort }
+    catch { $primaryClockRecoveryCleanup = $_.Exception.Message }
+    Assert-True -Condition (
+        $primaryClockRecoveryCleanup -ceq
+            'Instruction-graph batch I/O task did not join after abort.' -and
+        [long]$primaryClockRecoveryControl.Calls -eq 0 -and
+        $primaryClockRecovery.Transport.State.WaitForExitMilliseconds.Count -eq 1 -and
+        [int]$primaryClockRecovery.Transport.State.WaitForExitMilliseconds[0] -eq 0 -and
+        -not $primaryClockRecoveryControl.Source.Task.IsCompleted -and
+        [long]$primaryClockRecovery.Transport.State.DisposeCalls -eq 1
+    ) -Message "$label retried the clock after a primary clock-integrity fault."
 
     $hung = New-TestActorBatchSessionFixture -Actor $Actor `
         -HostedModule $HostedModule -TransportOptions @{
@@ -1905,7 +2181,8 @@ function Test-InstructionGraphBatchActorBehavior {
         -not [string]::IsNullOrEmpty($primaryMessage) -and
         $primaryMessage -match '(?i)(response|header|protocol|blob)' -and
         -not [string]::IsNullOrEmpty($cleanupMessage) -and
-        $cleanupMessage -match '(?i)(kill|dispose)'
+        $cleanupMessage -like '*synthetic kill failure*' -and
+        $cleanupMessage -like '*synthetic dispose failure*'
     ) -Message "$label cleanup fault hid the primary protocol failure."
 }
 
@@ -2093,14 +2370,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            '90341ae3eaf5c7c1be2b9e0476ef127043ffbacaf446d80f0e53e7823c4d935c') `
+            '55928fe4ea8b26b3267424ee7d02754edaa82f7efaf33b6ec3719acddad3d69d') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
         $compactGraphJsonSha = & $getSha256Action -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            'ccea708053469832cfec6c01b1ddb0da51df53b5cef626fdf70fa21486018004') `
+            'a09ca107493966b81393a79b0f47ff2ddd52f7f0bdea6e3c693105e4e160c5f0') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -2318,6 +2595,89 @@ Reference evidence: `docs/source/code.pdf`.
                 -not $protectedTokenReads.Contains($protectedTokenPath)
             ) -Message "TEST-0151 ordinary repository-path token '$protectedTokenPath' was not retained as unopened protected evidence."
         }
+        $projectMetadataFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' = 'Project metadata: `build/Application.mqproj`.'
+        }) -SpecialEntries @{
+            'build/Application.mqproj' = @{
+                Mode = '100644'; Type = 'blob'; Sha = ('e' * 40)
+            }
+        }
+        $projectMetadataReads = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+        $projectMetadataBaseReader = $projectMetadataFixture.Reader
+        $projectMetadataReader = {
+            param($entry)
+            [void]$projectMetadataReads.Add([string]$entry.Path)
+            [byte[]]$content = & $projectMetadataBaseReader $entry
+            return ,$content
+        }.GetNewClosure()
+        $projectMetadataGraph = $null
+        try {
+            $projectMetadataGraph = & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $projectMetadataFixture.Entries `
+                -ReadBlob $projectMetadataReader
+        }
+        catch {
+            Add-Failure (
+                'TEST-0151 ordinary reviewed project metadata did not remain ' +
+                'unopened protected evidence: ' + $_.Exception.Message
+            )
+        }
+        if ($null -ne $projectMetadataGraph) {
+            Assert-True -Condition (
+                [long]$projectMetadataGraph.schema -eq 2 -and
+                [bool](& $graphValidator -Graph $projectMetadataGraph) -and
+                @($projectMetadataGraph.nodes | Where-Object {
+                    $_.path -ceq 'build/Application.mqproj' -and
+                    $_.role -ceq 'ProtectedNonText' -and
+                    @($_.reasons) -ccontains 'References'
+                }).Count -eq 1 -and
+                @($projectMetadataGraph.edges | Where-Object {
+                    $_.source -ceq 'AGENTS.md' -and
+                    $_.target -ceq 'build/Application.mqproj' -and
+                    $_.kind -ceq 'References' -and $_.anchor -ceq 'L1' -and
+                    $_.reason -ceq 'RepositoryPathToken' -and
+                    -not [bool]$_.external
+                }).Count -eq 1 -and
+                -not $projectMetadataReads.Contains(
+                    'build/Application.mqproj'
+                ) -and
+                @($projectMetadataGraph.candidates) -cnotcontains
+                    'build/Application.mqproj' -and
+                @($projectMetadataGraph.protocolSurfaces) -cnotcontains
+                    'build/Application.mqproj'
+            ) -Message 'TEST-0151 reviewed project metadata was opened, promoted, or lost as terminal protected evidence.'
+        }
+        $requiredProjectMetadataFixture = New-TestGraphFixture `
+            -Files ([ordered]@{
+                'AGENTS.md' =
+                    'Required reading: `build/Application.mqproj`.'
+            }) -SpecialEntries @{
+                'build/Application.mqproj' = @{
+                    Mode = '100644'; Type = 'blob'; Sha = ('d' * 40)
+                }
+            }
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $requiredProjectMetadataFixture.Entries `
+                -ReadBlob $requiredProjectMetadataFixture.Reader
+        } -Pattern '*protected source or binary target*live instruction authority*' `
+            -Message 'TEST-0152 required reviewed project metadata did not retain the protected-authority failure.'
+        $qualifiedProtectedAuthorityFixture = New-TestGraphFixture `
+            -Files ([ordered]@{
+                'AGENTS.md' = @'
+Reference evidence: `src/Application.cs`.
+`src/Application.cs` is the single canonical application version source.
+'@
+                'src/Application.cs' = 'Protected application source.'
+            })
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $qualifiedProtectedAuthorityFixture.Entries `
+                -ReadBlob $qualifiedProtectedAuthorityFixture.Reader
+        } -Pattern '*protected source or binary target*live instruction authority*' `
+            -Message 'TEST-0152 a qualified canonical-source declaration did not fail closed for protected source evidence.'
         foreach ($requiredProtectedLine in @(
             'Required reading: docs/source/required.pdf',
             'Required reading: `docs/source/required.pdf`'
@@ -2952,6 +3312,688 @@ Consult [consumer scheme](consumer+memory:authority/root).
             -not (& $canonicalPathValidator -Path 'c:docs/x.md')
         ) -Message 'TEST-0152 canonical repository path predicate accepted a drive prefix on this host.'
 
+        $hashDirectiveInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $hashDirectiveReferences = @()
+        $hashDirectiveFailure = $null
+        try {
+            $hashDirectiveReferences = @(& $policyModule {
+                param($inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text 'Use `#configuration version` for metadata.' `
+                    -RepositoryPathInventory $inventory
+            } $hashDirectiveInventory)
+        }
+        catch { $hashDirectiveFailure = $_.Exception.Message }
+        Assert-True -Condition (
+            [string]::IsNullOrEmpty($hashDirectiveFailure) -and
+            $hashDirectiveReferences.Count -eq 0
+        ) -Message 'TEST-0151 fragment-only directive code span reached repository-path resolution.'
+
+        $placeholderInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $placeholderInventory.Add(
+            'docs/features/REC-0001.md', [pscustomobject]@{}
+        )
+        $placeholderReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'The active `docs/features/REC-####.md` packet, once one exists.' `
+                -RepositoryPathInventory $inventory
+        } $placeholderInventory)
+        Assert-True -Condition ($placeholderReferences.Count -eq 0) `
+            -Message 'TEST-0151 fixed-width filename placeholder became a truncated concrete reference.'
+
+        $trackedPlaceholderInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $trackedPlaceholderInventory.Add(
+            'docs/POLICY-##.md', [pscustomobject]@{}
+        )
+        $trackedPlaceholderReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Required reading: `docs/POLICY-##.md`.' `
+                -RepositoryPathInventory $inventory
+        } $trackedPlaceholderInventory)
+        Assert-True -Condition (
+            $trackedPlaceholderReferences.Count -eq 1 -and
+            [string]$trackedPlaceholderReferences[0].target -ceq
+                'docs/POLICY-##.md' -and
+            [string]$trackedPlaceholderReferences[0].kind -ceq
+                'RequiresRead' -and
+            [bool]$trackedPlaceholderReferences[0].required
+        ) -Message 'TEST-0152 an exact tracked repeated-hash path was discarded as a placeholder.'
+        $trackedHashCodeFragmentReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Required reading: `docs/POLICY-##.md#scope`.' `
+                -RepositoryPathInventory $inventory
+        } $trackedPlaceholderInventory)
+        Assert-True -Condition (
+            $trackedHashCodeFragmentReferences.Count -eq 1 -and
+            [string]$trackedHashCodeFragmentReferences[0].target -ceq
+                'docs/POLICY-##.md' -and
+            [string]$trackedHashCodeFragmentReferences[0].kind -ceq
+                'RequiresRead' -and
+            [string]$trackedHashCodeFragmentReferences[0].reason -ceq
+                'RepositoryPathToken' -and
+            [bool]$trackedHashCodeFragmentReferences[0].required
+        ) -Message 'TEST-0152 a fragment on an exact tracked repeated-hash code span truncated the literal-hash path.'
+        $trackedHashMarkdownReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Required reading: [policy](docs/POLICY-##.md).' `
+                -RepositoryPathInventory $inventory
+        } $trackedPlaceholderInventory)
+        Assert-True -Condition (
+            $trackedHashMarkdownReferences.Count -eq 1 -and
+            [string]$trackedHashMarkdownReferences[0].target -ceq
+                'docs/POLICY-##.md' -and
+            [string]$trackedHashMarkdownReferences[0].kind -ceq
+                'RequiresRead' -and
+            [string]$trackedHashMarkdownReferences[0].reason -ceq
+                'MarkdownLink' -and
+            [bool]$trackedHashMarkdownReferences[0].required
+        ) -Message 'TEST-0152 an exact tracked repeated-hash Markdown link was treated as a URI fragment.'
+        $trackedHashFragmentReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Required reading: [policy](docs/POLICY-##.md#scope).' `
+                -RepositoryPathInventory $inventory
+        } $trackedPlaceholderInventory)
+        Assert-True -Condition (
+            $trackedHashFragmentReferences.Count -eq 1 -and
+            [string]$trackedHashFragmentReferences[0].target -ceq
+                'docs/POLICY-##.md' -and
+            [string]$trackedHashFragmentReferences[0].kind -ceq
+                'RequiresRead' -and
+            [string]$trackedHashFragmentReferences[0].reason -ceq
+                'MarkdownLink' -and
+            [bool]$trackedHashFragmentReferences[0].required
+        ) -Message 'TEST-0152 a fragment on an exact tracked repeated-hash Markdown link truncated the literal-hash path.'
+        $trackedHashReferenceLinkReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text "Required reading: [policy][tracked].`n`n[tracked]: docs/POLICY-##.md#scope" `
+                -RepositoryPathInventory $inventory
+        } $trackedPlaceholderInventory)
+        Assert-True -Condition (
+            $trackedHashReferenceLinkReferences.Count -eq 1 -and
+            [string]$trackedHashReferenceLinkReferences[0].target -ceq
+                'docs/POLICY-##.md' -and
+            [string]$trackedHashReferenceLinkReferences[0].kind -ceq
+                'RequiresRead' -and
+            [string]$trackedHashReferenceLinkReferences[0].reason -ceq
+                'MarkdownReferenceLink' -and
+            [bool]$trackedHashReferenceLinkReferences[0].required
+        ) -Message 'TEST-0152 an exact tracked repeated-hash Markdown reference link was treated as a URI fragment.'
+
+        $trackedSpacedPlaceholderInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $trackedSpacedPlaceholderInventory.Add(
+            'docs/My POLICY-##.md', [pscustomobject]@{}
+        )
+        $trackedSpacedHashCases = @(
+            [pscustomobject]@{
+                Name = 'code span'
+                Text = 'Required reading: `docs/My POLICY-##.md#scope`.'
+                Reason = 'RepositoryPathToken'
+            },
+            [pscustomobject]@{
+                Name = 'inline Markdown angle target'
+                Text = 'Required reading: [policy](<docs/My POLICY-##.md#scope>).'
+                Reason = 'MarkdownLink'
+            },
+            [pscustomobject]@{
+                Name = 'reference-link angle target'
+                Text = "Required reading: [policy][tracked].`n`n[tracked]: <docs/My POLICY-##.md#scope>"
+                Reason = 'MarkdownReferenceLink'
+            }
+        )
+        foreach ($trackedSpacedHashCase in $trackedSpacedHashCases) {
+            $trackedSpacedHashReferences = @(& $policyModule {
+                param($text, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' -Text $text `
+                    -RepositoryPathInventory $inventory
+            } $trackedSpacedHashCase.Text $trackedSpacedPlaceholderInventory)
+            Assert-True -Condition (
+                $trackedSpacedHashReferences.Count -eq 1 -and
+                [string]$trackedSpacedHashReferences[0].target -ceq
+                    'docs/My POLICY-##.md' -and
+                [string]$trackedSpacedHashReferences[0].reason -ceq
+                    [string]$trackedSpacedHashCase.Reason -and
+                [bool]$trackedSpacedHashReferences[0].required
+            ) -Message "TEST-0152 spaced repeated-hash $($trackedSpacedHashCase.Name) lost its exact tracked target."
+        }
+        $fragmentTraversalInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $fragmentTraversalInventory.Add(
+            'docs/POLICY-##.md', [pscustomobject]@{}
+        )
+        $fragmentTraversalInventory.Add('docs/SECRET.md', [pscustomobject]@{})
+        foreach ($opaqueHashSuffix in @(
+            'docs/POLICY-##.md#scope/../SECRET.md',
+            'docs/POLICY-##.md?scope/../SECRET.md',
+            'docs/POLICY-##.md#scope/../SECRET.md#anchor',
+            'docs/POLICY-##.md?scope/../SECRET.md#anchor',
+            'docs/POLICY-##.md#scope/../SECRET.md%23anchor'
+        )) {
+            $opaqueHashReferences = @(& $policyModule {
+                param($target, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text "Required reading: ``$target``." `
+                    -RepositoryPathInventory $inventory
+            } $opaqueHashSuffix $fragmentTraversalInventory)
+            Assert-True -Condition (
+                $opaqueHashReferences.Count -eq 1 -and
+                [string]$opaqueHashReferences[0].target -ceq
+                    'docs/POLICY-##.md' -and
+                @($opaqueHashReferences | Where-Object {
+                    $_.target -ceq 'docs/SECRET.md'
+                }).Count -eq 0
+            ) -Message "TEST-0152 opaque repeated-hash suffix '$opaqueHashSuffix' redirected through dot-segment normalization."
+        }
+
+        $absentHashMarkdownReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Required reading: [placeholder](docs/REC-####.md).' `
+                -RepositoryPathInventory $inventory
+        } $placeholderInventory)
+        Assert-True -Condition ($absentHashMarkdownReferences.Count -eq 0) `
+            -Message 'TEST-0151 an absent repeated-hash Markdown placeholder became a truncated concrete reference.'
+
+        Assert-ThrowsLike -Action {
+            & $policyModule {
+                param($inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text 'Required reading: `../REC-####.md`.' `
+                    -RepositoryPathInventory $inventory
+            } $placeholderInventory
+        }.GetNewClosure() -Pattern '*escapes the repository root*' `
+            -Message 'TEST-0152 an unsafe repeated-hash path bypassed repository-boundary validation.'
+        foreach ($encodedUnsafeHashLine in @(
+            'Required reading: `%2e%2e/REC-####.md`.',
+            'Required reading: `docs%5cREC-####.md`.',
+            'Required reading: `file:docs/REC-####.md`.',
+            'Required reading: `file%3Adocs/REC-####.md`.'
+        )) {
+            Assert-ThrowsLike -Action {
+                & $policyModule {
+                    param($line, $inventory)
+                    Get-MeAndAIInstructionGraphReferences `
+                        -SourcePath 'AGENTS.md' -Text $line `
+                        -RepositoryPathInventory $inventory
+                } $encodedUnsafeHashLine $placeholderInventory
+            }.GetNewClosure() -Pattern '*escapes the repository root*' `
+                -Message "TEST-0152 encoded or URI repeated-hash path '$encodedUnsafeHashLine' bypassed repository-boundary validation."
+        }
+        $encodedFileInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $encodedFileInventory.Add(
+            'file:docs/REC-####.md', [pscustomobject]@{}
+        )
+        Assert-ThrowsLike -Action {
+            & $policyModule {
+                param($inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text 'Required reading: `file%3Adocs/REC-####.md`.' `
+                    -RepositoryPathInventory $inventory
+            } $encodedFileInventory
+        }.GetNewClosure() -Pattern '*escapes the repository root*' `
+            -Message 'TEST-0152 encoded file URI was accepted because its decoded spelling existed in the inventory.'
+        foreach ($encodedShapelessUnsafe in @(
+            'file%3Aoutside', 'C%3Aoutside'
+        )) {
+            Assert-ThrowsLike -Action {
+                & $policyModule {
+                    param($target, $inventory)
+                    Get-MeAndAIInstructionGraphReferences `
+                        -SourcePath 'AGENTS.md' `
+                        -Text "Reference: ``$target``." `
+                        -RepositoryPathInventory $inventory
+                } $encodedShapelessUnsafe $placeholderInventory
+            }.GetNewClosure() -Pattern '*escapes the repository root*' `
+                -Message "TEST-0152 encoded extensionless unsafe target '$encodedShapelessUnsafe' bypassed decoded classification."
+        }
+        $encodedShapelessExternalReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text 'Reference: `https%3Aoutside`.' `
+                -RepositoryPathInventory $inventory
+        } $placeholderInventory)
+        Assert-True -Condition (
+            $encodedShapelessExternalReferences.Count -eq 1 -and
+            [string]$encodedShapelessExternalReferences[0].target -ceq
+                'https:outside' -and
+            [bool]$encodedShapelessExternalReferences[0].external
+        ) -Message 'TEST-0152 encoded extensionless external target was discarded before decoded classification.'
+        foreach ($externalHashTarget in @(
+            'consumer+memory:authority/REC-####.md',
+            'https:REC-####.md'
+        )) {
+            $externalHashReferences = @(& $policyModule {
+                param($target, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text "Reference: ``$target``." `
+                    -RepositoryPathInventory $inventory
+            } $externalHashTarget $placeholderInventory)
+            Assert-True -Condition (
+                $externalHashReferences.Count -eq 1 -and
+                [string]$externalHashReferences[0].target -ceq
+                    $externalHashTarget -and
+                [bool]$externalHashReferences[0].external
+            ) -Message "TEST-0152 external repeated-hash code span '$externalHashTarget' was suppressed as a placeholder."
+        }
+        foreach ($encodedExternalHashCase in @(
+            [pscustomobject]@{
+                Encoded = 'consumer%2Bmemory%3Aauthority/REC-####.md'
+                Decoded = 'consumer+memory:authority/REC-####.md'
+            },
+            [pscustomobject]@{
+                Encoded = 'https%3AREC-####.md'
+                Decoded = 'https:REC-####.md'
+            }
+        )) {
+            $encodedExternalHashReferences = @(& $policyModule {
+                param($target, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' `
+                    -Text "Reference: ``$target``." `
+                    -RepositoryPathInventory $inventory
+            } $encodedExternalHashCase.Encoded $placeholderInventory)
+            Assert-True -Condition (
+                $encodedExternalHashReferences.Count -eq 1 -and
+                [string]$encodedExternalHashReferences[0].target -ceq
+                    [string]$encodedExternalHashCase.Decoded -and
+                [bool]$encodedExternalHashReferences[0].external
+            ) -Message "TEST-0152 encoded external repeated-hash code span '$($encodedExternalHashCase.Encoded)' was not classified after decoding."
+        }
+
+        $readingGrammarInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $readingGrammarInventory.Add(
+            'runtime/state_store.mqh', [pscustomobject]@{}
+        )
+        $readingGrammarInventory.Add(
+            'docs/AUTHORITY.md', [pscustomobject]@{}
+        )
+        $descriptiveLoadReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'docs/PROJECT_STATE.md' `
+                -Text '- `runtime/state_store.mqh`: committed state and load validation.' `
+                -RepositoryPathInventory $inventory
+        } $readingGrammarInventory)
+        Assert-True -Condition ($descriptiveLoadReferences.Count -eq 0) `
+            -Message 'TEST-0151 descriptive load-validation text became required reading.'
+        $leadingDescriptiveLoadReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'docs/PROJECT_STATE.md' `
+                -Text 'Load validation for `docs/AUTHORITY.md` is complete.' `
+                -RepositoryPathInventory $inventory
+        } $readingGrammarInventory)
+        Assert-True -Condition ($leadingDescriptiveLoadReferences.Count -eq 0) `
+            -Message 'TEST-0151 line-leading descriptive load text became required reading.'
+        foreach ($imperativeReadingLine in @(
+            'Load `docs/AUTHORITY.md`.',
+            'Consult `docs/AUTHORITY.md`.',
+            'You must read `docs/AUTHORITY.md`.',
+            'You must load `docs/AUTHORITY.md`.',
+            'You must consult `docs/AUTHORITY.md`.'
+        )) {
+            $imperativeReadingReferences = @(& $policyModule {
+                param($line, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'docs/PROJECT_STATE.md' -Text $line `
+                    -RepositoryPathInventory $inventory
+            } $imperativeReadingLine $readingGrammarInventory)
+            Assert-True -Condition (
+                $imperativeReadingReferences.Count -eq 1 -and
+                [string]$imperativeReadingReferences[0].target -ceq
+                    'docs/AUTHORITY.md' -and
+                [string]$imperativeReadingReferences[0].kind -ceq
+                    'RequiresRead' -and
+                [bool]$imperativeReadingReferences[0].required
+            ) -Message "TEST-0152 explicit imperative reading form '$imperativeReadingLine' was not retained."
+        }
+        $qualifiedAuthorityInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $qualifiedAuthorityInventory.Add(
+            'src/Application.cs', [pscustomobject]@{}
+        )
+        $qualifiedAuthorityReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text @'
+Reference evidence: `src/Application.cs`.
+`src/Application.cs` is the single canonical application version source.
+'@ `
+                -RepositoryPathInventory $inventory
+        } $qualifiedAuthorityInventory)
+        Assert-True -Condition (
+            @($qualifiedAuthorityReferences | Where-Object {
+                $_.target -ceq 'src/Application.cs' -and
+                $_.kind -ceq 'References' -and -not [bool]$_.required
+            }).Count -eq 1 -and
+            @($qualifiedAuthorityReferences | Where-Object {
+                $_.target -ceq 'src/Application.cs' -and
+                $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+            }).Count -eq 1
+        ) -Message 'TEST-0151 qualified canonical-source wording did not retain separate ordinary and authority references.'
+        $negatedQualifiedAuthorityReferences = @(& $policyModule {
+            param($inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'AGENTS.md' `
+                -Text '`src/Application.cs` must not be treated as the single canonical application version source.' `
+                -RepositoryPathInventory $inventory
+        } $qualifiedAuthorityInventory)
+        Assert-True -Condition (
+            $negatedQualifiedAuthorityReferences.Count -eq 1 -and
+            [string]$negatedQualifiedAuthorityReferences[0].kind -ceq
+                'References' -and
+            -not [bool]$negatedQualifiedAuthorityReferences[0].required
+        ) -Message 'TEST-0151 negated qualified canonical-source wording became live authority.'
+
+        $authorityBoundInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $authorityBoundInventory.Add('docs/BOUND.md', [pscustomobject]@{})
+        $authorityBoundCases = @(
+            [pscustomobject]@{
+                Name = 'six qualifiers'
+                Text = '`docs/BOUND.md` is the single canonical one two three four five six source.'
+                ExpectedAuthority = $true
+            },
+            [pscustomobject]@{
+                Name = 'seven qualifiers'
+                Text = '`docs/BOUND.md` is the single canonical one two three four five six seven source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = '32-character qualifier'
+                Text = ('`docs/BOUND.md` is the single canonical ' + ('a' * 32) + ' source.')
+                ExpectedAuthority = $true
+            },
+            [pscustomobject]@{
+                Name = 'qualifier conjunction'
+                Text = '`docs/BOUND.md` is the single canonical product and domain source.'
+                ExpectedAuthority = $true
+            },
+            [pscustomobject]@{
+                Name = '33-character qualifier'
+                Text = ('`docs/BOUND.md` is the single canonical ' + ('a' * 33) + ' source.')
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'Markdown table row'
+                Text = '| Evidence | `docs/BOUND.md` is the single canonical application source. |'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'does not remain predicate'
+                Text = '`docs/BOUND.md` does not remain the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'never serves as predicate'
+                Text = '`docs/BOUND.md` never serves as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'is not predicate'
+                Text = '`docs/BOUND.md` is not the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'cannot serve as predicate'
+                Text = '`docs/BOUND.md` cannot serve as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'must not serve as predicate'
+                Text = '`docs/BOUND.md` must not serve as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'should not serve as predicate'
+                Text = '`docs/BOUND.md` should not serve as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'no longer serves as predicate'
+                Text = '`docs/BOUND.md` no longer serves as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'will not remain predicate'
+                Text = '`docs/BOUND.md` will not remain the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'would not remain predicate'
+                Text = '`docs/BOUND.md` would not remain the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'could not serve as predicate'
+                Text = '`docs/BOUND.md` could not serve as the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'shall not remain predicate'
+                Text = '`docs/BOUND.md` shall not remain the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'contraction negation predicate'
+                Text = '`docs/BOUND.md` doesn''t remain the single canonical application source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'negated qualifier conjunction'
+                Text = '`docs/BOUND.md` does not remain the single canonical product and domain source.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'reverse predicate negation'
+                Text = '`docs/BOUND.md` canonical source for releases is not active.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'reverse no-longer negation'
+                Text = '`docs/BOUND.md` canonical source for releases is no longer active.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'reverse never negation'
+                Text = '`docs/BOUND.md` canonical source for releases is never active.'
+                ExpectedAuthority = $false
+            },
+            [pscustomobject]@{
+                Name = 'reverse modal negation'
+                Text = '`docs/BOUND.md` canonical source for releases will not remain active.'
+                ExpectedAuthority = $false
+            }
+        )
+        foreach ($authorityBoundCase in $authorityBoundCases) {
+            $authorityBoundReferences = @(& $policyModule {
+                param($line, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' -Text $line `
+                    -RepositoryPathInventory $inventory
+            } $authorityBoundCase.Text $authorityBoundInventory)
+            $authorityBoundCount = @($authorityBoundReferences | Where-Object {
+                $_.target -ceq 'docs/BOUND.md' -and
+                $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+            }).Count
+            $ordinaryBoundCount = @($authorityBoundReferences | Where-Object {
+                $_.target -ceq 'docs/BOUND.md' -and
+                $_.kind -ceq 'References' -and -not [bool]$_.required
+            }).Count
+            $authorityBoundCondition =
+                if ([bool]$authorityBoundCase.ExpectedAuthority) {
+                    $authorityBoundCount -eq 1 -and $ordinaryBoundCount -eq 0
+                }
+                else {
+                    $authorityBoundCount -eq 0 -and $ordinaryBoundCount -eq 1
+                }
+            Assert-True -Condition $authorityBoundCondition `
+                -Message "TEST-0151 qualified-authority bound '$($authorityBoundCase.Name)' was not enforced."
+        }
+        $mixedAuthorityInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $mixedAuthorityInventory.Add('docs/OLD.md', [pscustomobject]@{})
+        $mixedAuthorityInventory.Add('docs/NEW.md', [pscustomobject]@{})
+        foreach ($mixedAuthorityLine in @(
+            '`docs/OLD.md` does not remain the canonical source, but `docs/NEW.md` is the single canonical application source.',
+            '`docs/OLD.md` does not remain the canonical source; `docs/NEW.md` is the single canonical application source.',
+            '`docs/OLD.md` does not remain the canonical source. `docs/NEW.md` is the single canonical application source.',
+            '`docs/OLD.md` does not remain the canonical source, however, `docs/NEW.md` is the single canonical application source.'
+        )) {
+            $mixedAuthorityReferences = @(& $policyModule {
+                param($line, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' -Text $line `
+                    -RepositoryPathInventory $inventory
+            } $mixedAuthorityLine $mixedAuthorityInventory)
+            Assert-True -Condition (
+                @($mixedAuthorityReferences | Where-Object {
+                    $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+                }).Count -eq 2 -and
+                @($mixedAuthorityReferences | Where-Object {
+                    $_.target -ceq 'docs/NEW.md' -and
+                    $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+                }).Count -eq 1
+            ) -Message "TEST-0151 a line-level negation hid live authority in '$mixedAuthorityLine'."
+        }
+        $extensionlessMixedAuthorityInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $extensionlessMixedAuthorityInventory.Add(
+            'docs/OLD', [pscustomobject]@{}
+        )
+        $extensionlessMixedAuthorityInventory.Add(
+            'docs/NEW', [pscustomobject]@{}
+        )
+        foreach ($nonAuthorityConnector in @(
+            'when', 'because', 'although', 'if', 'after', 'before', 'where'
+        )) {
+            $nonAuthorityMixedLine =
+                "``docs/OLD`` does not remain available $nonAuthorityConnector ``docs/NEW`` is the single canonical application source."
+            $nonAuthorityMixedReferences = @(& $policyModule {
+                param($line, $inventory)
+                Get-MeAndAIInstructionGraphReferences `
+                    -SourcePath 'AGENTS.md' -Text $line `
+                    -RepositoryPathInventory $inventory
+            } $nonAuthorityMixedLine $extensionlessMixedAuthorityInventory)
+            Assert-True -Condition (
+                @($nonAuthorityMixedReferences | Where-Object {
+                    $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+                }).Count -eq 2 -and
+                @($nonAuthorityMixedReferences | Where-Object {
+                    $_.target -ceq 'docs/NEW' -and
+                    $_.kind -ceq 'DeclaresAuthority' -and [bool]$_.required
+                }).Count -eq 1
+            ) -Message "TEST-0151 non-authority negation crossed '$nonAuthorityConnector' into a later authority predicate."
+        }
+        $numericSlashInventory =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        $numericRatioText =
+            'Only the result record is authoritative; suite passes `24/24`.'
+        $numericRatioReferences = @(& $policyModule {
+            param($text, $inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'docs/PROJECT_STATE.md' -Text $text `
+                -RepositoryPathInventory $inventory
+        } $numericRatioText $numericSlashInventory)
+        Assert-True -Condition ($numericRatioReferences.Count -eq 0) `
+            -Message 'TEST-0151 an untracked numeric ratio became a required repository path.'
+        $numericSlashInventory.Add('24/24', [pscustomobject]@{})
+        $trackedNumericPathReferences = @(& $policyModule {
+            param($text, $inventory)
+            Get-MeAndAIInstructionGraphReferences `
+                -SourcePath 'docs/PROJECT_STATE.md' -Text $text `
+                -RepositoryPathInventory $inventory
+        } $numericRatioText $numericSlashInventory)
+        Assert-True -Condition (
+            $trackedNumericPathReferences.Count -eq 1 -and
+            [string]$trackedNumericPathReferences[0].target -ceq '24/24' -and
+            [string]$trackedNumericPathReferences[0].kind -ceq
+                'DeclaresAuthority' -and
+            [bool]$trackedNumericPathReferences[0].required
+        ) -Message 'TEST-0152 an exact tracked numeric path was discarded as a ratio.'
+
+        $placeholderFixture = New-TestGraphFixture -Files ([ordered]@{
+            'AGENTS.md' = @'
+The active `docs/features/REC-####.md` packet, once one exists.
+See `docs/AUTHORITY.md#decision` for current context.
+'@
+            'docs/AUTHORITY.md' = '# Decision authority'
+            'docs/features/REC-0001.md' = '# Concrete feature packet'
+        })
+        $placeholderGraph = $null
+        $placeholderFailure = $null
+        try {
+            $placeholderGraph = & $graphBuilder -BaseHead ('0' * 40) `
+                -TreeEntries $placeholderFixture.Entries `
+                -ReadBlob $placeholderFixture.Reader
+        }
+        catch { $placeholderFailure = $_.Exception.Message }
+        Assert-True -Condition (
+            [string]::IsNullOrEmpty($placeholderFailure) -and
+            $null -ne $placeholderGraph -and
+            [bool](& $graphValidator -Graph $placeholderGraph) -and
+            @($placeholderGraph.edges | Where-Object {
+                $_.source -ceq 'AGENTS.md' -and
+                $_.target -ceq 'docs/AUTHORITY.md' -and
+                $_.reason -ceq 'RepositoryPathToken'
+            }).Count -eq 1 -and
+            @($placeholderGraph.nodes | Where-Object {
+                $_.path -ceq 'docs/features/REC-0001.md' -and
+                $_.role -ceq 'UnlinkedKnownSurfaceCandidate'
+            }).Count -eq 1 -and
+            @($placeholderGraph.nodes.path) -cnotcontains 'docs/features/REC-'
+        ) -Message 'TEST-0151 fixed-width filename placeholder or concrete path fragment changed graph semantics.'
+
         $multilineReferenceText = @(
             '# Consumer instructions',
             '',
@@ -3278,6 +4320,14 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
                     "drift in $([string]$typeDrift.Area).$([string]$typeDrift.Property)."
                 )
         }
+
+        $priorSchemaGraph = Copy-TestInstructionGraph -Graph $graph
+        $priorSchemaGraph.schema = [int]1
+        Set-TestInstructionGraphDigest -Graph $priorSchemaGraph `
+            -PolicyModule $policyModule
+        Assert-True -Condition (-not (& $graphValidator `
+            -Graph $priorSchemaGraph)) `
+            -Message 'TEST-0152 schema-2 validator reinterpreted recomputed schema-1 graph evidence.'
 
         foreach ($reasonRole in @(
             'InstructionRoot', 'ReferencedText',
@@ -3770,7 +4820,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             } $realGitRoot $realGitHead)
             $realBatchArguments = [ordered]@{
                 Repository = $realGitRoot
-                MaximumBlobBytes = [long]262144
+                MaximumBlobBytes = [long]524288
                 MaximumAggregateBlobBytes = [long]4194304
                 SessionTimeoutMilliseconds = [int]120000
                 AbortTimeoutMilliseconds = [int]5000
@@ -3980,15 +5030,53 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
 
         $limits = & $limitGetter
         Assert-True -Condition (
+            [int]$graph.schema -eq 2 -and
             [int]$limits.MaximumTreeEntries -eq 65536 -and
             [int]$limits.MaximumTreePathUtf8Bytes -eq 4194304 -and
             [int]$limits.MaximumNodes -eq 512 -and
             [int]$limits.MaximumEdges -eq 4096 -and
             [int]$limits.MaximumDepth -eq 32 -and
-            [int]$limits.MaximumBlobBytes -eq 262144 -and
+            [int]$limits.MaximumBlobBytes -eq 524288 -and
             [int]$limits.MaximumAggregateBlobBytes -eq 4194304 -and
             [int]$limits.MaximumPathUtf8Bytes -eq 32768
-        ) -Message 'TEST-0152 release-owned graph limits differ from DEC-0024.'
+        ) -Message 'TEST-0152 release-owned graph schema or limits differ from DEC-0031.'
+
+        [byte[]]$realisticGovernanceRootBytes =
+            [Text.Encoding]::UTF8.GetBytes(
+                'Required reading: [catalog](docs/governance/catalog.md).'
+            )
+        [byte[]]$realisticGovernanceBytes =
+            [Text.Encoding]::UTF8.GetBytes(('a' * 269236))
+        $realisticGovernanceFixture = New-TestByteGraphFixture `
+            -Files ([ordered]@{
+                'AGENTS.md' = $realisticGovernanceRootBytes
+                'docs/governance/catalog.md' = $realisticGovernanceBytes
+            })
+        $realisticGovernanceGraph = $null
+        try {
+            $realisticGovernanceGraph = & $graphBuilder `
+                -BaseHead ('0' * 40) `
+                -TreeEntries $realisticGovernanceFixture.Entries `
+                -ReadBlob $realisticGovernanceFixture.Reader
+        }
+        catch {
+            Add-Failure (
+                'TEST-0152 a bounded 269236-byte governance document was ' +
+                'rejected: ' + $_.Exception.Message
+            )
+        }
+        if ($null -ne $realisticGovernanceGraph) {
+            Assert-True -Condition (
+                [bool](& $graphValidator -Graph $realisticGovernanceGraph) -and
+                [long]$realisticGovernanceGraph.counts.parsedBlobs -eq 2 -and
+                [long]$realisticGovernanceGraph.counts.parsedBlobBytes -eq
+                    ($realisticGovernanceRootBytes.Length + 269236) -and
+                @($realisticGovernanceGraph.nodes | Where-Object {
+                    $_.path -ceq 'docs/governance/catalog.md' -and
+                    $_.role -ceq 'ReferencedText'
+                }).Count -eq 1
+            ) -Message 'TEST-0152 bounded governance-document capacity did not preserve exact graph evidence.'
+        }
 
         $invalidUtf8Fixture = New-TestByteGraphFixture -Files ([ordered]@{
             'AGENTS.md' = [byte[]]@(0xC3, 0x28)
