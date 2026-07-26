@@ -9,21 +9,21 @@ Last verified: **2026-07-26**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.3`. The latest immutable release is
-  [v0.15.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.2) at
-  [`9bc12e394725a86d29efb745cbdfa26407ffd3d2`](https://github.com/hasanmanzak/meAndAI/commit/9bc12e394725a86d29efb745cbdfa26407ffd3d2).
-  [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) and closed
-  [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) retain its
+- Current protocol version: `0.15.4`. The latest immutable release before this
+  candidate is [v0.15.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.3) at
+  [`164543d939ef97ec02d96499d3e5b796eed64470`](https://github.com/hasanmanzak/meAndAI/commit/164543d939ef97ec02d96499d3e5b796eed64470).
+  [PR #136](https://github.com/hasanmanzak/meAndAI/pull/136) and closed
+  [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
-  requires distinct scenario intent and direct infrastructure-contract
-  boundaries without a second registry or test-of-test chain.
-- Current bounded correction:
   [FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
-  / [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) lowers two
-  exact quick-adoption operation maxima without removing credential
-  checkpoints, scenarios, supported runtimes, or hosted evidence.
+  lowers two exact quick-adoption operation maxima without removing evidence.
+- Current bounded correction:
+  [FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
+  / [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
+  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
+  moves structured workflow inputs from native fields to one UTF-8 JSON stdin
+  payload; the correction and regression remain upstream-only.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -119,6 +119,46 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-25; review after a
   GitHub CLI or Windows PowerShell native-argument transport change, or when the
   direct route succeeds with an exact multiline-body regression.
+- Superseded by: `None`
+
+### Windows native stdin framing and structured workflow dispatch
+
+- Status: `Active`
+- Observable signature: a repository-owned Windows native process receives a
+  BOM-prefixed or non-UTF-8 stdin document, or a workflow receives quote-
+  stripped `source_graph_identity` text and rejects it as invalid JSON.
+- Applicability: PowerShell 5.1/7 native-process calls that carry structured
+  repository input through stdin or `gh workflow run`, including instruction-
+  graph identities and other JSON workflow input maps.
+- Affected contract and cause: ambient `$OutputEncoding` or
+  `[Console]::InputEncoding` can add a preamble or use a legacy code page,
+  while native `--field`/`--raw-field` argument parsing is not a lossless
+  structured-JSON transport. The source JSON and downstream validator are not
+  the failing contracts. A local environment with a BOM-free console input
+  encoding can mask the second dependency until a hosted Windows runner sets a
+  preamble-bearing value.
+- Canonical owner and evidence: the
+  [v0.13.1 stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
+  owns batch-reader framing; [SUBF-0106](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md#subf-0106)
+  / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
+  / [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) owns lifecycle
+  workflow input transport.
+- Fixed release or evidence: immutable `v0.13.1` carries the batch framing
+  correction; target `v0.15.4` carries the shared quick-adoption stdin encoder
+  and workflow JSON dispatch correction.
+- Required safe response: bind both `$OutputEncoding` and
+  `[Console]::InputEncoding` to UTF-8 without a BOM for the bounded stdin call,
+  restore both caller values in `finally`, and send workflow input maps as one
+  outer JSON object through `gh workflow run --json`. Keep nested JSON as the
+  workflow's declared string value. Regression evidence must first install a
+  preamble-bearing ambient console input encoding so local defaults cannot
+  mask the failure.
+- Unsafe retry boundary: do not retry the same structured value through native
+  `--field`, `--raw-field`, or an ambient stdin encoding. Retry only after
+  moving to the canonical UTF-8/no-BOM stdin route and validating exact bytes.
+- Freshness and review condition: last confirmed 2026-07-26; review after a
+  Windows PowerShell, GitHub CLI, or workflow-dispatch input-model change, or
+  when an equivalent direct-argument route passes exact Unicode/byte evidence.
 - Superseded by: `None`
 
 ### PowerShell interpolated variable followed by a colon
@@ -433,14 +473,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
-  / [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) is the
-  current `0.15.3` continuation under [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
-  Close only the exact credential-containment 5-to-3 and
-  [TEST-0107](../../docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107)
-  7-to-2
-  operation ratchets; retain all checkpoints and material evidence, then stop
-  rather than opening another runtime-hardening cycle.
+- [FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
+  / [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
+  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
+  is the current `0.15.4` continuation. Close only the workflow-dispatch JSON
+  transport defect, its [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
+  parameterized variant, recurrence route,
+  immutable release, and exact owned-branch lifecycle; do not mutate or add
+  reusable tests to a consumer.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

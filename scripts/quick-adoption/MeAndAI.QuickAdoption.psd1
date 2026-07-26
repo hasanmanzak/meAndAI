@@ -1,6 +1,6 @@
 @{
     RootModule = 'MeAndAI.QuickAdoption.psm1'
-    ModuleVersion = '0.15.3'
+    ModuleVersion = '0.15.4'
     GUID = 'f6392442-30ae-4c8c-82ce-cb4bf67a3c15'
     Author = 'meAndAI maintainers'
     CompanyName = 'meAndAI'

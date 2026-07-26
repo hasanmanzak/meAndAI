@@ -17,6 +17,8 @@ $protocolReleasePath = Join-Path $root `
     'scripts/quick-adoption/Private/ProtocolReleaseAndAssets.ps1'
 $proposalOwnershipPath = Join-Path $root `
     'scripts/quick-adoption/Private/ProposalOwnership.ps1'
+$nativeProcessPath = Join-Path $root `
+    'scripts/quick-adoption/Private/OutputAndNativeProcess.ps1'
 $repositoryAssessmentPath = Join-Path $root `
     'scripts/quick-adoption/Private/RepositoryAssessment.ps1'
 $capabilitiesModulePath = Join-Path $root `
@@ -29,8 +31,8 @@ $immutableWorkflowPath =
     'templates/project/.github/workflows/meandai-protocol-update.yml'
 
 foreach ($path in @(
-    $protocolReleasePath, $proposalOwnershipPath, $repositoryAssessmentPath,
-    $capabilitiesModulePath, $currentWorkflowPath
+    $protocolReleasePath, $proposalOwnershipPath, $nativeProcessPath,
+    $repositoryAssessmentPath, $capabilitiesModulePath, $currentWorkflowPath
 )) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "TEST-0153 dispatch fixture is missing '$path'."
@@ -77,6 +79,7 @@ function Get-GitObjectBytes {
 }
 
 $script:DispatchArguments = @()
+$script:DispatchInputText = $null
 $script:DispatchCorrelationId = ''
 $script:DispatchHead = ''
 $script:RunListCalls = 0
@@ -88,6 +91,7 @@ function Invoke-External {
     param(
         [Parameter(Mandatory)][string]$Command,
         [Parameter(Mandatory)][object[]]$Arguments,
+        [AllowNull()][string]$InputText = $null,
         [switch]$AllowFailure
     )
 
@@ -102,9 +106,25 @@ function Invoke-External {
     if ($arguments.Count -ge 2 -and $arguments[0] -ceq 'workflow' -and
         $arguments[1] -ceq 'run') {
         $script:DispatchArguments = @($arguments)
-        foreach ($argument in $arguments) {
-            if ($argument -match '^correlation_id=(?<id>[0-9a-f]{32})$') {
-                $script:DispatchCorrelationId = [string]$Matches.id
+        $hasInputText = $PSBoundParameters.ContainsKey('InputText')
+        $script:DispatchInputText = if ($hasInputText) { $InputText } else { $null }
+        if ($hasInputText) {
+            try {
+                $dispatchInputs = $InputText | ConvertFrom-Json
+            }
+            catch {
+                throw 'TEST-0153 dispatch fixture received invalid JSON stdin.'
+            }
+            if ($null -ne $dispatchInputs.PSObject.Properties['correlation_id']) {
+                $script:DispatchCorrelationId =
+                    [string]$dispatchInputs.correlation_id
+            }
+        }
+        else {
+            foreach ($argument in $arguments) {
+                if ($argument -match '^correlation_id=(?<id>[0-9a-f]{32})$') {
+                    $script:DispatchCorrelationId = [string]$Matches.id
+                }
             }
         }
         return [pscustomobject]@{ ExitCode = 0; Output = @() }
@@ -156,11 +176,15 @@ function Invoke-DispatchCase {
         throw "TEST-0153 $Label workflow graph-input feature detection was incorrect."
     }
     $script:DispatchArguments = @()
+    $script:DispatchInputText = $null
     $script:DispatchCorrelationId = ''
     $script:DispatchHead = 'a' * 40
     $script:RunListCalls = 0
-    $compactIdentity =
-        '{"schema":1,"graphBase":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}'
+    $compactIdentity = [ordered]@{
+        schema = 1
+        graphBase = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+        protocolSurfaces = @('docs/özellik.md')
+    } | ConvertTo-Json -Depth 5 -Compress
     $selectedIdentity = if ($actualGraphSupport) {
         $compactIdentity
     }
@@ -173,19 +197,46 @@ function Invoke-DispatchCase {
     if ([long]$run.databaseId -ne 7001) {
         throw "TEST-0153 $Label dispatch did not converge to its exact run."
     }
-    $fields = @($script:DispatchArguments | Where-Object {
-        [string]$_ -match '^[a-z_]+='
-    })
-    $sourceGraphFields = @($fields | Where-Object {
-        [string]$_ -like 'source_graph_identity=*'
-    })
-    $expectedFieldCount = if ($ExpectedGraphSupport) { 5 } else { 4 }
-    if ($fields.Count -ne $expectedFieldCount -or
-        $sourceGraphFields.Count -ne [int]$ExpectedGraphSupport -or
-        ($ExpectedGraphSupport -and
-         [string]$sourceGraphFields[0] -cne
-            "source_graph_identity=$compactIdentity")) {
-        throw "TEST-0153 $Label dispatch did not preserve its exact graph-input compatibility envelope."
+    if ($script:DispatchArguments -cnotcontains '--json' -or
+        $script:DispatchArguments -ccontains '--field' -or
+        $script:DispatchArguments -ccontains '--raw-field' -or
+        $null -eq $script:DispatchInputText) {
+        throw "TEST-0153 $Label dispatch did not use one JSON stdin payload."
+    }
+    try {
+        $inputs = $script:DispatchInputText | ConvertFrom-Json
+    }
+    catch {
+        throw "TEST-0153 $Label dispatch stdin was invalid JSON."
+    }
+    $expectedProperties = @(
+        'acknowledge_protocol_record_loss', 'adoption_strategy',
+        'correlation_id', 'expected_base_sha'
+    )
+    if ($ExpectedGraphSupport) {
+        $expectedProperties += 'source_graph_identity'
+    }
+    $actualProperties = @(
+        $inputs.PSObject.Properties.Name | Sort-Object
+    )
+    $expectedProperties = @($expectedProperties | Sort-Object)
+    if (($actualProperties -join '|') -cne ($expectedProperties -join '|')) {
+        throw "TEST-0153 $Label dispatch property envelope was incorrect."
+    }
+    foreach ($property in $inputs.PSObject.Properties) {
+        if ($property.Value -isnot [string]) {
+            throw "TEST-0153 $Label dispatch input '$($property.Name)' was not a string."
+        }
+    }
+    if ([string]$inputs.correlation_id -cnotmatch '^[0-9a-f]{32}$' -or
+        [string]$inputs.adoption_strategy -cne 'FullMigration' -or
+        [string]$inputs.acknowledge_protocol_record_loss -cne 'false' -or
+        [string]$inputs.expected_base_sha -cne $script:DispatchHead) {
+        throw "TEST-0153 $Label dispatch did not preserve its required string inputs."
+    }
+    if ($ExpectedGraphSupport -and
+        [string]$inputs.source_graph_identity -cne $compactIdentity) {
+        throw "TEST-0153 $Label dispatch did not preserve its exact graph identity."
     }
 }
 
@@ -193,7 +244,7 @@ $currentWorkflowBytes = [IO.File]::ReadAllBytes($currentWorkflowPath)
 $legacyWorkflowBytes = Get-GitObjectBytes -Repository $root `
     -Object "$immutableGraphUnawareCommit`:$immutableWorkflowPath"
 Invoke-DispatchCase -WorkflowBytes $currentWorkflowBytes `
-    -ExpectedGraphSupport $true -Label 'current v0.15.3'
+    -ExpectedGraphSupport $true -Label 'current v0.15.4'
 Invoke-DispatchCase -WorkflowBytes $legacyWorkflowBytes `
     -ExpectedGraphSupport $false -Label 'immutable v0.12.5'
 
@@ -250,7 +301,91 @@ finally {
     }
 }
 
-Write-Host 'TEST-0153 current/legacy dispatch and actual quick-wrapper callback passed.' -ForegroundColor Green
+# Load the real native-process owner only after every mocked lifecycle call.
+. $nativeProcessPath
+$childExecutable = if ($PSVersionTable.PSEdition -ceq 'Desktop') {
+    Join-Path $PSHOME 'powershell.exe'
+}
+else {
+    (Get-Command pwsh -ErrorAction Stop).Source
+}
+$childSource = @'
+$inputStream = [Console]::OpenStandardInput()
+$buffer = [IO.MemoryStream]::new()
+try {
+    $inputStream.CopyTo($buffer)
+    [Convert]::ToBase64String($buffer.ToArray())
+}
+finally {
+    $buffer.Dispose()
+}
+'@
+$encodedChildSource = [Convert]::ToBase64String(
+    [Text.Encoding]::Unicode.GetBytes($childSource)
+)
+$unicodeInput =
+    '{"source_graph_identity":"{\"path\":\"docs/özellik.md\"}"}'
+$originalConsoleInputEncoding = [Console]::InputEncoding
+try {
+    [Console]::InputEncoding = [Text.UTF8Encoding]::new($true)
+    $ambientInputPreamble = [Console]::InputEncoding.GetPreamble()
+    if ($ambientInputPreamble.Length -ne 3 -or
+        $ambientInputPreamble[0] -ne 0xEF -or
+        $ambientInputPreamble[1] -ne 0xBB -or
+        $ambientInputPreamble[2] -ne 0xBF) {
+        throw 'TEST-0153 ambient stdin encoding lacks the UTF-8 BOM.'
+    }
+    $encodingBeforeInvocation = $OutputEncoding
+    $nativeResult = Invoke-External -Command $childExecutable -Arguments @(
+        '-NoProfile', '-NonInteractive', '-EncodedCommand', $encodedChildSource
+    ) -InputText $unicodeInput
+    if (-not [object]::ReferenceEquals(
+        $encodingBeforeInvocation, $OutputEncoding
+    )) {
+        throw 'TEST-0153 native stdin dispatch did not restore OutputEncoding.'
+    }
+    $restoredInputPreamble = [Console]::InputEncoding.GetPreamble()
+    if ($restoredInputPreamble.Length -ne 3 -or
+        $restoredInputPreamble[0] -ne 0xEF -or
+        $restoredInputPreamble[1] -ne 0xBB -or
+        $restoredInputPreamble[2] -ne 0xBF) {
+        throw 'TEST-0153 native stdin dispatch did not restore Console.InputEncoding.'
+    }
+    $stdinBytes = [Convert]::FromBase64String(
+        ((@($nativeResult.Output) -join '').Trim())
+    )
+    if ($stdinBytes.Length -ge 3 -and
+        $stdinBytes[0] -eq 0xEF -and $stdinBytes[1] -eq 0xBB -and
+        $stdinBytes[2] -eq 0xBF) {
+        throw 'TEST-0153 native stdin dispatch emitted a UTF-8 BOM.'
+    }
+    $payloadLength = $stdinBytes.Length
+    while ($payloadLength -gt 0 -and
+        $stdinBytes[$payloadLength - 1] -in @(0x0A, 0x0D)) {
+        $payloadLength--
+    }
+    $payloadBytes = if ($payloadLength -eq 0) {
+        [byte[]]@()
+    }
+    else {
+        [byte[]]$stdinBytes[0..($payloadLength - 1)]
+    }
+    $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+    try {
+        $decodedInput = $strictUtf8.GetString($payloadBytes)
+    }
+    catch {
+        throw 'TEST-0153 native stdin dispatch was not valid UTF-8.'
+    }
+    if ($decodedInput -cne $unicodeInput) {
+        throw 'TEST-0153 native stdin dispatch did not preserve its Unicode JSON bytes.'
+    }
+}
+finally {
+    [Console]::InputEncoding = $originalConsoleInputEncoding
+}
+
+Write-Host 'TEST-0153 JSON dispatch, UTF-8 stdin, compatibility, and callback passed.' -ForegroundColor Green
 Confirm-MeAndAICaseEvidence -Context $caseContext -TestId 'TEST-0153'
 $caseResult = New-MeAndAICaseResult -Context $caseContext
 Write-Host ('MEANDAI_CASE_RESULTS=' +

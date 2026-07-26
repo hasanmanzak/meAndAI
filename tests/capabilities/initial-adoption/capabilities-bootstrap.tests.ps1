@@ -1493,7 +1493,7 @@ Confirm-MeAndAIScenarioEvidence -Context $scenarioContext -TestId 'TEST-0145'
 if (Test-Path -LiteralPath $workflowPath -PathType Leaf) {
     $workflow = Get-Content -LiteralPath $workflowPath -Raw
     foreach ($required in @(
-        'BOOTSTRAP_PROTOCOL_TAG: v0.15.3',
+        'BOOTSTRAP_PROTOCOL_TAG: v0.15.4',
         'run-name: meAndAI AI capabilities lifecycle [${{ inputs.correlation_id || github.event_name }}]',
         'correlation_id:',
         'adoption_strategy:',
@@ -1691,7 +1691,8 @@ if ((Test-Path -LiteralPath $launcherPath -PathType Leaf) -and
     }
     foreach ($requiredDispatchHandoff in @(
         '[string]$SourceGraphIdentityJson',
-        '--field', 'source_graph_identity=$SourceGraphIdentityJson'
+        '$dispatchInputs.source_graph_identity = [string]$SourceGraphIdentityJson',
+        "'--json'", '-InputText $dispatchInputJson'
     )) {
         if (-not $dispatch.Contains($requiredDispatchHandoff)) {
             Add-Failure "TEST-0153 lifecycle dispatch graph handoff is missing '$requiredDispatchHandoff'."
