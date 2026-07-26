@@ -12,6 +12,11 @@
             BaseCommit = '299b8982cd57961e2b3a6136b07af3bfb49a16d1'
             ObserverDigest = 'sha256:1f0471fbe882ce959afe52f65713a4f3332c3ba0bc1616db0c5b256687fcf4a8'
         }
+        @{
+            Id = 'feat-0054-v0152-quick-adoption'
+            BaseCommit = '9bc12e394725a86d29efb745cbdfa26407ffd3d2'
+            ObserverDigest = 'sha256:cf8e5e2745c0bd2db12c405b282c19900131ead3776c39e942432a17360b9d63'
+        }
     )
     ObservationOwners = @(
         @{
@@ -22,6 +27,14 @@
                     Arguments = @()
                     RequiresObservation = $true
                     Counters = @(
+                        @{
+                            Name = 'credential-containment.git-process-per-scan'
+                            Maximum = [long]3
+                        }
+                        @{
+                            Name = 'github-cli-version.full-launcher'
+                            Maximum = [long]2
+                        }
                         @{
                             Name = 'reusable-fixture-family.init'
                             Maximum = [long]11
@@ -110,6 +123,26 @@
         }
     )
     ClosureTargets = @(
+        @{
+            Owner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
+            Route = 'Shard=All'
+            Counter = 'credential-containment.git-process-per-scan'
+            Baseline = [long]5
+            Maximum = [long]3
+            Instrumented = $true
+            MeasurementId = 'feat-0054-v0152-quick-adoption'
+            WorkId = 'SUBF-0103'
+        }
+        @{
+            Owner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
+            Route = 'Shard=All'
+            Counter = 'github-cli-version.full-launcher'
+            Baseline = [long]7
+            Maximum = [long]2
+            Instrumented = $true
+            MeasurementId = 'feat-0054-v0152-quick-adoption'
+            WorkId = 'SUBF-0104'
+        }
         @{
             Owner = 'tests/capabilities/initial-adoption/quick-adoption.tests.ps1'
             Route = 'Shard=All'

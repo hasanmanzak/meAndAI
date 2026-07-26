@@ -55,6 +55,7 @@
 | [FEAT-0051](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | [Recurrence prevention and modular test harness](FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md) | Complete | 0.15.0 |
 | [FEAT-0052](FEAT-0052-v0151-declarative-bundle-source-mapping/README.md) | [Declarative bundle source mapping](FEAT-0052-v0151-declarative-bundle-source-mapping/README.md) | Complete | 0.15.1 |
 | [FEAT-0053](FEAT-0053-v0152-distinct-test-intent/README.md) | [Distinct test intent and meta-test boundaries](FEAT-0053-v0152-distinct-test-intent/README.md) | Complete | 0.15.2 |
+| [FEAT-0054](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | [Bounded quick-adoption runtime reduction](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | Complete | 0.15.3 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

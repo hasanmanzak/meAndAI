@@ -118,28 +118,34 @@ function Assert-TokenFilesAreLocalOnly {
         throw 'Credential-history validation requires a non-shallow repository. Fetch complete history before rerunning.'
     }
 
-    foreach ($name in $tokenMappings.Keys) {
-        # Recursive glob plus icase catches the protected basename at the root
-        # or any depth, including case variants on case-sensitive Git indexes.
-        $credentialPathspec = ":(icase,glob)**/$name"
-        $tracked = Invoke-Git -Repository $Repository -Arguments @(
-            'ls-files', '--error-unmatch', '--', $credentialPathspec
-        ) -AllowFailure
-        if ($tracked.ExitCode -eq 0) {
-            throw "Credential-shaped file '$name' is tracked or staged. Remove every case/path variant from Git, rotate that token, and rerun."
-        }
+    # Recursive glob plus icase catches both protected basenames at the root or
+    # any depth, including case variants on case-sensitive Git indexes. The
+    # ordered production mapping supplies one combined query without removing
+    # any of the caller-owned TOCTOU checkpoints.
+    $credentialPathspecs = @($tokenMappings.Keys | ForEach-Object {
+        ":(icase,glob)**/$_"
+    })
+    $trackedArguments = @('ls-files', '--stage', '--') +
+        $credentialPathspecs
+    $tracked = Invoke-Git -Repository $Repository `
+        -Arguments $trackedArguments -AllowFailure
+    if ($tracked.ExitCode -ne 0) {
+        throw 'Credential tracking state could not be inspected.'
+    }
+    if ((@($tracked.Output) -join '').Trim()) {
+        throw 'A credential-shaped file is tracked or staged. Remove every case/path variant from Git, rotate that token, and rerun.'
+    }
 
-        $history = Invoke-Git -Repository $Repository -Arguments @(
-            'log', '--all', '--reflog', '--format=%H', '--',
-            $credentialPathspec
-        ) -AllowFailure
-        if ($history.ExitCode -ne 0) {
-            throw "Credential history for '$name' could not be inspected."
-        }
-        if ((@($history.Output) -join '').Trim()) {
-            throw "Credential-shaped file '$name' appears in locally reachable ref or reflog history. Rotate that token and clean every case/path variant from history before rerunning."
-        }
-
+    $historyArguments = @(
+        'log', '--all', '--reflog', '--format=%H', '--'
+    ) + $credentialPathspecs
+    $history = Invoke-Git -Repository $Repository `
+        -Arguments $historyArguments -AllowFailure
+    if ($history.ExitCode -ne 0) {
+        throw 'Credential history could not be inspected.'
+    }
+    if ((@($history.Output) -join '').Trim()) {
+        throw 'A credential-shaped file appears in locally reachable ref or reflog history. Rotate that token and clean every case/path variant from history before rerunning.'
     }
 }
 

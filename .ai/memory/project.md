@@ -9,22 +9,21 @@ Last verified: **2026-07-26**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.2`. The latest immutable release is
-  [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1) at
-  [`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
-  [PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
-  [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain its
+- Current protocol version: `0.15.3`. The latest immutable release is
+  [v0.15.2](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.2) at
+  [`9bc12e394725a86d29efb745cbdfa26407ffd3d2`](https://github.com/hasanmanzak/meAndAI/commit/9bc12e394725a86d29efb745cbdfa26407ffd3d2).
+  [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) and closed
+  [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-  makes the ordered source inventory the single archive-to-repository mapping
-  authority while preserving the immutable schema-1 history boundary.
-- Current bounded correction:
   [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
-  / [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) adds the
-  prospective distinct-test-intent and independent-oracle contract without
-  mutating the immutable capability definition or adding consumer-local
-  behavior.
+  requires distinct scenario intent and direct infrastructure-contract
+  boundaries without a second registry or test-of-test chain.
+- Current bounded correction:
+  [FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
+  / [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) lowers two
+  exact quick-adoption operation maxima without removing credential
+  checkpoints, scenarios, supported runtimes, or hosted evidence.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -434,18 +433,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
-  / [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) is the
-  current `0.15.2` continuation. Complete [TEST-0190](../../docs/features/FEAT-0053-v0152-distinct-test-intent/test-cases.md#test-0190),
-  the two proven supersessions, bounded review, immutable publication, and
-  current-authority verification; do not mutate the released capability blob
-  or add consumer-local copies.
-- [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
-  [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98). Reevaluate its
-  scope after `v0.15.2` publication against the completed modular test
-  architecture and [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
-  consolidation; do not absorb the runtime change
-  into the protocol clarification.
+- [FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
+  / [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) is the
+  current `0.15.3` continuation under [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98).
+  Close only the exact credential-containment 5-to-3 and
+  [TEST-0107](../../docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107)
+  7-to-2
+  operation ratchets; retain all checkpoints and material evidence, then stop
+  rather than opening another runtime-hardening cycle.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

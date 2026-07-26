@@ -452,7 +452,7 @@ Assert-Equal ($contract.PSObject.Properties.Name -join ',') `
 $measurements = @(
     Get-OptionalPropertyValue -Value $contract -Name 'Measurements'
 )
-Assert-Equal $measurements.Count 2 `
+Assert-Equal $measurements.Count 3 `
     'TEST-0162 measurement authority count differs.'
 $expectedMeasurements = @(
     [pscustomobject][ordered]@{
@@ -466,6 +466,12 @@ $expectedMeasurements = @(
         BaseCommit = '299b8982cd57961e2b3a6136b07af3bfb49a16d1'
         ObserverDigest =
             'sha256:1f0471fbe882ce959afe52f65713a4f3332c3ba0bc1616db0c5b256687fcf4a8'
+    },
+    [pscustomobject][ordered]@{
+        Id = 'feat-0054-v0152-quick-adoption'
+        BaseCommit = '9bc12e394725a86d29efb745cbdfa26407ffd3d2'
+        ObserverDigest =
+            'sha256:cf8e5e2745c0bd2db12c405b282c19900131ead3776c39e942432a17360b9d63'
     }
 )
 for ($index = 0; $index -lt $expectedMeasurements.Count; $index++) {
@@ -493,12 +499,15 @@ $closureTargets = @(
 )
 Assert-Equal $observationOwners.Count 4 `
     'TEST-0162 observation owner count differs.'
-Assert-Equal $closureTargets.Count 9 `
+Assert-Equal $closureTargets.Count 11 `
     'TEST-0162 closure target count differs.'
 
 $fixtureMeasurement = 'feat-0039-v0127-fixtures'
 $graphMeasurement = 'feat-0040-v0130-graph-transport'
+$quickMeasurement = 'feat-0054-v0152-quick-adoption'
 $expectedTargets = [ordered]@{
+    'tests/capabilities/initial-adoption/quick-adoption.tests.ps1|Shard=All|credential-containment.git-process-per-scan' = "5/3|$quickMeasurement|SUBF-0103"
+    'tests/capabilities/initial-adoption/quick-adoption.tests.ps1|Shard=All|github-cli-version.full-launcher' = "7/2|$quickMeasurement|SUBF-0104"
     'tests/capabilities/initial-adoption/quick-adoption.tests.ps1|Shard=All|reusable-fixture-family.init' = "47/11|$fixtureMeasurement|SUBF-0075"
     'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.init' = "38/3|$fixtureMeasurement|SUBF-0076"
     'tests/capabilities/initial-adoption/capabilities-bootstrap.tests.ps1|Shard=All|reusable-fixture-family.clone' = "72/2|$fixtureMeasurement|SUBF-0076"
@@ -1059,6 +1068,7 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$changeSetValidator|<script>' = 7
     '$closureResolver|<script>' = 17
     '$completionContract|<script>' = 12
+    '$contractAdapterPath|<script>' = 2
     '$graphIdentityGetter|<script>' = 1
     '$graphRecordConverter|<script>' = 1
     '$graphRecordConverter|global:gh' = 1

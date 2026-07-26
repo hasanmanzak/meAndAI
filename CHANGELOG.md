@@ -3,6 +3,36 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.3 - 2026-07-26
+
+### Changed
+
+- Batch both canonical credential pathspecs in each existing containment
+  checkpoint, reducing successful scans from five Git processes to three
+  without removing or caching any checkpoint.
+- Exercise all seven GitHub CLI version inputs through the exact production
+  parser while retaining the rejected-floor and accepted-floor full-launcher
+  vertical slices.
+- Append deterministic 5-to-3 and 7-to-2 operation ratchets to the existing
+  test-runtime authority.
+
+### Fixed
+
+- Fail closed when the combined tracked/staged credential query cannot be
+  executed instead of treating an operational query failure as absence.
+- Remove five redundant full-launcher executions from the
+  [TEST-0107](docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107)
+  parameterized family without copying its production parser or weakening its
+  public-boundary evidence.
+
+Related work: [FEAT-0054](docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md),
+[issue #135](https://github.com/hasanmanzak/meAndAI/issues/135),
+[TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98),
+[TEST-0055](docs/features/FEAT-0010-protocol-stability-invariants/test-cases.md#test-0055),
+[TEST-0107](docs/features/FEAT-0021-v096-github-cli-prerequisite/test-cases.md#test-0107),
+[TEST-0159](docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159),
+and [TEST-0160](docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0160).
+
 ## 0.15.2 - 2026-07-26
 
 ### Added
