@@ -50,7 +50,17 @@ The bundle is fetched as one release asset, never as independent module
 downloads. No moving-ref, unverified-cache, old-monolith, or partial-module
 fallback exists. The first version adds no persistent cache. The builder
 requires one clean exact source commit and reads one explicit ordered inventory
-and every payload as exact regular Git blobs from that commit. Fixed ZIP
+and every payload as exact regular Git blobs from that commit. The ordered
+inventory is also the sole mapping authority: each current entry declares its
+runtime `bundlePath` separately from its tracked `repositoryPath`; the builder,
+publication verifier, and test owners consume that released data and do not
+infer or recreate the mapping. Current verification authority may retain one
+bounded schema-1 compatibility adapter for immutable releases `v0.12.4`
+through `v0.15.0`; schema 2 is mandatory afterward and no request-failure
+fallback is permitted. The builder and verifier independently enforce the
+declared record shape and path-safety contract at their separate trust
+boundaries; the verifier does not execute the builder implementation, and this
+independent validation must not become a second mapping authority. Fixed ZIP
 metadata and deterministic no-compression entries make repeated builds from one
 exact source identity produce identical output. Publication and post-publication
 verification cover both assets, their API and downloaded digests, and the

@@ -115,3 +115,21 @@ Date: 2026-07-25
    against the completed architecture, including repeated tests and
    tests-that-test-tests. Keep that reevaluation separate from
    [FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
+
+## Closure update
+
+- [Implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
+  merged after its applicable review checks. Immutable
+  [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+  targets
+  [`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
+- Current-authority post-publication verification exposed the separate
+  [FEAT-0052](../../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
+  / [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) mapping
+  defect. Continue through the
+  [v0.15.1 handoff](2026-07-25-v0151-declarative-bundle-source-mapping.md);
+  do not mutate immutable v0.15.0 or add a consumer workaround.
+- After v0.15.1 closure, reevaluate
+  [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+  against the completed architecture, including repeated tests and
+  tests-that-test-tests.

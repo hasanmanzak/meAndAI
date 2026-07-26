@@ -18,6 +18,20 @@ if (-not $PSBoundParameters.ContainsKey('SourceRoot')) {
 
 $maximumBundleSourceBytes = 67108864
 
+function Test-BundleRelativePathSegments {
+    param([Parameter(Mandatory)][string]$Path)
+
+    foreach ($segment in $Path.Split(
+        [char[]]@('/'), [StringSplitOptions]::None
+    )) {
+        if ([string]::IsNullOrEmpty($segment) -or
+            $segment -ceq '.' -or $segment -ceq '..') {
+            return $false
+        }
+    }
+    return $true
+}
+
 function Invoke-BundleGitText {
     param(
         [Parameter(Mandatory)][string]$WorkingDirectory,
@@ -46,7 +60,8 @@ function Read-BundleGitBlob {
         [Parameter(Mandatory)][long]$MaximumBytes
     )
 
-    if ($RelativePath -cnotmatch '^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$') {
+    if ($RelativePath -cnotmatch '^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -or
+        -not (Test-BundleRelativePathSegments -Path $RelativePath)) {
         throw "Tracked bundle path '$RelativePath' is unsafe."
     }
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
@@ -163,20 +178,27 @@ $inventoryProperties = @($inventory.PSObject.Properties | ForEach-Object {
     [string]$_.Name
 })
 if (($inventoryProperties -join ',') -cne 'schema,kind,entryPoint,sources' -or
-    [long]$inventory.schema -ne 1 -or
-    [string]$inventory.kind -cne 'meandai.quick-adoption.bundle-sources') {
+    -not ($inventory.schema -is [int] -or $inventory.schema -is [long]) -or
+    [long]$inventory.schema -ne 2 -or
+    -not ($inventory.kind -is [string]) -or
+    [string]$inventory.kind -cne 'meandai.quick-adoption.bundle-sources' -or
+    -not ($inventory.entryPoint -is [string]) -or
+    -not ($inventory.sources -is [array])) {
     throw 'Bundle source inventory has an unsupported identity or shape.'
 }
 $entryPoint = [string]$inventory.entryPoint
-$sourcePaths = @($inventory.sources | ForEach-Object { [string]$_ })
-if ($sourcePaths.Count -lt 1 -or $sourcePaths.Count -gt 64 -or
-    $sourcePaths -cnotcontains $entryPoint) {
+$sourceRecords = @($inventory.sources)
+if ($sourceRecords.Count -lt 1 -or $sourceRecords.Count -gt 64) {
     throw 'Bundle source inventory has an invalid bounded entry-point set.'
 }
 
-$seenPaths = [Collections.Generic.HashSet[string]]::new(
+$seenBundlePaths = [Collections.Generic.HashSet[string]]::new(
     [StringComparer]::OrdinalIgnoreCase
 )
+$seenRepositoryPaths = [Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::OrdinalIgnoreCase
+)
+$sourcePaths = [Collections.Generic.List[string]]::new()
 $payload = [Collections.Generic.List[object]]::new()
 $payloadBytes = [Collections.Generic.Dictionary[string, byte[]]]::new(
     [StringComparer]::Ordinal
@@ -184,19 +206,30 @@ $payloadBytes = [Collections.Generic.Dictionary[string, byte[]]]::new(
 $sha256 = [Security.Cryptography.SHA256]::Create()
 [long]$totalSourceBytes = 0
 try {
-    foreach ($bundlePath in $sourcePaths) {
+    foreach ($sourceRecord in $sourceRecords) {
+        $sourceProperties = @($sourceRecord.PSObject.Properties | ForEach-Object {
+            [string]$_.Name
+        })
+        if (($sourceProperties -join ',') -cne 'bundlePath,repositoryPath' -or
+            -not ($sourceRecord.bundlePath -is [string]) -or
+            -not ($sourceRecord.repositoryPath -is [string])) {
+            throw 'Bundle source inventory contains an unsupported source record.'
+        }
+        $bundlePath = [string]$sourceRecord.bundlePath
+        $sourceRelativePath = [string]$sourceRecord.repositoryPath
         if ($bundlePath -cnotmatch '^MeAndAI\.QuickAdoption/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -or
-            $bundlePath.Contains('\') -or -not $seenPaths.Add($bundlePath)) {
+            $bundlePath.Contains('\') -or
+            -not (Test-BundleRelativePathSegments -Path $bundlePath) -or
+            -not $seenBundlePaths.Add($bundlePath)) {
             throw "Bundle source path '$bundlePath' is unsafe or duplicated."
         }
-        $sourceRelativePath = if ($bundlePath -ceq
-            'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
-            'scripts/MeAndAI.ContentIdentity.psm1'
+        if ($sourceRelativePath -cnotmatch '^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -or
+            $sourceRelativePath.Contains('\') -or
+            -not (Test-BundleRelativePathSegments -Path $sourceRelativePath) -or
+            -not $seenRepositoryPaths.Add($sourceRelativePath)) {
+            throw "Bundle repository source path '$sourceRelativePath' is unsafe or duplicated."
         }
-        else {
-            'scripts/quick-adoption/' +
-                $bundlePath.Substring('MeAndAI.QuickAdoption/'.Length)
-        }
+        $sourcePaths.Add($bundlePath)
         $sourcePath = Join-Path $resolvedSourceRoot `
             ($sourceRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
         $item = Get-Item -LiteralPath $sourcePath -Force -ErrorAction Stop
@@ -227,6 +260,9 @@ try {
 }
 finally {
     $sha256.Dispose()
+}
+if (-not $sourcePaths.Contains($entryPoint)) {
+    throw 'Bundle source inventory has an invalid bounded entry-point set.'
 }
 
 $manifest = [ordered]@{

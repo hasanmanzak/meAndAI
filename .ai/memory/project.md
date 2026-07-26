@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-25**
+Last verified: **2026-07-26**
 
 ## Verified facts
 
@@ -9,36 +9,27 @@ Last verified: **2026-07-25**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.0`. The latest immutable release
-  remains [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
-  until the reviewed `v0.15.0` publication under
-  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
-  [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122) and closed
-  [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) retain its
-  delivery and publication evidence. Current verifier authority passed the
-  `v0.14.5`, `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates; retained
-  [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
-  [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
-  Exact dated evidence is in the
-  [v0.14.5 publication-closure handoff](log/2026-07-25-v0145-publication-closure.md).
-- Most recently completed implementation scope:
+- Current protocol version: `0.15.1`. The latest immutable release is
+  [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0) at
+  [`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
+  [PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and closed
+  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) retain its
+  delivery and publication evidence.
+- Most recently completed and published implementation scope:
   [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
   and [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
   complete recurrence routing, canonical test utility ownership, exact Case
   evidence, role separation, the three bounded hotspot migrations, and the
   append-only `test-harness-modularity` capability. The final full suite passed
-  all deterministically discovered owners in 2,193.9 seconds. Draft
-  [implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
-  owns review and merge; immutable release publication remains the exact
-  continuation under [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
-- Most recently published correction: [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md),
-  [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
-  [SUBF-0094](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md#subf-0094),
-  [TEST-0182](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
-  and [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) govern
-  the completed v0.14.5 correction. Its exact owned branch is absent. The
-  correction admits only a separator-free visible basename that equals the
-  resolved target's case-sensitive basename; consumers remain outside it.
+  all deterministically discovered owners in 2,193.9 seconds; the pull-request
+  and main-push hosted gates passed before immutable `v0.15.0` publication.
+- Current bounded correction:
+  [FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
+  / [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) makes the
+  ordered source inventory the single archive-to-repository mapping authority.
+  It corrects the verifier defect exposed by
+  [run 30176928208](https://github.com/hasanmanzak/meAndAI/actions/runs/30176928208)
+  without mutating immutable `v0.15.0` or adding consumer-local behavior.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -123,7 +114,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125) records the
   failed route and the successful transport replacement.
 - Fixed release or evidence: project-local tooling-route evidence confirmed on
-  2026-07-25; target release `0.15.0` will publish the durable routing record.
+  2026-07-25; immutable
+  [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+  publishes the durable routing record.
 - Required safe response: pipe the body to
   `gh issue edit --body-file -`; verify the resulting work-surface content.
 - Unsafe retry boundary: do not repeat the direct multiline `--body $body`
@@ -416,26 +409,44 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   reviewed dynamic/helper/process call graph changes.
 - Superseded by: `None`
 
+### Runtime bundle path is inferred as a repository source path
+
+- Status: `Active`
+- Observable signature: current post-publication verification receives `404`
+  for a GitHub Contents request formed by prefixing a valid runtime bundle path,
+  while the immutable bundle and its manifest remain internally valid.
+- Applicability: deterministic release archives whose runtime layout differs
+  from the tracked source layout for one or more payloads.
+- Affected contract and cause: the builder, verifier, or a fixture recreates an
+  archive-to-repository mapping instead of consuming the release-owned ordered
+  source inventory.
+- Canonical owner and evidence:
+  [FIND-0287](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md#find-0287)
+  / [TEST-0189](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189)
+  / [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131).
+- Fixed release or evidence: target `0.15.1`; immutable `v0.15.0` remains the
+  historical schema-1 compatibility boundary.
+- Required safe response: read the declared `bundlePath` and `repositoryPath`
+  pair from the canonical inventory, validate both independently, and compare
+  exact tracked Git-blob bytes with the declared archive payload.
+- Unsafe retry boundary: do not infer repository paths from archive paths, add
+  another path-specific conditional, or retry a failed inferred request with a
+  heuristic alternate path.
+- Freshness and review condition: last confirmed 2026-07-25; review whenever
+  the source-inventory schema or bundle payload set changes.
+- Superseded by: `None`
+
 ## Open context
 
-- [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-  is implemented and locally reviewed for target `0.15.0` under
-  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124). Its four
-  independently tracked slices are complete:
-  [SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128),
-  [SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096) / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
-  [SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
-  and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
-  [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
-  records the accepted authority boundary. Follow the current
-  [release-candidate handoff](log/2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
-  through the final full suite, reviewed pull request, and immutable release.
-  The completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md)
-  and [planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
-  remain historical evidence.
+- [FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
+  / [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) is the current
+  `0.15.1` continuation. Complete schema-2 mapping, bounded historical
+  compatibility, [TEST-0189](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189),
+  reviewed publication, and current-authority verification of both immutable
+  `v0.15.0` and new `v0.15.1`; do not change consumers or replace `v0.15.0`.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98). Reevaluate its
-  scope only after `v0.15.0` publication against the completed modular test
+  scope after `v0.15.1` publication against the completed modular test
   architecture, including repeated tests and tests-that-test-tests; do not
   absorb that reevaluation into [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and

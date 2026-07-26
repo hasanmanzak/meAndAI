@@ -1,18 +1,51 @@
 {
-  "schema": 1,
+  "schema": 2,
   "kind": "meandai.quick-adoption.bundle-sources",
   "entryPoint": "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
   "sources": [
-    "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
-    "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1",
-    "MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1",
-    "MeAndAI.QuickAdoption/Private/Configuration.ps1",
-    "MeAndAI.QuickAdoption/Private/OutputAndNativeProcess.ps1",
-    "MeAndAI.QuickAdoption/Private/RepositoryAssessment.ps1",
-    "MeAndAI.QuickAdoption/Private/ProtocolReleaseAndAssets.ps1",
-    "MeAndAI.QuickAdoption/Private/ProposalOwnership.ps1",
-    "MeAndAI.QuickAdoption/Private/CodexRuntime.ps1",
-    "MeAndAI.QuickAdoption/Private/CompletionAndPublication.ps1",
-    "MeAndAI.QuickAdoption/Public/Invoke-MeAndAIQuickAdoption.ps1"
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1",
+      "repositoryPath": "scripts/quick-adoption/MeAndAI.QuickAdoption.psd1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1",
+      "repositoryPath": "scripts/quick-adoption/MeAndAI.QuickAdoption.psm1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1",
+      "repositoryPath": "scripts/MeAndAI.ContentIdentity.psm1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/Configuration.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/Configuration.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/OutputAndNativeProcess.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/OutputAndNativeProcess.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/RepositoryAssessment.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/RepositoryAssessment.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/ProtocolReleaseAndAssets.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/ProtocolReleaseAndAssets.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/ProposalOwnership.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/ProposalOwnership.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/CodexRuntime.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/CodexRuntime.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Private/CompletionAndPublication.ps1",
+      "repositoryPath": "scripts/quick-adoption/Private/CompletionAndPublication.ps1"
+    },
+    {
+      "bundlePath": "MeAndAI.QuickAdoption/Public/Invoke-MeAndAIQuickAdoption.ps1",
+      "repositoryPath": "scripts/quick-adoption/Public/Invoke-MeAndAIQuickAdoption.ps1"
+    }
   ]
 }

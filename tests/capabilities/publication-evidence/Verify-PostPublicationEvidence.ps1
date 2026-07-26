@@ -24,11 +24,21 @@ $sharedMergeEvidenceModule = Join-Path $PSScriptRoot `
     '../../../templates/project/.github/scripts/MeAndAI.ProtocolUpdate.psm1'
 $markdownEvidenceModule = Join-Path $PSScriptRoot `
     '../../infrastructure/MeAndAI.MarkdownEvidence.psm1'
+$contentIdentityModulePath = Join-Path $PSScriptRoot `
+    '../../../scripts/MeAndAI.ContentIdentity.psm1'
 if (-not (Test-Path -LiteralPath $sharedMergeEvidenceModule -PathType Leaf)) {
     throw "TEST-0065 shared merge-evidence resolver is missing: $sharedMergeEvidenceModule"
 }
+if (-not (Test-Path -LiteralPath $contentIdentityModulePath -PathType Leaf)) {
+    throw "TEST-0065 canonical content-identity owner is missing: $contentIdentityModulePath"
+}
 Import-Module $sharedMergeEvidenceModule -Force
 Import-Module $markdownEvidenceModule -Force
+$contentIdentityModule = @(Import-Module $contentIdentityModulePath `
+    -Force -PassThru)[0]
+$script:GetPostPublicationGitBlobSha1 = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
 $originalValidationCulture = [Threading.Thread]::CurrentThread.CurrentCulture
 try {
     [Threading.Thread]::CurrentThread.CurrentCulture =
@@ -2954,10 +2964,12 @@ function Invoke-GitHubPagedGet {
 function Get-GitHubRepositoryContentSnapshot {
     param(
         [Parameter(Mandatory)][string]$Ref,
-        [Parameter(Mandatory)][string]$RepositoryPath
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [ValidateRange(0, 67108864)][long]$MaximumBytes = 1048576,
+        [switch]$VerifyBlobIdentity
     )
 
-    $cacheKey = "$Ref`n$RepositoryPath"
+    $cacheKey = "$Ref`n$RepositoryPath`n$MaximumBytes`n$VerifyBlobIdentity"
     if ($githubRepositoryContentSnapshotCache.ContainsKey($cacheKey)) {
         return $githubRepositoryContentSnapshotCache[$cacheKey]
     }
@@ -2985,8 +2997,19 @@ function Get-GitHubRepositoryContentSnapshot {
         throw "TEST-0065 repository snapshot '$RepositoryPath' at '$Ref' contains invalid base64 content."
     }
     Assert-PostPublicationCondition `
-        ($bytes.LongLength -le 1048576) `
-        "repository snapshot '$RepositoryPath' at '$Ref' exceeds the bounded 1 MiB content limit."
+        ($bytes.LongLength -le $MaximumBytes) `
+        "repository snapshot '$RepositoryPath' at '$Ref' exceeds its bounded content limit."
+    if ($VerifyBlobIdentity) {
+        Assert-PostPublicationCondition `
+            (($contentRecord.size -is [int] -or
+                    $contentRecord.size -is [long]) -and
+                [long]$contentRecord.size -eq $bytes.LongLength) `
+            "repository snapshot '$RepositoryPath' at '$Ref' reported a size that does not match its exact content bytes."
+        Assert-PostPublicationCondition `
+            ((& $script:GetPostPublicationGitBlobSha1 -Bytes $bytes) -ceq
+                [string]$contentRecord.sha) `
+            "repository snapshot '$RepositoryPath' at '$Ref' blob SHA does not match its exact content bytes."
+    }
     $snapshot = [pscustomobject]@{
         Ref = $Ref
         Path = $RepositoryPath
@@ -3107,20 +3130,15 @@ function Get-Sha256Hex {
 }
 
 function Get-GitHubContentBytes {
-    param([Parameter(Mandatory)][string]$RepositoryPath)
+    param(
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [ValidateRange(0, 67108864)][long]$MaximumBytes = 67108864
+    )
 
-    $encodedPath = ConvertTo-ApiPath $RepositoryPath
-    $contentRecord = Invoke-GitHubGet "contents/$encodedPath`?ref=$ExpectedCommit"
-    Assert-PostPublicationCondition ($contentRecord.encoding -ceq 'base64') `
-        "released source '$RepositoryPath' was not returned as base64 content."
-    try {
-        return [Convert]::FromBase64String(
-            ([string]$contentRecord.content -replace '\s', '')
-        )
-    }
-    catch {
-        throw "TEST-0065 released source '$RepositoryPath' contains invalid base64 content."
-    }
+    $snapshot = Get-GitHubRepositoryContentSnapshot `
+        -Ref $ExpectedCommit -RepositoryPath $RepositoryPath `
+        -MaximumBytes $MaximumBytes -VerifyBlobIdentity
+    return [byte[]]$snapshot.Bytes
 }
 
 function Read-ZipEntryBytes {
@@ -3149,6 +3167,23 @@ function Read-ZipEntryBytes {
         $memory.Dispose()
         $stream.Dispose()
     }
+}
+
+function Test-CanonicalBundleSourcePath {
+    param([Parameter(Mandatory)][string]$Path)
+
+    return $Path -cmatch `
+        '^MeAndAI\.QuickAdoption/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -and
+        -not $Path.Contains('\') -and
+        $Path -cnotmatch '(^|/)(?:\.|\.\.)(?:/|$)'
+}
+
+function Test-CanonicalBundleRepositoryPath {
+    param([Parameter(Mandatory)][string]$Path)
+
+    return $Path -cmatch '^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -and
+        -not $Path.Contains('\') -and
+        $Path -cnotmatch '(^|/)(?:\.|\.\.)(?:/|$)'
 }
 
 function Assert-QuickAdoptionBundle {
@@ -3310,20 +3345,120 @@ function Assert-QuickAdoptionBundle {
         $inventoryProperties = @($inventory.PSObject.Properties | ForEach-Object {
             [string]$_.Name
         })
-        $inventorySources = @($inventory.sources | ForEach-Object { [string]$_ })
         Assert-PostPublicationCondition `
             (($inventoryProperties -join ',') -ceq 'schema,kind,entryPoint,sources' -and
                 ($inventory.schema -is [int] -or $inventory.schema -is [long]) -and
-                [long]$inventory.schema -eq 1 -and
+                $inventory.kind -is [string] -and
                 [string]$inventory.kind -ceq 'meandai.quick-adoption.bundle-sources' -and
+                $inventory.entryPoint -is [string] -and
                 [string]$inventory.entryPoint -ceq [string]$manifest.entryPoint -and
-                ($inventorySources -join "`n") -ceq (@($payloadPaths) -join "`n")) `
+                $inventory.sources -is [Array]) `
+            'bundle source inventory has an unsupported identity or shape.'
+
+        $inventorySources = @($inventory.sources)
+        Assert-PostPublicationCondition `
+            ($inventorySources.Count -ge 1 -and $inventorySources.Count -le 64) `
+            'bundle source inventory has an invalid bounded source count.'
+        $sourceMappings = [Collections.Generic.List[object]]::new()
+        $bundlePathSet = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+        $repositoryPathSet = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+
+        if ([long]$inventory.schema -eq 2) {
+            foreach ($sourceRecord in $inventorySources) {
+                $sourceProperties = @(
+                    $sourceRecord.PSObject.Properties | ForEach-Object {
+                        [string]$_.Name
+                    }
+                )
+                Assert-PostPublicationCondition `
+                    (($sourceProperties -join ',') -ceq 'bundlePath,repositoryPath' -and
+                        $sourceRecord.bundlePath -is [string] -and
+                        $sourceRecord.repositoryPath -is [string]) `
+                    'bundle source inventory contains an unsupported source record.'
+                $bundlePath = [string]$sourceRecord.bundlePath
+                $repositoryPath = [string]$sourceRecord.repositoryPath
+                Assert-PostPublicationCondition `
+                    ((Test-CanonicalBundleSourcePath -Path $bundlePath) -and
+                        $bundlePathSet.Add($bundlePath)) `
+                    "bundle source path '$bundlePath' is unsafe or duplicated."
+                Assert-PostPublicationCondition `
+                    ((Test-CanonicalBundleRepositoryPath -Path $repositoryPath) -and
+                        $repositoryPathSet.Add($repositoryPath)) `
+                    "bundle repository source path '$repositoryPath' is unsafe or duplicated."
+                $sourceMappings.Add([pscustomobject]@{
+                    BundlePath = $bundlePath
+                    RepositoryPath = $repositoryPath
+                })
+            }
+        }
+        elseif ([long]$inventory.schema -eq 1) {
+            $legacyTagMatch = [regex]::Match(
+                $Tag,
+                '^v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$'
+            )
+            $legacyVersion = if ($legacyTagMatch.Success) {
+                [version]$Tag.Substring(1)
+            }
+            else { [version]'0.0.0' }
+            Assert-PostPublicationCondition `
+                ($legacyTagMatch.Success -and
+                    $legacyVersion -ge [version]'0.12.4' -and
+                    $legacyVersion -le [version]'0.15.0') `
+                'bundle source inventory schema 1 is supported only for immutable releases v0.12.4 through v0.15.0.'
+
+            foreach ($legacySource in $inventorySources) {
+                Assert-PostPublicationCondition ($legacySource -is [string]) `
+                    'bundle source inventory contains an unsupported schema-1 source.'
+                $bundlePath = [string]$legacySource
+                Assert-PostPublicationCondition `
+                    ((Test-CanonicalBundleSourcePath -Path $bundlePath) -and
+                        $bundlePathSet.Add($bundlePath)) `
+                    "bundle source path '$bundlePath' is unsafe or duplicated."
+                $repositoryPath = if ($bundlePath -ceq
+                    'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
+                    'scripts/MeAndAI.ContentIdentity.psm1'
+                }
+                else {
+                    'scripts/quick-adoption/' +
+                        $bundlePath.Substring('MeAndAI.QuickAdoption/'.Length)
+                }
+                Assert-PostPublicationCondition $repositoryPathSet.Add($repositoryPath) `
+                    "bundle repository source path '$repositoryPath' is duplicated."
+                $sourceMappings.Add([pscustomobject]@{
+                    BundlePath = $bundlePath
+                    RepositoryPath = $repositoryPath
+                })
+            }
+        }
+        else {
+            throw 'bundle source inventory schema is unsupported.'
+        }
+
+        $mappedBundlePaths = @($sourceMappings | ForEach-Object {
+            [string]$_.BundlePath
+        })
+        Assert-PostPublicationCondition `
+            (($mappedBundlePaths -join "`n") -ceq (@($payloadPaths) -join "`n")) `
             'bundle manifest payload inventory does not match the released source inventory.'
+        $sourceMappingByBundlePath =
+            [Collections.Generic.Dictionary[string, object]]::new(
+                [StringComparer]::Ordinal
+            )
+        foreach ($sourceMapping in $sourceMappings) {
+            $sourceMappingByBundlePath.Add(
+                [string]$sourceMapping.BundlePath,
+                $sourceMapping
+            )
+        }
 
         foreach ($path in $payloadPaths) {
-            $repositoryPath = 'scripts/quick-adoption/' +
-                $path.Substring('MeAndAI.QuickAdoption/'.Length)
-            $sourceBytes = Get-GitHubContentBytes -RepositoryPath $repositoryPath
+            $sourceMapping = $sourceMappingByBundlePath[$path]
+            $sourceBytes = Get-GitHubContentBytes `
+                -RepositoryPath ([string]$sourceMapping.RepositoryPath)
             $payloadEntry = $payloadByPath[$path]
             Assert-PostPublicationCondition `
                 ($sourceBytes.LongLength -eq [long]$payloadEntry.length -and

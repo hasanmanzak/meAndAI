@@ -14,6 +14,9 @@ $contentIdentityModule = @(Import-Module `
 $getSha256Action = $contentIdentityModule.ExportedCommands[
     'Get-MeAndAISha256'
 ].ScriptBlock
+$getGitBlobSha1Action = $contentIdentityModule.ExportedCommands[
+    'Get-MeAndAIGitBlobSha1'
+].ScriptBlock
 $verifierPath = Join-Path $root 'tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1'
 $failureContext = New-MeAndAITestContext
 Set-MeAndAITestContext -Context $failureContext
@@ -166,7 +169,8 @@ function Assert-PostPublicationCheckoutContract {
 }
 
 $repository = 'example/meandai-consumer'
-$tag = 'v1.2.3'
+$defaultTag = 'v0.15.1'
+$tag = $defaultTag
 $commit = '0123456789abcdef0123456789abcdef01234567'
 $shortCommit = $commit.Substring(0, 12)
 $wrongCommit = 'ffffffffffffffffffffffffffffffffffffffff'
@@ -203,10 +207,23 @@ $launcherSourcePath = 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
 $bundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'
 $bundleInventoryPath = 'scripts/quick-adoption/bundle.sources.json'
 $bundleEntryPoint = 'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1'
-$bundleSources = @(
-    $bundleEntryPoint,
-    'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1'
+$bundleSourceRecords = @(
+    [pscustomobject]@{
+        BundlePath = $bundleEntryPoint
+        RepositoryPath = 'scripts/quick-adoption/MeAndAI.QuickAdoption.psd1'
+    },
+    [pscustomobject]@{
+        BundlePath = 'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1'
+        RepositoryPath = 'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1'
+    },
+    [pscustomobject]@{
+        BundlePath = 'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1'
+        RepositoryPath = 'scripts/MeAndAI.ContentIdentity.psm1'
+    }
 )
+$bundleSources = @($bundleSourceRecords | ForEach-Object {
+    [string]$_.BundlePath
+})
 $global:MeAndAIPostPublicationLauncherSourceBytes = [Text.UTF8Encoding]::new($false).GetBytes(
     "[CmdletBinding()]`nparam()`nWrite-Host 'verified launcher fixture'`n"
 )
@@ -218,6 +235,8 @@ $global:MeAndAIPostPublicationSourceBytes = @{
     )
     'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1' =
         [Text.UTF8Encoding]::new($false).GetBytes("function Invoke-TestRuntime { 'ok' }`n")
+    'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1' =
+        [Text.UTF8Encoding]::new($false).GetBytes("function Get-TestIdentity { 'root-source' }`n")
 }
 
 function New-TestQuickAdoptionBundleBytes {
@@ -338,6 +357,114 @@ function Set-TestAssetFixture {
     )
 }
 
+function New-TestBundleSourceInventory {
+    param([Parameter(Mandatory)][string]$Mode)
+
+    if ($Mode -in @('BundleLegacySchema1', 'BundleFutureSchema1')) {
+        return [ordered]@{
+            schema = 1
+            kind = 'meandai.quick-adoption.bundle-sources'
+            entryPoint = $bundleEntryPoint
+            sources = @($bundleSources)
+        }
+    }
+
+    $records = @($bundleSourceRecords | ForEach-Object {
+        [ordered]@{
+            bundlePath = [string]$_.BundlePath
+            repositoryPath = [string]$_.RepositoryPath
+        }
+    })
+    switch ($Mode) {
+        'BundleInventoryMalformedRecord' {
+            $records[0].bundlePath = 42
+        }
+        'BundleInventoryMissingProperty' {
+            $records[0] = [ordered]@{
+                bundlePath = [string]$bundleSourceRecords[0].BundlePath
+            }
+        }
+        'BundleInventoryExtraProperty' {
+            $records[0] = [ordered]@{
+                bundlePath = [string]$bundleSourceRecords[0].BundlePath
+                repositoryPath = [string]$bundleSourceRecords[0].RepositoryPath
+                unexpected = 'not-allowed'
+            }
+        }
+        'BundleInventoryUnsafeBundlePath' {
+            $records[0].bundlePath = 'MeAndAI.QuickAdoption/../escape.ps1'
+        }
+        'BundleInventoryUnsafeRepositoryPath' {
+            $records[0].repositoryPath = '../scripts/escape.ps1'
+        }
+        'BundleInventoryDuplicateBundlePath' {
+            $records[1].bundlePath =
+                ([string]$records[0].bundlePath).ToUpperInvariant()
+        }
+        'BundleInventoryDuplicateRepositoryPath' {
+            $records[1].repositoryPath =
+                ([string]$records[0].repositoryPath).ToUpperInvariant()
+        }
+        'BundleInventoryMappingMismatch' {
+            $records[2].repositoryPath = 'scripts/quick-adoption/WrongSource.psm1'
+        }
+        'BundleInventoryOrderMismatch' {
+            [array]::Reverse($records)
+        }
+    }
+    $inventory = [ordered]@{
+        schema = 2
+        kind = 'meandai.quick-adoption.bundle-sources'
+        entryPoint = $bundleEntryPoint
+        sources = $records
+    }
+    switch ($Mode) {
+        'BundleInventoryNonStringKind' {
+            $inventory.kind = [object[]]@(
+                'meandai.quick-adoption.bundle-sources'
+            )
+        }
+        'BundleInventoryNonStringEntryPoint' {
+            $inventory.entryPoint = [object[]]@($bundleEntryPoint)
+        }
+        'BundleInventoryScalarSources' {
+            $inventory.sources = $records[0]
+        }
+    }
+    return $inventory
+}
+
+function New-TestRepositoryContentRecord {
+    param(
+        [Parameter(Mandatory)][string]$RepositoryPath,
+        [Parameter(Mandatory)][byte[]]$Bytes
+    )
+
+    $type = 'file'
+    $returnedPath = $RepositoryPath
+    $blobSha = & $getGitBlobSha1Action -Bytes $Bytes
+    [long]$reportedSize = $Bytes.LongLength
+    if ($RepositoryPath -ceq 'scripts/MeAndAI.ContentIdentity.psm1') {
+        switch ($global:MeAndAIPostPublicationMode) {
+            'BundleSourceNonRegular' { $type = 'dir' }
+            'BundleSourcePathMismatch' {
+                $returnedPath =
+                    'scripts/quick-adoption/MeAndAI.ContentIdentity.psm1'
+            }
+            'BundleSourceBlobMismatch' { $blobSha = 'f' * 40 }
+            'BundleSourceSizeMismatch' { $reportedSize++ }
+        }
+    }
+    return [pscustomobject]@{
+        type = $type
+        path = $returnedPath
+        sha = $blobSha
+        size = $reportedSize
+        encoding = 'base64'
+        content = [Convert]::ToBase64String($Bytes)
+    }
+}
+
 function global:Invoke-RestMethod {
     param(
         [string]$Method,
@@ -381,7 +508,7 @@ function global:Invoke-RestMethod {
     if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer') {
         return [pscustomobject]@{ default_branch = 'main' }
     }
-    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/releases/tags/v1.2.3') {
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/releases/tags/$tag") {
         $launcherDigest = & $getSha256Action -Bytes $global:MeAndAIPostPublicationLauncherBytes
         $bundleDigest = & $getSha256Action -Bytes $global:MeAndAIPostPublicationBundleBytes
         if ($global:MeAndAIPostPublicationMode -ceq 'BadApiDigest') {
@@ -428,7 +555,7 @@ function global:Invoke-RestMethod {
             }
         }
         return [pscustomobject]@{
-            tag_name = 'v1.2.3'
+            tag_name = $tag
             draft = $false
             prerelease = $false
             published_at = '2026-07-16T00:00:00Z'
@@ -437,7 +564,7 @@ function global:Invoke-RestMethod {
             assets = $assets
         }
     }
-    if ($Uri -ceq 'https://api.test/repos/example/meandai-consumer/git/ref/tags/v1.2.3') {
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/git/ref/tags/$tag") {
         return [pscustomobject]@{
             object = [pscustomobject]@{ type = 'commit'; sha = $commit }
         }
@@ -1401,37 +1528,31 @@ $headingCollision
         }
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$launcherSourcePath`?ref=$commit") {
-        return [pscustomobject]@{
-            encoding = 'base64'
-            content = [Convert]::ToBase64String(
-                [byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes
-            )
-        }
+        return New-TestRepositoryContentRecord `
+            -RepositoryPath $launcherSourcePath `
+            -Bytes ([byte[]]$global:MeAndAIPostPublicationLauncherSourceBytes)
     }
     if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$bundleInventoryPath`?ref=$commit") {
-        $inventory = [ordered]@{
-            schema = 1
-            kind = 'meandai.quick-adoption.bundle-sources'
-            entryPoint = $bundleEntryPoint
-            sources = $bundleSources
-        }
+        $inventory = New-TestBundleSourceInventory `
+            -Mode $global:MeAndAIPostPublicationMode
         $content = $inventory | ConvertTo-Json -Depth 4
-        return [pscustomobject]@{
-            encoding = 'base64'
-            content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($content))
+        return New-TestRepositoryContentRecord `
+            -RepositoryPath $bundleInventoryPath `
+            -Bytes ([Text.Encoding]::UTF8.GetBytes($content))
+    }
+    foreach ($sourceRecord in $bundleSourceRecords) {
+        $source = [string]$sourceRecord.BundlePath
+        $sourceRepositoryPath = [string]$sourceRecord.RepositoryPath
+        if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$sourceRepositoryPath`?ref=$commit") {
+            return New-TestRepositoryContentRecord `
+                -RepositoryPath $sourceRepositoryPath `
+                -Bytes ([byte[]]$global:MeAndAIPostPublicationSourceBytes[$source])
         }
     }
-    foreach ($source in $bundleSources) {
-        $sourceRepositoryPath = 'scripts/quick-adoption/' +
-            $source.Substring('MeAndAI.QuickAdoption/'.Length)
-        if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/$sourceRepositoryPath`?ref=$commit") {
-            return [pscustomobject]@{
-                encoding = 'base64'
-                content = [Convert]::ToBase64String(
-                    [byte[]]$global:MeAndAIPostPublicationSourceBytes[$source]
-                )
-            }
-        }
+    if ($Uri -ceq "https://api.test/repos/example/meandai-consumer/contents/scripts/quick-adoption/WrongSource.psm1`?ref=$commit") {
+        return New-TestRepositoryContentRecord `
+            -RepositoryPath 'scripts/quick-adoption/WrongSource.psm1' `
+            -Bytes ([byte[]]$global:MeAndAIPostPublicationSourceBytes[$bundleSources[1]])
     }
     if ($Uri -ceq "https://api.test/repos/$repository/commits/$commit") {
         if ($global:MeAndAIPostPublicationMode -ceq
@@ -1467,9 +1588,12 @@ $headingCollision
 function Invoke-PostPublicationScenario {
     param(
         [Parameter(Mandatory)][string]$Mode,
-        [switch]$VerifyAssets
+        [switch]$VerifyAssets,
+        [string]$ScenarioTag = $defaultTag
     )
 
+    $script:tag = $ScenarioTag
+    $script:releaseUrl = "https://github.com/$repository/releases/tag/$ScenarioTag"
     $global:MeAndAIPostPublicationMode = $Mode
     $global:MeAndAIPostPublicationRequests.Clear()
     $global:MeAndAIPostPublicationDownloadRequests.Clear()
@@ -1749,7 +1873,7 @@ try {
             Add-Failure 'TEST-0076 repository metadata endpoint used an invalid trailing slash.'
         }
         foreach ($requiredPath in @(
-            '/releases/tags/v1.2.3', '/git/ref/tags/v1.2.3',
+            "/releases/tags/$defaultTag", "/git/ref/tags/$defaultTag",
             "/compare/$commit...main",
             '/git/matching-refs/heads/codex/feat-0042-release-evidence',
             '/issues/42', '/issues/42/comments?per_page=100&page=1',
@@ -2129,10 +2253,15 @@ try {
                 -TestId 'TEST-0176'
         }
 
+        $contentIdentitySourceRequest =
+            "https://api.test/repos/example/meandai-consumer/contents/scripts/MeAndAI.ContentIdentity.psm1`?ref=$commit"
+        $legacyInferredContentIdentityRequest =
+            "https://api.test/repos/example/meandai-consumer/contents/scripts/quick-adoption/MeAndAI.ContentIdentity.psm1`?ref=$commit"
         $assetContract = Invoke-PostPublicationScenario -Mode 'Valid' -VerifyAssets
         if ($assetContract.Threw) {
             Add-Failure "TEST-0147 valid immutable release assets failed: $($assetContract.Error)"
         }
+        $validAssetRequests = @($global:MeAndAIPostPublicationRequests)
         if ($global:MeAndAIPostPublicationDownloadRequests.Count -ne 2 -or
             $global:MeAndAIPostPublicationDownloadRequests[0] -cne 'https://api.test/repos/example/meandai-consumer/releases/assets/101' -or
             $global:MeAndAIPostPublicationDownloadRequests[1] -cne 'https://api.test/repos/example/meandai-consumer/releases/assets/102') {
@@ -2144,13 +2273,12 @@ try {
             "/contents/scripts/quick-adoption/MeAndAI.QuickAdoption.psd1`?ref=$commit",
             "/contents/scripts/quick-adoption/MeAndAI.QuickAdoption.psm1`?ref=$commit"
         )) {
-            if (@($global:MeAndAIPostPublicationRequests | Where-Object {
+            if (@($validAssetRequests | Where-Object {
                 $_.EndsWith($requiredPath, [StringComparison]::Ordinal)
             }).Count -ne 1) {
                 Add-Failure "TEST-0147 verifier did not request exactly one '$requiredPath' bundle source authority."
             }
         }
-
         foreach ($negative in @(
             @{ Mode = 'UnexpectedAsset'; Error = '*exact expected asset inventory*' },
             @{ Mode = 'LauncherSourceMismatch'; Error = '*launcher asset*released source commit*' },
@@ -2179,6 +2307,80 @@ try {
                 }).Count -ne 0) {
                 Add-Failure 'TEST-0147 oversized bundle metadata reached its asset download.'
             }
+        }
+
+        $test0189FailureCheckpoint = $failures.Count
+        if ($assetContract.Threw) {
+            Add-Failure "TEST-0189 shared valid schema-2 verification failed: $($assetContract.Error)"
+        }
+        if (@($validAssetRequests | Where-Object {
+            $_ -ceq $contentIdentitySourceRequest
+        }).Count -ne 1 -or @($validAssetRequests | Where-Object {
+            $_ -ceq $legacyInferredContentIdentityRequest
+        }).Count -ne 0) {
+            Add-Failure 'TEST-0189 schema-2 verification did not request exactly the declared root ContentIdentity source.'
+        }
+
+        foreach ($negative in @(
+            @{ Mode = 'BundleInventoryNonStringKind'; Error = '*unsupported identity or shape*' },
+            @{ Mode = 'BundleInventoryNonStringEntryPoint'; Error = '*unsupported identity or shape*' },
+            @{ Mode = 'BundleInventoryScalarSources'; Error = '*unsupported identity or shape*' },
+            @{ Mode = 'BundleInventoryMalformedRecord'; Error = '*unsupported source record*' },
+            @{ Mode = 'BundleInventoryMissingProperty'; Error = '*unsupported source record*' },
+            @{ Mode = 'BundleInventoryExtraProperty'; Error = '*unsupported source record*' },
+            @{ Mode = 'BundleInventoryUnsafeBundlePath'; Error = '*bundle source path*unsafe or duplicated*' },
+            @{ Mode = 'BundleInventoryUnsafeRepositoryPath'; Error = '*repository source path*unsafe or duplicated*' },
+            @{ Mode = 'BundleInventoryDuplicateBundlePath'; Error = '*bundle source path*unsafe or duplicated*' },
+            @{ Mode = 'BundleInventoryDuplicateRepositoryPath'; Error = '*repository source path*unsafe or duplicated*' },
+            @{ Mode = 'BundleInventoryMappingMismatch'; Error = '*does not match the released source commit*' },
+            @{ Mode = 'BundleInventoryOrderMismatch'; Error = '*payload inventory does not match*' },
+            @{ Mode = 'BundleSourceNonRegular'; Error = '*not one file*' },
+            @{ Mode = 'BundleSourcePathMismatch'; Error = '*instead of exact requested path*' },
+            @{ Mode = 'BundleSourceBlobMismatch'; Error = '*blob SHA does not match*' },
+            @{ Mode = 'BundleSourceSizeMismatch'; Error = '*reported a size that does not match*' }
+        )) {
+            $result = Invoke-PostPublicationScenario `
+                -Mode $negative.Mode -VerifyAssets
+            if (-not $result.Threw -or $result.Error -notlike $negative.Error) {
+                Add-Failure "TEST-0189 $($negative.Mode) did not fail closed: $($result.Error)"
+            }
+        }
+
+        foreach ($legacyTag in @('v0.12.4', 'v0.15.0')) {
+            $legacySchema1 = Invoke-PostPublicationScenario `
+                -Mode 'BundleLegacySchema1' -VerifyAssets `
+                -ScenarioTag $legacyTag
+            if ($legacySchema1.Threw) {
+                Add-Failure "TEST-0189 exact $legacyTag schema-1 compatibility failed: $($legacySchema1.Error)"
+            }
+            if (@($global:MeAndAIPostPublicationRequests | Where-Object {
+                $_ -ceq $contentIdentitySourceRequest
+            }).Count -ne 1 -or @($global:MeAndAIPostPublicationRequests | Where-Object {
+                $_ -ceq $legacyInferredContentIdentityRequest
+            }).Count -ne 0) {
+                Add-Failure "TEST-0189 $legacyTag adapter did not use only its bounded ContentIdentity relocation."
+            }
+        }
+
+        foreach ($rejectedSchema1Tag in @('v0.12.3', 'v0.15.1')) {
+            $futureSchema1 = Invoke-PostPublicationScenario `
+                -Mode 'BundleFutureSchema1' -VerifyAssets `
+                -ScenarioTag $rejectedSchema1Tag
+            if (-not $futureSchema1.Threw -or
+                $futureSchema1.Error -notlike '*schema 1 is supported only*v0.15.0*') {
+                Add-Failure "TEST-0189 $rejectedSchema1Tag schema-1 inventory was not rejected: $($futureSchema1.Error)"
+            }
+            if (@($global:MeAndAIPostPublicationRequests | Where-Object {
+                $_ -ceq $contentIdentitySourceRequest -or
+                    $_ -ceq $legacyInferredContentIdentityRequest
+            }).Count -ne 0) {
+                Add-Failure "TEST-0189 $rejectedSchema1Tag schema-1 rejection reached a ContentIdentity source request."
+            }
+        }
+
+        if ($failures.Count -eq $test0189FailureCheckpoint) {
+            Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
+                -TestId 'TEST-0189'
         }
     }
 }

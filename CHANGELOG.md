@@ -3,6 +3,31 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.1 - 2026-07-26
+
+### Changed
+
+- Make the ordered quick-adoption source inventory the single authority for
+  each runtime bundle path and its exact tracked repository source path.
+- Keep the archive manifest, runtime layout, workflow topology, and two-asset
+  release contract unchanged.
+
+### Fixed
+
+- Stop the builder, publication verifier, and owning tests from independently
+  recreating archive-to-repository path mappings.
+- Verify immutable schema-1 releases only through a version-bounded adapter for
+  `v0.12.4` through `v0.15.0`, and require declarative schema 2 afterward.
+- Reject missing, extra, unsafe, duplicate, reordered, or mismatched mapping
+  records before accepting source or archive bytes.
+
+Related work: [FEAT-0052](docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md),
+[BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) /
+[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131),
+[DEC-0023](docs/decisions/DEC-0023-verified-quick-adoption-module-bundle.md),
+[TEST-0189](docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189),
+and retained [TEST-0147](docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147).
+
 ## 0.15.0 - 2026-07-25
 
 ### Added
