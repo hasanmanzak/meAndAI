@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Backward-compatible protocol clarification and test-portfolio correction |
-| Status | In progress |
+| Status | Complete |
 | Target version | 0.15.2 |
 | Issue | [Issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) |
-| Pull request | Pending after local review |
+| Pull request | [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134) |
 | Decisions | [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md), [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -119,7 +119,7 @@ existing executable-owner inventory and only proven collisions are corrected.
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0100` <a name="subf-0100"></a> | Protocol decision, intent contract, and finite active-portfolio review | [Issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) | [TEST-0190](test-cases.md#test-0190) focused pass | [FIND-0289](#find-0289) and [FIND-0290](#find-0290) resolved | Implemented |
-| `SUBF-0101` <a name="subf-0101"></a> | Existing-owner structural barrier and two proven supersessions | [Issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) | [TEST-0190](test-cases.md#test-0190), retained canonical quick-adoption scenarios passed | [FIND-0291](#find-0291) and [FIND-0292](#find-0292) resolved; fresh-diff review pending | Implemented |
+| `SUBF-0101` <a name="subf-0101"></a> | Existing-owner structural barrier and two proven supersessions | [Issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) | [TEST-0190](test-cases.md#test-0190), retained canonical quick-adoption scenarios passed | [FIND-0291](#find-0291) through [FIND-0298](#find-0298) resolved; bounded fresh-diff review found no remaining blocker | Implemented |
 
 ## Finite active-portfolio review
 
@@ -213,8 +213,10 @@ implementation after this Gate 1 record.
 Review scope is limited to the prospective protocol/templates, one new
 decision, the canonical scenario authority, the existing role-boundary owner,
 the two superseded documentation records, their existing quick-adoption owner,
-version/memory surfaces, and release evidence. The budget is one focused review
-per slice, one fresh-diff review, and one final canonical suite.
+version/memory surfaces, release evidence, and the one self-consumer graph
+capacity blocker exposed by the final suite. The budget is one focused review
+per slice, one fresh-diff review, and one final canonical suite after proven
+blocker correction.
 
 | ID | Severity | Disposition | Finding | Resolution |
 | --- | --- | --- | --- | --- |
@@ -228,16 +230,17 @@ per slice, one fresh-diff review, and one final canonical suite.
 | `FIND-0296` <a name="find-0296"></a> | High | `Blocking` / Resolved | Fresh-diff review found [TEST-0190](test-cases.md#test-0190) hard-coding the 23-owner baseline and requiring every future canonical owner path to remain copied into the completed [FEAT-0053](README.md) record. That turned one-time audit evidence into a second live registry. | Removed the cardinality and historical-document parity assertions. The bounded dispatch guard now consumes whatever executable owners the canonical scenario authority declares, while the 23-owner audit remains immutable delivery evidence only. |
 | `FIND-0297` <a name="find-0297"></a> | High | `Blocking` / Resolved | Fresh-diff review found the first variable-aware dispatch guard pooling same-named assignments across the whole file without scope or execution order, allowing unrelated canonical-path data to falsely block a synthetic child invocation. | Candidate resolution is now limited to the command's nearest scriptblock, assignments before the command, and the nearest prior assignment. Separate-scope and later-assignment inert cases protect the negative boundary. |
 | `FIND-0298` <a name="find-0298"></a> | High | `Blocking` / Resolved | The first scope-aware implementation rescanned a complete scriptblock for every command variable and timed out after 124 seconds; it also compared PowerShell variable names and Windows dispatch paths case-sensitively. | Assignments are indexed once by scope and case-insensitive variable name, nearest-prior selection is linear within that small bucket, and Windows path matching uses ordinal-ignore-case. A mixed-case fixture protects both semantic boundaries. |
+| `FIND-0299` <a name="find-0299"></a> | High | `Blocking` / Resolved | The first final suite stopped at [TEST-0152](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152): immutable `v0.15.1` already used 16,015 of 16,384 graph path-inventory bytes, while the four required `v0.15.2` records and exact owner links produced 16,883. Review also found the current 512-node production ceiling still projected as 256 in [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) and the historical feature. | The current path-inventory and per-path ceiling alone increases to 32,768 bytes; exact N/N+1 rejection, node/edge/depth/blob/tree limits, committed-base integrity, and older immutable limits remain unchanged. The deterministic graph digest and compact-serialization golden values are re-bound to the new release-declared limit. [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) and [FEAT-0037](../FEAT-0037-v0126-instruction-graph-adoption-containment/README.md) now project both the already-released 512-node correction and this measured capacity correction. |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
-- [ ] Mandatory test code and scenario mapping complete.
-- [ ] Test commands and successful results recorded.
-- [ ] Bounded self-review and required convergence scan complete.
-- [ ] No unresolved `Blocking` finding; every other disposition has evidence.
-- [ ] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Acceptance criteria met.
+- [x] Mandatory test code and scenario mapping complete.
+- [x] Test commands and successful results recorded.
+- [x] Bounded self-review and required convergence scan complete.
+- [x] No unresolved `Blocking` finding; every other disposition has evidence.
+- [x] Documentation, links, version, and project memory current.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
 
 ## Post-merge release evidence

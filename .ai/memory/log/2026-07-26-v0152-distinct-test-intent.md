@@ -1,9 +1,10 @@
 # v0.15.2 Distinct Test Intent and Meta-Test Boundaries
 
 Date: 2026-07-26
-Status: In progress
+Status: Implementation complete; PR validation and immutable publication pending
 Feature: [FEAT-0053](../../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
 Issue: [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133)
+Pull request: [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134)
 
 ## Baseline
 
@@ -47,16 +48,24 @@ delivery and publication evidence.
 - The retained
   [TEST-0069](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
   IntegrityManifestIssue shard passed in 152.2 seconds.
+- The first final suite stopped after 1,587.9 seconds only because the exact
+  self-consumer graph used 16,883 bytes against the nearly exhausted 16,384-byte
+  path-inventory ceiling. [FIND-0299](../../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md#find-0299)
+  records the measured 32,768-byte current-policy correction while preserving
+  every independent graph bound and older immutable limit.
+- The corrected canonical instruction-graph owner then passed in 195.6 seconds,
+  including deterministic identity, exact N/N+1 aggregate and per-path limits,
+  self-consumer evidence, two batch processes, and four blob requests.
 
 ## Continuation
 
-1. Complete version/link consistency and StructureOnly validation.
-2. Perform one bounded fresh-diff review and resolve only proven blockers.
-3. Run one final canonical full suite.
-4. Publish the owned PR and immutable `v0.15.2` release, verify its exact
+1. Run one final canonical full suite.
+2. Complete the exact-head hosted gate for
+   [PR #134](https://github.com/hasanmanzak/meAndAI/pull/134).
+3. Publish the owned PR and immutable `v0.15.2` release, verify its exact
    assets and current-authority evidence, close
    [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133), and clean the owned
    branch.
-5. Reevaluate [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+4. Reevaluate [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
    against the completed architecture and deliver one separately measured
    runtime reduction.
