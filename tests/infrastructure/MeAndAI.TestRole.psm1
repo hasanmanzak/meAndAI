@@ -222,6 +222,8 @@ function Test-MeAndAITestRoleSource {
     foreach ($memberAst in @($ast.FindAll({
         param($node)
         $node -is [Management.Automation.Language.MemberExpressionAst] -and
+            $node.Member -is
+                [Management.Automation.Language.StringConstantExpressionAst] -and
             [string]$node.Member.Value -ieq 'Failures'
     }, $true))) {
         $observations.Add([pscustomobject]@{

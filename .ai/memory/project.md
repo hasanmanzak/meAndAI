@@ -9,27 +9,22 @@ Last verified: **2026-07-26**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.1`. The latest immutable release is
-  [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0) at
-  [`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
-  [PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and closed
-  [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) retain its
+- Current protocol version: `0.15.2`. The latest immutable release is
+  [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1) at
+  [`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
+  [PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
+  [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-  and [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
-  complete recurrence routing, canonical test utility ownership, exact Case
-  evidence, role separation, the three bounded hotspot migrations, and the
-  append-only `test-harness-modularity` capability. The final full suite passed
-  all deterministically discovered owners in 2,193.9 seconds; the pull-request
-  and main-push hosted gates passed before immutable `v0.15.0` publication.
-- Current bounded correction:
   [FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-  / [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) makes the
-  ordered source inventory the single archive-to-repository mapping authority.
-  It corrects the verifier defect exposed by
-  [run 30176928208](https://github.com/hasanmanzak/meAndAI/actions/runs/30176928208)
-  without mutating immutable `v0.15.0` or adding consumer-local behavior.
+  makes the ordered source inventory the single archive-to-repository mapping
+  authority while preserving the immutable schema-1 history boundary.
+- Current bounded correction:
+  [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+  / [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) adds the
+  prospective distinct-test-intent and independent-oracle contract without
+  mutating the immutable capability definition or adding consumer-local
+  behavior.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -424,8 +419,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0287](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md#find-0287)
   / [TEST-0189](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189)
   / [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131).
-- Fixed release or evidence: target `0.15.1`; immutable `v0.15.0` remains the
-  historical schema-1 compatibility boundary.
+- Fixed release or evidence: immutable
+  [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1);
+  immutable `v0.15.0` remains the historical schema-1 compatibility boundary.
 - Required safe response: read the declared `bundlePath` and `repositoryPath`
   pair from the canonical inventory, validate both independently, and compare
   exact tracked Git-blob bytes with the declared archive payload.
@@ -438,17 +434,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-  / [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) is the current
-  `0.15.1` continuation. Complete schema-2 mapping, bounded historical
-  compatibility, [TEST-0189](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189),
-  reviewed publication, and current-authority verification of both immutable
-  `v0.15.0` and new `v0.15.1`; do not change consumers or replace `v0.15.0`.
+- [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+  / [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) is the
+  current `0.15.2` continuation. Complete [TEST-0190](../../docs/features/FEAT-0053-v0152-distinct-test-intent/test-cases.md#test-0190),
+  the two proven supersessions, bounded review, immutable publication, and
+  current-authority verification; do not mutate the released capability blob
+  or add consumer-local copies.
 - [FIND-0204](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/README.md#find-0204) remains the separate elapsed-time residual under [TASK-0002](https://github.com/hasanmanzak/meAndAI/issues/98) /
   [issue #98](https://github.com/hasanmanzak/meAndAI/issues/98). Reevaluate its
-  scope after `v0.15.1` publication against the completed modular test
-  architecture, including repeated tests and tests-that-test-tests; do not
-  absorb that reevaluation into [FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
+  scope after `v0.15.2` publication against the completed modular test
+  architecture and [FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+  consolidation; do not absorb the runtime change
+  into the protocol clarification.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

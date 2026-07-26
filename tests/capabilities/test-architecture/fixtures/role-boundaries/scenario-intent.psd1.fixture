@@ -1,0 +1,378 @@
+@{
+    SchemaVersion = 1
+    Relationships = @(
+        'Distinct'
+        'ParameterizedVariant'
+        'InfrastructureContract'
+        'SupersededDuplicate'
+    )
+    DispatchCases = @(
+        @{
+            Name = 'direct-static-powershell-file'
+            Source = 'powershell -File ''tests/capabilities/consumer-update/protocol-update.tests.ps1'''
+            ExpectedTargets = @(
+                'tests/capabilities/consumer-update/protocol-update.tests.ps1'
+            )
+        }
+        @{
+            Name = 'variable-ampersand-dispatch'
+            Source = '$suitePath = ''tests/capabilities/consumer-update/protocol-update.tests.ps1''; & $suitePath'
+            ExpectedTargets = @(
+                'tests/capabilities/consumer-update/protocol-update.tests.ps1'
+            )
+        }
+        @{
+            Name = 'joined-variable-powershell-file'
+            Source = '$suitePath = Join-Path ''C:/repo'' ''tests/capabilities/consumer-update/protocol-update.tests.ps1''; powershell -File $suitePath'
+            ExpectedTargets = @(
+                'tests/capabilities/consumer-update/protocol-update.tests.ps1'
+            )
+        }
+        @{
+            Name = 'synthetic-child-suite'
+            Source = '$suitePath = ''C:/temp/synthetic-child.tests.ps1''; & $suitePath'
+            ExpectedTargets = @()
+        }
+        @{
+            Name = 'same-name-separate-scope'
+            Source = 'function Read-CanonicalPath { $suitePath = ''tests/capabilities/consumer-update/protocol-update.tests.ps1''; $suitePath }; function Invoke-SyntheticChild { $suitePath = ''C:/temp/synthetic-child.tests.ps1''; & $suitePath }; Invoke-SyntheticChild'
+            ExpectedTargets = @()
+        }
+        @{
+            Name = 'later-canonical-assignment'
+            Source = '$suitePath = ''C:/temp/synthetic-child.tests.ps1''; & $suitePath; $suitePath = ''tests/capabilities/consumer-update/protocol-update.tests.ps1'''
+            ExpectedTargets = @()
+        }
+        @{
+            Name = 'mixed-case-variable-and-path'
+            Source = '$SuitePath = ''TESTS/CAPABILITIES/CONSUMER-UPDATE/PROTOCOL-UPDATE.TESTS.PS1''; & $suitepath'
+            ExpectedTargets = @(
+                'tests/capabilities/consumer-update/protocol-update.tests.ps1'
+            )
+        }
+    )
+    Cases = @(
+        @{
+            Name = 'distinct-boundary'
+            Relationship = 'Distinct'
+            NearestSibling = 'canonical-neighbor'
+            Intent = @{
+                Contract = 'resolve published evidence'
+                Risk = 'remote authority drift'
+                EvidenceLevel = 'External integration'
+                ExercisedBoundary = 'GitHub release API'
+            }
+            SiblingIntent = @{
+                Contract = 'build release archive'
+                Risk = 'local byte drift'
+                EvidenceLevel = 'Local integration'
+                ExercisedBoundary = 'ZIP construction'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'publication-evidence'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @()
+        }
+        @{
+            Name = 'parameterized-variant'
+            Relationship = 'ParameterizedVariant'
+            NearestSibling = 'same-family-case'
+            Intent = @{
+                Contract = 'parse one marker family'
+                Risk = 'ambiguous ownership'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'issue body parser'
+            }
+            SiblingIntent = @{
+                Contract = 'parse one marker family'
+                Risk = 'ambiguous ownership'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'issue body parser'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'marker-family'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @()
+        }
+        @{
+            Name = 'direct-infrastructure-contract'
+            Relationship = 'InfrastructureContract'
+            NearestSibling = 'role-contract'
+            Intent = @{
+                Contract = 'canonical suite dispatch ownership'
+                Risk = 'nested suite execution'
+                EvidenceLevel = 'Structural negative'
+                ExercisedBoundary = 'PowerShell command AST'
+            }
+            SiblingIntent = @{
+                Contract = 'test source role ownership'
+                Risk = 'role overlap'
+                EvidenceLevel = 'Structural negative'
+                ExercisedBoundary = 'PowerShell source AST'
+            }
+            Oracle = 'OwnedInfrastructureContract'
+            InputKind = 'Inert'
+            CanonicalOwner = 'role-boundaries'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @()
+        }
+        @{
+            Name = 'explicit-supersession'
+            Relationship = 'SupersededDuplicate'
+            NearestSibling = 'active-owner'
+            Intent = @{
+                Contract = 'serialize secret writes'
+                Risk = 'concurrent overwrite'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'repository lock'
+            }
+            SiblingIntent = @{
+                Contract = 'serialize secret writes'
+                Risk = 'concurrent overwrite'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'repository lock'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'active-owner'
+            SupersededOwner = 'historical-owner'
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @()
+        }
+        @{
+            Name = 'undeclared-semantic-duplicate'
+            Relationship = 'Distinct'
+            NearestSibling = 'same-contract-owner'
+            Intent = @{
+                Contract = 'reconcile update proposal'
+                Risk = 'wrong proposal mutation'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'managed branch'
+            }
+            SiblingIntent = @{
+                Contract = 'reconcile update proposal'
+                Risk = 'wrong proposal mutation'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'managed branch'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'first-owner'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('IndistinctActiveIntent')
+        }
+        @{
+            Name = 'missing-nearest-sibling'
+            Relationship = 'Distinct'
+            NearestSibling = ''
+            Intent = @{
+                Contract = 'publish release evidence'
+                Risk = 'wrong external authority'
+                EvidenceLevel = 'External integration'
+                ExercisedBoundary = 'release API'
+            }
+            SiblingIntent = @{
+                Contract = 'build release bundle'
+                Risk = 'wrong local bytes'
+                EvidenceLevel = 'Local integration'
+                ExercisedBoundary = 'archive construction'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'publication-evidence'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('MissingNearestSibling')
+        }
+        @{
+            Name = 'missing-relationship'
+            Relationship = ''
+            NearestSibling = 'same-contract-owner'
+            Intent = @{
+                Contract = 'reconcile one proposal'
+                Risk = 'wrong proposal mutation'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'managed branch'
+            }
+            SiblingIntent = @{
+                Contract = 'reconcile one proposal'
+                Risk = 'wrong proposal mutation'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'managed branch'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'proposal-owner'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @('MissingRelationship')
+        }
+        @{
+            Name = 'missing-superseded-owner'
+            Relationship = 'SupersededDuplicate'
+            NearestSibling = 'active-owner'
+            Intent = @{
+                Contract = 'serialize secret writes'
+                Risk = 'concurrent overwrite'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'repository lock'
+            }
+            SiblingIntent = @{
+                Contract = 'serialize secret writes'
+                Risk = 'concurrent overwrite'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'repository lock'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'active-owner'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @('InvalidSupersession')
+        }
+        @{
+            Name = 'invalid-infrastructure-contract'
+            Relationship = 'InfrastructureContract'
+            NearestSibling = 'role-contract'
+            Intent = @{
+                Contract = 'suite dispatch ownership'
+                Risk = 'nested suite execution'
+                EvidenceLevel = 'Structural negative'
+                ExercisedBoundary = 'PowerShell command AST'
+            }
+            SiblingIntent = @{
+                Contract = 'test source role ownership'
+                Risk = 'role overlap'
+                EvidenceLevel = 'Structural negative'
+                ExercisedBoundary = 'PowerShell source AST'
+            }
+            Oracle = 'OwnedContract'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'role-boundaries'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @('InvalidInfrastructureContract')
+        }
+        @{
+            Name = 'missing-underlying-oracle'
+            Relationship = 'Distinct'
+            NearestSibling = 'canonical-neighbor'
+            Intent = @{
+                Contract = 'verify external release'
+                Risk = 'remote authority drift'
+                EvidenceLevel = 'External integration'
+                ExercisedBoundary = 'release API'
+            }
+            SiblingIntent = @{
+                Contract = 'build local bundle'
+                Risk = 'local byte drift'
+                EvidenceLevel = 'Local integration'
+                ExercisedBoundary = 'archive construction'
+            }
+            Oracle = ''
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'publication-evidence'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('MissingOracle')
+        }
+        @{
+            Name = 'another-test-source-oracle'
+            Relationship = 'Distinct'
+            NearestSibling = 'documented-scenario'
+            Intent = @{
+                Contract = 'scenario wording'
+                Risk = 'overstated evidence'
+                EvidenceLevel = 'Structural'
+                ExercisedBoundary = 'Markdown row'
+            }
+            SiblingIntent = @{
+                Contract = 'runtime state transition'
+                Risk = 'incorrect mutation'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'production launcher'
+            }
+            Oracle = 'AnotherTestSource'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'wording-check'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('AnotherTestOracle')
+        }
+        @{
+            Name = 'another-test-result-oracle'
+            Relationship = 'InfrastructureContract'
+            NearestSibling = 'runtime-suite'
+            Intent = @{
+                Contract = 'feature behavior'
+                Risk = 'false completion'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'child suite output'
+            }
+            SiblingIntent = @{
+                Contract = 'feature behavior'
+                Risk = 'false completion'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'child suite output'
+            }
+            Oracle = 'AnotherTestResult'
+            InputKind = 'Inert'
+            CanonicalOwner = 'meta-suite'
+            SupersededOwner = ''
+            ActiveIdentityCount = 1
+            ExpectedViolationCodes = @('AnotherTestOracle')
+        }
+        @{
+            Name = 'another-test-assertion-oracle'
+            Relationship = 'Distinct'
+            NearestSibling = 'runtime-scenario'
+            Intent = @{
+                Contract = 'feature behavior'
+                Risk = 'false completion'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'production command'
+            }
+            SiblingIntent = @{
+                Contract = 'assertion wording'
+                Risk = 'source coupling'
+                EvidenceLevel = 'Structural'
+                ExercisedBoundary = 'test source'
+            }
+            Oracle = 'AnotherTestAssertion'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'feature-owner'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('AnotherTestOracle')
+        }
+        @{
+            Name = 'another-test-pass-marker-oracle'
+            Relationship = 'Distinct'
+            NearestSibling = 'runtime-scenario'
+            Intent = @{
+                Contract = 'feature behavior'
+                Risk = 'false completion'
+                EvidenceLevel = 'Integration'
+                ExercisedBoundary = 'production command'
+            }
+            SiblingIntent = @{
+                Contract = 'pass marker text'
+                Risk = 'result coupling'
+                EvidenceLevel = 'Structural'
+                ExercisedBoundary = 'test output'
+            }
+            Oracle = 'AnotherTestPassMarker'
+            InputKind = 'Synthetic'
+            CanonicalOwner = 'feature-owner'
+            SupersededOwner = ''
+            ActiveIdentityCount = 2
+            ExpectedViolationCodes = @('AnotherTestOracle')
+        }
+    )
+}

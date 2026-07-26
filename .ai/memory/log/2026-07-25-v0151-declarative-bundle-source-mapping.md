@@ -1,7 +1,7 @@
 # v0.15.1 Declarative Bundle Source Mapping
 
 Date: 2026-07-25
-Status: In progress
+Status: Complete; closure appended below
 Feature: [FEAT-0052](../../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
 Issue: [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) /
 [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131)
@@ -49,3 +49,13 @@ mapping contract, not to a consumer or to the immutable release payload.
 5. Reevaluate [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
    against the completed test architecture, including repeated tests and
    tests-that-test-tests.
+
+## Closure update - 2026-07-26
+
+Immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
+was published at
+[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8)
+after [PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) merged; linked
+[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) is closed. The
+current continuation is the
+[v0.15.2 distinct-test-intent handoff](2026-07-26-v0152-distinct-test-intent.md).

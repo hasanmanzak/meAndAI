@@ -11,6 +11,14 @@
 | Decision | [DEC-0013](../../decisions/DEC-0013-trusted-adoption-and-recoverable-evidence.md) |
 | Tests | [TEST-0077](test-cases.md#test-0077), [TEST-0078](test-cases.md#test-0078), [TEST-0079](test-cases.md#test-0079), [TEST-0080](test-cases.md#test-0080), [TEST-0081](test-cases.md#test-0081), [TEST-0082](test-cases.md#test-0082), [TEST-0083](test-cases.md#test-0083), [TEST-0084](test-cases.md#test-0084), and [TEST-0085](test-cases.md#test-0085) |
 
+[FEAT-0053](../FEAT-0053-v0152-distinct-test-intent/README.md) preserves this
+correction history while superseding [TEST-0081](test-cases.md#test-0081) with canonical
+[TEST-0069](../FEAT-0012-v082-correction/test-cases.md#test-0069) and
+[TEST-0082](test-cases.md#test-0082)
+with canonical [TEST-0070](../FEAT-0012-v082-correction/test-cases.md#test-0070).
+Their material runtime variants remain covered by the canonical scenarios; the
+former [TEST-0082](test-cases.md#test-0082) source-wording oracle is retired.
+
 ## Problem and outcome
 
 The read-only v0.8.3 scan found eleven observations after the prior correction

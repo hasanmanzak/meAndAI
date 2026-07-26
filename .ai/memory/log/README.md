@@ -5,23 +5,20 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+Immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
 is published at
-[`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
-[PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and closed
-[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) retain the
-[FEAT-0051](../../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
+[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
+[PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
+[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain the
+[FEAT-0052](../../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
 delivery, review, test, and release evidence.
 
-[FEAT-0052](../../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-/ [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) is the current
-`0.15.1` continuation after post-publication
-[run 30176928208](https://github.com/hasanmanzak/meAndAI/actions/runs/30176928208)
-exposed a verifier-only inferred repository path. Follow the
-[declarative bundle-source mapping handoff](2026-07-25-v0151-declarative-bundle-source-mapping.md).
-The completed
-[v0.15.0 release-candidate handoff](2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
-and its slice handoffs remain historical evidence.
+[FEAT-0053](../../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+/ [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) is the current
+`0.15.2` continuation. Follow the
+[distinct-test-intent handoff](2026-07-26-v0152-distinct-test-intent.md).
+The completed [v0.15.1 handoff](2026-07-25-v0151-declarative-bundle-source-mapping.md)
+and earlier slice handoffs remain historical evidence.
 
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
@@ -51,6 +48,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-26 - v0.15.2 distinct test intent and meta-test boundaries](2026-07-26-v0152-distinct-test-intent.md)
 - [2026-07-25 - v0.15.1 declarative bundle source mapping](2026-07-25-v0151-declarative-bundle-source-mapping.md)
 - [2026-07-25 - v0.15.0 recurrence prevention and modular test harness release candidate](2026-07-25-v0150-recurrence-prevention-modular-test-harness.md)
 - [2026-07-25 - v0.15.0 runtime evidence and test roles](2026-07-25-v0150-subf-0097-runtime-evidence-roles.md)

@@ -31,6 +31,7 @@
 | [DEC-0027](DEC-0027-single-owner-consumer-merge-events.md) | [Use one consumer lifecycle event per managed merge](DEC-0027-single-owner-consumer-merge-events.md) | Accepted | 2026-07-23 |
 | [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md) | [Fix reusable consumer failures at their common upstream authority](DEC-0028-upstream-owned-reusable-corrections.md) | Accepted | 2026-07-23 |
 | [DEC-0029](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | [Keep recurrence knowledge and test harness roles under canonical owners](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | Accepted | 2026-07-25 |
+| [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) | [Require distinct numbered-test intent and direct infrastructure-contract evidence](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) | Accepted | 2026-07-26 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

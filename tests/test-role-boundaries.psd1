@@ -35,6 +35,7 @@
     )
     InertFixtures = @(
         'tests/capabilities/test-architecture/fixtures/helper-ownership/helper-ownership.psd1.fixture'
+        'tests/capabilities/test-architecture/fixtures/role-boundaries/scenario-intent.psd1.fixture'
     )
     ReviewedInertExceptions = @(
         @{

@@ -4,22 +4,18 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.15.1**
+Current protocol version: **0.15.2**
 
-Immutable [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
-is the prior published release. [PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
-and closed [issue #124](https://github.com/hasanmanzak/meAndAI/issues/124)
-retain its delivery and publication evidence. The `v0.15.1` correction is
-tracked by [FEAT-0052](docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-and [issue #131](https://github.com/hasanmanzak/meAndAI/issues/131), which remain
-the authority until the reviewed pull request and immutable release are
-published. Current verifier authority passed the
-[v0.14.5](https://github.com/hasanmanzak/meAndAI/actions/runs/30135901192),
-[v0.14.4](https://github.com/hasanmanzak/meAndAI/actions/runs/30136054438),
-[v0.14.3](https://github.com/hasanmanzak/meAndAI/actions/runs/30136203285), and
-[v0.14.2](https://github.com/hasanmanzak/meAndAI/actions/runs/30136551195)
-publication gates; retained [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117)
-and [issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
+Immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
+is the prior published release at
+[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
+[PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
+[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain the
+[FEAT-0052](docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
+delivery and publication evidence. The `v0.15.2` clarification is tracked by
+[FEAT-0053](docs/features/FEAT-0053-v0152-distinct-test-intent/README.md) and
+[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133), which remain the
+authority until the reviewed pull request and immutable release are published.
 [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains open as the separate residual runtime owner.
 

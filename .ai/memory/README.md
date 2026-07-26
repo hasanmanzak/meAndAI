@@ -2,34 +2,27 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-26**<br>
-Protocol version: **0.15.1**<br>
-Latest immutable release: **0.15.0**
+Protocol version: **0.15.2**<br>
+Latest immutable release: **0.15.1**
 
-The immutable [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+The immutable [v0.15.1](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.1)
 release is complete at
-[`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
-[PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and closed
-[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124),
-[issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
-[issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
-[issue #127](https://github.com/hasanmanzak/meAndAI/issues/127), and
-[issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) retain the
+[`c1a41d8fb633321ddf9725c1a00d829f006693a8`](https://github.com/hasanmanzak/meAndAI/commit/c1a41d8fb633321ddf9725c1a00d829f006693a8).
+[PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) and closed
+[issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
+[FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md).
 
-[FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
-/ [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) is the current
-`0.15.1` correction. Post-publication
-[run 30176928208](https://github.com/hasanmanzak/meAndAI/actions/runs/30176928208)
-proved that the verifier inferred a repository source path from a runtime
-bundle path even though the builder already required a different tracked path.
-The correction makes the ordered source inventory the single mapping authority
-and keeps only a version-bounded schema-1 adapter for immutable releases
-`v0.12.4` through `v0.15.0`. Follow the
-[current handoff](log/2026-07-25-v0151-declarative-bundle-source-mapping.md).
+[FEAT-0053](../../docs/features/FEAT-0053-v0152-distinct-test-intent/README.md)
+/ [issue #133](https://github.com/hasanmanzak/meAndAI/issues/133) is the current
+`0.15.2` clarification. It requires explicit same-contract sibling review,
+preserves direct infrastructure-contract tests, removes test-derived oracles,
+and consolidates only the two duplicate identities proven by the finite active
+portfolio review. Follow the
+[current handoff](log/2026-07-26-v0152-distinct-test-intent.md).
 [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-remains the separate runtime residual owner and must be reevaluated after this
-bounded publication correction closes.
+remains the separate runtime residual owner and follows this bounded
+publication correction.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

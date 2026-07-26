@@ -3,6 +3,46 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.2 - 2026-07-26
+
+### Added
+
+- Add an explicit numbered-scenario intent review with `Distinct`,
+  `ParameterizedVariant`, `InfrastructureContract`, and
+  `SupersededDuplicate` dispositions.
+- Add direct role-boundary evidence for the intent vocabulary, canonical-suite
+  dispatch boundary, and independent-oracle requirement.
+
+### Changed
+
+- Require one canonical identity, reviewed parameterization, or historical
+  supersession when contract, risk, evidence level, and exercised boundary are
+  identical.
+- Keep legitimate discovery, ownership, role, evidence, and lifecycle checks
+  as direct infrastructure-contract tests rather than classifying them as
+  tests of another test.
+
+### Fixed
+
+- Consolidate contract-equivalent
+  [TEST-0081](docs/features/FEAT-0013-v084-correction/test-cases.md#test-0081)
+  evidence under [TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
+  and [TEST-0082](docs/features/FEAT-0013-v084-correction/test-cases.md#test-0082)
+  evidence under [TEST-0070](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0070)
+  without removing material runtime cases.
+- Remove the source-row oracle that tested
+  [TEST-0070](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0070)'s documentation wording
+  instead of the production behavior.
+- Reject direct/static canonical-suite dispatch while preserving synthetic
+  child-suite execution owned by infrastructure-contract tests.
+
+Related work: [FEAT-0053](docs/features/FEAT-0053-v0152-distinct-test-intent/README.md),
+[issue #133](https://github.com/hasanmanzak/meAndAI/issues/133),
+[DEC-0030](docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md),
+[TEST-0190](docs/features/FEAT-0053-v0152-distinct-test-intent/test-cases.md#test-0190),
+[TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069),
+and [TEST-0070](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0070).
+
 ## 0.15.1 - 2026-07-26
 
 ### Changed
