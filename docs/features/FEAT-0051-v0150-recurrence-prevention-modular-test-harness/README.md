@@ -11,8 +11,10 @@
 | Tests | [Test scenarios](test-cases.md) |
 
 Implementation was authorized and completed in the declared subfeature order
-on 2026-07-25. The current branch does not publish `0.15.0`; the reviewed pull
-request and immutable release remain separate post-merge gates.
+on 2026-07-25. [Implementation PR #130](https://github.com/hasanmanzak/meAndAI/pull/130)
+merged and immutable [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+was published at
+[`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
 
 ## Problem
 
@@ -344,14 +346,14 @@ consistency, and one fresh-diff review.
 - [x] No unresolved Blocking finding; all other dispositions have evidence.
 - [x] Documentation, links, version, and project memory current.
 - [x] Issue, pull request, decisions, and related work cross-linked.
-- [ ] Applicable CI and review gates passed.
+- [x] Applicable CI and review gates passed.
 
 ## Post-merge release evidence
 
 | Field | Evidence |
 | --- | --- |
 | External evidence authority | [Issue #124](https://github.com/hasanmanzak/meAndAI/issues/124) |
-| Release authority | Pending implementation and immutable v0.15.0 publication |
-| Release identifier | Pending |
-| Target commit | Pending |
-| Verification evidence | Pending |
+| Release authority | Merged [PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and immutable [v0.15.0 release](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0) |
+| Release identifier | `v0.15.0` |
+| Target commit | [`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e) |
+| Verification evidence | [PR run 30175745114](https://github.com/hasanmanzak/meAndAI/actions/runs/30175745114), [main run 30176666663](https://github.com/hasanmanzak/meAndAI/actions/runs/30176666663), and [publication evidence](https://github.com/hasanmanzak/meAndAI/issues/124#issuecomment-5080766959). Current-authority post-publication path verification exposed the separate [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131); immutable payload replacement is not permitted. |

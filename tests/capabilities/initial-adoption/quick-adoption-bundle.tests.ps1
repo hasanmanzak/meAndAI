@@ -34,7 +34,7 @@ function New-TestRuntimeBundle {
 
     $moduleSource = @'
 function Invoke-MeAndAIQuickAdoption {
-    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.15.0')
+    param([string]$TargetPath = '.', [string]$ProtocolTag = 'v0.15.1')
     [IO.File]::WriteAllText(
         $env:MEANDAI_TEST_RUNTIME_SENTINEL,
         "$TargetPath`n$ProtocolTag",
@@ -46,7 +46,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
     $moduleManifest = @'
 @{
     RootModule = 'MeAndAI.QuickAdoption.psm1'
-    ModuleVersion = '0.15.0'
+    ModuleVersion = '0.15.1'
     GUID = '04ed28e4-4f2c-4ec0-9497-d81487d114ec'
     PowerShellVersion = '5.1'
     FunctionsToExport = @('Invoke-MeAndAIQuickAdoption')
@@ -84,7 +84,7 @@ Export-ModuleMember -Function 'Invoke-MeAndAIQuickAdoption'
         schema = 1
         kind = 'meandai.quick-adoption.module-bundle'
         runtimeRepository = 'hasanmanzak/meAndAI'
-        runtimeReleaseTag = 'v0.15.0'
+        runtimeReleaseTag = 'v0.15.1'
         sourceCommit = if ($ManifestSourceCommit) {
             $ManifestSourceCommit
         }
@@ -233,19 +233,101 @@ function Get-PublicParameterContract {
 $bootstrapRelativePath = 'scripts/Invoke-MeAndAIQuickAdoption.ps1'
 $builderRelativePath = 'scripts/Build-MeAndAIQuickAdoptionBundle.ps1'
 $inventoryRelativePath = 'scripts/quick-adoption/bundle.sources.json'
-$moduleRelativePaths = @(
-    'scripts/quick-adoption/MeAndAI.QuickAdoption.psd1',
-    'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1',
-    'scripts/MeAndAI.ContentIdentity.psm1',
-    'scripts/quick-adoption/Private/Configuration.ps1',
-    'scripts/quick-adoption/Private/OutputAndNativeProcess.ps1',
-    'scripts/quick-adoption/Private/RepositoryAssessment.ps1',
-    'scripts/quick-adoption/Private/ProtocolReleaseAndAssets.ps1',
-    'scripts/quick-adoption/Private/ProposalOwnership.ps1',
-    'scripts/quick-adoption/Private/CodexRuntime.ps1',
-    'scripts/quick-adoption/Private/CompletionAndPublication.ps1',
-    'scripts/quick-adoption/Public/Invoke-MeAndAIQuickAdoption.ps1'
-)
+$publicEntryBundlePath =
+    'MeAndAI.QuickAdoption/Public/Invoke-MeAndAIQuickAdoption.ps1'
+$moduleRootBundlePath = 'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psm1'
+$inventoryEntryPoint = ''
+$publicEntryRepositoryPath = ''
+$moduleRootRepositoryPath = ''
+$inventorySourceRecords = @()
+$moduleRelativePaths = @()
+$actualBundleSources = @()
+$repositoryPathByBundlePath =
+    [Collections.Generic.Dictionary[string, string]]::new(
+        [StringComparer]::Ordinal
+    )
+$inventoryText = Get-RelativeFileText -RelativePath $inventoryRelativePath
+if ($inventoryText) {
+    try {
+        $inventory = $inventoryText | ConvertFrom-Json
+        $properties = @($inventory.PSObject.Properties | ForEach-Object {
+            [string]$_.Name
+        })
+        if (($properties -join ',') -cne 'schema,kind,entryPoint,sources' -or
+            -not ($inventory.schema -is [int] -or
+                $inventory.schema -is [long]) -or
+            [long]$inventory.schema -ne 2 -or
+            -not ($inventory.kind -is [string]) -or
+            [string]$inventory.kind -cne
+                'meandai.quick-adoption.bundle-sources' -or
+            -not ($inventory.entryPoint -is [string]) -or
+            -not ($inventory.sources -is [array])) {
+            throw 'Bundle source inventory identity or top-level shape is invalid.'
+        }
+        $inventoryEntryPoint = [string]$inventory.entryPoint
+        $sources = @($inventory.sources)
+        if ($sources.Count -lt 1 -or $sources.Count -gt 64) {
+            throw 'Bundle source inventory has an invalid bounded source count.'
+        }
+        $bundlePathSet = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+        $repositoryPathSet = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+        $inventorySourceRecords = @($sources | ForEach-Object {
+            $sourceProperties = @($_.PSObject.Properties | ForEach-Object {
+                [string]$_.Name
+            })
+            if (($sourceProperties -join ',') -cne
+                    'bundlePath,repositoryPath' -or
+                -not ($_.bundlePath -is [string]) -or
+                -not ($_.repositoryPath -is [string])) {
+                throw 'Bundle source record does not have the exact canonical shape.'
+            }
+            $bundlePath = [string]$_.bundlePath
+            $repositoryPath = [string]$_.repositoryPath
+            if ($bundlePath -cnotmatch
+                    '^MeAndAI\.QuickAdoption/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -or
+                $bundlePath.Contains('\') -or
+                $bundlePath -cmatch '(^|/)(?:\.|\.\.)(?:/|$)' -or
+                -not $bundlePathSet.Add($bundlePath)) {
+                throw "Bundle source path '$bundlePath' is unsafe or duplicated."
+            }
+            if ($repositoryPath -cnotmatch
+                    '^(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+$' -or
+                $repositoryPath.Contains('\') -or
+                $repositoryPath -cmatch '(^|/)(?:\.|\.\.)(?:/|$)' -or
+                -not $repositoryPathSet.Add($repositoryPath)) {
+                throw "Bundle repository source path '$repositoryPath' is unsafe or duplicated."
+            }
+            $repositoryPathByBundlePath.Add($bundlePath, $repositoryPath)
+            [pscustomobject]@{
+                BundlePath = $bundlePath
+                RepositoryPath = $repositoryPath
+            }
+        })
+        $actualBundleSources = @($inventorySourceRecords | ForEach-Object {
+            [string]$_.BundlePath
+        })
+        if (-not ($actualBundleSources -ccontains $inventoryEntryPoint)) {
+            throw 'Bundle source inventory entry point is absent from its source records.'
+        }
+        if (-not $repositoryPathByBundlePath.TryGetValue(
+            $publicEntryBundlePath, [ref]$publicEntryRepositoryPath
+        ) -or -not $repositoryPathByBundlePath.TryGetValue(
+            $moduleRootBundlePath, [ref]$moduleRootRepositoryPath
+        )) {
+            throw 'Bundle source inventory omits a required runtime module entry.'
+        }
+        $moduleRelativePaths = @($inventorySourceRecords | ForEach-Object {
+            [string]$_.RepositoryPath
+        })
+    }
+    catch {
+        Add-Failure "TEST-0147 bundle source inventory is not canonical schema-2 JSON: $($_.Exception.Message)"
+    }
+}
 $allSourcePaths = @(
     $bootstrapRelativePath,
     $builderRelativePath,
@@ -264,7 +346,7 @@ if ($bootstrap) {
         Add-Failure "TEST-0147 thin bootstrapper exceeds its bounded review surface: $lineCount lines."
     }
     foreach ($required in @(
-        "`$runtimeReleaseTag = 'v0.15.0'",
+        "`$runtimeReleaseTag = 'v0.15.1'",
         "`$runtimeBundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'",
         '$runtimeBundleMaximumArchiveBytes = 67108864',
         '$runtimeBundleMaximumExpandedBytes = 67108864',
@@ -314,7 +396,7 @@ if ($bootstrap) {
     try {
         $bootstrapContract = @(Get-PublicParameterContract -Source $bootstrap)
         $publicContract = @(Get-PublicParameterContract `
-            -Source ([string]$sourceByPath['scripts/quick-adoption/Public/Invoke-MeAndAIQuickAdoption.ps1']) `
+            -Source ([string]$sourceByPath[$publicEntryRepositoryPath]) `
             -FunctionName 'Invoke-MeAndAIQuickAdoption')
         $bootstrapJson = $bootstrapContract | ConvertTo-Json -Depth 5 -Compress
         $publicJson = $publicContract | ConvertTo-Json -Depth 5 -Compress
@@ -327,7 +409,14 @@ if ($bootstrap) {
     }
 }
 
-foreach ($relativePath in @($bootstrapRelativePath, $builderRelativePath) + $moduleRelativePaths) {
+foreach ($relativePath in @(
+    $bootstrapRelativePath,
+    $builderRelativePath
+) + @($inventorySourceRecords | Where-Object {
+    [string]$_.BundlePath -match '\.(?:ps1|psd1|psm1)$'
+} | ForEach-Object {
+    [string]$_.RepositoryPath
+})) {
     $text = [string]$sourceByPath[$relativePath]
     if (-not $text) { continue }
     $tokens = $null
@@ -340,35 +429,9 @@ foreach ($relativePath in @($bootstrapRelativePath, $builderRelativePath) + $mod
     }
 }
 
-$inventoryText = [string]$sourceByPath[$inventoryRelativePath]
-if ($inventoryText) {
+$loaderText = [string]$sourceByPath[$moduleRootRepositoryPath]
+if ($loaderText) {
     try {
-        $inventory = $inventoryText | ConvertFrom-Json
-        $properties = @($inventory.PSObject.Properties | ForEach-Object { [string]$_.Name })
-        if (($properties -join ',') -cne 'schema,kind,entryPoint,sources') {
-            Add-Failure 'TEST-0147 bundle source inventory does not have the exact canonical property order.'
-        }
-        if ([long]$inventory.schema -ne 1 -or
-            [string]$inventory.kind -cne 'meandai.quick-adoption.bundle-sources' -or
-            [string]$inventory.entryPoint -cne 'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1') {
-            Add-Failure 'TEST-0147 bundle source inventory identity is invalid.'
-        }
-        $expectedBundleSources = @($moduleRelativePaths | ForEach-Object {
-            if ($_ -ceq 'scripts/MeAndAI.ContentIdentity.psm1') {
-                'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1'
-            }
-            else {
-                ($_ -replace '^scripts/quick-adoption/', `
-                    'MeAndAI.QuickAdoption/')
-            }
-        })
-        $actualBundleSources = @($inventory.sources | ForEach-Object { [string]$_ })
-        if (($actualBundleSources -join "`n") -cne ($expectedBundleSources -join "`n")) {
-            Add-Failure 'TEST-0147 bundle source inventory is not the exact ordered module payload.'
-        }
-        $loaderText = [string]$sourceByPath[
-            'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1'
-        ]
         $loaderSources = @([regex]::Matches(
             $loaderText,
             "'(?<path>(?:Private|Public)/[A-Za-z0-9_.-]+\.ps1)'",
@@ -384,7 +447,7 @@ if ($inventoryText) {
         }
     }
     catch {
-        Add-Failure "TEST-0147 bundle source inventory is not valid canonical JSON: $($_.Exception.Message)"
+        Add-Failure "TEST-0147 module loader inventory comparison failed: $($_.Exception.Message)"
     }
 }
 
@@ -393,8 +456,16 @@ if ($LASTEXITCODE -ne 0 -or $trackedArchive.Count -ne 0) {
     Add-Failure 'TEST-0147 a generated quick-adoption bundle is tracked or archive inventory failed.'
 }
 
-$moduleManifestPath = Join-Path $root 'scripts/quick-adoption/MeAndAI.QuickAdoption.psd1'
-$modulePath = Join-Path $root 'scripts/quick-adoption/MeAndAI.QuickAdoption.psm1'
+$moduleManifestRepositoryPath = if ($inventoryEntryPoint) {
+    [string]$repositoryPathByBundlePath[$inventoryEntryPoint]
+}
+else { '' }
+$moduleManifestPath = Join-Path $root (
+    $moduleManifestRepositoryPath -replace '/', [IO.Path]::DirectorySeparatorChar
+)
+$modulePath = Join-Path $root (
+    $moduleRootRepositoryPath -replace '/', [IO.Path]::DirectorySeparatorChar
+)
 if ((Test-Path -LiteralPath $moduleManifestPath -PathType Leaf) -and
     (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
     $beforeLocation = (Get-Location).Path
@@ -425,19 +496,40 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
     [void](New-Item -ItemType Directory -Path $fixtureRoot)
     try {
         $sourceRoot = Join-Path $fixtureRoot 'source'
-        $sourceScripts = Join-Path $sourceRoot 'scripts'
-        [void](New-Item -ItemType Directory -Path $sourceScripts -Force)
-        Copy-Item -LiteralPath (Join-Path $root 'scripts/quick-adoption') `
-            -Destination $sourceScripts -Recurse
-        Copy-Item -LiteralPath (Join-Path $root `
-            'scripts/MeAndAI.ContentIdentity.psm1') `
-            -Destination (Join-Path $sourceScripts `
-                'MeAndAI.ContentIdentity.psm1')
-        $fixtureBuilderPath = Join-Path $sourceScripts `
-            'Build-MeAndAIQuickAdoptionBundle.ps1'
+        [void](New-Item -ItemType Directory -Path $sourceRoot -Force)
+        foreach ($fixtureSourceRelativePath in @(
+            $inventoryRelativePath
+        ) + $moduleRelativePaths) {
+            $fixtureSourcePath = Join-Path $root (
+                $fixtureSourceRelativePath -replace '/',
+                    [IO.Path]::DirectorySeparatorChar
+            )
+            $fixtureDestinationPath = Join-Path $sourceRoot (
+                $fixtureSourceRelativePath -replace '/',
+                    [IO.Path]::DirectorySeparatorChar
+            )
+            [void](New-Item -ItemType Directory -Path (
+                Split-Path -Parent $fixtureDestinationPath
+            ) -Force)
+            Copy-Item -LiteralPath $fixtureSourcePath `
+                -Destination $fixtureDestinationPath
+        }
+        $fixtureBuilderPath = Join-Path $sourceRoot (
+            $builderRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar
+        )
+        [void](New-Item -ItemType Directory -Path (
+            Split-Path -Parent $fixtureBuilderPath
+        ) -Force)
         Copy-Item -LiteralPath $builderPath -Destination $fixtureBuilderPath
+        $transformSourceRecord = @($inventorySourceRecords | Where-Object {
+            [string]$_.BundlePath -cmatch
+                '^MeAndAI\.QuickAdoption/Private/.+\.ps1$'
+        } | Select-Object -First 1)
+        if ($transformSourceRecord.Count -ne 1) {
+            throw 'Bundle inventory has no transform-sensitive private source.'
+        }
         $transformRelativePath =
-            'scripts/quick-adoption/Private/Configuration.ps1'
+            [string]$transformSourceRecord[0].RepositoryPath
         $transformPath = Join-Path $sourceRoot `
             ($transformRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar)
         $initialTransformText = [IO.File]::ReadAllText($transformPath).Replace(
@@ -466,9 +558,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             if ($LASTEXITCODE -ne 0) { throw 'Unable to disable fixture commit signing.' }
             & git -C $sourceRoot config core.autocrlf false
             if ($LASTEXITCODE -ne 0) { throw 'Unable to pin fixture blob bytes.' }
-            & git -C $sourceRoot add -- .gitattributes scripts/quick-adoption `
-                scripts/Build-MeAndAIQuickAdoptionBundle.ps1 `
-                scripts/MeAndAI.ContentIdentity.psm1
+            & git -C $sourceRoot add -- .gitattributes scripts
             if ($LASTEXITCODE -ne 0) { throw 'Unable to stage bundle fixture sources.' }
             & git -C $sourceRoot commit -q -m 'TEST-0147 bundle source fixture'
             if ($LASTEXITCODE -ne 0) { throw 'Unable to commit bundle fixture sources.' }
@@ -494,10 +584,10 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $second = Join-Path $fixtureRoot 'second.zip'
         $defaultRoot = Join-Path $fixtureRoot 'default-root.zip'
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.1' -SourceCommit $sourceCommit `
             -OutputPath $first)
         [void](& $builderPath -SourceRoot $sourceRoot `
-            -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
+            -RuntimeReleaseTag 'v0.15.1' -SourceCommit $sourceCommit `
             -OutputPath $second)
         if ($PSVersionTable.PSEdition -ceq 'Desktop') {
             $windowsPowerShell = Join-Path $PSHOME 'powershell.exe'
@@ -506,7 +596,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 $ErrorActionPreference = 'Continue'
                 $defaultRootOutput = @(& $windowsPowerShell -NoProfile `
                     -ExecutionPolicy Bypass -File $fixtureBuilderPath `
-                    -RuntimeReleaseTag 'v0.15.0' `
+                    -RuntimeReleaseTag 'v0.15.1' `
                     -SourceCommit $sourceCommit -OutputPath $defaultRoot 2>&1)
                 $defaultRootExitCode = $LASTEXITCODE
             }
@@ -518,7 +608,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
         }
         else {
-            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.15.0' `
+            [void](& $fixtureBuilderPath -RuntimeReleaseTag 'v0.15.1' `
                 -SourceCommit $sourceCommit -OutputPath $defaultRoot)
         }
         if (-not (Test-Path -LiteralPath $first -PathType Leaf) -or
@@ -550,12 +640,18 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             try { $manifest = $reader.ReadToEnd() | ConvertFrom-Json }
             finally { $reader.Dispose() }
             if ([string]$manifest.sourceCommit -cne $sourceCommit -or
-                [string]$manifest.runtimeReleaseTag -cne 'v0.15.0') {
+                [string]$manifest.runtimeReleaseTag -cne 'v0.15.1') {
                 throw 'Production bundle manifest does not bind the exact source identity.'
             }
-            $expectedEntryOrder = @('manifest.json') + @(
-                $manifest.payload | ForEach-Object { [string]$_.path }
-            )
+            $manifestPayloadPaths = @($manifest.payload | ForEach-Object {
+                [string]$_.path
+            })
+            if ([string]$manifest.entryPoint -cne $inventoryEntryPoint -or
+                ($manifestPayloadPaths -join "`n") -cne
+                    ($actualBundleSources -join "`n")) {
+                throw 'Production bundle manifest does not preserve the declared inventory identity and order.'
+            }
+            $expectedEntryOrder = @('manifest.json') + $manifestPayloadPaths
             if ((@($entries | ForEach-Object { [string]$_.FullName }) -join "`n") -cne
                 ($expectedEntryOrder -join "`n")) {
                 throw 'Production bundle entry order differs from its canonical payload.'
@@ -567,15 +663,11 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
                 if ($entry.Count -ne 1) {
                     throw "Production payload '$($record.path)' is missing or duplicated."
                 }
-                $sourceRelative = if ([string]$record.path -ceq
-                    'MeAndAI.QuickAdoption/MeAndAI.ContentIdentity.psm1') {
-                    'scripts/MeAndAI.ContentIdentity.psm1'
-                }
-                else {
-                    'scripts/quick-adoption/' +
-                        ([string]$record.path).Substring(
-                            'MeAndAI.QuickAdoption/'.Length
-                        )
+                $sourceRelative = [string]$repositoryPathByBundlePath[
+                    [string]$record.path
+                ]
+                if ([string]::IsNullOrEmpty($sourceRelative)) {
+                    throw "Production payload '$($record.path)' has no canonical repository source mapping."
                 }
                 $expectedBytes = Read-TestTrackedBlob -Repository $sourceRoot `
                     -Commit $sourceCommit -RelativePath $sourceRelative
@@ -607,7 +699,8 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         $productionModule = $null
         try {
             $productionModule = Import-Module -Name (Join-Path $extractionRoot `
-                'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1') -Force -PassThru
+                ($inventoryEntryPoint -replace '/',
+                    [IO.Path]::DirectorySeparatorChar)) -Force -PassThru
             $beforeStatus = @(& git -C $sourceRoot status --porcelain=v1)
             & (Get-Command Invoke-MeAndAIQuickAdoption -Module $productionModule.Name) `
                 -TargetPath $sourceRoot -AdoptionStrategy Abort -NoProgress | Out-Null
@@ -639,7 +732,7 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
             }
             try {
                 [void](& $builderPath -SourceRoot $sourceRoot `
-                    -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
+                    -RuntimeReleaseTag 'v0.15.1' -SourceCommit $sourceCommit `
                     -OutputPath $partialOutput)
             }
             catch {
@@ -658,14 +751,132 @@ if (Test-Path -LiteralPath $builderPath -PathType Leaf) {
         Remove-Variable MeAndAITestPartialOutputObserved -Scope Global `
             -ErrorAction SilentlyContinue
 
-        $dirtySource = Join-Path $sourceRoot `
-            'scripts/quick-adoption/Private/Configuration.ps1'
+        $fixtureInventoryPath = Join-Path $sourceRoot $inventoryRelativePath
+        $canonicalInventoryText = [IO.File]::ReadAllText($fixtureInventoryPath)
+        $invalidInventoryCases = @(
+            [pscustomobject]@{
+                Name = 'BundleCurrentSegment'
+                ExpectedError = '*unsafe or duplicated*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.sources[0].bundlePath =
+                        'MeAndAI.QuickAdoption/./MeAndAI.QuickAdoption.psd1'
+                }
+            }
+            [pscustomobject]@{
+                Name = 'BundleParentSegment'
+                ExpectedError = '*unsafe or duplicated*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.sources[0].bundlePath =
+                        'MeAndAI.QuickAdoption/../MeAndAI.QuickAdoption.psd1'
+                }
+            }
+            [pscustomobject]@{
+                Name = 'RepositoryCurrentSegment'
+                ExpectedError = '*unsafe or duplicated*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.sources[0].repositoryPath =
+                        'scripts/./quick-adoption/MeAndAI.QuickAdoption.psd1'
+                }
+            }
+            [pscustomobject]@{
+                Name = 'RepositoryParentSegment'
+                ExpectedError = '*unsafe or duplicated*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.sources[0].repositoryPath =
+                        'scripts/../scripts/quick-adoption/MeAndAI.QuickAdoption.psd1'
+                }
+            }
+            [pscustomobject]@{
+                Name = 'NonStringKind'
+                ExpectedError = '*unsupported identity or shape*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.kind = [object[]]@(
+                        'meandai.quick-adoption.bundle-sources'
+                    )
+                }
+            }
+            [pscustomobject]@{
+                Name = 'NonStringEntryPoint'
+                ExpectedError = '*unsupported identity or shape*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.entryPoint = [object[]]@(
+                        'MeAndAI.QuickAdoption/MeAndAI.QuickAdoption.psd1'
+                    )
+                }
+            }
+            [pscustomobject]@{
+                Name = 'ScalarSources'
+                ExpectedError = '*unsupported identity or shape*'
+                Mutate = {
+                    param($Candidate)
+                    $Candidate.sources = $Candidate.sources[0]
+                }
+            }
+        )
+        foreach ($invalidInventoryCase in $invalidInventoryCases) {
+            $negativeInventory = $canonicalInventoryText | ConvertFrom-Json
+            & ([scriptblock]($invalidInventoryCase.Mutate)) $negativeInventory
+            [IO.File]::WriteAllText(
+                $fixtureInventoryPath,
+                ($negativeInventory | ConvertTo-Json -Depth 8),
+                [Text.UTF8Encoding]::new($false)
+            )
+            & git -C $sourceRoot add -- $inventoryRelativePath
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to stage $($invalidInventoryCase.Name) inventory."
+            }
+            & git -C $sourceRoot commit -q -m `
+                "TEST-0147 $($invalidInventoryCase.Name) inventory"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to commit $($invalidInventoryCase.Name) inventory."
+            }
+            $invalidCommit = (@(& git -C $sourceRoot rev-parse HEAD) -join '').Trim()
+            $invalidOutput = Join-Path $fixtureRoot `
+                ($invalidInventoryCase.Name + '.zip')
+            $invalidRejected = $false
+            try {
+                [void](& $builderPath -SourceRoot $sourceRoot `
+                    -RuntimeReleaseTag 'v0.15.1' `
+                    -SourceCommit $invalidCommit -OutputPath $invalidOutput)
+            }
+            catch {
+                $invalidRejected = $_.Exception.Message -like
+                    [string]$invalidInventoryCase.ExpectedError
+            }
+            if (-not $invalidRejected -or
+                (Test-Path -LiteralPath $invalidOutput)) {
+                Add-Failure "TEST-0147 builder accepted $($invalidInventoryCase.Name) invalid inventory."
+            }
+        }
+        [IO.File]::WriteAllText(
+            $fixtureInventoryPath, $canonicalInventoryText,
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $sourceRoot add -- $inventoryRelativePath
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to stage restored canonical bundle inventory.'
+        }
+        & git -C $sourceRoot commit -q -m 'TEST-0147 restore canonical inventory'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to commit restored canonical bundle inventory.'
+        }
+        $sourceCommit = (@(& git -C $sourceRoot rev-parse HEAD) -join '').Trim()
+
+        $dirtySource = Join-Path $sourceRoot (
+            $transformRelativePath -replace '/', [IO.Path]::DirectorySeparatorChar
+        )
         [IO.File]::AppendAllText($dirtySource, "`n# dirty TEST-0147 source`n")
         $dirtyOutput = Join-Path $fixtureRoot 'dirty.zip'
         $dirtyRejected = $false
         try {
             [void](& $builderPath -SourceRoot $sourceRoot `
-                -RuntimeReleaseTag 'v0.15.0' -SourceCommit $sourceCommit `
+                -RuntimeReleaseTag 'v0.15.1' -SourceCommit $sourceCommit `
                 -OutputPath $dirtyOutput)
         }
         catch {
@@ -857,7 +1068,7 @@ exit /b %ERRORLEVEL%
                 }
             }
             if ($scenario.ShouldPass) {
-                $expectedSentinel = "$runtimeRoot`nv0.15.0"
+                $expectedSentinel = "$runtimeRoot`nv0.15.1"
                 if (-not (Test-Path -LiteralPath $sentinel -PathType Leaf) -or
                     [IO.File]::ReadAllText($sentinel) -cne $expectedSentinel) {
                     Add-Failure 'TEST-0147 verified thin bootstrap did not invoke its exact module entry point.'

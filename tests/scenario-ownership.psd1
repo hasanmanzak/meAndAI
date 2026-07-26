@@ -94,7 +94,7 @@
             Owner = 'tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1'
             TestIds = @(
                 'TEST-0083', 'TEST-0176', 'TEST-0178', 'TEST-0180',
-                'TEST-0181', 'TEST-0182'
+                'TEST-0181', 'TEST-0182', 'TEST-0189'
             )
         }
         @{

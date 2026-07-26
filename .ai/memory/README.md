@@ -1,38 +1,35 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-25**<br>
-Protocol version: **0.15.0**<br>
-Latest immutable release: **0.14.5**
+Last reviewed: **2026-07-26**<br>
+Protocol version: **0.15.1**<br>
+Latest immutable release: **0.15.0**
 
-The immutable [v0.14.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.14.5)
-release is complete. [PR #122](https://github.com/hasanmanzak/meAndAI/pull/122)
-and closed [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121)
-retain its delivery and publication evidence. Current verifier authority also
-closed the retained `v0.14.4`, `v0.14.3`, and `v0.14.2` publication gates;
-[issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) and
-[issue #114](https://github.com/hasanmanzak/meAndAI/issues/114) are closed.
-Follow the [v0.14.5 publication-closure handoff](log/2026-07-25-v0145-publication-closure.md)
-for exact dated evidence. [`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
-remains the separate runtime residual owner.
+The immutable [v0.15.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.0)
+release is complete at
+[`5c6efa43ce366933a388065b32c7c06db0c5de2e`](https://github.com/hasanmanzak/meAndAI/commit/5c6efa43ce366933a388065b32c7c06db0c5de2e).
+[PR #130](https://github.com/hasanmanzak/meAndAI/pull/130) and closed
+[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124),
+[issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
+[issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
+[issue #127](https://github.com/hasanmanzak/meAndAI/issues/127), and
+[issue #128](https://github.com/hasanmanzak/meAndAI/issues/128) retain the
+delivery, review, test, and publication evidence for
+[FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md).
 
-[FEAT-0051](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md)
-is implemented and locally reviewed for target `0.15.0` under
-[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124), with
-[SUBF-0095](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0095) / [issue #128](https://github.com/hasanmanzak/meAndAI/issues/128),
-[SUBF-0096](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0096) / [issue #125](https://github.com/hasanmanzak/meAndAI/issues/125),
-[SUBF-0097](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0097) / [issue #126](https://github.com/hasanmanzak/meAndAI/issues/126),
-and [SUBF-0098](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#subf-0098) / [issue #127](https://github.com/hasanmanzak/meAndAI/issues/127).
-The maintainer authorized implementation on 2026-07-25. Follow the current
-[release-candidate handoff](log/2026-07-25-v0150-recurrence-prevention-modular-test-harness.md);
-the completed [runtime-role handoff](log/2026-07-25-v0150-subf-0097-runtime-evidence-roles.md),
-the completed [canonical-utility handoff](log/2026-07-25-v0150-subf-0096-canonical-utility-ownership.md),
-the completed [first-slice handoff](log/2026-07-25-v0150-subf-0095-recurrence-gate.md),
-and the earlier
-[planning handoff](log/2026-07-25-v0150-recurrence-prevention-planning.md)
-remain historical evidence. The final full suite, reviewed pull request, and
-immutable `v0.15.0` release remain pending under
-[issue #124](https://github.com/hasanmanzak/meAndAI/issues/124).
+[FEAT-0052](../../docs/features/FEAT-0052-v0151-declarative-bundle-source-mapping/README.md)
+/ [BUG-0034](https://github.com/hasanmanzak/meAndAI/issues/131) is the current
+`0.15.1` correction. Post-publication
+[run 30176928208](https://github.com/hasanmanzak/meAndAI/actions/runs/30176928208)
+proved that the verifier inferred a repository source path from a runtime
+bundle path even though the builder already required a different tracked path.
+The correction makes the ordered source inventory the single mapping authority
+and keeps only a version-bounded schema-1 adapter for immutable releases
+`v0.12.4` through `v0.15.0`. Follow the
+[current handoff](log/2026-07-25-v0151-declarative-bundle-source-mapping.md).
+[`TASK-0002` / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
+remains the separate runtime residual owner and must be reevaluated after this
+bounded publication correction closes.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
