@@ -32,6 +32,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: scenario_intent
+    attributes:
+      label: Numbered scenario intent review
+      description: Identify the nearest same-contract sibling, compare contract, risk, evidence level, and exercised boundary, and classify the relationship as Distinct, ParameterizedVariant, InfrastructureContract, or SupersededDuplicate.
+    validations:
+      required: true
+  - type: textarea
     id: decomposition
     attributes:
       label: Decomposition, dependencies, and risks

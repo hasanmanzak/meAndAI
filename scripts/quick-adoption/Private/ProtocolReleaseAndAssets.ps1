@@ -484,7 +484,7 @@ function Import-CanonicalInitialAdoptionPolicy {
             [long]$graphLimits.MaximumDepth -ne 32 -or
             [long]$graphLimits.MaximumBlobBytes -ne 262144 -or
             [long]$graphLimits.MaximumAggregateBlobBytes -ne 4194304 -or
-            [long]$graphLimits.MaximumPathUtf8Bytes -ne 16384) {
+            [long]$graphLimits.MaximumPathUtf8Bytes -ne 32768) {
             throw 'The exact initial-adoption policy returned invalid instruction-graph limits.'
         }
         return [pscustomobject]@{

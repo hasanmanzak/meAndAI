@@ -2093,14 +2093,14 @@ docs/SHOULD_NOT_BE_DISCOVERED.md
         Assert-True -Condition ([string]$graph.digest -ceq [string]$shuffled.digest) `
             -Message 'TEST-0151 shuffled exact-tree input changed the graph digest.'
         Assert-True -Condition ([string]$graph.digest -ceq `
-            '7da1bf35db9db45dbbf70ff777c02ac4c58619dab4a2d1ad5efb969b3c6b2950') `
+            '90341ae3eaf5c7c1be2b9e0476ef127043ffbacaf446d80f0e53e7823c4d935c') `
             -Message "TEST-0151 fixed graph digest differs across supported hosts: $([string]$graph.digest)."
         $compactGraphJson = $graph | ConvertTo-Json -Depth 20 -Compress
         $compactGraphJsonSha = & $getSha256Action -Bytes (
             [Text.UTF8Encoding]::new($false).GetBytes($compactGraphJson)
         )
         Assert-True -Condition ($compactGraphJsonSha -ceq `
-            '31955e351e5921cd5ee23aee4a8ef4d094d1ca0c3cecb38b5df54252b73a411e') `
+            'ccea708053469832cfec6c01b1ddb0da51df53b5cef626fdf70fa21486018004') `
             -Message "TEST-0151 fixed compact graph serialization differs across supported hosts: $compactGraphJsonSha."
         Assert-True -Condition (
             ($graph | ConvertTo-Json -Depth 20 -Compress) -ceq
@@ -3987,7 +3987,7 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             [int]$limits.MaximumDepth -eq 32 -and
             [int]$limits.MaximumBlobBytes -eq 262144 -and
             [int]$limits.MaximumAggregateBlobBytes -eq 4194304 -and
-            [int]$limits.MaximumPathUtf8Bytes -eq 16384
+            [int]$limits.MaximumPathUtf8Bytes -eq 32768
         ) -Message 'TEST-0152 release-owned graph limits differ from DEC-0024.'
 
         $invalidUtf8Fixture = New-TestByteGraphFixture -Files ([ordered]@{
@@ -4082,6 +4082,20 @@ Required reading: [live](docs/INVALID-INFO-LIVE.md).
             $remainingTreePathBytes -= $targetPathBytes
             $index++
         }
+        $perPathPrefix = 'unknown/per-path/'
+        $perPathSuffix = '.bin'
+        $perPathPaddingLength = [int]$limits.MaximumPathUtf8Bytes + 1 -
+            [Text.Encoding]::UTF8.GetByteCount($perPathPrefix + $perPathSuffix)
+        $perPathOverLimit = $perPathPrefix +
+            ('x' * $perPathPaddingLength) + $perPathSuffix
+        Assert-ThrowsLike -Action {
+            & $graphBuilder -BaseHead ('4' * 40) -TreeEntries @(
+                (New-TestTreeEntry -Path $perPathOverLimit)
+            ) -ReadBlob {
+                throw 'Over-limit per-path evidence was dereferenced.'
+            }
+        } -Pattern '*is invalid or case-ambiguous*' `
+            -Message 'TEST-0152 per-path N+1 did not fail closed.'
         $treePathBudgetReader = {
             param($entry)
             if ([string]$entry.Path -cne 'AGENTS.md') {

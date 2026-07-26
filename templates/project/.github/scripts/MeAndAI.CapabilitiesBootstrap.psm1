@@ -78,7 +78,7 @@ $script:MeAndAIInstructionGraphMaximumEdges = 4096
 $script:MeAndAIInstructionGraphMaximumDepth = 32
 $script:MeAndAIInstructionGraphMaximumBlobBytes = 262144
 $script:MeAndAIInstructionGraphMaximumAggregateBlobBytes = 4194304
-$script:MeAndAIInstructionGraphMaximumPathUtf8Bytes = 16384
+$script:MeAndAIInstructionGraphMaximumPathUtf8Bytes = 32768
 $script:MeAndAIGenericInstructionRootFiles = @(
     'CLAUDE.md', 'GEMINI.md', 'PROTOCOL.md', '.cursorrules',
     '.windsurfrules', '.github/copilot-instructions.md'

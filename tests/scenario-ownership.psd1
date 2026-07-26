@@ -62,7 +62,7 @@
                 'TEST-0049', 'TEST-0051', 'TEST-0052', 'TEST-0053',
                 'TEST-0054', 'TEST-0055', 'TEST-0060', 'TEST-0063',
                 'TEST-0069', 'TEST-0070', 'TEST-0073', 'TEST-0078',
-                'TEST-0079', 'TEST-0081', 'TEST-0082', 'TEST-0086',
+                'TEST-0079', 'TEST-0086',
                 'TEST-0087', 'TEST-0089', 'TEST-0090', 'TEST-0100',
                 'TEST-0102', 'TEST-0103', 'TEST-0104', 'TEST-0107',
                 'TEST-0113', 'TEST-0116', 'TEST-0129', 'TEST-0130',
@@ -146,7 +146,7 @@
         @{
             Evidence = 'ExecutableSuite'
             Owner = 'tests/capabilities/test-architecture/role-boundaries.tests.ps1'
-            TestIds = @('TEST-0186', 'TEST-0187')
+            TestIds = @('TEST-0186', 'TEST-0187', 'TEST-0190')
         }
         @{
             Evidence = 'ExecutableSuite'
@@ -191,6 +191,11 @@
             Evidence = 'HistoricalSuperseded'
             Owner = 'docs/features/FEAT-0025-v0102-balanced-windows-validation/test-cases.md'
             TestIds = @('TEST-0117')
+        }
+        @{
+            Evidence = 'HistoricalSuperseded'
+            Owner = 'docs/features/FEAT-0013-v084-correction/test-cases.md'
+            TestIds = @('TEST-0081', 'TEST-0082')
         }
     )
 }

@@ -41,6 +41,10 @@ Describe independently valuable behavior.
   planned executable barrier or reviewed `NotApplicable` rationale under
   [Protocol Gate 0](../../PROTOCOL.md#gate-0---context-and-baseline) and the
   [recurrence knowledge contract](../../PROTOCOL.md#recurrence-knowledge-contract).
+- Numbered scenario intent: identify the nearest same-contract sibling, compare
+  contract, risk, evidence level, and exercised boundary, and record exactly one
+  relationship disposition: `Distinct`, `ParameterizedVariant`,
+  `InfrastructureContract`, or `SupersededDuplicate`.
 - Verification approach: test levels, commands, manual checks, and review scope.
 
 ## Risks
@@ -77,6 +81,7 @@ Describe independently valuable behavior.
 - [ ] Numbered risks and decisions, or explicit N/A rationale.
 - [ ] Reviewable decomposition with a gate ledger.
 - [ ] Numbered test scenarios and verification approach.
+- [ ] Numbered scenario intent review and relationship disposition recorded.
 - [ ] Test-code and baseline-run states recorded.
 - [ ] Prior-art and recurrence evidence is recorded.
 

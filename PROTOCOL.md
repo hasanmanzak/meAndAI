@@ -1,6 +1,6 @@
 # Common Development Protocol
 
-Protocol version: **0.15.1**<br>
+Protocol version: **0.15.2**<br>
 Status: **Active**
 
 ## 1. Purpose and authority
@@ -804,6 +804,26 @@ scenario, support, fixture, and mock roles; fail-closed runtime evidence; and a
 finite self-application that preserves active TEST identities, behavior,
 process isolation, supported runtimes, workflow topology, and approved
 operation budgets without introducing a second framework.
+
+Before adding or changing a numbered scenario, identify its nearest
+same-contract sibling and review its contract, risk, evidence level, and
+exercised boundary. The reviewed relationship MUST be exactly one of `Distinct`,
+`ParameterizedVariant`, `InfrastructureContract`, or `SupersededDuplicate`.
+Scenarios with the same contract, risk, evidence level, and exercised boundary
+MUST have one canonical identity, be expressed as reviewed parameterized
+variants of that identity, or preserve the older identity only as historical
+supersession evidence. Semantic review owns this classification; automation MAY
+verify that the review exists and that explicit topology rules hold, but MUST
+NOT infer intent from source similarity or create a second scenario registry.
+
+A canonical suite MUST NOT invoke another canonical suite or use another test's
+source text, assertion wording, pass marker, or successful result as
+product-behavior evidence. No numbered scenario requires a second numbered
+scenario merely to prove that the first scenario ran or passed. A direct
+infrastructure-contract test MAY validate discovery, ownership, role, evidence,
+or lifecycle behavior when that infrastructure invariant is itself the contract
+under test. Such a test exercises the infrastructure boundary directly and
+does not substitute another scenario's result for its own oracle.
 
 An applicable repository MUST record or emit machine-readable fixture and
 operation evidence that binds ownership, lifecycle, builds, reuse, mutable

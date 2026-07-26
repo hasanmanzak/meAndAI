@@ -3,7 +3,7 @@ $minimumGitHubCliVersion = '2.82.1'
 $workflowSourcePath = 'templates/project/.github/workflows/meandai-protocol-update.yml'
 $workflowTargetPath = '.github/workflows/meandai-protocol-update.yml'
 $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
-$initialAdoptionPolicyTag = 'v0.15.1'
+$initialAdoptionPolicyTag = 'v0.15.2'
 $initialAdoptionPolicySourcePath =
     'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
 $consumerMigrationModulePath = 'scripts/MeAndAI.ConsumerMigrations.psm1'

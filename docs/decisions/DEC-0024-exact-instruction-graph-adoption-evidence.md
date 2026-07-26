@@ -142,8 +142,8 @@ protected unknown evidence: it is not live authority, does not block freshness,
 and cannot be changed or deleted by this feature.
 
 The current schema has inclusive limits of 65,536 inspected tree entries,
-4,194,304 UTF-8 bytes across their paths, 256 nodes, 4,096 edges, depth 32,
-262,144 bytes for one parsed blob, 4,194,304 aggregate parsed bytes, and 16,384
+4,194,304 UTF-8 bytes across their paths, 512 nodes, 4,096 edges, depth 32,
+262,144 bytes for one parsed blob, 4,194,304 aggregate parsed bytes, and 32,768
 UTF-8 bytes for the graph-node path inventory. One tree path is also bounded by
 the graph-node path limit so a pre-terminator tree record cannot grow without
 bound. Reaching a limit is valid; exceeding one blocks before external or
@@ -164,6 +164,21 @@ Deleting valid traceability would only postpone the same capacity failure, so
 the same fail-closed exact N/N+1 boundary. Older immutable releases retain their
 encoded 2,048-edge contract; the current launcher imports and validates the
 policy owned by its exact runtime release.
+
+The ordinary self-consumer graph later exceeded the original 256-node ceiling
+while remaining within every independent surface, edge, depth, and byte bound.
+`v0.15.0` therefore raised only the node ceiling to 512 and retained exact
+N/N+1 evidence. The corresponding current-decision projection is corrected
+here; older immutable releases keep their encoded node ceiling.
+
+At the `v0.15.1` baseline, the ordinary self-consumer graph used 16,015 of the
+16,384 path-inventory bytes. The four required `v0.15.2` feature, decision,
+test, and memory records, together with their exact owner links, produced
+16,883 bytes without changing traversal semantics. Deleting valid traceability
+would only defer the same capacity failure, so `v0.15.2` raises only the
+release-declared graph-node path inventory and per-path ceiling to 32,768 bytes
+and preserves the same exact N/N+1 fail-closed boundary. Older immutable
+releases retain their encoded 16,384-byte contract.
 
 ### Evidence is not mutation authority
 
