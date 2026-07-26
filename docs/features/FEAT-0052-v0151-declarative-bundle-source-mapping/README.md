@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.15.1 |
 | Issue | [Issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) |
-| Pull request | Pending |
+| Pull request | [PR #132](https://github.com/hasanmanzak/meAndAI/pull/132) |
 | Decisions | [DEC-0023](../../decisions/DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0029](../../decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) |
 | Tests | [Test scenarios](test-cases.md) |
 
@@ -92,7 +92,7 @@ still verify the bounded historical schema-1 releases without mutating them.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0099` <a name="subf-0099"></a> | Declarative mapping, bounded legacy adapter, and release closure | [Issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) | [TEST-0189](test-cases.md#test-0189), [TEST-0147](../FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147) | [FIND-0287](#find-0287) and [FIND-0288](#find-0288) resolved; focused owners pass; final full-suite and publication evidence remain external gates | Implementation complete |
+| `SUBF-0099` <a name="subf-0099"></a> | Declarative mapping, bounded legacy adapter, and release closure | [Issue #131](https://github.com/hasanmanzak/meAndAI/issues/131) | [TEST-0189](test-cases.md#test-0189), [TEST-0147](../FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147) | [FIND-0287](#find-0287) and [FIND-0288](#find-0288) resolved; focused owners and final canonical suite pass; hosted and publication evidence remain external gates | Implementation complete |
 
 ## Decisions and relationships
 
@@ -154,7 +154,7 @@ completion budget.
 - [x] Bounded self-review and required convergence scan complete.
 - [x] No unresolved `Blocking` finding; all other dispositions have evidence.
 - [x] Documentation, links, version, and project memory current.
-- [ ] Issue, pull request, decisions, and related work cross-linked.
+- [x] Issue, pull request, decisions, and related work cross-linked.
 - [ ] Applicable CI and review gates passed.
 
 ## Post-merge release evidence

@@ -39,7 +39,7 @@ mapping contract, not to a consumer or to the immutable release payload.
    / [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147)
    evidence is complete; retain the exact results in the feature record.
 2. Bounded fresh-diff review and focused governance are complete; the one
-   final canonical suite passed on Windows PowerShell 5.1 in 2070.1 seconds.
+   final canonical suite passed on Windows PowerShell 5.1 in 2,081.2 seconds.
 3. Merge the owned pull request and publish immutable `v0.15.1` with the
    established two assets.
 4. Verify both historical `v0.15.0` and new `v0.15.1` through current
