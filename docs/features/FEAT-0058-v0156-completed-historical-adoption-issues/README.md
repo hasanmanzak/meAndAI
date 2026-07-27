@@ -218,7 +218,7 @@ project scan, hosted checks, and publication remain delivery gates.
 | Retained lifecycle PowerShell 7 / Windows PowerShell 5.1 | The final candidate passed `AdoptionLifecycle` in 194.9 / 202.4 seconds, including current canonical/legacy behavior, unmarked-row classification, exact drift diagnostics, idempotent recovery, and final ready-state base-race handling. |
 | Final relevant auxiliary gates | PowerShell 7 / Windows PowerShell 5.1 passed bundle verification in 27.3 / 28.9 seconds, runtime-efficiency in 7.7 / 8.9 seconds, and source-graph dispatch in 4.9 / 5.7 seconds. PowerShell 7 role-boundary passed in 19.6 seconds, test architecture in 2.9 seconds, recurrence prevention in 1.1 seconds, and protocol governance in 124.0 seconds. Publication evidence passed without claiming published state on PowerShell 7 / Windows PowerShell 5.1 in 106.6 / 194.1 seconds. |
 | Canonical quick-adoption owner | PowerShell 7 `Shard=All` passed in 847.1 seconds after exercising every declared quick-adoption scenario in one process, including the completed-historical matrix, exact manifest-root rejection, fresh-attempt authority isolation, FullMigration, Codex-failure, and managed-consumer routes. |
-| Final local suite | Pending |
+| Final local suite | Exact candidate commit [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6) passed `pwsh -NoProfile -File tests/protocol.tests.ps1` in 1732.8 seconds. Exact owner times included quick adoption 844.371 seconds, instruction graph 129.840 seconds with 2/2 process starts and 4/4 blob requests, governance 121.801 seconds, publication evidence 100.484 seconds, and runtime efficiency 7.038 seconds; every discovered suite emitted valid scenario evidence. |
 | Pull request / hosted validation | Pending |
 | Immutable release / post-publication verification | Pending `v0.15.6` |
 
@@ -227,7 +227,7 @@ project scan, hosted checks, and publication remain delivery gates.
 - [ ] Acceptance criteria met.
 - [x] Existing [TEST-0069](../FEAT-0012-v082-correction/test-cases.md#test-0069) variant and scenario mapping complete.
 - [x] Focused PowerShell 7 and Windows PowerShell 5.1 evidence recorded.
-- [ ] Bundle, governance, structure, and canonical full-suite evidence recorded.
+- [x] Bundle, governance, structure, and canonical full-suite evidence recorded.
 - [x] Bounded self-review and post-development scan have no unresolved `Blocking` finding.
 - [ ] Documentation, links, version, changelog, active recurrence entry, and project memory current.
 - [ ] Issue and pull request cross-linked.

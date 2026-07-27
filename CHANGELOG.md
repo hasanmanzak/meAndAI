@@ -40,8 +40,11 @@ provider/marker negatives, frozen drift, full-launcher zero-mutation evidence,
 and idempotent positive rerun. The full PowerShell 7 quick-adoption owner then
 passed every declared scenario in one process in 847.1 seconds. Bundle, role-
 boundary, runtime-efficiency, and retained/current source-graph dispatch gates
-also passed. Canonical full-suite, hosted, and immutable-release evidence
-remain delivery gates.
+also passed. Canonical full-suite evidence was then evaluated on exact
+candidate commit
+[`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6):
+the full local suite passed every discovered owner in 1732.8 seconds. Hosted
+and immutable-release evidence remain delivery gates.
 
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /

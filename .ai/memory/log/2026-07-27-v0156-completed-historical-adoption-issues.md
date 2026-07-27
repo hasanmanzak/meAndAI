@@ -82,10 +82,17 @@ this release.
   failure shards also pass on PowerShell 7 / Windows PowerShell 5.1 in 220.3 /
   231.9 and 176.0 / 179.2 seconds. The retained `AdoptionLifecycle` shard
   passes on the final candidate in 194.9 / 202.4 seconds.
+- Exact candidate commit
+  [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6)
+  passes every discovered canonical local suite in 1732.8 seconds. The run
+  records quick adoption at 844.371 seconds, instruction graph at 129.840
+  seconds with 2/2 process starts and 4/4 blob requests, governance at 121.801
+  seconds, publication evidence at 100.484 seconds, and runtime efficiency at
+  7.038 seconds.
 - Final fresh-diff review, structural convergence, exact committed-HEAD graph
-  validation, canonical full suite, hosted checks, immutable publication,
-  post-publication verification, issue closure, and owned-branch cleanup remain
-  delivery gates.
+  validation of the evidence-only finalization, hosted checks, immutable
+  publication, post-publication verification, issue closure, and owned-branch
+  cleanup remain delivery gates.
 
 ## Safe continuation
 
