@@ -46,3 +46,16 @@ passed all discovered contracts in 203.3 seconds after canonical status/link
 hygiene and local package-cache containment corrections. Exact committed-tree
 and hosted evidence remain pending. [TEST-0193](#test-0193) remains a planning
 record.
+
+Exact implementation head
+[`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976)
+then passed 31 of 31 C# tests on Ubuntu and Windows. The complete
+[Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643866)
+passed in 12 min 28 s. The
+[Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643994)
+failed after 8 min 1 s only in the retained canonical
+[TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+streaming infrastructure oracle; the C# step, runtime-efficiency step, every
+required JSONL event, and every separate presentation assertion passed.
+[FIND-0362](README.md#find-0362) owns that blocker; an unchanged-head rerun is
+not closure evidence.

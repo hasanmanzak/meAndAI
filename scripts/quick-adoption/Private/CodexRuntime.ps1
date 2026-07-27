@@ -401,7 +401,14 @@ function Invoke-BoundedProcess {
                 }
                 $stdoutLines.Add([string]$line)
                 if ($null -ne $OutputLineHandler) {
-                    [void](& $OutputLineHandler ([string]$line))
+                    $isRunning = $false
+                    try { $isRunning = -not $process.HasExited } catch { }
+                    $processObservation = [pscustomobject][ordered]@{
+                        ProcessId = [int]$process.Id
+                        IsRunning = [bool]$isRunning
+                    }
+                    [void](& $OutputLineHandler `
+                        ([string]$line) $processObservation)
                 }
                 $stdoutReadTask = $process.StandardOutput.ReadLineAsync()
             }
@@ -435,7 +442,12 @@ function Invoke-BoundedProcess {
             }
             $stdoutLines.Add([string]$line)
             if ($null -ne $OutputLineHandler) {
-                [void](& $OutputLineHandler ([string]$line))
+                $processObservation = [pscustomobject][ordered]@{
+                    ProcessId = [int]$process.Id
+                    IsRunning = $false
+                }
+                [void](& $OutputLineHandler `
+                    ([string]$line) $processObservation)
             }
             $stdoutReadTask = $process.StandardOutput.ReadLineAsync()
         }
@@ -715,7 +727,7 @@ function Invoke-LocalCodexExec {
         -ProgressActivity 'Running local Codex' `
         -RequireProcessTreeContainment `
         -OutputLineHandler {
-            param([string]$Line)
+            param([string]$Line, $ProcessObservation)
             Write-LocalCodexEvent -Line $Line
         }
     if ($result.ExitCode -ne 0) {

@@ -182,6 +182,12 @@ to report:
 | `RISK-0286` <a name="risk-0286"></a> | Shared abstractions encode speculative or duplicated domain rules. | Feature owner / introduce only contracts required by the first vertical consumer and review dependency direction. |
 | `RISK-0287` <a name="risk-0287"></a> | Portable artifacts depend on an unavailable or ambiguous runtime. | Release owner / explicit target, roll-forward, preflight, manifest, and Windows/Linux evidence. |
 
+## Hosted blocker findings
+
+| ID | Area / priority | Finding | Disposition |
+| --- | --- | --- | --- |
+| `FIND-0362` <a name="find-0362"></a> | Canonical streaming test infrastructure / P1 | Exact C# implementation head [`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976) passed 31 of 31 C# tests on both hosts and the complete [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643866), but the [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643994) failed only [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105). Every required JSONL event and presentation assertion passed; only the aggregate live-consumption oracle failed. The C# diff does not touch the bounded process, streaming test, or fixture. The retained oracle reopens the child independently by PID inside the callback, so a hosted process-observation false negative can block the gate without disproving incremental consumption. | `Blocking` / resolved in the reviewed working tree, with new-head hosted confirmation pending. Canonical [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) now receives a `{ ProcessId, IsRunning }` value snapshot from the already-owned `Process` object with each output line, correlates the first event by parent-generated stream identity and exact process ID, and requires `IsRunning=true`. The tests-first missing-snapshot run failed only [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105); the bounded correction then passed [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) and [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) on PowerShell 7 and Windows PowerShell 5.1 in 9.7 / 11.7 seconds. No timing tolerance, weakened event, duplicate scenario, or adoption/publication behavior was added. |
+
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
@@ -237,7 +243,7 @@ Progress is measured against five independently observable delivery gates:
 4. Local self-review, locked restore, analyzer/format verification, and
    candidate-tree protocol validation: complete.
 5. Exact committed-tree validation, remote draft checkpoint, and final-head
-   Ubuntu/Windows hosted evidence: pending.
+   Ubuntu/Windows hosted evidence: blocked by [FIND-0362](#find-0362).
 
 The 2026-07-28 checkpoint is therefore four of five gates, or 80% of
 [SUBF-0120](#subf-0120). Feature completion remains one of three completed

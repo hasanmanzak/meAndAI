@@ -229,7 +229,7 @@ try {
                 -Operation 'Mock Codex JSONL stream' `
                 -ProgressActivity 'Running local Codex' `
                 -OutputLineHandler {
-                    param([string]$Line)
+                    param([string]$Line, $ProcessObservation)
                     Write-LocalCodexEvent -Line $Line
                     $fixtureEvent = $null
                     try {
@@ -244,13 +244,25 @@ try {
                         $fixtureEvent.PSObject.Properties['fixture_stream_identity']
                     }
                     else { $null }
+                    $observedProcessId = if ($null -ne $ProcessObservation) {
+                        $ProcessObservation.PSObject.Properties['ProcessId']
+                    }
+                    else { $null }
+                    $observedIsRunning = if ($null -ne $ProcessObservation) {
+                        $ProcessObservation.PSObject.Properties['IsRunning']
+                    }
+                    else { $null }
                     if ($null -ne $fixtureProcessId -and
                         $null -ne $fixtureStreamIdentity -and
+                        $null -ne $observedProcessId -and
+                        $null -ne $observedIsRunning -and
                         [string]$fixtureProcessId.Value -cmatch '^[1-9][0-9]*$' -and
                         [int64]$fixtureProcessId.Value -le [int]::MaxValue -and
+                        [int]$fixtureProcessId.Value -eq [int]$observedProcessId.Value -and
                         [string]$fixtureStreamIdentity.Value -ceq
                             $script:QuickAdoptionStreamIdentity -and
-                        (Test-OwnedProcessAlive -ProcessId ([int]$fixtureProcessId.Value))) {
+                        $observedIsRunning.Value -is [bool] -and
+                        [bool]$observedIsRunning.Value) {
                         $script:QuickAdoptionStreamObservedWhileActive = $true
                     }
                 }
