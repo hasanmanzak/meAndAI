@@ -467,9 +467,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
   / [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
   own the exact committed-tree boundary.
-- Fixed release or evidence: target release `0.15.5`; expand slash-joined command
-  shorthand into distinct inline-code commands, commit the complete packet, and
-  rerun the exact-tree owner on both PowerShell runtimes before the final suite.
+- Fixed release or evidence: target release `0.15.5`; all three slash-joined
+  command shorthands are distinct inline-code commands in commit `a0ed721`.
+  The exact committed-tree owner passed on PowerShell 7 / Windows PowerShell
+  5.1 in 136.2 / 236.5 seconds with 2/2 process starts and 4/4 blob requests,
+  and the committed-tree full suite passed in 1805.3 seconds. Hosted
+  confirmation remains pending.
 - Required safe response: classify the hosted diagnostic against committed
   bytes, search the entire candidate packet for the same token family, correct
   only ambiguous documentation syntax, commit the full graph-reachable packet,
@@ -670,9 +673,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   passed every discovered owner in 1745.3 seconds, but [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
   proved that the untracked feature packet was absent from its HEAD self-
   consumer slice; first hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
-  exposed the ambiguous documentation token on both runtimes. Later gates are
-  the corrected committed-tree focused/full suites, hosted validation and
-  review on the exact pull-request head, exact merged-commit release, post-
+  exposed the ambiguous documentation token on both runtimes. Commit `a0ed721`
+  expands the shorthand; its exact committed-tree owner passed on PowerShell 7
+  / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with 2/2 process starts and
+  4/4 blob requests, and its full suite passed every discovered owner in 1805.3
+  seconds. Later gates are final evidence-sync exact-tree verification, hosted
+  validation and review on the exact pull-request head, exact merged-commit release, post-
   publication verification, issue closure, and OID-bound branch cleanup. Keep
   every reusable regression upstream and do not mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact

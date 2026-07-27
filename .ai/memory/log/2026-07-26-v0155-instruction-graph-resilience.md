@@ -161,9 +161,20 @@ Completed local evidence:
   against the HEAD inventory found no remaining required local missing target
   and no additional `Blocking` or `Important` token finding. No production
   parser relaxation is indicated.
+- On corrected commit `a0ed721`, the canonical instruction-graph owner passed
+  [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
+  [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
+  and [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161)
+  on PowerShell 7 / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with exact
+  2/2 process starts and 4/4 blob requests on both runtimes. The exact
+  committed-tree full suite then passed every discovered owner in 1805.3
+  seconds, including capabilities bootstrap in 304.173 seconds, quick adoption
+  in 875.939 seconds, instruction graph in 138.206 seconds, governance in
+  127.574 seconds, publication evidence in 109.268 seconds, and runtime
+  efficiency in 7.839 seconds with `contract.self-check` 1/1.
 
 The overall bounded diff/self-review is complete with no unresolved `Blocking`
-finding. Remaining gates are the committed-tree focused/canonical reruns,
+finding. Remaining gates are final evidence-sync exact-tree verification,
 hosted checks and review on the corrected exact pull-request head, exact merged-
 commit `v0.15.5` publication and two-asset verification, post-publication
 verification, closure of only
