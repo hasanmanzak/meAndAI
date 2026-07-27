@@ -29,6 +29,11 @@ This project uses the `M.m.rev` version format defined in the
 - Extend the unchanged instruction-graph schema-2 policy profile through
   v0.15.6 while retaining an exact immutable v0.15.5 policy and dispatch
   fixture and using v0.15.7 only as the future-version negative.
+- Harden retained hosted-streaming
+  [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  by replacing its bidirectional file-observation handshake with an exact live
+  fixture PID and process-start identity check. Production streaming and
+  cancellation behavior remain unchanged.
 
 Candidate validation: exact v0.15.5 produced the expected malformed-marker red
 in 175.6 seconds. The corrected
@@ -48,8 +53,14 @@ the full local suite passed every discovered owner in 1732.8 seconds. Hosted
 validation on exact implementation head
 [`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b)
 then passed Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s. Final
-evidence-only protected checks and immutable-release evidence remain delivery
-gates.
+evidence-only protected checks then exposed the recurring test-only streaming
+handshake on Windows PowerShell 5.1 in two independent hosted runs while Ubuntu
+remained green. Exact correction commit
+[`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+passes the focused [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) /
+[TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.3 seconds. Exact
+final protected checks and immutable-release evidence remain delivery gates.
 
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /

@@ -112,6 +112,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   Exact candidate commit
   [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6)
   passes the canonical full local suite in 1732.8 seconds.
+  The retained hosted-streaming [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  fixture now proves incremental consumption through exact live PID and
+  process-start identity instead of a bidirectional file-observation handshake;
+  exact correction commit
+  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+  passes its focused owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 /
+  11.3 seconds. Final protected hosted confirmation remains required.
 - Required safe response: classify strict local grammar before provider reads,
   prove the exact immutable release, issue, merged pull request, terminal
   marker, actor, absent open pull request, and absent reserved branch within

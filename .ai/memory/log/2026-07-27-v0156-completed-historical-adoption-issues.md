@@ -102,6 +102,15 @@ this release.
 - Exact implementation head
   [`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b)
   passed hosted Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s.
+- Two later independent candidate heads reproduced a Windows PowerShell 5.1
+  [TEST-0105](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  fixture-only failure after the first JSONL event was rendered. The child did
+  not observe the bidirectional file acknowledgment within five seconds even
+  though Ubuntu remained green. Exact correction commit
+  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+  replaces the file handshake with exact live PID plus process-start-ticks
+  evidence. The focused owner passes on PowerShell 7 / Windows PowerShell 5.1
+  in 9.7 / 11.3 seconds without changing production or cancellation behavior.
 - Structural convergence, exact committed-HEAD graph validation and protected
   hosted checks of the evidence-only finalization, immutable publication,
   post-publication verification, issue closure, and owned-branch cleanup
