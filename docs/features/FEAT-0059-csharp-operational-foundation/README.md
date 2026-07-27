@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In development / [SUBF-0119](#subf-0119) authorized |
+| Status | In development / [SUBF-0119](#subf-0119) complete; later slices gated |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
 | Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
@@ -135,14 +135,14 @@ projects but never become a production dependency.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | [SUBF-0119](#subf-0119) passing locally; exact-head hosted evidence pending | [TEST-0191](test-cases.md#test-0191) |
+| Test code | [SUBF-0119](#subf-0119) passing locally and on exact-head Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191) |
 | Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests passing; hosted run pending | Local fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed | Local candidate / hosted pending |
+| `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / not started | Pending | Proposed |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / not started | Pending | Proposed |
 
@@ -155,15 +155,27 @@ Progress is measured against five independently observable delivery gates:
 3. Minimal typed implementation and focused green run: complete.
 4. Local self-review, locked restore, analyzer/format verification, and candidate-
    tree protocol validation: complete.
-5. Exact committed-tree validation and remote draft checkpoint: complete on the
-   initial candidate; final-head Ubuntu/Windows hosted evidence: pending.
+5. Exact committed-tree validation, remote draft checkpoint, and final-head
+   Ubuntu/Windows hosted evidence: complete.
 
-The 2026-07-27 local checkpoint is therefore four of five gates, or 80% of
-[SUBF-0119](#subf-0119). Feature completion remains zero of three completed
-subfeatures because a candidate slice is not counted as complete. The bounded
-estimate for the remaining hosted portion of gate 5 is 15 to 45 minutes,
-primarily dependent on hosted queue time. [SUBF-0120](#subf-0120) and
-[SUBF-0121](#subf-0121) remain unauthorized and are excluded from that estimate.
+The 2026-07-27 closure is therefore five of five gates, or 100% of
+[SUBF-0119](#subf-0119). Feature completion is one of three completed
+subfeatures, or 33%. [SUBF-0120](#subf-0120) and [SUBF-0121](#subf-0121)
+remain unauthorized; no estimate or implementation authority is inferred for
+them.
+
+Observed hosted timings are evidence, not workflow service-level objectives:
+
+| Host | .NET setup | Locked restore | C# tests | Full required job |
+| --- | ---: | ---: | ---: | ---: |
+| Ubuntu | 2 s | 2 s | 7 s | 11 min 56 s |
+| Windows | 32 s | 7 s | 8 s | 31 min 48 s |
+
+The existing PowerShell full-validation stages consumed 11 min 37 s on Ubuntu
+PowerShell 7 and 30 min 34 s on Windows PowerShell 5.1. This measurement shows
+where this checkpoint spent hosted time; it does not authorize removing either
+PowerShell route while those routes remain production or compatibility
+authority.
 
 ## Decisions and relationships
 
@@ -195,7 +207,11 @@ primarily dependent on hosted queue time. [SUBF-0120](#subf-0120) and
 
 ## Definition of Done
 
-Feature-level DoD remains pending. [SUBF-0119](#subf-0119) may be declared
-complete only after gate 5 records exact committed-tree and required hosted
-evidence; this local candidate does not authorize later slices, consumer
-mutation, authority transfer, release publication, or PowerShell retirement.
+[SUBF-0119](#subf-0119) DoD is complete: its scoped acceptance criteria,
+tests-first evidence, local and hosted test commands, fresh-diff review,
+exact-tree validation, documentation, links, and project memory are current,
+with no unresolved `Blocking` finding. Feature-level DoD remains pending for
+[SUBF-0120](#subf-0120), [SUBF-0121](#subf-0121), portable package/manifest
+acceptance, and their independent authorization. This closure does not
+authorize consumer mutation, authority transfer, release publication, or
+PowerShell retirement.

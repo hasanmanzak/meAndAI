@@ -1,7 +1,7 @@
 # FEAT-0059 Test Scenarios
 
-Test implementation: [SUBF-0119](README.md#subf-0119) is active; focused local
-expected-red and green evidence exists, while hosted evidence is pending.
+Test implementation: [SUBF-0119](README.md#subf-0119) is complete; focused local
+expected-red/green evidence and exact-head Ubuntu/Windows evidence pass.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -20,7 +20,12 @@ expanded boundary set covers exact case-sensitive identities, unknown/null
 identity rejection, exact stage/capability composition, mutation prerequisites,
 production package-reference absence, and solution dependency direction.
 Locked restore passed, `dotnet format --verify-no-changes --severity info`
-reported no remaining diagnostics, and the candidate-tree protocol structure
-route passed. Exact committed-tree and hosted Ubuntu/Windows evidence remain
-pending.
+reported no remaining diagnostics, and exact committed-tree protocol structure
+validation passed. On exact implementation head
+[`59c82770fb7175dc01aa40915ac5b8b6c4104bc7`](https://github.com/hasanmanzak/meAndAI/commit/59c82770fb7175dc01aa40915ac5b8b6c4104bc7),
+the required [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350)
+passed in 11 min 56 s and the required
+[Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352)
+passed in 31 min 48 s. The C# test steps themselves completed in 7 s and 8 s,
+respectively; the existing full PowerShell validation dominated the job times.
 [TEST-0192](#test-0192) and [TEST-0193](#test-0193) remain planning records.

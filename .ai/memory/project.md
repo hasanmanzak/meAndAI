@@ -23,11 +23,12 @@ Last verified: **2026-07-27**
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has a typed C#
-  solution and application-authority candidate with 17 of 17 focused Release
-  tests passing and four of five slice gates complete. The initial committed-
-  tree structure route passed; final-head hosted Ubuntu/Windows evidence remains
-  pending. PowerShell production authority is unchanged.
+  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has completed
+  the typed C# solution and application-authority first slice. All five slice
+  gates pass, including 17 of 17 focused Release tests, exact-tree validation,
+  and required Ubuntu/Windows jobs. Feature completion is one of three
+  subfeatures; later slices remain gated. PowerShell production authority is
+  unchanged.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -805,10 +806,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. Only [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-  is currently authorized: create the typed solution/domain/application
-  boundary and its tests. Do not implement consumer behavior, mutate consumers,
-  transfer authority, or retire PowerShell without later independent gates.
+  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+  completed the typed solution/domain/application boundary and its tests on
+  2026-07-27. Do not implement later foundation or consumer behavior, mutate
+  consumers, transfer authority, or retire PowerShell without later independent
+  gates.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

@@ -11,10 +11,11 @@ C# operational platform migration. Follow the
 and its linked planning authority.
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 / [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-/ [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is a candidate
-at four of five slice gates. The initial committed-tree route passed; final-head
-hosted evidence remains pending. Later foundation slices, consumer behavior,
-authority migration, and PowerShell retirement still require independent gates.
+is complete at five of five slice gates with exact-tree and required
+Ubuntu/Windows evidence; [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
+owns the checkpoint. Feature completion is one of three subfeatures. Later
+foundation slices, consumer behavior, authority migration, and PowerShell
+retirement still require independent gates.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
