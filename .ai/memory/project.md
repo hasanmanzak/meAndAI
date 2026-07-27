@@ -22,11 +22,12 @@ Last verified: **2026-07-27**
 - Current bounded development:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-  / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) has a local
-  typed C# solution and application-authority candidate with 17 of 17 focused
-  Release tests passing and four of five slice gates complete. Exact committed-
-  tree and hosted Ubuntu/Windows evidence remain pending. PowerShell production
-  authority is unchanged.
+  / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
+  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has a typed C#
+  solution and application-authority candidate with 17 of 17 focused Release
+  tests passing and four of five slice gates complete. The initial committed-
+  tree structure route passed; final-head hosted Ubuntu/Windows evidence remains
+  pending. PowerShell production authority is unchanged.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.

@@ -57,9 +57,9 @@ is not complete until the fifth gate passes. Feature completion remains zero of
 three completed subfeatures. The checkpoint estimate for gate 5 is 45 to 90
 minutes, mainly dependent on hosted queue time.
 
-After a commit makes the governance packet part of the HEAD instruction graph,
-rerun exact-tree structure validation, push the bounded branch, open or update
-the draft pull request, update [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154)
-through a multiline-safe body route,
-and require Ubuntu/Windows checks on the exact head. Later foundation slices
-remain unauthorized.
+The initial committed-tree structure route passed and
+[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) now owns the
+remote checkpoint. Validate the final documentation head, update
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) through a
+multiline-safe body route, and require Ubuntu/Windows checks on that exact head.
+Later foundation slices remain unauthorized.

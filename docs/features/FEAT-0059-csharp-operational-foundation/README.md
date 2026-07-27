@@ -6,7 +6,7 @@
 | Status | In development / [SUBF-0119](#subf-0119) authorized |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
-| Pull request | Not created; [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) remains the stable delivery authority |
+| Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
 | Tests | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
 
@@ -155,14 +155,15 @@ Progress is measured against five independently observable delivery gates:
 3. Minimal typed implementation and focused green run: complete.
 4. Local self-review, locked restore, analyzer/format verification, and candidate-
    tree protocol validation: complete.
-5. Exact committed-tree validation and Ubuntu/Windows hosted evidence: pending.
+5. Exact committed-tree validation and remote draft checkpoint: complete on the
+   initial candidate; final-head Ubuntu/Windows hosted evidence: pending.
 
 The 2026-07-27 local checkpoint is therefore four of five gates, or 80% of
 [SUBF-0119](#subf-0119). Feature completion remains zero of three completed
 subfeatures because a candidate slice is not counted as complete. The bounded
-estimate for gate 5 was 45 to 90 minutes, primarily dependent on hosted queue
-time. [SUBF-0120](#subf-0120) and [SUBF-0121](#subf-0121) remain unauthorized
-and are excluded from that estimate.
+estimate for the remaining hosted portion of gate 5 is 15 to 45 minutes,
+primarily dependent on hosted queue time. [SUBF-0120](#subf-0120) and
+[SUBF-0121](#subf-0121) remain unauthorized and are excluded from that estimate.
 
 ## Decisions and relationships
 

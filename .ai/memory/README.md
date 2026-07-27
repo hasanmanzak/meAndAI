@@ -15,7 +15,8 @@ delivery, review, test, and publication evidence for
 
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 / [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) is the current
+/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
+[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the current
 bounded development. Follow the
 [first-slice development handoff](log/2026-07-27-feat-0059-subf-0119-foundation.md)
 and its linked planning authority. The local candidate has completed four of
