@@ -3,6 +3,52 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.6 - 2026-07-27
+
+### Fixed
+
+- Classify an exact supported closed and completed historical adoption issue
+  as `CompletedHistorical` only after bounded immutable-release,
+  same-repository merged-pull-request, terminal-marker, actor, open-pull-
+  request, and reserved-branch proof. Leave that issue unchanged and preserve
+  the existing current-issue convergence path.
+- Finish historical classification before the first relevant mutation, freeze
+  its issue-metadata fingerprint for every later inventory read, and fail
+  closed without provider retries when evidence drifts, is partial,
+  unsupported, ambiguous, live, or unavailable.
+- Validate the all-state issue response as one bounded array of complete issue
+  records, keep malformed state issue-local, compare canonical repository
+  identity without case drift, and pass target tag and remote identity
+  explicitly through the ownership boundary.
+
+### Changed
+
+- Extend the unchanged instruction-graph schema-2 policy profile through
+  v0.15.6 while retaining an exact immutable v0.15.5 policy and dispatch
+  fixture and using v0.15.7 only as the future-version negative.
+
+Candidate validation: exact v0.15.5 produced the expected malformed-marker red
+in 175.6 seconds. The corrected
+[TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
+parameter passed the `IntegrityManifestIssue` shard on PowerShell 7 / Windows
+PowerShell 5.1 in 153.9 / 158.6 seconds, including the six classifications,
+20-tag immutable registry, exact 8/9 candidate and 999/1000 inventory bounds,
+provider/marker negatives, frozen drift, full-launcher zero-mutation evidence,
+and idempotent positive rerun. Bundle, role-boundary, runtime-efficiency, and
+retained/current source-graph dispatch gates also passed. Canonical full-suite,
+hosted, and immutable-release evidence remain delivery gates.
+
+Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
+[BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149),
+[DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md),
+[DEC-0020](docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md),
+[DEC-0028](docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md),
+[DEC-0029](docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md),
+[DEC-0030](docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md),
+[DEC-0031](docs/decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md),
+and [TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069).
+
 ## 0.15.5 - 2026-07-26
 
 ### Changed

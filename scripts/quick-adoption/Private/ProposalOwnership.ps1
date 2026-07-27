@@ -141,6 +141,49 @@ function Invoke-LifecycleWorkflow {
     throw "The lifecycle workflow did not complete within $WorkflowTimeoutMinutes minute(s)."
 }
 
+function Get-AdoptionPullRequestOwnershipMarkerRecord {
+    param([Parameter(Mandatory)]$PullRequest)
+
+    if ($null -eq $PullRequest.PSObject.Properties['body']) {
+        throw 'The deterministic adoption pull request is missing body metadata.'
+    }
+    $body = [string]$PullRequest.body
+    $markerStarts = [regex]::Matches(
+        $body, '<!--\s*meandai-capabilities-adoption:',
+        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $markerMatches = [regex]::Matches(
+        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
+        throw 'The deterministic adoption pull request does not contain one canonical ownership marker.'
+    }
+    try {
+        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
+    }
+    catch {
+        throw 'The deterministic adoption pull request ownership marker is invalid JSON.'
+    }
+    $schemaProperty = $marker.PSObject.Properties['schema']
+    if ($null -eq $schemaProperty -or
+        ($schemaProperty.Value -isnot [int] -and
+         $schemaProperty.Value -isnot [long])) {
+        throw 'The deterministic adoption pull request ownership marker has an invalid schema type.'
+    }
+    $schema = [long]$schemaProperty.Value
+    if ($schema -notin @(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) {
+        throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
+    }
+    return [pscustomobject]@{
+        Body = $body
+        MarkerText = [string]$markerMatches[0].Value
+        Marker = $marker
+        Schema = $schema
+    }
+}
+
 function Get-ValidatedAdoptionMarker {
     param(
         [Parameter(Mandatory)]$PullRequest,
@@ -204,35 +247,11 @@ function Get-ValidatedAdoptionMarker {
         throw 'The deterministic adoption pull request has invalid identity metadata.'
     }
 
-    $body = [string]$PullRequest.body
-    $markerStarts = [regex]::Matches(
-        $body, '<!--\s*meandai-capabilities-adoption:',
-        [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
-            [Text.RegularExpressions.RegexOptions]::CultureInvariant
-    )
-    $markerMatches = [regex]::Matches(
-        $body, '<!-- meandai-capabilities-adoption:(?<json>\{[^\r\n]*\}) -->',
-        [Text.RegularExpressions.RegexOptions]::CultureInvariant
-    )
-    if ($markerStarts.Count -ne 1 -or $markerMatches.Count -ne 1) {
-        throw 'The deterministic adoption pull request does not contain one canonical ownership marker.'
-    }
-    try {
-        $marker = $markerMatches[0].Groups['json'].Value | ConvertFrom-Json
-    }
-    catch {
-        throw 'The deterministic adoption pull request ownership marker is invalid JSON.'
-    }
-    $schemaProperty = $marker.PSObject.Properties['schema']
-    if ($null -eq $schemaProperty -or
-        ($schemaProperty.Value -isnot [int] -and
-         $schemaProperty.Value -isnot [long])) {
-        throw 'The deterministic adoption pull request ownership marker has an invalid schema type.'
-    }
-    $schema = [long]$schemaProperty.Value
-    if ($schema -notin @(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)) {
-        throw 'The deterministic adoption pull request ownership marker uses an unsupported schema.'
-    }
+    $markerRecord = Get-AdoptionPullRequestOwnershipMarkerRecord `
+        -PullRequest $PullRequest
+    $body = [string]$markerRecord.Body
+    $marker = $markerRecord.Marker
+    $schema = [long]$markerRecord.Schema
     $phase = if ($schema -eq 2) { 'Proposed' } else { [string]$marker.phase }
     if ($phase -ceq 'Publishing') {
         $expectedPublishingProperties = if ($schema -eq 4) {
@@ -1336,13 +1355,39 @@ function Get-AdoptionIssueInventory {
 
     $list = Invoke-External -Command 'gh' -Arguments @(
         'issue', 'list', '--repo', $Repository, '--state', 'all', '--limit', '1000',
-        '--json', 'number,url,title,body,state'
+        '--json', 'number,url,title,body,state,stateReason,closedAt,author'
     )
     try {
-        $parsed = ((@($list.Output) -join [Environment]::NewLine) | ConvertFrom-Json)
-        return @($parsed | Where-Object { $null -ne $_ })
+        $raw = (@($list.Output) -join [Environment]::NewLine).Trim()
+        if (-not $raw.StartsWith('[', [StringComparison]::Ordinal) -or
+            -not $raw.EndsWith(']', [StringComparison]::Ordinal)) {
+            throw 'shape'
+        }
+        $parsed = $raw | ConvertFrom-Json
+        $issues = @($parsed)
+        if ($issues.Count -ge 1000) {
+            throw 'The bounded adoption-issue inventory is pagination-ambiguous.'
+        }
+        foreach ($issue in $issues) {
+            if ($null -eq $issue) {
+                throw 'shape'
+            }
+            foreach ($property in @(
+                'number', 'url', 'title', 'body', 'state', 'stateReason',
+                'closedAt', 'author'
+            )) {
+                if ($null -eq $issue.PSObject.Properties[$property]) {
+                    throw 'shape'
+                }
+            }
+        }
+        return $issues
     }
     catch {
+        if ($_.Exception.Message -ceq
+                'The bounded adoption-issue inventory is pagination-ambiguous.') {
+            throw
+        }
         throw 'GitHub CLI returned invalid adoption-issue metadata.'
     }
 }
@@ -1387,6 +1432,7 @@ function New-AdoptionIssueBody {
         [Parameter(Mandatory)][string]$Repository,
         [Parameter(Mandatory)]$PullRequest,
         [Parameter(Mandatory)][string]$Marker,
+        [Parameter(Mandatory)][string]$TargetTag,
         [switch]$Legacy
     )
 
@@ -1419,7 +1465,7 @@ function New-AdoptionIssueBody {
             $Marker,
             '## AI capabilities adoption tracking',
             '',
-            "- Protocol release: ``$ProtocolTag``",
+            "- Protocol release: ``$TargetTag``",
             "- Adoption draft: $($PullRequest.url)",
             "- Adoption strategy: ``$($markerRecord.adoptionStrategy)``",
             "- Protocol-record loss acknowledged: ``$(([bool]$markerRecord.protocolRecordLossAcknowledged).ToString().ToLowerInvariant())``"
@@ -1456,7 +1502,7 @@ function New-AdoptionIssueBody {
         $Marker,
         '## AI capabilities adoption tracking',
         '',
-        "- Protocol release: [$ProtocolTag](https://github.com/$ProtocolRepository/releases/tag/$ProtocolTag)",
+        "- Protocol release: [$TargetTag](https://github.com/$ProtocolRepository/releases/tag/$TargetTag)",
         "- Protocol commit: [$([string]$markerRecord.protocolSha)](https://github.com/$ProtocolRepository/commit/$([string]$markerRecord.protocolSha))",
         "- Adoption draft: [PR #$([int]$PullRequest.number)]($([string]$PullRequest.url))",
         "- Adoption strategy: ``$($markerRecord.adoptionStrategy)``",
@@ -1473,75 +1519,11 @@ function New-AdoptionIssueBody {
     )) -join [Environment]::NewLine
 }
 
-function Get-MarkedAdoptionIssues {
-    param(
-        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Issues,
-        [Parameter(Mandatory)][string]$Marker,
-        [Parameter(Mandatory)][string]$ExpectedTitle,
-        [Parameter(Mandatory)][string]$ExpectedBody,
-        [Parameter(Mandatory)][string]$LegacyMarker,
-        [Parameter(Mandatory)][string]$LegacyExpectedBody
-    )
-
-    $numbers = [System.Collections.Generic.HashSet[int]]::new()
-    $matching = [System.Collections.Generic.List[object]]::new()
-    $normalizedExpectedBody = $ExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
-    $normalizedLegacyBody = $LegacyExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
-    foreach ($issue in $Issues) {
-        if ($null -eq $issue.PSObject.Properties['body']) {
-            continue
-        }
-        $body = [string]$issue.body
-        $normalizedBody = $body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
-        $firstLine = @($normalizedBody.Split("`n"))[0]
-        $kind = if ($firstLine -ceq $Marker) { 'Canonical' }
-            elseif ($firstLine -ceq $LegacyMarker) { 'Legacy' }
-            else { '' }
-        if (-not $kind) {
-            if ($normalizedBody.IndexOf(
-                    '<!-- meandai-local-adoption:',
-                    [StringComparison]::OrdinalIgnoreCase
-                ) -ge 0) {
-                throw 'A project-owned adoption issue contains a malformed ownership marker; manual review is required.'
-            }
-            continue
-        }
-        foreach ($property in @('number', 'url', 'title', 'body', 'state')) {
-            if ($null -eq $issue.PSObject.Properties[$property]) {
-                throw 'A project-owned adoption issue has incomplete identity metadata.'
-            }
-        }
-        $expected = if ($kind -ceq 'Canonical') {
-            $normalizedExpectedBody
-        }
-        else { $normalizedLegacyBody }
-        if ([string]$issue.title -cne $ExpectedTitle -or
-            $normalizedBody -cne $expected) {
-            throw 'A canonically marked adoption issue has drifted from its exact owned record; manual review is required.'
-        }
-        if ([string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
-            [string]$issue.url -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
-            [string]$issue.state -cnotin @('OPEN', 'CLOSED') -or
-            -not $numbers.Add([int]$issue.number)) {
-            throw 'A project-owned adoption issue has invalid or duplicate identity metadata.'
-        }
-        $matching.Add([pscustomobject]@{
-            number = $issue.number
-            url = $issue.url
-            title = $issue.title
-            body = $issue.body
-            state = $issue.state
-            markerKind = $kind
-        })
-    }
-    return @($matching | Sort-Object { [int]$_.number })
-}
-
-function Ensure-AdoptionIssue {
+function New-AdoptionIssueIdentityContract {
     param(
         [Parameter(Mandatory)][string]$Repository,
-        [Parameter(Mandatory)]$PullRequest,
-        [Parameter(Mandatory)][string]$TemporaryDirectory
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)]$PullRequest
     )
 
     $graphDigest = if ([long]$PullRequest.meAndAIMarker.schema -in
@@ -1550,16 +1532,659 @@ function Ensure-AdoptionIssue {
     }
     else { '' }
     $marker = Get-AdoptionIssueOwnershipMarker -Repository $Repository `
-        -TargetTag $ProtocolTag `
+        -TargetTag $TargetTag `
         -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
         -GraphDigest $graphDigest -PullRequestUrl ([string]$PullRequest.url)
     $legacyMarker = '<!-- meandai-local-adoption:{0}:pr-{1} -->' -f `
-        $ProtocolTag, [string]$PullRequest.number
-    $issueTitle = "Track meAndAI AI capabilities adoption from $ProtocolTag"
-    $issueBody = New-AdoptionIssueBody -Repository $Repository `
-        -PullRequest $PullRequest -Marker $marker
-    $legacyIssueBody = New-AdoptionIssueBody -Repository $Repository `
-        -PullRequest $PullRequest -Marker $legacyMarker -Legacy
+        $TargetTag, [string]$PullRequest.number
+    $title = "Track meAndAI AI capabilities adoption from $TargetTag"
+    return [pscustomobject][ordered]@{
+        Marker = $marker
+        LegacyMarker = $legacyMarker
+        Title = $title
+        Body = New-AdoptionIssueBody -Repository $Repository `
+            -PullRequest $PullRequest -Marker $marker -TargetTag $TargetTag
+        LegacyBody = New-AdoptionIssueBody -Repository $Repository `
+            -PullRequest $PullRequest -Marker $legacyMarker `
+            -TargetTag $TargetTag -Legacy
+    }
+}
+
+function Get-CompletedHistoricalAdoptionReleaseCommit {
+    param([Parameter(Mandatory)][string]$Tag)
+
+    $commits =
+        [System.Collections.Generic.Dictionary[string, string]]::new(
+            [StringComparer]::Ordinal
+        )
+    $commits.Add('v0.8.0', 'a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821')
+    $commits.Add('v0.8.1', '9b4060a98af65d2ff3102495b8b29719c831c7de')
+    $commits.Add('v0.8.2', '030caab88ad337f3a07c19382fe6a5bd6978b640')
+    $commits.Add('v0.8.3', '7ec7f83c7190c3f064a3c572e7e30d29ea1e5454')
+    $commits.Add('v0.8.4', '0d4a05e0ce09e5c5586d69a7868128e061f35295')
+    $commits.Add('v0.8.5', '7c06dfad75ab7b327d46c7b8f8d7cb541bab3896')
+    $commits.Add('v0.8.6', 'a3d58a9cee00b9914c40adcd8e93dff53bed235a')
+    $commits.Add('v0.9.0', 'd39eace793a768006c52126dc0fd4b1012664cd5')
+    $commits.Add('v0.9.1', 'd7cd95735a94fbd61dd0e0c6abb7c1f72862b8d8')
+    $commits.Add('v0.9.2', 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d')
+    $commits.Add('v0.9.3', '27615a6767e2a6738f43148d84c6d80219101776')
+    $commits.Add('v0.9.4', 'ac17602a564d2ba19567db93529c97769d5a7991')
+    $commits.Add('v0.9.5', 'f10f0878d482bbd9c172f96df64fd5f05830d197')
+    $commits.Add('v0.9.6', '865735fae1c899ff26db8e15ee3e5296b8361fc1')
+    $commits.Add('v0.9.7', 'cdaca51d9920c0262f7e6015795f919fb0e60bb9')
+    $commits.Add('v0.10.0', '103ed20e190dcda1abe0f3b6b1c3434111c6b6d2')
+    $commits.Add('v0.10.1', 'fd5635044c3eb5f7635aef32d53bb99a8dd490e1')
+    $commits.Add('v0.10.2', '4bb0fd14619bfc9ec25401e06a6d71e7f8433340')
+    $commits.Add('v0.10.3', 'f1c15a34a17d34d0499fd1c2cc586c5a7f923754')
+    $commits.Add('v0.10.4', 'e226293acc5967f8b4e3049c54f206ed78bc9fd4')
+    if ($commits.ContainsKey($Tag)) {
+        return [string]$commits[$Tag]
+    }
+    return ''
+}
+
+function New-LegacyProfileAAdoptionIssueBody {
+    param(
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$PullRequestUrl,
+        [Parameter(Mandatory)][string]$Marker
+    )
+
+    return @(
+        $Marker,
+        '## AI capabilities adoption tracking',
+        '',
+        "- Protocol release: ``$TargetTag``",
+        "- Adoption draft: $PullRequestUrl",
+        '',
+        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+        '',
+        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+    ) -join [Environment]::NewLine
+}
+
+function Get-CompletedHistoricalAdoptionIssueFingerprint {
+    param([Parameter(Mandatory)]$Issue)
+
+    $values = @(
+        [string]$Issue.number,
+        [string]$Issue.url,
+        [string]$Issue.title,
+        [string]$Issue.body,
+        [string]$Issue.state,
+        [string]$Issue.stateReason,
+        [string]$Issue.closedAt,
+        [string]$Issue.author.login
+    )
+    $encoding = [Text.UTF8Encoding]::new($false)
+    $payload = @($values | ForEach-Object {
+        $value = [string]$_
+        "$($encoding.GetByteCount($value)):$value"
+    }) -join "`n"
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($algorithm.ComputeHash(
+            $encoding.GetBytes($payload)
+        ))).Replace('-', '').ToLowerInvariant()
+    }
+    finally { $algorithm.Dispose() }
+}
+
+function Get-ValidatedCompletedHistoricalAdoptionIssue {
+    param(
+        [Parameter(Mandatory)]$Candidate,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$TargetRemote,
+        [string]$ProtocolToken = ''
+    )
+
+    $release = Get-ValidatedImmutableProtocolRelease `
+        -ProtocolToken $ProtocolToken -Tag $Candidate.TargetTag
+    if ([string]$release.CommitSha -cne $Candidate.ExpectedProtocolSha) {
+        throw 'A historical adoption issue does not bind to its reviewed immutable release identity.'
+    }
+    $view = Invoke-External -Command 'gh' -Arguments @(
+        'pr', 'view', [string]$Candidate.PullRequestNumber,
+        '--repo', $Repository,
+        '--json', 'number,url,isDraft,state,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,isCrossRepository,author,body,mergedAt,mergeCommit'
+    )
+    try {
+        $pullRequest = ((@($view.Output) -join [Environment]::NewLine) |
+            ConvertFrom-Json)
+    }
+    catch {
+        throw 'GitHub CLI returned invalid completed historical pull-request metadata.'
+    }
+    foreach ($property in @(
+        'number', 'url', 'isDraft', 'state', 'baseRefName', 'headRefName',
+        'headRefOid', 'headRepository', 'headRepositoryOwner',
+        'isCrossRepository', 'author', 'body', 'mergedAt', 'mergeCommit'
+    )) {
+        if ($null -eq $pullRequest -or
+            $null -eq $pullRequest.PSObject.Properties[$property]) {
+            throw 'A completed historical pull request has incomplete identity metadata.'
+        }
+    }
+    $expectedBranch =
+        "automation/meandai-capabilities-$($Candidate.TargetTag)"
+    $repositoryParts = @($Repository -split '/', 2)
+    $headRepositoryName = if ($null -ne $pullRequest.headRepository) {
+        $pullRequest.headRepository.PSObject.Properties['name']
+    }
+    else { $null }
+    $headOwnerLogin = if ($null -ne $pullRequest.headRepositoryOwner) {
+        $pullRequest.headRepositoryOwner.PSObject.Properties['login']
+    }
+    else { $null }
+    if ([string]$pullRequest.number -cne
+            [string]$Candidate.PullRequestNumber -or
+        [string]$pullRequest.url -cne $Candidate.PullRequestUrl -or
+        $pullRequest.isDraft -isnot [bool] -or [bool]$pullRequest.isDraft -or
+        [string]$pullRequest.state -cne 'MERGED' -or
+        [string]$pullRequest.baseRefName -cne $BaseBranch -or
+        [string]$pullRequest.headRefName -cne $expectedBranch -or
+        [string]$pullRequest.headRefOid -cnotmatch '^[0-9a-f]{40}$' -or
+        $pullRequest.isCrossRepository -isnot [bool] -or
+        [bool]$pullRequest.isCrossRepository -or
+        $repositoryParts.Count -ne 2 -or
+        $null -eq $headRepositoryName -or
+        -not ([string]$headRepositoryName.Value).Equals(
+            [string]$repositoryParts[1], [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        $null -eq $headOwnerLogin -or
+        -not ([string]$headOwnerLogin.Value).Equals(
+            [string]$repositoryParts[0], [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        $null -eq $pullRequest.mergeCommit -or
+        $null -eq $pullRequest.mergeCommit.PSObject.Properties['oid'] -or
+        [string]$pullRequest.mergeCommit.oid -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'A completed historical pull request does not match its exact same-repository merged identity.'
+    }
+    try {
+        $mergedAt = ConvertTo-MeAndAIGitHubTimestamp -Value $pullRequest.mergedAt
+    }
+    catch {
+        throw 'A completed historical pull request has an invalid merge timestamp.'
+    }
+    if ($mergedAt -gt $Candidate.ClosedAt) {
+        throw 'A historical adoption issue was completed before its pull request merged.'
+    }
+    $markerRecord = Get-AdoptionPullRequestOwnershipMarkerRecord `
+        -PullRequest $pullRequest
+    $firstLine = @(([string]$markerRecord.Body).Replace("`r`n", "`n").Split("`n"))[0]
+    if ($firstLine -cne [string]$markerRecord.MarkerText -or
+        [long]$markerRecord.Schema -ne 3 -or
+        [string]$markerRecord.Marker.phase -cne 'Completed' -or
+        [string]$markerRecord.Marker.state -cnotin @(
+            'BootstrapReady', 'AdoptionReviewRequired'
+        ) -or
+        $null -eq $pullRequest.author -or
+        $null -eq $pullRequest.author.PSObject.Properties['login'] -or
+        [string]::IsNullOrWhiteSpace([string]$markerRecord.Marker.actor) -or
+        -not ([string]$pullRequest.author.login).Equals(
+            [string]$markerRecord.Marker.actor,
+            [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        -not ([string]$Candidate.Issue.author.login).Equals(
+            [string]$markerRecord.Marker.actor,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'A completed historical pull request has invalid terminal ownership evidence.'
+    }
+    $contractPullRequest = [pscustomobject]@{
+        number = $pullRequest.number
+        url = $pullRequest.url
+        headRefName = $pullRequest.headRefName
+        headRefOid = $pullRequest.headRefOid
+        baseRefName = $pullRequest.baseRefName
+        headRepository = [pscustomobject]@{ nameWithOwner = $Repository }
+        author = $pullRequest.author
+        body = $pullRequest.body
+        isDraft = $false
+        state = 'OPEN'
+    }
+    if (-not (Test-QuickAdoptionExactPullRequestMarker `
+            -PullRequest $contractPullRequest `
+            -RemoteHead ([string]$pullRequest.headRefOid) `
+            -Repository $Repository -Branch $expectedBranch `
+            -BaseBranch $BaseBranch -TargetTag $Candidate.TargetTag `
+            -TargetSha $Candidate.ExpectedProtocolSha `
+            -ExpectedActor ([string]$markerRecord.Marker.actor) `
+            -ExpectedState ([string]$markerRecord.Marker.state) `
+            -ExpectedAdoptionStrategy 'LegacyUnspecified' `
+            -ExpectedProtocolSurfaces @() `
+            -ExpectedProtocolRecordLossAcknowledgement $false `
+            -ExpectedPhase 'Completed')) {
+        throw 'A completed historical pull request does not satisfy the canonical terminal marker contract.'
+    }
+    $openList = Invoke-External -Command 'gh' -Arguments @(
+        'pr', 'list', '--repo', $Repository, '--state', 'open',
+        '--head', $expectedBranch, '--limit', '2',
+        '--json', 'number,url,state,headRefName'
+    )
+    try {
+        $openPullRequests = @(((@($openList.Output) -join
+            [Environment]::NewLine) | ConvertFrom-Json))
+    }
+    catch {
+        throw 'GitHub CLI returned invalid historical branch pull-request metadata.'
+    }
+    if ($openPullRequests.Count -ge 2) {
+        throw 'Historical adoption pull-request authority is pagination-ambiguous.'
+    }
+    if ($openPullRequests.Count -ne 0) {
+        throw 'A completed historical adoption branch still has a live pull request.'
+    }
+    $remoteHead = Get-RemoteBranchHead -Repository $TargetRepository `
+        -Remote $TargetRemote -Branch $expectedBranch -AllowMissing
+    if ($remoteHead) {
+        throw 'A completed historical adoption branch still claims live remote authority.'
+    }
+    return [pscustomobject]@{
+        number = $Candidate.Issue.number
+        url = $Candidate.Issue.url
+        title = $Candidate.Issue.title
+        body = $Candidate.Issue.body
+        state = $Candidate.Issue.state
+        classification = 'CompletedHistorical'
+        markerKind = 'CompletedHistorical'
+        targetTag = $Candidate.TargetTag
+        pullRequestNumber = $Candidate.PullRequestNumber
+        fingerprint = $Candidate.Fingerprint
+    }
+}
+
+function Get-MarkedAdoptionIssues {
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$Issues,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$CurrentTargetTag,
+        [string]$TargetRemote = 'origin',
+        [string]$ProtocolToken = '',
+        [Parameter(Mandatory)][AllowEmptyString()][string]$Marker,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$ExpectedTitle,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$ExpectedBody,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$LegacyMarker,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$LegacyExpectedBody,
+        [switch]$ProveHistorical,
+        [AllowEmptyCollection()][object[]]$FrozenHistorical = @()
+    )
+
+    $numbers = [System.Collections.Generic.HashSet[int]]::new()
+    $historicalIdentities =
+        [System.Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+    $classifications = [System.Collections.Generic.List[object]]::new()
+    $historicalCandidates = [System.Collections.Generic.List[object]]::new()
+    $malformed = $false
+    $competing = $false
+    $normalizedExpectedBody =
+        $ExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    $normalizedLegacyBody =
+        $LegacyExpectedBody.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+    $currentVersion = ConvertTo-CanonicalProtocolVersionRecord `
+        -Tag $CurrentTargetTag
+    foreach ($issue in $Issues) {
+        if ($null -eq $issue.PSObject.Properties['body']) {
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Unmarked'
+            })
+            continue
+        }
+        $body = [string]$issue.body
+        $normalizedBody =
+            $body.Replace("`r`n", "`n").TrimEnd([char[]]"`r`n")
+        $reservedStarts = [regex]::Matches(
+            $normalizedBody, '<!--\s*meandai-local-adoption:',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        if ($reservedStarts.Count -eq 0) {
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Unmarked'
+            })
+            continue
+        }
+        $issueMalformed = $false
+        foreach ($property in @('number', 'url', 'title', 'body', 'state')) {
+            if ($null -eq $issue.PSObject.Properties[$property]) {
+                $issueMalformed = $true
+            }
+        }
+        if ($issueMalformed -or
+            [string]$issue.number -cnotmatch '^[1-9][0-9]*$' -or
+            [string]$issue.url -notmatch
+                '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$' -or
+            [string]$issue.state -cnotin @('OPEN', 'CLOSED') -or
+            -not $numbers.Add([int]$issue.number) -or
+            $reservedStarts.Count -ne 1) {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        $firstLine = @($normalizedBody.Split("`n"))[0]
+        $kind = if ($firstLine -ceq $Marker) { 'CurrentCanonical' }
+            elseif ($firstLine -ceq $LegacyMarker) { 'CurrentLegacy' }
+            else { '' }
+        if ($kind) {
+            $expected = if ($kind -ceq 'CurrentCanonical') {
+                $normalizedExpectedBody
+            }
+            else { $normalizedLegacyBody }
+            if ([string]$issue.title -cne $ExpectedTitle -or
+                $normalizedBody -cne $expected) {
+                $malformed = $true
+                $classifications.Add([pscustomobject]@{
+                    issue = $issue
+                    classification = 'Malformed'
+                })
+                continue
+            }
+            $classifications.Add([pscustomobject]@{
+                number = $issue.number
+                url = $issue.url
+                title = $issue.title
+                body = $issue.body
+                state = $issue.state
+                classification = $kind
+                markerKind = if ($kind -ceq 'CurrentCanonical') {
+                    'Canonical'
+                }
+                else { 'Legacy' }
+            })
+            continue
+        }
+        $historicalMatch = [regex]::Match(
+            $firstLine,
+            '^<!-- meandai-local-adoption:(?<tag>v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)):pr-(?<pr>[1-9][0-9]*) -->$',
+            [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        if (-not $historicalMatch.Success) {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        $targetTag = [string]$historicalMatch.Groups['tag'].Value
+        $pullRequestNumber = [int]$historicalMatch.Groups['pr'].Value
+        $expectedProtocolSha =
+            Get-CompletedHistoricalAdoptionReleaseCommit -Tag $targetTag
+        $historicalVersion =
+            ConvertTo-CanonicalProtocolVersionRecord -Tag $targetTag
+        if ($historicalVersion.Parts[0] -cne $currentVersion.Parts[0] -or
+            (Compare-CanonicalProtocolVersion -Left $historicalVersion `
+                -Right $currentVersion) -ge 0) {
+            $competing = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Competing'
+            })
+            continue
+        }
+        if (-not $expectedProtocolSha) {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        $pullRequestUrl =
+            "https://github.com/$Repository/pull/$pullRequestNumber"
+        $expectedHistoricalBody =
+            New-LegacyProfileAAdoptionIssueBody -TargetTag $targetTag `
+                -PullRequestUrl $pullRequestUrl -Marker $firstLine
+        $normalizedHistoricalBody = $expectedHistoricalBody.Replace(
+            "`r`n", "`n"
+        ).TrimEnd([char[]]"`r`n")
+        $expectedIssueUrl =
+            "https://github.com/$Repository/issues/$([int]$issue.number)"
+        $hasHistoricalMetadata =
+            $null -ne $issue.PSObject.Properties['stateReason'] -and
+            $null -ne $issue.PSObject.Properties['closedAt'] -and
+            $null -ne $issue.PSObject.Properties['author'] -and
+            $null -ne $issue.author -and
+            $null -ne $issue.author.PSObject.Properties['login'] -and
+            -not [string]::IsNullOrWhiteSpace([string]$issue.author.login)
+        if ([string]$issue.title -cne
+                "Track meAndAI AI capabilities adoption from $targetTag" -or
+            $normalizedBody -cne $normalizedHistoricalBody -or
+            [string]$issue.url -cne $expectedIssueUrl -or
+            -not $hasHistoricalMetadata) {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        if ([string]$issue.state -cne 'CLOSED' -or
+            [string]$issue.stateReason -cne 'COMPLETED') {
+            $competing = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Competing'
+            })
+            continue
+        }
+        try {
+            $closedAt = ConvertTo-MeAndAIGitHubTimestamp -Value $issue.closedAt
+        }
+        catch {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        $identity = "$targetTag`n$pullRequestNumber"
+        if (-not $historicalIdentities.Add($identity)) {
+            $malformed = $true
+            $classifications.Add([pscustomobject]@{
+                issue = $issue
+                classification = 'Malformed'
+            })
+            continue
+        }
+        $historicalCandidates.Add([pscustomobject]@{
+            Issue = $issue
+            TargetTag = $targetTag
+            PullRequestNumber = $pullRequestNumber
+            PullRequestUrl = $pullRequestUrl
+            ExpectedProtocolSha = $expectedProtocolSha
+            ClosedAt = $closedAt
+            Fingerprint =
+                Get-CompletedHistoricalAdoptionIssueFingerprint -Issue $issue
+        })
+    }
+    if ($malformed) {
+        throw 'A project-owned adoption issue contains a malformed ownership marker; manual review is required.'
+    }
+    if ($competing) {
+        throw 'A project-owned adoption issue competes with current adoption authority; manual review is required.'
+    }
+    if ($historicalCandidates.Count -gt 8) {
+        throw 'The completed historical adoption-issue candidate bound was exceeded.'
+    }
+    $sortedCandidates = @($historicalCandidates |
+        Sort-Object { [int]$_.Issue.number })
+    if (@($FrozenHistorical).Count -gt 0 -or -not $ProveHistorical) {
+        $sortedFrozen = @($FrozenHistorical |
+            Sort-Object { [int]$_.number })
+        if ($sortedCandidates.Count -ne $sortedFrozen.Count) {
+            throw 'Completed historical adoption-issue evidence changed during convergence.'
+        }
+        for ($index = 0; $index -lt $sortedCandidates.Count; $index++) {
+            if ([int]$sortedCandidates[$index].Issue.number -ne
+                    [int]$sortedFrozen[$index].number -or
+                [string]$sortedCandidates[$index].Fingerprint -cne
+                    [string]$sortedFrozen[$index].fingerprint) {
+                throw 'Completed historical adoption-issue evidence changed during convergence.'
+            }
+            $classifications.Add([pscustomobject]@{
+                number = $sortedCandidates[$index].Issue.number
+                url = $sortedCandidates[$index].Issue.url
+                title = $sortedCandidates[$index].Issue.title
+                body = $sortedCandidates[$index].Issue.body
+                state = $sortedCandidates[$index].Issue.state
+                classification = 'CompletedHistorical'
+                markerKind = 'CompletedHistorical'
+                targetTag = $sortedCandidates[$index].TargetTag
+                pullRequestNumber =
+                    $sortedCandidates[$index].PullRequestNumber
+                fingerprint = $sortedCandidates[$index].Fingerprint
+            })
+        }
+    }
+    else {
+        foreach ($candidate in $sortedCandidates) {
+            $classifications.Add(
+                (Get-ValidatedCompletedHistoricalAdoptionIssue `
+                    -Candidate $candidate -Repository $Repository `
+                    -TargetRepository $TargetRepository `
+                    -BaseBranch $BaseBranch -TargetRemote $TargetRemote `
+                    -ProtocolToken $ProtocolToken)
+            )
+        }
+    }
+    return @($classifications | Sort-Object {
+        if ($null -ne $_.PSObject.Properties['number']) {
+            [int]$_.number
+        }
+        else { [int]$_.issue.number }
+    })
+}
+
+function Get-AdoptionIssueReconciliationSnapshot {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$TargetRemote,
+        [string]$ProtocolToken = '',
+        [AllowNull()]$PullRequest = $null
+    )
+
+    $identity = if ($null -ne $PullRequest) {
+        New-AdoptionIssueIdentityContract -Repository $Repository `
+            -TargetTag $TargetTag `
+            -PullRequest $PullRequest
+    }
+    else {
+        [pscustomobject]@{
+            Marker = ''
+            LegacyMarker = ''
+            Title = ''
+            Body = ''
+            LegacyBody = ''
+        }
+    }
+    $classified = @(Get-MarkedAdoptionIssues `
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) `
+        -Repository $Repository -TargetRepository $TargetRepository `
+        -BaseBranch $BaseBranch -CurrentTargetTag $TargetTag `
+        -TargetRemote $TargetRemote `
+        -ProtocolToken $ProtocolToken `
+        -Marker ([string]$identity.Marker) `
+        -ExpectedTitle ([string]$identity.Title) `
+        -ExpectedBody ([string]$identity.Body) `
+        -LegacyMarker ([string]$identity.LegacyMarker) `
+        -LegacyExpectedBody ([string]$identity.LegacyBody) `
+        -ProveHistorical)
+    return [pscustomobject][ordered]@{
+        schema = 1
+        repository = $Repository
+        targetTag = $TargetTag
+        baseBranch = $BaseBranch
+        historical = @($classified | Where-Object {
+            [string]$_.classification -ceq 'CompletedHistorical'
+        })
+    }
+}
+
+function Confirm-AdoptionIssueReconciliationSnapshot {
+    param(
+        [Parameter(Mandatory)]$Snapshot,
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$BaseBranch,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [AllowNull()]$PullRequest = $null
+    )
+
+    foreach ($property in @(
+        'schema', 'repository', 'targetTag', 'baseBranch', 'historical'
+    )) {
+        if ($null -eq $Snapshot -or
+            $null -eq $Snapshot.PSObject.Properties[$property]) {
+            throw 'The adoption-issue reconciliation snapshot is incomplete.'
+        }
+    }
+    if ($Snapshot.schema -isnot [int] -or [int]$Snapshot.schema -ne 1 -or
+        -not ([string]$Snapshot.repository).Equals(
+            $Repository, [StringComparison]::OrdinalIgnoreCase
+        ) -or
+        [string]$Snapshot.targetTag -cne $TargetTag -or
+        [string]$Snapshot.baseBranch -cne $BaseBranch) {
+        throw 'The adoption-issue reconciliation snapshot does not match this invocation.'
+    }
+    $identity = if ($null -ne $PullRequest) {
+        New-AdoptionIssueIdentityContract -Repository $Repository `
+            -TargetTag $TargetTag `
+            -PullRequest $PullRequest
+    }
+    else {
+        [pscustomobject]@{
+            Marker = ''
+            LegacyMarker = ''
+            Title = ''
+            Body = ''
+            LegacyBody = ''
+        }
+    }
+    return @(Get-MarkedAdoptionIssues `
+        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) `
+        -Repository $Repository -TargetRepository $TargetRepository `
+        -BaseBranch $BaseBranch -CurrentTargetTag $TargetTag `
+        -Marker ([string]$identity.Marker) `
+        -ExpectedTitle ([string]$identity.Title) `
+        -ExpectedBody ([string]$identity.Body) `
+        -LegacyMarker ([string]$identity.LegacyMarker) `
+        -LegacyExpectedBody ([string]$identity.LegacyBody) `
+        -FrozenHistorical @($Snapshot.historical))
+}
+
+function Ensure-AdoptionIssue {
+    param(
+        [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetRepository,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)]$ReconciliationSnapshot,
+        [Parameter(Mandatory)][string]$TemporaryDirectory
+    )
+
+    $identity = New-AdoptionIssueIdentityContract -Repository $Repository `
+        -TargetTag $TargetTag -PullRequest $PullRequest
+    $marker = [string]$identity.Marker
+    $legacyMarker = [string]$identity.LegacyMarker
+    $issueTitle = [string]$identity.Title
+    $issueBody = [string]$identity.Body
+    $legacyIssueBody = [string]$identity.LegacyBody
     $completed = [string]$PullRequest.meAndAIMarker.phase -ceq 'Completed'
     $desiredStatusLabel = if ($completed) {
         'status:needs-review'
@@ -1569,10 +2194,17 @@ function Ensure-AdoptionIssue {
         'status:in-progress'
     }
     else { 'status:needs-review' }
-    $matchingIssues = @(Get-MarkedAdoptionIssues `
-        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-        -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
-        -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody)
+    $classifiedIssues = @(Confirm-AdoptionIssueReconciliationSnapshot `
+        -Snapshot $ReconciliationSnapshot `
+        -Repository $Repository -TargetRepository $TargetRepository `
+        -BaseBranch ([string]$PullRequest.baseRefName) `
+        -TargetTag $TargetTag -PullRequest $PullRequest)
+    Ensure-AdoptionLabels -Repository $Repository
+    $matchingIssues = @($classifiedIssues | Where-Object {
+        [string]$_.classification -cin @(
+            'CurrentCanonical', 'CurrentLegacy'
+        )
+    })
 
     $canonicalIssues = @($matchingIssues | Where-Object {
         [string]$_.markerKind -ceq 'Canonical'
@@ -1592,11 +2224,16 @@ function Ensure-AdoptionIssue {
                 'issue', 'edit', [string]$legacyIssues[0].number,
                 '--repo', $Repository, '--body-file', $bodyPath
             ) | Out-Null
-            $matchingIssues = @(Get-MarkedAdoptionIssues `
-                -Issues @(Get-AdoptionIssueInventory -Repository $Repository) `
-                -Marker $marker -ExpectedTitle $issueTitle `
-                -ExpectedBody $issueBody -LegacyMarker $legacyMarker `
-                -LegacyExpectedBody $legacyIssueBody)
+            $classifiedIssues = @(Confirm-AdoptionIssueReconciliationSnapshot `
+                -Snapshot $ReconciliationSnapshot `
+                -Repository $Repository -TargetRepository $TargetRepository `
+                -BaseBranch ([string]$PullRequest.baseRefName) `
+                -TargetTag $TargetTag -PullRequest $PullRequest)
+            $matchingIssues = @($classifiedIssues | Where-Object {
+                [string]$_.classification -cin @(
+                    'CurrentCanonical', 'CurrentLegacy'
+                )
+            })
             $canonicalIssues = @($matchingIssues | Where-Object {
                 [string]$_.markerKind -ceq 'Canonical'
             })
@@ -1620,10 +2257,16 @@ function Ensure-AdoptionIssue {
         if ($createdUrl -notmatch '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*/?$') {
             throw 'Created adoption issue returned an unrecognized URL.'
         }
-        $matchingIssues = @(Get-MarkedAdoptionIssues `
-            -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-            -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
-            -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody)
+        $classifiedIssues = @(Confirm-AdoptionIssueReconciliationSnapshot `
+            -Snapshot $ReconciliationSnapshot `
+            -Repository $Repository -TargetRepository $TargetRepository `
+            -BaseBranch ([string]$PullRequest.baseRefName) `
+            -TargetTag $TargetTag -PullRequest $PullRequest)
+        $matchingIssues = @($classifiedIssues | Where-Object {
+            [string]$_.classification -cin @(
+                'CurrentCanonical', 'CurrentLegacy'
+            )
+        })
         $canonicalIssues = @($matchingIssues | Where-Object {
             [string]$_.markerKind -ceq 'Canonical'
         })
@@ -1648,13 +2291,14 @@ function Ensure-AdoptionIssue {
         }
     }
 
-    $converged = @(Get-MarkedAdoptionIssues `
-        -Issues @(Get-AdoptionIssueInventory -Repository $Repository) -Marker $marker `
-        -ExpectedTitle $issueTitle -ExpectedBody $issueBody `
-        -LegacyMarker $legacyMarker -LegacyExpectedBody $legacyIssueBody |
+    $converged = @(Confirm-AdoptionIssueReconciliationSnapshot `
+        -Snapshot $ReconciliationSnapshot `
+        -Repository $Repository -TargetRepository $TargetRepository `
+        -BaseBranch ([string]$PullRequest.baseRefName) `
+        -TargetTag $TargetTag -PullRequest $PullRequest |
         Where-Object {
             [string]$_.state -ceq 'OPEN' -and
-            [string]$_.markerKind -ceq 'Canonical'
+            [string]$_.classification -ceq 'CurrentCanonical'
         })
     if ($converged.Count -ne 1 -or [int]$converged[0].number -ne $canonicalNumber) {
         throw 'Project-owned adoption issues did not converge to one canonical open identity.'

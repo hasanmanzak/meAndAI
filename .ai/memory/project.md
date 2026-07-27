@@ -9,22 +9,23 @@ Last verified: **2026-07-27**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.5`. The latest immutable release before this
-  candidate is [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4) at
-  [`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
-  [PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
-  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain its
+- Current protocol version: `0.15.6`. The latest immutable release before this
+  candidate is [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5) at
+  [`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
+  [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
+  [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+  [#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-  preserves workflow-dispatch JSON through exact UTF-8 stdin transport.
-- Current bounded correction:
   [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-  / [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-  [#147](https://github.com/hasanmanzak/meAndAI/issues/147)
-  repairs instruction-graph parsing, bounded abort cleanup, schema-2 capacity,
-  protected authority, and release-owned target-policy selection; every
-  implementation and regression remains upstream-only.
+  delivers instruction-graph schema 2 and bounded parser, abort, authority,
+  and target-policy resilience.
+- Current bounded correction:
+  [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+  / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
+  adds bounded completed-historical issue classification before mutation;
+  every implementation and regression remains upstream-only.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -37,8 +38,11 @@ Last verified: **2026-07-27**
   established the event-triggered stability and consistency mandate through
   [issue #47](https://github.com/hasanmanzak/meAndAI/issues/47) and
   [pull request #48](https://github.com/hasanmanzak/meAndAI/pull/48).
-- Open external follow-up: [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) / [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md#risk-0076) is tracked by
-  [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). [Issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) remains the historical [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md) delivery and publication authority.
+- Completed external follow-up: [FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) / [RISK-0076](../../docs/features/FEAT-0013-v084-correction/README.md#risk-0076) is closed by
+  [finding issue #44](https://github.com/hasanmanzak/meAndAI/issues/44). Main
+  requires the canonical Ubuntu and Windows validation checks, administrator
+  enforcement, and resolved conversations; force pushes and deletion are
+  disabled. [Issue #41](https://github.com/hasanmanzak/meAndAI/issues/41) remains the historical [FEAT-0013](../../docs/features/FEAT-0013-v084-correction/README.md) delivery and publication authority.
 - Historical v0.8.6 delivery: immutable release
   [`v0.8.6`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.8.6)
   targets commit [`a3d58a9cee00b9914c40adcd8e93dff53bed235a`](https://github.com/hasanmanzak/meAndAI/commit/a3d58a9cee00b9914c40adcd8e93dff53bed235a) and closed
@@ -80,6 +84,41 @@ documented project decision required when another approach better fits the
 domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Active recurrence knowledge
+
+### Completed historical adoption issue is misclassified as malformed
+
+- Status: `Active`
+- Observable signature: a later clean quick adoption reports a valid closed,
+  completed historical adoption issue as `A project-owned adoption issue
+  contains a malformed ownership marker; manual review is required.`
+- Applicability: current-launcher adoption when an exact supported legacy
+  profile-A issue from `v0.8.0` through `v0.10.4` remains alongside its merged
+  schema-3 terminal pull request and absent reserved branch.
+- Affected contract and cause: current ownership classification recognized only
+  the opaque current marker or current-target legacy marker, so complete older
+  immutable lifecycle evidence fell through to the malformed reserved-prefix
+  path.
+- Canonical owner and evidence: [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md) /
+  [SUBF-0118](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md#subf-0118) /
+  [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+  [TEST-0069](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
+  owns the project-neutral executable barrier.
+- Fixed release or evidence: target release `0.15.6`; the focused
+  `IntegrityManifestIssue` owner passes on PowerShell 7 / Windows PowerShell
+  5.1 in 153.9 / 158.6 seconds, with bounded provider proof, frozen-evidence
+  drift rejection, zero-mutation negatives, and idempotent positive rerun.
+- Required safe response: classify strict local grammar before provider reads,
+  prove the exact immutable release, issue, merged pull request, terminal
+  marker, actor, absent open pull request, and absent reserved branch within
+  the declared ceilings, freeze the metadata fingerprint before mutation, and
+  leave the historical issue unchanged while reconciling only current state.
+- Unsafe retry boundary: do not edit or delete the historical issue, suppress
+  malformed-marker rejection, retry provider proof, patch a named consumer, or
+  proceed after any ambiguous, unsupported, live, drifting, or failed proof.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  adoption issue marker families, terminal pull-request evidence, issue
+  inventory bounds, or mutation ordering changes.
+- Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure
 
@@ -535,7 +574,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [FIND-0339](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0339)
   / [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
   / [issue #140](https://github.com/hasanmanzak/meAndAI/issues/140).
-- Fixed release or evidence: the `0.15.5` candidate decodes before shape
+- Fixed release or evidence: immutable release `0.15.5` decodes before shape
   filtering, classifies decoded unsafe/external schemes first, selects the
   longest canonical exact-tree prefix for local hash/query targets, and keeps
   every later literal/decoded delimiter inside the opaque suffix. The final
@@ -581,7 +620,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [FIND-0341](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0341)
   / [TEST-0151](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151)
   / [issue #146](https://github.com/hasanmanzak/meAndAI/issues/146).
-- Fixed release or evidence: the `0.15.5` candidate covers bounded direct and
+- Fixed release or evidence: immutable release `0.15.5` covers bounded direct and
   reverse modal, contraction, `no longer`, and `never` forms; binds negation to
   the same exact authority-designation complement as the positive grammar;
   keeps qualifier conjunctions intact; and preserves a positive mixed-line
@@ -616,7 +655,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   unreviewed graph-unaware tag.
 - Applicability: quick-adoption runtime/target pairs from the first bundled
   runtime through the current candidate, including graph-unaware v0.12.4-
-  v0.12.5 and graph-aware v0.12.6-v0.15.5 workflows.
+  v0.12.5 and graph-aware v0.12.6-v0.15.6 workflows.
 - Affected contract and cause: workflow capability, exact target profile,
   target-semantic command ownership, ancillary-helper composition, and marker
   family were not treated as one immutable compatibility contract. Release-
@@ -630,7 +669,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [FIND-0334](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0334)
   / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
   / [issue #147](https://github.com/hasanmanzak/meAndAI/issues/147).
-- Fixed release or evidence: the `0.15.5` candidate binds every supported
+- Fixed release or evidence: immutable release `0.15.5`, retained by `0.15.6`, binds every supported
   graph-aware tag to its reviewed exact profile, keeps all target-semantic
   commands target-owned, composes the three linked-path helpers atomically,
   preserves schema 7/8 for v0.12.6-v0.14.1 and schema 9/10 thereafter, and
@@ -656,41 +695,26 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-  / [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-  [#147](https://github.com/hasanmanzak/meAndAI/issues/147)
-  / [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148)
-  is the current `0.15.5` continuation. Close only the eight owned parser,
-  batch, schema, protected-evidence, authority, and target-policy defects. The
-  target-policy and earlier cross-runtime owners for
-  [TEST-0151](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
-  [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
-  [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153),
-  [TEST-0161](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161),
-  and the affected initial-adoption integration are green. The final canonical
-  parser owner is green on Windows PowerShell 5.1 / PowerShell 7 in 248.3 / 143.5
-  seconds with exact operation counters; the parser-focused audit, AST parses,
-  diff-check and overall bounded review are clean. The pre-commit worktree suite
-  passed every discovered owner in 1745.3 seconds, but [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
-  proved that the untracked feature packet was absent from its HEAD self-
-  consumer slice; first hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
-  exposed the ambiguous documentation token on both runtimes.
-  [Commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0)
-  expands the shorthand; its exact committed-tree owner passed on PowerShell 7
-  / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with 2/2 process starts and
-  4/4 blob requests, and its full suite passed every discovered owner in 1805.3
-  seconds. Later gates are final evidence-sync exact-tree verification, hosted
-  validation and review on the exact pull-request head. The Ubuntu slice of
-  [run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
-  then passed every earlier owner before [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  rejected seven unlinked short checkpoint references; every occurrence now
-  uses its owning-repository exact full-SHA permalink. The focused publication-
-  evidence owner passed on PowerShell 7 / Windows PowerShell 5.1 in 103.2 /
-  192.0 seconds with [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  and every retained scenario green. Later gates remain corrected exact-head
-  hosted validation and review, exact merged-commit release, post-
-  publication verification, issue closure, and OID-bound branch cleanup. Keep
-  every reusable regression upstream and do not mutate a consumer.
+- Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
+  is published at
+  [`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
+  [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) merged after
+  [hosted run 30230496137](https://github.com/hasanmanzak/meAndAI/actions/runs/30230496137)
+  passed both canonical checks; the release API reports non-draft,
+  non-prerelease, immutable state and the exact two assets. Its owned remote
+  branch is absent.
+- [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+  / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
+  is the current `0.15.6` continuation. Bounded historical proof runs before
+  the first relevant mutation, freezes metadata for later inventory reads,
+  never edits completed historical issues, and preserves the current
+  convergence owner. Focused PowerShell 7 / Windows PowerShell 5.1,
+  role-boundary, runtime-efficiency, bundle, and source-graph compatibility
+  gates are green. Final record convergence, full-suite, pull-request, hosted,
+  immutable-release, post-publication, issue-closure, and owned-branch cleanup
+  gates remain. Keep every reusable regression upstream and do not mutate a
+  consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
   and every clone clean. Derdini `e7b10ef` retained its existing older seed,
   which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema

@@ -1043,7 +1043,7 @@ $expectedQuickOperationInventory = [ordered]@{
     'init|Invoke-QuickAdoptionFixtureFamilyGitInit|git' = 1
     'init|New-MockEmptyRemoteConsumer|git' = 2
     'push|<script>|Invoke-Git' = 10
-    'push|<script>|Invoke-TestGit' = 8
+    'push|<script>|Invoke-TestGit' = 10
     'push|Add-MockRootRuleGitlink|Invoke-TestGit' = 1
     'push|Advance-MockPublishedDefaultBranch|Invoke-TestGit' = 1
     'push|New-MockConnectedManagedConsumerPair|Invoke-TestGit' = 1
@@ -1073,9 +1073,10 @@ $expectedQuickDynamicInvocations = [ordered]@{
     '$graphRecordConverter|<script>' = 1
     '$graphRecordConverter|global:gh' = 1
     '$identityValidator|global:gh' = 1
-    # TEST-0176 retains one real launcher slice that converges an exact legacy
-    # adoption issue to the opaque marker plus visible exact-target links.
-    '$launcherPath|<script>' = 84
+    # TEST-0069/TEST-0176 retain bounded real-launcher ownership slices plus
+    # pure historical classification, inventory, and snapshot adapters.
+    '$launcherPath|<script>' = 91
+    '$historicalMutationCallCount|<script>' = 2
     '$launcherPath|New-MockCompletedAdoptionConsumer' = 1
     '$manifestValidationModule|<script>' = 1
     '$manifestValidator|<script>' = 2

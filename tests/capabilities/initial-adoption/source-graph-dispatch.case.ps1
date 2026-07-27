@@ -31,6 +31,8 @@ $immutableGraphUnawareCommit =
     '252488a88d2a64ea8816239bbf6d953f506b8840'
 $immutableGraphSchema1Commit =
     '1883a2315529e7493343c07eebb4c74ed77a62b4'
+$immutableGraphSchema2Commit =
+    '11c56aac369767202835c4e9d6cc83aa321f4070'
 $immutableWorkflowPath =
     'templates/project/.github/workflows/meandai-protocol-update.yml'
 $immutablePolicyPath =
@@ -296,13 +298,21 @@ $schema1WorkflowBytes = Get-GitObjectBytes -Repository $root `
     -Object "$immutableGraphSchema1Commit`:$immutableWorkflowPath"
 $schema1PolicyBytes = Get-GitObjectBytes -Repository $root `
     -Object "$immutableGraphSchema1Commit`:$immutablePolicyPath"
+$schema2PriorWorkflowBytes = Get-GitObjectBytes -Repository $root `
+    -Object "$immutableGraphSchema2Commit`:$immutableWorkflowPath"
+$schema2PriorPolicyBytes = Get-GitObjectBytes -Repository $root `
+    -Object "$immutableGraphSchema2Commit`:$immutablePolicyPath"
 $legacyGraphMarkerPolicyBytes = Get-GitObjectBytes -Repository $root `
     -Object "v0.14.1`:$immutablePolicyPath"
 $schema1PolicyContract = Get-TestPolicyGraphContract -Bytes $schema1PolicyBytes
+$schema2PriorPolicyContract = Get-TestPolicyGraphContract `
+    -Bytes $schema2PriorPolicyBytes
 $schema2PolicyContract = Get-TestPolicyGraphContract `
     -Bytes ([IO.File]::ReadAllBytes($capabilitiesModulePath))
 if ($schema1PolicyContract.Schema -ne 1 -or
     $schema1PolicyContract.MaximumBlobBytes -ne 262144 -or
+    $schema2PriorPolicyContract.Schema -ne 2 -or
+    $schema2PriorPolicyContract.MaximumBlobBytes -ne 524288 -or
     $schema2PolicyContract.Schema -ne 2 -or
     $schema2PolicyContract.MaximumBlobBytes -ne 524288) {
     throw 'TEST-0153 immutable schema-1 and candidate schema-2 policy probes were not exact.'
@@ -320,16 +330,20 @@ if ($null -eq $policyTagSelector) {
 else {
     $schema1PolicyTag = & $policyTagSelector `
         -WorkflowBytes $schema1WorkflowBytes -TargetTag 'v0.15.4' `
-        -RuntimePolicyTag 'v0.15.5'
+        -RuntimePolicyTag 'v0.15.6'
+    $schema2PriorPolicyTag = & $policyTagSelector `
+        -WorkflowBytes $schema2PriorWorkflowBytes -TargetTag 'v0.15.5' `
+        -RuntimePolicyTag 'v0.15.6'
     $legacyPolicyTag = & $policyTagSelector `
         -WorkflowBytes $legacyWorkflowBytes -TargetTag 'v0.12.5' `
-        -RuntimePolicyTag 'v0.15.5'
+        -RuntimePolicyTag 'v0.15.6'
     $minimumLegacyPolicyTag = & $policyTagSelector `
         -WorkflowBytes $minimumLegacyWorkflowBytes -TargetTag 'v0.12.4' `
-        -RuntimePolicyTag 'v0.15.5'
+        -RuntimePolicyTag 'v0.15.6'
     if ([string]$schema1PolicyTag -cne 'v0.15.4' -or
-        [string]$legacyPolicyTag -cne 'v0.15.5' -or
-        [string]$minimumLegacyPolicyTag -cne 'v0.15.5') {
+        [string]$schema2PriorPolicyTag -cne 'v0.15.5' -or
+        [string]$legacyPolicyTag -cne 'v0.15.6' -or
+        [string]$minimumLegacyPolicyTag -cne 'v0.15.6') {
         $transitionFailures.Add(
             'graph-aware target or graph-unaware fallback selected the wrong policy tag'
         )
@@ -340,7 +354,7 @@ else {
             [void](& $policyTagSelector `
                 -WorkflowBytes $legacyWorkflowBytes `
                 -TargetTag $unsupportedLegacyTag `
-                -RuntimePolicyTag 'v0.15.5')
+                -RuntimePolicyTag 'v0.15.6')
         }
         catch { $unsupportedLegacyFailure = $_.Exception.Message }
         if ($unsupportedLegacyFailure -notlike
@@ -374,8 +388,11 @@ if ($transitionFailures.Count -ne 0) {
     throw "TEST-0153 target-policy transition failed with $($transitionFailures.Count) problem(s): $($transitionFailures -join '; ')."
 }
 Invoke-DispatchCase -WorkflowBytes $currentWorkflowBytes `
-    -ExpectedGraphSupport $true -Label 'candidate v0.15.5' `
+    -ExpectedGraphSupport $true -Label 'candidate v0.15.6' `
     -SourceGraphIdentityJson $schema2PolicyContract.IdentityJson
+Invoke-DispatchCase -WorkflowBytes $schema2PriorWorkflowBytes `
+    -ExpectedGraphSupport $true -Label 'immutable v0.15.5' `
+    -SourceGraphIdentityJson $schema2PriorPolicyContract.IdentityJson
 Invoke-DispatchCase -WorkflowBytes $schema1WorkflowBytes `
     -ExpectedGraphSupport $true -Label 'immutable v0.15.4' `
     -SourceGraphIdentityJson $schema1PolicyContract.IdentityJson
@@ -511,7 +528,7 @@ $originalProtocolTag = $ProtocolTag
 try {
     $initialAdoptionPolicySourcePath =
         'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
-    $initialAdoptionPolicyTag = 'v0.15.5'
+    $initialAdoptionPolicyTag = 'v0.15.6'
     $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
     $ProtocolRepository = 'hasanmanzak/meAndAI'
     $script:Test0153LegacyPolicyBytes = [byte[]]$legacyGraphMarkerPolicyBytes
@@ -527,7 +544,7 @@ try {
         if ($TemplatePath -cne
                 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1' -or
             -not [string]::IsNullOrEmpty($ProtocolToken) -or
-            $Tag -cnotin @('v0.14.1', 'v0.15.5')) {
+            $Tag -cnotin @('v0.14.1', 'v0.15.6')) {
             throw 'TEST-0153 legacy marker transition requested an unexpected policy asset.'
         }
         return [pscustomobject][ordered]@{

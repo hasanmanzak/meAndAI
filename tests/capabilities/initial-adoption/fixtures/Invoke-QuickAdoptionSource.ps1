@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.15.5',
+    [string]$ProtocolTag = 'v0.15.6',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -28,7 +28,8 @@ param(
         'Launcher',
         'GitHubCliVersionContract',
         'CredentialContainmentContract',
-        'InitialPolicyContract'
+        'InitialPolicyContract',
+        'HistoricalIssueContract'
     )]
     [string]$SupportAction = 'Launcher',
     [AllowNull()][object[]]$SupportInput = @()
@@ -243,6 +244,369 @@ try {
                             -ErrorAction SilentlyContinue
                     }
                 }
+            }
+        } ([pscustomobject]$SupportInput[0])
+    }
+
+    if ($SupportAction -ceq 'HistoricalIssueContract') {
+        if ($SupportInput.Count -ne 1 -or $null -eq $SupportInput[0] -or
+            [string]$SupportInput[0].Mode -cnotin @(
+                'LocalClassification', 'ProviderProof', 'InventoryProof',
+                'SnapshotProof', 'RegistryProof'
+            )) {
+            throw 'Historical-issue contract support input is invalid.'
+        }
+        return & $module {
+            param([pscustomobject]$Case)
+
+            $script:HistoricalIssueContractCalls =
+                [System.Collections.Generic.List[object]]::new()
+            $protocolToken = if ($null -ne
+                    $Case.PSObject.Properties['ProtocolToken']) {
+                [string]$Case.ProtocolToken
+            }
+            else { '' }
+            if ([string]$Case.Mode -ceq 'RegistryProof') {
+                $records = @($Case.Tags | ForEach-Object {
+                    [pscustomobject]@{
+                        Tag = [string]$_
+                        Commit = Get-CompletedHistoricalAdoptionReleaseCommit `
+                            -Tag ([string]$_)
+                    }
+                })
+                return [pscustomobject][ordered]@{
+                    Succeeded = $true
+                    Error = ''
+                    Result = @($records)
+                    Calls = @()
+                }
+            }
+            if ([string]$Case.Mode -ceq 'InventoryProof') {
+                function script:Invoke-External {
+                    param(
+                        [Parameter(Mandatory)][string]$Command,
+                        [string[]]$Arguments = @(),
+                        [switch]$AllowFailure,
+                        [AllowNull()][string]$InputText = $null
+                    )
+                    $script:HistoricalIssueContractCalls.Add(
+                        [pscustomobject]@{
+                            Kind = 'IssueInventory'
+                            Arguments = @($Arguments)
+                        }
+                    )
+                    if ($null -ne $Case.PSObject.Properties['RawOutput']) {
+                        return [pscustomobject]@{
+                            ExitCode = 0
+                            Output = @([string]$Case.RawOutput)
+                            Error = @()
+                        }
+                    }
+                    $issues = [System.Collections.Generic.List[object]]::new()
+                    if ([int]$Case.IssueCount -gt 0) {
+                        foreach ($number in 1..([int]$Case.IssueCount)) {
+                            $issues.Add([pscustomobject]@{
+                                number = $number
+                                url = "https://github.com/test-owner/consumer/issues/$number"
+                                title = "Issue $number"
+                                body = ''
+                                state = 'OPEN'
+                                stateReason = ''
+                                closedAt = $null
+                                author = [pscustomobject]@{ login = 'test-owner' }
+                            })
+                        }
+                    }
+                    $json = if ($issues.Count -eq 0) {
+                        '[]'
+                    }
+                    else {
+                        @($issues) | ConvertTo-Json -Depth 4 -Compress
+                    }
+                    return [pscustomobject]@{
+                        ExitCode = 0
+                        Output = @($json)
+                        Error = @()
+                    }
+                }
+                $errorText = ''
+                $resultCount = 0
+                try {
+                    $resultCount = @(Get-AdoptionIssueInventory `
+                        -Repository ([string]$Case.Repository)).Count
+                }
+                catch { $errorText = $_.Exception.Message }
+                return [pscustomobject][ordered]@{
+                    Succeeded = [string]::IsNullOrEmpty($errorText)
+                    Error = $errorText
+                    ResultCount = $resultCount
+                    Calls = @($script:HistoricalIssueContractCalls)
+                }
+            }
+            if ([string]$Case.Mode -ceq 'SnapshotProof') {
+                $script:HistoricalIssueSnapshotInventoryRead = 0
+                function script:Get-AdoptionIssueInventory {
+                    param([Parameter(Mandatory)][string]$Repository)
+                    $script:HistoricalIssueSnapshotInventoryRead++
+                    $script:HistoricalIssueContractCalls.Add(
+                        [pscustomobject]@{
+                            Kind = 'IssueInventory'
+                            Read = $script:HistoricalIssueSnapshotInventoryRead
+                        }
+                    )
+                    if ($script:HistoricalIssueSnapshotInventoryRead -eq 1) {
+                        return @($Case.FirstIssues)
+                    }
+                    return @($Case.SecondIssues)
+                }
+                function script:Get-ValidatedCompletedHistoricalAdoptionIssue {
+                    param(
+                        [Parameter(Mandatory)]$Candidate,
+                        [Parameter(Mandatory)][string]$Repository,
+                        [Parameter(Mandatory)][string]$TargetRepository,
+                        [Parameter(Mandatory)][string]$BaseBranch,
+                        [Parameter(Mandatory)][string]$TargetRemote,
+                        [string]$ProtocolToken = ''
+                    )
+                    $script:HistoricalIssueContractCalls.Add(
+                        [pscustomobject]@{ Kind = 'HistoricalProvider' }
+                    )
+                    return [pscustomobject]@{
+                        number = $Candidate.Issue.number
+                        url = $Candidate.Issue.url
+                        title = $Candidate.Issue.title
+                        body = $Candidate.Issue.body
+                        state = $Candidate.Issue.state
+                        classification = 'CompletedHistorical'
+                        markerKind = 'CompletedHistorical'
+                        targetTag = $Candidate.TargetTag
+                        pullRequestNumber = $Candidate.PullRequestNumber
+                        fingerprint = $Candidate.Fingerprint
+                    }
+                }
+                $errorText = ''
+                $snapshot = $null
+                $result = @()
+                try {
+                    $snapshot = Get-AdoptionIssueReconciliationSnapshot `
+                        -Repository ([string]$Case.Repository) `
+                        -TargetRepository ([string]$Case.TargetRepository) `
+                        -BaseBranch ([string]$Case.BaseBranch) `
+                        -TargetTag ([string]$Case.ProtocolTag) `
+                        -TargetRemote 'origin'
+                    $result = @(Confirm-AdoptionIssueReconciliationSnapshot `
+                        -Snapshot $snapshot `
+                        -Repository ([string]$Case.Repository) `
+                        -TargetRepository ([string]$Case.TargetRepository) `
+                        -BaseBranch ([string]$Case.BaseBranch) `
+                        -TargetTag ([string]$Case.ProtocolTag))
+                }
+                catch { $errorText = $_.Exception.Message }
+                return [pscustomobject][ordered]@{
+                    Succeeded = [string]::IsNullOrEmpty($errorText)
+                    Error = $errorText
+                    Snapshot = $snapshot
+                    Result = @($result)
+                    Calls = @($script:HistoricalIssueContractCalls)
+                }
+            }
+            if ([string]$Case.Mode -ceq 'LocalClassification') {
+                $script:ProtocolTag = [string]$Case.ProtocolTag
+                function script:Get-ValidatedCompletedHistoricalAdoptionIssue {
+                    param(
+                        [Parameter(Mandatory)]$Candidate,
+                        [Parameter(Mandatory)][string]$Repository,
+                        [Parameter(Mandatory)][string]$TargetRepository,
+                        [Parameter(Mandatory)][string]$BaseBranch,
+                        [Parameter(Mandatory)][string]$TargetRemote,
+                        [string]$ProtocolToken = ''
+                    )
+                    $script:HistoricalIssueContractCalls.Add(
+                        [pscustomobject]@{
+                            Kind = 'HistoricalProvider'
+                            ProtocolToken = $ProtocolToken
+                        }
+                    )
+                    return [pscustomobject]@{
+                        number = $Candidate.Issue.number
+                        url = $Candidate.Issue.url
+                        title = $Candidate.Issue.title
+                        body = $Candidate.Issue.body
+                        state = $Candidate.Issue.state
+                        classification = 'CompletedHistorical'
+                        markerKind = 'CompletedHistorical'
+                        targetTag = $Candidate.TargetTag
+                        pullRequestNumber = $Candidate.PullRequestNumber
+                        fingerprint = $Candidate.Fingerprint
+                    }
+                }
+                $errorText = ''
+                $result = @()
+                try {
+                    $parameters = @{
+                        Issues = @($Case.Issues)
+                        Repository = [string]$Case.Repository
+                        TargetRepository = [string]$Case.TargetRepository
+                        BaseBranch = [string]$Case.BaseBranch
+                        CurrentTargetTag = [string]$Case.ProtocolTag
+                        Marker = [string]$Case.Marker
+                        ExpectedTitle = [string]$Case.ExpectedTitle
+                        ExpectedBody = [string]$Case.ExpectedBody
+                        LegacyMarker = [string]$Case.LegacyMarker
+                        LegacyExpectedBody = [string]$Case.LegacyExpectedBody
+                        ProtocolToken = $protocolToken
+                    }
+                    if ($null -ne $Case.PSObject.Properties[
+                            'FrozenHistorical']) {
+                        $parameters.FrozenHistorical =
+                            @($Case.FrozenHistorical)
+                    }
+                    else {
+                        $parameters.ProveHistorical = $true
+                    }
+                    $result = @(Get-MarkedAdoptionIssues @parameters)
+                }
+                catch { $errorText = $_.Exception.Message }
+                return [pscustomobject][ordered]@{
+                    Succeeded = [string]::IsNullOrEmpty($errorText)
+                    Error = $errorText
+                    Result = @($result)
+                    Calls = @($script:HistoricalIssueContractCalls)
+                }
+            }
+
+            function script:Get-ValidatedImmutableProtocolRelease {
+                param([string]$ProtocolToken = '', [string]$Tag)
+                $script:HistoricalIssueContractCalls.Add(
+                    [pscustomobject]@{
+                        Kind = 'Release'
+                        Tag = $Tag
+                        ProtocolToken = $ProtocolToken
+                    }
+                )
+                if ([string]$Case.ProviderMode -ceq 'ReleaseFailure') {
+                    throw 'Injected immutable release failure.'
+                }
+                return [pscustomobject]@{
+                    Tag = $Tag
+                    CommitSha = [string]$Case.ReleaseCommit
+                }
+            }
+            function script:Invoke-External {
+                param(
+                    [Parameter(Mandatory)][string]$Command,
+                    [string[]]$Arguments = @(),
+                    [switch]$AllowFailure,
+                    [AllowNull()][string]$InputText = $null
+                )
+                $kind = if ($Arguments.Count -ge 2 -and
+                    $Arguments[0] -ceq 'pr' -and
+                    $Arguments[1] -ceq 'view') { 'PullRequestView' }
+                elseif ($Arguments.Count -ge 2 -and
+                    $Arguments[0] -ceq 'pr' -and
+                    $Arguments[1] -ceq 'list') { 'OpenPullRequestList' }
+                else { 'Unexpected' }
+                $script:HistoricalIssueContractCalls.Add(
+                    [pscustomobject]@{
+                        Kind = $kind
+                        Arguments = @($Arguments)
+                    }
+                )
+                if ([string]$Case.ProviderMode -ceq 'ProviderFailure') {
+                    throw 'Injected historical provider failure.'
+                }
+                $json = if ($kind -ceq 'PullRequestView') {
+                    $Case.PullRequest | ConvertTo-Json -Depth 8 -Compress
+                }
+                elseif ($kind -ceq 'OpenPullRequestList') {
+                    if (@($Case.OpenPullRequests).Count -eq 0) {
+                        '[]'
+                    }
+                    else {
+                        @($Case.OpenPullRequests) |
+                            ConvertTo-Json -Depth 8 -Compress
+                    }
+                }
+                else {
+                    throw 'Historical-issue contract invoked an unexpected provider route.'
+                }
+                return [pscustomobject]@{
+                    ExitCode = 0
+                    Output = @($json)
+                    Error = @()
+                }
+            }
+            function script:Test-QuickAdoptionExactPullRequestMarker {
+                param(
+                    $PullRequest, [string]$RemoteHead,
+                    [string]$Repository, [string]$Branch,
+                    [string]$BaseBranch, [string]$TargetTag,
+                    [string]$TargetSha, [string]$ExpectedActor,
+                    [string]$ExpectedState,
+                    [string]$ExpectedAdoptionStrategy,
+                    [object[]]$ExpectedProtocolSurfaces,
+                    [bool]$ExpectedProtocolRecordLossAcknowledgement,
+                    $ExpectedSourceGraphIdentity = $null,
+                    [string]$ExpectedPhase
+                )
+                $script:HistoricalIssueContractCalls.Add(
+                    [pscustomobject]@{
+                        Kind = 'MarkerContract'
+                        TargetTag = $TargetTag
+                        TargetSha = $TargetSha
+                        Actor = $ExpectedActor
+                        Phase = $ExpectedPhase
+                        Repository = $Repository
+                        Branch = $Branch
+                        BaseBranch = $BaseBranch
+                        RemoteHead = $RemoteHead
+                        State = $ExpectedState
+                        AdoptionStrategy = $ExpectedAdoptionStrategy
+                        ProtocolSurfaces = @($ExpectedProtocolSurfaces)
+                        ProtocolRecordLossAcknowledgement =
+                            $ExpectedProtocolRecordLossAcknowledgement
+                        PullRequestNumber = $PullRequest.number
+                        PullRequestUrl = $PullRequest.url
+                        PullRequestHead = $PullRequest.headRefOid
+                    }
+                )
+                return [bool]$Case.MarkerContractValid
+            }
+            function script:Get-RemoteBranchHead {
+                param(
+                    [Parameter(Mandatory)][string]$Repository,
+                    [Parameter(Mandatory)][string]$Remote,
+                    [Parameter(Mandatory)][string]$Branch,
+                    [switch]$AllowMissing
+                )
+                $script:HistoricalIssueContractCalls.Add(
+                    [pscustomobject]@{
+                        Kind = 'RemoteBranch'
+                        Repository = $Repository
+                        Remote = $Remote
+                        Branch = $Branch
+                        AllowMissing = [bool]$AllowMissing
+                    }
+                )
+                return [string]$Case.RemoteHead
+            }
+            $errorText = ''
+            $result = $null
+            try {
+                $result = Get-ValidatedCompletedHistoricalAdoptionIssue `
+                    -Candidate $Case.Candidate `
+                    -Repository ([string]$Case.Repository) `
+                    -TargetRepository ([string]$Case.TargetRepository) `
+                    -BaseBranch ([string]$Case.BaseBranch) `
+                    -TargetRemote 'origin' `
+                    -ProtocolToken $protocolToken
+            }
+            catch { $errorText = $_.Exception.Message }
+            return [pscustomobject][ordered]@{
+                Succeeded = [string]::IsNullOrEmpty($errorText)
+                Error = $errorText
+                Result = $result
+                Calls = @($script:HistoricalIssueContractCalls)
             }
         } ([pscustomobject]$SupportInput[0])
     }

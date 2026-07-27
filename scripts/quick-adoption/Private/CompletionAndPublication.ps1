@@ -982,7 +982,9 @@ function Complete-AdoptionWithLocalCodex {
     param(
         [Parameter(Mandatory)][string]$TargetRepository,
         [Parameter(Mandatory)][string]$Repository,
+        [Parameter(Mandatory)][string]$TargetTag,
         [Parameter(Mandatory)]$PullRequest,
+        [Parameter(Mandatory)]$AdoptionIssueSnapshot,
         [Parameter(Mandatory)][string]$CanonicalBaseHead,
         [string]$ProtocolToken = ''
     )
@@ -1052,14 +1054,21 @@ function Complete-AdoptionWithLocalCodex {
                     -Manifest $recoveryManifest `
                     -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
                     -ProtocolSource $protocolSource
-                Ensure-AdoptionLabels -Repository $Repository
                 $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
-                    -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+                    -TargetRepository $clonePath -TargetTag $TargetTag `
+                    -PullRequest $PullRequest `
+                    -ReconciliationSnapshot $AdoptionIssueSnapshot `
+                    -TemporaryDirectory $temporaryRoot
                 Assert-CanonicalConsumerBaseUnchanged `
                     -TargetRepository $TargetRepository `
                     -Branch ([string]$PullRequest.baseRefName) `
                     -ExpectedHead $CanonicalBaseHead `
                     -FailureMessage 'The canonical consumer base changed before publishing recovery readiness.'
+                [void](Confirm-AdoptionIssueReconciliationSnapshot `
+                    -Snapshot $AdoptionIssueSnapshot `
+                    -Repository $Repository -TargetRepository $clonePath `
+                    -BaseBranch ([string]$PullRequest.baseRefName) `
+                    -TargetTag $TargetTag -PullRequest $PullRequest)
                 [void](Complete-AdoptionReviewTransition -Repository $Repository `
                     -TargetRepository $TargetRepository `
                     -PullRequest $PullRequest -PublishedHead $plannedHead `
@@ -1081,6 +1090,11 @@ function Complete-AdoptionWithLocalCodex {
             if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
                 throw 'The unpushed publishing transition cannot be restored because its proposal manifest is missing.'
             }
+            [void](Confirm-AdoptionIssueReconciliationSnapshot `
+                -Snapshot $AdoptionIssueSnapshot `
+                -Repository $Repository -TargetRepository $clonePath `
+                -BaseBranch ([string]$PullRequest.baseRefName) `
+                -TargetTag $TargetTag -PullRequest $PullRequest)
             $restoredBody = Set-AdoptionPullRequestProposedMarker `
                 -Repository $Repository -PullRequest $PullRequest `
                 -PreviousHead $previousHead -TemporaryDirectory $temporaryRoot
@@ -1121,14 +1135,21 @@ function Complete-AdoptionWithLocalCodex {
                     -Manifest $recoveryManifest `
                     -ProtocolSha ([string]$PullRequest.meAndAIMarker.protocolSha) `
                     -ProtocolSource $protocolSource
-                Ensure-AdoptionLabels -Repository $Repository
                 $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
-                    -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+                    -TargetRepository $clonePath -TargetTag $TargetTag `
+                    -PullRequest $PullRequest `
+                    -ReconciliationSnapshot $AdoptionIssueSnapshot `
+                    -TemporaryDirectory $temporaryRoot
                 Assert-CanonicalConsumerBaseUnchanged `
                     -TargetRepository $TargetRepository `
                     -Branch ([string]$PullRequest.baseRefName) `
                     -ExpectedHead $CanonicalBaseHead `
                     -FailureMessage 'The canonical consumer base changed before completed recovery readiness.'
+                [void](Confirm-AdoptionIssueReconciliationSnapshot `
+                    -Snapshot $AdoptionIssueSnapshot `
+                    -Repository $Repository -TargetRepository $clonePath `
+                    -BaseBranch ([string]$PullRequest.baseRefName) `
+                    -TargetTag $TargetTag -PullRequest $PullRequest)
                 [void](Complete-AdoptionReviewTransition -Repository $Repository `
                     -TargetRepository $TargetRepository `
                     -PullRequest $PullRequest -PublishedHead $expectedHead `
@@ -1175,9 +1196,11 @@ function Complete-AdoptionWithLocalCodex {
                 -ProtocolSha ([string]$manifest.protocolSha)
         }
 
-        Ensure-AdoptionLabels -Repository $Repository
         $adoptionIssue = Ensure-AdoptionIssue -Repository $Repository `
-            -PullRequest $PullRequest -TemporaryDirectory $temporaryRoot
+            -TargetRepository $clonePath -TargetTag $TargetTag `
+            -PullRequest $PullRequest `
+            -ReconciliationSnapshot $AdoptionIssueSnapshot `
+            -TemporaryDirectory $temporaryRoot
 
         $codexCompletion = Invoke-AdoptionCodexCompletion -Repository $Repository `
             -PullRequest $PullRequest -Manifest $manifest -ProtocolSource $protocolSource `
@@ -1238,6 +1261,11 @@ function Complete-AdoptionWithLocalCodex {
             -Branch ([string]$PullRequest.baseRefName) `
             -ExpectedHead $CanonicalBaseHead `
             -FailureMessage 'The canonical consumer base changed while local Codex was running; no completion result was published.'
+        [void](Confirm-AdoptionIssueReconciliationSnapshot `
+            -Snapshot $AdoptionIssueSnapshot `
+            -Repository $Repository -TargetRepository $clonePath `
+            -BaseBranch ([string]$PullRequest.baseRefName) `
+            -TargetTag $TargetTag -PullRequest $PullRequest)
         $publishingBody = Set-AdoptionPullRequestPublishingMarker `
             -Repository $Repository -PullRequest $PullRequest `
             -PreviousHead $expectedHead -PlannedHead $publishedHead `
@@ -1260,6 +1288,11 @@ function Complete-AdoptionWithLocalCodex {
             -Branch ([string]$PullRequest.baseRefName) `
             -ExpectedHead $CanonicalBaseHead `
             -FailureMessage 'The canonical consumer base changed before adoption readiness.'
+        [void](Confirm-AdoptionIssueReconciliationSnapshot `
+            -Snapshot $AdoptionIssueSnapshot `
+            -Repository $Repository -TargetRepository $clonePath `
+            -BaseBranch ([string]$publishingPullRequest.baseRefName) `
+            -TargetTag $TargetTag -PullRequest $publishingPullRequest)
         [void](Complete-AdoptionReviewTransition -Repository $Repository `
             -TargetRepository $TargetRepository `
             -PullRequest $publishingPullRequest -PublishedHead $publishedHead `
