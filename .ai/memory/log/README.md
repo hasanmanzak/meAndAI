@@ -7,15 +7,18 @@ and follow its canonical links.
 
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
 C# operational platform migration. Follow the
-[first-slice development handoff](2026-07-27-feat-0059-subf-0119-foundation.md)
-and its linked planning authority.
+[second-slice completion handoff](2026-07-28-feat-0059-subf-0120-ports-results.md),
+the historical [first-slice handoff](2026-07-27-feat-0059-subf-0119-foundation.md),
+and their linked planning authority.
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 / [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-is complete at five of five slice gates with exact-tree and required
+/ [SUBF-0120](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
+are complete at five of five slice gates with exact-tree and required
 Ubuntu/Windows evidence; [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
-owns the checkpoint. Feature completion is one of three subfeatures. Later
-foundation slices, consumer behavior, authority migration, and PowerShell
-retirement still require independent gates.
+owns the checkpoint. Feature completion is two of three subfeatures, or 67%.
+[SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121),
+consumer behavior, authority migration, and PowerShell retirement still
+require independent gates.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at

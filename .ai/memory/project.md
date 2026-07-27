@@ -27,14 +27,14 @@ Last verified: **2026-07-28**
   the typed C# solution and application-authority first slice. The authorized
   second slice is adding only closed deterministic results, single-capability
   port contracts, a grant-checked infrastructure scope, and a redacting async
-  dependency boundary. Its DoR, executable missing-contract red run, and 16 of
-  16 focused green tests and candidate-tree StructureOnly make four of five
-  gates complete; combined
+  dependency boundary. Its DoR, executable missing-contract red run, 16 of 16
+  focused green tests, exact-tree validation, and exact-head hosted evidence
+  complete five of five gates; combined
   [TEST-0191](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191)
   and [TEST-0192](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
   pass 31 of 31 with locked restore, zero-warning Release build, clean
   format/analyzer evidence, and a 203.3-second Windows PowerShell 5.1
-  StructureOnly pass. First hosted head
+  StructureOnly evidence. First hosted head
   [`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976)
   passed Ubuntu and both-host C# tests but exposed
   [FIND-0362](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0362)
@@ -42,9 +42,14 @@ Last verified: **2026-07-28**
   [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a)
   removed the independent PID reopen, but [run `30309863827`](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827)
   proved that retaining OS liveness remained over-constrained and also exposed
-  one short commit-link hygiene failure. The [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
-  consumption-stage correction and canonical link now pass their focused local
-  owners and await committed-tree and hosted evidence.
+  one short commit-link hygiene failure. Exact correction commit
+  [`26b126858cd4a6612a8c19909bd4fd3958fb82f1`](https://github.com/hasanmanzak/meAndAI/commit/26b126858cd4a6612a8c19909bd4fd3958fb82f1)
+  closes [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363),
+  passes exact committed-tree StructureOnly in 206.6 seconds, and passes
+  [run `30312104364`](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364)
+  on [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014)
+  in 12 min 04 s and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066)
+  in 32 min 09 s. The feature is two of three completed subfeatures, or 67%.
   [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   remains gated. PowerShell production authority is unchanged.
 - Content language: English
@@ -306,10 +311,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [run `30309863827`](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827)
   own the current recurrence. [DEC-0030](../../docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md)
   retains the existing scenario identity.
-- Fixed release or evidence: the exact evidence head passed 31 of 31 C# tests
-  on both hosts; Windows failed only the retained aggregate streaming oracle,
-  while Ubuntu passed that owner and failed later on one non-navigable short
-  commit reference. The reviewed working-tree
+- Fixed release or evidence: the first exact evidence head passed 31 of 31 C#
+  tests on both hosts but retained the aggregate Windows oracle failure, while
+  Ubuntu failed later on one non-navigable short commit reference. The reviewed
+  working-tree
   [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
   contract first failed
   alone on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.5 seconds when the
@@ -317,8 +322,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
   and [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
   passed in 10.0 / 12.4 seconds after adding distinct active-read and post-exit-
-  drain stages. Candidate-tree Windows PowerShell 5.1 StructureOnly passed in
-  208.5 seconds. Exact committed-tree and hosted confirmation remain pending.
+  drain stages. Exact correction commit
+  [`26b126858cd4a6612a8c19909bd4fd3958fb82f1`](https://github.com/hasanmanzak/meAndAI/commit/26b126858cd4a6612a8c19909bd4fd3958fb82f1)
+  passes candidate/exact-tree Windows PowerShell 5.1 StructureOnly in 208.5 /
+  206.6 seconds. Exact-head [run `30312104364`](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364)
+  passes Ubuntu and Windows; Windows emits the exact
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  manifest, and Ubuntu passes the
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  commit-link verifier.
 - Required safe response: require the exact parent-generated stream identity
   and `ConsumptionStage=ActiveReadLoop` for the first fixture event; label only
   the post-exit drain as `PostExitDrain`; retain exit, event, redaction, final-

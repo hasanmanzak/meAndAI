@@ -1,9 +1,8 @@
 # FEAT-0059 Test Scenarios
 
-Test implementation: [SUBF-0119](README.md#subf-0119) is complete; focused local
-expected-red/green evidence and exact-head Ubuntu/Windows evidence pass.
-[SUBF-0120](README.md#subf-0120) has executable expected-red and local green
-evidence; exact-head hosted evidence remains pending.
+Test implementation: [SUBF-0119](README.md#subf-0119) and
+[SUBF-0120](README.md#subf-0120) are complete; focused local expected-red/green,
+exact committed-tree, and exact-head Ubuntu/Windows evidence pass.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -83,5 +82,18 @@ and [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test
 in 10.0 / 12.4 seconds after the
 active read loop and post-exit drain received distinct closed stage values.
 The canonical exact commit link is restored, and candidate-tree Windows
-PowerShell 5.1 StructureOnly passed in 208.5 seconds; new committed-tree and
-hosted evidence remain required.
+PowerShell 5.1 StructureOnly passed in 208.5 seconds.
+
+Exact correction commit
+[`26b126858cd4a6612a8c19909bd4fd3958fb82f1`](https://github.com/hasanmanzak/meAndAI/commit/26b126858cd4a6612a8c19909bd4fd3958fb82f1)
+passed exact committed-tree StructureOnly in 206.6 seconds and exact-head
+[run `30312104364`](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364).
+The [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014)
+passed in 12 min 04 s with 31 of 31 C# tests in 99 ms and
+[TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+inside the seven-scenario post-publication manifest. The
+[Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066)
+passed in 32 min 09 s with 31 of 31 C# tests in 170 ms and the exact
+[TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+manifest. [TEST-0192](#test-0192) is complete; PowerShell production authority
+and every consumer remain unchanged.

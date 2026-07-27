@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In development / [SUBF-0119](#subf-0119) complete; [SUBF-0120](#subf-0120) authorized |
+| Status | In development / [SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) complete; [SUBF-0121](#subf-0121) gated |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
 | Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
@@ -187,12 +187,12 @@ to report:
 | ID | Area / priority | Finding | Disposition |
 | --- | --- | --- | --- |
 | `FIND-0362` <a name="find-0362"></a> | Canonical streaming test infrastructure / P1 | Exact C# implementation head [`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976) passed 31 of 31 C# tests on both hosts and the complete [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643866), but the [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690/job/90115643994) failed only [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105). Every required JSONL event and presentation assertion passed; only the aggregate live-consumption oracle failed. The C# diff does not touch the bounded process, streaming test, or fixture. The retained oracle reopens the child independently by PID inside the callback, so a hosted process-observation false negative can block the gate without disproving incremental consumption. | `Superseded` / exact correction commit [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a) removed the independent PID reopen and passed the canonical owner locally on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.7 seconds. Its exact-head [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827/job/90122730639) nevertheless failed only the same aggregate oracle. The correction therefore removed the reopen defect but proved that retaining OS process identity and liveness as the consumption boundary remained over-constrained; [FIND-0363](#find-0363) owns that distinct remaining blocker. |
-| `FIND-0363` <a name="find-0363"></a> | Portable streaming-consumption evidence / P1 | Exact correction head [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a) passed 31 of 31 C# tests on both hosts, but canonical [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) again reported only the aggregate live-consumption failure on hosted Windows even though all JSONL events and separate presentation assertions passed. The callback still inferred consumption from OS process identity and liveness. That state is not the contract: `Invoke-BoundedProcess` already has a deterministic control-flow boundary between its active asynchronous read loop and its post-exit drain. The exact-head [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827/job/90122730666) passed the streaming owner and failed later only because a current-status Markdown sentence used a non-navigable short commit reference. | `Blocking` / resolved in the reviewed working tree, with committed-tree and hosted confirmation pending. [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) first required exact parent-generated stream identity plus `ConsumptionStage=ActiveReadLoop`; the absent stage failed only [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.5 seconds. The minimal implementation now supplies `ActiveReadLoop` from the incremental loop and `PostExitDrain` only after process completion, and the unchanged [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) owner passes in 10.0 / 12.4 seconds. Candidate-tree Windows PowerShell 5.1 StructureOnly passes in 208.5 seconds. Exit zero, all required events, bounded redaction, final-result authority, and cancellation coverage remain mandatory; no process reopen, OS-liveness predicate, timing tolerance, retry, weakened event, duplicate scenario, or adoption/publication behavior was added. The short commit reference is also replaced by its canonical exact link. |
+| `FIND-0363` <a name="find-0363"></a> | Portable streaming-consumption evidence / P1 | Exact correction head [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a) passed 31 of 31 C# tests on both hosts, but canonical [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) again reported only the aggregate live-consumption failure on hosted Windows even though all JSONL events and separate presentation assertions passed. The callback still inferred consumption from OS process identity and liveness. That state is not the contract: `Invoke-BoundedProcess` already has a deterministic control-flow boundary between its active asynchronous read loop and its post-exit drain. The exact-head [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827/job/90122730666) passed the streaming owner and failed later only because a current-status Markdown sentence used a non-navigable short commit reference. | `Resolved` / exact correction commit [`26b126858cd4a6612a8c19909bd4fd3958fb82f1`](https://github.com/hasanmanzak/meAndAI/commit/26b126858cd4a6612a8c19909bd4fd3958fb82f1) requires exact parent-generated stream identity plus `ConsumptionStage=ActiveReadLoop`, supplies `PostExitDrain` only after process completion, and restores the canonical commit link. The absent stage first failed only [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.5 seconds; the unchanged [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) owner then passed locally in 10.0 / 12.4 seconds. Candidate- and exact-committed-tree Windows PowerShell 5.1 StructureOnly passed in 208.5 / 206.6 seconds. Exact-head [run `30312104364`](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364) passed [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066); Windows emitted the exact [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) pass manifest and Ubuntu passed the [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) link verifier. Exit zero, all required events, bounded redaction, final-result authority, and cancellation coverage remain mandatory. No process reopen, OS-liveness predicate, timing tolerance, retry, weakened event, duplicate scenario, or adoption/publication behavior was added. |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | [SUBF-0119](#subf-0119) passing locally and on exact-head Ubuntu/Windows hosts; [SUBF-0120](#subf-0120) expected-red plus 16 of 16 focused local tests complete | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192) |
+| Test code | [SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) passing locally and on exact-head Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192) |
 | Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
 
 ## Decomposition and subfeature gates
@@ -200,7 +200,7 @@ to report:
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 | Fresh-diff review complete; reference-type absence, implementation capability widening, concrete collection analyzer, canonical passing declaration, link hygiene, and local package-cache containment findings closed; candidate-tree StructureOnly passed in 203.3 seconds; [FIND-0363](#find-0363) awaits committed-tree and hosted closure | In development |
+| `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / not started | Pending | Proposed |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
@@ -244,11 +244,22 @@ Progress is measured against five independently observable delivery gates:
 4. Local self-review, locked restore, analyzer/format verification, and
    candidate-tree protocol validation: complete.
 5. Exact committed-tree validation, remote draft checkpoint, and final-head
-   Ubuntu/Windows hosted evidence: blocked by [FIND-0363](#find-0363).
+   Ubuntu/Windows hosted evidence: complete.
 
-The 2026-07-28 checkpoint is therefore four of five gates, or 80% of
-[SUBF-0120](#subf-0120). Feature completion remains one of three completed
-subfeatures, or 33%. [SUBF-0121](#subf-0121) remains unauthorized.
+The 2026-07-28 closure is therefore five of five gates, or 100% of
+[SUBF-0120](#subf-0120). Feature completion is two of three completed
+subfeatures, or 67%. [SUBF-0121](#subf-0121) remains gated and unauthorized.
+
+Observed hosted timings are evidence, not workflow service-level objectives:
+
+| Host | C# test process | C# workflow step | Retained validation | Full required job |
+| --- | ---: | ---: | ---: | ---: |
+| Ubuntu | 99 ms | 12 s | 11 min 31 s / PowerShell 7 | 12 min 04 s |
+| Windows | 170 ms | 10 s | 30 min 48 s / Windows PowerShell 5.1 | 32 min 09 s |
+
+The compiled contract tests remain a small fraction of hosted duration; this
+measurement does not authorize removing either retained PowerShell route while
+those routes remain production or compatibility authority.
 
 ## Decisions and relationships
 
@@ -307,11 +318,11 @@ subfeatures, or 33%. [SUBF-0121](#subf-0121) remains unauthorized.
 
 ## Definition of Done
 
-[SUBF-0119](#subf-0119) DoD is complete: its scoped acceptance criteria,
-tests-first evidence, local and hosted test commands, fresh-diff review,
-exact-tree validation, documentation, links, and project memory are current,
-with no unresolved `Blocking` finding. Feature-level DoD remains pending for
-[SUBF-0120](#subf-0120), [SUBF-0121](#subf-0121), portable package/manifest
-acceptance, and their independent authorization. This closure does not
+[SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) DoD are complete: their
+scoped acceptance criteria, tests-first evidence, local and hosted test
+commands, fresh-diff review, exact-tree validation, documentation, links, and
+project memory are current, with no unresolved `Blocking` finding. Feature-
+level DoD remains pending for [SUBF-0121](#subf-0121), portable package and
+manifest acceptance, and its independent authorization. This closure does not
 authorize consumer mutation, authority transfer, release publication, or
 PowerShell retirement.
