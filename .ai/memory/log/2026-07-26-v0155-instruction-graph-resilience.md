@@ -161,7 +161,7 @@ Completed local evidence:
   against the HEAD inventory found no remaining required local missing target
   and no additional `Blocking` or `Important` token finding. No production
   parser relaxation is indicated.
-- On corrected commit `a0ed721`, the canonical instruction-graph owner passed
+- On corrected [commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0), the canonical instruction-graph owner passed
   [TEST-0151](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
   [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
   and [TEST-0161](../../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161)
@@ -172,6 +172,15 @@ Completed local evidence:
   in 875.939 seconds, instruction graph in 138.206 seconds, governance in
   127.574 seconds, publication evidence in 109.268 seconds, and runtime
   efficiency in 7.839 seconds with `contract.self-check` 1/1.
+- The Ubuntu slice of [hosted run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
+  passed quick adoption, instruction graph, governance, and recurrence
+  prevention before [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  rejected seven renderer-active short checkpoint references introduced during
+  evidence synchronization ([FIND-0344](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0344)). All eight textual occurrences now link the owning-repository exact
+  full-SHA commit. The focused publication-evidence owner then passed
+  [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  and every retained scenario on PowerShell 7 / Windows PowerShell 5.1 in
+  103.2 / 192.0 seconds; no production runtime change was required.
 
 The overall bounded diff/self-review is complete with no unresolved `Blocking`
 finding. Remaining gates are final evidence-sync exact-tree verification,

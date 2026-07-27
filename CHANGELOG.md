@@ -63,12 +63,20 @@ seconds with `contract.self-check` 1/1. Because the new feature packet was still
 untracked, that HEAD-based self-consumer slice could not inspect it. First hosted
 [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
 then produced the same exact-tree expected red on Ubuntu PowerShell 7 and Windows
-PowerShell 5.1. On corrected commit `a0ed721`, the exact committed-tree owner
+PowerShell 5.1. On corrected [commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0), the exact committed-tree owner
 passed on PowerShell 7 / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with
 2/2 process starts and 4/4 blob requests on both runtimes. The committed-tree
 full suite then passed every discovered owner in 1805.3 seconds, including
 runtime efficiency with `contract.self-check` 1/1. Final evidence-sync exact-
 tree verification and hosted confirmation remain pending.
+The Ubuntu slice of [run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
+then passed every earlier owner before [TEST-0178](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+rejected seven short checkpoint references without exact full-SHA permalinks;
+all eight textual occurrences are linked exactly in the corrected evidence
+packet without a production runtime change. The focused publication-evidence
+owner then passed [TEST-0178](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+and every retained scenario on PowerShell 7 / Windows PowerShell 5.1 in 103.2 /
+192.0 seconds.
 
 Latest-byte read-only consumer resimulation kept all pre/post remote HEADs exact
 and clones clean: Derdini retained its classified older seed, TravelOS assessment

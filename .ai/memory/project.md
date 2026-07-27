@@ -468,7 +468,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
   own the exact committed-tree boundary.
 - Fixed release or evidence: target release `0.15.5`; all three slash-joined
-  command shorthands are distinct inline-code commands in commit `a0ed721`.
+  command shorthands are distinct inline-code commands in
+  [commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0).
   The exact committed-tree owner passed on PowerShell 7 / Windows PowerShell
   5.1 in 136.2 / 236.5 seconds with 2/2 process starts and 4/4 blob requests,
   and the committed-tree full suite passed in 1805.3 seconds. Hosted
@@ -673,12 +674,21 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   passed every discovered owner in 1745.3 seconds, but [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
   proved that the untracked feature packet was absent from its HEAD self-
   consumer slice; first hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
-  exposed the ambiguous documentation token on both runtimes. Commit `a0ed721`
+  exposed the ambiguous documentation token on both runtimes.
+  [Commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0)
   expands the shorthand; its exact committed-tree owner passed on PowerShell 7
   / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with 2/2 process starts and
   4/4 blob requests, and its full suite passed every discovered owner in 1805.3
   seconds. Later gates are final evidence-sync exact-tree verification, hosted
-  validation and review on the exact pull-request head, exact merged-commit release, post-
+  validation and review on the exact pull-request head. The Ubuntu slice of
+  [run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
+  then passed every earlier owner before [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  rejected seven unlinked short checkpoint references; every occurrence now
+  uses its owning-repository exact full-SHA permalink. The focused publication-
+  evidence owner passed on PowerShell 7 / Windows PowerShell 5.1 in 103.2 /
+  192.0 seconds with [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  and every retained scenario green. Later gates remain corrected exact-head
+  hosted validation and review, exact merged-commit release, post-
   publication verification, issue closure, and OID-bound branch cleanup. Keep
   every reusable regression upstream and do not mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
