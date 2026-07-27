@@ -155,19 +155,69 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   correction.
 - Fixed release or evidence: target release `0.15.6`; exact correction commit
   [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
-  emits the fixture PID and process-start ticks, retains the five-second live
-  window, and requires that exact identity to remain alive when the first event
-  is consumed. The focused owner passes on PowerShell 7 / Windows PowerShell
-  5.1; final protected hosted confirmation remains required.
-- Required safe response: use the exact live-process identity barrier, run the
-  canonical focused owner on both supported runtimes, then require structure,
-  committed-HEAD graph, and a new-head hosted Ubuntu/Windows pass.
+  removes the acknowledgment file and first replaced it with PID plus process-
+  start ticks. [FIND-0361](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md#find-0361)
+  records the separate portability correction completed by
+  [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d).
+- Required safe response: remove the bidirectional handshake, use one parent-
+  generated run identity plus bounded live PID, run the canonical focused owner
+  on both supported runtimes, then require structure, committed-HEAD graph, and
+  a new-head hosted Ubuntu/Windows pass.
 - Unsafe retry boundary: do not accept an unchanged old-head rerun as the
   correction, weaken production streaming, infer parent-write absence from the
   combined failure, or create a duplicate scenario ID.
 - Freshness and review condition: last confirmed 2026-07-27; review whenever
   the bounded-process stdout reader, mock event process, or hosted Windows
   runtime changes.
+- Superseded by: `None`
+
+### Cross-platform fixture identity needs portable run correlation
+
+- Status: `Active`
+- Observable signature: an exact hosted head reports only the aggregate
+  canonical
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  live-consumption failure, with no separate required-event or safe-
+  presentation failure. The hosted log does not expose which aggregate operand
+  failed.
+- Applicability: the first file-free streaming fixture, which serialized its
+  own process-start ticks and required an independently opened process object
+  to reproduce that exact value while the first event was handled.
+- Affected contract and cause: code-path diagnosis identifies exact process-
+  start timestamp equality as the remaining platform-sensitive correlation
+  discriminator. Independently opening process objects and requiring exact
+  timestamp equality is not an appropriate portable oracle, so PID/start-time
+  equality must not be the sole run-correlation boundary.
+- Canonical owner and evidence: [FEAT-0020](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md) /
+  [BUG-0008](https://github.com/hasanmanzak/meAndAI/issues/57) /
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  owns the streaming contract; [FIND-0361](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md#find-0361)
+  records the v0.15.6 delivery recurrence.
+  [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
+  owns the recurrence-entry schema and
+  [DEC-0030](../../docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md)
+  retains the existing canonical test identity for this infrastructure-only
+  correction.
+- Fixed release or evidence: target release `0.15.6`; exact evidence head
+  [`aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0`](https://github.com/hasanmanzak/meAndAI/commit/aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0)
+  reproduced the false negative on Ubuntu
+  [run `30278228996`](https://github.com/hasanmanzak/meAndAI/actions/runs/30278228996).
+  Exact correction commit
+  [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d)
+  uses one parent-generated lowercase 32-hex run identity plus bounded live PID;
+  the focused owner passes on PowerShell 7 / Windows PowerShell 5.1 in 10.1 /
+  12.8 seconds, and an independent review run repeats the pass in 9.5 / 11.8
+  seconds with the same canonical scenario manifest. Final protected hosted
+  confirmation remains required.
+- Required safe response: preserve exit zero, all expected events, safe
+  presentation, final-result authority, and cancellation assertions; replace
+  exact timestamp equality with a parent-generated run identity plus bounded
+  live PID, then validate a new exact head on both hosted platforms.
+- Unsafe retry boundary: do not add timestamp tolerance or retry loops, accept
+  an unchanged old-head rerun, weaken production streaming, or create a new
+  scenario ID for the same retained infrastructure contract.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  process identity, mock event startup, or hosted runtime behavior changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure

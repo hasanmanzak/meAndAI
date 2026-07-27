@@ -108,9 +108,23 @@ this release.
   not observe the bidirectional file acknowledgment within five seconds even
   though Ubuntu remained green. Exact correction commit
   [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
-  replaces the file handshake with exact live PID plus process-start-ticks
-  evidence. The focused owner passes on PowerShell 7 / Windows PowerShell 5.1
-  in 9.7 / 11.3 seconds without changing production or cancellation behavior.
+  removes the file handshake and first uses exact live PID plus process-start-
+  ticks evidence. The focused owner passes on PowerShell 7 / Windows PowerShell
+  5.1 in 9.7 / 11.3 seconds without changing production or cancellation
+  behavior.
+- Exact evidence head
+  [`aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0`](https://github.com/hasanmanzak/meAndAI/commit/aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0)
+  then failed only the aggregate live-consumption assertion on Ubuntu in
+  [run `30278228996`](https://github.com/hasanmanzak/meAndAI/actions/runs/30278228996)
+  with no separate required-event or safe-presentation failure. The hosted log
+  did not expose the failed aggregate operand; code-path diagnosis identified
+  exact process-start-tick equality as the remaining platform-sensitive
+  correlation discriminator. Final correction commit
+  [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d)
+  instead requires one parent-generated lowercase run identity plus bounded
+  live PID. The focused owner passes on PowerShell 7 / Windows PowerShell 5.1
+  in 10.1 / 12.8 seconds while exit zero, every expected event, safe rendering,
+  final-result authority, and cancellation evidence remain mandatory.
 - Structural convergence, exact committed-HEAD graph validation and protected
   hosted checks of the evidence-only finalization, immutable publication,
   post-publication verification, issue closure, and owned-branch cleanup

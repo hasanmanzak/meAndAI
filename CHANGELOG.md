@@ -31,9 +31,10 @@ This project uses the `M.m.rev` version format defined in the
   fixture and using v0.15.7 only as the future-version negative.
 - Harden retained hosted-streaming
   [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
-  by replacing its bidirectional file-observation handshake with an exact live
-  fixture PID and process-start identity check. Production streaming and
-  cancellation behavior remain unchanged.
+  by replacing its bidirectional file-observation handshake and nonportable
+  process-start-timestamp equality with one parent-generated run identity plus
+  a bounded live fixture PID. Production streaming and cancellation behavior
+  remain unchanged.
 
 Candidate validation: exact v0.15.5 produced the expected malformed-marker red
 in 175.6 seconds. The corrected
@@ -55,12 +56,23 @@ validation on exact implementation head
 then passed Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s. Final
 evidence-only protected checks then exposed the recurring test-only streaming
 handshake on Windows PowerShell 5.1 in two independent hosted runs while Ubuntu
-remained green. Exact correction commit
-[`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
-passes the focused [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) /
-[TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
-owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.3 seconds. Exact
-final protected checks and immutable-release evidence remain delivery gates.
+  remained green. First correction commit
+  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+  passes the focused [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) /
+  [TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.3 seconds. Exact
+  evidence head
+  [`aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0`](https://github.com/hasanmanzak/meAndAI/commit/aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0)
+  then failed only the aggregate live-consumption assertion on Ubuntu
+  [run `30278228996`](https://github.com/hasanmanzak/meAndAI/actions/runs/30278228996)
+  with no separate event-presence or safe-presentation failure. The hosted log
+  did not expose the failed aggregate operand; code-path diagnosis identified
+  exact process-start-tick equality as the remaining platform-sensitive
+  correlation discriminator. Final correction commit
+  [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d)
+  instead uses an exact run identity plus bounded live PID and passes the focused
+  owner on PowerShell 7 / Windows PowerShell 5.1 in 10.1 / 12.8 seconds. Exact
+  final protected checks and immutable-release evidence remain delivery gates.
 
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
