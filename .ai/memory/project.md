@@ -25,6 +25,13 @@ Last verified: **2026-07-27**
   repairs instruction-graph parsing, bounded abort cleanup, schema-2 capacity,
   protected authority, and release-owned target-policy selection; every
   implementation and regression remains upstream-only.
+- Proposed future governance scope:
+  [FEAT-0057](../../docs/features/FEAT-0057-v0160-lifecycle-backlog-governance/README.md)
+  / [DEC-0032](../../docs/decisions/DEC-0032-explicit-lifecycle-and-github-native-backlog.md)
+  / [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) records the
+  selected but not implementation-authorized `0.16.0` plan for an explicit
+  SDLC, work-item lifecycle, feature-catalog semantics, and GitHub-native
+  backlog governance shared with adopting repositories.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.

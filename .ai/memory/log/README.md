@@ -21,6 +21,13 @@ is the current `0.15.5` continuation. Follow the
 The completed [v0.15.4 handoff](2026-07-26-v0154-utf8-workflow-dispatch.md)
 and earlier slice handoffs remain historical evidence.
 
+[FEAT-0057](../../../docs/features/FEAT-0057-v0160-lifecycle-backlog-governance/README.md)
+/ [DEC-0032](../../../docs/decisions/DEC-0032-explicit-lifecycle-and-github-native-backlog.md)
+/ [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) is a separate
+proposed `0.16.0` future scope. Follow the
+[lifecycle and backlog planning handoff](2026-07-27-v0160-lifecycle-backlog-planning.md).
+Its records-only proposal does not authorize implementation.
+
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
 [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
 [SUBF-0092](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
@@ -49,6 +56,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-27 - v0.16.0 lifecycle and backlog governance planning](2026-07-27-v0160-lifecycle-backlog-planning.md)
 - [2026-07-26 - v0.15.5 instruction-graph resilience](2026-07-26-v0155-instruction-graph-resilience.md)
 - [2026-07-26 - v0.15.4 UTF-8 workflow dispatch](2026-07-26-v0154-utf8-workflow-dispatch.md)
 - [2026-07-26 - v0.15.3 bounded quick-adoption runtime](2026-07-26-v0153-bounded-quick-adoption-runtime.md)

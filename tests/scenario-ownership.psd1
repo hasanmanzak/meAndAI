@@ -178,6 +178,11 @@
             TestIds = @('TEST-0065')
         }
         @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0057-v0160-lifecycle-backlog-governance/test-cases.md'
+            TestIds = @('TEST-0191', 'TEST-0192', 'TEST-0193')
+        }
+        @{
             Evidence = 'HistoricalSuperseded'
             Owner = 'docs/features/FEAT-0006-quick-adoption-launcher/test-cases.md'
             TestIds = @('TEST-0037')

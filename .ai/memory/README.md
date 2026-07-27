@@ -23,6 +23,14 @@ PR validation and immutable publication.
 Follow the [current handoff](log/2026-07-26-v0155-instruction-graph-resilience.md).
 No consumer-local implementation or regression belongs to this correction.
 
+[FEAT-0057](../../docs/features/FEAT-0057-v0160-lifecycle-backlog-governance/README.md)
+/ [DEC-0032](../../docs/decisions/DEC-0032-explicit-lifecycle-and-github-native-backlog.md)
+/ [issue #150](https://github.com/hasanmanzak/meAndAI/issues/150) is the
+proposed `0.16.0` planning scope for an explicit SDLC, work-item state model,
+feature-catalog semantics, and GitHub-native backlog governance. Follow the
+[planning handoff](log/2026-07-27-v0160-lifecycle-backlog-planning.md).
+The records do not authorize implementation, consumer mutation, or release.
+
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),
 [SUBF-0092](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md#subf-0092),
