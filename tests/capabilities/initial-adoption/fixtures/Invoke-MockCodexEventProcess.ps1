@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('Stream', 'Tree', 'Child')]
     [string]$Mode,
+    [string]$StreamIdentity = '',
     [string]$ParentPidPath = '',
     [string]$ChildPidPath = ''
 )
@@ -17,12 +18,14 @@ function Write-JsonLine {
 }
 
 if ($Mode -ceq 'Stream') {
-    $fixtureProcess = Get-Process -Id $PID
+    if ($StreamIdentity -cnotmatch '^[0-9a-f]{32}$') {
+        throw 'Stream mode requires one exact lowercase run identity.'
+    }
     Write-JsonLine ([ordered]@{
         type = 'thread.started'
         thread_id = 'mock-thread'
         fixture_process_id = $PID
-        fixture_process_start_ticks = $fixtureProcess.StartTime.ToUniversalTime().Ticks
+        fixture_stream_identity = $StreamIdentity
     })
     Start-Sleep -Seconds 5
 

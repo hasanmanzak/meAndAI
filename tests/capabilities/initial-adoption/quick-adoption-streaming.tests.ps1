@@ -36,23 +36,14 @@ function ConvertTo-SingleQuotedLiteral {
 }
 
 function Test-OwnedProcessAlive {
-    param(
-        [int]$ProcessId,
-        [long]$ExpectedStartTicks = 0
-    )
+    param([int]$ProcessId)
 
     if ($ProcessId -le 0) {
         return $false
     }
     try {
         $process = [Diagnostics.Process]::GetProcessById($ProcessId)
-        try {
-            if ($ExpectedStartTicks -gt 0 -and
-                $process.StartTime.ToUniversalTime().Ticks -ne $ExpectedStartTicks) {
-                return $false
-            }
-            return -not $process.HasExited
-        }
+        try { return -not $process.HasExited }
         finally { $process.Dispose() }
     }
     catch {
@@ -190,6 +181,7 @@ $runtimeReady = @($runtimeDefinitions | Where-Object {
 
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-stream-test-$([guid]::NewGuid().ToString('N'))"
+$streamIdentity = [guid]::NewGuid().ToString('N')
 $parentPidPath = Join-Path $tempRoot 'parent.pid'
 $childPidPath = Join-Path $tempRoot 'child.pid'
 $ownedCancellationRoot = Join-Path $tempRoot 'owned-cancellation-root'
@@ -222,6 +214,7 @@ try {
             PrefixArguments = @()
             Description = 'mock JSONL event process'
         }
+        $script:QuickAdoptionStreamIdentity = $streamIdentity
         $script:QuickAdoptionStreamObservedWhileActive = $false
         $script:QuickAdoptionStreamResult = $null
         $streamOutput = @(& {
@@ -229,7 +222,7 @@ try {
                 -Runner $runner `
                 -Arguments @(
                     '-NoProfile', '-File', $fixturePath,
-                    '-Mode', 'Stream'
+                    '-Mode', 'Stream', '-StreamIdentity', $streamIdentity
                 ) `
                 -TimeoutMilliseconds 10000 `
                 -TimeoutDescription '10 second(s)' `
@@ -247,18 +240,17 @@ try {
                         $fixtureEvent.PSObject.Properties['fixture_process_id']
                     }
                     else { $null }
-                    $fixtureProcessStartTicks = if ($null -ne $fixtureEvent) {
-                        $fixtureEvent.PSObject.Properties['fixture_process_start_ticks']
+                    $fixtureStreamIdentity = if ($null -ne $fixtureEvent) {
+                        $fixtureEvent.PSObject.Properties['fixture_stream_identity']
                     }
                     else { $null }
                     if ($null -ne $fixtureProcessId -and
-                        $null -ne $fixtureProcessStartTicks -and
+                        $null -ne $fixtureStreamIdentity -and
                         [string]$fixtureProcessId.Value -cmatch '^[1-9][0-9]*$' -and
                         [int64]$fixtureProcessId.Value -le [int]::MaxValue -and
-                        [string]$fixtureProcessStartTicks.Value -cmatch '^[1-9][0-9]*$' -and
-                        (Test-OwnedProcessAlive `
-                            -ProcessId ([int]$fixtureProcessId.Value) `
-                            -ExpectedStartTicks ([long]$fixtureProcessStartTicks.Value))) {
+                        [string]$fixtureStreamIdentity.Value -ceq
+                            $script:QuickAdoptionStreamIdentity -and
+                        (Test-OwnedProcessAlive -ProcessId ([int]$fixtureProcessId.Value))) {
                         $script:QuickAdoptionStreamObservedWhileActive = $true
                     }
                 }
@@ -371,7 +363,7 @@ finally {
     if (Test-Path -LiteralPath $tempRoot) {
         Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
-    Remove-Variable -Scope Script -Name QuickAdoptionStreamObservedWhileActive,QuickAdoptionStreamResult `
+    Remove-Variable -Scope Script -Name QuickAdoptionStreamIdentity,QuickAdoptionStreamObservedWhileActive,QuickAdoptionStreamResult `
         -ErrorAction SilentlyContinue
 }
 if ($Shard -ceq 'All' -and
