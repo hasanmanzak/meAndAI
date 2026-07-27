@@ -179,7 +179,12 @@ still fails before issue mutation and local Codex execution.
 5. Open/uncompleted issue, open/unmerged/foreign/mismatched pull request, live historical branch, wrong target/repository/actor/title/body, malformed or displaced marker, provider failure, unsupported family, ambiguous inventory, and bound exhaustion all fail before issue, branch, pull-request, consumer-head, or Codex mutation.
 6. Provider reads are locally prefiltered and remain within the declared ceilings.
 7. Common source, fixtures, and normative records contain no named-consumer fact.
-8. Both supported PowerShell runtimes, applicable hosted gates, immutable release verification, and external post-publication evidence pass before closure.
+8. Both supported PowerShell runtimes and applicable hosted pre-merge gates pass before merge.
+
+Immutable release verification and external post-publication evidence remain
+the separate Gate 7 conditions recorded below and in
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149); they are
+required before issue closure, not part of pre-merge feature acceptance.
 
 ## Self-review
 
@@ -191,8 +196,11 @@ bundle identity, and graph-reachable records. Two independent final reviews
 found the late-proof, test-oracle, and credential-authority gaps below. The
 canonical quick-adoption run then exposed detached-helper, row-shape, race-
 fixture, partial-reset, version-oracle, and JSON-root gaps. Every `Blocking`
-finding is resolved in the candidate. The canonical committed-tree full-
-project scan, hosted checks, and publication remain delivery gates.
+finding is resolved in the candidate. A final narrow re-review additionally
+closed malformed open-PR absence evidence, its cross-runtime normalization,
+and the pre-merge/post-merge delivery-status split. The canonical committed-
+tree project scan and exact implementation-head hosted checks passed. Final
+PR-head protected checks and publication remain delivery gates.
 
 | ID | Area / priority | Finding | Disposition |
 | --- | --- | --- | --- |
@@ -210,6 +218,7 @@ project scan, hosted checks, and publication remain delivery gates.
 | `FIND-0356` <a name="find-0356"></a> | Manifest root shape / P1 | `ConvertFrom-Json` enumerated a root array before typed property access, leaking a raw `System.Object[]` to `Int64` conversion error instead of the canonical manifest-contract rejection. | `Blocking` / Resolved in candidate by validating the raw JSON object root and exact `PSCustomObject` result before any property cast on both supported runtimes. |
 | `FIND-0357` <a name="find-0357"></a> | Historical open-PR absence proof / P1 | The provider's open-PR list response was converted without validating an exact array root and complete non-null rows, so `null` or `[null]` could collapse to an empty PowerShell collection and falsely prove absence of live historical authority. | `Blocking` / Resolved before merge by requiring an exact JSON array root, non-null rows, and all requested identity properties before the bounded absence check; `null`, object-root, null-row, and missing-property responses now fail closed in the canonical [TEST-0069](../FEAT-0012-v082-correction/test-cases.md#test-0069) variant. |
 | `FIND-0358` <a name="find-0358"></a> | Cross-runtime JSON collection normalization / P1 | The first open-PR shape guard wrapped `ConvertFrom-Json` inline; Windows PowerShell 5.1 retained valid `[]` as one empty-array object and rejected the legitimate absence proof even though PowerShell 7 normalized it to zero rows. | `Blocking` / Resolved before merge by parsing into an intermediate value and only then normalizing the collection, matching the existing issue-inventory boundary; the same four malformed shapes remain fail closed on both runtimes. |
+| `FIND-0359` <a name="find-0359"></a> | Delivery-gate status separation / P1 | Final review found the canonical feature marked `Complete` while its catalog row remained `In progress`, two current pre-merge DoD fields were open, and acceptance criterion 8 incorrectly mixed immutable release and post-publication evidence into feature acceptance. | `Blocking` / Resolved before merge by aligning the catalog to `Complete`, limiting acceptance to runtime and hosted pre-merge gates, keeping publication in the separate Gate 7 evidence table, and closing each pre-merge DoD field only when its evidence exists. |
 
 ## Delivery evidence
 
@@ -221,19 +230,19 @@ project scan, hosted checks, and publication remain delivery gates.
 | Final relevant auxiliary gates | PowerShell 7 / Windows PowerShell 5.1 passed bundle verification in 27.3 / 28.9 seconds, runtime-efficiency in 7.7 / 8.9 seconds, and source-graph dispatch in 4.9 / 5.7 seconds. PowerShell 7 role-boundary passed in 19.6 seconds, test architecture in 2.9 seconds, recurrence prevention in 1.1 seconds, and protocol governance in 124.0 seconds. Publication evidence passed without claiming published state on PowerShell 7 / Windows PowerShell 5.1 in 106.6 / 194.1 seconds. |
 | Canonical quick-adoption owner | PowerShell 7 `Shard=All` passed in 847.1 seconds after exercising every declared quick-adoption scenario in one process, including the completed-historical matrix, exact manifest-root rejection, fresh-attempt authority isolation, FullMigration, Codex-failure, and managed-consumer routes. |
 | Final local suite | Exact candidate commit [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6) passed `pwsh -NoProfile -File tests/protocol.tests.ps1` in 1732.8 seconds. Exact owner times included quick adoption 844.371 seconds, instruction graph 129.840 seconds with 2/2 process starts and 4/4 blob requests, governance 121.801 seconds, publication evidence 100.484 seconds, and runtime efficiency 7.038 seconds; every discovered suite emitted valid scenario evidence. |
-| Pull request / hosted validation | Draft [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152); hosted required checks and final review pending |
+| Pull request / hosted validation | Draft [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152); exact implementation head [`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b) passed [hosted validation](https://github.com/hasanmanzak/meAndAI/actions/runs/30271181475): Ubuntu 11m16s, Windows 27m45s, and GitGuardian 35s. The final evidence-only PR head remains subject to the same protected checks before merge. |
 | Immutable release / post-publication verification | Pending `v0.15.6` |
 
 ## Definition of Done
 
-- [ ] Acceptance criteria met.
+- [x] Acceptance criteria met.
 - [x] Existing [TEST-0069](../FEAT-0012-v082-correction/test-cases.md#test-0069) variant and scenario mapping complete.
 - [x] Focused PowerShell 7 and Windows PowerShell 5.1 evidence recorded.
 - [x] Bundle, governance, structure, and canonical full-suite evidence recorded.
 - [x] Bounded self-review and post-development scan have no unresolved `Blocking` finding.
-- [ ] Documentation, links, version, changelog, active recurrence entry, and project memory current.
+- [x] Documentation, links, version, changelog, active recurrence entry, and project memory current.
 - [x] Issue and pull request cross-linked.
-- [ ] Applicable hosted pre-merge gates pass.
+- [x] Applicable hosted pre-merge gates pass on the exact implementation head; protected branch rules still require them on the final PR head before merge.
 
 ## Post-merge release evidence
 

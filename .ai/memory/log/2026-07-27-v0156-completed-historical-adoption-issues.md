@@ -84,6 +84,9 @@ this release.
   row, and requested-property validation now rejects null, object-root,
   null-row, and incomplete-row responses. The parse-then-normalize sequence
   preserves valid empty arrays on both PowerShell 7 and Windows PowerShell 5.1.
+- Final delivery review aligned the feature catalog to `Complete`, removed
+  immutable-release and post-publication work from pre-merge acceptance, and
+  retained those facts exclusively in the external Gate 7 authority.
 - The full PowerShell 7 quick-adoption owner passed every declared scenario in
   one process in 847.1 seconds. The affected metadata/FullMigration and Codex-
   failure shards also pass on PowerShell 7 / Windows PowerShell 5.1 in 220.3 /
@@ -96,10 +99,13 @@ this release.
   seconds with 2/2 process starts and 4/4 blob requests, governance at 121.801
   seconds, publication evidence at 100.484 seconds, and runtime efficiency at
   7.038 seconds.
-- Final fresh-diff review, structural convergence, exact committed-HEAD graph
-  validation of the evidence-only finalization, hosted checks, immutable
-  publication, post-publication verification, issue closure, and owned-branch
-  cleanup remain delivery gates.
+- Exact implementation head
+  [`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b)
+  passed hosted Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s.
+- Structural convergence, exact committed-HEAD graph validation and protected
+  hosted checks of the evidence-only finalization, immutable publication,
+  post-publication verification, issue closure, and owned-branch cleanup
+  remain delivery gates.
 
 ## Safe continuation
 

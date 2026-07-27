@@ -717,11 +717,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the first relevant mutation, freezes metadata for later inventory reads,
   never edits completed historical issues, and preserves the current
   convergence owner. Focused PowerShell 7 / Windows PowerShell 5.1,
-  role-boundary, runtime-efficiency, bundle, and source-graph compatibility
-  gates are green. Final record convergence, full-suite, pull-request, hosted,
-  immutable-release, post-publication, issue-closure, and owned-branch cleanup
-  gates remain. Keep every reusable regression upstream and do not mutate a
-  consumer.
+  role-boundary, runtime-efficiency, bundle, source-graph compatibility,
+  canonical full-suite, and exact implementation-head hosted gates are green.
+  Final evidence-only HEAD checks, pull-request merge, immutable release,
+  post-publication verification, issue closure, and owned-branch cleanup
+  remain. Keep every reusable regression upstream and do not mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
   and every clone clean. Derdini `e7b10ef` retained its existing older seed,
   which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema

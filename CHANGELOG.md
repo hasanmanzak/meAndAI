@@ -45,7 +45,11 @@ also passed. Canonical full-suite evidence was then evaluated on exact
 candidate commit
 [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6):
 the full local suite passed every discovered owner in 1732.8 seconds. Hosted
-and immutable-release evidence remain delivery gates.
+validation on exact implementation head
+[`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b)
+then passed Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s. Final
+evidence-only protected checks and immutable-release evidence remain delivery
+gates.
 
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
