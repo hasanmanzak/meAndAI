@@ -8,7 +8,7 @@ function Invoke-MeAndAIQuickAdoption {
         [ValidateSet('private', 'public', 'internal')]
         [string]$Visibility = 'private',
         [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-        [string]$ProtocolTag = 'v0.15.4',
+        [string]$ProtocolTag = 'v0.15.5',
         [string]$RemoteName = 'origin',
         [ValidateRange(1, 60)]
         [int]$WorkflowTimeoutMinutes = 15,
@@ -79,8 +79,15 @@ function Invoke-MeAndAIQuickAdoption {
         $protocolToken = $null
     }
     Invoke-External -Command 'gh' -Arguments @('auth', 'status') | Out-Null
+    $workflowBytes = if ($protocolTokenFileExists) {
+        Get-CanonicalWorkflow -ProtocolToken $protocolToken
+    }
+    else { Get-CanonicalWorkflow }
+    $selectedInitialPolicyTag = Resolve-QuickAdoptionInitialPolicyTag `
+        -WorkflowBytes $workflowBytes -TargetTag $ProtocolTag `
+        -RuntimePolicyTag $initialAdoptionPolicyTag
     $script:InitialAdoptionPolicy = Import-CanonicalInitialAdoptionPolicy `
-        -ProtocolToken ([string]$protocolToken)
+        -ProtocolToken ([string]$protocolToken) -Tag $selectedInitialPolicyTag
     $preflightAssessment = Get-QuickAdoptionPreflightAssessment -Root $target
     $initialAdoptionSelection = Resolve-QuickAdoptionStrategy `
         -Assessment $preflightAssessment -RequestedStrategy $AdoptionStrategy `
@@ -123,7 +130,6 @@ function Invoke-MeAndAIQuickAdoption {
     $discoveredExistingRepository = $false
     $discoveredRemoteUrl = ''
     $candidateRepository = ''
-    $workflowBytes = $null
 
     if ($hasRemote) {
         $remoteUrl = ((@($remoteResult.Output) -join '').Trim())
@@ -209,11 +215,8 @@ function Invoke-MeAndAIQuickAdoption {
 
     # Resolve the immutable workflow and reject a recognizable-but-modified seed
     # before creating a GitHub repository or attaching a discovered remote.
-    if ($protocolTokenFileExists) {
-        $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
-    }
-    else {
-        $workflowBytes = Get-CanonicalWorkflow
+    if ($null -eq $workflowBytes -or $workflowBytes.Length -eq 0) {
+        throw 'The exact canonical workflow was not retained through the mutation-free preflight.'
     }
     $preMutationWorkflowPath = Assert-ContainedManagedDestination `
         -Root $target -RelativePath $workflowTargetPath
@@ -370,19 +373,6 @@ function Invoke-MeAndAIQuickAdoption {
         }
         $hasRemote = $true
         $remoteIsEmpty = $true
-    }
-
-    if ($null -eq $workflowBytes) {
-        # Executable source authority is verified before the temporary lock label
-        # performs the first repository mutation. Prefer the local read-only token
-        # when its verified file is present; otherwise use the authenticated gh
-        # identity without attempting to recover an existing Actions secret.
-        if ($protocolTokenFileExists) {
-            $workflowBytes = Get-CanonicalWorkflow -ProtocolToken $protocolToken
-        }
-        else {
-            $workflowBytes = Get-CanonicalWorkflow
-        }
     }
 
     $routingHeadResult = Invoke-Git -Repository $target -Arguments @(
@@ -894,11 +884,34 @@ function Invoke-MeAndAIQuickAdoption {
     }
     finally {
         try {
-            if ($null -ne $script:InitialAdoptionPolicy -and
-                $null -ne $script:InitialAdoptionPolicy.Module) {
-                Remove-Module -ModuleInfo $script:InitialAdoptionPolicy.Module `
-                    -Force -ErrorAction SilentlyContinue
-                $script:InitialAdoptionPolicy = $null
+            if ($null -ne $script:InitialAdoptionPolicy) {
+                [object[]]$policyModules = @()
+                if ($null -ne
+                    $script:InitialAdoptionPolicy.PSObject.Properties['Modules']) {
+                    [object[]]$policyModules =
+                        @($script:InitialAdoptionPolicy.Modules)
+                }
+                if ($policyModules.Count -gt 0) {
+                    $script:InitialAdoptionPolicy = $null
+                    for ($index = $policyModules.Count - 1;
+                        $index -ge 0; $index--) {
+                        $module = $policyModules[$index]
+                        if ($null -ne $module) {
+                            Remove-Module -ModuleInfo $module -Force `
+                                -ErrorAction SilentlyContinue
+                        }
+                    }
+                }
+                elseif ($null -ne
+                    $script:InitialAdoptionPolicy.PSObject.Properties['Module'] -and
+                    $null -ne $script:InitialAdoptionPolicy.Module) {
+                    Remove-Module -ModuleInfo $script:InitialAdoptionPolicy.Module `
+                        -Force -ErrorAction SilentlyContinue
+                    $script:InitialAdoptionPolicy = $null
+                }
+                else {
+                    $script:InitialAdoptionPolicy = $null
+                }
             }
             if ($null -ne $gitHookSuppression) {
                 Exit-GitHookSuppression -State $gitHookSuppression

@@ -70,15 +70,18 @@ $script:MeAndAIResolvedAdoptionStrategies = @(
 )
 $script:MeAndAIProtocolSurfaceMaximumCount = 256
 $script:MeAndAIProtocolSurfaceMaximumUtf8Bytes = 16384
-$script:MeAndAIInstructionGraphSchema = 1
+$script:MeAndAIInstructionGraphSchema = 2
 $script:MeAndAIInstructionGraphMaximumTreeEntries = 65536
 $script:MeAndAIInstructionGraphMaximumTreePathUtf8Bytes = 4194304
 $script:MeAndAIInstructionGraphMaximumNodes = 512
 $script:MeAndAIInstructionGraphMaximumEdges = 4096
 $script:MeAndAIInstructionGraphMaximumDepth = 32
-$script:MeAndAIInstructionGraphMaximumBlobBytes = 262144
+$script:MeAndAIInstructionGraphMaximumBlobBytes = 524288
 $script:MeAndAIInstructionGraphMaximumAggregateBlobBytes = 4194304
 $script:MeAndAIInstructionGraphMaximumPathUtf8Bytes = 32768
+$script:MeAndAIInstructionGraphRepeatedHashPathPattern =
+    '^(?<path>(?:\./|\.\./)?(?:[^/?#]+/)*[^/?#]*#{2,}' +
+    '[^/?#]*\.[^/?#\s]+)(?:[?#].*)?$'
 $script:MeAndAIGenericInstructionRootFiles = @(
     'CLAUDE.md', 'GEMINI.md', 'PROTOCOL.md', '.cursorrules',
     '.windsurfrules', '.github/copilot-instructions.md'
@@ -107,7 +110,7 @@ $script:MeAndAIInstructionGraphProtectedExtensions = @(
     '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.vue', '.svelte',
     '.php', '.rb', '.swift', '.m', '.mm', '.scala', '.clj', '.cljs',
     '.ex', '.exs', '.erl', '.hrl', '.lua', '.r', '.dart', '.sol', '.asm',
-    '.s', '.mq5', '.mqh', '.ipynb', '.proto', '.graphql', '.gql',
+    '.s', '.mq5', '.mqh', '.mqproj', '.ipynb', '.proto', '.graphql', '.gql',
     '.html', '.htm', '.xml', '.xsd', '.css', '.scss', '.sass', '.less',
     '.tf', '.tfvars', '.hcl', '.sln', '.csproj', '.fsproj', '.vbproj',
     '.props', '.targets', '.gradle', '.csv', '.tsv', '.parquet',
@@ -702,6 +705,142 @@ function Resolve-MeAndAIInstructionGraphPath {
     return $resolved
 }
 
+function Resolve-MeAndAIInstructionGraphLiteralPath {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Target,
+        [Parameter(Mandatory)][bool]$RelativeToSource
+    )
+
+    $firstDelimiter = $Target.IndexOfAny([char[]]@('?', '#'))
+    if ($firstDelimiter -eq 0) { return $null }
+    if ($firstDelimiter -lt 0) {
+        return Resolve-MeAndAIInstructionGraphPath `
+            -SourcePath $SourcePath -Target $Target `
+            -RelativeToSource (
+                $RelativeToSource -or $Target.StartsWith('./') -or
+                $Target.StartsWith('../')
+            )
+    }
+
+    $literalPrefix = $Target.Substring(0, $firstDelimiter)
+    $literalSuffix = $Target.Substring($firstDelimiter)
+    $literalPrefixResolved = Resolve-MeAndAIInstructionGraphPath `
+        -SourcePath $SourcePath -Target $literalPrefix `
+        -RelativeToSource (
+            $RelativeToSource -or $literalPrefix.StartsWith('./') -or
+            $literalPrefix.StartsWith('../')
+        )
+    $literalResolved = $literalPrefixResolved + $literalSuffix
+    if (-not (Test-MeAndAICanonicalRepositoryPath -Path $literalResolved)) {
+        return $null
+    }
+    return $literalResolved
+}
+
+function Resolve-MeAndAIInstructionGraphReferenceTarget {
+    param(
+        [Parameter(Mandatory)][string]$SourcePath,
+        [Parameter(Mandatory)][string]$Target,
+        [Parameter(Mandatory)][bool]$RelativeToSource,
+        [Parameter(Mandatory)]$RepositoryPathInventory
+    )
+
+    try {
+        $decodedTarget = [uri]::UnescapeDataString($Target)
+    }
+    catch {
+        throw "Instruction reference '$Target' from '$SourcePath' has invalid escaping."
+    }
+    if ($decodedTarget.StartsWith(
+            'file:', [StringComparison]::OrdinalIgnoreCase
+        ) -or ($decodedTarget.Length -ge 2 -and
+               $decodedTarget[1] -ceq ':')) {
+        throw "Instruction reference '$Target' from '$SourcePath' escapes the repository root."
+    }
+    if (Test-MeAndAIExternalInstructionReference -Target $decodedTarget) {
+        return [pscustomobject][ordered]@{
+            Target = $decodedTarget
+            Resolved = $null
+            External = $true
+            ExistsInInventory = $false
+            RepeatedHashPlaceholder = $false
+        }
+    }
+
+    # A literal hash can be part of a tracked Git path. Prefer the longest exact
+    # inventory prefix before interpreting a later hash or query as URI syntax.
+    for ($index = $decodedTarget.Length - 1; $index -ge 0; $index--) {
+        if ($decodedTarget[$index] -cne '#' -and
+            $decodedTarget[$index] -cne '?') {
+            continue
+        }
+        if ($index -eq 0) { continue }
+        $prefix = $decodedTarget.Substring(0, $index)
+        $prefixResolved = Resolve-MeAndAIInstructionGraphLiteralPath `
+            -SourcePath $SourcePath -Target $prefix `
+            -RelativeToSource $RelativeToSource
+        if ($null -ne $prefixResolved -and
+            $RepositoryPathInventory.ContainsKey($prefixResolved)) {
+            return [pscustomobject][ordered]@{
+                Target = $decodedTarget
+                Resolved = $prefixResolved
+                External = $false
+                ExistsInInventory = $true
+                RepeatedHashPlaceholder = $false
+            }
+        }
+    }
+
+    # Preserve an exact literal-hash Git path without allowing query/fragment
+    # text to participate in dot-segment normalization. Delimiter suffixes are
+    # opaque here; only an already-canonical exact-tree identity can retain one.
+    $literalResolved = Resolve-MeAndAIInstructionGraphLiteralPath `
+        -SourcePath $SourcePath -Target $decodedTarget `
+        -RelativeToSource $RelativeToSource
+    if ($null -ne $literalResolved -and
+        $RepositoryPathInventory.ContainsKey($literalResolved)) {
+        return [pscustomobject][ordered]@{
+            Target = $decodedTarget
+            Resolved = $literalResolved
+            External = $false
+            ExistsInInventory = $true
+            RepeatedHashPlaceholder = $false
+        }
+    }
+
+    $hashMatch = [regex]::Match(
+        $decodedTarget,
+        $script:MeAndAIInstructionGraphRepeatedHashPathPattern,
+        [Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    $pathTarget = if ($hashMatch.Success) {
+        [string]$hashMatch.Groups['path'].Value
+    }
+    else {
+        $delimiter = $decodedTarget.IndexOfAny([char[]]@('?', '#'))
+        if ($delimiter -ge 0) {
+            $decodedTarget.Substring(0, $delimiter)
+        }
+        else { $decodedTarget }
+    }
+    $resolved = Resolve-MeAndAIInstructionGraphPath `
+        -SourcePath $SourcePath -Target $pathTarget `
+        -RelativeToSource (
+            $RelativeToSource -or $pathTarget.StartsWith('./') -or
+            $pathTarget.StartsWith('../')
+        )
+    $existsInInventory = $RepositoryPathInventory.ContainsKey($resolved)
+    return [pscustomobject][ordered]@{
+        Target = $decodedTarget
+        Resolved = $resolved
+        External = $false
+        ExistsInInventory = [bool]$existsInInventory
+        RepeatedHashPlaceholder =
+            [bool]($hashMatch.Success -and -not $existsInInventory)
+    }
+}
+
 function Get-MeAndAIInstructionGraphReferences {
     param(
         [Parameter(Mandatory)][string]$SourcePath,
@@ -713,6 +852,8 @@ function Get-MeAndAIInstructionGraphReferences {
     $seen = [System.Collections.Generic.HashSet[string]]::new(
         [StringComparer]::Ordinal
     )
+    $repeatedHashPathPattern =
+        $script:MeAndAIInstructionGraphRepeatedHashPathPattern
     $referenceDefinitions =
         [System.Collections.Generic.Dictionary[string, string]]::new(
             [StringComparer]::Ordinal
@@ -856,31 +997,82 @@ function Get-MeAndAIInstructionGraphReferences {
             $requiredReadingContext = $false
         }
 
-        $declaresAuthority =
+        $authorityLabelDeclaration =
             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
-                '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
+                 '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
                 '(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth|' +
                 'authoritative(?:\s+(?:source|authority))?|' +
                 '(?:(?:project|product|feature|decision|test|work|memory|' +
                 'protocol)\s+){1,3}authoritative\s+(?:source|authority))\s*:'
-            )) -or
-            (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
-                '\b(?:is|are|remains?|serves?\s+as)\s+(?:the\s+)?' +
-                '(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth|' +
-                'authoritative(?:\s+(?:source|authority))?)\b'
-            ))) -or
-            (-not $isMarkdownTableRow -and
-             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
-                '\b(?:canonical\s+(?:source|authority)|source[- ]of[- ]truth)' +
-                '(?:\s+(?:for|of)\s+[^.;:\r\n]{1,128})?\s+' +
-                '(?:is|are|remains?)\b'
-            ))) -or
+            ))
+        $authorityTableDeclaration =
             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*\|\s*(?:canonical\s+(?:source|authority)|' +
                 'source[- ]of[- ]truth|authoritative(?:\s+(?:source|' +
                 'authority))?)\s*\|'
             ))
+        $authorityDesignationPattern =
+            '(?:canonical\s+(?:source|authority)|' +
+            'source[- ]of[- ]truth|' +
+            'authoritative(?:\s+(?:source|authority))?|' +
+            'single\s+canonical' +
+            '(?:\s+[a-z][a-z0-9_-]{0,31}){0,6}\s+' +
+            '(?:source|authority))'
+        $authorityNegationPattern =
+            '\b(?:(?:(?:do(?:es)?|did)\s+not|don''t|doesn''t|didn''t)\s+' +
+            '(?:remain|serve)(?:s)?' +
+            '(?:\s+as)?|never\s+(?:remains?|serves?(?:\s+as)?)|' +
+            '(?:is|are|was|were)\s+not|' +
+            '(?:cannot|can''t|(?:could|must|should|may|might|will|would|' +
+            'shall)\s+not)\s+' +
+            '(?:remain|serve)(?:s)?(?:\s+as)?|' +
+            'no\s+longer\s+(?:remains?|serves?(?:\s+as)?))\s+' +
+            '(?:the\s+)?' + $authorityDesignationPattern + '\b'
+        $reverseAuthorityNegationPattern =
+            '\b(?:canonical\s+(?:source|authority)|' +
+            'source[- ]of[- ]truth)' +
+            '(?:\s+(?:for|of)\s+[^.;:,\r\n]{1,128})?\s+' +
+            '(?:(?:is|are|was|were|remains?)\s+' +
+            '(?:not|never|no\s+longer)|' +
+            '(?:(?:do(?:es)?|did)\s+not|don''t|doesn''t|didn''t)\s+' +
+            'remain|' +
+            '(?:cannot|can''t|(?:could|must|should|may|might|will|would|' +
+            'shall)\s+not)\s+remain)\b'
+        $authoritySentenceText = [regex]::Replace(
+            $semanticLine,
+            $authorityNegationPattern,
+            ' ',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        $authoritySentenceText = [regex]::Replace(
+            $authoritySentenceText,
+            $reverseAuthorityNegationPattern,
+            ' ',
+            [Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+        )
+        $authoritySentenceDeclaration =
+            (Test-MeAndAIInvariantRegex `
+                -InputText $authoritySentenceText -Pattern (
+                    '\b(?:is|are|remains?|serves?\s+as)\s+(?:the\s+)?' +
+                    '(?:canonical\s+(?:source|authority)|' +
+                    'source[- ]of[- ]truth|' +
+                    'authoritative(?:\s+(?:source|authority))?|' +
+                    'single\s+canonical' +
+                    '(?:\s+[a-z][a-z0-9_-]{0,31}){0,6}\s+' +
+                    '(?:source|authority))\b'
+                )) -or
+            (Test-MeAndAIInvariantRegex `
+                -InputText $authoritySentenceText -Pattern (
+                    '\b(?:canonical\s+(?:source|authority)|' +
+                    'source[- ]of[- ]truth)' +
+                    '(?:\s+(?:for|of)\s+[^.;:\r\n]{1,128})?\s+' +
+                    '(?:is|are|remains?)\b'
+                ))
+        $declaresAuthority = $authorityLabelDeclaration -or
+            $authorityTableDeclaration -or
+            (-not $isMarkdownTableRow -and $authoritySentenceDeclaration)
         $declaresIndex =
             (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '^\s*(?:[-*+]\s+)?(?:(?:canonical|authoritative)\s+)?' +
@@ -912,7 +1104,15 @@ function Get-MeAndAIInstructionGraphReferences {
             (-not $isMarkdownTableRow -and
              (Test-MeAndAIInvariantRegex -InputText $semanticLine -Pattern (
                 '\brequired\s+reading(?:\s+order)?(?=\s*(?::|$))|' +
-                '\b(?:must\s+read|load|consult)\b'
+                '\bmust\s+(?:read|load|consult)\b|' +
+                '^\s*(?:[-*+]\s+|[0-9]+[.)]\s+)?' +
+                '(?:(?:then|next|first|please|always)\s+)?' +
+                '(?:load|consult)\b(?=\s+(?:' +
+                '`[^`\r\n]+`|' +
+                '(?<!!)\[[^\]\r\n]+\](?:\([^\r\n]+\)|\[[^\]\r\n]*\])?|' +
+                '(?:[A-Za-z]:[\\/]|[\\/]+|\.\.?[\\/])?' +
+                '[^\s`/\\]+(?:[\\/][^\s`]+|\.[^\s`]+)' +
+                '))'
             ))) -or
             ((Test-MeAndAIInstructionRootPath -Path $SourcePath) -and
              -not $isMarkdownTableRow -and
@@ -1031,14 +1231,55 @@ function Get-MeAndAIInstructionGraphReferences {
                 )) {
                 continue
             }
-            $externalCandidate =
-                (Test-MeAndAIExternalInstructionReference -Target $value) -or
-                $value.StartsWith('file:', [StringComparison]::OrdinalIgnoreCase) -or
-                [regex]::IsMatch(
-                    $value, '^[A-Za-z]:',
+            # A fragment-only directive is not a repository target. Repeated
+            # hashes are classified in the common token path below, after
+            # external/escape handling and before placeholder suppression.
+            if ($value.StartsWith('#', [StringComparison]::Ordinal)) {
+                continue
+            }
+            $relativeToSource = $value.StartsWith('./') -or
+                $value.StartsWith('../')
+            # All-numeric slash tokens commonly encode ratios, dates, and test
+            # results. They remain concrete only when the exact resolved path
+            # exists in the committed tree, so a real numeric path is retained
+            # without turning evidence such as 24/24 into a missing target.
+            if ([regex]::IsMatch(
+                    $value, '^(?:(?:\.\.?/)+)?[0-9]+(?:/[0-9]+)+$',
                     [Text.RegularExpressions.RegexOptions]::CultureInvariant
-                )
-            $extension = Get-MeAndAIGitPathExtension -Path $value
+                )) {
+                $numericSlashPath = Resolve-MeAndAIInstructionGraphPath `
+                    -SourcePath $SourcePath -Target $value `
+                    -RelativeToSource $relativeToSource
+                if (-not $RepositoryPathInventory.ContainsKey(
+                        $numericSlashPath)) {
+                    continue
+                }
+            }
+            try {
+                $classificationValue = [uri]::UnescapeDataString($value)
+            }
+            catch {
+                throw "Instruction reference '$value' from '$SourcePath' has invalid escaping."
+            }
+            if ($classificationValue.StartsWith(
+                    'file:', [StringComparison]::OrdinalIgnoreCase
+                ) -or ($classificationValue.Length -ge 2 -and
+                       $classificationValue[1] -ceq ':')) {
+                throw "Instruction reference '$value' from '$SourcePath' escapes the repository root."
+            }
+            $externalCandidate =
+                Test-MeAndAIExternalInstructionReference `
+                    -Target $classificationValue
+            $classificationHashMatch = [regex]::Match(
+                $value, $repeatedHashPathPattern,
+                [Text.RegularExpressions.RegexOptions]::CultureInvariant
+            )
+            if ($classificationHashMatch.Success) {
+                $classificationValue =
+                    [string]$classificationHashMatch.Groups['path'].Value
+            }
+            $extension = Get-MeAndAIGitPathExtension `
+                -Path $classificationValue
             $whitespaceMatches = [regex]::Matches($value, '\s')
             $hasWhitespace = $whitespaceMatches.Count -gt 0
             if ($hasWhitespace -and -not $externalCandidate) {
@@ -1050,41 +1291,33 @@ function Get-MeAndAIInstructionGraphReferences {
                     )) {
                     continue
                 }
-                $membershipTarget = @($value -split '[?#]', 2)[0]
-                try {
-                    $membershipTarget =
-                        [uri]::UnescapeDataString($membershipTarget)
-                }
-                catch {
-                    throw "Instruction reference '$value' from '$SourcePath' has invalid escaping."
-                }
-                $resolvedMembershipTarget = Resolve-MeAndAIInstructionGraphPath `
-                    -SourcePath $SourcePath -Target $membershipTarget `
-                    -RelativeToSource (
-                        $value.StartsWith('./') -or $value.StartsWith('../')
-                    )
+                $membership = Resolve-MeAndAIInstructionGraphReferenceTarget `
+                    -SourcePath $SourcePath -Target $value `
+                    -RelativeToSource $relativeToSource `
+                    -RepositoryPathInventory $RepositoryPathInventory
                 if ($lineKind -ceq 'References' -and
-                    -not $RepositoryPathInventory.ContainsKey(
-                        $resolvedMembershipTarget
-                    )) {
+                    -not [bool]$membership.External -and
+                    -not [bool]$membership.ExistsInInventory) {
                     continue
                 }
             }
             $canonicalExtensionlessPath = $extension -ceq '' -and
-                ($value.Contains('/') -or $acceptFlatExtensionlessCodeSpan) -and
-                (Test-MeAndAICanonicalRepositoryPath -Path $value)
+                ($classificationValue.Contains('/') -or
+                    $acceptFlatExtensionlessCodeSpan) -and
+                (Test-MeAndAICanonicalRepositoryPath -Path $classificationValue)
             $canonicalDottedPath = $extension -cne '' -and
-                ((Test-MeAndAIInstructionGraphTextPath -Path $value) -or
-                 (Test-MeAndAIInstructionGraphProtectedPath -Path $value) -or
+                ((Test-MeAndAIInstructionGraphTextPath `
+                    -Path $classificationValue) -or
+                 (Test-MeAndAIInstructionGraphProtectedPath `
+                    -Path $classificationValue) -or
                  -not (Test-MeAndAIInstructionGraphNumericDottedToken `
-                    -Value $value))
+                    -Value $classificationValue))
             if ($canonicalDottedPath -or $canonicalExtensionlessPath -or
                 (Test-MeAndAIInstructionRootPath -Path $value) -or
                 $externalCandidate) {
                 $tokens.Add([pscustomobject]@{
                     Target = $value
-                    RelativeToSource = $value.StartsWith('./') -or
-                        $value.StartsWith('../')
+                    RelativeToSource = $relativeToSource
                     Reason = 'RepositoryPathToken'
                 })
             }
@@ -1136,15 +1369,16 @@ function Get-MeAndAIInstructionGraphReferences {
                 $target.StartsWith('#')) {
                 continue
             }
-            if ($target.StartsWith('file:', [StringComparison]::OrdinalIgnoreCase) -or
-                ($target.Length -ge 2 -and $target[1] -ceq ':')) {
-                throw "Instruction reference '$target' from '$SourcePath' escapes the repository root."
-            }
-            if (Test-MeAndAIExternalInstructionReference -Target $target) {
-                $key = "external`0$target`0$lineKind`0$lineNumber"
+            $classification = Resolve-MeAndAIInstructionGraphReferenceTarget `
+                -SourcePath $SourcePath -Target $target `
+                -RelativeToSource ([bool]$token.RelativeToSource) `
+                -RepositoryPathInventory $RepositoryPathInventory
+            if ([bool]$classification.External) {
+                $externalTarget = [string]$classification.Target
+                $key = "external`0$externalTarget`0$lineKind`0$lineNumber"
                 if ($seen.Add($key)) {
                     $references.Add([pscustomobject][ordered]@{
-                        target = $target
+                        target = $externalTarget
                         kind = $lineKind
                         anchor = "L$lineNumber"
                         reason = [string]$token.Reason
@@ -1154,14 +1388,10 @@ function Get-MeAndAIInstructionGraphReferences {
                 }
                 continue
             }
-            $withoutFragment = @($target -split '[?#]', 2)[0]
-            try { $withoutFragment = [uri]::UnescapeDataString($withoutFragment) }
-            catch {
-                throw "Instruction reference '$target' from '$SourcePath' has invalid escaping."
+            if ([bool]$classification.RepeatedHashPlaceholder) {
+                continue
             }
-            $resolved = Resolve-MeAndAIInstructionGraphPath `
-                -SourcePath $SourcePath -Target $withoutFragment `
-                -RelativeToSource ([bool]$token.RelativeToSource)
+            $resolved = [string]$classification.Resolved
             $key = "local`0$resolved`0$lineKind`0$lineNumber"
             if ($seen.Add($key)) {
                 $references.Add([pscustomobject][ordered]@{

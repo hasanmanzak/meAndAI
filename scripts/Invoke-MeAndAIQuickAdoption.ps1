@@ -6,7 +6,7 @@ param(
     [ValidateSet('private', 'public', 'internal')]
     [string]$Visibility = 'private',
     [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-    [string]$ProtocolTag = 'v0.15.4',
+    [string]$ProtocolTag = 'v0.15.5',
     [string]$RemoteName = 'origin',
     [ValidateRange(1, 60)]
     [int]$WorkflowTimeoutMinutes = 15,
@@ -30,7 +30,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $runtimeRepository = 'hasanmanzak/meAndAI'
-$runtimeReleaseTag = 'v0.15.4'
+$runtimeReleaseTag = 'v0.15.5'
 $runtimeBundleAssetName = 'MeAndAI.QuickAdoption.Bundle.zip'
 $runtimeBundleManifestName = 'manifest.json'
 $runtimeBundleManifestKind = 'meandai.quick-adoption.module-bundle'

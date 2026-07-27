@@ -441,11 +441,13 @@ function New-QuickAdoptionInstructionGraphBatchSession {
         Busy = $false
         Transport = $null
         ProcessStarted = $false
+        InputClosed = $false
         ProcessStarts = [long]0
         Requests = [long]0
         ResponseBytes = [long]0
         StartedAt = [long]0
         LastClock = [long]-1
+        ClockIntegrityFailed = $false
         StdoutBuffer = [byte[]]::new(8192)
         StdoutOffset = [int]0
         StdoutCount = [int]0
@@ -463,17 +465,36 @@ function New-QuickAdoptionInstructionGraphBatchSession {
     )
 
     $getNow = {
-        $raw = & $getMonotonicMilliseconds
-        if ($raw -isnot [ValueType]) {
-            throw 'Instruction-graph batch-session clock is invalid.'
+        if ($state.ClockIntegrityFailed) {
+            throw 'Instruction-graph batch-session clock integrity has failed.'
         }
-        [long]$now = $raw
-        if ($now -lt 0 -or
-            ($state.LastClock -ge 0 -and $now -lt $state.LastClock)) {
-            throw 'Instruction-graph batch-session clock is not monotonic.'
+        try {
+            $raw = & $getMonotonicMilliseconds
+            if ($raw -isnot [ValueType]) {
+                throw 'Instruction-graph batch-session clock is invalid.'
+            }
+            [long]$now = $raw
+            if ($now -lt 0 -or
+                ($state.LastClock -ge 0 -and $now -lt $state.LastClock)) {
+                throw 'Instruction-graph batch-session clock is not monotonic.'
+            }
+            $state.LastClock = $now
+            return $now
         }
-        $state.LastClock = $now
-        return $now
+        catch {
+            $state.ClockIntegrityFailed = $true
+            throw
+        }
+    }.GetNewClosure()
+    $closeInput = {
+        if (-not $state.ProcessStarted -or $state.InputClosed -or
+            $null -eq $state.Transport) {
+            return
+        }
+        # Set the state before invoking the callback so a failing close cannot
+        # be retried after the pipe enters an indeterminate state.
+        $state.InputClosed = $true
+        & $state.Transport.CloseInput
     }.GetNewClosure()
     $getRemainingMilliseconds = {
         [long]$elapsed = (& $getNow) - $state.StartedAt
@@ -768,7 +789,7 @@ function New-QuickAdoptionInstructionGraphBatchSession {
                 $state.Lifecycle = 'Completed'
                 return
             }
-            & $state.Transport.CloseInput
+            & $closeInput
             if ((& $readOutputByte) -ne -1) {
                 throw 'Instruction-graph batch response contains extra output.'
             }
@@ -816,18 +837,67 @@ function New-QuickAdoptionInstructionGraphBatchSession {
         if ($state.Lifecycle -ceq 'Completed' -or
             $state.Lifecycle -ceq 'Aborted') { return }
         $cleanupProblems = [System.Collections.Generic.List[string]]::new()
+        $abortBudget = [pscustomobject][ordered]@{
+            StartedAt = [long]0
+            ClockValid = -not [bool]$state.ClockIntegrityFailed
+        }
+        if ($abortBudget.ClockValid) {
+            try {
+                $abortBudget.StartedAt = & $getNow
+            }
+            catch {
+                $state.ClockIntegrityFailed = $true
+                $abortBudget.ClockValid = $false
+                # A clock-integrity fault can be the primary failure. Keep
+                # cleanup non-blocking while still killing and disposing.
+            }
+        }
+        $getAbortRemainingMilliseconds = {
+            if ($state.ClockIntegrityFailed -or
+                -not $abortBudget.ClockValid) { return [int]0 }
+            try {
+                [long]$elapsed = (& $getNow) - $abortBudget.StartedAt
+                [long]$remaining =
+                    [long]$AbortTimeoutMilliseconds - $elapsed
+                if ($remaining -le 0) { return [int]0 }
+                if ($remaining -gt [int]::MaxValue) {
+                    return [int]::MaxValue
+                }
+                return [int]$remaining
+            }
+            catch {
+                $state.ClockIntegrityFailed = $true
+                $abortBudget.ClockValid = $false
+                return [int]0
+            }
+        }
         try {
             if ($null -ne $state.Transport) {
+                try { & $closeInput }
+                catch { $cleanupProblems.Add($_.Exception.Message) }
                 $hasExited = $false
                 if ($state.ProcessStarted) {
                     try { $hasExited = [bool](& $state.Transport.GetHasExited) }
                     catch { $cleanupProblems.Add($_.Exception.Message) }
                     if (-not $hasExited) {
                         try { & $state.Transport.Kill }
-                        catch { $cleanupProblems.Add($_.Exception.Message) }
+                        catch {
+                            $killFailure = $_.Exception.Message
+                            try {
+                                if (-not [bool](& $state.Transport.GetHasExited)) {
+                                    $cleanupProblems.Add($killFailure)
+                                }
+                            }
+                            catch {
+                                $cleanupProblems.Add($killFailure)
+                                $cleanupProblems.Add($_.Exception.Message)
+                            }
+                        }
                         try {
+                            [int]$remaining =
+                                & $getAbortRemainingMilliseconds
                             if (-not (& $state.Transport.WaitForExit `
-                                $AbortTimeoutMilliseconds)) {
+                                $remaining)) {
                                 $cleanupProblems.Add(
                                     'Instruction-graph batch child survived abort.'
                                 )
@@ -836,12 +906,45 @@ function New-QuickAdoptionInstructionGraphBatchSession {
                         catch { $cleanupProblems.Add($_.Exception.Message) }
                     }
                 }
+                $pendingTasks =
+                    [System.Collections.Generic.List[Threading.Tasks.Task]]::new()
                 foreach ($pending in @(
                     $state.PendingPrimaryTask, $state.StderrTask
                 )) {
-                    if ($null -ne $pending -and -not $pending.IsCompleted) {
+                    if ($null -eq $pending) { continue }
+                    $alreadyRegistered = $false
+                    foreach ($registered in $pendingTasks) {
+                        if ([object]::ReferenceEquals($registered, $pending)) {
+                            $alreadyRegistered = $true
+                            break
+                        }
+                    }
+                    if (-not $alreadyRegistered) {
+                        $pendingTasks.Add($pending)
+                    }
+                }
+                foreach ($pending in $pendingTasks) {
+                    if (-not $pending.IsCompleted) {
+                        [int]$remaining = & $getAbortRemainingMilliseconds
+                        [int]$completed = [Threading.Tasks.Task]::WaitAny(
+                            [Threading.Tasks.Task[]]@($pending), $remaining
+                        )
+                        if ($completed -lt 0) {
+                            $cleanupProblems.Add(
+                                'Instruction-graph batch I/O task did not join after abort.'
+                            )
+                            continue
+                        }
+                    }
+                    if ($pending.IsFaulted) {
+                        [void]$pending.Exception
                         $cleanupProblems.Add(
-                            'Instruction-graph batch I/O task did not join after abort.'
+                            'Instruction-graph batch I/O task faulted during abort.'
+                        )
+                    }
+                    elseif ($pending.IsCanceled) {
+                        $cleanupProblems.Add(
+                            'Instruction-graph batch I/O task was canceled during abort.'
                         )
                     }
                 }

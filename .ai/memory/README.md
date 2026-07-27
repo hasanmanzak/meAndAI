@@ -2,26 +2,25 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-26**<br>
-Protocol version: **0.15.4**<br>
-Latest immutable release before this candidate: **0.15.3**
+Protocol version: **0.15.5**<br>
+Latest immutable release before this candidate: **0.15.4**
 
-The immutable [v0.15.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.3)
+The immutable [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)
 release is complete at
-[`164543d939ef97ec02d96499d3e5b796eed64470`](https://github.com/hasanmanzak/meAndAI/commit/164543d939ef97ec02d96499d3e5b796eed64470).
-[PR #136](https://github.com/hasanmanzak/meAndAI/pull/136) and closed
-[issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) retain the
+[`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
+[PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
+[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md).
+[FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md).
 
-[FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-/ [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
-[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
-is the current `0.15.4` correction. It sends lifecycle workflow inputs as one
-UTF-8 JSON stdin document through `gh workflow run --json`, keeps graph identity
-as an exact string input, pins both PowerShell pipeline and console input
-encodings for the bounded native call, and preserves older graph-unaware target
-behavior.
-Follow the [current handoff](log/2026-07-26-v0154-utf8-workflow-dispatch.md).
+[FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
+/ [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+[#147](https://github.com/hasanmanzak/meAndAI/issues/147)
+is the current `0.15.5` candidate correction for parser, batch-abort, schema-2
+capacity, protected-metadata, authority, and compatible target-policy defects
+found by exact read-only consumer simulations. Final closure remains gated on
+PR validation and immutable publication.
+Follow the [current handoff](log/2026-07-26-v0155-instruction-graph-resilience.md).
 No consumer-local implementation or regression belongs to this correction.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)

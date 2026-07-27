@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-26**
+Last verified: **2026-07-27**
 
 ## Verified facts
 
@@ -9,21 +9,22 @@ Last verified: **2026-07-26**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.4`. The latest immutable release before this
-  candidate is [v0.15.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.3) at
-  [`164543d939ef97ec02d96499d3e5b796eed64470`](https://github.com/hasanmanzak/meAndAI/commit/164543d939ef97ec02d96499d3e5b796eed64470).
-  [PR #136](https://github.com/hasanmanzak/meAndAI/pull/136) and closed
-  [issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) retain its
+- Current protocol version: `0.15.5`. The latest immutable release before this
+  candidate is [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4) at
+  [`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
+  [PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
+  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0054](../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
-  lowers two exact quick-adoption operation maxima without removing evidence.
-- Current bounded correction:
   [FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-  / [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
-  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
-  moves structured workflow inputs from native fields to one UTF-8 JSON stdin
-  payload; the correction and regression remain upstream-only.
+  preserves workflow-dispatch JSON through exact UTF-8 stdin transport.
+- Current bounded correction:
+  [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
+  / [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+  [#147](https://github.com/hasanmanzak/meAndAI/issues/147)
+  repairs instruction-graph parsing, bounded abort cleanup, schema-2 capacity,
+  protected authority, and release-owned target-policy selection; every
+  implementation and regression remains upstream-only.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -430,17 +431,59 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   while the review-only AST inventory still describes the pre-refactor call
   graph.
 - Canonical owner and evidence: [FIND-0286](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0286)
+  / [FIND-0342](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0342)
   / [TEST-0159](../../docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
   owns structural operation review independently from runtime maxima.
-- Fixed release or evidence: the focused runtime-efficiency owner passes; target
-  release `0.15.0` carries the reconciled inventory.
+- Fixed release or evidence: release `0.15.0` carried the original reconciled
+  inventory. The v0.15.5 exact immutable-policy fixture helper added four
+  reviewed launcher invocations and one helper-owned recursive cleanup identity;
+  after exact reconciliation the focused runtime-efficiency owner passed on
+  PowerShell 7 / Windows PowerShell 5.1 in 7.0 / 7.7 seconds. The declared
+  runtime-budget file stayed byte-identical. The frozen-tree canonical full
+  suite then passed every discovered owner in 1745.3 seconds; the runtime-
+  efficiency owner passed in 6.586 seconds with `contract.self-check` 1/1.
 - Required safe response: classify each diagnostic against the intended
   canonical owner, update the reviewed identities and centralized call-site
   assertions in the same slice, then prove runtime budgets remain unchanged.
 - Unsafe retry boundary: do not blindly copy observed counts, suppress the AST
   gate, or treat derivative diagnostics as separate runtime defects.
-- Freshness and review condition: last confirmed 2026-07-25; review whenever a
+- Freshness and review condition: last confirmed 2026-07-27; review whenever a
   reviewed dynamic/helper/process call graph changes.
+- Superseded by: `None`
+
+### Untracked governance packet is absent from the HEAD self-consumer graph
+
+- Status: `Active`
+- Observable signature: [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  passes in a dirty worktree, then hosted validation rejects a path-like token
+  from the newly committed packet as a missing required instruction target.
+- Applicability: new feature, decision, memory, or other governance packets that
+  are untracked while the canonical suite builds the repository's exact graph
+  from `HEAD`.
+- Affected contract and cause: filesystem-oriented owners can inspect the new
+  packet, but the exact self-consumer graph intentionally reads committed Git
+  objects and cannot inspect a path absent from the HEAD tree.
+- Canonical owner and evidence: [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
+  / [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  / [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+  own the exact committed-tree boundary.
+- Fixed release or evidence: target release `0.15.5`; all three slash-joined
+  command shorthands are distinct inline-code commands in
+  [commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0).
+  The exact committed-tree owner passed on PowerShell 7 / Windows PowerShell
+  5.1 in 136.2 / 236.5 seconds with 2/2 process starts and 4/4 blob requests,
+  and the committed-tree full suite passed in 1805.3 seconds. Hosted
+  confirmation remains pending.
+- Required safe response: classify the hosted diagnostic against committed
+  bytes, search the entire candidate packet for the same token family, correct
+  only ambiguous documentation syntax, commit the full graph-reachable packet,
+  then require exact-commit focused evidence on both runtimes and invalidate it
+  after any later graph-reachable Markdown change.
+- Unsafe retry boundary: do not weaken significant missing-path safety, ignore a
+  hosted-only exact-tree failure, or claim a dirty-worktree full-suite pass as
+  proof for a packet that was not yet in HEAD.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever a
+  final local suite includes new untracked governance packets.
 - Superseded by: `None`
 
 ### Runtime bundle path is inferred as a repository source path
@@ -471,16 +514,193 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the source-inventory schema or bundle payload set changes.
 - Superseded by: `None`
 
+### URI suffix or raw token shape changes a decoded instruction reference
+
+- Status: `Active`
+- Observable signature: a local literal-hash/query reference is redirected by
+  suffix dot segments, a second literal/decoded delimiter reopens a prior opaque
+  suffix, or an encoded extensionless file/drive/external target is discarded
+  before the decoded spelling reaches safety classification.
+- Applicability: instruction-reference code spans and Markdown targets whose
+  decoded value contains `#`, `?`, an encoded scheme/drive prefix, or no normal
+  path-shaped extension or slash.
+- Affected contract and cause: fragment/query suffix text was allowed to enter
+  repository dot-segment normalization; scanning backward from a later
+  delimiter could normalize an earlier suffix again; and a raw token-shape
+  prefilter ran before URI decoding and scheme classification.
+- Canonical owner and evidence:
+  [FIND-0331](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0331)
+  / [FIND-0335](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0335)
+  / [FIND-0336](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0336)
+  / [FIND-0339](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0339)
+  / [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  / [issue #140](https://github.com/hasanmanzak/meAndAI/issues/140).
+- Fixed release or evidence: the `0.15.5` candidate decodes before shape
+  filtering, classifies decoded unsafe/external schemes first, selects the
+  longest canonical exact-tree prefix for local hash/query targets, and keeps
+  every later literal/decoded delimiter inside the opaque suffix. The final
+  Windows PowerShell 5.1 / PowerShell 7 canonical owner passed in 248.3 / 143.5
+  seconds with exact 2/2 process starts and 4/4 blob requests on both runtimes;
+  the parser-focused bounded audit found no new `Blocking` or `Important`
+  finding and both runtime AST parses plus diff-check were clean.
+- Required safe response: strictly decode first. Reject decoded `file:` and
+  drive targets, retain decoded external schemes as external, then resolve a
+  local target against the longest canonical exact-tree prefix. Once the first
+  valid boundary establishes identity, never allow suffix fragment/query text
+  or a later literal/decoded delimiter to reopen dot-segment normalization.
+- Unsafe retry boundary: do not run a raw shape filter before decoding, treat
+  URI suffix text as a repository path, re-normalize a candidate through a
+  later delimiter, or prefer a shorter/literal candidate over the longest
+  exact-tree prefix.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  token extraction, URI decoding, scheme classification, exact-tree lookup, or
+  query/fragment handling changes.
+- Superseded by: `None`
+
+### Authority negation masks a positive mixed-line declaration
+
+- Status: `Active`
+- Observable signature: negative qualified-authority wording followed by a
+  positive declaration after `but`, a semicolon, a period, or `however` yields
+  no authority; alternatively, qualifier `and` splits the negative mask and
+  exposes a false authority tail, a missing direct/reverse negative form becomes
+  live authority, or ordinary extensionless-path negation crosses a connective
+  and masks a later positive designation.
+- Applicability: bounded `single canonical ... source/authority` declarations
+  containing direct/reverse modal, contraction, `no longer`, or `never`
+  predicates, qualifier conjunctions, or multiple clauses on one semantic line.
+- Affected contract and cause: the negative grammar omitted reviewed forms; a
+  broad 160-character mask could consume a later positive designation without
+  requiring an exact authority complement; and treating every conjunction as a
+  clause boundary split `product and domain` inside the same predicate.
+- Canonical owner and evidence:
+  [FIND-0332](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0332)
+  / [FIND-0337](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0337)
+  / [FIND-0338](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0338)
+  / [FIND-0340](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0340)
+  / [FIND-0341](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0341)
+  / [TEST-0151](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151)
+  / [issue #146](https://github.com/hasanmanzak/meAndAI/issues/146).
+- Fixed release or evidence: the `0.15.5` candidate covers bounded direct and
+  reverse modal, contraction, `no longer`, and `never` forms; binds negation to
+  the same exact authority-designation complement as the positive grammar;
+  keeps qualifier conjunctions intact; and preserves a positive mixed-line
+  declaration conservatively. The final Windows PowerShell 5.1 / PowerShell 7
+  canonical owner passed in 248.3 / 143.5 seconds with exact 2/2 process starts
+  and 4/4 blob requests on both runtimes; the parser-focused bounded audit found
+  no new `Blocking` or `Important` finding and both runtime AST parses plus
+  diff-check were clean.
+- Required safe response: require the exact positive authority-designation
+  complement after a reviewed negative predicate and keep allowed qualifier
+  conjunctions within that match. If any separate positive authority
+  declaration remains on the line and exact path-to-clause ownership is
+  unavailable, classify the line conservatively as authority so protected
+  evidence fails closed.
+- Unsafe retry boundary: do not suppress the entire line from one negative
+  predicate, use a generic character-width mask across ordinary prose, omit a
+  reviewed direct/reverse negative form, split qualifier `and` as though it
+  always starts a new clause, or infer that a path belongs only to the negative
+  clause.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  authority grammar, negation masks, qualifier bounds, or semantic-line
+  reference ownership changes.
+- Superseded by: `None`
+
+### Runtime graph policy or marker semantics replace an immutable target contract
+
+- Status: `Active`
+- Observable signature: a newer quick-adoption runtime targets an older
+  immutable workflow and imports runtime graph semantics, accepts only broad
+  limit bounds, mixes target commands with a partial helper family, rewrites a
+  schema-7/8 marker as schema 9/10, or grants runtime-policy fallback to an
+  unreviewed graph-unaware tag.
+- Applicability: quick-adoption runtime/target pairs from the first bundled
+  runtime through the current candidate, including graph-unaware v0.12.4-
+  v0.12.5 and graph-aware v0.12.6-v0.15.5 workflows.
+- Affected contract and cause: workflow capability, exact target profile,
+  target-semantic command ownership, ancillary-helper composition, and marker
+  family were not treated as one immutable compatibility contract. Release-
+  owned graph or transition evidence could therefore be reinterpreted across
+  a target boundary.
+- Canonical owner and evidence:
+  [FIND-0319](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0319)
+  / [FIND-0321](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0321)
+  / [FIND-0327](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0327)
+  / [FIND-0333](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0333)
+  / [FIND-0334](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0334)
+  / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
+  / [issue #147](https://github.com/hasanmanzak/meAndAI/issues/147).
+- Fixed release or evidence: the `0.15.5` candidate binds every supported
+  graph-aware tag to its reviewed exact profile, keeps all target-semantic
+  commands target-owned, composes the three linked-path helpers atomically,
+  preserves schema 7/8 for v0.12.6-v0.14.1 and schema 9/10 thereafter, and
+  limits graph-unaware runtime fallback to exactly v0.12.4-v0.12.5. Focused
+  PowerShell 5.1/7 and affected integration evidence is green; immutable
+  publication remains pending.
+- Required safe response: retrieve and verify the exact target workflow before
+  assessment. For a supported graph-aware tag, import the exact target policy,
+  require its exact reviewed profile and every target-semantic command, compose
+  either all three target ancillary helpers or all three runtime helpers, and
+  preserve the target marker family through every transition. Use runtime
+  policy for a graph-unaware target only when its exact tag is v0.12.4 or
+  v0.12.5. Fail closed for a partial helper family, an unknown profile, a
+  too-old tag, or a future tag.
+- Unsafe retry boundary: do not infer schema or marker family from a broad
+  upper bound, convert graph identity between schemas, mix target and runtime
+  helpers, rewrite schema-7/8 evidence as schema 9/10, extend fallback to an
+  unreviewed tag, or force runtime policy onto a graph-aware target.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  workflow graph inputs, exact target profiles, policy exports, ancillary
+  helpers, marker schemas, or dispatch identity changes.
+- Superseded by: `None`
+
 ## Open context
 
-- [FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-  / [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
-  [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
-  is the current `0.15.4` continuation. Close only the workflow-dispatch JSON
-  transport defect, its [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
-  parameterized variant, recurrence route,
-  immutable release, and exact owned-branch lifecycle; do not mutate or add
-  reusable tests to a consumer.
+- [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
+  / [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+  [#147](https://github.com/hasanmanzak/meAndAI/issues/147)
+  / [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148)
+  is the current `0.15.5` continuation. Close only the eight owned parser,
+  batch, schema, protected-evidence, authority, and target-policy defects. The
+  target-policy and earlier cross-runtime owners for
+  [TEST-0151](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
+  [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
+  [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153),
+  [TEST-0161](../../docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161),
+  and the affected initial-adoption integration are green. The final canonical
+  parser owner is green on Windows PowerShell 5.1 / PowerShell 7 in 248.3 / 143.5
+  seconds with exact operation counters; the parser-focused audit, AST parses,
+  diff-check and overall bounded review are clean. The pre-commit worktree suite
+  passed every discovered owner in 1745.3 seconds, but [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
+  proved that the untracked feature packet was absent from its HEAD self-
+  consumer slice; first hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+  exposed the ambiguous documentation token on both runtimes.
+  [Commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0)
+  expands the shorthand; its exact committed-tree owner passed on PowerShell 7
+  / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with 2/2 process starts and
+  4/4 blob requests, and its full suite passed every discovered owner in 1805.3
+  seconds. Later gates are final evidence-sync exact-tree verification, hosted
+  validation and review on the exact pull-request head. The Ubuntu slice of
+  [run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
+  then passed every earlier owner before [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  rejected seven unlinked short checkpoint references; every occurrence now
+  uses its owning-repository exact full-SHA permalink. The focused publication-
+  evidence owner passed on PowerShell 7 / Windows PowerShell 5.1 in 103.2 /
+  192.0 seconds with [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  and every retained scenario green. Later gates remain corrected exact-head
+  hosted validation and review, exact merged-commit release, post-
+  publication verification, issue closure, and OID-bound branch cleanup. Keep
+  every reusable regression upstream and do not mutate a consumer.
+- Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
+  and every clone clean. Derdini `e7b10ef` retained its existing older seed,
+  which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema
+  3 for graph `0cd369f4...` with 9 nodes / 74 edges: `Auto` required explicit
+  strategy and hypothetical `FullMigration` was `Resolved`; assessment/summary
+  SHA-256 values were `cf5f3609931cda8ba51cfb5b9f2325d777c82a7278ffd9ef36251ac509536c16`
+  / `b180143e125fdff13d24d3f717aeca4333fd0b6098be8c96cabb0a1ce2177d73`.
+  HAnchor `0281b39` failed closed for maintainer review because protected
+  `HAnchor.mq5` is live canonical authority. No consumer was modified and no
+  GitHub simulation repository was created.
 - [FEAT-0035](../../docs/features/FEAT-0035-test-runtime-efficiency/README.md) / [BUG-0017](https://github.com/hasanmanzak/meAndAI/issues/87) completed in v0.12.3 under [issue #87](https://github.com/hasanmanzak/meAndAI/issues/87). Its focused and
   hosted evidence retains the representative security, recovery, TOCTOU,
   credential, link/reparse, process, Codex, and native-Windows vertical slices.

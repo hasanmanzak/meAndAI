@@ -413,63 +413,117 @@ function Test-CanonicalWorkflowSupportsSourceGraphIdentity {
     return $declarations.Count -eq 1
 }
 
+function Resolve-QuickAdoptionInitialPolicyTag {
+    param(
+        [Parameter(Mandatory)][byte[]]$WorkflowBytes,
+        [Parameter(Mandatory)][string]$TargetTag,
+        [Parameter(Mandatory)][string]$RuntimePolicyTag
+    )
+
+    if (Test-CanonicalWorkflowSupportsSourceGraphIdentity `
+            -Bytes $WorkflowBytes) {
+        return $TargetTag
+    }
+    if ($TargetTag -cnotin @('v0.12.4', 'v0.12.5')) {
+        throw "Graph-unaware target '$TargetTag' is outside the reviewed v0.12.4-v0.12.5 runtime-policy fallback."
+    }
+    return $RuntimePolicyTag
+}
+
 function Import-CanonicalInitialAdoptionPolicy {
-    param([string]$ProtocolToken = '')
+    param(
+        [string]$ProtocolToken = '',
+        [string]$Tag = $initialAdoptionPolicyTag
+    )
 
-    $asset = Get-CanonicalProtocolAsset -Tag $initialAdoptionPolicyTag `
-        -TemplatePath $initialAdoptionPolicySourcePath `
-        -ProtocolToken $ProtocolToken
-    $decoder = [Text.UTF8Encoding]::new($false, $true)
-    try {
-        $source = $decoder.GetString([byte[]]$asset.Bytes)
-        $scriptBlock = [scriptblock]::Create($source)
-    }
-    catch {
-        throw 'The exact initial-adoption policy module is not valid UTF-8 PowerShell source.'
-    }
+    $targetSemanticCommands = @(
+        'Assert-MeAndAIProtocolAssessmentPathCasing',
+        'ConvertTo-MeAndAIInstructionGraphRecord',
+        'Get-MeAndAIInstructionGraphIdentity',
+        'Get-MeAndAIInstructionGraphLimits',
+        'Get-MeAndAIProtocolAssessmentLimits',
+        'Get-MeAndAIProtocolSurfaceInventory',
+        'New-MeAndAIInstructionGraph',
+        'Resolve-MeAndAIAdoptionStrategy',
+        'Resolve-MeAndAIInstructionGraphClosure',
+        'Test-MeAndAICompletedAdoptionChangeSet',
+        'Test-MeAndAICanonicalRepositoryPath',
+        'Test-MeAndAIConsumerGovernancePath',
+        'Test-MeAndAIExactAdoptionPullRequestMarker',
+        'Test-MeAndAIExactInstructionGraph',
+        'Test-MeAndAIExactInstructionGraphIdentity',
+        'Test-MeAndAIExactInstructionGraphIdentityRecord',
+        'Test-MeAndAILegacyCommonAuthorityPath',
+        'Test-MeAndAILegacyGovernancePath',
+        'Test-MeAndAIProtocolAssessmentRelevantPath',
+        'Test-MeAndAIReservedProtocolSubmoduleContract'
+    )
+    $ancillaryCommandFamily = @(
+        'Get-MeAndAILinkedPathIdentityDigest',
+        'New-MeAndAIGitHubBlobLink',
+        'Test-MeAndAIExactLinkedPathSection'
+    )
+    $loadedModules = [System.Collections.Generic.List[object]]::new()
+    $importPolicyModule = {
+        param([Parameter(Mandatory)][string]$PolicyTag)
 
-    $moduleName = "MeAndAI.InitialAdoptionPolicy.$($asset.Sha).$([guid]::NewGuid().ToString('N'))"
-    $dynamicModule = New-Module -Name $moduleName -ScriptBlock $scriptBlock
-    $loaded = @()
-    try {
-        $loaded = @(Import-Module -ModuleInfo $dynamicModule -Force -PassThru)
-        if ($loaded.Count -ne 1) {
-            throw 'The exact initial-adoption policy module could not be loaded unambiguously.'
+        $asset = Get-CanonicalProtocolAsset -Tag $PolicyTag `
+            -TemplatePath $initialAdoptionPolicySourcePath `
+            -ProtocolToken $ProtocolToken
+        $decoder = [Text.UTF8Encoding]::new($false, $true)
+        $dynamicModule = $null
+        $loaded = @()
+        $sourceValidated = $false
+        try {
+            $source = $decoder.GetString([byte[]]$asset.Bytes)
+            $scriptBlock = [scriptblock]::Create($source)
+            $sourceValidated = $true
+            $moduleName = "MeAndAI.InitialAdoptionPolicy.$($asset.Sha).$([guid]::NewGuid().ToString('N'))"
+            $dynamicModule = New-Module -Name $moduleName `
+                -ScriptBlock $scriptBlock
+            $loaded = @(Import-Module -ModuleInfo $dynamicModule -Force -PassThru)
+            if ($loaded.Count -ne 1) {
+                throw 'The exact initial-adoption policy module could not be loaded unambiguously.'
+            }
+            return [pscustomobject]@{
+                Tag = $PolicyTag
+                BlobSha = [string]$asset.Sha
+                Module = $loaded[0]
+                ModuleName = $moduleName
+            }
         }
-        $requiredCommands = @(
-            'Assert-MeAndAIProtocolAssessmentPathCasing',
-            'ConvertTo-MeAndAIInstructionGraphRecord',
-            'Get-MeAndAIInstructionGraphIdentity',
-            'Get-MeAndAIInstructionGraphLimits',
-            'Get-MeAndAILinkedPathIdentityDigest',
-            'Get-MeAndAIProtocolAssessmentLimits',
-            'Get-MeAndAIProtocolSurfaceInventory',
-            'New-MeAndAIGitHubBlobLink',
-            'New-MeAndAIInstructionGraph',
-            'Resolve-MeAndAIAdoptionStrategy',
-            'Resolve-MeAndAIInstructionGraphClosure',
-            'Test-MeAndAICompletedAdoptionChangeSet',
-            'Test-MeAndAICanonicalRepositoryPath',
-            'Test-MeAndAIConsumerGovernancePath',
-            'Test-MeAndAIExactAdoptionPullRequestMarker',
-            'Test-MeAndAIExactLinkedPathSection',
-            'Test-MeAndAIExactInstructionGraph',
-            'Test-MeAndAIExactInstructionGraphIdentity',
-            'Test-MeAndAIExactInstructionGraphIdentityRecord',
-            'Test-MeAndAILegacyCommonAuthorityPath',
-            'Test-MeAndAILegacyGovernancePath',
-            'Test-MeAndAIProtocolAssessmentRelevantPath',
-            'Test-MeAndAIReservedProtocolSubmoduleContract'
-        )
+        catch {
+            foreach ($module in @($loaded) + @($dynamicModule)) {
+                if ($null -ne $module) {
+                    Remove-Module -ModuleInfo $module -Force `
+                        -ErrorAction SilentlyContinue
+                }
+            }
+            if (-not $sourceValidated) {
+                throw 'The exact initial-adoption policy module is not valid UTF-8 PowerShell source.'
+            }
+            throw
+        }
+    }
+
+    try {
+        $targetPolicy = & $importPolicyModule -PolicyTag $Tag
+        [void]$loadedModules.Add($targetPolicy.Module)
         $commands = [System.Collections.Generic.Dictionary[string, object]]::new(
             [StringComparer]::Ordinal
         )
-        foreach ($name in $requiredCommands) {
-            $command = $loaded[0].ExportedCommands[$name]
-            if ($null -eq $command -or [string]$command.ModuleName -cne $moduleName) {
+        $commandSources =
+            [System.Collections.Generic.Dictionary[string, string]]::new(
+                [StringComparer]::Ordinal
+            )
+        foreach ($name in $targetSemanticCommands) {
+            $command = $targetPolicy.Module.ExportedCommands[$name]
+            if ($null -eq $command -or
+                [string]$command.ModuleName -cne $targetPolicy.ModuleName) {
                 throw "The exact initial-adoption policy module does not export '$name'."
             }
             $commands.Add($name, $command)
+            $commandSources.Add($name, $Tag)
         }
         $limits = & $commands['Get-MeAndAIProtocolAssessmentLimits']
         $graphLimits = & $commands['Get-MeAndAIInstructionGraphLimits']
@@ -482,22 +536,184 @@ function Import-CanonicalInitialAdoptionPolicy {
             [long]$limits.MaximumSurfaceUtf8Bytes -gt 1048576) {
             throw 'The exact initial-adoption policy returned invalid assessment limits.'
         }
-        if ($null -eq $graphLimits -or $graphLimits -is [array] -or
-            [long]$graphLimits.MaximumTreeEntries -ne 65536 -or
-            [long]$graphLimits.MaximumTreePathUtf8Bytes -ne 4194304 -or
-            [long]$graphLimits.MaximumNodes -ne 512 -or
-            [long]$graphLimits.MaximumEdges -ne 4096 -or
-            [long]$graphLimits.MaximumDepth -ne 32 -or
-            [long]$graphLimits.MaximumBlobBytes -ne 262144 -or
-            [long]$graphLimits.MaximumAggregateBlobBytes -ne 4194304 -or
-            [long]$graphLimits.MaximumPathUtf8Bytes -ne 32768) {
+        $targetVersion = ConvertTo-CanonicalProtocolVersionRecord -Tag $Tag
+        $reviewedGraphProfiles = @(
+            [pscustomobject]@{
+                MinimumTag = 'v0.12.6'; MaximumTag = 'v0.14.2'
+                Schema = 1; MaximumBlobBytes = 262144
+                MaximumNodes = 256; MaximumEdges = 2048
+                MaximumPathUtf8Bytes = 16384
+            },
+            [pscustomobject]@{
+                MinimumTag = 'v0.14.3'; MaximumTag = 'v0.14.5'
+                Schema = 1; MaximumBlobBytes = 262144
+                MaximumNodes = 256; MaximumEdges = 4096
+                MaximumPathUtf8Bytes = 16384
+            },
+            [pscustomobject]@{
+                MinimumTag = 'v0.15.0'; MaximumTag = 'v0.15.1'
+                Schema = 1; MaximumBlobBytes = 262144
+                MaximumNodes = 512; MaximumEdges = 4096
+                MaximumPathUtf8Bytes = 16384
+            },
+            [pscustomobject]@{
+                MinimumTag = 'v0.15.2'; MaximumTag = 'v0.15.4'
+                Schema = 1; MaximumBlobBytes = 262144
+                MaximumNodes = 512; MaximumEdges = 4096
+                MaximumPathUtf8Bytes = 32768
+            },
+            [pscustomobject]@{
+                MinimumTag = 'v0.15.5'; MaximumTag = 'v0.15.5'
+                Schema = 2; MaximumBlobBytes = 524288
+                MaximumNodes = 512; MaximumEdges = 4096
+                MaximumPathUtf8Bytes = 32768
+            }
+        )
+        $graphProfile = $null
+        $comparePolicyVersion = {
+            param(
+                [Parameter(Mandatory)]$Left,
+                [Parameter(Mandatory)]$Right
+            )
+
+            for ($partIndex = 0; $partIndex -lt 3; $partIndex++) {
+                $leftPart = [string]$Left.Parts[$partIndex]
+                $rightPart = [string]$Right.Parts[$partIndex]
+                if ($leftPart.Length -ne $rightPart.Length) {
+                    return [Math]::Sign(
+                        $leftPart.Length - $rightPart.Length
+                    )
+                }
+                $partComparison = [string]::CompareOrdinal(
+                    $leftPart, $rightPart
+                )
+                if ($partComparison -ne 0) {
+                    return [Math]::Sign($partComparison)
+                }
+            }
+            return 0
+        }
+        foreach ($candidateProfile in $reviewedGraphProfiles) {
+            $minimumVersion = ConvertTo-CanonicalProtocolVersionRecord `
+                -Tag ([string]$candidateProfile.MinimumTag)
+            $maximumVersion = ConvertTo-CanonicalProtocolVersionRecord `
+                -Tag ([string]$candidateProfile.MaximumTag)
+            if ((& $comparePolicyVersion -Left $targetVersion `
+                    -Right $minimumVersion) -ge 0 -and
+                (& $comparePolicyVersion -Left $targetVersion `
+                    -Right $maximumVersion) -le 0) {
+                $graphProfile = $candidateProfile
+                break
+            }
+        }
+        if ($null -eq $graphProfile) {
+            throw "The exact initial-adoption policy tag '$Tag' has no reviewed instruction-graph profile."
+        }
+        $retainedGraphLimits = [ordered]@{
+            MaximumTreeEntries = 65536
+            MaximumTreePathUtf8Bytes = 4194304
+            MaximumNodes = [int]$graphProfile.MaximumNodes
+            MaximumEdges = [int]$graphProfile.MaximumEdges
+            MaximumDepth = 32
+            MaximumAggregateBlobBytes = 4194304
+            MaximumPathUtf8Bytes =
+                [int]$graphProfile.MaximumPathUtf8Bytes
+        }
+        $graphLimitsValid = $null -ne $graphLimits -and
+            $graphLimits -isnot [array]
+        foreach ($limitName in $retainedGraphLimits.Keys) {
+            if (-not $graphLimitsValid) { break }
+            if ($null -eq $graphLimits.PSObject.Properties[$limitName] -or
+                [long]$graphLimits.$limitName -ne
+                    [long]$retainedGraphLimits[$limitName]) {
+                $graphLimitsValid = $false
+            }
+        }
+        if (-not $graphLimitsValid -or
+            $null -eq $graphLimits.PSObject.Properties['MaximumBlobBytes'] -or
+            [long]$graphLimits.MaximumBlobBytes -ne
+                [long]$graphProfile.MaximumBlobBytes) {
             throw 'The exact initial-adoption policy returned invalid instruction-graph limits.'
         }
+        $schemaProbe = & $commands['New-MeAndAIInstructionGraph'] `
+            -BaseHead ('0' * 40) -TreeEntries @() -ReadBlob {
+                throw 'The empty initial-adoption policy probe unexpectedly requested a blob.'
+            }
+        $graphSchema = if ($null -ne $schemaProbe -and
+            $null -ne $schemaProbe.PSObject.Properties['schema']) {
+            [int]$schemaProbe.schema
+        }
+        else { 0 }
+        $schemaLimitPairValid =
+            $graphSchema -eq [int]$graphProfile.Schema -and
+            [long]$graphLimits.MaximumBlobBytes -eq
+                [long]$graphProfile.MaximumBlobBytes
+        $graphValidator = $commands['Test-MeAndAIExactInstructionGraph']
+        $probeLimits = if ($null -ne $schemaProbe) {
+            $schemaProbe.limits
+        }
+        else { $null }
+        $probeLimitsMatch = $null -ne $probeLimits
+        foreach ($limitMapping in @(
+            @('maximumTreeEntries', 'MaximumTreeEntries'),
+            @('maximumTreePathUtf8Bytes', 'MaximumTreePathUtf8Bytes'),
+            @('maximumNodes', 'MaximumNodes'),
+            @('maximumEdges', 'MaximumEdges'),
+            @('maximumDepth', 'MaximumDepth'),
+            @('maximumBlobBytes', 'MaximumBlobBytes'),
+            @('maximumAggregateBlobBytes', 'MaximumAggregateBlobBytes'),
+            @('maximumPathUtf8Bytes', 'MaximumPathUtf8Bytes')
+        )) {
+            if (-not $probeLimitsMatch) { break }
+            $probeName = [string]$limitMapping[0]
+            $getterName = [string]$limitMapping[1]
+            if ($null -eq $probeLimits.PSObject.Properties[$probeName] -or
+                [long]$probeLimits.$probeName -ne
+                    [long]$graphLimits.$getterName) {
+                $probeLimitsMatch = $false
+            }
+        }
+        if (-not $schemaLimitPairValid -or -not $probeLimitsMatch -or
+            -not [bool](& $graphValidator -Graph $schemaProbe)) {
+            throw 'The exact initial-adoption policy returned an invalid graph schema contract.'
+        }
+
+        $targetAncillaryCommands = @($ancillaryCommandFamily | Where-Object {
+            $command = $targetPolicy.Module.ExportedCommands[[string]$_]
+            $null -ne $command -and
+                [string]$command.ModuleName -ceq $targetPolicy.ModuleName
+        })
+        if ($targetAncillaryCommands.Count -notin @(0, 3)) {
+            throw 'The exact target initial-adoption policy exports a partial ancillary command family.'
+        }
+        $ancillaryPolicy = $targetPolicy
+        $ancillaryRole = 'Target'
+        if ($targetAncillaryCommands.Count -eq 0) {
+            if ($Tag -ceq $initialAdoptionPolicyTag) {
+                throw 'The exact runtime initial-adoption policy does not export its ancillary command family.'
+            }
+            $ancillaryPolicy = & $importPolicyModule `
+                -PolicyTag $initialAdoptionPolicyTag
+            [void]$loadedModules.Add($ancillaryPolicy.Module)
+            $ancillaryRole = 'RuntimeAncillary'
+        }
+        foreach ($name in $ancillaryCommandFamily) {
+            $command = $ancillaryPolicy.Module.ExportedCommands[$name]
+            if ($null -eq $command -or
+                [string]$command.ModuleName -cne $ancillaryPolicy.ModuleName) {
+                throw "The exact $ancillaryRole initial-adoption policy does not export '$name'."
+            }
+            $commands.Add($name, $command)
+            $commandSources.Add($name, [string]$ancillaryPolicy.Tag)
+        }
         return [pscustomobject]@{
-            Tag = $initialAdoptionPolicyTag
-            BlobSha = [string]$asset.Sha
-            Module = $loaded[0]
+            Tag = $Tag
+            BlobSha = [string]$targetPolicy.BlobSha
+            GraphSchema = $graphSchema
+            Module = $targetPolicy.Module
+            Modules = @($loadedModules)
             Commands = $commands
+            CommandSources = $commandSources
             Limits = [pscustomobject]@{
                 MaximumSurfaceCount = [int]$limits.MaximumSurfaceCount
                 MaximumSurfaceUtf8Bytes = [int]$limits.MaximumSurfaceUtf8Bytes
@@ -516,9 +732,11 @@ function Import-CanonicalInitialAdoptionPolicy {
         }
     }
     catch {
-        foreach ($module in @($loaded) + @($dynamicModule)) {
+        for ($index = $loadedModules.Count - 1; $index -ge 0; $index--) {
+            $module = $loadedModules[$index]
             if ($null -ne $module) {
-                Remove-Module -ModuleInfo $module -Force -ErrorAction SilentlyContinue
+                Remove-Module -ModuleInfo $module -Force `
+                    -ErrorAction SilentlyContinue
             }
         }
         throw

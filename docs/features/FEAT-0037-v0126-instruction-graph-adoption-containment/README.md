@@ -179,11 +179,12 @@ later feature may authorize.
 
 ### Finite limits
 
-The current release-owned graph policy declares the following inclusive
+The latest immutable schema-1 policy, v0.15.4, declares the following inclusive
 limits. Reaching a limit is valid; exceeding one blocks before repository,
-secret, branch, issue, pull-request, or semantic-model mutation.
+secret, branch, issue, pull-request, or semantic-model mutation. Current
+schema-2 evolution is owned by [DEC-0031](../../decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md).
 
-| Dimension | Current inclusive limit |
+| Dimension | Latest schema-1 inclusive limit |
 | --- | ---: |
 | Tracked tree entries inspected | 65,536 |
 | Aggregate tracked-tree path inventory | 4,194,304 UTF-8 bytes |

@@ -57,6 +57,7 @@
 | [FEAT-0053](FEAT-0053-v0152-distinct-test-intent/README.md) | [Distinct test intent and meta-test boundaries](FEAT-0053-v0152-distinct-test-intent/README.md) | Complete | 0.15.2 |
 | [FEAT-0054](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | [Bounded quick-adoption runtime reduction](FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md) | Complete | 0.15.3 |
 | [FEAT-0055](FEAT-0055-v0154-utf8-workflow-dispatch/README.md) | [UTF-8 workflow dispatch](FEAT-0055-v0154-utf8-workflow-dispatch/README.md) | Complete | 0.15.4 |
+| [FEAT-0056](FEAT-0056-v0155-instruction-graph-resilience/README.md) | [Instruction-graph preflight resilience](FEAT-0056-v0155-instruction-graph-resilience/README.md) | Complete | 0.15.5 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

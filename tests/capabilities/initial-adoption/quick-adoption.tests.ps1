@@ -1009,7 +1009,7 @@ function Assert-QuickAdoptionFixtureReuse {
     $expectedRequests = [ordered]@{
         'connected-seed-workflow' = 5
         'connected-seed-no-workflow' = 10
-        'connected-managed-v0.15.4' = 6
+        'connected-managed-v0.15.5' = 6
     }
     foreach ($entry in $expectedRequests.GetEnumerator()) {
         if (-not $script:QuickAdoptionReusableRequests.ContainsKey($entry.Key) -or
@@ -1070,9 +1070,9 @@ function Assert-QuickAdoptionFixtureReuse {
         $script:QuickAdoptionFixtureFamilyGitInitCount -ne 11 -or
         $script:QuickAdoptionFreshManagedBuilds.Count -ne 2 -or
         -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.9.2') -or
-        -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.15.5') -or
+        -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.15.6') -or
         [int]$script:QuickAdoptionFreshManagedBuilds['v0.9.2'] -ne 1 -or
-        [int]$script:QuickAdoptionFreshManagedBuilds['v0.15.5'] -ne 1) {
+        [int]$script:QuickAdoptionFreshManagedBuilds['v0.15.6'] -ne 1) {
         $freshBuildSummary = @($script:QuickAdoptionFreshManagedBuilds.GetEnumerator() |
             Sort-Object Key | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ', '
         throw "Quick-adoption fixture closure is inconsistent: git init=$($script:QuickAdoptionFixtureFamilyGitInitCount), fresh builds=[$freshBuildSummary]."
@@ -1181,7 +1181,7 @@ function Copy-CanonicalProtocolFixture {
     param(
         [Parameter(Mandatory)][string]$Destination,
         [ValidatePattern('^v[0-9]+\.[0-9]+\.[0-9]+$')]
-        [string]$Tag = 'v0.15.4'
+        [string]$Tag = 'v0.15.5'
     )
 
     [IO.File]::WriteAllText(
@@ -1248,6 +1248,40 @@ function Copy-CanonicalProtocolFixture {
         $Tag.Substring(1),
         [Text.UTF8Encoding]::new($false)
     )
+}
+
+function Copy-ImmutableProtocolPolicyFixture {
+    param(
+        [Parameter(Mandatory)][string]$Destination,
+        [Parameter(Mandatory)][string]$Commit
+    )
+
+    $archiveRoot = New-TempRoot -Name 'immutable-policy-archive'
+    $archivePath = Join-Path $archiveRoot 'policy.zip'
+    $extractPath = Join-Path $archiveRoot 'extract'
+    $policyPaths = @(
+        'templates/project/.github/workflows/meandai-protocol-update.yml',
+        'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
+    )
+    try {
+        Invoke-TestGit -Repository $root -Arguments (
+            @('archive', '--format=zip', '-o', $archivePath, $Commit, '--') +
+            $policyPaths
+        ) | Out-Null
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath
+        foreach ($policyPath in $policyPaths) {
+            $relativePath = $policyPath -replace '/',
+                [IO.Path]::DirectorySeparatorChar
+            Copy-Item -LiteralPath (Join-Path $extractPath $relativePath) `
+                -Destination (Join-Path $Destination $relativePath) -Force
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $archiveRoot) {
+            Remove-Item -LiteralPath $archiveRoot -Recurse -Force `
+                -ErrorAction SilentlyContinue
+        }
+    }
 }
 
 function Get-MockConsumerMigrationBaseline {
@@ -1395,7 +1429,43 @@ function Initialize-QuickAdoptionImmutableFixture {
     Save-MockProtocolAssetSnapshot -Tag 'v0.9.2' `
         -Repository $protocolRepository -Snapshots $assetSnapshots
 
+    Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.14.1'
+    Copy-ImmutableProtocolPolicyFixture -Destination $protocolRepository `
+        -Commit 'f153e21a3098945a1b669563046f875ef6fb8b60'
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'add', '--', '.'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'commit', '-m', 'Create mock ancillary-fallback schema-1 protocol release'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'tag', 'v0.14.1'
+    ) | Out-Null
+    $ancillaryFallbackSha = (@(Invoke-TestGit -Repository $protocolRepository `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    $releaseCommits['v0.14.1'] = $ancillaryFallbackSha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.14.1' `
+        -Repository $protocolRepository -Snapshots $assetSnapshots
+
     Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.15.4'
+    Copy-ImmutableProtocolPolicyFixture -Destination $protocolRepository `
+        -Commit '1883a2315529e7493343c07eebb4c74ed77a62b4'
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'add', '--', '.'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'commit', '-m', 'Create mock immutable schema-1 protocol release'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'tag', 'v0.15.4'
+    ) | Out-Null
+    $schema1Sha = (@(Invoke-TestGit -Repository $protocolRepository `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    $releaseCommits['v0.15.4'] = $schema1Sha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.15.4' `
+        -Repository $protocolRepository -Snapshots $assetSnapshots
+
+    Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.15.5'
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'add', '--', '.'
     ) | Out-Null
@@ -1403,18 +1473,18 @@ function Initialize-QuickAdoptionImmutableFixture {
         'commit', '-m', 'Create mock current protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
-        'tag', 'v0.15.4'
+        'tag', 'v0.15.5'
     ) | Out-Null
     $currentSha = (@(Invoke-TestGit -Repository $protocolRepository `
         -Arguments @('rev-parse', 'HEAD')))[0]
-    $releaseCommits['v0.15.4'] = $currentSha
-    Save-MockProtocolAssetSnapshot -Tag 'v0.15.4' `
+    $releaseCommits['v0.15.5'] = $currentSha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.15.5' `
         -Repository $protocolRepository -Snapshots $assetSnapshots
 
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'switch', '--detach'
     ) | Out-Null
-    foreach ($futureTag in @('v0.15.5', 'v1.0.0')) {
+    foreach ($futureTag in @('v0.15.6', 'v1.0.0')) {
         if ($releaseCommits.ContainsKey($futureTag)) {
             throw "Future mock release tag '$futureTag' duplicates an existing fixture release."
         }
@@ -1439,10 +1509,10 @@ function Initialize-QuickAdoptionImmutableFixture {
         'switch', 'main'
     ) | Out-Null
 
-    $archivePath = Join-Path $protocolFixtureRoot 'protocol-v0.15.4.zip'
+    $archivePath = Join-Path $protocolFixtureRoot 'protocol-v0.15.5.zip'
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'archive', '--format=zip', '--prefix=openai-mock-protocol/',
-        '-o', $archivePath, 'v0.15.4'
+        '-o', $archivePath, 'v0.15.5'
     ) | Out-Null
     $status = @(Invoke-TestGit -Repository $protocolRepository `
         -Arguments @('status', '--porcelain'))
@@ -1721,7 +1791,7 @@ function New-MockConnectedManagedConsumer {
         [Parameter(Mandatory)][string]$InstalledTag
     )
 
-    if ($InstalledTag -cne 'v0.15.4') {
+    if ($InstalledTag -cne 'v0.15.5') {
         if (-not $script:QuickAdoptionFreshManagedBuilds.ContainsKey(
                 $InstalledTag
             )) {
@@ -1732,13 +1802,13 @@ function New-MockConnectedManagedConsumer {
             -Name $Name -InstalledTag $InstalledTag
     }
 
-    $reuseKey = 'connected-managed-v0.15.4'
+    $reuseKey = 'connected-managed-v0.15.5'
     $owner = Get-QuickAdoptionReusableFixture -Key $reuseKey -Builder {
         New-MockConnectedManagedConsumerPair `
-            -Name 'owner-connected-managed-v0.15.4' `
-            -InstalledTag 'v0.15.4'
+            -Name 'owner-connected-managed-v0.15.5' `
+            -InstalledTag 'v0.15.5'
     } -InputRecords @(
-        'installed-tag=v0.15.4',
+        'installed-tag=v0.15.5',
         "protocol-commit=$global:QuickAdoptionProtocolSha"
     )
     $consumer = New-QuickAdoptionMutableDerivative `
@@ -1969,7 +2039,7 @@ function New-MockCompletedAdoptionConsumer {
     ) -Force
     & $launcherPath -TargetPath $consumer.Repository `
         -CodexCommand $mockCodexPath | Out-Null
-    $completedBranch = 'automation/meandai-capabilities-v0.15.4'
+    $completedBranch = 'automation/meandai-capabilities-v0.15.5'
     $remoteHeadLine = @(Invoke-TestGit -Repository $consumer.Repository `
         -Arguments @('ls-remote', '--heads', 'origin', "refs/heads/$completedBranch"))
     if ($remoteHeadLine.Count -ne 1) {
@@ -2005,10 +2075,10 @@ function Initialize-MockAdoptionPullRequestBody {
             schema = 9
             phase = 'Proposed'
             state = $proposalState
-            target = 'v0.15.4'
+            target = 'v0.15.5'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $global:QuickAdoptionPrHead
-            branch = 'automation/meandai-capabilities-v0.15.4'
+            branch = 'automation/meandai-capabilities-v0.15.5'
             adoptionStrategy = $markerStrategy
             protocolRecordLossAcknowledged =
                 [bool]$global:QuickAdoptionDispatchedLossAcknowledgement
@@ -2047,7 +2117,7 @@ function Initialize-MockAdoptionPullRequestBody {
             '',
             '## AI capabilities adoption proposal',
             '',
-            "- Protocol release: ``v0.15.4``",
+            "- Protocol release: ``v0.15.5``",
             "- Protocol commit: ``$($global:QuickAdoptionProtocolSha)``",
             '',
             '### Detected protocol and governance surfaces',
@@ -2066,7 +2136,7 @@ function Initialize-MockAdoptionPullRequestBody {
             schema = 5
             phase = 'Proposed'
             state = $proposalState
-            target = 'v0.15.4'
+            target = 'v0.15.5'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $global:QuickAdoptionPrHead
             adoptionStrategy = $markerStrategy
@@ -2125,7 +2195,7 @@ function New-TestQuickAdoptionManifest {
         operation = 'ai-capabilities-adoption'
         state = $State
         repository = $Repository
-        targetTag = 'v0.15.4'
+        targetTag = 'v0.15.5'
         protocolSha = $ProtocolSha
         adoptionStrategy = $Strategy
         protocolSurfaces = @($ProtocolSurfaces)
@@ -2197,7 +2267,7 @@ function New-TestQuickAdoptionPullRequestContractFixture {
         schema = 5
         phase = 'Proposed'
         state = 'AdoptionReviewRequired'
-        target = 'v0.15.4'
+        target = 'v0.15.5'
         protocolSha = 'a' * 40
         head = $head
         adoptionStrategy = $Strategy
@@ -2209,7 +2279,7 @@ function New-TestQuickAdoptionPullRequestContractFixture {
     $pullRequest = [pscustomobject][ordered]@{
         number = 42
         url = 'https://github.com/test-owner/consumer/pull/42'
-        headRefName = 'automation/meandai-capabilities-v0.15.4'
+        headRefName = 'automation/meandai-capabilities-v0.15.5'
         headRefOid = $head
         baseRefName = 'main'
         headRepository = [pscustomobject]@{
@@ -2239,9 +2309,9 @@ function New-TestQuickAdoptionPullRequestContractFixture {
         PullRequest = $pullRequest
         RemoteHead = $head
         Repository = 'test-owner/consumer'
-        Branch = 'automation/meandai-capabilities-v0.15.4'
+        Branch = 'automation/meandai-capabilities-v0.15.5'
         BaseBranch = 'main'
-        TargetTag = 'v0.15.4'
+        TargetTag = 'v0.15.5'
         TargetSha = 'a' * 40
         ExpectedActor = 'test-owner'
         ExpectedState = 'AdoptionReviewRequired'
@@ -2303,7 +2373,7 @@ function New-TestQuickAdoptionCompletionContractFixture {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.15.4'
+    $branch = 'automation/meandai-capabilities-v0.15.5'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -2438,7 +2508,7 @@ function Publish-MockAdoptionBranch {
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.15.4'
+    $branch = 'automation/meandai-capabilities-v0.15.5'
     $branchLines = @(Invoke-TestGit `
         -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -2658,9 +2728,10 @@ function Test-MockInitialPolicyAuthorityCall {
         return $false
     }
     return [string]$endpoint[0] -cin @(
-        'repos/hasanmanzak/meAndAI/releases/tags/v0.15.4',
-        'repos/hasanmanzak/meAndAI/commits/v0.15.4',
-        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.4'
+        'repos/hasanmanzak/meAndAI/releases/tags/v0.15.5',
+        'repos/hasanmanzak/meAndAI/commits/v0.15.5',
+        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5',
+        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
     )
 }
 
@@ -3089,7 +3160,7 @@ function global:gh {
         $createdIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.15.4'
+            title = 'Track meAndAI AI capabilities adoption from v0.15.5'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
         }
@@ -3099,7 +3170,7 @@ function global:gh {
             $global:QuickAdoptionIssues.Add([pscustomobject]@{
                 number = 83
                 url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/83"
-                title = 'Track meAndAI AI capabilities adoption from v0.15.4'
+                title = 'Track meAndAI AI capabilities adoption from v0.15.5'
                 body = $createdIssue.body
                 state = 'OPEN'
             })
@@ -3464,7 +3535,7 @@ function global:gh {
             isDraft = $global:QuickAdoptionPrDraft
             state = $global:QuickAdoptionPrState
             baseRefName = $global:QuickAdoptionDefaultBranch
-            headRefName = 'automation/meandai-capabilities-v0.15.4'
+            headRefName = 'automation/meandai-capabilities-v0.15.5'
             headRefOid = $global:QuickAdoptionPrHead
             headRepository = [ordered]@{
                 id = 'R_mock_consumer'
@@ -3501,7 +3572,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.4'
+                    target = 'v0.15.5'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = ('0' * 40)
                     adoptionStrategy = $global:QuickAdoptionDispatchedStrategy
@@ -3517,7 +3588,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.4'
+                    target = 'v0.15.5'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = $global:QuickAdoptionPrHead
                     adoptionStrategy = 'FreshAdoption'
@@ -3533,7 +3604,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.4'
+                    target = 'v0.15.5'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = $global:QuickAdoptionPrHead
                     adoptionStrategy = $global:QuickAdoptionDispatchedStrategy
@@ -3615,11 +3686,222 @@ try {
     if (Test-QuickAdoptionShard -Name 'ContractsPreflight') {
         Reset-Mocks
         Test-QuickAdoptionGitHubTimestampContract
+        $schema1WorkflowKey =
+            "v0.15.4`ntemplates/project/.github/workflows/meandai-protocol-update.yml"
+        $schema1WorkflowSnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$schema1WorkflowKey]
+        $schema1PolicyKey =
+            "v0.15.4`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+        $schema1PolicySnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$schema1PolicyKey]
+        $ancillaryFallbackWorkflowKey =
+            "v0.14.1`ntemplates/project/.github/workflows/meandai-protocol-update.yml"
+        $ancillaryFallbackWorkflowSnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$ancillaryFallbackWorkflowKey]
+        $ancillaryFallbackPolicyKey =
+            "v0.14.1`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+        $ancillaryFallbackPolicySnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$ancillaryFallbackPolicyKey]
+        $runtimePolicyKey =
+            "v0.15.5`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+        $runtimePolicySnapshot =
+            $global:QuickAdoptionProtocolAssetBytes[$runtimePolicyKey]
+        try {
+            $schema1PolicyContract = & $launcherPath `
+                -SupportAction 'InitialPolicyContract' `
+                -SupportInput @([pscustomobject][ordered]@{
+                    WorkflowBytes = [byte[]]$schema1WorkflowSnapshot.Bytes
+                    PolicyBytes = [byte[]]$schema1PolicySnapshot.Bytes
+                    PolicySha = [string]$schema1PolicySnapshot.Sha
+                    TargetTag = 'v0.15.4'
+                    RuntimePolicyTag = 'v0.15.5'
+                })
+            if ([string]$schema1PolicyContract.SelectedTag -cne 'v0.15.4' -or
+                [string]$schema1PolicyContract.ImportedTag -cne 'v0.15.4' -or
+                [int]$schema1PolicyContract.GraphSchema -ne 1 -or
+                [int]$schema1PolicyContract.MaximumBlobBytes -ne 262144 -or
+                [int]$schema1PolicyContract.AssetCalls -ne 1) {
+                Add-Failure 'TEST-0153 graph-aware immutable v0.15.4 did not retain its release-owned schema-1 policy.'
+            }
+        }
+        catch {
+            Add-Failure (
+                'TEST-0153 graph-aware immutable v0.15.4 policy import ' +
+                'failed: ' + $_.Exception.Message
+            )
+        }
+        $dynamicPolicyModulesBefore = @(
+            Get-Module | Where-Object {
+                $_.Name -like 'MeAndAI.InitialAdoptionPolicy.*'
+            } | ForEach-Object { [string]$_.Name } | Sort-Object
+        )
+        try {
+            $ancillaryFallbackContract = & $launcherPath `
+                -SupportAction 'InitialPolicyContract' `
+                -SupportInput @([pscustomobject][ordered]@{
+                    WorkflowBytes =
+                        [byte[]]$ancillaryFallbackWorkflowSnapshot.Bytes
+                    PolicyBytes =
+                        [byte[]]$ancillaryFallbackPolicySnapshot.Bytes
+                    PolicySha =
+                        [string]$ancillaryFallbackPolicySnapshot.Sha
+                    TargetTag = 'v0.14.1'
+                    RuntimePolicyTag = 'v0.15.5'
+                    RuntimePolicyBytes = [byte[]]$runtimePolicySnapshot.Bytes
+                    RuntimePolicySha = [string]$runtimePolicySnapshot.Sha
+                })
+            $targetSemanticCommands = @(
+                'Assert-MeAndAIProtocolAssessmentPathCasing',
+                'ConvertTo-MeAndAIInstructionGraphRecord',
+                'Get-MeAndAIInstructionGraphIdentity',
+                'Get-MeAndAIInstructionGraphLimits',
+                'Get-MeAndAIProtocolAssessmentLimits',
+                'Get-MeAndAIProtocolSurfaceInventory',
+                'New-MeAndAIInstructionGraph',
+                'Resolve-MeAndAIAdoptionStrategy',
+                'Resolve-MeAndAIInstructionGraphClosure',
+                'Test-MeAndAICompletedAdoptionChangeSet',
+                'Test-MeAndAICanonicalRepositoryPath',
+                'Test-MeAndAIConsumerGovernancePath',
+                'Test-MeAndAIExactAdoptionPullRequestMarker',
+                'Test-MeAndAIExactInstructionGraph',
+                'Test-MeAndAIExactInstructionGraphIdentity',
+                'Test-MeAndAIExactInstructionGraphIdentityRecord',
+                'Test-MeAndAILegacyCommonAuthorityPath',
+                'Test-MeAndAILegacyGovernancePath',
+                'Test-MeAndAIProtocolAssessmentRelevantPath',
+                'Test-MeAndAIReservedProtocolSubmoduleContract'
+            )
+            $ancillaryCommands = @(
+                'Get-MeAndAILinkedPathIdentityDigest',
+                'New-MeAndAIGitHubBlobLink',
+                'Test-MeAndAIExactLinkedPathSection'
+            )
+            $wrongTargetSources = @($targetSemanticCommands | Where-Object {
+                [string]$ancillaryFallbackContract.CommandSources[$_] -cne
+                    'v0.14.1'
+            })
+            $wrongAncillarySources = @($ancillaryCommands | Where-Object {
+                [string]$ancillaryFallbackContract.CommandSources[$_] -cne
+                    'v0.15.5'
+            })
+            if ([string]$ancillaryFallbackContract.SelectedTag -cne
+                    'v0.14.1' -or
+                [string]$ancillaryFallbackContract.ImportedTag -cne
+                    'v0.14.1' -or
+                [int]$ancillaryFallbackContract.GraphSchema -ne 1 -or
+                [int]$ancillaryFallbackContract.MaximumBlobBytes -ne 262144 -or
+                [int]$ancillaryFallbackContract.AssetCalls -ne 2 -or
+                [int]$ancillaryFallbackContract.ModuleCount -ne 2 -or
+                $wrongTargetSources.Count -ne 0 -or
+                $wrongAncillarySources.Count -ne 0) {
+                Add-Failure 'TEST-0153 graph-aware immutable v0.14.1 did not retain target graph semantics with bounded runtime ancillary helpers.'
+            }
+        }
+        catch {
+            Add-Failure (
+                'TEST-0153 graph-aware immutable v0.14.1 policy composition ' +
+                'failed: ' + $_.Exception.Message
+            )
+        }
+        $ancillaryFallbackPolicyText = [Text.UTF8Encoding]::new(
+            $false, $true
+        ).GetString([byte[]]$ancillaryFallbackPolicySnapshot.Bytes)
+        $partialAncillaryPolicyText = $ancillaryFallbackPolicyText.Replace(
+            'Export-ModuleMember -Function @(',
+            "function Get-MeAndAILinkedPathIdentityDigest { return ('0' * 64) }`n`nExport-ModuleMember -Function @("
+        ).Replace(
+            "    'Get-MeAndAIInstructionGraphLimits',",
+            "    'Get-MeAndAIInstructionGraphLimits',`n    'Get-MeAndAILinkedPathIdentityDigest',"
+        )
+        if ($partialAncillaryPolicyText -ceq $ancillaryFallbackPolicyText -or
+            -not $partialAncillaryPolicyText.Contains(
+                'function Get-MeAndAILinkedPathIdentityDigest'
+            )) {
+            Add-Failure 'TEST-0153 partial ancillary-family mutation fixture was not constructed.'
+        }
+        else {
+            [byte[]]$partialAncillaryPolicyBytes =
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    $partialAncillaryPolicyText
+                )
+            $partialAncillaryFailure = $null
+            try {
+                [void](& $launcherPath `
+                    -SupportAction 'InitialPolicyContract' `
+                    -SupportInput @([pscustomobject][ordered]@{
+                        WorkflowBytes =
+                            [byte[]]$ancillaryFallbackWorkflowSnapshot.Bytes
+                        PolicyBytes = $partialAncillaryPolicyBytes
+                        PolicySha = Get-TestQuickAdoptionGitBlobSha1 `
+                            -Bytes $partialAncillaryPolicyBytes
+                        TargetTag = 'v0.14.1'
+                        RuntimePolicyTag = 'v0.15.5'
+                        RuntimePolicyBytes = [byte[]]$runtimePolicySnapshot.Bytes
+                        RuntimePolicySha = [string]$runtimePolicySnapshot.Sha
+                    }))
+            }
+            catch { $partialAncillaryFailure = $_.Exception.Message }
+            if ($partialAncillaryFailure -notlike
+                    '*partial ancillary command family*') {
+                Add-Failure (
+                    'TEST-0153 partial target ancillary family did not fail ' +
+                    'closed: ' + [string]$partialAncillaryFailure
+                )
+            }
+        }
+        $dynamicPolicyModulesAfter = @(
+            Get-Module | Where-Object {
+                $_.Name -like 'MeAndAI.InitialAdoptionPolicy.*'
+            } | ForEach-Object { [string]$_.Name } | Sort-Object
+        )
+        if (($dynamicPolicyModulesAfter -join "`n") -cne
+            ($dynamicPolicyModulesBefore -join "`n")) {
+            Add-Failure 'TEST-0153 composed target/runtime policy modules leaked after exact cleanup.'
+        }
+        $schema1PolicyText = [Text.UTF8Encoding]::new(
+            $false, $true
+        ).GetString([byte[]]$schema1PolicySnapshot.Bytes)
+        $mutatedSchema1PolicyText = $schema1PolicyText.Replace(
+            '$script:MeAndAIInstructionGraphMaximumNodes = 512',
+            '$script:MeAndAIInstructionGraphMaximumNodes = 511'
+        )
+        if ($mutatedSchema1PolicyText -ceq $schema1PolicyText) {
+            Add-Failure 'TEST-0153 retained-limit mutation fixture did not change the immutable policy.'
+        }
+        else {
+            [byte[]]$mutatedSchema1PolicyBytes =
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    $mutatedSchema1PolicyText
+                )
+            $mutatedSchema1PolicyFailure = $null
+            try {
+                [void](& $launcherPath `
+                    -SupportAction 'InitialPolicyContract' `
+                    -SupportInput @([pscustomobject][ordered]@{
+                        WorkflowBytes = [byte[]]$schema1WorkflowSnapshot.Bytes
+                        PolicyBytes = $mutatedSchema1PolicyBytes
+                        PolicySha = Get-TestQuickAdoptionGitBlobSha1 `
+                            -Bytes $mutatedSchema1PolicyBytes
+                        TargetTag = 'v0.15.4'
+                        RuntimePolicyTag = 'v0.15.5'
+                    }))
+            }
+            catch { $mutatedSchema1PolicyFailure = $_.Exception.Message }
+            if ($mutatedSchema1PolicyFailure -notlike
+                    '*invalid instruction-graph limits*') {
+                Add-Failure (
+                    'TEST-0153 accepted drift in a retained immutable graph ' +
+                    'limit: ' + [string]$mutatedSchema1PolicyFailure
+                )
+            }
+        }
+        Reset-Mocks
         $firstFixtureRepository = $global:QuickAdoptionProtocolRepository
         $firstFixtureArchive = $script:QuickAdoptionProtocolFixture.ArchivePath
         $firstMutableCalls = $global:QuickAdoptionGhCalls
         $firstCodexLog = $global:QuickAdoptionCodexLog
-        $assetIsolationKey = "v0.15.4`n$($canonicalInitialAdoptionPolicyAsset.TemplatePath)"
+        $assetIsolationKey = "v0.15.5`n$($canonicalInitialAdoptionPolicyAsset.TemplatePath)"
         $firstAssetBytes = [byte[]]$global:QuickAdoptionProtocolAssetBytes[
             $assetIsolationKey
         ].Bytes
@@ -3710,7 +3992,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.15.4',
+            'v0.15.5',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -3826,6 +4108,7 @@ try {
             if (-not $policyImportText.Contains('Get-CanonicalProtocolAsset') -or
                 -not $policyImportText.Contains('$initialAdoptionPolicyTag') -or
                 -not $policyImportText.Contains('$initialAdoptionPolicySourcePath') -or
+                -not $policyImportText.Contains('-Tag $Tag') -or
                 -not $policyImportText.Contains('New-Module') -or
                 -not $policyImportText.Contains(
                     "[guid]::NewGuid().ToString('N')"
@@ -3833,7 +4116,9 @@ try {
                 -not $policyImportText.Contains(
                     'Import-Module -ModuleInfo $dynamicModule'
                 ) -or
-                -not $policyImportText.Contains('Get-MeAndAIProtocolAssessmentLimits')) {
+                -not $policyImportText.Contains('Get-MeAndAIProtocolAssessmentLimits') -or
+                -not $policyImportText.Contains('$schemaProbe') -or
+                -not $policyImportText.Contains('GraphSchema = $graphSchema')) {
                 Add-Failure 'TEST-0130 initial policy is not imported from the verified canonical release asset with its bounded contract.'
             }
             foreach ($linkedEvidenceCommand in @(
@@ -3973,7 +4258,7 @@ try {
                     ) `
                     -ScriptBlock {
                         param([string]$FunctionDefinition)
-                        $script:ProtocolTag = 'v0.15.4'
+                        $script:ProtocolTag = 'v0.15.5'
 
                         function Test-QuickAdoptionExactPullRequestMarker {
                             return $true
@@ -4032,7 +4317,7 @@ try {
                                     Get-ValidatedAdoptionMarker `
                                         -PullRequest $PullRequest `
                                         -Repository 'test-owner/consumer' `
-                                        -Branch 'automation/meandai-capabilities-v0.15.4' `
+                                        -Branch 'automation/meandai-capabilities-v0.15.5' `
                                         -BaseBranch 'main' `
                                         -ExpectedActor 'test-owner' `
                                         -ExpectedMarkerHead ('c' * 40) `
@@ -4113,6 +4398,13 @@ try {
         $authIndex = $mainExecution.IndexOf(
             "@('auth', 'status')", [StringComparison]::Ordinal
         )
+        $workflowIndex = $mainExecution.IndexOf(
+            'Get-CanonicalWorkflow', [StringComparison]::Ordinal
+        )
+        $policyTagSelectionIndex = $mainExecution.IndexOf(
+            'Resolve-QuickAdoptionInitialPolicyTag',
+            [StringComparison]::Ordinal
+        )
         $policyImportIndex = $mainExecution.IndexOf(
             'Import-CanonicalInitialAdoptionPolicy',
             [StringComparison]::Ordinal
@@ -4122,11 +4414,14 @@ try {
             [StringComparison]::Ordinal
         )
         if ($mainExecutionIndex -lt 0 -or $tokenReadIndex -lt 0 -or
-            $authIndex -lt 0 -or $policyImportIndex -lt 0 -or
+            $authIndex -lt 0 -or $workflowIndex -lt 0 -or
+            $policyTagSelectionIndex -lt 0 -or $policyImportIndex -lt 0 -or
             $assessmentIndex -lt 0 -or $tokenReadIndex -gt $authIndex -or
-            $authIndex -gt $policyImportIndex -or
+            $authIndex -gt $workflowIndex -or
+            $workflowIndex -gt $policyTagSelectionIndex -or
+            $policyTagSelectionIndex -gt $policyImportIndex -or
             $policyImportIndex -gt $assessmentIndex) {
-            Add-Failure 'TEST-0130 initial-policy token read, gh authentication, canonical module import, and assessment are not ordered at the mutation-free boundary.'
+            Add-Failure 'TEST-0130 token read, gh authentication, target-workflow policy selection, canonical module import, and assessment are not ordered at the mutation-free boundary.'
         }
         $completionFunctions = @($launcherAst.FindAll({
             param($node)
@@ -4174,7 +4469,7 @@ try {
 
     if (Test-Path -LiteralPath $mockCodexScriptPath -PathType Leaf) {
         $mockCodex = Get-Content -LiteralPath $mockCodexScriptPath -Raw
-        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.15.4')) {
+        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.15.5')) {
             Add-Failure 'TEST-0059 mock Codex remote-race fixture is not pinned to the current adoption branch.'
         }
         if (-not $mockCodex.Contains('$Arguments[0] -ceq ''sandbox''') -or
@@ -4187,7 +4482,7 @@ try {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.15.4',
+            'v0.15.5',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -4573,7 +4868,7 @@ try {
                 $releaseBlocked = $true
             }
             $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
-                $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.15\.4$'
+                $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.15\.5$'
             })
             $prematureMutations = @($global:QuickAdoptionGhCalls | Where-Object {
                 $_.Arguments.Count -ge 2 -and
@@ -4898,12 +5193,12 @@ try {
         $initialPolicyRestCalls = @($global:QuickAdoptionRestCalls |
             Where-Object {
                 [string]$_.Uri -ceq
-                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.4'
+                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
             })
         $workflowRestCalls = @($global:QuickAdoptionRestCalls |
             Where-Object {
                 [string]$_.Uri -ceq
-                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.4'
+                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5'
             })
         if ($initialPolicyRestCalls.Count -ne 1 -or
             $workflowRestCalls.Count -ne 1) {
@@ -5014,7 +5309,7 @@ try {
         Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
             -TestId 'TEST-0060'
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
-            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.4' `
+            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.5' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
             -GraphDigest ([string]$global:QuickAdoptionDispatchedSourceGraphIdentity.graphDigest) `
             -PullRequestUrl "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
@@ -5052,7 +5347,7 @@ try {
         }
         else { @('- None') }
         $expectedIssueReferences = @(
-            "- Protocol release: [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)",
+            "- Protocol release: [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)",
             "- Protocol commit: [$($global:QuickAdoptionProtocolSha)](https://github.com/hasanmanzak/meAndAI/commit/$($global:QuickAdoptionProtocolSha))",
             $expectedVisiblePullRequestLink,
             "- Source graph base: [$issueGraphBase](https://github.com/$($global:QuickAdoptionRepoName)/commit/$issueGraphBase)"
@@ -5220,7 +5515,7 @@ try {
         $global:QuickAdoptionSecretLockMode = 'Normal'
         $global:QuickAdoptionSecretLockViewCalls = 0
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/governance/ai-adoption.md') {
@@ -5274,12 +5569,12 @@ try {
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.4'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
         })
-        $initialPolicySourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.4'
+        $initialPolicySourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
         $initialPolicySourceCalls = @($global:QuickAdoptionGhCalls |
             Where-Object {
                 $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
@@ -5321,7 +5616,7 @@ try {
         }
         $interruptedRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         $codexCountAfterInterruptedCompletion = @(Get-MockCodexCalls).Count
         if (-not $interruptedCompletionBlocked -or
@@ -5352,7 +5647,7 @@ try {
         }
         $recoveredRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         if ($interruptedRecoveryThrew -or
             $recoveredRemoteHead -cne $interruptedRemoteHead -or
@@ -5390,7 +5685,7 @@ try {
         }
         $postReadyHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         $codexCountAfterPostReadyFailure = @(Get-MockCodexCalls).Count
         $bodyEditsAfterPostReadyFailure = $global:QuickAdoptionPrBodyEditCalls
@@ -5414,7 +5709,7 @@ try {
         }
         $postReadyRecoveredHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         if ($postReadyRecoveryThrew -or
             $postReadyRecoveredHead -cne $postReadyHead -or
@@ -5582,7 +5877,7 @@ try {
         $completionHookPaths = @(Invoke-TestGit `
             -Repository $completionHookConsumer.Remote -Arguments @(
                 'ls-tree', '-r', '--name-only',
-                'refs/heads/automation/meandai-capabilities-v0.15.4'
+                'refs/heads/automation/meandai-capabilities-v0.15.5'
             ))
         if ($completionHookError -or
             -not $completionHookEnvironmentRestored -or
@@ -6566,14 +6861,14 @@ try {
             -Name 'Test-MeAndAIExactAdoptionPullRequestMarker'
         $sourceGraphRecord = & $graphRecordConverter -Graph $sourceGraph
         $sourceGraphIdentity = & $graphIdentityGetter -Graph $sourceGraph
-        $graphAwareBranch = 'automation/meandai-capabilities-v0.15.4'
+        $graphAwareBranch = 'automation/meandai-capabilities-v0.15.5'
         $graphAwareState = 'AdoptionReviewRequired'
         $graphAwareRepository = 'test-owner/consumer'
         $graphAwareMarkerRecord = [ordered]@{
             schema = 9
             phase = 'Proposed'
             state = $graphAwareState
-            target = 'v0.15.4'
+            target = 'v0.15.5'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $finalHead
             branch = $graphAwareBranch
@@ -6618,7 +6913,7 @@ try {
         $graphAwareMarkerValid = & $markerValidator `
             -PullRequest $graphAwarePullRequest -RemoteHead $finalHead `
             -Repository $graphAwareRepository -Branch $graphAwareBranch `
-            -BaseBranch 'main' -TargetTag 'v0.15.4' `
+            -BaseBranch 'main' -TargetTag 'v0.15.5' `
             -TargetSha $global:QuickAdoptionProtocolSha `
             -ExpectedActor 'test-owner' -ExpectedState $graphAwareState `
             -ExpectedAdoptionStrategy 'FullMigration' `
@@ -6636,7 +6931,7 @@ try {
             operation = 'ai-capabilities-adoption'
             state = $graphAwareState
             repository = $graphAwareRepository
-            targetTag = 'v0.15.4'
+            targetTag = 'v0.15.5'
             protocolSha = $global:QuickAdoptionProtocolSha
             adoptionStrategy = 'FullMigration'
             protocolSurfaces = @($sourceGraph.protocolSurfaces)
@@ -6696,7 +6991,7 @@ try {
                             [string]$StructuralBaseHead,
                             [string]$WorkflowPath
                         )
-                        $script:ProtocolTag = 'v0.15.4'
+                        $script:ProtocolTag = 'v0.15.5'
                         $script:workflowTargetPath = $WorkflowPath
                         $script:workflowBytes =
                             [Text.UTF8Encoding]::new($false).GetBytes(
@@ -6934,7 +7229,7 @@ try {
         catch { $liveAuthorityError = $_.Exception.Message }
         finally { $env:MEANDAI_TEST_CODEX_MODE = 'Success' }
         $liveAuthorityBranch =
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         $liveAuthorityBranchLines = @(Invoke-TestGit `
             -Repository $liveAuthorityConsumer.Repository -Arguments @(
                 'ls-remote', '--heads', 'origin', $liveAuthorityBranch
@@ -7013,7 +7308,7 @@ try {
 
     if ($runIntegrityShards -and
         (Test-QuickAdoptionShard -Name 'IntegrityCompletedGraph')) {
-        $completedBranch = 'automation/meandai-capabilities-v0.15.4'
+        $completedBranch = 'automation/meandai-capabilities-v0.15.5'
         $canonicalCompletedHead = $postReadyRecoveredHead
         $canonicalCompletedBody = [string]$global:QuickAdoptionPrBody
         # Credential, protected-workflow, and manifest policy combinations are
@@ -7180,7 +7475,7 @@ try {
                 schema = 3
                 phase = 'Completed'
                 state = 'BootstrapReady'
-                target = 'v0.15.4'
+                target = 'v0.15.5'
                 protocolSha = $global:QuickAdoptionProtocolSha
                 head = $variantHead
                 repository = 'test-owner/consumer'
@@ -7226,7 +7521,7 @@ try {
         $canonicalIssueGraphIdentity =
             $global:QuickAdoptionDispatchedSourceGraphIdentity
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
-            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.4' `
+            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.5' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
             -GraphDigest ([string]$canonicalIssueGraphIdentity.graphDigest) `
             -PullRequestUrl "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
@@ -7244,7 +7539,7 @@ try {
             -ProtocolSha ('a' * 40) -Strategy 'FreshAdoption'
         $validManifestAccepted = & $manifestValidator `
             -Manifest $validManifest -Repository 'test-owner/consumer' `
-            -TargetTag 'v0.15.4' -ProtocolSha ('a' * 40) `
+            -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
             -ExpectedState 'BootstrapReady' `
             -ExpectedAdoptionStrategy 'FreshAdoption' `
             -ExpectedProtocolSurfaces @() `
@@ -7260,7 +7555,7 @@ try {
                 -Strategy 'FreshAdoption'
             $contractAccepted = & $manifestValidator `
                 -Manifest $contractManifest -Repository 'test-owner/consumer' `
-                -TargetTag 'v0.15.4' -ProtocolSha ('a' * 40) `
+                -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
                 -ExpectedState 'BootstrapReady' `
                 -ExpectedAdoptionStrategy 'FreshAdoption' `
                 -ExpectedProtocolSurfaces @() `
@@ -7381,7 +7676,7 @@ try {
         if ($canonicalOwnedIssue.Count -eq 1) {
             Reset-MockAdoptionProposal
             $legacyIssueMarker =
-                '<!-- meandai-local-adoption:v0.15.4:pr-42 -->'
+                '<!-- meandai-local-adoption:v0.15.5:pr-42 -->'
             $pullRequestUrl =
                 "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
             $graphIdentity = $canonicalIssueGraphIdentity
@@ -7389,8 +7684,8 @@ try {
             $legacyOwnedBody = $legacyOwnedBody.Replace(
                 $canonicalIssueMarker, $legacyIssueMarker
             ).Replace(
-                '- Protocol release: [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)',
-                '- Protocol release: `v0.15.4`'
+                '- Protocol release: [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)',
+                '- Protocol release: `v0.15.5`'
             ).Replace(
                 "- Protocol commit: [$($global:QuickAdoptionProtocolSha)](https://github.com/hasanmanzak/meAndAI/commit/$($global:QuickAdoptionProtocolSha))$([Environment]::NewLine)",
                 ''
@@ -7624,7 +7919,7 @@ try {
                 Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.4'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
             ))
             if ($negativePaths -contains 'docs/governance/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
@@ -7647,7 +7942,7 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Sleep'
         $timeoutRemoteHeadBefore = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         $timeoutTempRootsBefore = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -7664,7 +7959,7 @@ try {
         }
         $timeoutRemoteHeadAfter = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         )))[0].Split("`t")[0]
         $timeoutTempRootsAfter = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -7826,7 +8121,7 @@ try {
                 -LiteralPath (Join-Path $freshBoundaryConsumer.Repository 'app.txt') `
                 -Algorithm SHA256).Hash
             $freshBranchRef =
-                'refs/heads/automation/meandai-capabilities-v0.15.4'
+                'refs/heads/automation/meandai-capabilities-v0.15.5'
             $freshBranchHeads = @(Invoke-TestGit `
                 -Repository $freshBoundaryConsumer.Repository -Arguments @(
                     'ls-remote', '--heads', 'origin', $freshBranchRef
@@ -8100,7 +8395,7 @@ try {
                 -ProtocolSurfaces $expectedMigrationSurfaces
             $contractAccepted = & $migrationManifestValidator `
                 -Manifest $contractManifest -Repository 'test-owner/consumer' `
-                -TargetTag 'v0.15.4' -ProtocolSha ('a' * 40) `
+                -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
                 -ExpectedState 'AdoptionReviewRequired' `
                 -ExpectedAdoptionStrategy 'FullMigration' `
                 -ExpectedProtocolSurfaces $expectedMigrationSurfaces `
@@ -8235,21 +8530,21 @@ try {
         }
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
         $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.15.4', '--', '.ai/protocol'
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.15.5', '--', '.ai/protocol'
         )))
         $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
         ))
         $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
         $migrationBranchApplicationBlob = (@(Invoke-TestGit `
             -Repository $existingRemote -Arguments @(
                 'rev-parse',
-                'refs/heads/automation/meandai-capabilities-v0.15.4:app.txt'
+                'refs/heads/automation/meandai-capabilities-v0.15.5:app.txt'
             )))[0]
         $migrationAgentsContent = @(Invoke-TestGit `
             -Repository $existingRemote -Arguments @(
                 'show',
-                'refs/heads/automation/meandai-capabilities-v0.15.4:AGENTS.md'
+                'refs/heads/automation/meandai-capabilities-v0.15.5:AGENTS.md'
             )) -join "`n"
         $migrationCodexCalls = @(Get-MockCodexCalls |
             Select-Object -Skip $codexCallsBeforeMigration | Where-Object {
@@ -8530,7 +8825,7 @@ try {
             -Repository $ruleGitlinkAutoConsumer.Repository `
             -Arguments @(
                 'ls-remote', '--heads', 'origin',
-                'refs/heads/automation/meandai-capabilities-v0.15.4'
+                'refs/heads/automation/meandai-capabilities-v0.15.5'
             ))
         if ($ruleGitlinkAutoError -notlike
                 '*requires an explicit adoption strategy*' -or
@@ -8672,7 +8967,7 @@ try {
         }
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
         $ruleGitlinkCleanBranch =
-            'refs/heads/automation/meandai-capabilities-v0.15.4'
+            'refs/heads/automation/meandai-capabilities-v0.15.5'
         $ruleGitlinkCleanHeads = @(Invoke-TestGit `
             -Repository $ruleGitlinkCleanConsumer.Repository `
             -Arguments @('ls-remote', '--heads', 'origin', $ruleGitlinkCleanBranch))
@@ -9727,7 +10022,7 @@ try {
             $strategyBranchApplicationBlob = (@(Invoke-TestGit `
                 -Repository $strategyConsumer.Remote -Arguments @(
                     'rev-parse',
-                    'refs/heads/automation/meandai-capabilities-v0.15.4:app.txt'
+                    'refs/heads/automation/meandai-capabilities-v0.15.5:app.txt'
                 )))[0]
             $strategyMissingIssueSurfaces = @(
                 $expectedStrategySurfaces | Where-Object {
@@ -9854,7 +10149,7 @@ try {
                 }
                 $env:MEANDAI_TEST_CODEX_MODE = 'Success'
                 $strategyEnvelopeBranch =
-                    'refs/heads/automation/meandai-capabilities-v0.15.4'
+                    'refs/heads/automation/meandai-capabilities-v0.15.5'
                 $strategyEnvelopeHeads = @(Invoke-TestGit `
                     -Repository $strategyConsumer.Repository -Arguments @(
                         'ls-remote', '--heads', 'origin',
@@ -10362,7 +10657,7 @@ try {
         $modifiedSeedHashAfter = (Get-FileHash `
             -LiteralPath $modifiedSeedPath -Algorithm SHA256).Hash
         if ($modifiedSeedError -notlike
-                '*not the exact canonical v0.15.4 file*no GitHub repository or remote was changed*' -or
+                '*not the exact canonical v0.15.5 file*no GitHub repository or remote was changed*' -or
             $modifiedSeedCreateCalls.Count -ne 0 -or
             $modifiedSeedRemotes.Count -ne 0 -or
             $global:QuickAdoptionSecrets.Count -ne 0 -or
@@ -10569,7 +10864,7 @@ try {
 
         Reset-Mocks
         $currentConsumer = New-MockConnectedManagedConsumer `
-            -Name 'managed-current' -InstalledTag 'v0.15.4'
+            -Name 'managed-current' -InstalledTag 'v0.15.5'
         # Already-current capability review uses the optional-input workflow
         # without reopening prospective initial-adoption graph assessment.
         $global:QuickAdoptionExpectSourceGraphIdentity = $false
@@ -10654,12 +10949,12 @@ try {
         }
 
         foreach ($blockedRoute in @(
-            [pscustomobject]@{ Name = 'manifest'; InstalledTag = 'v0.15.4'; TargetTag = 'v0.15.4'; Mutation = 'Manifest' },
-            [pscustomobject]@{ Name = 'partial'; InstalledTag = 'v0.15.4'; TargetTag = 'v0.15.4'; Mutation = 'Partial' },
-            [pscustomobject]@{ Name = 'missing-gitlink'; InstalledTag = 'v0.15.4'; TargetTag = 'v0.15.4'; Mutation = 'MissingGitlink' },
-            [pscustomobject]@{ Name = 'drift'; InstalledTag = 'v0.15.4'; TargetTag = 'v0.15.4'; Mutation = 'Drift' },
-            [pscustomobject]@{ Name = 'newer'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.4'; Mutation = 'None' },
-            [pscustomobject]@{ Name = 'cross-major'; InstalledTag = 'v0.15.4'; TargetTag = 'v1.0.0'; Mutation = 'None' }
+            [pscustomobject]@{ Name = 'manifest'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Manifest' },
+            [pscustomobject]@{ Name = 'partial'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Partial' },
+            [pscustomobject]@{ Name = 'missing-gitlink'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'MissingGitlink' },
+            [pscustomobject]@{ Name = 'drift'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Drift' },
+            [pscustomobject]@{ Name = 'newer'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.5'; Mutation = 'None' },
+            [pscustomobject]@{ Name = 'cross-major'; InstalledTag = 'v0.15.5'; TargetTag = 'v1.0.0'; Mutation = 'None' }
         )) {
             Reset-Mocks
             $blockedConsumer = New-MockConnectedManagedConsumer `

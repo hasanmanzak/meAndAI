@@ -5,20 +5,20 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable [v0.15.3](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.3)
+Immutable [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)
 is published at
-[`164543d939ef97ec02d96499d3e5b796eed64470`](https://github.com/hasanmanzak/meAndAI/commit/164543d939ef97ec02d96499d3e5b796eed64470).
-[PR #136](https://github.com/hasanmanzak/meAndAI/pull/136) and closed
-[issue #135](https://github.com/hasanmanzak/meAndAI/issues/135) retain the
-[FEAT-0054](../../../docs/features/FEAT-0054-v0153-bounded-quick-adoption-runtime/README.md)
+[`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
+[PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
+[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain the
+[FEAT-0055](../../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
 delivery, review, test, and release evidence.
 
-[FEAT-0055](../../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-/ [BUG-0035](https://github.com/hasanmanzak/meAndAI/issues/137) /
-[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137)
-is the current `0.15.4` continuation. Follow the
-[UTF-8 workflow-dispatch handoff](2026-07-26-v0154-utf8-workflow-dispatch.md).
-The completed [v0.15.3 handoff](2026-07-26-v0153-bounded-quick-adoption-runtime.md)
+[FEAT-0056](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
+/ [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+[#147](https://github.com/hasanmanzak/meAndAI/issues/147)
+is the current `0.15.5` continuation. Follow the
+[instruction-graph resilience handoff](2026-07-26-v0155-instruction-graph-resilience.md).
+The completed [v0.15.4 handoff](2026-07-26-v0154-utf8-workflow-dispatch.md)
 and earlier slice handoffs remain historical evidence.
 
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
@@ -49,6 +49,7 @@ remains the separate runtime residual owner.
 
 ## History
 
+- [2026-07-26 - v0.15.5 instruction-graph resilience](2026-07-26-v0155-instruction-graph-resilience.md)
 - [2026-07-26 - v0.15.4 UTF-8 workflow dispatch](2026-07-26-v0154-utf8-workflow-dispatch.md)
 - [2026-07-26 - v0.15.3 bounded quick-adoption runtime](2026-07-26-v0153-bounded-quick-adoption-runtime.md)
 - [2026-07-26 - v0.15.2 distinct test intent and meta-test boundaries](2026-07-26-v0152-distinct-test-intent.md)

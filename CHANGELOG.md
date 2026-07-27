@@ -3,6 +3,105 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.5 - 2026-07-26
+
+### Changed
+
+- Introduce instruction-graph schema 2 with a 524,288-byte per-blob ceiling,
+  the unchanged 4,194,304-byte aggregate ceiling, and reviewed `.mqproj`
+  terminal protected evidence.
+- Bind graph-aware targets to their exact reviewed schema/limit profiles and
+  target semantics; compose the three linked-path helpers atomically, preserve
+  schema-7/8 markers through v0.14.1 and schema-9/10 thereafter, and permit
+  graph-unaware runtime-policy fallback only for v0.12.4-v0.12.5.
+
+### Fixed
+
+- Decode before raw token-shape filtering; classify extensionless encoded
+  file/drive/external targets before placeholder suppression; resolve local
+  hash/query targets through their longest exact-tree prefix while keeping the
+  URI suffix opaque to dot-segment normalization, including across second
+  literal or percent-decoded delimiters; distinguish untracked numeric ratios
+  from exact tree paths.
+- Join distinct batch I/O tasks within the bounded abort deadline, keep clock-
+  integrity failure sticky, observe faulted-task exceptions, and suppress only
+  a confirmed natural-exit race after a failed kill.
+- Distinguish explicit required-reading imperatives from descriptive
+  `load`/`consult` text.
+- Recognize bounded qualified `single canonical ... source/authority`
+  declarations; cover bounded direct/reverse modal, contraction, `no longer`,
+  and `never` negation without splitting qualifier conjunctions; bind each
+  negative predicate to the positive grammar's exact authority-designation
+  complement; and preserve conservative fail-closed authority when punctuation
+  or a reviewed connector introduces a positive declaration.
+- Bind proposal identities to the schema probed from the selected release
+  policy, preserve its marker family, and fail closed on partial helper families
+  or unsupported old/future target tags.
+- Reconcile [TEST-0159](docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+  with the exact immutable-policy fixture call graph: four reviewed launcher
+  invocations and one helper-owned recursive cleanup identity, without changing
+  any runtime maximum.
+- Spell the three explicit required-reading commands as separate inline-code
+  forms so the committed self-consumer graph cannot reinterpret a slash-joined
+  documentation shorthand as a missing required repository path.
+
+Candidate validation: the final canonical instruction-graph owner passed
+[TEST-0151](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
+[TEST-0152](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
+and [TEST-0161](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161)
+on Windows PowerShell 5.1 / PowerShell 7 in 248.3 / 143.5 seconds with exact 2/2
+process starts and 4/4 blob requests on both runtimes. The parser-focused bounded
+audit found no new `Blocking` or `Important` finding; both runtime AST parses and
+diff-check were clean, and the overall bounded review is complete. The first
+canonical full-suite attempt reached only the expected-red stale
+[TEST-0159](docs/features/FEAT-0039-v0130-test-runtime-efficiency/test-cases.md#test-0159)
+inventory after 1751.8 seconds; its exact focused correction passed in 7.0 /
+7.7 seconds on PowerShell 7 / Windows PowerShell 5.1 with the declared runtime-
+budget file byte-identical. The final frozen-tree canonical suite then passed
+every discovered owner in 1745.3 seconds, including runtime efficiency in 6.586
+seconds with `contract.self-check` 1/1. Because the new feature packet was still
+untracked, that HEAD-based self-consumer slice could not inspect it. First hosted
+[run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+then produced the same exact-tree expected red on Ubuntu PowerShell 7 and Windows
+PowerShell 5.1. On corrected [commit a0ed721](https://github.com/hasanmanzak/meAndAI/commit/a0ed7218175b7e1783c9db56174518eef4b344b0), the exact committed-tree owner
+passed on PowerShell 7 / Windows PowerShell 5.1 in 136.2 / 236.5 seconds with
+2/2 process starts and 4/4 blob requests on both runtimes. The committed-tree
+full suite then passed every discovered owner in 1805.3 seconds, including
+runtime efficiency with `contract.self-check` 1/1. Final evidence-sync exact-
+tree verification and hosted confirmation remain pending.
+The Ubuntu slice of [run 30228883486](https://github.com/hasanmanzak/meAndAI/actions/runs/30228883486)
+then passed every earlier owner before [TEST-0178](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+rejected seven short checkpoint references without exact full-SHA permalinks;
+all eight textual occurrences are linked exactly in the corrected evidence
+packet without a production runtime change. The focused publication-evidence
+owner then passed [TEST-0178](docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+and every retained scenario on PowerShell 7 / Windows PowerShell 5.1 in 103.2 /
+192.0 seconds.
+
+Latest-byte read-only consumer resimulation kept all pre/post remote HEADs exact
+and clones clean: Derdini retained its classified older seed, TravelOS assessment
+schema 3 required explicit `Auto` strategy while hypothetical `FullMigration`
+was `Resolved`, and HAnchor's protected live authority failed closed for
+maintainer review. No consumer was modified and no GitHub simulation repository
+was created.
+
+Related work: [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148),
+[FEAT-0056](docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md),
+[BUG-0037 / issue #140](https://github.com/hasanmanzak/meAndAI/issues/140),
+[BUG-0038 / issue #141](https://github.com/hasanmanzak/meAndAI/issues/141),
+[BUG-0039 / issue #142](https://github.com/hasanmanzak/meAndAI/issues/142),
+[BUG-0040 / issue #143](https://github.com/hasanmanzak/meAndAI/issues/143),
+[BUG-0041 / issue #144](https://github.com/hasanmanzak/meAndAI/issues/144),
+[BUG-0042 / issue #145](https://github.com/hasanmanzak/meAndAI/issues/145),
+[BUG-0043 / issue #146](https://github.com/hasanmanzak/meAndAI/issues/146),
+[BUG-0044 / issue #147](https://github.com/hasanmanzak/meAndAI/issues/147),
+[DEC-0024](docs/decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md),
+[DEC-0031](docs/decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md),
+[TEST-0151](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
+[TEST-0152](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152),
+[TEST-0153](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153),
+and [TEST-0161](docs/features/FEAT-0040-v0131-batched-instruction-graph-acquisition/test-cases.md#test-0161).
+
 ## 0.15.4 - 2026-07-26
 
 ### Changed
