@@ -4416,8 +4416,14 @@ try {
             $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
             $node.Name -ceq 'Get-ValidatedAdoptionMarker'
         }, $true))
-        if ($markerOwnershipFunctions.Count -ne 1) {
-            Add-Failure 'TEST-0145 launcher must expose one parseable adoption-marker ownership boundary.'
+        $markerRecordFunctions = @($launcherAst.FindAll({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            $node.Name -ceq 'Get-AdoptionPullRequestOwnershipMarkerRecord'
+        }, $true))
+        if ($markerOwnershipFunctions.Count -ne 1 -or
+            $markerRecordFunctions.Count -ne 1) {
+            Add-Failure 'TEST-0145 launcher must expose one parseable adoption-marker record helper and ownership boundary.'
         }
         else {
             $markerCultureModule = $null
@@ -4425,17 +4431,22 @@ try {
                 $markerCultureModule = New-Module `
                     -Name "MeAndAIMarkerCulture$([guid]::NewGuid().ToString('N'))" `
                     -ArgumentList @(
+                        $markerRecordFunctions[0].Extent.Text,
                         $markerOwnershipFunctions[0].Extent.Text
                     ) `
                     -ScriptBlock {
-                        param([string]$FunctionDefinition)
+                        param(
+                            [string]$RecordFunctionDefinition,
+                            [string]$OwnershipFunctionDefinition
+                        )
                         $script:ProtocolTag = 'v0.15.6'
 
                         function Test-QuickAdoptionExactPullRequestMarker {
                             return $true
                         }
 
-                        Invoke-Expression $FunctionDefinition
+                        Invoke-Expression $RecordFunctionDefinition
+                        Invoke-Expression $OwnershipFunctionDefinition
                     }
                 $markerFixture =
                     New-TestQuickAdoptionPullRequestContractFixture `
@@ -5040,7 +5051,7 @@ try {
             }
             $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
                 $_.Uri.EndsWith(
-                    '/repos/hasanmanzak/meAndAI/releases/tags/v0.15.5',
+                        '/repos/hasanmanzak/meAndAI/releases/tags/v0.15.6',
                     [System.StringComparison]::Ordinal
                 )
             })
@@ -5906,10 +5917,16 @@ try {
             $global:QuickAdoptionPrReadyUndoCalls
         $baseAdvanceCallsBeforeCompletedBaseRace =
             $global:QuickAdoptionBaseAdvanceCalls
+        # This scenario owns the timing of its PR-read race. Earlier recovery
+        # scenarios share the mock process, so start this call index locally
+        # instead of coupling the injection point to their accumulated reads.
+        $global:QuickAdoptionPrListCalls = 0
         $global:QuickAdoptionPrMetadataMode =
             'AdvanceBaseAtConfiguredRevalidation'
+        # One new pre-mutation ownership snapshot read and the retained
+        # pre-existing proposal read precede the final ready-state revalidation.
         $global:QuickAdoptionBaseAdvanceAtPrListCall =
-            $global:QuickAdoptionPrListCalls + 2
+            3
         $completedBaseRaceError = ''
         try {
             & $launcherPath -TargetPath $existingRepo `
@@ -7745,27 +7762,39 @@ try {
         # The production contract table owns the malformed-manifest variants.
         # Keep one real launcher slice for JSON root parsing and fail-closed
         # translation at the adapter boundary.
+        $savedIssues = @($global:QuickAdoptionIssues)
+        $savedCanonicalIssue = $global:QuickAdoptionIssue
         $representativeManifestMode = 'ArrayRoot'
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionManifestMode = $representativeManifestMode
         $codexCountBeforeInvalidManifest = @(Get-MockCodexCalls).Count
         $invalidManifestBlocked = $false
+        $invalidManifestError = ''
         try {
             & $launcherPath -TargetPath $existingRepo `
                 -CodexCommand $mockCodexPath | Out-Null
         }
         catch {
             $invalidManifestBlocked = $true
+            $invalidManifestError = $_.Exception.Message
         }
         if (-not $invalidManifestBlocked -or
+            $invalidManifestError -cne
+                'The adoption manifest does not exactly match the independently derived protocol contract.' -or
             @(Get-MockCodexCalls).Count -ne $codexCountBeforeInvalidManifest -or
             $global:QuickAdoptionPrReadyCalls -ne 0) {
-            Add-Failure "TEST-0080 launcher accepted representative adoption manifest mode '$representativeManifestMode' before local Codex execution."
+            Add-Failure "TEST-0080 launcher did not reject representative adoption manifest mode '$representativeManifestMode' at the exact manifest boundary before local Codex execution: $invalidManifestError"
         }
 
         Reset-MockAdoptionProposal
-        $savedIssues = @($global:QuickAdoptionIssues)
-        $savedCanonicalIssue = $global:QuickAdoptionIssue
+        $global:QuickAdoptionIssues.Clear()
+        foreach ($issue in $savedIssues) {
+            $global:QuickAdoptionIssues.Add($issue)
+        }
+        $global:QuickAdoptionIssue = $savedCanonicalIssue
         $canonicalOwnedIssue = @($savedIssues | Where-Object {
             [string]$_.state -ceq 'OPEN' -and
             ([string]$_.body).StartsWith($canonicalIssueMarker, [StringComparison]::Ordinal)
@@ -9166,6 +9195,13 @@ try {
     if ($runIntegrityShards -and
         (Test-QuickAdoptionShard -Name 'IntegrityMetadataCredential')) {
         Reset-MockAdoptionProposal
+        # This slice models a new file-free adoption attempt. Reset the
+        # completed proposal's issue authority together with its PR/branch;
+        # retaining only the old issue would describe an impossible partial
+        # reset and must now fail the pre-mutation reconciliation boundary.
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $secretCountBeforeFileFreeAdoption = $global:QuickAdoptionSecrets.Count
         $protocolCloneCountBeforeFileFreeAdoption = @(
             $global:QuickAdoptionGhCalls | Where-Object {
@@ -9227,6 +9263,9 @@ try {
         if ($env:OS -eq 'Windows_NT') {
             foreach ($sandboxFailureMode in @('FailAll', 'Residue')) {
                 Reset-MockAdoptionProposal
+                $global:QuickAdoptionIssues.Clear()
+                $global:QuickAdoptionIssueLabels.Clear()
+                $global:QuickAdoptionIssue = $null
                 $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = $sandboxFailureMode
                 $sandboxCallsBefore = @(Get-MockCodexSandboxCalls).Count
                 $execCallsBefore = @(Get-MockCodexCalls | Where-Object {
@@ -9311,6 +9350,9 @@ try {
             'Unauthenticated', 'CreateCommit', 'RemoteRace', 'CaseMoveWorkflow'
         )) {
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
             $env:MEANDAI_TEST_CODEX_MODE = $negativeMode
             $reviewEventCountBeforeNegative = @($global:QuickAdoptionEvents | Where-Object {
                 $_ -ceq 'issue-label:add:status:needs-review'
@@ -9391,6 +9433,9 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionRunMode = 'Zero'
         $zeroRunBlocked = $false
         $codexCountBeforeZeroRun = @(Get-MockCodexCalls).Count
@@ -9407,6 +9452,9 @@ try {
         }
         $global:QuickAdoptionRunMode = 'Single'
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
 
         $global:QuickAdoptionRunMode = 'Ambiguous'
         $ambiguousRunBlocked = $false
@@ -9796,6 +9844,9 @@ try {
                 Add-Failure "TEST-0130 launcher accepted strategy/surface marker drift '$markerDriftMode' before semantic execution: $markerDriftError"
             }
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
         }
         $global:QuickAdoptionPrMetadataMode = 'Valid'
 
@@ -9842,6 +9893,9 @@ try {
             Add-Failure "TEST-0130 launcher accepted representative strategy/surface/loss manifest drift '$representativeManifestDriftMode' before semantic execution: $manifestDriftError"
         }
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionManifestMode = 'Valid'
         foreach ($readOnlyContractCase in @(
             [pscustomobject]@{
@@ -9890,6 +9944,9 @@ try {
                 Add-Failure "TEST-0129 FullMigration changed read-only or product path '$($readOnlyBoundaryCase.Path)' or published it: $readOnlyBoundaryError"
             }
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
         }
 
         $unchangedAgentsFixture =
@@ -9930,6 +9987,9 @@ try {
             Add-Failure "TEST-0129 FullMigration accepted a retained legacy common authority or published it: $retainedAuthorityError"
         }
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
 
         $env:MEANDAI_TEST_CODEX_MODE = 'DeleteApprovedSurface'
         $codexCallsBeforeMigration = @(Get-MockCodexCalls).Count

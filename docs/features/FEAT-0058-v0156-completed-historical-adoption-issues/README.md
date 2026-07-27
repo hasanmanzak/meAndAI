@@ -188,9 +188,11 @@ historical family registry, provider-read ceilings and arguments, proof and
 mutation ordering, frozen-evidence revalidation, private-protocol authority,
 same-contract test ownership, project-neutrality, version/profile boundaries,
 bundle identity, and graph-reachable records. Two independent final reviews
-found the late-proof, test-oracle, and credential-authority gaps below; every
-`Blocking` finding is resolved in the candidate. The canonical committed-tree
-full-project scan, hosted checks, and publication remain delivery gates.
+found the late-proof, test-oracle, and credential-authority gaps below. The
+canonical quick-adoption run then exposed detached-helper, row-shape, race-
+fixture, partial-reset, version-oracle, and JSON-root gaps. Every `Blocking`
+finding is resolved in the candidate. The canonical committed-tree full-
+project scan, hosted checks, and publication remain delivery gates.
 
 | ID | Area / priority | Finding | Disposition |
 | --- | --- | --- | --- |
@@ -200,14 +202,22 @@ full-project scan, hosted checks, and publication remain delivery gates.
 | `FIND-0348` <a name="find-0348"></a> | Test oracle / P1 | The injected frozen-drift fixture changed the backing issue object, so a stronger before/after oracle correctly reported mutation caused by the test itself. | `Blocking` / Resolved in candidate by generating drift only in the serialized read projection while keeping provider backing state byte-identical. |
 | `FIND-0349` <a name="find-0349"></a> | Credential authority / P1 | Historical immutable-release proof dropped the already-loaded protocol read token, so private protocol access could pass current preflight and then fail only on an otherwise valid old issue. | `Blocking` / Resolved in candidate by exact token forwarding from launcher through snapshot, classifier, validator, and immutable-release verifier without persisting the token in evidence; contract and full-launcher tests prove the private read boundary. |
 | `FIND-0350` <a name="find-0350"></a> | Evidence wording / P2 | The first test record claimed exact negative error-text assertions although the matrix contract requires expected acceptance or rejection plus exact bounded calls. | `Blocking` / Resolved in candidate by narrowing the record to the implemented semantic rejection contract while retaining exact call order, arguments, ceilings, and zero-unexpected-call evidence. |
+| `FIND-0351` <a name="find-0351"></a> | Detached test dependency / P1 | The culture fixture extracted `Get-ValidatedAdoptionMarker` after its parser became a canonical sibling helper, so the isolated module no longer contained its complete production dependency graph. | `Blocking` / Resolved in candidate by extracting both the parser and validation boundary; both culture variants now execute the actual dependency pair. |
+| `FIND-0352` <a name="find-0352"></a> | Version oracle / P1 | One current-release URL assertion still expected immutable prior `v0.15.5`, so the canonical full run rejected the correctly advanced `v0.15.6` source. | `Blocking` / Resolved in candidate by retaining v0.15.5 only in explicit immutable-prior fixtures and asserting v0.15.6 on the current runtime route. |
+| `FIND-0353` <a name="find-0353"></a> | Classification row safety / P1 | Current-issue lookup dereferenced `state` on every classification row even though `Unmarked` rows intentionally do not project a top-level state. | `Blocking` / Resolved in candidate by testing classification before accessing the current-only state field. |
+| `FIND-0354` <a name="find-0354"></a> | Race oracle / P1 | The already-ready base-race injection used a shared cumulative PR-read count and the pre-BUG-0045 call offset, so it could hit the mock ceiling before the intended final revalidation. | `Blocking` / Resolved in candidate by making the scenario own a zero-based counter and injecting on the third read: frozen issue snapshot, retained proposal read, then final ready-state revalidation. |
+| `FIND-0355` <a name="find-0355"></a> | Fixture authority / P1 | Several independent negative fixtures deleted the mock PR/branch but retained the completed proposal's marked issue, creating an impossible orphan authority; one invalid-manifest slice could therefore pass for the wrong preflight reason. | `Blocking` / Resolved in candidate by clearing issue/label authority only for explicitly fresh attempts, preserving it for true recovery scenarios, and asserting the representative manifest's exact boundary error. |
+| `FIND-0356` <a name="find-0356"></a> | Manifest root shape / P1 | `ConvertFrom-Json` enumerated a root array before typed property access, leaking a raw `System.Object[]` to `Int64` conversion error instead of the canonical manifest-contract rejection. | `Blocking` / Resolved in candidate by validating the raw JSON object root and exact `PSCustomObject` result before any property cast on both supported runtimes. |
 
 ## Delivery evidence
 
 | Field | Evidence |
 | --- | --- |
 | Expected red | Exact v0.15.5 plus the [TEST-0069](../FEAT-0012-v082-correction/test-cases.md#test-0069) fixture only failed in 175.6 seconds with `A project-owned adoption issue contains a malformed ownership marker; manual review is required.` No production source had changed. |
-| Focused PowerShell 7 / Windows PowerShell 5.1 | The final frozen implementation bytes passed `IntegrityManifestIssue` on PowerShell 7 / Windows PowerShell 5.1 in 153.9 / 158.6 seconds. The runs include exact protocol-read token forwarding through the full launcher, all six classifications, 20 supported immutable identities, exact candidate/inventory ceilings, provider-call contracts, frozen drift, full-state zero-mutation negatives, and idempotent convergence. |
+| Focused PowerShell 7 / Windows PowerShell 5.1 | The final frozen implementation bytes passed `IntegrityManifestIssue` on PowerShell 7 / Windows PowerShell 5.1 in 156.1 / 162.6 seconds. The runs include exact protocol-read token forwarding through the full launcher, all six classifications, 20 supported immutable identities, exact candidate/inventory ceilings, provider-call contracts, frozen drift, full-state zero-mutation negatives, exact manifest-root rejection, and idempotent convergence. |
+| Retained lifecycle PowerShell 7 / Windows PowerShell 5.1 | The final candidate passed `AdoptionLifecycle` in 194.9 / 202.4 seconds, including current canonical/legacy behavior, unmarked-row classification, exact drift diagnostics, idempotent recovery, and final ready-state base-race handling. |
 | Final relevant auxiliary gates | PowerShell 7 / Windows PowerShell 5.1 passed bundle verification in 27.3 / 28.9 seconds, runtime-efficiency in 7.7 / 8.9 seconds, and source-graph dispatch in 4.9 / 5.7 seconds. PowerShell 7 role-boundary passed in 19.6 seconds, test architecture in 2.9 seconds, recurrence prevention in 1.1 seconds, and protocol governance in 124.0 seconds. Publication evidence passed without claiming published state on PowerShell 7 / Windows PowerShell 5.1 in 106.6 / 194.1 seconds. |
+| Canonical quick-adoption owner | PowerShell 7 `Shard=All` passed in 847.1 seconds after exercising every declared quick-adoption scenario in one process, including the completed-historical matrix, exact manifest-root rejection, fresh-attempt authority isolation, FullMigration, Codex-failure, and managed-consumer routes. |
 | Final local suite | Pending |
 | Pull request / hosted validation | Pending |
 | Immutable release / post-publication verification | Pending `v0.15.6` |

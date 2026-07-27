@@ -20,6 +20,9 @@ This project uses the `M.m.rev` version format defined in the
   records, keep malformed state issue-local, compare canonical repository
   identity without case drift, and pass target tag and remote identity
   explicitly through the ownership boundary.
+- Reject a non-object adoption-manifest JSON root at the canonical contract
+  boundary before typed property access, including single-element arrays that
+  PowerShell would otherwise enumerate into an apparent object.
 
 ### Changed
 
@@ -31,12 +34,14 @@ Candidate validation: exact v0.15.5 produced the expected malformed-marker red
 in 175.6 seconds. The corrected
 [TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
 parameter passed the `IntegrityManifestIssue` shard on PowerShell 7 / Windows
-PowerShell 5.1 in 153.9 / 158.6 seconds, including the six classifications,
+PowerShell 5.1 in 156.1 / 162.6 seconds, including the six classifications,
 20-tag immutable registry, exact 8/9 candidate and 999/1000 inventory bounds,
 provider/marker negatives, frozen drift, full-launcher zero-mutation evidence,
-and idempotent positive rerun. Bundle, role-boundary, runtime-efficiency, and
-retained/current source-graph dispatch gates also passed. Canonical full-suite,
-hosted, and immutable-release evidence remain delivery gates.
+and idempotent positive rerun. The full PowerShell 7 quick-adoption owner then
+passed every declared scenario in one process in 847.1 seconds. Bundle, role-
+boundary, runtime-efficiency, and retained/current source-graph dispatch gates
+also passed. Canonical full-suite, hosted, and immutable-release evidence
+remain delivery gates.
 
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /

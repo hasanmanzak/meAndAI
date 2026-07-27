@@ -53,7 +53,7 @@ this release.
 ## Current evidence
 
 - The focused `IntegrityManifestIssue` shard passes on PowerShell 7 / Windows
-  PowerShell 5.1 in 153.9 / 158.6 seconds. It covers the six classes, all 20
+  PowerShell 5.1 in 156.1 / 162.6 seconds. It covers the six classes, all 20
   supported tag-to-commit identities, exact 8/9 candidate bounds, 999/1000
   inventory behavior, provider and marker negatives, frozen drift, full-
   launcher zero-mutation boundaries, and positive idempotence.
@@ -71,6 +71,17 @@ this release.
   candidate/provider matrices. Final review also corrected the test-owned drift
   mutation and forwarded the private-protocol read token through the complete
   historical release-proof chain without persisting credential material.
+- Canonical quick-adoption convergence then exposed and closed detached parser-
+  helper extraction, a stale current-version oracle, state access on unmarked
+  rows, cumulative race-fixture timing, partial PR/issue fixture resets, and a
+  root-array type-conversion leak. Fresh attempts now reset PR/branch and issue
+  authority together, recovery attempts retain both, and non-object manifest
+  roots reach the exact canonical contract error.
+- The full PowerShell 7 quick-adoption owner passed every declared scenario in
+  one process in 847.1 seconds. The affected metadata/FullMigration and Codex-
+  failure shards also pass on PowerShell 7 / Windows PowerShell 5.1 in 220.3 /
+  231.9 and 176.0 / 179.2 seconds. The retained `AdoptionLifecycle` shard
+  passes on the final candidate in 194.9 / 202.4 seconds.
 - Final fresh-diff review, structural convergence, exact committed-HEAD graph
   validation, canonical full suite, hosted checks, immutable publication,
   post-publication verification, issue closure, and owned-branch cleanup remain

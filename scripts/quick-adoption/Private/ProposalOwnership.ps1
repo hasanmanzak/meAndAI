@@ -1883,12 +1883,7 @@ function Get-MarkedAdoptionIssues {
             else { $normalizedLegacyBody }
             if ([string]$issue.title -cne $ExpectedTitle -or
                 $normalizedBody -cne $expected) {
-                $malformed = $true
-                $classifications.Add([pscustomobject]@{
-                    issue = $issue
-                    classification = 'Malformed'
-                })
-                continue
+                throw 'A canonically marked adoption issue has drifted from its exact owned record; manual review is required.'
             }
             $classifications.Add([pscustomobject]@{
                 number = $issue.number
@@ -2297,8 +2292,8 @@ function Ensure-AdoptionIssue {
         -BaseBranch ([string]$PullRequest.baseRefName) `
         -TargetTag $TargetTag -PullRequest $PullRequest |
         Where-Object {
-            [string]$_.state -ceq 'OPEN' -and
-            [string]$_.classification -ceq 'CurrentCanonical'
+            [string]$_.classification -ceq 'CurrentCanonical' -and
+            [string]$_.state -ceq 'OPEN'
         })
     if ($converged.Count -ne 1 -or [int]$converged[0].number -ne $canonicalNumber) {
         throw 'Project-owned adoption issues did not converge to one canonical open identity.'

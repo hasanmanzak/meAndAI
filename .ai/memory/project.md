@@ -105,7 +105,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   owns the project-neutral executable barrier.
 - Fixed release or evidence: target release `0.15.6`; the focused
   `IntegrityManifestIssue` owner passes on PowerShell 7 / Windows PowerShell
-  5.1 in 153.9 / 158.6 seconds, with bounded provider proof, frozen-evidence
+  5.1 in 156.1 / 162.6 seconds, with bounded provider proof, frozen-evidence
   drift rejection, zero-mutation negatives, and idempotent positive rerun.
 - Required safe response: classify strict local grammar before provider reads,
   prove the exact immutable release, issue, merged pull request, terminal

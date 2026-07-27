@@ -147,11 +147,22 @@ function Get-ValidatedAdoptionManifest {
         [Parameter(Mandatory)][string]$CanonicalBaseHead
     )
 
+    $manifestText = [IO.File]::ReadAllText($ManifestPath)
     try {
-        $manifest = [IO.File]::ReadAllText($ManifestPath) | ConvertFrom-Json
+        $manifest = $manifestText | ConvertFrom-Json
     }
     catch {
         throw 'The adoption manifest is not valid JSON.'
+    }
+    # ConvertFrom-Json enumerates a root array into pipeline output, and a
+    # single-element array can therefore masquerade as one object. Preserve
+    # the JSON root contract independently before any typed property access.
+    if (-not $manifestText.TrimStart().StartsWith(
+            '{', [StringComparison]::Ordinal) -or
+        $null -eq $manifest -or
+        $manifest.GetType().FullName -cne
+            'System.Management.Automation.PSCustomObject') {
+        throw 'The adoption manifest does not exactly match the independently derived protocol contract.'
     }
     if ([string]$PullRequest.meAndAIMarker.protocolSha -cnotmatch '^[0-9a-f]{40}$') {
         throw 'The adoption manifest does not match the pull-request ownership marker.'
