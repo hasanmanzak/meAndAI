@@ -6,26 +6,22 @@ and follow its canonical links.
 ## Current continuation
 
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
-proposed C# operational platform migration. Follow the
-[records-only planning handoff](2026-07-27-csharp-operational-platform-planning.md).
-Its child features and [DEC-0032](../../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
-are planning authority only; no development, consumer mutation, migration, or
-PowerShell retirement is authorized.
+C# operational platform migration. Follow the
+[first-slice development handoff](2026-07-27-feat-0059-subf-0119-foundation.md)
+and its linked planning authority.
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+/ [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+is a local candidate at four of five slice gates. Exact committed-tree and
+hosted evidence remain pending. Later foundation slices, consumer behavior,
+authority migration, and PowerShell retirement still require independent gates.
 
-Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
+Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
-[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
-[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
-[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
-[FEAT-0056](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-delivery, review, test, and release evidence.
-
-[FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
-/ [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) /
-[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
-is the current `0.15.6` continuation. Follow the
+[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
+[FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), and
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
+delivery and publication evidence. Follow the
 [completed-historical adoption-issue handoff](2026-07-27-v0156-completed-historical-adoption-issues.md).
 The completed [v0.15.5 handoff](2026-07-26-v0155-instruction-graph-resilience.md)
 and earlier slice handoffs remain historical evidence.
@@ -61,6 +57,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
 - [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)
 - [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)
 - [2026-07-26 - v0.15.5 instruction-graph resilience](2026-07-26-v0155-instruction-graph-resilience.md)

@@ -1,7 +1,7 @@
 # DEC-0032 - Use Separate C# Operational Applications with Portable JIT Distribution
 
 - Classification: Decision
-- Status: Accepted / implementation deferred
+- Status: Accepted
 - Date: 2026-07-27
 - Decision owners: Maintainer and meAndAI architecture owner
 - Related epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
@@ -42,6 +42,55 @@ planning cannot mutate; apply and publish are separately authorized. Existing
 PowerShell authority remains until the relevant feature proves equivalence and
 a later migration feature transfers authority.
 
+### Incremental authority transition
+
+Completing a C# feature does not automatically disable its PowerShell
+counterpart. Each operational capability moves through these explicit states:
+
+1. `PowerShellAuthority`: the supported PowerShell path remains the production
+   and compatibility authority.
+2. `CSharpShadow`: C# may evaluate the same immutable input read-only and
+   produce differential evidence; PowerShell still owns the result.
+3. `CSharpReleasedNonAuthoritative`: an immutable C# artifact exists and may be
+   invoked explicitly, but supported consumers have not transferred authority.
+4. `CSharpPrimaryWithRecovery`: an explicitly reviewed migration transfers the
+   supported operation to the C# release while a bounded legacy recovery route
+   may remain.
+5. `CSharpOnly`: supported normal and recovery paths use C# and executable
+   PowerShell authority is eligible for final retirement.
+
+Read-only actors may run both implementations against the same captured input
+for comparison. Mutating actors are exclusive: one operation is owned by
+exactly one engine, and PowerShell and C# must never both apply or publish the
+same plan. A failed C# mutation does not automatically fall back to PowerShell;
+it enters an explicit recovery state and fails closed until the owning recovery
+contract selects one engine.
+
+Consumer authority is recorded as one of `PowerShellManaged`,
+`CSharpMigrationPending`, `CSharpManaged`, `RecoveryRequired`, or `Unsupported`.
+File presence, runtime availability, or successful process startup alone cannot
+infer or change that state.
+
+The feature sequence owns distinct gates:
+
+- [FEAT-0059](../features/FEAT-0059-csharp-operational-foundation/README.md)
+  creates only the shared foundation and portable release contract; no
+  PowerShell authority changes.
+- [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
+  may shadow read-only governance and qualify an immutable C# release through
+  complete differential evidence.
+- [FEAT-0061](../features/FEAT-0061-consumer-adoption-cli/README.md) and
+  [FEAT-0062](../features/FEAT-0062-consumer-protocol-update-cli/README.md)
+  may dual-run only their read-only stages; apply, publish, recovery, and
+  finalization remain single-engine operations.
+- [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
+  owns consumer-state migration, explicit authority cutover, dependency proof,
+  and final retirement.
+
+Authority retirement, compatibility retirement, and source retirement are
+separate decisions. Historical tags, release assets, and evidence remain
+immutable even after their executable route is no longer supported.
+
 ## Consequences
 
 - Maintainers gain typed, directly readable operational behavior and tests.
@@ -53,7 +102,8 @@ a later migration feature transfers authority.
 - JIT startup cost is accepted unless measurement later proves it material.
 - PowerShell 5.1/7 tests remain mandatory only while supported production or
   migration paths still execute PowerShell behavior.
-- This decision authorizes architecture records, not implementation.
+- Every feature still requires its own complete Definition of Ready and explicit
+  maintainer authorization before implementation or authority transfer.
 
 ## Alternatives considered
 

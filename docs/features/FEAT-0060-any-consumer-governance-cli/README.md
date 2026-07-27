@@ -37,6 +37,21 @@ engine without repository or GitHub mutation authority.
 - Consumer-specific duplicated validators.
 - Retirement of PowerShell governance before equivalence and migration proof.
 
+## Authority transition
+
+- [SUBF-0122](#subf-0122) and [SUBF-0123](#subf-0123) run C# only as a
+  read-only shadow against one captured repository input. Their output cannot
+  replace the PowerShell result or authorize mutation.
+- [SUBF-0124](#subf-0124) maps every applicable PowerShell-owned scenario and
+  declared variant to equivalent or explicitly approved stronger C# evidence.
+  Any unmapped or divergent result keeps `PowerShellAuthority`.
+- An immutable C# release may become `CSharpReleasedNonAuthoritative` after the
+  differential gate. Consumer authority changes only through the explicit
+  migration owned by [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
+- Read-only dual execution is allowed; governance never gains a repair or
+  mutation fallback. PowerShell validation contracts remain live for the
+  supported scope until that migration and dependency proof complete.
+
 ## Readiness evidence
 
 - Dependency: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md).

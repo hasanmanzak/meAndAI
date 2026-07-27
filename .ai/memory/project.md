@@ -9,24 +9,24 @@ Last verified: **2026-07-27**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.6`. The latest immutable release before this
-  candidate is [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5) at
-  [`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
-  [PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
-  [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-  [#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain its
+- Current protocol version: `0.15.6`. The latest immutable release is
+  [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at
+  [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
+  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
+  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain its
   delivery and publication evidence.
 - Most recently completed and published implementation scope:
   [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
   delivers instruction-graph schema 2 and bounded parser, abort, authority,
   and target-policy resilience.
-- Current bounded correction:
-  [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
-  / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) /
-  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
-  adds bounded completed-historical issue classification before mutation;
-  every implementation and regression remains upstream-only.
+- Current bounded development:
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  / [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+  / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) has a local
+  typed C# solution and application-authority candidate with 17 of 17 focused
+  Release tests passing and four of five slice gates complete. Exact committed-
+  tree and hosted Ubuntu/Windows evidence remain pending. PowerShell production
+  authority is unchanged.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -797,16 +797,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
   / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
-  proposed C# operational platform with separate governance, adoption, and
-  update applications sharing one typed foundation and portable framework-
-  dependent JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md),
+  C# operational platform with separate governance, adoption, and update
+  applications sharing one typed foundation and portable framework-dependent
+  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md),
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  are planning records only. Do not create projects, implement behavior, alter
-  workflows or consumers, migrate authority, or retire PowerShell without a
-  later explicit development directive and independently satisfied feature DoR.
+  remain separately gated. Only [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+  is currently authorized: create the typed solution/domain/application
+  boundary and its tests. Do not implement consumer behavior, mutate consumers,
+  transfer authority, or retire PowerShell without later independent gates.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

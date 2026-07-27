@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | In development / [SUBF-0119](#subf-0119) authorized |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
-| Pull request | Not created; development deferred |
+| Pull request | Not created; [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) remains the stable delivery authority |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
 | Tests | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
 
@@ -38,12 +38,92 @@ independently.
   a unified all-capable executable.
 - Moving production authority from PowerShell in this feature.
 
+## Runtime and build contract
+
+- Target framework: `net10.0`, ordinary JIT, framework-dependent deployment.
+- SDK selection: `global.json` selects the `10.0.3xx` feature band and permits
+  only a later servicing patch in that band; hosted validation installs the
+  current reviewed `10.0.302` SDK explicitly instead of depending on mutable
+  runner-image contents.
+- Runtime selection: released applications require a supported .NET 10 runtime
+  at the latest servicing level accepted by the release preflight. Runtime
+  absence or incompatibility fails before application work; installation is a
+  separately declared host/workflow action, never an implicit application
+  mutation.
+- Source builds enable nullable analysis, implicit usings, deterministic output,
+  warnings as errors, package lock files, and locked restore in authoritative
+  validation.
+- Production projects take no third-party package dependency in this feature.
+  The test project uses only exact centrally pinned test packages.
+- Executables added by later slices use `UseAppHost=false` and are invoked as
+  `dotnet <entry-assembly>.dll`; no RID participates in package identity.
+
+## [SUBF-0119](#subf-0119) domain and dependency contract
+
+The first slice introduces only typed authority declarations and dependency
+rules needed by the three future entry applications:
+
+- Application identities are exactly `governance`, `adoption`, and
+  `consumer-update`.
+- Operation stages are application-owned identifiers. Governance initially
+  declares `validate`; adoption declares `discover`, `assess`, `plan`, `apply`,
+  and `publish`; consumer update declares `discover`, `plan`, `apply`,
+  `publish`, and `finalize`.
+- Capabilities are exactly `repository.read`, `repository.mutate`,
+  `provider.read`, and `provider.mutate`. A mutation capability requires the
+  corresponding read capability in the same immutable grant.
+- Governance grants contain no mutation capability. Discovery, assessment, and
+  planning grants contain no mutation capability. The typed catalog returns
+  one exact immutable grant or fails for an unknown application/stage; it never
+  widens a grant by fallback.
+- Identifiers are non-null closed value objects. Capability collections are
+  duplicate-free, ordinally ordered, and exposed read-only. Invalid identifiers,
+  duplicate capabilities, missing read prerequisites, and unknown catalog
+  lookups fail with typed argument/range errors before any I/O.
+- [SUBF-0119](#subf-0119) performs no repository, process, network, Git, GitHub,
+  packaging, or consumer operation. Capability-scoped ports and result schemas
+  remain [SUBF-0120](#subf-0120); executable and package composition remains
+  [SUBF-0121](#subf-0121).
+
+The planned production dependency graph is one-way:
+
+`Domain <- Application <- Infrastructure <- capability-bounded entry app`.
+
+`Domain` has no project or infrastructure dependency. `Application` may depend
+only on `Domain`. Infrastructure and entry projects are introduced only in the
+slice that exercises them. Test projects may depend inward on the production
+projects but never become a production dependency.
+
 ## Readiness evidence
 
-- Domain and contracts: direction is fixed by [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md); exact public models, schema evolution, runtime version, and dependency inventory remain to be designed.
+- Domain and contracts: [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
+  and the contracts above fix application/stage/capability meaning, dependency
+  direction, invalid-state behavior, runtime line, and slice ownership. Result,
+  port, manifest, and schema-evolution details remain intentionally owned by
+  their later subfeatures.
 - Consumers and dependencies: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md) consume this feature.
-- Prior art and recurrence: current PowerShell module, bundle, release, scenario ownership, and runtime-efficiency surfaces are canonical prior art; active recurrence entries must be inventoried before implementation.
-- Verification approach: unit architecture tests, package/manifest contract tests, Windows/Linux execution, and capability-negative tests.
+- Prior art and siblings: the repository currently has no C# solution, project,
+  or source file. PowerShell remains the behavior authority rather than a
+  compiled-contract sibling. Nearest scenario [TEST-0116](../FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116)
+  owns Windows validation composition; [TEST-0191](test-cases.md#test-0191) is
+  `Distinct` because it exercises compiled dependency and application-authority
+  boundaries.
+- Recurrence: no active entry matches the [SUBF-0119](#subf-0119) typed solution
+  boundary; result `None`. [SUBF-0121](#subf-0121) is separately routed by the
+  active [declarative bundle-path entry](../../../.ai/memory/project.md#runtime-bundle-path-is-inferred-as-a-repository-source-path),
+  which forbids inferred archive-to-source mapping. Candidate governance
+  packets must also follow the active [committed-HEAD graph entry](../../../.ai/memory/project.md#untracked-governance-packet-is-absent-from-the-head-self-consumer-graph)
+  before final exact-tree evidence.
+- Baseline: immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
+  at [merge commit `5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b)
+  is the exact predecessor. The 2026-07-27 local host exposes SDK `10.0.301`
+  and runtime `10.0.9`; source inventory proves no pre-existing `.sln`, `.slnx`,
+  `.csproj`, or `.cs` authority.
+- Verification approach: write [TEST-0191](test-cases.md#test-0191) first;
+  demonstrate the intended missing-contract failure; implement only Domain and
+  Application projects; run the focused .NET test project, solution build,
+  locked restore, protocol structure validation, and fresh-diff self-review.
+  Package/manifest and cross-platform execution remain later scenario gates.
 
 ## Risks
 
@@ -55,16 +135,34 @@ independently.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Not started; development not authorized | Later implementation directive required |
-| Baseline run | Not run | Exact PowerShell/source and packaging baselines remain required |
+| Test code | [SUBF-0119](#subf-0119) passing locally; exact-head hosted evidence pending | [TEST-0191](test-cases.md#test-0191) |
+| Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / not started | Pending | Proposed |
+| `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests passing; hosted run pending | Local fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed | Local candidate / hosted pending |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / not started | Pending | Proposed |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / not started | Pending | Proposed |
+
+## [SUBF-0119](#subf-0119) development checkpoint
+
+Progress is measured against five independently observable delivery gates:
+
+1. Definition of Ready and explicit authorization: complete.
+2. Tests-first missing-contract failure: complete.
+3. Minimal typed implementation and focused green run: complete.
+4. Local self-review, locked restore, analyzer/format verification, and candidate-
+   tree protocol validation: complete.
+5. Exact committed-tree validation and Ubuntu/Windows hosted evidence: pending.
+
+The 2026-07-27 local checkpoint is therefore four of five gates, or 80% of
+[SUBF-0119](#subf-0119). Feature completion remains zero of three completed
+subfeatures because a candidate slice is not counted as complete. The bounded
+estimate for gate 5 was 45 to 90 minutes, primarily dependent on hosted queue
+time. [SUBF-0120](#subf-0120) and [SUBF-0121](#subf-0121) remain unauthorized
+and are excluded from that estimate.
 
 ## Decisions and relationships
 
@@ -75,7 +173,17 @@ independently.
 
 - [x] Stable ID and linked issue.
 - [x] Problem, outcome, scope, and non-goals.
-- [ ] Detailed contracts, dependency inventory, recurrence evidence, scenario-intent review, baselines, target version, and implementation authorization.
+- [x] Detailed [SUBF-0119](#subf-0119) type, nullability, ownership, lifecycle,
+  invalid-state, compatibility, and dependency contracts recorded above.
+- [x] Consumers, same-contract sibling inventory, decisions, and risks recorded.
+- [x] Recurrence result `None` recorded for this slice; later packaging route is
+  explicitly bound to the active recurrence owner.
+- [x] [TEST-0191](test-cases.md#test-0191) and its `Distinct` sibling-intent
+  review are recorded with a tests-first verification route.
+- [x] Exact predecessor, absent C# source baseline, target `0.16.0`, target
+  framework, SDK policy, and local toolchain evidence recorded.
+- [x] Explicit [SUBF-0119](#subf-0119) implementation authorization received
+  from the maintainer on 2026-07-27.
 
 ## Acceptance criteria
 
@@ -86,4 +194,7 @@ independently.
 
 ## Definition of Done
 
-All template DoD gates remain pending; this planning record is not implementation evidence.
+Feature-level DoD remains pending. [SUBF-0119](#subf-0119) may be declared
+complete only after gate 5 records exact committed-tree and required hosted
+evidence; this local candidate does not authorize later slices, consumer
+mutation, authority transfer, release publication, or PowerShell retirement.

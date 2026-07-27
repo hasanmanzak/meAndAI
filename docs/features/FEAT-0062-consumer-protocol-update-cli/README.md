@@ -35,6 +35,22 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 - Updating an ambiguous or invalid installation by inference.
 - Consumer-local copies of shared engines or premature PowerShell retirement.
 
+## Authority transition
+
+- Installed PowerShell updaters remain authoritative for their immutable
+  contract. A reviewed release-declared migration may install and verify the C#
+  updater and move state from `PowerShellManaged` through
+  `CSharpMigrationPending` to `CSharpManaged`.
+- The transition state is explicit release/ledger evidence; the presence of a
+  DLL, a successful `dotnet` preflight, or the absence of one script never
+  infers authority.
+- Read-only installed-state resolution and plan comparison may dual-run. Plan
+  application, proposal publication, merge finalization, and recovery are
+  single-engine operations with no automatic cross-engine fallback.
+- A pre-cutover PowerShell updater may perform only the reviewed migration it
+  can prove. After cutover, the C# updater owns later updates; unresolved or
+  interrupted state becomes `RecoveryRequired` and fails closed.
+
 ## Readiness evidence
 
 - Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) and [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md).

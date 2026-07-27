@@ -352,7 +352,7 @@ if ($null -ne $scenarioAuthorityData) {
     }
     $scenarioAuthorities = @($scenarioAuthorityData.Authorities)
     $allowedEvidenceKinds = @(
-        'ExecutableSuite', 'GitHubActionsSemantic',
+        'ExecutableSuite', 'DotNetTestProject', 'GitHubActionsSemantic',
         'ExternalPostPublication', 'PlannedDocumentation',
         'HistoricalSuperseded'
     )
@@ -386,6 +386,11 @@ if ($null -ne $scenarioAuthorityData) {
             'ExecutableSuite' {
                 if (-not $canonicalSuiteOwners.Contains($owner)) {
                     Add-Failure "TEST-0074 executable owner is not a discovered canonical suite: '$owner'."
+                }
+            }
+            'DotNetTestProject' {
+                if ($owner -cnotmatch '^tests/dotnet/[^/]+/[^/]+\.csproj$') {
+                    Add-Failure "TEST-0074 .NET test evidence has an invalid owner: '$owner'."
                 }
             }
             'GitHubActionsSemantic' {
@@ -435,8 +440,9 @@ foreach ($testId in @($scenarioDeclarations.Keys | Sort-Object)) {
 }
 
 $activeTestSourcesByScenarioId = @{}
-foreach ($activeTestSource in @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
-    -Recurse -File -Filter '*.ps1')) {
+$activeTestSources = @(Get-ChildItem -LiteralPath (Join-Path $root 'tests') `
+    -Recurse -File | Where-Object { $_.Extension -cin @('.ps1', '.cs') })
+foreach ($activeTestSource in $activeTestSources) {
     $activeContent = Get-Content -LiteralPath $activeTestSource.FullName -Raw
     $relativeActivePath = $activeTestSource.FullName.Substring($root.Length + 1).Replace('\', '/')
     foreach ($match in @([regex]::Matches(
@@ -460,6 +466,25 @@ foreach ($testId in @($authorityByTestId.Keys | Sort-Object)) {
     }
 
     $authority = $authorityByTestId[$testId]
+    if ($authority.Evidence -ceq 'DotNetTestProject') {
+        $declaration = $scenarioDeclarations[$testId][0]
+        $ownerDirectory = $authority.Owner.Substring(
+            0,
+            $authority.Owner.LastIndexOf('/')
+        )
+        $activeSources = if ($activeTestSourcesByScenarioId.ContainsKey($testId)) {
+            @($activeTestSourcesByScenarioId[$testId] | Sort-Object)
+        }
+        else { @() }
+        $outsideOwner = @($activeSources | Where-Object {
+            -not $_.StartsWith("$ownerDirectory/", [StringComparison]::Ordinal)
+        })
+        if ($declaration.Line -cnotmatch '\|\s*Passing\s*\|' -or
+            $activeSources.Count -eq 0 -or
+            $outsideOwner.Count -gt 0) {
+            Add-Failure "TEST-0074 .NET scenario lacks a passing declaration or project-owned source: $testId."
+        }
+    }
     if ($authority.Evidence -ceq 'PlannedDocumentation') {
         $declaration = $scenarioDeclarations[$testId][0]
         if ($declaration.Path -cne $authority.Owner -or

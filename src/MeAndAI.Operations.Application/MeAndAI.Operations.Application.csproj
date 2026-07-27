@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>MeAndAI.Operations.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -3,25 +3,25 @@
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-27**<br>
 Protocol version: **0.15.6**<br>
-Latest immutable release before this candidate: **0.15.5**
+Latest immutable release before this candidate: **0.15.6**
 
-The immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
+The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 release is complete at
-[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
-[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
-[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
+[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md).
+[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md).
 
-[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
-/ [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
-is the current `0.15.6` correction. It proves supported completed historical
-adoption issues before mutation, leaves them byte-identical, and reconciles
-only the current issue through the existing lifecycle owner.
-Follow the [current handoff](log/2026-07-27-v0156-completed-historical-adoption-issues.md).
-No consumer-local implementation or regression belongs to this correction.
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+/ [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) is the current
+bounded development. Follow the
+[first-slice development handoff](log/2026-07-27-feat-0059-subf-0119-foundation.md)
+and its linked planning authority. The local candidate has completed four of
+five slice gates; exact committed-tree and hosted evidence remain pending.
+Only the first typed-foundation slice is authorized; PowerShell authority and
+consumer repositories remain unchanged.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

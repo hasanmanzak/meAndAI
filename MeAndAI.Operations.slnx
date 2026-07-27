@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj" />
+  <Project Path="src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
+  <Project Path="tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj" />
+</Solution>

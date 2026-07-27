@@ -42,6 +42,35 @@ normal, recovery, historical, or publication path depends on them.
 - Keeping PS 5.1/7 tests after executable evidence proves they have no supported
   production or migration contract.
 
+## Authority-state migration and retirement gates
+
+Every supported consumer is classified from immutable release, workflow,
+ledger, and repository evidence as exactly one of:
+
+- `PowerShellManaged`: PowerShell remains the sole mutating authority.
+- `CSharpMigrationPending`: one reviewed, target-bound migration is in progress;
+  only its declared engine may mutate.
+- `CSharpManaged`: the verified C# release owns normal operations.
+- `RecoveryRequired`: durable evidence is incomplete or interrupted; normal
+  operation and automatic fallback are blocked.
+- `Unsupported`: no reviewed compatible path exists and no inference is made.
+
+[SUBF-0132](#subf-0132) inventories and migrates supported states. It may keep
+a bounded legacy recovery route after `CSharpManaged`, but each recovery event
+still chooses one engine before mutation. [SUBF-0133](#subf-0133) separately
+proves three retirements:
+
+1. authority retirement: no supported operation selects PowerShell;
+2. compatibility retirement: no supported normal or recovery path requires PS
+   5.1/7 execution evidence; and
+3. source retirement: live scripts, workflow branches, tests, and fixtures may
+   be removed without deleting immutable historical tags, assets, or forensic
+   records.
+
+These gates are ordered. Completion of any predecessor C# feature, successful
+runtime installation, or source-file presence cannot skip consumer migration
+or authorize PowerShell deletion.
+
 ## Readiness evidence
 
 - Blocking dependencies: completed immutable releases for [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md).

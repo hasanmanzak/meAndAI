@@ -38,6 +38,22 @@ lifecycle contracts.
 - Consumer-specific policy or mutation outside an authorized repository.
 - Replacing the C# update application or retiring PowerShell during this feature.
 
+## Authority transition
+
+- `discover`, `assess`, and `plan` may run in read-only shadow mode against the
+  same captured base and immutable target evidence. Differential comparison
+  cannot itself authorize `apply` or `publish`.
+- A mutation attempt is single-engine: exactly one of PowerShell or C# owns the
+  exact plan, repository write, branch, issue, and pull-request lifecycle. The
+  two engines never apply or publish the same adoption operation.
+- A failed C# mutation enters `RecoveryRequired`; it does not automatically
+  invoke PowerShell. Recovery must revalidate the durable boundary and select
+  one explicitly supported engine before any later write.
+- This feature may qualify an immutable C# adoption release, but existing
+  consumer authority remains `PowerShellManaged` until the reviewed migration
+  in [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md)
+  records `CSharpManaged`.
+
 ## Readiness evidence
 
 - Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) and [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md).

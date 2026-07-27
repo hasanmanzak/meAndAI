@@ -36,3 +36,19 @@ apply/publish require separate authority.
 PowerShell remains production authority until feature-level differential and
 immutable release evidence transfers it. PS 5.1/7 validation may be removed only
 after supported dependency inventory and consumer migration prove it obsolete.
+
+## Later development authorization
+
+On 2026-07-27 the maintainer explicitly authorized the first development gate.
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+/ [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+may proceed after its independently completed Definition of Ready. No later
+foundation slice, consumer behavior, consumer mutation, authority cutover, or
+PowerShell retirement is implied by this authorization.
+
+[DEC-0032](../../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
+now records the explicit transition sequence: PowerShell authority, read-only
+C# shadow comparison, immutable non-authoritative C# release, reviewed consumer
+cutover, bounded recovery, C#-only operation, and evidence-gated retirement.
+Read-only comparison may use both engines; mutation is always single-engine and
+never falls back automatically across engines.
