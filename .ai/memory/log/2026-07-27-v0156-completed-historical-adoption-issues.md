@@ -5,7 +5,8 @@
 [FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [SUBF-0118](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md#subf-0118),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149), and
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) own the common,
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149), with delivery
+through [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), own the common,
 project-neutral v0.15.6 correction. A named consumer exposed the defect but is
 evidence only; no consumer-local workaround, fixture, or regression belongs in
 this release.

@@ -49,6 +49,7 @@ and immutable-release evidence remain delivery gates.
 Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
 [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
 [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149),
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152),
 [DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md),
 [DEC-0020](docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md),
 [DEC-0028](docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md),

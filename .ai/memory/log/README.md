@@ -16,7 +16,8 @@ delivery, review, test, and release evidence.
 
 [FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
 / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
 is the current `0.15.6` continuation. Follow the
 [completed-historical adoption-issue handoff](2026-07-27-v0156-completed-historical-adoption-issues.md).
 The completed [v0.15.5 handoff](2026-07-26-v0155-instruction-graph-resilience.md)

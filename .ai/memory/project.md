@@ -23,7 +23,8 @@ Last verified: **2026-07-27**
 - Current bounded correction:
   [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
   / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
+  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) /
+  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
   adds bounded completed-historical issue classification before mutation;
   every implementation and regression remains upstream-only.
 - Content language: English
