@@ -170,12 +170,12 @@
         @{
             Evidence = 'DotNetTestProject'
             Owner = 'tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj'
-            TestIds = @('TEST-0191')
+            TestIds = @('TEST-0191', 'TEST-0192')
         }
         @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md'
-            TestIds = @('TEST-0192', 'TEST-0193')
+            TestIds = @('TEST-0193')
         }
         @{
             Evidence = 'PlannedDocumentation'

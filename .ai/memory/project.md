@@ -21,14 +21,21 @@ Last verified: **2026-07-27**
   and target-policy resilience.
 - Current bounded development:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-  / [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+  / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
   [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has completed
-  the typed C# solution and application-authority first slice. All five slice
-  gates pass, including 17 of 17 focused Release tests, exact-tree validation,
-  and required Ubuntu/Windows jobs. Feature completion is one of three
-  subfeatures; later slices remain gated. PowerShell production authority is
-  unchanged.
+  the typed C# solution and application-authority first slice. The authorized
+  second slice is adding only closed deterministic results, single-capability
+  port contracts, a grant-checked infrastructure scope, and a redacting async
+  dependency boundary. Its DoR, executable missing-contract red run, and 16 of
+  16 focused green tests and candidate-tree StructureOnly make four of five
+  gates complete; combined
+  [TEST-0191](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191)
+  and [TEST-0192](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
+  pass 31 of 31 with locked restore, zero-warning Release build, clean
+  format/analyzer evidence, and a 203.3-second Windows PowerShell 5.1
+  StructureOnly pass. [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+  remains gated. PowerShell production authority is unchanged.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.

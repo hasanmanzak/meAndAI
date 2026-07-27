@@ -109,7 +109,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0191"
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192"
       - name: Install checksummed actionlint v1.7.12
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -231,7 +231,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0191"
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192"
       - name: Run runtime-efficiency contract on Windows PowerShell 7
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh

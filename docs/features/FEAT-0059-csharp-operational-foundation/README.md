@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In development / [SUBF-0119](#subf-0119) complete; later slices gated |
+| Status | In development / [SUBF-0119](#subf-0119) complete; [SUBF-0120](#subf-0120) authorized |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
 | Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
@@ -94,6 +94,50 @@ only on `Domain`. Infrastructure and entry projects are introduced only in the
 slice that exercises them. Test projects may depend inward on the production
 projects but never become a production dependency.
 
+## [SUBF-0120](#subf-0120) port and result contract
+
+The second slice adds only the shared boundary needed to keep later repository
+and provider implementations typed, least-authority, deterministic, and safe
+to report:
+
+- `Domain.Results` owns closed `OperationOutcome` identities for `succeeded`,
+  `rejected`, `failed`, and `canceled`, plus closed `OperationFailureCode`
+  identities for `input.malformed`, `capability.denied`, `dependency.failed`,
+  and `operation.canceled`.
+- `OperationResult<T>` contains exactly one stage, one outcome, a non-null value
+  only on success, and one compatible failure code only on a non-success
+  outcome. Payloads are reference types so absence remains unambiguous.
+  Factories reject nulls and impossible outcome/code combinations.
+  The base failure schema deliberately contains no arbitrary message,
+  exception, command, standard-output, standard-error, argument, environment,
+  or credential field.
+- `Application.Ports` owns four marker contracts: repository read, repository
+  mutation, provider read, and provider mutation. A future domain-specific
+  port must derive from exactly one marker; its implementation must expose the
+  same single marker. A marker itself is not a registrable operational contract.
+  Combining capability markers in either layer is rejected instead of silently
+  widening authority.
+- A new `Infrastructure` project depends inward on `Application` and `Domain`.
+  Its port registration binds one exact contract type to one implementation.
+  Its immutable scope rejects duplicate or malformed registrations and rejects
+  every registration not allowed by the supplied stage grant. Resolution checks
+  capability authority before registration presence, so a read-only scope
+  cannot probe for or acquire a mutation port.
+- The infrastructure execution boundary accepts one stage, one asynchronous
+  operation, and one cancellation token. Pre-cancellation does not invoke the
+  operation; caller-requested cancellation becomes the closed canceled result;
+  a typed dependency failure becomes the closed failed result. Raw exception
+  text and inner exceptions never enter the result. Unexpected programming
+  exceptions remain exceptions rather than being mislabeled as dependency
+  failures.
+- Result payloads are public, typed operation evidence only. Credential values
+  remain input-only adapter concerns and no foundation port returns them.
+  Application-specific report fields and credential transports remain owned by
+  their later features.
+- This slice adds no filesystem, Git, process, network, GitHub, credential, or
+  consumer adapter and moves no production authority. PowerShell remains the
+  supported implementation and compatibility authority.
+
 ## Readiness evidence
 
 - Domain and contracts: [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
@@ -124,6 +168,12 @@ projects but never become a production dependency.
   Application projects; run the focused .NET test project, solution build,
   locked restore, protocol structure validation, and fresh-diff self-review.
   Package/manifest and cross-platform execution remain later scenario gates.
+- [SUBF-0120](#subf-0120) verification approach: activate
+  [TEST-0192](test-cases.md#test-0192) first and demonstrate missing result,
+  marker, scope, and execution-boundary contracts; then add only the contract
+  surface above. Exercise malformed-result rejection, pre- and in-flight
+  cancellation, typed dependency failure redaction, capability-marker
+  ambiguity, duplicate registration, and read-only mutation denial.
 
 ## Risks
 
@@ -135,7 +185,7 @@ projects but never become a production dependency.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | [SUBF-0119](#subf-0119) passing locally and on exact-head Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191) |
+| Test code | [SUBF-0119](#subf-0119) passing locally and on exact-head Ubuntu/Windows hosts; [SUBF-0120](#subf-0120) expected-red plus 16 of 16 focused local tests complete | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192) |
 | Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
 
 ## Decomposition and subfeature gates
@@ -143,7 +193,7 @@ projects but never become a production dependency.
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / not started | Pending | Proposed |
+| `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 | Fresh-diff review complete; reference-type absence, implementation capability widening, concrete collection analyzer, canonical passing declaration, link hygiene, and local package-cache containment findings closed; candidate-tree StructureOnly passed in 203.3 seconds; zero unresolved `Blocking` findings | In development |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / not started | Pending | Proposed |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
@@ -177,6 +227,22 @@ where this checkpoint spent hosted time; it does not authorize removing either
 PowerShell route while those routes remain production or compatibility
 authority.
 
+## [SUBF-0120](#subf-0120) development checkpoint
+
+Progress is measured against five independently observable delivery gates:
+
+1. Definition of Ready and explicit authorization: complete.
+2. Tests-first missing-contract failure: complete.
+3. Minimal typed implementation and focused green run: complete.
+4. Local self-review, locked restore, analyzer/format verification, and
+   candidate-tree protocol validation: complete.
+5. Exact committed-tree validation, remote draft checkpoint, and final-head
+   Ubuntu/Windows hosted evidence: pending.
+
+The 2026-07-28 checkpoint is therefore four of five gates, or 80% of
+[SUBF-0120](#subf-0120). Feature completion remains one of three completed
+subfeatures, or 33%. [SUBF-0121](#subf-0121) remains unauthorized.
+
 ## Decisions and relationships
 
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
@@ -197,6 +263,33 @@ authority.
   framework, SDK policy, and local toolchain evidence recorded.
 - [x] Explicit [SUBF-0119](#subf-0119) implementation authorization received
   from the maintainer on 2026-07-27.
+
+### [SUBF-0120](#subf-0120) gate
+
+- [x] Exact result identities, valid state combinations, nullability, and
+  redaction boundary are recorded above.
+- [x] Exact port markers, single-capability rule, registration, grant-check,
+  and resolution behavior are recorded above.
+- [x] Cancellation, typed dependency failure, unexpected-exception, and
+  no-I/O/no-authority-transfer boundaries are recorded above.
+- [x] Consumers are the planned governance, adoption, and update applications;
+  their current records require read-only governance, stage-separated mutation,
+  deterministic reports, cancellation, credential redaction, and exact plans.
+- [x] PowerShell prior art was inventoried for deterministic plan/evidence
+  objects, bounded process termination, and secret-name-only reporting. No C#
+  sibling implements the same contract.
+- [x] Active recurrence review found no entry that owns this result or port
+  contract; result `None`. The committed-HEAD governance-packet entry remains
+  applicable to final validation, while bundle-path mapping remains owned only
+  by [SUBF-0121](#subf-0121).
+- [x] [TEST-0192](test-cases.md#test-0192) and its `Distinct` sibling-intent
+  review define the tests-first route.
+- [x] Exact predecessor is the completed [SUBF-0119](#subf-0119) checkpoint on
+  this branch; target version, SDK/runtime line, dependency direction, risks,
+  and local/hosted validation routes remain unchanged.
+- [x] Explicit [SUBF-0120](#subf-0120) implementation authorization received
+  from the maintainer through the sequential-continuation directive on
+  2026-07-27.
 
 ## Acceptance criteria
 

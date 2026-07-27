@@ -8,22 +8,28 @@ public sealed class ProjectDependencyTests
 
     [Fact]
     [Trait("Scenario", "TEST-0191")]
+    [Trait("Scenario", "TEST-0192")]
     public void ProductionDependencyDirectionIsInwardOnly()
     {
         const string domain =
             "src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj";
         const string application =
             "src/MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj";
+        const string infrastructure =
+            "src/MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj";
 
         Assert.Empty(ReadProjectReferences(domain));
         Assert.Equal([domain], ReadProjectReferences(application));
+        Assert.Equal([application, domain], ReadProjectReferences(infrastructure));
         Assert.Empty(ReadPackageReferences(domain));
         Assert.Empty(ReadPackageReferences(application));
+        Assert.Empty(ReadPackageReferences(infrastructure));
     }
 
     [Fact]
     [Trait("Scenario", "TEST-0191")]
-    public void SolutionContainsOnlyTheAuthorizedFirstSliceProjects()
+    [Trait("Scenario", "TEST-0192")]
+    public void SolutionContainsOnlyTheAuthorizedFoundationProjects()
     {
         var solutionPath = Path.Combine(
             RepositoryRoot,
@@ -39,6 +45,7 @@ public sealed class ProjectDependencyTests
             [
                 "src/MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj",
                 "src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj",
+                "src/MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj",
                 "tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj",
             ],
             projects);
