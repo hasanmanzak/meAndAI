@@ -112,13 +112,6 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   Exact candidate commit
   [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6)
   passes the canonical full local suite in 1732.8 seconds.
-  The retained hosted-streaming [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
-  fixture now proves incremental consumption through exact live PID and
-  process-start identity instead of a bidirectional file-observation handshake;
-  exact correction commit
-  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
-  passes its focused owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 /
-  11.3 seconds. Final protected hosted confirmation remains required.
 - Required safe response: classify strict local grammar before provider reads,
   prove the exact immutable release, issue, merged pull request, terminal
   marker, actor, absent open pull request, and absent reserved branch within
@@ -132,6 +125,49 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-27; review whenever
   adoption issue marker families, terminal pull-request evidence, issue
   inventory bounds, or mutation ordering changes.
+- Superseded by: `None`
+
+### Hosted streaming fixture stops after the first JSONL event
+
+- Status: `Active`
+- Observable signature: a hosted Windows PowerShell 5.1 full profile renders
+  `Codex | Session started`, then canonical
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  reports that JSONL stdout was not acknowledged while every later expected
+  activity line is absent.
+- Applicability: hosted or local execution of the pre-correction streaming
+  fixture whose child waits for a parent-created acknowledgment file before
+  emitting the remaining JSONL events.
+- Affected contract and cause: the bidirectional filesystem handshake coupled
+  incremental stdout evidence to the child's observation of a test-only file.
+  A failed run proves that the child did not observe the acknowledgment within
+  five seconds, but does not prove whether the parent wrote it or whether
+  production consumption was buffered.
+- Canonical owner and evidence: [FEAT-0020](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md) /
+  [BUG-0008](https://github.com/hasanmanzak/meAndAI/issues/57) /
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  owns the streaming contract; [FIND-0360](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md#find-0360)
+  records the v0.15.6 delivery recurrence.
+  [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
+  owns the recurrence-entry schema and
+  [DEC-0030](../../docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md)
+  retains the existing canonical test identity for this infrastructure-only
+  correction.
+- Fixed release or evidence: target release `0.15.6`; exact correction commit
+  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+  emits the fixture PID and process-start ticks, retains the five-second live
+  window, and requires that exact identity to remain alive when the first event
+  is consumed. The focused owner passes on PowerShell 7 / Windows PowerShell
+  5.1; final protected hosted confirmation remains required.
+- Required safe response: use the exact live-process identity barrier, run the
+  canonical focused owner on both supported runtimes, then require structure,
+  committed-HEAD graph, and a new-head hosted Ubuntu/Windows pass.
+- Unsafe retry boundary: do not accept an unchanged old-head rerun as the
+  correction, weaken production streaming, infer parent-write absence from the
+  combined failure, or create a duplicate scenario ID.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever
+  the bounded-process stdout reader, mock event process, or hosted Windows
+  runtime changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure
