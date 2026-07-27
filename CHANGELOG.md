@@ -34,10 +34,11 @@ Candidate validation: exact v0.15.5 produced the expected malformed-marker red
 in 175.6 seconds. The corrected
 [TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
 parameter passed the `IntegrityManifestIssue` shard on PowerShell 7 / Windows
-PowerShell 5.1 in 156.1 / 162.6 seconds, including the six classifications,
+PowerShell 5.1 in 141.9 / 147.7 seconds, including the six classifications,
 20-tag immutable registry, exact 8/9 candidate and 999/1000 inventory bounds,
-provider/marker negatives, frozen drift, full-launcher zero-mutation evidence,
-and idempotent positive rerun. The full PowerShell 7 quick-adoption owner then
+provider/marker negatives, fail-closed open-PR list roots and rows, frozen
+drift, full-launcher zero-mutation evidence, and idempotent positive rerun. The
+full PowerShell 7 quick-adoption owner then
 passed every declared scenario in one process in 847.1 seconds. Bundle, role-
 boundary, runtime-efficiency, and retained/current source-graph dispatch gates
 also passed. Canonical full-suite evidence was then evaluated on exact

@@ -519,7 +519,12 @@ try {
                     $Case.PullRequest | ConvertTo-Json -Depth 8 -Compress
                 }
                 elseif ($kind -ceq 'OpenPullRequestList') {
-                    if (@($Case.OpenPullRequests).Count -eq 0) {
+                    if ($null -ne $Case.PSObject.Properties[
+                            'OpenPullRequestRawOutput'] -and
+                        $null -ne $Case.OpenPullRequestRawOutput) {
+                        [string]$Case.OpenPullRequestRawOutput
+                    }
+                    elseif (@($Case.OpenPullRequests).Count -eq 0) {
                         '[]'
                     }
                     else {

@@ -54,10 +54,11 @@ this release.
 ## Current evidence
 
 - The focused `IntegrityManifestIssue` shard passes on PowerShell 7 / Windows
-  PowerShell 5.1 in 156.1 / 162.6 seconds. It covers the six classes, all 20
+  PowerShell 5.1 in 141.9 / 147.7 seconds. It covers the six classes, all 20
   supported tag-to-commit identities, exact 8/9 candidate bounds, 999/1000
-  inventory behavior, provider and marker negatives, frozen drift, full-
-  launcher zero-mutation boundaries, and positive idempotence.
+  inventory behavior, provider and marker negatives, fail-closed open-PR list
+  roots and rows, frozen drift, full-launcher zero-mutation boundaries, and
+  positive idempotence.
 - [TEST-0147](../../../docs/features/FEAT-0036-modular-quick-adoption-reliability/test-cases.md#test-0147)
   bundle verification passes on PowerShell 7 / Windows PowerShell 5.1 in 27.3
   / 28.9 seconds. Runtime-efficiency passes in 7.7 / 8.9 seconds and retained/
@@ -78,6 +79,11 @@ this release.
   root-array type-conversion leak. Fresh attempts now reset PR/branch and issue
   authority together, recovery attempts retain both, and non-object manifest
   roots reach the exact canonical contract error.
+- Independent final review then exposed a fail-open historical open-PR absence
+  proof for `null` or `[null]` provider responses. Exact array-root, non-null
+  row, and requested-property validation now rejects null, object-root,
+  null-row, and incomplete-row responses. The parse-then-normalize sequence
+  preserves valid empty arrays on both PowerShell 7 and Windows PowerShell 5.1.
 - The full PowerShell 7 quick-adoption owner passed every declared scenario in
   one process in 847.1 seconds. The affected metadata/FullMigration and Codex-
   failure shards also pass on PowerShell 7 / Windows PowerShell 5.1 in 220.3 /

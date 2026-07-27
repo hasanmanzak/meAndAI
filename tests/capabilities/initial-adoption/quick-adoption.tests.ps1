@@ -8291,7 +8291,9 @@ try {
                 'unsupported-marker-schema', 'duplicate-pr-marker',
                 'marker-actor-mismatch', 'issue-actor-mismatch',
                 'marker-contract-mismatch', 'competing-open-pr',
-                'ambiguous-open-pr', 'live-remote-branch'
+                'ambiguous-open-pr', 'null-open-pr-list',
+                'object-open-pr-list', 'null-row-open-pr-list',
+                'missing-property-open-pr-row', 'live-remote-branch'
             )) {
                 $providerIssue = ([string]($historicalIssue |
                     ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
@@ -8302,6 +8304,7 @@ try {
                     'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
                 $markerContractValid = $true
                 $openPullRequests = @()
+                $openPullRequestRawOutput = $null
                 $providerRemoteHead = ''
                 switch ($providerCaseName) {
                     'release-failure' { $providerMode = 'ReleaseFailure' }
@@ -8400,6 +8403,18 @@ try {
                             }
                         })
                     }
+                    'null-open-pr-list' {
+                        $openPullRequestRawOutput = 'null'
+                    }
+                    'object-open-pr-list' {
+                        $openPullRequestRawOutput = '{}'
+                    }
+                    'null-row-open-pr-list' {
+                        $openPullRequestRawOutput = '[null]'
+                    }
+                    'missing-property-open-pr-row' {
+                        $openPullRequestRawOutput = '[{"number":40}]'
+                    }
                     'live-remote-branch' { $providerRemoteHead = '4' * 40 }
                 }
                 $providerCandidate = [pscustomobject]@{
@@ -8432,6 +8447,8 @@ try {
                         ReleaseCommit = $releaseCommit
                         PullRequest = $providerPullRequest
                         OpenPullRequests = @($openPullRequests)
+                        OpenPullRequestRawOutput =
+                            $openPullRequestRawOutput
                         MarkerContractValid = $markerContractValid
                         RemoteHead = $providerRemoteHead
                     }
@@ -8598,6 +8615,16 @@ try {
                         [string]$providerRemoteCall[0].Branch -cne
                             'automation/meandai-capabilities-v0.9.2' -or
                         -not [bool]$providerRemoteCall[0].AllowMissing
+                }
+                elseif ($historicalContractCase.Name -cin @(
+                        'provider-null-open-pr-list',
+                        'provider-object-open-pr-list',
+                        'provider-null-row-open-pr-list',
+                        'provider-missing-property-open-pr-row'
+                    )) {
+                    $positiveIdentityInvalid =
+                        [string]$historicalContractResult.Error -cne
+                            'GitHub CLI returned invalid historical branch pull-request metadata.'
                 }
                 if ([bool]$historicalContractResult.Succeeded -ne
                         [bool]$historicalContractCase.ExpectSuccess -or

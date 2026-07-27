@@ -106,16 +106,19 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   owns the project-neutral executable barrier.
 - Fixed release or evidence: target release `0.15.6`; the focused
   `IntegrityManifestIssue` owner passes on PowerShell 7 / Windows PowerShell
-  5.1 in 156.1 / 162.6 seconds, with bounded provider proof, frozen-evidence
-  drift rejection, zero-mutation negatives, and idempotent positive rerun.
+  5.1 in 141.9 / 147.7 seconds, with bounded provider proof, fail-closed
+  provider collection shapes, frozen-evidence drift rejection, zero-mutation
+  negatives, and idempotent positive rerun.
   Exact candidate commit
   [`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6)
   passes the canonical full local suite in 1732.8 seconds.
 - Required safe response: classify strict local grammar before provider reads,
   prove the exact immutable release, issue, merged pull request, terminal
   marker, actor, absent open pull request, and absent reserved branch within
-  the declared ceilings, freeze the metadata fingerprint before mutation, and
-  leave the historical issue unchanged while reconciling only current state.
+  the declared ceilings, require exact JSON collection roots and complete
+  non-null rows for provider absence evidence, freeze the metadata fingerprint
+  before mutation, and leave the historical issue unchanged while reconciling
+  only current state.
 - Unsafe retry boundary: do not edit or delete the historical issue, suppress
   malformed-marker rejection, retry provider proof, patch a named consumer, or
   proceed after any ambiguous, unsupported, live, drifting, or failed proof.

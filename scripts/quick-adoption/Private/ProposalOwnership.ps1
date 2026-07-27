@@ -1765,8 +1765,31 @@ function Get-ValidatedCompletedHistoricalAdoptionIssue {
         '--json', 'number,url,state,headRefName'
     )
     try {
-        $openPullRequests = @(((@($openList.Output) -join
-            [Environment]::NewLine) | ConvertFrom-Json))
+        $rawOpenPullRequests = (@($openList.Output) -join
+            [Environment]::NewLine).Trim()
+        if (-not $rawOpenPullRequests.StartsWith(
+                '[', [StringComparison]::Ordinal
+            ) -or -not $rawOpenPullRequests.EndsWith(
+                ']', [StringComparison]::Ordinal
+            )) {
+            throw 'shape'
+        }
+        $parsedOpenPullRequests =
+            $rawOpenPullRequests | ConvertFrom-Json
+        $openPullRequests = @($parsedOpenPullRequests)
+        foreach ($openPullRequest in $openPullRequests) {
+            if ($null -eq $openPullRequest) {
+                throw 'shape'
+            }
+            foreach ($property in @(
+                'number', 'url', 'state', 'headRefName'
+            )) {
+                if ($null -eq
+                    $openPullRequest.PSObject.Properties[$property]) {
+                    throw 'shape'
+                }
+            }
+        }
     }
     catch {
         throw 'GitHub CLI returned invalid historical branch pull-request metadata.'
