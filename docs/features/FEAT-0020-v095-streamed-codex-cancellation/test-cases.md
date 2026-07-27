@@ -2,6 +2,7 @@
 
 Implementation: [`tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1),
 [`tests/capabilities/initial-adoption/quick-adoption.tests.ps1`](../../../tests/capabilities/initial-adoption/quick-adoption.tests.ps1),
+[`tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1`](../../../tests/capabilities/initial-adoption/fixtures/Invoke-MockCodexEventProcess.ps1),
 [`tests/capabilities/initial-adoption/fixtures/Invoke-MockCodex.ps1`](../../../tests/capabilities/initial-adoption/fixtures/Invoke-MockCodex.ps1),
 and the complete repository suite.
 
@@ -17,6 +18,9 @@ and the complete repository suite.
   `-NoProgress` suppression.
 - `--json` only for semantic execution and incremental JSONL stdout reads while
   the process is active.
+- One parent-generated lowercase run identity returned by the first fixture
+  event together with a bounded PID that remains live at consumption time; no
+  bidirectional file handshake or cross-process timestamp-equality oracle.
 - User-facing agent messages plus generic command, file, plan, tool, reasoning,
   lifecycle, error, and bounded heartbeat activity.
 - No raw reasoning, raw command output, credential value, or persistent event
@@ -37,3 +41,7 @@ and the complete repository suite.
 | 2026-07-17 | Working tree | Windows PowerShell 5.1 | `powershell -NoProfile -File tests/quick-adoption-streaming.tests.ps1` | Passed `TEST-0105` and `TEST-0106`; observable scenario result manifest emitted |
 | 2026-07-17 | Reviewed working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Every executable suite and scenario owner passed; the repository gate correctly blocked only because FEAT-0020 was still marked `In Progress` during that pre-completion run |
 | 2026-07-17 | Completed reviewed working tree | Windows PowerShell 5.1 | `powershell -NoProfile -ExecutionPolicy Bypass -File tests/protocol.tests.ps1` | Passed in 517.2 seconds; all discovered suites, 34 existing quick-adoption scenarios, `TEST-0105`, `TEST-0106`, and scenario-ownership gates passed |
+| 2026-07-27 | [Run `30244639416`](https://github.com/hasanmanzak/meAndAI/actions/runs/30244639416) and [run `30274245841`](https://github.com/hasanmanzak/meAndAI/actions/runs/30274245841) | GitHub Actions / Windows PowerShell 5.1 | Full protected Windows profile on two unrelated candidate heads | Recurrence red: both runs rendered the first JSONL event, but the child did not observe the test-only file acknowledgment within five seconds and emitted no later events. Ubuntu passed both heads, isolating a nondeterministic cross-process fixture handshake rather than a production streaming regression. |
+| 2026-07-27 | [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c) | PowerShell 7 / Windows PowerShell 5.1 | `pwsh -NoProfile -File tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1`; `powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1` | First correction passed in 9.7 / 11.3 seconds. It removed the acknowledgment file and used exact fixture PID plus process-start ticks during the existing five-second observation window. All later presentation and [TEST-0106](#test-0106) cancellation assertions remained unchanged. |
+| 2026-07-27 | [`aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0`](https://github.com/hasanmanzak/meAndAI/commit/aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0) / [run `30278228996`](https://github.com/hasanmanzak/meAndAI/actions/runs/30278228996) | GitHub Actions / Ubuntu | Full protected Ubuntu profile | Recurrence red: only the aggregate `TEST-0105` live-consumption assertion reported a failure; no separate required-event or safe-presentation assertion reported a failure. The hosted log did not expose the failed aggregate operand. Code-path diagnosis identified exact process-start-tick equality as the remaining platform-sensitive correlation discriminator. |
+| 2026-07-27 | [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d) | PowerShell 7 / Windows PowerShell 5.1 | `pwsh -NoProfile -File tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1`; `powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/capabilities/initial-adoption/quick-adoption-streaming.tests.ps1` | Passed in 10.1 / 12.8 seconds; an independent review run repeated the pass in 9.5 / 11.8 seconds with the same canonical TEST-0105/TEST-0106 manifest. The parent supplies one exact lowercase 32-hex run identity; the first fixture event must return it together with a bounded live PID. Exit zero, every expected event, safe presentation, final-result authority, and `TEST-0106` cancellation checks remain mandatory. |

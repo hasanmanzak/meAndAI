@@ -1,26 +1,26 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-26**<br>
-Protocol version: **0.15.5**<br>
-Latest immutable release before this candidate: **0.15.4**
+Last reviewed: **2026-07-27**<br>
+Protocol version: **0.15.6**<br>
+Latest immutable release before this candidate: **0.15.5**
 
-The immutable [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)
+The immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
 release is complete at
-[`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
-[PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
-[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain the
+[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
+[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
+[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0055](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md).
+[FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md).
 
-[FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-/ [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147)
-is the current `0.15.5` candidate correction for parser, batch-abort, schema-2
-capacity, protected-metadata, authority, and compatible target-policy defects
-found by exact read-only consumer simulations. Final closure remains gated on
-PR validation and immutable publication.
-Follow the [current handoff](log/2026-07-26-v0155-instruction-graph-resilience.md).
+[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+/ [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
+is the current `0.15.6` correction. It proves supported completed historical
+adoption issues before mutation, leaves them byte-identical, and reconciles
+only the current issue through the existing lifecycle owner.
+Follow the [current handoff](log/2026-07-27-v0156-completed-historical-adoption-issues.md).
 No consumer-local implementation or regression belongs to this correction.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)

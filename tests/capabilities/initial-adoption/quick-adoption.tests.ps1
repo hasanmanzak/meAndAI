@@ -1009,7 +1009,7 @@ function Assert-QuickAdoptionFixtureReuse {
     $expectedRequests = [ordered]@{
         'connected-seed-workflow' = 5
         'connected-seed-no-workflow' = 10
-        'connected-managed-v0.15.5' = 6
+        'connected-managed-v0.15.6' = 6
     }
     foreach ($entry in $expectedRequests.GetEnumerator()) {
         if (-not $script:QuickAdoptionReusableRequests.ContainsKey($entry.Key) -or
@@ -1070,9 +1070,9 @@ function Assert-QuickAdoptionFixtureReuse {
         $script:QuickAdoptionFixtureFamilyGitInitCount -ne 11 -or
         $script:QuickAdoptionFreshManagedBuilds.Count -ne 2 -or
         -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.9.2') -or
-        -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.15.6') -or
+        -not $script:QuickAdoptionFreshManagedBuilds.ContainsKey('v0.15.7') -or
         [int]$script:QuickAdoptionFreshManagedBuilds['v0.9.2'] -ne 1 -or
-        [int]$script:QuickAdoptionFreshManagedBuilds['v0.15.6'] -ne 1) {
+        [int]$script:QuickAdoptionFreshManagedBuilds['v0.15.7'] -ne 1) {
         $freshBuildSummary = @($script:QuickAdoptionFreshManagedBuilds.GetEnumerator() |
             Sort-Object Key | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ', '
         throw "Quick-adoption fixture closure is inconsistent: git init=$($script:QuickAdoptionFixtureFamilyGitInitCount), fresh builds=[$freshBuildSummary]."
@@ -1181,7 +1181,7 @@ function Copy-CanonicalProtocolFixture {
     param(
         [Parameter(Mandatory)][string]$Destination,
         [ValidatePattern('^v[0-9]+\.[0-9]+\.[0-9]+$')]
-        [string]$Tag = 'v0.15.5'
+        [string]$Tag = 'v0.15.6'
     )
 
     [IO.File]::WriteAllText(
@@ -1466,6 +1466,24 @@ function Initialize-QuickAdoptionImmutableFixture {
         -Repository $protocolRepository -Snapshots $assetSnapshots
 
     Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.15.5'
+    Copy-ImmutableProtocolPolicyFixture -Destination $protocolRepository `
+        -Commit '11c56aac369767202835c4e9d6cc83aa321f4070'
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'add', '--', '.'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'commit', '-m', 'Create mock immutable schema-2 protocol release'
+    ) | Out-Null
+    Invoke-TestGit -Repository $protocolRepository -Arguments @(
+        'tag', 'v0.15.5'
+    ) | Out-Null
+    $schema2PriorSha = (@(Invoke-TestGit -Repository $protocolRepository `
+        -Arguments @('rev-parse', 'HEAD')))[0]
+    $releaseCommits['v0.15.5'] = $schema2PriorSha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.15.5' `
+        -Repository $protocolRepository -Snapshots $assetSnapshots
+
+    Copy-CanonicalProtocolFixture -Destination $protocolRepository -Tag 'v0.15.6'
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'add', '--', '.'
     ) | Out-Null
@@ -1473,18 +1491,18 @@ function Initialize-QuickAdoptionImmutableFixture {
         'commit', '-m', 'Create mock current protocol release'
     ) | Out-Null
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
-        'tag', 'v0.15.5'
+        'tag', 'v0.15.6'
     ) | Out-Null
     $currentSha = (@(Invoke-TestGit -Repository $protocolRepository `
         -Arguments @('rev-parse', 'HEAD')))[0]
-    $releaseCommits['v0.15.5'] = $currentSha
-    Save-MockProtocolAssetSnapshot -Tag 'v0.15.5' `
+    $releaseCommits['v0.15.6'] = $currentSha
+    Save-MockProtocolAssetSnapshot -Tag 'v0.15.6' `
         -Repository $protocolRepository -Snapshots $assetSnapshots
 
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'switch', '--detach'
     ) | Out-Null
-    foreach ($futureTag in @('v0.15.6', 'v1.0.0')) {
+    foreach ($futureTag in @('v0.15.7', 'v1.0.0')) {
         if ($releaseCommits.ContainsKey($futureTag)) {
             throw "Future mock release tag '$futureTag' duplicates an existing fixture release."
         }
@@ -1509,10 +1527,10 @@ function Initialize-QuickAdoptionImmutableFixture {
         'switch', 'main'
     ) | Out-Null
 
-    $archivePath = Join-Path $protocolFixtureRoot 'protocol-v0.15.5.zip'
+    $archivePath = Join-Path $protocolFixtureRoot 'protocol-v0.15.6.zip'
     Invoke-TestGit -Repository $protocolRepository -Arguments @(
         'archive', '--format=zip', '--prefix=openai-mock-protocol/',
-        '-o', $archivePath, 'v0.15.5'
+        '-o', $archivePath, 'v0.15.6'
     ) | Out-Null
     $status = @(Invoke-TestGit -Repository $protocolRepository `
         -Arguments @('status', '--porcelain'))
@@ -1670,6 +1688,14 @@ function Reset-Mocks {
     $global:QuickAdoptionSecretLockViewCalls = 0
     $global:QuickAdoptionIssue = $null
     $global:QuickAdoptionIssues = [System.Collections.Generic.List[object]]::new()
+    $global:QuickAdoptionHistoricalPullRequests =
+        [System.Collections.Generic.List[object]]::new()
+    $global:QuickAdoptionHistoricalProviderMode = 'Valid'
+    $global:QuickAdoptionHistoricalPullRequestReads = 0
+    $global:QuickAdoptionHistoricalBranchReads = 0
+    $global:QuickAdoptionHistoricalIssueInventoryReads = 0
+    $global:QuickAdoptionHistoricalIssueDriftAtRead = 0
+    $global:QuickAdoptionHistoricalReleaseProofActive = $false
     $global:QuickAdoptionIssueRace = $false
     $global:QuickAdoptionIssueEditMode = 'Normal'
     $global:QuickAdoptionIssueEditFailures = 0
@@ -1791,7 +1817,7 @@ function New-MockConnectedManagedConsumer {
         [Parameter(Mandatory)][string]$InstalledTag
     )
 
-    if ($InstalledTag -cne 'v0.15.5') {
+    if ($InstalledTag -cne 'v0.15.6') {
         if (-not $script:QuickAdoptionFreshManagedBuilds.ContainsKey(
                 $InstalledTag
             )) {
@@ -1802,13 +1828,13 @@ function New-MockConnectedManagedConsumer {
             -Name $Name -InstalledTag $InstalledTag
     }
 
-    $reuseKey = 'connected-managed-v0.15.5'
+    $reuseKey = 'connected-managed-v0.15.6'
     $owner = Get-QuickAdoptionReusableFixture -Key $reuseKey -Builder {
         New-MockConnectedManagedConsumerPair `
-            -Name 'owner-connected-managed-v0.15.5' `
-            -InstalledTag 'v0.15.5'
+            -Name 'owner-connected-managed-v0.15.6' `
+            -InstalledTag 'v0.15.6'
     } -InputRecords @(
-        'installed-tag=v0.15.5',
+        'installed-tag=v0.15.6',
         "protocol-commit=$global:QuickAdoptionProtocolSha"
     )
     $consumer = New-QuickAdoptionMutableDerivative `
@@ -2039,7 +2065,7 @@ function New-MockCompletedAdoptionConsumer {
     ) -Force
     & $launcherPath -TargetPath $consumer.Repository `
         -CodexCommand $mockCodexPath | Out-Null
-    $completedBranch = 'automation/meandai-capabilities-v0.15.5'
+    $completedBranch = 'automation/meandai-capabilities-v0.15.6'
     $remoteHeadLine = @(Invoke-TestGit -Repository $consumer.Repository `
         -Arguments @('ls-remote', '--heads', 'origin', "refs/heads/$completedBranch"))
     if ($remoteHeadLine.Count -ne 1) {
@@ -2075,10 +2101,10 @@ function Initialize-MockAdoptionPullRequestBody {
             schema = 9
             phase = 'Proposed'
             state = $proposalState
-            target = 'v0.15.5'
+            target = 'v0.15.6'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $global:QuickAdoptionPrHead
-            branch = 'automation/meandai-capabilities-v0.15.5'
+            branch = 'automation/meandai-capabilities-v0.15.6'
             adoptionStrategy = $markerStrategy
             protocolRecordLossAcknowledged =
                 [bool]$global:QuickAdoptionDispatchedLossAcknowledgement
@@ -2117,7 +2143,7 @@ function Initialize-MockAdoptionPullRequestBody {
             '',
             '## AI capabilities adoption proposal',
             '',
-            "- Protocol release: ``v0.15.5``",
+            "- Protocol release: ``v0.15.6``",
             "- Protocol commit: ``$($global:QuickAdoptionProtocolSha)``",
             '',
             '### Detected protocol and governance surfaces',
@@ -2136,7 +2162,7 @@ function Initialize-MockAdoptionPullRequestBody {
             schema = 5
             phase = 'Proposed'
             state = $proposalState
-            target = 'v0.15.5'
+            target = 'v0.15.6'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $global:QuickAdoptionPrHead
             adoptionStrategy = $markerStrategy
@@ -2195,7 +2221,7 @@ function New-TestQuickAdoptionManifest {
         operation = 'ai-capabilities-adoption'
         state = $State
         repository = $Repository
-        targetTag = 'v0.15.5'
+        targetTag = 'v0.15.6'
         protocolSha = $ProtocolSha
         adoptionStrategy = $Strategy
         protocolSurfaces = @($ProtocolSurfaces)
@@ -2267,7 +2293,7 @@ function New-TestQuickAdoptionPullRequestContractFixture {
         schema = 5
         phase = 'Proposed'
         state = 'AdoptionReviewRequired'
-        target = 'v0.15.5'
+        target = 'v0.15.6'
         protocolSha = 'a' * 40
         head = $head
         adoptionStrategy = $Strategy
@@ -2279,7 +2305,7 @@ function New-TestQuickAdoptionPullRequestContractFixture {
     $pullRequest = [pscustomobject][ordered]@{
         number = 42
         url = 'https://github.com/test-owner/consumer/pull/42'
-        headRefName = 'automation/meandai-capabilities-v0.15.5'
+        headRefName = 'automation/meandai-capabilities-v0.15.6'
         headRefOid = $head
         baseRefName = 'main'
         headRepository = [pscustomobject]@{
@@ -2309,9 +2335,9 @@ function New-TestQuickAdoptionPullRequestContractFixture {
         PullRequest = $pullRequest
         RemoteHead = $head
         Repository = 'test-owner/consumer'
-        Branch = 'automation/meandai-capabilities-v0.15.5'
+        Branch = 'automation/meandai-capabilities-v0.15.6'
         BaseBranch = 'main'
-        TargetTag = 'v0.15.5'
+        TargetTag = 'v0.15.6'
         TargetSha = 'a' * 40
         ExpectedActor = 'test-owner'
         ExpectedState = 'AdoptionReviewRequired'
@@ -2373,7 +2399,7 @@ function New-TestQuickAdoptionCompletionContractFixture {
 }
 
 function Publish-MockAdoptionBranch {
-    $branch = 'automation/meandai-capabilities-v0.15.5'
+    $branch = 'automation/meandai-capabilities-v0.15.6'
     if ($global:QuickAdoptionPrHead) {
         $remoteLine = @((Invoke-TestGit -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -2508,7 +2534,7 @@ function Publish-MockAdoptionBranch {
 }
 
 function Reset-MockAdoptionProposal {
-    $branch = 'automation/meandai-capabilities-v0.15.5'
+    $branch = 'automation/meandai-capabilities-v0.15.6'
     $branchLines = @(Invoke-TestGit `
         -Repository $global:QuickAdoptionTargetPath -Arguments @(
             'ls-remote', '--heads', 'origin', "refs/heads/$branch"
@@ -2544,6 +2570,8 @@ function Reset-MockAdoptionProposal {
     $global:QuickAdoptionManifestMode = 'Valid'
     $global:QuickAdoptionIssueEditMode = 'Normal'
     $global:QuickAdoptionIssueEditFailures = 0
+    $global:QuickAdoptionHistoricalIssueInventoryReads = 0
+    $global:QuickAdoptionHistoricalIssueDriftAtRead = 0
 }
 
 function global:Invoke-RestMethod {
@@ -2605,6 +2633,12 @@ function global:Invoke-RestMethod {
 
     if ($Uri -match '/repos/hasanmanzak/meAndAI/commits/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
         $tag = [string]$Matches.tag
+        if ($global:QuickAdoptionHistoricalReleaseProofActive -and
+            $tag -ceq 'v0.9.2') {
+            return [pscustomobject]@{
+                sha = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+            }
+        }
         if (-not $global:QuickAdoptionProtocolReleaseCommits.ContainsKey($tag)) {
             throw "Mock protocol commit is missing for '$tag'."
         }
@@ -2728,10 +2762,10 @@ function Test-MockInitialPolicyAuthorityCall {
         return $false
     }
     return [string]$endpoint[0] -cin @(
-        'repos/hasanmanzak/meAndAI/releases/tags/v0.15.5',
-        'repos/hasanmanzak/meAndAI/commits/v0.15.5',
-        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5',
-        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
+        'repos/hasanmanzak/meAndAI/releases/tags/v0.15.6',
+        'repos/hasanmanzak/meAndAI/commits/v0.15.6',
+        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.6',
+        'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.6'
     )
 }
 
@@ -2939,6 +2973,12 @@ function global:gh {
         [string]$apiEndpoint[0] -match '^repos/hasanmanzak/meAndAI/commits/(?<tag>v[0-9]+\.[0-9]+\.[0-9]+)$') {
         Assert-MockGhApiHeaders -Arguments $Arguments
         $tag = [string]$Matches.tag
+        if ($global:QuickAdoptionHistoricalReleaseProofActive -and
+            $tag -ceq 'v0.9.2') {
+            return (@{
+                sha = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+            } | ConvertTo-Json -Compress)
+        }
         if (-not $global:QuickAdoptionProtocolReleaseCommits.ContainsKey($tag)) {
             throw "Mock protocol commit is missing for '$tag'."
         }
@@ -3147,10 +3187,56 @@ function global:gh {
         return
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'issue' -and $Arguments[1] -eq 'list') {
+        $expectedIssueInventoryArguments = @(
+            'issue', 'list', '--repo', $global:QuickAdoptionRepoName,
+            '--state', 'all', '--limit', '1000', '--json',
+            'number,url,title,body,state,stateReason,closedAt,author'
+        )
+        if (($Arguments -join "`n") -cne
+                ($expectedIssueInventoryArguments -join "`n")) {
+            throw 'Historical issue inventory omitted its exact bounded field contract.'
+        }
+        $global:QuickAdoptionHistoricalIssueInventoryReads++
+        $injectHistoricalIssueDrift =
+            $global:QuickAdoptionHistoricalIssueDriftAtRead -gt 0 -and
+            $global:QuickAdoptionHistoricalIssueInventoryReads -eq
+                $global:QuickAdoptionHistoricalIssueDriftAtRead
         if ($global:QuickAdoptionIssues.Count -eq 0) {
             return '[]'
         }
-        return (ConvertTo-Json -InputObject @($global:QuickAdoptionIssues) -Compress)
+        $inventoryRecords = @($global:QuickAdoptionIssues | ForEach-Object {
+            $issue = $_
+            [ordered]@{
+                number = $issue.number
+                url = $issue.url
+                title = $issue.title
+                body = $issue.body
+                state = $issue.state
+                stateReason = if ($null -ne
+                    $issue.PSObject.Properties['stateReason']) {
+                    $issue.stateReason
+                }
+                else { $null }
+                closedAt = if ($injectHistoricalIssueDrift -and
+                    [int]$issue.number -eq 81) {
+                    '2026-06-01T12:00:01Z'
+                }
+                elseif ($null -ne
+                    $issue.PSObject.Properties['closedAt']) {
+                    $issue.closedAt
+                }
+                else { $null }
+                author = if ($null -ne
+                    $issue.PSObject.Properties['author']) {
+                    $issue.author
+                }
+                else {
+                    [ordered]@{ login = $global:QuickAdoptionOwner }
+                }
+            }
+        })
+        return (ConvertTo-Json -InputObject $inventoryRecords `
+            -Depth 5 -Compress)
     }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'issue' -and $Arguments[1] -eq 'create') {
         $bodyIndex = [Array]::IndexOf([object[]]$Arguments, '--body-file')
@@ -3160,9 +3246,11 @@ function global:gh {
         $createdIssue = [pscustomobject]@{
             number = 84
             url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/84"
-            title = 'Track meAndAI AI capabilities adoption from v0.15.5'
+            title = 'Track meAndAI AI capabilities adoption from v0.15.6'
             body = [IO.File]::ReadAllText($Arguments[$bodyIndex + 1])
             state = 'OPEN'
+            stateReason = ''
+            closedAt = $null
         }
         $global:QuickAdoptionIssues.Add($createdIssue)
         $global:QuickAdoptionIssue = $createdIssue
@@ -3170,9 +3258,11 @@ function global:gh {
             $global:QuickAdoptionIssues.Add([pscustomobject]@{
                 number = 83
                 url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/83"
-                title = 'Track meAndAI AI capabilities adoption from v0.15.5'
+                title = 'Track meAndAI AI capabilities adoption from v0.15.6'
                 body = $createdIssue.body
                 state = 'OPEN'
+                stateReason = ''
+                closedAt = $null
             })
             $global:QuickAdoptionIssues.Add([pscustomobject]@{
                 number = 82
@@ -3180,6 +3270,8 @@ function global:gh {
                 title = 'Similar maintainer issue'
                 body = '> Similar adoption note without an ownership marker.'
                 state = 'OPEN'
+                stateReason = ''
+                closedAt = $null
             })
         }
         for ($index = 0; $index -lt $Arguments.Count - 1; $index++) {
@@ -3206,10 +3298,26 @@ function global:gh {
         $issue = $issue[0]
         if ($Arguments[1] -ceq 'close') {
             $issue.state = 'CLOSED'
+            if ($null -eq $issue.PSObject.Properties['stateReason']) {
+                $issue | Add-Member -NotePropertyName stateReason `
+                    -NotePropertyValue 'COMPLETED'
+            }
+            else { $issue.stateReason = 'COMPLETED' }
+            if ($null -eq $issue.PSObject.Properties['closedAt']) {
+                $issue | Add-Member -NotePropertyName closedAt `
+                    -NotePropertyValue '2026-07-27T12:00:00Z'
+            }
+            else { $issue.closedAt = '2026-07-27T12:00:00Z' }
             $global:QuickAdoptionEvents.Add("issue-close:$($issue.number)")
             return
         }
         $issue.state = 'OPEN'
+        if ($null -ne $issue.PSObject.Properties['stateReason']) {
+            $issue.stateReason = ''
+        }
+        if ($null -ne $issue.PSObject.Properties['closedAt']) {
+            $issue.closedAt = $null
+        }
         $global:QuickAdoptionIssue = $issue
         if ($Arguments[1] -ceq 'edit') {
             $bodyIndex = [Array]::IndexOf(
@@ -3495,6 +3603,69 @@ function global:gh {
             url = 'https://github.com/test-owner/consumer/actions/runs/7001'
         } | ConvertTo-Json -Compress)
     }
+    if ($Arguments.Count -ge 3 -and $Arguments[0] -eq 'pr' -and
+        $Arguments[1] -eq 'view') {
+        $global:QuickAdoptionHistoricalPullRequestReads++
+        if ($global:QuickAdoptionHistoricalProviderMode -ceq 'Failure') {
+            throw 'Mock historical pull-request provider failure.'
+        }
+        $matches = @($global:QuickAdoptionHistoricalPullRequests |
+            Where-Object {
+                [string]$_.number -ceq [string]$Arguments[2]
+            })
+        if ($matches.Count -ne 1) {
+            throw 'Mock historical pull-request identity mismatch.'
+        }
+        $jsonIndex = [Array]::IndexOf([object[]]$Arguments, '--json')
+        if ($jsonIndex -lt 0 -or $jsonIndex + 1 -ge $Arguments.Count) {
+            throw 'Historical pull-request proof omitted its JSON field contract.'
+        }
+        $requestedHistoricalFields = @(
+            [string]$Arguments[$jsonIndex + 1] -split ','
+        )
+        foreach ($requiredHistoricalField in @(
+            'number', 'url', 'isDraft', 'state', 'baseRefName', 'headRefName',
+            'headRefOid', 'headRepository', 'headRepositoryOwner',
+            'isCrossRepository', 'author', 'body', 'mergedAt', 'mergeCommit'
+        )) {
+            if ($requestedHistoricalFields -cnotcontains
+                    $requiredHistoricalField) {
+                throw "Historical pull-request proof omitted '$requiredHistoricalField'."
+            }
+        }
+        return ($matches[0] | ConvertTo-Json -Depth 6 -Compress)
+    }
+    if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'pr' -and
+        $Arguments[1] -eq 'list' -and $Arguments -ccontains '--head' -and
+        $Arguments -ccontains 'automation/meandai-capabilities-v0.9.2') {
+        $headIndex = [Array]::IndexOf([object[]]$Arguments, '--head')
+        $head = if ($headIndex -ge 0 -and $headIndex + 1 -lt $Arguments.Count) {
+            [string]$Arguments[$headIndex + 1]
+        }
+        else { '' }
+        $limitIndex = [Array]::IndexOf([object[]]$Arguments, '--limit')
+        $jsonIndex = [Array]::IndexOf([object[]]$Arguments, '--json')
+        if ($limitIndex -lt 0 -or $limitIndex + 1 -ge $Arguments.Count -or
+            [string]$Arguments[$limitIndex + 1] -cne '2' -or
+            $jsonIndex -lt 0 -or $jsonIndex + 1 -ge $Arguments.Count -or
+            [string]$Arguments[$jsonIndex + 1] -cne
+                'number,url,state,headRefName') {
+            throw 'Historical branch pull-request proof omitted its exact bounded field contract.'
+        }
+        $global:QuickAdoptionHistoricalBranchReads++
+        if ($global:QuickAdoptionHistoricalProviderMode -ceq 'Failure') {
+            throw 'Mock historical branch provider failure.'
+        }
+        if ($global:QuickAdoptionHistoricalProviderMode -ceq 'CompetingOpen') {
+            return (@([ordered]@{
+                number = 40
+                url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/40"
+                state = 'OPEN'
+                headRefName = $head
+            }) | ConvertTo-Json -Compress)
+        }
+        return '[]'
+    }
     if ($Arguments.Count -ge 2 -and $Arguments[0] -eq 'pr' -and $Arguments[1] -eq 'list') {
         $jsonIndex = [Array]::IndexOf([object[]]$Arguments, '--json')
         if ($jsonIndex -lt 0 -or $jsonIndex + 1 -ge $Arguments.Count) {
@@ -3535,7 +3706,7 @@ function global:gh {
             isDraft = $global:QuickAdoptionPrDraft
             state = $global:QuickAdoptionPrState
             baseRefName = $global:QuickAdoptionDefaultBranch
-            headRefName = 'automation/meandai-capabilities-v0.15.5'
+            headRefName = 'automation/meandai-capabilities-v0.15.6'
             headRefOid = $global:QuickAdoptionPrHead
             headRepository = [ordered]@{
                 id = 'R_mock_consumer'
@@ -3572,7 +3743,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.5'
+                    target = 'v0.15.6'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = ('0' * 40)
                     adoptionStrategy = $global:QuickAdoptionDispatchedStrategy
@@ -3588,7 +3759,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.5'
+                    target = 'v0.15.6'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = $global:QuickAdoptionPrHead
                     adoptionStrategy = 'FreshAdoption'
@@ -3604,7 +3775,7 @@ function global:gh {
                     schema = 5
                     phase = 'Proposed'
                     state = $proposalState
-                    target = 'v0.15.5'
+                    target = 'v0.15.6'
                     protocolSha = $global:QuickAdoptionProtocolSha
                     head = $global:QuickAdoptionPrHead
                     adoptionStrategy = $global:QuickAdoptionDispatchedStrategy
@@ -3703,7 +3874,7 @@ try {
         $ancillaryFallbackPolicySnapshot =
             $global:QuickAdoptionProtocolAssetBytes[$ancillaryFallbackPolicyKey]
         $runtimePolicyKey =
-            "v0.15.5`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
+            "v0.15.6`ntemplates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1"
         $runtimePolicySnapshot =
             $global:QuickAdoptionProtocolAssetBytes[$runtimePolicyKey]
         try {
@@ -3714,7 +3885,7 @@ try {
                     PolicyBytes = [byte[]]$schema1PolicySnapshot.Bytes
                     PolicySha = [string]$schema1PolicySnapshot.Sha
                     TargetTag = 'v0.15.4'
-                    RuntimePolicyTag = 'v0.15.5'
+                    RuntimePolicyTag = 'v0.15.6'
                 })
             if ([string]$schema1PolicyContract.SelectedTag -cne 'v0.15.4' -or
                 [string]$schema1PolicyContract.ImportedTag -cne 'v0.15.4' -or
@@ -3746,7 +3917,7 @@ try {
                     PolicySha =
                         [string]$ancillaryFallbackPolicySnapshot.Sha
                     TargetTag = 'v0.14.1'
-                    RuntimePolicyTag = 'v0.15.5'
+                    RuntimePolicyTag = 'v0.15.6'
                     RuntimePolicyBytes = [byte[]]$runtimePolicySnapshot.Bytes
                     RuntimePolicySha = [string]$runtimePolicySnapshot.Sha
                 })
@@ -3783,7 +3954,7 @@ try {
             })
             $wrongAncillarySources = @($ancillaryCommands | Where-Object {
                 [string]$ancillaryFallbackContract.CommandSources[$_] -cne
-                    'v0.15.5'
+                    'v0.15.6'
             })
             if ([string]$ancillaryFallbackContract.SelectedTag -cne
                     'v0.14.1' -or
@@ -3836,7 +4007,7 @@ try {
                         PolicySha = Get-TestQuickAdoptionGitBlobSha1 `
                             -Bytes $partialAncillaryPolicyBytes
                         TargetTag = 'v0.14.1'
-                        RuntimePolicyTag = 'v0.15.5'
+                        RuntimePolicyTag = 'v0.15.6'
                         RuntimePolicyBytes = [byte[]]$runtimePolicySnapshot.Bytes
                         RuntimePolicySha = [string]$runtimePolicySnapshot.Sha
                     }))
@@ -3884,7 +4055,7 @@ try {
                         PolicySha = Get-TestQuickAdoptionGitBlobSha1 `
                             -Bytes $mutatedSchema1PolicyBytes
                         TargetTag = 'v0.15.4'
-                        RuntimePolicyTag = 'v0.15.5'
+                        RuntimePolicyTag = 'v0.15.6'
                     }))
             }
             catch { $mutatedSchema1PolicyFailure = $_.Exception.Message }
@@ -3901,7 +4072,7 @@ try {
         $firstFixtureArchive = $script:QuickAdoptionProtocolFixture.ArchivePath
         $firstMutableCalls = $global:QuickAdoptionGhCalls
         $firstCodexLog = $global:QuickAdoptionCodexLog
-        $assetIsolationKey = "v0.15.5`n$($canonicalInitialAdoptionPolicyAsset.TemplatePath)"
+        $assetIsolationKey = "v0.15.6`n$($canonicalInitialAdoptionPolicyAsset.TemplatePath)"
         $firstAssetBytes = [byte[]]$global:QuickAdoptionProtocolAssetBytes[
             $assetIsolationKey
         ].Bytes
@@ -3992,7 +4163,7 @@ try {
         }
 
         foreach ($required in @(
-            'v0.15.5',
+            'v0.15.6',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -4245,8 +4416,14 @@ try {
             $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
             $node.Name -ceq 'Get-ValidatedAdoptionMarker'
         }, $true))
-        if ($markerOwnershipFunctions.Count -ne 1) {
-            Add-Failure 'TEST-0145 launcher must expose one parseable adoption-marker ownership boundary.'
+        $markerRecordFunctions = @($launcherAst.FindAll({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            $node.Name -ceq 'Get-AdoptionPullRequestOwnershipMarkerRecord'
+        }, $true))
+        if ($markerOwnershipFunctions.Count -ne 1 -or
+            $markerRecordFunctions.Count -ne 1) {
+            Add-Failure 'TEST-0145 launcher must expose one parseable adoption-marker record helper and ownership boundary.'
         }
         else {
             $markerCultureModule = $null
@@ -4254,17 +4431,22 @@ try {
                 $markerCultureModule = New-Module `
                     -Name "MeAndAIMarkerCulture$([guid]::NewGuid().ToString('N'))" `
                     -ArgumentList @(
+                        $markerRecordFunctions[0].Extent.Text,
                         $markerOwnershipFunctions[0].Extent.Text
                     ) `
                     -ScriptBlock {
-                        param([string]$FunctionDefinition)
-                        $script:ProtocolTag = 'v0.15.5'
+                        param(
+                            [string]$RecordFunctionDefinition,
+                            [string]$OwnershipFunctionDefinition
+                        )
+                        $script:ProtocolTag = 'v0.15.6'
 
                         function Test-QuickAdoptionExactPullRequestMarker {
                             return $true
                         }
 
-                        Invoke-Expression $FunctionDefinition
+                        Invoke-Expression $RecordFunctionDefinition
+                        Invoke-Expression $OwnershipFunctionDefinition
                     }
                 $markerFixture =
                     New-TestQuickAdoptionPullRequestContractFixture `
@@ -4317,7 +4499,7 @@ try {
                                     Get-ValidatedAdoptionMarker `
                                         -PullRequest $PullRequest `
                                         -Repository 'test-owner/consumer' `
-                                        -Branch 'automation/meandai-capabilities-v0.15.5' `
+                                        -Branch 'automation/meandai-capabilities-v0.15.6' `
                                         -BaseBranch 'main' `
                                         -ExpectedActor 'test-owner' `
                                         -ExpectedMarkerHead ('c' * 40) `
@@ -4469,7 +4651,7 @@ try {
 
     if (Test-Path -LiteralPath $mockCodexScriptPath -PathType Leaf) {
         $mockCodex = Get-Content -LiteralPath $mockCodexScriptPath -Raw
-        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.15.5')) {
+        if (-not $mockCodex.Contains('automation/meandai-capabilities-v0.15.6')) {
             Add-Failure 'TEST-0059 mock Codex remote-race fixture is not pinned to the current adoption branch.'
         }
         if (-not $mockCodex.Contains('$Arguments[0] -ceq ''sandbox''') -or
@@ -4482,7 +4664,7 @@ try {
         $guide = Get-Content -LiteralPath $guidePath -Raw
         $normalizedGuide = [regex]::Replace($guide, '\s+', ' ')
         foreach ($required in @(
-            'v0.15.5',
+            'v0.15.6',
             'FG_PAT.txt',
             'MEANDAI_RO_FG_PAT.txt',
             'MEANDAI_UPDATER_TOKEN',
@@ -4868,7 +5050,10 @@ try {
                 $releaseBlocked = $true
             }
             $releaseCalls = @($global:QuickAdoptionRestCalls | Where-Object {
-                $_.Uri -match '/repos/hasanmanzak/meAndAI/releases/tags/v0\.15\.5$'
+                $_.Uri.EndsWith(
+                        '/repos/hasanmanzak/meAndAI/releases/tags/v0.15.6',
+                    [System.StringComparison]::Ordinal
+                )
             })
             $prematureMutations = @($global:QuickAdoptionGhCalls | Where-Object {
                 $_.Arguments.Count -ge 2 -and
@@ -5193,12 +5378,12 @@ try {
         $initialPolicyRestCalls = @($global:QuickAdoptionRestCalls |
             Where-Object {
                 [string]$_.Uri -ceq
-                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
+                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.6'
             })
         $workflowRestCalls = @($global:QuickAdoptionRestCalls |
             Where-Object {
                 [string]$_.Uri -ceq
-                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5'
+                    'https://api.github.com/repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.6'
             })
         if ($initialPolicyRestCalls.Count -ne 1 -or
             $workflowRestCalls.Count -ne 1) {
@@ -5309,7 +5494,7 @@ try {
         Confirm-MeAndAIScenarioEvidence -Context $scenarioContext `
             -TestId 'TEST-0060'
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
-            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.5' `
+            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.6' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
             -GraphDigest ([string]$global:QuickAdoptionDispatchedSourceGraphIdentity.graphDigest) `
             -PullRequestUrl "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
@@ -5347,7 +5532,7 @@ try {
         }
         else { @('- None') }
         $expectedIssueReferences = @(
-            "- Protocol release: [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)",
+            "- Protocol release: [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)",
             "- Protocol commit: [$($global:QuickAdoptionProtocolSha)](https://github.com/hasanmanzak/meAndAI/commit/$($global:QuickAdoptionProtocolSha))",
             $expectedVisiblePullRequestLink,
             "- Source graph base: [$issueGraphBase](https://github.com/$($global:QuickAdoptionRepoName)/commit/$issueGraphBase)"
@@ -5515,7 +5700,7 @@ try {
         $global:QuickAdoptionSecretLockMode = 'Normal'
         $global:QuickAdoptionSecretLockViewCalls = 0
         $adoptionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.6'
         ))
         if ($adoptionPaths -contains '.ai/adoption/meandai-capabilities.json' -or
             $adoptionPaths -notcontains 'docs/governance/ai-adoption.md') {
@@ -5569,12 +5754,12 @@ try {
         if ($global:QuickAdoptionSecrets.Count -ne $secretCountBeforeRerun) {
             Add-Failure 'TEST-0045 exact rerun overwrote an existing mapped Actions secret.'
         }
-        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.5'
+        $protocolSourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/workflows/meandai-protocol-update.yml?ref=v0.15.6'
         $protocolSourceCalls = @($global:QuickAdoptionGhCalls | Where-Object {
             $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
             $_.Arguments -contains $protocolSourceEndpoint
         })
-        $initialPolicySourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.5'
+        $initialPolicySourceEndpoint = 'repos/hasanmanzak/meAndAI/contents/templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1?ref=v0.15.6'
         $initialPolicySourceCalls = @($global:QuickAdoptionGhCalls |
             Where-Object {
                 $_.Arguments.Count -ge 2 -and $_.Arguments[0] -eq 'api' -and
@@ -5616,7 +5801,7 @@ try {
         }
         $interruptedRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         $codexCountAfterInterruptedCompletion = @(Get-MockCodexCalls).Count
         if (-not $interruptedCompletionBlocked -or
@@ -5647,7 +5832,7 @@ try {
         }
         $recoveredRemoteHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         if ($interruptedRecoveryThrew -or
             $recoveredRemoteHead -cne $interruptedRemoteHead -or
@@ -5685,7 +5870,7 @@ try {
         }
         $postReadyHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         $codexCountAfterPostReadyFailure = @(Get-MockCodexCalls).Count
         $bodyEditsAfterPostReadyFailure = $global:QuickAdoptionPrBodyEditCalls
@@ -5709,7 +5894,7 @@ try {
         }
         $postReadyRecoveredHead = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         if ($postReadyRecoveryThrew -or
             $postReadyRecoveredHead -cne $postReadyHead -or
@@ -5732,10 +5917,16 @@ try {
             $global:QuickAdoptionPrReadyUndoCalls
         $baseAdvanceCallsBeforeCompletedBaseRace =
             $global:QuickAdoptionBaseAdvanceCalls
+        # This scenario owns the timing of its PR-read race. Earlier recovery
+        # scenarios share the mock process, so start this call index locally
+        # instead of coupling the injection point to their accumulated reads.
+        $global:QuickAdoptionPrListCalls = 0
         $global:QuickAdoptionPrMetadataMode =
             'AdvanceBaseAtConfiguredRevalidation'
+        # One new pre-mutation ownership snapshot read and the retained
+        # pre-existing proposal read precede the final ready-state revalidation.
         $global:QuickAdoptionBaseAdvanceAtPrListCall =
-            $global:QuickAdoptionPrListCalls + 2
+            3
         $completedBaseRaceError = ''
         try {
             & $launcherPath -TargetPath $existingRepo `
@@ -5877,7 +6068,7 @@ try {
         $completionHookPaths = @(Invoke-TestGit `
             -Repository $completionHookConsumer.Remote -Arguments @(
                 'ls-tree', '-r', '--name-only',
-                'refs/heads/automation/meandai-capabilities-v0.15.5'
+                'refs/heads/automation/meandai-capabilities-v0.15.6'
             ))
         if ($completionHookError -or
             -not $completionHookEnvironmentRestored -or
@@ -6861,14 +7052,14 @@ try {
             -Name 'Test-MeAndAIExactAdoptionPullRequestMarker'
         $sourceGraphRecord = & $graphRecordConverter -Graph $sourceGraph
         $sourceGraphIdentity = & $graphIdentityGetter -Graph $sourceGraph
-        $graphAwareBranch = 'automation/meandai-capabilities-v0.15.5'
+        $graphAwareBranch = 'automation/meandai-capabilities-v0.15.6'
         $graphAwareState = 'AdoptionReviewRequired'
         $graphAwareRepository = 'test-owner/consumer'
         $graphAwareMarkerRecord = [ordered]@{
             schema = 9
             phase = 'Proposed'
             state = $graphAwareState
-            target = 'v0.15.5'
+            target = 'v0.15.6'
             protocolSha = $global:QuickAdoptionProtocolSha
             head = $finalHead
             branch = $graphAwareBranch
@@ -6913,7 +7104,7 @@ try {
         $graphAwareMarkerValid = & $markerValidator `
             -PullRequest $graphAwarePullRequest -RemoteHead $finalHead `
             -Repository $graphAwareRepository -Branch $graphAwareBranch `
-            -BaseBranch 'main' -TargetTag 'v0.15.5' `
+            -BaseBranch 'main' -TargetTag 'v0.15.6' `
             -TargetSha $global:QuickAdoptionProtocolSha `
             -ExpectedActor 'test-owner' -ExpectedState $graphAwareState `
             -ExpectedAdoptionStrategy 'FullMigration' `
@@ -6931,7 +7122,7 @@ try {
             operation = 'ai-capabilities-adoption'
             state = $graphAwareState
             repository = $graphAwareRepository
-            targetTag = 'v0.15.5'
+            targetTag = 'v0.15.6'
             protocolSha = $global:QuickAdoptionProtocolSha
             adoptionStrategy = 'FullMigration'
             protocolSurfaces = @($sourceGraph.protocolSurfaces)
@@ -6991,7 +7182,7 @@ try {
                             [string]$StructuralBaseHead,
                             [string]$WorkflowPath
                         )
-                        $script:ProtocolTag = 'v0.15.5'
+                        $script:ProtocolTag = 'v0.15.6'
                         $script:workflowTargetPath = $WorkflowPath
                         $script:workflowBytes =
                             [Text.UTF8Encoding]::new($false).GetBytes(
@@ -7229,7 +7420,7 @@ try {
         catch { $liveAuthorityError = $_.Exception.Message }
         finally { $env:MEANDAI_TEST_CODEX_MODE = 'Success' }
         $liveAuthorityBranch =
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         $liveAuthorityBranchLines = @(Invoke-TestGit `
             -Repository $liveAuthorityConsumer.Repository -Arguments @(
                 'ls-remote', '--heads', 'origin', $liveAuthorityBranch
@@ -7308,7 +7499,7 @@ try {
 
     if ($runIntegrityShards -and
         (Test-QuickAdoptionShard -Name 'IntegrityCompletedGraph')) {
-        $completedBranch = 'automation/meandai-capabilities-v0.15.5'
+        $completedBranch = 'automation/meandai-capabilities-v0.15.6'
         $canonicalCompletedHead = $postReadyRecoveredHead
         $canonicalCompletedBody = [string]$global:QuickAdoptionPrBody
         # Credential, protected-workflow, and manifest policy combinations are
@@ -7475,7 +7666,7 @@ try {
                 schema = 3
                 phase = 'Completed'
                 state = 'BootstrapReady'
-                target = 'v0.15.5'
+                target = 'v0.15.6'
                 protocolSha = $global:QuickAdoptionProtocolSha
                 head = $variantHead
                 repository = 'test-owner/consumer'
@@ -7520,8 +7711,10 @@ try {
         (Test-QuickAdoptionShard -Name 'IntegrityManifestIssue')) {
         $canonicalIssueGraphIdentity =
             $global:QuickAdoptionDispatchedSourceGraphIdentity
+        $canonicalIssueGraphRecord =
+            $global:QuickAdoptionDispatchedSourceGraphRecord
         $canonicalIssueMarker = Get-TestCanonicalAdoptionIssueMarker `
-            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.5' `
+            -Repository $global:QuickAdoptionRepoName -TargetTag 'v0.15.6' `
             -ProtocolSha $global:QuickAdoptionProtocolSha `
             -GraphDigest ([string]$canonicalIssueGraphIdentity.graphDigest) `
             -PullRequestUrl "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
@@ -7539,7 +7732,7 @@ try {
             -ProtocolSha ('a' * 40) -Strategy 'FreshAdoption'
         $validManifestAccepted = & $manifestValidator `
             -Manifest $validManifest -Repository 'test-owner/consumer' `
-            -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
+            -TargetTag 'v0.15.6' -ProtocolSha ('a' * 40) `
             -ExpectedState 'BootstrapReady' `
             -ExpectedAdoptionStrategy 'FreshAdoption' `
             -ExpectedProtocolSurfaces @() `
@@ -7555,7 +7748,7 @@ try {
                 -Strategy 'FreshAdoption'
             $contractAccepted = & $manifestValidator `
                 -Manifest $contractManifest -Repository 'test-owner/consumer' `
-                -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
+                -TargetTag 'v0.15.6' -ProtocolSha ('a' * 40) `
                 -ExpectedState 'BootstrapReady' `
                 -ExpectedAdoptionStrategy 'FreshAdoption' `
                 -ExpectedProtocolSurfaces @() `
@@ -7569,27 +7762,39 @@ try {
         # The production contract table owns the malformed-manifest variants.
         # Keep one real launcher slice for JSON root parsing and fail-closed
         # translation at the adapter boundary.
+        $savedIssues = @($global:QuickAdoptionIssues)
+        $savedCanonicalIssue = $global:QuickAdoptionIssue
         $representativeManifestMode = 'ArrayRoot'
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionManifestMode = $representativeManifestMode
         $codexCountBeforeInvalidManifest = @(Get-MockCodexCalls).Count
         $invalidManifestBlocked = $false
+        $invalidManifestError = ''
         try {
             & $launcherPath -TargetPath $existingRepo `
                 -CodexCommand $mockCodexPath | Out-Null
         }
         catch {
             $invalidManifestBlocked = $true
+            $invalidManifestError = $_.Exception.Message
         }
         if (-not $invalidManifestBlocked -or
+            $invalidManifestError -cne
+                'The adoption manifest does not exactly match the independently derived protocol contract.' -or
             @(Get-MockCodexCalls).Count -ne $codexCountBeforeInvalidManifest -or
             $global:QuickAdoptionPrReadyCalls -ne 0) {
-            Add-Failure "TEST-0080 launcher accepted representative adoption manifest mode '$representativeManifestMode' before local Codex execution."
+            Add-Failure "TEST-0080 launcher did not reject representative adoption manifest mode '$representativeManifestMode' at the exact manifest boundary before local Codex execution: $invalidManifestError"
         }
 
         Reset-MockAdoptionProposal
-        $savedIssues = @($global:QuickAdoptionIssues)
-        $savedCanonicalIssue = $global:QuickAdoptionIssue
+        $global:QuickAdoptionIssues.Clear()
+        foreach ($issue in $savedIssues) {
+            $global:QuickAdoptionIssues.Add($issue)
+        }
+        $global:QuickAdoptionIssue = $savedCanonicalIssue
         $canonicalOwnedIssue = @($savedIssues | Where-Object {
             [string]$_.state -ceq 'OPEN' -and
             ([string]$_.body).StartsWith($canonicalIssueMarker, [StringComparison]::Ordinal)
@@ -7675,8 +7880,13 @@ try {
         }
         if ($canonicalOwnedIssue.Count -eq 1) {
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionDispatchedSourceGraphIdentity =
+                $canonicalIssueGraphIdentity
+            $global:QuickAdoptionDispatchedSourceGraphRecord =
+                $canonicalIssueGraphRecord
+            Publish-MockAdoptionBranch
             $legacyIssueMarker =
-                '<!-- meandai-local-adoption:v0.15.5:pr-42 -->'
+                '<!-- meandai-local-adoption:v0.15.6:pr-42 -->'
             $pullRequestUrl =
                 "https://github.com/$($global:QuickAdoptionRepoName)/pull/42"
             $graphIdentity = $canonicalIssueGraphIdentity
@@ -7684,8 +7894,8 @@ try {
             $legacyOwnedBody = $legacyOwnedBody.Replace(
                 $canonicalIssueMarker, $legacyIssueMarker
             ).Replace(
-                '- Protocol release: [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)',
-                '- Protocol release: `v0.15.5`'
+                '- Protocol release: [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)',
+                '- Protocol release: `v0.15.6`'
             ).Replace(
                 "- Protocol commit: [$($global:QuickAdoptionProtocolSha)](https://github.com/hasanmanzak/meAndAI/commit/$($global:QuickAdoptionProtocolSha))$([Environment]::NewLine)",
                 ''
@@ -7719,11 +7929,15 @@ try {
             $legacyEditCountBefore = @($global:QuickAdoptionEvents |
                 Where-Object { $_ -ceq 'issue-body-edit:83' }).Count
             $legacyConvergenceFailed = $false
+            $legacyConvergenceError = ''
             try {
                 & $launcherPath -TargetPath $existingRepo `
                     -CodexCommand $mockCodexPath | Out-Null
             }
-            catch { $legacyConvergenceFailed = $true }
+            catch {
+                $legacyConvergenceFailed = $true
+                $legacyConvergenceError = $_.Exception.Message
+            }
             $legacyEditCountAfter = @($global:QuickAdoptionEvents |
                 Where-Object { $_ -ceq 'issue-body-edit:83' }).Count
             if ($legacyConvergenceFailed -or
@@ -7735,8 +7949,1266 @@ try {
                     "- Adoption draft: [PR #42]($pullRequestUrl)"
                 ) -or
                 ([string]$legacyIssue.body).Contains(':pr-42 -->')) {
-                Add-Failure 'TEST-0176 exact legacy adoption-issue ownership did not converge once to the opaque marker and visible PR link.'
+                Add-Failure (
+                    'TEST-0176 exact legacy adoption-issue ownership did not ' +
+                    'converge once to the opaque marker and visible PR link: ' +
+                    $legacyConvergenceError
+                )
             }
+        }
+        if ($canonicalOwnedIssue.Count -eq 1) {
+            Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionHistoricalPullRequests.Clear()
+            $global:QuickAdoptionIssue = $null
+            $global:QuickAdoptionHistoricalReleaseProofActive = $true
+            $historicalTag = 'v0.9.2'
+            $historicalPullRequestNumber = 41
+            $historicalPullRequestUrl =
+                "https://github.com/$($global:QuickAdoptionRepoName)/pull/$historicalPullRequestNumber"
+            $historicalHead = '1' * 40
+            $historicalMarker =
+                "<!-- meandai-local-adoption:${historicalTag}:pr-${historicalPullRequestNumber} -->"
+            $historicalIssueBody = @(
+                $historicalMarker,
+                '## AI capabilities adoption tracking',
+                '',
+                "- Protocol release: ``$historicalTag``",
+                "- Adoption draft: $historicalPullRequestUrl",
+                '',
+                'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+                '',
+                'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+            ) -join [Environment]::NewLine
+            $historicalIssue = [pscustomobject]@{
+                number = 81
+                url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/81"
+                title = "Track meAndAI AI capabilities adoption from $historicalTag"
+                body = $historicalIssueBody
+                state = 'CLOSED'
+                stateReason = 'COMPLETED'
+                closedAt = '2026-06-01T12:00:00Z'
+                author = [pscustomobject][ordered]@{
+                    login = $global:QuickAdoptionOwner
+                }
+            }
+            $historicalPullRequestMarker = [ordered]@{
+                schema = 3
+                phase = 'Completed'
+                state = 'BootstrapReady'
+                target = $historicalTag
+                protocolSha =
+                    'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+                head = $historicalHead
+                repository = $global:QuickAdoptionRepoName
+                actor = $global:QuickAdoptionOwner
+            } | ConvertTo-Json -Compress
+            $historicalPullRequest = [pscustomobject][ordered]@{
+                number = $historicalPullRequestNumber
+                url = $historicalPullRequestUrl
+                isDraft = $false
+                state = 'MERGED'
+                baseRefName = $global:QuickAdoptionDefaultBranch
+                headRefName =
+                    "automation/meandai-capabilities-$historicalTag"
+                headRefOid = $historicalHead
+                headRepository = [ordered]@{
+                    id = 'R_mock_consumer'
+                    name = ([string]$global:QuickAdoptionRepoName -split '/', 2)[1]
+                }
+                headRepositoryOwner = [ordered]@{
+                    id = 'U_mock_owner'
+                    login = $global:QuickAdoptionOwner
+                }
+                isCrossRepository = $false
+                author = [ordered]@{ login = $global:QuickAdoptionOwner }
+                body =
+                    "<!-- meandai-capabilities-adoption:$historicalPullRequestMarker -->"
+                mergedAt = '2026-06-01T11:45:00Z'
+                mergeCommit = [ordered]@{ oid = '2' * 40 }
+            }
+            $historicalContractCases =
+                [System.Collections.Generic.List[object]]::new()
+            foreach ($localCaseName in @(
+                'valid', 'malformed-version', 'leading-zero-version',
+                'second-line', 'leading-space', 'quoted', 'duplicate',
+                'case-variant', 'unsupported-family', 'opaque-family',
+                'current-competing', 'newer-competing', 'wrong-title',
+                'wrong-body', 'marker-only', 'cross-major',
+                'wrong-pr-url', 'wrong-issue-url', 'open-issue',
+                'not-completed', 'invalid-closed-at'
+            )) {
+                $localIssue = ([string]($historicalIssue |
+                    ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+                switch ($localCaseName) {
+                    'malformed-version' {
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            ':v0.9.2:pr-', ':v0.9:pr-'
+                        )
+                    }
+                    'leading-zero-version' {
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            ':v0.9.2:pr-', ':v0.09.2:pr-'
+                        )
+                    }
+                    'second-line' {
+                        $localIssue.body =
+                            "Untrusted preface$([Environment]::NewLine)$($localIssue.body)"
+                    }
+                    'leading-space' {
+                        $localIssue.body =
+                            " $([string]$localIssue.body)"
+                    }
+                    'quoted' {
+                        $localIssue.body =
+                            "> $([string]$localIssue.body)"
+                    }
+                    'duplicate' {
+                        $localIssue.body =
+                            "$($localIssue.body)$([Environment]::NewLine)$historicalMarker"
+                    }
+                    'case-variant' {
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            'meandai-local-adoption',
+                            'MeAndAI-local-adoption'
+                        )
+                    }
+                    'unsupported-family' {
+                        $unsupportedTag = 'v0.7.3'
+                        $unsupportedMarker =
+                            "<!-- meandai-local-adoption:${unsupportedTag}:pr-${historicalPullRequestNumber} -->"
+                        $localIssue.title =
+                            "Track meAndAI AI capabilities adoption from $unsupportedTag"
+                        $localIssue.body = @(
+                            $unsupportedMarker,
+                            '## AI capabilities adoption tracking', '',
+                            "- Protocol release: ``$unsupportedTag``",
+                            "- Adoption draft: $historicalPullRequestUrl", '',
+                            'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+                            '',
+                            'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+                        ) -join [Environment]::NewLine
+                    }
+                    'opaque-family' {
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            $historicalMarker,
+                            "<!-- meandai-local-adoption:v2:$('a' * 64) -->"
+                        )
+                    }
+                    'current-competing' {
+                        $currentCompetingMarker =
+                            '<!-- meandai-local-adoption:v0.15.6:pr-41 -->'
+                        $localIssue.title =
+                            'Track meAndAI AI capabilities adoption from v0.15.6'
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            $historicalMarker, $currentCompetingMarker
+                        ).Replace('v0.9.2', 'v0.15.6')
+                    }
+                    'newer-competing' {
+                        $newerMarker =
+                            '<!-- meandai-local-adoption:v0.15.7:pr-41 -->'
+                        $localIssue.title =
+                            'Track meAndAI AI capabilities adoption from v0.15.7'
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            $historicalMarker, $newerMarker
+                        ).Replace('v0.9.2', 'v0.15.7')
+                    }
+                    'wrong-title' { $localIssue.title = 'Drifted historical title' }
+                    'wrong-body' { $localIssue.body += "`nDrift" }
+                    'marker-only' { $localIssue.body = $historicalMarker }
+                    'cross-major' {
+                        $localIssue.title =
+                            'Track meAndAI AI capabilities adoption from v1.0.0'
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            'v0.9.2', 'v1.0.0'
+                        )
+                    }
+                    'wrong-pr-url' {
+                        $localIssue.body = ([string]$localIssue.body).Replace(
+                            '/pull/41', '/pull/40'
+                        )
+                    }
+                    'wrong-issue-url' {
+                        $localIssue.url =
+                            "https://github.com/$($global:QuickAdoptionRepoName)/issues/82"
+                    }
+                    'open-issue' { $localIssue.state = 'OPEN' }
+                    'not-completed' { $localIssue.stateReason = 'NOT_PLANNED' }
+                    'invalid-closed-at' { $localIssue.closedAt = '01/06/2026' }
+                }
+                $historicalContractCases.Add([pscustomobject]@{
+                    Name = "local-$localCaseName"
+                    ExpectSuccess = $localCaseName -ceq 'valid'
+                    ExpectedLocalProviderCalls = if (
+                        $localCaseName -ceq 'valid'
+                    ) { 1 } else { 0 }
+                    Input = [pscustomobject]@{
+                        Mode = 'LocalClassification'
+                        ProtocolTag = 'v0.15.6'
+                        ProtocolToken =
+                            $global:QuickAdoptionExpectedProtocolToken
+                        Issues = @($localIssue)
+                        Repository = $global:QuickAdoptionRepoName
+                        TargetRepository = $existingRepo
+                        BaseBranch = $global:QuickAdoptionDefaultBranch
+                        Marker = $canonicalIssueMarker
+                        ExpectedTitle =
+                            [string]$canonicalOwnedIssue[0].title
+                        ExpectedBody = $canonicalOwnedBody
+                        LegacyMarker = $legacyIssueMarker
+                        LegacyExpectedBody = $legacyOwnedBody
+                    }
+                })
+            }
+            $boundedHistoricalIssues =
+                [System.Collections.Generic.List[object]]::new()
+            $boundedTags = @(
+                'v0.8.0', 'v0.8.1', 'v0.8.2', 'v0.8.3', 'v0.8.4',
+                'v0.8.5', 'v0.8.6', 'v0.9.0', 'v0.9.1'
+            )
+            for ($boundedIndex = 0; $boundedIndex -lt
+                    $boundedTags.Count; $boundedIndex++) {
+                $boundedTag = [string]$boundedTags[$boundedIndex]
+                $boundedPr = 50 + $boundedIndex
+                $boundedIssueNumber = 90 + $boundedIndex
+                $boundedPrUrl =
+                    "https://github.com/$($global:QuickAdoptionRepoName)/pull/$boundedPr"
+                $boundedMarker =
+                    "<!-- meandai-local-adoption:${boundedTag}:pr-${boundedPr} -->"
+                $boundedHistoricalIssues.Add([pscustomobject]@{
+                    number = $boundedIssueNumber
+                    url = "https://github.com/$($global:QuickAdoptionRepoName)/issues/$boundedIssueNumber"
+                    title =
+                        "Track meAndAI AI capabilities adoption from $boundedTag"
+                    body = @(
+                        $boundedMarker,
+                        '## AI capabilities adoption tracking', '',
+                        "- Protocol release: ``$boundedTag``",
+                        "- Adoption draft: $boundedPrUrl", '',
+                        'This issue tracks the project-owned feature and decision records, local memory, tests, evidence, links, and maintainer review required to complete the transient adoption manifest.',
+                        '',
+                        'The launcher may prepare the draft and mark it ready after bounded local validation; only the maintainer may merge it.'
+                    ) -join [Environment]::NewLine
+                    state = 'CLOSED'
+                    stateReason = 'COMPLETED'
+                    closedAt = '2026-06-01T12:00:00Z'
+                    author = [pscustomobject][ordered]@{
+                        login = $global:QuickAdoptionOwner
+                    }
+                })
+            }
+            $historicalContractCases.Add([pscustomobject]@{
+                Name = 'local-candidate-bound-exact'
+                ExpectSuccess = $true
+                ExpectedLocalProviderCalls = 8
+                Input = [pscustomobject]@{
+                    Mode = 'LocalClassification'
+                    ProtocolTag = 'v0.15.6'
+                    Issues = @($boundedHistoricalIssues | Select-Object -First 8)
+                    Repository = $global:QuickAdoptionRepoName
+                    TargetRepository = $existingRepo
+                    BaseBranch = $global:QuickAdoptionDefaultBranch
+                    Marker = $canonicalIssueMarker
+                    ExpectedTitle = [string]$canonicalOwnedIssue[0].title
+                    ExpectedBody = $canonicalOwnedBody
+                    LegacyMarker = $legacyIssueMarker
+                    LegacyExpectedBody = $legacyOwnedBody
+                }
+            })
+            $historicalContractCases.Add([pscustomobject]@{
+                Name = 'local-candidate-bound'
+                ExpectSuccess = $false
+                ExpectedLocalProviderCalls = 0
+                Input = [pscustomobject]@{
+                    Mode = 'LocalClassification'
+                    ProtocolTag = 'v0.15.6'
+                    Issues = @($boundedHistoricalIssues)
+                    Repository = $global:QuickAdoptionRepoName
+                    TargetRepository = $existingRepo
+                    BaseBranch = $global:QuickAdoptionDefaultBranch
+                    Marker = $canonicalIssueMarker
+                    ExpectedTitle = [string]$canonicalOwnedIssue[0].title
+                    ExpectedBody = $canonicalOwnedBody
+                    LegacyMarker = $legacyIssueMarker
+                    LegacyExpectedBody = $legacyOwnedBody
+                }
+            })
+            $historicalContractCases.Add([pscustomobject]@{
+                Name = 'local-frozen-evidence-drift'
+                ExpectSuccess = $false
+                ExpectedLocalProviderCalls = 0
+                Input = [pscustomobject]@{
+                    Mode = 'LocalClassification'
+                    ProtocolTag = 'v0.15.6'
+                    Issues = @($historicalIssue)
+                    Repository = $global:QuickAdoptionRepoName
+                    TargetRepository = $existingRepo
+                    BaseBranch = $global:QuickAdoptionDefaultBranch
+                    Marker = $canonicalIssueMarker
+                    ExpectedTitle = [string]$canonicalOwnedIssue[0].title
+                    ExpectedBody = $canonicalOwnedBody
+                    LegacyMarker = $legacyIssueMarker
+                    LegacyExpectedBody = $legacyOwnedBody
+                    FrozenHistorical = @([pscustomobject]@{
+                        number = $historicalIssue.number
+                        fingerprint = '0' * 64
+                    })
+                }
+            })
+            $duplicateHistoricalIssue = ([string]($historicalIssue |
+                ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+            $duplicateHistoricalIssue.number = 82
+            $duplicateHistoricalIssue.url =
+                "https://github.com/$($global:QuickAdoptionRepoName)/issues/82"
+            $historicalContractCases.Add([pscustomobject]@{
+                Name = 'local-duplicate-historical-identity'
+                ExpectSuccess = $false
+                ExpectedLocalProviderCalls = 0
+                Input = [pscustomobject]@{
+                    Mode = 'LocalClassification'
+                    ProtocolTag = 'v0.15.6'
+                    Issues = @($historicalIssue, $duplicateHistoricalIssue)
+                    Repository = $global:QuickAdoptionRepoName
+                    TargetRepository = $existingRepo
+                    BaseBranch = $global:QuickAdoptionDefaultBranch
+                    Marker = $canonicalIssueMarker
+                    ExpectedTitle = [string]$canonicalOwnedIssue[0].title
+                    ExpectedBody = $canonicalOwnedBody
+                    LegacyMarker = $legacyIssueMarker
+                    LegacyExpectedBody = $legacyOwnedBody
+                }
+            })
+            foreach ($providerCaseName in @(
+                'valid', 'alternate-terminal-state',
+                'release-failure', 'release-mismatch',
+                'provider-failure', 'missing-pr', 'open-pr', 'draft-pr',
+                'wrong-base',
+                'wrong-branch', 'invalid-head', 'cross-repository',
+                'wrong-head-owner', 'wrong-head-repository',
+                'missing-merge-commit',
+                'invalid-merge-commit', 'invalid-merged-at',
+                'merge-after-close', 'nonterminal-marker',
+                'unsupported-marker-schema', 'duplicate-pr-marker',
+                'marker-actor-mismatch', 'issue-actor-mismatch',
+                'marker-contract-mismatch', 'competing-open-pr',
+                'ambiguous-open-pr', 'null-open-pr-list',
+                'object-open-pr-list', 'null-row-open-pr-list',
+                'missing-property-open-pr-row', 'live-remote-branch'
+            )) {
+                $providerIssue = ([string]($historicalIssue |
+                    ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+                $providerPullRequest = ([string]($historicalPullRequest |
+                    ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+                $providerMode = 'Valid'
+                $releaseCommit =
+                    'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+                $markerContractValid = $true
+                $openPullRequests = @()
+                $openPullRequestRawOutput = $null
+                $providerRemoteHead = ''
+                switch ($providerCaseName) {
+                    'release-failure' { $providerMode = 'ReleaseFailure' }
+                    'release-mismatch' { $releaseCommit = '3' * 40 }
+                    'provider-failure' { $providerMode = 'ProviderFailure' }
+                    'missing-pr' { $providerPullRequest = $null }
+                    'alternate-terminal-state' {
+                        $providerPullRequest.body =
+                            ([string]$providerPullRequest.body).Replace(
+                                '"state":"BootstrapReady"',
+                                '"state":"AdoptionReviewRequired"'
+                            )
+                    }
+                    'open-pr' { $providerPullRequest.state = 'OPEN' }
+                    'draft-pr' { $providerPullRequest.isDraft = $true }
+                    'wrong-base' { $providerPullRequest.baseRefName = 'develop' }
+                    'wrong-branch' {
+                        $providerPullRequest.headRefName =
+                            'automation/meandai-capabilities-v0.9.1'
+                    }
+                    'invalid-head' {
+                        $providerPullRequest.headRefOid = 'invalid'
+                    }
+                    'cross-repository' {
+                        $providerPullRequest.isCrossRepository = $true
+                    }
+                    'wrong-head-owner' {
+                        $providerPullRequest.headRepositoryOwner.login =
+                            'foreign-owner'
+                    }
+                    'wrong-head-repository' {
+                        $providerPullRequest.headRepository.name =
+                            'foreign-consumer'
+                    }
+                    'missing-merge-commit' {
+                        $providerPullRequest.mergeCommit = $null
+                    }
+                    'invalid-merge-commit' {
+                        $providerPullRequest.mergeCommit.oid = 'invalid'
+                    }
+                    'invalid-merged-at' {
+                        $providerPullRequest.mergedAt = '01/06/2026'
+                    }
+                    'merge-after-close' {
+                        $providerPullRequest.mergedAt =
+                            '2026-06-01T12:01:00Z'
+                    }
+                    'nonterminal-marker' {
+                        $providerPullRequest.body =
+                            ([string]$providerPullRequest.body).Replace(
+                                '"phase":"Completed"',
+                                '"phase":"Proposed"'
+                            )
+                    }
+                    'unsupported-marker-schema' {
+                        $providerPullRequest.body =
+                            ([string]$providerPullRequest.body).Replace(
+                                '"schema":3', '"schema":4'
+                            )
+                    }
+                    'duplicate-pr-marker' {
+                        $providerPullRequest.body =
+                            "$($providerPullRequest.body)`n$($providerPullRequest.body)"
+                    }
+                    'marker-actor-mismatch' {
+                        $providerPullRequest.body =
+                            ([string]$providerPullRequest.body).Replace(
+                                ('"actor":"' +
+                                    [string]$global:QuickAdoptionOwner + '"'),
+                                '"actor":"foreign-owner"'
+                            )
+                    }
+                    'issue-actor-mismatch' {
+                        $providerIssue.author.login = 'foreign-owner'
+                    }
+                    'marker-contract-mismatch' {
+                        $markerContractValid = $false
+                    }
+                    'competing-open-pr' {
+                        $openPullRequests = @([pscustomobject]@{
+                            number = 40
+                            url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/40"
+                            state = 'OPEN'
+                            headRefName =
+                                'automation/meandai-capabilities-v0.9.2'
+                        })
+                    }
+                    'ambiguous-open-pr' {
+                        $openPullRequests = @(40, 39 | ForEach-Object {
+                            [pscustomobject]@{
+                                number = $_
+                                url = "https://github.com/$($global:QuickAdoptionRepoName)/pull/$_"
+                                state = 'OPEN'
+                                headRefName =
+                                    'automation/meandai-capabilities-v0.9.2'
+                            }
+                        })
+                    }
+                    'null-open-pr-list' {
+                        $openPullRequestRawOutput = 'null'
+                    }
+                    'object-open-pr-list' {
+                        $openPullRequestRawOutput = '{}'
+                    }
+                    'null-row-open-pr-list' {
+                        $openPullRequestRawOutput = '[null]'
+                    }
+                    'missing-property-open-pr-row' {
+                        $openPullRequestRawOutput = '[{"number":40}]'
+                    }
+                    'live-remote-branch' { $providerRemoteHead = '4' * 40 }
+                }
+                $providerCandidate = [pscustomobject]@{
+                    Issue = $providerIssue
+                    TargetTag = $historicalTag
+                    PullRequestNumber = $historicalPullRequestNumber
+                    PullRequestUrl = $historicalPullRequestUrl
+                    ExpectedProtocolSha =
+                        'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+                    ClosedAt = [DateTimeOffset]::Parse(
+                        '2026-06-01T12:00:00Z'
+                    )
+                    Fingerprint = '5' * 64
+                }
+                $historicalContractCases.Add([pscustomobject]@{
+                    Name = "provider-$providerCaseName"
+                    ExpectSuccess = $providerCaseName -cin @(
+                        'valid', 'alternate-terminal-state'
+                    )
+                    ExpectedLocalProviderCalls = -1
+                    Input = [pscustomobject]@{
+                        Mode = 'ProviderProof'
+                        ProtocolToken =
+                            $global:QuickAdoptionExpectedProtocolToken
+                        ProviderMode = $providerMode
+                        Candidate = $providerCandidate
+                        Repository = $global:QuickAdoptionRepoName
+                        TargetRepository = $existingRepo
+                        BaseBranch = $global:QuickAdoptionDefaultBranch
+                        ReleaseCommit = $releaseCommit
+                        PullRequest = $providerPullRequest
+                        OpenPullRequests = @($openPullRequests)
+                        OpenPullRequestRawOutput =
+                            $openPullRequestRawOutput
+                        MarkerContractValid = $markerContractValid
+                        RemoteHead = $providerRemoteHead
+                    }
+                })
+            }
+            foreach ($historicalContractCase in $historicalContractCases) {
+                $historicalContractResult = & $launcherPath `
+                    -SupportAction HistoricalIssueContract `
+                    -SupportInput @($historicalContractCase.Input)
+                $localProviderCalls = @(
+                    $historicalContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'HistoricalProvider'
+                    }
+                ).Count
+                $providerKinds = @(
+                    $historicalContractResult.Calls | ForEach-Object {
+                        [string]$_.Kind
+                    }
+                )
+                $expectedProviderKinds = @(
+                    'Release', 'PullRequestView', 'MarkerContract',
+                    'OpenPullRequestList', 'RemoteBranch'
+                )
+                $isProviderProofCase =
+                    $historicalContractCase.Name.StartsWith(
+                        'provider-', [StringComparison]::Ordinal
+                    )
+                $providerSequenceInvalid = $false
+                if ($isProviderProofCase) {
+                    $providerSequenceInvalid =
+                        $providerKinds.Count -eq 0 -or
+                        $providerKinds.Count -gt $expectedProviderKinds.Count -or
+                        @($providerKinds | Group-Object | Where-Object {
+                            $_.Count -gt 1
+                        }).Count -ne 0
+                }
+                if ($isProviderProofCase -and -not $providerSequenceInvalid) {
+                    for ($providerKindIndex = 0; $providerKindIndex -lt
+                            $providerKinds.Count; $providerKindIndex++) {
+                        if ($providerKinds[$providerKindIndex] -cne
+                                $expectedProviderKinds[$providerKindIndex]) {
+                            $providerSequenceInvalid = $true
+                            break
+                        }
+                    }
+                }
+                $unexpectedCalls = @(
+                    $historicalContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'Unexpected'
+                    }
+                ).Count
+                $providerReadArgumentsInvalid = $false
+                $providerReleaseCalls = @(
+                    $historicalContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'Release'
+                    }
+                )
+                if ($providerReleaseCalls.Count -eq 1 -and
+                    [string]$providerReleaseCalls[0].Tag -cne $historicalTag) {
+                    $providerReadArgumentsInvalid = $true
+                }
+                $providerPullRequestViewCalls = @(
+                    $historicalContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'PullRequestView'
+                    }
+                )
+                $expectedProviderPullRequestViewArguments = @(
+                    'pr', 'view', [string]$historicalPullRequestNumber,
+                    '--repo', $global:QuickAdoptionRepoName, '--json',
+                    'number,url,isDraft,state,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,isCrossRepository,author,body,mergedAt,mergeCommit'
+                )
+                if ($providerPullRequestViewCalls.Count -eq 1 -and
+                    (@($providerPullRequestViewCalls[0].Arguments) -join "`n") -cne
+                        ($expectedProviderPullRequestViewArguments -join "`n")) {
+                    $providerReadArgumentsInvalid = $true
+                }
+                $providerOpenPullRequestCalls = @(
+                    $historicalContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'OpenPullRequestList'
+                    }
+                )
+                $expectedProviderOpenPullRequestArguments = @(
+                    'pr', 'list', '--repo', $global:QuickAdoptionRepoName,
+                    '--state', 'open', '--head',
+                    'automation/meandai-capabilities-v0.9.2',
+                    '--limit', '2', '--json',
+                    'number,url,state,headRefName'
+                )
+                if ($providerOpenPullRequestCalls.Count -eq 1 -and
+                    (@($providerOpenPullRequestCalls[0].Arguments) -join "`n") -cne
+                        ($expectedProviderOpenPullRequestArguments -join "`n")) {
+                    $providerReadArgumentsInvalid = $true
+                }
+                $positiveIdentityInvalid = $false
+                if ($historicalContractCase.Name -ceq 'local-valid') {
+                    $localHistoricalProviderCall = @(
+                        $historicalContractResult.Calls | Where-Object {
+                            [string]$_.Kind -ceq 'HistoricalProvider'
+                        }
+                    )
+                    $positiveIdentityInvalid =
+                        @($historicalContractResult.Result).Count -ne 1 -or
+                        [string]$historicalContractResult.Result[0].classification -cne
+                            'CompletedHistorical' -or
+                        [int]$historicalContractResult.Result[0].number -ne 81 -or
+                        [string]$historicalContractResult.Result[0].targetTag -cne
+                            $historicalTag -or
+                        [int]$historicalContractResult.Result[0].pullRequestNumber -ne
+                            $historicalPullRequestNumber -or
+                        [string]$historicalContractResult.Result[0].fingerprint -cnotmatch
+                            '^[0-9a-f]{64}$' -or
+                        $localHistoricalProviderCall.Count -ne 1 -or
+                        [string]$localHistoricalProviderCall[0].ProtocolToken -cne
+                            $global:QuickAdoptionExpectedProtocolToken
+                }
+                elseif ($historicalContractCase.Name -ceq 'provider-valid') {
+                    $providerReleaseCall = @(
+                        $historicalContractResult.Calls | Where-Object {
+                            [string]$_.Kind -ceq 'Release'
+                        }
+                    )
+                    $providerMarkerCall = @(
+                        $historicalContractResult.Calls | Where-Object {
+                            [string]$_.Kind -ceq 'MarkerContract'
+                        }
+                    )
+                    $providerRemoteCall = @(
+                        $historicalContractResult.Calls | Where-Object {
+                            [string]$_.Kind -ceq 'RemoteBranch'
+                        }
+                    )
+                    $positiveIdentityInvalid =
+                        [string]$historicalContractResult.Result.classification -cne
+                            'CompletedHistorical' -or
+                        [int]$historicalContractResult.Result.number -ne 81 -or
+                        [string]$historicalContractResult.Result.targetTag -cne
+                            $historicalTag -or
+                        [int]$historicalContractResult.Result.pullRequestNumber -ne
+                            $historicalPullRequestNumber -or
+                        [string]$historicalContractResult.Result.fingerprint -cne
+                            ('5' * 64) -or
+                        $providerReleaseCall.Count -ne 1 -or
+                        [string]$providerReleaseCall[0].ProtocolToken -cne
+                            $global:QuickAdoptionExpectedProtocolToken -or
+                        $providerMarkerCall.Count -ne 1 -or
+                        [string]$providerMarkerCall[0].Repository -cne
+                            $global:QuickAdoptionRepoName -or
+                        [string]$providerMarkerCall[0].Branch -cne
+                            'automation/meandai-capabilities-v0.9.2' -or
+                        [string]$providerMarkerCall[0].BaseBranch -cne
+                            $global:QuickAdoptionDefaultBranch -or
+                        [string]$providerMarkerCall[0].RemoteHead -cne
+                            $historicalHead -or
+                        [string]$providerMarkerCall[0].State -cne
+                            'BootstrapReady' -or
+                        [string]$providerMarkerCall[0].AdoptionStrategy -cne
+                            'LegacyUnspecified' -or
+                        @($providerMarkerCall[0].ProtocolSurfaces).Count -ne 0 -or
+                        [bool]$providerMarkerCall[0].ProtocolRecordLossAcknowledgement -or
+                        $providerRemoteCall.Count -ne 1 -or
+                        [string]$providerRemoteCall[0].Repository -cne
+                            $existingRepo -or
+                        [string]$providerRemoteCall[0].Remote -cne 'origin' -or
+                        [string]$providerRemoteCall[0].Branch -cne
+                            'automation/meandai-capabilities-v0.9.2' -or
+                        -not [bool]$providerRemoteCall[0].AllowMissing
+                }
+                elseif ($historicalContractCase.Name -cin @(
+                        'provider-null-open-pr-list',
+                        'provider-object-open-pr-list',
+                        'provider-null-row-open-pr-list',
+                        'provider-missing-property-open-pr-row'
+                    )) {
+                    $positiveIdentityInvalid =
+                        [string]$historicalContractResult.Error -cne
+                            'GitHub CLI returned invalid historical branch pull-request metadata.'
+                }
+                if ([bool]$historicalContractResult.Succeeded -ne
+                        [bool]$historicalContractCase.ExpectSuccess -or
+                    $unexpectedCalls -ne 0 -or $providerSequenceInvalid -or
+                    $providerReadArgumentsInvalid -or
+                    $positiveIdentityInvalid -or
+                    ([int]$historicalContractCase.ExpectedLocalProviderCalls `
+                        -ge 0 -and $localProviderCalls -ne
+                        [int]$historicalContractCase.ExpectedLocalProviderCalls) -or
+                    ($historicalContractCase.Name -ceq 'provider-valid' -and
+                     ($providerKinds -join ',') -cne
+                        'Release,PullRequestView,MarkerContract,OpenPullRequestList,RemoteBranch')) {
+                    Add-Failure (
+                        "TEST-0069 completed-historical contract case '$($historicalContractCase.Name)' returned success=$($historicalContractResult.Succeeded), localProviderCalls=$localProviderCalls, calls=$($providerKinds -join ','), error=$($historicalContractResult.Error)."
+                    )
+                }
+            }
+            $driftedHistoricalIssue = ([string]($historicalIssue |
+                ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+            $driftedHistoricalIssue.closedAt = '2026-06-01T12:00:01Z'
+            foreach ($snapshotCase in @(
+                [pscustomobject]@{
+                    Name = 'stable'
+                    SecondIssues = @($historicalIssue)
+                    ExpectSuccess = $true
+                },
+                [pscustomobject]@{
+                    Name = 'drift'
+                    SecondIssues = @($driftedHistoricalIssue)
+                    ExpectSuccess = $false
+                }
+            )) {
+                $snapshotContractResult = & $launcherPath `
+                    -SupportAction HistoricalIssueContract `
+                    -SupportInput @([pscustomobject]@{
+                        Mode = 'SnapshotProof'
+                        ProtocolTag = 'v0.15.6'
+                        Repository = $global:QuickAdoptionRepoName
+                        TargetRepository = $existingRepo
+                        BaseBranch = $global:QuickAdoptionDefaultBranch
+                        FirstIssues = @($historicalIssue)
+                        SecondIssues = @($snapshotCase.SecondIssues)
+                    })
+                $snapshotCallKinds = @(
+                    $snapshotContractResult.Calls | ForEach-Object {
+                        [string]$_.Kind
+                    }
+                ) -join ','
+                $snapshotIdentityInvalid = if (
+                    [bool]$snapshotCase.ExpectSuccess
+                ) {
+                    @($snapshotContractResult.Snapshot.historical).Count -ne 1 -or
+                    @($snapshotContractResult.Result).Count -ne 1 -or
+                    [string]$snapshotContractResult.Result[0].classification -cne
+                        'CompletedHistorical'
+                }
+                else {
+                    [string]$snapshotContractResult.Error -cne
+                        'Completed historical adoption-issue evidence changed during convergence.'
+                }
+                if ([bool]$snapshotContractResult.Succeeded -ne
+                        [bool]$snapshotCase.ExpectSuccess -or
+                    $snapshotCallKinds -cne
+                        'IssueInventory,HistoricalProvider,IssueInventory' -or
+                    $snapshotIdentityInvalid) {
+                    Add-Failure (
+                        "TEST-0069 historical snapshot '$($snapshotCase.Name)' " +
+                        'did not prove once and then revalidate only the frozen ' +
+                        "fingerprint: calls=$snapshotCallKinds, " +
+                        "error=$($snapshotContractResult.Error)."
+                    )
+                }
+            }
+            foreach ($inventoryCount in @(999, 1000)) {
+                $inventoryContractResult = & $launcherPath `
+                    -SupportAction HistoricalIssueContract `
+                    -SupportInput @([pscustomobject]@{
+                        Mode = 'InventoryProof'
+                        Repository = $global:QuickAdoptionRepoName
+                        IssueCount = $inventoryCount
+                    })
+                $inventoryCalls = @(
+                    $inventoryContractResult.Calls | Where-Object {
+                        [string]$_.Kind -ceq 'IssueInventory'
+                    }
+                )
+                $inventoryArguments = if ($inventoryCalls.Count -eq 1) {
+                    @($inventoryCalls[0].Arguments)
+                }
+                else { @() }
+                $inventoryLimitIndex = [Array]::IndexOf(
+                    [object[]]$inventoryArguments, '--limit'
+                )
+                $inventoryJsonIndex = [Array]::IndexOf(
+                    [object[]]$inventoryArguments, '--json'
+                )
+                $expectedInventoryArguments = @(
+                    'issue', 'list', '--repo',
+                    $global:QuickAdoptionRepoName, '--state', 'all',
+                    '--limit', '1000', '--json',
+                    'number,url,title,body,state,stateReason,closedAt,author'
+                )
+                $inventoryExpectedSuccess = $inventoryCount -eq 999
+                if ([bool]$inventoryContractResult.Succeeded -ne
+                        $inventoryExpectedSuccess -or
+                    ($inventoryExpectedSuccess -and
+                     [int]$inventoryContractResult.ResultCount -ne 999) -or
+                    $inventoryCalls.Count -ne 1 -or
+                    ($inventoryArguments -join "`n") -cne
+                        ($expectedInventoryArguments -join "`n") -or
+                    $inventoryLimitIndex -lt 0 -or
+                    $inventoryLimitIndex + 1 -ge $inventoryArguments.Count -or
+                    [string]$inventoryArguments[
+                        $inventoryLimitIndex + 1] -cne '1000' -or
+                    $inventoryJsonIndex -lt 0 -or
+                    $inventoryJsonIndex + 1 -ge $inventoryArguments.Count -or
+                    [string]$inventoryArguments[$inventoryJsonIndex + 1] -cne
+                        'number,url,title,body,state,stateReason,closedAt,author' -or
+                    (-not $inventoryExpectedSuccess -and
+                     [string]$inventoryContractResult.Error -cne
+                        'The bounded adoption-issue inventory is pagination-ambiguous.')) {
+                    Add-Failure (
+                        'TEST-0069 historical issue inventory bound case ' +
+                        "'$inventoryCount' did not preserve its exact " +
+                        '999-item success / 1000-item ambiguity contract: ' +
+                        "success=$($inventoryContractResult.Succeeded), " +
+                        "count=$($inventoryContractResult.ResultCount), " +
+                        "error=$($inventoryContractResult.Error)."
+                    )
+                }
+            }
+            foreach ($invalidInventoryShape in @(
+                [pscustomobject]@{ Name = 'null-root'; Raw = 'null' },
+                [pscustomobject]@{ Name = 'object-root'; Raw = '{}' },
+                [pscustomobject]@{ Name = 'null-row'; Raw = '[null]' },
+                [pscustomobject]@{
+                    Name = 'missing-property'
+                    Raw = '[{"number":1}]'
+                }
+            )) {
+                $invalidInventoryResult = & $launcherPath `
+                    -SupportAction HistoricalIssueContract `
+                    -SupportInput @([pscustomobject]@{
+                        Mode = 'InventoryProof'
+                        Repository = $global:QuickAdoptionRepoName
+                        RawOutput = [string]$invalidInventoryShape.Raw
+                    })
+                if ([bool]$invalidInventoryResult.Succeeded -or
+                    [string]$invalidInventoryResult.Error -cne
+                        'GitHub CLI returned invalid adoption-issue metadata.' -or
+                    @($invalidInventoryResult.Calls).Count -ne 1) {
+                    Add-Failure (
+                        "TEST-0069 invalid issue inventory '$($invalidInventoryShape.Name)' " +
+                        "did not fail closed: $($invalidInventoryResult.Error)."
+                    )
+                }
+            }
+            $expectedHistoricalReleaseCommits = [ordered]@{
+                'v0.8.0' = 'a6a25b4e2a4dad5b0d09c0dddaf777f730c6a821'
+                'v0.8.1' = '9b4060a98af65d2ff3102495b8b29719c831c7de'
+                'v0.8.2' = '030caab88ad337f3a07c19382fe6a5bd6978b640'
+                'v0.8.3' = '7ec7f83c7190c3f064a3c572e7e30d29ea1e5454'
+                'v0.8.4' = '0d4a05e0ce09e5c5586d69a7868128e061f35295'
+                'v0.8.5' = '7c06dfad75ab7b327d46c7b8f8d7cb541bab3896'
+                'v0.8.6' = 'a3d58a9cee00b9914c40adcd8e93dff53bed235a'
+                'v0.9.0' = 'd39eace793a768006c52126dc0fd4b1012664cd5'
+                'v0.9.1' = 'd7cd95735a94fbd61dd0e0c6abb7c1f72862b8d8'
+                'v0.9.2' = 'b56ea19adeb8b34848fdd5b1e70eaaed831bf81d'
+                'v0.9.3' = '27615a6767e2a6738f43148d84c6d80219101776'
+                'v0.9.4' = 'ac17602a564d2ba19567db93529c97769d5a7991'
+                'v0.9.5' = 'f10f0878d482bbd9c172f96df64fd5f05830d197'
+                'v0.9.6' = '865735fae1c899ff26db8e15ee3e5296b8361fc1'
+                'v0.9.7' = 'cdaca51d9920c0262f7e6015795f919fb0e60bb9'
+                'v0.10.0' = '103ed20e190dcda1abe0f3b6b1c3434111c6b6d2'
+                'v0.10.1' = 'fd5635044c3eb5f7635aef32d53bb99a8dd490e1'
+                'v0.10.2' = '4bb0fd14619bfc9ec25401e06a6d71e7f8433340'
+                'v0.10.3' = 'f1c15a34a17d34d0499fd1c2cc586c5a7f923754'
+                'v0.10.4' = 'e226293acc5967f8b4e3049c54f206ed78bc9fd4'
+            }
+            $historicalRegistryTags = @(
+                $expectedHistoricalReleaseCommits.Keys
+            ) + @('v0.7.3', 'v0.11.0', 'v1.0.0')
+            $historicalRegistryResult = & $launcherPath `
+                -SupportAction HistoricalIssueContract `
+                -SupportInput @([pscustomobject]@{
+                    Mode = 'RegistryProof'
+                    Tags = @($historicalRegistryTags)
+                })
+            $historicalRegistryInvalid =
+                -not [bool]$historicalRegistryResult.Succeeded -or
+                @($historicalRegistryResult.Result).Count -ne 23
+            foreach ($registryRecord in @($historicalRegistryResult.Result)) {
+                $registryTag = [string]$registryRecord.Tag
+                $expectedRegistryCommit = if (
+                    $expectedHistoricalReleaseCommits.Contains($registryTag)
+                ) {
+                    [string]$expectedHistoricalReleaseCommits[$registryTag]
+                }
+                else { '' }
+                if ([string]$registryRecord.Commit -cne
+                        $expectedRegistryCommit) {
+                    $historicalRegistryInvalid = $true
+                }
+            }
+            if ($historicalRegistryInvalid) {
+                Add-Failure 'TEST-0069 completed-historical release-family registry did not match the exact reviewed v0.8.0-v0.10.4 tag/commit boundary.'
+            }
+            $historicalMutationCallCount = {
+                @($global:QuickAdoptionGhCalls | Where-Object {
+                    $arguments = @($_.Arguments)
+                    if ($arguments.Count -lt 2) { return $false }
+                    return (
+                        ($arguments[0] -ceq 'issue' -and
+                         $arguments[1] -cne 'list') -or
+                        ($arguments[0] -ceq 'pr' -and
+                         $arguments[1] -cin @(
+                            'create', 'edit', 'ready', 'close', 'reopen'
+                         )) -or
+                        ($arguments[0] -ceq 'workflow' -and
+                         $arguments[1] -ceq 'run') -or
+                        ($arguments[0] -ceq 'secret' -and
+                         $arguments[1] -ceq 'set') -or
+                        ($arguments[0] -ceq 'repo' -and
+                         $arguments[1] -ceq 'create')
+                    )
+                }).Count
+            }
+            foreach ($boundaryCase in @(
+                [pscustomobject]@{
+                    Name = 'local-malformed'
+                    Mode = 'Malformed'
+                    ExpectedError =
+                        'A project-owned adoption issue contains a malformed ownership marker; manual review is required.'
+                    ExpectedPullRequestReads = 0
+                    ExpectedBranchReads = 0
+                },
+                [pscustomobject]@{
+                    Name = 'provider-failure'
+                    Mode = 'ProviderFailure'
+                    ExpectedError = 'Mock historical pull-request provider failure.'
+                    ExpectedPullRequestReads = 1
+                    ExpectedBranchReads = 0
+                },
+                [pscustomobject]@{
+                    Name = 'live-remote-branch'
+                    Mode = 'LiveBranch'
+                    ExpectedError =
+                        'A completed historical adoption branch still claims live remote authority.'
+                    ExpectedPullRequestReads = 1
+                    ExpectedBranchReads = 1
+                },
+                [pscustomobject]@{
+                    Name = 'frozen-inventory-drift'
+                    Mode = 'Drift'
+                    ExpectedError =
+                        'Completed historical adoption-issue evidence changed during convergence.'
+                    ExpectedPullRequestReads = 1
+                    ExpectedBranchReads = 1
+                }
+            )) {
+                Reset-MockAdoptionProposal
+                $global:QuickAdoptionIssues.Clear()
+                $global:QuickAdoptionHistoricalPullRequests.Clear()
+                $global:QuickAdoptionHistoricalProviderMode = 'Valid'
+                $global:QuickAdoptionHistoricalReleaseProofActive = $true
+                $boundaryIssue = ([string]($historicalIssue |
+                    ConvertTo-Json -Depth 8 -Compress)) | ConvertFrom-Json
+                if ([string]$boundaryCase.Mode -ceq 'Malformed') {
+                    $boundaryIssue.body =
+                        "Untrusted preface$([Environment]::NewLine)$($boundaryIssue.body)"
+                }
+                $global:QuickAdoptionIssues.Add($boundaryIssue)
+                if ([string]$boundaryCase.Mode -cne 'Malformed') {
+                    $global:QuickAdoptionHistoricalPullRequests.Add(
+                        $historicalPullRequest
+                    )
+                }
+                if ([string]$boundaryCase.Mode -ceq 'ProviderFailure') {
+                    $global:QuickAdoptionHistoricalProviderMode = 'Failure'
+                }
+                if ([string]$boundaryCase.Mode -ceq 'Drift') {
+                    $global:QuickAdoptionHistoricalIssueDriftAtRead = 2
+                }
+                $historicalReservedBranch =
+                    'automation/meandai-capabilities-v0.9.2'
+                if ([string]$boundaryCase.Mode -ceq 'LiveBranch') {
+                    Invoke-TestGit -Repository $existingRepo -Arguments @(
+                        'push', 'origin',
+                        "HEAD:refs/heads/$historicalReservedBranch"
+                    ) | Out-Null
+                }
+                $boundaryHeadBefore = @(
+                    Invoke-TestGit -Repository $existingRepo `
+                        -Arguments @('rev-parse', 'HEAD')
+                )[0]
+                $boundaryStatusBefore = @(
+                    Invoke-TestGit -Repository $existingRepo -Arguments @(
+                        'status', '--porcelain=v1', '--untracked-files=all'
+                    )
+                ) -join "`n"
+                $boundaryRefsBefore = @(
+                    Invoke-TestGit -Repository $existingRepo `
+                        -Arguments @('ls-remote', 'origin') | Sort-Object
+                ) -join "`n"
+                $boundaryIssueInventoryBefore = @(
+                    $global:QuickAdoptionIssues
+                ) | ConvertTo-Json -Depth 12 -Compress
+                $boundaryHistoricalPullRequestsBefore = @(
+                    $global:QuickAdoptionHistoricalPullRequests
+                ) | ConvertTo-Json -Depth 12 -Compress
+                $boundaryCurrentPullRequestBefore = [ordered]@{
+                    Head = $global:QuickAdoptionPrHead
+                    Body = $global:QuickAdoptionPrBody
+                    Draft = $global:QuickAdoptionPrDraft
+                    State = $global:QuickAdoptionPrState
+                } | ConvertTo-Json -Depth 4 -Compress
+                $boundaryLabelsBefore = [ordered]@{
+                    Names = @($global:QuickAdoptionLabels)
+                    Records = @(
+                        $global:QuickAdoptionLabelRecords.Keys |
+                            Sort-Object | ForEach-Object {
+                                [ordered]@{
+                                    Name = [string]$_
+                                    Record = $global:QuickAdoptionLabelRecords[$_]
+                                }
+                            }
+                    )
+                    IssueLabels = @($global:QuickAdoptionIssueLabels)
+                } | ConvertTo-Json -Depth 8 -Compress
+                $boundaryMutationCallsBefore =
+                    & $historicalMutationCallCount
+                $boundaryCodexCallsBefore = @(
+                    Get-MockCodexCalls | Where-Object {
+                        $_.Arguments.Count -gt 0 -and
+                        $_.Arguments[0] -ceq 'exec'
+                    }
+                ).Count
+                $boundaryReadyCallsBefore =
+                    $global:QuickAdoptionPrReadyCalls
+                $boundaryBodyEditsBefore =
+                    $global:QuickAdoptionPrBodyEditCalls
+                $boundaryDispatchBefore =
+                    $global:QuickAdoptionWorkflowDispatched
+                $boundaryPullRequestReadsBefore =
+                    $global:QuickAdoptionHistoricalPullRequestReads
+                $boundaryBranchReadsBefore =
+                    $global:QuickAdoptionHistoricalBranchReads
+                $boundaryError = ''
+                try {
+                    & $launcherPath -TargetPath $existingRepo `
+                        -CodexCommand $mockCodexPath | Out-Null
+                }
+                catch { $boundaryError = $_.Exception.Message }
+                $boundaryHeadAfter = @(
+                    Invoke-TestGit -Repository $existingRepo `
+                        -Arguments @('rev-parse', 'HEAD')
+                )[0]
+                $boundaryStatusAfter = @(
+                    Invoke-TestGit -Repository $existingRepo -Arguments @(
+                        'status', '--porcelain=v1', '--untracked-files=all'
+                    )
+                ) -join "`n"
+                $boundaryRefsAfter = @(
+                    Invoke-TestGit -Repository $existingRepo `
+                        -Arguments @('ls-remote', 'origin') | Sort-Object
+                ) -join "`n"
+                $boundaryIssueInventoryAfter = @(
+                    $global:QuickAdoptionIssues
+                ) | ConvertTo-Json -Depth 12 -Compress
+                $boundaryHistoricalPullRequestsAfter = @(
+                    $global:QuickAdoptionHistoricalPullRequests
+                ) | ConvertTo-Json -Depth 12 -Compress
+                $boundaryCurrentPullRequestAfter = [ordered]@{
+                    Head = $global:QuickAdoptionPrHead
+                    Body = $global:QuickAdoptionPrBody
+                    Draft = $global:QuickAdoptionPrDraft
+                    State = $global:QuickAdoptionPrState
+                } | ConvertTo-Json -Depth 4 -Compress
+                $boundaryLabelsAfter = [ordered]@{
+                    Names = @($global:QuickAdoptionLabels)
+                    Records = @(
+                        $global:QuickAdoptionLabelRecords.Keys |
+                            Sort-Object | ForEach-Object {
+                                [ordered]@{
+                                    Name = [string]$_
+                                    Record = $global:QuickAdoptionLabelRecords[$_]
+                                }
+                            }
+                    )
+                    IssueLabels = @($global:QuickAdoptionIssueLabels)
+                } | ConvertTo-Json -Depth 8 -Compress
+                $boundaryPullRequestReads =
+                    $global:QuickAdoptionHistoricalPullRequestReads -
+                    $boundaryPullRequestReadsBefore
+                $boundaryBranchReads =
+                    $global:QuickAdoptionHistoricalBranchReads -
+                    $boundaryBranchReadsBefore
+                if ($boundaryError -cne [string]$boundaryCase.ExpectedError -or
+                    $boundaryHeadAfter -cne $boundaryHeadBefore -or
+                    $boundaryStatusAfter -cne $boundaryStatusBefore -or
+                    $boundaryRefsAfter -cne $boundaryRefsBefore -or
+                    $boundaryIssueInventoryAfter -cne
+                        $boundaryIssueInventoryBefore -or
+                    $boundaryHistoricalPullRequestsAfter -cne
+                        $boundaryHistoricalPullRequestsBefore -or
+                    $boundaryCurrentPullRequestAfter -cne
+                        $boundaryCurrentPullRequestBefore -or
+                    $boundaryLabelsAfter -cne $boundaryLabelsBefore -or
+                    (& $historicalMutationCallCount) -ne
+                        $boundaryMutationCallsBefore -or
+                    @(
+                        Get-MockCodexCalls | Where-Object {
+                            $_.Arguments.Count -gt 0 -and
+                            $_.Arguments[0] -ceq 'exec'
+                        }
+                    ).Count -ne $boundaryCodexCallsBefore -or
+                    $global:QuickAdoptionPrReadyCalls -ne
+                        $boundaryReadyCallsBefore -or
+                    $global:QuickAdoptionPrBodyEditCalls -ne
+                        $boundaryBodyEditsBefore -or
+                    $global:QuickAdoptionWorkflowDispatched -ne
+                        $boundaryDispatchBefore -or
+                    $boundaryPullRequestReads -ne
+                        [int]$boundaryCase.ExpectedPullRequestReads -or
+                    $boundaryBranchReads -ne
+                        [int]$boundaryCase.ExpectedBranchReads) {
+                    Add-Failure (
+                        "TEST-0069 pre-mutation boundary '$($boundaryCase.Name)' " +
+                        'did not fail before issue/branch/PR/consumer-head/' +
+                        "Codex mutation: error='$boundaryError', " +
+                        "prReads=$boundaryPullRequestReads, " +
+                        "branchReads=$boundaryBranchReads."
+                    )
+                }
+                if ([string]$boundaryCase.Mode -ceq 'LiveBranch') {
+                    Invoke-TestGit -Repository $existingRepo -Arguments @(
+                        'push', 'origin', '--delete', $historicalReservedBranch
+                    ) | Out-Null
+                }
+            }
+            Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionHistoricalPullRequests.Clear()
+            $global:QuickAdoptionHistoricalProviderMode = 'Valid'
+            $global:QuickAdoptionHistoricalReleaseProofActive = $true
+            $global:QuickAdoptionIssues.Add($historicalIssue)
+            $global:QuickAdoptionHistoricalPullRequests.Add(
+                $historicalPullRequest
+            )
+            $historicalProtocolTokenPath =
+                Join-Path $existingRepo 'MEANDAI_RO_FG_PAT.txt'
+            [IO.File]::WriteAllText(
+                $historicalProtocolTokenPath,
+                [string]$global:QuickAdoptionExpectedProtocolToken,
+                [Text.UTF8Encoding]::new($false)
+            )
+            $historicalIssueBefore =
+                $historicalIssue | ConvertTo-Json -Depth 6 -Compress
+            $historicalCodexExecCallsBefore = @(
+                Get-MockCodexCalls | Where-Object {
+                    $_.Arguments.Count -gt 0 -and
+                    $_.Arguments[0] -ceq 'exec'
+                }
+            ).Count
+            $historicalIssueCreateCallsBefore = @(
+                $global:QuickAdoptionGhCalls | Where-Object {
+                    $_.Arguments.Count -ge 2 -and
+                    $_.Arguments[0] -ceq 'issue' -and
+                    $_.Arguments[1] -ceq 'create'
+                }
+            ).Count
+            $historicalPullRequestReadsBefore =
+                $global:QuickAdoptionHistoricalPullRequestReads
+            $historicalBranchReadsBefore =
+                $global:QuickAdoptionHistoricalBranchReads
+            $historicalReleaseRestCallsBefore = @(
+                $global:QuickAdoptionRestCalls | Where-Object {
+                    ([string]$_.Uri).EndsWith(
+                        '/repos/hasanmanzak/meAndAI/releases/tags/v0.9.2',
+                        [StringComparison]::Ordinal
+                    ) -and
+                    [string]$_.CredentialBoundary -ceq 'protocol-read'
+                }
+            ).Count
+            $historicalCommitRestCallsBefore = @(
+                $global:QuickAdoptionRestCalls | Where-Object {
+                    ([string]$_.Uri).EndsWith(
+                        '/repos/hasanmanzak/meAndAI/commits/v0.9.2',
+                        [StringComparison]::Ordinal
+                    ) -and
+                    [string]$_.CredentialBoundary -ceq 'protocol-read'
+                }
+            ).Count
+            $historicalFixtureErrors =
+                [System.Collections.Generic.List[string]]::new()
+            foreach ($historicalRun in 1..2) {
+                if ($historicalRun -gt 1) {
+                    $global:QuickAdoptionRunListCalls = 0
+                    $global:QuickAdoptionWorkflowDispatched = $false
+                    $global:QuickAdoptionExpectedPublishedHead = ''
+                    $global:QuickAdoptionDispatchRecord = $null
+                }
+                try {
+                    & $launcherPath -TargetPath $existingRepo `
+                        -CodexCommand $mockCodexPath | Out-Null
+                }
+                catch {
+                    $historicalFixtureErrors.Add($_.Exception.Message)
+                    break
+                }
+            }
+            $historicalIssueAfter =
+                $historicalIssue | ConvertTo-Json -Depth 6 -Compress
+            $historicalIssueMutations = @(
+                $global:QuickAdoptionGhCalls | Where-Object {
+                    $_.Arguments.Count -ge 3 -and
+                    $_.Arguments[0] -ceq 'issue' -and
+                    $_.Arguments[1] -cin @('edit', 'reopen', 'close') -and
+                    [string]$_.Arguments[2] -ceq '81'
+                }
+            )
+            $historicalIssueCreateCallsAfter = @(
+                $global:QuickAdoptionGhCalls | Where-Object {
+                    $_.Arguments.Count -ge 2 -and
+                    $_.Arguments[0] -ceq 'issue' -and
+                    $_.Arguments[1] -ceq 'create'
+                }
+            ).Count
+            $historicalCurrentIssues = @(
+                $global:QuickAdoptionIssues | Where-Object {
+                    [int]$_.number -ne 81 -and
+                    ([string]$_.body).StartsWith(
+                        '<!-- meandai-local-adoption:v2:',
+                        [StringComparison]::Ordinal
+                    )
+                }
+            )
+            $historicalReleaseRestCallsAfter = @(
+                $global:QuickAdoptionRestCalls | Where-Object {
+                    ([string]$_.Uri).EndsWith(
+                        '/repos/hasanmanzak/meAndAI/releases/tags/v0.9.2',
+                        [StringComparison]::Ordinal
+                    ) -and
+                    [string]$_.CredentialBoundary -ceq 'protocol-read'
+                }
+            ).Count
+            $historicalCommitRestCallsAfter = @(
+                $global:QuickAdoptionRestCalls | Where-Object {
+                    ([string]$_.Uri).EndsWith(
+                        '/repos/hasanmanzak/meAndAI/commits/v0.9.2',
+                        [StringComparison]::Ordinal
+                    ) -and
+                    [string]$_.CredentialBoundary -ceq 'protocol-read'
+                }
+            ).Count
+            if ($historicalFixtureErrors.Count -ne 0 -or
+                $historicalIssueBefore -cne $historicalIssueAfter -or
+                $historicalIssueMutations.Count -ne 0 -or
+                $historicalIssueCreateCallsAfter -ne
+                    $historicalIssueCreateCallsBefore + 1 -or
+                $historicalCurrentIssues.Count -ne 1 -or
+                $global:QuickAdoptionHistoricalPullRequestReads -ne
+                    $historicalPullRequestReadsBefore + 2 -or
+                $global:QuickAdoptionHistoricalBranchReads -ne
+                    $historicalBranchReadsBefore + 2 -or
+                $historicalReleaseRestCallsAfter -ne
+                    $historicalReleaseRestCallsBefore + 2 -or
+                $historicalCommitRestCallsAfter -ne
+                    $historicalCommitRestCallsBefore + 2 -or
+                @(Get-MockCodexCalls | Where-Object {
+                    $_.Arguments.Count -gt 0 -and
+                    $_.Arguments[0] -ceq 'exec'
+                }).Count -ne $historicalCodexExecCallsBefore + 1) {
+                Add-Failure (
+                    'TEST-0069 completed historical adoption issue did not ' +
+                    'remain immutable while one current issue and one Codex ' +
+                    'completion converged across reruns: ' +
+                    ($historicalFixtureErrors -join ' | ') +
+                    " [snapshot=$($historicalIssueBefore -ceq $historicalIssueAfter); mutations=$($historicalIssueMutations.Count); creates=$historicalIssueCreateCallsBefore->$historicalIssueCreateCallsAfter; current=$($historicalCurrentIssues.Count); historicalReleaseReads=$historicalReleaseRestCallsBefore->$historicalReleaseRestCallsAfter; historicalCommitReads=$historicalCommitRestCallsBefore->$historicalCommitRestCallsAfter; codexExec=$historicalCodexExecCallsBefore->$(@(Get-MockCodexCalls | Where-Object { $_.Arguments.Count -gt 0 -and $_.Arguments[0] -ceq 'exec' }).Count)]"
+                )
+            }
+            Remove-Item -LiteralPath $historicalProtocolTokenPath -Force
+            $global:QuickAdoptionHistoricalPullRequests.Clear()
+            $global:QuickAdoptionHistoricalReleaseProofActive = $false
         }
         $global:QuickAdoptionIssues.Clear()
         foreach ($issue in $savedIssues) {
@@ -7750,6 +9222,13 @@ try {
     if ($runIntegrityShards -and
         (Test-QuickAdoptionShard -Name 'IntegrityMetadataCredential')) {
         Reset-MockAdoptionProposal
+        # This slice models a new file-free adoption attempt. Reset the
+        # completed proposal's issue authority together with its PR/branch;
+        # retaining only the old issue would describe an impossible partial
+        # reset and must now fail the pre-mutation reconciliation boundary.
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $secretCountBeforeFileFreeAdoption = $global:QuickAdoptionSecrets.Count
         $protocolCloneCountBeforeFileFreeAdoption = @(
             $global:QuickAdoptionGhCalls | Where-Object {
@@ -7811,6 +9290,9 @@ try {
         if ($env:OS -eq 'Windows_NT') {
             foreach ($sandboxFailureMode in @('FailAll', 'Residue')) {
                 Reset-MockAdoptionProposal
+                $global:QuickAdoptionIssues.Clear()
+                $global:QuickAdoptionIssueLabels.Clear()
+                $global:QuickAdoptionIssue = $null
                 $env:MEANDAI_TEST_CODEX_SANDBOX_MODE = $sandboxFailureMode
                 $sandboxCallsBefore = @(Get-MockCodexSandboxCalls).Count
                 $execCallsBefore = @(Get-MockCodexCalls | Where-Object {
@@ -7895,6 +9377,9 @@ try {
             'Unauthenticated', 'CreateCommit', 'RemoteRace', 'CaseMoveWorkflow'
         )) {
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
             $env:MEANDAI_TEST_CODEX_MODE = $negativeMode
             $reviewEventCountBeforeNegative = @($global:QuickAdoptionEvents | Where-Object {
                 $_ -ceq 'issue-label:add:status:needs-review'
@@ -7919,7 +9404,7 @@ try {
                 Add-Failure "TEST-0049 blocked local Codex mode '$negativeMode' assigned review-ready issue status."
             }
             $negativePaths = @(Invoke-TestGit -Repository $existingRemote -Arguments @(
-                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
+                'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.6'
             ))
             if ($negativePaths -contains 'docs/governance/ai-adoption.md') {
                 Add-Failure "TEST-0040 local Codex negative mode '$negativeMode' published the local completion."
@@ -7942,7 +9427,7 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Sleep'
         $timeoutRemoteHeadBefore = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         $timeoutTempRootsBefore = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -7959,7 +9444,7 @@ try {
         }
         $timeoutRemoteHeadAfter = (@(Invoke-Git -Repository $existingRepo -Arguments @(
             'ls-remote', '--heads', 'origin',
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         )))[0].Split("`t")[0]
         $timeoutTempRootsAfter = @(Get-ChildItem -LiteralPath ([IO.Path]::GetTempPath()) `
             -Directory -Filter 'meandai-local-adoption-*' -ErrorAction SilentlyContinue |
@@ -7975,6 +9460,9 @@ try {
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
 
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionRunMode = 'Zero'
         $zeroRunBlocked = $false
         $codexCountBeforeZeroRun = @(Get-MockCodexCalls).Count
@@ -7991,6 +9479,9 @@ try {
         }
         $global:QuickAdoptionRunMode = 'Single'
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
 
         $global:QuickAdoptionRunMode = 'Ambiguous'
         $ambiguousRunBlocked = $false
@@ -8121,7 +9612,7 @@ try {
                 -LiteralPath (Join-Path $freshBoundaryConsumer.Repository 'app.txt') `
                 -Algorithm SHA256).Hash
             $freshBranchRef =
-                'refs/heads/automation/meandai-capabilities-v0.15.5'
+                'refs/heads/automation/meandai-capabilities-v0.15.6'
             $freshBranchHeads = @(Invoke-TestGit `
                 -Repository $freshBoundaryConsumer.Repository -Arguments @(
                     'ls-remote', '--heads', 'origin', $freshBranchRef
@@ -8380,6 +9871,9 @@ try {
                 Add-Failure "TEST-0130 launcher accepted strategy/surface marker drift '$markerDriftMode' before semantic execution: $markerDriftError"
             }
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
         }
         $global:QuickAdoptionPrMetadataMode = 'Valid'
 
@@ -8395,7 +9889,7 @@ try {
                 -ProtocolSurfaces $expectedMigrationSurfaces
             $contractAccepted = & $migrationManifestValidator `
                 -Manifest $contractManifest -Repository 'test-owner/consumer' `
-                -TargetTag 'v0.15.5' -ProtocolSha ('a' * 40) `
+                -TargetTag 'v0.15.6' -ProtocolSha ('a' * 40) `
                 -ExpectedState 'AdoptionReviewRequired' `
                 -ExpectedAdoptionStrategy 'FullMigration' `
                 -ExpectedProtocolSurfaces $expectedMigrationSurfaces `
@@ -8426,6 +9920,9 @@ try {
             Add-Failure "TEST-0130 launcher accepted representative strategy/surface/loss manifest drift '$representativeManifestDriftMode' before semantic execution: $manifestDriftError"
         }
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
         $global:QuickAdoptionManifestMode = 'Valid'
         foreach ($readOnlyContractCase in @(
             [pscustomobject]@{
@@ -8474,6 +9971,9 @@ try {
                 Add-Failure "TEST-0129 FullMigration changed read-only or product path '$($readOnlyBoundaryCase.Path)' or published it: $readOnlyBoundaryError"
             }
             Reset-MockAdoptionProposal
+            $global:QuickAdoptionIssues.Clear()
+            $global:QuickAdoptionIssueLabels.Clear()
+            $global:QuickAdoptionIssue = $null
         }
 
         $unchangedAgentsFixture =
@@ -8514,6 +10014,9 @@ try {
             Add-Failure "TEST-0129 FullMigration accepted a retained legacy common authority or published it: $retainedAuthorityError"
         }
         Reset-MockAdoptionProposal
+        $global:QuickAdoptionIssues.Clear()
+        $global:QuickAdoptionIssueLabels.Clear()
+        $global:QuickAdoptionIssue = $null
 
         $env:MEANDAI_TEST_CODEX_MODE = 'DeleteApprovedSurface'
         $codexCallsBeforeMigration = @(Get-MockCodexCalls).Count
@@ -8530,21 +10033,21 @@ try {
         }
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
         $collisionEntry = @((Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.15.5', '--', '.ai/protocol'
+            'ls-tree', 'refs/heads/automation/meandai-capabilities-v0.15.6', '--', '.ai/protocol'
         )))
         $collisionPaths = @(Invoke-Git -Repository $existingRemote -Arguments @(
-            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'ls-tree', '-r', '--name-only', 'refs/heads/automation/meandai-capabilities-v0.15.6'
         ))
         $expectedCollisionEntry = "160000 commit $($global:QuickAdoptionProtocolSha)`t.ai/protocol"
         $migrationBranchApplicationBlob = (@(Invoke-TestGit `
             -Repository $existingRemote -Arguments @(
                 'rev-parse',
-                'refs/heads/automation/meandai-capabilities-v0.15.5:app.txt'
+                'refs/heads/automation/meandai-capabilities-v0.15.6:app.txt'
             )))[0]
         $migrationAgentsContent = @(Invoke-TestGit `
             -Repository $existingRemote -Arguments @(
                 'show',
-                'refs/heads/automation/meandai-capabilities-v0.15.5:AGENTS.md'
+                'refs/heads/automation/meandai-capabilities-v0.15.6:AGENTS.md'
             )) -join "`n"
         $migrationCodexCalls = @(Get-MockCodexCalls |
             Select-Object -Skip $codexCallsBeforeMigration | Where-Object {
@@ -8825,7 +10328,7 @@ try {
             -Repository $ruleGitlinkAutoConsumer.Repository `
             -Arguments @(
                 'ls-remote', '--heads', 'origin',
-                'refs/heads/automation/meandai-capabilities-v0.15.5'
+                'refs/heads/automation/meandai-capabilities-v0.15.6'
             ))
         if ($ruleGitlinkAutoError -notlike
                 '*requires an explicit adoption strategy*' -or
@@ -8967,7 +10470,7 @@ try {
         }
         $env:MEANDAI_TEST_CODEX_MODE = 'Success'
         $ruleGitlinkCleanBranch =
-            'refs/heads/automation/meandai-capabilities-v0.15.5'
+            'refs/heads/automation/meandai-capabilities-v0.15.6'
         $ruleGitlinkCleanHeads = @(Invoke-TestGit `
             -Repository $ruleGitlinkCleanConsumer.Repository `
             -Arguments @('ls-remote', '--heads', 'origin', $ruleGitlinkCleanBranch))
@@ -10022,7 +11525,7 @@ try {
             $strategyBranchApplicationBlob = (@(Invoke-TestGit `
                 -Repository $strategyConsumer.Remote -Arguments @(
                     'rev-parse',
-                    'refs/heads/automation/meandai-capabilities-v0.15.5:app.txt'
+                    'refs/heads/automation/meandai-capabilities-v0.15.6:app.txt'
                 )))[0]
             $strategyMissingIssueSurfaces = @(
                 $expectedStrategySurfaces | Where-Object {
@@ -10149,7 +11652,7 @@ try {
                 }
                 $env:MEANDAI_TEST_CODEX_MODE = 'Success'
                 $strategyEnvelopeBranch =
-                    'refs/heads/automation/meandai-capabilities-v0.15.5'
+                    'refs/heads/automation/meandai-capabilities-v0.15.6'
                 $strategyEnvelopeHeads = @(Invoke-TestGit `
                     -Repository $strategyConsumer.Repository -Arguments @(
                         'ls-remote', '--heads', 'origin',
@@ -10657,7 +12160,7 @@ try {
         $modifiedSeedHashAfter = (Get-FileHash `
             -LiteralPath $modifiedSeedPath -Algorithm SHA256).Hash
         if ($modifiedSeedError -notlike
-                '*not the exact canonical v0.15.5 file*no GitHub repository or remote was changed*' -or
+                '*not the exact canonical v0.15.6 file*no GitHub repository or remote was changed*' -or
             $modifiedSeedCreateCalls.Count -ne 0 -or
             $modifiedSeedRemotes.Count -ne 0 -or
             $global:QuickAdoptionSecrets.Count -ne 0 -or
@@ -10864,7 +12367,7 @@ try {
 
         Reset-Mocks
         $currentConsumer = New-MockConnectedManagedConsumer `
-            -Name 'managed-current' -InstalledTag 'v0.15.5'
+            -Name 'managed-current' -InstalledTag 'v0.15.6'
         # Already-current capability review uses the optional-input workflow
         # without reopening prospective initial-adoption graph assessment.
         $global:QuickAdoptionExpectSourceGraphIdentity = $false
@@ -10949,12 +12452,12 @@ try {
         }
 
         foreach ($blockedRoute in @(
-            [pscustomobject]@{ Name = 'manifest'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Manifest' },
-            [pscustomobject]@{ Name = 'partial'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Partial' },
-            [pscustomobject]@{ Name = 'missing-gitlink'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'MissingGitlink' },
-            [pscustomobject]@{ Name = 'drift'; InstalledTag = 'v0.15.5'; TargetTag = 'v0.15.5'; Mutation = 'Drift' },
-            [pscustomobject]@{ Name = 'newer'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.5'; Mutation = 'None' },
-            [pscustomobject]@{ Name = 'cross-major'; InstalledTag = 'v0.15.5'; TargetTag = 'v1.0.0'; Mutation = 'None' }
+            [pscustomobject]@{ Name = 'manifest'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.6'; Mutation = 'Manifest' },
+            [pscustomobject]@{ Name = 'partial'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.6'; Mutation = 'Partial' },
+            [pscustomobject]@{ Name = 'missing-gitlink'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.6'; Mutation = 'MissingGitlink' },
+            [pscustomobject]@{ Name = 'drift'; InstalledTag = 'v0.15.6'; TargetTag = 'v0.15.6'; Mutation = 'Drift' },
+            [pscustomobject]@{ Name = 'newer'; InstalledTag = 'v0.15.7'; TargetTag = 'v0.15.6'; Mutation = 'None' },
+            [pscustomobject]@{ Name = 'cross-major'; InstalledTag = 'v0.15.6'; TargetTag = 'v1.0.0'; Mutation = 'None' }
         )) {
             Reset-Mocks
             $blockedConsumer = New-MockConnectedManagedConsumer `

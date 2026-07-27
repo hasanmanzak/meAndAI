@@ -3,6 +3,89 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.15.6 - 2026-07-27
+
+### Fixed
+
+- Classify an exact supported closed and completed historical adoption issue
+  as `CompletedHistorical` only after bounded immutable-release,
+  same-repository merged-pull-request, terminal-marker, actor, open-pull-
+  request, and reserved-branch proof. Leave that issue unchanged and preserve
+  the existing current-issue convergence path.
+- Finish historical classification before the first relevant mutation, freeze
+  its issue-metadata fingerprint for every later inventory read, and fail
+  closed without provider retries when evidence drifts, is partial,
+  unsupported, ambiguous, live, or unavailable.
+- Validate the all-state issue response as one bounded array of complete issue
+  records, keep malformed state issue-local, compare canonical repository
+  identity without case drift, and pass target tag and remote identity
+  explicitly through the ownership boundary.
+- Reject a non-object adoption-manifest JSON root at the canonical contract
+  boundary before typed property access, including single-element arrays that
+  PowerShell would otherwise enumerate into an apparent object.
+
+### Changed
+
+- Extend the unchanged instruction-graph schema-2 policy profile through
+  v0.15.6 while retaining an exact immutable v0.15.5 policy and dispatch
+  fixture and using v0.15.7 only as the future-version negative.
+- Harden retained hosted-streaming
+  [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  by replacing its bidirectional file-observation handshake and nonportable
+  process-start-timestamp equality with one parent-generated run identity plus
+  a bounded live fixture PID. Production streaming and cancellation behavior
+  remain unchanged.
+
+Candidate validation: exact v0.15.5 produced the expected malformed-marker red
+in 175.6 seconds. The corrected
+[TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069)
+parameter passed the `IntegrityManifestIssue` shard on PowerShell 7 / Windows
+PowerShell 5.1 in 141.9 / 147.7 seconds, including the six classifications,
+20-tag immutable registry, exact 8/9 candidate and 999/1000 inventory bounds,
+provider/marker negatives, fail-closed open-PR list roots and rows, frozen
+drift, full-launcher zero-mutation evidence, and idempotent positive rerun. The
+full PowerShell 7 quick-adoption owner then
+passed every declared scenario in one process in 847.1 seconds. Bundle, role-
+boundary, runtime-efficiency, and retained/current source-graph dispatch gates
+also passed. Canonical full-suite evidence was then evaluated on exact
+candidate commit
+[`7856697dc8733449bf907dfb47af77486dd8dee6`](https://github.com/hasanmanzak/meAndAI/commit/7856697dc8733449bf907dfb47af77486dd8dee6):
+the full local suite passed every discovered owner in 1732.8 seconds. Hosted
+validation on exact implementation head
+[`b47ee8d36144774ce86efc959a5668b1a42d517b`](https://github.com/hasanmanzak/meAndAI/commit/b47ee8d36144774ce86efc959a5668b1a42d517b)
+then passed Ubuntu in 11m16s, Windows in 27m45s, and GitGuardian in 35s. Final
+evidence-only protected checks then exposed the recurring test-only streaming
+handshake on Windows PowerShell 5.1 in two independent hosted runs while Ubuntu
+  remained green. First correction commit
+  [`120b04f6d724a1c01971d59332f3c54b2ada789c`](https://github.com/hasanmanzak/meAndAI/commit/120b04f6d724a1c01971d59332f3c54b2ada789c)
+  passes the focused [TEST-0105](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105) /
+  [TEST-0106](docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.3 seconds. Exact
+  evidence head
+  [`aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0`](https://github.com/hasanmanzak/meAndAI/commit/aa8c9f479fe902972fcd4b103e0e2353dc6ba5e0)
+  then failed only the aggregate live-consumption assertion on Ubuntu
+  [run `30278228996`](https://github.com/hasanmanzak/meAndAI/actions/runs/30278228996)
+  with no separate event-presence or safe-presentation failure. The hosted log
+  did not expose the failed aggregate operand; code-path diagnosis identified
+  exact process-start-tick equality as the remaining platform-sensitive
+  correlation discriminator. Final correction commit
+  [`345647fbd2affaba787b3b1db3a8c295a9eae49d`](https://github.com/hasanmanzak/meAndAI/commit/345647fbd2affaba787b3b1db3a8c295a9eae49d)
+  instead uses an exact run identity plus bounded live PID and passes the focused
+  owner on PowerShell 7 / Windows PowerShell 5.1 in 10.1 / 12.8 seconds. Exact
+  final protected checks and immutable-release evidence remain delivery gates.
+
+Related work: [FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
+[BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149),
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152),
+[DEC-0017](docs/decisions/DEC-0017-idempotent-consumer-lifecycle.md),
+[DEC-0020](docs/decisions/DEC-0020-target-bound-current-launcher-recovery.md),
+[DEC-0028](docs/decisions/DEC-0028-upstream-owned-reusable-corrections.md),
+[DEC-0029](docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md),
+[DEC-0030](docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md),
+[DEC-0031](docs/decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md),
+and [TEST-0069](docs/features/FEAT-0012-v082-correction/test-cases.md#test-0069).
+
 ## 0.15.5 - 2026-07-26
 
 ### Changed

@@ -5,20 +5,22 @@ and follow its canonical links.
 
 ## Current continuation
 
-Immutable [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)
+Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
 is published at
-[`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
-[PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
-[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain the
-[FEAT-0055](../../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
+[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
+[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
+[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
+[FEAT-0056](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
 delivery, review, test, and release evidence.
 
-[FEAT-0056](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-/ [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147)
-is the current `0.15.5` continuation. Follow the
-[instruction-graph resilience handoff](2026-07-26-v0155-instruction-graph-resilience.md).
-The completed [v0.15.4 handoff](2026-07-26-v0154-utf8-workflow-dispatch.md)
+[FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+/ [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) /
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
+is the current `0.15.6` continuation. Follow the
+[completed-historical adoption-issue handoff](2026-07-27-v0156-completed-historical-adoption-issues.md).
+The completed [v0.15.5 handoff](2026-07-26-v0155-instruction-graph-resilience.md)
 and earlier slice handoffs remain historical evidence.
 
 [FEAT-0048](../../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md),
@@ -45,10 +47,14 @@ bounded v0.14.5 basename-label correction. Follow the
 [v0.14.5 handoff](2026-07-25-v0145-bare-document-basename-links.md).
 [TASK-0002 / issue #98](https://github.com/hasanmanzak/meAndAI/issues/98)
 remains the separate runtime residual owner.
-[FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) remains the separate open follow-up in [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44).
+[FIND-0120](https://github.com/hasanmanzak/meAndAI/issues/44) is complete in
+closed [issue #44](https://github.com/hasanmanzak/meAndAI/issues/44); main now
+requires the two canonical validation checks, administrators, and resolved
+conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)
 - [2026-07-26 - v0.15.5 instruction-graph resilience](2026-07-26-v0155-instruction-graph-resilience.md)
 - [2026-07-26 - v0.15.4 UTF-8 workflow dispatch](2026-07-26-v0154-utf8-workflow-dispatch.md)
 - [2026-07-26 - v0.15.3 bounded quick-adoption runtime](2026-07-26-v0153-bounded-quick-adoption-runtime.md)

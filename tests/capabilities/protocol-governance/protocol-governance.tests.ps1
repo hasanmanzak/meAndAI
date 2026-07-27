@@ -2001,7 +2001,7 @@ foreach ($entry in @{
     'BUG-0035' = 137; 'BUG-0036' = 139; 'BUG-0037' = 140
     'BUG-0038' = 141; 'BUG-0039' = 142; 'BUG-0040' = 143
     'BUG-0041' = 144; 'BUG-0042' = 145; 'BUG-0043' = 146
-    'BUG-0044' = 147
+    'BUG-0044' = 147; 'BUG-0045' = 149
 }.GetEnumerator()) {
     $documentRecordTargets[$entry.Key] =
         "https://github.com/hasanmanzak/meAndAI/issues/$($entry.Value)"

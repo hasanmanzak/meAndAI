@@ -8,7 +8,7 @@ function Invoke-MeAndAIQuickAdoption {
         [ValidateSet('private', 'public', 'internal')]
         [string]$Visibility = 'private',
         [string]$ProtocolRepository = 'hasanmanzak/meAndAI',
-        [string]$ProtocolTag = 'v0.15.5',
+        [string]$ProtocolTag = 'v0.15.6',
         [string]$RemoteName = 'origin',
         [ValidateRange(1, 60)]
         [int]$WorkflowTimeoutMinutes = 15,
@@ -413,6 +413,46 @@ function Invoke-MeAndAIQuickAdoption {
             -FailureMessage 'The live repository/default branch changed after strategy assessment; secrets and seed publication were not changed.'
     }
 
+    $authenticatedActor = ''
+    $adoptionIssueSnapshot = $null
+    if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
+        $actorResult = Invoke-External -Command 'gh' `
+            -Arguments @('api', 'user', '--jq', '.login')
+        $authenticatedActor = ((@($actorResult.Output) -join '').Trim())
+        if ($authenticatedActor -cnotmatch '^[A-Za-z0-9_.-]+$') {
+            throw 'The authenticated GitHub maintainer identity is invalid.'
+        }
+        $preflightAdoptionBranch =
+            "automation/meandai-capabilities-$ProtocolTag"
+        $preflightAdoptionHead = Get-RemoteBranchHead `
+            -Repository $target -Remote $RemoteName `
+            -Branch $preflightAdoptionBranch -AllowMissing
+        $preflightPullRequest = if ($preflightAdoptionHead) {
+            Get-AdoptionPullRequest -Repository $repository `
+                -BaseBranch $defaultBranch `
+                -ExpectedActor $authenticatedActor -MaxAttempts 1 `
+                -ExpectedAdoptionStrategy `
+                    ([string]$initialAdoptionSelection.AdoptionStrategy) `
+                -ExpectedProtocolSurfaces `
+                    @($initialAdoptionSelection.ProtocolSurfaces) `
+                -ExpectedProtocolRecordLossAcknowledgement `
+                    ([bool]$initialAdoptionSelection.ProtocolRecordLossAcknowledged)
+        }
+        else { $null }
+        $adoptionIssueSnapshot =
+            Get-AdoptionIssueReconciliationSnapshot `
+                -Repository $repository -TargetRepository $target `
+                -BaseBranch $defaultBranch -TargetTag $ProtocolTag `
+                -TargetRemote $RemoteName `
+                -ProtocolToken ([string]$protocolToken) `
+                -PullRequest $preflightPullRequest
+        [void](Confirm-AdoptionIssueReconciliationSnapshot `
+            -Snapshot $adoptionIssueSnapshot `
+            -Repository $repository -TargetRepository $target `
+            -BaseBranch $defaultBranch -TargetTag $ProtocolTag `
+            -PullRequest $preflightPullRequest)
+    }
+
     if ([string]$existingAdoptionRoute.State -ceq 'InitialAdoption') {
         $repositoryOwner = $repository.Split('/')[0]
         $nameResult = Invoke-Git -Repository $target `
@@ -793,11 +833,6 @@ function Invoke-MeAndAIQuickAdoption {
         if ($currentPublishedHead -cne $publishedHead) {
             throw 'Repository HEAD changed after exact seed publication.'
         }
-        $actorResult = Invoke-External -Command 'gh' -Arguments @('api', 'user', '--jq', '.login')
-        $authenticatedActor = ((@($actorResult.Output) -join '').Trim())
-        if ($authenticatedActor -cnotmatch '^[A-Za-z0-9_.-]+$') {
-            throw 'The authenticated GitHub maintainer identity is invalid.'
-        }
         $adoptionBranch = "automation/meandai-capabilities-$ProtocolTag"
         $existingAdoptionHead = Get-RemoteBranchHead -Repository $target `
             -Remote $RemoteName -Branch $adoptionBranch -AllowMissing
@@ -860,7 +895,9 @@ function Invoke-MeAndAIQuickAdoption {
                 Set-QuickAdoptionProgress -Status 'Running local Codex' `
                     -PercentComplete 84
                 $completion = Complete-AdoptionWithLocalCodex -TargetRepository $target `
-                    -Repository $repository -PullRequest $adoptionPullRequest `
+                    -Repository $repository -TargetTag $ProtocolTag `
+                    -PullRequest $adoptionPullRequest `
+                    -AdoptionIssueSnapshot $adoptionIssueSnapshot `
                     -CanonicalBaseHead $publishedHead -ProtocolToken $protocolToken
                 if ($completion.Ran) {
                     Write-Host "Local Codex completed synchronously through $($completion.Runner)."

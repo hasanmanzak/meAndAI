@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('Stream', 'Tree', 'Child')]
     [string]$Mode,
-    [string]$AckPath = '',
+    [string]$StreamIdentity = '',
     [string]$ParentPidPath = '',
     [string]$ChildPidPath = ''
 )
@@ -18,19 +18,16 @@ function Write-JsonLine {
 }
 
 if ($Mode -ceq 'Stream') {
+    if ($StreamIdentity -cnotmatch '^[0-9a-f]{32}$') {
+        throw 'Stream mode requires one exact lowercase run identity.'
+    }
     Write-JsonLine ([ordered]@{
         type = 'thread.started'
         thread_id = 'mock-thread'
+        fixture_process_id = $PID
+        fixture_stream_identity = $StreamIdentity
     })
-    $deadline = [DateTime]::UtcNow.AddSeconds(5)
-    while (-not (Test-Path -LiteralPath $AckPath -PathType Leaf) -and
-        [DateTime]::UtcNow -lt $deadline) {
-        Start-Sleep -Milliseconds 50
-    }
-    if (-not (Test-Path -LiteralPath $AckPath -PathType Leaf)) {
-        [Console]::Error.WriteLine('The JSONL consumer did not acknowledge the first event while the process was active.')
-        exit 7
-    }
+    Start-Sleep -Seconds 5
 
     Write-JsonLine ([ordered]@{ type = 'turn.started' })
     Write-JsonLine ([ordered]@{

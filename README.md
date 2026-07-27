@@ -4,19 +4,20 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.15.5**
+Current protocol version: **0.15.6**
 
-Immutable [v0.15.4](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.4)
+Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
 is the prior published release at
-[`1883a2315529e7493343c07eebb4c74ed77a62b4`](https://github.com/hasanmanzak/meAndAI/commit/1883a2315529e7493343c07eebb4c74ed77a62b4).
-[PR #138](https://github.com/hasanmanzak/meAndAI/pull/138) and closed
-[issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) retain the
-[FEAT-0055](docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md)
-delivery and publication evidence. The `v0.15.5` instruction-graph resilience
-correction is tracked by
+[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
+[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
+[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
+[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
 [FEAT-0056](docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-and [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140)
-through [#147](https://github.com/hasanmanzak/meAndAI/issues/147).
+delivery and publication evidence. The `v0.15.6` completed historical
+adoption-issue correction is tracked by
+[FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
+[BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149), and
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149).
 
 ## Start here
 

@@ -181,7 +181,7 @@ $runtimeReady = @($runtimeDefinitions | Where-Object {
 
 $tempRoot = Join-Path ([IO.Path]::GetTempPath()) `
     "meandai-stream-test-$([guid]::NewGuid().ToString('N'))"
-$ackPath = Join-Path $tempRoot 'stream-ack.txt'
+$streamIdentity = [guid]::NewGuid().ToString('N')
 $parentPidPath = Join-Path $tempRoot 'parent.pid'
 $childPidPath = Join-Path $tempRoot 'child.pid'
 $ownedCancellationRoot = Join-Path $tempRoot 'owned-cancellation-root'
@@ -214,14 +214,15 @@ try {
             PrefixArguments = @()
             Description = 'mock JSONL event process'
         }
-        $script:QuickAdoptionTestAckPath = $ackPath
+        $script:QuickAdoptionStreamIdentity = $streamIdentity
+        $script:QuickAdoptionStreamObservedWhileActive = $false
         $script:QuickAdoptionStreamResult = $null
         $streamOutput = @(& {
             $script:QuickAdoptionStreamResult = Invoke-BoundedProcess `
                 -Runner $runner `
                 -Arguments @(
                     '-NoProfile', '-File', $fixturePath,
-                    '-Mode', 'Stream', '-AckPath', $ackPath
+                    '-Mode', 'Stream', '-StreamIdentity', $streamIdentity
                 ) `
                 -TimeoutMilliseconds 10000 `
                 -TimeoutDescription '10 second(s)' `
@@ -230,20 +231,35 @@ try {
                 -OutputLineHandler {
                     param([string]$Line)
                     Write-LocalCodexEvent -Line $Line
-                    if (-not (Test-Path -LiteralPath $script:QuickAdoptionTestAckPath)) {
-                        [IO.File]::WriteAllText(
-                            $script:QuickAdoptionTestAckPath,
-                            'ack',
-                            [Text.UTF8Encoding]::new($false)
-                        )
+                    $fixtureEvent = $null
+                    try {
+                        $fixtureEvent = $Line | ConvertFrom-Json -ErrorAction Stop
+                    }
+                    catch { }
+                    $fixtureProcessId = if ($null -ne $fixtureEvent) {
+                        $fixtureEvent.PSObject.Properties['fixture_process_id']
+                    }
+                    else { $null }
+                    $fixtureStreamIdentity = if ($null -ne $fixtureEvent) {
+                        $fixtureEvent.PSObject.Properties['fixture_stream_identity']
+                    }
+                    else { $null }
+                    if ($null -ne $fixtureProcessId -and
+                        $null -ne $fixtureStreamIdentity -and
+                        [string]$fixtureProcessId.Value -cmatch '^[1-9][0-9]*$' -and
+                        [int64]$fixtureProcessId.Value -le [int]::MaxValue -and
+                        [string]$fixtureStreamIdentity.Value -ceq
+                            $script:QuickAdoptionStreamIdentity -and
+                        (Test-OwnedProcessAlive -ProcessId ([int]$fixtureProcessId.Value))) {
+                        $script:QuickAdoptionStreamObservedWhileActive = $true
                     }
                 }
         } 6>&1 | ForEach-Object { [string]$_ })
         $streamText = $streamOutput -join "`n"
         if ($null -eq $script:QuickAdoptionStreamResult -or
             $script:QuickAdoptionStreamResult.ExitCode -ne 0 -or
-            -not (Test-Path -LiteralPath $ackPath -PathType Leaf)) {
-            Add-Failure 'TEST-0105 JSONL stdout was not acknowledged and consumed while the process was active.'
+            -not $script:QuickAdoptionStreamObservedWhileActive) {
+            Add-Failure 'TEST-0105 JSONL stdout was not consumed while the fixture process remained active.'
         }
         foreach ($required in @(
             'Codex | Session started',
@@ -347,7 +363,7 @@ finally {
     if (Test-Path -LiteralPath $tempRoot) {
         Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
-    Remove-Variable -Scope Script -Name QuickAdoptionTestAckPath,QuickAdoptionStreamResult `
+    Remove-Variable -Scope Script -Name QuickAdoptionStreamIdentity,QuickAdoptionStreamObservedWhileActive,QuickAdoptionStreamResult `
         -ErrorAction SilentlyContinue
 }
 if ($Shard -ceq 'All' -and
