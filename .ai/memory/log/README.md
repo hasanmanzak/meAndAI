@@ -5,6 +5,13 @@ and follow its canonical links.
 
 ## Current continuation
 
+[Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
+proposed C# operational platform migration. Follow the
+[records-only planning handoff](2026-07-27-csharp-operational-platform-planning.md).
+Its child features and [DEC-0032](../../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
+are planning authority only; no development, consumer mutation, migration, or
+PowerShell retirement is authorized.
+
 Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
 is published at
 [`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
@@ -54,6 +61,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)
 - [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)
 - [2026-07-26 - v0.15.5 instruction-graph resilience](2026-07-26-v0155-instruction-graph-resilience.md)
 - [2026-07-26 - v0.15.4 UTF-8 workflow dispatch](2026-07-26-v0154-utf8-workflow-dispatch.md)

@@ -795,6 +795,19 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
+- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
+  / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
+  proposed C# operational platform with separate governance, adoption, and
+  update applications sharing one typed foundation and portable framework-
+  dependent JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md),
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
+  [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
+  [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
+  and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
+  are planning records only. Do not create projects, implement behavior, alter
+  workflows or consumers, migrate authority, or retire PowerShell without a
+  later explicit development directive and independently satisfied feature DoR.
+
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at
   [`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).

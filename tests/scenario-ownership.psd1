@@ -168,6 +168,33 @@
             )
         }
         @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md'
+            TestIds = @('TEST-0191', 'TEST-0192', 'TEST-0193')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md'
+            TestIds = @('TEST-0194', 'TEST-0195', 'TEST-0196')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0061-consumer-adoption-cli/test-cases.md'
+            TestIds = @(
+                'TEST-0197', 'TEST-0198', 'TEST-0200', 'TEST-0201'
+            )
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0062-consumer-protocol-update-cli/test-cases.md'
+            TestIds = @('TEST-0202', 'TEST-0203', 'TEST-0204')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0063-consumer-migration-powershell-retirement/test-cases.md'
+            TestIds = @('TEST-0205', 'TEST-0206', 'TEST-0207')
+        }
+        @{
             Evidence = 'GitHubActionsSemantic'
             Owner = '.github/workflows/protocol-tests.yml'
             TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124', 'TEST-0160')
