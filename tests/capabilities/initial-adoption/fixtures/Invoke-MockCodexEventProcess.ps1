@@ -3,7 +3,6 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('Stream', 'Tree', 'Child')]
     [string]$Mode,
-    [string]$AckPath = '',
     [string]$ParentPidPath = '',
     [string]$ChildPidPath = ''
 )
@@ -18,19 +17,14 @@ function Write-JsonLine {
 }
 
 if ($Mode -ceq 'Stream') {
+    $fixtureProcess = Get-Process -Id $PID
     Write-JsonLine ([ordered]@{
         type = 'thread.started'
         thread_id = 'mock-thread'
+        fixture_process_id = $PID
+        fixture_process_start_ticks = $fixtureProcess.StartTime.ToUniversalTime().Ticks
     })
-    $deadline = [DateTime]::UtcNow.AddSeconds(5)
-    while (-not (Test-Path -LiteralPath $AckPath -PathType Leaf) -and
-        [DateTime]::UtcNow -lt $deadline) {
-        Start-Sleep -Milliseconds 50
-    }
-    if (-not (Test-Path -LiteralPath $AckPath -PathType Leaf)) {
-        [Console]::Error.WriteLine('The JSONL consumer did not acknowledge the first event while the process was active.')
-        exit 7
-    }
+    Start-Sleep -Seconds 5
 
     Write-JsonLine ([ordered]@{ type = 'turn.started' })
     Write-JsonLine ([ordered]@{
