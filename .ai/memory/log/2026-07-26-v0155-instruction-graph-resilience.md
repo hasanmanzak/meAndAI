@@ -148,11 +148,25 @@ Completed local evidence:
   without changing their open state or labels; every visible record identity is
   linked, and the designated verifier issue carries full-SHA links to the
   feature, pull request, and all four applicable decisions.
+- First hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+  failed on Ubuntu PowerShell 7 / Windows PowerShell 5.1 in 7m39s / 23m15s at
+  the same [TEST-0152](../../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  exact-tree diagnostic. The new feature packet had been untracked during the
+  earlier local suite and therefore absent from the HEAD graph; once committed,
+  its slash-joined inline-code shorthand for `must read`, `must load`, and
+  `must consult` was correctly classified as a missing required path
+  ([FIND-0343](../../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)). All three occurrences are expanded into distinct command code spans;
+  two had been parser-active and the table gate already protected the third.
+  An independent production-extractor scan of all 16 changed/new Markdown files
+  against the HEAD inventory found no remaining required local missing target
+  and no additional `Blocking` or `Important` token finding. No production
+  parser relaxation is indicated.
 
 The overall bounded diff/self-review is complete with no unresolved `Blocking`
-finding. Remaining gates are hosted checks and review on the exact pull-request
-head, exact merged-commit `v0.15.5` publication and two-asset verification,
-post-publication verification, closure of only
+finding. Remaining gates are the committed-tree focused/canonical reruns,
+hosted checks and review on the corrected exact pull-request head, exact merged-
+commit `v0.15.5` publication and two-asset verification, post-publication
+verification, closure of only
 [issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
 [#147](https://github.com/hasanmanzak/meAndAI/issues/147), and exact OID-bound
 branch cleanup.

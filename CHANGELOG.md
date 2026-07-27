@@ -41,6 +41,9 @@ This project uses the `M.m.rev` version format defined in the
   with the exact immutable-policy fixture call graph: four reviewed launcher
   invocations and one helper-owned recursive cleanup identity, without changing
   any runtime maximum.
+- Spell the three explicit required-reading commands as separate inline-code
+  forms so the committed self-consumer graph cannot reinterpret a slash-joined
+  documentation shorthand as a missing required repository path.
 
 Candidate validation: the final canonical instruction-graph owner passed
 [TEST-0151](docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151),
@@ -56,7 +59,12 @@ inventory after 1751.8 seconds; its exact focused correction passed in 7.0 /
 7.7 seconds on PowerShell 7 / Windows PowerShell 5.1 with the declared runtime-
 budget file byte-identical. The final frozen-tree canonical suite then passed
 every discovered owner in 1745.3 seconds, including runtime efficiency in 6.586
-seconds with `contract.self-check` 1/1. Hosted gates remain pending.
+seconds with `contract.self-check` 1/1. Because the new feature packet was still
+untracked, that HEAD-based self-consumer slice could not inspect it. First hosted
+[run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+then produced the same exact-tree expected red on Ubuntu PowerShell 7 and Windows
+PowerShell 5.1; committed-tree focused, canonical, and hosted reruns remain
+pending after the documentation-only correction.
 
 Latest-byte read-only consumer resimulation kept all pre/post remote HEADs exact
 and clones clean: Derdini retained its classified older seed, TravelOS assessment

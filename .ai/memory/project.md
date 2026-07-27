@@ -451,6 +451,37 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   reviewed dynamic/helper/process call graph changes.
 - Superseded by: `None`
 
+### Untracked governance packet is absent from the HEAD self-consumer graph
+
+- Status: `Active`
+- Observable signature: [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  passes in a dirty worktree, then hosted validation rejects a path-like token
+  from the newly committed packet as a missing required instruction target.
+- Applicability: new feature, decision, memory, or other governance packets that
+  are untracked while the canonical suite builds the repository's exact graph
+  from `HEAD`.
+- Affected contract and cause: filesystem-oriented owners can inspect the new
+  packet, but the exact self-consumer graph intentionally reads committed Git
+  objects and cannot inspect a path absent from the HEAD tree.
+- Canonical owner and evidence: [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
+  / [TEST-0152](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0152)
+  / [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+  own the exact committed-tree boundary.
+- Fixed release or evidence: target release `0.15.5`; expand slash-joined command
+  shorthand into distinct inline-code commands, commit the complete packet, and
+  rerun the exact-tree owner on both PowerShell runtimes before the final suite.
+- Required safe response: classify the hosted diagnostic against committed
+  bytes, search the entire candidate packet for the same token family, correct
+  only ambiguous documentation syntax, commit the full graph-reachable packet,
+  then require exact-commit focused evidence on both runtimes and invalidate it
+  after any later graph-reachable Markdown change.
+- Unsafe retry boundary: do not weaken significant missing-path safety, ignore a
+  hosted-only exact-tree failure, or claim a dirty-worktree full-suite pass as
+  proof for a packet that was not yet in HEAD.
+- Freshness and review condition: last confirmed 2026-07-27; review whenever a
+  final local suite includes new untracked governance packets.
+- Superseded by: `None`
+
 ### Runtime bundle path is inferred as a repository source path
 
 - Status: `Active`
@@ -635,12 +666,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and the affected initial-adoption integration are green. The final canonical
   parser owner is green on Windows PowerShell 5.1 / PowerShell 7 in 248.3 / 143.5
   seconds with exact operation counters; the parser-focused audit, AST parses,
-  diff-check, overall bounded review, and frozen-tree canonical full suite are
-  clean. The full suite passed every discovered owner in 1745.3 seconds. Later
-  gates are hosted validation and review on the exact pull-request head, exact
-  merged-commit release, post-publication verification, issue closure, and OID-
-  bound branch cleanup. Keep every reusable regression upstream and do not
-  mutate a consumer.
+  diff-check and overall bounded review are clean. The pre-commit worktree suite
+  passed every discovered owner in 1745.3 seconds, but [FIND-0343](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0343)
+  proved that the untracked feature packet was absent from its HEAD self-
+  consumer slice; first hosted [run 30225563133](https://github.com/hasanmanzak/meAndAI/actions/runs/30225563133)
+  exposed the ambiguous documentation token on both runtimes. Later gates are
+  the corrected committed-tree focused/full suites, hosted validation and
+  review on the exact pull-request head, exact merged-commit release, post-
+  publication verification, issue closure, and OID-bound branch cleanup. Keep
+  every reusable regression upstream and do not mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
   and every clone clean. Derdini `e7b10ef` retained its existing older seed,
   which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema
