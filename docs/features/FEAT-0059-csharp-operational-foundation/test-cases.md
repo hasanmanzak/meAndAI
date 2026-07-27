@@ -59,3 +59,29 @@ streaming infrastructure oracle; the C# step, runtime-efficiency step, every
 required JSONL event, and every separate presentation assertion passed.
 [FIND-0362](README.md#find-0362) owns that blocker; an unchanged-head rerun is
 not closure evidence.
+
+Exact correction head
+[`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a)
+again passed 31 of 31 C# tests on both hosts. Its
+[Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827/job/90122730639)
+failed only the retained
+[TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+aggregate even though every event and
+separate presentation assertion passed; its
+[Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827/job/90122730666)
+passed the streaming owner and failed later only when
+[TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065) rejected the
+non-navigable short commit reference in the current project snapshot.
+[FIND-0363](README.md#find-0363) owns the remaining process-liveness oracle.
+The replacement
+[TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+contract first failed alone on PowerShell 7 /
+Windows PowerShell 5.1 in 9.7 / 11.5 seconds while `ConsumptionStage` was
+absent, then passed
+[TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+and [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+in 10.0 / 12.4 seconds after the
+active read loop and post-exit drain received distinct closed stage values.
+The canonical exact commit link is restored, and candidate-tree Windows
+PowerShell 5.1 StructureOnly passed in 208.5 seconds; new committed-tree and
+hosted evidence remain required.

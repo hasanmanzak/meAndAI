@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-27**
+Last verified: **2026-07-28**
 
 ## Verified facts
 
@@ -34,11 +34,18 @@ Last verified: **2026-07-27**
   and [TEST-0192](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
   pass 31 of 31 with locked restore, zero-warning Release build, clean
   format/analyzer evidence, and a 203.3-second Windows PowerShell 5.1
-  StructureOnly pass. First hosted head `c5fa78d` passed Ubuntu and both-host
-  C# tests but exposed [FIND-0362](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0362)
-  in the retained Windows streaming oracle; its bounded same-process
-  observation correction passes locally on both PowerShell runtimes and awaits
-  new-head evidence. [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+  StructureOnly pass. First hosted head
+  [`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976)
+  passed Ubuntu and both-host C# tests but exposed
+  [FIND-0362](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0362)
+  in the retained Windows streaming oracle. Exact correction head
+  [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a)
+  removed the independent PID reopen, but [run `30309863827`](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827)
+  proved that retaining OS liveness remained over-constrained and also exposed
+  one short commit-link hygiene failure. The [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
+  consumption-stage correction and canonical link now pass their focused local
+  owners and await committed-tree and hosted evidence.
+  [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   remains gated. PowerShell production authority is unchanged.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
@@ -235,7 +242,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ### Independent PID reopen can falsify streaming liveness
 
-- Status: `Active`
+- Status: `Superseded`
 - Observable signature: an exact hosted Windows PowerShell 5.1 head passes
   every required JSONL event and separate presentation assertion, but canonical
   [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
@@ -255,23 +262,74 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [run `30307649690`](https://github.com/hasanmanzak/meAndAI/actions/runs/30307649690)
   own the current recurrence. [DEC-0030](../../docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md)
   retains the existing scenario identity.
-- Fixed release or evidence: the unrelated C# step passed 31 of 31 on both
-  hosts and the complete Ubuntu job passed; Windows failed only the retained
-  streaming oracle. The reviewed working-tree correction then passed the
-  canonical owner on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.7
-  seconds; exact committed-tree and hosted confirmation remain pending.
-- Required safe response: pass a process-state value snapshot from the
-  already-owned `Process` object with each consumed line; require the first
-  event's exact stream identity and process ID to match that observation and
-  require `IsRunning=true`; retain every exit, event, redaction, final-result,
-  and cancellation assertion; then validate the focused owner on both runtimes
-  and require a new-head Ubuntu/Windows pass.
+- Fixed release or evidence: exact correction commit
+  [`4b10fc9314157e83cd36ae8d3b45162459bd547a`](https://github.com/hasanmanzak/meAndAI/commit/4b10fc9314157e83cd36ae8d3b45162459bd547a)
+  removed the independent PID reopen and passed the canonical owner on
+  PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.7 seconds. Exact-head
+  [run `30309863827`](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827)
+  then failed only the same Windows aggregate oracle, proving that OS process
+  liveness itself remained an unsuitable consumption boundary.
+  [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
+  owns the successor correction.
+- Required safe response: retain the exact stream identity and all event,
+  redaction, exit, final-result, and cancellation assertions, then follow
+  [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
+  instead of reopening a PID or inferring consumption from OS process liveness.
 - Unsafe retry boundary: do not rerun the unchanged head as correction, reopen
   the PID again, add timing tolerance or retries, weaken required events, or
   create a duplicate scenario.
 - Freshness and review condition: last confirmed 2026-07-28; review whenever
   the bounded-process line callback, process observation, or hosted runtime
   changes.
+- Superseded by: [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
+
+### OS process liveness is not a streaming-consumption boundary
+
+- Status: `Active`
+- Observable signature: an exact hosted Windows PowerShell 5.1 head renders
+  every required JSONL event and passes every separate presentation assertion,
+  but canonical
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  still reports only that stdout was not consumed while the fixture remained
+  active.
+- Applicability: the streaming fixture and bounded-process callback when the
+  behavioral oracle correlates a parent-generated stream identity with PID or
+  OS process-liveness state instead of the reader's own control-flow stage.
+- Affected contract and cause: OS process identity and `HasExited` are not the
+  streaming-consumption contract. The production reader already distinguishes
+  the asynchronous active read loop from its post-exit drain; retaining an OS
+  liveness predicate can reject complete incremental output without identifying
+  a missing event, unsafe presentation, nonzero exit, or source regression.
+- Canonical owner and evidence:
+  [FIND-0363](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#find-0363)
+  / [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  / [run `30309863827`](https://github.com/hasanmanzak/meAndAI/actions/runs/30309863827)
+  own the current recurrence. [DEC-0030](../../docs/decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md)
+  retains the existing scenario identity.
+- Fixed release or evidence: the exact evidence head passed 31 of 31 C# tests
+  on both hosts; Windows failed only the retained aggregate streaming oracle,
+  while Ubuntu passed that owner and failed later on one non-navigable short
+  commit reference. The reviewed working-tree
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  contract first failed
+  alone on PowerShell 7 / Windows PowerShell 5.1 in 9.7 / 11.5 seconds when the
+  consumption stage was absent, then
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  and [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  passed in 10.0 / 12.4 seconds after adding distinct active-read and post-exit-
+  drain stages. Candidate-tree Windows PowerShell 5.1 StructureOnly passed in
+  208.5 seconds. Exact committed-tree and hosted confirmation remain pending.
+- Required safe response: require the exact parent-generated stream identity
+  and `ConsumptionStage=ActiveReadLoop` for the first fixture event; label only
+  the post-exit drain as `PostExitDrain`; retain exit, event, redaction, final-
+  result, and cancellation assertions; validate both supported local runtimes
+  and a new exact hosted head.
+- Unsafe retry boundary: do not infer streaming from PID, `HasExited`, process-
+  start timestamps, timing tolerances, or retries; do not rerun an unchanged
+  failed head, weaken required events, or create a duplicate scenario.
+- Freshness and review condition: last confirmed 2026-07-28; review whenever
+  the bounded-process read-loop boundary, callback observation, fixture startup,
+  or hosted runtime changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure

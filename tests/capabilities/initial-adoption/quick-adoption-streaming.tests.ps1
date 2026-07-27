@@ -229,40 +229,26 @@ try {
                 -Operation 'Mock Codex JSONL stream' `
                 -ProgressActivity 'Running local Codex' `
                 -OutputLineHandler {
-                    param([string]$Line, $ProcessObservation)
+                    param([string]$Line, $StreamObservation)
                     Write-LocalCodexEvent -Line $Line
                     $fixtureEvent = $null
                     try {
                         $fixtureEvent = $Line | ConvertFrom-Json -ErrorAction Stop
                     }
                     catch { }
-                    $fixtureProcessId = if ($null -ne $fixtureEvent) {
-                        $fixtureEvent.PSObject.Properties['fixture_process_id']
-                    }
-                    else { $null }
                     $fixtureStreamIdentity = if ($null -ne $fixtureEvent) {
                         $fixtureEvent.PSObject.Properties['fixture_stream_identity']
                     }
                     else { $null }
-                    $observedProcessId = if ($null -ne $ProcessObservation) {
-                        $ProcessObservation.PSObject.Properties['ProcessId']
+                    $consumptionStage = if ($null -ne $StreamObservation) {
+                        $StreamObservation.PSObject.Properties['ConsumptionStage']
                     }
                     else { $null }
-                    $observedIsRunning = if ($null -ne $ProcessObservation) {
-                        $ProcessObservation.PSObject.Properties['IsRunning']
-                    }
-                    else { $null }
-                    if ($null -ne $fixtureProcessId -and
-                        $null -ne $fixtureStreamIdentity -and
-                        $null -ne $observedProcessId -and
-                        $null -ne $observedIsRunning -and
-                        [string]$fixtureProcessId.Value -cmatch '^[1-9][0-9]*$' -and
-                        [int64]$fixtureProcessId.Value -le [int]::MaxValue -and
-                        [int]$fixtureProcessId.Value -eq [int]$observedProcessId.Value -and
+                    if ($null -ne $fixtureStreamIdentity -and
+                        $null -ne $consumptionStage -and
                         [string]$fixtureStreamIdentity.Value -ceq
                             $script:QuickAdoptionStreamIdentity -and
-                        $observedIsRunning.Value -is [bool] -and
-                        [bool]$observedIsRunning.Value) {
+                        [string]$consumptionStage.Value -ceq 'ActiveReadLoop') {
                         $script:QuickAdoptionStreamObservedWhileActive = $true
                     }
                 }
