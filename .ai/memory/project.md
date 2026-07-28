@@ -430,11 +430,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   own the correction. Existing
   [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
   recurrence entries are distinct and do not route this signature.
-- Fixed release or evidence: reviewed candidate uses parent-owned exact child
-  PID publication, observes early pipeline completion, drains bounded error
-  detail, and proves both processes active before cancellation. Focused
-  PowerShell 7 / Windows PowerShell 5.1 evidence passes; exact committed and
-  hosted evidence remain pending.
+- Fixed release or evidence: exact checkpoint
+  [`7cfcdcb4bf320aec950147097086bba1978863d9`](https://github.com/hasanmanzak/meAndAI/commit/7cfcdcb4bf320aec950147097086bba1978863d9)
+  uses atomic parent-owned exact child PID publication, observes early pipeline
+  completion, drains bounded error detail, independently retains every parsed
+  PID for cleanup, and proves both processes active before cancellation.
+  PowerShell 7 / Windows PowerShell 5.1 StructureOnly passes in 184.3 / 292.4
+  seconds; the exact Windows streaming and quick-adoption child owners pass in
+  12.9 / 482.4 seconds. Exact hosted evidence remains pending.
 - Required safe response: retain
   [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106),
   make the fixture parent publish the

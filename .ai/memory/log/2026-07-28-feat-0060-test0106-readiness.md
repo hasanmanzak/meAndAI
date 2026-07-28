@@ -48,14 +48,21 @@ and
 owner emits its exact pass manifest on both runtimes in 16.6 / 14.9
 seconds; the final atomic-publication and independent partial-PID review
 repeated the pass in 10.1 / 14.7 seconds. Production and workflow files are
-unchanged. Full-profile,
-StructureOnly, exact-commit, and hosted evidence remain pending.
+unchanged.
+
+Exact checkpoint
+[`7cfcdcb4bf320aec950147097086bba1978863d9`](https://github.com/hasanmanzak/meAndAI/commit/7cfcdcb4bf320aec950147097086bba1978863d9)
+passes StructureOnly on PowerShell 7 / Windows PowerShell 5.1 in 184.3 / 292.4
+seconds with governance observations of 181607 / 289670 ms. Its exact Windows
+streaming shard passes in 12.9 seconds and the unchanged quick-adoption sibling
+passes in 482.4 seconds. A combined local invocation reached only the command
+wrapper's external 704-second observation ceiling; its unavailable exit was
+not accepted, no orphan remained, and the exact child owners were run
+separately with preserved exit codes. Exact-hosted evidence remains pending.
 
 ## Continuation
 
-Complete the single PS5.1 `WindowsNative` profile that reproduces the old-head
-failure, perform fresh-diff review, update the evidence records, run
-StructureOnly on both supported runtimes, commit the complete packet, repeat
-exact-commit validation, and push once. Accept closure only after a new exact
-head passes both protected Ubuntu and Windows jobs; do not rerun the unchanged
-failed head.
+Commit this evidence-only record update, repeat exact-commit StructureOnly on
+both supported runtimes because the committed graph changed, and push once.
+Accept closure only after a new exact head passes both protected Ubuntu and
+Windows jobs; do not rerun the unchanged failed head.
