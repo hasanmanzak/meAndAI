@@ -34,11 +34,21 @@ boundary and independent severity/enforcement metadata. Readiness is nine of
 twelve items (75%); implementation is zero of seven subfeatures. Follow the
 [contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md)
 and the separately authorized
-[readiness-correction handoff](log/2026-07-28-feat-0060-test0106-readiness.md).
+[readiness-correction handoff](log/2026-07-28-feat-0060-test0106-readiness.md),
+then the separately authorized
+[Windows Full job-ceiling handoff](log/2026-07-28-feat-0060-test0124-windows-timeout.md).
 Only the bounded canonical test harness and inert fixture changed under
 [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365);
-no C# implementation, workflow behavior, consumer repository, production
-authority, PowerShell production route, or readiness percentage changed.
+that correction did not change workflow behavior. Replacement exact-head
+[run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+then exposed
+[FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366),
+a stale Windows serial `Full` whole-job ceiling under
+[TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124).
+The separately authorized correction changes only that Windows ceiling from 35
+to 60 minutes; Linux 20, post-publication 5, C# implementation, consumer
+repositories, production authority, PowerShell production routes, and the
+readiness percentage remain unchanged. Exact-hosted confirmation is pending.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

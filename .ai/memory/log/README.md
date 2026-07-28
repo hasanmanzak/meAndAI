@@ -12,6 +12,7 @@ through the
 [contract-acceptance handoff](2026-07-28-feat-0060-contract-acceptance.md)
 and the separately authorized
 [readiness-correction handoff](2026-07-28-feat-0060-test0106-readiness.md)
+and [Windows Full job-ceiling handoff](2026-07-28-feat-0060-test0124-windows-timeout.md)
 and its canonical
 [readiness analysis](../../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md).
 The records-only gate has inventoried 188/188 base identities, seven explicit
@@ -24,7 +25,15 @@ changes only the canonical
 [TEST-0106](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
 harness and inert fixture; no C#
 implementation, workflow, consumer, production authority, or PowerShell
-production route changed.
+production route changed. Replacement exact-head
+[run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+then exposed
+[FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366)
+under canonical
+[TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124).
+Its separately authorized test-first correction changes only the Windows
+serial `Full` whole-job ceiling from 35 to 60 minutes; exact-hosted
+confirmation remains pending.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
@@ -80,6 +89,9 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366) /
+  [Windows Full job-ceiling correction](2026-07-28-feat-0060-test0124-windows-timeout.md)
 - 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
   [FIND-0365](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365) /
   [readiness correction](2026-07-28-feat-0060-test0106-readiness.md)

@@ -111,7 +111,14 @@ Last verified: **2026-07-28**
   [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
   harness and inert fixture; no C#
   implementation, workflow, consumer, PowerShell production route, or
-  production-authority state changed.
+  production-authority state changed. The replacement exact head then exposed
+  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366):
+  [run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+  passed Ubuntu but canceled the correctly selected serial Windows `Full`
+  route at its stale 35-minute whole-job ceiling. The separately authorized
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+  correction changes only that Windows ceiling to 60 minutes; Linux remains
+  20, post-publication remains 5, and exact-hosted confirmation is pending.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -452,6 +459,57 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
   fixture startup, PowerShell async-pipeline boundary, Windows
   process containment, or hosted runtime changes.
+- Superseded by: `None`
+
+### Windows Full validation can exhaust a stale single-job ceiling without a test failure
+
+- Status: `Active`
+- Observable signature: an exact hosted Windows `Full` job is `cancelled` with
+  `The job has exceeded the maximum execution time of 35m0s` while Ubuntu
+  passes; Git or fixture-teardown failures may appear while runner
+  cancellation is already active and are not independent defect evidence.
+- Applicability: the pre-correction single serial Windows PowerShell 5.1 job
+  bounded at 35 minutes, and later Windows `Full` routes whose measured suite
+  plus setup consumption approaches the current whole-job ceiling.
+- Affected contract and cause: canonical
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+  requires the Windows upper bound to cover measured serial `Full` execution.
+  The historical 35-minute budget left only about three minutes around the
+  nearest successful 31 min 48 s Windows job and could cancel authoritative
+  evidence before a test verdict.
+- Canonical owner and evidence:
+  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366) /
+  [FEAT-0027](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md) /
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) /
+  [DEC-0019](../../docs/decisions/DEC-0019-hosted-runner-efficiency.md) /
+  failed exact-head [run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+  own the correction. Historical
+  [FIND-0160](../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0160)
+  is the same-contract prior occurrence.
+- Fixed release or evidence: release evidence is not applicable to this
+  pre-merge test-infrastructure correction. The test-first working tree changed
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+  to require 60 minutes; its PowerShell 7 structural verifier failed alone in
+  201 seconds against workflow 35 and passed in 176.9 seconds after only the
+  Windows job ceiling changed to 60. Checksummed actionlint, selector
+  [TEST-0123](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0123),
+  the unchanged
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  owner on both runtimes, and the candidate PowerShell 7 / Windows PowerShell 5.1
+  StructureOnly pass. Exact-commit and hosted evidence remain pending.
+- Required safe response: retain one stable Windows job and the fail-safe
+  profile selector, set only its whole-job ceiling to 60 minutes, preserve
+  Linux 20 and post-publication 5, run StructureOnly on both supported
+  runtimes, and require a new exact-head Ubuntu/Windows pass. Treat teardown or
+  native-command failures emitted during whole-job cancellation as secondary
+  until an uncancelled run reproduces them.
+- Unsafe retry boundary: do not rerun an unchanged canceled head, add retry or
+  sleep behavior, broaden per-operation timeouts, suppress child failures,
+  restore hosted fan-out, weaken `Full` coverage, or route this signature to
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106).
+- Freshness and review condition: last confirmed 2026-07-28; review whenever
+  the Windows workflow ceiling, serial `Full` suite composition, hosted image,
+  setup steps, or measured runner consumption changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure

@@ -1061,7 +1061,7 @@ else {
     }
     if (-not [regex]::IsMatch(
         $windowsJobSource,
-        '(?m)^ {4}timeout-minutes: 35\r?$'
+        '(?m)^ {4}timeout-minutes: 60\r?$'
     )) {
         Add-Failure 'TEST-0124 Windows full validation timeout does not cover the measured serial-suite budget.'
     }
