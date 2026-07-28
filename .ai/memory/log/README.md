@@ -9,15 +9,16 @@ and follow its canonical links.
 C# operational platform migration. Follow current
 [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
 through the
-[Definition-of-Ready handoff](2026-07-28-feat-0060-dor-analysis.md)
+[ledger and matrix handoff](2026-07-28-feat-0060-ledger-matrix-analysis.md)
 and its canonical
 [readiness analysis](../../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md).
-The records-only gate has inventoried the immutable baseline, rule families,
-profile/snapshot/report proposal, recurrence barriers, and seven reviewable
-subfeatures. Readiness is eight of twelve items (67%); implementation is zero
-of seven subfeatures. Exact per-variant mapping, rule applicability/source
-mapping, contract acceptance, and separate development authorization remain
-open. No workflow, consumer, production-authority, or PowerShell state changed.
+The records-only gate has inventoried 188/188 base identities, seven explicit
+declaration packets, and a separate lower bound of 116 TEST/case mappings.
+Scenario-level routes are 172/188 unambiguous (91.5%) and 16/188 mixed (8.5%). Readiness
+remains eight of twelve items (67%); implementation is zero of seven
+subfeatures. The v1 contract decision, full material-variant normalization,
+and separate development authorization remain open. No workflow, consumer,
+production-authority, or PowerShell state changed.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
@@ -73,6 +74,8 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  [ledger and matrix analysis](2026-07-28-feat-0060-ledger-matrix-analysis.md)
 - 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
   [Definition-of-Ready analysis](2026-07-28-feat-0060-dor-analysis.md)
 - [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)

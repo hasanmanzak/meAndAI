@@ -18,15 +18,21 @@ evidence for
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md).
 
 [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-/ [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) is now in
+/ [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) is in
 records-only Definition-of-Ready analysis. Its
-[readiness record](../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md)
-captures the v0.16.0 owner/rule inventory, snapshot/profile/report proposal,
-recurrence and baseline evidence, seven reviewable slices, and the remaining
-scenario/variant mapping and contract-approval gates. Readiness is eight of
-twelve items (67%); implementation is zero of seven subfeatures. No executable
-development, workflow behavior, consumer repository, production authority, or
-PowerShell route has changed.
+[ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+accounts for 188/188 active base identities, all seven explicit declaration
+packets, and a separate proven lower bound of 116 TEST/case mappings. The
+[rule/profile matrix](../../docs/features/FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
+classifies the base universe into 43 C# candidates, 16 mixed boundaries, 94
+retained PowerShell operations, 29 infrastructure contracts, three provider
+identities, and three existing C# identities. The
+[v1 decision packet](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
+is the first maintainer gate. Readiness remains eight of twelve items (67%);
+implementation is zero of seven subfeatures. No executable development,
+workflow behavior, consumer repository, production authority, or PowerShell
+route has changed.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

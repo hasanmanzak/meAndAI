@@ -24,7 +24,11 @@ numbered scenario; the existing identity is cited by the differential ledger.
 ## Evidence
 
 No feature implementation or executable scenario evidence exists; all three
-scenarios remain planning records. The accepted pre-change baseline is exact-head
+scenarios remain planning records. The records-only
+[differential-ledger inventory](differential-ledger-analysis.md),
+[rule/profile matrix](rule-profile-matrix-analysis.md), and
+[v1 decision packet](contract-decision-packet.md) refine their future evidence
+boundaries without claiming executable completion. The accepted pre-change baseline is exact-head
 [run `30337115744`](https://github.com/hasanmanzak/meAndAI/actions/runs/30337115744),
 exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671),
 and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375).

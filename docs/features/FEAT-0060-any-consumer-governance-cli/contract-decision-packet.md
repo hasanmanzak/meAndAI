@@ -1,0 +1,129 @@
+# [FEAT-0060](README.md) v1 Contract Decision Packet
+
+Status: maintainer decision required; records only. Acceptance authorizes
+continued Definition-of-Ready normalization, not executable development.
+
+The repository evidence now reaches the first boundary that cannot be resolved
+by inspection alone. The following bundle keeps v1 finite, deterministic,
+repository-only, and non-authoritative while C# remains a shadow engine.
+
+## Recommended v1 bundle
+
+### 1. Material-variant granularity
+
+Assign a stable namespaced `variantKey` whenever an input branch changes the
+expected outcome, finding code, profile applicability, evidence source,
+snapshot mode, authority state, or disposition. Multiple inputs with the same
+oracle may share one declared finite partition and case-list digest.
+Generative spaces are represented by explicit boundary partitions and a fixed
+seed/corpus, not by pretending every generated sample is a separate permanent
+identity.
+
+Each declaration packet records `Unexpanded`, `Partial`, or `Complete` plus its
+proven cardinality. This creates an auditable denominator without allocating
+new `TEST-*` identities for language ports.
+
+### 2. Planned route versus evidenced disposition
+
+Use separate fields:
+
+- `plannedRoute` records the records-only analysis hypothesis; and
+- `evidencedDisposition` remains empty until same-snapshot executable proof
+  supports one closed disposition;
+- `canonicalEvidenceOwner` preserves the current PowerShell suite, GitHub
+  Actions semantic contract, external verifier, or .NET test project; and
+- `operationalAuthorityState` exists only for rows that participate in the
+  governance operational-capability migration.
+
+Applicable current migration rows retain `PowerShellAuthority`; infrastructure,
+provider, workflow-semantic, and existing-foundation rows do not receive that
+state merely because they appear in the same inventory. Existing C# foundation
+rows later receive reasoned `NotApplicable` /
+`AlreadyOwnedByCSharpFoundation` evidence rather than a fabricated language
+transfer. All analysis rows currently keep `evidencedDisposition` empty.
+Missing or divergent evidence cannot be converted into an optimistic
+disposition.
+
+### 3. Policy/runtime support range
+
+Treat the evaluated subject snapshot and the engine/policy bundle as separate
+identities. An unreleased shadow bundle binds the exact engine source commit,
+exact policy source commit, rule-catalog schema/digest, and application artifact
+digest; it can emit only `CSharpShadow`. A dirty or ambiguous engine/policy
+source cannot create a shadow result.
+
+An immutable application release binds the same identities in its manifest.
+Only that released bundle is eligible for `CSharpReleasedNonAuthoritative` and
+consumer execution, and the consumer pin must equal its exact policy commit.
+If a subject candidate changes policy-owning files relative to the selected
+released policy, its result is `incomplete`; candidate-policy evaluation
+requires a separately bound unreleased shadow bundle.
+
+Do not apply current policy to an older consumer pin and do not infer
+compatibility from semantic version ranges. Historical support may be added
+later only through an explicit finite application-release/policy-commit table
+with executable evidence.
+
+### 4. Severity and enforcement
+
+Use the closed severity vocabulary `critical`, `high`, `medium`, `low`, and
+`info`. Severity describes impact; it is not the disposition and is not the
+blocking flag. Every v1 rule violation is blocking. A rule missing its
+canonical severity makes the report `incomplete` rather than silently choosing
+a default.
+
+### 5. Report digest
+
+Compute SHA-256 over the exact canonical UTF-8-without-BOM semantic payload,
+excluding `reportDigest` itself and the transport LF. Bind schema,
+application, stage, profile, snapshot, policy, verdict, engine/authority
+states, counts, and sorted findings. Do not bind timestamps, durations,
+absolute paths, host data, or presentation-only transport bytes.
+
+### 6. Process exit codes
+
+| Exit code | Meaning |
+| ---: | --- |
+| `0` | Completed and `conforming` |
+| `1` | Completed and `nonconforming` |
+| `2` | Completed but `incomplete` |
+| `64` | Rejected input or undeclared capability |
+| `70` | Dependency or internal failure; no authoritative verdict |
+| `130` | Canceled; no authoritative verdict |
+
+Both `nonconforming` and `incomplete` are nonzero so local and hosted callers
+cannot mistake them for a successful governance gate.
+
+### 7. Candidate snapshot authority
+
+Keep both `exact-commit` and `candidate` subject-repository snapshot modes.
+This mode does not select or loosen the independently bound engine/policy
+bundle from the preceding decision. Candidate subject results may be
+`conforming`, `nonconforming`, or `incomplete`, but remain provisional
+`CSharpShadow` evidence and never establish authority. A graph-relevant or
+released-policy-owning candidate change yields `incomplete`; ambiguity or
+capture drift yields a failed operation with no verdict. Authority comparison
+requires committed HEAD evidence.
+
+### 8. Provider boundary
+
+Keep [TEST-0065](../FEAT-0011-stability-closure/test-cases.md#test-0065) and the
+other wholly provider-owned identities outside the repository-only v1 engine
+with reasoned `NotApplicable` ledger rows; split mixed local/provider
+identities by material variant and retain
+their existing external authority. General enumeration and content governance
+for all issues, pull requests, and comments remains excluded pending the
+maintainer's separately reserved discussion and authorization.
+
+## Effect of acceptance
+
+Accepting this bundle completes only the maintainer-contract readiness item.
+The next records-only work is to normalize every material inline/generative
+variant, split the 16 mixed identities, assign canonical finding/severity
+metadata, and publish the complete ledger and generated matrix. Executable C#
+work still requires a later, separate authorization after the Definition of
+Ready closes.
+
+If accepted, readiness moves from 8/12 (67%) to 9/12 (75%). Completion of the
+ledger and matrix would then move it to 11/12 (92%); separate executable
+development authorization is the final 12/12 gate.

@@ -83,19 +83,23 @@ Last verified: **2026-07-28**
   release evidence above.
 - Current records-only work:
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-  / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) is in
+  / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
+  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) is in
   Definition-of-Ready analysis. The
-  [readiness record](../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md)
-  binds the immutable v0.16.0 baseline, 188 active canonical identities,
-  rule-family and owner inventory, proposed repository-only
-  snapshot/profile/report contracts, seven reviewable subfeatures, recurrence
-  barriers, and bounded authority states. Readiness is eight of twelve items
-  (67%); implementation is zero of seven subfeatures. The exact per-variant
-  ledger, rule applicability/snapshot matrix, maintainer contract acceptance,
-  and separate development authorization remain open. General all-repository
-  GitHub issue/PR/comment governance remains reserved for a separate
-  discussion. No workflow, consumer, PowerShell, or production-authority state
-  changed.
+  [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+  covers all 188 active base identities, all seven explicit declaration
+  packets, 195 declaration-level units, and a separate proven lower bound of
+  116 TEST/case mappings. The
+  [rule/profile matrix](../../docs/features/FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
+  classifies 43 C# candidates, 16 mixed boundaries, 94 retained PowerShell
+  operations, 29 infrastructure contracts, three provider identities, and
+  three existing C# identities. The global inline/generative denominator and
+  variant-level finding/severity matrix require the maintainer's
+  [v1 contract decision](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md).
+  Readiness remains eight of twelve items (67%); implementation is zero of
+  seven subfeatures. General all-repository GitHub issue/PR/comment governance
+  remains reserved for a separate discussion. No workflow, consumer,
+  PowerShell, or production-authority state changed.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.

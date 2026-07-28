@@ -37,14 +37,22 @@ Representative high-relevance owners are:
 | [tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1](../../../tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1) | 2,445 lines | 7 | Local mock publication contracts |
 | [tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1](../../../tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1) | 4,037 lines | 1 | One supplied release/issue/pull-request evidence set |
 
-These counts are an audit baseline, not a completeness claim for the future
-differential ledger. Every inline positive and negative variant still needs a
-finite disposition before authority can move. Larger mutation-heavy adoption
-and update suites are intentionally not presented as size-ranked governance
+These counts are the exact scenario-level audit baseline, not a completeness
+claim for concrete variants. The
+[differential-ledger inventory](differential-ledger-analysis.md) accounts for
+188/188 active identities and seven explicit declaration packets, proves at
+least 116 TEST/case mappings separately from the base identities, and records
+why the global inline/generative variant denominator is not encoded today.
+Every material variant still needs a finite
+disposition before authority can move. Larger mutation-heavy adoption and
+update suites are intentionally not presented as size-ranked governance
 owners; their pure-validation and operational variants still require explicit
 ledger dispositions.
 
 ## Rule-family inventory
+
+The complete scenario-level distribution and profile/evidence-source analysis
+is in the [rule/profile matrix](rule-profile-matrix-analysis.md).
 
 | Family | Current authority surface | Intended profile | Transfer boundary |
 | --- | --- | --- | --- |
@@ -77,7 +85,17 @@ The v1 request is repository-only and carries closed, versioned identities:
 - `RepositorySnapshotMode`: `exact-commit` or `candidate`;
 - `ProtocolPolicyIdentity`: exact release/tag, source commit, rule-catalog
   schema/digest, and instruction-graph schema/limits; and
+- `EnginePolicyBundleIdentity`: exact engine source commit, policy source
+  commit, catalog digest, and application artifact digest, plus immutable
+  release identity when released; and
 - `EvidenceScope`: exactly `repository` for this feature boundary.
+
+The subject repository snapshot and engine/policy bundle are independent
+identities. An unreleased exact-source bundle is shadow-only. Only an immutable
+release manifest may qualify a bundle as `CSharpReleasedNonAuthoritative`; a
+consumer pin must match its exact policy commit. A subject candidate that
+changes released-policy-owning files is `incomplete` under that released
+bundle and requires a separately bound candidate shadow bundle.
 
 The caller selects a profile but cannot supply arbitrary rules, capabilities,
 authority state, or a replacement catalog. The engine verifies the selection
@@ -135,8 +153,9 @@ Each finding contains stable rule ID, canonical scenario identity and owner,
 finding code, canonical severity, repository-relative location, safe
 line/anchor, and content/object digest. It contains no file snippet, provider
 body, exception, command line, stdout/stderr, environment value, absolute
-path, or credential material. Existing failure behavior starts as blocking;
-new severity levels require inventory evidence.
+path, or credential material. The exact severity vocabulary, enforcement
+relationship, digest scope, and exit-code map remain recommendations pending
+maintainer acceptance in the [v1 decision packet](contract-decision-packet.md).
 
 Process and report meanings stay distinct:
 
@@ -170,9 +189,18 @@ cannot enter the public model.
 
 ## Differential authority ledger
 
-[TEST-0196](test-cases.md#test-0196) will own one finite ledger starting from
-all 188 active canonical identities and expanding each declared
-positive/negative variant. Each row has exactly one disposition:
+[The inventory analysis](differential-ledger-analysis.md) accounts for all 188
+active canonical identities, all seven explicit `ParameterizedVariant`
+declaration packets, and 195 declaration-level units. It proves 107 named
+source cases and 116 TEST/case mappings. The base identities and mappings are
+separate facts; adding them would be valid only if the accepted schema retains
+a base row beside expanded mappings. No central machine-readable source
+currently assigns stable keys or cardinalities to every inline/generative
+variant, so a complete row count or denominator cannot yet be claimed.
+
+[TEST-0196](test-cases.md#test-0196) will own the accepted finite ledger after
+material-variant normalization. Each evidenced row has exactly one
+disposition:
 
 - `CSharpSameContract`;
 - `ApprovedStrongerEvidence`;
@@ -180,10 +208,24 @@ positive/negative variant. Each row has exactly one disposition:
 - `InfrastructureContract`; or
 - reasoned `NotApplicable`.
 
-Every row records canonical owner, profile, snapshot source, rule/finding
-identity, PowerShell result, C# result, evidence link, and authority state.
-Missing, duplicate, divergent, or unproved stronger rows fail closed. A
-language port does not create a new numbered scenario by itself.
+Every row records canonical scenario and evidence owners, profile, snapshot
+source, rule/finding identity, expected oracle, separate PowerShell/C#
+observations, evidence link, and applicable operational-authority state.
+`plannedRoute` is separate from `evidencedDisposition`; during records-only
+analysis the latter is empty. Only rows participating in governance
+operational-capability migration receive `operationalAuthorityState`, and
+applicable current rows retain `PowerShellAuthority`. Infrastructure, provider,
+workflow-semantic, and existing-foundation rows preserve their canonical
+evidence owners without a fabricated PowerShell authority state. Missing,
+duplicate, divergent, or unproved stronger rows fail closed. A language port
+does not create a new numbered scenario by itself.
+
+Scenario-level planned routes are complete and mutually exclusive: 43 C#
+candidates, 16 mixed boundaries, 94 retained PowerShell operations, 29
+infrastructure contracts, three external-provider identities, and three
+existing C# foundation identities. The 172 unambiguous routes are 91.5% of the
+base universe; the 16 mixed routes are the remaining 8.5% and require accepted
+variant keys.
 
 Authority progression is bounded:
 
@@ -271,14 +313,24 @@ seven subfeatures (0%).
 - [x] Recurrence review.
 - [x] Sibling-intent review for the three new scenario families.
 - [x] Independently reviewable subfeature decomposition.
-- [ ] Exact 188-scenario plus declared-variant differential ledger.
-- [ ] Rule-by-rule profile/applicability and snapshot-source matrix.
+- [ ] Complete material-variant differential ledger; the 188/188 base
+  identities and 7/7 explicit declaration packets are inventoried, but the
+  inline/generative denominator and 16 mixed boundaries await accepted
+  granularity.
+- [ ] Complete rule-by-rule profile/applicability and evidence-source matrix;
+  the scenario-level matrix is complete and the variant-level matrix remains
+  open.
 - [ ] Maintainer acceptance of the proposed v1 contract and open policy-range,
   severity, report-digest, and exit-code choices.
 - [ ] Separate executable development authorization.
 
-The remaining duration cannot yet be evidence-backed because the declared
-variant count and observed mapping throughput do not exist. The next
-conclusive update must report the ledger row count, measured mapping rate,
-elapsed work, remaining percentage, and a revised estimate. Implementation
-duration is intentionally not estimated before Gate 1 closes.
+Current conclusive progress is 188/188 base identities (100%), 7/7 explicit
+declaration packets (100%), 116 proven TEST/case mappings, and 172/188
+unambiguous scenario routes (91.5%), with 16/188 mixed (8.5%). No honest global
+row count or denominator exists until the maintainer accepts the
+[material-variant contract](contract-decision-packet.md). No monotonic start
+marker was captured for this audit, so elapsed analysis time cannot be
+reconstructed without guessing. The first post-decision normalization batch
+must record elapsed time and rows per hour before a remaining-duration estimate
+is published. Implementation duration remains intentionally unestimated before
+Gate 1 closes.

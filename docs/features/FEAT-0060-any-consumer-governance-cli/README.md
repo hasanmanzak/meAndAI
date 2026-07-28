@@ -6,10 +6,10 @@
 | Status | Definition-of-Ready analysis in progress / development not authorized |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | Not created; records-only readiness analysis is local |
+| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft, records only) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
 | Tests | [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0196](test-cases.md#test-0196) |
-| Readiness analysis | [Rule, profile, snapshot, report, differential, and baseline analysis](readiness-analysis.md) |
+| Readiness analysis | [Definition-of-Ready analysis](readiness-analysis.md), [differential-ledger inventory](differential-ledger-analysis.md), [rule/profile matrix](rule-profile-matrix-analysis.md), and [v1 decision packet](contract-decision-packet.md) |
 
 ## Problem
 
@@ -72,8 +72,19 @@ engine without repository or GitHub mutation authority.
 - The [readiness analysis](readiness-analysis.md) inventories current owners,
   rule families, snapshot/profile/report contracts, immutable baseline,
   recurrence barriers, and the bounded authority progression.
-- The exact 188-active-scenario plus declared-variant differential ledger and
-  rule-by-rule profile/snapshot matrix remain required before implementation.
+- The [differential-ledger inventory](differential-ledger-analysis.md) accounts
+  for all 188 active base identities, all seven explicit declaration packets,
+  195 declaration-level units, and a separate proven lower bound of 116
+  TEST/case mappings. It identifies the absence of a global
+  inline/generative variant denominator rather than claiming a ledger size or
+  false completeness before the row-shape decision.
+- The [rule/profile matrix](rule-profile-matrix-analysis.md) classifies all 188
+  base identities: 43 C# candidates, 16 mixed boundaries, 94 retained
+  PowerShell operations, 29 infrastructure contracts, three provider-owned
+  identities, and three existing C# foundation identities.
+- The [v1 decision packet](contract-decision-packet.md) records the first
+  maintainer decision required before the remaining material variants can be
+  normalized.
 
 ## Risks
 
@@ -113,14 +124,18 @@ engine without repository or GitHub mutation authority.
 - [x] Target `0.17.0`, immutable baseline, owner/rule-family inventory,
   recurrence review, sibling-intent review, and independently reviewable
   decomposition.
-- [ ] Exact scenario/variant ledger and rule-by-rule profile/snapshot matrix.
+- [ ] Complete material-variant ledger and rule-by-rule
+  profile/applicability/evidence-source matrix; scenario-level inventory is
+  complete, but inline/generative expansion and 16 mixed boundaries await the
+  accepted granularity contract.
 - [ ] Maintainer acceptance of the proposed v1 request, snapshot, profile,
   report, policy-range, severity, digest, and exit-code contract.
 - [ ] Separate executable development authorization.
 
 Readiness is eight of twelve items, or 67%; implementation is zero of seven
-subfeatures, or 0%. See the
-[remaining gates and estimation boundary](readiness-analysis.md#remaining-definition-of-ready-gates).
+subfeatures, or 0%. Base identity and explicit declaration-packet inventory is
+100%; scenario-level route classification is 91.5% unambiguous and 8.5% mixed.
+See the [remaining gates and estimation boundary](readiness-analysis.md#remaining-definition-of-ready-gates).
 
 ## Acceptance criteria
 
