@@ -72,12 +72,33 @@ scope was declared complete and the remote branch was not deleted. A future
 intake must start from current `main`, select a new target version, and allocate
 unused subordinate identities.
 
+## Records-only validation
+
+Independent self-review closed all path, scope, contract, estimate, and memory
+consistency findings. The first exact committed planning checkpoint passed the
+canonical StructureOnly profile in both supported runtimes:
+
+- PowerShell 7: protocol-governance assertions and root structure validation
+  passed; canonical owner observation `147355 ms`;
+- Windows PowerShell 5.1: the same assertions and root validation passed;
+  canonical owner observation `244768 ms`.
+
+The elapsed values are observational, not correctness thresholds. No full
+behavior suite or hosted workflow was repeated because the packet changes only
+records and memory, reuses the immutable v0.16.0 full baseline, and changes no
+executable source, workflow, scenario authority, or consumer surface. The
+final evidence-only commit still requires the same exact-tree StructureOnly
+gate before publication.
+
 ## Continuation
 
-1. Validate this planning packet against the candidate tree and then the exact
-   committed tree in both supported PowerShell runtimes.
-2. Publish one records-only draft review checkpoint if validation is clean.
-3. Do not begin
+1. Validate the final evidence-only commit in both supported PowerShell
+   runtimes.
+2. Publish one records-only draft review checkpoint if that validation is
+   clean.
+3. Synchronize [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155)
+   to the exact final record and review evidence.
+4. Do not begin
    [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
    implementation until the remaining Definition of Ready gates and separate
    development authorization are complete.
