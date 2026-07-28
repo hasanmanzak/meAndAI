@@ -4,20 +4,19 @@
 delivery. A project can pin this repository as a Git submodule or repository
 reference while keeping its own context and AI memory inside that project.
 
-Current protocol version: **0.15.6**
+Current protocol version: **0.16.0**
 
-Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
+Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is the prior published release at
-[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
-[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
-[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
-[FEAT-0056](docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-delivery and publication evidence. The `v0.15.6` completed historical
-adoption-issue correction is tracked by
-[FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
-[BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149), and
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149).
+[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
+[FEAT-0058](docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
+delivery and publication evidence. The `v0.16.0` shared C# operational
+foundation is tracked by
+[FEAT-0059](docs/features/FEAT-0059-csharp-operational-foundation/README.md),
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154), and
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159).
 
 ## Start here
 

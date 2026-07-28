@@ -2,7 +2,7 @@
 
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-28**<br>
-Protocol version: **0.15.6**<br>
+Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.15.6**
 
 The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)

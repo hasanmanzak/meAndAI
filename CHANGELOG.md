@@ -3,6 +3,45 @@
 This project uses the `M.m.rev` version format defined in the
 [common protocol](PROTOCOL.md#8-versioning).
 
+## 0.16.0 - 2026-07-28
+
+### Added
+
+- Add one `net10.0` solution with typed domain, application, infrastructure,
+  capability-grant, deterministic-result, cancellation, and redaction
+  boundaries for the planned governance, adoption, and consumer-update
+  applications.
+- Add three separately publishable framework-dependent JIT entry packages and
+  one external schema-1 manifest that bind source commit, runtime, application
+  schema, asset length, and SHA-256 identity. Required CI builds the package
+  set once on Ubuntu and verifies and executes those same bytes on Windows.
+
+### Changed
+
+- Advance the protocol, quick-adoption runtime, default consumer target,
+  templates, and current documentation to `v0.16.0` while preserving immutable
+  `v0.15.6` as the exact predecessor and extending the unchanged reviewed
+  instruction-graph schema-2 profile through this release.
+- Keep all governance, adoption, and consumer-update behavior and production
+  authority in PowerShell. The new C# entry applications expose only their
+  deterministic contract description; later features own operational behavior,
+  differential evidence, consumer migration, and retirement.
+
+Candidate validation: [TEST-0191](docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191),
+[TEST-0192](docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192),
+and [TEST-0193](docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
+pass 48 of 48 compiled cases on Windows and Linux. The exact same-byte package
+handoff, retained PowerShell validation, release-preparation checks, and final
+publication evidence are retained by
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) and
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159).
+
+Related work: [FEAT-0059](docs/features/FEAT-0059-csharp-operational-foundation/README.md),
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154),
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159),
+[DEC-0032](docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md),
+and [TEST-0193](docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193).
+
 ## 0.15.6 - 2026-07-27
 
 ### Fixed

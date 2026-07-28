@@ -7,6 +7,7 @@ and follow its canonical links.
 
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
 C# operational platform migration. Follow the
+[v0.16.0 release-preparation handoff](2026-07-28-feat-0059-v0160-release-preparation.md),
 [third-slice portable-package handoff](2026-07-28-feat-0059-subf-0121-portable-packaging.md),
 [second-slice completion handoff](2026-07-28-feat-0059-subf-0120-ports-results.md),
 the historical [first-slice handoff](2026-07-27-feat-0059-subf-0119-foundation.md),
@@ -18,8 +19,10 @@ and their linked planning authority.
 are complete at five of five slice gates with exact-tree and required
 Ubuntu/Windows evidence. [Draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
 owns the unmerged checkpoint. Feature implementation is three of three
-subfeatures and 15 of 15 gates, or 100%. Consumer behavior, authority migration,
-release publication, and PowerShell retirement still require independent gates.
+subfeatures and 15 of 15 gates, or 100%. The maintainer authorized only the
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) protected merge and immutable `v0.16.0` release closure on 2026-07-28;
+consumer behavior, authority migration, later features, and PowerShell
+retirement still require independent gates.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
@@ -63,6 +66,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
 - [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)
 - [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
 - [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)

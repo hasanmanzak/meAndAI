@@ -169,7 +169,7 @@ function Assert-PostPublicationCheckoutContract {
 }
 
 $repository = 'example/meandai-consumer'
-$defaultTag = 'v0.15.6'
+$defaultTag = 'v0.16.0'
 $tag = $defaultTag
 $commit = '0123456789abcdef0123456789abcdef01234567'
 $shortCommit = $commit.Substring(0, 12)

@@ -9,7 +9,8 @@ Last verified: **2026-07-28**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.15.6`. The latest immutable release is
+- Current protocol version: `0.16.0`. The latest immutable release before this
+  release-preparation candidate is
   [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at
   [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
   [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
@@ -70,8 +71,11 @@ Last verified: **2026-07-28**
   [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) /
   [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
   handoff. The slice is five of five and feature implementation is three of
-  three subfeatures, or 100%. No consumer, release, PowerShell route, or
-  production authority changed; merge and release remain unauthorized.
+  three subfeatures, or 100%. No consumer, PowerShell route, or production
+  authority changed. The maintainer authorized [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
+  `v0.16.0` release closure on 2026-07-28; exact release-preparation metadata,
+  renewed exact-head checks, protected merge, publication, and verification
+  remain required before that authorization is complete.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -899,7 +903,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   unreviewed graph-unaware tag.
 - Applicability: quick-adoption runtime/target pairs from the first bundled
   runtime through the current candidate, including graph-unaware v0.12.4-
-  v0.12.5 and graph-aware v0.12.6-v0.15.6 workflows.
+  v0.12.5 and graph-aware v0.12.6-v0.16.0 workflows.
 - Affected contract and cause: workflow capability, exact target profile,
   target-semantic command ownership, ancillary-helper composition, and marker
   family were not treated as one immutable compatibility contract. Release-
@@ -913,7 +917,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [FIND-0334](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md#find-0334)
   / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
   / [issue #147](https://github.com/hasanmanzak/meAndAI/issues/147).
-- Fixed release or evidence: immutable release `0.15.5`, retained by `0.15.6`, binds every supported
+- Fixed release or evidence: immutable release `0.15.5`, retained through `0.16.0`, binds every supported
   graph-aware tag to its reviewed exact profile, keeps all target-semantic
   commands target-owned, composes the three linked-path helpers atomically,
   preserves schema 7/8 for v0.12.6-v0.14.1 and schema 9/10 thereafter, and
@@ -951,9 +955,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. Do not implement the separately gated consumer features,
-  mutate consumers, transfer authority, publish this feature, merge its draft
-  PR, or retire PowerShell without later independent gates and authorization.
+  are complete. The maintainer authorized only [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
+  `v0.16.0` release closure on 2026-07-28. Do not implement the separately
+  gated consumer features, mutate consumers, transfer authority, or retire
+  PowerShell without later independent gates and authorization.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at
@@ -965,16 +970,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   branch is absent.
 - [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
   / [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
-  is the current `0.15.6` continuation. Bounded historical proof runs before
-  the first relevant mutation, freezes metadata for later inventory reads,
-  never edits completed historical issues, and preserves the current
-  convergence owner. Focused PowerShell 7 / Windows PowerShell 5.1,
-  role-boundary, runtime-efficiency, bundle, source-graph compatibility,
-  canonical full-suite, and exact implementation-head hosted gates are green.
-  Final evidence-only HEAD checks, pull-request merge, immutable release,
-  post-publication verification, issue closure, and owned-branch cleanup
-  remain. Keep every reusable regression upstream and do not mutate a consumer.
+  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) is the
+  completed historical `0.15.6` delivery. [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152)
+  merged at
+  [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b),
+  immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
+  publishes the exact two canonical assets, and final post-publication
+  [run `30285030427`](https://github.com/hasanmanzak/meAndAI/actions/runs/30285030427)
+  passed. Bounded historical proof still runs before the first relevant
+  mutation, freezes metadata for later inventory reads, never edits completed
+  historical issues, and preserves the current convergence owner. Keep every
+  reusable regression upstream and do not mutate a consumer.
 - Latest-byte read-only consumer resimulation kept pre/post remote HEADs exact
   and every clone clean. Derdini `e7b10ef` retained its existing older seed,
   which v0.15.5 does not recognize. TravelOS `6ee1191` returned assessment schema
