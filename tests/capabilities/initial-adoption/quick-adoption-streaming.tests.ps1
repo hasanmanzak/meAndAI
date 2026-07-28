@@ -304,7 +304,7 @@ try {
             [string]$functionText['Invoke-BoundedProcess'],
             "`$runner = [pscustomobject]@{ Command = $engineLiteral; PrefixArguments = @(); Description = 'mock process tree' }",
             'try {',
-            "  Invoke-BoundedProcess -Runner `$runner -Arguments @('-NoProfile','-File',$fixtureLiteral,'-Mode','Tree','-ParentPidPath',$parentLiteral,'-ChildPidPath',$childLiteral) -TimeoutMilliseconds 120000 -TimeoutDescription '120 second(s)' -Operation 'Mock cancellable process tree' -RequireProcessTreeContainment | Out-Null",
+            "  Invoke-BoundedProcess -Runner `$runner -Arguments @('-NoProfile','-File',$fixtureLiteral,'-Mode','Tree','-ParentPidPath',$parentLiteral,'-ChildPidPath',$childLiteral,'-ChildReadyDelayMilliseconds','6000') -TimeoutMilliseconds 120000 -TimeoutDescription '120 second(s)' -Operation 'Mock cancellable process tree' -RequireProcessTreeContainment | Out-Null",
             '}',
             'finally {',
             "  if (Test-Path -LiteralPath $ownedRootLiteral) { Remove-Item -LiteralPath $ownedRootLiteral -Recurse -Force }",
@@ -318,19 +318,101 @@ try {
             $deadline = [DateTime]::UtcNow.AddSeconds(10)
             while ((-not (Test-Path -LiteralPath $parentPidPath -PathType Leaf) -or
                 -not (Test-Path -LiteralPath $childPidPath -PathType Leaf)) -and
+                -not $async.IsCompleted -and
                 [DateTime]::UtcNow -lt $deadline) {
                 Start-Sleep -Milliseconds 50
             }
-            if (-not (Test-Path -LiteralPath $parentPidPath -PathType Leaf) -or
-                -not (Test-Path -LiteralPath $childPidPath -PathType Leaf)) {
-                Add-Failure 'TEST-0106 mock process tree did not start before cancellation.'
+            $parentPidReady = Test-Path -LiteralPath $parentPidPath -PathType Leaf
+            $childPidReady = Test-Path -LiteralPath $childPidPath -PathType Leaf
+            $readinessProblems = [System.Collections.Generic.List[string]]::new()
+            if ($parentPidReady) {
+                try {
+                    $ownedParentPid = [int][IO.File]::ReadAllText($parentPidPath)
+                }
+                catch {
+                    [void]$readinessProblems.Add(
+                        "parent process identity was invalid: $($_.Exception.Message)"
+                    )
+                }
             }
             else {
-                $ownedParentPid = [int][IO.File]::ReadAllText($parentPidPath)
-                $ownedChildPid = [int][IO.File]::ReadAllText($childPidPath)
-                $pipeline.Stop()
-                try { [void]$pipeline.EndInvoke($async) } catch { }
+                [void]$readinessProblems.Add(
+                    'parent process identity was not published'
+                )
+            }
+            if ($childPidReady) {
+                try {
+                    $ownedChildPid = [int][IO.File]::ReadAllText($childPidPath)
+                }
+                catch {
+                    [void]$readinessProblems.Add(
+                        "child process identity was invalid: $($_.Exception.Message)"
+                    )
+                }
+            }
+            else {
+                [void]$readinessProblems.Add(
+                    'child process identity was not published'
+                )
+            }
 
+            $readinessFailure = ''
+            if ($readinessProblems.Count -eq 0) {
+                $parentReadyAlive = Test-OwnedProcessAlive -ProcessId $ownedParentPid
+                $childReadyAlive = Test-OwnedProcessAlive -ProcessId $ownedChildPid
+                if (-not $parentReadyAlive -or -not $childReadyAlive) {
+                    [void]$readinessProblems.Add(
+                        "published process identities were not both active (parent=$ownedParentPid alive=$parentReadyAlive; child=$ownedChildPid alive=$childReadyAlive)"
+                    )
+                }
+            }
+            if ($readinessProblems.Count -gt 0) {
+                $readinessState = if (-not $parentPidReady -or -not $childPidReady) {
+                    if ($async.IsCompleted) {
+                        'pipeline completed before readiness'
+                    }
+                    else {
+                        'readiness deadline expired'
+                    }
+                }
+                else {
+                    'published process identities were invalid or inactive'
+                }
+                $readinessFailure = $readinessState + ': ' +
+                    (@($readinessProblems) -join '; ')
+            }
+
+            $pipelineException = ''
+            if (-not $async.IsCompleted) {
+                try { $pipeline.Stop() }
+                catch { $pipelineException = [string]$_.Exception.Message }
+            }
+            try { [void]$pipeline.EndInvoke($async) }
+            catch {
+                $endInvokeException = [string]$_.Exception.Message
+                $pipelineExceptionValues = @($pipelineException, $endInvokeException)
+                $pipelineException = @($pipelineExceptionValues | Where-Object {
+                    -not [string]::IsNullOrWhiteSpace([string]$_)
+                }) -join ' | '
+            }
+            $pipelineErrors = @($pipeline.Streams.Error | ForEach-Object {
+                [string]$_
+            })
+            $pipelineDetailValues = @($pipelineException) + @($pipelineErrors)
+            $pipelineDetail = @($pipelineDetailValues | Where-Object {
+                -not [string]::IsNullOrWhiteSpace([string]$_)
+            }) -join ' | '
+            if ($pipelineDetail.Length -gt 600) {
+                $pipelineDetail = $pipelineDetail.Substring(0, 597) + '...'
+            }
+            if ($readinessFailure) {
+                if ($pipelineDetail) {
+                    $readinessFailure += "; pipeline detail: $pipelineDetail"
+                }
+                Add-Failure "TEST-0106 mock process tree was not ready for cancellation: $readinessFailure."
+            }
+
+            if ($ownedParentPid -gt 0 -or $ownedChildPid -gt 0) {
                 $exitDeadline = [DateTime]::UtcNow.AddSeconds(5)
                 while (((Test-OwnedProcessAlive -ProcessId $ownedParentPid) -or
                     (Test-OwnedProcessAlive -ProcessId $ownedChildPid)) -and
@@ -342,9 +424,9 @@ try {
                 if ($parentAlive -or $childAlive) {
                     Add-Failure "TEST-0106 pipeline cancellation left the owned process tree running (parent=$ownedParentPid alive=$parentAlive; child=$ownedChildPid alive=$childAlive)."
                 }
-                if (Test-Path -LiteralPath $ownedCancellationRoot) {
-                    Add-Failure 'TEST-0106 pipeline cancellation did not reach owned temporary-root cleanup.'
-                }
+            }
+            if (Test-Path -LiteralPath $ownedCancellationRoot) {
+                Add-Failure 'TEST-0106 pipeline cancellation did not reach owned temporary-root cleanup.'
             }
         }
         finally {

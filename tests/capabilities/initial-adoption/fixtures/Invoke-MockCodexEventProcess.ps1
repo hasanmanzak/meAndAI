@@ -5,7 +5,9 @@ param(
     [string]$Mode,
     [string]$StreamIdentity = '',
     [string]$ParentPidPath = '',
-    [string]$ChildPidPath = ''
+    [string]$ChildPidPath = '',
+    [ValidateRange(0, 60000)]
+    [int]$ChildReadyDelayMilliseconds = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,6 +17,28 @@ function Write-JsonLine {
 
     [Console]::Out.WriteLine(($Value | ConvertTo-Json -Compress -Depth 8))
     [Console]::Out.Flush()
+}
+
+function Write-ProcessIdentity {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][int]$ProcessId
+    )
+
+    $temporaryPath = "$Path.pending"
+    try {
+        [IO.File]::WriteAllText(
+            $temporaryPath,
+            [string]$ProcessId,
+            [Text.UTF8Encoding]::new($false)
+        )
+        [IO.File]::Move($temporaryPath, $Path)
+    }
+    finally {
+        if (Test-Path -LiteralPath $temporaryPath -PathType Leaf) {
+            [IO.File]::Delete($temporaryPath)
+        }
+    }
 }
 
 if ($Mode -ceq 'Stream') {
@@ -85,41 +109,32 @@ if ($Mode -ceq 'Stream') {
     exit 0
 }
 
-if ([string]::IsNullOrWhiteSpace($ParentPidPath) -or
-    [string]::IsNullOrWhiteSpace($ChildPidPath)) {
-    throw 'Tree and child modes require both PID paths.'
+if ($Mode -ceq 'Tree' -and
+    ([string]::IsNullOrWhiteSpace($ParentPidPath) -or
+        [string]::IsNullOrWhiteSpace($ChildPidPath))) {
+    throw 'Tree mode requires both PID paths.'
 }
 
 if ($Mode -ceq 'Child') {
-    [IO.File]::WriteAllText(
-        $ChildPidPath,
-        [string]$PID,
-        [Text.UTF8Encoding]::new($false)
-    )
+    if ($ChildReadyDelayMilliseconds -gt 0) {
+        Start-Sleep -Milliseconds $ChildReadyDelayMilliseconds
+    }
     Start-Sleep -Seconds 120
     exit 0
 }
 
-[IO.File]::WriteAllText(
-    $ParentPidPath,
-    [string]$PID,
-    [Text.UTF8Encoding]::new($false)
-)
+Write-ProcessIdentity -Path $ParentPidPath -ProcessId $PID
 $engine = (Get-Process -Id $PID).Path
 $child = Start-Process -FilePath $engine -ArgumentList @(
     '-NoProfile', '-File', $PSCommandPath,
     '-Mode', 'Child',
-    '-ParentPidPath', $ParentPidPath,
-    '-ChildPidPath', $ChildPidPath
+    '-ChildReadyDelayMilliseconds', $ChildReadyDelayMilliseconds
 ) -PassThru
-
-$deadline = [DateTime]::UtcNow.AddSeconds(5)
-while (-not (Test-Path -LiteralPath $ChildPidPath -PathType Leaf) -and
-    [DateTime]::UtcNow -lt $deadline) {
-    Start-Sleep -Milliseconds 50
+try {
+    Write-ProcessIdentity -Path $ChildPidPath -ProcessId $child.Id
 }
-if (-not (Test-Path -LiteralPath $ChildPidPath -PathType Leaf)) {
+catch {
     try { Stop-Process -Id $child.Id -Force -ErrorAction SilentlyContinue } catch { }
-    throw 'The mock descendant did not start.'
+    throw
 }
 Start-Sleep -Seconds 120

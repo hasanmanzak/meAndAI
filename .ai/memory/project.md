@@ -102,9 +102,15 @@ Last verified: **2026-07-28**
   use without granting authority, and separates severity from blocking or
   advisory enforcement. Readiness is nine of twelve items (75%);
   implementation is zero of seven subfeatures. Follow the
-  [contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md).
+  [contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md)
+  and the separately authorized
+  [readiness-correction handoff](log/2026-07-28-feat-0060-test0106-readiness.md).
   General all-repository GitHub issue/PR/comment governance remains reserved
-  for a separate discussion. No workflow, consumer, PowerShell, or
+  for a separate discussion. [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
+  changes only the canonical
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  harness and inert fixture; no C#
+  implementation, workflow, consumer, PowerShell production route, or
   production-authority state changed.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
@@ -396,6 +402,53 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-28; review whenever
   the bounded-process read-loop boundary, callback observation, fixture startup,
   or hosted runtime changes.
+- Superseded by: `None`
+
+### Child-owned [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) PID readiness can expire before cancellation
+
+- Status: `Active`
+- Observable signature: a Windows PowerShell 5.1 protected or local
+  `WindowsNative` profile fails only at canonical
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  with `mock process tree did not start before cancellation`, while the
+  isolated canonical owner may pass.
+- Applicability: the pre-correction
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  fixture in which the descendant
+  writes `child.pid` after script initialization, its parent waits five seconds
+  for that file, and the outer harness waits ten seconds without observing
+  early async-pipeline completion or draining its error.
+- Affected contract and cause: cancellation requires one active parent and
+  descendant, not a nested child-to-parent filesystem readiness handshake.
+  Delayed child initialization can expire the inner wait and the outer harness
+  then collapses the real pipeline result into a generic readiness failure.
+- Canonical owner and evidence:
+  [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365) /
+  [FEAT-0020](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md) /
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) /
+  failed exact-head [run `30358996927`](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927)
+  own the correction. Existing
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  recurrence entries are distinct and do not route this signature.
+- Fixed release or evidence: reviewed candidate uses parent-owned exact child
+  PID publication, observes early pipeline completion, drains bounded error
+  detail, and proves both processes active before cancellation. Focused
+  PowerShell 7 / Windows PowerShell 5.1 evidence passes; exact committed and
+  hosted evidence remain pending.
+- Required safe response: retain
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106),
+  make the fixture parent publish the
+  exact `Start-Process -PassThru` descendant ID, require both processes active,
+  stop and drain every failed readiness path, and preserve process-tree
+  termination plus owned-root cleanup before accepting a new exact hosted head.
+- Unsafe retry boundary: do not rerun an unchanged failed head, increase the
+  readiness or child wait as the correction, add retries/tolerance, weaken
+  cancellation or cleanup assertions, change production behavior, or create a
+  duplicate scenario.
+- Freshness and review condition: last confirmed 2026-07-28; review whenever
+  the [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  fixture startup, PowerShell async-pipeline boundary, Windows
+  process containment, or hosted runtime changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Definition-of-Ready analysis in progress / development not authorized |
+| Status | Definition-of-Ready analysis in progress / C# development not authorized; bounded [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) harness correction authorized |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
 | Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft, records only) |
@@ -92,6 +92,12 @@ engine without repository or GitHub mutation authority.
 | --- | --- | --- |
 | `RISK-0288` <a name="risk-0288"></a> | A C# validator reports green while omitting PowerShell-owned semantics. | Governance owner / complete scenario inventory, differential fixtures, and fail-closed unmapped contract handling. |
 | `RISK-0289` <a name="risk-0289"></a> | Profiles become named-consumer policy forks. | Governance owner / capability-derived profiles and project-neutral fixtures. |
+
+## Delivery findings
+
+| ID | Boundary | Evidence | Status / response |
+| --- | --- | --- | --- |
+| `FIND-0365` <a name="find-0365"></a> | Canonical [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) process-tree fixture readiness / P1 | The records-only exact head [`9fa453b58a39817839beaff98927f7654419f950`](https://github.com/hasanmanzak/meAndAI/commit/9fa453b58a39817839beaff98927f7654419f950) passed the [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927/job/90273817948), but its [Windows PowerShell 5.1 job](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927/job/90273818054) failed only at the canonical [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) startup boundary with `mock process tree did not start before cancellation.` The test, fixture, and production bounded-process blobs were unchanged from a prior passing head. A delayed-child variant then reproduced the exact failure locally: the child owned `child.pid`, the fixture parent imposed a separate five-second wait, and the outer harness neither observed early async completion nor surfaced `EndInvoke` errors. | `Blocking` / corrected candidate. The fixture parent now publishes the exact `Start-Process -PassThru` child ID without a cross-process readiness handshake; the harness requires both published processes to be active before cancellation, observes early completion, stops and drains a timed-out pipeline, and preserves bounded diagnostics. The deterministic delayed-child variant and canonical [TEST-0105](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)/[TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) owner pass on PowerShell 7 and Windows PowerShell 5.1. Production, workflow, timeout, retry, cleanup, C# implementation, consumer, and authority behavior remain unchanged; full-profile and exact-head confirmation are pending. |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
