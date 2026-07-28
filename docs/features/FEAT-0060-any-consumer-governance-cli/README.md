@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0138](#subf-0138) first clean-room `CSharpShadow` vertical slice locally complete; exact-commit/hosted closure pending; full feature incomplete and PowerShell authority unchanged |
+| Status | [SUBF-0138](#subf-0138) complete with exact-head hosted evidence; bounded non-authoritative MVP authorized under [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md); PowerShell authority unchanged |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; first clean-room shadow slice locally complete) |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) and [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md) |
-| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004); [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0196](test-cases.md#test-0196) remain `Planned` |
+| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; first clean-room shadow slice complete with exact-head hosted evidence) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
+| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005); bounded request/report [TEST-0194](test-cases.md#test-0194) and [TEST-0195](test-cases.md#test-0195) remain `Planned` before their expected-red slices |
 | Readiness analysis | [Definition-of-Ready analysis](readiness-analysis.md), [differential-ledger inventory](differential-ledger-analysis.md), [rule/profile matrix](rule-profile-matrix-analysis.md), and [v1 decision packet](contract-decision-packet.md) |
 
 ## Problem
@@ -25,15 +25,20 @@ engine without repository or GitHub mutation authority.
 
 ## Scope
 
-- Repository discovery, governance profile selection, structural and semantic
-  validation, instruction graph inspection, scenario ownership, links, ledgers,
-  markers, release contracts, and machine-readable reports.
+- One parse-once, immutable repository/document analysis context shared by the
+  bounded rule catalog without duplicate grammar, index, finding, serializer,
+  snapshot-reader, or fixture implementations.
 - Explicit caller-selected and engine-verified `protocol-authority` and
-  `consumer` profiles derived from canonical contracts rather than automatic
-  detection or named-project allowlists.
-- Versioned policy identity, canonical repository snapshot, deterministic
-  typed findings, and a byte-stable report envelope.
-- Differential evidence against applicable PowerShell governance authority.
+  canonical `.ai/protocol` gitlink `consumer` profiles derived from canonical
+  contracts rather than automatic detection or named-project allowlists.
+- An `exact-commit` release snapshot, versioned policy identity, canonical
+  [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  feature packet validation, canonical
+  [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+  decision-record validation, deterministic typed findings, and a byte-stable
+  bounded-coverage report envelope.
+- One portable framework-dependent `maai-governance.zip`, eligible only for
+  `CSharpReleasedNonAuthoritative` use.
 
 ## Specification-first implementation boundary
 
@@ -44,13 +49,17 @@ dated context and safe continuation routes only. PowerShell source is neither a
 normative specification nor a line-by-line migration source; after a rule is
 independently implemented, PowerShell may serve as a legacy black-box oracle.
 
-The first authorized clean-room slice is [SUBF-0138](#subf-0138) and reuses canonical
+The first clean-room slice was [SUBF-0138](#subf-0138) and reuses canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 for the explicit `protocol-authority` profile. It reads repository state, checks
 that every `FEAT-NNNN-*` directory contains `README.md` and `test-cases.md`,
 emits a non-authoritative typed result, registers no provider or mutation port,
 and follows expected-red then focused-green test-first delivery. No new
-numbered scenario is allocated for the C# language implementation.
+numbered scenario is allocated for the C# language implementation. The
+maintainer subsequently authorized the complete bounded MVP defined by
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md);
+that authorization does not extend to FEAT-0064 equivalence work, migration,
+authority transfer, or PowerShell retirement.
 
 ## Non-goals
 
@@ -59,6 +68,10 @@ numbered scenario is allocated for the C# language implementation.
 - General enumeration and content governance for all open/closed GitHub
   issues, pull requests, and comments; that provider feature requires the
   maintainer's separately reserved discussion and authorization.
+- Full HEAD/index/worktree candidate overlay, repository-reference consumer
+  integration, remaining governance rule families, and exhaustive
+  PowerShell/C# equivalence; these are owned by
+  [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md).
 - Retirement of PowerShell governance before equivalence and migration proof.
 
 ## Authority transition
@@ -69,11 +82,10 @@ numbered scenario is allocated for the C# language implementation.
   read-only `CSharpShadow` against one
   captured repository input. Their output cannot replace the PowerShell result
   or authorize mutation.
-- [SUBF-0136](#subf-0136) incrementally maps every applicable
-  PowerShell-owned scenario and declared variant to equivalent, retained,
-  not-applicable, infrastructure, or explicitly approved stronger C# evidence.
-  It is not a prerequisite for bounded clean-room implementation or an
-  explicitly non-authoritative package. Any missing or divergent mapping
+- [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
+  incrementally maps every applicable PowerShell-owned scenario and declared
+  variant to equivalent, retained, not-applicable, infrastructure, or
+  explicitly approved stronger C# evidence. Any missing or divergent mapping
   blocks equivalence and keeps `PowerShellAuthority`.
 - [SUBF-0137](#subf-0137) may qualify an immutable C# release only as
   `CSharpReleasedNonAuthoritative`, without implying complete rule coverage or
@@ -108,12 +120,18 @@ numbered scenario is allocated for the C# language implementation.
   severity/enforcement. [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
   then moved exhaustive variant normalization to the equivalence, authority,
   and retirement gates and authorized the bounded first clean-room slice.
+- On 2026-07-29 the maintainer accepted
+  [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md):
+  FEAT-0060 now closes the exact bounded catalog and portable
+  non-authoritative package, while
+  [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) owns full
+  candidate, remaining-coverage, and equivalence qualification.
 
 ## Risks
 
 | ID | Risk | Owner / response |
 | --- | --- | --- |
-| `RISK-0288` <a name="risk-0288"></a> | A C# validator reports green while omitting PowerShell-owned semantics. | Governance owner / complete scenario inventory, differential fixtures, and fail-closed unmapped contract handling. |
+| `RISK-0288` <a name="risk-0288"></a> | A bounded C# validator result is mistaken for complete governance coverage. | Governance owner / bind the exact two-rule inventory and catalog digest into every report, label coverage bounded, and leave equivalence and authority gates fail-closed under FEAT-0064. |
 | `RISK-0289` <a name="risk-0289"></a> | Profiles become named-consumer policy forks. | Governance owner / capability-derived profiles and project-neutral fixtures. |
 
 ## Delivery findings
@@ -125,22 +143,26 @@ numbered scenario is allocated for the C# language implementation.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | First clean-room slice locally green; complete equivalence variants pending | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [test scenarios](test-cases.md), and [readiness analysis](readiness-analysis.md) |
-| Test code | First slice implemented | Expected compile-red in 7.9 s; final solution green in 6.4 s: governance 28/28, architecture 31/31, packaging 17/17 |
-| Baseline run | Existing immutable baseline accepted | Exact-head [run `30337115744`](https://github.com/hasanmanzak/meAndAI/actions/runs/30337115744), exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671), and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375) |
+| Scenarios | Bounded MVP ready; full coverage/equivalence is outside this feature | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), canonical [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0194](test-cases.md#test-0194), and [TEST-0195](test-cases.md#test-0195) |
+| Test code | First slice exact-head green; next expected-red slice not started | Expected compile-red in 7.9 s; final solution green in 6.4 s: governance 28/28, architecture 31/31, packaging 17/17; exact-head hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671) green |
+| Baseline run | Current exact-head baseline accepted for continuation | [Run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671) passed Ubuntu and Windows for exact head [`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0122` <a name="subf-0122"></a> | Versioned policy, profile, request, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) remains `Planned`; [SUBF-0138](#subf-0138) supplies only bounded internal building blocks | Pending | In progress / not complete |
-| `SUBF-0123` <a name="subf-0123"></a> | Exact Git/index/worktree snapshot and repository-only profile-resolution CLI vertical slice | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) plus [TEST-0194](test-cases.md#test-0194), which remains `Planned`; [SUBF-0138](#subf-0138) implements candidate snapshot only | Pending | In progress / not complete |
+| `SUBF-0122` <a name="subf-0122"></a> | Versioned bounded catalog, profile, request, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) remains `Planned`; [SUBF-0138](#subf-0138) supplies only bounded internal building blocks | Pending | In progress / not complete |
+| `SUBF-0123` <a name="subf-0123"></a> | Exact-commit snapshot and explicit profile-resolution CLI vertical slice | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) plus [TEST-0194](test-cases.md#test-0194), which remains `Planned`; full candidate overlay is excluded | Pending | In progress / not complete |
 | `SUBF-0124` <a name="subf-0124"></a> | Versioned rule catalog, typed finding, deterministic report, and process contract | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0195](test-cases.md#test-0195) remains `Planned`; [SUBF-0138](#subf-0138) supplies only bounded internal building blocks | Pending | In progress / not complete |
-| `SUBF-0134` <a name="subf-0134"></a> | Common pure governance kernel and `protocol-authority` self-consumer profile | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | First canonical rule proven by [SUBF-0138](#subf-0138); [TEST-0195](test-cases.md#test-0195) and remaining rule family stay `Planned` | Pending | In progress / not complete |
-| `SUBF-0135` <a name="subf-0135"></a> | Project-neutral `consumer` profile and pinned-integration fixture | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed / separate later gate |
-| `SUBF-0136` <a name="subf-0136"></a> | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0196](test-cases.md#test-0196) / not started | Pending | Mandatory before equivalence, authority transfer, or retirement |
+| `SUBF-0134` <a name="subf-0134"></a> | Parse-once repository/document kernel and the exact [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) / [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) `protocol-authority` rules | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | First rule proven by [SUBF-0138](#subf-0138); shared-kernel refactor and decision-record rule are the next test-first gate | Pending | In progress / not complete |
+| `SUBF-0135` <a name="subf-0135"></a> | Project-neutral canonical `.ai/protocol` gitlink `consumer` profile and pinned-integration fixture | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed / separate later gate |
 | `SUBF-0137` <a name="subf-0137"></a> | Immutable portable-package qualification at non-authoritative state | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests / not started | Pending | Proposed / separate later gate |
-| `SUBF-0138` <a name="subf-0138"></a> | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, required feature-record pair rule, deterministic report/exit, thin CLI, and repository-read-only adapter | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004); expected compile-red 7.9 s; final solution governance 28/28, architecture 31/31, packaging 17/17 in 6.4 s; locked restore, format, publish, and published-DLL self-run green | Pending exact-commit/hosted evidence | Locally complete; PowerShell authority unchanged |
+| `SUBF-0138` <a name="subf-0138"></a> | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, required feature-record pair rule, deterministic report/exit, thin CLI, and repository-read-only adapter | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Local test-first, locked restore, format, publish, real self-run, both StructureOnly runtimes, and exact-head hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671) green | Complete | Complete; PowerShell authority unchanged |
+
+The former FEAT-0060 `SUBF-0136` differential slice moved to the single
+canonical [FEAT-0064 SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136).
+This sentence is navigation only and does not declare a second subfeature
+identity.
 
 ## First-slice local implementation evidence
 
@@ -175,6 +197,12 @@ pair rule; it does not inspect or call PowerShell.
   `0`, `conforming`, one evaluated rule, zero findings,
   `csharp-shadow`, `powershell-authority`, deterministic digest, and no
   absolute path in the public report.
+- Exact head
+  [`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2)
+  passed hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671):
+  Ubuntu completed in 13 min 57 s and Windows in 33 min 26 s, including the
+  PowerShell Full compatibility gates. The release verifier skipped as
+  expected for the pull request.
 
 These results complete canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
@@ -187,6 +215,8 @@ documentation scenarios with no active C# source ownership.
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
 - Dependency: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md)
 - Specification-first sequencing: [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
+- Bounded catalog and reuse boundary: [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+- Deferred coverage/equivalence owner: [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
 - Readiness detail: [Definition-of-Ready analysis](readiness-analysis.md)
 
 ## Definition of Ready
@@ -214,30 +244,45 @@ documentation scenarios with no active C# source ownership.
 - [x] Explicit maintainer authorization on 2026-07-28 for only the first
   clean-room `CSharpShadow` vertical slice.
 
-The bounded first-slice Definition of Ready is complete, 10/10 (100%).
-[SUBF-0138](#subf-0138) is locally complete, so implementation is one of eight
-subfeatures (12.5%); exact-commit/hosted closure and the other seven subfeatures
-remain. Historical inventory remains 188/188 base identities and 7/7
-declaration packets, with 172/188 scenario routes unambiguous and 16/188 mixed.
-Those ledger and matrix gaps are mandatory before equivalence, authority
-transfer, or retirement, not before this slice. See the
-[sequencing and remaining gates](readiness-analysis.md#remaining-definition-of-ready-gates).
+The first-slice Definition of Ready remains complete, 10/10 (100%). The
+2026-07-29 bounded-MVP addendum is also ready: the exact two-rule catalog,
+parse-once reuse ownership, exact-commit-only snapshot, canonical gitlink
+consumer boundary, typed bounded-coverage report, portable artifact, deferred
+FEAT-0064 scope, risks, and maintainer implementation authorization are all
+explicit in DEC-0034 and this record.
+
+[SUBF-0138](#subf-0138) is complete, so implementation is one of seven
+subfeatures (14.3%); six remain. The historical 188-identity inventory and its
+mixed/variant gaps are inputs to FEAT-0064 equivalence, not FEAT-0060
+completion criteria. See the historical
+[sequencing analysis](readiness-analysis.md#remaining-definition-of-ready-gates)
+with the DEC-0034 scope banner.
 
 ## Acceptance criteria
 
 1. The governance application has no repository or GitHub mutation capability.
 2. The same engine validates meAndAI and project-neutral consumers through
    caller-selected, engine-verified capability profiles.
-3. Every transferred canonical scenario has equivalent or stronger executable evidence and unmapped authority blocks transfer.
-4. Reports are deterministic, typed, redacted, and useful to local and hosted callers.
-5. Repository bytes follow the existing HEAD/index/worktree precedence and
-   ambiguous or drifting state fails closed.
-6. General live GitHub issue/PR/comment governance remains outside this feature
+3. One parse-once immutable analysis context serves the distinct TEST-0004 and
+   TEST-0005 rules; no second same-contract parser, index, finding envelope,
+   serializer, adapter, or fixture builder exists.
+4. Reports are deterministic, typed, redacted, bind the exact evaluated
+   two-rule catalog/digest, and describe coverage as bounded.
+5. The released CLI accepts only an explicit exact-commit snapshot and fails
+   closed on an unknown, ambiguous, unsafe, mismatched, or drifting commit.
+6. The consumer profile supports only the canonical `.ai/protocol` gitlink;
+   repository-reference and full candidate overlays remain outside the package.
+7. One framework-dependent `maai-governance.zip` is qualified as
+   `CSharpReleasedNonAuthoritative`; it grants no required-check or authority
+   claim.
+8. General live GitHub issue/PR/comment governance remains outside this feature
    unless separately discussed and authorized.
 
 ## Definition of Done
 
-[SUBF-0138](#subf-0138) is locally implemented and verified; its exact-commit
-and hosted gates remain pending. The other seven subfeatures, full-feature
-review/CI, equivalence ledger, release, migration, authority, and retirement
-gates remain incomplete.
+[SUBF-0138](#subf-0138) is implemented and exact-head verified. Six bounded
+subfeatures, their executable evidence, full-feature review/CI, exact-commit
+package qualification, draft-PR completion, merge, and immutable release
+remain incomplete. FEAT-0064 equivalence, FEAT-0063 migration, authority
+transfer, and PowerShell retirement are explicit successor work rather than
+this feature's Definition of Done.

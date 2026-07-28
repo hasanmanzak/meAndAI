@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-28**
+Last verified: **2026-07-29**
 
 ## Verified facts
 
@@ -84,28 +84,36 @@ Last verified: **2026-07-28**
 - Current governance work:
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
   / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
-  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) has locally
-  completed
+  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) continues on
+  `codex/feat-0060-dor-analysis`. The clean-room `CSharpShadow` slice
   [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
-  the first clean-room `CSharpShadow` vertical slice under
-  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md).
-  Canonical protocol, decision, feature, and numbered-scenario contracts design
-  C# behavior; this memory supplies context only, and PowerShell is a later
-  legacy black-box oracle rather than a translation source. The first slice
-  reuses canonical
+  implemented under
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+  has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+  passed both Ubuntu and Windows validation. Canonical protocol, decision,
+  feature, and numbered-scenario contracts design C# behavior; this memory
+  supplies context only. The slice reuses canonical
   [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
   for explicit `protocol-authority`, repository-read-only, provider-free,
-  non-authoritative validation. Its Definition of Ready is 10/10 (100%);
-  implementation is one of eight subfeatures (12.5%), with exact-commit/hosted
-  evidence and seven subfeatures pending. The first compiled test failed for
-  the intended missing-type reason in 7.9 seconds; the final focused suite
-  passed 28/28 in 5.5 seconds after fresh-review boundary corrections. The
-  final full solution passed governance 28/28, architecture 31/31, and packaging
-  17/17 in 6.4 seconds. Locked restore,
-  format, portable publish, and the published-DLL real-repository run passed;
-  the report retained `csharp-shadow` and `powershell-authority`.
-  Follow the
-  [clean-room pivot handoff](log/2026-07-28-feat-0060-clean-room-pivot.md).
+  non-authoritative validation. PowerShell remains production and compatibility
+  authority; no workflow route, consumer, required check, or retirement
+  boundary changed. Follow the
+  [bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md).
+
+  [DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+  bounds FEAT-0060 to an independently releasable `v0.17.0` MVP: exact-commit
+  evaluation, the two recorded profiles, canonical
+  [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  and
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+  a deterministic typed catalog and report, and one framework-dependent
+  `maai-governance.zip`. One immutable evaluation context reads and parses each
+  repository artifact once; rules reuse its typed indexes rather than creating
+  parallel parsers, scanners, snapshots, or catalog projections. Progress is
+  one of seven subfeatures, approximately 14.3%, with six pending. The next
+  coherent gate is the shared parse-once repository/document context followed
+  by canonical TEST-0005.
+
   The historical
   [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
   covers all 188 active base identities, all seven explicit declaration
@@ -114,30 +122,17 @@ Last verified: **2026-07-28**
   [rule/profile matrix](../../docs/features/FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
   classifies 43 C# candidates, 16 mixed boundaries, 94 retained PowerShell
   operations, 29 infrastructure contracts, three provider identities, and
-  three existing C# identities. The global inline/generative denominator and
-  variant-level finding/severity/enforcement matrix remain to be normalized
-  under the maintainer's accepted
-  [v1 contract decision](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md).
-  The accepted contract permits exact-bound unreleased read-only consumer
-  shadow runs, requires immutable release eligibility for managed/required-check
-  use without granting authority, and separates severity from blocking or
-  advisory enforcement. Exhaustive ledger/matrix completion no longer blocks
-  bounded implementation or an explicitly non-authoritative package; it
-  remains mandatory before equivalence, required-check enforcement, authority
-  transfer, compatibility retirement, or PowerShell source retirement.
-  General all-repository GitHub issue/PR/comment governance remains reserved
-  for a separate discussion.
-  [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
-  and
-  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366)
-  are closed by exact head
-  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
-  and [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
-  Ubuntu job `90346608851` passed in 12 min 58 s and Windows job `90346609315`
-  passed in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Linux
-  remains 20 minutes, post-publication remains 5, and no consumer, C# rule,
-  production authority, or PowerShell production route changed in those
-  infrastructure corrections.
+  three existing C# identities. The accepted
+  [v1 contract decision](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
+  remains historical scope input.
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  / [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+  candidate-worktree evaluation, the remaining governance families, complete
+  catalog qualification, and differential equivalence. Its evidence remains
+  mandatory before required-check enforcement, authority transfer,
+  compatibility retirement, or PowerShell source retirement. General
+  all-repository GitHub issue/PR/comment governance remains reserved for a
+  separate discussion.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -1115,8 +1110,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153),
   [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md),
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
   and
-  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md)
+  [DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
   record a
   C# operational platform with separate governance, adoption, and update
   applications sharing one typed foundation and portable framework-dependent
@@ -1124,24 +1120,33 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is implementation-complete. [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. Only
-  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
-  the bounded first specification-first `CSharpShadow` vertical slice for
+  remain separately gated.
+
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-  is locally complete with exact-commit/hosted evidence pending. It reuses canonical
+  is authorized only for the bounded `v0.17.0` MVP recorded above. Its
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+  the first specification-first `CSharpShadow` vertical slice, has exact-head
+  hosted Ubuntu and Windows evidence in
+  [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671).
+  It reuses canonical
   [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004),
   is `protocol-authority`, repository-read-only, provider-free, and
-  non-authoritative, and starts test-first. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
+  non-authoritative. The feature is one of seven subfeatures complete
+  (approximately 14.3%); the next gate is the shared parse-once context and
+  canonical
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
+  [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. Executable and delivery authorization for
-  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-  was limited to that first clean-room slice. Do not implement later rule
-  slices or another feature, mutate consumers, claim equivalence, transfer
-  authority, or retire PowerShell without later independent gates and
-  authorization. Complete applicable ledgers and matrices before any such
-  equivalence, transfer, or retirement.
+  are complete. Candidate-worktree evaluation, remaining rule families,
+  complete catalog qualification, and equivalence belong to
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  / [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161). Do not
+  implement FEAT-0064 or another feature, mutate consumers, widen authority,
+  disable a PowerShell route, claim equivalence, or retire PowerShell without
+  later independent gates and authorization.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

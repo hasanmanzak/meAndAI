@@ -1,9 +1,10 @@
 # FEAT-0060 Test Scenarios
 
-Test implementation: [SUBF-0138](README.md#subf-0138) is locally complete;
-exact-commit/hosted closure and the remaining feature are pending.
+Test implementation: [SUBF-0138](README.md#subf-0138) is complete with
+exact-head hosted evidence; the six remaining bounded-MVP subfeatures are
+pending.
 
-## Authorized first clean-room slice
+## Authorized bounded clean-room catalog
 
 The first compiled C# vertical slice is [SUBF-0138](README.md#subf-0138) and
 reuses canonical
@@ -20,11 +21,16 @@ missing-file boundary after the smallest coherent implementation. PowerShell
 source was not inspected or translated to design the rule; later differential
 work may compare the independently produced results as black-box observations.
 
+The next rule reuses canonical
+[TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005).
+It validates the decision-record identity, classification, status, and exact
+required sections through the same repository/document indexes as TEST-0004;
+it does not allocate a language-specific test identity or a second parser.
+
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122), [SUBF-0123](README.md#subf-0123), and [SUBF-0135](README.md#subf-0135) | Build a closed governance request, capture permitted repository states, resolve explicit `protocol-authority` and `consumer` profiles, and bind one exact application/policy pair from canonical evidence. | Exactly one caller-selected profile and exact pair are independently verified; unknown, ambiguous, range-inferred, mismatched, drifting, or unsafe state fails closed. An exact-bound unreleased bundle may inspect a real consumer only as explicit read-only `CSharpShadow` and cannot be a required or merge-blocking check. Persistent managed use and minimum future required-check eligibility require an immutable release; neither state grants mutation or primary authority. | Contract / Git / integration / security | `Distinct`; see the exact sibling tuple below. Existing snapshot byte precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171). | Planned | Future .NET tests |
+| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122), [SUBF-0123](README.md#subf-0123), and [SUBF-0135](README.md#subf-0135) | Build a closed exact-commit governance request, resolve explicit `protocol-authority` and canonical gitlink `consumer` profiles, and bind one exact application/policy pair from canonical evidence. | Exactly one caller-selected profile, 40-character commit, catalog, and application/policy pair are independently verified; unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, or unsupported repository-reference state fails closed. An exact-bound unreleased bundle may inspect only as read-only `CSharpShadow`. Persistent managed use requires the immutable package and still grants neither mutation nor primary authority. | Contract / Git / integration / security | `Distinct`; see the exact sibling tuple below. Existing canonical-byte selection remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171). | Planned | Future .NET tests |
 | `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124), [SUBF-0134](README.md#subf-0134), and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
-| `TEST-0196` <a name="test-0196"></a> | [SUBF-0136](README.md#subf-0136) | Compare one captured input across the independently implemented C# engine and every applicable canonical PowerShell scenario plus declared positive/negative variant. | Each row has exactly one evidenced disposition; missing, duplicate, divergent, or unproved stronger evidence blocks equivalence and stronger-evidence claims, required-check enforcement, authority transfer, and retirement. It does not block an explicitly non-authoritative package whose partial coverage is declared. Only an immutable exact-pair artifact can become eligible for persistent managed consumer use or future required-check consideration, and artifact eligibility alone does not grant equivalence, enforcement, or authority. | Differential / compatibility / authority | `Distinct`; see the exact sibling tuple below. | Planned | Future differential harness |
 
 [SUBF-0138](README.md#subf-0138) contributes bounded implementation experience
 to the future request/report design, but it does not activate or pass
@@ -38,12 +44,15 @@ C# source ownership.
 | --- | --- | --- | --- | --- | --- |
 | Profile/request scenario | [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) and [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) | Owns the closed compiled request and explicit profile-resolution result; byte-source precedence and graph discovery remain with their existing owners. | Prevents named-repository, automatic-profile, or caller-supplied-policy authority rather than only selecting canonical bytes or graph nodes. | Compiled contract plus Git integration over project-neutral authority/consumer fixtures. | Request composition and profile verification around, not inside, the canonical snapshot and graph contracts. |
 | Report-envelope scenario | [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) | Owns the governance finding/report/process envelope; the foundation scenario owns closed operation results and port failures. | Prevents a false green, nondeterministic/redaction-unsafe report, or collapsed verdict/outcome state. | Byte-deterministic compiled serialization and security evidence. | Public governance report boundary after canonical rule evaluation. |
-| Differential-authority scenario | [TEST-0145](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0145) | Owns finite cross-language scenario/variant disposition and equivalence eligibility; the sibling owns runtime-efficiency evidence. | Prevents silent semantic omission or premature authority transfer rather than runtime-cost regression. | Same-snapshot differential over an independently implemented C# rule. | Equivalence and authority ledger, not non-authoritative package construction, runner scheduling, or elapsed performance. |
 
-The relationship for all three rows is `Distinct` under
+The relationship for both rows is `Distinct` under
 [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md).
 Porting an existing rule or snapshot behavior to C# does not allocate another
 numbered scenario; the existing identity is cited by the differential ledger.
+
+Canonical [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+and its distinct-intent review moved to FEAT-0064. This link is navigation only;
+FEAT-0060 no longer declares that scenario.
 
 ## Evidence
 
@@ -86,8 +95,10 @@ root on 2026-07-28:
 This evidence completes the canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 C# vertical slice. It does not activate [TEST-0194](#test-0194) or
-[TEST-0195](#test-0195), which remain `Planned`; [TEST-0196](#test-0196) also
-remains planned. Exact-commit and hosted evidence are pending. The historical
+[TEST-0195](#test-0195), which remain `Planned`. Exact head
+[`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2)
+passed hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+on Ubuntu and Windows. Exact-commit package behavior remains pending. The historical
 [differential-ledger inventory](differential-ledger-analysis.md),
 [rule/profile matrix](rule-profile-matrix-analysis.md), and
 [accepted v1 decision packet](contract-decision-packet.md) refine later

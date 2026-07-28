@@ -1,5 +1,13 @@
 # [FEAT-0060](README.md) Differential Ledger Inventory Analysis
 
+> **Historical-input boundary (2026-07-29):** This analysis is retained as
+> FEAT-0060 planning and audit input. Under
+> [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
+> full `candidate` snapshot support, remaining governance coverage, and
+> equivalence qualification belong to
+> [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
+> bounded FEAT-0060 release completion boundary.
+
 Status: historical scenario-level inventory complete; bounded
 specification-first `CSharpShadow` development is authorized independently;
 equivalence and authority transfer remain blocked on the complete ledger.

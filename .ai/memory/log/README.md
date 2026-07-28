@@ -8,43 +8,44 @@ and follow its canonical links.
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
 C# operational platform migration. Follow current
 [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-through the [clean-room pivot handoff](2026-07-28-feat-0060-clean-room-pivot.md),
+through the
+[bounded reusable MVP handoff](2026-07-29-feat-0060-bounded-reusable-mvp.md),
 [DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
-and the canonical
-[readiness analysis](../../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md).
-The bounded first clean-room `CSharpShadow` vertical slice,
+and
+[DEC-0034](../../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md).
+Development continues on `codex/feat-0060-dor-analysis` under
+[issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) and
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160). The first
+clean-room `CSharpShadow` vertical slice,
 [SUBF-0138](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
-is locally complete: it reuses canonical
+has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+passed Ubuntu and Windows. It reuses canonical
 [TEST-0004](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 for explicit `protocol-authority`, repository-read-only, provider-free,
-non-authoritative validation, beginning with an expected-red C# test. Canonical
-specifications design the rule; memory is context and PowerShell is only a
-later black-box oracle. First-slice readiness is 10/10 (100%) and
-implementation is one of eight subfeatures (12.5%), with exact-commit/hosted
-and seven subfeatures pending. The compile-red took 7.9 seconds; the final
-focused governance suite passed 28/28 in 5.5 seconds after fresh-review
-boundary corrections. The final full solution passed governance 28/28,
-architecture 31/31, and packaging 17/17 in 6.4 seconds.
-Locked restore, format, portable publish, and the published-DLL
-real-repository run also passed while retaining `csharp-shadow` and
-`powershell-authority`.
+non-authoritative validation. Canonical specifications design the rule; memory
+is context, and PowerShell remains production and compatibility authority.
+
+The bounded `v0.17.0` feature targets exact-commit evaluation, the two recorded
+profiles, canonical
+[TEST-0004](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+and
+[TEST-0005](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+a deterministic typed catalog and report, and one framework-dependent
+`maai-governance.zip`. Shared repository and document analysis is parse-once;
+rules consume one typed evaluation context instead of duplicating parsers,
+scanners, snapshots, or metadata projections. Progress is one of seven
+subfeatures complete, approximately 14.3%, with six pending. The next coherent
+gate is the shared parse-once context and canonical TEST-0005.
 
 The historical inventory remains 188/188 base identities, seven explicit
 declaration packets, a lower bound of 116 TEST/case mappings, and 172/188
-unambiguous scenario routes with 16/188 mixed. Complete material-variant and
-rule/profile matrices remain mandatory before equivalence, required-check
-enforcement, authority transfer, or retirement, but do not block the bounded
-slice or explicitly non-authoritative package.
-
-[FIND-0365](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
-and
-[FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366)
-are closed at exact head
-[`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
-by [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
-Ubuntu job `90346608851` passed in 12 min 58 s and Windows job `90346609315`
-passed in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Production
-authority and PowerShell production routes remain unchanged.
+unambiguous scenario routes with 16/188 mixed.
+[FEAT-0064](../../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+/ [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+candidate-worktree support, remaining rule families, complete catalog
+qualification, and differential equivalence. Those gates remain mandatory
+before required-check enforcement, authority transfer, compatibility
+retirement, or PowerShell source retirement.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
@@ -100,6 +101,9 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- 2026-07-29 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [DEC-0034](../../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) /
+  [bounded reusable governance MVP](2026-07-29-feat-0060-bounded-reusable-mvp.md)
 - 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
   [DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md) /
   [specification-first clean-room pivot](2026-07-28-feat-0060-clean-room-pivot.md)

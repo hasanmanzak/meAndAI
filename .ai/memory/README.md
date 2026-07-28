@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-28**<br>
+Last reviewed: **2026-07-29**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release: **0.16.0**
 
@@ -19,25 +19,30 @@ evidence for
 
 [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
 / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
-[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) has locally
-completed [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
-the first clean-room `CSharpShadow` vertical slice. Follow the
-[clean-room pivot handoff](log/2026-07-28-feat-0060-clean-room-pivot.md) and
-[DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md).
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) continues on
+`codex/feat-0060-dor-analysis`. Its first clean-room `CSharpShadow` slice,
+[SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+passed Ubuntu and Windows. Follow the
+[bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md),
+[DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+and
+[DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md).
 Canonical protocol, decision, feature, and numbered-scenario contracts design
-C# behavior; project memory supplies context only, and PowerShell is a later
-legacy black-box oracle rather than a translation source. The first slice
-reuses canonical
+C# behavior; project memory supplies context only, and PowerShell remains
+production and compatibility authority.
+
+The bounded `v0.17.0` feature targets exact-commit evaluation, the two recorded
+profiles, canonical
 [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-for `protocol-authority`, repository-read-only, provider-free,
-non-authoritative validation. Its Definition of Ready is 10/10 (100%);
-implementation is 1/8 (12.5%), with exact-commit/hosted evidence and the other
-seven subfeatures pending. The focused test first failed to compile in 7.9
-seconds before production types existed; fresh review expanded the focused
-suite to 28/28 in 5.5 seconds. The final full-solution rerun passed governance
-28/28, architecture 31/31, and packaging 17/17 in 6.4 seconds. Locked restore, format,
-portable publish, and the published-DLL real-repository run also passed; the
-report retained `csharp-shadow` and `powershell-authority`.
+and
+[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+a deterministic typed catalog and report, and one framework-dependent
+`maai-governance.zip`. Shared repository and document analysis is parse-once;
+rules consume common typed indexes instead of creating parallel parsers,
+scanners, snapshots, or metadata sources. Progress is one of seven subfeatures
+(approximately 14.3%), with six pending. The next gate is the shared parse-once
+context and canonical TEST-0005.
 
 The historical
 [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
@@ -49,10 +54,14 @@ retained PowerShell operations, 29 infrastructure contracts, three provider
 identities, and three existing C# identities. The
 [v1 decision packet](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
 was accepted by the maintainer on 2026-07-28 with an exact-pair shadow/release
-boundary and independent severity/enforcement metadata. Exhaustive ledger and
-matrix completion is deferred from bounded implementation/package sequencing,
-not waived; it remains mandatory before equivalence, required-check
-enforcement, authority transfer, or PowerShell retirement.
+boundary and independent severity/enforcement metadata. Under
+[DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md),
+[FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+/ [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+candidate-worktree evaluation, remaining governance families, complete catalog
+qualification, and differential equivalence. Those records remain mandatory
+before required-check enforcement, authority transfer, compatibility
+retirement, or PowerShell source retirement.
 
 The earlier bounded canonical test harness and inert fixture changed under
 [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365);

@@ -4,8 +4,8 @@
 - Status: Accepted
 - Date: 2026-07-28
 - Decision owners: Maintainer and meAndAI governance owner
-- Related feature: [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
-- Related decisions: [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) and [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
+- Related features: [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md) and [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md)
+- Related decisions: [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md), [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), and [DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md)
 - Narrow supersession: supersedes [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) only where it sequences complete PowerShell differential evidence before bounded `CSharpShadow` implementation or an explicitly non-authoritative portable package; the separate applications, shared typed foundation, portable framework-dependent JIT distribution, and authority-state architecture remain authoritative
 
 ## Context
@@ -62,6 +62,18 @@ On 2026-07-28 the maintainer's explicit continuation directive authorized only
 this bounded first clean-room `CSharpShadow` vertical slice. Later rule slices,
 managed integration, release publication, authority transfer, consumer
 mutation, and retirement retain independent gates and authorization.
+
+### Subsequent bounded scope allocation
+
+[DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md) preserves this
+decision as the authoritative specification-first sequencing rule while
+bounding the first FEAT-0060 release to an exact declared catalog. It assigns
+full `candidate` snapshot support, remaining governance coverage, and
+equivalence qualification to
+[FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md).
+That allocation changes feature ownership and release scope, not this
+decision's normative-source, black-box-oracle, or fail-closed authority
+boundaries.
 
 ## Consequences
 

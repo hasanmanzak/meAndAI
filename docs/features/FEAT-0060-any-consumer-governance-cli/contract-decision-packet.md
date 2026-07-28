@@ -1,5 +1,13 @@
 # [FEAT-0060](README.md) v1 Contract Decision Packet
 
+> **Historical-input boundary (2026-07-29):** This packet is retained as
+> FEAT-0060 planning and audit input. Under
+> [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
+> full `candidate` snapshot support, remaining governance coverage, and
+> equivalence qualification belong to
+> [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
+> bounded FEAT-0060 release completion boundary.
+
 Status: accepted by the maintainer on 2026-07-28; the original acceptance was
 records-only. The later specification-first sequencing and bounded first-slice
 authorization are recorded by
