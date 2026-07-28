@@ -2,8 +2,8 @@
 
 Test implementation: [SUBF-0138](README.md#subf-0138) is fully complete with
 exact-head hosted evidence. [SUBF-0134](README.md#subf-0134) is locally
-implemented and fresh-review green, with exact committed-tree and hosted closure
-pending. Local implementation is two of seven subfeatures (28.6%); fully
+implemented, fresh-review green, and exact committed-tree verified; hosted
+closure is pending. Local implementation is two of seven subfeatures (28.6%); fully
 closed progress is one of seven (14.3%). Five subfeatures are not implemented.
 
 ## Authorized bounded clean-room catalog
@@ -29,8 +29,8 @@ It validates the decision-record identity, classification, status, and exact
 required sections through the same repository/document indexes as
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004);
 it does not allocate a language-specific test identity or a second parser.
-The rule is implemented locally and green after fresh review; exact
-committed-tree and hosted closure remain pending.
+The rule is implemented locally, green after fresh review, and exact
+committed-tree verified; hosted closure remains pending.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -89,8 +89,9 @@ This is local executable evidence for canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
 and regression evidence for canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-through the shared analysis context. Exact committed-tree and hosted closure remain
-pending; [TEST-0194](#test-0194) and [TEST-0195](#test-0195) remain `Planned`.
+through the shared analysis context. Exact committed-tree closure is green and
+hosted closure remains pending; [TEST-0194](#test-0194) and
+[TEST-0195](#test-0195) remain `Planned`.
 
 ### [SUBF-0138](README.md#subf-0138) exact-head closure
 

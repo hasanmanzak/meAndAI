@@ -61,7 +61,13 @@ Two of seven subfeatures are locally implemented, approximately 28.6%; only
 [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
 is fully closed, so closure remains one of seven, approximately 14.3%.
 [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
-still requires exact committed-tree local gates and exact-head hosted evidence.
+has exact committed-tree local evidence at
+[`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
+full solution tests are green, repository-only
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+passed in 64.6 seconds, and PowerShell 7 / Windows PowerShell 5.1
+`StructureOnly` passed in 178.0 / 253.4 seconds. Exact-head hosted evidence
+remains pending.
 Hosted
 [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
 for exact commit
@@ -71,7 +77,9 @@ passed every C# build/test/package step and failed on both runtimes only at
 because tracked Markdown contained a short commit target. The correction is
 recorded in
 [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369);
-the focused repository-only owner now passes in 71.2 seconds.
+the focused repository-only owner passes on exact
+[`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
+in 64.6 seconds.
 After closing [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134),
 the next gate is the bounded catalog/request/report gate or the exact-commit
 gate according to the canonical feature record. PowerShell authority is
