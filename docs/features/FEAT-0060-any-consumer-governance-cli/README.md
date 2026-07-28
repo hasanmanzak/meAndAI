@@ -3,12 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | Definition-of-Ready analysis in progress / development not authorized |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | Not created; development deferred |
+| Pull request | Not created; records-only readiness analysis is local |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
 | Tests | [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0196](test-cases.md#test-0196) |
+| Readiness analysis | [Rule, profile, snapshot, report, differential, and baseline analysis](readiness-analysis.md) |
 
 ## Problem
 
@@ -27,36 +28,52 @@ engine without repository or GitHub mutation authority.
 - Repository discovery, governance profile selection, structural and semantic
   validation, instruction graph inspection, scenario ownership, links, ledgers,
   markers, release contracts, and machine-readable reports.
-- Explicit `protocol-authority` and `consumer` profiles derived from canonical
-  contracts rather than named-project allowlists.
+- Explicit caller-selected and engine-verified `protocol-authority` and
+  `consumer` profiles derived from canonical contracts rather than automatic
+  detection or named-project allowlists.
+- Versioned policy identity, canonical repository snapshot, deterministic
+  typed findings, and a byte-stable report envelope.
 - Differential evidence against applicable PowerShell governance authority.
 
 ## Non-goals
 
 - Automatic repair, adoption, update, GitHub publication, or mutation.
 - Consumer-specific duplicated validators.
+- General enumeration and content governance for all open/closed GitHub
+  issues, pull requests, and comments; that provider feature requires the
+  maintainer's separately reserved discussion and authorization.
 - Retirement of PowerShell governance before equivalence and migration proof.
 
 ## Authority transition
 
-- [SUBF-0122](#subf-0122) and [SUBF-0123](#subf-0123) run C# only as a
-  read-only shadow against one captured repository input. Their output cannot
-  replace the PowerShell result or authorize mutation.
-- [SUBF-0124](#subf-0124) maps every applicable PowerShell-owned scenario and
-  declared variant to equivalent or explicitly approved stronger C# evidence.
-  Any unmapped or divergent result keeps `PowerShellAuthority`.
-- An immutable C# release may become `CSharpReleasedNonAuthoritative` after the
-  differential gate. Consumer authority changes only through the explicit
-  migration owned by [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
+- [SUBF-0122](#subf-0122), [SUBF-0123](#subf-0123),
+  [SUBF-0124](#subf-0124), [SUBF-0134](#subf-0134), and
+  [SUBF-0135](#subf-0135) run C# only as a read-only `CSharpShadow` against one
+  captured repository input. Their output cannot replace the PowerShell result
+  or authorize mutation.
+- [SUBF-0136](#subf-0136) maps every applicable PowerShell-owned scenario and
+  declared variant to equivalent, retained, not-applicable, infrastructure, or
+  explicitly approved stronger C# evidence. Any missing or divergent mapping
+  keeps `PowerShellAuthority`.
+- [SUBF-0137](#subf-0137) may qualify an immutable C# release only as
+  `CSharpReleasedNonAuthoritative`. Consumer authority changes only through
+  the explicit migration owned by
+  [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
 - Read-only dual execution is allowed; governance never gains a repair or
   mutation fallback. PowerShell validation contracts remain live for the
   supported scope until that migration and dependency proof complete.
 
 ## Readiness evidence
 
-- Dependency: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md).
-- Prior art: `tests/protocol.tests.ps1`, capability suites, scenario ownership, and recurrence validation remain canonical until transferred.
-- Recurrence and exact scenario mapping remain required before implementation.
+- Dependency: immutable
+  [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) / `v0.16.0`
+  at
+  [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+- The [readiness analysis](readiness-analysis.md) inventories current owners,
+  rule families, snapshot/profile/report contracts, immutable baseline,
+  recurrence barriers, and the bounded authority progression.
+- The exact 188-active-scenario plus declared-variant differential ledger and
+  rule-by-rule profile/snapshot matrix remain required before implementation.
 
 ## Risks
 
@@ -67,35 +84,55 @@ engine without repository or GitHub mutation authority.
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [Test scenarios](test-cases.md) |
+| Scenarios | Refined; exact variant ledger pending | [Test scenarios](test-cases.md) and [readiness analysis](readiness-analysis.md) |
 | Test code | Not started | Development not authorized |
-| Baseline run | Not run | Current canonical suite baseline required before implementation |
+| Baseline run | Existing immutable baseline accepted | Exact-head [run `30337115744`](https://github.com/hasanmanzak/meAndAI/actions/runs/30337115744), exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671), and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375) |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0122` <a name="subf-0122"></a> | Read-only repository snapshot and profiles | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) / not started | Pending | Proposed |
-| `SUBF-0123` <a name="subf-0123"></a> | Governance rules and structured report | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed |
-| `SUBF-0124` <a name="subf-0124"></a> | Differential authority transfer evidence | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0196](test-cases.md#test-0196) / not started | Pending | Proposed |
+| `SUBF-0122` <a name="subf-0122"></a> | Versioned policy, profile, request, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0123` <a name="subf-0123"></a> | Exact repository snapshot and repository-only profile-resolution CLI vertical slice | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) plus [TEST-0194](test-cases.md#test-0194) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0124` <a name="subf-0124"></a> | Versioned rule catalog, typed finding, deterministic report, and process contract | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0134` <a name="subf-0134"></a> | Common pure governance kernel and `protocol-authority` self-consumer profile | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Canonical mapped scenarios plus [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0135` <a name="subf-0135"></a> | Project-neutral `consumer` profile and pinned-integration fixture | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0136` <a name="subf-0136"></a> | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0196](test-cases.md#test-0196) / not started | Pending | Proposed / development not authorized |
+| `SUBF-0137` <a name="subf-0137"></a> | Immutable portable-package qualification at non-authoritative state | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus [TEST-0196](test-cases.md#test-0196) / not started | Pending | Proposed / development not authorized |
 
 ## Decisions and relationships
 
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
 - Dependency: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md)
+- Readiness detail: [Definition-of-Ready analysis](readiness-analysis.md)
 
 ## Definition of Ready
 
 - [x] Stable ID and linked issue.
 - [x] Problem, outcome, scope, non-goals, initial scenarios, and risks.
-- [ ] Exact rule inventory, profile contract, recurrence evidence, sibling-intent review, baseline, target version, and development authorization.
+- [x] Target `0.17.0`, immutable baseline, owner/rule-family inventory,
+  recurrence review, sibling-intent review, and independently reviewable
+  decomposition.
+- [ ] Exact scenario/variant ledger and rule-by-rule profile/snapshot matrix.
+- [ ] Maintainer acceptance of the proposed v1 request, snapshot, profile,
+  report, policy-range, severity, digest, and exit-code contract.
+- [ ] Separate executable development authorization.
+
+Readiness is eight of twelve items, or 67%; implementation is zero of seven
+subfeatures, or 0%. See the
+[remaining gates and estimation boundary](readiness-analysis.md#remaining-definition-of-ready-gates).
 
 ## Acceptance criteria
 
 1. The governance application has no repository or GitHub mutation capability.
-2. The same engine validates meAndAI and arbitrary consumers through explicit capability profiles.
+2. The same engine validates meAndAI and project-neutral consumers through
+   caller-selected, engine-verified capability profiles.
 3. Every transferred canonical scenario has equivalent or stronger executable evidence and unmapped authority blocks transfer.
 4. Reports are deterministic, typed, redacted, and useful to local and hosted callers.
+5. Repository bytes follow the existing HEAD/index/worktree precedence and
+   ambiguous or drifting state fails closed.
+6. General live GitHub issue/PR/comment governance remains outside this feature
+   unless separately discussed and authorized.
 
 ## Definition of Done
 

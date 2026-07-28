@@ -9,24 +9,27 @@ Last verified: **2026-07-28**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.16.0`. The latest immutable release before this
-  release-preparation candidate is
-  [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at
-  [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
-  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain its
-  delivery and publication evidence.
+- Current protocol version: `0.16.0`. The latest immutable release is at
+  [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+  [Release `v0.16.0`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0),
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159),
+  [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154), and
+  post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375)
+  retain the merge, publication, and current-authority evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-  delivers instruction-graph schema 2 and bounded parser, abort, authority,
-  and target-policy resilience.
-- Previous C# operational-foundation checkpoint:
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  delivers the shared C# solution, closed result and port boundaries, and
+  portable RID-free JIT package contract without changing PowerShell or
+  consumer authority.
+- Historical C# operational-foundation second-slice checkpoint (retained as
+  then-current evidence; superseded by immutable v0.16.0):
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has completed
-  the typed C# solution and application-authority first slice. The authorized
-  second slice is adding only closed deterministic results, single-capability
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) had completed
+  the typed C# solution and application-authority first slice. At that
+  checkpoint, the authorized second slice was adding only closed deterministic
+  results, single-capability
   port contracts, a grant-checked infrastructure scope, and a redacting async
   dependency boundary. Its DoR, executable missing-contract red run, 16 of 16
   focused green tests, exact-tree validation, and exact-head hosted evidence
@@ -54,13 +57,14 @@ Last verified: **2026-07-28**
   subfeatures, or 67%.
   [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   remained gated. PowerShell production authority was unchanged.
-- Current C# foundation completion:
+- Historical C# foundation pre-merge completion checkpoint (retained as
+  then-current evidence; superseded by immutable v0.16.0):
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   / [TEST-0193](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the
-  unmerged portable-package completion. Seventeen focused and 48 combined local
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) recorded the
+  then-unmerged portable-package completion. Seventeen focused and 48 combined local
   C# tests, locked restore, zero-warning Release build, format/analyzer evidence,
   candidate/exact-tree StructureOnly, clean exact-commit package construction,
   and fresh-download execution pass. Exact implementation commit
@@ -75,7 +79,23 @@ Last verified: **2026-07-28**
   authority changed. The maintainer authorized [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
   `v0.16.0` release closure on 2026-07-28; exact release-preparation metadata,
   renewed exact-head checks, protected merge, publication, and verification
-  remain required before that authorization is complete.
+  were then still required and are now completed by the current immutable
+  release evidence above.
+- Current records-only work:
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) is in
+  Definition-of-Ready analysis. The
+  [readiness record](../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md)
+  binds the immutable v0.16.0 baseline, 188 active canonical identities,
+  rule-family and owner inventory, proposed repository-only
+  snapshot/profile/report contracts, seven reviewable subfeatures, recurrence
+  barriers, and bounded authority states. Readiness is eight of twelve items
+  (67%); implementation is zero of seven subfeatures. The exact per-variant
+  ledger, rule applicability/snapshot matrix, maintainer contract acceptance,
+  and separate development authorization remain open. General all-repository
+  GitHub issue/PR/comment governance remains reserved for a separate
+  discussion. No workflow, consumer, PowerShell, or production-authority state
+  changed.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -923,7 +943,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   preserves schema 7/8 for v0.12.6-v0.14.1 and schema 9/10 thereafter, and
   limits graph-unaware runtime fallback to exactly v0.12.4-v0.12.5. Focused
   PowerShell 5.1/7 and affected integration evidence is green; immutable
-  publication remains pending.
+  publication is current through v0.16.0.
 - Required safe response: retrieve and verify the exact target workflow before
   assessment. For a supported graph-aware tag, import the exact target policy,
   require its exact reviewed profile and every target-semantic command, compose
@@ -952,13 +972,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
+  remain separately gated. Only the records-only Definition-of-Ready analysis
+  for [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  is now active. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. The maintainer authorized only [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
-  `v0.16.0` release closure on 2026-07-28. Do not implement the separately
-  gated consumer features, mutate consumers, transfer authority, or retire
-  PowerShell without later independent gates and authorization.
+  are complete. Executable and delivery authorization was completed only for
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  merge and immutable `v0.16.0` release closure. Authorization for
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  is records-only Definition-of-Ready analysis. Do not implement any later
+  feature, mutate consumers, transfer authority, or retire PowerShell without
+  later independent gates and authorization.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at
