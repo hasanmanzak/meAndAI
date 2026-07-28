@@ -28,7 +28,7 @@ same-snapshot evidenced disposition before any authority or retirement claim.
 ## Scope
 
 - Remaining transferable governance rule families beyond the exact bounded
-  FEAT-0060 catalog.
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) catalog.
 - Reuse of one canonical snapshot, document, record, ID, version, link, anchor,
   catalog, finding, serialization, and fixture foundation.
 - Full HEAD/index/worktree `candidate` overlay with fail-closed ambiguity and
@@ -69,7 +69,8 @@ policy into one rule.
   [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), immutable
   [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md), and the
   specification/authority boundaries in the three linked decisions.
-- Prior art: the FEAT-0060
+- Prior art: the
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
   [differential inventory](../FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
   and
   [rule/profile matrix](../FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
@@ -95,7 +96,7 @@ policy into one rule.
 | --- | --- | --- |
 | Scenarios | Defined but not implementation-ready | [TEST-0196](test-cases.md#test-0196) and existing canonical rule scenarios |
 | Test code | Not started | Development is not authorized |
-| Baseline run | Not run | FEAT-0060 bounded package and complete variant denominator do not yet exist |
+| Baseline run | Not run | [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) bounded package and complete variant denominator do not yet exist |
 
 ## Decomposition and subfeature gates
 
@@ -132,7 +133,9 @@ policy into one rule.
 3. Every supported material behavior has exactly one evidenced differential
    disposition; missing, duplicate, divergent, or unproved stronger evidence
    blocks equivalence.
-4. Complete evidence is consumable by FEAT-0063 without granting mutation,
+4. Complete evidence is consumable by
+   [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md)
+   without granting mutation,
    required-check, or retirement authority in this feature.
 
 ## Definition of Done

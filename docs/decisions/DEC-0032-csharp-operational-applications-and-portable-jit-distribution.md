@@ -97,10 +97,12 @@ immutable even after their executable route is no longer supported.
 [DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md) applies the
 specification-first sequencing accepted in
 [DEC-0033](DEC-0033-specification-first-csharp-governance.md) by bounding the
-first FEAT-0060 release catalog and assigning full `candidate` snapshot
+first [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
+release catalog and assigning full `candidate` snapshot
 support, remaining governance coverage, and equivalence qualification to
 [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md).
-DEC-0033 remains authoritative, and this later allocation does not alter this
+[DEC-0033](DEC-0033-specification-first-csharp-governance.md) remains
+authoritative, and this later allocation does not alter this
 decision's application separation, portable JIT distribution, or authority
 state architecture.
 

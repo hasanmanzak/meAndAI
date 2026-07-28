@@ -58,7 +58,9 @@ and follows expected-red then focused-green test-first delivery. No new
 numbered scenario is allocated for the C# language implementation. The
 maintainer subsequently authorized the complete bounded MVP defined by
 [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md);
-that authorization does not extend to FEAT-0064 equivalence work, migration,
+that authorization does not extend to
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
+equivalence work, migration,
 authority transfer, or PowerShell retirement.
 
 ## Non-goals
@@ -131,7 +133,7 @@ authority transfer, or PowerShell retirement.
 
 | ID | Risk | Owner / response |
 | --- | --- | --- |
-| `RISK-0288` <a name="risk-0288"></a> | A bounded C# validator result is mistaken for complete governance coverage. | Governance owner / bind the exact two-rule inventory and catalog digest into every report, label coverage bounded, and leave equivalence and authority gates fail-closed under FEAT-0064. |
+| `RISK-0288` <a name="risk-0288"></a> | A bounded C# validator result is mistaken for complete governance coverage. | Governance owner / bind the exact two-rule inventory and catalog digest into every report, label coverage bounded, and leave equivalence and authority gates fail-closed under [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). |
 | `RISK-0289` <a name="risk-0289"></a> | Profiles become named-consumer policy forks. | Governance owner / capability-derived profiles and project-neutral fixtures. |
 
 ## Delivery findings
@@ -140,6 +142,8 @@ authority transfer, or PowerShell retirement.
 | --- | --- | --- | --- |
 | `FIND-0365` <a name="find-0365"></a> | Canonical [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) process-tree fixture readiness / P1 | The records-only exact head [`9fa453b58a39817839beaff98927f7654419f950`](https://github.com/hasanmanzak/meAndAI/commit/9fa453b58a39817839beaff98927f7654419f950) passed the [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927/job/90273817948), but its [Windows PowerShell 5.1 job](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927/job/90273818054) failed only at the canonical [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) startup boundary with `mock process tree did not start before cancellation.` The test, fixture, and production bounded-process blobs were unchanged from a prior passing head. A delayed-child variant then reproduced the exact failure locally: the child owned `child.pid`, the fixture parent imposed a separate five-second wait, and the outer harness neither observed early async completion nor surfaced `EndInvoke` errors. | Resolved. The fixture parent atomically publishes the exact `Start-Process -PassThru` child ID without a cross-process readiness handshake; the harness independently parses each identity, requires both processes active before cancellation, observes early completion, stops and drains a timed-out pipeline, and preserves bounded diagnostics and cleanup. Exact checkpoint [`7cfcdcb4bf320aec950147097086bba1978863d9`](https://github.com/hasanmanzak/meAndAI/commit/7cfcdcb4bf320aec950147097086bba1978863d9) passes PowerShell 7 / Windows PowerShell 5.1 StructureOnly in 184.3 / 292.4 seconds, the exact Windows streaming shard in 12.9 seconds, and its unchanged quick-adoption sibling in 482.4 seconds. Exact final head [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186) passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016): [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016/job/90346608851) in 12 min 58 s and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016/job/90346609315) in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Production, retry, C# implementation, consumer, and authority behavior remained unchanged. |
 | `FIND-0366` <a name="find-0366"></a> | Windows serial `Full` whole-job ceiling under [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) / test-infrastructure budget defect / `p1`, high severity, high impact, high confidence / dependency [FIND-0365](#find-0365) | Exact head [`39d6a0790e967293249dff2e32f5197a149added`](https://github.com/hasanmanzak/meAndAI/commit/39d6a0790e967293249dff2e32f5197a149added) selected `Full`; [run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189) passed [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189/job/90300266387), skipped the [release verifier](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189/job/90300267382) as expected, and canceled only the [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189/job/90300266379) at its exact 35-minute ceiling. The check annotation was `The job has exceeded the maximum execution time of 35m0s`; the displayed quick-adoption Git failures were emitted while cancellation was active and do not independently establish three defects, so they remain secondary unless reproduced by an uncancelled run. The nearest successful `Full` Windows evidence used 30 min 17 s for the PowerShell 5.1 step and 31 min 48 s for the job, leaving about three minutes of effective headroom. This repeats historical [FIND-0160](../FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0160). | Resolved. [TEST-0124](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) first failed alone in 201 s while requiring 60 minutes against the unchanged 35-minute workflow, then passed in 176.9 s after only the Windows job ceiling changed to 60. Selector [TEST-0123](../FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0123), checksummed actionlint, the unchanged [TEST-0106](../FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) owner on both runtimes, and candidate PowerShell 7 / Windows PowerShell 5.1 StructureOnly are green. Exact final head [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186) passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016): Ubuntu in 12 min 58 s and Windows in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Linux remains 20 minutes, post-publication remains 5, and no retry, operation timeout, runner, matrix, profile, coverage route, production code, consumer, C#, PowerShell authority, or release behavior changed. |
+
+| `FIND-0367` <a name="find-0367"></a> | Bounded-scope record relocation / structural governance | Exact committed records checkpoint [`97c8c63`](https://github.com/hasanmanzak/meAndAI/commit/97c8c63) first failed only [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) because planned [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) still named the old owner in `tests/scenario-ownership.psd1`. After moving that authority, the same gate exposed 110 then 23 [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003) / [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) defects in moved targets, new scope banners, and repeated visible IDs. | Resolved in the working tree. [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) has one canonical [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) declaration/authority; former local targets now link to it; all visible stable IDs use exact canonical links. PowerShell 7 `StructureOnly` passed in 184.6 s with protocol-governance elapsed 182.748 s and zero remaining problems. Exact-commit dual-runtime confirmation follows this record update. |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
@@ -159,8 +163,9 @@ authority transfer, or PowerShell retirement.
 | `SUBF-0137` <a name="subf-0137"></a> | Immutable portable-package qualification at non-authoritative state | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests / not started | Pending | Proposed / separate later gate |
 | `SUBF-0138` <a name="subf-0138"></a> | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, required feature-record pair rule, deterministic report/exit, thin CLI, and repository-read-only adapter | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Local test-first, locked restore, format, publish, real self-run, both StructureOnly runtimes, and exact-head hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671) green | Complete | Complete; PowerShell authority unchanged |
 
-The former FEAT-0060 `SUBF-0136` differential slice moved to the single
-canonical [FEAT-0064 SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136).
+The former FEAT-0060 [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136)
+differential slice moved to its single canonical record in
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md).
 This sentence is navigation only and does not declare a second subfeature
 identity.
 
@@ -248,23 +253,32 @@ The first-slice Definition of Ready remains complete, 10/10 (100%). The
 2026-07-29 bounded-MVP addendum is also ready: the exact two-rule catalog,
 parse-once reuse ownership, exact-commit-only snapshot, canonical gitlink
 consumer boundary, typed bounded-coverage report, portable artifact, deferred
-FEAT-0064 scope, risks, and maintainer implementation authorization are all
-explicit in DEC-0034 and this record.
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) scope,
+risks, and maintainer implementation authorization are all explicit in
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+and this record.
 
 [SUBF-0138](#subf-0138) is complete, so implementation is one of seven
 subfeatures (14.3%); six remain. The historical 188-identity inventory and its
-mixed/variant gaps are inputs to FEAT-0064 equivalence, not FEAT-0060
+mixed/variant gaps are inputs to
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
+equivalence, not FEAT-0060
 completion criteria. See the historical
 [sequencing analysis](readiness-analysis.md#remaining-definition-of-ready-gates)
-with the DEC-0034 scope banner.
+with the
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+scope banner.
 
 ## Acceptance criteria
 
 1. The governance application has no repository or GitHub mutation capability.
 2. The same engine validates meAndAI and project-neutral consumers through
    caller-selected, engine-verified capability profiles.
-3. One parse-once immutable analysis context serves the distinct TEST-0004 and
-   TEST-0005 rules; no second same-contract parser, index, finding envelope,
+3. One parse-once immutable analysis context serves the distinct
+   [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+   and
+   [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+   rules; no second same-contract parser, index, finding envelope,
    serializer, adapter, or fixture builder exists.
 4. Reports are deterministic, typed, redacted, bind the exact evaluated
    two-rule catalog/digest, and describe coverage as bounded.
@@ -283,6 +297,9 @@ with the DEC-0034 scope banner.
 [SUBF-0138](#subf-0138) is implemented and exact-head verified. Six bounded
 subfeatures, their executable evidence, full-feature review/CI, exact-commit
 package qualification, draft-PR completion, merge, and immutable release
-remain incomplete. FEAT-0064 equivalence, FEAT-0063 migration, authority
-transfer, and PowerShell retirement are explicit successor work rather than
-this feature's Definition of Done.
+remain incomplete.
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
+equivalence,
+[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md)
+migration, authority transfer, and PowerShell retirement are explicit successor
+work rather than this feature's Definition of Done.

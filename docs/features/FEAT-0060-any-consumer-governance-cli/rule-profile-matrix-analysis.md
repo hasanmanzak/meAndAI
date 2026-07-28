@@ -1,12 +1,12 @@
 # [FEAT-0060](README.md) Rule, Profile, and Evidence-Source Matrix Analysis
 
 > **Historical-input boundary (2026-07-29):** This analysis is retained as
-> FEAT-0060 planning and audit input. Under
+> [FEAT-0060](README.md) planning and audit input. Under
 > [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
 > full `candidate` snapshot support, remaining governance coverage, and
 > equivalence qualification belong to
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
-> bounded FEAT-0060 release completion boundary.
+> bounded [FEAT-0060](README.md) release completion boundary.
 
 Status: historical scenario-level analysis complete; variant-level
 normalization is deferred to the equivalence and authority gate under the
@@ -62,7 +62,8 @@ The first clean-room [SUBF-0138](README.md#subf-0138) slice selects only
 The scenario-level proposal that the same canonical behavior may later apply
 to consumers remains unimplemented and unauthorized in this slice. Its local
 compiled and published-DLL evidence does not alter any count or populate a
-[TEST-0196](test-cases.md#test-0196) equivalence disposition.
+[TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+equivalence disposition.
 
 ## Snapshot mode and evidence source
 
@@ -96,7 +97,7 @@ candidate subject snapshot never permits an implicit candidate policy.
 | `PowerShellOperationalRetained` | Not a [FEAT-0060](README.md) rule transfer | `ProcessRuntime`, provider operation, or mutation fixture | Retain PowerShell operational owner |
 | `InfrastructureContract` | Not a governance profile rule | `ProcessRuntime`, workflow definition, runner, AST, or fixture topology | Retain infrastructure owner |
 | `ExternalProvider` | Wholly outside repository-only v1 | `CapturedProviderEvidence` or live provider | Reasoned `NotApplicable` to v1 while existing verifier remains authoritative |
-| `ExistingCSharpFoundation` | Shared application foundation, not a governance profile rule | Compiled test and `ImmutableRelease` | Reasoned `NotApplicable` / `AlreadyOwnedByCSharpFoundation`; reuse canonical evidence and do not duplicate it in [TEST-0196](test-cases.md#test-0196) |
+| `ExistingCSharpFoundation` | Shared application foundation, not a governance profile rule | Compiled test and `ImmutableRelease` | Reasoned `NotApplicable` / `AlreadyOwnedByCSharpFoundation`; reuse canonical evidence and do not duplicate it in [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) |
 
 Canonical evidence ownership and operational migration authority are different
 fields. A PowerShell suite, GitHub Actions semantic contract, external verifier,

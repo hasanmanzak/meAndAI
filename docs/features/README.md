@@ -64,7 +64,7 @@
 | [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption CLI](FEAT-0061-consumer-adoption-cli/README.md) | Proposed / development deferred | 0.18.0 |
 | [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update CLI](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed / development deferred | 0.19.0 |
 | [FEAT-0064](FEAT-0064-governance-coverage-equivalence/README.md) | [Governance coverage convergence and equivalence](FEAT-0064-governance-coverage-equivalence/README.md) | Proposed / records-only; development not authorized | 0.20.0 |
-| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Consumer migration and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Proposed / blocked by FEAT-0064 / development deferred | 0.21.0 |
+| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Consumer migration and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Proposed / blocked by [FEAT-0064](FEAT-0064-governance-coverage-equivalence/README.md) / development deferred | 0.21.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

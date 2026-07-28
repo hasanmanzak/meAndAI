@@ -42,7 +42,8 @@ a deterministic typed catalog and report, and one framework-dependent
 rules consume common typed indexes instead of creating parallel parsers,
 scanners, snapshots, or metadata sources. Progress is one of seven subfeatures
 (approximately 14.3%), with six pending. The next gate is the shared parse-once
-context and canonical TEST-0005.
+context and canonical
+[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
 
 The historical
 [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)

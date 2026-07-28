@@ -35,7 +35,8 @@ a deterministic typed catalog and report, and one framework-dependent
 rules consume one typed evaluation context instead of duplicating parsers,
 scanners, snapshots, or metadata projections. Progress is one of seven
 subfeatures complete, approximately 14.3%, with six pending. The next coherent
-gate is the shared parse-once context and canonical TEST-0005.
+gate is the shared parse-once context and canonical
+[TEST-0005](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
 
 The historical inventory remains 188/188 base identities, seven explicit
 declaration packets, a lower bound of 116 TEST/case mappings, and 172/188
@@ -119,7 +120,8 @@ conversations while disallowing force pushes and deletion.
   [ledger and matrix analysis](2026-07-28-feat-0060-ledger-matrix-analysis.md)
 - 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
   [Definition-of-Ready analysis](2026-07-28-feat-0060-dor-analysis.md)
-- [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
+- 2026-07-28 - [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  [v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
 - [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)
 - [2026-07-28 - C# operational foundation ports and results](2026-07-28-feat-0059-subf-0120-ports-results.md)
 - [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
@@ -198,4 +200,5 @@ conversations while disallowing force pushes and deletion.
 - [2026-07-14 - Convergent completion scan](2026-07-14-convergent-completion-scan.md)
 - [2026-07-14 - Urgent-work gate order](2026-07-14-urgent-gate-order.md)
 - [2026-07-14 - Cleanup comment clarity](2026-07-14-cleanup-comment-clarity.md)
-- [2026-07-15 - FEAT-0002 release-gate evidence](2026-07-15-feat-0002-release-gate-evidence.md)
+- 2026-07-15 - [FEAT-0002](../../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
+  [release-gate evidence](2026-07-15-feat-0002-release-gate-evidence.md)

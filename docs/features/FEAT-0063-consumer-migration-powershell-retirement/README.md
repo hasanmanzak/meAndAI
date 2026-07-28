@@ -85,7 +85,9 @@ closed.
 allocates full `candidate` snapshot support, remaining governance coverage,
 and equivalence qualification to
 [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). The
-FEAT-0060 ledger and matrix remain historical inputs, while FEAT-0064 is the
+[FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) ledger and
+matrix remain historical inputs, while
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) is the
 blocking owner that must turn them into complete executable evidence before
 this feature may transfer or retire governance authority.
 
@@ -112,7 +114,7 @@ this feature may transfer or retire governance authority.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0132` <a name="subf-0132"></a> | Consumer inventory and immutable migration | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206) / not started | Pending | Blocked by predecessor releases and FEAT-0064 equivalence |
+| `SUBF-0132` <a name="subf-0132"></a> | Consumer inventory and immutable migration | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206) / not started | Pending | Blocked by predecessor releases and [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) equivalence |
 | `SUBF-0133` <a name="subf-0133"></a> | Dependency-proof retirement and validation contraction | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0207](test-cases.md#test-0207) / not started | Pending | Blocked by migration closure |
 
 ## Decisions and relationships

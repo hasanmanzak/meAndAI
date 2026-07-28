@@ -1,19 +1,20 @@
 # [FEAT-0060](README.md) Differential Ledger Inventory Analysis
 
 > **Historical-input boundary (2026-07-29):** This analysis is retained as
-> FEAT-0060 planning and audit input. Under
+> [FEAT-0060](README.md) planning and audit input. Under
 > [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
 > full `candidate` snapshot support, remaining governance coverage, and
 > equivalence qualification belong to
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
-> bounded FEAT-0060 release completion boundary.
+> bounded [FEAT-0060](README.md) release completion boundary.
 
 Status: historical scenario-level inventory complete; bounded
 specification-first `CSharpShadow` development is authorized independently;
 equivalence and authority transfer remain blocked on the complete ledger.
 
 This record fixes the finite starting universe for the later
-[TEST-0196](test-cases.md#test-0196) equivalence and authority gate without
+[TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+equivalence and authority gate without
 pretending that the existing PowerShell suites expose a complete
 machine-readable variant manifest. Under
 [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md),
@@ -111,7 +112,8 @@ only the explicit `protocol-authority` profile; the scenario-level proposal for
 later consumer applicability neither authorizes that profile now nor changes
 the historical counts. [SUBF-0138](README.md#subf-0138) has now implemented
 that C# slice locally without consulting PowerShell source; its future
-differential observation remains empty until [TEST-0196](test-cases.md#test-0196)
+differential observation remains empty until
+[TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
 evidence is deliberately collected.
 
 ## Accepted ledger shape

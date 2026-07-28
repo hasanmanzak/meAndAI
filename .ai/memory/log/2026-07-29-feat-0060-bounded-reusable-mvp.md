@@ -44,10 +44,24 @@ or PowerShell source retirement.
 
 ## Progress and continuation
 
-After the scope-record correction, FEAT-0060 is one of seven subfeatures
+After the scope-record correction,
+[FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+is one of seven subfeatures
 complete, approximately 14.3%, with six pending. The next coherent development
 gate is the shared parse-once repository/document context followed by canonical
-TEST-0005 through that same context. Keep the typed catalog, engine defaults,
+[TEST-0005](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+through that same context. Keep the typed catalog, engine defaults,
 and report metadata single-sourced as the rule set grows. Do not implement
-FEAT-0064, widen authority, mutate a consumer, disable PowerShell, or claim
+[FEAT-0064](../../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md),
+widen authority, mutate a consumer, disable PowerShell, or claim
 equivalence as part of this continuation.
+
+## Structural record correction
+
+The first committed scope packet exposed
+[FIND-0367](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0367):
+the planned-scenario authority still named its former owner, then exact-link
+governance found moved and newly repeated identifiers. The owner and links were
+corrected without restoring duplicate declarations; PowerShell 7
+`StructureOnly` then passed in 184.6 seconds. Commit the correction before
+counting dual-runtime exact-HEAD evidence.

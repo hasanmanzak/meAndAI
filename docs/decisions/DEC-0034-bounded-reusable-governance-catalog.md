@@ -7,8 +7,8 @@
 - Related epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
 - Related features: [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md), and [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
 - Related decisions: [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) and [DEC-0033](DEC-0033-specification-first-csharp-governance.md)
-- Narrow supersession: supersedes the [accepted FEAT-0060 v1 packet](../features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md#7-candidate-snapshot-authority) only where that packet places full `candidate` snapshot support inside the first released governance package; the candidate contract remains planned under [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md)
-- Scope allocation: applies DEC-0033 by assigning exhaustive coverage and equivalence qualification to FEAT-0064; DEC-0033 remains authoritative and is not superseded
+- Narrow supersession: supersedes the [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md) [accepted v1 packet](../features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md#7-candidate-snapshot-authority) only where that packet places full `candidate` snapshot support inside the first released governance package; the candidate contract remains planned under [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md)
+- Scope allocation: applies [DEC-0033](DEC-0033-specification-first-csharp-governance.md) by assigning exhaustive coverage and equivalence qualification to [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md); [DEC-0033](DEC-0033-specification-first-csharp-governance.md) remains authoritative and is not superseded
 
 ## Context
 
@@ -69,7 +69,9 @@ non-authoritative catalog over one reusable analysis pipeline.
    [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md).
 8. Existing PowerShell governance remains production and compatibility
    authority. [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-   depends on complete FEAT-0064 equivalence evidence in addition to the
+   depends on complete
+   [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md)
+   equivalence evidence in addition to the
    released operational applications before any authority, compatibility, or
    source retirement.
 
@@ -92,7 +94,8 @@ non-authoritative catalog over one reusable analysis pipeline.
 ## Alternatives considered
 
 - Complete all 43 candidate identities and every differential variant inside
-  FEAT-0060: rejected because it delays the first useful package and conflates
+  [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md):
+  rejected because it delays the first useful package and conflates
   delivery with authority qualification.
 - Implement each canonical scenario independently: rejected because it would
   duplicate parsers, models, fixtures, and metadata and cause late review

@@ -67,7 +67,9 @@ mutation, and retirement retain independent gates and authorization.
 
 [DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md) preserves this
 decision as the authoritative specification-first sequencing rule while
-bounding the first FEAT-0060 release to an exact declared catalog. It assigns
+bounding the first
+[FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
+release to an exact declared catalog. It assigns
 full `candidate` snapshot support, remaining governance coverage, and
 equivalence qualification to
 [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md).

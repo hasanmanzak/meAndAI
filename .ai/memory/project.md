@@ -101,7 +101,8 @@ Last verified: **2026-07-29**
   [bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md).
 
   [DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
-  bounds FEAT-0060 to an independently releasable `v0.17.0` MVP: exact-commit
+  bounds [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  to an independently releasable `v0.17.0` MVP: exact-commit
   evaluation, the two recorded profiles, canonical
   [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
   and
@@ -112,7 +113,8 @@ Last verified: **2026-07-29**
   parallel parsers, scanners, snapshots, or catalog projections. Progress is
   one of seven subfeatures, approximately 14.3%, with six pending. The next
   coherent gate is the shared parse-once repository/document context followed
-  by canonical TEST-0005.
+  by canonical
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
 
   The historical
   [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
@@ -1144,7 +1146,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   complete catalog qualification, and equivalence belong to
   [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
   / [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161). Do not
-  implement FEAT-0064 or another feature, mutate consumers, widen authority,
+  implement [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  or another feature, mutate consumers, widen authority,
   disable a PowerShell route, claim equivalence, or retire PowerShell without
   later independent gates and authorization.
 

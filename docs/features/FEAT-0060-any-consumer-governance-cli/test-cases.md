@@ -24,7 +24,8 @@ work may compare the independently produced results as black-box observations.
 The next rule reuses canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005).
 It validates the decision-record identity, classification, status, and exact
-required sections through the same repository/document indexes as TEST-0004;
+required sections through the same repository/document indexes as
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004);
 it does not allocate a language-specific test identity or a second parser.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
@@ -51,7 +52,9 @@ Porting an existing rule or snapshot behavior to C# does not allocate another
 numbered scenario; the existing identity is cited by the differential ledger.
 
 Canonical [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
-and its distinct-intent review moved to FEAT-0064. This link is navigation only;
+and its distinct-intent review moved to
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). This link
+is navigation only;
 FEAT-0060 no longer declares that scenario.
 
 ## Evidence

@@ -22,7 +22,8 @@ not authorized.
 ## Evidence
 
 No executable evidence exists. The historical
-[FEAT-0060 inventory](../FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+[FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
+[differential inventory](../FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
 and
 [rule/profile matrix](../FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
 are records-only inputs, not equivalence proof.

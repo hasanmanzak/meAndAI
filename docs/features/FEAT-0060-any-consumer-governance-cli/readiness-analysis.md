@@ -1,12 +1,12 @@
 # [FEAT-0060](README.md) Definition-of-Ready Analysis
 
 > **Historical-input boundary (2026-07-29):** This analysis is retained as
-> FEAT-0060 planning and audit input. Under
+> [FEAT-0060](README.md) planning and audit input. Under
 > [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
 > full `candidate` snapshot support, remaining governance coverage, and
 > equivalence qualification belong to
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
-> bounded FEAT-0060 release completion boundary.
+> bounded [FEAT-0060](README.md) release completion boundary.
 
 Status: [SUBF-0138](README.md#subf-0138) bounded first clean-room
 `CSharpShadow` vertical slice locally complete; exact-commit/hosted and
@@ -242,7 +242,8 @@ a base row beside expanded mappings. No central machine-readable source
 currently assigns stable keys or cardinalities to every inline/generative
 variant, so a complete row count or denominator cannot yet be claimed.
 
-[TEST-0196](test-cases.md#test-0196) will own the finite authority-transfer
+[TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+will own the finite authority-transfer
 ledger after material-variant normalization. The ledger is populated
 incrementally after specification-first rule slices; it does not gate bounded
 implementation or an explicitly non-authoritative package. Each evidenced row
@@ -300,7 +301,7 @@ identity is unchanged.
 | [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical rule slices plus planned [TEST-0195](test-cases.md#test-0195) | In progress; first rule proven by [SUBF-0138](README.md#subf-0138), broader scenario not active |
 | [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
-| [SUBF-0136](README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](test-cases.md#test-0196) | Mandatory before equivalence, authority transfer, or retirement |
+| [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Mandatory before equivalence, authority transfer, or retirement |
 | [SUBF-0137](README.md#subf-0137) | Immutable portable-package qualification at non-authoritative state | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests | Proposed; separate later gate |
 | [SUBF-0138](README.md#subf-0138) | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, feature-record pair rule, deterministic report/exit, thin CLI, and read-only adapter | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | Locally complete; exact-commit/hosted pending, PowerShell authority unchanged |
 
@@ -375,7 +376,8 @@ Sibling-intent boundaries under
 - [TEST-0195](test-cases.md#test-0195) owns only the typed
   finding/report/process envelope. It does not restate missing, duplicate,
   link, or semantic rule behavior.
-- [TEST-0196](test-cases.md#test-0196) owns cross-language scenario/variant
+- [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+  owns cross-language scenario/variant
   authority disposition, while runtime-efficiency evidence remains with its
   existing owner.
 
