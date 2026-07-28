@@ -1,6 +1,5 @@
-using System.Security.Cryptography;
-using System.Text;
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Governance.Core.Analysis;
 using MeAndAI.Operations.Governance.Core.Repository;
 using MeAndAI.Operations.Governance.Core.Rules;
 
@@ -8,17 +7,15 @@ namespace MeAndAI.Operations.Governance.Core.Contracts;
 
 public sealed class GovernanceEngine
 {
-    public const string PolicyCatalogVersion = "0.17.0-preview.1";
+    private readonly GovernanceRuleCatalog catalog;
 
-    private readonly IGovernanceRule[] rules;
-
-    private GovernanceEngine(IGovernanceRule[] rules)
+    private GovernanceEngine(GovernanceRuleCatalog catalog)
     {
-        this.rules = rules;
+        this.catalog = catalog;
     }
 
     public static GovernanceEngine CreateDefault() =>
-        new([new FeatureRecordRequiredPairRule()]);
+        new(GovernanceRuleCatalog.Current);
 
     public GovernanceReport Evaluate(
         GovernanceRequest request,
@@ -27,10 +24,7 @@ public sealed class GovernanceEngine
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        var applicableRules = rules
-            .Where(rule => rule.AppliesTo(request.Profile))
-            .OrderBy(rule => rule.RuleId, StringComparer.Ordinal)
-            .ToArray();
+        var applicableRules = catalog.GetApplicableRules(request.Profile);
         if (applicableRules.Length == 0)
         {
             throw new ArgumentOutOfRangeException(
@@ -39,8 +33,9 @@ public sealed class GovernanceEngine
                 "No rule catalog exists for the selected profile.");
         }
 
+        var context = GovernanceAnalysisContext.Create(snapshot);
         var findings = applicableRules
-            .SelectMany(rule => rule.Evaluate(request.Profile, snapshot))
+            .SelectMany(rule => rule.Evaluate(request.Profile, context))
             .OrderBy(finding => finding.RelativePath, StringComparer.Ordinal)
             .ThenBy(finding => finding.Code, StringComparer.Ordinal)
             .ThenBy(finding => finding.RuleId, StringComparer.Ordinal)
@@ -56,26 +51,14 @@ public sealed class GovernanceEngine
             request.Profile,
             snapshot.Mode,
             snapshot.EvidenceDigest,
-            PolicyCatalogVersion,
-            ComputeCatalogMetadataDigest(applicableRules),
+            catalog.Version,
+            catalog.ComputeMetadataDigest(applicableRules),
+            applicableRules.Select(rule => rule.RuleId).ToArray(),
             verdict,
             new GovernanceCounts(
                 applicableRules.Length,
                 blockingCount,
                 advisoryCount),
             findings);
-    }
-
-    private static string ComputeCatalogMetadataDigest(
-        IEnumerable<IGovernanceRule> applicableRules)
-    {
-        var canonicalCatalog = string.Concat(
-            applicableRules.Select(rule =>
-                $"{rule.RuleId}\0{rule.CanonicalScenarioId}\0" +
-                $"{rule.FindingCode}\0{rule.Severity.Value}\0" +
-                $"{rule.Enforcement.Value}\n"));
-        return Convert.ToHexString(
-                SHA256.HashData(Encoding.UTF8.GetBytes(canonicalCatalog)))
-            .ToLowerInvariant();
     }
 }

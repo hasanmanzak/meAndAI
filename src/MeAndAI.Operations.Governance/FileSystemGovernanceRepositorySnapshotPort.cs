@@ -1,15 +1,11 @@
-using System.Text.RegularExpressions;
 using MeAndAI.Operations.Governance.Core.Repository;
 using MeAndAI.Operations.Infrastructure.Execution;
 
 namespace MeAndAI.Operations.Governance;
 
-internal sealed partial class FileSystemGovernanceRepositorySnapshotPort :
+internal sealed class FileSystemGovernanceRepositorySnapshotPort :
     IGovernanceRepositorySnapshotPort
 {
-    private static readonly string[] RequiredFeatureFiles =
-        ["README.md", "test-cases.md"];
-
     private readonly string repositoryPath;
 
     public FileSystemGovernanceRepositorySnapshotPort(string repositoryPath)
@@ -61,19 +57,36 @@ internal sealed partial class FileSystemGovernanceRepositorySnapshotPort :
             return GovernanceRepositorySnapshot.CreateCandidate([]);
         }
 
+        var entries = new List<GovernanceRepositoryEntry>();
+        CaptureFeatureEntries(
+            root,
+            docsDirectory,
+            entries,
+            cancellationToken);
+        CaptureDecisionEntries(
+            root,
+            docsDirectory,
+            entries,
+            cancellationToken);
+
+        return GovernanceRepositorySnapshot.CreateCandidate(entries);
+    }
+
+    private static void CaptureFeatureEntries(
+        DirectoryInfo root,
+        DirectoryInfo docsDirectory,
+        List<GovernanceRepositoryEntry> entries,
+        CancellationToken cancellationToken)
+    {
         var featuresDirectory = FindExactOrdinaryDirectory(
             docsDirectory,
             "features");
         if (featuresDirectory is null)
         {
-            return GovernanceRepositorySnapshot.CreateCandidate([]);
+            return;
         }
 
-        var entries = new List<GovernanceRepositoryEntry>();
-        foreach (var entry in featuresDirectory
-                     .EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)
-                     .Where(item => FeatureDirectoryNamePattern().IsMatch(item.Name))
-                     .OrderBy(item => item.Name, StringComparer.Ordinal))
+        foreach (var entry in EnumerateOrdinal(featuresDirectory))
         {
             cancellationToken.ThrowIfCancellationRequested();
             EnsureOrdinaryEntry(entry);
@@ -86,32 +99,48 @@ internal sealed partial class FileSystemGovernanceRepositorySnapshotPort :
                 Path.GetRelativePath(root.FullName, directory.FullName));
             entries.Add(GovernanceRepositoryEntry.Directory(relativeDirectory));
 
-            var children = directory
-                .EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)
-                .ToArray();
-
-            foreach (var requiredFile in RequiredFeatureFiles)
+            foreach (var child in EnumerateOrdinal(directory))
             {
-                var exactEntry = children.SingleOrDefault(child =>
-                    string.Equals(
-                        child.Name,
-                        requiredFile,
-                        StringComparison.Ordinal));
-                if (exactEntry is null)
-                {
-                    continue;
-                }
-
-                EnsureOrdinaryEntry(exactEntry);
-                if (exactEntry is FileInfo file && file.Exists)
+                cancellationToken.ThrowIfCancellationRequested();
+                EnsureOrdinaryEntry(child);
+                if (child is FileInfo file && file.Exists)
                 {
                     entries.Add(GovernanceRepositoryEntry.File(
-                        $"{relativeDirectory}/{file.Name}"));
+                        $"{relativeDirectory}/{file.Name}",
+                        File.ReadAllBytes(file.FullName)));
                 }
             }
         }
+    }
 
-        return GovernanceRepositorySnapshot.CreateCandidate(entries);
+    private static void CaptureDecisionEntries(
+        DirectoryInfo root,
+        DirectoryInfo docsDirectory,
+        List<GovernanceRepositoryEntry> entries,
+        CancellationToken cancellationToken)
+    {
+        var decisionsDirectory = FindExactOrdinaryDirectory(
+            docsDirectory,
+            "decisions");
+        if (decisionsDirectory is null)
+        {
+            return;
+        }
+
+        foreach (var entry in EnumerateOrdinal(decisionsDirectory))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            EnsureOrdinaryEntry(entry);
+            if (entry is not FileInfo file || !file.Exists)
+            {
+                continue;
+            }
+
+            entries.Add(GovernanceRepositoryEntry.File(
+                NormalizeRelativePath(
+                    Path.GetRelativePath(root.FullName, file.FullName)),
+                File.ReadAllBytes(file.FullName)));
+        }
     }
 
     private static void EnsureOrdinaryEntry(FileSystemInfo entry)
@@ -148,8 +177,9 @@ internal sealed partial class FileSystemGovernanceRepositorySnapshotPort :
     private static string NormalizeRelativePath(string path) =>
         path.Replace('\\', '/');
 
-    [GeneratedRegex(
-        "^FEAT-[0-9]{4}-[^/]+$",
-        RegexOptions.CultureInvariant)]
-    private static partial Regex FeatureDirectoryNamePattern();
+    private static IEnumerable<FileSystemInfo> EnumerateOrdinal(
+        DirectoryInfo directory) =>
+        directory
+            .EnumerateFileSystemInfos("*", SearchOption.TopDirectoryOnly)
+            .OrderBy(entry => entry.Name, StringComparer.Ordinal);
 }

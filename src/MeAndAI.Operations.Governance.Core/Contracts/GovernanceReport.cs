@@ -16,6 +16,7 @@ public sealed class GovernanceReport
         string snapshotEvidenceDigest,
         string policyCatalogVersion,
         string policyCatalogMetadataDigest,
+        string[] evaluatedRuleIds,
         GovernanceVerdict verdict,
         GovernanceCounts counts,
         GovernanceFinding[] findings)
@@ -25,6 +26,7 @@ public sealed class GovernanceReport
         SnapshotEvidenceDigest = snapshotEvidenceDigest;
         PolicyCatalogVersion = policyCatalogVersion;
         PolicyCatalogMetadataDigest = policyCatalogMetadataDigest;
+        EvaluatedRuleIds = new ReadOnlyCollection<string>(evaluatedRuleIds);
         Verdict = verdict;
         Counts = counts;
         Findings = new ReadOnlyCollection<GovernanceFinding>(findings);
@@ -46,7 +48,9 @@ public sealed class GovernanceReport
 
     public string PolicyCatalogMetadataDigest { get; }
 
-    public string Coverage => "bounded-first-slice";
+    public IReadOnlyList<string> EvaluatedRuleIds { get; }
+
+    public string Coverage => "bounded-catalog";
 
     public GovernanceVerdict Verdict { get; }
 

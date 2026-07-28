@@ -25,7 +25,14 @@ public sealed class GovernanceEngineTests
         Assert.Same(GovernanceVerdict.Conforming, report.Verdict);
         Assert.Equal("csharp-shadow", report.EngineState);
         Assert.Equal("powershell-authority", report.AuthorityState);
-        Assert.Equal(1, report.Counts.EvaluatedRules);
+        Assert.Equal("bounded-catalog", report.Coverage);
+        Assert.Equal(
+            [
+                "protocol.decision-record.required-structure.v1",
+                "protocol.feature-record.required-pair.v1",
+            ],
+            report.EvaluatedRuleIds);
+        Assert.Equal(2, report.Counts.EvaluatedRules);
         Assert.Equal(0, report.Counts.BlockingFindings);
         Assert.Empty(report.Findings);
     }
@@ -41,7 +48,7 @@ public sealed class GovernanceEngineTests
                     "docs/features/FEAT-0001-example")));
 
         Assert.Same(GovernanceVerdict.Nonconforming, report.Verdict);
-        Assert.Equal(1, report.Counts.EvaluatedRules);
+        Assert.Equal(2, report.Counts.EvaluatedRules);
         Assert.Equal(1, report.Counts.BlockingFindings);
         Assert.Single(report.Findings);
     }

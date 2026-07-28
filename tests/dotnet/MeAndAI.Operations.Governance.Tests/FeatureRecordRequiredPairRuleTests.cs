@@ -1,4 +1,6 @@
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Governance.Core.Analysis;
+using MeAndAI.Operations.Governance.Core.Contracts;
 using MeAndAI.Operations.Governance.Core.Repository;
 using MeAndAI.Operations.Governance.Core.Rules;
 
@@ -20,7 +22,7 @@ public sealed class FeatureRecordRequiredPairRuleTests
 
         var findings = new FeatureRecordRequiredPairRule().Evaluate(
             GovernanceProfileId.ProtocolAuthority,
-            snapshot);
+            GovernanceAnalysisContext.Create(snapshot));
 
         Assert.Empty(findings);
     }
@@ -46,7 +48,7 @@ public sealed class FeatureRecordRequiredPairRuleTests
         var finding = Assert.Single(
             new FeatureRecordRequiredPairRule().Evaluate(
                 GovernanceProfileId.ProtocolAuthority,
-                snapshot));
+                GovernanceAnalysisContext.Create(snapshot)));
 
         Assert.Equal(
             "protocol.feature-record.required-pair.v1",
@@ -58,7 +60,13 @@ public sealed class FeatureRecordRequiredPairRuleTests
         Assert.Same(GovernanceSeverity.High, finding.Severity);
         Assert.Same(GovernanceEnforcement.Blocking, finding.Enforcement);
         Assert.Equal(featurePath, finding.RelativePath);
-        Assert.Equal([missingFile], finding.MissingFiles);
+        Assert.Equal(
+            [
+                new GovernanceRequirement(
+                    GovernanceRequirementKind.RepositoryFile,
+                    missingFile),
+            ],
+            finding.UnsatisfiedRequirements);
     }
 
     [Fact]
@@ -76,7 +84,7 @@ public sealed class FeatureRecordRequiredPairRuleTests
 
         var findings = new FeatureRecordRequiredPairRule().Evaluate(
             GovernanceProfileId.ProtocolAuthority,
-            snapshot);
+            GovernanceAnalysisContext.Create(snapshot));
 
         Assert.Equal(
             [
@@ -87,8 +95,15 @@ public sealed class FeatureRecordRequiredPairRuleTests
         Assert.All(
             findings,
             finding => Assert.Equal(
-                ["README.md", "test-cases.md"],
-                finding.MissingFiles));
+                [
+                    new GovernanceRequirement(
+                        GovernanceRequirementKind.RepositoryFile,
+                        "README.md"),
+                    new GovernanceRequirement(
+                        GovernanceRequirementKind.RepositoryFile,
+                        "test-cases.md"),
+                ],
+                finding.UnsatisfiedRequirements));
     }
 
     private static GovernanceRepositorySnapshot CandidateSnapshot(

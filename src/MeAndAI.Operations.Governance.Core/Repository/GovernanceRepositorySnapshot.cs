@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -47,13 +48,41 @@ public sealed class GovernanceRepositorySnapshot
                 nameof(entries));
         }
 
-        var digestInput = string.Concat(
-            ordered.Select(entry =>
-                $"{entry.Kind.ToString().ToLowerInvariant()}\0{entry.RelativePath}\n"));
-        var digest = Convert.ToHexString(
-                SHA256.HashData(Encoding.UTF8.GetBytes(digestInput)))
-            .ToLowerInvariant();
+        var digest = ComputeEvidenceDigest(ordered);
 
         return new GovernanceRepositorySnapshot(ordered, digest);
+    }
+
+    private static string ComputeEvidenceDigest(
+        IEnumerable<GovernanceRepositoryEntry> entries)
+    {
+        using var evidence = IncrementalHash.CreateHash(
+            HashAlgorithmName.SHA256);
+        AppendFramed(
+            evidence,
+            "meandai-governance-repository-snapshot-v2"u8);
+
+        foreach (var entry in entries)
+        {
+            Span<byte> kind = [(byte)entry.Kind];
+            AppendFramed(evidence, kind);
+            AppendFramed(
+                evidence,
+                Encoding.UTF8.GetBytes(entry.RelativePath));
+            AppendFramed(evidence, entry.CapturedContent);
+        }
+
+        return Convert.ToHexString(evidence.GetHashAndReset())
+            .ToLowerInvariant();
+    }
+
+    private static void AppendFramed(
+        IncrementalHash evidence,
+        ReadOnlySpan<byte> value)
+    {
+        Span<byte> length = stackalloc byte[sizeof(int)];
+        BinaryPrimitives.WriteInt32BigEndian(length, value.Length);
+        evidence.AppendData(length);
+        evidence.AppendData(value);
     }
 }

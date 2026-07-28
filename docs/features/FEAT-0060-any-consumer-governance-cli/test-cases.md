@@ -1,8 +1,10 @@
 # FEAT-0060 Test Scenarios
 
-Test implementation: [SUBF-0138](README.md#subf-0138) is complete with
-exact-head hosted evidence; the six remaining bounded-MVP subfeatures are
-pending.
+Test implementation: [SUBF-0138](README.md#subf-0138) is fully complete with
+exact-head hosted evidence. [SUBF-0134](README.md#subf-0134) is locally
+implemented and fresh-review green, with exact committed-tree and hosted closure
+pending. Local implementation is two of seven subfeatures (28.6%); fully
+closed progress is one of seven (14.3%). Five subfeatures are not implemented.
 
 ## Authorized bounded clean-room catalog
 
@@ -21,20 +23,23 @@ missing-file boundary after the smallest coherent implementation. PowerShell
 source was not inspected or translated to design the rule; later differential
 work may compare the independently produced results as black-box observations.
 
-The next rule reuses canonical
+The second bounded rule reuses canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005).
 It validates the decision-record identity, classification, status, and exact
 required sections through the same repository/document indexes as
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004);
 it does not allocate a language-specific test identity or a second parser.
+The rule is implemented locally and green after fresh review; exact
+committed-tree and hosted closure remain pending.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122), [SUBF-0123](README.md#subf-0123), and [SUBF-0135](README.md#subf-0135) | Build a closed exact-commit governance request, resolve explicit `protocol-authority` and canonical gitlink `consumer` profiles, and bind one exact application/policy pair from canonical evidence. | Exactly one caller-selected profile, 40-character commit, catalog, and application/policy pair are independently verified; unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, or unsupported repository-reference state fails closed. An exact-bound unreleased bundle may inspect only as read-only `CSharpShadow`. Persistent managed use requires the immutable package and still grants neither mutation nor primary authority. | Contract / Git / integration / security | `Distinct`; see the exact sibling tuple below. Existing canonical-byte selection remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171). | Planned | Future .NET tests |
 | `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124), [SUBF-0134](README.md#subf-0134), and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
 
-[SUBF-0138](README.md#subf-0138) contributes bounded implementation experience
-to the future request/report design, but it does not activate or pass
+[SUBF-0138](README.md#subf-0138) and
+[SUBF-0134](README.md#subf-0134) contribute bounded implementation experience
+to the future request/report design, but they do not activate or pass
 [TEST-0194](#test-0194) or [TEST-0195](#test-0195). Both remain canonical
 `PlannedDocumentation` scenarios with literal `Planned` status and no active
 C# source ownership.
@@ -54,10 +59,40 @@ numbered scenario; the existing identity is cited by the differential ledger.
 Canonical [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
 and its distinct-intent review moved to
 [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). This link
-is navigation only;
-FEAT-0060 no longer declares that scenario.
+is navigation only; this feature no longer declares that scenario.
 
 ## Evidence
+
+### [SUBF-0134](README.md#subf-0134) shared-kernel local checkpoint
+
+[SUBF-0134](README.md#subf-0134) local test-first evidence on 2026-07-29:
+
+- The focused governance test command first exited `1` with `CS0234` and
+  `CS0246` because the `Analysis` namespace and `GovernanceAnalysisContext`
+  were absent. The first combined
+  [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  / [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+  implementation passed 53/53.
+- Fresh review and independent re-review produced and resolved
+  [FIND-0368](README.md#find-0368): fenced and HTML-comment structure is
+  excluded, fence/comment state is isolated, only indexed numbered decisions
+  are parsed, invalid UTF-8 has bounded fail-closed behavior, reports bind exact
+  `evaluatedRuleIds` with `coverage=bounded-catalog`, and decision
+  symlink/dangling cases fail closed. The final focused suite passed 62/62.
+- The full solution passed governance 62/62, architecture 31/31, and packaging
+  17/17. Locked restore and format verification are green.
+- Framework-dependent publish succeeded without an apphost. The published DLL
+  validated the real repository as `conforming` with two evaluated rules, zero
+  findings, and `bounded-catalog` coverage.
+
+This is local executable evidence for canonical
+[TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+and regression evidence for canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+through the shared analysis context. Exact committed-tree and hosted closure remain
+pending; [TEST-0194](#test-0194) and [TEST-0195](#test-0195) remain `Planned`.
+
+### [SUBF-0138](README.md#subf-0138) exact-head closure
 
 [SUBF-0138](README.md#subf-0138) local test-first evidence, from the repository
 root on 2026-07-28:
@@ -97,8 +132,12 @@ root on 2026-07-28:
 
 This evidence completes the canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-C# vertical slice. It does not activate [TEST-0194](#test-0194) or
-[TEST-0195](#test-0195), which remain `Planned`. Exact head
+C# vertical slice with exact-head hosted proof. The shared-kernel checkpoint
+above adds local canonical
+[TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+evidence but does not yet close exact-commit or hosted verification. Neither
+slice activates [TEST-0194](#test-0194) or [TEST-0195](#test-0195), which
+remain `Planned`. Exact head
 [`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2)
 passed hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
 on Ubuntu and Windows. Exact-commit package behavior remains pending. The historical

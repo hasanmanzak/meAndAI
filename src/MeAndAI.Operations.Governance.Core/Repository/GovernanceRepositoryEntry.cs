@@ -8,12 +8,16 @@ public enum GovernanceRepositoryEntryKind
 
 public sealed record GovernanceRepositoryEntry
 {
+    private readonly byte[] _content;
+
     private GovernanceRepositoryEntry(
         string relativePath,
-        GovernanceRepositoryEntryKind kind)
+        GovernanceRepositoryEntryKind kind,
+        ReadOnlyMemory<byte> content)
     {
         Path = RepositoryRelativePath.From(relativePath);
         Kind = kind;
+        _content = content.ToArray();
     }
 
     public RepositoryRelativePath Path { get; }
@@ -22,10 +26,21 @@ public sealed record GovernanceRepositoryEntry
 
     public GovernanceRepositoryEntryKind Kind { get; }
 
+    public ReadOnlyMemory<byte> Content => _content.ToArray();
+
+    internal ReadOnlySpan<byte> CapturedContent => _content;
+
     public static GovernanceRepositoryEntry Directory(string relativePath) =>
-        new(relativePath, GovernanceRepositoryEntryKind.Directory);
+        new(
+            relativePath,
+            GovernanceRepositoryEntryKind.Directory,
+            ReadOnlyMemory<byte>.Empty);
 
     public static GovernanceRepositoryEntry File(string relativePath) =>
-        new(relativePath, GovernanceRepositoryEntryKind.File);
+        File(relativePath, ReadOnlyMemory<byte>.Empty);
 
+    public static GovernanceRepositoryEntry File(
+        string relativePath,
+        ReadOnlyMemory<byte> content) =>
+        new(relativePath, GovernanceRepositoryEntryKind.File, content);
 }

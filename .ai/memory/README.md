@@ -40,10 +40,42 @@ and
 a deterministic typed catalog and report, and one framework-dependent
 `maai-governance.zip`. Shared repository and document analysis is parse-once;
 rules consume common typed indexes instead of creating parallel parsers,
-scanners, snapshots, or metadata sources. Progress is one of seven subfeatures
-(approximately 14.3%), with six pending. The next gate is the shared parse-once
-context and canonical
-[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
+scanners, snapshots, or metadata sources.
+
+[SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+now locally implements canonical
+[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+through that shared kernel. Its expected-red checkpoint produced `CS0234` and
+`CS0246`; the first green checkpoint passed 53/53. Fresh review and independent
+re-review under
+[FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368)
+covered fenced/HTML-comment structure, fence-state isolation, indexed-only
+document parsing, bounded invalid-UTF-8 failure, exact evaluated-rule inventory,
+bounded-catalog identity, and decision-document symlink behavior. Final local
+gates passed 62/62 focused governance, 62/62 full governance, 31/31
+architecture, and 17/17 packaging tests, plus locked restore, format
+verification, publish, and a
+published-DLL real-repository run that evaluated two rules with zero findings.
+
+Two of seven subfeatures are locally implemented, approximately 28.6%; only
+[SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
+is fully closed, so closure remains one of seven, approximately 14.3%.
+[SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+still requires exact committed-tree local gates and exact-head hosted evidence.
+Hosted
+[run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
+for exact commit
+[`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
+passed every C# build/test/package step and failed on both runtimes only at
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+because tracked Markdown contained a short commit target. The correction is
+recorded in
+[FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369);
+the focused repository-only owner now passes in 71.2 seconds.
+After closing [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134),
+the next gate is the bounded catalog/request/report gate or the exact-commit
+gate according to the canonical feature record. PowerShell authority is
+unchanged.
 
 The historical
 [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)

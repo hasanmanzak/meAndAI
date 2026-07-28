@@ -44,6 +44,13 @@ public static class GovernanceReportSerializer
             writer.WriteString(
                 "catalogMetadataDigest",
                 report.PolicyCatalogMetadataDigest);
+            writer.WriteStartArray("evaluatedRuleIds");
+            foreach (var ruleId in report.EvaluatedRuleIds)
+            {
+                writer.WriteStringValue(ruleId);
+            }
+
+            writer.WriteEndArray();
             writer.WriteEndObject();
 
             writer.WriteString("verdict", report.Verdict.Value);
@@ -77,10 +84,14 @@ public static class GovernanceReportSerializer
                     "enforcement",
                     finding.Enforcement.Value);
                 writer.WriteString("relativePath", finding.RelativePath);
-                writer.WriteStartArray("missingFiles");
-                foreach (var missingFile in finding.MissingFiles)
+                writer.WriteStartArray("unsatisfiedRequirements");
+                foreach (var requirement in
+                         finding.UnsatisfiedRequirements)
                 {
-                    writer.WriteStringValue(missingFile);
+                    writer.WriteStartObject();
+                    writer.WriteString("kind", requirement.Kind.Value);
+                    writer.WriteString("name", requirement.Name);
+                    writer.WriteEndObject();
                 }
 
                 writer.WriteEndArray();

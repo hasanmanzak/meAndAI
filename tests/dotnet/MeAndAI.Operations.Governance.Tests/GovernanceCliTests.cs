@@ -28,7 +28,16 @@ public sealed class GovernanceCliTests
             "candidate",
             root.GetProperty("snapshot").GetProperty("mode").GetString());
         Assert.Equal("conforming", root.GetProperty("verdict").GetString());
-        Assert.Equal("bounded-first-slice", root.GetProperty("coverage").GetString());
+        Assert.Equal("bounded-catalog", root.GetProperty("coverage").GetString());
+        Assert.Equal(
+            [
+                "protocol.decision-record.required-structure.v1",
+                "protocol.feature-record.required-pair.v1",
+            ],
+            root.GetProperty("policy")
+                .GetProperty("evaluatedRuleIds")
+                .EnumerateArray()
+                .Select(rule => rule.GetString()));
         Assert.Equal("csharp-shadow", root.GetProperty("engineState").GetString());
         Assert.Equal(
             "powershell-authority",
@@ -78,10 +87,141 @@ public sealed class GovernanceCliTests
         var finding = Assert.Single(
             report.RootElement.GetProperty("findings").EnumerateArray());
         Assert.Equal(
+            "repository-file",
+            Assert.Single(
+                finding
+                    .GetProperty("unsatisfiedRequirements")
+                    .EnumerateArray())
+                .GetProperty("kind")
+                .GetString());
+        Assert.Equal(
             "README.md",
             Assert.Single(
-                finding.GetProperty("missingFiles").EnumerateArray())
+                finding
+                    .GetProperty("unsatisfiedRequirements")
+                    .EnumerateArray())
+                .GetProperty("name")
                 .GetString());
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0005")]
+    public async Task ValidDecisionRecordIsIncludedInTheBoundedCatalog()
+    {
+        using var fixture = GovernanceRepositoryFixture.Create();
+        fixture.AddFeature(
+            "FEAT-0001-example",
+            includeReadme: true,
+            includeTests: true);
+        fixture.AddDecision(
+            "DEC-0001-example.md",
+            """
+            # DEC-0001 - Example
+            - Classification: Decision
+            - Status: Accepted
+            ## Context
+            ## Decision
+            ## Consequences
+            """);
+
+        var result = await InvokeAsync(fixture.Root);
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(string.Empty, result.StandardError);
+        using var report = JsonDocument.Parse(result.StandardOutput);
+        Assert.Equal(
+            "conforming",
+            report.RootElement.GetProperty("verdict").GetString());
+        Assert.Equal(
+            2,
+            report.RootElement
+                .GetProperty("counts")
+                .GetProperty("evaluatedRules")
+                .GetInt32());
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0005")]
+    public async Task InvalidDecisionRecordReturnsTypedNonconformingFinding()
+    {
+        using var fixture = GovernanceRepositoryFixture.Create();
+        fixture.AddFeature(
+            "FEAT-0001-example",
+            includeReadme: true,
+            includeTests: true);
+        fixture.AddDecision(
+            "DEC-0001-example.md",
+            """
+            # DEC-0001 - Example
+            - Classification: Decision
+            - Status:
+            ## Context
+            ## Decision
+            ## Consequences
+            """);
+
+        var result = await InvokeAsync(fixture.Root);
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Equal(string.Empty, result.StandardError);
+        using var report = JsonDocument.Parse(result.StandardOutput);
+        var finding = Assert.Single(
+            report.RootElement.GetProperty("findings").EnumerateArray());
+        Assert.Equal(
+            "protocol.decision-record.required-structure.v1",
+            finding.GetProperty("ruleId").GetString());
+        Assert.Equal(
+            "governance.decision.record-structure-incomplete",
+            finding.GetProperty("code").GetString());
+        var requirement = Assert.Single(
+            finding
+                .GetProperty("unsatisfiedRequirements")
+                .EnumerateArray());
+        Assert.Equal(
+            "metadata-field",
+            requirement.GetProperty("kind").GetString());
+        Assert.Equal("Status", requirement.GetProperty("name").GetString());
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0005")]
+    public async Task UnrelatedInvalidUtf8MarkdownDoesNotAffectTheBoundedCatalog()
+    {
+        using var fixture = GovernanceRepositoryFixture.Create();
+        fixture.AddFeature(
+            "FEAT-0001-example",
+            includeReadme: true,
+            includeTests: true);
+        fixture.AddDecisionBytes("README.md", [0xff]);
+
+        var result = await InvokeAsync(fixture.Root);
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(string.Empty, result.StandardError);
+        using var report = JsonDocument.Parse(result.StandardOutput);
+        Assert.Equal(
+            "conforming",
+            report.RootElement.GetProperty("verdict").GetString());
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0005")]
+    public async Task InvalidUtf8NumberedDecisionIsAnOperationalFailure()
+    {
+        using var fixture = GovernanceRepositoryFixture.Create();
+        fixture.AddFeature(
+            "FEAT-0001-example",
+            includeReadme: true,
+            includeTests: true);
+        fixture.AddDecisionBytes("DEC-0001-invalid.md", [0xff]);
+
+        var result = await InvokeAsync(fixture.Root);
+
+        Assert.Equal(70, result.ExitCode);
+        Assert.Equal(string.Empty, result.StandardOutput);
+        Assert.Equal(
+            "Repository snapshot capture failed.\n",
+            NormalizeNewline(result.StandardError));
     }
 
     [Theory]
@@ -93,6 +233,8 @@ public sealed class GovernanceCliTests
     [InlineData("dangling-features")]
     [InlineData("file-link-docs")]
     [InlineData("file-link-features")]
+    [InlineData("decision-file")]
+    [InlineData("dangling-decision-file")]
     public async Task RepositoryLinksFailWithoutGovernanceVerdict(string linkKind)
     {
         using var fixture = GovernanceRepositoryFixture.Create();
@@ -113,6 +255,10 @@ public sealed class GovernanceCliTests
                 fixture.CreateIntermediateLink("docs", dangling: false),
             "file-link-features" =>
                 fixture.CreateIntermediateLink("features", dangling: false),
+            "decision-file" =>
+                fixture.CreateDecisionFileLink(dangling: false),
+            "dangling-decision-file" =>
+                fixture.CreateDecisionFileLink(dangling: true),
             _ => throw new InvalidOperationException("Unknown link fixture."),
         };
 
@@ -233,6 +379,7 @@ public sealed class GovernanceCliTests
             this.container = container;
             Root = root;
             Directory.CreateDirectory(Path.Combine(root, "docs", "features"));
+            Directory.CreateDirectory(Path.Combine(root, "docs", "decisions"));
         }
 
         public string Root { get; }
@@ -276,6 +423,20 @@ public sealed class GovernanceCliTests
                 directoryName);
             Directory.CreateDirectory(directory);
             File.WriteAllText(Path.Combine(directory, fileName), "fixture\n");
+        }
+
+        public void AddDecision(string fileName, string content)
+        {
+            File.WriteAllText(
+                Path.Combine(Root, "docs", "decisions", fileName),
+                content);
+        }
+
+        public void AddDecisionBytes(string fileName, byte[] content)
+        {
+            File.WriteAllBytes(
+                Path.Combine(Root, "docs", "decisions", fileName),
+                content);
         }
 
         public string CreateRootLink()
@@ -333,6 +494,23 @@ public sealed class GovernanceCliTests
                 File.WriteAllText(target, "not a directory\n");
             }
 
+            File.CreateSymbolicLink(link, target);
+            return Root;
+        }
+
+        public string CreateDecisionFileLink(bool dangling)
+        {
+            var target = Path.Combine(container, "linked-decision-target.md");
+            if (!dangling)
+            {
+                File.WriteAllText(target, "# DEC-0001 - Linked target\n");
+            }
+
+            var link = Path.Combine(
+                Root,
+                "docs",
+                "decisions",
+                "DEC-0001-linked.md");
             File.CreateSymbolicLink(link, target);
             return Root;
         }

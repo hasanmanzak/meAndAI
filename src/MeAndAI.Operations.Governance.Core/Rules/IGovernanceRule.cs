@@ -1,6 +1,6 @@
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Governance.Core.Analysis;
 using MeAndAI.Operations.Governance.Core.Contracts;
-using MeAndAI.Operations.Governance.Core.Repository;
 
 namespace MeAndAI.Operations.Governance.Core.Rules;
 
@@ -20,5 +20,5 @@ public interface IGovernanceRule
 
     IReadOnlyList<GovernanceFinding> Evaluate(
         GovernanceProfileId profile,
-        GovernanceRepositorySnapshot snapshot);
+        GovernanceAnalysisContext context);
 }

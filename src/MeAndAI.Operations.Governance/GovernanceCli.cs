@@ -72,9 +72,18 @@ public static class GovernanceCli
                     .Require<IGovernanceRepositorySnapshotPort>()
                     .CaptureCandidateAsync(token)
                     .ConfigureAwait(false);
-                return engine.Evaluate(
-                    new GovernanceRequest(profile),
-                    snapshot);
+                try
+                {
+                    return engine.Evaluate(
+                        new GovernanceRequest(profile),
+                        snapshot);
+                }
+                catch (InvalidDataException exception)
+                {
+                    throw new OperationalDependencyException(
+                        "Governance repository content could not be analyzed.",
+                        exception);
+                }
             },
             cancellationToken);
 

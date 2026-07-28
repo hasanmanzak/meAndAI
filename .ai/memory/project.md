@@ -108,13 +108,47 @@ Last verified: **2026-07-29**
   and
   [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
   a deterministic typed catalog and report, and one framework-dependent
-  `maai-governance.zip`. One immutable evaluation context reads and parses each
+  `maai-governance.zip`. One immutable evaluation context parses each applicable
   repository artifact once; rules reuse its typed indexes rather than creating
-  parallel parsers, scanners, snapshots, or catalog projections. Progress is
-  one of seven subfeatures, approximately 14.3%, with six pending. The next
-  coherent gate is the shared parse-once repository/document context followed
-  by canonical
-  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
+  parallel parsers, scanners, snapshots, or catalog projections.
+
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  now locally implements canonical
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+  through that shared kernel. Its expected-red checkpoint produced `CS0234`
+  and `CS0246`; the first green checkpoint passed 53/53. Fresh review and
+  independent re-review under
+  [FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368)
+  covered fenced/HTML-comment structure, fence-state isolation, indexed-only
+  document parsing, bounded invalid-UTF-8 failure, exact evaluated-rule
+  inventory, bounded-catalog identity, and decision-document symlink behavior.
+  Final local gates passed 62/62 focused governance, 62/62 full governance,
+  31/31 architecture, and 17/17 packaging tests. Locked restore, format
+  verification, and publish
+  passed; the published DLL evaluated the real repository as conforming with
+  two rules and zero findings.
+
+  Two of seven subfeatures are locally implemented, approximately 28.6%; only
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
+  is fully closed, so closed progress remains one of seven, approximately
+  14.3%.
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  still requires exact committed-tree local gates and exact-head hosted evidence.
+  Hosted
+  [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
+  for exact commit
+  [`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
+  passed every C# build/test/package step and failed on both runtimes only at
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  because tracked Markdown contained a short commit target. The correction is
+  recorded under
+  [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
+  and the focused repository-only owner now passes in 71.2 seconds. After
+  closing
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134),
+  continue with either the bounded catalog/request/report gate or the
+  exact-commit gate according to the canonical feature record. PowerShell
+  authority is unchanged.
 
   The historical
   [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
@@ -1135,10 +1169,33 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   It reuses canonical
   [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004),
   is `protocol-authority`, repository-read-only, provider-free, and
-  non-authoritative. The feature is one of seven subfeatures complete
-  (approximately 14.3%); the next gate is the shared parse-once context and
-  canonical
-  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005).
+  non-authoritative.
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  locally implements canonical
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+  through the same parse-once kernel. Final local evidence is 62/62 focused
+  governance, 62/62 full governance, 31/31 architecture, and 17/17 packaging,
+  with locked restore, format verification, publish, and published-DLL
+  real-repository execution green. Fresh review is recorded under
+  [FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368).
+  Two of seven subfeatures are locally implemented, approximately 28.6%; only
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
+  is fully closed, so closed progress remains one of seven, approximately
+  14.3%. [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  still requires exact committed-tree local gates and exact-head hosted evidence.
+  Hosted
+  [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
+  for exact commit
+  [`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
+  passed every C# build/test/package step and failed on both runtimes only at
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  because tracked Markdown contained a short commit target. The correction is
+  recorded under
+  [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
+  and the focused repository-only owner now passes in 71.2 seconds. After closing
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134),
+  the next gate remains whichever of bounded catalog/request/report or
+  exact-commit is selected by the canonical feature record.
   [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)

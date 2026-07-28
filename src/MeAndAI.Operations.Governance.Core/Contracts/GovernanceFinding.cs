@@ -4,6 +4,48 @@ using MeAndAI.Operations.Governance.Core.Repository;
 
 namespace MeAndAI.Operations.Governance.Core.Contracts;
 
+public sealed record GovernanceRequirementKind
+{
+    public static GovernanceRequirementKind RepositoryFile { get; } =
+        new("repository-file");
+
+    public static GovernanceRequirementKind DocumentIdentity { get; } =
+        new("document-identity");
+
+    public static GovernanceRequirementKind MetadataField { get; } =
+        new("metadata-field");
+
+    public static GovernanceRequirementKind Section { get; } =
+        new("section");
+
+    private GovernanceRequirementKind(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+
+    public override string ToString() => Value;
+}
+
+public sealed record GovernanceRequirement
+{
+    public GovernanceRequirement(
+        GovernanceRequirementKind kind,
+        string name)
+    {
+        ArgumentNullException.ThrowIfNull(kind);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        Kind = kind;
+        Name = name;
+    }
+
+    public GovernanceRequirementKind Kind { get; }
+
+    public string Name { get; }
+}
+
 public sealed class GovernanceFinding
 {
     public GovernanceFinding(
@@ -13,7 +55,7 @@ public sealed class GovernanceFinding
         GovernanceSeverity severity,
         GovernanceEnforcement enforcement,
         RepositoryRelativePath path,
-        IEnumerable<string> missingFiles)
+        IEnumerable<GovernanceRequirement> unsatisfiedRequirements)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(ruleId);
         ArgumentException.ThrowIfNullOrWhiteSpace(canonicalScenarioId);
@@ -21,20 +63,27 @@ public sealed class GovernanceFinding
         ArgumentNullException.ThrowIfNull(severity);
         ArgumentNullException.ThrowIfNull(enforcement);
         ArgumentNullException.ThrowIfNull(path);
-        ArgumentNullException.ThrowIfNull(missingFiles);
+        ArgumentNullException.ThrowIfNull(unsatisfiedRequirements);
 
-        var orderedMissingFiles = missingFiles
-            .Order(StringComparer.Ordinal)
-            .ToArray();
-        if (orderedMissingFiles.Length == 0 ||
-            orderedMissingFiles.Any(string.IsNullOrWhiteSpace) ||
-            orderedMissingFiles.Distinct(StringComparer.Ordinal).Count() !=
-                orderedMissingFiles.Length)
+        var materializedRequirements = unsatisfiedRequirements.ToArray();
+        if (materializedRequirements.Length == 0 ||
+            materializedRequirements.Any(requirement => requirement is null) ||
+            materializedRequirements.Distinct().Count() !=
+                materializedRequirements.Length)
         {
             throw new ArgumentException(
-                "A finding requires distinct non-empty missing file roles.",
-                nameof(missingFiles));
+                "A finding requires distinct non-null requirements.",
+                nameof(unsatisfiedRequirements));
         }
+
+        var orderedRequirements = materializedRequirements
+            .OrderBy(
+                requirement => requirement.Kind.Value,
+                StringComparer.Ordinal)
+            .ThenBy(
+                requirement => requirement.Name,
+                StringComparer.Ordinal)
+            .ToArray();
 
         RuleId = ruleId;
         CanonicalScenarioId = canonicalScenarioId;
@@ -42,7 +91,9 @@ public sealed class GovernanceFinding
         Severity = severity;
         Enforcement = enforcement;
         Path = path;
-        MissingFiles = new ReadOnlyCollection<string>(orderedMissingFiles);
+        UnsatisfiedRequirements =
+            new ReadOnlyCollection<GovernanceRequirement>(
+                orderedRequirements);
     }
 
     public string RuleId { get; }
@@ -59,5 +110,8 @@ public sealed class GovernanceFinding
 
     public string RelativePath => Path.Value;
 
-    public IReadOnlyList<string> MissingFiles { get; }
+    public IReadOnlyList<GovernanceRequirement> UnsatisfiedRequirements
+    {
+        get;
+    }
 }
