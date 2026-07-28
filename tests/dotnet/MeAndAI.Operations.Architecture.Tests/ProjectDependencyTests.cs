@@ -17,13 +17,29 @@ public sealed class ProjectDependencyTests
             "src/MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj";
         const string infrastructure =
             "src/MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj";
+        const string adoption =
+            "src/MeAndAI.Operations.Adoption/MeAndAI.Operations.Adoption.csproj";
+        const string consumerUpdate =
+            "src/MeAndAI.Operations.ConsumerUpdate/MeAndAI.Operations.ConsumerUpdate.csproj";
+        const string governance =
+            "src/MeAndAI.Operations.Governance/MeAndAI.Operations.Governance.csproj";
+        const string packaging =
+            "tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj";
 
         Assert.Empty(ReadProjectReferences(domain));
         Assert.Equal([domain], ReadProjectReferences(application));
         Assert.Equal([application, domain], ReadProjectReferences(infrastructure));
+        Assert.Equal([domain, infrastructure], ReadProjectReferences(adoption));
+        Assert.Equal([domain, infrastructure], ReadProjectReferences(consumerUpdate));
+        Assert.Equal([domain, infrastructure], ReadProjectReferences(governance));
+        Assert.Empty(ReadProjectReferences(packaging));
         Assert.Empty(ReadPackageReferences(domain));
         Assert.Empty(ReadPackageReferences(application));
         Assert.Empty(ReadPackageReferences(infrastructure));
+        Assert.Empty(ReadPackageReferences(adoption));
+        Assert.Empty(ReadPackageReferences(consumerUpdate));
+        Assert.Empty(ReadPackageReferences(governance));
+        Assert.Empty(ReadPackageReferences(packaging));
     }
 
     [Fact]
@@ -43,10 +59,15 @@ public sealed class ProjectDependencyTests
 
         Assert.Equal(
             [
+                "src/MeAndAI.Operations.Adoption/MeAndAI.Operations.Adoption.csproj",
                 "src/MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj",
+                "src/MeAndAI.Operations.ConsumerUpdate/MeAndAI.Operations.ConsumerUpdate.csproj",
                 "src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj",
+                "src/MeAndAI.Operations.Governance/MeAndAI.Operations.Governance.csproj",
                 "src/MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj",
                 "tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj",
+                "tests/dotnet/MeAndAI.Operations.Packaging.Tests/MeAndAI.Operations.Packaging.Tests.csproj",
+                "tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj",
             ],
             projects);
     }

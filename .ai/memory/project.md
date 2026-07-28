@@ -19,7 +19,7 @@ Last verified: **2026-07-28**
   [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
   delivers instruction-graph schema 2 and bounded parser, abort, authority,
   and target-policy resilience.
-- Current bounded development:
+- Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
@@ -49,9 +49,27 @@ Last verified: **2026-07-28**
   [run `30312104364`](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364)
   on [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014)
   in 12 min 04 s and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066)
-  in 32 min 09 s. The feature is two of three completed subfeatures, or 67%.
+  in 32 min 09 s. At that checkpoint the feature was two of three completed
+  subfeatures, or 67%.
   [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  remains gated. PowerShell production authority is unchanged.
+  remained gated. PowerShell production authority was unchanged.
+- Current bounded development:
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+  / [TEST-0193](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
+  / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
+  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the
+  portable-package implementation candidate. Its DoR and tests-first missing-
+  contract red are complete. Seventeen focused and 48 combined local C# tests,
+  locked restore, zero-warning Release build, clean format/analyzer evidence,
+  and one real framework-dependent publish probe pass. The three exact RID-free
+  ZIPs, external source/runtime/schema/digest manifest, strict C# verifier, and
+  same-byte two-job handoff are implemented. Candidate-tree Windows PowerShell
+  5.1 StructureOnly passed in 211.2 seconds. Exact committed-tree construction
+  and hosted Ubuntu/Windows package execution remain pending, so the slice is
+  four of five gates and formal feature completion remains two of three
+  subfeatures. No consumer, release, PowerShell route, or production authority
+  changed.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -929,10 +947,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
   remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-  completed the typed solution/domain/application boundary and its tests on
-  2026-07-27. Do not implement later foundation or consumer behavior, mutate
-  consumers, transfer authority, or retire PowerShell without later independent
-  gates.
+  and [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
+  are complete. [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+  is the authorized portable-package candidate and may proceed only through its
+  remaining exact-tree and hosted gates. Do not implement consumer behavior,
+  mutate consumers, transfer authority, publish this feature, or retire
+  PowerShell without later independent gates.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

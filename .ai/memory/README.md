@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-27**<br>
+Last reviewed: **2026-07-28**<br>
 Protocol version: **0.15.6**<br>
 Latest immutable release before this candidate: **0.15.6**
 
@@ -14,15 +14,18 @@ delivery, review, test, and publication evidence for
 [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md).
 
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-/ [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
+/ [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
 / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
 [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the current
 bounded development. Follow the
-[first-slice development handoff](log/2026-07-27-feat-0059-subf-0119-foundation.md)
-and its linked planning authority. The first typed-foundation slice is complete
-at five of five gates; feature completion is one of three subfeatures. Later
-slices remain unauthorized. PowerShell authority and consumer repositories
-remain unchanged.
+[portable-package development handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+and its linked prior slice/planning authority. The first two foundation slices
+are complete. The third has tests-first red, 17 focused and 48 combined local
+C# tests, locked restore, clean Release build/analyzer evidence, a real
+framework-dependent publish probe, and passing candidate-tree StructureOnly;
+exact-tree and same-byte hosted package evidence remain. The slice is four of
+five gates; formal feature completion is still two of three subfeatures.
+PowerShell authority and consumer repositories remain unchanged.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

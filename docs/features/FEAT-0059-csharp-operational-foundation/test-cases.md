@@ -3,14 +3,41 @@
 Test implementation: [SUBF-0119](README.md#subf-0119) and
 [SUBF-0120](README.md#subf-0120) are complete; focused local expected-red/green,
 exact committed-tree, and exact-head Ubuntu/Windows evidence pass.
+[SUBF-0121](README.md#subf-0121) has executable tests-first red and focused
+local green evidence; exact committed-tree packaging and hosted same-byte
+execution remain pending.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0191` <a name="test-0191"></a> | [SUBF-0119](README.md#subf-0119) | Build the planned solution and inspect project dependencies and capability composition. | Dependency direction is acyclic; domain is infrastructure-free; each entry application receives only declared capabilities. | Architecture / unit | Nearest sibling: [TEST-0116](../FEAT-0024-v0101-parallel-windows-validation/test-cases.md#test-0116); `Distinct` compiled application dependency and authority boundaries. | Passing | `tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj` |
 | `TEST-0192` <a name="test-0192"></a> | [SUBF-0120](README.md#subf-0120) | Exercise typed results and infrastructure ports with malformed, canceled, failed, and redacted operations. | Results remain deterministic, secrets are not emitted, and read-only callers cannot acquire mutation ports. | Unit / security | Nearest sibling: [TEST-0168](../FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168); `Distinct` compiled port and result contract. | Passing | `tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj` |
-| `TEST-0193` <a name="test-0193"></a> | [SUBF-0121](README.md#subf-0121) | Verify one portable package on supported Windows and Linux and tamper with manifest/asset/runtime evidence. | The same package runs on both; exact verified identity succeeds; tampering or incompatible runtime fails closed. | Packaging / integration | Nearest sibling: [TEST-0185](../FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0185); `Distinct` portable package runtime-evidence identity. | Planned | Future publish and cross-platform tests |
+| `TEST-0193` <a name="test-0193"></a> | [SUBF-0121](README.md#subf-0121) | Build the exact three declared framework-dependent ZIPs once, validate the external manifest and archive inventories, run those same bytes through `dotnet` on supported Windows and Linux, and tamper with source, schema, asset, archive, and runtime evidence. | The exact manifest-bound package set runs unchanged on both; unknown/duplicate/inferred identity, digest or length drift, unsafe archive content, and missing/incompatible runtime evidence fail before application work. | Packaging / integration | Nearest sibling: [TEST-0185](../FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0185); `Distinct` because this scenario owns portable release identity/runtime preflight rather than test-harness execution identity. | Passing | `tests/dotnet/MeAndAI.Operations.Packaging.Tests/MeAndAI.Operations.Packaging.Tests.csproj` plus exact-head package handoff in `.github/workflows/protocol-tests.yml` |
 
 ## Evidence
+
+[TEST-0193](#test-0193) expected red on 2026-07-28 because the authorized C#
+packaging project, inventory, manifest, builder, and verifier contracts did not
+exist. Configured restore identified only the absent production project; the
+subsequent focused Release compile failed in 4.1 seconds with `CS0246` only for
+the planned `OperationsPackageInventory`, `PortablePackageBuildRequest`, and
+`PortablePackageVerificationRequest` contract family. An earlier invocation
+that supplied restore-only `--configfile` syntax to `dotnet test` did not reach
+the scenario and is not test evidence.
+
+The bounded implementation then passed 17 of 17 focused cases and the combined
+[TEST-0191](#test-0191), [TEST-0192](#test-0192), and [TEST-0193](#test-0193)
+set passed 48 of 48. The package cases cover exact declarative mappings,
+unknown/missing/duplicate inventory state, deterministic repeated ZIP/manifest
+bytes, source/schema/asset tampering, digest and length drift, escaping archive
+entries even after digest rebinding, apphost/RID payload rejection, missing or
+incompatible runtime inventories, and inherited entry-project publish policy.
+Locked restore, zero-warning/zero-error Release build, and clean format/analyzer
+evidence pass. A real adoption-entry publish probe produced six flat managed
+files and the exact declared runtime config. Windows PowerShell 5.1 candidate-
+tree StructureOnly passed all discovered contracts in 211.2 seconds; its
+protocol-governance owner reported 208,942 ms. Clean-HEAD package construction,
+cross-platform execution of the same bytes, exact committed-tree validation,
+and hosted evidence remain pending.
 
 [TEST-0191](#test-0191) expected red on 2026-07-27 because the authorized
 `Domain.Authority`, `Domain.Identity`, and `Application.Authority` contracts did
@@ -42,9 +69,9 @@ concrete immutable dictionary type identified by `CA1859`. Locked restore,
 zero-warning/zero-error Release build, and `dotnet format --verify-no-changes
 --severity info` pass. Windows PowerShell 5.1 candidate-tree StructureOnly
 passed all discovered contracts in 203.3 seconds after canonical status/link
-hygiene and local package-cache containment corrections. Exact committed-tree
-and hosted evidence remain pending. [TEST-0193](#test-0193) remains a planning
-record.
+hygiene and local package-cache containment corrections. At that checkpoint,
+exact committed-tree and hosted evidence remained pending and
+[TEST-0193](#test-0193) was still a planning record.
 
 Exact implementation head
 [`c5fa78dc71a6106beac8461acd950efa44c55976`](https://github.com/hasanmanzak/meAndAI/commit/c5fa78dc71a6106beac8461acd950efa44c55976)

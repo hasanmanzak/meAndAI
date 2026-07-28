@@ -7,6 +7,7 @@ and follow its canonical links.
 
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
 C# operational platform migration. Follow the
+[third-slice portable-package handoff](2026-07-28-feat-0059-subf-0121-portable-packaging.md),
 [second-slice completion handoff](2026-07-28-feat-0059-subf-0120-ports-results.md),
 the historical [first-slice handoff](2026-07-27-feat-0059-subf-0119-foundation.md),
 and their linked planning authority.
@@ -16,9 +17,11 @@ and their linked planning authority.
 are complete at five of five slice gates with exact-tree and required
 Ubuntu/Windows evidence; [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
 owns the checkpoint. Feature completion is two of three subfeatures, or 67%.
-[SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121),
-consumer behavior, authority migration, and PowerShell retirement still
-require independent gates.
+[SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+is a local candidate at four of five gates with 17 focused and 48 combined C#
+tests plus candidate-tree StructureOnly passing; exact-tree and same-byte
+hosted package evidence remain. Consumer behavior, authority migration, and
+PowerShell retirement still require independent gates.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
@@ -62,6 +65,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)
 - [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
 - [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)
 - [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)

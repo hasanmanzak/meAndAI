@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MeAndAI.Operations.Packaging</RootNamespace>
+    <SelfContained>false</SelfContained>
+    <RollForward>LatestPatch</RollForward>
+  </PropertyGroup>
+</Project>
