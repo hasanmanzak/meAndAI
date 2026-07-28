@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "meandai.operations.packages",
+  "packages": [
+    {
+      "application": "adoption",
+      "projectPath": "src/MeAndAI.Operations.Adoption/MeAndAI.Operations.Adoption.csproj",
+      "assetName": "maai-adoption.zip",
+      "entryAssembly": "MeAndAI.Operations.Adoption.dll"
+    },
+    {
+      "application": "consumer-update",
+      "projectPath": "src/MeAndAI.Operations.ConsumerUpdate/MeAndAI.Operations.ConsumerUpdate.csproj",
+      "assetName": "maai-consumer-update.zip",
+      "entryAssembly": "MeAndAI.Operations.ConsumerUpdate.dll"
+    },
+    {
+      "application": "governance",
+      "projectPath": "src/MeAndAI.Operations.Governance/MeAndAI.Operations.Governance.csproj",
+      "assetName": "maai-governance.zip",
+      "entryAssembly": "MeAndAI.Operations.Governance.dll"
+    }
+  ]
+}

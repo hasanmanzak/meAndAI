@@ -86,6 +86,72 @@ jobs:
           "route=$($route[0])" | Out-File `
             -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           Write-Host "Selected main validation route: $($route[0])"
+      - name: Set up pinned .NET 10 SDK
+        if: steps.main-route.outputs.route == 'Full'
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+        with:
+          dotnet-version: 10.0.302
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Restore locked .NET dependencies
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        run: >-
+          dotnet restore MeAndAI.Operations.slnx
+          --configfile NuGet.Config
+          --locked-mode
+      - name: Run C# operational foundation tests
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        run: >-
+          dotnet test MeAndAI.Operations.slnx
+          --configuration Release
+          --no-restore
+          --nologo
+          --verbosity minimal
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
+      - name: Build exact portable operations package set
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        env:
+          PACKAGE_ROOT: ${{ runner.temp }}/meandai-operations-packages
+        run: |
+          source_commit="$(git rev-parse HEAD)"
+          dotnet run \
+            --project tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj \
+            --configuration Release \
+            --no-build \
+            -- \
+            pack \
+            --repository-root "$GITHUB_WORKSPACE" \
+            --inventory packaging/operations-packages.json \
+            --output "$PACKAGE_ROOT" \
+            --source-commit "$source_commit"
+      - name: Verify and run portable operations package set on Linux
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        env:
+          PACKAGE_ROOT: ${{ runner.temp }}/meandai-operations-packages
+        run: >-
+          dotnet run
+          --project tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj
+          --configuration Release
+          --no-build
+          --
+          verify
+          --inventory packaging/operations-packages.json
+          --manifest "$PACKAGE_ROOT/maai-operations-release-manifest.json"
+          --assets "$PACKAGE_ROOT"
+          --execute
+      - name: Upload exact portable operations package set
+        if: steps.main-route.outputs.route == 'Full'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: meandai-operations-${{ github.run_id }}
+          path: ${{ runner.temp }}/meandai-operations-packages/*
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
       - name: Install checksummed actionlint v1.7.12
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -184,6 +250,30 @@ jobs:
           "profile=$($profile[0])" | Out-File `
             -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           Write-Host "Selected Windows validation profile: $($profile[0])"
+      - name: Set up pinned .NET 10 SDK
+        if: steps.main-route.outputs.route == 'Full'
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+        with:
+          dotnet-version: 10.0.302
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Restore locked .NET dependencies
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        run: >-
+          dotnet restore MeAndAI.Operations.slnx
+          --configfile NuGet.Config
+          --locked-mode
+      - name: Run C# operational foundation tests
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        run: >-
+          dotnet test MeAndAI.Operations.slnx
+          --configuration Release
+          --no-restore
+          --nologo
+          --verbosity minimal
+          --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
       - name: Run runtime-efficiency contract on Windows PowerShell 7
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh
@@ -195,6 +285,28 @@ jobs:
         run: >-
           ./tests/protocol.tests.ps1
           -ExecutionProfile '${{ steps.windows-profile.outputs.profile }}'
+      - name: Download exact Linux-built operations package set
+        if: steps.main-route.outputs.route == 'Full'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: meandai-operations-${{ github.run_id }}
+          path: ${{ runner.temp }}/meandai-operations-packages
+      - name: Verify and run the same operations package set on Windows
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        env:
+          PACKAGE_ROOT: ${{ runner.temp }}\meandai-operations-packages
+        run: >-
+          dotnet run
+          --project tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj
+          --configuration Release
+          --no-build
+          --
+          verify
+          --inventory packaging/operations-packages.json
+          --manifest "$env:PACKAGE_ROOT\maai-operations-release-manifest.json"
+          --assets "$env:PACKAGE_ROOT"
+          --execute
       - name: Verify exact reused tree structure on Windows PowerShell 5.1
         if: steps.main-route.outputs.route == 'ReuseExactValidatedTree'
         shell: powershell

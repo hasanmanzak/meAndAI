@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>MeAndAI.Operations.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../MeAndAI.Operations.Application/MeAndAI.Operations.Application.csproj" />
+    <ProjectReference Include="../MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,27 +1,32 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-27**<br>
-Protocol version: **0.15.6**<br>
-Latest immutable release before this candidate: **0.15.5**
+Last reviewed: **2026-07-28**<br>
+Protocol version: **0.16.0**<br>
+Latest immutable release before this unmerged development: **0.15.6**
 
-The immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
+The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 release is complete at
-[`11c56aac369767202835c4e9d6cc83aa321f4070`](https://github.com/hasanmanzak/meAndAI/commit/11c56aac369767202835c4e9d6cc83aa321f4070).
-[PR #148](https://github.com/hasanmanzak/meAndAI/pull/148) and closed
-[issues #140](https://github.com/hasanmanzak/meAndAI/issues/140) through
-[#147](https://github.com/hasanmanzak/meAndAI/issues/147) retain the
+[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
+[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
+[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
 delivery, review, test, and publication evidence for
-[FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md).
+[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md).
 
-[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md)
-/ [BUG-0045](https://github.com/hasanmanzak/meAndAI/issues/149) /
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149)
-is the current `0.15.6` correction. It proves supported completed historical
-adoption issues before mutation, leaves them byte-identical, and reconciles
-only the current issue through the existing lifecycle owner.
-Follow the [current handoff](log/2026-07-27-v0156-completed-historical-adoption-issues.md).
-No consumer-local implementation or regression belongs to this correction.
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+/ [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
+[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is complete at
+five of five slice gates. Follow the
+[portable-package completion handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+and its linked prior slice/planning authority. All three foundation slices and
+all 15 delivery gates are complete. Exact implementation commit
+[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+passed committed-tree package evidence and
+[run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+passed 48/48 compiled tests plus the same package bytes on Ubuntu and Windows.
+PowerShell authority and consumer repositories remain unchanged; merge and
+release are not authorized.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

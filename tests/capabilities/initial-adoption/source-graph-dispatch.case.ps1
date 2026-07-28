@@ -32,7 +32,7 @@ $immutableGraphUnawareCommit =
 $immutableGraphSchema1Commit =
     '1883a2315529e7493343c07eebb4c74ed77a62b4'
 $immutableGraphSchema2Commit =
-    '11c56aac369767202835c4e9d6cc83aa321f4070'
+    '5321f1f1aa5966114c69b46bf6ed9191df109e6b'
 $immutableWorkflowPath =
     'templates/project/.github/workflows/meandai-protocol-update.yml'
 $immutablePolicyPath =
@@ -330,20 +330,20 @@ if ($null -eq $policyTagSelector) {
 else {
     $schema1PolicyTag = & $policyTagSelector `
         -WorkflowBytes $schema1WorkflowBytes -TargetTag 'v0.15.4' `
-        -RuntimePolicyTag 'v0.15.6'
+        -RuntimePolicyTag 'v0.16.0'
     $schema2PriorPolicyTag = & $policyTagSelector `
-        -WorkflowBytes $schema2PriorWorkflowBytes -TargetTag 'v0.15.5' `
-        -RuntimePolicyTag 'v0.15.6'
+        -WorkflowBytes $schema2PriorWorkflowBytes -TargetTag 'v0.15.6' `
+        -RuntimePolicyTag 'v0.16.0'
     $legacyPolicyTag = & $policyTagSelector `
         -WorkflowBytes $legacyWorkflowBytes -TargetTag 'v0.12.5' `
-        -RuntimePolicyTag 'v0.15.6'
+        -RuntimePolicyTag 'v0.16.0'
     $minimumLegacyPolicyTag = & $policyTagSelector `
         -WorkflowBytes $minimumLegacyWorkflowBytes -TargetTag 'v0.12.4' `
-        -RuntimePolicyTag 'v0.15.6'
+        -RuntimePolicyTag 'v0.16.0'
     if ([string]$schema1PolicyTag -cne 'v0.15.4' -or
-        [string]$schema2PriorPolicyTag -cne 'v0.15.5' -or
-        [string]$legacyPolicyTag -cne 'v0.15.6' -or
-        [string]$minimumLegacyPolicyTag -cne 'v0.15.6') {
+        [string]$schema2PriorPolicyTag -cne 'v0.15.6' -or
+        [string]$legacyPolicyTag -cne 'v0.16.0' -or
+        [string]$minimumLegacyPolicyTag -cne 'v0.16.0') {
         $transitionFailures.Add(
             'graph-aware target or graph-unaware fallback selected the wrong policy tag'
         )
@@ -354,7 +354,7 @@ else {
             [void](& $policyTagSelector `
                 -WorkflowBytes $legacyWorkflowBytes `
                 -TargetTag $unsupportedLegacyTag `
-                -RuntimePolicyTag 'v0.15.6')
+                -RuntimePolicyTag 'v0.16.0')
         }
         catch { $unsupportedLegacyFailure = $_.Exception.Message }
         if ($unsupportedLegacyFailure -notlike
@@ -388,10 +388,10 @@ if ($transitionFailures.Count -ne 0) {
     throw "TEST-0153 target-policy transition failed with $($transitionFailures.Count) problem(s): $($transitionFailures -join '; ')."
 }
 Invoke-DispatchCase -WorkflowBytes $currentWorkflowBytes `
-    -ExpectedGraphSupport $true -Label 'candidate v0.15.6' `
+    -ExpectedGraphSupport $true -Label 'candidate v0.16.0' `
     -SourceGraphIdentityJson $schema2PolicyContract.IdentityJson
 Invoke-DispatchCase -WorkflowBytes $schema2PriorWorkflowBytes `
-    -ExpectedGraphSupport $true -Label 'immutable v0.15.5' `
+    -ExpectedGraphSupport $true -Label 'immutable v0.15.6' `
     -SourceGraphIdentityJson $schema2PriorPolicyContract.IdentityJson
 Invoke-DispatchCase -WorkflowBytes $schema1WorkflowBytes `
     -ExpectedGraphSupport $true -Label 'immutable v0.15.4' `
@@ -528,7 +528,7 @@ $originalProtocolTag = $ProtocolTag
 try {
     $initialAdoptionPolicySourcePath =
         'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1'
-    $initialAdoptionPolicyTag = 'v0.15.6'
+    $initialAdoptionPolicyTag = 'v0.16.0'
     $adoptionManifestPath = '.ai/adoption/meandai-capabilities.json'
     $ProtocolRepository = 'hasanmanzak/meAndAI'
     $script:Test0153LegacyPolicyBytes = [byte[]]$legacyGraphMarkerPolicyBytes
@@ -544,7 +544,7 @@ try {
         if ($TemplatePath -cne
                 'templates/project/.github/scripts/MeAndAI.CapabilitiesBootstrap.psm1' -or
             -not [string]::IsNullOrEmpty($ProtocolToken) -or
-            $Tag -cnotin @('v0.14.1', 'v0.15.6')) {
+            $Tag -cnotin @('v0.14.1', 'v0.16.0')) {
             throw 'TEST-0153 legacy marker transition requested an unexpected policy asset.'
         }
         return [pscustomobject][ordered]@{
