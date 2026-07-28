@@ -91,11 +91,11 @@ owner, evidence kind, and canonical record are retained in the
 auditable analysis projection, not scenario identity authority or the future
 evidenced differential ledger.
 
-## Proposed authoritative ledger shape
+## Accepted ledger shape
 
-After maintainer acceptance, one protocol-owned JSON ledger may become the
-authoritative TEST/variant mapping. It must reference, not replace, scenario
-identity authority. A generated Markdown view may aid review.
+Following maintainer acceptance on 2026-07-28, one protocol-owned JSON ledger
+may become the authoritative TEST/variant mapping. It must reference, not
+replace, scenario identity authority. A generated Markdown view may aid review.
 
 Each declaration packet records `expansionState` as `Unexpanded`, `Partial`,
 or `Complete` and its proven cardinality. Each concrete row uses a stable
@@ -108,7 +108,8 @@ Required row fields are:
   `canonicalEvidenceKind`;
 - `canonicalScenarioOwner`, `canonicalEvidenceOwner`, `canonicalRecordPath`,
   `canonicalVariantSource`, and `contractSourceOwner`;
-- `ruleFamily`, `ruleId`, `findingCodes`, and `profileApplicability`;
+- `ruleFamily`, `ruleId`, `findingCodes`, `severity`, `enforcement`, and
+  `profileApplicability`;
 - `repositorySnapshotMode` and `evidenceSourceKinds`;
 - `expectedOracle`, separate PowerShell and C# observed results, and evidence
   links;
@@ -135,12 +136,12 @@ empty.
 
 ## Decision boundary and progress
 
-The [contract decision packet](contract-decision-packet.md) asks the maintainer
-to approve the material-variant granularity and the separation between
-planned route, evidenced disposition, canonical evidence owner, and applicable
-operational authority. Until that decision, expanding the 16 mixed identities
-would invent an authority schema rather than document an
-accepted one.
+The maintainer accepted the material-variant granularity and the separation
+between planned route, evidenced disposition, canonical evidence owner, and
+applicable operational authority in the
+[contract decision packet](contract-decision-packet.md) on 2026-07-28. The 16
+mixed identities and other material inline/generative variants can now be
+expanded under that contract.
 
 Current conclusive progress is:
 
@@ -151,10 +152,10 @@ Current conclusive progress is:
 - mapping evidence: 188 base identities and a separate lower bound of 116
   TEST/case mappings; 304 is conditional base-plus-mapping arithmetic, not an
   accepted ledger row count;
-- Definition of Ready: 8/12, 67%; and
+- Definition of Ready: 9/12, 75%; and
 - implementation: 0/7 subfeatures, 0%.
 
-No monotonic start marker was captured for this records-only audit, so its
-elapsed duration cannot be reconstructed without guessing. The first
-post-decision normalization batch must record elapsed time and observed rows
-per hour before publishing a remaining-duration estimate.
+No monotonic start marker was captured for the earlier records-only audit, so
+its elapsed duration cannot be reconstructed without guessing. The first
+post-decision normalization batch records a fresh elapsed interval and observed
+rows per hour before publishing a remaining-duration estimate.

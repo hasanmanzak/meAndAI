@@ -82,9 +82,9 @@ engine without repository or GitHub mutation authority.
   base identities: 43 C# candidates, 16 mixed boundaries, 94 retained
   PowerShell operations, 29 infrastructure contracts, three provider-owned
   identities, and three existing C# foundation identities.
-- The [v1 decision packet](contract-decision-packet.md) records the first
-  maintainer decision required before the remaining material variants can be
-  normalized.
+- The maintainer accepted the [v1 decision packet](contract-decision-packet.md)
+  on 2026-07-28, including exact-pair shadow/release eligibility and separate
+  severity/enforcement. The remaining material variants can now be normalized.
 
 ## Risks
 
@@ -126,13 +126,14 @@ engine without repository or GitHub mutation authority.
   decomposition.
 - [ ] Complete material-variant ledger and rule-by-rule
   profile/applicability/evidence-source matrix; scenario-level inventory is
-  complete, but inline/generative expansion and 16 mixed boundaries await the
-  accepted granularity contract.
-- [ ] Maintainer acceptance of the proposed v1 request, snapshot, profile,
-  report, policy-range, severity, digest, and exit-code contract.
+  complete, but inline/generative expansion and 16 mixed boundaries still
+  require normalization under the accepted granularity contract.
+- [x] Maintainer acceptance of the v1 request, snapshot, profile, report,
+  exact-pair policy/runtime, severity/enforcement, digest, and exit-code
+  contract.
 - [ ] Separate executable development authorization.
 
-Readiness is eight of twelve items, or 67%; implementation is zero of seven
+Readiness is nine of twelve items, or 75%; implementation is zero of seven
 subfeatures, or 0%. Base identity and explicit declaration-packet inventory is
 100%; scenario-level route classification is 91.5% unambiguous and 8.5% mixed.
 See the [remaining gates and estimation boundary](readiness-analysis.md#remaining-definition-of-ready-gates).

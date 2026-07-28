@@ -29,10 +29,12 @@ classifies the base universe into 43 C# candidates, 16 mixed boundaries, 94
 retained PowerShell operations, 29 infrastructure contracts, three provider
 identities, and three existing C# identities. The
 [v1 decision packet](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
-is the first maintainer gate. Readiness remains eight of twelve items (67%);
-implementation is zero of seven subfeatures. No executable development,
-workflow behavior, consumer repository, production authority, or PowerShell
-route has changed.
+was accepted by the maintainer on 2026-07-28 with an exact-pair shadow/release
+boundary and independent severity/enforcement metadata. Readiness is nine of
+twelve items (75%); implementation is zero of seven subfeatures. Follow the
+[contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md).
+No executable development, workflow behavior, consumer repository, production
+authority, or PowerShell route has changed.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

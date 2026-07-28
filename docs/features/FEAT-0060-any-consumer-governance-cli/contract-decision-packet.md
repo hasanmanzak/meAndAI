@@ -1,13 +1,14 @@
 # [FEAT-0060](README.md) v1 Contract Decision Packet
 
-Status: maintainer decision required; records only. Acceptance authorizes
-continued Definition-of-Ready normalization, not executable development.
+Status: accepted by the maintainer on 2026-07-28; records only. Acceptance
+authorizes continued Definition-of-Ready normalization, not executable
+development.
 
-The repository evidence now reaches the first boundary that cannot be resolved
-by inspection alone. The following bundle keeps v1 finite, deterministic,
+The repository evidence reached the first boundary that could not be resolved
+by inspection alone. The accepted bundle keeps v1 finite, deterministic,
 repository-only, and non-authoritative while C# remains a shadow engine.
 
-## Recommended v1 bundle
+## Accepted v1 bundle
 
 ### 1. Material-variant granularity
 
@@ -47,14 +48,27 @@ disposition.
 ### 3. Policy/runtime support range
 
 Treat the evaluated subject snapshot and the engine/policy bundle as separate
-identities. An unreleased shadow bundle binds the exact engine source commit,
-exact policy source commit, rule-catalog schema/digest, and application artifact
-digest; it can emit only `CSharpShadow`. A dirty or ambiguous engine/policy
-source cannot create a shadow result.
+identities. v1 claims support only for an explicitly bound application/policy
+pair; it does not claim compatibility across a semantic-version range. An
+unreleased shadow bundle binds the exact engine source commit, exact policy
+source commit, rule-catalog schema/digest, and application artifact digest.
+
+A clean, exact-bound unreleased bundle may inspect a real consumer only through
+an explicitly requested, repository-read-only, non-authoritative
+`CSharpShadow` run. It cannot be installed as the managed consumer integration,
+act as a required or merge-blocking check, perform adoption or update, replace
+the PowerShell result, or authorize mutation. A dirty or ambiguous
+engine/policy source cannot create a shadow result.
 
 An immutable application release binds the same identities in its manifest.
-Only that released bundle is eligible for `CSharpReleasedNonAuthoritative` and
-consumer execution, and the consumer pin must equal its exact policy commit.
+Only a released bundle may be referenced by a persistent managed consumer
+workflow and it is the minimum artifact eligibility for any future required
+check. It initially emits only `CSharpReleasedNonAuthoritative`; release alone
+does not grant blocking or primary authority. Required-check enforcement and
+authority transfer remain separately reviewed work owned by
+[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
+The consumer pin must equal the release manifest's exact policy commit.
+
 If a subject candidate changes policy-owning files relative to the selected
 released policy, its result is `incomplete`; candidate-policy evaluation
 requires a separately bound unreleased shadow bundle.
@@ -66,11 +80,19 @@ with executable evidence.
 
 ### 4. Severity and enforcement
 
-Use the closed severity vocabulary `critical`, `high`, `medium`, `low`, and
-`info`. Severity describes impact; it is not the disposition and is not the
-blocking flag. Every v1 rule violation is blocking. A rule missing its
-canonical severity makes the report `incomplete` rather than silently choosing
-a default.
+Each catalog entry declares two independent fields:
+
+- `severity` uses the closed vocabulary `critical`, `high`, `medium`, `low`,
+  and `info`; and
+- `enforcement` is exactly `blocking` or `advisory`.
+
+Severity describes impact and never implies enforcement. All violations of
+currently canonical governance requirements remain `blocking` in v1.
+Additional `advisory` observations may be reported, but they do not change an
+otherwise `conforming` verdict to `nonconforming`. The caller cannot override
+or downgrade catalog enforcement. A rule missing its canonical severity or
+enforcement makes the report `incomplete` rather than silently choosing a
+default.
 
 ### 5. Report digest
 
@@ -117,13 +139,14 @@ maintainer's separately reserved discussion and authorization.
 
 ## Effect of acceptance
 
-Accepting this bundle completes only the maintainer-contract readiness item.
-The next records-only work is to normalize every material inline/generative
-variant, split the 16 mixed identities, assign canonical finding/severity
-metadata, and publish the complete ledger and generated matrix. Executable C#
-work still requires a later, separate authorization after the Definition of
-Ready closes.
+The maintainer accepted this bundle, including the exact-pair shadow/release
+boundary and the separate severity/enforcement model, on 2026-07-28. This
+completes only the maintainer-contract readiness item. The next records-only
+work is to normalize every material inline/generative variant, split the 16
+mixed identities, assign canonical finding/severity/enforcement metadata, and
+publish the complete ledger and generated matrix. Executable C# work still
+requires a later, separate authorization after the Definition of Ready closes.
 
-If accepted, readiness moves from 8/12 (67%) to 9/12 (75%). Completion of the
-ledger and matrix would then move it to 11/12 (92%); separate executable
-development authorization is the final 12/12 gate.
+Readiness is now 9/12 (75%). Completion of the ledger and matrix would move it
+to 11/12 (92%); separate executable development authorization is the final
+12/12 gate.

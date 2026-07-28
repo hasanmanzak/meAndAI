@@ -94,12 +94,18 @@ Last verified: **2026-07-28**
   classifies 43 C# candidates, 16 mixed boundaries, 94 retained PowerShell
   operations, 29 infrastructure contracts, three provider identities, and
   three existing C# identities. The global inline/generative denominator and
-  variant-level finding/severity matrix require the maintainer's
+  variant-level finding/severity/enforcement matrix remain to be normalized
+  under the maintainer's accepted
   [v1 contract decision](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md).
-  Readiness remains eight of twelve items (67%); implementation is zero of
-  seven subfeatures. General all-repository GitHub issue/PR/comment governance
-  remains reserved for a separate discussion. No workflow, consumer,
-  PowerShell, or production-authority state changed.
+  The accepted contract permits exact-bound unreleased read-only consumer
+  shadow runs, requires immutable release eligibility for managed/required-check
+  use without granting authority, and separates severity from blocking or
+  advisory enforcement. Readiness is nine of twelve items (75%);
+  implementation is zero of seven subfeatures. Follow the
+  [contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md).
+  General all-repository GitHub issue/PR/comment governance remains reserved
+  for a separate discussion. No workflow, consumer, PowerShell, or
+  production-authority state changed.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.

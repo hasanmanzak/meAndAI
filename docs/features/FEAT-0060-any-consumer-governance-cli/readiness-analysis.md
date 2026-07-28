@@ -77,7 +77,7 @@ port:
   schema; and
 - several scenarios mix pure validation with mutation or recovery.
 
-## Proposed v1 request and snapshot contract
+## Accepted v1 request and snapshot contract
 
 The v1 request is repository-only and carries closed, versioned identities:
 
@@ -91,10 +91,18 @@ The v1 request is repository-only and carries closed, versioned identities:
 - `EvidenceScope`: exactly `repository` for this feature boundary.
 
 The subject repository snapshot and engine/policy bundle are independent
-identities. An unreleased exact-source bundle is shadow-only. Only an immutable
-release manifest may qualify a bundle as `CSharpReleasedNonAuthoritative`; a
-consumer pin must match its exact policy commit. A subject candidate that
-changes released-policy-owning files is `incomplete` under that released
+identities. v1 supports only an exact application/policy pair and makes no
+semantic-version-range compatibility claim. A clean unreleased exact-source
+bundle may inspect a real consumer only through an explicit, read-only,
+non-authoritative `CSharpShadow` run. It cannot become a managed integration or
+required check, replace PowerShell authority, perform adoption/update, or
+authorize mutation. Only an immutable release manifest may qualify a bundle as
+`CSharpReleasedNonAuthoritative` or make it eligible for persistent managed
+consumer use. Release alone does not grant blocking authority; required-check
+enforcement and authority transfer remain owned by
+[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md). A
+consumer pin must match the manifest's exact policy commit. A subject candidate
+that changes released-policy-owning files is `incomplete` under that released
 bundle and requires a separately bound candidate shadow bundle.
 
 The caller selects a profile but cannot supply arbitrary rules, capabilities,
@@ -136,7 +144,7 @@ A graph-relevant candidate change may produce only an `incomplete` provisional
 result and requires committed-HEAD validation before it can become authority
 evidence.
 
-## Proposed report and process contract
+## Accepted report and process contract
 
 The public output is a dedicated, deterministic
 `GovernanceReportEnvelopeV1`, not raw `OperationResult<T>` serialization. It
@@ -150,19 +158,22 @@ contains:
 - a report digest over the canonical payload.
 
 Each finding contains stable rule ID, canonical scenario identity and owner,
-finding code, canonical severity, repository-relative location, safe
+finding code, canonical severity, canonical enforcement, repository-relative location, safe
 line/anchor, and content/object digest. It contains no file snippet, provider
 body, exception, command line, stdout/stderr, environment value, absolute
-path, or credential material. The exact severity vocabulary, enforcement
-relationship, digest scope, and exit-code map remain recommendations pending
-maintainer acceptance in the [v1 decision packet](contract-decision-packet.md).
+path, or credential material. The accepted
+[v1 decision packet](contract-decision-packet.md) fixes the severity and
+enforcement vocabularies, caller non-downgrade rule, digest scope, and exit-code
+map. Missing canonical severity or enforcement yields `incomplete`; advisory
+observations do not make an otherwise conforming report nonconforming.
 
 Process and report meanings stay distinct:
 
 | Situation | Operation result | Report verdict |
 | --- | --- | --- |
 | Validation completed and no violation exists | Succeeded | `conforming` |
-| Validation completed and violations exist | Succeeded | `nonconforming` |
+| Validation completed and blocking violations exist | Succeeded | `nonconforming` |
+| Validation completed with advisory observations only | Succeeded | `conforming` |
 | Required profile/policy/evidence is unavailable | Succeeded | `incomplete` |
 | Malformed command or schema | Rejected / `input.malformed` | No report or fixed rejected envelope |
 | Undeclared port requested | Rejected / `capability.denied` | No report or fixed rejected envelope |
@@ -302,7 +313,7 @@ Sibling-intent boundaries under
 
 ## Remaining Definition-of-Ready gates
 
-Eight of twelve readiness items are complete (67%); implementation is zero of
+Nine of twelve readiness items are complete (75%); implementation is zero of
 seven subfeatures (0%).
 
 - [x] Stable feature, issue, dependency, and target `0.17.0`.
@@ -315,22 +326,21 @@ seven subfeatures (0%).
 - [x] Independently reviewable subfeature decomposition.
 - [ ] Complete material-variant differential ledger; the 188/188 base
   identities and 7/7 explicit declaration packets are inventoried, but the
-  inline/generative denominator and 16 mixed boundaries await accepted
-  granularity.
+  inline/generative denominator and 16 mixed boundaries remain pending
+  normalization under the accepted granularity contract.
 - [ ] Complete rule-by-rule profile/applicability and evidence-source matrix;
   the scenario-level matrix is complete and the variant-level matrix remains
   open.
-- [ ] Maintainer acceptance of the proposed v1 contract and open policy-range,
-  severity, report-digest, and exit-code choices.
+- [x] Maintainer acceptance of the v1 exact-pair policy/runtime,
+  severity/enforcement, report-digest, and exit-code contract on 2026-07-28.
 - [ ] Separate executable development authorization.
 
 Current conclusive progress is 188/188 base identities (100%), 7/7 explicit
 declaration packets (100%), 116 proven TEST/case mappings, and 172/188
 unambiguous scenario routes (91.5%), with 16/188 mixed (8.5%). No honest global
-row count or denominator exists until the maintainer accepts the
-[material-variant contract](contract-decision-packet.md). No monotonic start
-marker was captured for this audit, so elapsed analysis time cannot be
-reconstructed without guessing. The first post-decision normalization batch
-must record elapsed time and rows per hour before a remaining-duration estimate
-is published. Implementation duration remains intentionally unestimated before
-Gate 1 closes.
+row count or denominator existed before the maintainer accepted the
+[material-variant contract](contract-decision-packet.md). The first
+post-decision normalization batch records its own elapsed time and rows per
+hour before a remaining-duration estimate is published; the earlier audit's
+elapsed duration remains unknowable. Implementation duration remains
+intentionally unestimated before Gate 1 closes.

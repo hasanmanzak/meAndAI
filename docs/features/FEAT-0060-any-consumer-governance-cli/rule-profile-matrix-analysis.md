@@ -1,6 +1,7 @@
 # [FEAT-0060](README.md) Rule, Profile, and Evidence-Source Matrix Analysis
 
-Status: scenario-level analysis complete; variant-level matrix blocked on the
+Status: scenario-level analysis complete; variant-level normalization is in
+progress under the accepted
 [contract decision packet](contract-decision-packet.md). Development is not
 authorized.
 
@@ -62,9 +63,11 @@ separate from both evidence source and the exact engine/policy bundle identity:
   repository rule.
 
 An unreleased engine/policy bundle is bound by exact source commits, catalog
-digest, and application artifact digest and remains shadow-only. An immutable
-release manifest binds the consumer-eligible bundle. Selecting a candidate
-subject snapshot never permits an implicit candidate policy.
+digest, and application artifact digest and may inspect a real consumer only
+through an explicit, read-only, non-authoritative `CSharpShadow` run. An
+immutable release manifest is required for persistent managed consumer use;
+release alone does not grant required-check or primary authority. Selecting a
+candidate subject snapshot never permits an implicit candidate policy.
 
 | Planned route | Profile treatment | Typical source | v1 authority treatment |
 | --- | --- | --- | --- |
@@ -105,17 +108,19 @@ and assertions. They do not provide a complete canonical mapping to both a
 stable finding code and severity. Neither severity nor enforcement may be
 inferred from prose, test names, or current failure messages.
 
-The recommended v1 contract is recorded in the
+The accepted v1 contract is recorded in the
 [decision packet](contract-decision-packet.md): severity uses
-`critical`, `high`, `medium`, `low`, or `info`; enforcement remains a separate
-concept; every v1 violation is blocking; and a missing rule severity yields an
+`critical`, `high`, `medium`, `low`, or `info`; enforcement independently uses
+`blocking` or `advisory`; current canonical violations remain blocking;
+advisory observations do not make a conforming verdict nonconforming; callers
+cannot downgrade enforcement; and missing canonical metadata yields an
 `incomplete` report.
 
 ## Completion boundary
 
 This analysis supplies a complete scenario-level family and route matrix but
-does not satisfy the variant-level Definition-of-Ready item. Completion
-requires accepted variant granularity, stable variant keys for the 16 mixed
-identities and every other material inline/generative branch, and canonical
-finding/severity assignments. No C# equivalence or stronger-evidence claim is
-made here.
+does not yet satisfy the variant-level Definition-of-Ready item. The accepted
+granularity contract now permits stable variant keys for the 16 mixed
+identities and every other material inline/generative branch, plus canonical
+finding/severity/enforcement assignments. No C# equivalence or
+stronger-evidence claim is made here.
