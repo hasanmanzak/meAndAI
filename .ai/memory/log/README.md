@@ -8,32 +8,43 @@ and follow its canonical links.
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
 C# operational platform migration. Follow current
 [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-through the
-[contract-acceptance handoff](2026-07-28-feat-0060-contract-acceptance.md)
-and the separately authorized
-[readiness-correction handoff](2026-07-28-feat-0060-test0106-readiness.md)
-and [Windows Full job-ceiling handoff](2026-07-28-feat-0060-test0124-windows-timeout.md)
-and its canonical
+through the [clean-room pivot handoff](2026-07-28-feat-0060-clean-room-pivot.md),
+[DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+and the canonical
 [readiness analysis](../../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md).
-The records-only gate has inventoried 188/188 base identities, seven explicit
-declaration packets, and a separate lower bound of 116 TEST/case mappings.
-Scenario-level routes are 172/188 unambiguous (91.5%) and 16/188 mixed (8.5%). Readiness
-is nine of twelve items (75%); implementation is zero of seven subfeatures.
-The v1 contract is accepted; full material-variant normalization and separate
-development authorization remain open. [FIND-0365](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
-changes only the canonical
-[TEST-0106](../../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
-harness and inert fixture; no C#
-implementation, workflow, consumer, production authority, or PowerShell
-production route changed. Replacement exact-head
-[run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
-then exposed
+The bounded first clean-room `CSharpShadow` vertical slice,
+[SUBF-0138](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+is locally complete: it reuses canonical
+[TEST-0004](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+for explicit `protocol-authority`, repository-read-only, provider-free,
+non-authoritative validation, beginning with an expected-red C# test. Canonical
+specifications design the rule; memory is context and PowerShell is only a
+later black-box oracle. First-slice readiness is 10/10 (100%) and
+implementation is one of eight subfeatures (12.5%), with exact-commit/hosted
+and seven subfeatures pending. The compile-red took 7.9 seconds; the final
+focused governance suite passed 28/28 in 5.5 seconds after fresh-review
+boundary corrections. The final full solution passed governance 28/28,
+architecture 31/31, and packaging 17/17 in 6.4 seconds.
+Locked restore, format, portable publish, and the published-DLL
+real-repository run also passed while retaining `csharp-shadow` and
+`powershell-authority`.
+
+The historical inventory remains 188/188 base identities, seven explicit
+declaration packets, a lower bound of 116 TEST/case mappings, and 172/188
+unambiguous scenario routes with 16/188 mixed. Complete material-variant and
+rule/profile matrices remain mandatory before equivalence, required-check
+enforcement, authority transfer, or retirement, but do not block the bounded
+slice or explicitly non-authoritative package.
+
+[FIND-0365](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
+and
 [FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366)
-under canonical
-[TEST-0124](../../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124).
-Its separately authorized test-first correction changes only the Windows
-serial `Full` whole-job ceiling from 35 to 60 minutes; exact-hosted
-confirmation remains pending.
+are closed at exact head
+[`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+by [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
+Ubuntu job `90346608851` passed in 12 min 58 s and Windows job `90346609315`
+passed in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Production
+authority and PowerShell production routes remain unchanged.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
@@ -89,6 +100,9 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md) /
+  [specification-first clean-room pivot](2026-07-28-feat-0060-clean-room-pivot.md)
 - 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
   [FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366) /
   [Windows Full job-ceiling correction](2026-07-28-feat-0060-test0124-windows-timeout.md)

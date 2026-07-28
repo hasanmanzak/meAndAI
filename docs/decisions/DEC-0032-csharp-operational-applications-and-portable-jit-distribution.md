@@ -7,6 +7,7 @@
 - Related epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
 - Related features: [FEAT-0059](../features/FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../features/FEAT-0061-consumer-adoption-cli/README.md), [FEAT-0062](../features/FEAT-0062-consumer-protocol-update-cli/README.md), and [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
 - Related decisions: [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), and [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md)
+- Narrow sequencing supersession: [DEC-0033](DEC-0033-specification-first-csharp-governance.md) supersedes only the requirement to complete exhaustive PowerShell differential evidence before bounded `CSharpShadow` implementation or an explicitly non-authoritative governance package; this decision's application, JIT distribution, and authority architecture remain active
 
 ## Context
 

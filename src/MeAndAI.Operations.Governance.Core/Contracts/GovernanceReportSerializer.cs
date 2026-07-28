@@ -1,0 +1,101 @@
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+
+namespace MeAndAI.Operations.Governance.Core.Contracts;
+
+public static class GovernanceReportSerializer
+{
+    public static string Serialize(GovernanceReport report)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+
+        var semanticBytes = WriteReport(report, reportDigest: null);
+        var reportDigest = Convert.ToHexString(SHA256.HashData(semanticBytes))
+            .ToLowerInvariant();
+        var reportBytes = WriteReport(report, reportDigest);
+        return Encoding.UTF8.GetString(reportBytes) + "\n";
+    }
+
+    private static byte[] WriteReport(
+        GovernanceReport report,
+        string? reportDigest)
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream))
+        {
+            writer.WriteStartObject();
+            writer.WriteNumber("schema", report.Schema);
+            writer.WriteString("application", report.Application);
+            writer.WriteString("stage", report.Stage);
+            writer.WriteString("profile", report.Profile.Value);
+
+            writer.WriteStartObject("snapshot");
+            writer.WriteString("mode", report.SnapshotMode);
+            writer.WriteString(
+                "evidenceDigest",
+                report.SnapshotEvidenceDigest);
+            writer.WriteEndObject();
+
+            writer.WriteStartObject("policy");
+            writer.WriteString(
+                "catalogVersion",
+                report.PolicyCatalogVersion);
+            writer.WriteString(
+                "catalogMetadataDigest",
+                report.PolicyCatalogMetadataDigest);
+            writer.WriteEndObject();
+
+            writer.WriteString("verdict", report.Verdict.Value);
+            writer.WriteString("coverage", report.Coverage);
+            writer.WriteString("engineState", report.EngineState);
+            writer.WriteString("authorityState", report.AuthorityState);
+
+            writer.WriteStartObject("counts");
+            writer.WriteNumber(
+                "evaluatedRules",
+                report.Counts.EvaluatedRules);
+            writer.WriteNumber(
+                "blockingFindings",
+                report.Counts.BlockingFindings);
+            writer.WriteNumber(
+                "advisoryFindings",
+                report.Counts.AdvisoryFindings);
+            writer.WriteEndObject();
+
+            writer.WriteStartArray("findings");
+            foreach (var finding in report.Findings)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("ruleId", finding.RuleId);
+                writer.WriteString(
+                    "canonicalScenarioId",
+                    finding.CanonicalScenarioId);
+                writer.WriteString("code", finding.Code);
+                writer.WriteString("severity", finding.Severity.Value);
+                writer.WriteString(
+                    "enforcement",
+                    finding.Enforcement.Value);
+                writer.WriteString("relativePath", finding.RelativePath);
+                writer.WriteStartArray("missingFiles");
+                foreach (var missingFile in finding.MissingFiles)
+                {
+                    writer.WriteStringValue(missingFile);
+                }
+
+                writer.WriteEndArray();
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+            if (reportDigest is not null)
+            {
+                writer.WriteString("reportDigest", reportDigest);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        return stream.ToArray();
+    }
+}

@@ -1,11 +1,16 @@
 # [FEAT-0060](README.md) Differential Ledger Inventory Analysis
 
-Status: records-only inventory complete at scenario level; executable
-development and authority transfer are not authorized.
+Status: historical scenario-level inventory complete; bounded
+specification-first `CSharpShadow` development is authorized independently;
+equivalence and authority transfer remain blocked on the complete ledger.
 
-This record fixes the finite starting universe for [TEST-0196](test-cases.md#test-0196)
-without pretending that the existing PowerShell suites expose a complete
-machine-readable variant manifest. The identity authority remains
+This record fixes the finite starting universe for the later
+[TEST-0196](test-cases.md#test-0196) equivalence and authority gate without
+pretending that the existing PowerShell suites expose a complete
+machine-readable variant manifest. Under
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md),
+it is historical migration evidence, not a C# design source or a prerequisite
+for a bounded non-authoritative slice/package. The identity authority remains
 [tests/scenario-ownership.psd1](../../../tests/scenario-ownership.psd1); this
 analysis is not a second scenario registry.
 
@@ -69,8 +74,8 @@ The proven lower bound expands as follows:
 
 ## Scenario-level planned-route inventory
 
-These routes describe analysis intent only. They are not evidenced
-dispositions and cannot move authority.
+These routes describe historical analysis intent only. They are not evidenced
+dispositions, do not design C# behavior, and cannot move authority.
 
 | Planned route | Count | Meaning |
 | --- | ---: | --- |
@@ -91,11 +96,22 @@ owner, evidence kind, and canonical record are retained in the
 auditable analysis projection, not scenario identity authority or the future
 evidenced differential ledger.
 
+Canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+is one of the 43 `CSharpCandidate` identities. Its first clean-room slice uses
+only the explicit `protocol-authority` profile; the scenario-level proposal for
+later consumer applicability neither authorizes that profile now nor changes
+the historical counts. [SUBF-0138](README.md#subf-0138) has now implemented
+that C# slice locally without consulting PowerShell source; its future
+differential observation remains empty until [TEST-0196](test-cases.md#test-0196)
+evidence is deliberately collected.
+
 ## Accepted ledger shape
 
 Following maintainer acceptance on 2026-07-28, one protocol-owned JSON ledger
-may become the authoritative TEST/variant mapping. It must reference, not
-replace, scenario identity authority. A generated Markdown view may aid review.
+may become the authoritative TEST/variant mapping for equivalence and authority
+transition. It must reference, not replace, scenario identity authority. A
+generated Markdown view may aid review.
 
 Each declaration packet records `expansionState` as `Unexpanded`, `Partial`,
 or `Complete` and its proven cardinality. Each concrete row uses a stable
@@ -131,8 +147,8 @@ post-publication evidence, and .NET test projects.
 governance operational-capability migration; applicable current rows remain
 `PowerShellAuthority`. Infrastructure, provider, workflow-semantic, and
 existing-foundation rows do not receive a fabricated PowerShell authority
-state. During this records-only stage every `evidencedDisposition` remains
-empty.
+state. At the first clean-room slice authorization checkpoint every
+`evidencedDisposition` remains empty.
 
 ## Decision boundary and progress
 
@@ -140,8 +156,11 @@ The maintainer accepted the material-variant granularity and the separation
 between planned route, evidenced disposition, canonical evidence owner, and
 applicable operational authority in the
 [contract decision packet](contract-decision-packet.md) on 2026-07-28. The 16
-mixed identities and other material inline/generative variants can now be
-expanded under that contract.
+mixed identities and other material inline/generative variants can be expanded
+incrementally under that contract after independently implemented C# rules.
+Their completion is mandatory before equivalence, authority transfer, or
+PowerShell retirement, not before bounded `CSharpShadow` implementation or an
+explicitly non-authoritative portable package.
 
 Current conclusive progress is:
 
@@ -152,10 +171,11 @@ Current conclusive progress is:
 - mapping evidence: 188 base identities and a separate lower bound of 116
   TEST/case mappings; 304 is conditional base-plus-mapping arithmetic, not an
   accepted ledger row count;
-- Definition of Ready: 9/12, 75%; and
-- implementation: 0/7 subfeatures, 0%.
+- bounded first-slice Definition of Ready: 10/10, 100%; and
+- implementation: 1/8 subfeatures locally complete, 12.5%.
 
 No monotonic start marker was captured for the earlier records-only audit, so
-its elapsed duration cannot be reconstructed without guessing. The first
-post-decision normalization batch records a fresh elapsed interval and observed
-rows per hour before publishing a remaining-duration estimate.
+its elapsed duration cannot be reconstructed without guessing. A later
+normalization batch will record a fresh elapsed interval and observed rows per
+hour before publishing a remaining-duration estimate; that estimate does not
+block the authorized first clean-room slice.

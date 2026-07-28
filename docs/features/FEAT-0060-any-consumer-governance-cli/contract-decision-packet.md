@@ -1,8 +1,9 @@
 # [FEAT-0060](README.md) v1 Contract Decision Packet
 
-Status: accepted by the maintainer on 2026-07-28; records only. Acceptance
-authorizes continued Definition-of-Ready normalization, not executable
-development.
+Status: accepted by the maintainer on 2026-07-28; the original acceptance was
+records-only. The later specification-first sequencing and bounded first-slice
+authorization are recorded by
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md).
 
 The repository evidence reached the first boundary that could not be resolved
 by inspection alone. The accepted bundle keeps v1 finite, deterministic,
@@ -140,13 +141,32 @@ maintainer's separately reserved discussion and authorization.
 ## Effect of acceptance
 
 The maintainer accepted this bundle, including the exact-pair shadow/release
-boundary and the separate severity/enforcement model, on 2026-07-28. This
-completes only the maintainer-contract readiness item. The next records-only
-work is to normalize every material inline/generative variant, split the 16
-mixed identities, assign canonical finding/severity/enforcement metadata, and
-publish the complete ledger and generated matrix. Executable C# work still
-requires a later, separate authorization after the Definition of Ready closes.
+boundary and the separate severity/enforcement model, on 2026-07-28. That
+initial acceptance completed the maintainer-contract readiness item without
+authorizing executable work.
 
-Readiness is now 9/12 (75%). Completion of the ledger and matrix would move it
-to 11/12 (92%); separate executable development authorization is the final
-12/12 gate.
+Later on 2026-07-28, the maintainer accepted the
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
+sequencing amendment and explicitly authorized only the bounded first
+clean-room `CSharpShadow` vertical slice. Canonical protocol, decision,
+feature, and numbered-scenario contracts now design C# behavior; project memory
+supports context only, and PowerShell may be used only as a later legacy
+black-box oracle after independent implementation.
+
+That first slice is [SUBF-0138](README.md#subf-0138) and reuses canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004),
+selects only `protocol-authority`, reads repository state, registers no provider
+or mutation port, and emits no authoritative result. Its test first failed to
+compile before production governance types existed, then passed after the
+smallest implementation. Its Definition of Ready is 10/10 (100%);
+[SUBF-0138](README.md#subf-0138) is locally complete, so feature implementation
+is 1/8 (12.5%) while exact-commit/hosted and all broader gates remain pending.
+
+The material-variant ledger, the 16 mixed-identity splits, and the complete
+rule/profile/evidence-source matrix are no longer prerequisites for that
+bounded implementation or an explicitly non-authoritative portable package.
+They remain mandatory before equivalence or stronger-evidence claims,
+required-check enforcement, authority transfer, compatibility retirement, or
+PowerShell source retirement. This amendment does not change any accepted v1
+request, identity, severity/enforcement, digest, exit-code, snapshot, provider,
+or authority-state contract.

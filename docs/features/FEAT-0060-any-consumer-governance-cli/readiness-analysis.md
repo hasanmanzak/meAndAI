@@ -1,11 +1,36 @@
 # [FEAT-0060](README.md) Definition-of-Ready Analysis
 
-Status: records-only analysis in progress; executable development is not
-authorized.
+Status: [SUBF-0138](README.md#subf-0138) bounded first clean-room
+`CSharpShadow` vertical slice locally complete; exact-commit/hosted and
+full-feature equivalence, authority, and retirement gates remain open.
 
-This record freezes the current evidence boundary. It is planning evidence,
-not a C# implementation, workflow change, authority transfer, consumer
-mutation, or PowerShell retirement authorization.
+This record freezes the current evidence boundary. The maintainer authorized
+only the first specification-first slice on 2026-07-28. It is not implementation
+evidence, a workflow change, authority transfer, consumer mutation, or
+PowerShell retirement authorization.
+
+## Specification-first sequencing amendment
+
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
+defines the canonical protocol, decisions, feature contracts, and numbered
+scenarios as the C# design authority. Project memory remains supporting context
+and recurrence routing. PowerShell source is not translated or treated as a
+design specification; only after independent C# implementation may its result
+be observed as a legacy black-box oracle.
+
+Therefore the exhaustive differential ledger and variant-level matrix are not
+Definition-of-Ready prerequisites for a bounded read-only `CSharpShadow` slice
+or an explicitly non-authoritative portable package. They remain mandatory
+before an equivalence or stronger-evidence claim, required-check enforcement,
+authority transfer, compatibility retirement, or PowerShell source retirement.
+
+The authorized first slice is [SUBF-0138](README.md#subf-0138) and reuses canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+under the explicit `protocol-authority` profile. It reads feature directories,
+requires `README.md` and `test-cases.md`, emits only a non-authoritative typed
+result, and registers no provider or mutation port. Its C# test first failed to
+compile before the domain/core types existed, then passed after the smallest
+coherent implementation.
 
 ## Audited starting point
 
@@ -37,14 +62,14 @@ Representative high-relevance owners are:
 | [tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1](../../../tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1) | 2,445 lines | 7 | Local mock publication contracts |
 | [tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1](../../../tests/capabilities/publication-evidence/Verify-PostPublicationEvidence.ps1) | 4,037 lines | 1 | One supplied release/issue/pull-request evidence set |
 
-These counts are the exact scenario-level audit baseline, not a completeness
-claim for concrete variants. The
+These counts are the exact historical scenario-level audit baseline, not a C#
+design source or a completeness claim for concrete variants. The
 [differential-ledger inventory](differential-ledger-analysis.md) accounts for
 188/188 active identities and seven explicit declaration packets, proves at
 least 116 TEST/case mappings separately from the base identities, and records
 why the global inline/generative variant denominator is not encoded today.
-Every material variant still needs a finite
-disposition before authority can move. Larger mutation-heavy adoption and
+Every material variant still needs a finite disposition before equivalence or
+authority can move; that work does not block the authorized first slice. Larger mutation-heavy adoption and
 update suites are intentionally not presented as size-ranked governance
 owners; their pure-validation and operational variants still require explicit
 ledger dispositions.
@@ -209,9 +234,11 @@ a base row beside expanded mappings. No central machine-readable source
 currently assigns stable keys or cardinalities to every inline/generative
 variant, so a complete row count or denominator cannot yet be claimed.
 
-[TEST-0196](test-cases.md#test-0196) will own the accepted finite ledger after
-material-variant normalization. Each evidenced row has exactly one
-disposition:
+[TEST-0196](test-cases.md#test-0196) will own the finite authority-transfer
+ledger after material-variant normalization. The ledger is populated
+incrementally after specification-first rule slices; it does not gate bounded
+implementation or an explicitly non-authoritative package. Each evidenced row
+has exactly one disposition:
 
 - `CSharpSameContract`;
 - `ApprovedStrongerEvidence`;
@@ -222,13 +249,15 @@ disposition:
 Every row records canonical scenario and evidence owners, profile, snapshot
 source, rule/finding identity, expected oracle, separate PowerShell/C#
 observations, evidence link, and applicable operational-authority state.
-`plannedRoute` is separate from `evidencedDisposition`; during records-only
-analysis the latter is empty. Only rows participating in governance
+`plannedRoute` is separate from `evidencedDisposition`; at the first-slice
+authorization checkpoint the latter is empty. Only rows participating in governance
 operational-capability migration receive `operationalAuthorityState`, and
 applicable current rows retain `PowerShellAuthority`. Infrastructure, provider,
 workflow-semantic, and existing-foundation rows preserve their canonical
 evidence owners without a fabricated PowerShell authority state. Missing,
-duplicate, divergent, or unproved stronger rows fail closed. A language port
+duplicate, divergent, or unproved stronger rows fail equivalence,
+required-check, authority-transfer, and retirement gates closed. They do not
+turn a bounded shadow slice into PowerShell translation work. A language port
 does not create a new numbered scenario by itself.
 
 Scenario-level planned routes are complete and mutually exclusive: 43 C#
@@ -240,7 +269,8 @@ variant keys.
 
 Authority progression is bounded:
 
-1. development slices emit `CSharpShadow` only;
+1. specification-first development slices emit `CSharpShadow` only and may
+   proceed before exhaustive ledger completion;
 2. a qualified immutable package may emit
    `CSharpReleasedNonAuthoritative`;
 3. PowerShell remains the authoritative result engine throughout this feature;
@@ -251,19 +281,39 @@ This feature cannot emit `CSharpPrimaryWithRecovery` or `CSharpOnly`.
 
 ## Refined delivery slices
 
-The original milestones are refined into seven independently reviewable
+The original milestones are refined into eight independently reviewable
 subfeatures. Existing canonical scenarios are reused where the behavioral
 identity is unchanged.
 
 | ID | Independently testable boundary | Evidence owner | Status |
 | --- | --- | --- | --- |
-| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Proposed; development not authorized |
-| [SUBF-0123](README.md#subf-0123) | Exact Git/index/worktree snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0194](test-cases.md#test-0194) | Proposed; development not authorized |
-| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | Proposed; development not authorized |
-| [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical mapped scenarios plus [TEST-0195](test-cases.md#test-0195) | Proposed; development not authorized |
-| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) | Proposed; development not authorized |
-| [SUBF-0136](README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](test-cases.md#test-0196) | Proposed; development not authorized |
-| [SUBF-0137](README.md#subf-0137) | Immutable portable-package qualification at non-authoritative state | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) contract plus [TEST-0196](test-cases.md#test-0196) | Proposed; development not authorized |
+| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0194](test-cases.md#test-0194) remains `Planned` |
+| [SUBF-0123](README.md#subf-0123) | Exact Git/index/worktree snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0194](test-cases.md#test-0194) | In progress; candidate snapshot only through [SUBF-0138](README.md#subf-0138), while [TEST-0194](test-cases.md#test-0194) remains `Planned` |
+| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
+| [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical rule slices plus planned [TEST-0195](test-cases.md#test-0195) | In progress; first rule proven by [SUBF-0138](README.md#subf-0138), broader scenario not active |
+| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
+| [SUBF-0136](README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](test-cases.md#test-0196) | Mandatory before equivalence, authority transfer, or retirement |
+| [SUBF-0137](README.md#subf-0137) | Immutable portable-package qualification at non-authoritative state | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests | Proposed; separate later gate |
+| [SUBF-0138](README.md#subf-0138) | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, feature-record pair rule, deterministic report/exit, thin CLI, and read-only adapter | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | Locally complete; exact-commit/hosted pending, PowerShell authority unchanged |
+
+[SUBF-0138](README.md#subf-0138) uses a separate governance-core class
+library, thin console, and repository-read-only filesystem adapter. Its focused
+test first failed to compile in 7.9 seconds because the production governance
+types were absent, then passed 12/12 in 6.1 seconds. Fresh-review boundary
+corrections expanded the final focused suite to 28/28 in 5.5 seconds. The final
+full-solution rerun passed governance 28/28, architecture 31/31, and packaging
+17/17 in 6.4 seconds. Locked restore, format verification, and portable publish
+also passed.
+The published DLL validated the real repository in 0.5 seconds with exit `0`,
+`conforming`, one evaluated rule, zero findings, `csharp-shadow`,
+`powershell-authority`, deterministic digest, and no absolute path. This
+reviewed result uses distinct `evidenceDigest` and `catalogMetadataDigest`
+fields, declares `coverage=bounded-first-slice`, and centralizes
+repository-relative finding-path validation. It
+completes the canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+C# slice. [TEST-0194](test-cases.md#test-0194) and
+[TEST-0195](test-cases.md#test-0195) remain `PlannedDocumentation` and are not
+activated by this slice.
 
 Each subfeature closes its own expected-red, focused green, self-review,
 finding disposition, documentation, and exact committed-tree gate before the
@@ -280,7 +330,13 @@ snapshot contract remain unchanged:
 - exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671)
   reused the exact tree and passed StructureOnly on Ubuntu and Windows; and
 - post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375)
-  verified immutable `v0.16.0` at the exact merge commit.
+  verified immutable `v0.16.0` at the exact merge commit; and
+- exact-head [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016)
+  passed the final pre-slice branch head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  on Ubuntu in 12 min 58 s and Windows in 32 min 12 s, including a
+  30 min 46 s PowerShell 5.1 step, and closes [FIND-0365](README.md#find-0365)
+  and [FIND-0366](README.md#find-0366).
 
 Observed baseline durations are diagnostic only: Ubuntu governance was about
 115 seconds plus 124 seconds for instruction graph; Windows PowerShell 5.1 was
@@ -301,6 +357,10 @@ Applicable recurrence barriers are:
 Sibling-intent boundaries under
 [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md):
 
+- The first C# slice implements the existing behavioral identity
+  [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004).
+  Compiled C# evidence is a language implementation of that contract, not a
+  new scenario or a validator of the PowerShell test.
 - [TEST-0194](test-cases.md#test-0194) owns explicit compiled profile/request
   resolution, while graph discovery and repository byte-source precedence
   retain their canonical identities.
@@ -313,34 +373,42 @@ Sibling-intent boundaries under
 
 ## Remaining Definition-of-Ready gates
 
-Nine of twelve readiness items are complete (75%); implementation is zero of
-seven subfeatures (0%).
+The bounded first clean-room slice has completed all ten readiness items:
 
-- [x] Stable feature, issue, dependency, and target `0.17.0`.
-- [x] Problem, outcome, scope, non-goals, risks, and authority boundary.
-- [x] Immutable baseline and runtime evidence.
-- [x] Executable-owner and rule-family inventory.
-- [x] Draft request, snapshot, profile, report, and authority contracts.
-- [x] Recurrence review.
-- [x] Sibling-intent review for the three new scenario families.
-- [x] Independently reviewable subfeature decomposition.
-- [ ] Complete material-variant differential ledger; the 188/188 base
-  identities and 7/7 explicit declaration packets are inventoried, but the
-  inline/generative denominator and 16 mixed boundaries remain pending
-  normalization under the accepted granularity contract.
-- [ ] Complete rule-by-rule profile/applicability and evidence-source matrix;
-  the scenario-level matrix is complete and the variant-level matrix remains
-  open.
-- [x] Maintainer acceptance of the v1 exact-pair policy/runtime,
-  severity/enforcement, report-digest, and exit-code contract on 2026-07-28.
-- [ ] Separate executable development authorization.
+- [x] Stable feature/slice identity, linked issue, dependency, and target
+  `0.17.0`.
+- [x] Problem, outcome, scope, non-goals, and measurable first-slice outcome.
+- [x] Affected feature-packet concept, governance CLI entry point, existing C#
+  foundation dependency, and meAndAI self-consumer.
+- [x] Read-only capability, type, ownership, lifecycle, deterministic result,
+  failure, and compatibility contracts.
+- [x] Owned risks and accepted [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) /
+  [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
+  boundaries.
+- [x] Independently reviewable subfeature and first vertical-slice
+  decomposition.
+- [x] Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  positive and missing-file behavior with expected-red then focused-green
+  implementation.
+- [x] Active recurrence and same-contract sibling review, preserving the
+  existing scenario identity.
+- [x] Canonical specification ownership, memory-as-context boundary, and
+  PowerShell-only-as-later-black-box-oracle route.
+- [x] Explicit maintainer authorization on 2026-07-28 for only this bounded
+  `protocol-authority` `CSharpShadow` slice.
 
-Current conclusive progress is 188/188 base identities (100%), 7/7 explicit
+First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138) is
+locally complete, so feature implementation is one of eight subfeatures
+(12.5%); exact-commit/hosted closure and the other seven subfeatures remain.
+Later rule slices retain their own review gates and authorization.
+
+The historical inventory remains 188/188 base identities (100%), 7/7 explicit
 declaration packets (100%), 116 proven TEST/case mappings, and 172/188
-unambiguous scenario routes (91.5%), with 16/188 mixed (8.5%). No honest global
-row count or denominator existed before the maintainer accepted the
-[material-variant contract](contract-decision-packet.md). The first
-post-decision normalization batch records its own elapsed time and rows per
-hour before a remaining-duration estimate is published; the earlier audit's
-elapsed duration remains unknowable. Implementation duration remains
-intentionally unestimated before Gate 1 closes.
+unambiguous scenario routes (91.5%), with 16/188 mixed (8.5%). The complete
+material-variant ledger and rule/profile/evidence-source matrix are explicitly
+deferred from this slice's Definition of Ready, not waived. They must be
+complete before equivalence or stronger-evidence claims, required-check
+enforcement, authority transfer, compatibility retirement, or PowerShell
+source retirement. A duration estimate for those later gates begins only when
+fresh normalization timing exists; the earlier audit duration cannot be
+reconstructed honestly.

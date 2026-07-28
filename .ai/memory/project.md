@@ -81,11 +81,32 @@ Last verified: **2026-07-28**
   renewed exact-head checks, protected merge, publication, and verification
   were then still required and are now completed by the current immutable
   release evidence above.
-- Current records-only work:
+- Current governance work:
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
   / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
-  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) is in
-  Definition-of-Ready analysis. The
+  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) has locally
+  completed
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+  the first clean-room `CSharpShadow` vertical slice under
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md).
+  Canonical protocol, decision, feature, and numbered-scenario contracts design
+  C# behavior; this memory supplies context only, and PowerShell is a later
+  legacy black-box oracle rather than a translation source. The first slice
+  reuses canonical
+  [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  for explicit `protocol-authority`, repository-read-only, provider-free,
+  non-authoritative validation. Its Definition of Ready is 10/10 (100%);
+  implementation is one of eight subfeatures (12.5%), with exact-commit/hosted
+  evidence and seven subfeatures pending. The first compiled test failed for
+  the intended missing-type reason in 7.9 seconds; the final focused suite
+  passed 28/28 in 5.5 seconds after fresh-review boundary corrections. The
+  final full solution passed governance 28/28, architecture 31/31, and packaging
+  17/17 in 6.4 seconds. Locked restore,
+  format, portable publish, and the published-DLL real-repository run passed;
+  the report retained `csharp-shadow` and `powershell-authority`.
+  Follow the
+  [clean-room pivot handoff](log/2026-07-28-feat-0060-clean-room-pivot.md).
+  The historical
   [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
   covers all 188 active base identities, all seven explicit declaration
   packets, 195 declaration-level units, and a separate proven lower bound of
@@ -100,25 +121,23 @@ Last verified: **2026-07-28**
   The accepted contract permits exact-bound unreleased read-only consumer
   shadow runs, requires immutable release eligibility for managed/required-check
   use without granting authority, and separates severity from blocking or
-  advisory enforcement. Readiness is nine of twelve items (75%);
-  implementation is zero of seven subfeatures. Follow the
-  [contract-acceptance handoff](log/2026-07-28-feat-0060-contract-acceptance.md)
-  and the separately authorized
-  [readiness-correction handoff](log/2026-07-28-feat-0060-test0106-readiness.md).
+  advisory enforcement. Exhaustive ledger/matrix completion no longer blocks
+  bounded implementation or an explicitly non-authoritative package; it
+  remains mandatory before equivalence, required-check enforcement, authority
+  transfer, compatibility retirement, or PowerShell source retirement.
   General all-repository GitHub issue/PR/comment governance remains reserved
-  for a separate discussion. [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
-  changes only the canonical
-  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
-  harness and inert fixture; no C#
-  implementation, workflow, consumer, PowerShell production route, or
-  production-authority state changed. The replacement exact head then exposed
-  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366):
-  [run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
-  passed Ubuntu but canceled the correctly selected serial Windows `Full`
-  route at its stale 35-minute whole-job ceiling. The separately authorized
-  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
-  correction changes only that Windows ceiling to 60 minutes; Linux remains
-  20, post-publication remains 5, and exact-hosted confirmation is pending.
+  for a separate discussion.
+  [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365)
+  and
+  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366)
+  are closed by exact head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  and [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
+  Ubuntu job `90346608851` passed in 12 min 58 s and Windows job `90346609315`
+  passed in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Linux
+  remains 20 minutes, post-publication remains 5, and no consumer, C# rule,
+  production authority, or PowerShell production route changed in those
+  infrastructure corrections.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -444,7 +463,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   PID for cleanup, and proves both processes active before cancellation.
   PowerShell 7 / Windows PowerShell 5.1 StructureOnly passes in 184.3 / 292.4
   seconds; the exact Windows streaming and quick-adoption child owners pass in
-  12.9 / 482.4 seconds. Exact hosted evidence remains pending.
+  12.9 / 482.4 seconds. Exact final head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016)
+  on Ubuntu and Windows.
 - Required safe response: retain
   [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106),
   make the fixture parent publish the
@@ -487,7 +509,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0160](../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0160)
   is the same-contract prior occurrence.
 - Fixed release or evidence: release evidence is not applicable to this
-  pre-merge test-infrastructure correction. The test-first working tree changed
+  pre-merge test-infrastructure correction. The test-first change updated
   [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
   to require 60 minutes; its PowerShell 7 structural verifier failed alone in
   201 seconds against workflow 35 and passed in 176.9 seconds after only the
@@ -496,7 +518,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the unchanged
   [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
   owner on both runtimes, and the candidate PowerShell 7 / Windows PowerShell 5.1
-  StructureOnly pass. Exact-commit and hosted evidence remain pending.
+  StructureOnly passed. Exact final head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
+  Ubuntu job `90346608851` in 12 min 58 s and Windows job `90346609315` in
+  32 min 12 s, including a 30 min 46 s PowerShell 5.1 step.
 - Required safe response: retain one stable Windows job and the fail-safe
   profile selector, set only its whole-job ceiling to 60 minutes, preserve
   Linux 20 and post-publication 5, run StructureOnly on both supported
@@ -1087,8 +1113,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-  / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
+- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153),
+  [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md),
+  and
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md)
+  record a
   C# operational platform with separate governance, adoption, and update
   applications sharing one typed foundation and portable framework-dependent
   JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
@@ -1096,18 +1125,23 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. Only the records-only Definition-of-Ready analysis
-  for [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-  is now active. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
+  remain separately gated. Only
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+  the bounded first specification-first `CSharpShadow` vertical slice for
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  is locally complete with exact-commit/hosted evidence pending. It reuses canonical
+  [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004),
+  is `protocol-authority`, repository-read-only, provider-free, and
+  non-authoritative, and starts test-first. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. Executable and delivery authorization was completed only for
-  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-  merge and immutable `v0.16.0` release closure. Authorization for
+  are complete. Executable and delivery authorization for
   [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-  is records-only Definition-of-Ready analysis. Do not implement any later
-  feature, mutate consumers, transfer authority, or retire PowerShell without
-  later independent gates and authorization.
+  was limited to that first clean-room slice. Do not implement later rule
+  slices or another feature, mutate consumers, claim equivalence, transfer
+  authority, or retire PowerShell without later independent gates and
+  authorization. Complete applicable ledgers and matrices before any such
+  equivalence, transfer, or retirement.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

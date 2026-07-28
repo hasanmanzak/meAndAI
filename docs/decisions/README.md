@@ -33,7 +33,8 @@
 | [DEC-0029](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | [Keep recurrence knowledge and test harness roles under canonical owners](DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md) | Accepted | 2026-07-25 |
 | [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) | [Require distinct numbered-test intent and direct infrastructure-contract evidence](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) | Accepted | 2026-07-26 |
 | [DEC-0031](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) | [Evolve the instruction graph to schema 2 for bounded compatibility](DEC-0031-instruction-graph-schema-2-bounded-compatibility.md) | Accepted | 2026-07-26 |
-| [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | [Use separate C# operational applications with portable JIT distribution](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted | 2026-07-27 |
+| [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | [Use separate C# operational applications with portable JIT distribution](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Partially superseded by [DEC-0033](DEC-0033-specification-first-csharp-governance.md) for [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md) sequencing only | 2026-07-27 |
+| [DEC-0033](DEC-0033-specification-first-csharp-governance.md) | [Build C# governance from canonical specifications](DEC-0033-specification-first-csharp-governance.md) | Accepted | 2026-07-28 |
 
 Create future records from the
 [decision template](../../templates/decision.md). A newer decision does not edit

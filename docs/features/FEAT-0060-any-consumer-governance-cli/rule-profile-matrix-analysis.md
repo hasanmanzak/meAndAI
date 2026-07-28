@@ -1,13 +1,17 @@
 # [FEAT-0060](README.md) Rule, Profile, and Evidence-Source Matrix Analysis
 
-Status: scenario-level analysis complete; variant-level normalization is in
-progress under the accepted
-[contract decision packet](contract-decision-packet.md). Development is not
-authorized.
+Status: historical scenario-level analysis complete; variant-level
+normalization is deferred to the equivalence and authority gate under the
+accepted [contract decision packet](contract-decision-packet.md). The bounded
+first specification-first `CSharpShadow` slice is locally complete
+independently.
 
 This record separates governance rule applicability from operational runtime,
-test infrastructure, and provider evidence. It does not infer consumer policy
-from the current PowerShell owner name.
+test infrastructure, and provider evidence. Under
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md),
+it is migration-planning evidence rather than a C# design source or bounded
+implementation prerequisite. It does not infer consumer policy from the
+current PowerShell owner name.
 
 ## Family distribution
 
@@ -43,6 +47,14 @@ Profile applicability must be assigned per material variant. It cannot be
 derived automatically from repository name, feature family, or script owner.
 The caller selects one of the two closed profiles and the engine independently
 verifies that choice from canonical evidence.
+
+The first clean-room [SUBF-0138](README.md#subf-0138) slice selects only
+`protocol-authority` for canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004).
+The scenario-level proposal that the same canonical behavior may later apply
+to consumers remains unimplemented and unauthorized in this slice. Its local
+compiled and published-DLL evidence does not alter any count or populate a
+[TEST-0196](test-cases.md#test-0196) equivalence disposition.
 
 ## Snapshot mode and evidence source
 
@@ -118,9 +130,12 @@ cannot downgrade enforcement; and missing canonical metadata yields an
 
 ## Completion boundary
 
-This analysis supplies a complete scenario-level family and route matrix but
-does not yet satisfy the variant-level Definition-of-Ready item. The accepted
-granularity contract now permits stable variant keys for the 16 mixed
-identities and every other material inline/generative branch, plus canonical
-finding/severity/enforcement assignments. No C# equivalence or
-stronger-evidence claim is made here.
+This analysis supplies a complete historical scenario-level family and route
+matrix but not the variant-level equivalence/authority matrix. The accepted
+granularity contract permits stable variant keys for the 16 mixed identities
+and every other material inline/generative branch, plus canonical
+finding/severity/enforcement assignments. Its completion is mandatory before a
+C# equivalence or stronger-evidence claim, required-check enforcement,
+authority transfer, or PowerShell retirement. It does not block a bounded
+read-only shadow slice or explicitly non-authoritative package, and no
+equivalence claim is made here.

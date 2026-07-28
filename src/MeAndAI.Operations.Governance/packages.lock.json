@@ -11,6 +11,13 @@
       "meandai.operations.domain": {
         "type": "Project"
       },
+      "meandai.operations.governance.core": {
+        "type": "Project",
+        "dependencies": {
+          "MeAndAI.Operations.Application": "[1.0.0, )",
+          "MeAndAI.Operations.Domain": "[1.0.0, )"
+        }
+      },
       "meandai.operations.infrastructure": {
         "type": "Project",
         "dependencies": {
