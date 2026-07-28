@@ -17,7 +17,7 @@ preflight, and same-byte Windows/Linux evidence. It does not implement
 governance, adoption, or update behavior; publish a release; mutate a consumer;
 transfer authority; or retire PowerShell.
 
-## Candidate contract
+## Delivered contract
 
 - Exact assets are `maai-adoption.zip`, `maai-consumer-update.zip`, and
   `maai-governance.zip`, each framework-dependent `net10.0`, ordinary JIT,
@@ -57,12 +57,21 @@ StructureOnly passed in 211.2 seconds; the protocol-governance owner reported
 208,942 ms. Local `actionlint` and Ruby are unavailable; no local success is
 claimed for those tools.
 
-## Continuation
+## Completion and continuation
 
-The candidate is four of five slice gates. Commit the complete graph-reachable
-packet, then require exact committed-tree validation. Only that clean committed
-head may construct and execute the real package set. Push the converged branch
-and require the same uploaded bytes to pass the pinned hosted Ubuntu/Windows
-workflow. [Issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) and
-[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) remain the
-external exact-head evidence authority. No merge or release is authorized.
+Exact implementation commit
+[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+passed committed-tree StructureOnly in 208.8 seconds, built the clean exact-head
+package set in 13.1 seconds, and verified/executed it locally in 2.6 seconds.
+Exact-head [run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+passed 48/48 compiled tests and the same uploaded bytes on
+[Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565)
+in 9 min 39 s and
+[Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
+in 31 min 23 s. A fresh download passed all digest/runtime checks and all three
+Windows executions in 2.4 seconds. The slice is five of five gates and
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+is three of three subfeatures, or 100%. [Issue #154](https://github.com/hasanmanzak/meAndAI/issues/154)
+and [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) remain the
+external evidence authority. No merge, release, consumer mutation, authority
+transfer, behavior implementation, or PowerShell retirement is authorized.

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | In development / [SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) complete; [SUBF-0121](#subf-0121) local implementation candidate |
+| Status | Complete / [SUBF-0119](#subf-0119), [SUBF-0120](#subf-0120), and [SUBF-0121](#subf-0121) complete; merge and release not authorized |
 | Target version | 0.16.0 |
 | Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
 | Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
@@ -255,7 +255,7 @@ Windows and Linux hosts:
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | [SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) passing locally and on exact-head Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192) |
+| Test code | All three subfeatures passing locally and on required Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), [TEST-0193](test-cases.md#test-0193) |
 | Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
 
 ## Decomposition and subfeature gates
@@ -264,7 +264,7 @@ Windows and Linux hosts:
 | --- | --- | --- | --- | --- | --- |
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red then 17 of 17 focused and 48 of 48 combined local tests | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate-tree StructureOnly passed in 211.2 seconds; exact-tree and hosted package evidence pending | Local candidate (4/5 gates) |
+| `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red, 17 of 17 focused and 48 of 48 combined local tests, then exact same-byte [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611) execution | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate/exact-tree StructureOnly passed in 211.2 / 208.8 seconds; zero unresolved `Blocking` findings | Complete |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
 
@@ -337,12 +337,11 @@ Progress is measured against five independently observable delivery gates:
    candidate-tree protocol validation: complete.
 5. Exact committed-tree package construction, same-byte Ubuntu/Windows
    execution, remote draft checkpoint, and final exact-head hosted evidence:
-   pending.
+   complete.
 
-The 2026-07-28 candidate is therefore four of five gates, or 80% of
-[SUBF-0121](#subf-0121). Across all three slices, 14 of 15 delivery gates are
-closed, or 93%; formal feature completion remains two of three completed
-subfeatures, or 67%, until the exact package and hosted gate closes.
+The 2026-07-28 closure is therefore five of five gates, or 100% of
+[SUBF-0121](#subf-0121). Across all three slices, all 15 delivery gates are
+closed and feature implementation is three of three subfeatures, or 100%.
 
 Local implementation evidence is 17 of 17 focused [TEST-0193](test-cases.md#test-0193)
 cases in 419 ms and 48 of 48 combined C# cases in 523 ms of test-process time.
@@ -362,6 +361,35 @@ Windows job performs its retained long platform validation before downloading
 the current-run artifact. Missing or late artifact evidence fails closed. The
 expected critical path and total hosted runner count therefore remain materially
 unchanged; this observation does not alter PowerShell authority or coverage.
+
+Exact implementation commit
+[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+passed committed-tree StructureOnly in 208.8 seconds; its governance owner
+reported 206,754 ms. A clean local pack bound that exact commit, produced the
+three declared ZIPs in 13.1 seconds, and verified/executed all three on Windows
+in 2.6 seconds.
+
+Exact-head [hosted run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+then evaluated clean PR merge tree
+[`59effa49b3f473f14de4078365f4cbc7563ad2bd`](https://github.com/hasanmanzak/meAndAI/commit/59effa49b3f473f14de4078365f4cbc7563ad2bd).
+The [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565)
+passed in 9 min 39 s and the independent
+[Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
+passed in 31 min 23 s. Ubuntu built, executed, and uploaded one manifest-bound
+set; Windows downloaded and executed those same bytes. A fresh post-run download
+also passed digest/runtime verification and all three application executions on
+Windows in 2.4 seconds.
+
+| Hosted asset | Length | SHA-256 |
+| --- | ---: | --- |
+| `maai-adoption.zip` | 52,804 bytes | `0723cfbf3f9614c95b3d97926fc9867e3be7181c8bad52eb06fe2b1c920a65fa` |
+| `maai-consumer-update.zip` | 53,370 bytes | `a1cb5c29758b7fb6b7ff902a430b2f1cb9b17d22f73ca16a96c1175e1005908f` |
+| `maai-governance.zip` | 53,334 bytes | `98db071c8f8926b395e204df3913d4a8e22191208ac4094af72fff5caaaab7d6` |
+
+| Host | Compiled tests | Package handoff | Retained validation | Required job |
+| --- | ---: | ---: | ---: | ---: |
+| Ubuntu | 48/48 in 599 ms | build, execute, upload in 9 s | PowerShell 7 in 9 min 00 s | 9 min 39 s |
+| Windows | 48/48 in 690 ms | download and execute in 3 s | PowerShell 5.1 in 29 min 55 s | 31 min 23 s |
 
 ## Decisions and relationships
 
@@ -460,11 +488,10 @@ unchanged; this observation does not alter PowerShell authority or coverage.
 
 ## Definition of Done
 
-[SUBF-0119](#subf-0119) and [SUBF-0120](#subf-0120) DoD are complete: their
-scoped acceptance criteria, tests-first evidence, local and hosted test
-commands, fresh-diff review, exact-tree validation, documentation, links, and
-project memory are current, with no unresolved `Blocking` finding. Feature-
-level DoD remains pending for [SUBF-0121](#subf-0121), portable package and
-manifest acceptance, and its independent authorization. This closure does not
-authorize consumer mutation, authority transfer, release publication, or
-PowerShell retirement.
+[SUBF-0119](#subf-0119), [SUBF-0120](#subf-0120), and [SUBF-0121](#subf-0121)
+DoD are complete: scoped acceptance criteria, tests-first evidence, local and
+hosted tests, exact same-byte package execution, fresh-download verification,
+fresh-diff review, exact-tree validation, documentation, links, and project
+memory are current, with no unresolved `Blocking` finding. Feature-level DoD is
+complete. This closure does not authorize merge, consumer mutation, authority
+transfer, release publication, or PowerShell retirement.

@@ -1,11 +1,9 @@
 # FEAT-0059 Test Scenarios
 
-Test implementation: [SUBF-0119](README.md#subf-0119) and
-[SUBF-0120](README.md#subf-0120) are complete; focused local expected-red/green,
-exact committed-tree, and exact-head Ubuntu/Windows evidence pass.
-[SUBF-0121](README.md#subf-0121) has executable tests-first red and focused
-local green evidence; exact committed-tree packaging and hosted same-byte
-execution remain pending.
+Test implementation: [SUBF-0119](README.md#subf-0119),
+[SUBF-0120](README.md#subf-0120), and [SUBF-0121](README.md#subf-0121) are
+complete. Focused local expected-red/green, exact committed-tree, exact package,
+fresh-download, and required Ubuntu/Windows evidence pass.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -35,9 +33,17 @@ Locked restore, zero-warning/zero-error Release build, and clean format/analyzer
 evidence pass. A real adoption-entry publish probe produced six flat managed
 files and the exact declared runtime config. Windows PowerShell 5.1 candidate-
 tree StructureOnly passed all discovered contracts in 211.2 seconds; its
-protocol-governance owner reported 208,942 ms. Clean-HEAD package construction,
-cross-platform execution of the same bytes, exact committed-tree validation,
-and hosted evidence remain pending.
+protocol-governance owner reported 208,942 ms. Exact implementation commit
+[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+passed exact committed-tree StructureOnly in 208.8 seconds, built all three
+clean-HEAD packages in 13.1 seconds, and verified/executed them locally in 2.6
+seconds. Exact-head [run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+passed 48 of 48 compiled tests and the same uploaded package bytes on
+[Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565)
+in 9 min 39 s and
+[Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
+in 31 min 23 s. A fresh hosted-artefact download independently passed all
+digest/runtime checks and all three Windows executions in 2.4 seconds.
 
 [TEST-0191](#test-0191) expected red on 2026-07-27 because the authorized
 `Domain.Authority`, `Domain.Identity`, and `Application.Authority` contracts did

@@ -53,23 +53,25 @@ Last verified: **2026-07-28**
   subfeatures, or 67%.
   [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   remained gated. PowerShell production authority was unchanged.
-- Current bounded development:
+- Current C# foundation completion:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   / [TEST-0193](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
   [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the
-  portable-package implementation candidate. Its DoR and tests-first missing-
-  contract red are complete. Seventeen focused and 48 combined local C# tests,
-  locked restore, zero-warning Release build, clean format/analyzer evidence,
-  and one real framework-dependent publish probe pass. The three exact RID-free
-  ZIPs, external source/runtime/schema/digest manifest, strict C# verifier, and
-  same-byte two-job handoff are implemented. Candidate-tree Windows PowerShell
-  5.1 StructureOnly passed in 211.2 seconds. Exact committed-tree construction
-  and hosted Ubuntu/Windows package execution remain pending, so the slice is
-  four of five gates and formal feature completion remains two of three
-  subfeatures. No consumer, release, PowerShell route, or production authority
-  changed.
+  unmerged portable-package completion. Seventeen focused and 48 combined local
+  C# tests, locked restore, zero-warning Release build, format/analyzer evidence,
+  candidate/exact-tree StructureOnly, clean exact-commit package construction,
+  and fresh-download execution pass. Exact implementation commit
+  [`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+  and [run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+  prove the three RID-free ZIPs, external source/runtime/schema/digest manifest,
+  strict C# verifier, 48/48 compiled tests, and same-byte
+  [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) /
+  [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
+  handoff. The slice is five of five and feature implementation is three of
+  three subfeatures, or 100%. No consumer, release, PowerShell route, or
+  production authority changed; merge and release remain unauthorized.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -941,18 +943,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
   C# operational platform with separate governance, adoption, and update
   applications sharing one typed foundation and portable framework-dependent
-  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md),
-  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
+  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  is implementation-complete. [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-  and [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
-  are complete. [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  is the authorized portable-package candidate and may proceed only through its
-  remaining exact-tree and hosted gates. Do not implement consumer behavior,
-  mutate consumers, transfer authority, publish this feature, or retire
-  PowerShell without later independent gates.
+  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
+  [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
+  and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
+  are complete. Do not implement the separately gated consumer features,
+  mutate consumers, transfer authority, publish this feature, merge its draft
+  PR, or retire PowerShell without later independent gates and authorization.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

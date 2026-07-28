@@ -3,7 +3,7 @@
 Scope: **this `meAndAI` repository only**<br>
 Last reviewed: **2026-07-28**<br>
 Protocol version: **0.15.6**<br>
-Latest immutable release before this candidate: **0.15.6**
+Latest immutable release before this unmerged development: **0.15.6**
 
 The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 release is complete at
@@ -16,16 +16,17 @@ delivery, review, test, and publication evidence for
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
 / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the current
-bounded development. Follow the
-[portable-package development handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
-and its linked prior slice/planning authority. The first two foundation slices
-are complete. The third has tests-first red, 17 focused and 48 combined local
-C# tests, locked restore, clean Release build/analyzer evidence, a real
-framework-dependent publish probe, and passing candidate-tree StructureOnly;
-exact-tree and same-byte hosted package evidence remain. The slice is four of
-five gates; formal feature completion is still two of three subfeatures.
-PowerShell authority and consumer repositories remain unchanged.
+[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is complete at
+five of five slice gates. Follow the
+[portable-package completion handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+and its linked prior slice/planning authority. All three foundation slices and
+all 15 delivery gates are complete. Exact implementation commit
+[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
+passed committed-tree package evidence and
+[run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
+passed 48/48 compiled tests plus the same package bytes on Ubuntu and Windows.
+PowerShell authority and consumer repositories remain unchanged; merge and
+release are not authorized.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

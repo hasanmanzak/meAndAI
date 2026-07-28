@@ -14,14 +14,12 @@ and their linked planning authority.
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 / [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
 / [SUBF-0120](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
+/ [SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
 are complete at five of five slice gates with exact-tree and required
-Ubuntu/Windows evidence; [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
-owns the checkpoint. Feature completion is two of three subfeatures, or 67%.
-[SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-is a local candidate at four of five gates with 17 focused and 48 combined C#
-tests plus candidate-tree StructureOnly passing; exact-tree and same-byte
-hosted package evidence remain. Consumer behavior, authority migration, and
-PowerShell retirement still require independent gates.
+Ubuntu/Windows evidence. [Draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
+owns the unmerged checkpoint. Feature implementation is three of three
+subfeatures and 15 of 15 gates, or 100%. Consumer behavior, authority migration,
+release publication, and PowerShell retirement still require independent gates.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
