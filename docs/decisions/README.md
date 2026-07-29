@@ -36,8 +36,10 @@
 | [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | [Use separate C# operational applications with portable JIT distribution](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded by [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | 2026-07-27 |
 | [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | [Make the executable protocol the governance and execution authority](DEC-0035-protocol-owned-governance-and-execution-architecture.md) | Accepted; implementation authority withheld | 2026-07-29 |
 
-The [specification-first C# governance draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md)
-and [bounded reusable governance catalog draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+The specification-first C# governance draft at
+`docs/decisions/DEC-0033-specification-first-csharp-governance.md` and bounded
+reusable governance catalog draft at
+`docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md`
 were allocated on the preserved, unmerged
 [exact draft commit `1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
 Their identifier positions remain reserved and are not reused. Their compatible

@@ -88,7 +88,7 @@ release work, and authority transfer are outside the freeze boundary.
 - merging the preserved [FEAT-0060](../../features/FEAT-0060-any-consumer-governance-cli/README.md)
   branch wholesale.
 
-## 4. The four meanings currently hidden by “test”
+## 4. The four meanings currently hidden by test
 
 The architecture separates four concepts that were previously easy to
 conflate:

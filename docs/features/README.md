@@ -69,8 +69,9 @@
 | [FEAT-0067](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [Evidence acquisition and managed consumer integration](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0068](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [Protocol release finalizer and authority transfer](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 
-The [coverage-equivalence draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
-was allocated only on the preserved, unmerged
+The coverage-equivalence draft at
+`docs/features/FEAT-0064-governance-coverage-equivalence/README.md` was
+allocated only on the preserved, unmerged
 [exact draft commit `1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
 Its identifier position remains reserved. Rule coverage is allocated prospectively to
 [FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md), while
