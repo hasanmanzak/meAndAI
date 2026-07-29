@@ -239,6 +239,13 @@ non-commit Git tree-object identity while preserving the two exact commit
 permalinks and their proven tree equality. The focused repository-only
 [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
 owner is the bounded correction gate; no executable behavior changed.
+Exact correction head
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed candidate/exact-tree repository-only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+in 65.3 / 66.3 seconds and hosted
+[run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu in 13 min 05 s and Windows in 33 min 19 s. The correction gate is
+complete.
 
 ## Distinct-intent review
 

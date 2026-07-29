@@ -1,9 +1,13 @@
 # FEAT-0059 Test Scenarios
 
-Test implementation: [SUBF-0119](README.md#subf-0119),
-[SUBF-0120](README.md#subf-0120), and [SUBF-0121](README.md#subf-0121) are
-complete. Focused local expected-red/green, exact committed-tree, exact package,
-fresh-download, and required Ubuntu/Windows evidence pass.
+The original `v0.16.0` implementation of
+[SUBF-0119](README.md#subf-0119), [SUBF-0120](README.md#subf-0120), and
+[SUBF-0121](README.md#subf-0121) is complete and its focused local
+expected-red/green, exact committed-tree, exact package, fresh-download, and
+required Ubuntu/Windows evidence remains below.
+[SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
+identities; those extensions are planned tests-first and no new TEST identity
+is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -11,7 +15,23 @@ fresh-download, and required Ubuntu/Windows evidence pass.
 | `TEST-0192` <a name="test-0192"></a> | [SUBF-0120](README.md#subf-0120) | Exercise typed results and infrastructure ports with malformed, canceled, failed, and redacted operations. | Results remain deterministic, secrets are not emitted, and read-only callers cannot acquire mutation ports. | Unit / security | Nearest sibling: [TEST-0168](../FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168); `Distinct` compiled port and result contract. | Passing | `tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj` |
 | `TEST-0193` <a name="test-0193"></a> | [SUBF-0121](README.md#subf-0121) | Build the exact three declared framework-dependent ZIPs once, validate the external manifest and archive inventories, run those same bytes through `dotnet` on supported Windows and Linux, and tamper with source, schema, asset, archive, and runtime evidence. | The exact manifest-bound package set runs unchanged on both; unknown/duplicate/inferred identity, digest or length drift, unsafe archive content, and missing/incompatible runtime evidence fail before application work. | Packaging / integration | Nearest sibling: [TEST-0185](../FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0185); `Distinct` because this scenario owns portable release identity/runtime preflight rather than test-harness execution identity. | Passing | `tests/dotnet/MeAndAI.Operations.Packaging.Tests/MeAndAI.Operations.Packaging.Tests.csproj` plus exact-head package handoff in `.github/workflows/protocol-tests.yml` |
 
-## Evidence
+## [SUBF-0141](README.md#subf-0141) extension evidence
+
+No expected-red, implementation, or green result is claimed yet. Evidence will
+be appended only from exact commands and committed trees that exercise the
+declared [TEST-0191](#test-0191), [TEST-0192](#test-0192), and
+[TEST-0193](#test-0193) extensions. The exact predecessor
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu and Windows and is readiness evidence, not implementation evidence.
+
+| Existing owner | Planned support-extension amendment | Expected extension result |
+| --- | --- | --- |
+| [TEST-0191](#test-0191) | Extend the existing dependency inspection with exact single ownership of production process primitives and absence of a Packaging runner/wrapper. | Domain and Application remain process-free; Infrastructure is the only production owner; Packaging references Infrastructure and contains no second runner. |
+| [TEST-0192](#test-0192) | Extend the existing Infrastructure execution boundary with immutable process requests/results, discrete shell-free arguments, environment isolation, binary stdin/stdout/stderr, concurrent streaming limits, nonzero exit, cancellation, timeout, inherited-pipe completion, active-descendant cleanup, and redacted failure. | Exact bytes and inclusive limits hold without deadlock or unobserved work; clean cancellation preserves the caller token after cleanup; dependency failures disclose no sensitive request, output, path, environment, or operating-system diagnostics. |
+| [TEST-0193](#test-0193) | Extend existing package execution to consume the shared Infrastructure kernel while retaining strict adapter decode/exit interpretation and temporary-state cleanup. | Package/manifest identities and same-byte Windows/Linux behavior remain unchanged; process failure stops before application work; Packaging owns no process implementation. |
+
+## Historical `v0.16.0` evidence
 
 [TEST-0193](#test-0193) expected red on 2026-07-28 because the authorized C#
 packaging project, inventory, manifest, builder, and verifier contracts did not

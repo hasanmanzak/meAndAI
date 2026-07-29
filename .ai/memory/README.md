@@ -16,6 +16,14 @@ and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/
 retain the merge, review, test, immutable publication, and verification
 evidence for
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md).
+That immutable release retains its original three-of-three closure.
+[SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+is a later `v0.17.0` support extension tracked by
+[issue #162](https://github.com/hasanmanzak/meAndAI/issues/162);
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+is
+currently three of four complete (75%) without changing the released
+`v0.16.0` assets or evidence.
 
 [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
 / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
@@ -66,12 +74,19 @@ and the latest checkpoint in the
 [SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
 closes the deterministic report/process contract under
 [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
-Before later implementation, the commit containing that closure record must
-pass the existing hosted Ubuntu and Windows gates. The next implementation gate
-is the single shared Infrastructure process/acquisition foundation before
+Its closure-record correction head
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu and Windows. The next implementation gate is owned by
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
+[SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+shared Infrastructure process foundation before
 [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
 [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
-remains `Planned`. PowerShell authority is unchanged.
+remains `Planned`. [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+is external to [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
+which remains four of seven (57.1%). PowerShell
+authority is unchanged.
 
 The historical
 [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
