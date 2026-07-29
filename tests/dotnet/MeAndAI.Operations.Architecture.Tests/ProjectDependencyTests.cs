@@ -1,10 +1,36 @@
 using System.Xml.Linq;
+using MeAndAI.Operations.Infrastructure.Execution;
 
 namespace MeAndAI.Operations.Architecture.Tests;
 
 public sealed class ProjectDependencyTests
 {
     private static readonly string RepositoryRoot = FindRepositoryRoot();
+    private static readonly string[] ProductionSourceRoots = ["src", "tools"];
+    private static readonly string[] ChildProcessPrimitiveTokens =
+    [
+        "using System.Diagnostics;",
+        "ProcessStartInfo",
+        "System.Diagnostics.Process",
+        "Process.Start(",
+        "new Process",
+        "WaitForExitAsync(",
+        "Kill(entireProcessTree:",
+        "RedirectStandardOutput",
+    ];
+    private static readonly string[] PackagingJsonParserTokens =
+    [
+        "JsonDocument.Parse(",
+        "JsonNode.Parse(",
+        "JsonSerializer.Deserialize",
+        "Utf8JsonReader",
+    ];
+    private static readonly string[] PackagingTextDecoderTokens =
+    [
+        "UTF8Encoding",
+        "Encoding.UTF8.GetString",
+        "DecoderFallbackException",
+    ];
 
     [Fact]
     [Trait("Scenario", "TEST-0191")]
@@ -86,7 +112,7 @@ public sealed class ProjectDependencyTests
     [Trait("Scenario", "TEST-0191")]
     public void InfrastructureIsTheOnlyProductionChildProcessOwner()
     {
-        var owners = new[] { "src", "tools" }
+        var owners = ProductionSourceRoots
             .SelectMany(root => Directory.EnumerateFiles(
                 Path.Combine(RepositoryRoot, root),
                 "*.cs",
@@ -106,6 +132,54 @@ public sealed class ProjectDependencyTests
             "tools",
             "MeAndAI.Operations.Packaging",
             "BoundedProcess.cs")));
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0191")]
+    [Trait("Scenario", "TEST-0192")]
+    [Trait("Scenario", "TEST-0193")]
+    public void ProcessKernelIsInternalAndPackagingConsumesItDirectly()
+    {
+        Assert.All(
+            [
+                typeof(BoundedProcessRequest),
+                typeof(BoundedProcessResult),
+                typeof(BoundedProcessRunner),
+            ],
+            type => Assert.False(type.IsVisible));
+
+        var consumers = EnumeratePackagingSources()
+            .Select(path => new
+            {
+                Path = NormalizePath(Path.GetRelativePath(RepositoryRoot, path)),
+                References = CountOccurrences(
+                    File.ReadAllText(path),
+                    nameof(BoundedProcessRunner)),
+            })
+            .Where(candidate => candidate.References > 0)
+            .Select(candidate => $"{candidate.Path}:{candidate.References}")
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                "tools/MeAndAI.Operations.Packaging/PackagingCli.cs:4",
+                "tools/MeAndAI.Operations.Packaging/PortablePackageExecutor.cs:1",
+            ],
+            consumers);
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0191")]
+    [Trait("Scenario", "TEST-0193")]
+    public void PackagingJsonParsingAndTextDecodingAreSingleOwned()
+    {
+        Assert.Equal(
+            ["tools/MeAndAI.Operations.Packaging/StrictJson.cs"],
+            FindPackagingOwners(PackagingJsonParserTokens));
+        Assert.Equal(
+            ["tools/MeAndAI.Operations.Packaging/StrictUtf8.cs"],
+            FindPackagingOwners(PackagingTextDecoderTokens));
     }
 
     private static string[] ReadProjectReferences(string projectPath)
@@ -178,11 +252,49 @@ public sealed class ProjectDependencyTests
     private static bool OwnsChildProcessPrimitive(string path)
     {
         var source = File.ReadAllText(path);
-        return source.Contains(
-                "using System.Diagnostics;",
-                StringComparison.Ordinal) &&
-            source.Contains("ProcessStartInfo", StringComparison.Ordinal) &&
-            source.Contains("new Process", StringComparison.Ordinal);
+        return ChildProcessPrimitiveTokens.Any(token =>
+            source.Contains(token, StringComparison.Ordinal));
+    }
+
+    private static IEnumerable<string> EnumeratePackagingSources() =>
+        Directory
+            .EnumerateFiles(
+                Path.Combine(
+                    RepositoryRoot,
+                    "tools",
+                    "MeAndAI.Operations.Packaging"),
+                "*.cs",
+                SearchOption.AllDirectories)
+            .Where(path => !HasBuildArtifactSegment(path));
+
+    private static string[] FindPackagingOwners(IReadOnlyList<string> tokens) =>
+    [
+        .. EnumeratePackagingSources()
+            .Where(path =>
+            {
+                var source = File.ReadAllText(path);
+                return tokens.Any(token =>
+                    source.Contains(token, StringComparison.Ordinal));
+            })
+            .Select(path => NormalizePath(
+                Path.GetRelativePath(RepositoryRoot, path)))
+            .Order(StringComparer.Ordinal),
+    ];
+
+    private static int CountOccurrences(string source, string value)
+    {
+        var count = 0;
+        var offset = 0;
+        while ((offset = source.IndexOf(
+                   value,
+                   offset,
+                   StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            offset += value.Length;
+        }
+
+        return count;
     }
 
     private static string NormalizePath(string? path) =>

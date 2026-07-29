@@ -189,6 +189,8 @@ internal static class BoundedProcessRunner
     private const int BufferSize = 8192;
     private static readonly TimeSpan CleanupGrace = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan CleanupSettleGrace = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MaximumTimerDelay =
+        TimeSpan.FromMilliseconds(int.MaxValue);
 
     internal static async Task<BoundedProcessResult> ExecuteAsync(
         BoundedProcessRequest request,
@@ -230,7 +232,7 @@ internal static class BoundedProcessRunner
                 {
                     StartInfo = BuildStartInfo(request),
                 };
-                if (!process.Start())
+                if (!terminal.Task.IsCompleted && !process.Start())
                 {
                     terminal.TrySetResult(TerminalReason.StartFailed);
                 }
@@ -333,22 +335,34 @@ internal static class BoundedProcessRunner
     {
         try
         {
-            var standardOutput = DrainAsync(
-                process.StandardOutput.BaseStream,
-                request.MaximumStandardOutputBytes,
-                TerminalReason.StandardOutputLimitExceeded,
+            var standardOutput = ObserveTransportAsync(
+                DrainAsync(
+                    process.StandardOutput.BaseStream,
+                    request.MaximumStandardOutputBytes,
+                    TerminalReason.StandardOutputLimitExceeded,
+                    terminal,
+                    inputOutputAbort),
                 terminal,
                 inputOutputAbort);
-            var standardError = DrainAsync(
-                process.StandardError.BaseStream,
-                request.MaximumStandardErrorBytes,
-                TerminalReason.StandardErrorLimitExceeded,
+            var standardError = ObserveTransportAsync(
+                DrainAsync(
+                    process.StandardError.BaseStream,
+                    request.MaximumStandardErrorBytes,
+                    TerminalReason.StandardErrorLimitExceeded,
+                    terminal,
+                    inputOutputAbort),
                 terminal,
                 inputOutputAbort);
-            var exit = process.WaitForExitAsync(CancellationToken.None);
-            var input = WriteAndCloseInputAsync(
-                process.StandardInput.BaseStream,
-                request.StandardInput,
+            var exit = ObserveTransportAsync(
+                process.WaitForExitAsync(CancellationToken.None),
+                terminal,
+                inputOutputAbort);
+            var input = ObserveTransportAsync(
+                WriteAndCloseInputAsync(
+                    process.StandardInput.BaseStream,
+                    request.StandardInput,
+                    inputOutputAbort),
+                terminal,
                 inputOutputAbort);
 
             await Task.WhenAll(standardOutput, standardError, exit, input)
@@ -363,6 +377,58 @@ internal static class BoundedProcessRunner
             when (inputOutputAbort.IsCancellationRequested)
         {
             throw;
+        }
+        catch (Exception exception) when (IsTransportFailure(exception))
+        {
+            terminal.TrySetResult(TerminalReason.TransportFailed);
+            throw TransportFailure();
+        }
+    }
+
+    private static async Task ObserveTransportAsync(
+        Task operation,
+        TaskCompletionSource<TerminalReason> terminal,
+        CancellationToken inputOutputAbort)
+    {
+        try
+        {
+            await operation.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+            when (inputOutputAbort.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            terminal.TrySetResult(TerminalReason.TransportFailed);
+            throw TransportFailure();
+        }
+        catch (Exception exception) when (IsTransportFailure(exception))
+        {
+            terminal.TrySetResult(TerminalReason.TransportFailed);
+            throw TransportFailure();
+        }
+    }
+
+    private static async Task<T> ObserveTransportAsync<T>(
+        Task<T> operation,
+        TaskCompletionSource<TerminalReason> terminal,
+        CancellationToken inputOutputAbort)
+    {
+        try
+        {
+            return await operation.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+            when (inputOutputAbort.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (OperationCanceledException)
+        {
+            terminal.TrySetResult(TerminalReason.TransportFailed);
+            throw TransportFailure();
         }
         catch (Exception exception) when (IsTransportFailure(exception))
         {
@@ -456,13 +522,13 @@ internal static class BoundedProcessRunner
             return killAccepted && IsExited(process);
         }
 
-        inputOutputAbort.Cancel();
+        var abortAccepted = TryCancel(inputOutputAbort);
         CloseRedirectedStreams(process);
         if (await CompletesWithinAsync(lifecycle, CleanupSettleGrace)
                 .ConfigureAwait(false))
         {
             await ObserveAsync(lifecycle).ConfigureAwait(false);
-            return killAccepted && IsExited(process);
+            return abortAccepted && killAccepted && IsExited(process);
         }
 
         _ = lifecycle.ContinueWith(
@@ -478,8 +544,23 @@ internal static class BoundedProcessRunner
         Task task,
         TimeSpan timeout)
     {
-        var grace = Task.Delay(timeout);
-        return await Task.WhenAny(task, grace).ConfigureAwait(false) == task;
+        using var graceStop = new CancellationTokenSource();
+        var grace = Task.Delay(timeout, graceStop.Token);
+        if (await Task.WhenAny(task, grace).ConfigureAwait(false) != task)
+        {
+            return false;
+        }
+
+        graceStop.Cancel();
+        try
+        {
+            await grace.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (graceStop.IsCancellationRequested)
+        {
+        }
+
+        return true;
     }
 
     private static async Task SignalTimeoutAsync(
@@ -489,7 +570,17 @@ internal static class BoundedProcessRunner
     {
         try
         {
-            await Task.Delay(timeout, timeoutStop).ConfigureAwait(false);
+            var elapsed = Stopwatch.StartNew();
+            var remaining = timeout;
+            while (remaining > TimeSpan.Zero)
+            {
+                var delay = remaining > MaximumTimerDelay
+                    ? MaximumTimerDelay
+                    : remaining;
+                await Task.Delay(delay, timeoutStop).ConfigureAwait(false);
+                remaining = timeout - elapsed.Elapsed;
+            }
+
             terminal.TrySetResult(TerminalReason.TimedOut);
         }
         catch (OperationCanceledException) when (timeoutStop.IsCancellationRequested)
@@ -564,6 +655,23 @@ internal static class BoundedProcessRunner
         {
             return false;
         }
+        catch (Win32Exception)
+        {
+            return false;
+        }
+    }
+
+    private static bool TryCancel(CancellationTokenSource cancellation)
+    {
+        try
+        {
+            cancellation.Cancel();
+            return true;
+        }
+        catch (AggregateException)
+        {
+            return false;
+        }
     }
 
     private static void CloseStandardInput(Process process)
@@ -573,6 +681,15 @@ internal static class BoundedProcessRunner
             process.StandardInput.Close();
         }
         catch (InvalidOperationException)
+        {
+        }
+        catch (IOException)
+        {
+        }
+        catch (NotSupportedException)
+        {
+        }
+        catch (Win32Exception)
         {
         }
     }
@@ -587,12 +704,30 @@ internal static class BoundedProcessRunner
         catch (InvalidOperationException)
         {
         }
+        catch (IOException)
+        {
+        }
+        catch (NotSupportedException)
+        {
+        }
+        catch (Win32Exception)
+        {
+        }
 
         try
         {
             process.StandardError.Close();
         }
         catch (InvalidOperationException)
+        {
+        }
+        catch (IOException)
+        {
+        }
+        catch (NotSupportedException)
+        {
+        }
+        catch (Win32Exception)
         {
         }
     }
@@ -608,7 +743,9 @@ internal static class BoundedProcessRunner
     private static bool IsTransportFailure(Exception exception) =>
         exception is IOException or
         InvalidOperationException or
-        NotSupportedException;
+        NotSupportedException or
+        UnauthorizedAccessException or
+        Win32Exception;
 
     [DoesNotReturn]
     private static void ThrowTerminalFailure(

@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
-using System.Text.Json;
 using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Packaging;
@@ -111,14 +110,7 @@ public static class PortablePackageBuilder
 
         try
         {
-            using var document = JsonDocument.Parse(
-                stream,
-                new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = false,
-                    CommentHandling = JsonCommentHandling.Disallow,
-                    MaxDepth = 16,
-                });
+            using var document = StrictJson.Parse(stream, surface);
             var runtimeOptions = document.RootElement.GetProperty("runtimeOptions");
             var framework = runtimeOptions.GetProperty("framework");
             if (!string.Equals(
@@ -143,7 +135,7 @@ public static class PortablePackageBuilder
             }
         }
         catch (Exception exception) when (
-            exception is JsonException or
+            exception is InvalidDataException or
             InvalidOperationException or
             KeyNotFoundException)
         {

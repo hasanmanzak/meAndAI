@@ -32,26 +32,10 @@ internal static class StrictJson
         }
 
         var bytes = File.ReadAllBytes(file.FullName);
-        if (bytes.Length >= 3 &&
-            bytes[0] == 0xef &&
-            bytes[1] == 0xbb &&
-            bytes[2] == 0xbf)
-        {
-            throw new InvalidDataException($"{surface} must not contain a UTF-8 BOM.");
-        }
-
         try
         {
-            using var document = JsonDocument.Parse(
-                bytes,
-                new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = false,
-                    CommentHandling = JsonCommentHandling.Disallow,
-                    MaxDepth = 32,
-                });
-            AssertUniqueProperties(document.RootElement, surface);
-            return JsonSerializer.Deserialize<T>(bytes, SerializerOptions)
+            using var document = Parse(bytes, surface);
+            return document.RootElement.Deserialize<T>(SerializerOptions)
                 ?? throw new InvalidDataException($"{surface} is empty.");
         }
         catch (JsonException exception)
@@ -60,6 +44,81 @@ internal static class StrictJson
                 $"{surface} is not strict UTF-8 JSON.",
                 exception);
         }
+    }
+
+    internal static JsonDocument Parse(
+        ReadOnlyMemory<byte> bytes,
+        string surface)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(surface);
+        if (bytes.IsEmpty || bytes.Length > MaximumJsonBytes)
+        {
+            throw new InvalidDataException(
+                $"{surface} must be bounded and non-empty.");
+        }
+
+        var span = bytes.Span;
+        if (span.Length >= 3 &&
+            span[0] == 0xef &&
+            span[1] == 0xbb &&
+            span[2] == 0xbf)
+        {
+            throw new InvalidDataException($"{surface} must not contain a UTF-8 BOM.");
+        }
+
+        try
+        {
+            var document = JsonDocument.Parse(
+                bytes,
+                new JsonDocumentOptions
+                {
+                    AllowTrailingCommas = false,
+                    CommentHandling = JsonCommentHandling.Disallow,
+                    MaxDepth = 32,
+                });
+            try
+            {
+                AssertUniqueProperties(document.RootElement, surface);
+                return document;
+            }
+            catch (InvalidDataException)
+            {
+                document.Dispose();
+                throw;
+            }
+        }
+        catch (JsonException exception)
+        {
+            throw new InvalidDataException(
+                $"{surface} is not strict UTF-8 JSON.",
+                exception);
+        }
+    }
+
+    internal static JsonDocument Parse(Stream stream, string surface)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentException.ThrowIfNullOrWhiteSpace(surface);
+        using var buffered = new MemoryStream();
+        var buffer = new byte[8192];
+        while (true)
+        {
+            var read = stream.Read(buffer, 0, buffer.Length);
+            if (read == 0)
+            {
+                break;
+            }
+
+            if (buffered.Length + read > MaximumJsonBytes)
+            {
+                throw new InvalidDataException(
+                    $"{surface} must be bounded and non-empty.");
+            }
+
+            buffered.Write(buffer, 0, read);
+        }
+
+        return Parse(buffered.ToArray(), surface);
     }
 
     internal static byte[] Write<T>(T value)

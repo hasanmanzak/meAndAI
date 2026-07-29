@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using MeAndAI.Operations.Infrastructure.Execution;
 
@@ -17,7 +18,10 @@ public sealed class BoundedProcessRunnerTests
     {
         using var fixture = ProcessTestDirectory.Create();
         var result = await BoundedProcessRunner.ExecuteAsync(
-            CreateRequest(fixture, ["binary"]))
+            CreateRequest(
+                fixture,
+                ["binary"],
+                timeout: TimeSpan.MaxValue))
             .ConfigureAwait(true);
 
         Assert.Equal(23, result.ExitCode);
@@ -175,9 +179,27 @@ public sealed class BoundedProcessRunnerTests
         var run = BoundedProcessRunner.ExecuteAsync(CreateRequest(
             fixture,
             ["hang", marker],
-            timeout: TimeSpan.FromSeconds(3)));
+            timeout: TimeSpan.FromSeconds(5)));
 
-        await WaitForFileAsync(marker, TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+        using var readinessCancellation =
+            new CancellationTokenSource(TimeSpan.FromSeconds(7));
+        try
+        {
+            await WaitForFileAsync(marker, readinessCancellation.Token)
+                .ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+            when (readinessCancellation.IsCancellationRequested)
+        {
+            var earlyFailure =
+                await Assert.ThrowsAsync<OperationalDependencyException>(() => run)
+                    .ConfigureAwait(true);
+            Assert.Fail(
+                "The timeout fixture did not report readiness before the run ended: " +
+                earlyFailure.Message);
+            return;
+        }
+
         var processId = ReadProcessId(marker);
         var exception = await Assert.ThrowsAsync<OperationalDependencyException>(() => run)
             .ConfigureAwait(true);
@@ -185,6 +207,42 @@ public sealed class BoundedProcessRunnerTests
         Assert.Equal("Process dependency exceeded its runtime limit.", exception.Message);
         Assert.Null(exception.InnerException);
         await AssertProcessExitedAsync(processId, TimeSpan.FromSeconds(2))
+            .ConfigureAwait(true);
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0192")]
+    public async Task BrokenInputPipeBecomesRedactedTransportFailureAfterCleanup()
+    {
+        using var fixture = ProcessTestDirectory.Create();
+        var marker = fixture.PathFor("input-closed");
+        var secret = "transport-secret-" + Guid.NewGuid().ToString("N");
+        var fragment = Encoding.UTF8.GetBytes(secret);
+        var input = new byte[4 * 1024 * 1024];
+        for (var offset = 0; offset < input.Length; offset += fragment.Length)
+        {
+            fragment.AsSpan(0, Math.Min(fragment.Length, input.Length - offset))
+                .CopyTo(input.AsSpan(offset));
+        }
+
+        var request = BoundedProcessRequest.Create(
+            DotnetExecutable,
+            [FixtureAssembly, "close-input", marker],
+            fixture.Root,
+            input,
+            TimeSpan.FromSeconds(10),
+            1024,
+            1024);
+        var exception = await Assert.ThrowsAsync<OperationalDependencyException>(() =>
+            BoundedProcessRunner.ExecuteAsync(request)).ConfigureAwait(true);
+
+        Assert.Equal("Process dependency communication failed.", exception.Message);
+        Assert.DoesNotContain(secret, exception.ToString(), StringComparison.Ordinal);
+        Assert.Null(exception.InnerException);
+        Assert.True(File.Exists(marker));
+        await AssertProcessExitedAsync(
+                ReadProcessId(marker),
+                TimeSpan.FromSeconds(2))
             .ConfigureAwait(true);
     }
 
@@ -221,10 +279,13 @@ public sealed class BoundedProcessRunnerTests
         var childReady = fixture.PathFor("pipe-child-ready");
         var parentExiting = fixture.PathFor("pipe-parent-exiting");
         var release = fixture.PathFor("pipe-release");
-        var run = BoundedProcessRunner.ExecuteAsync(CreateRequest(
-            fixture,
-            ["inherited-pipe", childReady, parentExiting, release],
-            timeout: TimeSpan.FromSeconds(20)));
+        using var cleanupCancellation = new CancellationTokenSource();
+        var run = BoundedProcessRunner.ExecuteAsync(
+            CreateRequest(
+                fixture,
+                ["inherited-pipe", childReady, parentExiting, release],
+                timeout: TimeSpan.FromSeconds(20)),
+            cleanupCancellation.Token);
 
         try
         {
@@ -248,7 +309,9 @@ public sealed class BoundedProcessRunnerTests
         }
         finally
         {
-            File.WriteAllBytes(release, []);
+            TryWriteRelease(release);
+            cleanupCancellation.CancelAfter(TimeSpan.FromSeconds(5));
+            await ObserveFixtureRunAsync(run).ConfigureAwait(true);
         }
     }
 
@@ -362,10 +425,45 @@ public sealed class BoundedProcessRunnerTests
     private static async Task WaitForFileAsync(string path, TimeSpan timeout)
     {
         using var cancellation = new CancellationTokenSource(timeout);
+        await WaitForFileAsync(path, cancellation.Token).ConfigureAwait(true);
+    }
+
+    private static async Task WaitForFileAsync(
+        string path,
+        CancellationToken cancellationToken)
+    {
         while (!File.Exists(path))
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(20), cancellation.Token)
+            await Task.Delay(TimeSpan.FromMilliseconds(20), cancellationToken)
                 .ConfigureAwait(true);
+        }
+    }
+
+    private static void TryWriteRelease(string path)
+    {
+        try
+        {
+            File.WriteAllBytes(path, []);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
+
+    private static async Task ObserveFixtureRunAsync(Task run)
+    {
+        try
+        {
+            await run.ConfigureAwait(true);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (OperationalDependencyException)
+        {
         }
     }
 

@@ -12,8 +12,8 @@ internal static class ChildProcessFixtureProgram
     private static int Main(string[] arguments) =>
         RunAsync(arguments).GetAwaiter().GetResult();
 
-    private static Task<int> RunAsync(IReadOnlyList<string> arguments) =>
-        arguments.Count == 0
+    private static Task<int> RunAsync(string[] arguments) =>
+        arguments.Length == 0
             ? Task.FromResult(64)
             : arguments[0] switch
             {
@@ -23,6 +23,7 @@ internal static class ChildProcessFixtureProgram
                 "flood-block" => FloodAsync(arguments, blockAfterWrite: true),
                 "touch" => TouchAsync(arguments),
                 "hang" => HangAsync(arguments),
+                "close-input" => CloseInputAsync(arguments),
                 "tree-block" => TreeBlockAsync(arguments),
                 "leaf-block" => LeafBlockAsync(arguments),
                 "inherited-pipe" => InheritedPipeAsync(arguments),
@@ -44,13 +45,13 @@ internal static class ChildProcessFixtureProgram
         return 23;
     }
 
-    private static async Task<int> ObserveAsync(IReadOnlyList<string> arguments)
+    private static async Task<int> ObserveAsync(string[] arguments)
     {
-        if (arguments.Count < 4 ||
+        if (arguments.Length < 4 ||
             !int.TryParse(arguments[1], CultureInfo.InvariantCulture, out var exitCode) ||
             !int.TryParse(arguments[3], CultureInfo.InvariantCulture, out var environmentCount) ||
             environmentCount < 0 ||
-            arguments.Count < 4 + environmentCount)
+            arguments.Length < 4 + environmentCount)
         {
             return 64;
         }
@@ -82,10 +83,10 @@ internal static class ChildProcessFixtureProgram
     }
 
     private static async Task<int> FloodAsync(
-        IReadOnlyList<string> arguments,
+        string[] arguments,
         bool blockAfterWrite)
     {
-        if (arguments.Count != (blockAfterWrite ? 4 : 3) ||
+        if (arguments.Length != (blockAfterWrite ? 4 : 3) ||
             !int.TryParse(arguments[1], CultureInfo.InvariantCulture, out var outputCount) ||
             !int.TryParse(arguments[2], CultureInfo.InvariantCulture, out var errorCount) ||
             outputCount < 0 ||
@@ -108,9 +109,9 @@ internal static class ChildProcessFixtureProgram
         return 0;
     }
 
-    private static Task<int> TouchAsync(IReadOnlyList<string> arguments)
+    private static Task<int> TouchAsync(string[] arguments)
     {
-        if (arguments.Count != 2)
+        if (arguments.Length != 2)
         {
             return Task.FromResult(64);
         }
@@ -119,9 +120,9 @@ internal static class ChildProcessFixtureProgram
         return Task.FromResult(0);
     }
 
-    private static async Task<int> HangAsync(IReadOnlyList<string> arguments)
+    private static async Task<int> HangAsync(string[] arguments)
     {
-        if (arguments.Count != 2)
+        if (arguments.Length != 2)
         {
             return 64;
         }
@@ -131,9 +132,21 @@ internal static class ChildProcessFixtureProgram
         return 0;
     }
 
-    private static async Task<int> TreeBlockAsync(IReadOnlyList<string> arguments)
+    private static Task<int> CloseInputAsync(string[] arguments)
     {
-        if (arguments.Count != 2)
+        if (arguments.Length != 2)
+        {
+            return Task.FromResult(64);
+        }
+
+        WriteAtomic(arguments[1], Environment.ProcessId);
+        Console.OpenStandardInput().Close();
+        return Task.FromResult(0);
+    }
+
+    private static async Task<int> TreeBlockAsync(string[] arguments)
+    {
+        if (arguments.Length != 2)
         {
             return 64;
         }
@@ -144,9 +157,9 @@ internal static class ChildProcessFixtureProgram
         return 0;
     }
 
-    private static async Task<int> LeafBlockAsync(IReadOnlyList<string> arguments)
+    private static async Task<int> LeafBlockAsync(string[] arguments)
     {
-        if (arguments.Count != 2)
+        if (arguments.Length != 2)
         {
             return 64;
         }
@@ -156,9 +169,9 @@ internal static class ChildProcessFixtureProgram
         return 0;
     }
 
-    private static async Task<int> InheritedPipeAsync(IReadOnlyList<string> arguments)
+    private static async Task<int> InheritedPipeAsync(string[] arguments)
     {
-        if (arguments.Count != 4)
+        if (arguments.Length != 4)
         {
             return 64;
         }
@@ -169,9 +182,9 @@ internal static class ChildProcessFixtureProgram
         return 0;
     }
 
-    private static async Task<int> LeafReleaseAsync(IReadOnlyList<string> arguments)
+    private static async Task<int> LeafReleaseAsync(string[] arguments)
     {
-        if (arguments.Count != 3)
+        if (arguments.Length != 3)
         {
             return 64;
         }
