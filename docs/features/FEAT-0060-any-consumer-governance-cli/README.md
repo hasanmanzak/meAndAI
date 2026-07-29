@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) fully complete with exact-head hosted evidence; [SUBF-0122](#subf-0122) locally implementation-green under [TEST-0194](test-cases.md#test-0194) with exact committed-tree/hosted closure pending; two of seven bounded subfeatures closed; PowerShell authority unchanged |
+| Status | [SUBF-0138](#subf-0138), [SUBF-0134](#subf-0134), and [SUBF-0122](#subf-0122) fully complete with exact-head hosted evidence; three of seven bounded subfeatures closed (42.9%); [SUBF-0124](#subf-0124) / [TEST-0195](test-cases.md#test-0195) is the next dependency-coherent gate; PowerShell authority unchanged |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; first clean-room shadow slice complete with exact-head hosted evidence) |
+| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; three bounded shadow slices complete with exact-head hosted evidence) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
-| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) are implemented in the bounded C# catalog; bounded identity/request [TEST-0194](test-cases.md#test-0194) is passing locally; report [TEST-0195](test-cases.md#test-0195) and exact profile-evidence [TEST-0208](test-cases.md#test-0208) remain `Planned` |
+| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) are implemented in the bounded C# catalog; bounded identity/request [TEST-0194](test-cases.md#test-0194) is exact-head hosted complete; report [TEST-0195](test-cases.md#test-0195) and exact profile-evidence [TEST-0208](test-cases.md#test-0208) remain `Planned` |
 | Readiness analysis | [Definition-of-Ready analysis](readiness-analysis.md), [differential-ledger inventory](differential-ledger-analysis.md), [rule/profile matrix](rule-profile-matrix-analysis.md), and [v1 decision packet](contract-decision-packet.md) |
 
 ## Problem
@@ -155,19 +155,19 @@ are green on Ubuntu and Windows. The PowerShell authority state is unchanged.
 | `FIND-0367` <a name="find-0367"></a> | Bounded-scope record relocation / structural governance | Exact committed records checkpoint [`97c8c63`](https://github.com/hasanmanzak/meAndAI/commit/97c8c633f7268cd74d189191df48a6bfbc6ebddf) first failed only [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) because planned [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) still named the old owner in `tests/scenario-ownership.psd1`. After moving that authority, the same gate exposed 110 then 23 [TEST-0003](../FEAT-0001-common-development-protocol/test-cases.md#test-0003) / [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) defects in moved targets, new scope banners, and repeated visible IDs. | Resolved. [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) has one canonical [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) declaration/authority; former local targets link to it and visible stable IDs use exact canonical links. Exact checkpoint [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4) passed PowerShell 7 / Windows PowerShell 5.1 `StructureOnly` in 178.0 / 253.4 seconds, with protocol-governance elapsed 175.753 / 250.869 seconds and zero remaining problems. |
 | `FIND-0368` <a name="find-0368"></a> | [SUBF-0134](#subf-0134) shared analysis and bounded-report fresh review | Fresh review of the first combined [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) / [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) green result found fenced metadata, incomplete evaluated-rule inventory, and decision-link fail-closed gaps. Independent re-review then found over-broad eager parsing of unrelated Markdown, unhandled invalid UTF-8 for a numbered decision, HTML-comment structure that could falsely satisfy the rule, and fence-info/comment state leakage that could hide later real structure. | Resolved. One protocol-record index owns path grammar; the shared document index parses only its numbered decision entries, excludes fenced and HTML-comment content from structure, and isolates fence/comment state. Unrelated invalid UTF-8 is outside the bounded catalog, targeted invalid UTF-8 produces a controlled operational failure with no verdict, reports bind exact `evaluatedRuleIds` with `coverage=bounded-catalog`, and decision symlink/dangling cases fail closed. Exact checkpoint [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4) passed full solution governance 62/62, architecture 31/31, packaging 17/17, repository-only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in 64.6 seconds, both `StructureOnly` runtimes, published-DLL self-consumption, locked restore, format verification, and framework-dependent publish without apphost. Exact final head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) on Ubuntu and Windows. |
 | `FIND-0369` <a name="find-0369"></a> | Exact-head publication evidence / P1 | On exact head [`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a), [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573) passed every C# build, test, package, and Linux package-reuse step. Both long PowerShell `Full` routes then failed only at [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178): tracked Markdown contained two human-facing commit-reference problems because [FIND-0367](#find-0367) used a short commit target. | Resolved by replacing the short target with the exact full-SHA permalink. Exact checkpoint [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4) passed the focused repository-only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) owner in 64.6 seconds and both `StructureOnly` runtimes; exact final head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) on Ubuntu and Windows. No C#, PowerShell, workflow, consumer, or authority behavior changed for this evidence correction. |
-| `FIND-0370` <a name="find-0370"></a> | [TEST-0194](test-cases.md#test-0194) hosted execution route / P1 | Exact implementation head [`c2236b1`](https://github.com/hasanmanzak/meAndAI/commit/c2236b10328f78c0285d966c4b14ea70b9216d6e) passed 69/69 focused tests and compiled the new governance code in both hosted jobs, but inspection found that both C# workflow filters still selected only the three operational-foundation scenarios and omitted [TEST-0194](test-cases.md#test-0194). A green C# step therefore could not prove execution of the bounded contract. | Correction implemented locally. A same-owner C# route regression first failed `Expected: 2`, `Actual: 0`; both existing Ubuntu and Windows filters now include [TEST-0194](test-cases.md#test-0194), and the focused suite passes 70/70. Exact committed-tree [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) then rejected the first assertion because its literal full-filter match repeated three sibling scenario identities; the assertion now verifies only its owned identity across both existing filters. No job, matrix, runner, package, PowerShell route, consumer behavior, or authority changed. Exact committed-tree and hosted closure remain pending. |
+| `FIND-0370` <a name="find-0370"></a> | [TEST-0194](test-cases.md#test-0194) hosted execution route / P1 | Exact implementation head [`c2236b1`](https://github.com/hasanmanzak/meAndAI/commit/c2236b10328f78c0285d966c4b14ea70b9216d6e) passed 69/69 focused tests and compiled the new governance code in both hosted jobs, but inspection found that both C# workflow filters still selected only the three operational-foundation scenarios and omitted [TEST-0194](test-cases.md#test-0194). A green C# step therefore could not prove execution of the bounded contract. | Resolved. A same-owner C# route regression first failed `Expected: 2`, `Actual: 0`; both existing Ubuntu and Windows filters now include [TEST-0194](test-cases.md#test-0194), and the focused suite passes 70/70. Exact committed-tree [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) then rejected the first assertion because its literal full-filter match repeated three sibling scenario identities; the assertion now verifies only its owned identity across both existing filters. Exact head [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d) passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) on Ubuntu and Windows, and both logs prove that the existing C# step selected the owned scenario. No job, matrix, runner, package, PowerShell route, consumer behavior, or authority changed. |
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Bounded MVP ready; its two canonical rules are locally implemented; full coverage/equivalence is outside this feature | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), canonical [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0208](test-cases.md#test-0208) |
-| Test code | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) exact-head green; [SUBF-0122](#subf-0122) local implementation green | [TEST-0194](test-cases.md#test-0194) expected-red failed in 9.6 seconds with `CS0234` / `CS0246`; the focused identity suite then passed 69/69 after single-owner and consumer/candidate fail-closed review corrections. [FIND-0370](#find-0370) added the hosted-route regression, which failed at 0/2 expected workflow filters before the correction and brings the focused suite to 70/70. Exact committed-tree and hosted evidence for this slice remain pending. The later records-only exact head [`7a935a5`](https://github.com/hasanmanzak/meAndAI/commit/7a935a5d8a62b3e49348475962215849f3c4a18b) passed hosted [run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175); earlier shared-kernel exact head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) passed [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) |
-| Baseline run | Latest hosted exact-head baseline accepted for continuation | [Run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175) passed Ubuntu and Windows for the records-only identity-contract head [`7a935a5`](https://github.com/hasanmanzak/meAndAI/commit/7a935a5d8a62b3e49348475962215849f3c4a18b); it does not close the later implementation tree |
+| Test code | [SUBF-0138](#subf-0138), [SUBF-0134](#subf-0134), and [SUBF-0122](#subf-0122) exact-head green | [TEST-0194](test-cases.md#test-0194) expected-red failed in 9.6 seconds with `CS0234` / `CS0246`; the focused identity suite then passed 69/69 after single-owner and consumer/candidate fail-closed review corrections. [FIND-0370](#find-0370) added the hosted-route regression, which failed at 0/2 expected workflow filters before the correction and brings the focused suite to 70/70. Exact head [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d) passed the full local C# and structural gates plus hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) on Ubuntu and Windows. |
+| Baseline run | Latest hosted exact-head baseline accepted for continuation | [Run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) passed Ubuntu in 13 min 33 s and Windows in 25 min 54 s for exact head [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d), including the owned C# route and supported PowerShell validation routes |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0122` <a name="subf-0122"></a> | Versioned bounded catalog, profile, request, application-policy-pair, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) expected-red `CS0234` / `CS0246`; focused 70/70 green after review and [FIND-0370](#find-0370) route corrections; catalog metadata, bounded version/tag, hex grammar, and candidate eligibility each have one production owner; distinct Git/profile evidence remains in [TEST-0208](test-cases.md#test-0208) | Fresh review complete; no open Blocking finding | Local implementation/review/full-suite green; exact-tree and hosted closure pending |
+| `SUBF-0122` <a name="subf-0122"></a> | Versioned bounded catalog, profile, request, application-policy-pair, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) expected-red `CS0234` / `CS0246`; focused 70/70 green after review and [FIND-0370](#find-0370) route corrections; catalog metadata, bounded version/tag, hex grammar, and candidate eligibility each have one production owner; distinct Git/profile evidence remains in [TEST-0208](test-cases.md#test-0208); exact head [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d) passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) | Complete; no open Blocking finding | Complete; PowerShell authority unchanged |
 | `SUBF-0123` <a name="subf-0123"></a> | Exact-commit snapshot and explicit profile-resolution CLI vertical slice | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) plus [TEST-0208](test-cases.md#test-0208), which remains `Planned`; full candidate overlay is excluded | Pending | In progress / not complete |
 | `SUBF-0124` <a name="subf-0124"></a> | Versioned rule catalog, typed finding, deterministic report, and process contract | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0195](test-cases.md#test-0195) remains `Planned`; [SUBF-0138](#subf-0138) supplies only bounded internal building blocks | Pending | In progress / not complete |
 | `SUBF-0134` <a name="subf-0134"></a> | Parse-once repository/document kernel and the exact [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) / [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) `protocol-authority` rules | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Expected-red `CS0234` / `CS0246`; first combined green 53/53; [FIND-0368](#find-0368) resolved after independent re-review; exact local [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4) gates and exact final [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) green | Complete | Complete; PowerShell authority unchanged |
@@ -266,7 +266,7 @@ closure are green. Neither result activates
 [TEST-0195](test-cases.md#test-0195) and [TEST-0208](test-cases.md#test-0208)
 remain literal `Planned` documentation scenarios.
 
-### [SUBF-0122](#subf-0122) local identity-contract evidence
+### [SUBF-0122](#subf-0122) exact-head identity-contract closure
 
 [SUBF-0122](#subf-0122) now implements only the repository-independent
 [TEST-0194](test-cases.md#test-0194) contract. It does not claim exact Git
@@ -298,9 +298,22 @@ publication, equivalence, authority transfer, or PowerShell retirement.
   repository access because [TEST-0208](test-cases.md#test-0208) is still
   planned.
 - A matching immutable-release binding remains a hypothetical identity proof;
-  no released engine or qualified `maai-governance.zip` is asserted. Exact
-  committed-tree and hosted exact-head evidence for this slice remain pending,
-  so only two of seven bounded subfeatures are closed.
+  no released engine or qualified `maai-governance.zip` is asserted.
+- Exact committed-tree reruns on
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  passed the focused 70/70 identity suite, the full 132/132 governance,
+  31/31 architecture, and 17/17 packaging suites, locked restore, format,
+  PowerShell 7 / Windows PowerShell 5.1 `StructureOnly` in 186.6 / 272.4
+  seconds, and the repository-only publication-evidence owner.
+- The same exact head passed hosted
+  [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904):
+  Ubuntu completed in 13 min 33 s and Windows in 25 min 54 s. Both C# logs
+  explicitly selected [TEST-0194](test-cases.md#test-0194) and passed 70/70
+  governance, 31/31 architecture, and 17/17 packaging tests. The supported
+  PowerShell routes also passed and the release verifier skipped as expected.
+
+This closes the third of seven bounded subfeatures (42.9%). Four subfeatures
+remain independently open; PowerShell remains authoritative.
 
 ## Decisions and relationships
 
@@ -345,11 +358,9 @@ risks, and maintainer implementation authorization are all explicit in
 [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
 and this record.
 
-[SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) are fully closed, so both
-local implementation and exact-head closure are two of seven subfeatures
-(28.6%). [SUBF-0122](#subf-0122) makes three of seven slices implementation-
-active (42.9%), but it is not counted closed before exact committed-tree and
-hosted evidence; five subfeatures are therefore not independently closed. The
+[SUBF-0138](#subf-0138), [SUBF-0134](#subf-0134), and
+[SUBF-0122](#subf-0122) are fully closed, so bounded feature closure is three
+of seven subfeatures (42.9%). Four subfeatures remain independently open. The
 historical 188-identity inventory and its
 mixed/variant gaps are inputs to
 [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
@@ -384,10 +395,9 @@ scope banner.
 
 ## Definition of Done
 
-[SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) are implemented,
-fresh-review green, and exact-head verified. [SUBF-0122](#subf-0122) is locally
-implementation- and fresh-review-green but awaits exact committed-tree and
-hosted closure. Four bounded subfeature implementations, their executable
+[SUBF-0138](#subf-0138), [SUBF-0134](#subf-0134), and
+[SUBF-0122](#subf-0122) are implemented, fresh-review green, and exact-head
+verified. Four bounded subfeature implementations, their executable
 evidence, full-feature review/CI,
 exact-commit package qualification, draft-PR completion, merge, and immutable
 release remain incomplete.

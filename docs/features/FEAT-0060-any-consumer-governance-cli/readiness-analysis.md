@@ -10,10 +10,12 @@
 
 Status: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) bounded clean-room `CSharpShadow` slices are
-exact-head hosted complete. [SUBF-0122](README.md#subf-0122) is locally
-implementation-green under [TEST-0194](test-cases.md#test-0194), with exact
-committed-tree and hosted closure pending. Exact repository/profile, package,
-equivalence, authority, and retirement gates remain open.
+exact-head hosted complete. [SUBF-0122](README.md#subf-0122) is also exact-head
+hosted complete under [TEST-0194](test-cases.md#test-0194), closing three of
+seven bounded subfeatures (42.9%). Exact repository/profile, package,
+equivalence, authority, and retirement gates remain open. The next
+dependency-coherent implementation gate is [SUBF-0124](README.md#subf-0124)
+under [TEST-0195](test-cases.md#test-0195).
 
 This record freezes the current evidence boundary. The historical first-slice
 authorization was extended only to the bounded reusable MVP under
@@ -182,6 +184,22 @@ identities must equal their bundle counterparts; any mismatch is rejected
 before repository access. Release therefore changes artifact eligibility only,
 never authority.
 
+The production source of that bundle identity is frozen for the later package
+gate rather than inferred from the running assembly. The release publishes an
+external sibling `maai-operations-release-manifest.json`, not a manifest
+embedded only inside the ZIP. Schema `1` retains its existing shape; schema
+`2` adds the governance policy source commit, catalog schema, and catalog
+digest. For bounded `0.17.0`, the manifest source commit, engine source commit,
+and policy source commit must be the same exact commit. The governance asset's
+manifest `sha256` is the digest of the exact ZIP bytes. Catalog schema and
+digest are derived from `GovernanceRuleCatalog.Current`; no caller-provided
+scalar, duplicate metadata serializer, or second digest implementation is
+allowed. The verifier recomputes the ZIP digest. An immutable release binding
+is populated only after the tag and post-publication evidence prove that exact
+manifest/artifact relationship. Until [SUBF-0137](README.md#subf-0137) wires
+and qualifies that provenance, runtime evaluation remains
+`csharp-shadow` and cannot claim a released engine.
+
 The subject repository snapshot and engine/policy bundle remain independent
 identities. The bounded contract makes no semantic-version-range compatibility
 claim. A clean unreleased exact-source bundle is read-only and
@@ -203,6 +221,29 @@ Operational permissions and rule applicability are separate types. The first
 repository-only composition may use `RepositoryRead`; it registers no mutation
 port and no provider port. A caller cannot narrow or widen
 `GovernanceRuleCapabilityId` applicability.
+
+### Exact repository acquisition bounds
+
+[SUBF-0123](README.md#subf-0123) derives its acquisition limits from the one
+current instruction-graph policy owned by `BoundedGovernanceContract`; it does
+not repeat numeric literals in `ProtocolPolicyIdentity`, Git adapters, or test
+fixtures. `ProtocolPolicyIdentity` verifies exact equality with that owned
+identity. The derived `ExactRepositoryAcquisitionLimits` are:
+
+- at most 65,536 tree entries;
+- at most 4,194,304 aggregate UTF-8 bytes across tree paths;
+- at most 32,768 UTF-8 bytes for one repository-relative path;
+- at most 524,288 bytes for one selected governance blob; and
+- at most 4,194,304 aggregate bytes across selected governance blobs.
+
+Only blobs selected by the bounded governance catalog consume the blob
+budgets; acquisition does not read every repository blob. Graph node, edge,
+and depth limits remain graph-construction limits and are not duplicated as
+repository-acquisition limits. Git invocation and package verification reuse
+one Infrastructure-owned streaming, binary-safe bounded child-process kernel;
+their adapters add domain-specific decoding and exit interpretation without a
+second process runner. Timeout and stderr caps remain internal operational
+defaults rather than public protocol guarantees.
 
 > Historical candidate-analysis input: the following overlay table documents
 > the already implemented internal shadow input and future
@@ -256,6 +297,17 @@ enforcement vocabularies, caller non-downgrade rule, digest scope, and exit-code
 map. Missing canonical severity or enforcement yields `incomplete`; advisory
 observations do not make an otherwise conforming report nonconforming.
 
+Here, canonical scenario owner means the stable normative scenario record
+address: its repository-relative `test-cases.md` path plus exact anchor. It
+never means the current PowerShell suite, C# test class, workflow, or other
+replaceable executable-evidence owner. `GovernanceCatalogRuleIdentity` owns
+that address beside the other rule metadata and includes it in the one
+canonical metadata serialization/digest; no report-only lookup map is valid.
+Because `0.17.0` is unreleased, [SUBF-0124](README.md#subf-0124) may finalize
+that schema-`1` catalog metadata, but it must update the exact
+[TEST-0194](test-cases.md#test-0194) assertions and record/rerun the pre-release
+catalog-identity change in the same coherent slice.
+
 Process and report meanings stay distinct:
 
 | Situation | Operation result | Report verdict |
@@ -264,15 +316,30 @@ Process and report meanings stay distinct:
 | Validation completed and blocking violations exist | Succeeded | `nonconforming` |
 | Validation completed with advisory observations only | Succeeded | `conforming` |
 | Required profile/policy/evidence is unavailable | Succeeded | `incomplete` |
-| Malformed command or schema | Rejected / `input.malformed` | No report or fixed rejected envelope |
-| Undeclared port requested | Rejected / `capability.denied` | No report or fixed rejected envelope |
-| Git or filesystem dependency fails | Failed / `dependency.failed` | No authoritative verdict |
-| Cancellation | Canceled / `operation.canceled` | No authoritative verdict |
-| Unexpected programming exception | Fixed redacted internal-error result | No authoritative verdict |
+| Malformed command or schema | Rejected / `input.malformed`; fixed redacted stderr | No report |
+| Undeclared port requested | Rejected / `capability.denied`; fixed redacted stderr | No report |
+| Git or filesystem dependency fails | Failed / `dependency.failed`; fixed redacted stderr | No report |
+| Cancellation | Canceled / `operation.canceled`; fixed redacted stderr | No report |
+| Unexpected programming exception | Fixed redacted internal-error stderr | No report |
 
 JSON is one UTF-8-without-BOM object with explicit property order, ordinally
 sorted collections, and one LF terminator. Culture, operating-system path
 separator, elapsed duration, and timestamp cannot change its bytes.
+
+[SUBF-0124](README.md#subf-0124) implements this contract before exact Git and
+consumer-profile integration. One `GovernanceReportFactory` and one
+`GovernanceExitCodeMapper` serve every verdict; no parallel report envelope,
+serializer, or CLI-specific mapping is introduced. `incomplete` remains a
+successful `OperationResult` carrying a report and maps to exit `2`.
+Conforming, nonconforming, and incomplete results emit only the canonical JSON
+report on stdout and exit `0`, `1`, and `2` respectively. Rejected,
+dependency/internal failure, and cancellation exit `64`, `70`, and `130`,
+emit only fixed redacted diagnostics on stderr, and emit no JSON report. The
+pure [TEST-0195](test-cases.md#test-0195) contract may construct a typed
+`EnginePolicyBundleIdentity` test seam; production provenance resolution and
+any released-engine assertion remain deferred to
+[SUBF-0137](README.md#subf-0137). This sequencing prevents report/process
+work from inventing a second package-provenance source.
 
 ## Live provider boundary
 
@@ -354,7 +421,7 @@ unchanged.
 
 | ID | Independently testable boundary | Evidence owner | Status |
 | --- | --- | --- | --- |
-| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Local implementation green: expected-red `CS0234` / `CS0246`, focused 70/70 after independent single-owner, fail-closed, and hosted-route review corrections; exact committed-tree and hosted closure pending |
+| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Exact-head hosted complete at [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) for [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d); PowerShell authority unchanged |
 | [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
 | [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
@@ -405,7 +472,13 @@ snapshot contract remain unchanged:
   [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
   on Ubuntu in 12 min 58 s and Windows in 32 min 12 s, including a
   30 min 46 s PowerShell 5.1 step, and closes [FIND-0365](README.md#find-0365)
-  and [FIND-0366](README.md#find-0366).
+  and [FIND-0366](README.md#find-0366); and
+- exact-head [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
+  passed the [SUBF-0122](README.md#subf-0122) final head
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including explicit
+  execution of [TEST-0194](test-cases.md#test-0194) in both existing C# routes
+  and the supported PowerShell validation routes.
 
 Observed baseline durations are diagnostic only: Ubuntu governance was about
 115 seconds plus 124 seconds for instruction graph; Windows PowerShell 5.1 was
@@ -470,13 +543,13 @@ The bounded first clean-room slice has completed all ten readiness items:
 - [x] Explicit maintainer authorization on 2026-07-28 for only this bounded
   `protocol-authority` `CSharpShadow` slice.
 
-First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138) and
-[SUBF-0134](README.md#subf-0134) are exact-head hosted complete, so bounded
-feature closure remains two of seven subfeatures (28.6%).
-[SUBF-0122](README.md#subf-0122) makes three of seven slices implementation-
-active (42.9%) but remains outside the closed numerator until exact committed-
-tree and hosted evidence; five subfeatures are not independently closed. Later
-slices retain their own review gates and authorization.
+First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138),
+[SUBF-0134](README.md#subf-0134), and [SUBF-0122](README.md#subf-0122) are
+exact-head hosted complete, so bounded feature closure is three of seven
+subfeatures (42.9%). Four subfeatures remain independently open. The next gate
+is the pure report/process contract in [SUBF-0124](README.md#subf-0124), then
+the exact repository/profile contract in [SUBF-0123](README.md#subf-0123).
+Later slices retain their own review gates and authorization.
 
 The historical inventory remains 188/188 base identities (100%), 7/7 explicit
 declaration packets (100%), 116 proven TEST/case mappings, and 172/188

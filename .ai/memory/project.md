@@ -128,12 +128,11 @@ Last verified: **2026-07-29**
   passed; the published DLL evaluated the real repository as conforming with
   two rules and zero findings.
 
-  Two of seven subfeatures are fully closed, approximately 28.6%.
+  Three of seven bounded subfeatures are fully closed, approximately 42.9%.
   [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
-  is locally implementation-green under repository-independent
-  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194),
-  so three of seven slices are implementation-active (42.9%); exact
-  committed-tree and hosted closure remain pending for the third slice.
+  is exact-head hosted complete under repository-independent
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194);
+  four bounded subfeatures remain independently open.
   [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
   has exact committed-tree local evidence at
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
@@ -163,15 +162,39 @@ Last verified: **2026-07-29**
   [FIND-0370](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0370).
   The full solution passes 132 governance, 31
   architecture, and 17 packaging tests; locked restore, format, and both local
-  structural runtimes are green. Exact-tree and hosted closure remain pending.
-  The next repository gate is
+  structural runtimes are green. Exact head
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
+  on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including explicit
+  execution of the owned C# route and the supported PowerShell routes. The
+  next gate is the single report/process path in
+  [SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+  under
+  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195),
+  followed by exact repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
-  consumer fixture, while
+  consumer fixture. Canonical
   [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
-  separately owns later exact-commit and two-profile repository evidence. This
+  separately owns exact-commit and two-profile repository evidence. This
   preserves independently reviewable slices without duplicating
   [TEST-0171](../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171).
+  The frozen next-gate contract keeps one report factory and one exit mapper:
+  exits `0` / `1` / `2` emit only canonical JSON, while `64` / `70` / `130`
+  emit only fixed redacted stderr and no report. `incomplete` is a successful
+  operation carrying a report. Exact acquisition derives tree/path/selected-
+  blob limits from the one bounded instruction-graph policy and reuses one
+  Infrastructure-owned streaming binary-safe child-process kernel. Later
+  package provenance comes from external sibling
+  `maai-operations-release-manifest.json` schema `2`, with equal bounded
+  engine/policy/source commits and catalog identity derived only from the
+  canonical rule catalog; no released claim is valid before
+  [SUBF-0137](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0137).
+  A report's canonical scenario owner is the normative repository-relative
+  `test-cases.md#anchor` address owned by the catalog identity, never a
+  PowerShell suite or C# test-class path; the pre-release catalog metadata and
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  digest assertions must change atomically in the report slice.
   PowerShell authority is unchanged.
 
   The historical
@@ -1202,12 +1225,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   with locked restore, format verification, publish, and published-DLL
   real-repository execution green. Fresh review is recorded under
   [FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368).
-  Two of seven subfeatures are fully closed, approximately 28.6%.
+  Three of seven bounded subfeatures are fully closed, approximately 42.9%.
   [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
-  is locally implementation-green under
-  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194),
-  making three of seven slices implementation-active (42.9%) while exact
-  committed-tree and hosted closure remain pending.
+  is exact-head hosted complete under
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194);
+  four bounded subfeatures remain independently open.
   [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
   has exact committed-tree local evidence at
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
@@ -1237,10 +1259,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0370](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0370).
   The full solution passes 132 governance, 31 architecture, and 17 packaging
   tests; locked restore, format, and both local structural runtimes are green.
-  Exact-tree and hosted closure remain pending. The next repository gate is
+  Exact head
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
+  on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including both existing
+  C# routes and the supported PowerShell routes. The next gate is
+  [SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+  under
+  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195),
+  followed by exact repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
-  fixture; exact-commit and two-profile repository evidence remains distinct
+  fixture. Exact-commit and two-profile repository evidence remains distinct
   [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
   The [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
   [DoR contract](../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md#bounded-v017-request-and-identity-contract)
@@ -1248,6 +1278,22 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   commit/digest parsers, an exact `maai-governance.zip` byte digest, and one
   all-or-nothing release binding. Candidate remains internal/deferred and
   PowerShell authority is unchanged.
+  The frozen next-gate contract keeps one report factory and one exit mapper:
+  exits `0` / `1` / `2` emit only canonical JSON, while `64` / `70` / `130`
+  emit only fixed redacted stderr and no report. `incomplete` is a successful
+  operation carrying a report. Exact acquisition derives tree/path/selected-
+  blob limits from the one bounded instruction-graph policy and reuses one
+  Infrastructure-owned streaming binary-safe child-process kernel. Later
+  package provenance comes from external sibling
+  `maai-operations-release-manifest.json` schema `2`, with equal bounded
+  engine/policy/source commits and catalog identity derived only from the
+  canonical rule catalog; no released claim is valid before
+  [SUBF-0137](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0137).
+  A report's canonical scenario owner is the normative repository-relative
+  `test-cases.md#anchor` address owned by the catalog identity, never a
+  PowerShell suite or C# test-class path; the pre-release catalog metadata and
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  digest assertions must change atomically in the report slice.
   [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)

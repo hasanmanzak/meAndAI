@@ -2,10 +2,9 @@
 
 Test implementation: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) are fully complete with exact-head hosted
-evidence. [SUBF-0122](README.md#subf-0122) is locally implementation-green
-under [TEST-0194](#test-0194), while its exact committed-tree and hosted
-closure remain pending. Fully closed progress therefore remains two of seven
-(28.6%); three of seven slices (42.9%) now have active implementation.
+evidence. [SUBF-0122](README.md#subf-0122) is also exact-head hosted complete
+under [TEST-0194](#test-0194). Fully closed progress is therefore three of
+seven (42.9%); four bounded subfeatures remain open.
 
 ## Authorized bounded clean-room catalog
 
@@ -113,13 +112,59 @@ Test-first evidence on 2026-07-29:
   digest identities. Packaging references Domain and reuses those identities;
   rule descriptors own catalog metadata once, while one typed bounded contract
   owns version `0.17.0` and derives its exact release tag.
+- Exact committed-tree reruns on
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  passed the focused 70/70 identity suite, the full 132/132 governance,
+  31/31 architecture, and 17/17 packaging suites, locked restore, format,
+  both supported `StructureOnly` runtimes, and the repository-only
+  publication-evidence owner.
+- The same exact head passed hosted
+  [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904):
+  Ubuntu completed in 13 min 33 s and Windows in 25 min 54 s. Both existing
+  C# routes explicitly selected [TEST-0194](#test-0194) and passed 70/70
+  governance, 31/31 architecture, and 17/17 packaging tests; the supported
+  PowerShell routes also passed.
 
 This proves only repository-independent typed construction and fail-closed
 cross-identity validation. It does not prove commit existence or Git object
 type, consumer pin/profile evidence, exact-commit CLI acquisition, ZIP
 qualification/publication, or an actual released engine. The matching release
 test constructs a hypothetical all-or-nothing binding; PowerShell remains the
-authority. Exact committed-tree and hosted closure are pending.
+authority. Exact committed-tree and hosted closure are complete for this
+repository-independent contract. Exact Git/profile evidence and package
+qualification remain separate later gates.
+
+### [TEST-0195](#test-0195) frozen implementation boundary
+
+[SUBF-0124](README.md#subf-0124) is the next dependency-coherent slice. Its
+expected-red and implementation must preserve one engine-to-report path:
+
+- one typed report factory and one exit-code mapper serve conforming,
+  nonconforming, and incomplete results;
+- `incomplete` is a successful operation result carrying a report, not a
+  dependency failure;
+- exits `0`, `1`, and `2` emit only the canonical deterministic JSON report on
+  stdout;
+- rejected, dependency/internal failure, and cancellation exits `64`, `70`,
+  and `130` emit only fixed redacted stderr and no JSON report;
+- findings retain canonical rule/scenario ownership, severity, enforcement,
+  safe repository-relative location/line/anchor, and content/object evidence
+  digest without snippets, host data, commands, or secrets; and
+- the pure test seam may construct the typed bundle identity, while production
+  manifest/ZIP provenance and any released-engine claim remain owned by
+  [SUBF-0137](README.md#subf-0137).
+
+Canonical scenario owner is the normative repository-relative
+`test-cases.md#anchor` address, not a PowerShell suite or C# class path. The
+single catalog rule identity owns that value and includes it in canonical
+metadata/digest bytes. Since `0.17.0` is not released, this slice may finalize
+the schema-`1` catalog identity only by atomically updating and rerunning the
+exact [TEST-0194](#test-0194) assertions; a second owner lookup is forbidden.
+
+This scenario remains `PlannedDocumentation` until its coherent executable
+slice is added atomically. Exact Git acquisition and both repository profiles
+remain owned by [TEST-0208](#test-0208), which follows this report/process
+gate.
 
 ## Distinct-intent review
 
