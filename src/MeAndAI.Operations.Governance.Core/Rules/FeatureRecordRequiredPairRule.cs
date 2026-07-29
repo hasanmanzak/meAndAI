@@ -17,9 +17,6 @@ public sealed class FeatureRecordRequiredPairRule :
             GovernanceSeverity.High,
             GovernanceEnforcement.Blocking);
 
-    private static readonly string[] RequiredFiles =
-        ["README.md", "test-cases.md"];
-
     public override GovernanceCatalogRuleIdentity Identity =>
         CanonicalIdentity;
 
@@ -41,7 +38,7 @@ public sealed class FeatureRecordRequiredPairRule :
         FeatureRecord featureRecord,
         GovernanceAnalysisContext context)
     {
-        var requirements = RequiredFiles
+        var requirements = ProtocolRecordPath.RequiredFeatureFileNames
             .Where(requiredFile => !IsRepositoryFile(
                 context,
                 $"{featureRecord.RelativePath}/{requiredFile}"))

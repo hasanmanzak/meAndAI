@@ -19,6 +19,66 @@ internal sealed class GovernanceReportFactory
         GovernanceRepositorySnapshot snapshot,
         IEnumerable<GovernanceRuleEvaluation> evaluations)
     {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        if (!snapshot.IsCandidate)
+        {
+            throw new ArgumentException(
+                "Candidate governance reports require a candidate snapshot.",
+                nameof(snapshot));
+        }
+
+        return CreateCore(
+            profile,
+            snapshot,
+            exactPolicy: null,
+            profileEvidenceState: null,
+            evaluations);
+    }
+
+    internal GovernanceReport CreateExact(
+        GovernanceProfileId profile,
+        GovernanceRepositorySnapshot snapshot,
+        ProtocolPolicyIdentity policy,
+        GovernanceProfileEvidenceState profileEvidenceState,
+        IEnumerable<GovernanceRuleEvaluation> evaluations)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(policy);
+        ArgumentNullException.ThrowIfNull(profileEvidenceState);
+        ArgumentNullException.ThrowIfNull(evaluations);
+
+        if (!snapshot.IsExactCommit)
+        {
+            throw new ArgumentException(
+                "Exact governance reports require an exact-commit snapshot.",
+                nameof(snapshot));
+        }
+
+        if (profileEvidenceState != GovernanceProfileEvidenceState.Complete &&
+            profileEvidenceState != GovernanceProfileEvidenceState.Incomplete)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(profileEvidenceState),
+                profileEvidenceState,
+                "Unknown governance profile-evidence state.");
+        }
+
+        return CreateCore(
+            profile,
+            snapshot,
+            policy,
+            profileEvidenceState,
+            evaluations);
+    }
+
+    private GovernanceReport CreateCore(
+        GovernanceProfileId profile,
+        GovernanceRepositorySnapshot snapshot,
+        ProtocolPolicyIdentity? exactPolicy,
+        GovernanceProfileEvidenceState? profileEvidenceState,
+        IEnumerable<GovernanceRuleEvaluation> evaluations)
+    {
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(evaluations);
@@ -99,10 +159,14 @@ internal sealed class GovernanceReportFactory
             profile,
             snapshot.Mode,
             snapshot.EvidenceDigest,
+            snapshot.SubjectCommit,
+            exactPolicy?.Version,
+            exactPolicy?.SourceCommit,
+            profileEvidenceState,
             catalog.Version.Value,
             catalog.Identity.MetadataDigest.Value,
             evaluatedRuleIds,
-            DetermineVerdict(counts),
+            DetermineVerdict(counts, profileEvidenceState),
             GovernanceEngineState.CSharpShadow,
             GovernanceAuthorityState.PowerShellAuthority,
             counts,
@@ -111,8 +175,18 @@ internal sealed class GovernanceReportFactory
 
     internal static GovernanceVerdict DetermineVerdict(
         GovernanceCounts counts)
+        => DetermineVerdict(counts, profileEvidenceState: null);
+
+    private static GovernanceVerdict DetermineVerdict(
+        GovernanceCounts counts,
+        GovernanceProfileEvidenceState? profileEvidenceState)
     {
         ArgumentNullException.ThrowIfNull(counts);
+
+        if (profileEvidenceState == GovernanceProfileEvidenceState.Incomplete)
+        {
+            return GovernanceVerdict.Incomplete;
+        }
 
         if (counts.MissingRules > 0 || counts.UnmappedRules > 0)
         {

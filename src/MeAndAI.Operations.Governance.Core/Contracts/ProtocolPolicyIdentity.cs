@@ -39,7 +39,7 @@ public sealed class ProtocolPolicyIdentity
 
         if (version != BoundedGovernanceContract.Version ||
             !IsCurrentCatalog(catalog) ||
-            !IsCurrentInstructionGraph(instructionGraph))
+            instructionGraph != BoundedGovernanceContract.InstructionGraph)
         {
             throw new ArgumentException(
                 $"The protocol policy identity is outside the bounded v{BoundedGovernanceContract.Version.Value} contract.");
@@ -52,6 +52,17 @@ public sealed class ProtocolPolicyIdentity
             instructionGraph);
     }
 
+    internal static ProtocolPolicyIdentity CreateCurrent(
+        ExactGitCommitId sourceCommit)
+    {
+        ArgumentNullException.ThrowIfNull(sourceCommit);
+        return CreateBounded(
+            BoundedGovernanceContract.Version,
+            sourceCommit,
+            GovernanceRuleCatalog.Current.Identity,
+            BoundedGovernanceContract.InstructionGraph);
+    }
+
     private static bool IsCurrentCatalog(GovernanceCatalogIdentity catalog)
     {
         var current = GovernanceRuleCatalog.Current.Identity;
@@ -60,16 +71,4 @@ public sealed class ProtocolPolicyIdentity
             catalog.MetadataDigest == current.MetadataDigest &&
             catalog.Rules.SequenceEqual(current.Rules);
     }
-
-    private static bool IsCurrentInstructionGraph(
-        InstructionGraphPolicyIdentity graph) =>
-        graph.Schema == 2 &&
-        graph.MaximumTreeEntries == 65536 &&
-        graph.MaximumAggregateTreePathUtf8Bytes == 4194304 &&
-        graph.MaximumNodes == 512 &&
-        graph.MaximumEdges == 4096 &&
-        graph.MaximumDepth == 32 &&
-        graph.MaximumParsedBlobBytes == 524288 &&
-        graph.MaximumAggregateParsedBytes == 4194304 &&
-        graph.MaximumGraphPathUtf8Bytes == 32768;
 }

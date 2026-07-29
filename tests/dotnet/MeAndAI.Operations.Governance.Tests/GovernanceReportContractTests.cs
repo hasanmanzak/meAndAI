@@ -420,6 +420,141 @@ public sealed class GovernanceReportContractTests
 
     [Fact]
     [Trait("Scenario", GovernanceScenarios.ReportProcess)]
+    public void ExactProfileEvidenceIsBoundWithoutFalsifyingRuleCounts()
+    {
+        var subjectCommit = ExactGitCommitId.Parse(
+            "0123456789abcdef0123456789abcdef01234567");
+        var policyCommit = ExactGitCommitId.Parse(
+            "89abcdef0123456789abcdef0123456789abcdef");
+        var snapshot = GovernanceRepositorySnapshot.CreateExact(
+            subjectCommit,
+            [
+                GovernanceRepositoryEntry.Directory(
+                    "docs/features/FEAT-0001-example"),
+                GovernanceRepositoryEntry.File(
+                    "docs/features/FEAT-0001-example/README.md"),
+                GovernanceRepositoryEntry.File(
+                    "docs/features/FEAT-0001-example/test-cases.md"),
+            ]);
+        var policy = ProtocolPolicyIdentity.CreateCurrent(policyCommit);
+        var engine = GovernanceEngine.CreateDefault();
+
+        var complete = engine.EvaluateExactShadow(
+            GovernanceProfileId.Consumer,
+            snapshot,
+            policy,
+            GovernanceProfileEvidenceState.Complete);
+        var incomplete = engine.EvaluateExactShadow(
+            GovernanceProfileId.Consumer,
+            snapshot,
+            policy,
+            GovernanceProfileEvidenceState.Incomplete);
+
+        Assert.Same(GovernanceVerdict.Conforming, complete.Verdict);
+        Assert.Same(GovernanceVerdict.Incomplete, incomplete.Verdict);
+        Assert.Equal(2, incomplete.Counts.EvaluatedRules);
+        Assert.Equal(0, incomplete.Counts.MissingRules);
+        Assert.Equal(0, incomplete.Counts.UnmappedRules);
+        Assert.Empty(incomplete.Findings);
+        Assert.Same(subjectCommit, incomplete.SnapshotSubjectCommit);
+        Assert.Same(policyCommit, incomplete.PolicySourceCommit);
+        Assert.Same(
+            BoundedGovernanceContract.Version,
+            incomplete.PolicyVersion);
+        Assert.Same(
+            GovernanceProfileEvidenceState.Incomplete,
+            incomplete.ProfileEvidenceState);
+
+        using var document = JsonDocument.Parse(
+            GovernanceReportSerializer.Serialize(incomplete));
+        var root = document.RootElement;
+        Assert.Equal(
+            subjectCommit.Value,
+            root.GetProperty("snapshot")
+                .GetProperty("subjectCommit")
+                .GetString());
+        var serializedPolicy = root.GetProperty("policy");
+        Assert.Equal(
+            policyCommit.Value,
+            serializedPolicy.GetProperty("sourceCommit").GetString());
+        Assert.Equal(
+            BoundedGovernanceContract.Version.Value,
+            serializedPolicy.GetProperty("version").GetString());
+        Assert.Equal(
+            "incomplete",
+            serializedPolicy.GetProperty("profileEvidence").GetString());
+    }
+
+    [Fact]
+    [Trait("Scenario", GovernanceScenarios.ReportProcess)]
+    public void ProfileIncompletenessDominatesBlockingFindingsWithoutHidingThem()
+    {
+        var subjectCommit = ExactGitCommitId.Parse(
+            "0123456789abcdef0123456789abcdef01234567");
+        var snapshot = GovernanceRepositorySnapshot.CreateExact(
+            subjectCommit,
+            [
+                GovernanceRepositoryEntry.Directory(
+                    "docs/features/FEAT-0001-example"),
+            ]);
+        var policy = ProtocolPolicyIdentity.CreateCurrent(subjectCommit);
+
+        var report = GovernanceEngine.CreateDefault().EvaluateExactShadow(
+            GovernanceProfileId.ProtocolAuthority,
+            snapshot,
+            policy,
+            GovernanceProfileEvidenceState.Incomplete);
+
+        Assert.Same(GovernanceVerdict.Incomplete, report.Verdict);
+        Assert.Equal(2, report.Counts.EvaluatedRules);
+        Assert.Equal(0, report.Counts.MissingRules);
+        Assert.Equal(0, report.Counts.UnmappedRules);
+        Assert.Equal(1, report.Counts.BlockingFindings);
+        Assert.Single(report.Findings);
+    }
+
+    [Fact]
+    [Trait("Scenario", GovernanceScenarios.ReportProcess)]
+    public void CandidateFactoryRejectsAnExactSnapshotWithoutPolicyEvidence()
+    {
+        var subjectCommit = ExactGitCommitId.Parse(
+            "0123456789abcdef0123456789abcdef01234567");
+        var snapshot = GovernanceRepositorySnapshot.CreateExact(
+            subjectCommit,
+            []);
+
+        Assert.Throws<ArgumentException>(() =>
+            GovernanceReportTestData.Factory().Create(
+                GovernanceProfileId.ProtocolAuthority,
+                snapshot,
+                []));
+    }
+
+    [Fact]
+    [Trait("Scenario", GovernanceScenarios.ReportProcess)]
+    public void CandidateReportDoesNotInventExactProfileEvidence()
+    {
+        using var document = JsonDocument.Parse(Serialize(
+            GovernanceRepositoryEntry.Directory(
+                "docs/features/FEAT-0001-example")));
+        var root = document.RootElement;
+
+        Assert.False(
+            root.GetProperty("snapshot").TryGetProperty(
+                "subjectCommit",
+                out _));
+        Assert.False(
+            root.GetProperty("policy").TryGetProperty("sourceCommit", out _));
+        Assert.False(
+            root.GetProperty("policy").TryGetProperty("version", out _));
+        Assert.False(
+            root.GetProperty("policy").TryGetProperty(
+                "profileEvidence",
+                out _));
+    }
+
+    [Fact]
+    [Trait("Scenario", GovernanceScenarios.ReportProcess)]
     public void SerializedFindingCarriesCanonicalOwnerLocationAndEvidenceWithoutContent()
     {
         var serialized = Serialize(

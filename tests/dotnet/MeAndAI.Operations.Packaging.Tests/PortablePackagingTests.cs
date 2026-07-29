@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
+using MeAndAI.Operations.Domain.Identity;
 using MeAndAI.Operations.Packaging;
 
 namespace MeAndAI.Operations.Packaging.Tests;
@@ -12,6 +13,12 @@ public sealed class PortablePackagingTests
 {
     private const string SourceCommit =
         "0123456789abcdef0123456789abcdef01234567";
+
+    private const string GovernancePolicyBindingProperty =
+        "MeAndAIGovernancePolicySourceCommit";
+
+    private const string GovernancePolicyMetadataKey =
+        "MeAndAI.Governance.PolicySourceCommit";
 
     private const string CompatibleRuntimeInventory =
         "Microsoft.NETCore.App 10.0.9 [runtime-root]";
@@ -292,6 +299,96 @@ public sealed class PortablePackagingTests
             Assert.Null(ReadProperty(project, "PublishSingleFile"));
             Assert.Empty(project.Descendants("PackageReference"));
         }
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0193")]
+    public void GovernancePublishAloneReceivesTheValidatedPolicySourceCommit()
+    {
+        var inventory = ReadRepositoryInventory();
+        var argumentSets = inventory.Packages
+            .Select(package => new
+            {
+                Package = package,
+                Arguments = PackagingCli.CreatePublishArguments(
+                    package,
+                    package.ProjectPath,
+                    $"publish/{package.Application}",
+                    SourceCommit),
+            })
+            .ToArray();
+
+        Assert.Equal(inventory.Packages.Count, argumentSets.Length);
+        Assert.Equal(
+            argumentSets.Length,
+            argumentSets.Select(item => item.Arguments).Distinct().Count());
+        foreach (var item in argumentSets)
+        {
+            var bindings = item.Arguments
+                .Where(argument => argument.StartsWith(
+                    $"-p:{GovernancePolicyBindingProperty}=",
+                    StringComparison.Ordinal))
+                .ToArray();
+
+            if (string.Equals(
+                    item.Package.Application,
+                    OperationalApplicationId.Governance.Value,
+                    StringComparison.Ordinal))
+            {
+                Assert.Equal(
+                    [$"-p:{GovernancePolicyBindingProperty}={SourceCommit}"],
+                    bindings);
+            }
+            else
+            {
+                Assert.Empty(bindings);
+                Assert.DoesNotContain(SourceCommit, item.Arguments);
+            }
+        }
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0193")]
+    public void OnlyGovernanceProjectOwnsTheConditionalBindingMetadata()
+    {
+        var sourceRoot = Path.Combine(RepositoryRoot, "src");
+        var owners = Directory
+            .EnumerateFiles(
+                sourceRoot,
+                "*.csproj",
+                SearchOption.AllDirectories)
+            .Select(path => new
+            {
+                Path = path,
+                Project = XDocument.Load(path),
+            })
+            .SelectMany(item => item.Project
+                .Descendants("AssemblyMetadata")
+                .Where(element => string.Equals(
+                    (string?)element.Attribute("Include"),
+                    GovernancePolicyMetadataKey,
+                    StringComparison.Ordinal))
+                .Select(element => new
+                {
+                    item.Path,
+                    Metadata = element,
+                }))
+            .ToArray();
+        var owner = Assert.Single(owners);
+
+        Assert.Equal(
+            Path.Combine(
+                sourceRoot,
+                "MeAndAI.Operations.Governance",
+                "MeAndAI.Operations.Governance.csproj"),
+            owner.Path);
+        Assert.Equal(
+            $"$({GovernancePolicyBindingProperty})",
+            (string?)owner.Metadata.Attribute("Value"));
+        Assert.Equal(
+            $"'$({GovernancePolicyBindingProperty})' != ''",
+            (string?)owner.Metadata.Parent?.Attribute("Condition"));
+        Assert.Null(owner.Metadata.Attribute("Condition"));
     }
 
     private static OperationsPackageInventory ReadRepositoryInventory() =>

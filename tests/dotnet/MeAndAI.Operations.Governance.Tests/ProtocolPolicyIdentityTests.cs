@@ -24,7 +24,9 @@ public sealed class ProtocolPolicyIdentityTests
         Assert.Equal("0.17.0", policy.Version.Value);
         Assert.Same(PolicyCommit, policy.SourceCommit);
         Assert.Same(GovernanceRuleCatalog.Current.Identity, policy.Catalog);
-        Assert.Equal(CurrentGraph(), policy.InstructionGraph);
+        Assert.Same(
+            BoundedGovernanceContract.InstructionGraph,
+            policy.InstructionGraph);
     }
 
     [Fact]
@@ -45,15 +47,23 @@ public sealed class ProtocolPolicyIdentityTests
     {
         var invalidGraphs = new[]
         {
-            Graph(schema: 3),
-            Graph(maximumTreeEntries: 65535),
-            Graph(maximumAggregateTreePathUtf8Bytes: 4194303),
-            Graph(maximumNodes: 511),
-            Graph(maximumEdges: 4095),
-            Graph(maximumDepth: 31),
-            Graph(maximumParsedBlobBytes: 524287),
-            Graph(maximumAggregateParsedBytes: 4194303),
-            Graph(maximumGraphPathUtf8Bytes: 32767),
+            Graph(schema: CurrentGraph().Schema + 1),
+            Graph(maximumTreeEntries: CurrentGraph().MaximumTreeEntries - 1),
+            Graph(
+                maximumAggregateTreePathUtf8Bytes:
+                    CurrentGraph().MaximumAggregateTreePathUtf8Bytes - 1),
+            Graph(maximumNodes: CurrentGraph().MaximumNodes - 1),
+            Graph(maximumEdges: CurrentGraph().MaximumEdges - 1),
+            Graph(maximumDepth: CurrentGraph().MaximumDepth - 1),
+            Graph(
+                maximumParsedBlobBytes:
+                    CurrentGraph().MaximumParsedBlobBytes - 1),
+            Graph(
+                maximumAggregateParsedBytes:
+                    CurrentGraph().MaximumAggregateParsedBytes - 1),
+            Graph(
+                maximumGraphPathUtf8Bytes:
+                    CurrentGraph().MaximumGraphPathUtf8Bytes - 1),
         };
 
         foreach (var graph in invalidGraphs)
@@ -97,26 +107,31 @@ public sealed class ProtocolPolicyIdentityTests
                 null!));
     }
 
-    private static InstructionGraphPolicyIdentity CurrentGraph() => Graph();
+    private static InstructionGraphPolicyIdentity CurrentGraph() =>
+        BoundedGovernanceContract.InstructionGraph;
 
     private static InstructionGraphPolicyIdentity Graph(
-        int schema = 2,
-        int maximumTreeEntries = 65536,
-        int maximumAggregateTreePathUtf8Bytes = 4194304,
-        int maximumNodes = 512,
-        int maximumEdges = 4096,
-        int maximumDepth = 32,
-        int maximumParsedBlobBytes = 524288,
-        int maximumAggregateParsedBytes = 4194304,
-        int maximumGraphPathUtf8Bytes = 32768) =>
-        InstructionGraphPolicyIdentity.Create(
-            schema,
-            maximumTreeEntries,
-            maximumAggregateTreePathUtf8Bytes,
-            maximumNodes,
-            maximumEdges,
-            maximumDepth,
-            maximumParsedBlobBytes,
-            maximumAggregateParsedBytes,
-            maximumGraphPathUtf8Bytes);
+        int? schema = null,
+        int? maximumTreeEntries = null,
+        int? maximumAggregateTreePathUtf8Bytes = null,
+        int? maximumNodes = null,
+        int? maximumEdges = null,
+        int? maximumDepth = null,
+        int? maximumParsedBlobBytes = null,
+        int? maximumAggregateParsedBytes = null,
+        int? maximumGraphPathUtf8Bytes = null)
+    {
+        var current = CurrentGraph();
+        return InstructionGraphPolicyIdentity.Create(
+            schema ?? current.Schema,
+            maximumTreeEntries ?? current.MaximumTreeEntries,
+            maximumAggregateTreePathUtf8Bytes ??
+                current.MaximumAggregateTreePathUtf8Bytes,
+            maximumNodes ?? current.MaximumNodes,
+            maximumEdges ?? current.MaximumEdges,
+            maximumDepth ?? current.MaximumDepth,
+            maximumParsedBlobBytes ?? current.MaximumParsedBlobBytes,
+            maximumAggregateParsedBytes ?? current.MaximumAggregateParsedBytes,
+            maximumGraphPathUtf8Bytes ?? current.MaximumGraphPathUtf8Bytes);
+    }
 }

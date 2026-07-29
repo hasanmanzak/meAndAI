@@ -29,10 +29,7 @@ public sealed class GovernanceEngine
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        if (!string.Equals(
-                snapshot.Mode,
-                "candidate",
-                StringComparison.Ordinal))
+        if (!snapshot.IsCandidate)
         {
             throw new ArgumentException(
                 "The internal shadow path accepts only a candidate snapshot.",
@@ -41,10 +38,39 @@ public sealed class GovernanceEngine
 
         RequireCandidateProfile(profile);
 
-        return EvaluateCore(profile, snapshot);
+        return reportFactory.Create(
+            profile,
+            snapshot,
+            EvaluateCore(profile, snapshot));
     }
 
-    private GovernanceReport EvaluateCore(
+    internal GovernanceReport EvaluateExactShadow(
+        GovernanceProfileId profile,
+        GovernanceRepositorySnapshot snapshot,
+        ProtocolPolicyIdentity policy,
+        GovernanceProfileEvidenceState profileEvidenceState)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(policy);
+        ArgumentNullException.ThrowIfNull(profileEvidenceState);
+
+        if (!snapshot.IsExactCommit)
+        {
+            throw new ArgumentException(
+                "The exact shadow path accepts only an exact-commit snapshot.",
+                nameof(snapshot));
+        }
+
+        return reportFactory.CreateExact(
+            profile,
+            snapshot,
+            policy,
+            profileEvidenceState,
+            EvaluateCore(profile, snapshot));
+    }
+
+    private GovernanceRuleEvaluation[] EvaluateCore(
         GovernanceProfileId profile,
         GovernanceRepositorySnapshot snapshot)
     {
@@ -64,9 +90,6 @@ public sealed class GovernanceEngine
                 rule.Evaluate(context)))
             .ToArray();
 
-        return reportFactory.Create(
-            profile,
-            snapshot,
-            evaluations);
+        return evaluations;
     }
 }

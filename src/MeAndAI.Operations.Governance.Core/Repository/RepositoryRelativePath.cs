@@ -14,17 +14,37 @@ public sealed record RepositoryRelativePath
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
         var normalized = value.Replace('\\', '/');
-        if (normalized.StartsWith("/", StringComparison.Ordinal) ||
-            IsDrivePrefixed(normalized) ||
-            normalized.EndsWith("/", StringComparison.Ordinal) ||
-            normalized.Any(char.IsControl))
+        return CreateValidated(normalized, nameof(value));
+    }
+
+    internal static RepositoryRelativePath FromExactGit(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        if (value.Contains('\\', StringComparison.Ordinal))
         {
             throw new ArgumentException(
-                "Repository paths must be safe repository-relative paths.",
+                "Exact Git paths cannot contain platform path separators.",
                 nameof(value));
         }
 
-        var segments = normalized.Split('/');
+        return CreateValidated(value, nameof(value));
+    }
+
+    private static RepositoryRelativePath CreateValidated(
+        string value,
+        string parameterName)
+    {
+        if (value.StartsWith("/", StringComparison.Ordinal) ||
+            IsDrivePrefixed(value) ||
+            value.EndsWith("/", StringComparison.Ordinal) ||
+            value.Any(char.IsControl))
+        {
+            throw new ArgumentException(
+                "Repository paths must be safe repository-relative paths.",
+                parameterName);
+        }
+
+        var segments = value.Split('/');
         if (segments.Any(segment =>
                 segment.Length == 0 ||
                 string.Equals(segment, ".", StringComparison.Ordinal) ||
@@ -32,10 +52,10 @@ public sealed record RepositoryRelativePath
         {
             throw new ArgumentException(
                 "Repository paths must not contain empty or traversal segments.",
-                nameof(value));
+                parameterName);
         }
 
-        return new RepositoryRelativePath(normalized);
+        return new RepositoryRelativePath(value);
     }
 
     public override string ToString() => Value;

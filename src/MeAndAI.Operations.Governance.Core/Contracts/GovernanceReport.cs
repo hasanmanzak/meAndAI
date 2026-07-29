@@ -48,6 +48,10 @@ public sealed class GovernanceReport
         GovernanceProfileId profile,
         string snapshotMode,
         string snapshotEvidenceDigest,
+        ExactGitCommitId? snapshotSubjectCommit,
+        ProtocolVersion? policyVersion,
+        ExactGitCommitId? policySourceCommit,
+        GovernanceProfileEvidenceState? profileEvidenceState,
         string policyCatalogVersion,
         string policyCatalogMetadataDigest,
         string[] evaluatedRuleIds,
@@ -60,6 +64,10 @@ public sealed class GovernanceReport
         Profile = profile;
         SnapshotMode = snapshotMode;
         SnapshotEvidenceDigest = snapshotEvidenceDigest;
+        SnapshotSubjectCommit = snapshotSubjectCommit;
+        PolicyVersion = policyVersion;
+        PolicySourceCommit = policySourceCommit;
+        ProfileEvidenceState = profileEvidenceState;
         PolicyCatalogVersion = policyCatalogVersion;
         PolicyCatalogMetadataDigest = policyCatalogMetadataDigest;
         EvaluatedRuleIds = new ReadOnlyCollection<string>(evaluatedRuleIds);
@@ -82,6 +90,14 @@ public sealed class GovernanceReport
     public string SnapshotMode { get; }
 
     public string SnapshotEvidenceDigest { get; }
+
+    public ExactGitCommitId? SnapshotSubjectCommit { get; }
+
+    public ProtocolVersion? PolicyVersion { get; }
+
+    public ExactGitCommitId? PolicySourceCommit { get; }
+
+    public GovernanceProfileEvidenceState? ProfileEvidenceState { get; }
 
     public string PolicyCatalogVersion { get; }
 

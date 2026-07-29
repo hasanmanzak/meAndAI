@@ -376,7 +376,9 @@ public sealed class GovernanceCliTests
         string profile = "protocol-authority",
         CancellationToken cancellationToken = default)
     {
-        return await InvokeArgumentsAsync(
+        using var output = new StringWriter();
+        using var error = new StringWriter();
+        var exitCode = await GovernanceCli.RunCandidateShadowAsync(
             [
                 "validate",
                 "--repository",
@@ -384,7 +386,10 @@ public sealed class GovernanceCliTests
                 "--profile",
                 profile,
             ],
+            output,
+            error,
             cancellationToken);
+        return new CliResult(exitCode, output.ToString(), error.ToString());
     }
 
     private static async Task<CliResult> InvokeArgumentsAsync(

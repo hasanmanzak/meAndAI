@@ -1,4 +1,5 @@
 using System.Text.Json;
+using MeAndAI.Operations.Domain.Identity;
 using MeAndAI.Operations.Infrastructure.Execution;
 
 namespace MeAndAI.Operations.Packaging;
@@ -129,21 +130,11 @@ internal static class PackagingCli
                 var result = await BoundedProcessRunner.ExecuteAsync(
                         PackagingProcessPolicy.CreateTextRequest(
                             "dotnet",
-                            [
-                                "publish",
+                            CreatePublishArguments(
+                                package,
                                 projectPath,
-                                "--configuration",
-                                "Release",
-                                "--no-restore",
-                                "--nologo",
-                                "--output",
                                 publishDirectory,
-                                "--self-contained",
-                                "false",
-                                "-p:UseAppHost=false",
-                                "-p:DebugSymbols=false",
-                                "-p:DebugType=None",
-                            ],
+                                sourceCommit),
                             repository.FullName,
                             PackagingProcessPolicy.PublishTimeout),
                         cancellationToken)
@@ -183,6 +174,46 @@ internal static class PackagingCli
         {
             temporaryDirectory.Dispose();
         }
+    }
+
+    internal static string[] CreatePublishArguments(
+        OperationsPackageDefinition package,
+        string projectPath,
+        string publishDirectory,
+        string validatedSourceCommit)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(projectPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(publishDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(validatedSourceCommit);
+
+        var arguments = new List<string>
+        {
+            "publish",
+            projectPath,
+            "--configuration",
+            "Release",
+            "--no-restore",
+            "--nologo",
+            "--output",
+            publishDirectory,
+            "--self-contained",
+            "false",
+            "-p:UseAppHost=false",
+            "-p:DebugSymbols=false",
+            "-p:DebugType=None",
+        };
+        if (string.Equals(
+                package.Application,
+                OperationalApplicationId.Governance.Value,
+                StringComparison.Ordinal))
+        {
+            arguments.Add(
+                "-p:MeAndAIGovernancePolicySourceCommit=" +
+                validatedSourceCommit);
+        }
+
+        return [.. arguments];
     }
 
     private static async Task<int> VerifyAsync(

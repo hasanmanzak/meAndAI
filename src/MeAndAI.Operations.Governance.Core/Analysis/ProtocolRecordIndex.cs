@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using MeAndAI.Operations.Governance.Core.Repository;
 
 namespace MeAndAI.Operations.Governance.Core.Analysis;
@@ -31,13 +30,13 @@ public sealed partial class ProtocolRecordIndex
             .Select(entry => new
             {
                 Entry = entry,
-                Match = FeatureRecordPathPattern().Match(
+                Id = ProtocolRecordPath.GetFeatureRecordId(
                     entry.RelativePath),
             })
-            .Where(candidate => candidate.Match.Success)
+            .Where(candidate => candidate.Id is not null)
             .Select(candidate => new FeatureRecord(
                 candidate.Entry,
-                candidate.Match.Groups["id"].Value))
+                candidate.Id!))
             .OrderBy(record => record.RelativePath, StringComparer.Ordinal)
             .ToArray();
         var decisionRecords = snapshot.Entries
@@ -45,28 +44,18 @@ public sealed partial class ProtocolRecordIndex
             .Select(entry => new
             {
                 Entry = entry,
-                Match = DecisionRecordPathPattern().Match(
+                Id = ProtocolRecordPath.GetDecisionRecordId(
                     entry.RelativePath),
             })
-            .Where(candidate => candidate.Match.Success)
+            .Where(candidate => candidate.Id is not null)
             .Select(candidate => new DecisionRecord(
                 candidate.Entry,
-                candidate.Match.Groups["id"].Value))
+                candidate.Id!))
             .OrderBy(record => record.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
         return new ProtocolRecordIndex(featureRecords, decisionRecords);
     }
-
-    [GeneratedRegex(
-        "^docs/features/(?<id>FEAT-[0-9]{4})-[^/]+$",
-        RegexOptions.CultureInvariant)]
-    private static partial Regex FeatureRecordPathPattern();
-
-    [GeneratedRegex(
-        "^docs/decisions/(?<id>DEC-[0-9]{4})-[^/]+\\.md$",
-        RegexOptions.CultureInvariant)]
-    private static partial Regex DecisionRecordPathPattern();
 }
 
 public abstract class ProtocolRecord

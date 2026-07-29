@@ -34,12 +34,32 @@ public static class GovernanceReportSerializer
 
             writer.WriteStartObject("snapshot");
             writer.WriteString("mode", report.SnapshotMode);
+            if (report.SnapshotSubjectCommit is not null)
+            {
+                writer.WriteString(
+                    "subjectCommit",
+                    report.SnapshotSubjectCommit.Value);
+            }
+
             writer.WriteString(
                 "evidenceDigest",
                 report.SnapshotEvidenceDigest);
             writer.WriteEndObject();
 
             writer.WriteStartObject("policy");
+            if (report.PolicyVersion is not null &&
+                report.PolicySourceCommit is not null &&
+                report.ProfileEvidenceState is not null)
+            {
+                writer.WriteString("version", report.PolicyVersion.Value);
+                writer.WriteString(
+                    "sourceCommit",
+                    report.PolicySourceCommit.Value);
+                writer.WriteString(
+                    "profileEvidence",
+                    report.ProfileEvidenceState.Value);
+            }
+
             writer.WriteString(
                 "catalogVersion",
                 report.PolicyCatalogVersion);
