@@ -93,7 +93,10 @@ Test-first evidence on 2026-07-29:
 - Hosted-route regression [FIND-0370](README.md#find-0370) then failed with
   `Expected: 2`, `Actual: 0` because the Ubuntu and Windows C# workflow filters
   did not select this scenario. After extending only those two existing
-  filters, the focused command passed 70/70.
+  filters, the focused command passed 70/70. Exact committed-tree
+  [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) then caught
+  sibling scenario literals in the first regression assertion; it was narrowed
+  to verify only its owned identity across the same two filter lines.
 - The final local full-solution run passed governance 132/132, architecture
   31/31, and packaging 17/17 after moving canonical catalog metadata
   serialization and digest derivation behind the catalog owner.
