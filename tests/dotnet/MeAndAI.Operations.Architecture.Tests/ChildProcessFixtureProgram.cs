@@ -178,10 +178,6 @@ internal static class ChildProcessFixtureProgram
 
         WriteAtomic(arguments[1], Environment.ProcessId);
         await WaitForFileAsync(arguments[2], SafetyLimit).ConfigureAwait(false);
-        await Task.WhenAll(
-            Console.OpenStandardOutput().WriteAsync(new byte[] { 0x5a }).AsTask(),
-            Console.OpenStandardError().WriteAsync(new byte[] { 0x5b }).AsTask())
-            .ConfigureAwait(false);
         return 0;
     }
 

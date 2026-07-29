@@ -25,6 +25,20 @@ warning, or unrelated compiler failure occurred. This is the expected-red
 evidence for the shared Infrastructure contract. No implementation or green
 result is claimed yet.
 
+The Infrastructure-only implementation checkpoint then compiled cleanly and
+passed all 11 new bounded-process cases in 4 seconds. They exercise exact
+binary streams and nonzero exit, defensive request copies, discrete arguments,
+working-directory and environment isolation, exact stdin, concurrent exact and
+over-limit byte caps, pre- and in-flight cancellation, timeout cleanup, an
+active descendant, inherited-pipe EOF, validation, start-failure redaction,
+and the explicit inert fixture entry point. The full [TEST-0192](#test-0192)
+filter passed 26 of 27 and failed only the planned Packaging-to-Infrastructure
+dependency assertion. The [TEST-0191](#test-0191) filter passed 16 of 18 and
+failed only that same missing reference plus the exact inventory showing both
+the new Infrastructure owner and the retained old Packaging runner. This is
+the required controlled duplicate-owner red; no complete green or Packaging
+adoption result is claimed yet.
+
 The exact predecessor
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
 passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)

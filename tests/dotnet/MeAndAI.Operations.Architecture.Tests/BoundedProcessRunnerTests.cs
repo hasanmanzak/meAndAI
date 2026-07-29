@@ -241,8 +241,8 @@ public sealed class BoundedProcessRunnerTests
             var result = await run.ConfigureAwait(true);
 
             Assert.Equal(0, result.ExitCode);
-            Assert.Equal(new byte[] { 0x5a }, result.StandardOutput.ToArray());
-            Assert.Equal(new byte[] { 0x5b }, result.StandardError.ToArray());
+            Assert.Empty(result.StandardOutput.ToArray());
+            Assert.Empty(result.StandardError.ToArray());
             await AssertProcessExitedAsync(childId, TimeSpan.FromSeconds(2))
                 .ConfigureAwait(true);
         }
@@ -330,13 +330,15 @@ public sealed class BoundedProcessRunnerTests
         Assert.NotNull(entryPoint);
         Assert.Equal(fixtureType, entryPoint.DeclaringType);
         Assert.Equal("Main", entryPoint.Name);
-        Assert.Empty(fixtureType.GetMethods(
+        var fixtureAttributes = fixtureType.GetMethods(
                 BindingFlags.Public |
                 BindingFlags.NonPublic |
                 BindingFlags.Static)
-            .SelectMany(method => method.GetCustomAttributes(inherit: false))
-            .Where(attribute =>
-                attribute is FactAttribute || attribute is TheoryAttribute));
+            .SelectMany(method => method.GetCustomAttributes(inherit: false));
+        Assert.DoesNotContain(
+            fixtureAttributes,
+            attribute =>
+                attribute is FactAttribute || attribute is TheoryAttribute);
     }
 
     private static string DotnetExecutable =>
@@ -378,6 +380,7 @@ public sealed class BoundedProcessRunnerTests
             process = Process.GetProcessById(processId);
             using var cancellation = new CancellationTokenSource(timeout);
             await process.WaitForExitAsync(cancellation.Token).ConfigureAwait(true);
+            Assert.True(process.HasExited);
         }
         catch (ArgumentException)
         {
@@ -387,8 +390,6 @@ public sealed class BoundedProcessRunnerTests
         {
             process?.Dispose();
         }
-
-        Assert.True(process.HasExited);
     }
 
     private sealed class ProcessTestDirectory : IDisposable

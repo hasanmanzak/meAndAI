@@ -262,3 +262,21 @@ must turn green while the new
 [TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191)
 single-owner and Packaging dependency assertions remain intentionally red
 until direct Packaging adoption removes the prior runner.
+
+## [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141) kernel-only checkpoint
+
+The internal Infrastructure request, result, and async runner now compile.
+All 11 new
+[TEST-0192](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
+process cases passed in 4 seconds. The complete scenario filter passed 26 of 27
+and failed only the deliberately premature Packaging dependency expectation.
+The
+[TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191)
+filter passed 16 of 18 and failed only that dependency plus the exact two-owner
+inventory containing the new Infrastructure file and the old Packaging file.
+
+This controlled red is the planned migration barrier. No wrapper, public
+process API, package, project, solution node, workflow change, PowerShell
+change, or authority transfer was introduced. Overall delivery remains two of
+five gates complete (40%) while gate three is in progress; direct async
+Packaging adoption and removal of the old owner are next.
