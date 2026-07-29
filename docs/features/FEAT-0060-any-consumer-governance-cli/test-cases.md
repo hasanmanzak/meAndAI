@@ -1,13 +1,10 @@
 # FEAT-0060 Test Scenarios
 
-Test implementation: [SUBF-0138](README.md#subf-0138) and
-[SUBF-0134](README.md#subf-0134) are fully complete with exact-head hosted
-evidence. [SUBF-0122](README.md#subf-0122) is also exact-head hosted complete
-under [TEST-0194](#test-0194). Fully closed progress is therefore three of
-seven (42.9%). [SUBF-0124](README.md#subf-0124) is locally implementation-
-green under [TEST-0195](#test-0195), making four of seven slices
-implementation-active (57.1%); exact committed-tree and hosted closure remain
-pending for that fourth slice.
+Test implementation: [SUBF-0138](README.md#subf-0138),
+[SUBF-0134](README.md#subf-0134), [SUBF-0122](README.md#subf-0122), and
+[SUBF-0124](README.md#subf-0124) are fully complete with exact hosted evidence.
+Fully closed progress is therefore four of seven (57.1%); three bounded slices
+remain open.
 
 ## Authorized bounded clean-room catalog
 
@@ -138,7 +135,7 @@ authority. Exact committed-tree and hosted closure are complete for this
 repository-independent contract. Exact Git/profile evidence and package
 qualification remain separate later gates.
 
-### [TEST-0195](#test-0195) local implementation evidence
+### [TEST-0195](#test-0195) exact hosted closure evidence
 
 [SUBF-0124](README.md#subf-0124) preserves one engine-to-report path:
 
@@ -200,9 +197,11 @@ Test-first and local verification evidence on 2026-07-29:
   invalid identity, total-order, and late-cancellation edges; the final focused
   suite passed 25/25. The full solution passed governance 155/155,
   architecture 31/31, and packaging 17/17.
-- Locked restore and format verification passed. Candidate PowerShell 7 /
-  Windows PowerShell 5.1 `StructureOnly` passed in 183.2 / 275.4 seconds, with
-  protocol-governance elapsed times of 181.0 / 272.3 seconds.
+- Locked restore and format verification passed. Exact committed-tree
+  PowerShell 7 / Windows PowerShell 5.1 `StructureOnly` passed in 203.6 /
+  284.7 seconds, with protocol-governance elapsed times of 201.5 / 282.3
+  seconds. Earlier candidate observations of 183.2 / 275.4 seconds remain
+  historical development evidence only.
 - Framework-dependent publish produced no apphost. The published governance
   DLL validated the real repository at exit `0` with `conforming`, two
   evaluated rules, zero findings, `bounded-catalog`, `csharp-shadow`, and
@@ -211,9 +210,24 @@ Test-first and local verification evidence on 2026-07-29:
   filters and matches its own exact pipe-delimited token. No job, matrix,
   PowerShell route, package route, consumer behavior, or authority changes.
 
-Exact committed-tree reruns and hosted closure remain pending. Exact Git
-acquisition and both repository profiles remain owned by
-[TEST-0208](#test-0208), which follows this report/process gate.
+Exact implementation head
+[`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99)
+has tree-equivalent hosted evidence from
+[run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722),
+which tested merge commit
+[`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04).
+The PR head and tested merge commit share exact tree
+`39176f2149e2a9b6cb3b03b1761ac208ebc88dcb`, so this is exact-tree-equivalent
+hosted implementation evidence rather than a claim that checkout executed the
+head commit object directly. Ubuntu completed in 8 min 37 s and Windows in 33
+min 52 s. Both hosted C#
+filters explicitly selected [TEST-0195](#test-0195); exact-head trait inventory
+and filtered log results reconcile 25 selected, executed, and passed cases with
+zero failed or skipped. Each platform passed governance 95/95, architecture
+31/31, and packaging 17/17. The Windows PowerShell 5.1 step took 32 min 28 s;
+all elapsed values are observations, not thresholds. Exact Git acquisition and
+both repository profiles remain owned by [TEST-0208](#test-0208), which follows
+this closed report/process gate.
 
 ## Distinct-intent review
 

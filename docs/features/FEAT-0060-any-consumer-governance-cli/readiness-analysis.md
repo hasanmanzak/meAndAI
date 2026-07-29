@@ -8,16 +8,15 @@
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
 > bounded [FEAT-0060](README.md) release completion boundary.
 
-Status: [SUBF-0138](README.md#subf-0138) and
-[SUBF-0134](README.md#subf-0134) bounded clean-room `CSharpShadow` slices are
-exact-head hosted complete. [SUBF-0122](README.md#subf-0122) is also exact-head
-hosted complete under [TEST-0194](test-cases.md#test-0194), closing three of
-seven bounded subfeatures (42.9%). [SUBF-0124](README.md#subf-0124) is locally
-implementation-green under [TEST-0195](test-cases.md#test-0195); its exact-tree
-and hosted closure remain open. Exact repository/profile, package,
-equivalence, authority, and retirement gates also remain open. The next
-dependency-coherent closure gate is the exact evidence for that report/process
-slice, followed by [SUBF-0123](README.md#subf-0123).
+Status: [SUBF-0138](README.md#subf-0138),
+[SUBF-0134](README.md#subf-0134), [SUBF-0122](README.md#subf-0122), and
+[SUBF-0124](README.md#subf-0124) bounded clean-room `CSharpShadow` slices are
+exact hosted complete, closing four of seven bounded subfeatures (57.1%). Exact
+repository/profile and package gates remain open, while equivalence, authority,
+and retirement remain separate later features. The next dependency-coherent
+gate is the shared process/acquisition foundation before
+[SUBF-0123](README.md#subf-0123); [TEST-0208](test-cases.md#test-0208) remains
+`Planned` until its exact profile evidence is frozen and implemented atomically.
 
 This record freezes the current evidence boundary. The historical first-slice
 authorization was extended only to the bounded reusable MVP under
@@ -330,7 +329,7 @@ JSON is one UTF-8-without-BOM object with explicit property order, ordinally
 sorted collections, and one LF terminator. Culture, operating-system path
 separator, elapsed duration, and timestamp cannot change its bytes.
 
-[SUBF-0124](README.md#subf-0124) locally implements this contract before exact
+[SUBF-0124](README.md#subf-0124) implements this contract before exact
 Git and consumer-profile integration. One `GovernanceReportFactory` and one
 `GovernanceExitCodeMapper` serve every verdict; no parallel report envelope,
 serializer, or CLI-specific mapping is introduced. `incomplete` remains a
@@ -427,7 +426,7 @@ unchanged.
 | --- | --- | --- | --- |
 | [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Exact-head hosted complete at [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) for [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d); PowerShell authority unchanged |
 | [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
-| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | Locally implementation-green: focused 25/25 and full solution governance 155/155, architecture 31/31, packaging 17/17 after independent fresh review; locked restore, format, both candidate structural runtimes, publish, and published-DLL self-validation green; exact committed-tree reruns and hosted closure pending |
+| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | Exact hosted complete: focused 25/25 and full solution governance 155/155, architecture 31/31, packaging 17/17 after independent fresh review; locked restore, format, exact-tree PowerShell 7 / Windows PowerShell 5.1 structural runtimes, publish, and published-DLL self-validation green; implementation PR head [`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99) and hosted [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722) merge commit [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04) share exact tree `39176f2149e2a9b6cb3b03b1761ac208ebc88dcb`; Ubuntu and Windows passed |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
 | [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0208](test-cases.md#test-0208) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
 | External [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Linked [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) prerequisite; excluded from the seven-slice [FEAT-0060](README.md) denominator |
@@ -550,12 +549,12 @@ The bounded first clean-room slice has completed all ten readiness items:
   `protocol-authority` `CSharpShadow` slice.
 
 First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138),
-[SUBF-0134](README.md#subf-0134), and [SUBF-0122](README.md#subf-0122) are
-exact-head hosted complete, so bounded feature closure is three of seven
-subfeatures (42.9%). Four subfeatures remain independently open. The next gate
-is exact-tree and hosted closure of the locally green report/process contract
-in [SUBF-0124](README.md#subf-0124), then the exact repository/profile contract
-in [SUBF-0123](README.md#subf-0123).
+[SUBF-0134](README.md#subf-0134), [SUBF-0122](README.md#subf-0122), and
+[SUBF-0124](README.md#subf-0124) are exact hosted complete, so bounded feature
+closure is four of seven subfeatures (57.1%). Three subfeatures remain
+independently open. The next implementation gate is the single shared
+process/acquisition foundation before the exact repository/profile contract in
+[SUBF-0123](README.md#subf-0123).
 Later slices retain their own review gates and authorization.
 
 The historical inventory remains 188/188 base identities (100%), 7/7 explicit

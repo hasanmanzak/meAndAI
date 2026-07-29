@@ -51,41 +51,18 @@ and publish passed; the
 published DLL evaluated the real repository as conforming with two rules and
 zero findings.
 
-Two of seven subfeatures are fully closed, approximately 28.6%.
-[SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
-is locally implementation-green under repository-independent
-[TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194),
-so three of seven slices are implementation-active (42.9%); exact committed-
-tree and hosted closure remain pending for the third slice.
-[SUBF-0134](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
-has exact committed-tree evidence at
-[`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110):
-full solution, repository-only
-[TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
-PowerShell 7 / Windows PowerShell 5.1 `StructureOnly`, and hosted
-[run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
-all passed on the exact head. Earlier hosted
-[run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
-for exact commit
-[`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
-passed every C# build/test/package step and failed on both runtimes only at
-[TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-because tracked Markdown contained a short commit target. The correction is
-recorded in
-[FIND-0369](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369);
-the focused repository-only owner passes on exact
-[`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
-in 64.6 seconds. Repository-independent
-[TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-now passes 69/69 locally; the full solution passes 131 governance, 31
-architecture, and 17 packaging tests, with locked restore, format, and
-PowerShell 7 / Windows PowerShell 5.1 structural gates green. Exact-tree and
-hosted closure remain pending. Continue with
-[SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
-and the [SUBF-0135](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
-consumer fixture under
-[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
-PowerShell authority remains unchanged.
+Four of seven bounded [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+subfeatures are closed, approximately 57.1%. Current detailed evidence is
+single-owned by the feature/test records and the latest checkpoint in the
+[bounded reusable MVP handoff](2026-07-29-feat-0060-bounded-reusable-mvp.md).
+[SUBF-0124](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+closes [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
+Before later implementation, the commit containing that closure record must
+pass the existing hosted Ubuntu and Windows gates. Continue next with the one
+shared Infrastructure process/acquisition foundation before
+[SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
+[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+remains `Planned`. PowerShell authority remains unchanged.
 
 The historical inventory remains 188/188 base identities, seven explicit
 declaration packets, a lower bound of 116 TEST/case mappings, and 172/188

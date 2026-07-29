@@ -42,11 +42,11 @@ qualification, and differential equivalence. Those gates remain fail-closed
 for required-check enforcement, authority transfer, compatibility retirement,
 or PowerShell source retirement.
 
-## Progress and continuation
+## Historical progress checkpoint
 
-After the scope-record correction, two of seven
+At the scope-record correction checkpoint, two of seven
 [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-subfeatures are fully closed, approximately 28.6%.
+subfeatures were fully closed, approximately 28.6%.
 [SUBF-0134](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
 has exact committed-tree evidence at
 [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110):
@@ -55,7 +55,8 @@ full solution tests are green, repository-only
 passed in 64.6 seconds, PowerShell 7 / Windows PowerShell 5.1 `StructureOnly`
 passed in 178.0 / 253.4 seconds, and hosted
 [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
-passed Ubuntu and Windows on the exact head. Continue with
+passed Ubuntu and Windows on the exact head. Continuation at that checkpoint
+was
 [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
 under repository-independent [TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194).
 Exact repository/profile evidence follows later under
@@ -144,9 +145,10 @@ only CLI preflight and the internal candidate evaluator before repository
 access. This is not consumer Git evidence: commit existence/object type,
 consumer pin/profile verification, exact-commit CLI acquisition, ZIP
 qualification/publication, and an actual released engine remain unproved.
-PowerShell remains authority. Two of seven subfeatures remain fully closed;
-three are implementation-active, and exact committed-tree/hosted closure is
-still pending for [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
+At this historical checkpoint PowerShell remained authority, two of seven
+subfeatures were fully closed, three were implementation-active, and exact
+committed-tree/hosted closure was still pending for
+[SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
 
 The final local full solution passes governance 131/131, architecture 31/31,
 and packaging 17/17; locked restore and format verification also pass. The
@@ -161,3 +163,38 @@ digest, two evaluated rules, zero findings, `csharp-shadow`, and
 passed hosted [run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175)
 on Ubuntu and Windows; that historical result does not close this later
 implementation tree.
+
+## [TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194) and [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195) closure checkpoint
+
+[SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+closed on exact implementation head
+[`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+and hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904).
+[SUBF-0124](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+then closed the single typed report/process path without adding another engine,
+serializer, report envelope, exit map, parser, or fixture family. Its exact
+implementation head
+[`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99)
+passes 25/25 focused tests and the full solution passes governance 155/155,
+architecture 31/31, and packaging 17/17 after fresh review. Locked restore,
+format, both exact-tree structural runtimes, framework-dependent publish, and
+published-DLL real-repository validation are green.
+
+Hosted [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722)
+was associated with that PR head and tested merge commit
+[`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04).
+Both objects have exact tree `39176f2149e2a9b6cb3b03b1761ac208ebc88dcb`.
+Ubuntu passed in 8 min 37 s and Windows in 33 min 52 s; the Windows PowerShell
+5.1 step consumed 32 min 28 s. Both hosted filters explicitly selected
+[TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
+The exact trait inventory plus aggregate hosted results reconcile 25 selected,
+executed, and passed cases with zero failed or skipped.
+
+Four of seven bounded subfeatures are now closed, approximately 57.1%. The
+commit containing this closure checkpoint must pass the existing Ubuntu and
+Windows gates before any later implementation begins. The next implementation
+gate is one shared Infrastructure-owned, streaming, binary-safe bounded child-
+process/acquisition foundation reused by packaging and later exact Git work.
+[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+remains `Planned`; its exact profile semantics must be frozen before atomic
+activation. PowerShell remains authority.
