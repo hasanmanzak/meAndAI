@@ -185,8 +185,10 @@ identity.
 The shared process prerequisite is owned by
 [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) /
 [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141).
-It must close before [SUBF-0123](#subf-0123) implementation continues. This
-link is navigation only and does not declare an eighth
+It is complete on [hosted run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248).
+[SUBF-0123](#subf-0123) is now the next implementation gate after its exact-
+profile semantics are approved. This link is navigation only and does not
+declare an eighth
 [FEAT-0060](#feat-0060---any-consumer-governance-cli) subfeature; the
 [FEAT-0060](#feat-0060---any-consumer-governance-cli) denominator remains seven.
 
@@ -401,17 +403,19 @@ green. This closes the fourth of seven bounded subfeatures (57.1%); three remain
 open. [FIND-0371](#find-0371) records the later closure-record Markdown defect
 and its now-complete bounded correction on exact head
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3).
-The next implementation gate is the external
+The external
 [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) /
 [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
-shared process foundation before [SUBF-0123](#subf-0123).
+shared process foundation is complete. The next implementation gate is
+[SUBF-0123](#subf-0123) after its exact-profile semantics are approved.
 
 ## Decisions and relationships
 
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-- External implementation prerequisite:
+- Completed external implementation prerequisite:
   [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) /
-  [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+  [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141) /
+  [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
 - Specification-first sequencing: [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
 - Bounded catalog and reuse boundary: [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
 - Deferred coverage/equivalence owner: [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)

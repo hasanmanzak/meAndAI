@@ -8,8 +8,8 @@ required Ubuntu/Windows evidence remains below.
 [SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
 identities; its tests-first and controlled duplicate-owner failures plus local
 implementation green, exact-tree validation, and local exact-package execution
-are complete. Hosted same-byte Ubuntu/Windows and final closure remain pending,
-and no new TEST identity is declared.
+are complete. Hosted same-byte Ubuntu/Windows and final closure are also
+complete, and no new TEST identity is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -72,7 +72,27 @@ and ran adoption, consumer update, and governance in 2.7 seconds on Windows.
 | `maai-governance.zip` | 185,733 | `319fb4431be7bbee52036d1d5cc8875d408accb33344b3077723cd44e88c6609` |
 
 These are exact local Windows outputs, not a cross-host same-byte claim.
-Hosted Ubuntu/Windows package handoff and final confirmation remain pending.
+The separate hosted cross-platform claim is proven by the implementation
+run-time PR head
+[`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+and hosted [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248).
+The PR head and tested merge commit
+[`ae6cc95475f4514fb9e66b42f480acf7170b8083`](https://github.com/hasanmanzak/meAndAI/commit/ae6cc95475f4514fb9e66b42f480acf7170b8083)
+resolve to the same exact Git tree. The manifest was bound to the tested merge
+commit.
+
+The [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360)
+passed Governance 95/95, Packaging 33/33, and Architecture 46/46, built the
+package set in 8 seconds, verified and executed adoption, consumer update, and
+governance in 2 seconds, and uploaded artifact `8719031242` at 382,242 bytes
+with digest
+`96b1cd931dcbfc4fac23eada6b5fbc177ee95ecc3b4f38318a5d023f81fbb387`.
+The [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423)
+passed the same C# totals, downloaded that exact artifact with the same
+expected and observed digest, and verified and executed the same three assets
+in 2 seconds. Ubuntu completed in 14 min 17 s and Windows in 30 min 53 s,
+including the 29 min 31 s retained Windows PowerShell 5.1 route. The same-byte
+Ubuntu/Windows handoff and final hosted confirmation are complete.
 
 The exact predecessor
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)

@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.16.0 |
 | Support extension target | 0.17.0 |
-| Support extension status | [SUBF-0141](#subf-0141) local candidate complete at four of five gates (80%); local exact-tree/package evidence complete and hosted same-byte/final closure pending; declared-slice ledger remains three of four (75%) |
+| Support extension status | [SUBF-0141](#subf-0141) complete at five of five gates (100%) on [hosted run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248); declared-slice ledger four of four (100%) |
 | Issue | Original release [#154](https://github.com/hasanmanzak/meAndAI/issues/154); support extension [#162](https://github.com/hasanmanzak/meAndAI/issues/162) |
 | Pull request | Merged [#159](https://github.com/hasanmanzak/meAndAI/pull/159); current draft [#160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
@@ -346,8 +346,9 @@ responsibilities; no duplicate scenario identity is introduced.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Original scope passing; existing identities extended for [SUBF-0141](#subf-0141) with no new scenario identity | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
-| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) expected-red, local implementation, exact-tree, and local exact-package green complete | Exact local evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
+| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) expected-red, local implementation, exact-tree, local exact-package, and hosted same-byte evidence complete | Exact local and hosted evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
 | Baseline run | Original release complete; support-extension predecessor exact hosted green | Exact [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3) / [run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869) |
+| Support-extension run | Implementation run-time PR head and tested merge commit resolve to the same Git tree; Ubuntu-built bytes execute unchanged on Windows | Exact [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561) / [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248) |
 
 ## Decomposition and subfeature gates
 
@@ -356,7 +357,7 @@ responsibilities; no duplicate scenario identity is introduced.
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red, 17 of 17 focused and 48 of 48 combined local tests, then exact same-byte [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611) execution | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate/exact-tree StructureOnly passed in 211.2 / 208.8 seconds; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red, controlled duplicate-owner red, 79/79 targeted and 234/234 full solution green; exact local checkpoint [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193) passed StructureOnly in 192.6 seconds, canonical pack in 15.9 seconds, and execute verification in 2.7 seconds | Three independent fresh reviews and bounded re-reviews closed process lifecycle, cleanup, cancellation, direct-consumer, parser/decoder single-owner, and test-fixture findings; zero remaining P0/P1/P2 | Four of five gates complete / hosted same-byte and final closure pending |
+| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red, controlled duplicate-owner red, 79/79 targeted and 234/234 full solution green; exact local checkpoint [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193); hosted implementation head [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561) and hosted [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423) same-byte execution green | Three independent fresh reviews and bounded re-reviews closed process lifecycle, cleanup, cancellation, direct-consumer, parser/decoder single-owner, and test-fixture findings; zero remaining P0/P1/P2 | Complete |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
 
@@ -436,7 +437,8 @@ The 2026-07-28 closure is therefore five of five gates, or 100% of
 15 delivery gates are closed and feature implementation at that dated
 checkpoint was three of three subfeatures, or 100%. The later
 [SUBF-0141](#subf-0141) support extension does not rewrite that immutable
-release fact; current feature progress is three of four subfeatures, or 75%.
+release fact. Its later closure makes current feature progress four of four
+subfeatures, or 100%.
 
 Local implementation evidence is 17 of 17 focused [TEST-0193](test-cases.md#test-0193)
 cases in 419 ms and 48 of 48 combined C# cases in 523 ms of test-process time.
@@ -509,22 +511,31 @@ Progress is measured against five independently observable delivery gates:
    0-error Release build, changed-file analyzer/format verification, 33
    Packaging cases, and candidate-tree StructureOnly in 186.5 seconds pass.
 5. Exact committed-tree validation, same-byte Ubuntu/Windows package handoff,
-   remote evidence, and final hosted confirmation: in progress. Exact local
+   remote evidence, and final hosted confirmation: complete. Exact local
    checkpoint
    [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
    passed committed-tree StructureOnly in 192.6 seconds, canonical package
    construction in 15.9 seconds, and local Windows execute verification in
-   2.7 seconds. Same-byte Ubuntu/Windows handoff, remote evidence, and final
-   hosted confirmation remain pending.
+   2.7 seconds. Hosted implementation head
+   [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+   and tested merge commit
+   [`ae6cc95475f4514fb9e66b42f480acf7170b8083`](https://github.com/hasanmanzak/meAndAI/commit/ae6cc95475f4514fb9e66b42f480acf7170b8083)
+   resolve to the same exact Git tree. Hosted
+   [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
+   built and executed the manifest-bound set on Ubuntu, transferred the same
+   artifact bytes to Windows, and verified and executed all three applications
+   there.
 
-The current checkpoint is four of five gates, or 80%, for
+The closure is five of five gates, or 100%, for
 [SUBF-0141](#subf-0141). The original three `v0.16.0` subfeatures remain fully
-closed; current feature progress is three of four subfeatures, or 75%.
-Remaining elapsed-time projection is one 35-to-60-minute hosted closure
-observation. This value is a planning range, not a threshold. The intermediate
-expected-red, kernel-only, and fully green migration commits are consolidated
-behind this evidence record so they consume one hosted run rather than
-separate long Windows runs.
+closed; current feature progress is four of four subfeatures, or 100%.
+[Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360)
+completed in 14 min 17 s and
+[Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423)
+in 30 min 53 s, including 29 min 31 s in the retained Windows PowerShell 5.1
+route. These values are observations, not thresholds. Intermediate expected-
+red, kernel-only, and fully green migration commits were consolidated into one
+implementation hosted run rather than separate long Windows runs.
 
 ## Decisions and relationships
 
@@ -534,8 +545,8 @@ separate long Windows runs.
 - Support-extension consumer:
   [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) /
   [SUBF-0123](../FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
-  is blocked on [SUBF-0141](#subf-0141) but retains its independent seven-slice
-  denominator.
+  now has its [SUBF-0141](#subf-0141) process prerequisite complete but retains
+  its independent seven-slice denominator and exact-profile decision gate.
 - Bounded reuse boundary: [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
 
 ## Definition of Ready
@@ -632,9 +643,9 @@ separate long Windows runs.
   [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) subfeature is
   declared.
 - [x] Historical/current arithmetic is fixed: the original immutable
-  `v0.16.0` delivery remains three of three; the current support extension
-  makes [FEAT-0059](#feat-0059---shared-c-operational-foundation-and-portable-release-contract)
-  three of four (75%); [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
+  `v0.16.0` delivery remains three of three; closing the later support
+  extension makes [FEAT-0059](#feat-0059---shared-c-operational-foundation-and-portable-release-contract)
+  four of four (100%); [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
   remains four of seven (57.1%).
 - [x] Problem, accepted outcome, scope, non-goals, consumers, internal/public
   surface, PowerShell authority, and platform-containment limits are recorded
@@ -694,10 +705,10 @@ validation, documentation, links, and project memory were complete with no
 unresolved `Blocking` finding.
 
 The immutable `v0.16.0` feature-level Definition of Done remains closed. The
-separate [SUBF-0141](#subf-0141) support-extension Definition of Done is
-incomplete until its tests-first, shared-kernel, Packaging-adoption,
-fresh-review, exact-tree, hosted Windows/Linux, documentation, link, and memory
-evidence is complete with no unresolved `Blocking` finding. Neither the
-original nor support-extension DoD authorizes merge,
+separate [SUBF-0141](#subf-0141) support-extension Definition of Done is also
+complete: its tests-first, shared-kernel, Packaging-adoption, fresh-review,
+exact-tree, hosted Windows/Linux, documentation, link, and memory evidence is
+complete with no unresolved `Blocking` finding. Neither the original nor
+support-extension DoD authorizes merge,
 consumer mutation, authority transfer, release publication, workflow cutover,
 or PowerShell retirement; all such boundaries remain separately gated.
