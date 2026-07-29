@@ -3,12 +3,29 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | Architecture hold; exact draft work preserved; parent incomplete and implementation stopped |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
+| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; frozen at a preservation checkpoint) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) and proposed [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Tests | [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0196](test-cases.md#test-0196) |
+
+## Architecture hold and preservation
+
+Implementation is stopped by
+[TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164).
+The exact draft checkpoint
+[`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52)
+preserves all current work without granting default-branch or production
+authority. Four of seven bounded subfeatures have exact draft-branch
+implementation evidence; the parent feature was not completed, merged,
+released, or granted authority, and three subfeatures remain incomplete.
+
+This CLI-shaped record remains historical input. Its prospective ownership and
+carry-forward rules are defined by the
+[new architecture](../../architecture/protocol-governance-and-execution/README.md)
+and its [transition register](../../architecture/protocol-governance-and-execution/transition-register.md).
+No implementation extraction is authorized yet.
 
 ## Problem
 

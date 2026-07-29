@@ -3,12 +3,21 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | Architecture hold / development not authorized |
 | Target version | 0.18.0 |
 | Issue | [#156](https://github.com/hasanmanzak/meAndAI/issues/156) |
 | Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md), and [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), proposed [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0021](../../decisions/DEC-0021-explicit-initial-adoption-strategy.md), and [DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md) |
 | Tests | [TEST-0197](test-cases.md#test-0197), [TEST-0198](test-cases.md#test-0198), [TEST-0200](test-cases.md#test-0200), and [TEST-0201](test-cases.md#test-0201) |
+
+## Architecture hold
+
+No implementation is authorized while
+[TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164)
+defines the shared protocol platform. After architecture acceptance, this
+record is reviewed as an adoption application and adapter lifecycle; CLI syntax
+cannot remain its product boundary. Existing scenario identities remain
+planned and receive no passing status by rescope.
 
 ## Problem
 

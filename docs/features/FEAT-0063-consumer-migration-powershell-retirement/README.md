@@ -3,12 +3,22 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | Parked on architecture hold / development and retirement not authorized |
 | Target version | 0.20.0 |
 | Issue | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) |
 | Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) and proposed [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Tests | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206), and [TEST-0207](test-cases.md#test-0207) |
+
+## Architecture hold
+
+This feature is parked by
+[TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164).
+PowerShell retirement is not a prerequisite for defining or initially
+delivering the new protocol platform. It may resume only after the accepted
+architecture, successor immutable releases, supported-consumer inventory, and
+explicit authority-transfer evidence exist. No test, workflow, compatibility,
+source, or consumer state is retired by this hold.
 
 ## Problem
 

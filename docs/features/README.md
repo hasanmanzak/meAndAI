@@ -60,10 +60,10 @@
 | [FEAT-0056](FEAT-0056-v0155-instruction-graph-resilience/README.md) | [Instruction-graph preflight resilience](FEAT-0056-v0155-instruction-graph-resilience/README.md) | Complete | 0.15.5 |
 | [FEAT-0058](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | [Completed historical adoption-issue compatibility](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete | 0.15.6 |
 | [FEAT-0059](FEAT-0059-csharp-operational-foundation/README.md) | [Shared C# operational foundation and portable release contract](FEAT-0059-csharp-operational-foundation/README.md) | Complete | 0.16.0 |
-| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Proposed / development deferred | 0.17.0 |
-| [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption CLI](FEAT-0061-consumer-adoption-cli/README.md) | Proposed / development deferred | 0.18.0 |
-| [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update CLI](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed / development deferred | 0.19.0 |
-| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Consumer migration and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Proposed / development deferred | 0.20.0 |
+| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Architecture hold; draft work preserved, parent incomplete | 0.17.0 |
+| [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption CLI](FEAT-0061-consumer-adoption-cli/README.md) | Architecture hold / development not authorized | 0.18.0 |
+| [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update CLI](FEAT-0062-consumer-protocol-update-cli/README.md) | Architecture hold / development not authorized | 0.19.0 |
+| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Consumer migration and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Parked on architecture hold | 0.20.0 |
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory
