@@ -5,4 +5,8 @@
     <SelfContained>false</SelfContained>
     <RollForward>LatestPatch</RollForward>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
+  </ItemGroup>
 </Project>

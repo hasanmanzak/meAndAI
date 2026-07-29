@@ -129,6 +129,11 @@ Last verified: **2026-07-29**
   two rules and zero findings.
 
   Two of seven subfeatures are fully closed, approximately 28.6%.
+  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+  is locally implementation-green under repository-independent
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194),
+  so three of seven slices are implementation-active (42.9%); exact
+  committed-tree and hosted closure remain pending for the third slice.
   [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
   has exact committed-tree local evidence at
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
@@ -151,10 +156,16 @@ Last verified: **2026-07-29**
   [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
   and the focused repository-only owner passes on exact
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
-  in 64.6 seconds. The next gate is
-  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
-  Canonical [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  owns the repository-independent typed request/identity contract, while
+  in 64.6 seconds. Canonical
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  now passes 69/69 locally for the repository-independent typed
+  request/identity contract. The full solution passes 131 governance, 31
+  architecture, and 17 packaging tests; locked restore, format, and both local
+  structural runtimes are green. Exact-tree and hosted closure remain pending.
+  The next repository gate is
+  [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
+  consumer fixture, while
   [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
   separately owns later exact-commit and two-profile repository evidence. This
   preserves independently reviewable slices without duplicating
@@ -1190,6 +1201,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   real-repository execution green. Fresh review is recorded under
   [FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368).
   Two of seven subfeatures are fully closed, approximately 28.6%.
+  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+  is locally implementation-green under
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194),
+  making three of seven slices implementation-active (42.9%) while exact
+  committed-tree and hosted closure remain pending.
   [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
   has exact committed-tree local evidence at
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
@@ -1211,11 +1227,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
   and the focused repository-only owner passes on exact
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
-  in 64.6 seconds. The next gate is the repository-independent
-  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
-  identity/request contract under
-  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194);
-  later exact-commit and two-profile repository evidence is distinct
+  in 64.6 seconds. Repository-independent
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  now passes 69/69 locally for
+  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
+  The full solution passes 131 governance, 31 architecture, and 17 packaging
+  tests; locked restore, format, and both local structural runtimes are green.
+  Exact-tree and hosted closure remain pending. The next repository gate is
+  [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
+  fixture; exact-commit and two-profile repository evidence remains distinct
   [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
   The [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
   [DoR contract](../../docs/features/FEAT-0060-any-consumer-governance-cli/readiness-analysis.md#bounded-v017-request-and-identity-contract)

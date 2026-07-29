@@ -53,6 +53,18 @@ public static class GovernanceCli
             return 64;
         }
 
+        var engine = GovernanceEngine.CreateDefault();
+        try
+        {
+            engine.RequireCandidateProfile(profile);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            await standardError.WriteLineAsync(
+                "Governance profile is unavailable for candidate validation.");
+            return 64;
+        }
+
         var authority = OperationalAuthorityCatalog
             .For(OperationalApplicationId.Governance)
             .For(OperationStageId.Validate);
@@ -62,8 +74,6 @@ public static class GovernanceCli
             authority,
             OperationalPortRegistration
                 .Create<IGovernanceRepositorySnapshotPort>(snapshotPort));
-        var engine = GovernanceEngine.CreateDefault();
-
         var result = await OperationBoundary.ExecuteAsync(
             OperationStageId.Validate,
             async token =>
@@ -74,8 +84,8 @@ public static class GovernanceCli
                     .ConfigureAwait(false);
                 try
                 {
-                    return engine.Evaluate(
-                        new GovernanceRequest(profile),
+                    return engine.EvaluateCandidateShadow(
+                        profile,
                         snapshot);
                 }
                 catch (InvalidDataException exception)

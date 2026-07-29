@@ -6,6 +6,8 @@ namespace MeAndAI.Operations.Governance.Core.Rules;
 
 public interface IGovernanceRule
 {
+    GovernanceCatalogRuleIdentity Identity { get; }
+
     string RuleId { get; }
 
     string CanonicalScenarioId { get; }
@@ -16,9 +18,6 @@ public interface IGovernanceRule
 
     GovernanceEnforcement Enforcement { get; }
 
-    bool AppliesTo(GovernanceProfileId profile);
-
     IReadOnlyList<GovernanceFinding> Evaluate(
-        GovernanceProfileId profile,
         GovernanceAnalysisContext context);
 }

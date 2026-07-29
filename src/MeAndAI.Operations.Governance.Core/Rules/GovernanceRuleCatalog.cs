@@ -2,27 +2,30 @@ using System.Collections.ObjectModel;
 using System.Security.Cryptography;
 using System.Text;
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Domain.Identity;
+using MeAndAI.Operations.Governance.Core.Contracts;
 
 namespace MeAndAI.Operations.Governance.Core.Rules;
 
 public sealed class GovernanceRuleCatalog
 {
-    private const string CurrentVersion = "0.17.0-preview.1";
+    private static readonly IGovernanceRule[] BoundedRules =
+    [
+        new DecisionRecordRequiredStructureRule(),
+        new FeatureRecordRequiredPairRule(),
+    ];
 
     public static GovernanceRuleCatalog Current { get; } = new(
-        CurrentVersion,
-        [
-            new FeatureRecordRequiredPairRule(),
-            new DecisionRecordRequiredStructureRule(),
-        ]);
+        BoundedGovernanceContract.Version,
+        BoundedRules);
 
     private readonly IGovernanceRule[] rules;
 
     private GovernanceRuleCatalog(
-        string version,
+        ProtocolVersion version,
         IEnumerable<IGovernanceRule> rules)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(version);
+        ArgumentNullException.ThrowIfNull(version);
         ArgumentNullException.ThrowIfNull(rules);
 
         var materializedRules = rules.ToArray();
@@ -37,41 +40,65 @@ public sealed class GovernanceRuleCatalog
                 nameof(rules));
         }
 
-        var orderedRules = materializedRules
-            .OrderBy(rule => rule.RuleId, StringComparer.Ordinal)
-            .ToArray();
-
         Version = version;
-        this.rules = orderedRules;
+        this.rules = materializedRules;
         Rules = new ReadOnlyCollection<IGovernanceRule>(this.rules);
+        Identity = CreateBoundedIdentity(
+            this.rules.Select(rule => rule.Identity));
     }
 
-    public string Version { get; }
+    public ProtocolVersion Version { get; }
 
     public IReadOnlyList<IGovernanceRule> Rules { get; }
+
+    public GovernanceCatalogIdentity Identity { get; }
 
     internal IGovernanceRule[] GetApplicableRules(
         GovernanceProfileId profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
 
-        return rules
-            .Where(rule => rule.AppliesTo(profile))
-            .ToArray();
+        if (profile != GovernanceProfileId.ProtocolAuthority &&
+            profile != GovernanceProfileId.Consumer)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(profile),
+                profile,
+                "No rule catalog exists for the selected profile.");
+        }
+
+        return [.. rules];
     }
 
-    internal string ComputeMetadataDigest(
-        IEnumerable<IGovernanceRule> applicableRules)
-    {
-        ArgumentNullException.ThrowIfNull(applicableRules);
+    internal static GovernanceCatalogRuleIdentity[]
+        GetBoundedRuleIdentities() =>
+        [.. BoundedRules.Select(rule => rule.Identity)];
 
-        var canonicalCatalog = string.Concat(
-            applicableRules.Select(rule =>
+    internal static GovernanceCatalogIdentity CreateBoundedIdentity(
+        IEnumerable<GovernanceCatalogRuleIdentity> rules)
+    {
+        ArgumentNullException.ThrowIfNull(rules);
+
+        var materializedRules = rules.ToArray();
+        if (!materializedRules.SequenceEqual(GetBoundedRuleIdentities()))
+        {
+            throw new ArgumentException(
+                "The governance catalog must match the exact bounded rule inventory and order.",
+                nameof(rules));
+        }
+
+        var canonicalMetadata = string.Concat(
+            materializedRules.Select(rule =>
                 $"{rule.RuleId}\0{rule.CanonicalScenarioId}\0" +
                 $"{rule.FindingCode}\0{rule.Severity.Value}\0" +
                 $"{rule.Enforcement.Value}\n"));
-        return Convert.ToHexString(
-                SHA256.HashData(Encoding.UTF8.GetBytes(canonicalCatalog)))
-            .ToLowerInvariant();
+        var canonicalMetadataBytes = Encoding.UTF8.GetBytes(canonicalMetadata);
+        var metadataDigest = ExactSha256Digest.FromHashBytes(
+            SHA256.HashData(canonicalMetadataBytes));
+
+        return GovernanceCatalogIdentity.CreateFromCatalog(
+            materializedRules,
+            canonicalMetadataBytes,
+            metadataDigest);
     }
 }

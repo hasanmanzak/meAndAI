@@ -17,25 +17,47 @@ public sealed class GovernanceEngine
     public static GovernanceEngine CreateDefault() =>
         new(GovernanceRuleCatalog.Current);
 
-    public GovernanceReport Evaluate(
-        GovernanceRequest request,
+    internal void RequireCandidateProfile(GovernanceProfileId profile) =>
+        CandidateGovernanceProfilePolicy.RequireEligible(profile);
+
+    internal GovernanceReport EvaluateCandidateShadow(
+        GovernanceProfileId profile,
         GovernanceRepositorySnapshot snapshot)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        var applicableRules = catalog.GetApplicableRules(request.Profile);
+        if (!string.Equals(
+                snapshot.Mode,
+                "candidate",
+                StringComparison.Ordinal))
+        {
+            throw new ArgumentException(
+                "The internal shadow path accepts only a candidate snapshot.",
+                nameof(snapshot));
+        }
+
+        RequireCandidateProfile(profile);
+
+        return EvaluateCore(profile, snapshot);
+    }
+
+    private GovernanceReport EvaluateCore(
+        GovernanceProfileId profile,
+        GovernanceRepositorySnapshot snapshot)
+    {
+        var applicableRules = catalog.GetApplicableRules(profile);
         if (applicableRules.Length == 0)
         {
             throw new ArgumentOutOfRangeException(
-                nameof(request),
-                request.Profile,
+                nameof(profile),
+                profile,
                 "No rule catalog exists for the selected profile.");
         }
 
         var context = GovernanceAnalysisContext.Create(snapshot);
         var findings = applicableRules
-            .SelectMany(rule => rule.Evaluate(request.Profile, context))
+            .SelectMany(rule => rule.Evaluate(context))
             .OrderBy(finding => finding.RelativePath, StringComparer.Ordinal)
             .ThenBy(finding => finding.Code, StringComparer.Ordinal)
             .ThenBy(finding => finding.RuleId, StringComparer.Ordinal)
@@ -48,11 +70,11 @@ public sealed class GovernanceEngine
             : GovernanceVerdict.Nonconforming;
 
         return new GovernanceReport(
-            request.Profile,
+            profile,
             snapshot.Mode,
             snapshot.EvidenceDigest,
-            catalog.Version,
-            catalog.ComputeMetadataDigest(applicableRules),
+            catalog.Version.Value,
+            catalog.Identity.MetadataDigest.Value,
             applicableRules.Select(rule => rule.RuleId).ToArray(),
             verdict,
             new GovernanceCounts(

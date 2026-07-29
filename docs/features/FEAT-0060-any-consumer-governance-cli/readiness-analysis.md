@@ -10,13 +10,16 @@
 
 Status: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) bounded clean-room `CSharpShadow` slices are
-exact-head hosted complete; exact-commit request/profile, package, equivalence,
-authority, and retirement gates remain open.
+exact-head hosted complete. [SUBF-0122](README.md#subf-0122) is locally
+implementation-green under [TEST-0194](test-cases.md#test-0194), with exact
+committed-tree and hosted closure pending. Exact repository/profile, package,
+equivalence, authority, and retirement gates remain open.
 
-This record freezes the current evidence boundary. The maintainer authorized
-only the first specification-first slice on 2026-07-28. It is not implementation
-evidence, a workflow change, authority transfer, consumer mutation, or
-PowerShell retirement authorization.
+This record freezes the current evidence boundary. The historical first-slice
+authorization was extended only to the bounded reusable MVP under
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md).
+It is not a workflow cutover, authority transfer, consumer mutation, equivalence
+claim, or PowerShell retirement authorization.
 
 ## Specification-first sequencing amendment
 
@@ -351,7 +354,7 @@ unchanged.
 
 | ID | Independently testable boundary | Evidence owner | Status |
 | --- | --- | --- | --- |
-| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | In progress; the repository-independent identity boundary is now distinct from exact profile evidence, but [TEST-0194](test-cases.md#test-0194) remains `Planned` before its expected-red slice |
+| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Local implementation green: expected-red `CS0234` / `CS0246`, focused 69/69 after independent single-owner and fail-closed review corrections; exact committed-tree and hosted closure pending |
 | [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
 | [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
@@ -375,10 +378,11 @@ reviewed result uses distinct `evidenceDigest` and `catalogMetadataDigest`
 fields, declares `coverage=bounded-first-slice`, and centralizes
 repository-relative finding-path validation. It
 completes the canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-C# slice. [TEST-0194](test-cases.md#test-0194),
-[TEST-0195](test-cases.md#test-0195), and
-[TEST-0208](test-cases.md#test-0208) remain `PlannedDocumentation` and are not
-activated by this slice.
+C# slice. At that historical [SUBF-0138](README.md#subf-0138) checkpoint,
+[TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and
+[TEST-0208](test-cases.md#test-0208) remained `PlannedDocumentation`. The later
+[SUBF-0122](README.md#subf-0122) slice activates only repository-independent
+[TEST-0194](test-cases.md#test-0194); the other two remain planned.
 
 Each subfeature closes its own expected-red, focused green, self-review,
 finding disposition, documentation, and exact committed-tree gate before the
@@ -468,8 +472,11 @@ The bounded first clean-room slice has completed all ten readiness items:
 
 First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) are exact-head hosted complete, so bounded
-feature progress is two of seven subfeatures (28.6%); five subfeatures remain.
-Later slices retain their own review gates and authorization.
+feature closure remains two of seven subfeatures (28.6%).
+[SUBF-0122](README.md#subf-0122) makes three of seven slices implementation-
+active (42.9%) but remains outside the closed numerator until exact committed-
+tree and hosted evidence; five subfeatures are not independently closed. Later
+slices retain their own review gates and authorization.
 
 The historical inventory remains 188/188 base identities (100%), 7/7 explicit
 declaration packets (100%), 116 proven TEST/case mappings, and 172/188

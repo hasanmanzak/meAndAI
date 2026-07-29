@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.Json;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Packaging;
 
@@ -94,10 +95,7 @@ public static class PortablePackageBuilder
 
     internal static void ValidateSourceCommit(string sourceCommit)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourceCommit);
-        if (sourceCommit.Length != 40 ||
-            sourceCommit.Any(character =>
-                !char.IsAsciiHexDigit(character) || char.IsAsciiLetterUpper(character)))
+        if (!ExactGitCommitId.TryParse(sourceCommit, out _))
         {
             throw new InvalidDataException(
                 "Source commit must be one exact lowercase 40-hex identity.");
@@ -276,7 +274,9 @@ public static class PortablePackageBuilder
     private static string ComputeSha256(string path)
     {
         using var stream = File.OpenRead(path);
-        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+        return ExactSha256Digest
+            .FromHashBytes(SHA256.HashData(stream))
+            .Value;
     }
 
     private sealed record PublishedFile(string Name, string Path);

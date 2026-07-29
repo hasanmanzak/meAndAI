@@ -125,3 +125,39 @@ governance found moved and newly repeated identifiers. The owner and links were
 corrected without restoring duplicate declarations; PowerShell 7
 `StructureOnly` then passed in 184.6 seconds. The correction was committed and
 dual-runtime exact-head evidence is counted only from the later successful run.
+
+## [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122) local continuation
+
+The historical handoff above has now advanced through repository-independent
+[TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194).
+Its focused expected-red failed in 9.6 seconds with `CS0234` / `CS0246`; the
+post-review focused suite passes 69/69. The public request accepts only an
+explicit profile plus exact 40-lowercase-hex commit and fixes exact-commit /
+repository evidence. One Domain matcher owns lowercase-ASCII-hex grammar for
+commit and digest identities, packaging reuses those identities, each rule
+descriptor owns its metadata once, and one typed bounded contract owns version
+`0.17.0` plus the derived release tag.
+
+The catalog maps both typed profiles to the same rule objects, while a distinct
+single candidate-eligibility policy rejects `consumer` in both the candidate-
+only CLI preflight and the internal candidate evaluator before repository
+access. This is not consumer Git evidence: commit existence/object type,
+consumer pin/profile verification, exact-commit CLI acquisition, ZIP
+qualification/publication, and an actual released engine remain unproved.
+PowerShell remains authority. Two of seven subfeatures remain fully closed;
+three are implementation-active, and exact committed-tree/hosted closure is
+still pending for [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
+
+The final local full solution passes governance 131/131, architecture 31/31,
+and packaging 17/17; locked restore and format verification also pass. The
+first PowerShell 7 `StructureOnly` run found only the newly appended heading's
+unlinked subfeature identity. After linking the whole identity to its canonical
+record, PowerShell 7 and Windows PowerShell 5.1 passed in 189.1 and 274.3
+seconds. Framework-dependent publish produced no apphost, and the published
+DLL validated the real repository as `conforming` with the exact catalog
+digest, two evaluated rules, zero findings, `csharp-shadow`, and
+`powershell-authority`. The preceding records-only identity-contract checkpoint
+[`7a935a5`](https://github.com/hasanmanzak/meAndAI/commit/7a935a5d8a62b3e49348475962215849f3c4a18b)
+passed hosted [run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175)
+on Ubuntu and Windows; that historical result does not close this later
+implementation tree.

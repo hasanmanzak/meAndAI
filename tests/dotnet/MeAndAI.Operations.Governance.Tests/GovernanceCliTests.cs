@@ -299,6 +299,21 @@ public sealed class GovernanceCliTests
     }
 
     [Fact]
+    [Trait("Scenario", "TEST-0194")]
+    public async Task ConsumerProfileIsNotActivatedOnTheCandidateCli()
+    {
+        var result = await InvokeAsync(
+            "does-not-need-to-exist",
+            profile: "consumer");
+
+        Assert.Equal(64, result.ExitCode);
+        Assert.Equal(string.Empty, result.StandardOutput);
+        Assert.Equal(
+            "Governance profile is unavailable for candidate validation.\n",
+            NormalizeNewline(result.StandardError));
+    }
+
+    [Fact]
     public async Task MissingRepositoryIsAnOperationalFailure()
     {
         var missingPath = Path.Combine(

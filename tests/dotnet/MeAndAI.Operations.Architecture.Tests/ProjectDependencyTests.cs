@@ -39,7 +39,7 @@ public sealed class ProjectDependencyTests
         Assert.Equal(
             [application, domain],
             ReadProjectReferences(governanceCore));
-        Assert.Empty(ReadProjectReferences(packaging));
+        Assert.Equal([domain], ReadProjectReferences(packaging));
         Assert.Empty(ReadPackageReferences(domain));
         Assert.Empty(ReadPackageReferences(application));
         Assert.Empty(ReadPackageReferences(infrastructure));

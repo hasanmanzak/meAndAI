@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Governance.Core.Contracts;
 
@@ -11,8 +12,9 @@ public static class GovernanceReportSerializer
         ArgumentNullException.ThrowIfNull(report);
 
         var semanticBytes = WriteReport(report, reportDigest: null);
-        var reportDigest = Convert.ToHexString(SHA256.HashData(semanticBytes))
-            .ToLowerInvariant();
+        var reportDigest = ExactSha256Digest
+            .FromHashBytes(SHA256.HashData(semanticBytes))
+            .Value;
         var reportBytes = WriteReport(report, reportDigest);
         return Encoding.UTF8.GetString(reportBytes) + "\n";
     }

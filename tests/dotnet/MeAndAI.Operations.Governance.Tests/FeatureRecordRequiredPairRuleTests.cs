@@ -21,7 +21,6 @@ public sealed class FeatureRecordRequiredPairRuleTests
             ]);
 
         var findings = new FeatureRecordRequiredPairRule().Evaluate(
-            GovernanceProfileId.ProtocolAuthority,
             GovernanceAnalysisContext.Create(snapshot));
 
         Assert.Empty(findings);
@@ -47,7 +46,6 @@ public sealed class FeatureRecordRequiredPairRuleTests
 
         var finding = Assert.Single(
             new FeatureRecordRequiredPairRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 GovernanceAnalysisContext.Create(snapshot)));
 
         Assert.Equal(
@@ -83,7 +81,6 @@ public sealed class FeatureRecordRequiredPairRuleTests
             files: []);
 
         var findings = new FeatureRecordRequiredPairRule().Evaluate(
-            GovernanceProfileId.ProtocolAuthority,
             GovernanceAnalysisContext.Create(snapshot));
 
         Assert.Equal(

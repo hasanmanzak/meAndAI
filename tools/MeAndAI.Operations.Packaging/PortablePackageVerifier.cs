@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Packaging;
 
@@ -194,10 +195,7 @@ public static class PortablePackageVerifier
             asset.ContractSchema !=
                 PortableReleaseContract.ApplicationContractSchemaVersion ||
             asset.Length is <= 0 or > MaximumAssetBytes ||
-            string.IsNullOrWhiteSpace(asset.Sha256) ||
-            asset.Sha256.Length != 64 ||
-            asset.Sha256.Any(character =>
-                !char.IsAsciiHexDigit(character) || char.IsAsciiLetterUpper(character)))
+            !ExactSha256Digest.TryParse(asset.Sha256, out _))
         {
             throw new InvalidDataException(
                 "Portable release manifest contains an invalid asset identity.");
@@ -284,6 +282,8 @@ public static class PortablePackageVerifier
     private static string ComputeSha256(string path)
     {
         using var stream = File.OpenRead(path);
-        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+        return ExactSha256Digest
+            .FromHashBytes(SHA256.HashData(stream))
+            .Value;
     }
 }

@@ -93,8 +93,14 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "meandai.operations.packaging": {
+      "meandai.operations.domain": {
         "type": "Project"
+      },
+      "meandai.operations.packaging": {
+        "type": "Project",
+        "dependencies": {
+          "MeAndAI.Operations.Domain": "[1.0.0, )"
+        }
       }
     }
   }

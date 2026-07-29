@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Governance.Core.Repository;
 
@@ -21,7 +22,7 @@ public sealed class GovernanceRepositorySnapshot
 
     public IReadOnlyList<GovernanceRepositoryEntry> Entries { get; }
 
-    public static GovernanceRepositorySnapshot CreateCandidate(
+    internal static GovernanceRepositorySnapshot CreateCandidate(
         IEnumerable<GovernanceRepositoryEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
@@ -72,8 +73,9 @@ public sealed class GovernanceRepositorySnapshot
             AppendFramed(evidence, entry.CapturedContent);
         }
 
-        return Convert.ToHexString(evidence.GetHashAndReset())
-            .ToLowerInvariant();
+        return ExactSha256Digest
+            .FromHashBytes(evidence.GetHashAndReset())
+            .Value;
     }
 
     private static void AppendFramed(

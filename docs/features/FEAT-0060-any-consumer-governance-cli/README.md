@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) fully complete with exact-head hosted evidence; two of seven bounded subfeatures closed; non-authoritative MVP authorized under [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md); PowerShell authority unchanged |
+| Status | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) fully complete with exact-head hosted evidence; [SUBF-0122](#subf-0122) locally implementation-green under [TEST-0194](test-cases.md#test-0194) with exact committed-tree/hosted closure pending; two of seven bounded subfeatures closed; PowerShell authority unchanged |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
 | Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; first clean-room shadow slice complete with exact-head hosted evidence) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
-| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) are implemented in the bounded C# catalog; bounded identity/request [TEST-0194](test-cases.md#test-0194), report [TEST-0195](test-cases.md#test-0195), and exact profile-evidence [TEST-0208](test-cases.md#test-0208) remain `Planned` before their expected-red slices |
+| Tests | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) are implemented in the bounded C# catalog; bounded identity/request [TEST-0194](test-cases.md#test-0194) is passing locally; report [TEST-0195](test-cases.md#test-0195) and exact profile-evidence [TEST-0208](test-cases.md#test-0208) remain `Planned` |
 | Readiness analysis | [Definition-of-Ready analysis](readiness-analysis.md), [differential-ledger inventory](differential-ledger-analysis.md), [rule/profile matrix](rule-profile-matrix-analysis.md), and [v1 decision packet](contract-decision-packet.md) |
 
 ## Problem
@@ -159,14 +159,14 @@ are green on Ubuntu and Windows. The PowerShell authority state is unchanged.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Bounded MVP ready; its two canonical rules are locally implemented; full coverage/equivalence is outside this feature | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), canonical [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0208](test-cases.md#test-0208) |
-| Test code | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) exact-head green | [SUBF-0134](#subf-0134) expected-red exited `1` with `CS0234` / `CS0246` for the absent shared analysis types; first combined green was 53/53 and final post-review focused green is 62/62. Exact checkpoint [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4): governance 62/62, architecture 31/31, packaging 17/17, PS 7 / PS 5.1 `StructureOnly` 178.0 / 253.4 seconds; exact final head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) |
-| Baseline run | Latest hosted exact-head baseline accepted for continuation | [Run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) passed Ubuntu and Windows for exact head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) |
+| Test code | [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) exact-head green; [SUBF-0122](#subf-0122) local implementation green | [TEST-0194](test-cases.md#test-0194) expected-red failed in 9.6 seconds with `CS0234` / `CS0246`; the final focused local suite passes 69/69 after single-owner and consumer/candidate fail-closed review corrections. Exact committed-tree and hosted evidence for this slice remain pending. The later records-only exact head [`7a935a5`](https://github.com/hasanmanzak/meAndAI/commit/7a935a5d8a62b3e49348475962215849f3c4a18b) passed hosted [run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175); earlier shared-kernel exact head [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) passed [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) |
+| Baseline run | Latest hosted exact-head baseline accepted for continuation | [Run `30414044175`](https://github.com/hasanmanzak/meAndAI/actions/runs/30414044175) passed Ubuntu and Windows for the records-only identity-contract head [`7a935a5`](https://github.com/hasanmanzak/meAndAI/commit/7a935a5d8a62b3e49348475962215849f3c4a18b); it does not close the later implementation tree |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0122` <a name="subf-0122"></a> | Versioned bounded catalog, profile, request, application-policy-pair, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Exact identity/nullability/artifact contract is frozen in the [readiness analysis](readiness-analysis.md#bounded-v017-request-and-identity-contract); [TEST-0194](test-cases.md#test-0194) remains `Planned` before expected-red, and distinct repository/profile evidence remains in [TEST-0208](test-cases.md#test-0208) | Pending | Ready / next implementation gate |
+| `SUBF-0122` <a name="subf-0122"></a> | Versioned bounded catalog, profile, request, application-policy-pair, and authority-state identities | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0194](test-cases.md#test-0194) expected-red `CS0234` / `CS0246`; focused 69/69 green after review corrections; catalog metadata, bounded version/tag, hex grammar, and candidate eligibility each have one production owner; distinct Git/profile evidence remains in [TEST-0208](test-cases.md#test-0208) | Fresh review complete; no open Blocking finding | Local implementation/review/full-suite green; exact-tree and hosted closure pending |
 | `SUBF-0123` <a name="subf-0123"></a> | Exact-commit snapshot and explicit profile-resolution CLI vertical slice | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) plus [TEST-0208](test-cases.md#test-0208), which remains `Planned`; full candidate overlay is excluded | Pending | In progress / not complete |
 | `SUBF-0124` <a name="subf-0124"></a> | Versioned rule catalog, typed finding, deterministic report, and process contract | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | [TEST-0195](test-cases.md#test-0195) remains `Planned`; [SUBF-0138](#subf-0138) supplies only bounded internal building blocks | Pending | In progress / not complete |
 | `SUBF-0134` <a name="subf-0134"></a> | Parse-once repository/document kernel and the exact [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) / [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) `protocol-authority` rules | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) | Expected-red `CS0234` / `CS0246`; first combined green 53/53; [FIND-0368](#find-0368) resolved after independent re-review; exact local [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4) gates and exact final [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110) hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192) green | Complete | Complete; PowerShell authority unchanged |
@@ -260,8 +260,45 @@ and preserves the already implemented canonical
 behavior through the shared kernel. Exact committed-tree and exact-head hosted
 closure are green. Neither result activates
 [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), or
-[TEST-0208](test-cases.md#test-0208); all three remain literal `Planned`
-documentation scenarios with no active C# source ownership.
+[TEST-0208](test-cases.md#test-0208) at that historical checkpoint. The later
+[SUBF-0122](#subf-0122) slice now activates only [TEST-0194](test-cases.md#test-0194);
+[TEST-0195](test-cases.md#test-0195) and [TEST-0208](test-cases.md#test-0208)
+remain literal `Planned` documentation scenarios.
+
+### [SUBF-0122](#subf-0122) local identity-contract evidence
+
+[SUBF-0122](#subf-0122) now implements only the repository-independent
+[TEST-0194](test-cases.md#test-0194) contract. It does not claim exact Git
+object evidence, consumer repository evidence, package qualification,
+publication, equivalence, authority transfer, or PowerShell retirement.
+
+- The focused expected-red failed in 9.6 seconds with `CS0234` / `CS0246`
+  because the typed request, identity, policy, and bundle contracts did not
+  exist. The final focused local run passes 69/69.
+- The final local full-solution run passes governance 131/131, architecture
+  31/31, and packaging 17/17.
+- Locked restore and format verification pass. The first PowerShell 7
+  `StructureOnly` run found only an unlinked subfeature identity in the newly
+  appended memory heading; after linking it to this canonical record,
+  PowerShell 7 and Windows PowerShell 5.1 pass in 189.1 and 274.3 seconds.
+- Framework-dependent publish produces no apphost. The published DLL validates
+  the real repository as `conforming` with the exact catalog digest, two rules,
+  zero findings, `csharp-shadow`, and `powershell-authority`.
+- One Domain-owned lowercase-ASCII-hex matcher serves exact commit and SHA-256
+  digest identities, and packaging references those same types. Each rule owns
+  its canonical metadata once; the bounded contract owns the protocol version
+  and derived tag once; the catalog alone serializes its ordered metadata and
+  derives its digest.
+- The public request accepts only profile plus exact commit and fixes
+  `exact-commit` / `repository` evidence. Candidate snapshot construction and
+  evaluation remain internal. Both profiles map to the same rule instances,
+  while the current candidate CLI and evaluator reject `consumer` before
+  repository access because [TEST-0208](test-cases.md#test-0208) is still
+  planned.
+- A matching immutable-release binding remains a hypothetical identity proof;
+  no released engine or qualified `maai-governance.zip` is asserted. Exact
+  committed-tree and hosted exact-head evidence for this slice remain pending,
+  so only two of seven bounded subfeatures are closed.
 
 ## Decisions and relationships
 
@@ -308,8 +345,10 @@ and this record.
 
 [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) are fully closed, so both
 local implementation and exact-head closure are two of seven subfeatures
-(28.6%). Five subfeatures are not independently closed. The historical
-188-identity inventory and its
+(28.6%). [SUBF-0122](#subf-0122) makes three of seven slices implementation-
+active (42.9%), but it is not counted closed before exact committed-tree and
+hosted evidence; five subfeatures are therefore not independently closed. The
+historical 188-identity inventory and its
 mixed/variant gaps are inputs to
 [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
 equivalence, not this feature's completion criteria. See the historical
@@ -344,8 +383,10 @@ scope banner.
 ## Definition of Done
 
 [SUBF-0138](#subf-0138) and [SUBF-0134](#subf-0134) are implemented,
-fresh-review green, and exact-head verified. Five bounded
-subfeature implementations, their executable evidence, full-feature review/CI,
+fresh-review green, and exact-head verified. [SUBF-0122](#subf-0122) is locally
+implementation- and fresh-review-green but awaits exact committed-tree and
+hosted closure. Four bounded subfeature implementations, their executable
+evidence, full-feature review/CI,
 exact-commit package qualification, draft-PR completion, merge, and immutable
 release remain incomplete.
 [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)

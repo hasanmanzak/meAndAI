@@ -6,26 +6,23 @@ using MeAndAI.Operations.Governance.Core.Repository;
 namespace MeAndAI.Operations.Governance.Core.Rules;
 
 public sealed class FeatureRecordRequiredPairRule :
-    ProtocolAuthorityGovernanceRule
+    GovernanceRule
 {
+    internal static GovernanceCatalogRuleIdentity CanonicalIdentity { get; } =
+        new(
+            "protocol.feature-record.required-pair.v1",
+            "TEST-0004",
+            "governance.feature.record-set-incomplete",
+            GovernanceSeverity.High,
+            GovernanceEnforcement.Blocking);
+
     private static readonly string[] RequiredFiles =
         ["README.md", "test-cases.md"];
 
-    public override string RuleId =>
-        "protocol.feature-record.required-pair.v1";
+    public override GovernanceCatalogRuleIdentity Identity =>
+        CanonicalIdentity;
 
-    public override string CanonicalScenarioId => "TEST-0004";
-
-    public override string FindingCode =>
-        "governance.feature.record-set-incomplete";
-
-    public override GovernanceSeverity Severity =>
-        GovernanceSeverity.High;
-
-    public override GovernanceEnforcement Enforcement =>
-        GovernanceEnforcement.Blocking;
-
-    protected override IReadOnlyList<GovernanceFinding> Evaluate(
+    public override IReadOnlyList<GovernanceFinding> Evaluate(
         GovernanceAnalysisContext context)
     {
         return

@@ -5,26 +5,23 @@ using MeAndAI.Operations.Governance.Core.Contracts;
 namespace MeAndAI.Operations.Governance.Core.Rules;
 
 public sealed class DecisionRecordRequiredStructureRule :
-    ProtocolAuthorityGovernanceRule
+    GovernanceRule
 {
+    internal static GovernanceCatalogRuleIdentity CanonicalIdentity { get; } =
+        new(
+            "protocol.decision-record.required-structure.v1",
+            "TEST-0005",
+            "governance.decision.record-structure-incomplete",
+            GovernanceSeverity.High,
+            GovernanceEnforcement.Blocking);
+
     private static readonly string[] RequiredSections =
         ["Context", "Decision", "Consequences"];
 
-    public override string RuleId =>
-        "protocol.decision-record.required-structure.v1";
+    public override GovernanceCatalogRuleIdentity Identity =>
+        CanonicalIdentity;
 
-    public override string CanonicalScenarioId => "TEST-0005";
-
-    public override string FindingCode =>
-        "governance.decision.record-structure-incomplete";
-
-    public override GovernanceSeverity Severity =>
-        GovernanceSeverity.High;
-
-    public override GovernanceEnforcement Enforcement =>
-        GovernanceEnforcement.Blocking;
-
-    protected override IReadOnlyList<GovernanceFinding> Evaluate(
+    public override IReadOnlyList<GovernanceFinding> Evaluate(
         GovernanceAnalysisContext context)
     {
         return

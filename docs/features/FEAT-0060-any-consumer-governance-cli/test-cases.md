@@ -2,8 +2,10 @@
 
 Test implementation: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) are fully complete with exact-head hosted
-evidence. Local implementation and fully closed progress are both two of seven
-subfeatures (28.6%). Five subfeatures are not independently closed.
+evidence. [SUBF-0122](README.md#subf-0122) is locally implementation-green
+under [TEST-0194](#test-0194), while its exact committed-tree and hosted
+closure remain pending. Fully closed progress therefore remains two of seven
+(28.6%); three of seven slices (42.9%) now have active implementation.
 
 ## Authorized bounded clean-room catalog
 
@@ -33,20 +35,20 @@ verified, and exact-head hosted on Ubuntu and Windows.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122) | Construct the closed, versioned governance profile, exact-commit request, policy/catalog, application-policy-pair, evidence-scope, engine-state, and authority-state identities without reading a repository. | Every lexical identity and cross-identity invariant is exact and fail closed; the caller selects one declared profile and exact commit but cannot inject rules, catalog metadata, enforcement, engine state, or authority. Invalid casing, length, schema, digest, release state, commit, or mismatched application/policy identity is rejected before repository access. | Unit / contract / identity / security | `Distinct`; see the exact sibling tuple below. [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) closed application/stage/capability identities remain owned by [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191). | Planned | Future .NET tests |
+| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122) | Construct the closed, versioned governance profile, exact-commit request, policy/catalog, application-policy-pair, evidence-scope, engine-state, and authority-state identities without reading a repository. | Every lexical identity and cross-identity invariant is exact and fail closed; the caller selects one declared profile and exact commit but cannot inject rules, catalog metadata, enforcement, engine state, or authority. Invalid casing, length, schema, digest, release state, commit, or mismatched application/policy identity is rejected before repository access. | Unit / contract / identity / security | `Distinct`; see the exact sibling tuple below. [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) closed application/stage/capability identities remain owned by [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191). | Passing | `tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj` |
 | `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124) and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
 | `TEST-0208` <a name="test-0208"></a> | [SUBF-0123](README.md#subf-0123) and [SUBF-0135](README.md#subf-0135) | In fresh anonymous real Git repositories, resolve one closed [TEST-0194](#test-0194) request against an exact commit and verify explicit `protocol-authority` plus canonical `.ai/protocol` gitlink `consumer` profile evidence. | One caller-selected profile, exact 40-character commit, catalog, and application-policy pair are independently verified from canonical repository evidence. Unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, zero/multiple pin, or unsupported repository-reference state fails closed; no named repository, automatic profile, mutation, or authority inference exists. | Git / integration / profile / security | `Distinct`; see the exact sibling tuple below. Canonical byte-source precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171), while [TEST-0194](#test-0194) owns the repository-independent typed request. | Planned | Future .NET integration tests |
 
 [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) contribute bounded implementation experience
-to the future request/report design, but they do not activate or pass
-[TEST-0194](#test-0194), [TEST-0195](#test-0195), or
-[TEST-0208](#test-0208). All three remain canonical `PlannedDocumentation`
-scenarios with literal `Planned` status and no active C# source ownership.
+to the request/report design. [SUBF-0122](README.md#subf-0122) now activates
+and passes repository-independent [TEST-0194](#test-0194) in the governance
+.NET test project. [TEST-0195](#test-0195) and [TEST-0208](#test-0208) remain
+canonical `PlannedDocumentation` scenarios with no active C# source ownership.
 
 ### [TEST-0194](#test-0194) exact identity matrix
 
-The expected-red slice must cover the contract before any repository adapter is
+The executable slice covers the contract before any repository adapter is
 called:
 
 - both exact profile values and ordinal rejection of unknown or differently
@@ -66,13 +68,51 @@ called:
   catalog, rules, enforcement, state, or authority;
 - an unreleased bundle with no partial release fields, derived
   `csharp-shadow`, and derived `powershell-authority`; and
-- a fully bound immutable release with matching `vM.m.rev`, engine commit,
-  policy commit, catalog digest, and exact `maai-governance.zip` digest,
+- a hypothetical fully matching immutable release binding with `vM.m.rev`,
+  engine commit, policy commit, catalog digest, and exact
+  `maai-governance.zip` digest,
   deriving `csharp-released-non-authoritative` while every null/partial/mismatch
   combination fails before repository access.
 
 Commit existence, Git object type, authority/consumer evidence, and pin
 verification remain exclusively owned by [TEST-0208](#test-0208).
+
+### [TEST-0194](#test-0194) local implementation evidence
+
+Test-first evidence on 2026-07-29:
+
+- The focused `dotnet test` command filtered to `Scenario=TEST-0194` first
+  failed to compile in 9.6 seconds with `CS0234` / `CS0246` because the exact
+  identity, policy, request, and bundle types did not exist.
+- After implementation and independent review corrections, the same focused
+  command passed 69/69 in 7.5 seconds. The corrections prevent public candidate
+  selection, reject `consumer` on both the current candidate-only CLI
+  preflight and the internal candidate evaluator before repository access, and
+  keep the two profiles mapped to the same catalog rule objects without
+  activating consumer repository evidence.
+- The final local full-solution run passed governance 131/131, architecture
+  31/31, and packaging 17/17 after moving canonical catalog metadata
+  serialization and digest derivation behind the catalog owner.
+- Locked restore and format verification passed. The first PowerShell 7
+  `StructureOnly` run found only the new memory-log heading's unlinked
+  subfeature identity; after linking the whole identity to its canonical
+  record, PowerShell 7 and Windows PowerShell 5.1 passed in 189.1 and 274.3
+  seconds.
+- Framework-dependent publish produced DLL/JSON/PDB output without an apphost.
+  Running that published DLL on the real repository exited `0` with
+  `conforming`, the exact catalog digest, two evaluated rules, zero findings,
+  `csharp-shadow`, and `powershell-authority`.
+- One Domain-owned lowercase-ASCII-hex matcher serves both exact commit and
+  digest identities. Packaging references Domain and reuses those identities;
+  rule descriptors own catalog metadata once, while one typed bounded contract
+  owns version `0.17.0` and derives its exact release tag.
+
+This proves only repository-independent typed construction and fail-closed
+cross-identity validation. It does not prove commit existence or Git object
+type, consumer pin/profile evidence, exact-commit CLI acquisition, ZIP
+qualification/publication, or an actual released engine. The matching release
+test constructs a hypothetical all-or-nothing binding; PowerShell remains the
+authority. Exact committed-tree and hosted closure are pending.
 
 ## Distinct-intent review
 
@@ -126,8 +166,9 @@ This is executable evidence for canonical
 and regression evidence for canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 through the shared analysis context. Exact committed-tree and hosted closure
-are green; [TEST-0194](#test-0194),
-[TEST-0195](#test-0195), and [TEST-0208](#test-0208) remain `Planned`.
+are green for that historical shared-kernel checkpoint. The later
+[SUBF-0122](README.md#subf-0122) slice activates [TEST-0194](#test-0194);
+[TEST-0195](#test-0195) and [TEST-0208](#test-0208) remain `Planned`.
 
 ### [SUBF-0138](README.md#subf-0138) exact-head closure
 
@@ -172,9 +213,11 @@ This evidence completes the canonical
 C# vertical slice with exact-head hosted proof. The shared-kernel checkpoint
 above adds canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
-evidence but does not yet close exact-commit request/profile verification. Neither
-slice activates [TEST-0194](#test-0194), [TEST-0195](#test-0195), or
-[TEST-0208](#test-0208), which remain `Planned`. Exact head
+evidence but did not itself close exact-commit request/profile verification. At
+that checkpoint [TEST-0194](#test-0194), [TEST-0195](#test-0195), and
+[TEST-0208](#test-0208) remained `Planned`; the later
+[SUBF-0122](README.md#subf-0122) slice activates only [TEST-0194](#test-0194).
+Exact head
 [`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2)
 passed hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
 on Ubuntu and Windows. Exact-commit package behavior remains pending. The historical

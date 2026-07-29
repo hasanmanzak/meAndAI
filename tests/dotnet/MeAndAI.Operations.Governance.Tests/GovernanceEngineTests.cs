@@ -12,8 +12,8 @@ public sealed class GovernanceEngineTests
     [Trait("Scenario", "TEST-0004")]
     public void CompletePairIsConformingWithinTheBoundedShadowCatalog()
     {
-        var report = GovernanceEngine.CreateDefault().Evaluate(
-            new GovernanceRequest(GovernanceProfileId.ProtocolAuthority),
+        var report = GovernanceEngine.CreateDefault().EvaluateCandidateShadow(
+            GovernanceProfileId.ProtocolAuthority,
             Snapshot(
                 GovernanceRepositoryEntry.Directory(
                     "docs/features/FEAT-0001-example"),
@@ -41,8 +41,8 @@ public sealed class GovernanceEngineTests
     [Trait("Scenario", "TEST-0004")]
     public void BlockingFindingIsNonconforming()
     {
-        var report = GovernanceEngine.CreateDefault().Evaluate(
-            new GovernanceRequest(GovernanceProfileId.ProtocolAuthority),
+        var report = GovernanceEngine.CreateDefault().EvaluateCandidateShadow(
+            GovernanceProfileId.ProtocolAuthority,
             Snapshot(
                 GovernanceRepositoryEntry.Directory(
                     "docs/features/FEAT-0001-example")));
@@ -66,13 +66,14 @@ public sealed class GovernanceEngineTests
                 "docs/features/FEAT-0001-alpha"),
         };
         var engine = GovernanceEngine.CreateDefault();
-        var request = new GovernanceRequest(
-            GovernanceProfileId.ProtocolAuthority);
+        var profile = GovernanceProfileId.ProtocolAuthority;
 
         var first = GovernanceReportSerializer.Serialize(
-            engine.Evaluate(request, Snapshot(entries)));
+            engine.EvaluateCandidateShadow(profile, Snapshot(entries)));
         var second = GovernanceReportSerializer.Serialize(
-            engine.Evaluate(request, Snapshot(entries.Reverse().ToArray())));
+            engine.EvaluateCandidateShadow(
+                profile,
+                Snapshot(entries.Reverse().ToArray())));
 
         Assert.Equal(first, second);
         Assert.EndsWith("\n", first, StringComparison.Ordinal);
@@ -82,8 +83,8 @@ public sealed class GovernanceEngineTests
     [Fact]
     public void ReportDigestBindsExactSemanticPayloadWithoutTransportLf()
     {
-        var report = GovernanceEngine.CreateDefault().Evaluate(
-            new GovernanceRequest(GovernanceProfileId.ProtocolAuthority),
+        var report = GovernanceEngine.CreateDefault().EvaluateCandidateShadow(
+            GovernanceProfileId.ProtocolAuthority,
             Snapshot(
                 GovernanceRepositoryEntry.Directory(
                     "docs/features/FEAT-0001-example")));

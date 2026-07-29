@@ -27,7 +27,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
                 """));
 
         var findings = new DecisionRecordRequiredStructureRule().Evaluate(
-            GovernanceProfileId.ProtocolAuthority,
             context);
 
         Assert.Empty(findings);
@@ -49,7 +48,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -89,7 +87,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -123,7 +120,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -155,7 +151,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -193,7 +188,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -228,7 +222,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(6, finding.UnsatisfiedRequirements.Count);
@@ -261,7 +254,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
                 """));
 
         var findings = new DecisionRecordRequiredStructureRule().Evaluate(
-            GovernanceProfileId.ProtocolAuthority,
             context);
 
         Assert.Equal(
@@ -318,7 +310,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
 
         var finding = Assert.Single(
             new DecisionRecordRequiredStructureRule().Evaluate(
-                GovernanceProfileId.ProtocolAuthority,
                 context));
 
         Assert.Equal(
@@ -350,7 +341,6 @@ public sealed class DecisionRecordRequiredStructureRuleTests
                 "not a direct decision path"));
 
         var findings = new DecisionRecordRequiredStructureRule().Evaluate(
-            GovernanceProfileId.ProtocolAuthority,
             context);
 
         Assert.Empty(findings);
