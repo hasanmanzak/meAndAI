@@ -137,7 +137,6 @@ public sealed class ProjectDependencyTests
     [Fact]
     [Trait("Scenario", "TEST-0191")]
     [Trait("Scenario", "TEST-0192")]
-    [Trait("Scenario", "TEST-0193")]
     public void ProcessKernelIsInternalAndPackagingConsumesItDirectly()
     {
         Assert.All(
@@ -171,7 +170,6 @@ public sealed class ProjectDependencyTests
 
     [Fact]
     [Trait("Scenario", "TEST-0191")]
-    [Trait("Scenario", "TEST-0193")]
     public void PackagingJsonParsingAndTextDecodingAreSingleOwned()
     {
         Assert.Equal(
