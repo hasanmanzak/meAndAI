@@ -30,8 +30,10 @@ Last verified: **2026-07-29**
   implementation is green at four of five delivery gates (80%) on migration
   commit
   [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6);
-  candidate-tree StructureOnly passed in 186.5 seconds; exact-tree/package and
-  hosted closure remain pending.
+  candidate-tree StructureOnly passed in 186.5 seconds. Exact local checkpoint
+  [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+  passed committed-tree StructureOnly and local package execution; hosted
+  same-byte/final closure remains pending.
 - Historical C# operational-foundation second-slice checkpoint (retained as
   then-current evidence; superseded by immutable v0.16.0):
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
@@ -210,8 +212,9 @@ Last verified: **2026-07-29**
   [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141),
   is locally complete with 79/79 targeted and 234/234 full-solution tests,
   locked restore, zero-warning build, clean analyzer/format, and no remaining
-  independent-review finding. Its exact-tree/package and hosted closure must
-  finish before exact repository/profile work in
+  independent-review finding. Its exact local checkpoint/package execution is
+  complete; hosted same-byte/final closure must finish before exact
+  repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
   consumer fixture. Canonical

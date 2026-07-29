@@ -314,3 +314,23 @@ extension is four of five gates complete (80%); exact committed-tree protocol
 and package evidence plus one consolidated hosted Ubuntu/Windows closure
 remain. PowerShell, workflows, consumers, release assets, and operational
 authority are unchanged.
+
+## [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141) exact-local checkpoint
+
+Exact local evidence checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+passed committed-tree StructureOnly in 192.6 seconds. The canonical workflow
+CLI built the manifest-bound framework-dependent JIT package set in 15.9
+seconds and `--execute` verification validated and ran all three applications
+on Windows in 2.7 seconds.
+
+The exact local assets were `maai-adoption.zip` at 95,385 bytes with SHA-256
+`645faf79967d9352aa57b3debc1b076c4b93488d0602491d7f95c894b1c444de`,
+`maai-consumer-update.zip` at 95,951 bytes with SHA-256
+`91a05dbb792e72b830288670c87cd4da4eb7a732bdff0a06ef90aa081bd08561`,
+and `maai-governance.zip` at 185,733 bytes with SHA-256
+`319fb4431be7bbee52036d1d5cc8875d408accb33344b3077723cd44e88c6609`.
+These are local Windows outputs, not a cross-host same-byte claim. Only the
+hosted same-byte Ubuntu/Windows handoff, remote evidence, and final hosted
+confirmation remain for gate five; the support extension therefore stays at
+four of five gates (80%).

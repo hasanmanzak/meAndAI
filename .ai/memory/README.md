@@ -24,9 +24,11 @@ is a later `v0.17.0` support extension tracked by
 remains three of four complete (75%) while the extension is locally green at
 four of five delivery gates (80%) on migration commit
 [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6).
-Candidate-tree StructureOnly passed in 186.5 seconds. Exact-tree/package and
-hosted closure remain pending; released `v0.16.0` assets
-and evidence are unchanged.
+Candidate-tree StructureOnly passed in 186.5 seconds; exact local checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+then passed committed-tree StructureOnly and local package execution. Hosted
+same-byte/final closure remains pending; released `v0.16.0` assets and evidence
+are unchanged.
 
 [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
 / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
@@ -85,8 +87,8 @@ on Ubuntu and Windows. The shared-process implementation gate owned by
 [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
 is locally complete with 79/79 targeted and 234/234 full-solution tests,
 locked restore, zero-warning Release build, format/analyzer verification, and
-three clean independent re-reviews. Complete its exact-tree/package and hosted
-closure before beginning
+three clean independent re-reviews. Exact local checkpoint/package execution
+is complete; finish hosted same-byte/final closure before beginning
 [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
 [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
 remains `Planned`. The support extension is external to

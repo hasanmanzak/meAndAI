@@ -7,7 +7,8 @@ expected-red/green, exact committed-tree, exact package, fresh-download, and
 required Ubuntu/Windows evidence remains below.
 [SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
 identities; its tests-first and controlled duplicate-owner failures plus local
-implementation green are complete, exact-tree/hosted closure remains pending,
+implementation green, exact-tree validation, and local exact-package execution
+are complete. Hosted same-byte Ubuntu/Windows and final closure remain pending,
 and no new TEST identity is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
@@ -55,8 +56,23 @@ the exact-commit Release build with zero warnings/errors, changed-file
 analyzer/format verification, and three independent bounded re-reviews pass
 with no remaining P0/P1/P2. Candidate-tree StructureOnly then passed all
 discovered contracts in 186.5 seconds; its protocol-governance owner reported
-184,511 ms. Exact committed-tree package/protocol evidence plus hosted
-Ubuntu/Windows confirmation remain pending.
+184,511 ms.
+
+Exact local evidence checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+passed committed-tree StructureOnly in 192.6 seconds. The canonical workflow
+CLI built all three framework-dependent JIT archives in 15.9 seconds with the
+manifest bound to that source commit; `--execute` verification then validated
+and ran adoption, consumer update, and governance in 2.7 seconds on Windows.
+
+| Exact local asset | Length | SHA-256 |
+| --- | ---: | --- |
+| `maai-adoption.zip` | 95,385 | `645faf79967d9352aa57b3debc1b076c4b93488d0602491d7f95c894b1c444de` |
+| `maai-consumer-update.zip` | 95,951 | `91a05dbb792e72b830288670c87cd4da4eb7a732bdff0a06ef90aa081bd08561` |
+| `maai-governance.zip` | 185,733 | `319fb4431be7bbee52036d1d5cc8875d408accb33344b3077723cd44e88c6609` |
+
+These are exact local Windows outputs, not a cross-host same-byte claim.
+Hosted Ubuntu/Windows package handoff and final confirmation remain pending.
 
 The exact predecessor
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)

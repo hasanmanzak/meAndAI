@@ -65,8 +65,10 @@ on Ubuntu and Windows. The
 [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
 shared Infrastructure process foundation is locally green on
 [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
-with 79/79 targeted and 234/234 full-solution tests. Complete its exact-tree,
-package, and hosted closure before
+with 79/79 targeted and 234/234 full-solution tests. Exact local checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+passed committed-tree StructureOnly and local package execution. Complete its
+hosted same-byte/final closure before
 [SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
 [TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
 remains `Planned`. The support extension is external to
@@ -98,10 +100,11 @@ historical evidence. That immutable release remains its original three of
 three; the later
 [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
 support extension is locally green at four of five gates (80%), including a
-186.5-second candidate-tree StructureOnly pass, while current
+186.5-second candidate-tree StructureOnly pass and exact local
+checkpoint/package execution, while current
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-progress remains three of four (75%) pending exact-tree/hosted closure, without
-changing the released assets.
+progress remains three of four (75%) pending hosted same-byte/final closure,
+without changing the released assets.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
