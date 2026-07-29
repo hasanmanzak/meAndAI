@@ -60,10 +60,13 @@ closes [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/
 Its correction head
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
 passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
-on Ubuntu and Windows. Continue next with the
+on Ubuntu and Windows. The
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
 [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
-shared Infrastructure process foundation before
+shared Infrastructure process foundation is locally green on
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+with 79/79 targeted and 234/234 full-solution tests. Complete its exact-tree,
+package, and hosted closure before
 [SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
 [TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
 remains `Planned`. The support extension is external to
@@ -94,9 +97,10 @@ retain closure evidence. The earlier release-preparation and slice handoffs are
 historical evidence. That immutable release remains its original three of
 three; the later
 [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
-support extension makes current
+support extension is locally green at four of five gates (80%), including a
+186.5-second candidate-tree StructureOnly pass, while current
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-progress three of four (75%) without
+progress remains three of four (75%) pending exact-tree/hosted closure, without
 changing the released assets.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)

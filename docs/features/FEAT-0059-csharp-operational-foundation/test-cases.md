@@ -6,8 +6,9 @@ The original `v0.16.0` implementation of
 expected-red/green, exact committed-tree, exact package, fresh-download, and
 required Ubuntu/Windows evidence remains below.
 [SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
-identities; its tests-first failure is complete, implementation remains
-pending, and no new TEST identity is declared.
+identities; its tests-first and controlled duplicate-owner failures plus local
+implementation green are complete, exact-tree/hosted closure remains pending,
+and no new TEST identity is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -22,8 +23,8 @@ project with `--no-restore` and the exact `Scenario=TEST-0192` filter. It
 failed in 11.1 seconds only with `CS0246` for the deliberately absent
 `BoundedProcessRequest`; no test executed and no `CS0017`, restore, lock,
 warning, or unrelated compiler failure occurred. This is the expected-red
-evidence for the shared Infrastructure contract. No implementation or green
-result is claimed yet.
+evidence for the shared Infrastructure contract. At that checkpoint no
+implementation or green result was claimed.
 
 The Infrastructure-only implementation checkpoint then compiled cleanly and
 passed all 11 new bounded-process cases in 4 seconds. They exercise exact
@@ -36,8 +37,26 @@ filter passed 26 of 27 and failed only the planned Packaging-to-Infrastructure
 dependency assertion. The [TEST-0191](#test-0191) filter passed 16 of 18 and
 failed only that same missing reference plus the exact inventory showing both
 the new Infrastructure owner and the retained old Packaging runner. This is
-the required controlled duplicate-owner red; no complete green or Packaging
-adoption result is claimed yet.
+the required controlled duplicate-owner red; at that checkpoint no complete
+green or Packaging-adoption result was claimed.
+
+Direct Packaging adoption is now locally green on exact implementation commit
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6).
+The old Packaging runner is deleted; Infrastructure is the only production
+process owner; its request/result/runner family is internal; and Packaging has
+exactly four direct CLI calls plus one executor call with no forwarding
+wrapper. Executable source-owner barriers also make `StrictJson` the sole
+Packaging JSON parser and `StrictUtf8` the sole direct text decoder, while a
+runtime-configuration duplicate-property/BOM regression proves builder
+delegation through the shared parser. The final targeted union passed 46
+Architecture and 33 Packaging cases (79/79); the full solution passed 46
+Architecture, 33 Packaging, and 155 Governance cases (234/234). Locked restore,
+the exact-commit Release build with zero warnings/errors, changed-file
+analyzer/format verification, and three independent bounded re-reviews pass
+with no remaining P0/P1/P2. Candidate-tree StructureOnly then passed all
+discovered contracts in 186.5 seconds; its protocol-governance owner reported
+184,511 ms. Exact committed-tree package/protocol evidence plus hosted
+Ubuntu/Windows confirmation remain pending.
 
 The exact predecessor
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)

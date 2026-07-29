@@ -6,7 +6,7 @@
 | Status | Complete |
 | Target version | 0.16.0 |
 | Support extension target | 0.17.0 |
-| Support extension status | [SUBF-0141](#subf-0141) authorized and pending; current declared-slice ledger three of four (75%) |
+| Support extension status | [SUBF-0141](#subf-0141) local candidate complete at four of five gates (80%); exact-tree/hosted closure pending; declared-slice ledger remains three of four (75%) |
 | Issue | Original release [#154](https://github.com/hasanmanzak/meAndAI/issues/154); support extension [#162](https://github.com/hasanmanzak/meAndAI/issues/162) |
 | Pull request | Merged [#159](https://github.com/hasanmanzak/meAndAI/pull/159); current draft [#160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
@@ -346,7 +346,7 @@ responsibilities; no duplicate scenario identity is introduced.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Original scope passing; existing identities extended for [SUBF-0141](#subf-0141) with no new scenario identity | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
-| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) tests-first failure complete | Exact expected-red evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
+| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) expected-red and local implementation green complete | Exact expected-red and local-green evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
 | Baseline run | Original release complete; support-extension predecessor exact hosted green | Exact [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3) / [run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869) |
 
 ## Decomposition and subfeature gates
@@ -356,7 +356,7 @@ responsibilities; no duplicate scenario identity is introduced.
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red, 17 of 17 focused and 48 of 48 combined local tests, then exact same-byte [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611) execution | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate/exact-tree StructureOnly passed in 211.2 / 208.8 seconds; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red complete; kernel behavior 11/11 green; two planned adoption assertions red | Independent records, lifecycle, and test-topology reviews complete; implementation review pending | Kernel-only checkpoint complete / Packaging adoption pending |
+| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red, controlled duplicate-owner red, 79/79 targeted local green, 234/234 full solution green, and candidate-tree StructureOnly green | Three independent fresh reviews and bounded re-reviews closed process lifecycle, cleanup, cancellation, direct-consumer, parser/decoder single-owner, and test-fixture findings; zero remaining P0/P1/P2 | Four of five gates complete / exact-tree and hosted closure pending |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
 
@@ -497,24 +497,29 @@ Progress is measured against five independently observable delivery gates:
    `BoundedProcessRequest` contract in 11.1 seconds, with no entrypoint,
    restore, lock, warning, or unrelated compiler failure.
 3. Shared kernel behavior green with intentional duplicate-owner red, then
-   direct Packaging adoption and complete focused green: in progress. The
-   kernel-only half is complete: 11 of 11 new process cases pass, while the
-   missing Packaging dependency and retained Packaging runner are the only
-   intentional architecture failures.
+   direct Packaging adoption and complete focused green: complete. Exact local
+   implementation commit
+   [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+   removes the old runner, keeps the shared family internal, and passes 79 of
+   79 targeted and 234 of 234 full-solution tests.
 4. Local fresh-diff review, locked restore, zero-warning build,
    analyzer/format verification, package verification, and candidate-tree
-   protocol validation: pending.
+   protocol validation: complete. Three independent reviews and their
+   bounded re-reviews have no remaining P0/P1/P2; locked restore, a 0-warning /
+   0-error Release build, changed-file analyzer/format verification, 33
+   Packaging cases, and candidate-tree StructureOnly in 186.5 seconds pass.
 5. Exact committed-tree validation, same-byte Ubuntu/Windows package handoff,
    remote evidence, and final hosted confirmation: pending.
 
-The current checkpoint is two of five gates, or 40%, for
+The current checkpoint is four of five gates, or 80%, for
 [SUBF-0141](#subf-0141). The original three `v0.16.0` subfeatures remain fully
 closed; current feature progress is three of four subfeatures, or 75%.
-Remaining elapsed-time projection is three to seven implementation/review
-hours plus one 35-to-60-minute hosted closure observation. These values are planning ranges,
-not thresholds. Intermediate expected-red and kernel-only commits will remain
-local and be pushed with the fully green Packaging migration so they do not
-consume separate long hosted Windows runs.
+Remaining elapsed-time projection is 10 to 25 minutes of local exact-tree and
+package work plus one 35-to-60-minute hosted closure observation. These values
+are planning ranges, not thresholds. Intermediate expected-red, kernel-only,
+and fully green migration commits remain local until this candidate-tree record
+is committed, so they consume one hosted run rather than separate long Windows
+runs.
 
 ## Decisions and relationships
 

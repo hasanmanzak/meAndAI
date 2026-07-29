@@ -249,8 +249,9 @@ fixture and the
 [TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191) /
 [TEST-0192](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
 extensions; no project, package, solution node, workflow filter, or new test
-identity was added. The focused Release `Scenario=TEST-0192` compile with
-`--no-restore` failed in 11.1 seconds only
+identity was added. The focused Release compile for
+[TEST-0192](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
+with `--no-restore` failed in 11.1 seconds only
 with `CS0246` for the absent `BoundedProcessRequest`. No entrypoint collision,
 restore/lock problem, warning, or unrelated compiler failure occurred.
 
@@ -280,3 +281,36 @@ process API, package, project, solution node, workflow change, PowerShell
 change, or authority transfer was introduced. Overall delivery remains two of
 five gates complete (40%) while gate three is in progress; direct async
 Packaging adoption and removal of the old owner are next.
+
+## [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141) local-green checkpoint
+
+Exact local implementation commit
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+completes direct asynchronous Packaging adoption. The old Packaging runner is
+deleted, Infrastructure is the sole production process owner, and the internal
+request/result/runner family has no Packaging forwarding wrapper. Executable
+source-owner tests fix the direct-consumer inventory at four CLI calls plus one
+executor call and keep Packaging JSON parsing and direct UTF-8 decoding
+single-owned by `StrictJson` and `StrictUtf8`.
+
+The shared runner now covers exact binary stdin/stdout/stderr, inclusive byte
+limits, discrete arguments, environment set/remove isolation, nonzero result,
+pre- and in-flight cancellation, huge timeouts, active descendant cleanup,
+inherited-pipe EOF, prompt broken-pipe transport failure, fixed redaction, and
+bounded cleanup observation. Packaging preserves strict descriptor/runtime
+JSON, whitespace-compatible strict UTF-8, exit interpretation, Ctrl+C mapping,
+and fail-closed temporary-workspace cleanup with bounded deletion retry.
+
+The final targeted union passed 46 Architecture and 33 Packaging cases
+(79/79). The exact clean commit passed the complete solution with 46
+Architecture, 33 Packaging, and 155 Governance cases (234/234), locked restore,
+and a zero-warning/zero-error Release build in 2.61 seconds. Changed-file
+analyzer/format verification passed. Three independent process, Packaging, and
+duplication reviews found two recurrence-barrier P1s and four lifecycle/cleanup
+P2s; all were corrected, and their bounded re-reviews report no remaining
+P0/P1/P2. Candidate-tree StructureOnly then passed all discovered contracts in
+186.5 seconds; its protocol-governance owner reported 184,511 ms. The support
+extension is four of five gates complete (80%); exact committed-tree protocol
+and package evidence plus one consolidated hosted Ubuntu/Windows closure
+remain. PowerShell, workflows, consumers, release assets, and operational
+authority are unchanged.
