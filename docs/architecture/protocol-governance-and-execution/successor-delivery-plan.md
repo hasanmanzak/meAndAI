@@ -6,18 +6,25 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Implementation authority | Withheld |
+| Implementation authority | Scoped only to [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) |
 
 This plan allocates the accepted architecture to stable delivery records. It
-does not authorize C# implementation, test implementation, WIP extraction,
-workflow changes, consumer mutation, release publication, authority transfer,
-or PowerShell retirement.
+did not itself authorize implementation. The later
+[scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+authorizes only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+and [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220),
+including that scenario's route inside both existing stable jobs. WIP
+extraction, other C# or test implementation, consumer mutation, release
+publication, authority transfer, and PowerShell retirement remain unauthorized.
+The [infrastructure clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847)
+also permits only the corresponding assertion in existing
+[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
 
 ## 1. Capability ownership
 
 | Boundary | Stable owner | Outcome | Planning tests |
 | --- | --- | --- | --- |
-| 1. Shared conformance | [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) / [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) | Protocol-owned domain, rule catalog, evaluator kernel, typed evidence, canonical report, extension semantics, qualification, and self-consumption | [TEST-0209](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [TEST-0211](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) |
+| 1. Shared conformance | [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) / [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) | Protocol-owned domain, rule catalog, evaluator kernel, typed evidence, canonical report, extension semantics, qualification, and self-consumption | Feature scenarios [TEST-0209](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [TEST-0211](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211); dependency-closed contracts [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220), [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221), and [TEST-0222](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222) |
 | 2. Shared execution authority | [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md) / [issue #166](https://github.com/hasanmanzak/meAndAI/issues/166) | Authority snapshots, grants, separation, activation CAS, publication envelopes, leases, fences, journal, receipts, reconstruction, and recovery | [TEST-0212](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0212) and [TEST-0213](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0213) |
 | 3. Evidence and consumer integration | [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) / [issue #167](https://github.com/hasanmanzak/meAndAI/issues/167) | Exact Git/GitHub acquisition, Trust Bootstrap, immutable resolution, managed hook, evaluator host, and result publisher | [TEST-0214](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214), [TEST-0215](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0215), and [TEST-0216](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0216) |
 | 4. Adoption | [FEAT-0061](../../features/FEAT-0061-consumer-adoption-cli/README.md) / [issue #156](https://github.com/hasanmanzak/meAndAI/issues/156) | Adoption assessment, explicit strategy, sealed planning, authorized apply, closure, finalization, and recovery | Existing [TEST-0197](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0197), [TEST-0198](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0198), [TEST-0200](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0200), and [TEST-0201](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0201) remain planned |
@@ -88,10 +95,13 @@ surfaces:
 
 ## 5. First rule/specification/qualification/evidence matrix
 
-This is the first implementation slice, not the complete catalog. Later rule
-inventory work must cover every normative contract and may add stable rule
-identities without changing these meanings. A rule is shared even when its
-evidence comes from different repository or provider adapters.
+This is the first rule/catalog implementation slice, not the first prerequisite
+code slice and not the complete catalog. Authorized
+[SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+establishes scalar vocabulary only and grants no catalog or evaluator authority.
+Later rule inventory work must cover every normative contract and may add stable
+rule identities without changing these meanings. A rule is shared even when
+its evidence comes from different repository or provider adapters.
 
 For record-shape rules, the exact protocol-owned template is part of the
 normative source: the documentation graph establishes the record class and
@@ -121,10 +131,10 @@ enumeration, pagination, freshness, and acquisition completeness belong to
 | Stable successor features and issue links | Satisfied by this plan |
 | First rule/specification/qualification/evidence matrix | Satisfied at design level by [the first matrix](#5-first-rulespecificationqualificationevidence-matrix) |
 | Exact WIP disposition and destination | Satisfied at design level by the [WIP extraction ledger](wip-extraction-ledger.md); no extraction is authorized |
-| Feature Gate 1 expected-red evidence | Not satisfied; each owner must capture it before implementation |
-| Feature Gate 2 design review | Not satisfied |
-| Exact accepted-head structural validation | Pending external evidence on [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
-| Separate maintainer implementation directive | Not issued |
+| Selected-slice Gate 1 and expected-red design | Satisfied only for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) / [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220) by the [design record](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0152-domain-vocabulary-design.md); executable Gate 3 red remains pending |
+| Feature Gate 2 design review | Satisfied only for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) by the [design record](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0152-domain-vocabulary-design.md); every other slice remains unsatisfied |
+| Exact accepted-head structural validation | Satisfied by merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) and exact-main [run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367) |
+| Separate maintainer implementation directive | Issued only for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) / [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220) in the [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932) |
 
 The first eligible implementation directive should name exactly one
 dependency-closed feature or subfeature. It must not authorize broad

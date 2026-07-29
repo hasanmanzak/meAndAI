@@ -5,7 +5,7 @@
 | Owner | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Reviewed architecture | [Protocol Governance and Execution Architecture](README.md) |
 | Review state | Closed at design level; maintainer accepted architecture |
-| Implementation authority | Withheld |
+| Implementation authority | Withheld at architecture-review closure; later scoped only to [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) |
 
 The review challenged the design against the committed default-branch baseline
 and the exact preserved WIP commit. A closed result means the architecture
