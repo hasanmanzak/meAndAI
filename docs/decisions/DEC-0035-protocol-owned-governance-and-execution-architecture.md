@@ -1,16 +1,19 @@
 # DEC-0035 - Make the Executable Protocol the Governance and Execution Authority
 
 - Classification: Decision
-- Status: Proposed; maintainer acceptance pending
+- Status: Accepted; implementation authority withheld
 - Date: 2026-07-29
+- Accepted: 2026-07-29 by maintainer directive; [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) owns durable integration and validation evidence
 - Decision owners: Maintainer and meAndAI architecture owner
 - Owning epic: [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
 - Owning task: [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164)
 - Full architecture: [Protocol Governance and Execution Architecture](../architecture/protocol-governance-and-execution/README.md)
 - Transition register: [Architecture Transition and Carry-Forward Register](../architecture/protocol-governance-and-execution/transition-register.md)
+- Successor allocation: [Successor Delivery and Qualification Plan](../architecture/protocol-governance-and-execution/successor-delivery-plan.md)
+- Preserved WIP disposition: [Exact Extraction Ledger](../architecture/protocol-governance-and-execution/wip-extraction-ledger.md)
 - Red-team review: [Closed at design level](../architecture/protocol-governance-and-execution/red-team-review.md)
 - Related decisions: [DEC-0001](DEC-0001-portable-protocol-reference.md), [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md), [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md), and [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
-- Proposed supersession: on acceptance, supersedes [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) only where separate CLI/application artifacts or the PowerShell-migration feature sequence define the product architecture; preserves its C#, typed-foundation, portable-JIT, least-authority, plan/apply, single-engine-mutation, and explicit-authority-state decisions
+- Supersedes: [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) only where separate CLI/application artifacts or the PowerShell-migration feature sequence define the product architecture; preserves its C#, typed-foundation, portable-JIT, least-authority, plan/apply, single-engine-mutation, and explicit-authority-state decisions
 - Reserved draft decisions: [DEC-0033](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md) and [DEC-0034](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) exist only on preserved exact draft commit [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52); their identifiers are not reused and their compatible rationale is incorporated here without claiming default-branch authority
 
 ## Context
@@ -328,10 +331,10 @@ through a release-declared reviewed transition.
   `[skip ci]` architecture commits and a frozen draft stop recurring runner cost
   while leaving the later enforcement contract available for redesign.
 
-## Implementation and acceptance boundary
+## Implementation boundary
 
-This proposed decision contains no implementation authority. Acceptance of the
-decision still requires the separate implementation-entry gate in the full
+This accepted decision contains no implementation authority. Every successor
+still requires the separate implementation-entry gate in the full
 architecture. No code, test, workflow, consumer, release, authority, or
 retirement change may begin without a later explicit maintainer directive.
 

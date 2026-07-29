@@ -4,7 +4,7 @@
 | --- | --- |
 | Owner | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Reviewed architecture | [Protocol Governance and Execution Architecture](README.md) |
-| Review state | Closed at design level; maintainer acceptance still pending |
+| Review state | Closed at design level; maintainer accepted architecture |
 | Implementation authority | Withheld |
 
 The review challenged the design against the committed default-branch baseline
@@ -82,9 +82,9 @@ states a resolution; it does not mean the behavior is implemented or proven.
 ## Review conclusion
 
 No implementation-blocking architecture question remains open after independent
-final re-review. The remaining unchecked conditions are external gates:
+final re-review. Maintainer acceptance is complete. The remaining unchecked
+conditions are external delivery gates:
 
-- maintainer acceptance of the proposed architecture and decision;
-- one bounded validation on the exact approved documentation head; and
+- one bounded validation on the exact accepted documentation head; and
 - a later, separate implementation directive after successor Definition of
-  Ready and design review.
+  Ready, expected-red evidence, and design review.

@@ -200,6 +200,26 @@
             TestIds = @('TEST-0205', 'TEST-0206', 'TEST-0207')
         }
         @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md'
+            TestIds = @('TEST-0209', 'TEST-0210', 'TEST-0211')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0066-shared-execution-authority-foundation/test-cases.md'
+            TestIds = @('TEST-0212', 'TEST-0213')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md'
+            TestIds = @('TEST-0214', 'TEST-0215', 'TEST-0216')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0068-protocol-release-finalizer-authority-transfer/test-cases.md'
+            TestIds = @('TEST-0217', 'TEST-0218', 'TEST-0219')
+        }
+        @{
             Evidence = 'GitHubActionsSemantic'
             Owner = '.github/workflows/protocol-tests.yml'
             TestIds = @('TEST-0067', 'TEST-0075', 'TEST-0124', 'TEST-0160')

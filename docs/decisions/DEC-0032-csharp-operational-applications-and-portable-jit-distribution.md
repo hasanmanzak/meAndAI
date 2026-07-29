@@ -1,12 +1,20 @@
 # DEC-0032 - Use Separate C# Operational Applications with Portable JIT Distribution
 
 - Classification: Decision
-- Status: Accepted
+- Status: Accepted; partially superseded by [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md)
 - Date: 2026-07-27
 - Decision owners: Maintainer and meAndAI architecture owner
-- Related epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
+- Related epics: historical [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) and successor [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
 - Related features: [FEAT-0059](../features/FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../features/FEAT-0061-consumer-adoption-cli/README.md), [FEAT-0062](../features/FEAT-0062-consumer-protocol-update-cli/README.md), and [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-- Related decisions: [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), and [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md)
+- Related decisions: [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md), and [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md)
+
+The accepted [DEC-0035](DEC-0035-protocol-owned-governance-and-execution-architecture.md)
+supersedes this decision only where three separate CLI/application products,
+their ZIPs, or the original migration sequence define the architecture.
+The C# implementation rule, typed shared foundation, portable framework-
+dependent JIT distribution, least authority, read-only governance, plan/apply
+separation, explicit authority states, and single-engine mutation constraints
+remain in force.
 
 ## Context
 

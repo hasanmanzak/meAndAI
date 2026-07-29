@@ -1,23 +1,24 @@
-# FEAT-0062 - Consumer Protocol Update CLI
+# FEAT-0062 - Consumer Protocol Update Application
 
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Architecture hold / development not authorized |
+| Status | Proposed under accepted architecture; implementation not authorized |
 | Target version | 0.19.0 |
 | Issue | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) |
 | Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), proposed [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
+| Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0018](../../decisions/DEC-0018-release-declared-consumer-migrations.md), and [DEC-0017](../../decisions/DEC-0017-idempotent-consumer-lifecycle.md) |
 | Tests | [TEST-0202](test-cases.md#test-0202), [TEST-0203](test-cases.md#test-0203), and [TEST-0204](test-cases.md#test-0204) |
 
-## Architecture hold
+## Accepted architecture rescope and implementation hold
 
-No implementation is authorized while
-[TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164)
-defines the shared protocol platform. After architecture acceptance, this
-record is reviewed as an update application and adapter lifecycle; CLI syntax
-cannot remain its product boundary. Existing scenario identities remain
-planned and receive no passing status by rescope.
+This record now owns boundary 5 in the accepted
+[successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#1-capability-ownership).
+Its historical directory slug is retained to avoid destructive record moves;
+CLI syntax is only an optional host adapter and does not define the product.
+Existing scenario identities remain planned and receive no passing status by
+rescope. No implementation, mutation, publication, finalization, or consumer
+operation is authorized.
 
 ## Problem
 
@@ -34,6 +35,8 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 
 - Installed-version, catalog, ledger, gitlink, managed asset, and release identity validation.
 - Complete numeric descendant-chain resolution and exact immutable plan/apply.
+- Side-by-side target-runtime handoff and explicit legacy-handoff-pending
+  reconciliation without executing target semantics in the old runtime.
 - Existing updater recovery, proposal ownership, managed merge finalization,
   and current/no-op behavior.
 - Differential evidence against applicable PowerShell authority.
@@ -43,6 +46,8 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 - Initial adoption or semantic strategy selection.
 - Updating an ambiguous or invalid installation by inference.
 - Consumer-local copies of shared engines or premature PowerShell retirement.
+- Reimplementing shared conformance, acquisition, grant, journal, lease,
+  publication, or release-finalization behavior.
 
 ## Authority transition
 
@@ -62,7 +67,7 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 
 ## Readiness evidence
 
-- Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) and [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md).
+- Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md), and [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md).
 - Prior art: updater workflow/adapter, migration catalogs, ledgers, target-bound recovery, proposal ownership, and managed finalization.
 - Exact recurrence, scenario, release-schema, workflow projection, runtime, and baseline inventories remain required.
 
@@ -83,20 +88,22 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0129` <a name="subf-0129"></a> | Installed-state validation and transition resolution | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0202](test-cases.md#test-0202) / not started | Pending | Proposed |
-| `SUBF-0130` <a name="subf-0130"></a> | Exact plan and contained apply | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0203](test-cases.md#test-0203) / not started | Pending | Proposed |
-| `SUBF-0131` <a name="subf-0131"></a> | Proposal lifecycle, finalization, recovery, and equivalence | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0204](test-cases.md#test-0204) / not started | Pending | Proposed |
+| `SUBF-0129` <a name="subf-0129"></a> | Installed-state validation, side-by-side target handoff, and migration resolution | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0202](test-cases.md#test-0202) / not started | Pending | Proposed |
+| `SUBF-0130` <a name="subf-0130"></a> | Sealed target-bound plan, separately granted apply, and interruption recovery | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0203](test-cases.md#test-0203) / not started | Pending | Proposed |
+| `SUBF-0131` <a name="subf-0131"></a> | Proposal lifecycle, direct/provider closure, finalization, legacy-handoff reconciliation, and recovery | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | [TEST-0204](test-cases.md#test-0204) / not started | Pending | Proposed |
 
 ## Decisions and relationships
 
-- Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-- Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) and [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
+- Parent epic: [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
+- Historical planning parent: [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
+- Dependencies: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md), and [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+- Immutable publication dependency: [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
 
 ## Definition of Ready
 
 - [x] Stable ID and linked issue.
 - [x] Problem, outcome, scope, non-goals, initial scenarios, and risks.
-- [ ] Complete transition/lifecycle inventory, recurrence evidence, runtime/workflow contract, baselines, target version, and implementation authorization.
+- [ ] Complete transition/lifecycle inventory, recurrence evidence, side-by-side runtime/workflow/grant contracts, expected-red baselines, Gate 2 design review, and separate implementation authorization.
 
 ## Acceptance criteria
 
@@ -104,7 +111,9 @@ or resumes one managed proposal, and finalizes only a qualified merged result.
 2. Plan and apply preserve exact release, source, graph, marker, schema, managed-asset, and ledger identity.
 3. One managed proposal lifecycle is created or resumed and only a qualified exact merge can finalize it.
 4. Current state is an idempotent no-op; ambiguity and unsupported history fail closed.
-5. Authority transfers only after canonical PowerShell scenario equivalence and immutable release evidence.
+5. This feature emits exact compatibility and handoff evidence but consumer
+   authority migration and PowerShell retirement remain owned by
+   [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
 
 ## Definition of Done
 

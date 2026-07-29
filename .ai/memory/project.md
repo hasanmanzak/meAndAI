@@ -943,22 +943,57 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-  / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
-  C# operational platform with separate governance, adoption, and update
-  applications sharing one typed foundation and portable framework-dependent
-  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-  is implementation-complete. [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
-  [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
-  [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
-  and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
-  [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
-  and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. The maintainer authorized only [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
-  `v0.16.0` release closure on 2026-07-28. Do not implement the separately
-  gated consumer features, mutate consumers, transfer authority, or retire
-  PowerShell without later independent gates and authorization.
+- The maintainer accepted
+  [DEC-0035](../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
+  on 2026-07-29 under
+  [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
+  and [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164).
+  The accepted
+  [architecture](../../docs/architecture/protocol-governance-and-execution/README.md)
+  makes one versioned executable protocol platform the product: shared
+  conformance, shared execution authority, evidence/integration, adoption,
+  update, release finalization, and compatibility/migration are capability
+  boundaries; CLI processes are thin hosts only. C# is the implementation
+  language. Implementation authority remains withheld.
+- The accepted
+  [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md)
+  allocates shared conformance to
+  [FEAT-0065](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md)
+  / [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165),
+  shared execution authority to
+  [FEAT-0066](../../docs/features/FEAT-0066-shared-execution-authority-foundation/README.md)
+  / [issue #166](https://github.com/hasanmanzak/meAndAI/issues/166),
+  evidence/managed integration to
+  [FEAT-0067](../../docs/features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+  / [issue #167](https://github.com/hasanmanzak/meAndAI/issues/167),
+  adoption to rescoped
+  [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md)
+  / [issue #156](https://github.com/hasanmanzak/meAndAI/issues/156),
+  update to rescoped
+  [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md)
+  / [issue #157](https://github.com/hasanmanzak/meAndAI/issues/157),
+  release finalization/transfer to
+  [FEAT-0068](../../docs/features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
+  / [issue #168](https://github.com/hasanmanzak/meAndAI/issues/168),
+  and parked compatibility/migration/retirement to
+  [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
+  / [issue #158](https://github.com/hasanmanzak/meAndAI/issues/158).
+  Stable [RULE-0001](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0001)
+  through [RULE-0005](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0005)
+  start the first shared semantics matrix across documents, links, anchors,
+  commit evidence, repository evidence, and provider evidence; this is not the
+  complete catalog.
+- [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  and [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
+  remain frozen at exact preserved commit
+  [1873c98638ba4960734aadb188eb8c8d70b4bc52](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
+  The [WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md)
+  classifies all 158 changed paths as reusable, refactor, preserve-only, or
+  reject. Four of seven WIP slices have historical exact-branch evidence, the
+  parent is incomplete, and no successor inherits a passing state. Do not push
+  implementation to PR #160, extract code, change workflows, mutate consumers,
+  publish releases, transfer authority, or retire PowerShell without a later
+  dependency-closed Definition of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

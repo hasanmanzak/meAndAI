@@ -5,7 +5,7 @@
 | Owner | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Current default-branch baseline | [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd) |
 | Preserved WIP | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Transition state | Architecture hold; no implementation extraction authorized |
+| Transition state | Accepted architecture and allocated planning; no implementation extraction authorized |
 
 This register changes prospective ownership without rewriting historical
 evidence. A prior exact commit or workflow run proves only the code and
@@ -15,20 +15,20 @@ contract that it actually evaluated.
 
 | Record | Current truth | Architecture disposition |
 | --- | --- | --- |
-| [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) | Open CLI/PowerShell-migration epic | Freeze now. After architecture acceptance, close as prospectively superseded by [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163); do not rewrite its original outcome. |
-| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Proposed protocol-platform authority | New active architecture authority. Implementation remains unauthorized. |
-| [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) | Architecture design | Owns this architecture, red-team review, and transition register only. |
-| [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted default-branch decision | Preserve C#, typed shared foundation, portable JIT, read-only governance, authority states, plan/apply separation, and single-engine mutation. On acceptance, [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) supersedes separate CLI/application products as the architectural center. |
+| [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) | Open historical CLI/PowerShell-migration epic | Freeze. After the accepted architecture reaches the default branch, close as prospectively superseded by [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163); do not rewrite its original outcome. |
+| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Accepted protocol-platform architecture authority | Active prospective owner for the [successor plan](successor-delivery-plan.md). Implementation remains unauthorized. |
+| [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) | Accepted architecture design and integration | Owns this architecture, red-team review, successor allocation, extraction ledger, bounded validation, and integration only. |
+| [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded | Preserve C#, typed shared foundation, portable JIT, read-only governance, authority states, plan/apply separation, and single-engine mutation. [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) supersedes separate CLI/application products as the architectural center. |
 | [DEC-0033](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md) on preserved WIP | Accepted on draft, never default-branch authority | Identifier remains reserved. Incorporate specification-first C# and legacy-black-box-oracle reasoning into [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md); do not present the draft record as merged history. |
 | [DEC-0034](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) on preserved WIP | Accepted on draft, never default-branch authority | Identifier remains reserved. Incorporate parse-once/catalog/report reuse; reject the two-rule CLI/one-ZIP scope as target architecture. |
 | [FEAT-0059](../../features/FEAT-0059-csharp-operational-foundation/README.md) / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) | Complete in immutable `v0.16.0` | Retain as a completed technical prerequisite. Do not reopen or relabel its exact release evidence. |
 | [SUBF-0141 / issue #162](https://github.com/hasanmanzak/meAndAI/issues/162) | Complete shared process extension on [PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) branch | Retain historical completion evidence. Any carried implementation is independently reviewed in successor work. |
-| [FEAT-0060 / issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) | Default branch says proposed; draft branch contains four of seven implemented/verified slices | Freeze. Preserve both truths explicitly: four slices have exact draft-branch evidence; the parent was not completed, merged, released, or granted authority, and three slices remain incomplete. After approved extraction, supersede prospectively. |
+| [FEAT-0060 / issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) | Frozen historical CLI-shaped record; draft branch contains four of seven implemented/verified slices | Preserve both truths explicitly: four slices have exact draft-branch evidence; the parent was not completed, merged, released, or granted authority, and three slices remain incomplete. The [WIP ledger](wip-extraction-ledger.md) allocates design-level destinations; after independently verified extraction, supersede prospectively. |
 | [Draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) | Open draft at preserved exact head | Keep draft and stop implementation pushes. Extract only approved items into new main-based successor work. Close as superseded only after extraction is independently verified; do not delete its branch first. |
-| [FEAT-0061 / issue #156](https://github.com/hasanmanzak/meAndAI/issues/156) | Proposed adoption CLI; no implementation authority | Freeze. After architecture acceptance, rescope to the adoption application and adapters without changing its historical test state. |
-| [FEAT-0062 / issue #157](https://github.com/hasanmanzak/meAndAI/issues/157) | Proposed update CLI; no implementation authority | Freeze. After architecture acceptance, rescope to the update application and adapters. |
-| [FEAT-0063 / issue #158](https://github.com/hasanmanzak/meAndAI/issues/158) | Proposed migration/retirement work | Park. PowerShell retirement is not a precondition for defining or initially delivering the new platform. Reactivate only after supported authority-transfer evidence exists. |
-| [FEAT-0064 / issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) | Draft-branch coverage/equivalence record | Freeze. Carry rule coverage into successor conformance work; keep PowerShell equivalence/retirement qualification as a later compatibility concern. |
+| [FEAT-0061 / issue #156](https://github.com/hasanmanzak/meAndAI/issues/156) | Rescoped adoption application; no implementation authority | Retain the stable identity and planned tests for the same adoption lifecycle. CLI syntax is host-only; shared conformance, acquisition, and execution-authority behavior are dependencies. |
+| [FEAT-0062 / issue #157](https://github.com/hasanmanzak/meAndAI/issues/157) | Rescoped update application; no implementation authority | Retain the stable identity and planned tests for the same update lifecycle. Side-by-side target handoff and shared authority/recovery are explicit; CLI syntax is host-only. |
+| [FEAT-0063 / issue #158](https://github.com/hasanmanzak/meAndAI/issues/158) | Compatibility, migration, and retirement work | Park. PowerShell retirement is not a precondition for defining or initially delivering the new platform. Reactivate only after complete differential, immutable successor, supported-consumer, and authority-transfer evidence exists. |
+| [FEAT-0064 / issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) | Draft-branch coverage/equivalence record | Freeze. Rule coverage is allocated to [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) / [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165); PowerShell equivalence/retirement qualification remains in [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) / [issue #158](https://github.com/hasanmanzak/meAndAI/issues/158). Its planned evidence does not pass either successor. |
 
 ## 2. Test and evidence disposition
 
@@ -78,10 +78,9 @@ Every extracted implementation receives new exact-head tests and review.
 
 ## 4. Successor capability boundaries
 
-Stable successor feature IDs are allocated only after
+Stable successor feature IDs were allocated only after
 [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
-is accepted.
-The required capability boundaries are nevertheless fixed:
+was accepted. The required capability boundaries are:
 
 1. shared conformance domain, abstractions, kernel, baseline catalog, typed
    evidence, canonical report, protected-base extension transitions,
@@ -113,6 +112,23 @@ The required capability boundaries are nevertheless fixed:
 These are application/capability boundaries. They must not be named or scoped
 as CLI products.
 
+The accepted stable allocation is:
+
+| Boundary | Feature | Issue | Planned tests |
+| --- | --- | --- | --- |
+| 1 | [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0209](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209) through [TEST-0211](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) |
+| 2 | [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md) | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0212) and [TEST-0213](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0213) |
+| 3 | [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [#167](https://github.com/hasanmanzak/meAndAI/issues/167) | [TEST-0214](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) through [TEST-0216](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0216) |
+| 4 | [FEAT-0061](../../features/FEAT-0061-consumer-adoption-cli/README.md) | [#156](https://github.com/hasanmanzak/meAndAI/issues/156) | Existing [planned scenarios](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md) |
+| 5 | [FEAT-0062](../../features/FEAT-0062-consumer-protocol-update-cli/README.md) | [#157](https://github.com/hasanmanzak/meAndAI/issues/157) | Existing [planned scenarios](../../features/FEAT-0062-consumer-protocol-update-cli/test-cases.md) |
+| 6 | [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [#168](https://github.com/hasanmanzak/meAndAI/issues/168) | [TEST-0217](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/test-cases.md#test-0217) through [TEST-0219](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/test-cases.md#test-0219) |
+| 7 | [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | Existing [planned scenarios](../../features/FEAT-0063-consumer-migration-powershell-retirement/test-cases.md) |
+
+The detailed dependency, surface, first-rule, and gate matrices are canonical
+in the [successor delivery plan](successor-delivery-plan.md). Exact WIP
+classification and future provenance requirements are canonical in the
+[extraction ledger](wip-extraction-ledger.md).
+
 ## 5. Temporary workflow posture
 
 No workflow file, trigger, required check, ruleset, test filter, or timeout is
@@ -131,11 +147,14 @@ temporary architecture hold into permanent evidence weakening.
 
 ## 6. Exit conditions
 
-The register may move from `Architecture hold` only after:
+The register may move from architecture hold only after:
 
-1. the maintainer accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md);
-2. the architecture red-team checklist is closed;
-3. successor features and test matrices are allocated;
-4. each selected WIP asset has an approved destination and required fresh
-   evidence; and
-5. a separate implementation directive is issued.
+| Condition | State |
+| --- | --- |
+| Maintainer accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) | Satisfied |
+| Architecture red-team checklist is closed | Satisfied |
+| Successor features and test matrices are allocated | Satisfied by the [successor plan](successor-delivery-plan.md) |
+| Every selected WIP asset has an approved destination and required fresh evidence | Satisfied at design level by the [extraction ledger](wip-extraction-ledger.md); extraction remains unauthorized |
+| A separate implementation directive is issued | Not satisfied |
+
+Therefore the transition remains on architecture hold.

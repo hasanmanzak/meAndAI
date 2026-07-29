@@ -3,11 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Complete proposal; maintainer approval pending |
+| Status | Accepted; implementation authority withheld |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
-| Proposed decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
+| Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Red-team review | [Closed at design level](red-team-review.md) |
+| Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
+| Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Current baseline | [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd) |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Implementation authority | Withheld |
@@ -35,9 +37,10 @@ release boundaries.
 
 ## 2. Architecture freeze
 
-This record authorizes architecture work only. Until the maintainer explicitly
-accepts the complete architecture and later issues a separate implementation
-directive, the following remain prohibited:
+This record and [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
+are accepted. Acceptance authorizes planning records only. Until the maintainer
+later issues a separate implementation directive for a Definition-of-Ready
+successor slice, the following remain prohibited:
 
 - production or test implementation;
 - moving code from the preserved draft into the target branch;
@@ -1326,7 +1329,7 @@ cannot reopen an architectural boundary without a new decision.
 - [x] Final independent re-review confirms that no implementation-blocking
   architecture question remains open.
 - [x] All findings received so far are reconciled in the [red-team register](red-team-review.md).
-- [ ] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
+- [x] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
 - [ ] Maintainer separately authorizes an implementation feature after its own Definition of Ready.
 
 ## 27. Implementation entry gate
@@ -1349,3 +1352,6 @@ Implementation may begin only when all of the following are true:
 8. the maintainer issues a separate explicit implementation directive.
 
 Architecture approval alone does not satisfy item 8.
+
+Current gate allocation and open states are recorded in the
+[successor delivery plan](successor-delivery-plan.md#6-delivery-gates).
