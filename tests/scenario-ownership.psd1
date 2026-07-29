@@ -180,7 +180,7 @@
         @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md'
-            TestIds = @('TEST-0194', 'TEST-0195')
+            TestIds = @('TEST-0194', 'TEST-0195', 'TEST-0208')
         }
         @{
             Evidence = 'PlannedDocumentation'

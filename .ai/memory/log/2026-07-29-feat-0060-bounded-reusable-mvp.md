@@ -46,21 +46,25 @@ or PowerShell source retirement.
 
 After the scope-record correction, two of seven
 [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
-subfeatures are locally implemented, approximately 28.6%.
-[SUBF-0138](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
-is the only fully closed subfeature, so fully closed progress remains one of
-seven, approximately 14.3%.
+subfeatures are fully closed, approximately 28.6%.
 [SUBF-0134](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
-has exact committed-tree local evidence at
-[`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
+has exact committed-tree evidence at
+[`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110):
 full solution tests are green, repository-only
 [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-passed in 64.6 seconds, and PowerShell 7 / Windows PowerShell 5.1
-`StructureOnly` passed in 178.0 / 253.4 seconds. Exact-head hosted evidence
-remains pending before closure. After that closure, continue with either the
-bounded catalog/request/report gate or the
-exact-commit gate according to the canonical feature record; this handoff does
-not select between them.
+passed in 64.6 seconds, PowerShell 7 / Windows PowerShell 5.1 `StructureOnly`
+passed in 178.0 / 253.4 seconds, and hosted
+[run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
+passed Ubuntu and Windows on the exact head. Continue with
+[SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+under repository-independent [TEST-0194](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194).
+Exact repository/profile evidence follows later under
+[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
+The [SUBF-0122](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+DoR now freezes a public `profile + exact commit` request, shared Domain-owned
+commit/digest parsers, an exact `maai-governance.zip` byte digest, and one
+all-or-nothing release binding; candidate remains internal/deferred and
+PowerShell authority is unchanged.
 
 Keep the typed catalog, engine defaults, and report metadata single-sourced as
 the rule set grows. Do not implement
@@ -68,7 +72,7 @@ the rule set grows. Do not implement
 widen authority, mutate a consumer, disable PowerShell, or claim equivalence
 as part of this continuation.
 
-## Shared-kernel local checkpoint
+## Shared-kernel exact-head checkpoint
 
 [SUBF-0134](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
 now implements canonical
@@ -107,7 +111,10 @@ recorded under
 [FIND-0369](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
 and the focused repository-only owner passes on exact
 [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
-in 64.6 seconds.
+in 64.6 seconds. The final exact-head correction at
+[`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110)
+passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
+on Ubuntu and Windows.
 
 ## Structural record correction
 
@@ -116,5 +123,5 @@ The first committed scope packet exposed
 the planned-scenario authority still named its former owner, then exact-link
 governance found moved and newly repeated identifiers. The owner and links were
 corrected without restoring duplicate declarations; PowerShell 7
-`StructureOnly` then passed in 184.6 seconds. Commit the correction before
-counting dual-runtime exact-HEAD evidence.
+`StructureOnly` then passed in 184.6 seconds. The correction was committed and
+dual-runtime exact-head evidence is counted only from the later successful run.

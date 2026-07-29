@@ -60,7 +60,7 @@
 | [FEAT-0056](FEAT-0056-v0155-instruction-graph-resilience/README.md) | [Instruction-graph preflight resilience](FEAT-0056-v0155-instruction-graph-resilience/README.md) | Complete | 0.15.5 |
 | [FEAT-0058](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | [Completed historical adoption-issue compatibility](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete | 0.15.6 |
 | [FEAT-0059](FEAT-0059-csharp-operational-foundation/README.md) | [Shared C# operational foundation and portable release contract](FEAT-0059-csharp-operational-foundation/README.md) | Complete | 0.16.0 |
-| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Bounded MVP authorized / [SUBF-0138](FEAT-0060-any-consumer-governance-cli/README.md#subf-0138) exact-head complete / 1 of 7 implemented | 0.17.0 |
+| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Bounded MVP authorized / 2 of 7 exact-head closed | 0.17.0 |
 | [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption CLI](FEAT-0061-consumer-adoption-cli/README.md) | Proposed / development deferred | 0.18.0 |
 | [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update CLI](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed / development deferred | 0.19.0 |
 | [FEAT-0064](FEAT-0064-governance-coverage-equivalence/README.md) | [Governance coverage convergence and equivalence](FEAT-0064-governance-coverage-equivalence/README.md) | Proposed / records-only; development not authorized | 0.20.0 |

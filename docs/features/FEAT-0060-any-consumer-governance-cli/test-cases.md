@@ -1,10 +1,9 @@
 # FEAT-0060 Test Scenarios
 
-Test implementation: [SUBF-0138](README.md#subf-0138) is fully complete with
-exact-head hosted evidence. [SUBF-0134](README.md#subf-0134) is locally
-implemented, fresh-review green, and exact committed-tree verified; hosted
-closure is pending. Local implementation is two of seven subfeatures (28.6%); fully
-closed progress is one of seven (14.3%). Five subfeatures are not implemented.
+Test implementation: [SUBF-0138](README.md#subf-0138) and
+[SUBF-0134](README.md#subf-0134) are fully complete with exact-head hosted
+evidence. Local implementation and fully closed progress are both two of seven
+subfeatures (28.6%). Five subfeatures are not independently closed.
 
 ## Authorized bounded clean-room catalog
 
@@ -29,29 +28,61 @@ It validates the decision-record identity, classification, status, and exact
 required sections through the same repository/document indexes as
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004);
 it does not allocate a language-specific test identity or a second parser.
-The rule is implemented locally, green after fresh review, and exact
-committed-tree verified; hosted closure remains pending.
+The rule is implemented, green after fresh review, exact committed-tree
+verified, and exact-head hosted on Ubuntu and Windows.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122), [SUBF-0123](README.md#subf-0123), and [SUBF-0135](README.md#subf-0135) | Build a closed exact-commit governance request, resolve explicit `protocol-authority` and canonical gitlink `consumer` profiles, and bind one exact application/policy pair from canonical evidence. | Exactly one caller-selected profile, 40-character commit, catalog, and application/policy pair are independently verified; unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, or unsupported repository-reference state fails closed. An exact-bound unreleased bundle may inspect only as read-only `CSharpShadow`. Persistent managed use requires the immutable package and still grants neither mutation nor primary authority. | Contract / Git / integration / security | `Distinct`; see the exact sibling tuple below. Existing canonical-byte selection remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171). | Planned | Future .NET tests |
-| `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124), [SUBF-0134](README.md#subf-0134), and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
+| `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122) | Construct the closed, versioned governance profile, exact-commit request, policy/catalog, application-policy-pair, evidence-scope, engine-state, and authority-state identities without reading a repository. | Every lexical identity and cross-identity invariant is exact and fail closed; the caller selects one declared profile and exact commit but cannot inject rules, catalog metadata, enforcement, engine state, or authority. Invalid casing, length, schema, digest, release state, commit, or mismatched application/policy identity is rejected before repository access. | Unit / contract / identity / security | `Distinct`; see the exact sibling tuple below. [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) closed application/stage/capability identities remain owned by [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191). | Planned | Future .NET tests |
+| `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124) and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
+| `TEST-0208` <a name="test-0208"></a> | [SUBF-0123](README.md#subf-0123) and [SUBF-0135](README.md#subf-0135) | In fresh anonymous real Git repositories, resolve one closed [TEST-0194](#test-0194) request against an exact commit and verify explicit `protocol-authority` plus canonical `.ai/protocol` gitlink `consumer` profile evidence. | One caller-selected profile, exact 40-character commit, catalog, and application-policy pair are independently verified from canonical repository evidence. Unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, zero/multiple pin, or unsupported repository-reference state fails closed; no named repository, automatic profile, mutation, or authority inference exists. | Git / integration / profile / security | `Distinct`; see the exact sibling tuple below. Canonical byte-source precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171), while [TEST-0194](#test-0194) owns the repository-independent typed request. | Planned | Future .NET integration tests |
 
 [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) contribute bounded implementation experience
 to the future request/report design, but they do not activate or pass
-[TEST-0194](#test-0194) or [TEST-0195](#test-0195). Both remain canonical
-`PlannedDocumentation` scenarios with literal `Planned` status and no active
-C# source ownership.
+[TEST-0194](#test-0194), [TEST-0195](#test-0195), or
+[TEST-0208](#test-0208). All three remain canonical `PlannedDocumentation`
+scenarios with literal `Planned` status and no active C# source ownership.
+
+### [TEST-0194](#test-0194) exact identity matrix
+
+The expected-red slice must cover the contract before any repository adapter is
+called:
+
+- both exact profile values and ordinal rejection of unknown or differently
+  cased values;
+- exact 40-character lowercase commit and 64-character lowercase digest
+  acceptance, with null, empty, whitespace-padded, short, long, uppercase, and
+  non-ASCII/non-hex rejection;
+- one shared ASCII `M.m.rev` parser reused by exact lowercase `vM.m.rev` tags;
+  bounded engine version exactly `0.17.0`; catalog schema exactly `1`; and the
+  exact instruction-graph profile, including rejection of another lexically
+  valid version with the current limits or `0.17.0` with any changed limit;
+- the exact two-rule catalog metadata byte serialization and derived digest,
+  including rejection of reordered/changed inventory or metadata and an
+  unrelated but lexically valid 64-hex digest;
+- a public request surface that accepts only profile plus subject commit and
+  fixes `exact-commit` plus `repository` without caller-injected policy,
+  catalog, rules, enforcement, state, or authority;
+- an unreleased bundle with no partial release fields, derived
+  `csharp-shadow`, and derived `powershell-authority`; and
+- a fully bound immutable release with matching `vM.m.rev`, engine commit,
+  policy commit, catalog digest, and exact `maai-governance.zip` digest,
+  deriving `csharp-released-non-authoritative` while every null/partial/mismatch
+  combination fails before repository access.
+
+Commit existence, Git object type, authority/consumer evidence, and pin
+verification remain exclusively owned by [TEST-0208](#test-0208).
 
 ## Distinct-intent review
 
 | Scenario | Nearest same-contract sibling | Contract difference | Risk difference | Evidence-level difference | Exercised-boundary difference |
 | --- | --- | --- | --- | --- | --- |
-| Profile/request scenario | [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) and [TEST-0151](../FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0151) | Owns the closed compiled request and explicit profile-resolution result; byte-source precedence and graph discovery remain with their existing owners. | Prevents named-repository, automatic-profile, or caller-supplied-policy authority rather than only selecting canonical bytes or graph nodes. | Compiled contract plus Git integration over project-neutral authority/consumer fixtures. | Request composition and profile verification around, not inside, the canonical snapshot and graph contracts. |
+| Request/identity scenario | [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191) and [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) | Owns the governance-specific exact profile, request, policy/catalog, application-policy-pair, evidence, engine, and authority identities; the foundation scenarios retain generic application/stage/capability identities and operation-result boundaries. | Prevents caller-injected policy, catalog, enforcement, or authority and invalid cross-identity combinations before any repository access. | Pure compiled unit/contract evidence without Git or filesystem state. | Construction and rejection of the closed governance request vocabulary. |
+| Exact profile-evidence scenario | [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) and [TEST-0194](#test-0194) | Owns engine verification of an already typed request against exact repository/profile evidence; byte-source precedence and typed request construction remain with their existing owners. | Prevents named-repository, automatic-profile, drifting-commit, unsupported-adapter, or pin/policy authority inference. | Real anonymous Git integration over project-neutral authority and canonical-gitlink consumer fixtures. | Exact-commit acquisition and profile resolution around, not inside, the canonical byte resolver or request types. |
 | Report-envelope scenario | [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192) | Owns the governance finding/report/process envelope; the foundation scenario owns closed operation results and port failures. | Prevents a false green, nondeterministic/redaction-unsafe report, or collapsed verdict/outcome state. | Byte-deterministic compiled serialization and security evidence. | Public governance report boundary after canonical rule evaluation. |
 
-The relationship for both rows is `Distinct` under
+The relationship for all three rows is `Distinct` under
 [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md).
 Porting an existing rule or snapshot behavior to C# does not allocate another
 numbered scenario; the existing identity is cited by the differential ledger.
@@ -63,9 +94,9 @@ is navigation only; this feature no longer declares that scenario.
 
 ## Evidence
 
-### [SUBF-0134](README.md#subf-0134) shared-kernel local checkpoint
+### [SUBF-0134](README.md#subf-0134) shared-kernel exact-head closure
 
-[SUBF-0134](README.md#subf-0134) local test-first evidence on 2026-07-29:
+[SUBF-0134](README.md#subf-0134) test-first evidence on 2026-07-29:
 
 - The focused governance test command first exited `1` with `CS0234` and
   `CS0246` because the `Analysis` namespace and `GovernanceAnalysisContext`
@@ -84,14 +115,19 @@ is navigation only; this feature no longer declares that scenario.
 - Framework-dependent publish succeeded without an apphost. The published DLL
   validated the real repository as `conforming` with two evaluated rules, zero
   findings, and `bounded-catalog` coverage.
+- Exact final head
+  [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110)
+  passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
+  on Ubuntu and Windows, including the C# build/test/package/reuse gates and
+  the supported PowerShell validation routes.
 
-This is local executable evidence for canonical
+This is executable evidence for canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
 and regression evidence for canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-through the shared analysis context. Exact committed-tree closure is green and
-hosted closure remains pending; [TEST-0194](#test-0194) and
-[TEST-0195](#test-0195) remain `Planned`.
+through the shared analysis context. Exact committed-tree and hosted closure
+are green; [TEST-0194](#test-0194),
+[TEST-0195](#test-0195), and [TEST-0208](#test-0208) remain `Planned`.
 
 ### [SUBF-0138](README.md#subf-0138) exact-head closure
 
@@ -134,11 +170,11 @@ root on 2026-07-28:
 This evidence completes the canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 C# vertical slice with exact-head hosted proof. The shared-kernel checkpoint
-above adds local canonical
+above adds canonical
 [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005)
-evidence but does not yet close exact-commit or hosted verification. Neither
-slice activates [TEST-0194](#test-0194) or [TEST-0195](#test-0195), which
-remain `Planned`. Exact head
+evidence but does not yet close exact-commit request/profile verification. Neither
+slice activates [TEST-0194](#test-0194), [TEST-0195](#test-0195), or
+[TEST-0208](#test-0208), which remain `Planned`. Exact head
 [`393aaa561d0133aba7522083617564e1dca76fe2`](https://github.com/hasanmanzak/meAndAI/commit/393aaa561d0133aba7522083617564e1dca76fe2)
 passed hosted [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
 on Ubuntu and Windows. Exact-commit package behavior remains pending. The historical

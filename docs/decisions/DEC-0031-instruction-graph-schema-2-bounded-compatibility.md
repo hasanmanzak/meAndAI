@@ -100,6 +100,13 @@ closed.
    | `v0.15.0` through `v0.15.1` | `1` / `262144` | `512` / `4096` / `16384` | `9` Proposed/Completed; `10` Publishing |
    | `v0.15.2` through `v0.15.4` | `1` / `262144` | `512` / `4096` / `32768` | `9` Proposed/Completed; `10` Publishing |
    | `v0.15.5` through `v0.16.0` | `2` / `524288` | `512` / `4096` / `32768` | `9` Proposed/Completed; `10` Publishing |
+   | `v0.17.0` | `2` / `524288` | `512` / `4096` / `32768` | `9` Proposed/Completed; `10` Publishing |
+
+   The prospective `v0.17.0` review for
+   [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
+   retains every schema-2 graph semantic and limit. Its separate exact row
+   avoids accepting unreviewed intervening tags and does not itself publish or
+   qualify an immutable release.
 
 8. All assessment, graph, strategy, closure, and marker semantics come from
    the exact selected target policy. A schema-7/8 marker remains in that family

@@ -8,9 +8,10 @@
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
 > bounded [FEAT-0060](README.md) release completion boundary.
 
-Status: [SUBF-0138](README.md#subf-0138) bounded first clean-room
-`CSharpShadow` vertical slice locally complete; exact-commit/hosted and
-full-feature equivalence, authority, and retirement gates remain open.
+Status: [SUBF-0138](README.md#subf-0138) and
+[SUBF-0134](README.md#subf-0134) bounded clean-room `CSharpShadow` slices are
+exact-head hosted complete; exact-commit request/profile, package, equivalence,
+authority, and retirement gates remain open.
 
 This record freezes the current evidence boundary. The maintainer authorized
 only the first specification-first slice on 2026-07-28. It is not implementation
@@ -110,38 +111,85 @@ port:
   schema; and
 - several scenarios mix pure validation with mutation or recovery.
 
-## Accepted v1 request and snapshot contract
+## Bounded v0.17 request and identity contract
 
-The v1 request is repository-only and carries closed, versioned identities:
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+narrows the historical v1 packet to an `exact-commit` public release request.
+The public request factory accepts exactly two caller selections:
 
-- `GovernanceProfileId`: exactly `protocol-authority` or `consumer`;
-- `RepositorySnapshotMode`: `exact-commit` or `candidate`;
-- `ProtocolPolicyIdentity`: exact release/tag, source commit, rule-catalog
-  schema/digest, and instruction-graph schema/limits; and
-- `EnginePolicyBundleIdentity`: exact engine source commit, policy source
-  commit, catalog digest, and application artifact digest, plus immutable
-  release identity when released; and
-- `EvidenceScope`: exactly `repository` for this feature boundary.
+- `GovernanceProfileId`: exactly `protocol-authority` or `consumer`; and
+- `ExactGitCommitId subjectCommit`: exactly 40 lowercase ASCII hexadecimal
+  characters (`0-9a-f`) with no trimming, normalization, ref, range, or short
+  form.
 
-The subject repository snapshot and engine/policy bundle are independent
-identities. v1 supports only an exact application/policy pair and makes no
-semantic-version-range compatibility claim. A clean unreleased exact-source
-bundle may inspect a real consumer only through an explicit, read-only,
-non-authoritative `CSharpShadow` run. It cannot become a managed integration or
-required check, replace PowerShell authority, perform adoption/update, or
-authorize mutation. Only an immutable release manifest may qualify a bundle as
-`CSharpReleasedNonAuthoritative` or make it eligible for persistent managed
-consumer use. Release alone does not grant blocking authority; required-check
-enforcement and authority transfer remain owned by
-[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md). A
-consumer pin must match the manifest's exact policy commit. A subject candidate
-that changes released-policy-owning files is `incomplete` under that released
-bundle and requires a separately bound candidate shadow bundle.
+The factory fixes `RepositorySnapshotMode` to `exact-commit` and
+`EvidenceScope` to `repository`. It does not accept policy, rules, catalog
+metadata, enforcement, engine state, authority state, snapshot mode, or
+evidence scope from the caller. The existing `candidate` input remains only an
+internal, unreleased [SUBF-0138](README.md#subf-0138) shadow-composition detail;
+public candidate overlay belongs to
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). `auto`,
+repository-name allowlists, and named-consumer exceptions are forbidden.
 
-The caller selects a profile but cannot supply arbitrary rules, capabilities,
-authority state, or a replacement catalog. The engine verifies the selection
-from canonical repository evidence. `auto`, repository-name allowlists, and
-named-consumer exceptions are forbidden.
+The engine-owned composition uses the following exact identities:
+
+- `ExactSha256Digest`: exactly 64 lowercase ASCII hexadecimal characters with
+  no trimming or normalization. This, `ExactGitCommitId`, and the canonical
+  `M.m.rev` version grammar have one parser each in
+  `MeAndAI.Operations.Domain.Identity`; packaging and governance reuse those
+  primitives rather than copying validation. Exact lowercase `vM.m.rev` tag
+  parsing removes only the required `v` prefix and delegates to the same
+  version parser.
+- `GovernanceCatalogIdentity`: schema integer exactly `1` and the ordinally
+  ordered bounded inventory
+  `protocol.decision-record.required-structure.v1` plus
+  `protocol.feature-record.required-pair.v1`. Catalog registration is the one
+  profile-applicability owner; consumer support must reuse the same rules and
+  analysis indexes rather than create another parser or rule family. The
+  catalog owner, not a caller or identity constructor, derives its digest as
+  lowercase SHA-256 over UTF-8 without BOM of each ordinally ordered rule's
+  `ruleId NUL canonicalScenarioId NUL findingCode NUL severity NUL enforcement LF`
+  metadata record. An inventory, metadata, or digest mismatch is rejected.
+- `ProtocolPolicyIdentity`: the bounded engine composition fixes exact policy
+  version `0.17.0`, exact policy source commit, the catalog identity, and the
+  exact current
+  instruction-graph identity from
+  [DEC-0031](../../decisions/DEC-0031-instruction-graph-schema-2-bounded-compatibility.md):
+  schema `2`; 65,536 tree entries; 4,194,304 aggregate tree-path UTF-8 bytes;
+  512 nodes; 4,096 edges; depth 32; 524,288 bytes per parsed blob; 4,194,304
+  aggregate parsed bytes; 32,768 UTF-8 bytes for one path and the graph-node
+  path inventory. The reusable version value accepts canonical ASCII
+  `M.m.rev`, but the bounded current engine rejects every other otherwise-valid
+  version/profile pair. Version components contain ASCII digits only and have
+  no leading zero unless the component is exactly `0`.
+- `EnginePolicyBundleIdentity`: exact engine source commit, the nested protocol
+  policy identity, and the SHA-256 of the exact portable
+  `maai-governance.zip` bytes. The digest never represents an extracted
+  directory, one DLL, or reserialized manifest data.
+
+`EnginePolicyBundleIdentity` has exactly one nullable field:
+`ImmutableGovernanceReleaseBinding`. When absent, engine state is derived as
+`csharp-shadow`; when present, it is derived as
+`csharp-released-non-authoritative`. Authority state is always derived as
+`powershell-authority`. No separate release boolean or caller-provided state is
+valid. A release binding is all-or-nothing and carries the exact `v0.17.0` tag,
+engine source commit, policy source commit, catalog digest, and ZIP digest. Its
+tag version must equal the nested policy version and all four repeated exact
+identities must equal their bundle counterparts; any mismatch is rejected
+before repository access. Release therefore changes artifact eligibility only,
+never authority.
+
+The subject repository snapshot and engine/policy bundle remain independent
+identities. The bounded contract makes no semantic-version-range compatibility
+claim. A clean unreleased exact-source bundle is read-only and
+non-authoritative. Only the later immutable-package gate may populate a release
+binding; even then required-check enforcement and authority transfer remain
+owned by
+[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
+Repository existence, object type, profile evidence, consumer pin equality,
+and exact commit acquisition are deliberately deferred to
+[TEST-0208](test-cases.md#test-0208); [TEST-0194](test-cases.md#test-0194) reads
+no repository.
 
 | Profile | Required evidence | Fail-closed cases |
 | --- | --- | --- |
@@ -152,6 +200,11 @@ Operational permissions and rule applicability are separate types. The first
 repository-only composition may use `RepositoryRead`; it registers no mutation
 port and no provider port. A caller cannot narrow or widen
 `GovernanceRuleCapabilityId` applicability.
+
+> Historical candidate-analysis input: the following overlay table documents
+> the already implemented internal shadow input and future
+> [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) work. It is
+> not a public [FEAT-0060](README.md) release request contract.
 
 The repository snapshot extends the existing canonical
 [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171)
@@ -290,20 +343,22 @@ This feature cannot emit `CSharpPrimaryWithRecovery` or `CSharpOnly`.
 
 ## Refined delivery slices
 
-The original milestones are refined into eight independently reviewable
-subfeatures. Existing canonical scenarios are reused where the behavioral
-identity is unchanged.
+The original milestones are refined into seven independently reviewable
+[FEAT-0060](README.md) subfeatures plus one linked external
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) prerequisite.
+Existing canonical scenarios are reused where the behavioral identity is
+unchanged.
 
 | ID | Independently testable boundary | Evidence owner | Status |
 | --- | --- | --- | --- |
-| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0194](test-cases.md#test-0194) remains `Planned` |
-| [SUBF-0123](README.md#subf-0123) | Exact Git/index/worktree snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0194](test-cases.md#test-0194) | In progress; candidate snapshot only through [SUBF-0138](README.md#subf-0138), while [TEST-0194](test-cases.md#test-0194) remains `Planned` |
+| [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | In progress; the repository-independent identity boundary is now distinct from exact profile evidence, but [TEST-0194](test-cases.md#test-0194) remains `Planned` before its expected-red slice |
+| [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
 | [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
-| [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical rule slices plus planned [TEST-0195](test-cases.md#test-0195) | In progress; first rule proven by [SUBF-0138](README.md#subf-0138), broader scenario not active |
-| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0194](test-cases.md#test-0194) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
-| [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Mandatory before equivalence, authority transfer, or retirement |
+| [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
+| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0208](test-cases.md#test-0208) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
+| External [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Linked [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) prerequisite; excluded from the seven-slice [FEAT-0060](README.md) denominator |
 | [SUBF-0137](README.md#subf-0137) | Immutable portable-package qualification at non-authoritative state | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests | Proposed; separate later gate |
-| [SUBF-0138](README.md#subf-0138) | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, feature-record pair rule, deterministic report/exit, thin CLI, and read-only adapter | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | Locally complete; exact-commit/hosted pending, PowerShell authority unchanged |
+| [SUBF-0138](README.md#subf-0138) | Clean-room canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) vertical slice: `protocol-authority` candidate snapshot, feature-record pair rule, deterministic report/exit, thin CLI, and read-only adapter | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | Exact-head hosted complete; PowerShell authority unchanged |
 
 [SUBF-0138](README.md#subf-0138) uses a separate governance-core class
 library, thin console, and repository-read-only filesystem adapter. Its focused
@@ -320,8 +375,9 @@ reviewed result uses distinct `evidenceDigest` and `catalogMetadataDigest`
 fields, declares `coverage=bounded-first-slice`, and centralizes
 repository-relative finding-path validation. It
 completes the canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
-C# slice. [TEST-0194](test-cases.md#test-0194) and
-[TEST-0195](test-cases.md#test-0195) remain `PlannedDocumentation` and are not
+C# slice. [TEST-0194](test-cases.md#test-0194),
+[TEST-0195](test-cases.md#test-0195), and
+[TEST-0208](test-cases.md#test-0208) remain `PlannedDocumentation` and are not
 activated by this slice.
 
 Each subfeature closes its own expected-red, focused green, self-review,
@@ -370,9 +426,12 @@ Sibling-intent boundaries under
   [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004).
   Compiled C# evidence is a language implementation of that contract, not a
   new scenario or a validator of the PowerShell test.
-- [TEST-0194](test-cases.md#test-0194) owns explicit compiled profile/request
-  resolution, while graph discovery and repository byte-source precedence
-  retain their canonical identities.
+- [TEST-0194](test-cases.md#test-0194) owns the repository-independent closed
+  governance request and identity vocabulary, while generic foundation
+  identities retain [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191).
+- [TEST-0208](test-cases.md#test-0208) owns exact-commit and explicit compiled
+  profile-evidence resolution, while graph discovery and repository byte-source
+  precedence retain their canonical identities.
 - [TEST-0195](test-cases.md#test-0195) owns only the typed
   finding/report/process envelope. It does not restate missing, duplicate,
   link, or semantic rule behavior.
@@ -407,10 +466,10 @@ The bounded first clean-room slice has completed all ten readiness items:
 - [x] Explicit maintainer authorization on 2026-07-28 for only this bounded
   `protocol-authority` `CSharpShadow` slice.
 
-First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138) is
-locally complete, so feature implementation is one of eight subfeatures
-(12.5%); exact-commit/hosted closure and the other seven subfeatures remain.
-Later rule slices retain their own review gates and authorization.
+First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138) and
+[SUBF-0134](README.md#subf-0134) are exact-head hosted complete, so bounded
+feature progress is two of seven subfeatures (28.6%); five subfeatures remain.
+Later slices retain their own review gates and authorization.
 
 The historical inventory remains 188/188 base identities (100%), 7/7 explicit
 declaration packets (100%), 116 proven TEST/case mappings, and 172/188

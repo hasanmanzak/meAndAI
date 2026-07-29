@@ -43,7 +43,7 @@ rules consume common typed indexes instead of creating parallel parsers,
 scanners, snapshots, or metadata sources.
 
 [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
-now locally implements canonical
+now implements canonical
 [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
 through that shared kernel. Its expected-red checkpoint produced `CS0234` and
 `CS0246`; the first green checkpoint passed 53/53. Fresh review and independent
@@ -57,18 +57,15 @@ architecture, and 17/17 packaging tests, plus locked restore, format
 verification, publish, and a
 published-DLL real-repository run that evaluated two rules with zero findings.
 
-Two of seven subfeatures are locally implemented, approximately 28.6%; only
-[SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138)
-is fully closed, so closure remains one of seven, approximately 14.3%.
+Two of seven subfeatures are fully closed, approximately 28.6%.
 [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
-has exact committed-tree local evidence at
-[`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
-full solution tests are green, repository-only
-[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-passed in 64.6 seconds, and PowerShell 7 / Windows PowerShell 5.1
-`StructureOnly` passed in 178.0 / 253.4 seconds. Exact-head hosted evidence
-remains pending.
-Hosted
+has exact committed-tree evidence at
+[`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110):
+full solution, repository-only
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178),
+PowerShell 7 / Windows PowerShell 5.1 `StructureOnly`, and hosted
+[run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
+all passed on the exact head. Earlier hosted
 [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
 for exact commit
 [`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
@@ -79,11 +76,12 @@ recorded in
 [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369);
 the focused repository-only owner passes on exact
 [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
-in 64.6 seconds.
-After closing [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134),
-the next gate is the bounded catalog/request/report gate or the exact-commit
-gate according to the canonical feature record. PowerShell authority is
-unchanged.
+in 64.6 seconds. The next gate is
+[SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+under repository-independent [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194).
+Exact repository/profile evidence follows later under
+[TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
+PowerShell authority is unchanged.
 
 The historical
 [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
