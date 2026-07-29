@@ -1,5 +1,6 @@
 using System.Text.Json;
-using System.ComponentModel;
+using MeAndAI.Operations.Domain.Identity;
+using MeAndAI.Operations.Infrastructure.Execution;
 
 namespace MeAndAI.Operations.Packaging;
 
@@ -10,11 +11,14 @@ internal static class PackagingCli
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    internal static int Run(IReadOnlyList<string> arguments)
+    internal static async Task<int> RunAsync(
+        IReadOnlyList<string> arguments,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(arguments);
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (arguments.Count == 0)
             {
                 return Usage();
@@ -22,25 +26,38 @@ internal static class PackagingCli
 
             return arguments[0] switch
             {
-                "pack" => Pack(ParseOptions(arguments, allowExecute: false)),
-                "verify" => Verify(ParseOptions(arguments, allowExecute: true)),
+                "pack" => await PackAsync(
+                        ParseOptions(arguments, allowExecute: false),
+                        cancellationToken)
+                    .ConfigureAwait(false),
+                "verify" => await VerifyAsync(
+                        ParseOptions(arguments, allowExecute: true),
+                        cancellationToken)
+                    .ConfigureAwait(false),
                 _ => Usage(),
             };
+        }
+        catch (OperationCanceledException)
+            when (cancellationToken.IsCancellationRequested)
+        {
+            Console.Error.WriteLine("Packaging operation was canceled.");
+            return 130;
         }
         catch (Exception exception) when (
             exception is ArgumentException or
             InvalidDataException or
             InvalidOperationException or
             IOException or
-            Win32Exception or
-            TimeoutException)
+            OperationalDependencyException)
         {
             Console.Error.WriteLine(exception.Message);
             return 1;
         }
     }
 
-    private static int Pack(CommandOptions options)
+    private static async Task<int> PackAsync(
+        CommandOptions options,
+        CancellationToken cancellationToken)
     {
         var repositoryRoot = options.Require("--repository-root");
         var inventoryPath = options.Require("--inventory");
@@ -48,7 +65,11 @@ internal static class PackagingCli
         var sourceCommit = options.Require("--source-commit");
         options.RequireExactCount(4);
 
-        var repository = ValidateRepository(repositoryRoot, sourceCommit);
+        var repository = await ValidateRepositoryAsync(
+                repositoryRoot,
+                sourceCommit,
+                cancellationToken)
+            .ConfigureAwait(false);
         const string canonicalInventoryPath =
             "packaging/operations-packages.json";
         var resolvedInventoryPath = ResolveContainedFile(
@@ -67,7 +88,11 @@ internal static class PackagingCli
                 "Pack must consume the canonical repository-owned inventory path.");
         }
 
-        AssertTrackedRegularFile(repository.FullName, canonicalInventoryPath);
+        await AssertTrackedRegularFileAsync(
+                repository.FullName,
+                canonicalInventoryPath,
+                cancellationToken)
+            .ConfigureAwait(false);
         var resolvedOutput = Path.GetFullPath(
             outputDirectory,
             repository.FullName);
@@ -78,10 +103,9 @@ internal static class PackagingCli
         }
 
         var inventory = OperationsPackageInventory.Read(resolvedInventoryPath);
-        var temporaryRoot = Path.Combine(
-            Path.GetTempPath(),
-            $"meandai-portable-publish-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(temporaryRoot);
+        var temporaryDirectory = PackagingTemporaryDirectory.Create(
+            "meandai-portable-publish-");
+        var temporaryRoot = temporaryDirectory.FullName;
 
         try
         {
@@ -89,112 +113,164 @@ internal static class PackagingCli
                 StringComparer.Ordinal);
             foreach (var package in inventory.Packages)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var projectPath = ResolveContainedFile(
                     repository.FullName,
                     package.ProjectPath,
                     "Package project");
-                AssertTrackedRegularFile(
-                    repository.FullName,
-                    package.ProjectPath);
+                await AssertTrackedRegularFileAsync(
+                        repository.FullName,
+                        package.ProjectPath,
+                        cancellationToken)
+                    .ConfigureAwait(false);
                 var publishDirectory = Path.Combine(
                     temporaryRoot,
                     package.Application);
                 Directory.CreateDirectory(publishDirectory);
-                var result = BoundedProcess.Run(
-                    "dotnet",
-                    [
-                        "publish",
-                        projectPath,
-                        "--configuration",
-                        "Release",
-                        "--no-restore",
-                        "--nologo",
-                        "--output",
-                        publishDirectory,
-                        "--self-contained",
-                        "false",
-                        "-p:UseAppHost=false",
-                        "-p:DebugSymbols=false",
-                        "-p:DebugType=None",
-                    ],
-                    repository.FullName,
-                    TimeSpan.FromMinutes(3));
+                var result = await BoundedProcessRunner.ExecuteAsync(
+                        PackagingProcessPolicy.CreateTextRequest(
+                            "dotnet",
+                            CreatePublishArguments(
+                                package,
+                                projectPath,
+                                publishDirectory,
+                                sourceCommit),
+                            repository.FullName,
+                            PackagingProcessPolicy.PublishTimeout),
+                        cancellationToken)
+                    .ConfigureAwait(false);
                 if (result.ExitCode != 0)
                 {
                     throw new InvalidOperationException(
-                        $"Publish for '{package.Application}' failed: " +
-                        result.StandardError.Trim());
+                        $"Publish for '{package.Application}' failed.");
                 }
 
                 publishDirectories.Add(package.Application, publishDirectory);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             var manifest = PortablePackageBuilder.Build(
                 new PortablePackageBuildRequest(
                     sourceCommit,
                     inventory,
                     publishDirectories,
                     resolvedOutput));
-            Console.WriteLine(JsonSerializer.Serialize(
+            cancellationToken.ThrowIfCancellationRequested();
+            var response = JsonSerializer.Serialize(
                 new
                 {
                     manifest = PortableReleaseContract.ManifestFileName,
                     sourceCommit = manifest.SourceCommit,
                     assets = manifest.Assets.Select(asset => asset.AssetName),
                 },
-                SerializerOptions));
+                SerializerOptions);
+            cancellationToken.ThrowIfCancellationRequested();
+            temporaryDirectory.DeleteOrThrow();
+            cancellationToken.ThrowIfCancellationRequested();
+            Console.WriteLine(response);
             return 0;
         }
         finally
         {
-            if (Directory.Exists(temporaryRoot))
-            {
-                Directory.Delete(temporaryRoot, recursive: true);
-            }
+            temporaryDirectory.Dispose();
         }
     }
 
-    private static int Verify(CommandOptions options)
+    internal static string[] CreatePublishArguments(
+        OperationsPackageDefinition package,
+        string projectPath,
+        string publishDirectory,
+        string validatedSourceCommit)
+    {
+        ArgumentNullException.ThrowIfNull(package);
+        ArgumentException.ThrowIfNullOrWhiteSpace(projectPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(publishDirectory);
+        ArgumentException.ThrowIfNullOrWhiteSpace(validatedSourceCommit);
+
+        var arguments = new List<string>
+        {
+            "publish",
+            projectPath,
+            "--configuration",
+            "Release",
+            "--no-restore",
+            "--nologo",
+            "--output",
+            publishDirectory,
+            "--self-contained",
+            "false",
+            "-p:UseAppHost=false",
+            "-p:DebugSymbols=false",
+            "-p:DebugType=None",
+        };
+        if (string.Equals(
+                package.Application,
+                OperationalApplicationId.Governance.Value,
+                StringComparison.Ordinal))
+        {
+            arguments.Add(
+                "-p:MeAndAIGovernancePolicySourceCommit=" +
+                validatedSourceCommit);
+        }
+
+        return [.. arguments];
+    }
+
+    private static async Task<int> VerifyAsync(
+        CommandOptions options,
+        CancellationToken cancellationToken)
     {
         var inventoryPath = options.Require("--inventory");
         var manifestPath = options.Require("--manifest");
         var assetDirectory = options.Require("--assets");
         options.RequireExactCount(options.Execute ? 4 : 3);
         var inventory = OperationsPackageInventory.Read(inventoryPath);
-        var runtimes = BoundedProcess.Run(
-            "dotnet",
-            ["--list-runtimes"],
-            Directory.GetCurrentDirectory(),
-            TimeSpan.FromSeconds(30));
+        var runtimes = await BoundedProcessRunner.ExecuteAsync(
+                PackagingProcessPolicy.CreateTextRequest(
+                    "dotnet",
+                    ["--list-runtimes"],
+                    Directory.GetCurrentDirectory(),
+                    PackagingProcessPolicy.VerificationTimeout),
+                cancellationToken)
+            .ConfigureAwait(false);
         if (runtimes.ExitCode != 0)
         {
             throw new InvalidOperationException(
                 "The installed .NET runtime inventory could not be read.");
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
         var release = PortablePackageVerifier.Verify(
             new PortablePackageVerificationRequest(
                 inventory,
                 manifestPath,
                 assetDirectory,
-                runtimes.StandardOutput));
-        var executed = options.Execute
-            ? PortablePackageExecutor.Execute(release)
+                StrictUtf8.Decode(runtimes.StandardOutput)));
+        cancellationToken.ThrowIfCancellationRequested();
+        IReadOnlyList<ExecutedPortableAsset> executed = options.Execute
+            ? await PortablePackageExecutor.ExecuteAsync(
+                    release,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false)
             : [];
-        Console.WriteLine(JsonSerializer.Serialize(
+        cancellationToken.ThrowIfCancellationRequested();
+        var response = JsonSerializer.Serialize(
             new
             {
                 sourceCommit = release.Manifest.SourceCommit,
                 verifiedAssets = release.Assets.Select(asset => asset.Application),
                 executedAssets = executed.Select(asset => asset.Application),
             },
-            SerializerOptions));
+            SerializerOptions);
+        cancellationToken.ThrowIfCancellationRequested();
+        Console.WriteLine(response);
         return 0;
     }
 
-    private static DirectoryInfo ValidateRepository(
+    private static async Task<DirectoryInfo> ValidateRepositoryAsync(
         string repositoryRoot,
-        string sourceCommit)
+        string sourceCommit,
+        CancellationToken cancellationToken)
     {
         PortablePackageBuilder.ValidateSourceCommit(sourceCommit);
         var repository = new DirectoryInfo(Path.GetFullPath(repositoryRoot));
@@ -205,7 +281,11 @@ internal static class PackagingCli
                 "Package source must be one ordinary repository directory.");
         }
 
-        var topLevel = RunGit(repository.FullName, "rev-parse", "--show-toplevel");
+        var topLevel = await RunGitAsync(
+                repository.FullName,
+                ["rev-parse", "--show-toplevel"],
+                cancellationToken)
+            .ConfigureAwait(false);
         if (!string.Equals(
                 Path.GetFullPath(topLevel),
                 repository.FullName,
@@ -215,27 +295,34 @@ internal static class PackagingCli
                 "Package source root does not match the Git repository root.");
         }
 
-        var head = RunGit(repository.FullName, "rev-parse", "--verify", "HEAD^{commit}");
+        var head = await RunGitAsync(
+                repository.FullName,
+                ["rev-parse", "--verify", "HEAD^{commit}"],
+                cancellationToken)
+            .ConfigureAwait(false);
         if (!string.Equals(head, sourceCommit, StringComparison.Ordinal))
         {
             throw new InvalidDataException(
                 "Package source commit does not match repository HEAD.");
         }
 
-        var status = BoundedProcess.Run(
-            "git",
-            [
-                "-C",
-                repository.FullName,
-                "status",
-                "--porcelain=v1",
-                "--untracked-files=all",
-            ],
-            repository.FullName,
-            TimeSpan.FromSeconds(30));
+        var status = await BoundedProcessRunner.ExecuteAsync(
+                PackagingProcessPolicy.CreateTextRequest(
+                    "git",
+                    [
+                        "-C",
+                        repository.FullName,
+                        "status",
+                        "--porcelain=v1",
+                        "--untracked-files=all",
+                    ],
+                    repository.FullName,
+                    PackagingProcessPolicy.GitTimeout),
+                cancellationToken)
+            .ConfigureAwait(false);
         if (status.ExitCode != 0 ||
-            !string.IsNullOrWhiteSpace(status.StandardOutput) ||
-            !string.IsNullOrWhiteSpace(status.StandardError))
+            !StrictUtf8.IsNullOrWhiteSpace(status.StandardOutput) ||
+            !StrictUtf8.IsNullOrWhiteSpace(status.StandardError))
         {
             throw new InvalidDataException(
                 "Package construction requires one clean exact-HEAD source tree.");
@@ -244,17 +331,28 @@ internal static class PackagingCli
         return repository;
     }
 
-    private static string RunGit(string repositoryRoot, params string[] arguments)
+    private static async Task<string> RunGitAsync(
+        string repositoryRoot,
+        IReadOnlyList<string> arguments,
+        CancellationToken cancellationToken)
     {
-        var result = BoundedProcess.Run(
-            "git",
-            ["-C", repositoryRoot, .. arguments],
-            repositoryRoot,
-            TimeSpan.FromSeconds(30));
-        var output = result.StandardOutput.Trim();
+        var result = await BoundedProcessRunner.ExecuteAsync(
+                PackagingProcessPolicy.CreateTextRequest(
+                    "git",
+                    ["-C", repositoryRoot, .. arguments],
+                    repositoryRoot,
+                    PackagingProcessPolicy.GitTimeout),
+                cancellationToken)
+            .ConfigureAwait(false);
         if (result.ExitCode != 0 ||
-            string.IsNullOrWhiteSpace(output) ||
-            !string.IsNullOrWhiteSpace(result.StandardError))
+            !StrictUtf8.IsNullOrWhiteSpace(result.StandardError))
+        {
+            throw new InvalidDataException(
+                "Package source Git identity could not be verified.");
+        }
+
+        var output = StrictUtf8.Decode(result.StandardOutput).Trim();
+        if (string.IsNullOrWhiteSpace(output))
         {
             throw new InvalidDataException(
                 "Package source Git identity could not be verified.");
@@ -285,17 +383,22 @@ internal static class PackagingCli
         return file.FullName;
     }
 
-    private static void AssertTrackedRegularFile(
+    private static async Task AssertTrackedRegularFileAsync(
         string repositoryRoot,
-        string relativePath)
+        string relativePath,
+        CancellationToken cancellationToken)
     {
-        var evidence = RunGit(
-            repositoryRoot,
-            "ls-files",
-            "--stage",
-            "--error-unmatch",
-            "--",
-            relativePath);
+        var evidence = await RunGitAsync(
+                repositoryRoot,
+                [
+                    "ls-files",
+                    "--stage",
+                    "--error-unmatch",
+                    "--",
+                    relativePath,
+                ],
+                cancellationToken)
+            .ConfigureAwait(false);
         if (!evidence.StartsWith("100644 ", StringComparison.Ordinal) ||
             !evidence.EndsWith("\t" + relativePath, StringComparison.Ordinal) ||
             evidence.Contains('\n') ||

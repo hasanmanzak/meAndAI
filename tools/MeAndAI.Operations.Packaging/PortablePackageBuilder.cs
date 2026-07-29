@@ -1,6 +1,6 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
-using System.Text.Json;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Packaging;
 
@@ -94,10 +94,7 @@ public static class PortablePackageBuilder
 
     internal static void ValidateSourceCommit(string sourceCommit)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(sourceCommit);
-        if (sourceCommit.Length != 40 ||
-            sourceCommit.Any(character =>
-                !char.IsAsciiHexDigit(character) || char.IsAsciiLetterUpper(character)))
+        if (!ExactGitCommitId.TryParse(sourceCommit, out _))
         {
             throw new InvalidDataException(
                 "Source commit must be one exact lowercase 40-hex identity.");
@@ -113,14 +110,7 @@ public static class PortablePackageBuilder
 
         try
         {
-            using var document = JsonDocument.Parse(
-                stream,
-                new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = false,
-                    CommentHandling = JsonCommentHandling.Disallow,
-                    MaxDepth = 16,
-                });
+            using var document = StrictJson.Parse(stream, surface);
             var runtimeOptions = document.RootElement.GetProperty("runtimeOptions");
             var framework = runtimeOptions.GetProperty("framework");
             if (!string.Equals(
@@ -145,7 +135,7 @@ public static class PortablePackageBuilder
             }
         }
         catch (Exception exception) when (
-            exception is JsonException or
+            exception is InvalidDataException or
             InvalidOperationException or
             KeyNotFoundException)
         {
@@ -276,7 +266,9 @@ public static class PortablePackageBuilder
     private static string ComputeSha256(string path)
     {
         using var stream = File.OpenRead(path);
-        return Convert.ToHexString(SHA256.HashData(stream)).ToLowerInvariant();
+        return ExactSha256Digest
+            .FromHashBytes(SHA256.HashData(stream))
+            .Value;
     }
 
     private sealed record PublishedFile(string Name, string Path);

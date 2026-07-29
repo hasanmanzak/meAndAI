@@ -1,0 +1,150 @@
+# [FEAT-0060](README.md) Rule, Profile, and Evidence-Source Matrix Analysis
+
+> **Historical-input boundary (2026-07-29):** This analysis is retained as
+> [FEAT-0060](README.md) planning and audit input. Under
+> [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md),
+> full `candidate` snapshot support, remaining governance coverage, and
+> equivalence qualification belong to
+> [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md), not the
+> bounded [FEAT-0060](README.md) release completion boundary.
+
+Status: historical scenario-level analysis complete; variant-level
+normalization is deferred to the equivalence and authority gate under the
+accepted [contract decision packet](contract-decision-packet.md). The bounded
+first specification-first `CSharpShadow` slice is locally complete
+independently.
+
+This record separates governance rule applicability from operational runtime,
+test infrastructure, and provider evidence. Under
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md),
+it is migration-planning evidence rather than a C# design source or bounded
+implementation prerequisite. It does not infer consumer policy from the
+current PowerShell owner name.
+
+## Family distribution
+
+| Family | Total | C# candidate | Mixed | PowerShell operational | Infrastructure | Provider | Existing C# |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Direct protocol governance | 37 | 29 | 6 | 1 | 1 | 0 | 0 |
+| Adoption | 61 | 0 | 2 | 54 | 5 | 0 | 0 |
+| Update, migration, and finalization | 40 | 2 | 4 | 30 | 4 | 0 | 0 |
+| Instruction graph | 3 | 2 | 0 | 0 | 1 | 0 | 0 |
+| Capability | 15 | 5 | 1 | 9 | 0 | 0 | 0 |
+| Publication | 8 | 1 | 3 | 0 | 1 | 3 | 0 |
+| Windows, workflow, and runtime | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
+| Test architecture and recurrence | 10 | 3 | 0 | 0 | 7 | 0 | 0 |
+| Idea lifecycle | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
+| C# foundation | 3 | 0 | 0 | 0 | 0 | 0 | 3 |
+| **Total** | **188** | **43** | **16** | **94** | **29** | **3** | **3** |
+
+The category membership is enumerated in the
+[differential-ledger inventory](differential-ledger-analysis.md#scenario-level-planned-route-inventory).
+
+## Candidate profile applicability
+
+Only the 43 `CSharpCandidate` identities have a conclusive scenario-level
+profile proposal. No candidate is consumer-only at scenario level.
+
+| Applicability | Count | TEST identities |
+| --- | ---: | --- |
+| `protocol-authority` only | 10 | Exact membership in the [scenario-route analysis](scenario-route-analysis.csv) |
+| Both `protocol-authority` and `consumer` | 33 | Exact membership in the [scenario-route analysis](scenario-route-analysis.csv) |
+| `consumer` only | 0 | None at scenario level; mixed variants may yield consumer-only rows after accepted expansion |
+
+Profile applicability must be assigned per material variant. It cannot be
+derived automatically from repository name, feature family, or script owner.
+The caller selects one of the two closed profiles and the engine independently
+verifies that choice from canonical evidence.
+
+The first clean-room [SUBF-0138](README.md#subf-0138) slice selects only
+`protocol-authority` for canonical
+[TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004).
+The scenario-level proposal that the same canonical behavior may later apply
+to consumers remains unimplemented and unauthorized in this slice. Its local
+compiled and published-DLL evidence does not alter any count or populate a
+[TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196)
+equivalence disposition.
+
+## Snapshot mode and evidence source
+
+`RepositorySnapshotMode` describes the evaluated subject repository. It is
+separate from both evidence source and the exact engine/policy bundle identity:
+
+- `exact-commit` reads the immutable commit tree and is eligible for
+  authoritative comparison;
+- `candidate` applies the accepted HEAD/index/worktree precedence and can emit
+  provisional `CSharpShadow` evidence only;
+- `RepositorySnapshot` identifies repository bytes;
+- `SyntheticFixture` identifies project-neutral constructed inputs;
+- `WorkflowDefinitionAtCommit` identifies a workflow blob at an exact commit;
+- `ImmutableRelease` identifies released package/content evidence;
+- `CapturedProviderEvidence` identifies a bounded immutable provider capture;
+  and
+- `ProcessRuntime` identifies execution/transport behavior that is not a pure
+  repository rule.
+
+An unreleased engine/policy bundle is bound by exact source commits, catalog
+digest, and application artifact digest and may inspect a real consumer only
+through an explicit, read-only, non-authoritative `CSharpShadow` run. An
+immutable release manifest is required for persistent managed consumer use;
+release alone does not grant required-check or primary authority. Selecting a
+candidate subject snapshot never permits an implicit candidate policy.
+
+| Planned route | Profile treatment | Typical source | v1 authority treatment |
+| --- | --- | --- | --- |
+| `CSharpCandidate` | Explicit variant-level `protocol-authority`, `consumer`, or both | `RepositorySnapshot`, `SyntheticFixture`, and when required `WorkflowDefinitionAtCommit` or `ImmutableRelease` | Later differential evidence required; applicable production governance authority remains PowerShell |
+| `MixedBoundary` | Undetermined until variant split | More than one source kind | Fail closed as unmapped |
+| `PowerShellOperationalRetained` | Not a [FEAT-0060](README.md) rule transfer | `ProcessRuntime`, provider operation, or mutation fixture | Retain PowerShell operational owner |
+| `InfrastructureContract` | Not a governance profile rule | `ProcessRuntime`, workflow definition, runner, AST, or fixture topology | Retain infrastructure owner |
+| `ExternalProvider` | Wholly outside repository-only v1 | `CapturedProviderEvidence` or live provider | Reasoned `NotApplicable` to v1 while existing verifier remains authoritative |
+| `ExistingCSharpFoundation` | Shared application foundation, not a governance profile rule | Compiled test and `ImmutableRelease` | Reasoned `NotApplicable` / `AlreadyOwnedByCSharpFoundation`; reuse canonical evidence and do not duplicate it in [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) |
+
+Canonical evidence ownership and operational migration authority are different
+fields. A PowerShell suite, GitHub Actions semantic contract, external verifier,
+or .NET test project keeps its exact canonical evidence owner. Only a row that
+participates in governance operational-capability migration receives an
+`operationalAuthorityState`; applicable current rows remain
+`PowerShellAuthority`.
+
+Instruction-graph results preserve the immutable exact-commit rule from
+[DEC-0024](../../decisions/DEC-0024-exact-instruction-graph-adoption-evidence.md).
+A graph-relevant candidate result is incomplete and provisional; it cannot
+become authority evidence.
+
+## Mixed boundaries requiring variant keys
+
+The 16 rows classified as `MixedBoundary` in the
+[scenario-route analysis](scenario-route-analysis.csv) cannot safely receive
+one rule/profile/source row.
+
+Typical splits include pure validation versus mutation/rollback, local
+repository grammar versus provider collection, and semantic contract versus
+PowerShell process mechanics. The accepted material-variant rule must be
+applied before any of these receives a final profile or disposition.
+
+## Finding and severity gap
+
+The 43 candidate scenarios currently assert pass/fail behavior through strings
+and assertions. They do not provide a complete canonical mapping to both a
+stable finding code and severity. Neither severity nor enforcement may be
+inferred from prose, test names, or current failure messages.
+
+The accepted v1 contract is recorded in the
+[decision packet](contract-decision-packet.md): severity uses
+`critical`, `high`, `medium`, `low`, or `info`; enforcement independently uses
+`blocking` or `advisory`; current canonical violations remain blocking;
+advisory observations do not make a conforming verdict nonconforming; callers
+cannot downgrade enforcement; and missing canonical metadata yields an
+`incomplete` report.
+
+## Completion boundary
+
+This analysis supplies a complete historical scenario-level family and route
+matrix but not the variant-level equivalence/authority matrix. The accepted
+granularity contract permits stable variant keys for the 16 mixed identities
+and every other material inline/generative branch, plus canonical
+finding/severity/enforcement assignments. Its completion is mandatory before a
+C# equivalence or stronger-evidence claim, required-check enforcement,
+authority transfer, or PowerShell retirement. It does not block a bounded
+read-only shadow slice or explicitly non-authoritative package, and no
+equivalence claim is made here.

@@ -178,9 +178,19 @@
             TestIds = @('TEST-0193')
         }
         @{
+            Evidence = 'DotNetTestProject'
+            Owner = 'tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj'
+            TestIds = @('TEST-0194', 'TEST-0195')
+        }
+        @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md'
-            TestIds = @('TEST-0194', 'TEST-0195', 'TEST-0196')
+            TestIds = @('TEST-0208')
+        }
+        @{
+            Evidence = 'PlannedDocumentation'
+            Owner = 'docs/features/FEAT-0064-governance-coverage-equivalence/test-cases.md'
+            TestIds = @('TEST-0196')
         }
         @{
             Evidence = 'PlannedDocumentation'

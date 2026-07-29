@@ -1,9 +1,15 @@
 # FEAT-0059 Test Scenarios
 
-Test implementation: [SUBF-0119](README.md#subf-0119),
-[SUBF-0120](README.md#subf-0120), and [SUBF-0121](README.md#subf-0121) are
-complete. Focused local expected-red/green, exact committed-tree, exact package,
-fresh-download, and required Ubuntu/Windows evidence pass.
+The original `v0.16.0` implementation of
+[SUBF-0119](README.md#subf-0119), [SUBF-0120](README.md#subf-0120), and
+[SUBF-0121](README.md#subf-0121) is complete and its focused local
+expected-red/green, exact committed-tree, exact package, fresh-download, and
+required Ubuntu/Windows evidence remains below.
+[SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
+identities; its tests-first and controlled duplicate-owner failures plus local
+implementation green, exact-tree validation, and local exact-package execution
+are complete. Hosted same-byte Ubuntu/Windows and final closure are also
+complete, and no new TEST identity is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -11,7 +17,95 @@ fresh-download, and required Ubuntu/Windows evidence pass.
 | `TEST-0192` <a name="test-0192"></a> | [SUBF-0120](README.md#subf-0120) | Exercise typed results and infrastructure ports with malformed, canceled, failed, and redacted operations. | Results remain deterministic, secrets are not emitted, and read-only callers cannot acquire mutation ports. | Unit / security | Nearest sibling: [TEST-0168](../FEAT-0043-v0134-case-safe-review-authority/test-cases.md#test-0168); `Distinct` compiled port and result contract. | Passing | `tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj` |
 | `TEST-0193` <a name="test-0193"></a> | [SUBF-0121](README.md#subf-0121) | Build the exact three declared framework-dependent ZIPs once, validate the external manifest and archive inventories, run those same bytes through `dotnet` on supported Windows and Linux, and tamper with source, schema, asset, archive, and runtime evidence. | The exact manifest-bound package set runs unchanged on both; unknown/duplicate/inferred identity, digest or length drift, unsafe archive content, and missing/incompatible runtime evidence fail before application work. | Packaging / integration | Nearest sibling: [TEST-0185](../FEAT-0051-v0150-recurrence-prevention-modular-test-harness/test-cases.md#test-0185); `Distinct` because this scenario owns portable release identity/runtime preflight rather than test-harness execution identity. | Passing | `tests/dotnet/MeAndAI.Operations.Packaging.Tests/MeAndAI.Operations.Packaging.Tests.csproj` plus exact-head package handoff in `.github/workflows/protocol-tests.yml` |
 
-## Evidence
+## [SUBF-0141](README.md#subf-0141) extension evidence
+
+The first [TEST-0192](#test-0192) Release compile ran the existing Architecture.Tests
+project with `--no-restore` and the exact `Scenario=TEST-0192` filter. It
+failed in 11.1 seconds only with `CS0246` for the deliberately absent
+`BoundedProcessRequest`; no test executed and no `CS0017`, restore, lock,
+warning, or unrelated compiler failure occurred. This is the expected-red
+evidence for the shared Infrastructure contract. At that checkpoint no
+implementation or green result was claimed.
+
+The Infrastructure-only implementation checkpoint then compiled cleanly and
+passed all 11 new bounded-process cases in 4 seconds. They exercise exact
+binary streams and nonzero exit, defensive request copies, discrete arguments,
+working-directory and environment isolation, exact stdin, concurrent exact and
+over-limit byte caps, pre- and in-flight cancellation, timeout cleanup, an
+active descendant, inherited-pipe EOF, validation, start-failure redaction,
+and the explicit inert fixture entry point. The full [TEST-0192](#test-0192)
+filter passed 26 of 27 and failed only the planned Packaging-to-Infrastructure
+dependency assertion. The [TEST-0191](#test-0191) filter passed 16 of 18 and
+failed only that same missing reference plus the exact inventory showing both
+the new Infrastructure owner and the retained old Packaging runner. This is
+the required controlled duplicate-owner red; at that checkpoint no complete
+green or Packaging-adoption result was claimed.
+
+Direct Packaging adoption is now locally green on exact implementation commit
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6).
+The old Packaging runner is deleted; Infrastructure is the only production
+process owner; its request/result/runner family is internal; and Packaging has
+exactly four direct CLI calls plus one executor call with no forwarding
+wrapper. Executable source-owner barriers also make `StrictJson` the sole
+Packaging JSON parser and `StrictUtf8` the sole direct text decoder, while a
+runtime-configuration duplicate-property/BOM regression proves builder
+delegation through the shared parser. The final targeted union passed 46
+Architecture and 33 Packaging cases (79/79); the full solution passed 46
+Architecture, 33 Packaging, and 155 Governance cases (234/234). Locked restore,
+the exact-commit Release build with zero warnings/errors, changed-file
+analyzer/format verification, and three independent bounded re-reviews pass
+with no remaining P0/P1/P2. Candidate-tree StructureOnly then passed all
+discovered contracts in 186.5 seconds; its protocol-governance owner reported
+184,511 ms.
+
+Exact local evidence checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+passed committed-tree StructureOnly in 192.6 seconds. The canonical workflow
+CLI built all three framework-dependent JIT archives in 15.9 seconds with the
+manifest bound to that source commit; `--execute` verification then validated
+and ran adoption, consumer update, and governance in 2.7 seconds on Windows.
+
+| Exact local asset | Length | SHA-256 |
+| --- | ---: | --- |
+| `maai-adoption.zip` | 95,385 | `645faf79967d9352aa57b3debc1b076c4b93488d0602491d7f95c894b1c444de` |
+| `maai-consumer-update.zip` | 95,951 | `91a05dbb792e72b830288670c87cd4da4eb7a732bdff0a06ef90aa081bd08561` |
+| `maai-governance.zip` | 185,733 | `319fb4431be7bbee52036d1d5cc8875d408accb33344b3077723cd44e88c6609` |
+
+These are exact local Windows outputs, not a cross-host same-byte claim.
+The separate hosted cross-platform claim is proven by the implementation
+run-time PR head
+[`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+and hosted [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248).
+The PR head and tested merge commit
+[`ae6cc95475f4514fb9e66b42f480acf7170b8083`](https://github.com/hasanmanzak/meAndAI/commit/ae6cc95475f4514fb9e66b42f480acf7170b8083)
+resolve to the same exact Git tree. The manifest was bound to the tested merge
+commit.
+
+The [Ubuntu job](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360)
+passed Governance 95/95, Packaging 33/33, and Architecture 46/46, built the
+package set in 8 seconds, verified and executed adoption, consumer update, and
+governance in 2 seconds, and uploaded artifact `8719031242` at 382,242 bytes
+with digest
+`96b1cd931dcbfc4fac23eada6b5fbc177ee95ecc3b4f38318a5d023f81fbb387`.
+The [Windows job](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423)
+passed the same C# totals, downloaded that exact artifact with the same
+expected and observed digest, and verified and executed the same three assets
+in 2 seconds. Ubuntu completed in 14 min 17 s and Windows in 30 min 53 s,
+including the 29 min 31 s retained Windows PowerShell 5.1 route. The same-byte
+Ubuntu/Windows handoff and final hosted confirmation are complete.
+
+The exact predecessor
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu and Windows and is readiness evidence, not implementation evidence.
+
+| Existing owner | Planned support-extension amendment | Expected extension result |
+| --- | --- | --- |
+| [TEST-0191](#test-0191) | Extend the existing dependency inspection with exact single ownership of production process primitives and absence of a Packaging runner/wrapper. | Domain and Application remain process-free; Infrastructure is the only production owner; Packaging references Infrastructure and contains no second runner. |
+| [TEST-0192](#test-0192) | Extend the existing Infrastructure execution boundary with immutable process requests/results, discrete shell-free arguments, environment isolation, binary stdin/stdout/stderr, concurrent streaming limits, nonzero exit, cancellation, timeout, inherited-pipe completion, active-descendant cleanup, and redacted failure. | Exact bytes and inclusive limits hold without deadlock or unobserved work; clean cancellation preserves the caller token after cleanup; dependency failures disclose no sensitive request, output, path, environment, or operating-system diagnostics. |
+| [TEST-0193](#test-0193) | Extend existing package execution to consume the shared Infrastructure kernel while retaining strict adapter decode/exit interpretation and temporary-state cleanup. | Package/manifest identities and same-byte Windows/Linux behavior remain unchanged; process failure stops before application work; Packaging owns no process implementation. |
+
+## Historical `v0.16.0` evidence
 
 [TEST-0193](#test-0193) expected red on 2026-07-28 because the authorized C#
 packaging project, inventory, manifest, builder, and verifier contracts did not

@@ -5,8 +5,9 @@
 - Date: 2026-07-27
 - Decision owners: Maintainer and meAndAI architecture owner
 - Related epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-- Related features: [FEAT-0059](../features/FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../features/FEAT-0061-consumer-adoption-cli/README.md), [FEAT-0062](../features/FEAT-0062-consumer-protocol-update-cli/README.md), and [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-- Related decisions: [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), and [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md)
+- Related features: [FEAT-0059](../features/FEAT-0059-csharp-operational-foundation/README.md), [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../features/FEAT-0061-consumer-adoption-cli/README.md), [FEAT-0062](../features/FEAT-0062-consumer-protocol-update-cli/README.md), [FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md), and [FEAT-0063](../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
+- Related decisions: [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0023](DEC-0023-verified-quick-adoption-module-bundle.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md), [DEC-0033](DEC-0033-specification-first-csharp-governance.md), and [DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md)
+- Narrow sequencing supersession: [DEC-0033](DEC-0033-specification-first-csharp-governance.md) supersedes only the requirement to complete exhaustive PowerShell differential evidence before bounded `CSharpShadow` implementation or an explicitly non-authoritative governance package; this decision's application, JIT distribution, and authority architecture remain active
 
 ## Context
 
@@ -90,6 +91,20 @@ The feature sequence owns distinct gates:
 Authority retirement, compatibility retirement, and source retirement are
 separate decisions. Historical tags, release assets, and evidence remain
 immutable even after their executable route is no longer supported.
+
+### Subsequent bounded scope allocation
+
+[DEC-0034](DEC-0034-bounded-reusable-governance-catalog.md) applies the
+specification-first sequencing accepted in
+[DEC-0033](DEC-0033-specification-first-csharp-governance.md) by bounding the
+first [FEAT-0060](../features/FEAT-0060-any-consumer-governance-cli/README.md)
+release catalog and assigning full `candidate` snapshot
+support, remaining governance coverage, and equivalence qualification to
+[FEAT-0064](../features/FEAT-0064-governance-coverage-equivalence/README.md).
+[DEC-0033](DEC-0033-specification-first-csharp-governance.md) remains
+authoritative, and this later allocation does not alter this
+decision's application separation, portable JIT distribution, or authority
+state architecture.
 
 ## Consequences
 

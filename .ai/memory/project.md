@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-28**
+Last verified: **2026-07-29**
 
 ## Verified facts
 
@@ -9,24 +9,41 @@ Last verified: **2026-07-28**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.16.0`. The latest immutable release before this
-  release-preparation candidate is
-  [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at
-  [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
-  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain its
-  delivery and publication evidence.
+- Current protocol version: `0.16.0`. The latest immutable release is at
+  [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+  [Release `v0.16.0`](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0),
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159),
+  [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154), and
+  post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375)
+  retain the merge, publication, and current-authority evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-  delivers instruction-graph schema 2 and bounded parser, abort, authority,
-  and target-policy resilience.
-- Previous C# operational-foundation checkpoint:
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  delivers the shared C# solution, closed result and port boundaries, and
+  portable RID-free JIT package contract without changing PowerShell or
+  consumer authority. Its original immutable `v0.16.0` delivery remains three
+  of three complete; the later
+  [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+  support extension tracked by
+  [issue #162](https://github.com/hasanmanzak/meAndAI/issues/162) makes current
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  progress four of four (100%) without altering that release. The extension
+  implementation commit is
+  [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6);
+  candidate-tree StructureOnly passed in 186.5 seconds. Exact local checkpoint
+  [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+  passed committed-tree StructureOnly and local package execution. Hosted
+  implementation head [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+  passed hosted [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
+  with same-byte Ubuntu/Windows execution.
+- Historical C# operational-foundation second-slice checkpoint (retained as
+  then-current evidence; superseded by immutable v0.16.0):
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) has completed
-  the typed C# solution and application-authority first slice. The authorized
-  second slice is adding only closed deterministic results, single-capability
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) had completed
+  the typed C# solution and application-authority first slice. At that
+  checkpoint, the authorized second slice was adding only closed deterministic
+  results, single-capability
   port contracts, a grant-checked infrastructure scope, and a redacting async
   dependency boundary. Its DoR, executable missing-contract red run, 16 of 16
   focused green tests, exact-tree validation, and exact-head hosted evidence
@@ -54,13 +71,14 @@ Last verified: **2026-07-28**
   subfeatures, or 67%.
   [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   remained gated. PowerShell production authority was unchanged.
-- Current C# foundation completion:
+- Historical C# foundation pre-merge completion checkpoint (retained as
+  then-current evidence; superseded by immutable v0.16.0):
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   / [TEST-0193](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the
-  unmerged portable-package completion. Seventeen focused and 48 combined local
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) recorded the
+  then-unmerged portable-package completion. Seventeen focused and 48 combined local
   C# tests, locked restore, zero-warning Release build, format/analyzer evidence,
   candidate/exact-tree StructureOnly, clean exact-commit package construction,
   and fresh-download execution pass. Exact implementation commit
@@ -75,7 +93,177 @@ Last verified: **2026-07-28**
   authority changed. The maintainer authorized [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
   `v0.16.0` release closure on 2026-07-28; exact release-preparation metadata,
   renewed exact-head checks, protected merge, publication, and verification
-  remain required before that authorization is complete.
+  were then still required and are now completed by the current immutable
+  release evidence above.
+- Current governance work:
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  / [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
+  [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) continues on
+  `codex/feat-0060-dor-analysis`. The clean-room `CSharpShadow` slice
+  [SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+  implemented under
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+  has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+  passed both Ubuntu and Windows validation. Canonical protocol, decision,
+  feature, and numbered-scenario contracts design C# behavior; this memory
+  supplies context only. The slice reuses canonical
+  [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  for explicit `protocol-authority`, repository-read-only, provider-free,
+  non-authoritative validation. PowerShell remains production and compatibility
+  authority; no workflow route, consumer, required check, or retirement
+  boundary changed. Follow the
+  [bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md).
+
+  [DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+  bounds [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  to an independently releasable `v0.17.0` MVP: exact-commit
+  evaluation, the two recorded profiles, canonical
+  [TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+  and
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+  a deterministic typed catalog and report, and one framework-dependent
+  `maai-governance.zip`. One immutable evaluation context parses each applicable
+  repository artifact once; rules reuse its typed indexes rather than creating
+  parallel parsers, scanners, snapshots, or catalog projections.
+
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  now fully implements canonical
+  [TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+  through that shared kernel. Its expected-red checkpoint produced `CS0234`
+  and `CS0246`; the first green checkpoint passed 53/53. Fresh review and
+  independent re-review under
+  [FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368)
+  covered fenced/HTML-comment structure, fence-state isolation, indexed-only
+  document parsing, bounded invalid-UTF-8 failure, exact evaluated-rule
+  inventory, bounded-catalog identity, and decision-document symlink behavior.
+  Final local gates passed 62/62 focused governance, 62/62 full governance,
+  31/31 architecture, and 17/17 packaging tests. Locked restore, format
+  verification, and publish
+  passed; the published DLL evaluated the real repository as conforming with
+  two rules and zero findings.
+
+  Four of seven bounded subfeatures are fully closed, approximately 57.1%.
+  [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122)
+  is exact-head hosted complete under repository-independent
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194);
+  three bounded subfeatures remain independently open.
+  [SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+  has exact committed-tree local evidence at
+  [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4):
+  full solution tests are green, repository-only
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  passed in 64.6 seconds, and PowerShell 7 / Windows PowerShell 5.1
+  `StructureOnly` passed in 178.0 / 253.4 seconds. Exact final head
+  [`492ca9f`](https://github.com/hasanmanzak/meAndAI/commit/492ca9fa8ac5c43b1a3497b871ddc9061a5dc110)
+  passed hosted [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192)
+  on Ubuntu and Windows, closing the shared-kernel slice without changing
+  PowerShell authority.
+  Hosted
+  [run `30406017573`](https://github.com/hasanmanzak/meAndAI/actions/runs/30406017573)
+  for exact commit
+  [`990b634`](https://github.com/hasanmanzak/meAndAI/commit/990b6346c7a1f7455872c2164a54dc7d7fe4223a)
+  passed every C# build/test/package step and failed on both runtimes only at
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  because tracked Markdown contained a short commit target. The correction is
+  recorded under
+  [FIND-0369](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0369),
+  and the focused repository-only owner passes on exact
+  [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
+  in 64.6 seconds. Canonical
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  now passes 70/70 locally for the repository-independent typed
+  request/identity contract, including the hosted-route regression recorded as
+  [FIND-0370](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0370).
+  The full solution passes 132 governance, 31
+  architecture, and 17 packaging tests; locked restore, format, and both local
+  structural runtimes are green. Exact head
+  [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
+  passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
+  on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including explicit
+  execution of the owned C# route and the supported PowerShell routes.
+  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+  is atomically activated in the same governance project and both existing
+  hosted C# filters. Its exact implementation head
+  [`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99)
+  passes 25/25 focused tests and the full solution passes 155 governance, 31
+  architecture, and 17 packaging tests after independent fresh review; no
+  implementation finding remains. Locked restore and format verification
+  pass. Exact-tree PowerShell 7 / Windows PowerShell 5.1 `StructureOnly` pass
+  in 203.6 / 284.7 seconds, and the framework-dependent published DLL (no
+  apphost) self-validates the real repository as `conforming` with two
+  evaluated rules and zero findings. Hosted
+  [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722),
+  associated with that PR head, tested merge commit
+  [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04)
+  over their shared exact Git tree and passed Ubuntu in 8 min 37 s
+  and Windows in 33 min 52 s. Both hosted
+  filters selected all 25 [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+  cases with zero failed or skipped; the Windows PowerShell 5.1 step consumed
+  32 min 28 s. Later closure-record head
+  [`8cb4fa4`](https://github.com/hasanmanzak/meAndAI/commit/8cb4fa4549ef8ccd3f3eb59ded531012e79e89fa)
+  failed hosted [run `30427450155`](https://github.com/hasanmanzak/meAndAI/actions/runs/30427450155)
+  only because six visible copies of a non-commit Git tree identity violated
+  the tracked-Markdown commit-reference contract. The bounded correction is
+  recorded by [FIND-0371](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0371)
+  on exact head
+  [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3),
+  which passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+  on Ubuntu and Windows. The shared-process implementation owned by
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
+  [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141),
+  is locally complete with 79/79 targeted and 234/234 full-solution tests,
+  locked restore, zero-warning build, clean analyzer/format, and no remaining
+  independent-review finding. Its exact local and hosted same-byte closure is
+  complete. The next decision gate is exact repository/profile work in
+  [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
+  consumer fixture. Canonical
+  [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+  separately owns exact-commit and two-profile repository evidence. This
+  preserves independently reviewable slices without duplicating
+  [TEST-0171](../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171).
+  The implemented report/process contract keeps one report factory, one
+  serializer, and one exit mapper:
+  exits `0` / `1` / `2` emit only canonical JSON, while `64` / `70` / `130`
+  emit only fixed redacted stderr and no report. `incomplete` is a successful
+  operation carrying a report; pre-cancellation does not invoke the operation.
+  Findings reference their one catalog identity and carry typed
+  `content-object` / `snapshot` evidence scope plus digest. Duplicate or
+  contradictory evaluations are wholly excluded, so input order cannot alter
+  findings or report digest. Exact acquisition derives tree/path/selected-
+  blob limits from the one bounded instruction-graph policy and reuses one
+  Infrastructure-owned streaming binary-safe child-process kernel. Later
+  package provenance comes from external sibling
+  `maai-operations-release-manifest.json` schema `2`, with equal bounded
+  engine/policy/source commits and catalog identity derived only from the
+  canonical rule catalog; no released claim is valid before
+  [SUBF-0137](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0137).
+  A report's canonical scenario owner is the normative repository-relative
+  `test-cases.md#anchor` address owned by the catalog identity, never a
+  PowerShell suite or C# test-class path; the pre-release catalog metadata and
+  [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  digest assertions changed atomically in the report slice.
+  PowerShell authority is unchanged.
+
+  The historical
+  [ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+  covers all 188 active base identities, all seven explicit declaration
+  packets, 195 declaration-level units, and a separate proven lower bound of
+  116 TEST/case mappings. The
+  [rule/profile matrix](../../docs/features/FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
+  classifies 43 C# candidates, 16 mixed boundaries, 94 retained PowerShell
+  operations, 29 infrastructure contracts, three provider identities, and
+  three existing C# identities. The accepted
+  [v1 contract decision](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
+  remains historical scope input.
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  / [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+  candidate-worktree evaluation, the remaining governance families, complete
+  catalog qualification, and differential equivalence. Its evidence remains
+  mandatory before required-check enforcement, authority transfer,
+  compatibility retirement, or PowerShell source retirement. General
+  all-repository GitHub issue/PR/comment governance remains reserved for a
+  separate discussion.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -366,6 +554,114 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Freshness and review condition: last confirmed 2026-07-28; review whenever
   the bounded-process read-loop boundary, callback observation, fixture startup,
   or hosted runtime changes.
+- Superseded by: `None`
+
+### Child-owned [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) PID readiness can expire before cancellation
+
+- Status: `Active`
+- Observable signature: a Windows PowerShell 5.1 protected or local
+  `WindowsNative` profile fails only at canonical
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  with `mock process tree did not start before cancellation`, while the
+  isolated canonical owner may pass.
+- Applicability: the pre-correction
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  fixture in which the descendant
+  writes `child.pid` after script initialization, its parent waits five seconds
+  for that file, and the outer harness waits ten seconds without observing
+  early async-pipeline completion or draining its error.
+- Affected contract and cause: cancellation requires one active parent and
+  descendant, not a nested child-to-parent filesystem readiness handshake.
+  Delayed child initialization can expire the inner wait and the outer harness
+  then collapses the real pipeline result into a generic readiness failure.
+- Canonical owner and evidence:
+  [FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365) /
+  [FEAT-0020](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/README.md) /
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106) /
+  failed exact-head [run `30358996927`](https://github.com/hasanmanzak/meAndAI/actions/runs/30358996927)
+  own the correction. Existing
+  [TEST-0105](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0105)
+  recurrence entries are distinct and do not route this signature.
+- Fixed release or evidence: exact checkpoint
+  [`7cfcdcb4bf320aec950147097086bba1978863d9`](https://github.com/hasanmanzak/meAndAI/commit/7cfcdcb4bf320aec950147097086bba1978863d9)
+  uses atomic parent-owned exact child PID publication, observes early pipeline
+  completion, drains bounded error detail, independently retains every parsed
+  PID for cleanup, and proves both processes active before cancellation.
+  PowerShell 7 / Windows PowerShell 5.1 StructureOnly passes in 184.3 / 292.4
+  seconds; the exact Windows streaming and quick-adoption child owners pass in
+  12.9 / 482.4 seconds. Exact final head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016)
+  on Ubuntu and Windows.
+- Required safe response: retain
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106),
+  make the fixture parent publish the
+  exact `Start-Process -PassThru` descendant ID, require both processes active,
+  stop and drain every failed readiness path, and preserve process-tree
+  termination plus owned-root cleanup before accepting a new exact hosted head.
+- Unsafe retry boundary: do not rerun an unchanged failed head, increase the
+  readiness or child wait as the correction, add retries/tolerance, weaken
+  cancellation or cleanup assertions, change production behavior, or create a
+  duplicate scenario.
+- Freshness and review condition: last confirmed 2026-07-28; review whenever
+  the [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  fixture startup, PowerShell async-pipeline boundary, Windows
+  process containment, or hosted runtime changes.
+- Superseded by: `None`
+
+### Windows Full validation can exhaust a stale single-job ceiling without a test failure
+
+- Status: `Active`
+- Observable signature: an exact hosted Windows `Full` job is `cancelled` with
+  `The job has exceeded the maximum execution time of 35m0s` while Ubuntu
+  passes; Git or fixture-teardown failures may appear while runner
+  cancellation is already active and are not independent defect evidence.
+- Applicability: the pre-correction single serial Windows PowerShell 5.1 job
+  bounded at 35 minutes, and later Windows `Full` routes whose measured suite
+  plus setup consumption approaches the current whole-job ceiling.
+- Affected contract and cause: canonical
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+  requires the Windows upper bound to cover measured serial `Full` execution.
+  The historical 35-minute budget left only about three minutes around the
+  nearest successful 31 min 48 s Windows job and could cancel authoritative
+  evidence before a test verdict.
+- Canonical owner and evidence:
+  [FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366) /
+  [FEAT-0027](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/README.md) /
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124) /
+  [DEC-0019](../../docs/decisions/DEC-0019-hosted-runner-efficiency.md) /
+  failed exact-head [run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+  own the correction. Historical
+  [FIND-0160](../../docs/features/FEAT-0029-v0110-protocol-aware-initial-adoption/README.md#find-0160)
+  is the same-contract prior occurrence.
+- Fixed release or evidence: release evidence is not applicable to this
+  pre-merge test-infrastructure correction. The test-first change updated
+  [TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124)
+  to require 60 minutes; its PowerShell 7 structural verifier failed alone in
+  201 seconds against workflow 35 and passed in 176.9 seconds after only the
+  Windows job ceiling changed to 60. Checksummed actionlint, selector
+  [TEST-0123](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0123),
+  the unchanged
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106)
+  owner on both runtimes, and the candidate PowerShell 7 / Windows PowerShell 5.1
+  StructureOnly passed. Exact final head
+  [`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+  passed [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
+  Ubuntu job `90346608851` in 12 min 58 s and Windows job `90346609315` in
+  32 min 12 s, including a 30 min 46 s PowerShell 5.1 step.
+- Required safe response: retain one stable Windows job and the fail-safe
+  profile selector, set only its whole-job ceiling to 60 minutes, preserve
+  Linux 20 and post-publication 5, run StructureOnly on both supported
+  runtimes, and require a new exact-head Ubuntu/Windows pass. Treat teardown or
+  native-command failures emitted during whole-job cancellation as secondary
+  until an uncancelled run reproduces them.
+- Unsafe retry boundary: do not rerun an unchanged canceled head, add retry or
+  sleep behavior, broaden per-operation timeouts, suppress child failures,
+  restore hosted fan-out, weaken `Full` coverage, or route this signature to
+  [TEST-0106](../../docs/features/FEAT-0020-v095-streamed-codex-cancellation/test-cases.md#test-0106).
+- Freshness and review condition: last confirmed 2026-07-28; review whenever
+  the Windows workflow ceiling, serial `Full` suite composition, hosted image,
+  setup steps, or measured runner consumption changes.
 - Superseded by: `None`
 
 ### Restricted-sandbox Git signal-pipe failure
@@ -923,7 +1219,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   preserves schema 7/8 for v0.12.6-v0.14.1 and schema 9/10 thereafter, and
   limits graph-unaware runtime fallback to exactly v0.12.4-v0.12.5. Focused
   PowerShell 5.1/7 and affected integration evidence is green; immutable
-  publication remains pending.
+  publication is current through v0.16.0.
 - Required safe response: retrieve and verify the exact target workflow before
   assessment. For a supported graph-aware tag, import the exact target policy,
   require its exact reviewed profile and every target-semantic command, compose
@@ -943,22 +1239,48 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Open context
 
-- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-  / [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) record a
+- [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153),
+  [DEC-0032](../../docs/decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md),
+  [DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+  and
+  [DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+  record a
   C# operational platform with separate governance, adoption, and update
   applications sharing one typed foundation and portable framework-dependent
-  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-  is implementation-complete. [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
+  JIT artifacts. [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)'s
+  original `v0.16.0` three-slice delivery is implementation-complete; its later
+  [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+  support extension is exact local and hosted complete.
+  [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
   [FEAT-0061](../../docs/features/FEAT-0061-consumer-adoption-cli/README.md),
   [FEAT-0062](../../docs/features/FEAT-0062-consumer-protocol-update-cli/README.md),
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md),
   and [FEAT-0063](../../docs/features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
-  remain separately gated. [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
+  remain separately gated.
+
+  Current [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  evidence and progress are single-owned by the detailed Verified facts above
+  and the canonical feature/test records. The
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
+  [SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+  shared Infrastructure process foundation is complete; freeze the exact
+  profile semantics before beginning
+  [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  and [TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208).
+  Do not duplicate those current counters, commit/run evidence, or report
+  semantics here. PowerShell remains authority, and candidate/equivalence work
+  remains with [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md).
+  [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-  are complete. The maintainer authorized only [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
-  `v0.16.0` release closure on 2026-07-28. Do not implement the separately
-  gated consumer features, mutate consumers, transfer authority, or retire
-  PowerShell without later independent gates and authorization.
+  are complete. Candidate-worktree evaluation, remaining rule families,
+  complete catalog qualification, and equivalence belong to
+  [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  / [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161). Do not
+  implement [FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+  or another feature, mutate consumers, widen authority,
+  disable a PowerShell route, claim equivalence, or retire PowerShell without
+  later independent gates and authorization.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

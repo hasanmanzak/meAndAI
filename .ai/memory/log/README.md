@@ -6,23 +6,107 @@ and follow its canonical links.
 ## Current continuation
 
 [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) records the
-C# operational platform migration. Follow the
-[v0.16.0 release-preparation handoff](2026-07-28-feat-0059-v0160-release-preparation.md),
-[third-slice portable-package handoff](2026-07-28-feat-0059-subf-0121-portable-packaging.md),
-[second-slice completion handoff](2026-07-28-feat-0059-subf-0120-ports-results.md),
-the historical [first-slice handoff](2026-07-27-feat-0059-subf-0119-foundation.md),
-and their linked planning authority.
+C# operational platform migration. Follow current
+[FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+through the
+[bounded reusable MVP handoff](2026-07-29-feat-0060-bounded-reusable-mvp.md),
+[DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+and
+[DEC-0034](../../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md).
+Development continues on `codex/feat-0060-dor-analysis` under
+[issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) and
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160). The first
+clean-room `CSharpShadow` vertical slice,
+[SUBF-0138](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+passed Ubuntu and Windows. It reuses canonical
+[TEST-0004](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+for explicit `protocol-authority`, repository-read-only, provider-free,
+non-authoritative validation. Canonical specifications design the rule; memory
+is context, and PowerShell remains production and compatibility authority.
+
+The bounded `v0.17.0` feature targets exact-commit evaluation, the two recorded
+profiles, canonical
+[TEST-0004](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+and
+[TEST-0005](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+a deterministic typed catalog and report, and one framework-dependent
+`maai-governance.zip`. Shared repository and document analysis is parse-once;
+rules consume one typed evaluation context instead of duplicating parsers,
+scanners, snapshots, or metadata projections.
+
+[SUBF-0134](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+now implements canonical
+[TEST-0005](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+through that shared kernel. Its expected-red checkpoint produced `CS0234` and
+`CS0246`, and its first green checkpoint passed 53/53. Fresh review and
+independent re-review under
+[FIND-0368](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368)
+covered fenced/HTML-comment structure, fence-state isolation, indexed-only
+document parsing, bounded invalid-UTF-8 failure, exact evaluated-rule inventory,
+bounded-catalog identity, and decision-document symlink behavior. Final local
+gates passed 62/62 focused governance, 62/62 full governance, 31/31
+architecture, and 17/17 packaging tests. Locked restore, format verification,
+and publish passed; the
+published DLL evaluated the real repository as conforming with two rules and
+zero findings.
+
+Four of seven bounded [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+subfeatures are closed, approximately 57.1%. Current detailed evidence is
+single-owned by the feature/test records and the latest checkpoint in the
+[bounded reusable MVP handoff](2026-07-29-feat-0060-bounded-reusable-mvp.md).
+[SUBF-0124](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+closes [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
+Its correction head
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu and Windows. The
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
+[SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+shared Infrastructure process foundation is locally green on
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+with 79/79 targeted and 234/234 full-solution tests. Exact local checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+passed committed-tree StructureOnly and local package execution. Hosted
+implementation head
+[`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+passed hosted [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
+with same-byte Ubuntu/Windows execution. The next decision gate is
+[SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
+[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+remains `Planned`. The support extension is external to
+[FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md), whose
+denominator remains seven and progress remains four closed (57.1%). PowerShell
+authority remains unchanged.
+
+The historical inventory remains 188/188 base identities, seven explicit
+declaration packets, a lower bound of 116 TEST/case mappings, and 172/188
+unambiguous scenario routes with 16/188 mixed.
+[FEAT-0064](../../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+/ [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+candidate-worktree support, remaining rule families, complete catalog
+qualification, and differential equivalence. Those gates remain mandatory
+before required-check enforcement, authority transfer, compatibility
+retirement, or PowerShell source retirement.
+
+Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
+is published at
+[`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md),
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159),
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154), exact-head
+[run `30337115744`](https://github.com/hasanmanzak/meAndAI/actions/runs/30337115744),
+exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671),
+and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375)
+retain closure evidence. The earlier release-preparation and slice handoffs are
+historical evidence. That immutable release remains its original three of
+three; the later
+[SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+support extension is complete at five of five gates (100%), including a
+186.5-second candidate-tree StructureOnly pass and exact local
+checkpoint/package execution plus hosted same-byte closure. Current
 [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-/ [SUBF-0119](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119)
-/ [SUBF-0120](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
-/ [SUBF-0121](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-are complete at five of five slice gates with exact-tree and required
-Ubuntu/Windows evidence. [Draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159)
-owns the unmerged checkpoint. Feature implementation is three of three
-subfeatures and 15 of 15 gates, or 100%. The maintainer authorized only the
-[FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) protected merge and immutable `v0.16.0` release closure on 2026-07-28;
-consumer behavior, authority migration, later features, and PowerShell
-retirement still require independent gates.
+progress is four of four (100%) without changing the released assets.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
@@ -66,8 +150,28 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
+- 2026-07-29 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [DEC-0034](../../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) /
+  [bounded reusable governance MVP](2026-07-29-feat-0060-bounded-reusable-mvp.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [DEC-0033](../../../docs/decisions/DEC-0033-specification-first-csharp-governance.md) /
+  [specification-first clean-room pivot](2026-07-28-feat-0060-clean-room-pivot.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [FIND-0366](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366) /
+  [Windows Full job-ceiling correction](2026-07-28-feat-0060-test0124-windows-timeout.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md) /
+  [FIND-0365](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365) /
+  [readiness correction](2026-07-28-feat-0060-test0106-readiness.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  [v1 contract acceptance](2026-07-28-feat-0060-contract-acceptance.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  [ledger and matrix analysis](2026-07-28-feat-0060-ledger-matrix-analysis.md)
+- 2026-07-28 - [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+  [Definition-of-Ready analysis](2026-07-28-feat-0060-dor-analysis.md)
+- 2026-07-28 - [FEAT-0059](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  [v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
 - [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+- [2026-07-28 - C# operational foundation ports and results](2026-07-28-feat-0059-subf-0120-ports-results.md)
 - [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
 - [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)
 - [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)
@@ -144,4 +248,5 @@ conversations while disallowing force pushes and deletion.
 - [2026-07-14 - Convergent completion scan](2026-07-14-convergent-completion-scan.md)
 - [2026-07-14 - Urgent-work gate order](2026-07-14-urgent-gate-order.md)
 - [2026-07-14 - Cleanup comment clarity](2026-07-14-cleanup-comment-clarity.md)
-- [2026-07-15 - FEAT-0002 release-gate evidence](2026-07-15-feat-0002-release-gate-evidence.md)
+- 2026-07-15 - [FEAT-0002](../../../docs/features/FEAT-0002-semi-automatic-consumer-updates/README.md)
+  [release-gate evidence](2026-07-15-feat-0002-release-gate-evidence.md)

@@ -4,10 +4,10 @@
 | --- | --- |
 | Classification | Feature |
 | Status | Proposed / development not authorized |
-| Target version | 0.20.0 |
+| Target version | 0.21.0 |
 | Issue | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) |
 | Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
 | Tests | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206), and [TEST-0207](test-cases.md#test-0207) |
 
 ## Problem
@@ -71,9 +71,29 @@ These gates are ordered. Completion of any predecessor C# feature, successful
 runtime installation, or source-file presence cannot skip consumer migration
 or authorize PowerShell deletion.
 
+[DEC-0033](../../decisions/DEC-0033-specification-first-csharp-governance.md)
+allows bounded clean-room governance implementation and an explicitly
+non-authoritative package before exhaustive PowerShell mapping. It does not
+weaken this feature's cutover boundary. Before governance equivalence,
+authority transfer, compatibility retirement, or source retirement, the
+complete [governance differential ledger](../FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+and variant-level [rule/profile/evidence-source matrix](../FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
+must cover every applicable supported row; missing or divergent evidence fails
+closed.
+
+[DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
+allocates full `candidate` snapshot support, remaining governance coverage,
+and equivalence qualification to
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md). The
+[FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) ledger and
+matrix remain historical inputs, while
+[FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) is the
+blocking owner that must turn them into complete executable evidence before
+this feature may transfer or retire governance authority.
+
 ## Readiness evidence
 
-- Blocking dependencies: completed immutable releases for [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md).
+- Blocking dependencies: completed immutable releases for [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md), plus completed [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) coverage and equivalence evidence before any cutover.
 - Prior art: release-declared migrations, target-bound recovery, instruction graph closure, managed workflow projection, and exact consumer ledger.
 - Live supported-consumer inventory requires separate authorization and fresh evidence before implementation.
 
@@ -94,19 +114,22 @@ or authorize PowerShell deletion.
 
 | ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- |
-| `SUBF-0132` <a name="subf-0132"></a> | Consumer inventory and immutable migration | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206) / not started | Pending | Blocked by predecessor releases |
+| `SUBF-0132` <a name="subf-0132"></a> | Consumer inventory and immutable migration | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0205](test-cases.md#test-0205), [TEST-0206](test-cases.md#test-0206) / not started | Pending | Blocked by predecessor releases and [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) equivalence |
 | `SUBF-0133` <a name="subf-0133"></a> | Dependency-proof retirement and validation contraction | [#158](https://github.com/hasanmanzak/meAndAI/issues/158) | [TEST-0207](test-cases.md#test-0207) / not started | Pending | Blocked by migration closure |
 
 ## Decisions and relationships
 
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-- Blocking dependencies: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md)
+- Blocking dependencies: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md), and [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md)
 
 ## Definition of Ready
 
 - [x] Stable ID and linked issue.
 - [x] Problem, outcome, scope, non-goals, initial scenarios, and risks.
-- [ ] Immutable predecessor releases, supported-consumer authority, fresh inventory, recurrence evidence, migration design, baselines, target version, and explicit migration/deletion authorization.
+- [ ] Immutable predecessor releases, complete applicable differential
+  ledgers and rule/profile/evidence-source matrices, supported-consumer
+  authority, fresh inventory, recurrence evidence, migration design,
+  baselines, and explicit migration/deletion authorization.
 
 ## Acceptance criteria
 

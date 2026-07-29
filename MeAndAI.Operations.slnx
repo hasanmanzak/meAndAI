@@ -4,8 +4,10 @@
   <Project Path="src/MeAndAI.Operations.ConsumerUpdate/MeAndAI.Operations.ConsumerUpdate.csproj" />
   <Project Path="src/MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
   <Project Path="src/MeAndAI.Operations.Governance/MeAndAI.Operations.Governance.csproj" />
+  <Project Path="src/MeAndAI.Operations.Governance.Core/MeAndAI.Operations.Governance.Core.csproj" />
   <Project Path="src/MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj" />
   <Project Path="tests/dotnet/MeAndAI.Operations.Architecture.Tests/MeAndAI.Operations.Architecture.Tests.csproj" />
+  <Project Path="tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj" />
   <Project Path="tests/dotnet/MeAndAI.Operations.Packaging.Tests/MeAndAI.Operations.Packaging.Tests.csproj" />
   <Project Path="tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj" />
 </Solution>

@@ -1,37 +1,46 @@
 using System.IO.Compression;
 using System.Text.Json;
+using MeAndAI.Operations.Infrastructure.Execution;
 
 namespace MeAndAI.Operations.Packaging;
 
 public static class PortablePackageExecutor
 {
-    public static IReadOnlyList<ExecutedPortableAsset> Execute(
+    public static async Task<IReadOnlyList<ExecutedPortableAsset>> ExecuteAsync(
         VerifiedPortableRelease release,
-        string dotnetExecutable = "dotnet")
+        string dotnetExecutable = "dotnet",
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(release);
         ArgumentException.ThrowIfNullOrWhiteSpace(dotnetExecutable);
-        var temporaryRoot = Path.Combine(
-            Path.GetTempPath(),
-            $"meandai-portable-execution-{Guid.NewGuid():N}");
-        Directory.CreateDirectory(temporaryRoot);
+        cancellationToken.ThrowIfCancellationRequested();
+        var temporaryDirectory = PackagingTemporaryDirectory.Create(
+            "meandai-portable-execution-");
+        var temporaryRoot = temporaryDirectory.FullName;
 
         try
         {
             var results = new List<ExecutedPortableAsset>(release.Assets.Count);
             foreach (var asset in release.Assets)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var extraction = Path.Combine(temporaryRoot, asset.Application);
                 Directory.CreateDirectory(extraction);
-                ExtractVerifiedArchive(asset.AssetPath, extraction);
+                await ExtractVerifiedArchiveAsync(
+                        asset.AssetPath,
+                        extraction,
+                        cancellationToken)
+                    .ConfigureAwait(false);
                 var entryAssembly = Path.Combine(extraction, asset.EntryAssembly);
-                var process = BoundedProcess.Run(
-                    dotnetExecutable,
-                    [entryAssembly, "--describe-contract"],
-                    extraction,
-                    TimeSpan.FromSeconds(30));
+                var process = await BoundedProcessRunner.ExecuteAsync(
+                        PackagingProcessPolicy.CreateDescriptorRequest(
+                            dotnetExecutable,
+                            [entryAssembly, "--describe-contract"],
+                            extraction),
+                        cancellationToken)
+                    .ConfigureAwait(false);
                 if (process.ExitCode != 0 ||
-                    !string.IsNullOrWhiteSpace(process.StandardError))
+                    !StrictUtf8.IsNullOrWhiteSpace(process.StandardError))
                 {
                     throw new InvalidDataException(
                         $"Portable application '{asset.Application}' did not run cleanly.");
@@ -46,18 +55,22 @@ public static class PortablePackageExecutor
                     asset.ContractSchema));
             }
 
-            return Array.AsReadOnly(results.ToArray());
+            cancellationToken.ThrowIfCancellationRequested();
+            var completed = Array.AsReadOnly(results.ToArray());
+            temporaryDirectory.DeleteOrThrow();
+            cancellationToken.ThrowIfCancellationRequested();
+            return completed;
         }
         finally
         {
-            if (Directory.Exists(temporaryRoot))
-            {
-                Directory.Delete(temporaryRoot, recursive: true);
-            }
+            temporaryDirectory.Dispose();
         }
     }
 
-    private static void ExtractVerifiedArchive(string assetPath, string extraction)
+    private static async Task ExtractVerifiedArchiveAsync(
+        string assetPath,
+        string extraction,
+        CancellationToken cancellationToken)
     {
         using var stream = File.OpenRead(assetPath);
         using var archive = new ZipArchive(
@@ -66,6 +79,7 @@ public static class PortablePackageExecutor
             leaveOpen: false);
         foreach (var entry in archive.Entries)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (!OperationsPackageInventory.IsCanonicalLeaf(entry.FullName))
             {
                 throw new InvalidDataException(
@@ -79,44 +93,50 @@ public static class PortablePackageExecutor
                 FileMode.CreateNew,
                 FileAccess.Write,
                 FileShare.None);
-            source.CopyTo(target);
+            await source.CopyToAsync(target, cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 
-    private static void ValidateDescriptor(
-        string output,
+    internal static void ValidateDescriptor(
+        ReadOnlyMemory<byte> output,
         string expectedApplication,
         int expectedSchema)
     {
+        JsonDocument document;
         try
         {
-            using var document = JsonDocument.Parse(output);
-            var root = document.RootElement;
-            if (root.ValueKind != JsonValueKind.Object)
-            {
-                throw new InvalidDataException(
-                    $"Portable application '{expectedApplication}' returned mismatched identity.");
-            }
-
-            var properties = root.EnumerateObject().ToArray();
-            if (properties.Length != 2 ||
-                properties.Select(property => property.Name)
-                    .Distinct(StringComparer.Ordinal).Count() != 2 ||
-                !string.Equals(
-                    root.GetProperty("application").GetString(),
-                    expectedApplication,
-                    StringComparison.Ordinal) ||
-                root.GetProperty("contractSchemaVersion").GetInt32() != expectedSchema)
-            {
-                throw new InvalidDataException(
-                    $"Portable application '{expectedApplication}' returned mismatched identity.");
-            }
+            document = StrictJson.Parse(
+                output,
+                "Portable application descriptor");
         }
-        catch (JsonException exception)
+        catch (InvalidDataException)
         {
             throw new InvalidDataException(
-                $"Portable application '{expectedApplication}' returned invalid JSON.",
-                exception);
+                $"Portable application '{expectedApplication}' returned invalid JSON.");
+        }
+
+        using (document)
+        {
+            var root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object ||
+                root.EnumerateObject().Count() != 2 ||
+                !root.TryGetProperty("application", out var application) ||
+                application.ValueKind != JsonValueKind.String ||
+                !string.Equals(
+                    application.GetString(),
+                    expectedApplication,
+                    StringComparison.Ordinal) ||
+                !root.TryGetProperty(
+                    "contractSchemaVersion",
+                    out var contractSchemaVersion) ||
+                contractSchemaVersion.ValueKind != JsonValueKind.Number ||
+                !contractSchemaVersion.TryGetInt32(out var actualSchema) ||
+                actualSchema != expectedSchema)
+            {
+                throw new InvalidDataException(
+                    $"Portable application '{expectedApplication}' returned mismatched identity.");
+            }
         }
     }
 }

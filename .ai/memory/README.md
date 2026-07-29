@@ -1,32 +1,140 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-28**<br>
+Last reviewed: **2026-07-29**<br>
 Protocol version: **0.16.0**<br>
-Latest immutable release before this unmerged development: **0.15.6**
+Latest immutable release: **0.16.0**
 
-The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
+The immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 release is complete at
-[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
-[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
-delivery, review, test, and publication evidence for
-[FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md).
-
+[`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159),
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154), exact-head
+[run `30337115744`](https://github.com/hasanmanzak/meAndAI/actions/runs/30337115744),
+exact-main [run `30339245671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30339245671),
+and post-publication [run `30340370375`](https://github.com/hasanmanzak/meAndAI/actions/runs/30340370375)
+retain the merge, review, test, immutable publication, and verification
+evidence for
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md).
+That immutable release retains its original three-of-three closure.
+[SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+is a later `v0.17.0` support extension tracked by
+[issue #162](https://github.com/hasanmanzak/meAndAI/issues/162);
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-/ [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is complete at
-five of five slice gates. Follow the
-[portable-package completion handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
-and its linked prior slice/planning authority. All three foundation slices and
-all 15 delivery gates are complete. Exact implementation commit
-[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
-passed committed-tree package evidence and
-[run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
-passed 48/48 compiled tests plus the same package bytes on Ubuntu and Windows.
-PowerShell authority and consumer repositories remain unchanged; merge and
-release are not authorized.
+is now four of four complete (100%) after the extension closed all five
+delivery gates. Migration commit
+[`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+passed the local implementation gates.
+Candidate-tree StructureOnly passed in 186.5 seconds; exact local checkpoint
+[`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+then passed committed-tree StructureOnly and local package execution. Hosted
+implementation head [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+passed hosted [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
+with same-byte Ubuntu/Windows execution. Released `v0.16.0` assets and evidence
+are unchanged.
+
+[FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+/ [issue #155](https://github.com/hasanmanzak/meAndAI/issues/155) /
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) continues on
+`codex/feat-0060-dor-analysis`. Its first clean-room `CSharpShadow` slice,
+[SUBF-0138](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0138),
+has exact-head hosted evidence: [run `30394623671`](https://github.com/hasanmanzak/meAndAI/actions/runs/30394623671)
+passed Ubuntu and Windows. Follow the
+[bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md),
+[DEC-0033](../../docs/decisions/DEC-0033-specification-first-csharp-governance.md),
+and
+[DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md).
+Canonical protocol, decision, feature, and numbered-scenario contracts design
+C# behavior; project memory supplies context only, and PowerShell remains
+production and compatibility authority.
+
+The bounded `v0.17.0` feature targets exact-commit evaluation, the two recorded
+profiles, canonical
+[TEST-0004](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004)
+and
+[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005),
+a deterministic typed catalog and report, and one framework-dependent
+`maai-governance.zip`. Shared repository and document analysis is parse-once;
+rules consume common typed indexes instead of creating parallel parsers,
+scanners, snapshots, or metadata sources.
+
+[SUBF-0134](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0134)
+now implements canonical
+[TEST-0005](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005)
+through that shared kernel. Its expected-red checkpoint produced `CS0234` and
+`CS0246`; the first green checkpoint passed 53/53. Fresh review and independent
+re-review under
+[FIND-0368](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0368)
+covered fenced/HTML-comment structure, fence-state isolation, indexed-only
+document parsing, bounded invalid-UTF-8 failure, exact evaluated-rule inventory,
+bounded-catalog identity, and decision-document symlink behavior. Final local
+gates passed 62/62 focused governance, 62/62 full governance, 31/31
+architecture, and 17/17 packaging tests, plus locked restore, format
+verification, publish, and a
+published-DLL real-repository run that evaluated two rules with zero findings.
+
+Four of seven bounded [FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md)
+subfeatures are closed, approximately 57.1%. Current detailed evidence is
+single-owned by the feature record, its
+[test record](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md),
+and the latest checkpoint in the
+[bounded reusable MVP handoff](log/2026-07-29-feat-0060-bounded-reusable-mvp.md).
+[SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+closes the deterministic report/process contract under
+[TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
+Its closure-record correction head
+[`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+on Ubuntu and Windows. The shared-process implementation gate owned by
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) /
+[SUBF-0141](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+is locally complete with 79/79 targeted and 234/234 full-solution tests,
+locked restore, zero-warning Release build, format/analyzer verification, and
+three clean independent re-reviews. Its exact local and hosted same-byte
+closure is complete. The next decision gate is
+[SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123);
+[TEST-0208](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+remains `Planned`. The support extension is external to
+[FEAT-0060](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
+which remains four of seven (57.1%). PowerShell
+authority is unchanged.
+
+The historical
+[ledger inventory](../../docs/features/FEAT-0060-any-consumer-governance-cli/differential-ledger-analysis.md)
+accounts for 188/188 active base identities, all seven explicit declaration
+packets, and a separate proven lower bound of 116 TEST/case mappings. The
+[rule/profile matrix](../../docs/features/FEAT-0060-any-consumer-governance-cli/rule-profile-matrix-analysis.md)
+classifies the base universe into 43 C# candidates, 16 mixed boundaries, 94
+retained PowerShell operations, 29 infrastructure contracts, three provider
+identities, and three existing C# identities. The
+[v1 decision packet](../../docs/features/FEAT-0060-any-consumer-governance-cli/contract-decision-packet.md)
+was accepted by the maintainer on 2026-07-28 with an exact-pair shadow/release
+boundary and independent severity/enforcement metadata. Under
+[DEC-0034](../../docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md),
+[FEAT-0064](../../docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+/ [issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) now owns
+candidate-worktree evaluation, remaining governance families, complete catalog
+qualification, and differential equivalence. Those records remain mandatory
+before required-check enforcement, authority transfer, compatibility
+retirement, or PowerShell source retirement.
+
+The earlier bounded canonical test harness and inert fixture changed under
+[FIND-0365](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0365);
+that correction did not change workflow behavior. Replacement exact-head
+[run `30366875189`](https://github.com/hasanmanzak/meAndAI/actions/runs/30366875189)
+then exposed
+[FIND-0366](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0366),
+a stale Windows serial `Full` whole-job ceiling under
+[TEST-0124](../../docs/features/FEAT-0027-v0104-runner-minute-efficiency/test-cases.md#test-0124).
+Both findings are closed by exact final head
+[`a573ad8b00f2939258ab59a3b06c13520733c186`](https://github.com/hasanmanzak/meAndAI/commit/a573ad8b00f2939258ab59a3b06c13520733c186)
+and [run `30380421016`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016):
+Ubuntu [job `90346608851`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016/job/90346608851)
+passed in 12 min 58 s and Windows
+[job `90346609315`](https://github.com/hasanmanzak/meAndAI/actions/runs/30380421016/job/90346609315)
+passed in 32 min 12 s, including a 30 min 46 s PowerShell 5.1 step. Linux
+remains 20 minutes, post-publication remains 5, and consumer repositories,
+production authority, and PowerShell production routes remain unchanged.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

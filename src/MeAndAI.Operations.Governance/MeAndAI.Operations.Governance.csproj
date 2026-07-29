@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="../MeAndAI.Operations.Domain/MeAndAI.Operations.Domain.csproj" />
+    <ProjectReference Include="../MeAndAI.Operations.Governance.Core/MeAndAI.Operations.Governance.Core.csproj" />
     <ProjectReference Include="../MeAndAI.Operations.Infrastructure/MeAndAI.Operations.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MeAndAIGovernancePolicySourceCommit)' != ''">
+    <AssemblyMetadata Include="MeAndAI.Governance.PolicySourceCommit"
+                      Value="$(MeAndAIGovernancePolicySourceCommit)" />
   </ItemGroup>
 </Project>

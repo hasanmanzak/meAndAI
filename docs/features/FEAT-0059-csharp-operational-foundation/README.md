@@ -5,9 +5,11 @@
 | Classification | Feature |
 | Status | Complete |
 | Target version | 0.16.0 |
-| Issue | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) |
-| Pull request | Draft [#159](https://github.com/hasanmanzak/meAndAI/pull/159) |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) and [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md) |
+| Support extension target | 0.17.0 |
+| Support extension status | [SUBF-0141](#subf-0141) complete at five of five gates (100%) on [hosted run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248); declared-slice ledger four of four (100%) |
+| Issue | Original release [#154](https://github.com/hasanmanzak/meAndAI/issues/154); support extension [#162](https://github.com/hasanmanzak/meAndAI/issues/162) |
+| Pull request | Merged [#159](https://github.com/hasanmanzak/meAndAI/pull/159); current draft [#160](https://github.com/hasanmanzak/meAndAI/pull/160) |
+| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), [DEC-0019](../../decisions/DEC-0019-hosted-runner-efficiency.md), and [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md) |
 | Tests | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
 
 ## Problem
@@ -30,6 +32,8 @@ independently.
 - Per-application ZIP identity and one release manifest with source commit,
   target framework, entry assembly, schema compatibility, and SHA-256.
 - Runtime preflight contract for hosted and local execution.
+- One Infrastructure-owned streaming, binary-safe, bounded child-process
+  kernel reused by Packaging and later operational adapters.
 
 ## Non-goals
 
@@ -37,6 +41,9 @@ independently.
 - Native AOT, self-contained, single-file, ReadyToRun, RID-specific assets, or
   a unified all-capable executable.
 - Moving production authority from PowerShell in this feature.
+- Git acquisition, profile resolution, governance-rule semantics, a new public
+  process API, a new package/application, or a platform-specific containment
+  runtime in the [SUBF-0141](#subf-0141) support extension.
 
 ## Runtime and build contract
 
@@ -199,6 +206,67 @@ Windows and Linux hosts:
   operational behavior, and transfers no authority. PowerShell remains the
   production and compatibility authority.
 
+## [SUBF-0141](#subf-0141) shared bounded child-process kernel and Packaging adoption
+
+The later `0.17.0` support extension moves and generalizes the repository's
+sole C# child-process implementation without changing the immutable `v0.16.0`
+application or package identities:
+
+- `MeAndAI.Operations.Infrastructure` owns one internal validated request,
+  result, and asynchronous runner family. No general-purpose process API is
+  public, and Packaging retains no runner or forwarding wrapper.
+- A request defensively copies the executable, ordered discrete arguments,
+  absolute working directory, optional exact stdin bytes, positive timeout,
+  positive stdout/stderr byte limits, and exact child-environment set/remove
+  overrides. Environment names are non-empty, contain neither `=` nor NUL,
+  and are duplicate-free under ordinal-ignore-case comparison on every host;
+  values may be null to remove, empty to preserve an empty value, or exact
+  non-NUL text to set. The parent process environment is never mutated.
+- Invocation is shell-free with `UseShellExecute=false`, `ArgumentList`, and
+  all three standard streams redirected. Stdin write/close, stdout drain,
+  stderr drain, and parent-exit observation start concurrently after a
+  successful process start.
+- Stdout and stderr remain exact bytes. Each limit is inclusive and enforced
+  while reading: exactly `N` bytes succeeds and the first `N+1` byte fails
+  closed. An overflowed reader discards further bytes while the supervisor
+  terminates and drains, preventing a full pipe from blocking cleanup.
+- One supervisor atomically selects clean completion, caller cancellation,
+  timeout, output overflow, start failure, or transport failure. Clean
+  completion requires stdin closure, parent exit, and EOF on both redirected
+  streams. Nonzero exit is a normal bounded result for the consuming adapter
+  to interpret.
+- Caller cancellation returns only after safe cleanup and preserves the exact
+  caller token. Timeout, overflow, start, transport, and cleanup failure become
+  fixed redacted dependency failures with no executable, argument,
+  environment, credential, working-directory, stdout, stderr, operating-system
+  message, or inner exception disclosure.
+- Failure cleanup attempts BCL whole-tree termination for the active owned
+  process, waits within an internal cleanup grace for parent exit and both
+  redirected EOF boundaries, observes all lifecycle tasks, then disposes the
+  process. BCL tree kill cannot prove termination of a detached descendant
+  after its parent has already exited; no Job Object or Unix process-group
+  guarantee is claimed by this bounded support extension.
+- The existing Architecture.Tests assembly supplies one explicit, inert,
+  test-only child entry point. It exercises binary streams, discrete arguments,
+  environment overrides, stdin, limits, hangs, inherited pipes, and active
+  descendants without adding a project, package, solution node, production
+  policy, or release asset.
+- Packaging consumes the shared runner asynchronously, owns only strict
+  UTF-8/JSON and exit interpretation, retains its existing temporary-state
+  cleanup, and preserves the exact package/manifest contract. The later
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) /
+  [SUBF-0123](../FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  Git adapter reuses this kernel but separately owns Git framing, environment
+  policy, exact-object acquisition, and profile semantics.
+
+The extension changes no PowerShell source, workflow authority, consumer,
+provider operation, credential transport, immutable release, or governance
+rule. Existing [TEST-0191](test-cases.md#test-0191),
+[TEST-0192](test-cases.md#test-0192), and
+[TEST-0193](test-cases.md#test-0193) retain their canonical identities and
+expand only their existing architecture, operational-boundary, and Packaging
+responsibilities; no duplicate scenario identity is introduced.
+
 ## Readiness evidence
 
 - Domain and contracts: [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
@@ -237,6 +305,21 @@ Windows and Linux hosts:
   surface above. Exercise malformed-result rejection, pre- and in-flight
   cancellation, typed dependency failure redaction, capability-marker
   ambiguity, duplicate registration, and read-only mutation denial.
+- [SUBF-0141](#subf-0141) baseline and verification approach: the exact
+  post-[SUBF-0124](../FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
+  predecessor
+  [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+  passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
+  on Ubuntu and Windows. Inventory finds the synchronous Packaging-owned
+  `BoundedProcess` as the only current production C# process owner and five
+  Packaging call sites as its only consumers. Add the Architecture.Tests
+  fixture, behavioral cases, dependency assertion, and single-owner assertion
+  first; the initial compile must fail only because the planned Infrastructure
+  request/result/runner family is absent. Implement only that kernel next so
+  behavior becomes green while duplicate-owner and Packaging-dependency
+  assertions remain intentionally red. Finally migrate every Packaging call
+  site directly, add the Infrastructure project reference, and delete the old
+  runner before the full green gate.
 
 ## Risks
 
@@ -244,6 +327,8 @@ Windows and Linux hosts:
 | --- | --- | --- |
 | `RISK-0286` <a name="risk-0286"></a> | Shared abstractions encode speculative or duplicated domain rules. | Feature owner / introduce only contracts required by the first vertical consumer and review dependency direction. |
 | `RISK-0287` <a name="risk-0287"></a> | Portable artifacts depend on an unavailable or ambiguous runtime. | Release owner / explicit target, roll-forward, preflight, manifest, and Windows/Linux evidence. |
+| `RISK-0298` <a name="risk-0298"></a> | Cancellation, timeout, or output overflow leaves an active owned descendant, blocked pipe, or unobserved lifecycle task. | Infrastructure owner / one terminal-state supervisor, concurrent byte drains, active-tree kill, bounded parent/EOF cleanup, and project-neutral child-process evidence. |
+| `RISK-0299` <a name="risk-0299"></a> | The shared kernel gains Git/Packaging policy, a second runner survives, or process diagnostics disclose sensitive request/output state. | Architecture owner / one Infrastructure process owner, domain interpretation only in adapters, exact source-ownership assertions, fixed redacted dependency failures, and fresh-diff duplication review. |
 
 ## Hosted blocker findings
 
@@ -260,9 +345,10 @@ Windows and Linux hosts:
 
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | All three subfeatures passing locally and on required Ubuntu/Windows hosts | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), [TEST-0193](test-cases.md#test-0193) |
-| Baseline run | Complete for first slice | Exact v0.15.6 predecessor, absent C# source graph, and local .NET inventory recorded above |
+| Scenarios | Original scope passing; existing identities extended for [SUBF-0141](#subf-0141) with no new scenario identity | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
+| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) expected-red, local implementation, exact-tree, local exact-package, and hosted same-byte evidence complete | Exact local and hosted evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
+| Baseline run | Original release complete; support-extension predecessor exact hosted green | Exact [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3) / [run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869) |
+| Support-extension run | Implementation run-time PR head and tested merge commit resolve to the same Git tree; Ubuntu-built bytes execute unchanged on Windows | Exact [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561) / [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248) |
 
 ## Decomposition and subfeature gates
 
@@ -271,6 +357,7 @@ Windows and Linux hosts:
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red, 17 of 17 focused and 48 of 48 combined local tests, then exact same-byte [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611) execution | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate/exact-tree StructureOnly passed in 211.2 / 208.8 seconds; zero unresolved `Blocking` findings | Complete |
+| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red, controlled duplicate-owner red, 79/79 targeted and 234/234 full solution green; exact local checkpoint [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193); hosted implementation head [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561) and hosted [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423) same-byte execution green | Three independent fresh reviews and bounded re-reviews closed process lifecycle, cleanup, cancellation, direct-consumer, parser/decoder single-owner, and test-fixture findings; zero remaining P0/P1/P2 | Complete |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
 
@@ -346,8 +433,12 @@ Progress is measured against five independently observable delivery gates:
    complete.
 
 The 2026-07-28 closure is therefore five of five gates, or 100% of
-[SUBF-0121](#subf-0121). Across all three slices, all 15 delivery gates are
-closed and feature implementation is three of three subfeatures, or 100%.
+[SUBF-0121](#subf-0121). Across the three then-declared `v0.16.0` slices, all
+15 delivery gates are closed and feature implementation at that dated
+checkpoint was three of three subfeatures, or 100%. The later
+[SUBF-0141](#subf-0141) support extension does not rewrite that immutable
+release fact. Its later closure makes current feature progress four of four
+subfeatures, or 100%.
 
 Local implementation evidence is 17 of 17 focused [TEST-0193](test-cases.md#test-0193)
 cases in 419 ms and 48 of 48 combined C# cases in 523 ms of test-process time.
@@ -397,10 +488,66 @@ Windows in 2.4 seconds.
 | Ubuntu | 48/48 in 599 ms | build, execute, upload in 9 s | PowerShell 7 in 9 min 00 s | 9 min 39 s |
 | Windows | 48/48 in 690 ms | download and execute in 3 s | PowerShell 5.1 in 29 min 55 s | 31 min 23 s |
 
+## [SUBF-0141](#subf-0141) development checkpoint
+
+Progress is measured against five independently observable delivery gates:
+
+1. Definition of Ready, exact predecessor, and explicit continuation
+   authorization: complete.
+2. Tests-first missing Infrastructure contract failure: complete; the focused
+   Release compile failed only with `CS0246` for the absent
+   `BoundedProcessRequest` contract in 11.1 seconds, with no entrypoint,
+   restore, lock, warning, or unrelated compiler failure.
+3. Shared kernel behavior green with intentional duplicate-owner red, then
+   direct Packaging adoption and complete focused green: complete. Exact local
+   implementation commit
+   [`389ebf70699ccf55788838772811af14f6cab2f6`](https://github.com/hasanmanzak/meAndAI/commit/389ebf70699ccf55788838772811af14f6cab2f6)
+   removes the old runner, keeps the shared family internal, and passes 79 of
+   79 targeted and 234 of 234 full-solution tests.
+4. Local fresh-diff review, locked restore, zero-warning build,
+   analyzer/format verification, package verification, and candidate-tree
+   protocol validation: complete. Three independent reviews and their
+   bounded re-reviews have no remaining P0/P1/P2; locked restore, a 0-warning /
+   0-error Release build, changed-file analyzer/format verification, 33
+   Packaging cases, and candidate-tree StructureOnly in 186.5 seconds pass.
+5. Exact committed-tree validation, same-byte Ubuntu/Windows package handoff,
+   remote evidence, and final hosted confirmation: complete. Exact local
+   checkpoint
+   [`537776966c3f3ac31c4271378456b1073c2dd193`](https://github.com/hasanmanzak/meAndAI/commit/537776966c3f3ac31c4271378456b1073c2dd193)
+   passed committed-tree StructureOnly in 192.6 seconds, canonical package
+   construction in 15.9 seconds, and local Windows execute verification in
+   2.7 seconds. Hosted implementation head
+   [`bf62e7969977819438cfd873a7a20a41243a5561`](https://github.com/hasanmanzak/meAndAI/commit/bf62e7969977819438cfd873a7a20a41243a5561)
+   and tested merge commit
+   [`ae6cc95475f4514fb9e66b42f480acf7170b8083`](https://github.com/hasanmanzak/meAndAI/commit/ae6cc95475f4514fb9e66b42f480acf7170b8083)
+   resolve to the same exact Git tree. Hosted
+   [run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248)
+   built and executed the manifest-bound set on Ubuntu, transferred the same
+   artifact bytes to Windows, and verified and executed all three applications
+   there.
+
+The closure is five of five gates, or 100%, for
+[SUBF-0141](#subf-0141). The original three `v0.16.0` subfeatures remain fully
+closed; current feature progress is four of four subfeatures, or 100%.
+[Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710360)
+completed in 14 min 17 s and
+[Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248/job/90536710423)
+in 30 min 53 s, including 29 min 31 s in the retained Windows PowerShell 5.1
+route. These values are observations, not thresholds. Intermediate expected-
+red, kernel-only, and fully green migration commits were consolidated into one
+implementation hosted run rather than separate long Windows runs.
+
 ## Decisions and relationships
 
 - Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
-- Dependencies: no new feature dependency; existing immutable release contracts are prior authority.
+- Original `v0.16.0` dependencies: no new feature dependency; existing
+  immutable release contracts are prior authority.
+- Support-extension consumer:
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) /
+  [SUBF-0123](../FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  now has its [SUBF-0141](#subf-0141) process prerequisite complete but retains
+  its independent seven-slice denominator and exact-profile decision gate.
+- Bounded reuse boundary: [DEC-0034](../../decisions/DEC-0034-bounded-reusable-governance-catalog.md)
 
 ## Definition of Ready
 
@@ -485,22 +632,83 @@ Windows in 2.4 seconds.
   from the maintainer through the sequential-continuation directive on
   2026-07-28.
 
+### [SUBF-0141](#subf-0141) gate
+
+- [x] Stable monotonic identity, canonical feature ownership, linked
+  [issue #162](https://github.com/hasanmanzak/meAndAI/issues/162), and
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) /
+  [SUBF-0123](../FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
+  external-prerequisite relationship are fixed. Historical identity gaps are
+  not reused and no eighth
+  [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) subfeature is
+  declared.
+- [x] Historical/current arithmetic is fixed: the original immutable
+  `v0.16.0` delivery remains three of three; closing the later support
+  extension makes [FEAT-0059](#feat-0059---shared-c-operational-foundation-and-portable-release-contract)
+  four of four (100%); [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md)
+  remains four of seven (57.1%).
+- [x] Problem, accepted outcome, scope, non-goals, consumers, internal/public
+  surface, PowerShell authority, and platform-containment limits are recorded
+  above.
+- [x] The current Packaging-owned synchronous runner and all five current C#
+  process call sites are inventoried. One move-and-remove strategy is fixed:
+  Infrastructure becomes the sole production process owner; Packaging adopts
+  it directly and retains no implementation or forwarding wrapper.
+- [x] Defensive request/result copies, shell-free discrete arguments, exact
+  environment set/empty/remove semantics, binary stdin/stdout/stderr,
+  inclusive streaming limits, nonzero-exit behavior, single terminal-state
+  supervision, caller cancellation, timeout, active-tree kill, parent/EOF
+  cleanup, disposal, and fixed diagnostic redaction are fixed above.
+- [x] Existing [TEST-0191](test-cases.md#test-0191),
+  [TEST-0192](test-cases.md#test-0192), and
+  [TEST-0193](test-cases.md#test-0193) retain ownership of the architecture,
+  process-boundary, and Packaging adoption behaviors. No new TEST identity or
+  scenario-owner entry is required.
+- [x] The existing Architecture.Tests executable-DLL fixture topology is
+  fixed as test-only: explicit inert entry point, no new project/solution node,
+  no production policy, and no release/package inventory entry.
+- [x] Active-tree, detached-descendant, inherited-pipe, two-way backpressure,
+  output growth, decoding, cleanup-race, environment-isolation, and diagnostic-
+  disclosure risks are recorded in [RISK-0298](#risk-0298) and
+  [RISK-0299](#risk-0299).
+- [x] Exact predecessor
+  [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
+  passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869):
+  Ubuntu in 13 min 05 s and Windows in 33 min 19 s, including the 31 min 47 s
+  Windows PowerShell 5.1 full route and same-byte package handoff.
+- [x] Verification order is fixed: compile-only missing-contract red; shared
+  kernel behavior green with intentional duplicate-owner/dependency red;
+  direct Packaging adoption and old-runner deletion; focused/full green;
+  fresh review; exact-tree and one hosted closure run.
+- [x] Explicit [SUBF-0141](#subf-0141) implementation authorization is the
+  maintainer's 2026-07-29 directive to continue sequentially without further
+  input until a genuine decision boundary or quota limit.
+
 ## Acceptance criteria
 
 1. One solution builds shared components without allowing domain dependencies on infrastructure or CLI projects.
 2. Governance, adoption, and update entry applications can receive different capability sets without duplicating canonical domain policy.
 3. One portable ZIP per application runs unchanged on declared Windows and Linux hosts through `dotnet`.
 4. The immutable manifest binds source, entry assembly, framework, schema compatibility, asset name, and digest.
+5. Infrastructure owns the only production child-process implementation;
+   Packaging and later Git/repository adapters reuse it without duplicating
+   process lifecycle, streaming, cancellation, cleanup, or redaction logic.
 
 ## Definition of Done
 
-[SUBF-0119](#subf-0119), [SUBF-0120](#subf-0120), and [SUBF-0121](#subf-0121)
-DoD are complete: scoped acceptance criteria, tests-first evidence, local and
-hosted tests, exact same-byte package execution, fresh-download verification,
-fresh-diff review, exact-tree validation, documentation, links, and project
-memory are current, with no unresolved `Blocking` finding. Feature-level DoD is
-complete. Feature-level DoD alone does not authorize merge, consumer mutation,
-authority transfer, release publication, or PowerShell retirement. The
-maintainer separately authorized only protected merge and immutable `v0.16.0`
-release closure on 2026-07-28; all consumer, authority-transfer, behavior, and
-retirement boundaries remain unchanged.
+The original `v0.16.0` Definition of Done for
+[SUBF-0119](#subf-0119), [SUBF-0120](#subf-0120), and
+[SUBF-0121](#subf-0121) remains complete and immutable: scoped acceptance
+criteria, tests-first evidence, local and hosted tests, exact same-byte package
+execution, fresh-download verification, fresh-diff review, exact-tree
+validation, documentation, links, and project memory were complete with no
+unresolved `Blocking` finding.
+
+The immutable `v0.16.0` feature-level Definition of Done remains closed. The
+separate [SUBF-0141](#subf-0141) support-extension Definition of Done is also
+complete: its tests-first, shared-kernel, Packaging-adoption, fresh-review,
+exact-tree, hosted Windows/Linux, documentation, link, and memory evidence is
+complete with no unresolved `Blocking` finding. Neither the original nor
+support-extension DoD authorizes merge,
+consumer mutation, authority transfer, release publication, workflow cutover,
+or PowerShell retirement; all such boundaries remain separately gated.
