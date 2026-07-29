@@ -34,7 +34,7 @@ public static class OperationalApplicationHost
         {
             standardError.WriteLine(
                 "This foundation shell accepts only --describe-contract.");
-            return 64;
+            return (int)OperationalApplicationHostExitCode.UsageRejected;
         }
 
         var descriptor = new OperationalApplicationContractDescriptor(
@@ -42,7 +42,7 @@ public static class OperationalApplicationHost
             ContractSchemaVersion);
         standardOutput.WriteLine(
             JsonSerializer.Serialize(descriptor, SerializerOptions));
-        return 0;
+        return (int)OperationalApplicationHostExitCode.Success;
     }
 
     private sealed record OperationalApplicationContractDescriptor(

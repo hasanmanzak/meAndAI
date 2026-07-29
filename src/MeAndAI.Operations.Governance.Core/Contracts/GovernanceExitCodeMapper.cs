@@ -3,16 +3,20 @@ using MeAndAI.Operations.Domain.Results;
 
 namespace MeAndAI.Operations.Governance.Core.Contracts;
 
+internal enum GovernanceProcessExitCode : int
+{
+    Conforming = 0,
+    Nonconforming = 1,
+    Incomplete = 2,
+    Rejected = 64,
+    Failed = 70,
+    Canceled = 130,
+}
+
 internal static class GovernanceExitCodeMapper
 {
-    internal const int Conforming = 0;
-    internal const int Nonconforming = 1;
-    internal const int Incomplete = 2;
-    internal const int Rejected = 64;
-    internal const int Failed = 70;
-    internal const int Canceled = 130;
-
-    internal static int Map(OperationResult<GovernanceReport> result)
+    internal static GovernanceProcessExitCode Map(
+        OperationResult<GovernanceReport> result)
     {
         ArgumentNullException.ThrowIfNull(result);
 
@@ -22,28 +26,28 @@ internal static class GovernanceExitCodeMapper
                 ?? throw new InvalidOperationException(
                     "A successful governance operation requires a report.");
             return report.Verdict == GovernanceVerdict.Conforming
-                ? Conforming
+                ? GovernanceProcessExitCode.Conforming
                 : report.Verdict == GovernanceVerdict.Nonconforming
-                    ? Nonconforming
+                    ? GovernanceProcessExitCode.Nonconforming
                     : report.Verdict == GovernanceVerdict.Incomplete
-                        ? Incomplete
+                        ? GovernanceProcessExitCode.Incomplete
                         : throw new InvalidOperationException(
                             "The governance report contains an unknown verdict.");
         }
 
         if (result.Outcome == OperationOutcome.Rejected)
         {
-            return Rejected;
+            return GovernanceProcessExitCode.Rejected;
         }
 
         if (result.Outcome == OperationOutcome.Failed)
         {
-            return Failed;
+            return GovernanceProcessExitCode.Failed;
         }
 
         if (result.Outcome == OperationOutcome.Canceled)
         {
-            return Canceled;
+            return GovernanceProcessExitCode.Canceled;
         }
 
         throw new InvalidOperationException(

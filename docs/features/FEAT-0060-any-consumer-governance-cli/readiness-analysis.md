@@ -19,8 +19,10 @@ owned by
 [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
 is complete on [hosted run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248).
 The next dependency-coherent gate is [SUBF-0123](README.md#subf-0123);
-[TEST-0208](test-cases.md#test-0208) remains
-`Planned` until its exact profile evidence is frozen and implemented atomically.
+[TEST-0208](test-cases.md#test-0208) remains `Planned` while its authority and
+consumer implementations may be developed and reviewed in stages. Formal
+scenario ownership, traits, and hosted-filter activation occur atomically only
+after both variants are green.
 
 This record freezes the current evidence boundary. The historical first-slice
 authorization was extended only to the bounded reusable MVP under
@@ -253,6 +255,64 @@ interpretation without a second process runner. Timeout, output-cap, and
 cleanup-grace values remain internal operational policy rather than public
 protocol guarantees.
 
+### Approved production binding and exact profile proof
+
+The maintainer approved this packet on 2026-07-29. `policySourceCommit` is not
+a public request or CLI value. The packaging command has already proved one
+clean exact source HEAD; only for the canonical inventory application identity
+`governance`, it passes that exact commit as a fixed MSBuild property. The
+governance project emits one internal assembly-metadata value, and the runtime
+composition requires exactly one value and parses it through the existing
+Domain-owned `ExactGitCommitId`. Adoption and consumer-update assemblies receive
+no such binding. No environment value, descriptor file, archive/runtime path,
+current working directory, runtime `HEAD`, tag, range, ref, or network result
+can supply or replace policy identity.
+
+The assembly binding supplies only the expected `ExactGitCommitId` policy
+commit. Existing `BoundedGovernanceContract.Version` remains the sole bounded
+version owner; each profile independently proves its exact `VERSION` bytes from
+Git objects. Full `EnginePolicyBundleIdentity`, archive digest, and release
+provenance remain deferred to [SUBF-0137](README.md#subf-0137):
+
+- `protocol-authority` first acquires the exact subject commit and catalog
+  snapshot. Subject and compiled policy commit must be equal. Root `VERSION`
+  must be one regular blob in that exact tree and its bounded exact bytes must
+  equal the canonical typed-version bytes. The same exact subject tree must not
+  contain reserved consumer-pin evidence.
+- `consumer` first acquires the exact superproject subject, which must differ
+  from the policy commit. That exact tree must contain one canonical
+  `.ai/protocol` `160000` gitlink equal to the policy commit and one canonical
+  `.gitmodules` mapping. The only allowed object provider for the normally
+  external submodule commit is the already initialized local Git repository at
+  the fixed `.ai/protocol` path. Git resolves its repository administration;
+  checkout HEAD and filesystem `VERSION` are not evidence. The resolver reads
+  the exact policy commit tree and its regular `VERSION` blob through the same
+  bounded binary-safe process owner. It performs no clone, update, fetch, tag,
+  moving-ref, or other network operation.
+
+Malformed CLI/profile/SHA remains rejected before binding or repository access.
+A missing/duplicate/malformed compiled binding for an otherwise valid exact
+request is a failed runtime composition. Subject-commit absence/wrong type,
+process startup/timeout, malformed Git framing, unsafe boundary, or acquisition
+budget overflow is failed with no report. Once the exact subject snapshot and
+bounded catalog evaluation exist, subject/policy mismatch, missing/conflicting
+authority or pin evidence, absent initialized submodule objects, cleanly missing
+or wrong-type policy object, and missing/noncanonical/mismatched within-limit
+`VERSION` are successful profile-evidence incompleteness and flow through the
+one report factory as verdict `incomplete`. This is not a rule violation and
+does not create a second report envelope.
+
+[SUBF-0123](README.md#subf-0123) and
+[SUBF-0135](README.md#subf-0135) share one formal
+[TEST-0208](test-cases.md#test-0208) identity. The authority implementation may
+be developed and reviewed first, but the scenario remains
+`PlannedDocumentation` and no committed test source may assert its literal ID
+until the consumer variant is also green. Activation then atomically changes
+the declaration to `Passing`, scenario ownership to the existing governance
+`.NET` project, both variants/traits, the hosted-route regression, and both
+workflow filters. Feature progress remains four of seven during staged work and
+becomes six of seven only at this combined closure.
+
 > Historical candidate-analysis input: the following overlay table documents
 > the already implemented internal shadow input and future
 > [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) work. It is
@@ -345,6 +405,14 @@ Conforming, nonconforming, and incomplete results emit only the canonical JSON
 report on stdout and exit `0`, `1`, and `2` respectively. Rejected,
 dependency/internal failure, and cancellation exit `64`, `70`, and `130`,
 emit only fixed redacted diagnostics on stderr, and emit no JSON report. The
+six ABI values are declared once by internal
+`GovernanceProcessExitCode : int`; the mapper and process boundary return enum
+members, and only the public CLI converts once to `int`. Generic operation
+results and verdicts remain exit-code agnostic. The independent
+`--describe-contract` Infrastructure host owns a separate success/usage enum
+and does not reuse governance verdict semantics. The value `32` discussed in
+this policy identity is the instruction-graph depth limit, not a governance
+exit-code member. The
 pure [TEST-0195](test-cases.md#test-0195) contract does not resolve or inject an
 `EnginePolicyBundleIdentity`. Production bundle/provenance resolution and any
 released-engine assertion remain wholly deferred to
@@ -434,10 +502,10 @@ unchanged.
 | ID | Independently testable boundary | Evidence owner | Status |
 | --- | --- | --- | --- |
 | [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Exact-head hosted complete at [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) for [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d); PowerShell authority unchanged |
-| [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
+| [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot, packaging-owned compiled policy binding, and repository-only `protocol-authority` profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus the authority variant of [TEST-0208](test-cases.md#test-0208) | Ready and implementation-active under the approved exact-profile packet; formal TEST activation remains coupled to the consumer variant |
 | [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | Exact hosted complete: focused 25/25 and full solution governance 155/155, architecture 31/31, packaging 17/17 after independent fresh review; locked restore, format, exact-tree PowerShell 7 / Windows PowerShell 5.1 structural runtimes, publish, and published-DLL self-validation green; implementation PR head [`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99) and hosted [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722) merge commit [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04) resolve to the same exact Git tree; Ubuntu and Windows passed. [FIND-0371](README.md#find-0371) closure-record correction head [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3) then passed hosted [run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869). |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
-| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0208](test-cases.md#test-0208) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
+| [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture reusing the same reader/resolver/fixture family | [TEST-0208](test-cases.md#test-0208) / existing [TEST-0195](test-cases.md#test-0195) | Ready; follows the shared authority foundation and closes atomically with [TEST-0208](test-cases.md#test-0208) |
 | External [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141) | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | Existing [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), and [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) | Complete on [hosted run `30439984248`](https://github.com/hasanmanzak/meAndAI/actions/runs/30439984248); excluded from the seven-slice [FEAT-0060](README.md) denominator |
 | External [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Linked [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) prerequisite; excluded from the seven-slice [FEAT-0060](README.md) denominator |
 | [SUBF-0137](README.md#subf-0137) | Immutable portable-package qualification at non-authoritative state | Existing [TEST-0193](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193) plus applicable focused C# tests | Proposed; separate later gate |
@@ -562,9 +630,11 @@ First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138),
 [SUBF-0134](README.md#subf-0134), [SUBF-0122](README.md#subf-0122), and
 [SUBF-0124](README.md#subf-0124) are exact hosted complete, so bounded feature
 closure is four of seven subfeatures (57.1%). Three subfeatures remain
-independently open. The next implementation gate is the
-[SUBF-0123](README.md#subf-0123) exact repository/profile contract after its
-profile semantics are approved. The completed external
+open. The exact repository/profile semantics are now approved, and
+[SUBF-0123](README.md#subf-0123) is implementation-active. Its formal scenario
+activation remains atomic with [SUBF-0135](README.md#subf-0135), so neither
+staged implementation changes the four-of-seven denominator until both
+variants close. The completed external
 [SUBF-0141](../FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
 prerequisite does not alter the seven-slice denominator.
 Later slices retain their own review gates and authorization.

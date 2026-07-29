@@ -35,11 +35,13 @@ public static class GovernanceCli
                 standardError);
         }
 
-        return await GovernanceProcessBoundary.ExecuteAsync(
-            token => ValidateAsync(arguments, token),
-            standardOutput,
-            standardError,
-            cancellationToken).ConfigureAwait(false);
+        var exitCode = await GovernanceProcessBoundary.ExecuteAsync(
+                token => ValidateAsync(arguments, token),
+                standardOutput,
+                standardError,
+                cancellationToken)
+            .ConfigureAwait(false);
+        return (int)exitCode;
     }
 
     private static async ValueTask<OperationResult<GovernanceReport>>

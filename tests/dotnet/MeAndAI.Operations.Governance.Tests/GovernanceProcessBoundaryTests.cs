@@ -13,9 +13,15 @@ public sealed class GovernanceProcessBoundaryTests
         var stage = OperationStageId.Validate;
         var cases = new[]
         {
-            (ExitCode: 0, Report: GovernanceReportTestData.ConformingReport()),
-            (ExitCode: 1, Report: GovernanceReportTestData.NonconformingReport()),
-            (ExitCode: 2, Report: GovernanceReportTestData.IncompleteReport()),
+            (
+                ExitCode: GovernanceProcessExitCode.Conforming,
+                Report: GovernanceReportTestData.ConformingReport()),
+            (
+                ExitCode: GovernanceProcessExitCode.Nonconforming,
+                Report: GovernanceReportTestData.NonconformingReport()),
+            (
+                ExitCode: GovernanceProcessExitCode.Incomplete,
+                Report: GovernanceReportTestData.IncompleteReport()),
         };
 
         foreach (var item in cases)
@@ -50,25 +56,25 @@ public sealed class GovernanceProcessBoundaryTests
         var cases = new[]
         {
             (
-                ExitCode: 64,
+                ExitCode: GovernanceProcessExitCode.Rejected,
                 Diagnostic: "Governance validation rejected.\n",
                 Result: OperationResult<GovernanceReport>.Rejected(
                     stage,
                     OperationFailureCode.MalformedInput)),
             (
-                ExitCode: 64,
+                ExitCode: GovernanceProcessExitCode.Rejected,
                 Diagnostic: "Governance validation rejected.\n",
                 Result: OperationResult<GovernanceReport>.Rejected(
                     stage,
                     OperationFailureCode.CapabilityDenied)),
             (
-                ExitCode: 70,
+                ExitCode: GovernanceProcessExitCode.Failed,
                 Diagnostic: "Governance validation failed.\n",
                 Result: OperationResult<GovernanceReport>.Failed(
                     stage,
                     OperationFailureCode.DependencyFailed)),
             (
-                ExitCode: 130,
+                ExitCode: GovernanceProcessExitCode.Canceled,
                 Diagnostic: "Governance validation canceled.\n",
                 Result: OperationResult<GovernanceReport>.Canceled(stage)),
         };
@@ -108,7 +114,7 @@ public sealed class GovernanceProcessBoundaryTests
             CancellationToken.None);
 
         var diagnostic = NormalizeNewline(error.ToString());
-        Assert.Equal(70, exitCode);
+        Assert.Equal(GovernanceProcessExitCode.Failed, exitCode);
         Assert.Equal(string.Empty, output.ToString());
         Assert.Equal("Governance validation failed.\n", diagnostic);
         Assert.DoesNotContain(secret, diagnostic, StringComparison.Ordinal);
@@ -134,7 +140,7 @@ public sealed class GovernanceProcessBoundaryTests
             error,
             cancellation.Token);
 
-        Assert.Equal(130, exitCode);
+        Assert.Equal(GovernanceProcessExitCode.Canceled, exitCode);
         Assert.Equal(string.Empty, output.ToString());
         Assert.Equal(
             "Governance validation canceled.\n",
@@ -165,7 +171,7 @@ public sealed class GovernanceProcessBoundaryTests
             cancellation.Token);
 
         Assert.False(invoked);
-        Assert.Equal(130, exitCode);
+        Assert.Equal(GovernanceProcessExitCode.Canceled, exitCode);
         Assert.Equal(string.Empty, output.ToString());
         Assert.Equal(
             "Governance validation canceled.\n",
@@ -193,7 +199,7 @@ public sealed class GovernanceProcessBoundaryTests
             error,
             cancellation.Token);
 
-        Assert.Equal(130, exitCode);
+        Assert.Equal(GovernanceProcessExitCode.Canceled, exitCode);
         Assert.Equal(string.Empty, output.ToString());
         Assert.Equal(
             "Governance validation canceled.\n",

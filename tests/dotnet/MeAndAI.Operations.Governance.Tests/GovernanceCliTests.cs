@@ -1,4 +1,5 @@
 using System.Text.Json;
+using MeAndAI.Operations.Governance.Core.Contracts;
 
 namespace MeAndAI.Operations.Governance.Tests;
 
@@ -17,7 +18,9 @@ public sealed class GovernanceCliTests
         var first = await InvokeAsync(fixture.Root);
         var second = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(0, first.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Conforming,
+            first.ExitCode);
         Assert.Equal(string.Empty, first.StandardError);
         Assert.Equal(first.StandardOutput, second.StandardOutput);
 
@@ -61,7 +64,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(1, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Nonconforming,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardError);
         using var report = JsonDocument.Parse(result.StandardOutput);
         Assert.Equal(
@@ -82,7 +87,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(1, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Nonconforming,
+            result.ExitCode);
         using var report = JsonDocument.Parse(result.StandardOutput);
         var finding = Assert.Single(
             report.RootElement.GetProperty("findings").EnumerateArray());
@@ -126,7 +133,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Conforming,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardError);
         using var report = JsonDocument.Parse(result.StandardOutput);
         Assert.Equal(
@@ -162,7 +171,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(1, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Nonconforming,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardError);
         using var report = JsonDocument.Parse(result.StandardOutput);
         var finding = Assert.Single(
@@ -196,7 +207,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Conforming,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardError);
         using var report = JsonDocument.Parse(result.StandardOutput);
         Assert.Equal(
@@ -217,7 +230,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(fixture.Root);
 
-        Assert.Equal(70, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Failed,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation failed.\n",
@@ -264,7 +279,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(repository);
 
-        Assert.Equal(70, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Failed,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation failed.\n",
@@ -291,7 +308,9 @@ public sealed class GovernanceCliTests
             "does-not-need-to-exist",
             profile: "automatic");
 
-        Assert.Equal(64, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Rejected,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation rejected.\n",
@@ -306,7 +325,9 @@ public sealed class GovernanceCliTests
             "does-not-need-to-exist",
             profile: "consumer");
 
-        Assert.Equal(64, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Rejected,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation rejected.\n",
@@ -322,7 +343,9 @@ public sealed class GovernanceCliTests
 
         var result = await InvokeAsync(missingPath);
 
-        Assert.Equal(70, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Failed,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation failed.\n",
@@ -339,7 +362,9 @@ public sealed class GovernanceCliTests
             ".",
             cancellationToken: cancellation.Token);
 
-        Assert.Equal(130, result.ExitCode);
+        Assert.Equal(
+            (int)GovernanceProcessExitCode.Canceled,
+            result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
             "Governance validation canceled.\n",

@@ -20,45 +20,54 @@ public sealed class GovernanceExitCodeMapperTests
         var nonconforming = GovernanceReportTestData.NonconformingReport();
 
         Assert.Equal(
-            0,
+            GovernanceProcessExitCode.Conforming,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Succeeded(
                     stage,
                     conforming)));
         Assert.Equal(
-            1,
+            GovernanceProcessExitCode.Nonconforming,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Succeeded(
                     stage,
                     nonconforming)));
         Assert.Equal(
-            2,
+            GovernanceProcessExitCode.Incomplete,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Succeeded(
                     stage,
                     incomplete)));
         Assert.Equal(
-            64,
+            GovernanceProcessExitCode.Rejected,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Rejected(
                     stage,
                     OperationFailureCode.MalformedInput)));
         Assert.Equal(
-            64,
+            GovernanceProcessExitCode.Rejected,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Rejected(
                     stage,
                     OperationFailureCode.CapabilityDenied)));
         Assert.Equal(
-            70,
+            GovernanceProcessExitCode.Failed,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Failed(
                     stage,
                     OperationFailureCode.DependencyFailed)));
         Assert.Equal(
-            130,
+            GovernanceProcessExitCode.Canceled,
             GovernanceExitCodeMapper.Map(
                 OperationResult<GovernanceReport>.Canceled(stage)));
     }
 
+    [Fact]
+    [Trait("Scenario", GovernanceScenarios.ReportProcess)]
+    public void ProcessExitAbiHasOneExactTypedValueSet()
+    {
+        Assert.Equal(
+            [0, 1, 2, 64, 70, 130],
+            Enum.GetValues<GovernanceProcessExitCode>()
+                .Select(value => (int)value));
+    }
 }

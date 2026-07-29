@@ -365,3 +365,45 @@ three-of-three release evidence remains unchanged. The external prerequisite
 does not change [FEAT-0060](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md),
 which remains four of seven (57.1%). PowerShell, workflows, consumers,
 released assets, and operational authority are unchanged.
+
+## [SUBF-0123](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123) exact-profile contract approval
+
+The maintainer approved the exact-profile packet and requested semantic exit
+codes on 2026-07-29. Packaging owns `policySourceCommit` as governance-only
+compile-time assembly metadata derived from its already validated clean exact
+HEAD. It is not a CLI argument, environment value, descriptor, runtime path,
+ref, or network result. The production resolver requires exactly one value and
+reuses the Domain `ExactGitCommitId` parser.
+
+Both profiles prove canonical `VERSION` bytes from exact Git objects. The
+authority profile requires subject/policy commit equality, root exact-commit
+`VERSION`, and no consumer pin. The consumer profile requires a distinct
+subject, canonical `.ai/protocol` gitlink and `.gitmodules`, then uses only the
+pre-initialized fixed `.ai/protocol` local Git repository as an object provider
+for the exact policy commit and its `VERSION`; worktree bytes, checkout HEAD,
+clone/fetch/update, tags, and moving refs are not evidence.
+
+Malformed public input is rejected; unsafe or failed acquisition has no report;
+and missing/mismatched authority, pin, initialized policy object, or within-
+limit `VERSION` evidence becomes the one canonical `incomplete` report after an
+exact subject snapshot exists. Exit ABI values remain exactly
+`0/1/2/64/70/130`, now owned by one typed governance enum and converted to
+`int` only at the public process boundary. The independent contract-description
+host owns a separate success/usage enum. The value `32` discussed in the policy
+identity is an instruction-graph depth limit, not a governance exit-code member.
+
+[TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
+remains `PlannedDocumentation` while authority and consumer variants are
+developed. Its eventual declaration, scenario ownership, both test variants,
+hosted-route assertion, and both workflow filters must activate atomically.
+PowerShell authority, workflows, consumers, package manifest schema, release
+assets, and the four-of-seven feature denominator remain unchanged at this
+records checkpoint.
+
+The typed exit refinement's expected-red failed only with `CS0103` / `CS0246`
+for the intentionally absent enum. Focused [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+then passed 26/26. The separate contract-host enum expected-red failed only
+with `CS0246` and then passed 1/1. The full solution passed Governance 156/156,
+Packaging 33/33, and Architecture 47/47; format verification and `git diff --check`
+passed. Exact committed-tree and hosted evidence remain pending for the later
+coherent implementation checkpoint.

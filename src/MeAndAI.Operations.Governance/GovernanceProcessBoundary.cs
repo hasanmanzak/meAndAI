@@ -12,7 +12,7 @@ internal static class GovernanceProcessBoundary
     private const string CanceledDiagnostic =
         "Governance validation canceled.";
 
-    internal static async Task<int> ExecuteAsync(
+    internal static async Task<GovernanceProcessExitCode> ExecuteAsync(
         Func<CancellationToken, ValueTask<OperationResult<GovernanceReport>>>
             operation,
         TextWriter standardOutput,
@@ -53,13 +53,13 @@ internal static class GovernanceProcessBoundary
         {
             await standardError.WriteLineAsync(CanceledDiagnostic)
                 .ConfigureAwait(false);
-            return GovernanceExitCodeMapper.Canceled;
+            return GovernanceProcessExitCode.Canceled;
         }
         catch (Exception)
         {
             await standardError.WriteLineAsync(FailedDiagnostic)
                 .ConfigureAwait(false);
-            return GovernanceExitCodeMapper.Failed;
+            return GovernanceProcessExitCode.Failed;
         }
     }
 

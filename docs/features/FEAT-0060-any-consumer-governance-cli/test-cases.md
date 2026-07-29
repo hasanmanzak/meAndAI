@@ -36,7 +36,7 @@ verified, and exact-head hosted on Ubuntu and Windows.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122) | Construct the closed, versioned governance profile, exact-commit request, policy/catalog, application-policy-pair, evidence-scope, engine-state, and authority-state identities without reading a repository. | Every lexical identity and cross-identity invariant is exact and fail closed; the caller selects one declared profile and exact commit but cannot inject rules, catalog metadata, enforcement, engine state, or authority. Invalid casing, length, schema, digest, release state, commit, or mismatched application/policy identity is rejected before repository access. | Unit / contract / identity / security | `Distinct`; see the exact sibling tuple below. [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) closed application/stage/capability identities remain owned by [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191). | Passing | `tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj` |
 | `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124) and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Passing | `tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj` |
-| `TEST-0208` <a name="test-0208"></a> | [SUBF-0123](README.md#subf-0123) and [SUBF-0135](README.md#subf-0135) | In fresh anonymous real Git repositories, resolve one closed [TEST-0194](#test-0194) request against an exact commit and verify explicit `protocol-authority` plus canonical `.ai/protocol` gitlink `consumer` profile evidence. | One caller-selected profile, exact 40-character commit, catalog, and application-policy pair are independently verified from canonical repository evidence. Unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, zero/multiple pin, or unsupported repository-reference state fails closed; no named repository, automatic profile, mutation, or authority inference exists. | Git / integration / profile / security | `Distinct`; see the exact sibling tuple below. Canonical byte-source precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171), while [TEST-0194](#test-0194) owns the repository-independent typed request. | Planned | Future .NET integration tests |
+| `TEST-0208` <a name="test-0208"></a> | [SUBF-0123](README.md#subf-0123) and [SUBF-0135](README.md#subf-0135) | In fresh anonymous real Git repositories, resolve one closed [TEST-0194](#test-0194) request against an exact commit and packaging-owned compiled policy binding, then verify explicit `protocol-authority` plus canonical `.ai/protocol` gitlink `consumer` profile evidence. | Both variants use one bounded binary-safe Git reader, resolver, parse-once snapshot, and project-neutral fixture family. Exact subject/policy equality or gitlink pin, canonical `.gitmodules`, and exact `VERSION` blob bytes are independently verified. Missing or mismatched observed profile evidence yields a canonical `incomplete` report and exit `2`; malformed caller input is rejected with `64`; acquisition/process/security failure emits no report and exits `70`; cancellation exits `130`. No named repository, automatic profile, public policy-commit input, network/ref acquisition, candidate overlay, mutation, or authority inference exists. | Git / integration / profile / security | `Distinct`; see the exact sibling tuple below. Canonical byte-source precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171), while [TEST-0194](#test-0194) owns the repository-independent typed request. | Planned | Future .NET integration tests; authority and consumer variants activate atomically |
 
 [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) contribute bounded implementation experience
@@ -76,6 +76,59 @@ called:
 
 Commit existence, Git object type, authority/consumer evidence, and pin
 verification remain exclusively owned by [TEST-0208](#test-0208).
+
+### [TEST-0208](#test-0208) approved implementation and activation contract
+
+The public request continues to contain only the caller-selected profile and
+exact subject commit. Packaging passes its already validated clean exact HEAD
+to the governance publish only, and the governance assembly records that value
+as compile-time metadata. Runtime composition requires exactly one valid
+metadata value and parses it through the existing `ExactGitCommitId` owner.
+There is no `--policy-commit`, environment fallback, runtime descriptor, cwd
+file, ref, range, tag lookup, or network fetch. An ordinary unbound development
+build may still execute `--describe-contract`; a syntactically valid exact
+validation request against that build fails with no report and exit `70`.
+
+The `protocol-authority` variant requires the exact subject commit to equal the
+compiled policy commit, reads root `VERSION` only through that exact commit's
+regular Git blob, compares its canonical bytes with the bounded typed version,
+and rejects conflicting `.ai/protocol` pin evidence as profile-incomplete. The
+`consumer` variant requires a distinct subject, exactly one `160000` canonical
+`.ai/protocol` gitlink equal to the compiled policy commit, and one canonical
+`.gitmodules` mapping. Because the superproject object database does not
+normally contain the submodule commit, the resolver may use only the already
+initialized local Git repository at the fixed `.ai/protocol` integration path
+as an object provider. It does not require or trust checkout HEAD and reads
+`VERSION` from the exact policy commit object, never from worktree bytes.
+
+After a bounded exact subject snapshot exists, absent/uninitialized local
+submodule objects, cleanly missing policy objects, wrong equality/pin/mode,
+noncanonical `.gitmodules`, or missing/noncanonical/mismatched `VERSION` are
+profile evidence gaps and therefore produce the one canonical report with
+`incomplete` and exit `2`. A missing or wrong-type subject commit, malformed Git
+framing, unsafe repository/admin boundary, process failure, timeout, or byte
+limit failure prevents safe acquisition and exits `70` without a report. A
+within-limit but invalid `VERSION` is incomplete; a blob that exceeds the
+acquisition limit is failed.
+
+Formal activation is indivisible. While this row is `Planned`, committed C#
+source contains no `TEST-0208` literal. Only after both profile variants are
+green may one commit change this row to `Passing`, move the scenario from
+`PlannedDocumentation` to the existing governance `DotNetTestProject` owner,
+add the single scenario constant/traits and hosted-route assertion, and extend
+both existing workflow filters. No profile receives an earlier formal TEST
+identity.
+
+The stable exit ABI is owned by one internal `GovernanceProcessExitCode : int`
+enum with semantic members for conforming, nonconforming, incomplete, rejected,
+failed, and canceled. The existing mapper and process boundary return the typed
+value, and the public CLI casts it once to the operating-system `int` boundary.
+Generic domain/result types remain exit-code agnostic. The independent
+`--describe-contract` Infrastructure host uses its own success/usage enum and
+converts it to `int` only at that process boundary; it does not reuse governance
+verdict semantics.
+The exact enum-value set is covered by existing [TEST-0195](#test-0195); `32`
+is an instruction-graph depth limit, not a governance exit code.
 
 ### [TEST-0194](#test-0194) local implementation evidence
 
@@ -191,6 +244,15 @@ Test-first and local verification evidence on 2026-07-29:
   for every other outcome, and converts an unexpected programming failure to
   fixed exit `70` without changing the shared operation boundary. A
   pre-canceled token exits `130` without invoking the operation.
+- The later maintainer-approved typed-ABI refinement first failed only with
+  `CS0103` / `CS0246` for the absent `GovernanceProcessExitCode`. The mapper and
+  process boundary now return semantic enum members, the public CLI performs
+  the single `int` conversion, and one ABI assertion fixes the exact six-value
+  set. Focused [TEST-0195](#test-0195) passed 26/26; the distinct host-enum
+  expected-red failed only with `CS0246` and then passed 1/1. The complete
+  solution passed Governance 156/156, Packaging 33/33, and Architecture 47/47; format
+  verification passed. No workflow, scenario owner, generic descriptor result,
+  PowerShell route, consumer, package, or authority state changed.
 - Focused development checkpoints passed 8/8, 14/14, and 16/16 before atomic
   route activation. Independent fresh review then closed typed identity,
   duplicate-order, evidence-scope, positive location, and cancellation gaps;
