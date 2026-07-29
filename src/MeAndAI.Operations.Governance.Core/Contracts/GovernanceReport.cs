@@ -1,12 +1,46 @@
 using System.Collections.ObjectModel;
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Domain.Identity;
 
 namespace MeAndAI.Operations.Governance.Core.Contracts;
 
-public sealed record GovernanceCounts(
-    int EvaluatedRules,
-    int BlockingFindings,
-    int AdvisoryFindings);
+public sealed record GovernanceCounts
+{
+    public GovernanceCounts(
+        int evaluatedRules,
+        int missingRules,
+        int unmappedRules,
+        int blockingFindings,
+        int advisoryFindings)
+    {
+        if (evaluatedRules < 0 ||
+            missingRules < 0 ||
+            unmappedRules < 0 ||
+            blockingFindings < 0 ||
+            advisoryFindings < 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(evaluatedRules),
+                "Governance counts cannot be negative.");
+        }
+
+        EvaluatedRules = evaluatedRules;
+        MissingRules = missingRules;
+        UnmappedRules = unmappedRules;
+        BlockingFindings = blockingFindings;
+        AdvisoryFindings = advisoryFindings;
+    }
+
+    public int EvaluatedRules { get; }
+
+    public int MissingRules { get; }
+
+    public int UnmappedRules { get; }
+
+    public int BlockingFindings { get; }
+
+    public int AdvisoryFindings { get; }
+}
 
 public sealed class GovernanceReport
 {
@@ -18,6 +52,8 @@ public sealed class GovernanceReport
         string policyCatalogMetadataDigest,
         string[] evaluatedRuleIds,
         GovernanceVerdict verdict,
+        GovernanceEngineState engineState,
+        GovernanceAuthorityState authorityState,
         GovernanceCounts counts,
         GovernanceFinding[] findings)
     {
@@ -28,15 +64,18 @@ public sealed class GovernanceReport
         PolicyCatalogMetadataDigest = policyCatalogMetadataDigest;
         EvaluatedRuleIds = new ReadOnlyCollection<string>(evaluatedRuleIds);
         Verdict = verdict;
+        EngineState = engineState;
+        AuthorityState = authorityState;
         Counts = counts;
         Findings = new ReadOnlyCollection<GovernanceFinding>(findings);
     }
 
     public int Schema => 1;
 
-    public string Application => "governance";
+    public OperationalApplicationId Application =>
+        OperationalApplicationId.Governance;
 
-    public string Stage => "validate";
+    public OperationStageId Stage => OperationStageId.Validate;
 
     public GovernanceProfileId Profile { get; }
 
@@ -54,9 +93,9 @@ public sealed class GovernanceReport
 
     public GovernanceVerdict Verdict { get; }
 
-    public string EngineState => "csharp-shadow";
+    public GovernanceEngineState EngineState { get; }
 
-    public string AuthorityState => "powershell-authority";
+    public GovernanceAuthorityState AuthorityState { get; }
 
     public GovernanceCounts Counts { get; }
 

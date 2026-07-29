@@ -4,7 +4,10 @@ Test implementation: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) are fully complete with exact-head hosted
 evidence. [SUBF-0122](README.md#subf-0122) is also exact-head hosted complete
 under [TEST-0194](#test-0194). Fully closed progress is therefore three of
-seven (42.9%); four bounded subfeatures remain open.
+seven (42.9%). [SUBF-0124](README.md#subf-0124) is locally implementation-
+green under [TEST-0195](#test-0195), making four of seven slices
+implementation-active (57.1%); exact committed-tree and hosted closure remain
+pending for that fourth slice.
 
 ## Authorized bounded clean-room catalog
 
@@ -35,15 +38,16 @@ verified, and exact-head hosted on Ubuntu and Windows.
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0194` <a name="test-0194"></a> | [SUBF-0122](README.md#subf-0122) | Construct the closed, versioned governance profile, exact-commit request, policy/catalog, application-policy-pair, evidence-scope, engine-state, and authority-state identities without reading a repository. | Every lexical identity and cross-identity invariant is exact and fail closed; the caller selects one declared profile and exact commit but cannot inject rules, catalog metadata, enforcement, engine state, or authority. Invalid casing, length, schema, digest, release state, commit, or mismatched application/policy identity is rejected before repository access. | Unit / contract / identity / security | `Distinct`; see the exact sibling tuple below. [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md) closed application/stage/capability identities remain owned by [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191). | Passing | `tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj` |
-| `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124) and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Planned | Future .NET tests |
+| `TEST-0195` <a name="test-0195"></a> | [SUBF-0124](README.md#subf-0124) and [SUBF-0135](README.md#subf-0135) | Serialize conforming, nonconforming, incomplete, rejected, failed, canceled, redacted, reordered, and cross-platform governance outcomes. | One typed report/process contract preserves canonical rule ownership, independent severity/enforcement, deterministic bytes, redaction, and the distinction between execution outcome and governance verdict. Current canonical violations remain blocking, advisory observations do not fail the verdict, caller downgrade is rejected, and missing canonical metadata yields `incomplete`. | Unit / contract / security | `Distinct`; see the exact sibling tuple below. Existing rule semantics retain their canonical `TEST-*` identities. | Passing | `tests/dotnet/MeAndAI.Operations.Governance.Tests/MeAndAI.Operations.Governance.Tests.csproj` |
 | `TEST-0208` <a name="test-0208"></a> | [SUBF-0123](README.md#subf-0123) and [SUBF-0135](README.md#subf-0135) | In fresh anonymous real Git repositories, resolve one closed [TEST-0194](#test-0194) request against an exact commit and verify explicit `protocol-authority` plus canonical `.ai/protocol` gitlink `consumer` profile evidence. | One caller-selected profile, exact 40-character commit, catalog, and application-policy pair are independently verified from canonical repository evidence. Unknown, ambiguous, range-inferred, mismatched, drifting, unsafe, candidate-overlay, zero/multiple pin, or unsupported repository-reference state fails closed; no named repository, automatic profile, mutation, or authority inference exists. | Git / integration / profile / security | `Distinct`; see the exact sibling tuple below. Canonical byte-source precedence remains owned by [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171), while [TEST-0194](#test-0194) owns the repository-independent typed request. | Planned | Future .NET integration tests |
 
 [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) contribute bounded implementation experience
 to the request/report design. [SUBF-0122](README.md#subf-0122) now activates
 and passes repository-independent [TEST-0194](#test-0194) in the governance
-.NET test project. [TEST-0195](#test-0195) and [TEST-0208](#test-0208) remain
-canonical `PlannedDocumentation` scenarios with no active C# source ownership.
+.NET test project. [TEST-0195](#test-0195) now also has executable ownership in
+that one project; [TEST-0208](#test-0208) remains the only local canonical
+`PlannedDocumentation` scenario.
 
 ### [TEST-0194](#test-0194) exact identity matrix
 
@@ -134,10 +138,9 @@ authority. Exact committed-tree and hosted closure are complete for this
 repository-independent contract. Exact Git/profile evidence and package
 qualification remain separate later gates.
 
-### [TEST-0195](#test-0195) frozen implementation boundary
+### [TEST-0195](#test-0195) local implementation evidence
 
-[SUBF-0124](README.md#subf-0124) is the next dependency-coherent slice. Its
-expected-red and implementation must preserve one engine-to-report path:
+[SUBF-0124](README.md#subf-0124) preserves one engine-to-report path:
 
 - one typed report factory and one exit-code mapper serve conforming,
   nonconforming, and incomplete results;
@@ -148,10 +151,12 @@ expected-red and implementation must preserve one engine-to-report path:
 - rejected, dependency/internal failure, and cancellation exits `64`, `70`,
   and `130` emit only fixed redacted stderr and no JSON report;
 - findings retain canonical rule/scenario ownership, severity, enforcement,
-  safe repository-relative location/line/anchor, and content/object evidence
-  digest without snippets, host data, commands, or secrets; and
-- the pure test seam may construct the typed bundle identity, while production
-  manifest/ZIP provenance and any released-engine claim remain owned by
+  safe repository-relative location/line/anchor, and a typed `content-object`
+  or `snapshot` evidence scope plus digest without snippets, host data,
+  commands, or secrets; and
+- engine/authority state remains typed `csharp-shadow` /
+  `powershell-authority`; production manifest/ZIP provenance, bundle
+  resolution, and any released-engine claim remain owned by
   [SUBF-0137](README.md#subf-0137).
 
 Canonical scenario owner is the normative repository-relative
@@ -161,10 +166,54 @@ metadata/digest bytes. Since `0.17.0` is not released, this slice may finalize
 the schema-`1` catalog identity only by atomically updating and rerunning the
 exact [TEST-0194](#test-0194) assertions; a second owner lookup is forbidden.
 
-This scenario remains `PlannedDocumentation` until its coherent executable
-slice is added atomically. Exact Git acquisition and both repository profiles
-remain owned by [TEST-0208](#test-0208), which follows this report/process
-gate.
+Test-first and local verification evidence on 2026-07-29:
+
+- The focused command first failed to compile in 11.2 seconds with `CS0246`
+  because `GovernanceReportFactory` and `GovernanceRuleEvaluation` did not
+  exist.
+- One factory now owns canonical evaluation matching, finding ordering,
+  evaluated/missing/unmapped counts, verdict selection, typed engine/authority
+  state, and construction of the existing report model. The engine only runs
+  rules; the existing serializer remains the sole byte writer.
+- Findings hold the exact catalog identity rather than copied rule/scenario/
+  severity/enforcement scalars. A shared rule helper produces typed safe
+  locations and exact typed `content-object` / `snapshot` evidence digests.
+  Canonical owner is
+  part of the schema-`1` metadata bytes, changing the unreleased catalog digest
+  to `000caecc4c5cd941da8b0ab06386cc1a88c294117f69f685245b6bc29af9fc6f`;
+  the exact [TEST-0194](#test-0194) assertions changed atomically.
+- Changed metadata, missing evaluation, and a finding attached to another rule
+  all yield `incomplete` with explicit missing/unmapped counts; their untrusted
+  findings cannot enter the report. Every member of a duplicate/contradictory
+  evaluation group is also excluded, so input order cannot change findings or
+  report digest. Blocking remains nonconforming and advisory-only ready
+  evaluation remains conforming.
+- One exit mapper owns `0` / `1` / `2` / `64` / `70` / `130`. The governance
+  process boundary emits one canonical JSON report only for succeeded
+  conforming/nonconforming/incomplete results, emits only fixed redacted stderr
+  for every other outcome, and converts an unexpected programming failure to
+  fixed exit `70` without changing the shared operation boundary. A
+  pre-canceled token exits `130` without invoking the operation.
+- Focused development checkpoints passed 8/8, 14/14, and 16/16 before atomic
+  route activation. Independent fresh review then closed typed identity,
+  duplicate-order, evidence-scope, positive location, and cancellation gaps;
+  invalid identity, total-order, and late-cancellation edges; the final focused
+  suite passed 25/25. The full solution passed governance 155/155,
+  architecture 31/31, and packaging 17/17.
+- Locked restore and format verification passed. Candidate PowerShell 7 /
+  Windows PowerShell 5.1 `StructureOnly` passed in 183.2 / 275.4 seconds, with
+  protocol-governance elapsed times of 181.0 / 272.3 seconds.
+- Framework-dependent publish produced no apphost. The published governance
+  DLL validated the real repository at exit `0` with `conforming`, two
+  evaluated rules, zero findings, `bounded-catalog`, `csharp-shadow`, and
+  `powershell-authority`.
+- The same-owner hosted-route regression extends only the two existing C#
+  filters and matches its own exact pipe-delimited token. No job, matrix,
+  PowerShell route, package route, consumer behavior, or authority changes.
+
+Exact committed-tree reruns and hosted closure remain pending. Exact Git
+acquisition and both repository profiles remain owned by
+[TEST-0208](#test-0208), which follows this report/process gate.
 
 ## Distinct-intent review
 
@@ -218,9 +267,10 @@ This is executable evidence for canonical
 and regression evidence for canonical
 [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004)
 through the shared analysis context. Exact committed-tree and hosted closure
-are green for that historical shared-kernel checkpoint. The later
-[SUBF-0122](README.md#subf-0122) slice activates [TEST-0194](#test-0194);
-[TEST-0195](#test-0195) and [TEST-0208](#test-0208) remain `Planned`.
+are green for that historical shared-kernel checkpoint. At that checkpoint,
+the later [SUBF-0122](README.md#subf-0122) slice was to activate
+[TEST-0194](#test-0194), while [TEST-0195](#test-0195) and
+[TEST-0208](#test-0208) still remained `Planned`.
 
 ### [SUBF-0138](README.md#subf-0138) exact-head closure
 

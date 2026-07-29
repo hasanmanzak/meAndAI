@@ -8,10 +8,12 @@ namespace MeAndAI.Operations.Governance.Core.Contracts;
 public sealed class GovernanceEngine
 {
     private readonly GovernanceRuleCatalog catalog;
+    private readonly GovernanceReportFactory reportFactory;
 
     private GovernanceEngine(GovernanceRuleCatalog catalog)
     {
         this.catalog = catalog;
+        reportFactory = new GovernanceReportFactory(catalog);
     }
 
     public static GovernanceEngine CreateDefault() =>
@@ -56,31 +58,15 @@ public sealed class GovernanceEngine
         }
 
         var context = GovernanceAnalysisContext.Create(snapshot);
-        var findings = applicableRules
-            .SelectMany(rule => rule.Evaluate(context))
-            .OrderBy(finding => finding.RelativePath, StringComparer.Ordinal)
-            .ThenBy(finding => finding.Code, StringComparer.Ordinal)
-            .ThenBy(finding => finding.RuleId, StringComparer.Ordinal)
+        var evaluations = applicableRules
+            .Select(rule => new GovernanceRuleEvaluation(
+                rule.Identity,
+                rule.Evaluate(context)))
             .ToArray();
-        var blockingCount = findings.Count(finding =>
-            finding.Enforcement == GovernanceEnforcement.Blocking);
-        var advisoryCount = findings.Length - blockingCount;
-        var verdict = blockingCount == 0
-            ? GovernanceVerdict.Conforming
-            : GovernanceVerdict.Nonconforming;
 
-        return new GovernanceReport(
+        return reportFactory.Create(
             profile,
-            snapshot.Mode,
-            snapshot.EvidenceDigest,
-            catalog.Version.Value,
-            catalog.Identity.MetadataDigest.Value,
-            applicableRules.Select(rule => rule.RuleId).ToArray(),
-            verdict,
-            new GovernanceCounts(
-                applicableRules.Length,
-                blockingCount,
-                advisoryCount),
-            findings);
+            snapshot,
+            evaluations);
     }
 }

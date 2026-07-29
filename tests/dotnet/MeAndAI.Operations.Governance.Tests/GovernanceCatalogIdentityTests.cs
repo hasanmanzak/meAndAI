@@ -10,15 +10,17 @@ public sealed class GovernanceCatalogIdentityTests
     private const string ExpectedMetadata =
         "protocol.decision-record.required-structure.v1\0" +
         "TEST-0005\0" +
+        "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005\0" +
         "governance.decision.record-structure-incomplete\0" +
         "high\0blocking\n" +
         "protocol.feature-record.required-pair.v1\0" +
         "TEST-0004\0" +
+        "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004\0" +
         "governance.feature.record-set-incomplete\0" +
         "high\0blocking\n";
 
     private const string ExpectedDigest =
-        "ff99d63fb1fed8cff276edb5833e0d65ca554367ead998ec2bc365ecc65ce047";
+        "000caecc4c5cd941da8b0ab06386cc1a88c294117f69f685245b6bc29af9fc6f";
 
     [Fact]
     [Trait("Scenario", "TEST-0194")]
@@ -34,12 +36,14 @@ public sealed class GovernanceCatalogIdentityTests
                 (
                     "protocol.decision-record.required-structure.v1",
                     "TEST-0005",
+                    "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005",
                     "governance.decision.record-structure-incomplete",
                     "high",
                     "blocking"),
                 (
                     "protocol.feature-record.required-pair.v1",
                     "TEST-0004",
+                    "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004",
                     "governance.feature.record-set-incomplete",
                     "high",
                     "blocking"),
@@ -48,6 +52,7 @@ public sealed class GovernanceCatalogIdentityTests
                 (
                     rule.RuleId,
                     rule.CanonicalScenarioId,
+                    rule.CanonicalScenarioOwner,
                     rule.FindingCode,
                     rule.Severity.Value,
                     rule.Enforcement.Value)));
@@ -74,6 +79,14 @@ public sealed class GovernanceCatalogIdentityTests
             [
                 exact[0],
                 exact[1] with { CanonicalScenarioId = "TEST-9999" },
+            ],
+            [
+                exact[0],
+                exact[1] with
+                {
+                    CanonicalScenarioOwner =
+                        "docs/features/FEAT-0001-common-development-protocol/test-cases.md#changed",
+                },
             ],
             [
                 exact[0],
@@ -131,12 +144,14 @@ public sealed class GovernanceCatalogIdentityTests
         new(
             "protocol.decision-record.required-structure.v1",
             "TEST-0005",
+            "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005",
             "governance.decision.record-structure-incomplete",
             GovernanceSeverity.High,
             GovernanceEnforcement.Blocking),
         new(
             "protocol.feature-record.required-pair.v1",
             "TEST-0004",
+            "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004",
             "governance.feature.record-set-incomplete",
             GovernanceSeverity.High,
             GovernanceEnforcement.Blocking),

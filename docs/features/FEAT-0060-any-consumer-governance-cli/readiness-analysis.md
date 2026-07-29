@@ -12,10 +12,12 @@ Status: [SUBF-0138](README.md#subf-0138) and
 [SUBF-0134](README.md#subf-0134) bounded clean-room `CSharpShadow` slices are
 exact-head hosted complete. [SUBF-0122](README.md#subf-0122) is also exact-head
 hosted complete under [TEST-0194](test-cases.md#test-0194), closing three of
-seven bounded subfeatures (42.9%). Exact repository/profile, package,
-equivalence, authority, and retirement gates remain open. The next
-dependency-coherent implementation gate is [SUBF-0124](README.md#subf-0124)
-under [TEST-0195](test-cases.md#test-0195).
+seven bounded subfeatures (42.9%). [SUBF-0124](README.md#subf-0124) is locally
+implementation-green under [TEST-0195](test-cases.md#test-0195); its exact-tree
+and hosted closure remain open. Exact repository/profile, package,
+equivalence, authority, and retirement gates also remain open. The next
+dependency-coherent closure gate is the exact evidence for that report/process
+slice, followed by [SUBF-0123](README.md#subf-0123).
 
 This record freezes the current evidence boundary. The historical first-slice
 authorization was extended only to the bounded reusable MVP under
@@ -153,7 +155,7 @@ The engine-owned composition uses the following exact identities:
   analysis indexes rather than create another parser or rule family. The
   catalog owner, not a caller or identity constructor, derives its digest as
   lowercase SHA-256 over UTF-8 without BOM of each ordinally ordered rule's
-  `ruleId NUL canonicalScenarioId NUL findingCode NUL severity NUL enforcement LF`
+  `ruleId NUL canonicalScenarioId NUL canonicalScenarioOwner NUL findingCode NUL severity NUL enforcement LF`
   metadata record. An inventory, metadata, or digest mismatch is rejected.
 - `ProtocolPolicyIdentity`: the bounded engine composition fixes exact policy
   version `0.17.0`, exact policy source commit, the catalog identity, and the
@@ -288,8 +290,10 @@ contains:
 - a report digest over the canonical payload.
 
 Each finding contains stable rule ID, canonical scenario identity and owner,
-finding code, canonical severity, canonical enforcement, repository-relative location, safe
-line/anchor, and content/object digest. It contains no file snippet, provider
+finding code, canonical severity, canonical enforcement, repository-relative
+location, safe line/anchor, and one typed evidence object. Its scope is exactly
+`content-object` for an existing file or `snapshot` for directory/absence
+evidence, and its digest is lowercase SHA-256. It contains no file snippet, provider
 body, exception, command line, stdout/stderr, environment value, absolute
 path, or credential material. The accepted
 [v1 decision packet](contract-decision-packet.md) fixes the severity and
@@ -326,8 +330,8 @@ JSON is one UTF-8-without-BOM object with explicit property order, ordinally
 sorted collections, and one LF terminator. Culture, operating-system path
 separator, elapsed duration, and timestamp cannot change its bytes.
 
-[SUBF-0124](README.md#subf-0124) implements this contract before exact Git and
-consumer-profile integration. One `GovernanceReportFactory` and one
+[SUBF-0124](README.md#subf-0124) locally implements this contract before exact
+Git and consumer-profile integration. One `GovernanceReportFactory` and one
 `GovernanceExitCodeMapper` serve every verdict; no parallel report envelope,
 serializer, or CLI-specific mapping is introduced. `incomplete` remains a
 successful `OperationResult` carrying a report and maps to exit `2`.
@@ -335,11 +339,11 @@ Conforming, nonconforming, and incomplete results emit only the canonical JSON
 report on stdout and exit `0`, `1`, and `2` respectively. Rejected,
 dependency/internal failure, and cancellation exit `64`, `70`, and `130`,
 emit only fixed redacted diagnostics on stderr, and emit no JSON report. The
-pure [TEST-0195](test-cases.md#test-0195) contract may construct a typed
-`EnginePolicyBundleIdentity` test seam; production provenance resolution and
-any released-engine assertion remain deferred to
-[SUBF-0137](README.md#subf-0137). This sequencing prevents report/process
-work from inventing a second package-provenance source.
+pure [TEST-0195](test-cases.md#test-0195) contract does not resolve or inject an
+`EnginePolicyBundleIdentity`. Production bundle/provenance resolution and any
+released-engine assertion remain wholly deferred to
+[SUBF-0137](README.md#subf-0137). This sequencing prevents report/process work
+from inventing a second package-provenance source.
 
 ## Live provider boundary
 
@@ -423,7 +427,7 @@ unchanged.
 | --- | --- | --- | --- |
 | [SUBF-0122](README.md#subf-0122) | Versioned governance policy, profile, request, application-policy-pair, and authority-state identities | [TEST-0194](test-cases.md#test-0194) | Exact-head hosted complete at [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904) for [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d); PowerShell authority unchanged |
 | [SUBF-0123](README.md#subf-0123) | Exact-commit snapshot and repository-only profile-resolution CLI vertical slice | Existing [TEST-0171](../FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171) contract plus [TEST-0208](test-cases.md#test-0208) | In progress; candidate snapshot exists only as an internal first-slice input, while release exact-commit evidence and [TEST-0208](test-cases.md#test-0208) remain `Planned` |
-| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | In progress; bounded internal building blocks through [SUBF-0138](README.md#subf-0138), but [TEST-0195](test-cases.md#test-0195) remains `Planned` |
+| [SUBF-0124](README.md#subf-0124) | Versioned rule catalog, typed finding, deterministic report, and process/exit contract | [TEST-0195](test-cases.md#test-0195) | Locally implementation-green: focused 25/25 and full solution governance 155/155, architecture 31/31, packaging 17/17 after independent fresh review; locked restore, format, both candidate structural runtimes, publish, and published-DLL self-validation green; exact committed-tree reruns and hosted closure pending |
 | [SUBF-0134](README.md#subf-0134) | Common pure governance kernel and `protocol-authority` self-consumer profile | Canonical [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | Exact-head hosted complete at [run `30410251192`](https://github.com/hasanmanzak/meAndAI/actions/runs/30410251192); PowerShell authority unchanged |
 | [SUBF-0135](README.md#subf-0135) | Project-neutral `consumer` profile and pinned-integration fixture | Canonical mapped scenarios plus [TEST-0208](test-cases.md#test-0208) / [TEST-0195](test-cases.md#test-0195) | Proposed; separate later gate |
 | External [SUBF-0136](../FEAT-0064-governance-coverage-equivalence/README.md#subf-0136) | Same-snapshot PowerShell/C# variant ledger and fail-closed differential harness | [TEST-0196](../FEAT-0064-governance-coverage-equivalence/test-cases.md#test-0196) | Linked [FEAT-0064](../FEAT-0064-governance-coverage-equivalence/README.md) prerequisite; excluded from the seven-slice [FEAT-0060](README.md) denominator |
@@ -448,8 +452,10 @@ completes the canonical [TEST-0004](../FEAT-0001-common-development-protocol/tes
 C# slice. At that historical [SUBF-0138](README.md#subf-0138) checkpoint,
 [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and
 [TEST-0208](test-cases.md#test-0208) remained `PlannedDocumentation`. The later
-[SUBF-0122](README.md#subf-0122) slice activates only repository-independent
-[TEST-0194](test-cases.md#test-0194); the other two remain planned.
+[SUBF-0122](README.md#subf-0122) checkpoint then activated only
+repository-independent [TEST-0194](test-cases.md#test-0194); at that checkpoint
+[TEST-0195](test-cases.md#test-0195) and [TEST-0208](test-cases.md#test-0208)
+remained planned.
 
 Each subfeature closes its own expected-red, focused green, self-review,
 finding disposition, documentation, and exact committed-tree gate before the
@@ -547,8 +553,9 @@ First-slice readiness is 10/10 (100%). [SUBF-0138](README.md#subf-0138),
 [SUBF-0134](README.md#subf-0134), and [SUBF-0122](README.md#subf-0122) are
 exact-head hosted complete, so bounded feature closure is three of seven
 subfeatures (42.9%). Four subfeatures remain independently open. The next gate
-is the pure report/process contract in [SUBF-0124](README.md#subf-0124), then
-the exact repository/profile contract in [SUBF-0123](README.md#subf-0123).
+is exact-tree and hosted closure of the locally green report/process contract
+in [SUBF-0124](README.md#subf-0124), then the exact repository/profile contract
+in [SUBF-0123](README.md#subf-0123).
 Later slices retain their own review gates and authorization.
 
 The historical inventory remains 188/188 base identities (100%), 7/7 explicit

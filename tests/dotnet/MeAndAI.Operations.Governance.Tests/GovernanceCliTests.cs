@@ -220,7 +220,7 @@ public sealed class GovernanceCliTests
         Assert.Equal(70, result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
-            "Repository snapshot capture failed.\n",
+            "Governance validation failed.\n",
             NormalizeNewline(result.StandardError));
     }
 
@@ -267,7 +267,7 @@ public sealed class GovernanceCliTests
         Assert.Equal(70, result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
-            "Repository snapshot capture failed.\n",
+            "Governance validation failed.\n",
             NormalizeNewline(result.StandardError));
     }
 
@@ -294,7 +294,7 @@ public sealed class GovernanceCliTests
         Assert.Equal(64, result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
-            "Unknown governance profile.\n",
+            "Governance validation rejected.\n",
             NormalizeNewline(result.StandardError));
     }
 
@@ -309,7 +309,7 @@ public sealed class GovernanceCliTests
         Assert.Equal(64, result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
-            "Governance profile is unavailable for candidate validation.\n",
+            "Governance validation rejected.\n",
             NormalizeNewline(result.StandardError));
     }
 
@@ -325,7 +325,7 @@ public sealed class GovernanceCliTests
         Assert.Equal(70, result.ExitCode);
         Assert.Equal(string.Empty, result.StandardOutput);
         Assert.Equal(
-            "Repository snapshot capture failed.\n",
+            "Governance validation failed.\n",
             NormalizeNewline(result.StandardError));
     }
 

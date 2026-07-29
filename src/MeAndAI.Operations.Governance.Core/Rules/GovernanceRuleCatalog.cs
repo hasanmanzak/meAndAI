@@ -90,7 +90,8 @@ public sealed class GovernanceRuleCatalog
         var canonicalMetadata = string.Concat(
             materializedRules.Select(rule =>
                 $"{rule.RuleId}\0{rule.CanonicalScenarioId}\0" +
-                $"{rule.FindingCode}\0{rule.Severity.Value}\0" +
+                $"{rule.CanonicalScenarioOwner}\0{rule.FindingCode}\0" +
+                $"{rule.Severity.Value}\0" +
                 $"{rule.Enforcement.Value}\n"));
         var canonicalMetadataBytes = Encoding.UTF8.GetBytes(canonicalMetadata);
         var metadataDigest = ExactSha256Digest.FromHashBytes(

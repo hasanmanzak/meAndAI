@@ -35,11 +35,23 @@ public static class GovernanceCli
                 standardError);
         }
 
+        return await GovernanceProcessBoundary.ExecuteAsync(
+            token => ValidateAsync(arguments, token),
+            standardOutput,
+            standardError,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async ValueTask<OperationResult<GovernanceReport>>
+        ValidateAsync(
+            IReadOnlyList<string> arguments,
+            CancellationToken cancellationToken)
+    {
         if (!TryParse(arguments, out var repository, out var profileValue))
         {
-            await standardError.WriteLineAsync(
-                "Usage: validate --repository <path> --profile protocol-authority.");
-            return 64;
+            return OperationResult<GovernanceReport>.Rejected(
+                OperationStageId.Validate,
+                OperationFailureCode.MalformedInput);
         }
 
         GovernanceProfileId profile;
@@ -49,8 +61,9 @@ public static class GovernanceCli
         }
         catch (ArgumentOutOfRangeException)
         {
-            await standardError.WriteLineAsync("Unknown governance profile.");
-            return 64;
+            return OperationResult<GovernanceReport>.Rejected(
+                OperationStageId.Validate,
+                OperationFailureCode.MalformedInput);
         }
 
         var engine = GovernanceEngine.CreateDefault();
@@ -60,9 +73,9 @@ public static class GovernanceCli
         }
         catch (ArgumentOutOfRangeException)
         {
-            await standardError.WriteLineAsync(
-                "Governance profile is unavailable for candidate validation.");
-            return 64;
+            return OperationResult<GovernanceReport>.Rejected(
+                OperationStageId.Validate,
+                OperationFailureCode.CapabilityDenied);
         }
 
         var authority = OperationalAuthorityCatalog
@@ -74,7 +87,7 @@ public static class GovernanceCli
             authority,
             OperationalPortRegistration
                 .Create<IGovernanceRepositorySnapshotPort>(snapshotPort));
-        var result = await OperationBoundary.ExecuteAsync(
+        return await OperationBoundary.ExecuteAsync(
             OperationStageId.Validate,
             async token =>
             {
@@ -95,38 +108,7 @@ public static class GovernanceCli
                         exception);
                 }
             },
-            cancellationToken);
-
-        if (result.Outcome == OperationOutcome.Succeeded)
-        {
-            var report = result.Value
-                ?? throw new InvalidOperationException(
-                    "A successful governance operation requires a report.");
-            await standardOutput.WriteAsync(
-                GovernanceReportSerializer.Serialize(report));
-            return report.Verdict == GovernanceVerdict.Conforming
-                ? 0
-                : report.Verdict == GovernanceVerdict.Nonconforming
-                    ? 1
-                    : 2;
-        }
-
-        if (result.Outcome == OperationOutcome.Canceled)
-        {
-            await standardError.WriteLineAsync(
-                "Governance validation canceled.");
-            return 130;
-        }
-
-        if (result.Outcome == OperationOutcome.Failed)
-        {
-            await standardError.WriteLineAsync(
-                "Repository snapshot capture failed.");
-            return 70;
-        }
-
-        await standardError.WriteLineAsync("Governance validation rejected.");
-        return 64;
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static bool TryParse(

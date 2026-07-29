@@ -11,6 +11,7 @@ public sealed class DecisionRecordRequiredStructureRule :
         new(
             "protocol.decision-record.required-structure.v1",
             "TEST-0005",
+            "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0005",
             "governance.decision.record-structure-incomplete",
             GovernanceSeverity.High,
             GovernanceEnforcement.Blocking);
@@ -31,7 +32,8 @@ public sealed class DecisionRecordRequiredStructureRule :
                 .Select(record => CreateFindingIfIncomplete(
                     record,
                     context.MarkdownDocuments.GetRequired(
-                        record.RelativePath)))
+                        record.RelativePath),
+                    context))
                 .Where(finding => finding is not null)
                 .Select(finding => finding!),
         ];
@@ -39,7 +41,8 @@ public sealed class DecisionRecordRequiredStructureRule :
 
     private GovernanceFinding? CreateFindingIfIncomplete(
         DecisionRecord record,
-        MarkdownDocument document)
+        MarkdownDocument document,
+        GovernanceAnalysisContext context)
     {
         var requirements = new List<GovernanceRequirement>();
 
@@ -89,12 +92,8 @@ public sealed class DecisionRecordRequiredStructureRule :
 
         return requirements.Count == 0
             ? null
-            : new GovernanceFinding(
-                RuleId,
-                CanonicalScenarioId,
-                FindingCode,
-                Severity,
-                Enforcement,
+            : CreateFinding(
+                context,
                 record.Path,
                 requirements);
     }

@@ -166,11 +166,18 @@ Last verified: **2026-07-29**
   [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
   passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
   on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including explicit
-  execution of the owned C# route and the supported PowerShell routes. The
-  next gate is the single report/process path in
+  execution of the owned C# route and the supported PowerShell routes.
+  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+  is now atomically activated in the same governance project and both existing
+  hosted C# filters. Its local implementation passes 25/25 focused tests and
+  the full solution passes 155 governance, 31 architecture, and 17 packaging
+  tests after independent fresh review; no Blocking/P1/P2 finding remains.
+  Locked restore and format verification pass. Candidate PowerShell 7 /
+  Windows PowerShell 5.1 `StructureOnly` pass in 183.2 / 275.4 seconds, and the
+  framework-dependent published DLL (no apphost) self-validates the real
+  repository as `conforming` with two evaluated rules and zero findings.
+  The next gate is exact-tree and hosted closure of the report/process path in
   [SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
-  under
-  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195),
   followed by exact repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
@@ -179,10 +186,15 @@ Last verified: **2026-07-29**
   separately owns exact-commit and two-profile repository evidence. This
   preserves independently reviewable slices without duplicating
   [TEST-0171](../../docs/features/FEAT-0045-v0140-canonical-repository-evidence/test-cases.md#test-0171).
-  The frozen next-gate contract keeps one report factory and one exit mapper:
+  The implemented report/process contract keeps one report factory, one
+  serializer, and one exit mapper:
   exits `0` / `1` / `2` emit only canonical JSON, while `64` / `70` / `130`
   emit only fixed redacted stderr and no report. `incomplete` is a successful
-  operation carrying a report. Exact acquisition derives tree/path/selected-
+  operation carrying a report; pre-cancellation does not invoke the operation.
+  Findings reference their one catalog identity and carry typed
+  `content-object` / `snapshot` evidence scope plus digest. Duplicate or
+  contradictory evaluations are wholly excluded, so input order cannot alter
+  findings or report digest. Exact acquisition derives tree/path/selected-
   blob limits from the one bounded instruction-graph policy and reuses one
   Infrastructure-owned streaming binary-safe child-process kernel. Later
   package provenance comes from external sibling
@@ -194,7 +206,7 @@ Last verified: **2026-07-29**
   `test-cases.md#anchor` address owned by the catalog identity, never a
   PowerShell suite or C# test-class path; the pre-release catalog metadata and
   [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  digest assertions must change atomically in the report slice.
+  digest assertions changed atomically in the report slice.
   PowerShell authority is unchanged.
 
   The historical
@@ -1263,10 +1275,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`603823e`](https://github.com/hasanmanzak/meAndAI/commit/603823e5e6521e009d6b50e77d602b812ea1da6d)
   passed hosted [run `30419091904`](https://github.com/hasanmanzak/meAndAI/actions/runs/30419091904)
   on Ubuntu in 13 min 33 s and Windows in 25 min 54 s, including both existing
-  C# routes and the supported PowerShell routes. The next gate is
+  C# routes and the supported PowerShell routes.
+  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+  is now activated in that governance project and both existing hosted C#
+  filters. Its local implementation passes 25/25 focused tests and the full
+  solution passes 155 governance, 31 architecture, and 17 packaging tests
+  after independent fresh review. Locked restore, format, both candidate
+  structural runtimes, framework-dependent publish, and published-DLL
+  self-validation are green. The next gate is exact-tree and hosted
+  closure of
   [SUBF-0124](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0124)
-  under
-  [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195),
   followed by exact repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
@@ -1278,10 +1296,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   commit/digest parsers, an exact `maai-governance.zip` byte digest, and one
   all-or-nothing release binding. Candidate remains internal/deferred and
   PowerShell authority is unchanged.
-  The frozen next-gate contract keeps one report factory and one exit mapper:
+  The implemented report/process contract keeps one report factory, one
+  serializer, and one exit mapper:
   exits `0` / `1` / `2` emit only canonical JSON, while `64` / `70` / `130`
   emit only fixed redacted stderr and no report. `incomplete` is a successful
-  operation carrying a report. Exact acquisition derives tree/path/selected-
+  operation carrying a report; pre-cancellation does not invoke the operation.
+  Findings use catalog-owned metadata plus typed `content-object` / `snapshot`
+  evidence scope and digest; contradictory duplicate evaluations are fully
+  excluded for order-independent bytes. Exact acquisition derives tree/path/selected-
   blob limits from the one bounded instruction-graph policy and reuses one
   Infrastructure-owned streaming binary-safe child-process kernel. Later
   package provenance comes from external sibling
@@ -1293,7 +1315,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `test-cases.md#anchor` address owned by the catalog identity, never a
   PowerShell suite or C# test-class path; the pre-release catalog metadata and
   [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  digest assertions must change atomically in the report slice.
+  digest assertions changed atomically in the report slice.
   [SUBF-0119](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0119),
   [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120),
   and [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)

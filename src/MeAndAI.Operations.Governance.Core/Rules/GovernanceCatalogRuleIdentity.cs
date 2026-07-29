@@ -5,6 +5,7 @@ namespace MeAndAI.Operations.Governance.Core.Rules;
 public sealed record GovernanceCatalogRuleIdentity(
     string RuleId,
     string CanonicalScenarioId,
+    string CanonicalScenarioOwner,
     string FindingCode,
     GovernanceSeverity Severity,
     GovernanceEnforcement Enforcement);

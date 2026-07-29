@@ -28,8 +28,8 @@ public static class GovernanceReportSerializer
         {
             writer.WriteStartObject();
             writer.WriteNumber("schema", report.Schema);
-            writer.WriteString("application", report.Application);
-            writer.WriteString("stage", report.Stage);
+            writer.WriteString("application", report.Application.Value);
+            writer.WriteString("stage", report.Stage.Value);
             writer.WriteString("profile", report.Profile.Value);
 
             writer.WriteStartObject("snapshot");
@@ -57,13 +57,19 @@ public static class GovernanceReportSerializer
 
             writer.WriteString("verdict", report.Verdict.Value);
             writer.WriteString("coverage", report.Coverage);
-            writer.WriteString("engineState", report.EngineState);
-            writer.WriteString("authorityState", report.AuthorityState);
+            writer.WriteString("engineState", report.EngineState.Value);
+            writer.WriteString("authorityState", report.AuthorityState.Value);
 
             writer.WriteStartObject("counts");
             writer.WriteNumber(
                 "evaluatedRules",
                 report.Counts.EvaluatedRules);
+            writer.WriteNumber(
+                "missingRules",
+                report.Counts.MissingRules);
+            writer.WriteNumber(
+                "unmappedRules",
+                report.Counts.UnmappedRules);
             writer.WriteNumber(
                 "blockingFindings",
                 report.Counts.BlockingFindings);
@@ -80,12 +86,41 @@ public static class GovernanceReportSerializer
                 writer.WriteString(
                     "canonicalScenarioId",
                     finding.CanonicalScenarioId);
+                writer.WriteString(
+                    "canonicalScenarioOwner",
+                    finding.CanonicalScenarioOwner);
                 writer.WriteString("code", finding.Code);
                 writer.WriteString("severity", finding.Severity.Value);
                 writer.WriteString(
                     "enforcement",
                     finding.Enforcement.Value);
                 writer.WriteString("relativePath", finding.RelativePath);
+                if (finding.Location.Line is int line)
+                {
+                    writer.WriteNumber("line", line);
+                }
+                else
+                {
+                    writer.WriteNull("line");
+                }
+
+                if (finding.Location.Anchor is string anchor)
+                {
+                    writer.WriteString("anchor", anchor);
+                }
+                else
+                {
+                    writer.WriteNull("anchor");
+                }
+
+                writer.WriteStartObject("evidence");
+                writer.WriteString(
+                    "scope",
+                    finding.Evidence.Scope.Value);
+                writer.WriteString(
+                    "digest",
+                    finding.Evidence.Digest.Value);
+                writer.WriteEndObject();
                 writer.WriteStartArray("unsatisfiedRequirements");
                 foreach (var requirement in
                          finding.UnsatisfiedRequirements)

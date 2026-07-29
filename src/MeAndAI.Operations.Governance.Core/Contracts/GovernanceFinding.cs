@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using MeAndAI.Operations.Domain.Governance;
+using MeAndAI.Operations.Domain.Identity;
 using MeAndAI.Operations.Governance.Core.Repository;
+using MeAndAI.Operations.Governance.Core.Rules;
 
 namespace MeAndAI.Operations.Governance.Core.Contracts;
 
@@ -46,23 +48,107 @@ public sealed record GovernanceRequirement
     public string Name { get; }
 }
 
+public sealed record GovernanceFindingEvidenceScope
+{
+    public static GovernanceFindingEvidenceScope ContentObject { get; } =
+        new("content-object");
+
+    public static GovernanceFindingEvidenceScope Snapshot { get; } =
+        new("snapshot");
+
+    private GovernanceFindingEvidenceScope(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+
+    public override string ToString() => Value;
+}
+
+public sealed class GovernanceFindingEvidence
+{
+    private GovernanceFindingEvidence(
+        GovernanceFindingEvidenceScope scope,
+        ExactSha256Digest digest)
+    {
+        Scope = scope;
+        Digest = digest;
+    }
+
+    public GovernanceFindingEvidenceScope Scope { get; }
+
+    public ExactSha256Digest Digest { get; }
+
+    internal static GovernanceFindingEvidence FromContentObject(
+        ExactSha256Digest digest)
+    {
+        ArgumentNullException.ThrowIfNull(digest);
+        return new GovernanceFindingEvidence(
+            GovernanceFindingEvidenceScope.ContentObject,
+            digest);
+    }
+
+    internal static GovernanceFindingEvidence FromSnapshot(
+        string digest) =>
+        new(
+            GovernanceFindingEvidenceScope.Snapshot,
+            ExactSha256Digest.Parse(digest));
+}
+
+public sealed class GovernanceFindingLocation
+{
+    internal GovernanceFindingLocation(
+        RepositoryRelativePath path,
+        int? line,
+        string? anchor)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        if (line is <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(line),
+                line,
+                "A finding line must be positive when present.");
+        }
+
+        if (anchor is not null && !IsSafeAnchor(anchor))
+        {
+            throw new ArgumentException(
+                "A finding anchor must be a non-empty lowercase ASCII anchor token.",
+                nameof(anchor));
+        }
+
+        Path = path;
+        Line = line;
+        Anchor = anchor;
+    }
+
+    public RepositoryRelativePath Path { get; }
+
+    public string RelativePath => Path.Value;
+
+    public int? Line { get; }
+
+    public string? Anchor { get; }
+
+    private static bool IsSafeAnchor(string value) =>
+        value.Length > 0 && value.All(character =>
+            character is >= 'a' and <= 'z' or
+                >= '0' and <= '9' or '-' or '_');
+}
+
 public sealed class GovernanceFinding
 {
-    public GovernanceFinding(
-        string ruleId,
-        string canonicalScenarioId,
-        string code,
-        GovernanceSeverity severity,
-        GovernanceEnforcement enforcement,
-        RepositoryRelativePath path,
+    internal GovernanceFinding(
+        GovernanceCatalogRuleIdentity ruleIdentity,
+        GovernanceFindingLocation location,
+        GovernanceFindingEvidence evidence,
         IEnumerable<GovernanceRequirement> unsatisfiedRequirements)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(ruleId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(canonicalScenarioId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(code);
-        ArgumentNullException.ThrowIfNull(severity);
-        ArgumentNullException.ThrowIfNull(enforcement);
-        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(ruleIdentity);
+        ArgumentNullException.ThrowIfNull(location);
+        ArgumentNullException.ThrowIfNull(evidence);
         ArgumentNullException.ThrowIfNull(unsatisfiedRequirements);
 
         var materializedRequirements = unsatisfiedRequirements.ToArray();
@@ -85,30 +171,36 @@ public sealed class GovernanceFinding
                 StringComparer.Ordinal)
             .ToArray();
 
-        RuleId = ruleId;
-        CanonicalScenarioId = canonicalScenarioId;
-        Code = code;
-        Severity = severity;
-        Enforcement = enforcement;
-        Path = path;
+        RuleIdentity = ruleIdentity;
+        Location = location;
+        Evidence = evidence;
         UnsatisfiedRequirements =
             new ReadOnlyCollection<GovernanceRequirement>(
                 orderedRequirements);
     }
 
-    public string RuleId { get; }
+    public GovernanceCatalogRuleIdentity RuleIdentity { get; }
 
-    public string CanonicalScenarioId { get; }
+    public string RuleId => RuleIdentity.RuleId;
 
-    public string Code { get; }
+    public string CanonicalScenarioId => RuleIdentity.CanonicalScenarioId;
 
-    public GovernanceSeverity Severity { get; }
+    public string CanonicalScenarioOwner =>
+        RuleIdentity.CanonicalScenarioOwner;
 
-    public GovernanceEnforcement Enforcement { get; }
+    public string Code => RuleIdentity.FindingCode;
 
-    public RepositoryRelativePath Path { get; }
+    public GovernanceSeverity Severity => RuleIdentity.Severity;
 
-    public string RelativePath => Path.Value;
+    public GovernanceEnforcement Enforcement => RuleIdentity.Enforcement;
+
+    public GovernanceFindingLocation Location { get; }
+
+    public RepositoryRelativePath Path => Location.Path;
+
+    public string RelativePath => Location.RelativePath;
+
+    public GovernanceFindingEvidence Evidence { get; }
 
     public IReadOnlyList<GovernanceRequirement> UnsatisfiedRequirements
     {

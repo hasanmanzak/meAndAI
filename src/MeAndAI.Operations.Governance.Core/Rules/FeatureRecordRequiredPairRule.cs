@@ -12,6 +12,7 @@ public sealed class FeatureRecordRequiredPairRule :
         new(
             "protocol.feature-record.required-pair.v1",
             "TEST-0004",
+            "docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0004",
             "governance.feature.record-set-incomplete",
             GovernanceSeverity.High,
             GovernanceEnforcement.Blocking);
@@ -51,12 +52,8 @@ public sealed class FeatureRecordRequiredPairRule :
 
         return requirements.Length == 0
             ? null
-            : new GovernanceFinding(
-                RuleId,
-                CanonicalScenarioId,
-                FindingCode,
-                Severity,
-                Enforcement,
+            : CreateFinding(
+                context,
                 featureRecord.Path,
                 requirements);
     }
