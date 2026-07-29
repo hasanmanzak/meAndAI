@@ -117,7 +117,7 @@ or authorize PowerShell deletion.
 - Parent epic: [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
 - Historical planning parent: [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
 - Blocking dependencies: [FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md), [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md), [FEAT-0061](../FEAT-0061-consumer-adoption-cli/README.md), and [FEAT-0062](../FEAT-0062-consumer-protocol-update-cli/README.md)
-- Historical source: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160), and [FEAT-0064 / issue #161](https://github.com/hasanmanzak/meAndAI/issues/161)
+- Historical sources: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md), [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160), and the [coverage-equivalence draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0064-governance-coverage-equivalence/README.md) with [tracking issue #161](https://github.com/hasanmanzak/meAndAI/issues/161) on [exact preserved commit `1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52)
 
 ## Definition of Ready
 

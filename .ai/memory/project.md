@@ -991,7 +991,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   classifies all 158 changed paths as reusable, refactor, preserve-only, or
   reject. Four of seven WIP slices have historical exact-branch evidence, the
   parent is incomplete, and no successor inherits a passing state. Do not push
-  implementation to PR #160, extract code, change workflows, mutate consumers,
+  implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160),
+  extract code, change workflows, mutate consumers,
   publish releases, transfer authority, or retire PowerShell without a later
   dependency-closed Definition of Ready and explicit maintainer directive.
 

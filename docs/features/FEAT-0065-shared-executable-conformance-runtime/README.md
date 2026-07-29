@@ -72,8 +72,8 @@ publication, or authority-transfer capabilities.
 - WIP input: the exact
   [extraction ledger](../../architecture/protocol-governance-and-execution/wip-extraction-ledger.md)
   classifies reusable evaluator, catalog, parser, identity, and report seeds.
-- Prior-art state: [TEST-0194](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  and [TEST-0195](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
+- Prior-art state: the [preserved WIP host scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
+  and [preserved WIP model scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
   are historical WIP evidence only.
 
 ## Risks

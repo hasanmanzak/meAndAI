@@ -14,7 +14,7 @@
 - Red-team review: [Closed at design level](../architecture/protocol-governance-and-execution/red-team-review.md)
 - Related decisions: [DEC-0001](DEC-0001-portable-protocol-reference.md), [DEC-0017](DEC-0017-idempotent-consumer-lifecycle.md), [DEC-0018](DEC-0018-release-declared-consumer-migrations.md), [DEC-0021](DEC-0021-explicit-initial-adoption-strategy.md), [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md), [DEC-0024](DEC-0024-exact-instruction-graph-adoption-evidence.md), [DEC-0028](DEC-0028-upstream-owned-reusable-corrections.md), [DEC-0030](DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md), and [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
 - Supersedes: [DEC-0032](DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) only where separate CLI/application artifacts or the PowerShell-migration feature sequence define the product architecture; preserves its C#, typed-foundation, portable-JIT, least-authority, plan/apply, single-engine-mutation, and explicit-authority-state decisions
-- Reserved draft decisions: [DEC-0033](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md) and [DEC-0034](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) exist only on preserved exact draft commit [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52); their identifiers are not reused and their compatible rationale is incorporated here without claiming default-branch authority
+- Reserved draft decisions: the [specification-first C# governance draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md) and [bounded reusable governance catalog draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0034-bounded-reusable-governance-catalog.md) exist only on preserved exact draft commit [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52); their identifier positions are not reused and their compatible rationale is incorporated here without claiming default-branch authority
 
 ## Context
 
@@ -170,16 +170,19 @@ is produced in isolated proposal storage, C# reacquires it and seals exact
 output hashes, and a second review plus grant binds that final plan before
 target mutation. Failure cannot trigger an automatic PowerShell/C# fallback.
 
-Updates preserve the DEC-0018 boundary: `MIG-NNNN` is declarative and
+Updates preserve the [DEC-0018](DEC-0018-release-declared-consumer-migrations.md)
+boundary: `MIG-NNNN` is declarative and
 deterministic. The exact target runtime is staged side-by-side under a sealed
 handoff while the current durable pin remains unchanged; the target pin is an
-effect of the reviewed final plan. DEC-0022 semantic/manual capabilities use a
+effect of the reviewed final plan. [DEC-0022](DEC-0022-release-declared-semantic-capabilities.md)
+semantic/manual capabilities use a
 separate capability catalog and ledger. When both are needed, deterministic
 update reaches exact-target closure first and then starts a separately linked
 adoption/capability operation; a MIG never invokes a semantic actor.
 
 An immutable predecessor that cannot perform side-by-side handoff retains the
-DEC-0018 two-proposal truth as an explicit `LegacyHandoffPending` authority
+[DEC-0018](DEC-0018-release-declared-consumer-migrations.md) two-proposal truth
+as an explicit `LegacyHandoffPending` authority
 state. Exact predecessor/merge/target evidence and a protected immutable marker
 permit only one same-target deterministic ledger reconciliation under the new
 runtime, normal grant, and journal. It is never treated as ordinary installed or
