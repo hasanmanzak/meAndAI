@@ -158,8 +158,10 @@ Last verified: **2026-07-29**
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
   in 64.6 seconds. Canonical
   [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  now passes 69/69 locally for the repository-independent typed
-  request/identity contract. The full solution passes 131 governance, 31
+  now passes 70/70 locally for the repository-independent typed
+  request/identity contract, including the hosted-route regression recorded as
+  [FIND-0370](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0370).
+  The full solution passes 132 governance, 31
   architecture, and 17 packaging tests; locked restore, format, and both local
   structural runtimes are green. Exact-tree and hosted closure remain pending.
   The next repository gate is
@@ -1229,9 +1231,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`a4231a2`](https://github.com/hasanmanzak/meAndAI/commit/a4231a2d4d6ff1068092c0f7b4c8304aaef5ceb4)
   in 64.6 seconds. Repository-independent
   [TEST-0194](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194)
-  now passes 69/69 locally for
+  now passes 70/70 locally for
   [SUBF-0122](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0122).
-  The full solution passes 131 governance, 31 architecture, and 17 packaging
+  The same-owner hosted-route regression is recorded as
+  [FIND-0370](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0370).
+  The full solution passes 132 governance, 31 architecture, and 17 packaging
   tests; locked restore, format, and both local structural runtimes are green.
   Exact-tree and hosted closure remain pending. The next repository gate is
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)

@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="../../../.github/workflows/protocol-tests.yml"
+          Link="protocol-tests.yml"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

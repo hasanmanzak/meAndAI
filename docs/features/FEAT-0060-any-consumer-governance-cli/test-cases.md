@@ -90,7 +90,11 @@ Test-first evidence on 2026-07-29:
   preflight and the internal candidate evaluator before repository access, and
   keep the two profiles mapped to the same catalog rule objects without
   activating consumer repository evidence.
-- The final local full-solution run passed governance 131/131, architecture
+- Hosted-route regression [FIND-0370](README.md#find-0370) then failed with
+  `Expected: 2`, `Actual: 0` because the Ubuntu and Windows C# workflow filters
+  did not select this scenario. After extending only those two existing
+  filters, the focused command passed 70/70.
+- The final local full-solution run passed governance 132/132, architecture
   31/31, and packaging 17/17 after moving canonical catalog metadata
   serialization and digest derivation behind the catalog owner.
 - Locked restore and format verification passed. The first PowerShell 7
