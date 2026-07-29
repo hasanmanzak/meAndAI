@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/MeAndAI.Protocol.Domain/MeAndAI.Protocol.Domain.csproj" />
+  <Project Path="tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj" />
+</Solution>
