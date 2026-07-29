@@ -39,7 +39,7 @@ public sealed class ProjectDependencyTests
         Assert.Equal(
             [application, domain],
             ReadProjectReferences(governanceCore));
-        Assert.Equal([domain], ReadProjectReferences(packaging));
+        Assert.Equal([domain, infrastructure], ReadProjectReferences(packaging));
         Assert.Empty(ReadPackageReferences(domain));
         Assert.Empty(ReadPackageReferences(application));
         Assert.Empty(ReadPackageReferences(infrastructure));
@@ -80,6 +80,32 @@ public sealed class ProjectDependencyTests
                 "tools/MeAndAI.Operations.Packaging/MeAndAI.Operations.Packaging.csproj",
             ],
             projects);
+    }
+
+    [Fact]
+    [Trait("Scenario", "TEST-0191")]
+    public void InfrastructureIsTheOnlyProductionChildProcessOwner()
+    {
+        var owners = new[] { "src", "tools" }
+            .SelectMany(root => Directory.EnumerateFiles(
+                Path.Combine(RepositoryRoot, root),
+                "*.cs",
+                SearchOption.AllDirectories))
+            .Where(path => !HasBuildArtifactSegment(path))
+            .Where(OwnsChildProcessPrimitive)
+            .Select(path => NormalizePath(
+                Path.GetRelativePath(RepositoryRoot, path)))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            ["src/MeAndAI.Operations.Infrastructure/Execution/BoundedProcessRunner.cs"],
+            owners);
+        Assert.False(File.Exists(Path.Combine(
+            RepositoryRoot,
+            "tools",
+            "MeAndAI.Operations.Packaging",
+            "BoundedProcess.cs")));
     }
 
     private static string[] ReadProjectReferences(string projectPath)
@@ -140,6 +166,23 @@ public sealed class ProjectDependencyTests
 
         throw new DirectoryNotFoundException(
             "Could not locate the repository root from the test output directory.");
+    }
+
+    private static bool HasBuildArtifactSegment(string path) =>
+        NormalizePath(Path.GetRelativePath(RepositoryRoot, path))
+            .Split('/')
+            .Any(segment =>
+                string.Equals(segment, "bin", StringComparison.Ordinal) ||
+                string.Equals(segment, "obj", StringComparison.Ordinal));
+
+    private static bool OwnsChildProcessPrimitive(string path)
+    {
+        var source = File.ReadAllText(path);
+        return source.Contains(
+                "using System.Diagnostics;",
+                StringComparison.Ordinal) &&
+            source.Contains("ProcessStartInfo", StringComparison.Ordinal) &&
+            source.Contains("new Process", StringComparison.Ordinal);
     }
 
     private static string NormalizePath(string? path) =>

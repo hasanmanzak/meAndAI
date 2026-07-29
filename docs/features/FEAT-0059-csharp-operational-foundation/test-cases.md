@@ -6,8 +6,8 @@ The original `v0.16.0` implementation of
 expected-red/green, exact committed-tree, exact package, fresh-download, and
 required Ubuntu/Windows evidence remains below.
 [SUBF-0141](README.md#subf-0141) extends the same three canonical scenario
-identities; those extensions are planned tests-first and no new TEST identity
-is declared.
+identities; its tests-first failure is complete, implementation remains
+pending, and no new TEST identity is declared.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -17,10 +17,15 @@ is declared.
 
 ## [SUBF-0141](README.md#subf-0141) extension evidence
 
-No expected-red, implementation, or green result is claimed yet. Evidence will
-be appended only from exact commands and committed trees that exercise the
-declared [TEST-0191](#test-0191), [TEST-0192](#test-0192), and
-[TEST-0193](#test-0193) extensions. The exact predecessor
+The first [TEST-0192](#test-0192) Release compile ran the existing Architecture.Tests
+project with `--no-restore` and the exact `Scenario=TEST-0192` filter. It
+failed in 11.1 seconds only with `CS0246` for the deliberately absent
+`BoundedProcessRequest`; no test executed and no `CS0017`, restore, lock,
+warning, or unrelated compiler failure occurred. This is the expected-red
+evidence for the shared Infrastructure contract. No implementation or green
+result is claimed yet.
+
+The exact predecessor
 [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3)
 passed [hosted run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869)
 on Ubuntu and Windows and is readiness evidence, not implementation evidence.

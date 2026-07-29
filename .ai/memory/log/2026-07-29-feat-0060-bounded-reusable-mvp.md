@@ -241,3 +241,24 @@ Existing [TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundat
 and [TEST-0193](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
 identities are extended; no new TEST identity, PowerShell change, consumer
 mutation, release publication, or authority transfer is introduced.
+
+## [SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141) tests-first checkpoint
+
+The existing Architecture.Tests assembly now owns the explicit inert child
+fixture and the
+[TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191) /
+[TEST-0192](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
+extensions; no project, package, solution node, workflow filter, or new test
+identity was added. The focused Release `Scenario=TEST-0192` compile with
+`--no-restore` failed in 11.1 seconds only
+with `CS0246` for the absent `BoundedProcessRequest`. No entrypoint collision,
+restore/lock problem, warning, or unrelated compiler failure occurred.
+
+[SUBF-0141](../../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0141)
+is therefore two of five delivery gates complete (40%). The next gate
+implements only the Infrastructure kernel: behavioral
+[TEST-0192](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192)
+must turn green while the new
+[TEST-0191](../../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191)
+single-owner and Packaging dependency assertions remain intentionally red
+until direct Packaging adoption removes the prior runner.

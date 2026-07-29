@@ -346,7 +346,7 @@ responsibilities; no duplicate scenario identity is introduced.
 | Test readiness | Gate 1 state | Evidence |
 | --- | --- | --- |
 | Scenarios | Original scope passing; existing identities extended for [SUBF-0141](#subf-0141) with no new scenario identity | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) |
-| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) extensions planned tests-first | Historical evidence and the not-yet-claimed extension section in [test scenarios](test-cases.md) |
+| Test code | Original `v0.16.0` evidence passing; [SUBF-0141](#subf-0141) tests-first failure complete | Exact expected-red evidence in [test scenarios](test-cases.md#subf-0141-extension-evidence) |
 | Baseline run | Original release complete; support-extension predecessor exact hosted green | Exact [`2a70b64a7b34abfc440f4af65e2067cdee6adcc3`](https://github.com/hasanmanzak/meAndAI/commit/2a70b64a7b34abfc440f4af65e2067cdee6adcc3) / [run `30429072869`](https://github.com/hasanmanzak/meAndAI/actions/runs/30429072869) |
 
 ## Decomposition and subfeature gates
@@ -356,7 +356,7 @@ responsibilities; no duplicate scenario identity is introduced.
 | `SUBF-0119` <a name="subf-0119"></a> | Solution boundaries and typed core contracts | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0191](test-cases.md#test-0191) / 17 of 17 local Release tests plus exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410350) and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30299109933/job/90087410352) jobs passing | Fresh-diff review complete; parameter-name, closed-identity, serializable-theory-data, and analyzer findings closed; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0120` <a name="subf-0120"></a> | Capability-scoped infrastructure ports and result schemas | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0192](test-cases.md#test-0192) / expected red then 16 of 16 focused Release tests; combined [TEST-0191](test-cases.md#test-0191) and [TEST-0192](test-cases.md#test-0192) 31 of 31 locally and on exact-head [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779014) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30312104364/job/90129779066) | Fresh-diff review complete; all result, authority, analyzer, link, cache, and hosted streaming findings closed; candidate/exact-tree StructureOnly passed in 208.5 / 206.6 seconds; zero unresolved `Blocking` findings | Complete |
 | `SUBF-0121` <a name="subf-0121"></a> | Portable packaging and immutable manifest | [#154](https://github.com/hasanmanzak/meAndAI/issues/154) | [TEST-0193](test-cases.md#test-0193) / expected red, 17 of 17 focused and 48 of 48 combined local tests, then exact same-byte [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) / [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611) execution | Fresh-diff review closed source binding, atomic output, null/ambiguity, bounded archive, analyzer, workflow-topology, and link findings; candidate/exact-tree StructureOnly passed in 211.2 / 208.8 seconds; zero unresolved `Blocking` findings | Complete |
-| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / expected red not started | Independent records, lifecycle, and test-topology reviews complete; implementation review not started | Authorized / pending |
+| `SUBF-0141` <a name="subf-0141"></a> | Shared streaming binary-safe bounded child-process kernel and Packaging adoption | [#162](https://github.com/hasanmanzak/meAndAI/issues/162) | [TEST-0191](test-cases.md#test-0191), [TEST-0192](test-cases.md#test-0192), and [TEST-0193](test-cases.md#test-0193) / exact expected red complete | Independent records, lifecycle, and test-topology reviews complete; implementation review not started | Tests-first red complete / implementation pending |
 
 ## [SUBF-0119](#subf-0119) development checkpoint
 
@@ -492,7 +492,10 @@ Progress is measured against five independently observable delivery gates:
 
 1. Definition of Ready, exact predecessor, and explicit continuation
    authorization: complete.
-2. Tests-first missing Infrastructure contract failure: pending.
+2. Tests-first missing Infrastructure contract failure: complete; the focused
+   Release compile failed only with `CS0246` for the absent
+   `BoundedProcessRequest` contract in 11.1 seconds, with no entrypoint,
+   restore, lock, warning, or unrelated compiler failure.
 3. Shared kernel behavior green with intentional duplicate-owner red, then
    direct Packaging adoption and complete focused green: pending.
 4. Local fresh-diff review, locked restore, zero-warning build,
@@ -501,10 +504,10 @@ Progress is measured against five independently observable delivery gates:
 5. Exact committed-tree validation, same-byte Ubuntu/Windows package handoff,
    remote evidence, and final hosted confirmation: pending.
 
-The current checkpoint is one of five gates, or 20%, for
+The current checkpoint is two of five gates, or 40%, for
 [SUBF-0141](#subf-0141). The original three `v0.16.0` subfeatures remain fully
 closed; current feature progress is three of four subfeatures, or 75%.
-Elapsed-time projection is five to nine implementation/review hours plus one
+Remaining elapsed-time projection is four to eight implementation/review hours plus one
 35-to-60-minute hosted closure observation. These values are planning ranges,
 not thresholds. Intermediate expected-red and kernel-only commits will remain
 local and be pushed with the fully green Packaging migration so they do not
