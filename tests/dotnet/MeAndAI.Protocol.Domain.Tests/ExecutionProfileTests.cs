@@ -86,7 +86,7 @@ public sealed class ExecutionProfileTests
         var subjectRole = SubjectRole.Consumer;
         var operation = ProtocolOperation.Conformance;
         var snapshotKind = SnapshotKind.ExactCommit;
-        var surfaces = SurfaceSet.Create(new[] { SurfaceKind.Repository });
+        var surfaces = SurfaceSet.Create([SurfaceKind.Repository]);
         var enforcementPhase = EnforcementPhase.Audit;
 
         Assert.Throws<ArgumentNullException>(() => ExecutionProfile.Create(
@@ -130,14 +130,14 @@ public sealed class ExecutionProfileTests
             ProtocolOperation.Conformance,
             SnapshotKind.ExactCommit,
             SurfaceSet.Create(
-                new[] { SurfaceKind.Release, SurfaceKind.Repository }),
+                [SurfaceKind.Release, SurfaceKind.Repository]),
             EnforcementPhase.Audit);
         var equal = ExecutionProfile.Create(
             SubjectRole.Parse("protocol-authority-self-consumer"),
             ProtocolOperation.Parse("conformance"),
             SnapshotKind.Parse("exact-commit"),
             SurfaceSet.Create(
-                new[] { SurfaceKind.Repository, SurfaceKind.Release }),
+                [SurfaceKind.Repository, SurfaceKind.Release]),
             EnforcementPhase.Parse("audit"));
 
         Assert.Equal(left, equal);
@@ -170,7 +170,7 @@ public sealed class ExecutionProfileTests
                 left.SubjectRole,
                 left.Operation,
                 left.SnapshotKind,
-                SurfaceSet.Create(new[] { SurfaceKind.Provider }),
+                SurfaceSet.Create([SurfaceKind.Provider]),
                 left.EnforcementPhase),
             ExecutionProfile.Create(
                 left.SubjectRole,
@@ -218,7 +218,7 @@ public sealed class ExecutionProfileTests
                 typeof(SurfaceSet)));
     }
 
-    private static IReadOnlyList<SurfaceSet> CreateEveryNonEmptySurfaceSubset()
+    private static List<SurfaceSet> CreateEveryNonEmptySurfaceSubset()
     {
         var kinds = new[]
         {

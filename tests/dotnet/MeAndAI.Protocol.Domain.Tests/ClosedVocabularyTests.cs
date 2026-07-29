@@ -6,7 +6,7 @@ namespace MeAndAI.Protocol.Domain.Tests;
 public sealed class ClosedVocabularyTests
 {
     private static readonly string[] AllVocabularyTokens =
-    {
+    [
         "protocol-authority-self-consumer",
         "consumer",
         "conformance",
@@ -44,10 +44,10 @@ public sealed class ClosedVocabularyTests
         "allow",
         "block",
         "report-only",
-    };
+    ];
 
     private static readonly string[] ExplicitRejectedAliases =
-    {
+    [
         "protocol-authority",
         "self-consumer",
         "governance",
@@ -66,20 +66,19 @@ public sealed class ClosedVocabularyTests
         "skipped",
         "nonconforming",
         "reportonly",
-    };
+    ];
 
     [Fact]
     [Trait("Scenario", "TEST-0220")]
     public void SubjectRoleContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (
                     Token: "protocol-authority-self-consumer",
                     Named: SubjectRole.ProtocolAuthoritySelfConsumer),
                 (Token: "consumer", Named: SubjectRole.Consumer),
-            },
+            ],
             SubjectRole.Parse,
             SubjectRole.TryParse);
     }
@@ -89,8 +88,7 @@ public sealed class ClosedVocabularyTests
     public void ProtocolOperationContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "conformance", Named: ProtocolOperation.Conformance),
                 (
                     Token: "adoption-assessment",
@@ -105,7 +103,7 @@ public sealed class ClosedVocabularyTests
                 (Token: "publication", Named: ProtocolOperation.Publication),
                 (Token: "finalization", Named: ProtocolOperation.Finalization),
                 (Token: "recovery", Named: ProtocolOperation.Recovery),
-            },
+            ],
             ProtocolOperation.Parse,
             ProtocolOperation.TryParse);
     }
@@ -115,8 +113,7 @@ public sealed class ClosedVocabularyTests
     public void SnapshotKindContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "exact-commit", Named: SnapshotKind.ExactCommit),
                 (Token: "candidate", Named: SnapshotKind.Candidate),
                 (Token: "provider-event", Named: SnapshotKind.ProviderEvent),
@@ -124,7 +121,7 @@ public sealed class ClosedVocabularyTests
                     Token: "provider-full-inventory",
                     Named: SnapshotKind.ProviderFullInventory),
                 (Token: "captured-evidence", Named: SnapshotKind.CapturedEvidence),
-            },
+            ],
             SnapshotKind.Parse,
             SnapshotKind.TryParse);
     }
@@ -134,13 +131,12 @@ public sealed class ClosedVocabularyTests
     public void SurfaceKindContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "repository", Named: SurfaceKind.Repository),
                 (Token: "provider", Named: SurfaceKind.Provider),
                 (Token: "workflow", Named: SurfaceKind.Workflow),
                 (Token: "release", Named: SurfaceKind.Release),
-            },
+            ],
             SurfaceKind.Parse,
             SurfaceKind.TryParse);
     }
@@ -150,12 +146,11 @@ public sealed class ClosedVocabularyTests
     public void EnforcementPhaseContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "audit", Named: EnforcementPhase.Audit),
                 (Token: "prospective", Named: EnforcementPhase.Prospective),
                 (Token: "full-blocking", Named: EnforcementPhase.FullBlocking),
-            },
+            ],
             EnforcementPhase.Parse,
             EnforcementPhase.TryParse);
     }
@@ -165,12 +160,11 @@ public sealed class ClosedVocabularyTests
     public void AcquisitionStatusContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "complete", Named: AcquisitionStatus.Complete),
                 (Token: "incomplete", Named: AcquisitionStatus.Incomplete),
                 (Token: "failed", Named: AcquisitionStatus.Failed),
-            },
+            ],
             AcquisitionStatus.Parse,
             AcquisitionStatus.TryParse);
     }
@@ -180,8 +174,7 @@ public sealed class ClosedVocabularyTests
     public void RuleEvaluationStatusContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "satisfied", Named: RuleEvaluationStatus.Satisfied),
                 (Token: "violated", Named: RuleEvaluationStatus.Violated),
                 (
@@ -190,7 +183,7 @@ public sealed class ClosedVocabularyTests
                 (
                     Token: "not-evaluated",
                     Named: RuleEvaluationStatus.NotEvaluated),
-            },
+            ],
             RuleEvaluationStatus.Parse,
             RuleEvaluationStatus.TryParse);
     }
@@ -200,14 +193,13 @@ public sealed class ClosedVocabularyTests
     public void ConformanceVerdictContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "conforming", Named: ConformanceVerdict.Conforming),
                 (
                     Token: "non-conforming",
                     Named: ConformanceVerdict.NonConforming),
                 (Token: "indeterminate", Named: ConformanceVerdict.Indeterminate),
-            },
+            ],
             ConformanceVerdict.Parse,
             ConformanceVerdict.TryParse);
     }
@@ -217,12 +209,11 @@ public sealed class ClosedVocabularyTests
     public void EnforcementDecisionContractIsClosedAndExact()
     {
         AssertClosedVocabulary(
-            new[]
-            {
+            [
                 (Token: "allow", Named: EnforcementDecision.Allow),
                 (Token: "block", Named: EnforcementDecision.Block),
                 (Token: "report-only", Named: EnforcementDecision.ReportOnly),
-            },
+            ],
             EnforcementDecision.Parse,
             EnforcementDecision.TryParse);
     }

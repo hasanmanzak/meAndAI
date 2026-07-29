@@ -8,7 +8,7 @@ namespace MeAndAI.Protocol.Domain.Tests;
 public sealed class PublicApiContractTests
 {
     private static readonly Type[] CategoricalTypes =
-    {
+    [
         typeof(SubjectRole),
         typeof(ProtocolOperation),
         typeof(SnapshotKind),
@@ -18,10 +18,10 @@ public sealed class PublicApiContractTests
         typeof(RuleEvaluationStatus),
         typeof(ConformanceVerdict),
         typeof(EnforcementDecision),
-    };
+    ];
 
-    private static readonly IReadOnlyDictionary<Type, string[]>
-        CategoricalPropertyNames = new Dictionary<Type, string[]>
+    private static readonly Dictionary<Type, string[]>
+        CategoricalPropertyNames = new()
         {
             [typeof(SubjectRole)] =
             [
@@ -93,6 +93,29 @@ public sealed class PublicApiContractTests
     [Trait("Scenario", "TEST-0220")]
     public void TypesHaveExactReferenceShapeInterfacesAndNoPublicConstructors()
     {
+        var expectedExportedTypes = new[]
+        {
+            typeof(AcquisitionStatus),
+            typeof(ConformanceVerdict),
+            typeof(EnforcementDecision),
+            typeof(EnforcementPhase),
+            typeof(ExactSha256Digest),
+            typeof(ExecutionProfile),
+            typeof(ProtocolOperation),
+            typeof(RuleEvaluationStatus),
+            typeof(RuleId),
+            typeof(RuleRevision),
+            typeof(SnapshotKind),
+            typeof(SubjectRole),
+            typeof(SurfaceKind),
+            typeof(SurfaceSet),
+        };
+        var exportedTypes = typeof(RuleId).Assembly
+            .GetExportedTypes()
+            .OrderBy(type => type.FullName, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(expectedExportedTypes, exportedTypes);
         AssertTypeShape(
             typeof(RuleId),
             typeof(IComparable<RuleId>),
@@ -276,9 +299,9 @@ public sealed class PublicApiContractTests
 
         foreach (var type in tryParseTypes)
         {
-            var method = Assert.Single(type
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .Where(candidate => candidate.Name == "TryParse"));
+            var method = Assert.Single(
+                type.GetMethods(BindingFlags.Public | BindingFlags.Static),
+                candidate => candidate.Name == "TryParse");
             var parameters = method.GetParameters();
 
             var attribute = Assert.Single(
@@ -643,15 +666,17 @@ public sealed class PublicApiContractTests
         NullabilityState expected,
         bool useWriteState = false)
     {
-        var parameter = Assert.Single(type
+        var parameters = type
             .GetMethods(
                 BindingFlags.Public |
                 BindingFlags.Instance |
                 BindingFlags.Static |
                 BindingFlags.DeclaredOnly)
             .Where(method => method.Name == methodName)
-            .SelectMany(method => method.GetParameters())
-            .Where(candidate => candidate.Name == parameterName));
+            .SelectMany(method => method.GetParameters());
+        var parameter = Assert.Single(
+            parameters,
+            candidate => candidate.Name == parameterName);
         var nullability = context.Create(parameter);
 
         Assert.Equal(

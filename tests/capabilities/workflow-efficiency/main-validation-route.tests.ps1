@@ -428,6 +428,100 @@ try {
             Add-Failure "TEST-0146 workflow lost cross-runtime validation contract '$runtimeContract'."
         }
     }
+    if ($jobsIndex -ge 0) {
+        $jobMatches = @([regex]::Matches(
+            $jobsSource,
+            '(?m)^  (?<id>[a-z0-9-]+):\r?$'
+        ))
+        $protocolScenarioId = 'TEST-' + '0220'
+        $protocolTestCommand =
+            'dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario={0}"' -f $protocolScenarioId
+        $expectedProtocolCommands = @(
+            'dotnet restore MeAndAI.Protocol.slnx --configfile NuGet.Config --locked-mode',
+            $protocolTestCommand
+        )
+        foreach ($stableJobId in @('linux-validation', 'windows-validation')) {
+            $matchingJobs = @($jobMatches | Where-Object {
+                $_.Groups['id'].Value -ceq $stableJobId
+            })
+            if ($matchingJobs.Count -ne 1) {
+                Add-Failure "TEST-0146 cannot inspect protocol invocation in stable job '$stableJobId'."
+                continue
+            }
+
+            $jobMatch = $matchingJobs[0]
+            $nextJobs = @($jobMatches | Where-Object {
+                $_.Index -gt $jobMatch.Index
+            } | Sort-Object Index)
+            $jobEnd = $jobsSource.Length
+            if ($nextJobs.Count -gt 0) {
+                $jobEnd = $nextJobs[0].Index
+            }
+            $jobSource = $jobsSource.Substring(
+                $jobMatch.Index,
+                $jobEnd - $jobMatch.Index)
+            $stepMatches = @([regex]::Matches(
+                $jobSource,
+                '(?m)^      - '
+            ))
+            $steps = @()
+            for ($stepIndex = 0;
+                $stepIndex -lt $stepMatches.Count;
+                $stepIndex++) {
+                $stepStart = $stepMatches[$stepIndex].Index
+                $stepEnd = $jobSource.Length
+                if ($stepIndex + 1 -lt $stepMatches.Count) {
+                    $stepEnd = $stepMatches[$stepIndex + 1].Index
+                }
+                $stepSource = $jobSource.Substring(
+                    $stepStart,
+                    $stepEnd - $stepStart)
+                $runMatch = [regex]::Match(
+                    $stepSource,
+                    '(?ms)^        run:\s*>-\r?\n(?<body>(?:          [^\r\n]*(?:\r?\n|$))+)' )
+                if (-not $runMatch.Success) {
+                    continue
+                }
+                $runLines = @(
+                    $runMatch.Groups['body'].Value -split '\r?\n' |
+                        Where-Object { $_.Length -gt 0 } |
+                        ForEach-Object { $_.Substring(10) }
+                )
+                $steps += [pscustomobject]@{
+                    Command = ($runLines -join ' ').Trim()
+                    Source = $stepSource
+                }
+            }
+
+            foreach ($expectedCommand in $expectedProtocolCommands) {
+                $matchingSteps = @($steps | Where-Object {
+                    $_.Command -ceq $expectedCommand
+                })
+                if ($matchingSteps.Count -ne 1) {
+                    Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one protocol step '$expectedCommand'."
+                    continue
+                }
+
+                $candidateSource = $matchingSteps[0].Source
+                $ifLines = [regex]::Matches(
+                    $candidateSource,
+                    '(?m)^        if:.*\r?$'
+                )
+                $fullRouteLines = [regex]::Matches(
+                    $candidateSource,
+                    "(?m)^        if: steps\.main-route\.outputs\.route == 'Full'\r?$"
+                )
+                if ($ifLines.Count -ne 1 -or $fullRouteLines.Count -ne 1) {
+                    Add-Failure "TEST-0146 protocol step in '$stableJobId' is not bound exactly to the Full route: '$expectedCommand'."
+                }
+                if ([regex]::IsMatch(
+                    $candidateSource,
+                    '(?m)^        continue-on-error:\s*true\s*\r?$')) {
+                    Add-Failure "TEST-0146 protocol step in '$stableJobId' is allowed to fail: '$expectedCommand'."
+                }
+            }
+        }
+    }
     if ($failures.Count -eq $test0146FailureCount) {
         Confirm-MeAndAIScenarioEvidence -Context $scenarioEvidenceContext `
             -TestId 'TEST-0146'

@@ -7,6 +7,8 @@ namespace MeAndAI.Protocol.Domain.Tests;
 public sealed class ProjectGraphTests
 {
     private static readonly string RepositoryRoot = FindRepositoryRoot();
+    private static readonly string[] ExpectedFrameworkReferences =
+        ["Microsoft.NETCore.App"];
 
     [Fact]
     [Trait("Scenario", "TEST-0220")]
@@ -43,17 +45,16 @@ public sealed class ProjectGraphTests
         Assert.Empty(ReadProjectReferences(domainProject));
         Assert.Empty(ReadPackageReferences(domainProject));
         Assert.Equal(
-            new[] { domainProject },
+            [domainProject],
             ReadProjectReferences(testProject));
 
         var packageReferences = ReadPackageReferences(testProject);
         Assert.Equal(
-            new[]
-            {
+            [
                 "Microsoft.NET.Test.Sdk",
                 "xunit",
                 "xunit.runner.visualstudio",
-            },
+            ],
             packageReferences.Select(reference => reference.Name));
         Assert.All(
             packageReferences,
@@ -154,7 +155,7 @@ public sealed class ProjectGraphTests
             .Order(StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(new[] { "Microsoft.NETCore.App" }, frameworkReferences);
+        Assert.Equal(ExpectedFrameworkReferences, frameworkReferences);
     }
 
     [Fact]
@@ -180,12 +181,11 @@ public sealed class ProjectGraphTests
             .ToArray();
 
         Assert.Equal(
-            new[]
-            {
+            [
                 "Microsoft.NET.Test.Sdk",
                 "xunit",
                 "xunit.runner.visualstudio",
-            },
+            ],
             dependencies.Select(dependency => dependency.Name));
         Assert.All(
             dependencies,
@@ -199,7 +199,7 @@ public sealed class ProjectGraphTests
             .Select(reference => reference.Name)
             .Order(StringComparer.Ordinal)
             .ToArray();
-        Assert.Equal(new[] { "Microsoft.NETCore.App" }, frameworkReferences);
+        Assert.Equal(ExpectedFrameworkReferences, frameworkReferences);
 
         var restore = project.GetProperty("restore");
         Assert.Equal(
@@ -227,7 +227,7 @@ public sealed class ProjectGraphTests
             ?? throw new InvalidOperationException("Project directory is missing.");
         var document = XDocument.Load(fullPath);
 
-        return document
+        return [.. document
             .Descendants("ProjectReference")
             .Select(element => (string?)element.Attribute("Include"))
             .Select(path => Path.GetFullPath(
@@ -236,8 +236,7 @@ public sealed class ProjectGraphTests
                 projectDirectory))
             .Select(path => NormalizePath(
                 Path.GetRelativePath(RepositoryRoot, path)))
-            .Order(StringComparer.Ordinal)
-            .ToArray();
+            .Order(StringComparer.Ordinal)];
     }
 
     private static IReadOnlyList<PackageReference> ReadPackageReferences(
@@ -245,7 +244,7 @@ public sealed class ProjectGraphTests
     {
         var document = XDocument.Load(ToFullPath(projectPath));
 
-        return document
+        return [.. document
             .Descendants("PackageReference")
             .Select(element => new PackageReference(
                 (string?)element.Attribute("Include")
@@ -253,8 +252,7 @@ public sealed class ProjectGraphTests
                         "PackageReference has no Include attribute."),
                 ReadMetadata(element, "Version"),
                 ReadMetadata(element, "VersionOverride")))
-            .OrderBy(reference => reference.Name, StringComparer.Ordinal)
-            .ToArray();
+            .OrderBy(reference => reference.Name, StringComparer.Ordinal)];
     }
 
     private static JsonElement ReadJson(string repositoryRelativePath)

@@ -963,6 +963,24 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
   for fresh test-first implementation, including its route inside both existing
   stable workflow jobs. All later slices and successor boundaries remain held.
+  Expected-red checkpoint
+  [`9a48c02266d9690e14240de0fac3c57d54d12fa6`](https://github.com/hasanmanzak/meAndAI/commit/9a48c02266d9690e14240de0fac3c57d54d12fa6)
+  followed a successful locked restore and failed only for the deliberately
+  absent `SurfaceSet` and `SurfaceKind` contracts. The
+  [canonical local evidence](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#evidence)
+  now records 52 of 52 focused Release tests passing, a zero-warning/zero-error
+  Release build, clean format verification, direct [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  passes on PowerShell 7 and Windows PowerShell 5.1, and transfer of
+  [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  to its `DotNetTestProject` owner. Final StructureOnly exited zero with zero
+  failures on PowerShell 7 in approximately 160.5 seconds and on Windows
+  PowerShell 5.1 in 275.9 seconds, whose owner observation was 273,271 ms. Gate 5
+  code/test and infrastructure fresh-diff reviews are clean after all findings
+  were resolved; the latest correction review is clean and no `Blocking`
+  finding remains. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+  is locally converged but not complete; exact-head and hosted evidence remain
+  pending. Pull-request and hosted facts are external to the candidate tree and
+  governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
 - The accepted
   [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md)
   allocates shared conformance to

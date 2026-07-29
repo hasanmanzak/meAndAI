@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0152](#subf-0152) authorized; Gate 3 expected-red pending |
+| Status | [SUBF-0152](#subf-0152) locally converged; exact-head and hosted evidence pending |
 | Target version | 0.17.0 |
 | Issue | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) |
-| Pull request | Not created; Gate 1 and Gate 2 complete |
+| Pull request | Pull-request and hosted evidence are external to the candidate tree and governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), and [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) |
 | Tests | [TEST-0209](test-cases.md#test-0209), [TEST-0210](test-cases.md#test-0210), [TEST-0211](test-cases.md#test-0211), [TEST-0220](test-cases.md#test-0220), [TEST-0221](test-cases.md#test-0221), and [TEST-0222](test-cases.md#test-0222) |
 
@@ -110,9 +110,9 @@ publication, or authority-transfer capabilities.
 
 | Test readiness | Current state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined and decomposed | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; [TEST-0220](test-cases.md#test-0220) owns [SUBF-0152](#subf-0152) |
-| Test code | Not started | Exact-main prerequisite satisfied; Gate 3 expected-red is next |
-| Baseline run | Not run | [TEST-0220](test-cases.md#test-0220) expected-red target assemblies and fixtures do not exist |
+| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) executable | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; later scenarios remain planned |
+| Test code | [TEST-0220](test-cases.md#test-0220) passing locally | The Domain test project is its sole executable owner; [canonical local evidence](test-cases.md#evidence) |
+| Baseline run | Local convergence complete | [Canonical local evidence](test-cases.md#evidence) records expected red, focused green, cross-runtime StructureOnly, and clean Gate 5 review; exact-head and hosted evidence remain pending |
 
 ## Decomposition and subfeature gates
 
@@ -121,7 +121,7 @@ publication, or authority-transfer capabilities.
 | `SUBF-0142` <a name="subf-0142"></a> | Original typed rule/evidence/location/outcome/report planning slice | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | Accepted architecture | [TEST-0209](test-cases.md#test-0209) / not started | Gate 2 found mixed contracts | Superseded before implementation by [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), and [SUBF-0154](#subf-0154); never reuse |
 | `SUBF-0143` <a name="subf-0143"></a> | Immutable catalog, evaluator kernel, first common-rule slice, and deterministic aggregation | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), and rule-fragment closure | [TEST-0210](test-cases.md#test-0210) / not started | Pending | Proposed |
 | `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0143](#subf-0143) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
-| `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); exact-main [run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367) | [TEST-0220](test-cases.md#test-0220) / not started | Gate 2 fresh-diff findings resolved; implementation review pending | Authorized; Gate 3 expected-red pending |
+| `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); exact-main [run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367) | [TEST-0220](test-cases.md#test-0220) / expected red, then 52 of 52 focused Release tests in 116 ms; final PowerShell 7 and Windows PowerShell 5.1 StructureOnly green; [local evidence](test-cases.md#evidence) | Gate 5 code/test and infrastructure fresh-diff reviews clean after all findings resolved; latest correction review clean; zero unresolved `Blocking` findings | Locally converged; exact-head and hosted evidence pending |
 | `SUBF-0153` <a name="subf-0153"></a> | Evidence requirements/envelopes, typed locations, findings, and rule-evaluation records | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0152](#subf-0152) | [TEST-0221](test-cases.md#test-0221) / not started | Pending | Proposed / not authorized |
 | `SUBF-0154` <a name="subf-0154"></a> | Canonical report sealing, serialization, digest, redaction, and full composed qualification | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), [SUBF-0144](#subf-0144) | [TEST-0222](test-cases.md#test-0222), [TEST-0209](test-cases.md#test-0209) / not started | Pending | Proposed / not authorized |
 
@@ -147,7 +147,7 @@ aggregator and cannot close a predecessor by collecting other tests' results.
 - [x] Project-neutral [TEST-0220](test-cases.md#test-0220) expected-red matrix and exact execution route.
 - [x] [Gate 2 design review](subf-0152-domain-vocabulary-design.md) for [SUBF-0152](#subf-0152), including recurrence, sibling, WIP, project-graph, error, compatibility, and hosted-owner contracts.
 - [x] Separate [maintainer implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932), scoped only to [SUBF-0152](#subf-0152) after exact-main validation.
-- [ ] Gate 3 [TEST-0220](test-cases.md#test-0220) expected-red execution.
+- [x] Gate 3 [TEST-0220](test-cases.md#test-0220) expected-red execution and focused green; see [canonical local evidence](test-cases.md#evidence).
 
 ## Acceptance criteria
 
@@ -161,6 +161,12 @@ aggregator and cannot close a predecessor by collecting other tests' results.
 
 ## Definition of Done
 
-[SUBF-0152](#subf-0152) implementation, expected-red, review, exact-head, and hosted evidence
-remain pending. Every later task/subfeature, release, self-consumption transfer,
-and authority gate remains separately pending and unauthorized.
+[SUBF-0152](#subf-0152) expected-red, bounded production implementation, focused
+green, zero-warning Release build, clean format verification, direct
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+evidence, cross-runtime StructureOnly, and clean Gate 5 fresh-diff reviews are
+recorded. Exact-head and hosted evidence remain pending, so the subfeature and
+parent feature are not complete. Pull-request and hosted facts are external to
+the candidate tree and governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+Every later task/subfeature, release, self-consumption transfer, and authority
+gate remains separately pending and unauthorized.

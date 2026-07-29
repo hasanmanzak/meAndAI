@@ -178,6 +178,11 @@
             TestIds = @('TEST-0193')
         }
         @{
+            Evidence = 'DotNetTestProject'
+            Owner = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
+            TestIds = @('TEST-0220')
+        }
+        @{
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md'
             TestIds = @('TEST-0194', 'TEST-0195', 'TEST-0196')
@@ -203,8 +208,8 @@
             Evidence = 'PlannedDocumentation'
             Owner = 'docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md'
             TestIds = @(
-                'TEST-0209', 'TEST-0210', 'TEST-0211', 'TEST-0220',
-                'TEST-0221', 'TEST-0222'
+                'TEST-0209', 'TEST-0210', 'TEST-0211', 'TEST-0221',
+                'TEST-0222'
             )
         }
         @{

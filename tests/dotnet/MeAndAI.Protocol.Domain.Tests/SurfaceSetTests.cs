@@ -11,17 +11,16 @@ public sealed class SurfaceSetTests
     {
         Assert.Throws<ArgumentNullException>(() => SurfaceSet.Create(null!));
         Assert.Throws<ArgumentException>(() =>
-            SurfaceSet.Create(Array.Empty<SurfaceKind>()));
+            SurfaceSet.Create([]));
         Assert.Throws<ArgumentException>(() =>
             SurfaceSet.Create(
-                new SurfaceKind[] { SurfaceKind.Repository, null! }));
+                [SurfaceKind.Repository, null!]));
         Assert.Throws<ArgumentException>(() =>
             SurfaceSet.Create(
-                new[]
-                {
+                [
                     SurfaceKind.Repository,
                     SurfaceKind.Parse("repository"),
-                }));
+                ]));
     }
 
     [Fact]
@@ -56,11 +55,11 @@ public sealed class SurfaceSetTests
     public void SubsetsUseSchemaOrderRatherThanInputOrder()
     {
         var set = SurfaceSet.Create(
-            new[] { SurfaceKind.Release, SurfaceKind.Repository });
-        var different = SurfaceSet.Create(new[] { SurfaceKind.Provider });
+            [SurfaceKind.Release, SurfaceKind.Repository]);
+        var different = SurfaceSet.Create([SurfaceKind.Provider]);
 
         Assert.Equal(
-            new[] { SurfaceKind.Repository, SurfaceKind.Release },
+            [SurfaceKind.Repository, SurfaceKind.Release],
             set.Values);
         Assert.Equal("repository,release", set.ToString());
         Assert.NotEqual(set, different);
@@ -81,14 +80,14 @@ public sealed class SurfaceSetTests
         };
         var set = SurfaceSet.Create(input);
         var equivalent = SurfaceSet.Create(
-            new[] { SurfaceKind.Repository, SurfaceKind.Release });
+            [SurfaceKind.Repository, SurfaceKind.Release]);
         var hashBeforeCallerMutation = set.GetHashCode();
 
         input[0] = SurfaceKind.Provider;
         input.Clear();
 
         Assert.Equal(
-            new[] { SurfaceKind.Repository, SurfaceKind.Release },
+            [SurfaceKind.Repository, SurfaceKind.Release],
             set.Values);
         Assert.Equal(equivalent, set);
         Assert.Equal(hashBeforeCallerMutation, set.GetHashCode());
@@ -99,10 +98,10 @@ public sealed class SurfaceSetTests
     public void ValuesCannotBeMutatedThroughAnyExposedCollectionInterface()
     {
         var set = SurfaceSet.Create(
-            new[] { SurfaceKind.Repository, SurfaceKind.Release });
+            [SurfaceKind.Repository, SurfaceKind.Release]);
         var values = set.Values;
 
-        Assert.IsAssignableFrom<IReadOnlyList<SurfaceKind>>(values);
+        Assert.IsType<IReadOnlyList<SurfaceKind>>(values, exactMatch: false);
         Assert.False(values is SurfaceKind[]);
 
         if (values is IList<SurfaceKind> list)
@@ -120,11 +119,11 @@ public sealed class SurfaceSetTests
         }
 
         Assert.Equal(
-            new[] { SurfaceKind.Repository, SurfaceKind.Release },
+            [SurfaceKind.Repository, SurfaceKind.Release],
             set.Values);
     }
 
-    private static IReadOnlyList<SurfaceKind[]> CreatePermutations(
+    private static List<SurfaceKind[]> CreatePermutations(
         IReadOnlyList<SurfaceKind> values)
     {
         var working = values.ToArray();
