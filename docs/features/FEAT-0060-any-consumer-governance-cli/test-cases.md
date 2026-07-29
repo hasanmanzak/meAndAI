@@ -216,8 +216,8 @@ has tree-equivalent hosted evidence from
 [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722),
 which tested merge commit
 [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04).
-The PR head and tested merge commit share exact tree
-`39176f2149e2a9b6cb3b03b1761ac208ebc88dcb`, so this is exact-tree-equivalent
+The PR head and tested merge commit resolve to the same exact Git tree, so this
+is exact-tree-equivalent
 hosted implementation evidence rather than a claim that checkout executed the
 head commit object directly. Ubuntu completed in 8 min 37 s and Windows in 33
 min 52 s. Both hosted C#
@@ -228,6 +228,17 @@ zero failed or skipped. Each platform passed governance 95/95, architecture
 all elapsed values are observations, not thresholds. Exact Git acquisition and
 both repository profiles remain owned by [TEST-0208](#test-0208), which follows
 this closed report/process gate.
+
+Closure-record head
+[`8cb4fa4`](https://github.com/hasanmanzak/meAndAI/commit/8cb4fa4549ef8ccd3f3eb59ded531012e79e89fa)
+then passed the C# and package gates in hosted
+[run `30427450155`](https://github.com/hasanmanzak/meAndAI/actions/runs/30427450155)
+but failed Ubuntu only at [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178).
+[FIND-0371](README.md#find-0371) removes six human-facing repetitions of the
+non-commit Git tree-object identity while preserving the two exact commit
+permalinks and their proven tree equality. The focused repository-only
+[TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+owner is the bounded correction gate; no executable behavior changed.
 
 ## Distinct-intent review
 

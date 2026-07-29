@@ -183,7 +183,7 @@ published-DLL real-repository validation are green.
 Hosted [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722)
 was associated with that PR head and tested merge commit
 [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04).
-Both objects have exact tree `39176f2149e2a9b6cb3b03b1761ac208ebc88dcb`.
+Both objects resolve to the same exact Git tree.
 Ubuntu passed in 8 min 37 s and Windows in 33 min 52 s; the Windows PowerShell
 5.1 step consumed 32 min 28 s. Both hosted filters explicitly selected
 [TEST-0195](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195).
@@ -198,3 +198,14 @@ process/acquisition foundation reused by packaging and later exact Git work.
 [TEST-0208](../../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0208)
 remains `Planned`; its exact profile semantics must be frozen before atomic
 activation. PowerShell remains authority.
+
+The first closure-record head
+[`8cb4fa4`](https://github.com/hasanmanzak/meAndAI/commit/8cb4fa4549ef8ccd3f3eb59ded531012e79e89fa)
+passed its C# and portable-package gates in hosted
+[run `30427450155`](https://github.com/hasanmanzak/meAndAI/actions/runs/30427450155),
+but Ubuntu failed only the tracked-Markdown commit-reference owner. Six visible
+copies of the shared Git tree-object SHA-1 were shaped like commit identities
+although the object was not a commit. [FIND-0371](../../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0371)
+removes that non-commit object identifier from human-facing prose while
+preserving the exact linked PR-head and tested-merge commits and their proven
+tree equality. No executable or authority behavior changes.

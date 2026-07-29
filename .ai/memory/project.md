@@ -173,7 +173,7 @@ Last verified: **2026-07-29**
   [`885ab84`](https://github.com/hasanmanzak/meAndAI/commit/885ab84faa965d052167a48dd2f52facbcaf8d99)
   passes 25/25 focused tests and the full solution passes 155 governance, 31
   architecture, and 17 packaging tests after independent fresh review; no
-  open recorded finding remains. Locked restore and format verification
+  implementation finding remains. Locked restore and format verification
   pass. Exact-tree PowerShell 7 / Windows PowerShell 5.1 `StructureOnly` pass
   in 203.6 / 284.7 seconds, and the framework-dependent published DLL (no
   apphost) self-validates the real repository as `conforming` with two
@@ -181,12 +181,18 @@ Last verified: **2026-07-29**
   [run `30424139722`](https://github.com/hasanmanzak/meAndAI/actions/runs/30424139722),
   associated with that PR head, tested merge commit
   [`9582a4a`](https://github.com/hasanmanzak/meAndAI/commit/9582a4aabb67dfcf9adf291a7eb2b781cf8c4a04)
-  over their shared exact tree
-  `39176f2149e2a9b6cb3b03b1761ac208ebc88dcb` and passed Ubuntu in 8 min 37 s
+  over their shared exact Git tree and passed Ubuntu in 8 min 37 s
   and Windows in 33 min 52 s. Both hosted
   filters selected all 25 [TEST-0195](../../docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195)
   cases with zero failed or skipped; the Windows PowerShell 5.1 step consumed
-  32 min 28 s. The next gate is the single shared process/acquisition
+  32 min 28 s. Later closure-record head
+  [`8cb4fa4`](https://github.com/hasanmanzak/meAndAI/commit/8cb4fa4549ef8ccd3f3eb59ded531012e79e89fa)
+  failed hosted [run `30427450155`](https://github.com/hasanmanzak/meAndAI/actions/runs/30427450155)
+  only because six visible copies of a non-commit Git tree identity violated
+  the tracked-Markdown commit-reference contract. The bounded correction is
+  recorded by [FIND-0371](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#find-0371)
+  and must pass both hosted gates before later implementation. The next gate
+  after that confirmation is the single shared process/acquisition
   foundation followed by exact repository/profile work in
   [SUBF-0123](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0123)
   with the [SUBF-0135](../../docs/features/FEAT-0060-any-consumer-governance-cli/README.md#subf-0135)
