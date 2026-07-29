@@ -76,6 +76,7 @@ conversations while disallowing force pushes and deletion.
 - [2026-07-29 - Protocol governance and execution architecture acceptance](2026-07-29-protocol-governance-execution-architecture-acceptance.md)
 - [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
 - [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+- [2026-07-28 - C# operational foundation ports and results](2026-07-28-feat-0059-subf-0120-ports-results.md)
 - [2026-07-27 - C# operational foundation first slice](2026-07-27-feat-0059-subf-0119-foundation.md)
 - [2026-07-27 - C# operational platform planning](2026-07-27-csharp-operational-platform-planning.md)
 - [2026-07-27 - v0.15.6 completed historical adoption issues](2026-07-27-v0156-completed-historical-adoption-issues.md)
