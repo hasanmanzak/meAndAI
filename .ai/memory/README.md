@@ -1,9 +1,29 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-28**<br>
+Last reviewed: **2026-07-29**<br>
 Protocol version: **0.16.0**<br>
-Latest immutable release before this unmerged development: **0.15.6**
+Latest immutable release before this unmerged development: **0.16.0**
+
+The maintainer accepted
+[DEC-0035](../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
+on 2026-07-29. Follow the accepted
+[architecture](../../docs/architecture/protocol-governance-and-execution/README.md),
+[successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md),
+[WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md),
+and [architecture-acceptance handoff](log/2026-07-29-protocol-governance-execution-architecture-acceptance.md).
+The product is one versioned executable protocol platform implemented in C#,
+not a collection of CLI products. Implementation authority remains withheld;
+no WIP extraction, workflow change, consumer mutation, release publication,
+authority transfer, or PowerShell retirement is authorized.
+
+Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
+is published at
+[2329f944694d24523f85b3a60352743918f0e5cd](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) and
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) retain the
+merge, test, and immutable publication evidence for
+[FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md).
 
 The immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 release is complete at
@@ -14,19 +34,10 @@ delivery, review, test, and publication evidence for
 [FEAT-0058](../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md).
 
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
-/ [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
-/ [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-[draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is complete at
-five of five slice gates. Follow the
+is the completed shared technical prerequisite. Follow the historical
 [portable-package completion handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
-and its linked prior slice/planning authority. All three foundation slices and
-all 15 delivery gates are complete. Exact implementation commit
-[`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
-passed committed-tree package evidence and
-[run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
-passed 48/48 compiled tests plus the same package bytes on Ubuntu and Windows.
-PowerShell authority and consumer repositories remain unchanged; merge and
-release are not authorized.
+for its slice evidence. Its release does not authorize any successor feature,
+consumer change, or authority migration.
 
 [FEAT-0048](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/README.md)
 / [BUG-0031](https://github.com/hasanmanzak/meAndAI/issues/117),

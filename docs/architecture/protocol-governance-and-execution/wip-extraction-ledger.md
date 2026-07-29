@@ -1,0 +1,120 @@
+# Preserved WIP Extraction Ledger
+
+| Field | Value |
+| --- | --- |
+| Classification | Accepted design-level disposition; implementation not accepted |
+| Base compared | [2329f944694d24523f85b3a60352743918f0e5cd](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd) |
+| Preserved WIP | [1873c98638ba4960734aadb188eb8c8d70b4bc52](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
+| Diff inventory | 158 changed paths, grouped completely below |
+| Extraction authority | Withheld |
+
+This ledger answers how the work on
+[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) will be used.
+The branch is an immutable design, implementation, fixture, and oracle
+reservoir. It is not a merge candidate and no row inherits passing,
+completion, release, or production-authority status.
+
+## 1. Classification meanings
+
+- **Reusable** means the behavior is compatible with the accepted
+  architecture and may be reintroduced through a new dependency-closed change.
+- **Refactor** means the source contains useful behavior but its contract,
+  ownership, namespace, data model, or boundary is incompatible with the target.
+- **Preserve-only** means it remains historical rationale, fixture, or oracle
+  evidence and is not copied into production.
+- **Reject** means the element must not constrain the target architecture.
+
+Every reusable or refactored item still requires a new owner, expected-red
+evidence, fresh implementation review, exact-head tests, and provenance.
+
+Every code-form source path below is resolved against the preserved WIP exact
+commit identified in the metadata table. The paths are inventory labels, not
+current-record authority links.
+
+## 2. Exhaustive grouped disposition
+
+| Exact WIP source set | Class | Approved destination | Required fresh evidence |
+| --- | --- | --- | --- |
+| Project memory and seven [FEAT-0060](../../features/FEAT-0060-any-consumer-governance-cli/README.md) handoff logs under `.ai/memory/` | Preserve-only | Planning input for [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), and [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Preserve the exact WIP permalink only; do not copy stale memory or passing claims |
+| WIP decision packet under `docs/decisions/`, including two draft-only records | Preserve-only | Rationale already reconciled into [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) | Draft identifiers remain reserved; successor authority comes from accepted records |
+| Earlier feature test edits under `docs/features/` and [FEAT-0059](../../features/FEAT-0059-csharp-operational-foundation/README.md) record edits | Preserve-only | Process oracle for [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) and compatibility input for [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Old tests and runs prove only their exact WIP head |
+| [FEAT-0060](../../features/FEAT-0060-any-consumer-governance-cli/README.md) analysis, contract packet, ledger, matrices, scenarios, and tests under `docs/features/` | Preserve-only | Rule/evaluator input for [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md), acquisition input for [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), differential input for [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | [TEST-0194](../../features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0194) and [TEST-0195](../../features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195) stay historical; the additional draft-only planned scenario stays unactivated |
+| WIP-only governance coverage/equivalence packet and related feature-index edits under `docs/features/` | Preserve-only | Rule inventory to [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md); equivalence and retirement to [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Its planned scenario remains unactivated; capture a fresh same-evidence matrix |
+| [Workflow](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/.github/workflows/protocol-tests.yml), [scenario ownership](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/tests/scenario-ownership.psd1), and [PowerShell governance-suite wiring](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/tests/capabilities/protocol-governance/protocol-governance.tests.ps1) | Reject as carry-forward; preserve historical wiring | New ownership split between [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), and [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Recreate scenario ownership, filters, and hosted routes on the new exact head; never cherry-pick the WIP workflow |
+| Initial-adoption mock child-process fixture and streaming tests under `tests/capabilities/initial-adoption/` | Preserve-only oracle | Process qualification in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md); legacy comparison in [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | New C# child fixture and Windows/Linux timeout, cancellation, binary-stream, and tree-termination evidence |
+| Governance enforcement, severity, and verdict value objects under `src/MeAndAI.Operations.Domain/Governance/`, plus exact identity value objects under `src/MeAndAI.Operations.Domain/Identity/` | Reusable | Shared types in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md); release identities consumed by [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | New namespace and null, case, length, grammar, build, format, and exact-head tests |
+| EvidenceScope, RepositorySnapshotMode, GovernanceProfileEvidenceState, and InstructionGraphPolicyIdentity under `src/MeAndAI.Operations.Domain/` | Refactor | Typed evidence/snapshot in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md); requirement-driven acquisition limits in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Replace repository-only and graph-derived limits with discriminated evidence and requirement-driven bounds |
+| GovernanceAuthorityState, GovernanceEngineState, and GovernanceProfileId under `src/MeAndAI.Operations.Domain/Governance/` | Reject as new core; preserve transition vocabulary | Compatibility evidence only in [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Same-evidence qualification and explicit transfer proof; these values cannot replace [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md) |
+| MarkdownDocumentIndex, ProtocolRecordIndex, analysis context, and record paths under `src/MeAndAI.Operations.Governance.Core/Analysis/` | Refactor | Parse-once evidence indexes in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Parser schema/content digest, fenced/comment/invalid-UTF-8/boundary fixtures, and typed surfaces beyond feature/decision files |
+| ProtocolIntegrationPath and ProtocolSubmoduleConfiguration under `src/MeAndAI.Operations.Governance.Core/Analysis/` | Refactor | Git-reference resolver in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Gitlink/reference equivalence, case collision, malformed configuration, exact version, initialized/unavailable object-provider tests |
+| FeatureRecordRequiredPairRule and DecisionRecordRequiredStructureRule under `src/MeAndAI.Operations.Governance.Core/Rules/` | Reusable evaluator seed; refactor required | [RULE-0001](successor-delivery-plan.md#rule-0001) and [RULE-0002](successor-delivery-plan.md#rule-0002) in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Bind exact normative fragments; reuse [TEST-0004](../../features/FEAT-0001-common-development-protocol/test-cases.md#test-0004) and [TEST-0005](../../features/FEAT-0001-common-development-protocol/test-cases.md#test-0005) only as qualification scenarios; capture fresh expected-red/green |
+| Governance rule interfaces, descriptors, identities, and catalog under `src/MeAndAI.Operations.Governance.Core/Rules/` | Refactor; hard-coded bounded catalog rejected | Complete immutable catalog in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Applicability axes, normative provenance, transitions, and fail-closed missing/unmapped/duplicate inventory |
+| Governance engine, request, evaluation, finding, report, factory, and serializer under `src/MeAndAI.Operations.Governance.Core/Contracts/` | Refactor | Conformance kernel/report in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Discriminated repository/provider/release locations; separate acquisition, evaluation, conformance, enforcement, debt, and waiver dimensions; deterministic cross-OS bytes and digest |
+| EnginePolicyBundleIdentity, ImmutableGovernanceReleaseBinding, and ProtocolPolicyIdentity under `src/MeAndAI.Operations.Governance.Core/Contracts/` | Refactor | Release envelope in [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md); policy identity consumed by [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Bind source, catalog, evaluators, hosts, schemas, runtime, projections, transitions, and attestation; tamper and mismatch tests |
+| BoundedGovernanceContract and CandidateGovernanceProfilePolicy under `src/MeAndAI.Operations.Governance.Core/Contracts/` | Reject | None | Prove the hard-coded version, two-rule boundary, and candidate-only profile policy are absent from the new dependency graph |
+| [ExactGovernanceProfileResolver](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/src/MeAndAI.Operations.Governance.Core/Contracts/ExactGovernanceProfileResolver.cs) | Split/refactor | Reference evidence in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md); semantic axes in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | Preserve exact gitlink/version proof; replace authority/consumer switch with independent role, operation, snapshot, surface, and enforcement axes |
+| [GovernanceExitCodeMapper](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/src/MeAndAI.Operations.Governance.Core/Contracts/GovernanceExitCodeMapper.cs) | Reject as core; preserve host oracle | Thin evaluator host in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), optional compatibility in [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | Keep host transport mapping separate from domain outcomes; old exit ABI cannot constrain the kernel |
+| Repository snapshot entry, path, snapshot, and port contracts under `src/MeAndAI.Operations.Governance.Core/Repository/` | Refactor | Typed evidence in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) and adapters in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Exact/candidate authority, canonical framing/order/digest, duplicate/path/content bounds, and provider evidence |
+| Exact Git object, tree, capture, limits, and snapshot-port contracts under `src/MeAndAI.Operations.Governance.Core/Repository/` | Reusable with refactor | Exact Git acquisition in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Anonymous real repositories; object type/mode/framing/binary/invalid UTF-8/missing/oversize/cancellation/admin-boundary matrix on Windows and Linux |
+| BoundedGovernanceRepositoryProjection and GovernanceRepositoryPath under `src/MeAndAI.Operations.Governance.Core/Repository/` | Refactor | Requirement-driven projection in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Replace hard-coded feature/decision paths and profile selection with aggregated rule evidence requirements, containment, and completeness |
+| Exact Git snapshot adapter, object reader, parser, and process policy under `src/MeAndAI.Operations.Governance/` | Reusable | Exact Git adapter in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Hostile Git environment, no lazy fetch/network/prompt, NUL/batch framing, stream caps, exact objects, links/reparse points, admin boundary, and two-OS integration |
+| [FileSystemGovernanceRepositorySnapshotPort](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/src/MeAndAI.Operations.Governance/FileSystemGovernanceRepositorySnapshotPort.cs) | Refactor | Candidate acquisition in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Explicitly non-authoritative HEAD/index/worktree/untracked envelope, TOCTOU, links, and reparse points |
+| [PackagedGovernancePolicySource](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/src/MeAndAI.Operations.Governance/PackagedGovernancePolicySource.cs) | Refactor | Attested envelope in [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) and resolver in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Assembly metadata alone is not authority; require release-envelope/source-commit binding and mismatch evidence |
+| GovernanceCli, GovernanceProcessBoundary, and Program under `src/MeAndAI.Operations.Governance/` | Reject as product/domain; preserve host oracle | Optional thin evaluator host in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | New host contract and isolation tests; CLI grammar and exit ABI are not carry-forward constraints |
+| [BoundedProcessRunner](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/src/MeAndAI.Operations.Infrastructure/Execution/BoundedProcessRunner.cs) | Reusable | Canonical process capability in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Reintroduce child fixture/tests for start failure, binary streams, caps, timeout, cancellation, process-tree termination, cleanup, and environment on Windows/Linux |
+| OperationalApplicationHost and host exit mapping under `src/MeAndAI.Operations.Infrastructure/Hosting/` | Refactor | First thin host in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), shared by later hosts | Typed transport outcomes distinct from domain outcomes; late cancellation, start, and dependency-failure tests |
+| Packaging process policy, temporary containment, strict UTF-8, and portable executor under `tools/MeAndAI.Operations.Packaging/` | Reusable/refactor | Immutable resolution and execution in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | One process owner; containment/cleanup, strict framing, runtime/assembly/digest mismatch, and fresh extracted execution |
+| PortablePackageBuilder, PortablePackageVerifier, and StrictJson under `tools/MeAndAI.Operations.Packaging/` | Reusable/refactor | Distribution build/verification in [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Deterministic cross-OS ZIP/manifest, ordering/timestamps, strict JSON, traversal/link/extra/missing/tamper/runtime/schema/digest, and full attestation |
+| PackagingCli and packaging Program under `tools/MeAndAI.Operations.Packaging/` | Reject as finalizer architecture | Behavior input only for [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | New least-authority release-finalizer use case with grants, journal, verification, transfer, and recovery |
+| Governance unit/integration test project under `tests/dotnet/MeAndAI.Operations.Governance.Tests/` | Preserve as oracle; selectively refactor fixtures | Assertions and fixtures split across [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md), and [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md) | New target assemblies and fresh expected-red/green; WIP pass counts do not complete a successor |
+| Architecture dependency tests under `tests/dotnet/MeAndAI.Operations.Architecture.Tests/` | Preserve-only; recreate | Every new project boundary in [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md), [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), and [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | New inward dependency assertions; the former Operations graph is not copied |
+| Packaging execution and packaging test projects under `tests/dotnet/` | Reusable test seed with expansion | Resolution/execution in [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md); distribution/finalizer in [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Fresh download/extract/execute plus same-byte cross-OS full-envelope and tamper matrix |
+| Root solution `MeAndAI.Operations.slnx`, source projects under `src/`, tool projects under `tools/`, and test projects under `tests/dotnet/`, including project, assembly metadata, and lock-file changes | Reject mechanical carry-forward; recreate/regenerate | Owning feature for each new project | New project names and dependency graph, locked restore, zero-warning Release build, format/analyzer; no copied locks or friend-assembly policy |
+
+The grouped rows cover every path in the exact 158-file diff. Extraction work
+must still record each selected file individually in the provenance receipt;
+grouping here is architecture approval, not permission to bulk copy.
+
+## 3. Important absence findings
+
+- [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md)
+  has no directly reusable implementation in the WIP. A report authority label
+  is not an authority-set snapshot, grant, separation-of-duty policy,
+  activation CAS, lease/fence, journal, receipt, or recovery grant.
+- [FEAT-0061](../../features/FEAT-0061-consumer-adoption-cli/README.md) and
+  [FEAT-0062](../../features/FEAT-0062-consumer-protocol-update-cli/README.md)
+  have no production implementation in the WIP. They consume later successor
+  contracts; governance code must not be relabeled as adoption or update.
+- [FEAT-0068](../../features/FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
+  receives packaging and provenance seeds only. Release planning,
+  predecessor-trusted execution, publication, verification, journal/recovery,
+  and authority transfer are new work.
+- [FEAT-0063](../../features/FEAT-0063-consumer-migration-powershell-retirement/README.md)
+  receives no production core. It retains only compatibility and differential
+  oracles until supported-consumer migration is separately authorized.
+
+## 4. Extraction protocol
+
+No broad merge, cherry-pick, file copy, or namespace-preserving transplant is
+approved. Every later extraction must record:
+
+1. exact WIP commit and source path;
+2. successor feature, subfeature, component, and target path;
+3. classification and required transformation;
+4. new normative rule or application contract, when applicable;
+5. fresh expected-red scenario and project-neutral fixture;
+6. exact target commit and exact test run;
+7. dependency-boundary and security review; and
+8. disposition of the source oracle and any residual compatibility owner.
+
+Only the smallest dependency-closed item may enter an authorized successor
+branch. A successful WIP run remains historical evidence for the preserved WIP
+exact commit identified above; it never becomes successor completion evidence.
+
+## 5. PR and branch disposition
+
+[Draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) stays open,
+draft, and frozen at its preserved exact head. It receives no implementation
+push. It may close without merge as prospectively superseded only after every
+approved extraction has independent exact-head proof. Its branch is preserved
+before any later closure.

@@ -60,10 +60,23 @@
 | [FEAT-0056](FEAT-0056-v0155-instruction-graph-resilience/README.md) | [Instruction-graph preflight resilience](FEAT-0056-v0155-instruction-graph-resilience/README.md) | Complete | 0.15.5 |
 | [FEAT-0058](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | [Completed historical adoption-issue compatibility](FEAT-0058-v0156-completed-historical-adoption-issues/README.md) | Complete | 0.15.6 |
 | [FEAT-0059](FEAT-0059-csharp-operational-foundation/README.md) | [Shared C# operational foundation and portable release contract](FEAT-0059-csharp-operational-foundation/README.md) | Complete | 0.16.0 |
-| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Proposed / development deferred | 0.17.0 |
-| [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption CLI](FEAT-0061-consumer-adoption-cli/README.md) | Proposed / development deferred | 0.18.0 |
-| [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update CLI](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed / development deferred | 0.19.0 |
-| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Consumer migration and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Proposed / development deferred | 0.20.0 |
+| [FEAT-0060](FEAT-0060-any-consumer-governance-cli/README.md) | [Any-consumer governance CLI](FEAT-0060-any-consumer-governance-cli/README.md) | Frozen historical WIP under accepted architecture; parent incomplete | 0.17.0 |
+| [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption application](FEAT-0061-consumer-adoption-cli/README.md) | Proposed under accepted architecture / implementation not authorized | 0.18.0 |
+| [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update application](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed under accepted architecture / implementation not authorized | 0.19.0 |
+| [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Compatibility qualification, consumer authority migration, and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Parked under accepted architecture | 0.20.0 |
+| [FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md) | [Shared executable conformance runtime](FEAT-0065-shared-executable-conformance-runtime/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
+| [FEAT-0066](FEAT-0066-shared-execution-authority-foundation/README.md) | [Shared execution-authority foundation](FEAT-0066-shared-execution-authority-foundation/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
+| [FEAT-0067](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [Evidence acquisition and managed consumer integration](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
+| [FEAT-0068](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [Protocol release finalizer and authority transfer](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
+
+The coverage-equivalence draft at
+`docs/features/FEAT-0064-governance-coverage-equivalence/README.md` was
+allocated only on the preserved, unmerged
+[exact draft commit `1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
+Its identifier position remains reserved. Rule coverage is allocated prospectively to
+[FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md), while
+compatibility and retirement qualification remain in
+[FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md).
 
 Create future feature records from the
 [feature template](../../templates/feature/README.md). Every feature directory

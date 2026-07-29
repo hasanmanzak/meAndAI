@@ -2011,6 +2011,9 @@ $documentRecordTargets['FIND-0050'] = 'https://github.com/hasanmanzak/meAndAI/is
 $documentRecordTargets['FIND-0120'] = 'https://github.com/hasanmanzak/meAndAI/issues/44'
 $documentRecordTargets['TASK-0001'] = 'https://github.com/hasanmanzak/meAndAI/issues/95'
 $documentRecordTargets['TASK-0002'] = 'https://github.com/hasanmanzak/meAndAI/issues/98'
+$documentRecordTargets['EPIC-0001'] = 'https://github.com/hasanmanzak/meAndAI/issues/153'
+$documentRecordTargets['EPIC-0002'] = 'https://github.com/hasanmanzak/meAndAI/issues/163'
+$documentRecordTargets['TASK-0003'] = 'https://github.com/hasanmanzak/meAndAI/issues/164'
 foreach ($entry in @{
     'BUG-0001' = 24; 'BUG-0002' = 27; 'BUG-0003' = 32
     'BUG-0005' = 49; 'BUG-0006' = 53; 'BUG-0007' = 55

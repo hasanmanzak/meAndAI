@@ -3,12 +3,37 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed / development not authorized |
+| Status | Frozen under accepted architecture; exact draft work preserved; parent incomplete |
 | Target version | 0.17.0 |
 | Issue | [#155](https://github.com/hasanmanzak/meAndAI/issues/155) |
-| Pull request | Not created; development deferred |
-| Decisions | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
+| Pull request | [#160](https://github.com/hasanmanzak/meAndAI/pull/160) (draft; frozen at a preservation checkpoint) |
+| Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) and partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) |
 | Tests | [TEST-0194](test-cases.md#test-0194), [TEST-0195](test-cases.md#test-0195), and [TEST-0196](test-cases.md#test-0196) |
+
+## Accepted transition and preservation hold
+
+The maintainer accepted the replacement architecture, but implementation and
+extraction remain unauthorized under
+[TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164).
+The exact draft checkpoint
+[`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52)
+preserves all current work without granting default-branch or production
+authority. Four of seven bounded subfeatures have exact draft-branch
+implementation evidence; the parent feature was not completed, merged,
+released, or granted authority, and three subfeatures remain incomplete.
+
+This CLI-shaped record remains historical input. Its prospective ownership and
+carry-forward rules are defined by the
+[accepted architecture](../../architecture/protocol-governance-and-execution/README.md),
+[successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md),
+and exact [WIP extraction ledger](../../architecture/protocol-governance-and-execution/wip-extraction-ledger.md).
+The target conformance owner is
+[FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md);
+acquisition/integration belongs to
+[FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md);
+compatibility evidence belongs to
+[FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md).
+No implementation extraction is authorized.
 
 ## Problem
 
@@ -16,13 +41,13 @@ Governance validation is difficult for the maintainer to review and is coupled
 to PowerShell runtime behavior even when the governed evidence is technology
 neutral.
 
-## Outcome
+## Historical proposed outcome
 
 A read-only C# application validates meAndAI itself and arbitrary consumers
 through explicit profiles, structured results, and one canonical governance
 engine without repository or GitHub mutation authority.
 
-## Scope
+## Historical proposed scope
 
 - Repository discovery, governance profile selection, structural and semantic
   validation, instruction graph inspection, scenario ownership, links, ledgers,
@@ -81,8 +106,10 @@ engine without repository or GitHub mutation authority.
 
 ## Decisions and relationships
 
-- Parent epic: [Epic issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
+- Historical parent epic: [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153)
+- Prospective architecture epic: [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163)
 - Dependency: [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md)
+- Successor owners: [FEAT-0065](../FEAT-0065-shared-executable-conformance-runtime/README.md), [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md), and [FEAT-0063](../FEAT-0063-consumer-migration-powershell-retirement/README.md)
 
 ## Definition of Ready
 
