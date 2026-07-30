@@ -3,13 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / second dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 design candidate; bounded red-team clean; maintainer acceptance, merge, exact-main validation, typed-handoff Gate 2 closure, and a separate implementation directive are pending |
+| Status | Gate 2 design accepted, merged, and exact-main validated; typed-handoff Gate 2 closure and a separate implementation directive remain pending before Gate 3 |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0221](test-cases.md#test-0221) |
-| Exact-main baseline | [c31819487e77fc878fc40fae6445bfef582719da](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
+| Design input baseline | [c31819487e77fc878fc40fae6445bfef582719da](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | Design authority | [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) |
+| Acceptance | [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) at exact main [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) with [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520) |
 
 ## Directive and hard boundary
 
@@ -38,6 +39,15 @@ The continuation chain is normative:
 
 No earlier step implies a later one. A draft pull request, design validation,
 or the word “continue” is not implementation authority.
+
+Steps 1 through 3 are now complete through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171),
+exact main
+[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
+and the [bounded closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+Steps 4 through 6 remain open. The current
+[SUBF-0143](README.md#subf-0143) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+authorizes only the typed-handoff Gate 1/2 packet and its expected-red plan; it
+does not authorize this slice's Gate 3.
 
 [SUBF-0152](README.md#subf-0152) is the completed predecessor. Its existing
 RuleId, RuleRevision, ExactSha256Digest, SurfaceKind, SnapshotKind,
@@ -847,27 +857,42 @@ is an explicit prerequisite for the [SUBF-0153](README.md#subf-0153) implementat
    membership. Each schema key/version binds one provider-neutral canonical
    codec, immutable model/capability key, model/parser-schema version, assembly
    and type identity, implementation artifact digest, canonicality rules, and
-   deterministic byte/depth/count/complexity resource limits. [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
-   consumes this registry and owns adapter-output qualification; it is not a
-   second schema owner.
-2. Result admission is variant-specific. Observed requires an exact
-   release-bound [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification receipt after source-contract,
-   freshness, completeness, canonical codec, payload/location coherence, and
-   deterministic resource checks. Failed requires an exact [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
-   attempt/failure receipt binding the request, interval, failure codes, and
-   absence of any valid partial context. Absent is never adapter-qualified or
-   accepted as a caller-authored fact: the protocol-owned application/kernel
-   synthesizes it only from a catalog-declared expected request slot plus a
-   routing receipt proving no input was supplied and no attempt occurred.
-   Publicly constructed Domain result values remain untrusted carriers.
+   deterministic byte/depth/node/complexity resource limits. The registry also
+   owns the pure typed demand-projector declaration and the exact persistent
+   binary schema-1 wires for repository-tree, one governed body, and
+   owner-sharded repository-target resolution across CommitObject, TagRoot, and
+   CapturedSnapshotPath selectors. [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+   consumes this registry for routing and I/O; it is not a second schema,
+   codec, demand, or cache owner.
+2. Result qualification and admission are variant-specific and distinct.
+   [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+   resolves one issued instruction's route, performs I/O, and constructs the
+   structural observed result. It then calls that plan's internal Conformance
+   qualification session; the session resolves the manifest registration,
+   invokes the canonical codec once per exact binding/cache miss, owns the
+   qualification/decode cache, and returns qualified typed-model handles or a
+   declared rejection. Application copies qualified handles into its Observed
+   proof candidate or turns rejection into a Failed proof. Admission validates
+   the instruction-bound post-codec proof and mints the internal receipt without
+   rerunning the codec. Failed binds the attempted instruction/request,
+   interval, failure codes, and absence of any valid partial context. Absent is
+   never adapter-qualified or accepted as a caller-authored fact: the
+   protocol-owned application/kernel synthesizes it only from a catalog-declared
+   expected request slot plus a routing proof candidate proving no input was
+   supplied and no attempt occurred. Publicly constructed Domain result values
+   remain untrusted carriers.
 3. The protocol-owned kernel alone constructs SealedEvaluationContext from
    variant-qualified or kernel-synthesized result inputs. Retrieval is
    generic/model-typed; no public object, dynamic, provider DTO, raw JSON node,
    service-provider lookup, reflection scan, lazy I/O model, or consumer
    executable registration exists.
-4. Decode/parse attempts are memoized thread-safely, including typed failures,
-   by exact release identity, schema key/version, content digest,
-   model/parser-schema version, and decoder/parser artifact digest.
+4. Codec qualification and parser attempts are memoized thread-safely in the
+   one Conformance session cache, including typed failures, by exact release,
+   instruction/demand, schema, binding bytes/length, model/parser contract,
+   component/artifact, and resource-budget identity. Every successful producer
+   reports exact non-negative byte, maximum-depth, node, and complexity usage;
+   usage is independently checked against its declaration and copied into the
+   proof receipt. Application owns no semantic decoder or competing cache.
 5. Context-sensitive index attempts are separately memoized, including typed
    failures, by exact release identity, exact structural EvidenceContext and
    ordered parent root references, index key/version, and indexer artifact
@@ -882,7 +907,8 @@ is an explicit prerequisite for the [SUBF-0153](README.md#subf-0153) implementat
    runtime failure and never a cached semantic evidence result.
 7. SealedEvaluationContext mints a qualified context-proof reference for the
    whole qualified EvidenceContext, including a zero-binding complete context.
-   It binds the exact request/context, release and qualification receipt,
+   It binds the exact request/context, release and admitted qualification-proof
+   digest,
    requirement key, and completeness/convergence proof without inventing a
    member location. This is the only admissible absence/coverage provenance.
 8. SealedEvaluationContext alone mints each parser-derived evidence reference.
@@ -890,12 +916,15 @@ is an explicit prerequisite for the [SUBF-0153](README.md#subf-0153) implementat
    and digest, typed node/span identity, and a validated same-or-narrower
    repository/provider refinement. Acquisition adapters do not pre-parse every
    link or line merely to create findings.
-9. RuleEvaluationInput uses a catalog-declared two-phase requirement closure.
-   It first closes qualified applicability requirements. Proven false yields
+9. RuleEvaluationInput uses a catalog-declared staged requirement closure:
+   `PlanApplicability -> CloseApplicability -> PlanEvaluation -> zero-to-N
+   AdvanceEvaluation -> EvaluationClosure -> Evaluate`. Proven false yields
    NotApplicable without acquiring or requiring evaluation-only evidence;
-   proven true activates and closes evaluation requirements; unresolved
-   applicability yields NotEvaluated. Shared requirements may serve both
-   phases but are acquired once per exact request.
+   proven true activates evaluation requirements; unresolved applicability
+   yields NotEvaluated. Each evaluation plan is non-empty, instruction-bound,
+   predecessor/session-stamped, and single-use. Shared static requirements are
+   acquired once; a proof-free Evaluate accepts only a ready closure and runs
+   no acquisition, codec, parser, index, or demand projector.
 10. Evaluation readiness is derived from variant admission, adapter/source
     qualification, completeness/freshness, canonicality, payload/location
     coherence, required typed model/index availability, and the applicable
@@ -917,19 +946,45 @@ is an explicit prerequisite for the [SUBF-0153](README.md#subf-0153) implementat
     failures, and zero findings. NotEvaluated requires unresolved evidence,
     undetermined applicability, unavailable model/index, or evaluation failure
     and may retain already proven partial findings.
-14. Activation resolves evaluator/decoder/index implementations only from the
-    exact immutable release catalog. Implementing an interface grants no
-    consumer/provider execution authority; there is no assembly/DI discovery.
+14. Activation resolves codec/parser/index/demand-projector/selector/evaluator
+   implementations only from the exact immutable release catalog and its six
+   typed registration lists. Implementing an interface grants no consumer/
+   provider execution authority; there is no assembly/DI discovery.
+15. Repository-target demand is projected only after the one per-plan
+   IGovernedReferenceIndex is ready. Repository/provider input-slot aliases
+   canonicalize to that one capability. Conformance assigns global contiguous
+   ItemIds to qualified source-reference plus source-authority handles, retains
+   the private ItemId-to-both-handles map, and emits one non-empty instruction per owning
+   repository. The governed subject target remains the instruction scope;
+   an external OwningRepositoryIdentity is object custody, not a substitute
+   EvidenceScope. [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+   owns owner-to-route resolution. An empty demand
+   performs no external instruction, I/O, payload, or codec; the registered
+   repository-target-resolution index still runs exactly once over zero target
+   and target-Markdown models plus the qualified governed-reference capability
+   and produces the empty capability.
+16. The exact public export counts are cumulative `48/72/95/96`, ending at
+   `72` Abstractions, `23` Conformance, and `1` Policy export. Activation binds
+   six typed codec/parser/index/demand-projector/selector/evaluator registration
+   lists, a `27`-row Policy registration/type-contract partition, and a
+   `35`-row full component union. These are [SUBF-0143](README.md#subf-0143)/
+   [TEST-0210](test-cases.md#test-0210) design oracles, not
+   [SUBF-0153](README.md#subf-0153) implementation authority.
 
-The [SUBF-0143](README.md#subf-0143) typed-handoff packet and [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification boundary are
-joint authority for the exact observed/failure/absence receipt contracts above;
-neither record may define a competing admission path.
+The [SUBF-0143](README.md#subf-0143) typed-handoff packet owns codec,
+qualification-cache, demand, staged-kernel, and admission semantics;
+[FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+owns routing, I/O, source qualification, and construction of instruction-bound
+proof candidates. They are joint authority for the exact observed/failure/
+absence receipt seam above; neither record may define a competing codec,
+cache, demand, or admission path.
 
 The [SUBF-0143](README.md#subf-0143) Gate 2 packet must prove feasibility for RULE-0001 through
 RULE-0005 with provider-neutral capabilities for repository/file-tree
 inventory, source text/body plus deterministic line/span mapping, provider
 object/conversation provenance, Markdown/link/record models, context-sensitive
-link/record indexes, and Git object/permalink resolution. Repository documents
+link/record indexes, and historical/current repository-target resolution.
+Repository documents
 and issue/PR/comment bodies must be able to feed the same common evaluator
 through the same typed capability while retaining distinct root/derived
 locations.
@@ -1075,16 +1130,19 @@ exact presence and shape of PredecessorInventory. Those types may not drift.
 - proof that every SliceInventory type is in the existing Domain assembly.
 
 [TEST-0221](test-cases.md#test-0221) does not reassert predecessor member contracts or duplicate
-[TEST-0220](test-cases.md#test-0220) project/package/lock/restore tests. The combined process runs both.
+[TEST-0220](test-cases.md#test-0220) project/package/lock/restore tests. The
+single Domain.Tests testhost under the existing protocol test CLI invocation
+runs both scenarios.
 Neither scenario invokes the other or consumes the other’s result. A later
 Domain export needs another explicit cumulative-owner transition.
 
 ## Future canonical execution route
 
-This route is planning, not current authority. It may start only after
-maintainer acceptance/merge/exact-main validation of this design, the
-maintainer-accepted/merged/exact-main-validated [SUBF-0143](README.md#subf-0143) typed-handoff design,
-and a separate implementation directive.
+This route is planning, not current authority. Acceptance/merge/exact-main
+validation of this design is complete through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171).
+It may start only after the separately maintainer-accepted/merged/exact-main-
+validated [SUBF-0143](README.md#subf-0143) typed-handoff design and a separate
+implementation directive.
 
 1. Start from the accepted exact-main predecessor with clean scoped project
    and lock files.
@@ -1101,8 +1159,8 @@ and a separate implementation directive.
 6. Implement exactly SliceInventory/invariants without project, package,
    dependency, lock, adapter, parser, evaluator, finding, report, host, or
    authority behavior.
-7. Run focused [TEST-0221](test-cases.md#test-0221) green, then combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) in one test
-   process, explicit Release build, and format verification.
+7. Run focused [TEST-0221](test-cases.md#test-0221) green, then combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) in the existing Domain.Tests testhost under one protocol test CLI
+   invocation, explicit Release build, and format verification.
 8. After green only, atomically set [TEST-0221](test-cases.md#test-0221) to Passing, set Automation to the
    existing Domain test project, retain project-owned Scenario traits, move
    authority from PlannedDocumentation to that DotNetTestProject owner, update
@@ -1192,11 +1250,16 @@ Only workflow YAML contains the exact literal combined filter.
 - CreateProcessAsUserW failed: 5 causes narrow retries only, not broad repeated
   commands.
 
-No new job, trigger, path filter, restore process, test process, timeout
-increase, or workflow registry is allowed. The accepted PR-head
+No new job, trigger, path filter, restore CLI invocation, test CLI invocation,
+testhost, timeout increase, or workflow registry is allowed for the
+[SUBF-0153](README.md#subf-0153)-only transition. The accepted PR-head
 [Windows job 90708165290](https://github.com/hasanmanzak/meAndAI/actions/runs/30490879521/job/90708165290)
 used approximately 33 minutes 25 seconds of the 35-minute timeout, leaving
-approximately 1 minute 35 seconds. [SUBF-0153](README.md#subf-0153) extends the existing process only.
+approximately 1 minute 35 seconds. [SUBF-0153](README.md#subf-0153) extends
+only the existing Domain.Tests testhost under the existing protocol test CLI
+invocation. A later separately accepted [TEST-0210](test-cases.md#test-0210)
+transition may add one Conformance.Tests testhost without adding a second
+workflow test invocation.
 If the combined route cannot fit, implementation stops for design review.
 
 ## Gate 2 findings incorporated
@@ -1211,7 +1274,7 @@ If the combined route cannot fit, implementation stops for design review.
 | [FIND-0379](README.md#find-0379) | Inventory-derived cumulative ownership removes handwritten counts. |
 | [FIND-0380](README.md#find-0380) | WIP records are dispositioned by exact successor owner; no code/status carry-forward. |
 | [FIND-0381](README.md#find-0381) | [SUBF-0152](README.md#subf-0152) exact-main baseline remains explicit. |
-| [FIND-0382](README.md#find-0382) | One-process hosted route, exact job evidence, and fail-closed budget remain. |
+| [FIND-0382](README.md#find-0382) | Single-invocation [SUBF-0153](README.md#subf-0153) route, existing Domain.Tests testhost, exact job evidence, and fail-closed budget remain. |
 | [FIND-0383](README.md#find-0383) | [TEST-0220](test-cases.md#test-0220) stays Passing and [TEST-0221](test-cases.md#test-0221) stays Planned until atomic activation. |
 | [FIND-0384](README.md#find-0384) | Schema-identified content plus mandatory qualification and a release-bound typed context replace metadata-only evidence. |
 | [FIND-0385](README.md#find-0385) | Target/boundary/scope and location membership close subject/source/snapshot authority. |
@@ -1236,16 +1299,20 @@ outside the current design-only mutation authority.
 
 ## Approval gate
 
-Gate 2 is not accepted merely because this revision exists. Before Gate 3:
+Gate 2 design acceptance is complete through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171),
+exact main
+[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
+and the [bounded closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+Before Gate 3:
 
-- bounded red-team must find no unresolved Blocking issue;
-- the maintainer must accept or revise this exact design;
-- the accepted design must merge and pass exact-main validation; and
-- a separately reviewed and maintainer-accepted [SUBF-0143](README.md#subf-0143) typed-handoff Gate 2
-  design must close every
+- [x] bounded red-team found no unresolved Blocking issue;
+- [x] the maintainer accepted this exact design;
+- [x] the accepted design merged and passed bounded exact-main validation;
+- [ ] a separately reviewed and maintainer-accepted [SUBF-0143](README.md#subf-0143)
+  typed-handoff Gate 2 design closes every
   [sealed evaluation boundary](#sealed-typed-evaluation-boundary) requirement,
-  merge, and pass bounded exact-main validation; and
-- a new directive must explicitly authorize [TEST-0221](test-cases.md#test-0221) source, expected red,
+  merges, and passes bounded exact-main validation; and
+- [ ] a new directive explicitly authorizes [TEST-0221](test-cases.md#test-0221) source, expected red,
   SliceInventory implementation, [TEST-0220](test-cases.md#test-0220) inventory transition, scenario
   activation, combined workflow filter, and narrow [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) change.
 

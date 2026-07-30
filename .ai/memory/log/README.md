@@ -6,7 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[evidence-acquisition design handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
+[typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
+the historical [evidence-acquisition design handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
 the historical [domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
 [domain-vocabulary planning handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
 the historical
@@ -36,18 +37,27 @@ are complete through [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170),
 exact main
 [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
 and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506).
-The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
-authorizes only Gate 1/2 design and expected-red planning for
+The historical
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-and [TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
-Its [exact design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
-is not implementation authority. Bounded red-team is clean. Maintainer
-acceptance, accepted-design merge/exact-main validation, an accepted and
-merged exact-main-validated
+[design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+produced the accepted
+[exact design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
+[PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) merged it at exact
+main
+[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
+with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+
+The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+authorizes only Gate 1/2 design and expected-red planning for
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-typed handoff, and a separate directive
-must all precede Gate 3. C# source/test, project/lock, workflow,
-scenario ownership, WIP extraction, later conformance slices, consumer
+and [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
+Its [exact typed-handoff design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
+is not implementation authority. Bounded red-team, maintainer acceptance,
+accepted-design merge/exact-main validation, and a separate directive must all
+precede Gate 3. C# source/test, project/lock/solution, workflow, scenario
+ownership,
+[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+WIP extraction, later conformance slices, consumer
 mutation, release publication, authority transfer, and PowerShell retirement
 remain unauthorized.
 
@@ -92,6 +102,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-30 - Typed-evaluation-kernel design](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md)
 - [2026-07-30 - Evidence-acquisition design](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md)
 - [2026-07-29 - Domain-vocabulary local implementation](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md)
 - [2026-07-29 - Domain-vocabulary planning](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md)

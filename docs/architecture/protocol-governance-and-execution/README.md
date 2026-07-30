@@ -3,16 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 design candidate red-team clean, implementation not authorized |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 accepted/merged/exact-main validated; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 design candidate active; implementation not authorized |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Red-team review | [Closed at design level](red-team-review.md) |
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
-| Current baseline | [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
+| Current baseline | [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | Completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is historical implementation authority; only [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 1/2 design and expected-red planning are active under the [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) |
+| Current authority | Completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is historical implementation authority; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 is historical accepted design; only [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 1/2 design and expected-red planning are active under the [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) |
 
 ## 1. Outcome
 
@@ -47,10 +47,20 @@ merged it at exact main
 and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506)
 passed both stable jobs.
 
-The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
-authorizes only Gate 1/2 design and expected-red planning for
+The historical
 [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-and [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+[design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+produced the accepted evidence contract. [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171)
+merged it at exact main
+[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
+with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+
+The current
+[SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+[design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+authorizes only Gate 1/2 design and expected-red planning for
+[SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
 Outside that exact design boundary, the following remain prohibited:
 
 - production or test implementation;
@@ -211,10 +221,10 @@ All arrows point inward. The target C# project boundaries are:
 
 | Logical project | Responsibility | Allowed dependencies |
 | --- | --- | --- |
-| `MeAndAI.Protocol.Domain` | Identities, semantic values, evidence-requirement values, acquisition/evidence values, findings, authority grants, plans, and state values | BCL only |
-| `MeAndAI.Protocol.Conformance.Abstractions` | Rule/catalog declarations over Domain requirement values, release-bound typed-model keys/context, applicability, and evaluator contracts | Domain |
-| `MeAndAI.Protocol.Conformance` | Acquisition planning over requirements, rule execution, outcome aggregation, and canonical report construction | Domain and abstractions |
-| `MeAndAI.Protocol.Policy` | Compiled baseline evaluators plus embedded catalog metadata | Domain and abstractions |
+| `MeAndAI.Protocol.Domain` | Identities, profile/outcome tokens, evidence-requirement values, and structural acquisition/evidence carriers | BCL only |
+| `MeAndAI.Protocol.Conformance.Abstractions` | Rule/catalog/schema declarations, finalized-manifest bindings, provider-neutral capabilities, evaluator inputs/intents, and proof-candidate seams over Domain values | Domain |
+| `MeAndAI.Protocol.Conformance` | Manifest/catalog activation, admission, two-phase planning, typed-model/index caches, sealed qualified references, kernel-minted findings/evaluations, and outcome aggregation | Domain and abstractions |
+| `MeAndAI.Protocol.Policy` | Exact compiled codecs/models/indexers/evaluators plus logical qualification or complete-policy exports; final artifact digests remain in the external finalized manifest | Domain and abstractions |
 | `MeAndAI.Protocol.Transitions` | Pure adoption/update transition and plan invariants | Domain |
 | `MeAndAI.Protocol.Application` | Governance evaluation, report publication, adoption, update, and protocol release-finalization use cases and I/O ports | Domain, conformance, transitions |
 | `MeAndAI.Protocol.Infrastructure.*` | Git, filesystem, GitHub, release, cache, clock, process, and report-publisher port implementations | Application and inward contracts |
@@ -330,6 +340,12 @@ for unchanged prose with changed expected outcomes, a defect record plus exact
 qualification/differential evidence. No semantic-version range infers rule
 compatibility.
 
+A bounded qualification slice may declare a smaller exact fixture inventory,
+but it is not a protocol release catalog. It has no authoritative named profile
+and cannot mint a complete-baseline `ConformanceVerdict`. Qualification-slice
+and complete-snapshot declarations, compiled exports, kernels, and results are
+non-interchangeable; relabeling a partial slice as complete fails activation.
+
 ### 9.3 Compiled policy pack
 
 The release contains both:
@@ -338,9 +354,19 @@ The release contains both:
 2. compiled C# evaluator implementations.
 
 The manifest is metadata, not an interpreted general-purpose rule language.
-Its evaluator keys must resolve to compiled implementations in the exact
-release-bound policy pack. This keeps catalogs inspectable while preventing
-arbitrary consumer or provider content from becoming executable code.
+Its evaluator, codec, model, and index keys must resolve to explicit compiled
+implementations in the exact release-bound policy export. This keeps catalogs
+inspectable while preventing arbitrary consumer or provider content from
+becoming executable code.
+
+Binding is acyclic: compiled artifacts contain logical keys only; a separate
+finalized manifest binds their exact artifact digests; the release envelope
+then binds that manifest and the artifacts. No artifact contains its own final
+digest and the canonical manifest bytes do not contain their own digest.
+Activation uses an already trusted release-loader proof that the loaded export
+came from those exact artifact bytes. Assembly names, MVIDs, self-asserted
+digests, reflection discovery, DI registration, and consumer implementations
+do not confer authority.
 
 The normative record remains the authority. The catalog references its exact
 source blob/anchor for provenance and digests the canonical rule fragment; it
@@ -433,8 +459,10 @@ valid “failure envelope.”
 
 Admission to the sealed kernel is variant-specific. Observed requires an exact
 [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
-qualification receipt; Failed requires an exact request/attempt/
-failure receipt proving that no valid partial context exists; Absent is
+manifest-bound post-codec qualification proof candidate which Conformance
+validates before minting its internal receipt; the codec is not rerun. Failed
+requires an exact request/attempt/failure proof proving that no valid partial
+context exists; Absent is
 kernel-synthesized only from a catalog-declared expected request slot plus a
 no-input/no-attempt routing receipt. A caller-authored Absent value or a raw
 public Domain result never becomes sealed authority.
@@ -447,14 +475,18 @@ qualification must succeed before the kernel can seal them for evaluation.
 
 Rules never call adapters. The application aggregates rule requirements,
 acquires each shared source once, constructs the exact context/result values,
-builds the sealed typed-model context, and only then evaluates. The exact
+and supplies proof candidates; the Conformance kernel alone admits them,
+builds the sealed typed-model context, and evaluates. The exact
 BCL-only acquisition value contract, invalid-state matrix, typed-location
 family, typed-kernel handoff, and
 [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
-plan are defined by the
-review-candidate
+plan are defined by the accepted/merged/exact-main
 [evidence-acquisition design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
-That design does not authorize implementation.
+That accepted design still does not authorize implementation. Its exact
+catalog/admission/evaluation seam is closed prospectively by the separately
+reviewed
+[SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+[typed-evaluation-kernel design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
 [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
 owns I/O,
 normalization, source-schema qualification, pagination, and convergence;
@@ -1423,7 +1455,7 @@ cannot reopen an architectural boundary without a new decision.
   architecture question remains open.
 - [x] All findings received so far are reconciled in the [red-team register](red-team-review.md).
 - [x] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
-- [x] Maintainer separately authorized and completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; the later [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) does not satisfy any implementation-entry item for [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153).
+- [x] Maintainer separately authorized and completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; the historical [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) produced accepted design only, and the current [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) satisfies no implementation-entry item.
 
 ## 27. Implementation entry gate
 
@@ -1461,11 +1493,15 @@ For [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/R
 all applicable items were satisfied and the slice is now complete at
 [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da).
 For [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153),
-the [Gate 2 design candidate](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
-and expected-red plan may be reviewed, but Gate 2 acceptance, accepted-design
-merge, exact-main validation, the item 9 typed handoff, and item 10's separate
-implementation directive remain unsatisfied. No test or production code may
-begin; all later slices remain held.
+the [Gate 2 design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
+is accepted, merged, and exact-main validated at
+[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f).
+Item 9's [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+[typed-handoff design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
+is the active Gate 2 candidate, while its acceptance/merge/exact-main
+validation and item 10's separate implementation directive remain
+unsatisfied. No test or production code may begin; all later slices remain
+held.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).

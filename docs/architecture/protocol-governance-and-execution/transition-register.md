@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Owner | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
-| Current default-branch baseline | [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
+| Current default-branch baseline | [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) |
 | Preserved WIP | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Transition state | Accepted architecture; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 design candidate red-team clean, maintainer acceptance pending; no WIP extraction authorized |
+| Transition state | Accepted architecture; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 accepted/merged/exact-main validated; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 design candidate active; no implementation or WIP extraction authorized |
 
 This register changes prospective ownership without rewriting historical
 evidence. A prior exact commit or workflow run proves only the code and
@@ -16,7 +16,7 @@ contract that it actually evaluated.
 | Record | Current truth | Architecture disposition |
 | --- | --- | --- |
 | [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) | Open historical CLI/PowerShell-migration epic | Freeze. After the accepted architecture reaches the default branch, close as prospectively superseded by [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163); do not rewrite its original outcome. |
-| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Accepted protocol-platform architecture authority | Active prospective owner for the [successor plan](successor-delivery-plan.md). [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is complete; the current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) grants [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) no implementation authority. |
+| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Accepted protocol-platform architecture authority | Active prospective owner for the [successor plan](successor-delivery-plan.md). [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is complete and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 design is accepted; the current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) grants [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) no implementation authority. |
 | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) | Accepted architecture design and integration | Owns this architecture, red-team review, successor allocation, extraction ledger, bounded validation, and integration only. |
 | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded | Preserve C#, typed shared foundation, portable JIT, read-only governance, authority states, plan/apply separation, and single-engine mutation. [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) supersedes separate CLI/application products as the architectural center. |
 | First preserved WIP decision draft ([exact draft record](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md)) | Accepted on draft, never default-branch authority | Its draft identifier remains reserved. Incorporate specification-first C# and legacy-black-box-oracle reasoning into [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md); do not present the draft record as merged history. |
@@ -155,21 +155,21 @@ The register may move from architecture hold only after:
 | Architecture red-team checklist is closed | Satisfied |
 | Successor features and test matrices are allocated | Satisfied by the [successor plan](successor-delivery-plan.md) |
 | Every selected WIP asset has an approved destination and required fresh evidence | Satisfied at design level by the [extraction ledger](wip-extraction-ledger.md); extraction remains unauthorized |
-| The accepted [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) design is merged and its exact-main commit validated | Unsatisfied; a candidate design commit or draft pull request is not exact-main evidence |
-| The [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 design is accepted, merged, and exact-main validated | Unsatisfied; it must close canonical codec/qualification, variant admission receipts, deterministic semantic budgets, typed models and two-tier caches, qualified context-proof/root/derived references, two-phase applicability/evaluation readiness, findings, and kernel-minted status before [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 3 |
-| A separate implementation directive is issued | Historical [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) directive is consumed and complete; the [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) explicitly leaves [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) implementation unsatisfied; every other boundary remains unsatisfied |
+| The accepted [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) design is merged and its exact-main commit validated | Satisfied by [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171), exact main [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f), and the [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520) |
+| The [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 design is accepted, merged, and exact-main validated | Unsatisfied; the exact [design candidate](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md) is active, but bounded red-team, maintainer acceptance, merge, and exact-main validation remain pending before [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 3 |
+| A separate implementation directive is issued | Historical [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) directive is consumed and complete; the current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) explicitly leaves [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143), [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) implementation unsatisfied; every other boundary remains unsatisfied |
 
 Therefore completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 has left architecture hold and no active slice currently has test-first
 implementation authority. [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-may proceed only through Gate 2 design review, accepted-design merge/exact-main
-validation, and the accepted/merged/exact-main-validated
+Gate 2 is complete. The active step is bounded review, maintainer acceptance,
+accepted-design merge, and exact-main validation of the
 [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-typed-handoff design. The gate-level order is
+typed-handoff Gate 2 design. Only a later separate directive may then authorize
 [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-Gate 2,
+Gate 3, followed by completed
+[SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+implementation before
 [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-typed-handoff Gate 2, [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-Gate 3, then [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-Gate 3. All other
-successor boundaries remain on architecture hold.
+Gate 3.
+All other successor boundaries remain on architecture hold.
