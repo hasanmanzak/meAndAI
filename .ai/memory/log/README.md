@@ -54,7 +54,7 @@ activation for
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
 The local working-tree candidate is on
 `codex/subf-0153-evidence-contract-implementation` from predecessor
-`23d27478af09446363bcb299dee24957e3a206a7`. Its valid red failed 1 of 1 solely
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7). Its valid red failed 1 of 1 solely
 for the absent normative 23 types; discard the separate `NETSDK1064` cache
 attempt. Current local evidence is 46 of 46 focused, 98 of 98 combined, Release
 zero warnings/zero errors, clean format, unchanged lock hashes, and unchanged

@@ -11,7 +11,7 @@
   [TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
 - The local candidate is on
   `codex/subf-0153-evidence-contract-implementation` from predecessor
-  `23d27478af09446363bcb299dee24957e3a206a7`.
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 - The accepted
   [evidence-contract design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
   remains the exact implementation boundary.
@@ -53,7 +53,7 @@
   this slice.
 - [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
   Gate 2 is accepted, merged, and bounded on exact `main`
-  `23d27478af09446363bcb299dee24957e3a206a7`, while
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7), while
   [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned` with no executable source or run evidence.
 - Gate 3 remains unauthorized until

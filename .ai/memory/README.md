@@ -43,7 +43,7 @@ activation for
 and
 [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
 On branch `codex/subf-0153-evidence-contract-implementation`, from local
-predecessor `23d27478af09446363bcb299dee24957e3a206a7`, the working-tree
+predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7), the working-tree
 candidate has a valid 1-of-1 missing-23-types red, 46-of-46 focused green,
 98-of-98 combined green, a zero-warning/zero-error Release build, clean format,
 unchanged lock hashes, and no project/package/solution/lock change.

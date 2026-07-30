@@ -981,7 +981,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
   The local activation candidate is on
   `codex/subf-0153-evidence-contract-implementation`, from predecessor
-  `23d27478af09446363bcb299dee24957e3a206a7`.
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 
   The valid red compiled the public-API reflection oracle and failed its one
   selected test solely because the normative 23-type slice inventory was
