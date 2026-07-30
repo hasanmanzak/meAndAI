@@ -359,8 +359,8 @@ The exact baseline input blobs are:
 
 | Path | Exact blob |
 | --- | --- |
-| `PROTOCOL.md` | `4698461c34196bc3639498d6b137f87e5a8bbe5d` |
-| `templates/decision.md` | `a222f89700ea589dfbda683d69ad0ad50c48d72a` |
+| `PROTOCOL.md` | SHA-1 digest: `4698461c34196bc3639498d6b137f87e5a8bbe5d` |
+| `templates/decision.md` | SHA-1 digest: `a222f89700ea589dfbda683d69ad0ad50c48d72a` |
 
 ### Initial normative fragment inventory
 
@@ -3975,7 +3975,9 @@ The corresponding initial production artifact set is exactly
 `MeAndAI.Protocol.Application.dll`, and `Markdig.dll`. Every file is referenced
 by at least one component and the proof verifies every byte of all six files.
 The locked restore graph pins NuGet package `Markdig` exactly to `1.3.2` at
-source commit `fc705234fa211d179ee1d5e7656b51ab99f70ca9`. The only accepted
+source commit
+[`fc705234fa211d179ee1d5e7656b51ab99f70ca9`](https://github.com/xoofx/markdig/commit/fc705234fa211d179ee1d5e7656b51ab99f70ca9).
+The only accepted
 .NET 10 asset is `lib/net10.0/Markdig.dll`, length `493056`, SHA-256
 `6231C6A7216466CBE7FDEAB7463A30ED29275CF90042BA64B49E1205D45E7EB5`, assembly
 identity `Markdig, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null`, file
