@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / first dependency-closed [FEAT-0065](README.md) implementation slice |
-| Status | Locally converged; exact-head and hosted evidence pending |
+| Status | Complete at exact main [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -360,10 +360,16 @@ jobs are required; no result is inferred before it exists.
 | [FIND-0370](README.md#find-0370) | Public signatures, nullability, collection exposure, and error categories were incomplete while private implementation details leaked into the proposed oracle. | `Blocking`, resolved by the [exact public API](#exact-public-api-and-semantic-contract) and observable [TEST-0220](test-cases.md#test-0220) boundary. |
 | [FIND-0371](README.md#find-0371) | Mixed-slice successor ownership, future dependency edges, and [TEST-0221](test-cases.md#test-0221) sibling review were incomplete. | `Blocking`, resolved in the feature ledger and test matrix; later slices remain unauthorized. |
 | [FIND-0372](README.md#find-0372) | [TEST-0209](test-cases.md#test-0209) collapsed incomplete acquisition and non-conforming verdict into one outcome phrase. | `Blocking`, resolved by restoring the four independent dimensions and accepted precedence in [TEST-0209](test-cases.md#test-0209). |
-| [FIND-0373](README.md#find-0373) | Future [TEST-0221](test-cases.md#test-0221) wording could imply a fourth acquisition status for absence. | `ExternalOrLegacyFollowUp`; clarified as an input fact that rolls up to `Incomplete`, with full envelope semantics still owned by [SUBF-0153](README.md#subf-0153). |
+| [FIND-0373](README.md#find-0373) | Future [TEST-0221](test-cases.md#test-0221) wording could imply a fourth acquisition status for absence. | `ExternalOrLegacyFollowUp`; clarified as an input fact that is `Incomplete`, with exact context/result-union semantics owned by [SUBF-0153](README.md#subf-0153). |
 
-Gate 2 result: [SUBF-0152](README.md#subf-0152) is dependency-closed and ready
-for Gate 3. [SUBF-0153](README.md#subf-0153),
-[SUBF-0143](README.md#subf-0143), [SUBF-0144](README.md#subf-0144),
-[SUBF-0154](README.md#subf-0154), and all other [FEAT-0065](README.md)
-implementation remain unauthorized.
+Gate 2 made [SUBF-0152](README.md#subf-0152) dependency-closed for Gate 3.
+Its later implementation, [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170),
+exact merge commit
+[`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
+and exact-main [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506)
+now close the slice. The separate
+[SUBF-0153](README.md#subf-0153) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+authorizes only its [Gate 2 design candidate](subf-0153-evidence-contract-design.md),
+not implementation. [SUBF-0143](README.md#subf-0143),
+[SUBF-0144](README.md#subf-0144), [SUBF-0154](README.md#subf-0154), and all
+other [FEAT-0065](README.md) implementation remain unauthorized.

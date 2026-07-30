@@ -3,16 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; implementation authority scoped only to [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 design candidate red-team clean, implementation not authorized |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Red-team review | [Closed at design level](red-team-review.md) |
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
-| Current baseline | [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e) |
+| Current baseline | [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Implementation authority | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) / [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220), plus its narrow existing [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) infrastructure assertion, under the [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932) and [clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847) |
+| Current authority | Completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is historical implementation authority; only [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 1/2 design and expected-red planning are active under the [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) |
 
 ## 1. Outcome
 
@@ -39,27 +39,39 @@ release boundaries.
 
 This record and [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
 are accepted. Architecture acceptance itself authorized planning records only.
-The later [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
-now authorizes only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
-and [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220),
-including registration of that scenario in the two existing stable jobs.
-Outside that exact boundary, the following remain prohibited:
+The later [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+and [infrastructure clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847)
+authorized one bounded implementation. [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170)
+merged it at exact main
+[`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
+and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506)
+passed both stable jobs.
+
+The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+authorizes only Gate 1/2 design and expected-red planning for
+[SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+and [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+Outside that exact design boundary, the following remain prohibited:
 
 - production or test implementation;
 - moving code from the preserved draft into the target branch;
-- workflow, ruleset, or required-check changes, except the authorized
-  [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  steps inside the existing stable jobs;
+- project, package, lock-file, workflow, ruleset, required-check, or scenario-
+  ownership changes;
 - consumer-repository or provider mutation;
 - release publication or protocol-authority transfer; and
 - PowerShell compatibility or source retirement.
 
-The architecture packet used a no-run route and left the workflow unchanged.
-[PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) is now merged at
+The original architecture packet used a no-run route and left the workflow
+unchanged. [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) merged it at
 [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e),
 whose exact tree passed [main run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
-Only the scoped boundary above has passed the entry gate; the architecture
-freeze remains in force everywhere else.
+Only completed
+[SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+has passed its implementation entry gate. The architecture freeze remains in
+force for
+[SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+Gate 3 and every other
+successor implementation.
 
 Outside the scoped directive, allowed work remains limited to architecture
 decisions, diagrams, terminology, record-transition maps, red-team review, and
@@ -199,8 +211,8 @@ All arrows point inward. The target C# project boundaries are:
 
 | Logical project | Responsibility | Allowed dependencies |
 | --- | --- | --- |
-| `MeAndAI.Protocol.Domain` | Identities, semantic value types, evidence, findings, authority grants, plans, and state values | BCL only |
-| `MeAndAI.Protocol.Conformance.Abstractions` | Rule, catalog, evidence-requirement, applicability, and evaluator contracts | Domain |
+| `MeAndAI.Protocol.Domain` | Identities, semantic values, evidence-requirement values, acquisition/evidence values, findings, authority grants, plans, and state values | BCL only |
+| `MeAndAI.Protocol.Conformance.Abstractions` | Rule/catalog declarations over Domain requirement values, release-bound typed-model keys/context, applicability, and evaluator contracts | Domain |
 | `MeAndAI.Protocol.Conformance` | Acquisition planning over requirements, rule execution, outcome aggregation, and canonical report construction | Domain and abstractions |
 | `MeAndAI.Protocol.Policy` | Compiled baseline evaluators plus embedded catalog metadata | Domain and abstractions |
 | `MeAndAI.Protocol.Transitions` | Pure adoption/update transition and plan invariants | Domain |
@@ -338,10 +350,27 @@ code may silently override the referenced specification.
 
 ### 9.4 Parse and acquire once
 
-Each sealed evidence context owns one normalized file/object inventory and one
-parse/index result per content digest and parser schema. Distinct rules reuse
-those immutable models while retaining distinct invariants and findings. A
-universal parser is not required; a second same-contract parser is prohibited.
+Acquisition first produces schema-identified payload bytes asserted canonical
+by an untrusted carrier, typed locations, and content-addressed structural
+bindings.
+[FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+qualifies that carrier against the exact release schema,
+source contract, provenance, resource limits, and payload/location coherence.
+The protocol-owned kernel then constructs one sealed evaluation context.
+Release/schema/content/artifact-bound decode/parse attempts and their typed
+failures are cached separately from context/location/root-reference/index-
+artifact-bound index attempts and failures. Distinct rules reuse those
+immutable typed models while retaining distinct invariants and findings.
+Canonical semantic limits are deterministic byte, depth, count, and complexity
+budgets. Host wall-clock timeout or cancellation is an operational runtime
+failure, never a memoized semantic parse/evidence result.
+
+The evaluator-facing boundary is generic and model-typed. It exposes no
+`object`, `dynamic`, raw provider DTO/JSON node, service-provider lookup,
+reflection scan, or consumer executable registration. Decoder/evaluator
+activation resolves only from the exact immutable release catalog, including
+assembly, type, schema, parser version, and artifact digest. A universal parser
+is not required; a second same-contract parser is prohibited.
 
 ## 10. Evidence and location model
 
@@ -370,24 +399,69 @@ A finding location is a discriminated value, never merely a path string:
 - release asset plus release/tag and digest; or
 - snapshot/run-level location where no narrower location exists.
 
-### 10.3 Acquisition envelope
+### 10.3 Acquisition context and result union
 
-Adapters return an evidence envelope containing:
+The post-routing request names an exact subject/source target, surface,
+snapshot kind, adapter contract, source API/schema contract, and rule-declared
+evidence requirements. One source-contract identity denotes one endpoint and
+cursor grammar; independent endpoints use distinct requests/results. The
+observed acquisition context then contains:
 
-- subject and source identity;
-- acquisition adapter and API/schema version;
-- requested and acquired evidence requirements;
-- object IDs, revisions, `updatedAt` values, ETags where available, and content
-  digests;
-- page/cursor chain and object counts;
-- acquisition start/end and convergence identity;
-- consistency class: `ExactSnapshot`, `ObjectVersionBound`,
-  `BoundedNonAtomicObservation`, or `InsufficientConsistency`;
-- redaction classification; and
-- completeness status and typed failures.
+- the requested target and exact observed boundary as one EvidenceScope;
+- schema-identified content asserted canonical but not yet qualified, content
+  digests, typed locations, and structural bindings;
+- one requirement-scoped consistency/redaction/failure state per request;
+- page/cursor observations and source-object counts, distinct from schema
+  projection/binding counts;
+- acquisition interval and provider convergence/boundary identity;
+- context-minted structural root evidence references for binding members; and
+- caller-independent Complete or Incomplete status.
+
+A structurally Complete zero-binding context carries an empty-inventory
+assertion but no member reference. After
+[FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+qualification, the sealed
+evaluation context alone mints a qualified context-proof reference for
+absence/coverage findings. Raw Domain root references are not independently
+finding authority.
+
+The closed acquisition result has three variants. Observed carries a valid
+Complete/Incomplete context. Absent records that no attempt/input was supplied
+and is Incomplete. Failed records an attempted required source that produced no
+valid context, carries requirement-scoped failures, and is Failed. There is no
+valid “failure envelope.”
+
+Admission to the sealed kernel is variant-specific. Observed requires an exact
+[FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+qualification receipt; Failed requires an exact request/attempt/
+failure receipt proving that no valid partial context exists; Absent is
+kernel-synthesized only from a catalog-declared expected request slot plus a
+no-input/no-attempt routing receipt. A caller-authored Absent value or a raw
+public Domain result never becomes sealed authority.
+
+Raw cursors, ETags, provider DTOs, credentials, response bodies, and exception
+text are never public Domain values. Adapters hash or normalize them into
+schema-identified structural carriers; exact release-bound
+[FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+qualification must succeed before the kernel can seal them for evaluation.
 
 Rules never call adapters. The application aggregates rule requirements,
-acquires each shared source once, seals the envelope, and only then evaluates.
+acquires each shared source once, constructs the exact context/result values,
+builds the sealed typed-model context, and only then evaluates. The exact
+BCL-only acquisition value contract, invalid-state matrix, typed-location
+family, typed-kernel handoff, and
+[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+plan are defined by the
+review-candidate
+[evidence-acquisition design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
+That design does not authorize implementation.
+[FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+owns I/O,
+normalization, source-schema qualification, pagination, and convergence;
+Domain derives ContentDigest and immutable structural binding/context values;
+[SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+owns typed decoding, sealed context/root/derived references,
+applicability, findings, and evaluation.
 
 ## 11. Snapshot authority
 
@@ -425,6 +499,13 @@ is a separate acquisition-planning contract. If an applicable rule's required
 capability/evidence is unavailable, the rule is `NotEvaluated` and conformance
 is `Indeterminate`; it never becomes `NotApplicable`.
 
+Requirement closure is two-phase. The catalog first declares and closes
+applicability requirements. Proven false yields `NotApplicable` without
+requiring evaluation-only evidence; proven true activates evaluation
+requirements; unresolved applicability yields `NotEvaluated`. A
+`NotApplicable` result has no finding or evaluation failure and retains the
+qualified applicability/context-proof references that establish it.
+
 Authority grants likewise are not profile or applicability inputs: they
 constrain which acquisition, publication, or mutation I/O may be performed.
 Missing authority causes a typed acquisition/publication/apply failure; it
@@ -451,10 +532,11 @@ allows it and the waiver is valid.
 The acquisition plan contains only evidence required by the selected named
 profile/rules; optional diagnostics are separately labeled warnings and cannot
 change its aggregate. `Complete` means every required evidence contract is
-complete. `Incomplete` means bounded evidence exists but coverage, freshness,
-consistency, or capability is insufficient. `Failed` means a required source
-could not produce a valid envelope. Both latter states create unresolved
-required evaluation.
+complete. `Incomplete` means either no acquisition attempt/input was supplied
+or a valid bounded context exists but coverage, freshness, consistency, or
+capability is insufficient. `Failed` means a required source was attempted but
+could not produce a valid evidence context. Both latter states create
+unresolved required evaluation.
 
 The canonical aggregate exposes two independent flags before choosing a single
 verdict:
@@ -871,8 +953,8 @@ snapshot, so a successful scan is explicitly a
 `BoundedNonAtomicObservation`, not an exact snapshot. Rules that require
 cross-object atomicity remain `NotEvaluated` unless a future provider supplies
 that evidence. Duplicate, missing, reordered, changed, capped, rate-limited,
-or otherwise unstable enumeration yields `Incomplete` or
-`AcquisitionFailed`, never success. Protocol-release limits are safety ceilings;
+or otherwise unstable enumeration yields `Incomplete` or `Failed` with typed
+requirement failures, never success. Protocol-release limits are safety ceilings;
 a caller cannot lower them for authoritative execution.
 
 Event execution binds the provider delivery ID, event object version, current
@@ -1043,7 +1125,8 @@ are distinct. Tokens are provided through protected host channels, are not
 persisted, and never enter argv, logs, findings, plans, or reports.
 
 An offline run may use only an already verified exact cache entry. A missing or
-unverifiable artifact is `AcquisitionFailed`; it does not fall back to a moving
+unverifiable artifact produces a `Failed` acquisition result with typed
+requirement failures; it does not fall back to a moving
 version or source build.
 
 Two durable consumer reference kinds are supported by one typed resolver
@@ -1340,7 +1423,7 @@ cannot reopen an architectural boundary without a new decision.
   architecture question remains open.
 - [x] All findings received so far are reconciled in the [red-team register](red-team-review.md).
 - [x] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
-- [x] Maintainer separately authorizes only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; all other slices remain unchecked by this item.
+- [x] Maintainer separately authorized and completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; the later [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) does not satisfy any implementation-entry item for [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153).
 
 ## 27. Implementation entry gate
 
@@ -1358,18 +1441,31 @@ Test-first delivery may begin only when all of the following are true:
 6. the selected successor slice satisfies protocol Gates 1 and 2, including
    numbered scenarios plus an exact expected-red design and execution route;
    and
-7. one bounded architecture/document validation is green on the exact approved
-   architecture head without starting the historical full workflow matrix; and
-8. the maintainer issues a separate explicit implementation directive.
+7. the accepted slice design is merged;
+8. one bounded architecture/document validation is green on that exact-main
+   commit without starting the historical full workflow matrix; and
+9. every separately allocated handoff design required by the slice Definition
+   of Ready is maintainer-accepted, merged, and exact-main validated—for
+   [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+   this is the
+   [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+   typed-handoff Gate 2 packet; and
+10. the maintainer issues a separate explicit implementation directive.
 
-Architecture approval alone does not satisfy item 8. Passing this list admits
+Architecture approval alone does not satisfy item 10. Passing this list admits
 only the test/project work required to capture the fresh Gate 3 expected-red
 result. Production contract code may begin only after that test fails for the
 deliberately absent contract and no unrelated infrastructure failure.
 
 For [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152),
-all eight items are satisfied. Test code may now be written solely to capture
-the fresh Gate 3 red; all later slices remain held.
+all applicable items were satisfied and the slice is now complete at
+[`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da).
+For [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153),
+the [Gate 2 design candidate](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
+and expected-red plan may be reviewed, but Gate 2 acceptance, accepted-design
+merge, exact-main validation, the item 9 typed handoff, and item 10's separate
+implementation directive remain unsatisfied. No test or production code may
+begin; all later slices remain held.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).

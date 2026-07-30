@@ -64,14 +64,13 @@
 | [FEAT-0061](FEAT-0061-consumer-adoption-cli/README.md) | [Consumer adoption application](FEAT-0061-consumer-adoption-cli/README.md) | Proposed under accepted architecture / implementation not authorized | 0.18.0 |
 | [FEAT-0062](FEAT-0062-consumer-protocol-update-cli/README.md) | [Consumer protocol update application](FEAT-0062-consumer-protocol-update-cli/README.md) | Proposed under accepted architecture / implementation not authorized | 0.19.0 |
 | [FEAT-0063](FEAT-0063-consumer-migration-powershell-retirement/README.md) | [Compatibility qualification, consumer authority migration, and PowerShell retirement](FEAT-0063-consumer-migration-powershell-retirement/README.md) | Parked under accepted architecture | 0.20.0 |
-| [FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md) | [Shared executable conformance runtime](FEAT-0065-shared-executable-conformance-runtime/README.md) | [SUBF-0152](FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) locally converged; exact-head and hosted evidence pending | 0.17.0 |
+| [FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md) | [Shared executable conformance runtime](FEAT-0065-shared-executable-conformance-runtime/README.md) | [SUBF-0152](FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 design candidate red-team clean, implementation not authorized | 0.17.0 |
 | [FEAT-0066](FEAT-0066-shared-execution-authority-foundation/README.md) | [Shared execution-authority foundation](FEAT-0066-shared-execution-authority-foundation/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0067](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [Evidence acquisition and managed consumer integration](FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 | [FEAT-0068](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | [Protocol release finalizer and authority transfer](FEAT-0068-protocol-release-finalizer-authority-transfer/README.md) | Proposed under accepted architecture / implementation not authorized | 0.17.0 |
 
-The coverage-equivalence draft at
-`docs/features/FEAT-0064-governance-coverage-equivalence/README.md` was
-allocated only on the preserved, unmerged
+The [preserved coverage-equivalence WIP draft](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0064-governance-coverage-equivalence/README.md)
+was allocated only on the preserved, unmerged
 [exact draft commit `1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
 Its identifier position remains reserved. Rule coverage is allocated prospectively to
 [FEAT-0065](FEAT-0065-shared-executable-conformance-runtime/README.md), while
