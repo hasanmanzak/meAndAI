@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-29**
+Last verified: **2026-07-30**
 
 ## Verified facts
 
@@ -9,17 +9,16 @@ Last verified: **2026-07-29**
   intends to return the repository to private after outstanding hosted and
   adoption-recovery work complete.
 - Default branch: `main`
-- Current protocol version: `0.16.0`. The latest immutable release before this
-  release-preparation candidate is
-  [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6) at
-  [`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
-  [PR #152](https://github.com/hasanmanzak/meAndAI/pull/152) and
-  [issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain its
-  delivery and publication evidence.
+- Current protocol version: `0.16.0`. The latest immutable release is
+  [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0) at
+  [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) and
+  [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) retain its
+  delivery and immutable publication evidence.
 - Most recently completed and published implementation scope:
-  [FEAT-0056](../../docs/features/FEAT-0056-v0155-instruction-graph-resilience/README.md)
-  delivers instruction-graph schema 2 and bounded parser, abort, authority,
-  and target-policy resilience.
+  [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
+  provides the typed C# operational foundation and portable verified package
+  prerequisite. Its release grants no successor implementation authority.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -59,23 +58,13 @@ Last verified: **2026-07-29**
   / [SUBF-0121](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0121)
   / [TEST-0193](../../docs/features/FEAT-0059-csharp-operational-foundation/test-cases.md#test-0193)
   / [issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) /
-  [draft PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is the
-  unmerged portable-package completion. Seventeen focused and 48 combined local
-  C# tests, locked restore, zero-warning Release build, format/analyzer evidence,
-  candidate/exact-tree StructureOnly, clean exact-commit package construction,
-  and fresh-download execution pass. Exact implementation commit
-  [`956a2b8c3d0787b6133f5d7ed2eb2a1636294560`](https://github.com/hasanmanzak/meAndAI/commit/956a2b8c3d0787b6133f5d7ed2eb2a1636294560)
-  and [run `30329211045`](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045)
-  prove the three RID-free ZIPs, external source/runtime/schema/digest manifest,
-  strict C# verifier, 48/48 compiled tests, and same-byte
-  [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695565) /
-  [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30329211045/job/90180695611)
-  handoff. The slice is five of five and feature implementation is three of
-  three subfeatures, or 100%. No consumer, PowerShell route, or production
-  authority changed. The maintainer authorized [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md) merge and immutable
-  `v0.16.0` release closure on 2026-07-28; exact release-preparation metadata,
-  renewed exact-head checks, protected merge, publication, and verification
-  remain required before that authorization is complete.
+  [PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) is complete in
+  immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
+  at exact commit
+  [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+  The release retains the portable verified package and completed foundation
+  evidence. No consumer, PowerShell route, or successor product authority was
+  changed by that release.
 - Content language: English
 - Purpose: provide a shared development protocol that other projects can pin
   while retaining independent project memory.
@@ -958,29 +947,34 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the accepted architecture at
   [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e),
   whose exact tree passed [main run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
-  The [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
-  authorizes only [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
-  and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  for fresh test-first implementation, including its route inside both existing
-  stable workflow jobs. All later slices and successor boundaries remain held.
+  The historical [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+  and [infrastructure clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847)
+  authorized only [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+  and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220).
   Expected-red checkpoint
   [`9a48c02266d9690e14240de0fac3c57d54d12fa6`](https://github.com/hasanmanzak/meAndAI/commit/9a48c02266d9690e14240de0fac3c57d54d12fa6)
-  followed a successful locked restore and failed only for the deliberately
-  absent `SurfaceSet` and `SurfaceKind` contracts. The
-  [canonical local evidence](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#evidence)
-  now records 52 of 52 focused Release tests passing, a zero-warning/zero-error
-  Release build, clean format verification, direct [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-  passes on PowerShell 7 and Windows PowerShell 5.1, and transfer of
-  [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  to its `DotNetTestProject` owner. Final StructureOnly exited zero with zero
-  failures on PowerShell 7 in approximately 160.5 seconds and on Windows
-  PowerShell 5.1 in 275.9 seconds, whose owner observation was 273,271 ms. Gate 5
-  code/test and infrastructure fresh-diff reviews are clean after all findings
-  were resolved; the latest correction review is clean and no `Blocking`
-  finding remains. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
-  is locally converged but not complete; exact-head and hosted evidence remain
-  pending. Pull-request and hosted facts are external to the candidate tree and
-  governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+  failed only for deliberately absent contracts; 52 focused tests, Release
+  build, format,
+  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+  cross-runtime StructureOnly, and Gate 5 reviews
+  later passed. [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170)
+  merged the completed implementation at exact main
+  [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
+  whose [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506)
+  passed Ubuntu and Windows.
+
+  The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+  authorizes Gate 1/2 design and expected-red planning for
+  [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+  and [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+  only. Follow the exact
+  [evidence-acquisition design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
+  Bounded red-team is clean. Maintainer acceptance, accepted-design merge and
+  exact-main validation, an accepted/merged/exact-main-validated
+  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  typed-handoff Gate 2 packet, and a separate implementation directive remain
+  missing; no source/test/project/lock/workflow/scenario-owner change is
+  authorized.
 - The accepted
   [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md)
   allocates shared conformance to
@@ -1018,10 +1012,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   reject. Four of seven WIP slices have historical exact-branch evidence, the
   parent is incomplete, and no successor inherits a passing state. Do not push
   implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
-  or extract its code. Outside the bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  stable-job route, do not change workflows, mutate consumers, publish releases,
-  transfer authority, or retire PowerShell without a later dependency-closed
-  Definition of Ready and explicit maintainer directive.
+  or extract its code. The bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  stable-job route is complete. The current
+  [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+  directive authorizes no
+  workflow or scenario-owner change. Do not implement, mutate consumers,
+  publish releases, transfer authority, or retire PowerShell without a later
+  dependency-closed Definition of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

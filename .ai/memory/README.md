@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-29**<br>
+Last reviewed: **2026-07-30**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -13,21 +13,28 @@ on 2026-07-29. Follow the accepted
 [WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md),
 the historical [architecture-acceptance handoff](log/2026-07-29-protocol-governance-execution-architecture-acceptance.md),
 the historical [domain-vocabulary planning handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
-and the current [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md).
+the historical [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
+and the current [evidence-acquisition design handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-design.md).
 The product is one versioned executable protocol platform implemented in C#,
-not a collection of CLI products. Implementation authority is granted only to
-[SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
-and its [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-stable-job route, plus the narrow existing
-[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-infrastructure assertion authorized by the
-[clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847).
-[TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-is locally converged; exact-head and hosted evidence remain pending.
-Pull-request and hosted facts are external to the candidate tree and governed
-by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
-No WIP extraction, later conformance slice, consumer mutation,
-release publication, authority transfer, or PowerShell retirement is authorized.
+not a collection of CLI products. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+are complete through [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170),
+exact main commit
+[`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
+and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506).
+
+The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+authorizes only Gate 1/2 design and expected-red planning for
+[SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+and [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+Follow the exact [evidence-acquisition design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
+Bounded red-team is clean. Maintainer acceptance, accepted-design merge,
+exact-main validation, an accepted/merged/exact-main-validated
+[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+typed handoff, and a separate implementation directive remain required. No
+C# source/test, project/package/lock, workflow/scenario-owner, WIP extraction,
+consumer, release, publication, authority-transfer, or PowerShell-retirement
+change is authorized.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at

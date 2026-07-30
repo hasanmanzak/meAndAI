@@ -6,8 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
-the historical
+[evidence-acquisition design handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
+the historical [domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
 [domain-vocabulary planning handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
 the historical
 [protocol governance and execution architecture acceptance handoff](2026-07-29-protocol-governance-execution-architecture-acceptance.md),
@@ -30,23 +30,33 @@ tests; they do not copy shared evaluators, fixtures, or transitions.
 and [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) remain
 frozen at
 [1873c98638ba4960734aadb188eb8c8d70b4bc52](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
-Only [SUBF-0152](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+[SUBF-0152](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 and [TEST-0220](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-have implementation authority. The [canonical local evidence](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#evidence)
-is locally converged and [TEST-0220](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-has moved to its `DotNetTestProject` owner. Exact-head and hosted evidence remain
-pending. Pull-request and hosted facts are external to the candidate tree and
-governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165). WIP
-extraction, later conformance slices, consumer mutation, release publication,
-authority transfer, and PowerShell retirement remain unauthorized.
+are complete through [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170),
+exact main
+[`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
+and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506).
+The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+authorizes only Gate 1/2 design and expected-red planning for
+[SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+and [TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+Its [exact design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md)
+is not implementation authority. Bounded red-team is clean. Maintainer
+acceptance, accepted-design merge/exact-main validation, an accepted and
+merged exact-main-validated
+[SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+typed handoff, and a separate directive
+must all precede Gate 3. C# source/test, project/lock, workflow,
+scenario ownership, WIP extraction, later conformance slices, consumer
+mutation, release publication, authority transfer, and PowerShell retirement
+remain unauthorized.
 
-Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
+Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
-[`5321f1f1aa5966114c69b46bf6ed9191df109e6b`](https://github.com/hasanmanzak/meAndAI/commit/5321f1f1aa5966114c69b46bf6ed9191df109e6b).
-[FEAT-0058](../../../docs/features/FEAT-0058-v0156-completed-historical-adoption-issues/README.md),
-[PR #152](https://github.com/hasanmanzak/meAndAI/pull/152), and
-[issue #149](https://github.com/hasanmanzak/meAndAI/issues/149) retain the
-delivery and publication evidence. Follow the
+[`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd).
+[PR #159](https://github.com/hasanmanzak/meAndAI/pull/159) and
+[issue #154](https://github.com/hasanmanzak/meAndAI/issues/154) retain its
+delivery and publication evidence. Immutable v0.15.6 remains historical in the
 [completed-historical adoption-issue handoff](2026-07-27-v0156-completed-historical-adoption-issues.md).
 The completed [v0.15.5 handoff](2026-07-26-v0155-instruction-graph-resilience.md)
 and earlier slice handoffs remain historical evidence.
@@ -82,6 +92,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-30 - Evidence-acquisition design](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md)
 - [2026-07-29 - Domain-vocabulary local implementation](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md)
 - [2026-07-29 - Domain-vocabulary planning](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md)
 - [2026-07-29 - Protocol governance and execution architecture acceptance](2026-07-29-protocol-governance-execution-architecture-acceptance.md)
