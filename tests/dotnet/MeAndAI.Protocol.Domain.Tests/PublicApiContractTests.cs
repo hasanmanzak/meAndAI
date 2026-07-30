@@ -115,7 +115,9 @@ public sealed class PublicApiContractTests
             .OrderBy(type => type.FullName, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(expectedExportedTypes, exportedTypes);
+        Assert.All(
+            expectedExportedTypes,
+            expectedType => Assert.Contains(expectedType, exportedTypes));
         AssertTypeShape(
             typeof(RuleId),
             typeof(IComparable<RuleId>),

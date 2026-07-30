@@ -6,7 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
+[evidence-contract implementation handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
+the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 the historical [evidence-acquisition design handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
 the historical [domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
 [domain-vocabulary planning handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
@@ -46,15 +47,46 @@ produced the accepted
 main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+The later
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+authorizes bounded Gate 3 implementation and atomic workflow/scenario-owner
+activation for
+[SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+The local working-tree candidate is on
+`codex/subf-0153-evidence-contract-implementation` from predecessor
+`23d27478af09446363bcb299dee24957e3a206a7`. Its valid red failed 1 of 1 solely
+for the absent normative 23 types; discard the separate `NETSDK1064` cache
+attempt. Current local evidence is 46 of 46 focused, 98 of 98 combined, Release
+zero warnings/zero errors, clean format, unchanged lock hashes, and unchanged
+project/package/solution/lock files.
+[TEST-0221](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+is `Passing` under the existing
+`MeAndAI.Protocol.Domain.Tests` owner. Workflow/scenario-owner activation is
+applied and the local
+[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+activation implementation is green. Gate 5
+removed the private `CanonicalEvidencePayload` constructor oracle and expanded
+public-observable error, equality, and ownership coverage. None of these facts
+claims a candidate commit, pull request, hosted run, merge, committed exact
+tree, or exact-head evidence.
 
-The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only Gate 1/2 design and expected-red planning for
+The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+produced the Gate 1/2 design and expected-red planning for
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 and [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
 Its [exact typed-handoff design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
-is not implementation authority. Bounded red-team, maintainer acceptance,
-accepted-design merge/exact-main validation, and a separate directive must all
-precede Gate 3. C# source/test, project/lock/solution, workflow, scenario
+is accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+but is not implementation authority.
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. Gate 3 may begin only after the complete
+[SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+packet merges, its exact `main` tree is validated, and a separate directive is
+granted.
+[SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+C# source/test,
+project/lock/solution, workflow,
+scenario
 ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, later conformance slices, consumer
@@ -102,6 +134,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-30 - Evidence-contract local activation candidate](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md)
 - [2026-07-30 - Typed-evaluation-kernel design](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md)
 - [2026-07-30 - Evidence-acquisition design](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md)
 - [2026-07-29 - Domain-vocabulary local implementation](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md)

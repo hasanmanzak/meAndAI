@@ -15,7 +15,8 @@ the historical [architecture-acceptance handoff](log/2026-07-29-protocol-governa
 the historical [domain-vocabulary planning handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
 the historical [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
 the historical [evidence-acquisition design handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
-and the current [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md).
+the current [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
+and the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md).
 The product is one versioned executable protocol platform implemented in C#,
 not a collection of CLI products. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
@@ -33,20 +34,50 @@ produced the accepted
 main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
-That design has no executable evidence or implementation authority.
+That historical directive granted no executable or implementation authority.
+The later
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+now authorizes bounded Gate 3 implementation plus atomic workflow/scenario-owner
+activation for
+[SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+and
+[TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+On branch `codex/subf-0153-evidence-contract-implementation`, from local
+predecessor `23d27478af09446363bcb299dee24957e3a206a7`, the working-tree
+candidate has a valid 1-of-1 missing-23-types red, 46-of-46 focused green,
+98-of-98 combined green, a zero-warning/zero-error Release build, clean format,
+unchanged lock hashes, and no project/package/solution/lock change.
+[TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+is `Passing`, its current owner is the existing
+`MeAndAI.Protocol.Domain.Tests` project, and the bounded workflow/scenario-owner/
+[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+activation implementation is locally green. Gate 5 removed the private
+`CanonicalEvidencePayload` constructor oracle and strengthened public-observable
+error, equality, and defensive-ownership coverage. Discard the separate
+`NETSDK1064` cache attempt. These are local candidate facts, not a commit,
+pull-request, hosted-run, merge, committed-exact-tree, or exact-head claim.
+Follow the current implementation handoff above.
 
-The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only Gate 1/2 design and expected-red planning for
+The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+produced the Gate 1/2 design and expected-red plan for
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
 Follow the exact
 [typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
-Bounded red-team, maintainer acceptance, accepted-design merge/exact-main
-validation, and a separate implementation directive remain required. No C#
-source/test, Gate 3, project/package/lock/solution, workflow/scenario-owner/
+That Gate 2 packet is accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+[TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`, with no executable source or run.
+[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+Gate 3 may begin only after the complete
+[SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+packet merges, its exact `main` tree is validated, and a separate implementation
+directive is granted. No
+[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+C# source/test, Gate 3, project/package/lock/solution, workflow/scenario-owner/
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
-WIP extraction, consumer, release, publication, authority-transfer,
-or PowerShell-retirement change is authorized.
+WIP extraction, consumer, release, publication, authority-transfer, or
+PowerShell-retirement change is authorized.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at

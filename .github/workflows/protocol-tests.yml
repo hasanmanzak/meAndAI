@@ -126,7 +126,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0220"
+          --filter "Scenario=TEST-0220|Scenario=TEST-0221"
       - name: Build exact portable operations package set
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -307,7 +307,7 @@ jobs:
           --no-restore
           --nologo
           --verbosity minimal
-          --filter "Scenario=TEST-0220"
+          --filter "Scenario=TEST-0220|Scenario=TEST-0221"
       - name: Run runtime-efficiency contract on Windows PowerShell 7
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh

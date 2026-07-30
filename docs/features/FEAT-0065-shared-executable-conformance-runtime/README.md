@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0152](#subf-0152) complete; [SUBF-0153](#subf-0153) Gate 2 accepted/merged/exact-main validated; [SUBF-0143](#subf-0143) Gate 2 design candidate active; implementation not authorized |
+| Status | [SUBF-0152](#subf-0152) complete; [SUBF-0143](#subf-0143) Gate 2 accepted/merged/exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); [SUBF-0153](#subf-0153) Gate 3 local candidate green and [TEST-0221](test-cases.md#test-0221) Passing; candidate commit, PR, hosted exact-head, merge, and exact-main closure pending |
 | Target version | 0.17.0 |
 | Issue | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) |
-| Pull request | Completed [SUBF-0152](#subf-0152): [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170); accepted [SUBF-0153](#subf-0153) design: [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171); active [SUBF-0143](#subf-0143) design remains governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
+| Pull request | Completed [SUBF-0152](#subf-0152): [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170); accepted [SUBF-0153](#subf-0153) design: [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171); accepted [SUBF-0143](#subf-0143) Gate 2 exact-main predecessor: [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); current [SUBF-0153](#subf-0153) implementation candidate PR pending |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), and [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) |
 | Tests | [TEST-0209](test-cases.md#test-0209), [TEST-0210](test-cases.md#test-0210), [TEST-0211](test-cases.md#test-0211), [TEST-0220](test-cases.md#test-0220), [TEST-0221](test-cases.md#test-0221), and [TEST-0222](test-cases.md#test-0222) |
 
@@ -36,19 +36,32 @@ and its [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issue
 records bounded exact-main validation. That consumed design authority did not
 authorize implementation.
 
-The current
+The later
 [SUBF-0143](#subf-0143)
 [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only Gate 1/2 design and expected-red planning for
-[SUBF-0143](#subf-0143)/[TEST-0210](test-cases.md#test-0210). Its
-[typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md)
-is a review candidate. Production code, executable tests, Gate 3,
-project/package/lock/solution files, workflows, scenario ownership,
-[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP
-extraction, provider or consumer mutation, publication, release, authority
-transfer, and PowerShell retirement remain unauthorized. Maintainer acceptance,
-merge of the accepted [SUBF-0143](#subf-0143) packet, bounded exact-main validation, and a
-separate implementation directive are required before Gate 3.
+produced the accepted
+[typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md).
+That typed-handoff Gate 2 packet was accepted, merged, and bounded exact-main
+validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+It satisfies the [SUBF-0153](#subf-0153) typed-handoff prerequisite but grants
+no [SUBF-0143](#subf-0143)/[TEST-0210](test-cases.md#test-0210) implementation
+authority.
+
+The subsequent scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+authorized exactly the [SUBF-0153](#subf-0153) Gate 3 packet: fresh
+[TEST-0221](test-cases.md#test-0221) source and expected red, the bounded
+SliceInventory implementation, the [TEST-0220](test-cases.md#test-0220)
+inventory transition, scenario activation, the existing stable-job combined
+filter, and the narrow
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+transition. The local candidate consumed that authority and is green. It does
+not authorize WIP extraction, [SUBF-0143](#subf-0143) Gate 3, provider or
+consumer mutation, release publication, authority transfer, PowerShell
+retirement, or any project/package/dependency/lock graph expansion. Candidate
+commit, exact-commit StructureOnly, PR, hosted exact-head, merge, and exact-main
+closure evidence remain pending.
 
 ## Problem
 
@@ -151,7 +164,7 @@ parser, lifecycle, and target-resolution reviews are recorded separately as
 | `FIND-0380` <a name="find-0380"></a> | Preserved WIP mixes reusable ideas with repository-only evidence, reports, parsers, hosts, and CLI contracts. | `Blocking`, resolved by exact successor-owner [WIP dispositions](subf-0153-evidence-contract-design.md#prior-art-and-wip-disposition); no source or passing state is inherited. |
 | `FIND-0381` <a name="find-0381"></a> | Records called SUBF-0152 local/pending after exact-main completion. | `Blocking`, resolved by reconciling [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170), exact commit [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da), and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506). |
 | `FIND-0382` <a name="find-0382"></a> | A separate [TEST-0221](test-cases.md#test-0221) workflow test invocation exceeds the tight Windows budget and duplicates discovery. | `Blocking`, resolved for the [SUBF-0153](#subf-0153)-only route by one protocol test CLI invocation using the existing Domain.Tests testhost, exact-count [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), scoped lock hashes, and the exact [budget job](https://github.com/hasanmanzak/meAndAI/actions/runs/30490879521/job/90708165290). A later accepted [TEST-0210](test-cases.md#test-0210) transition may add one Conformance.Tests testhost without adding another workflow test invocation. |
-| `FIND-0383` <a name="find-0383"></a> | Lifecycle prose had replaced canonical scenario states. | `Blocking`, resolved by retaining [TEST-0220](test-cases.md#test-0220) `Passing` and [TEST-0221](test-cases.md#test-0221) `Planned` until atomic authorized activation. |
+| `FIND-0383` <a name="find-0383"></a> | Lifecycle prose had replaced canonical scenario states. | `Blocking`, resolved by retaining [TEST-0220](test-cases.md#test-0220) `Passing` and [TEST-0221](test-cases.md#test-0221) `Planned` until atomic authorized activation; [TEST-0221](test-cases.md#test-0221) is now `Passing` in the local candidate after that activation. |
 | `FIND-0384` <a name="find-0384"></a> | The first SUBF-0153 draft carried provenance metadata but no document/issue/PR/comment/file-tree content. | `Blocking`, resolved by schema-identified, defensively copied payload bytes and a mandatory release-bound qualification/typed-model handoff. |
 | `FIND-0385` <a name="find-0385"></a> | Request subject/source, snapshot authority, and location identity were independently constructible. | `Blocking`, resolved by requested target, observed boundary, exact EvidenceScope, and scope-owned locations/bindings. |
 | `FIND-0386` <a name="find-0386"></a> | Bare location/digest values and public Domain construction could be mistaken for verified evidence authority. | `Blocking`, resolved by context-minted structural root references, explicit untrusted-carrier semantics, [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) payload/location qualification, and SUBF-0143 parser-derived references. |
@@ -159,7 +172,7 @@ parser, lifecycle, and target-resolution reviews are recorded separately as
 | `FIND-0388` <a name="find-0388"></a> | Location equality, version grammar, UTF-16 validity, page counts, and cursor uniqueness had contradictory edges. | `Blocking`, resolved by concrete base equality, explicit version/UTF-16 rules, long checked counts, non-paged semantics, and adjacent-transition uniqueness. |
 | `FIND-0389` <a name="find-0389"></a> | The live directive requires design review, merge, exact-main validation, then a separate implementation directive. | `Blocking`, resolved by making that chain an unchecked DoR/continuation gate. |
 | `FIND-0390` <a name="find-0390"></a> | The expected-red route could run StructureOnly on an intentionally invalid authority tree and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) could miss duplicate commands or self-register scenario IDs. | `Blocking`, resolved by transient-red prohibition, split IDs, exact-count command assertions, and lock-hash proof. |
-| `FIND-0391` <a name="find-0391"></a> | [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) [TEST-0214](../FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) still uses the superseded “one typed acquisition envelope” terminology after SUBF-0153 selected EvidenceContext plus a closed AcquisitionResult union. | `ExternalOrLegacyFollowUp` owned by [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)/[TEST-0214](../FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) Gate 2; it must consume the accepted result/context contract before implementation, but the current SUBF-0153 design-only directive does not authorize sibling-record mutation. |
+| `FIND-0391` <a name="find-0391"></a> | [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) [TEST-0214](../FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) still uses the superseded “one typed acquisition envelope” terminology after SUBF-0153 selected EvidenceContext plus a closed AcquisitionResult union. | `ExternalOrLegacyFollowUp` owned by [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)/[TEST-0214](../FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) Gate 2; it must consume the accepted result/context contract before implementation, but the scoped SUBF-0153 activation directive does not authorize sibling-record mutation. |
 | `FIND-0392` <a name="find-0392"></a> | Payload schema, provider/source contracts, and provider ObjectType had overlapping or implicit semantic owners. | `Blocking`, resolved in design by one immutable SUBF-0143 release schema registry and explicit [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) adapter, source-contract, failure-code, and ObjectType registries/contracts. |
 | `FIND-0393` <a name="find-0393"></a> | SUBF-0153 implementation could begin before the exact typed evaluation seam was accepted. | `Blocking`, resolved by the gate-level DAG: accepted/merged/exact-main SUBF-0153 Gate 2, then accepted/merged/exact-main SUBF-0143 typed-handoff Gate 2, then a separate directive before SUBF-0153 Gate 3. |
 | `FIND-0394` <a name="find-0394"></a> | Content-only parse/index caching, adapter-minted refined references, reference-free empty-inventory findings, and `Complete`-only evaluation readiness could cross locations or manufacture closure. | `Blocking`, resolved in design by separate release/artifact-bound decode and context/location-bound index caches, sealed-context qualified context-proof/derived references, and kernel-derived readiness/applicability/final status. |
@@ -207,19 +220,19 @@ parser, lifecycle, and target-resolution reviews are recorded separately as
 
 | Test readiness | Current state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) executable and complete; [TEST-0221](test-cases.md#test-0221) Gate 2 design complete; [TEST-0210](test-cases.md#test-0210) Gate 2/expected-red design candidate | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; later executable scenarios remain planned |
-| Test code | [TEST-0220](test-cases.md#test-0220) exact-main complete; [TEST-0221](test-cases.md#test-0221) and [TEST-0210](test-cases.md#test-0210) deliberately absent | No source, project, lock, workflow, scenario-owner, expected-red execution, or [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) mutation is authorized |
-| Baseline run | [SUBF-0153](#subf-0153) Gate 2 exact-main closure complete; executable baseline remains [SUBF-0152](#subf-0152) | [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171), exact design commit [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f), and [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520); no [TEST-0221](test-cases.md#test-0221) or [TEST-0210](test-cases.md#test-0210) executable evidence exists |
+| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) executable and complete; [TEST-0221](test-cases.md#test-0221) Passing in the local candidate; [TEST-0210](test-cases.md#test-0210) Gate 2 design accepted/merged/exact-main but still Planned | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; no later executable scenario inherits [TEST-0221](test-cases.md#test-0221) evidence |
+| Test code | [TEST-0220](test-cases.md#test-0220) exact-main complete; [TEST-0221](test-cases.md#test-0221) is owned by the existing `MeAndAI.Protocol.Domain.Tests` project and locally green; [TEST-0210](test-cases.md#test-0210) remains deliberately absent | [TEST-0221](test-cases.md#test-0221) focused `46/46`; combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) `98/98`; local [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) green; Release build `0` warnings/`0` errors; severity-`info` format verification clean |
+| Baseline run | Accepted exact-main typed-handoff predecessor is [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); [SUBF-0153](#subf-0153) local activation packet is green | Valid reflection expected red selected/executed `1/1` and failed solely for the absent `23` SliceInventory types; scoped lock fingerprints `03EE...CB46` and `D206...00BC` were unchanged; no graph expansion; candidate commit, exact-commit/hosted/PR/exact-main closure pending |
 
 ## Decomposition and subfeature gates
 
 | ID | Slice | Tracking | Dependencies | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | `SUBF-0142` <a name="subf-0142"></a> | Original typed rule/evidence/location/outcome/report planning slice | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | Accepted architecture | [TEST-0209](test-cases.md#test-0209) / not started | Gate 2 found mixed contracts | Superseded before implementation by [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), and [SUBF-0154](#subf-0154); never reuse |
-| `SUBF-0143` <a name="subf-0143"></a> | [Qualification/complete catalog separation, release-bound provider-neutral typed context, persistent schema wires, topological owner-sharded target demand, sealed references, staged evaluator kernel, first common-rule slice, and deterministic aggregation](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) | Accepted/merged/exact-main-validated [SUBF-0153](#subf-0153) Gate 2 for its own Gate 2; completed [SUBF-0153](#subf-0153) before its Gate 3 | [TEST-0210](test-cases.md#test-0210) / expected-red matrix designed; no executable source or run | Bounded red-team and maintainer acceptance pending; exact design inventory is `48/72/95/96`, final public split `72/23/1`, with `27` Policy registration/type-contract and `35` full component rows | Gate 2 design candidate; implementation not authorized |
+| `SUBF-0143` <a name="subf-0143"></a> | [Qualification/complete catalog separation, release-bound provider-neutral typed context, persistent schema wires, topological owner-sharded target demand, sealed references, staged evaluator kernel, first common-rule slice, and deterministic aggregation](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) | Accepted/merged/exact-main-validated [SUBF-0153](#subf-0153) Gate 2 for its own Gate 2; completed [SUBF-0153](#subf-0153) before its Gate 3 | [TEST-0210](test-cases.md#test-0210) / expected-red matrix designed; no executable source or run | Bounded red-team and maintainer acceptance complete; exact design inventory is `48/72/95/96`, final public split `72/23/1`, with `27` Policy registration/type-contract and `35` full component rows | Gate 2 accepted/merged/exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); Gate 3 not authorized |
 | `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0143](#subf-0143) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
 | `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); architecture [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); implementation [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170) | [TEST-0220](test-cases.md#test-0220) / expected red, 52 of 52 focused Release tests, cross-runtime StructureOnly, and exact-main [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506) | Gate 5 reviews and exact-main Ubuntu/Windows validation clean; zero unresolved `Blocking` findings | Complete at [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
-| `SUBF-0153` <a name="subf-0153"></a> | [Evidence requirements, target/boundary scope, asserted-canonical payloads, typed locations, contexts, and acquisition-result union](subf-0153-evidence-contract-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) / [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) | Completed [SUBF-0152](#subf-0152) for Gate 2; accepted/merged/exact-main-validated [SUBF-0143](#subf-0143) typed-handoff Gate 2 before Gate 3 | [TEST-0221](test-cases.md#test-0221) / expected-red matrix designed; no executable source or run | Gate 2 accepted/merged/exact-main validated at [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) | Gate 2 design complete; implementation not authorized |
+| `SUBF-0153` <a name="subf-0153"></a> | [Evidence requirements, target/boundary scope, asserted-canonical payloads, typed locations, contexts, and acquisition-result union](subf-0153-evidence-contract-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) / [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) / [Gate 3 activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) | Completed [SUBF-0152](#subf-0152); accepted/merged/exact-main [SUBF-0143](#subf-0143) typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) | [TEST-0221](test-cases.md#test-0221) Passing in existing Domain.Tests: focused `46/46`, combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) `98/98` | Valid expected red `1/1` failed solely for absent `23` SliceInventory types; Release and format clean; lock fingerprints unchanged; no graph expansion | Gate 3 local candidate green; candidate commit, PR, hosted exact-head, merge, and exact-main closure pending |
 | `SUBF-0154` <a name="subf-0154"></a> | Canonical report sealing, serialization, digest, redaction, and full composed qualification | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), [SUBF-0144](#subf-0144) | [TEST-0222](test-cases.md#test-0222), [TEST-0209](test-cases.md#test-0209) / not started | Pending | Proposed / not authorized |
 
 [TEST-0209](test-cases.md#test-0209) is a feature-level composed production
@@ -276,20 +289,25 @@ aggregator and cannot close a predecessor by collecting other tests' results.
   passed the bounded structural/document route recorded in the
   [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520)
   without restarting the held full hosted workflow matrix.
-- [ ] A separately reviewed and maintainer-accepted SUBF-0143 typed-handoff
+- [x] The separately reviewed and maintainer-accepted SUBF-0143 typed-handoff
   Gate 2 packet closes persistent schema wires, plan-bound Conformance
   codec/qualification/cache ownership, instruction-bound admission receipts,
   four-counter semantic budgets, typed producer/demand DAG, owner-sharded target
   projection, context-proof/derived references, zero-to-N staged evaluation
-  readiness, finding, and final-status ownership; that packet is merged and
-  passes bounded exact-main validation before SUBF-0153 implementation.
-- [ ] A separate maintainer directive explicitly authorizes [TEST-0221](test-cases.md#test-0221) source,
+  readiness, finding, and final-status ownership; it is accepted, merged, and
+  bounded exact-main validated at
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+- [x] The separate
+  [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+  explicitly authorizes [TEST-0221](test-cases.md#test-0221) source,
   expected-red execution, production implementation, [TEST-0220](test-cases.md#test-0220) inventory
   transition, scenario-owner activation, combined workflow filter, and narrow
   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) update.
 
-No unchecked item may be inferred from design publication, structural
-validation, a draft pull request, or the word “continue.” Gate 3 remains closed.
+All [SUBF-0153](#subf-0153) Gate 3 entry items are satisfied. The scoped local
+candidate is green; that does not imply a candidate commit, exact-commit
+StructureOnly result, PR, hosted exact-head run, merge, exact-main validation,
+release, or authority transfer.
 
 ## Definition of Ready for [SUBF-0143](#subf-0143)
 
@@ -316,11 +334,12 @@ validation, a draft pull request, or the word “continue.” Gate 3 remains clo
   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   obligations,
   and unchanged Windows budget are defined.
-- [ ] Bounded Gate 2 red-team has no unresolved `Blocking` or `Important`
+- [x] Bounded Gate 2 red-team has no unresolved `Blocking` or `Important`
   finding.
-- [ ] The maintainer has accepted the [SUBF-0143](#subf-0143) design candidate.
-- [ ] The accepted design packet is merged and its exact-main commit passes
-  bounded structural/document validation.
+- [x] The maintainer accepted the [SUBF-0143](#subf-0143) design.
+- [x] The accepted design packet is merged and its exact-main predecessor
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7)
+  passed bounded structural/document validation.
 - [ ] A separate maintainer directive explicitly authorizes the first
   [TEST-0210](test-cases.md#test-0210) ContractSlice source, expected-red
   execution, reviewed project/lock transition, and bounded production
@@ -349,12 +368,27 @@ exact merge commit
 [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
 and exact-main [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506).
 
-[SUBF-0153](#subf-0153) is complete through Gate 2 design acceptance, merge,
-and bounded exact-main validation, but its implementation and
-[TEST-0221](test-cases.md#test-0221) remain
-pending. [SUBF-0143](#subf-0143) is not done: the current packet is only a Gate
-2 design candidate and [TEST-0210](test-cases.md#test-0210) has no executable
-source or run. The parent
+[SUBF-0153](#subf-0153) has consumed its scoped Gate 3 authority. The valid
+reflection expected red selected/executed `1/1` and failed solely because all
+`23` SliceInventory public types were absent. The local candidate then passed
+[TEST-0221](test-cases.md#test-0221) `46/46`, the combined
+[TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) route
+`98/98`, Release build with `0` warnings and `0` errors, and severity-`info`
+format verification, together with local
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) green.
+Gate 5 strengthened the retained green suite with public-observable coverage
+and removed the private-reflection oracle; the historical expected-red result
+remains unchanged.
+The two scoped lock fingerprints remained unchanged
+(`03EE...CB46` and `D206...00BC`) and no solution/project/package/reference/
+dependency/lock graph expansion occurred. This is local candidate evidence;
+candidate commit, exact-commit StructureOnly, PR, hosted exact-head, merge, and
+exact-main closure remain pending, so [SUBF-0153](#subf-0153) is not yet closed.
+
+[SUBF-0143](#subf-0143) Gate 2 is accepted, merged, and exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+but [TEST-0210](test-cases.md#test-0210) has no executable source or run and
+Gate 3 remains unauthorized. The parent
 feature remains open because every later implementation, complete catalog,
 report, policy, self-consumption, release, and authority gate is separately
 pending. External pull-request, directive, and hosted facts are governed by
