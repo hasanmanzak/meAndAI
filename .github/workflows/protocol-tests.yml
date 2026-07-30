@@ -100,6 +100,13 @@ jobs:
           dotnet restore MeAndAI.Operations.slnx
           --configfile NuGet.Config
           --locked-mode
+      - name: Restore locked protocol-domain dependencies
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        run: >-
+          dotnet restore MeAndAI.Protocol.slnx
+          --configfile NuGet.Config
+          --locked-mode
       - name: Run C# operational foundation tests
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -110,6 +117,16 @@ jobs:
           --nologo
           --verbosity minimal
           --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
+      - name: Run protocol-domain vocabulary tests
+        if: steps.main-route.outputs.route == 'Full'
+        shell: bash
+        run: >-
+          dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj
+          --configuration Release
+          --no-restore
+          --nologo
+          --verbosity minimal
+          --filter "Scenario=TEST-0220"
       - name: Build exact portable operations package set
         if: steps.main-route.outputs.route == 'Full'
         shell: bash
@@ -264,6 +281,13 @@ jobs:
           dotnet restore MeAndAI.Operations.slnx
           --configfile NuGet.Config
           --locked-mode
+      - name: Restore locked protocol-domain dependencies
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        run: >-
+          dotnet restore MeAndAI.Protocol.slnx
+          --configfile NuGet.Config
+          --locked-mode
       - name: Run C# operational foundation tests
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh
@@ -274,6 +298,16 @@ jobs:
           --nologo
           --verbosity minimal
           --filter "Scenario=TEST-0191|Scenario=TEST-0192|Scenario=TEST-0193"
+      - name: Run protocol-domain vocabulary tests
+        if: steps.main-route.outputs.route == 'Full'
+        shell: pwsh
+        run: >-
+          dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj
+          --configuration Release
+          --no-restore
+          --nologo
+          --verbosity minimal
+          --filter "Scenario=TEST-0220"
       - name: Run runtime-efficiency contract on Windows PowerShell 7
         if: steps.main-route.outputs.route == 'Full'
         shell: pwsh

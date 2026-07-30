@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Owner | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
-| Current default-branch baseline | [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd) |
+| Current default-branch baseline | [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e) |
 | Preserved WIP | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Transition state | Accepted architecture and allocated planning; no implementation extraction authorized |
+| Transition state | Accepted architecture; fresh [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) implementation only; no WIP extraction authorized |
 
 This register changes prospective ownership without rewriting historical
 evidence. A prior exact commit or workflow run proves only the code and
@@ -16,7 +16,7 @@ contract that it actually evaluated.
 | Record | Current truth | Architecture disposition |
 | --- | --- | --- |
 | [EPIC-0001 / issue #153](https://github.com/hasanmanzak/meAndAI/issues/153) | Open historical CLI/PowerShell-migration epic | Freeze. After the accepted architecture reaches the default branch, close as prospectively superseded by [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163); do not rewrite its original outcome. |
-| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Accepted protocol-platform architecture authority | Active prospective owner for the [successor plan](successor-delivery-plan.md). Implementation remains unauthorized. |
+| [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) | Accepted protocol-platform architecture authority | Active prospective owner for the [successor plan](successor-delivery-plan.md). Implementation remains unauthorized except the separately directed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) boundary. |
 | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) | Accepted architecture design and integration | Owns this architecture, red-team review, successor allocation, extraction ledger, bounded validation, and integration only. |
 | [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md) | Accepted; partially superseded | Preserve C#, typed shared foundation, portable JIT, read-only governance, authority states, plan/apply separation, and single-engine mutation. [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) supersedes separate CLI/application products as the architectural center. |
 | First preserved WIP decision draft ([exact draft record](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/decisions/DEC-0033-specification-first-csharp-governance.md)) | Accepted on draft, never default-branch authority | Its draft identifier remains reserved. Incorporate specification-first C# and legacy-black-box-oracle reasoning into [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md); do not present the draft record as merged history. |
@@ -116,7 +116,7 @@ The accepted stable allocation is:
 
 | Boundary | Feature | Issue | Planned tests |
 | --- | --- | --- | --- |
-| 1 | [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0209](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), and [TEST-0211](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211) |
+| 1 | [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0209](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0209), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210), [TEST-0211](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0211), [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220), [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221), and [TEST-0222](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0222) |
 | 2 | [FEAT-0066](../../features/FEAT-0066-shared-execution-authority-foundation/README.md) | [#166](https://github.com/hasanmanzak/meAndAI/issues/166) | [TEST-0212](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0212) and [TEST-0213](../../features/FEAT-0066-shared-execution-authority-foundation/test-cases.md#test-0213) |
 | 3 | [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) | [#167](https://github.com/hasanmanzak/meAndAI/issues/167) | [TEST-0214](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214), [TEST-0215](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0215), and [TEST-0216](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0216) |
 | 4 | [FEAT-0061](../../features/FEAT-0061-consumer-adoption-cli/README.md) | [#156](https://github.com/hasanmanzak/meAndAI/issues/156) | [TEST-0197](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0197), [TEST-0198](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0198), [TEST-0200](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0200), and [TEST-0201](../../features/FEAT-0061-consumer-adoption-cli/test-cases.md#test-0201) |
@@ -155,6 +155,8 @@ The register may move from architecture hold only after:
 | Architecture red-team checklist is closed | Satisfied |
 | Successor features and test matrices are allocated | Satisfied by the [successor plan](successor-delivery-plan.md) |
 | Every selected WIP asset has an approved destination and required fresh evidence | Satisfied at design level by the [extraction ledger](wip-extraction-ledger.md); extraction remains unauthorized |
-| A separate implementation directive is issued | Not satisfied |
+| A separate implementation directive is issued | Satisfied only for [FEAT-0065](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md) [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) by the [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932); every other boundary remains unsatisfied |
 
-Therefore the transition remains on architecture hold.
+Therefore only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+may leave architecture hold for fresh test-first delivery. All later conformance
+slices and every other successor boundary remain on architecture hold.

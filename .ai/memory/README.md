@@ -11,11 +11,23 @@ on 2026-07-29. Follow the accepted
 [architecture](../../docs/architecture/protocol-governance-and-execution/README.md),
 [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md),
 [WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md),
-and [architecture-acceptance handoff](log/2026-07-29-protocol-governance-execution-architecture-acceptance.md).
+the historical [architecture-acceptance handoff](log/2026-07-29-protocol-governance-execution-architecture-acceptance.md),
+the historical [domain-vocabulary planning handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
+and the current [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md).
 The product is one versioned executable protocol platform implemented in C#,
-not a collection of CLI products. Implementation authority remains withheld;
-no WIP extraction, workflow change, consumer mutation, release publication,
-authority transfer, or PowerShell retirement is authorized.
+not a collection of CLI products. Implementation authority is granted only to
+[SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+and its [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+stable-job route, plus the narrow existing
+[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+infrastructure assertion authorized by the
+[clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847).
+[TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+is locally converged; exact-head and hosted evidence remain pending.
+Pull-request and hosted facts are external to the candidate tree and governed
+by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+No WIP extraction, later conformance slice, consumer mutation,
+release publication, authority transfer, or PowerShell retirement is authorized.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at

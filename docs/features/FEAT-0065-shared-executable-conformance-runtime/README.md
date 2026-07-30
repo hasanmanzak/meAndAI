@@ -3,20 +3,31 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | Proposed under accepted architecture; implementation not authorized |
+| Status | [SUBF-0152](#subf-0152) locally converged; exact-head and hosted evidence pending |
 | Target version | 0.17.0 |
 | Issue | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) |
-| Pull request | Not created; development not authorized |
+| Pull request | Pull-request and hosted evidence are external to the candidate tree and governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), and [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) |
-| Tests | [TEST-0209](test-cases.md#test-0209), [TEST-0210](test-cases.md#test-0210), and [TEST-0211](test-cases.md#test-0211) |
+| Tests | [TEST-0209](test-cases.md#test-0209), [TEST-0210](test-cases.md#test-0210), [TEST-0211](test-cases.md#test-0211), [TEST-0220](test-cases.md#test-0220), [TEST-0221](test-cases.md#test-0221), and [TEST-0222](test-cases.md#test-0222) |
 
-## Implementation hold
+## Scoped implementation directive
 
 This record owns boundary 1 in the accepted
 [successor plan](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#1-capability-ownership).
-It does not authorize C# code, test code, extraction from
-[draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160), workflow
-changes, publication, or authority transfer.
+The maintainer's 2026-07-29
+[directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+and narrow [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+[infrastructure clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847)
+authorize only [SUBF-0152](#subf-0152), whose
+[design](subf-0152-domain-vocabulary-design.md) defines a
+test-first implementation slice. [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169)
+is merged and its exact tree passed the
+[main validation run](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
+[SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143),
+[SUBF-0144](#subf-0144), [SUBF-0154](#subf-0154),
+extraction from [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160),
+provider or repository I/O, publication, release, and authority transfer remain
+unauthorized.
 
 ## Problem
 
@@ -83,19 +94,42 @@ publication, or authority-transfer capabilities.
 | `RISK-0300` <a name="risk-0300"></a> | An incomplete catalog or missing evidence silently yields a conforming result. | Conformance owner / complete inventory binding, explicit acquisition/execution dimensions, and fail-closed missing or unmapped rules. |
 | `RISK-0301` <a name="risk-0301"></a> | A profile, extension, waiver, or self-consumption route weakens the protected baseline. | Policy owner / independent semantic axes, namespaced additive extensions, typed bounded waivers, predecessor-trusted execution, and deterministic enforcement truth tables. |
 
-| Test readiness | Gate 1 state | Evidence |
+## Gate 2 findings
+
+| ID | Observation | Disposition |
 | --- | --- | --- |
-| Scenarios | Defined | [Test scenarios](test-cases.md) |
-| Test code | Not started | Implementation is not authorized |
-| Baseline run | Not run | Expected-red target assemblies and fixtures do not exist |
+| `FIND-0365` <a name="find-0365"></a> | [SUBF-0142](#subf-0142) and [TEST-0209](test-cases.md#test-0209) mixed scalar, evidence, report, serialization, and debt/waiver contracts. | `Blocking`, resolved in design by [SUBF-0152](#subf-0152)/[TEST-0220](test-cases.md#test-0220) and later dependency-closed owners while preserving [TEST-0209](test-cases.md#test-0209) as a true feature-level composed scenario. |
+| `FIND-0366` <a name="find-0366"></a> | The stable workflow runs only the Operations solution, so a new protocol test could compile locally yet never execute in hosted validation. | `Blocking`, resolved in design by the exact two-job [execution route](subf-0152-domain-vocabulary-design.md#canonical-execution-route) and explicitly authorized existing [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) infrastructure-contract barrier; executable closure remains part of [SUBF-0152](#subf-0152). |
+| `FIND-0367` <a name="find-0367"></a> | The accepted architecture said no RULE IDs were allocated while its accepted successor matrix allocated [RULE-0001](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0001), [RULE-0002](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0002), [RULE-0003](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0003), [RULE-0004](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0004), and [RULE-0005](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0005). | `Blocking`, resolved by the planning correction in the same Gate 2 packet; it grants no evaluator or digest authority. |
+| `FIND-0368` <a name="find-0368"></a> | [RULE-0001](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0001), [RULE-0002](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0002), [RULE-0003](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0003), [RULE-0004](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0004), and [RULE-0005](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0005) resolve, but rule-specific fragment selectors, canonical bytes, and exact digests are not ready; [RULE-0002](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0002) has conflicting required-structure authorities. | `ExternalOrLegacyFollowUp`, owned by [SUBF-0143](#subf-0143) and [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165); blocking before the first catalog/evaluator slice, not [SUBF-0152](#subf-0152). |
+| `FIND-0369` <a name="find-0369"></a> | The original durable directive and active instruction graph named the mixed [SUBF-0142](#subf-0142)/[TEST-0209](test-cases.md#test-0209) boundary and still withheld every implementation/workflow change. | `Blocking`, resolved by the [corrected scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932), transition gate, successor gate, and project-memory handoff. Only [SUBF-0152](#subf-0152)/[TEST-0220](test-cases.md#test-0220), including its stable-job registration, receives authority. |
+| `FIND-0370` <a name="find-0370"></a> | The first Gate 2 draft left public signatures, nullability, collection exposure, and error categories ambiguous while making private/record details test oracles. | `Blocking`, resolved by the [exact public API/error contract and observable-test boundary](subf-0152-domain-vocabulary-design.md#exact-public-api-and-semantic-contract). |
+| `FIND-0371` <a name="find-0371"></a> | The mixed-slice supersession map, future dependency edges, and [TEST-0221](test-cases.md#test-0221) same-contract review were incomplete. | `Blocking`, resolved by allocating typed rule/catalog ownership to [SUBF-0143](#subf-0143), making the dependency chain explicit, and recording [TEST-0221](test-cases.md#test-0221) against [TEST-0209](test-cases.md#test-0209) plus preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195). |
+| `FIND-0372` <a name="find-0372"></a> | [TEST-0209](test-cases.md#test-0209) described incomplete acquisition and non-conforming verdict as one alternative outcome. | `Blocking`, resolved by preserving acquisition, rule evaluation, conformance, and enforcement as four separate dimensions with accepted precedence. |
+| `FIND-0373` <a name="find-0373"></a> | Future [TEST-0221](test-cases.md#test-0221) wording could make evidence absence look like a fourth acquisition status. | `ExternalOrLegacyFollowUp`: planning now retains absence as an input fact whose required-evidence rollup is `Incomplete`, distinct from a present invalid source yielding `Failed`; full envelope semantics remain a [SUBF-0153](#subf-0153) Gate 2 obligation and do not block [SUBF-0152](#subf-0152). |
+
+| Test readiness | Current state | Evidence |
+| --- | --- | --- |
+| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) executable | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; later scenarios remain planned |
+| Test code | [TEST-0220](test-cases.md#test-0220) passing locally | The Domain test project is its sole executable owner; [canonical local evidence](test-cases.md#evidence) |
+| Baseline run | Local convergence complete | [Canonical local evidence](test-cases.md#evidence) records expected red, focused green, cross-runtime StructureOnly, and clean Gate 5 review; exact-head and hosted evidence remain pending |
 
 ## Decomposition and subfeature gates
 
-| ID | Slice | Tracking | Tests/run | Self-review/findings | Status |
-| --- | --- | --- | --- | --- | --- |
-| `SUBF-0142` <a name="subf-0142"></a> | Typed rule, evidence, location, outcome, and report contracts | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0209](test-cases.md#test-0209) / not started | Pending | Proposed |
-| `SUBF-0143` <a name="subf-0143"></a> | Immutable catalog, evaluator kernel, first common-rule slice, and deterministic aggregation | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0210](test-cases.md#test-0210) / not started | Pending | Proposed |
-| `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
+| ID | Slice | Tracking | Dependencies | Tests/run | Self-review/findings | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `SUBF-0142` <a name="subf-0142"></a> | Original typed rule/evidence/location/outcome/report planning slice | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | Accepted architecture | [TEST-0209](test-cases.md#test-0209) / not started | Gate 2 found mixed contracts | Superseded before implementation by [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), and [SUBF-0154](#subf-0154); never reuse |
+| `SUBF-0143` <a name="subf-0143"></a> | Immutable catalog, evaluator kernel, first common-rule slice, and deterministic aggregation | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), and rule-fragment closure | [TEST-0210](test-cases.md#test-0210) / not started | Pending | Proposed |
+| `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0143](#subf-0143) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
+| `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); exact-main [run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367) | [TEST-0220](test-cases.md#test-0220) / expected red, then 52 of 52 focused Release tests in 116 ms; final PowerShell 7 and Windows PowerShell 5.1 StructureOnly green; [local evidence](test-cases.md#evidence) | Gate 5 code/test and infrastructure fresh-diff reviews clean after all findings resolved; latest correction review clean; zero unresolved `Blocking` findings | Locally converged; exact-head and hosted evidence pending |
+| `SUBF-0153` <a name="subf-0153"></a> | Evidence requirements/envelopes, typed locations, findings, and rule-evaluation records | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0152](#subf-0152) | [TEST-0221](test-cases.md#test-0221) / not started | Pending | Proposed / not authorized |
+| `SUBF-0154` <a name="subf-0154"></a> | Canonical report sealing, serialization, digest, redaction, and full composed qualification | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), [SUBF-0144](#subf-0144) | [TEST-0222](test-cases.md#test-0222), [TEST-0209](test-cases.md#test-0209) / not started | Pending | Proposed / not authorized |
+
+[TEST-0209](test-cases.md#test-0209) is a feature-level composed production
+qualification scenario across [SUBF-0152](#subf-0152),
+[SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143),
+[SUBF-0144](#subf-0144), and [SUBF-0154](#subf-0154). It is not a child-test
+aggregator and cannot close a predecessor by collecting other tests' results.
 
 ## Decisions and relationships
 
@@ -104,15 +138,16 @@ publication, or authority-transfer capabilities.
 - Required collaborators: [FEAT-0066](../FEAT-0066-shared-execution-authority-foundation/README.md) and [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
 - Historical source: [FEAT-0060](../FEAT-0060-any-consumer-governance-cli/README.md) and [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
 
-## Definition of Ready
+## Definition of Ready for [SUBF-0152](#subf-0152)
 
 - [x] Stable ID, linked issue, accepted decision, problem, outcome, scope, non-goals, dependencies, risks, and reviewable decomposition.
-- [x] Initial rule/specification/qualification/evidence matrix and numbered planning scenarios.
+- [x] Initial rule/specification/qualification/evidence matrix and numbered planning scenarios, including distinct [SUBF-0152](#subf-0152) coverage.
 - [x] Exact WIP source disposition and approved design-level destinations.
-- [ ] Complete rule inventory for the selected implementation slice and exact normative-fragment digests.
-- [ ] Expected-red test implementation and project-neutral fixtures.
-- [ ] Gate 2 design review for the selected dependency-closed slice.
-- [ ] Separate maintainer implementation directive.
+- [x] Complete [SUBF-0152](#subf-0152) contract inventory; normative RULE inventory and fragment digests are reviewed `NotApplicable` and owned by [SUBF-0143](#subf-0143).
+- [x] Project-neutral [TEST-0220](test-cases.md#test-0220) expected-red matrix and exact execution route.
+- [x] [Gate 2 design review](subf-0152-domain-vocabulary-design.md) for [SUBF-0152](#subf-0152), including recurrence, sibling, WIP, project-graph, error, compatibility, and hosted-owner contracts.
+- [x] Separate [maintainer implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932), scoped only to [SUBF-0152](#subf-0152) after exact-main validation.
+- [x] Gate 3 [TEST-0220](test-cases.md#test-0220) expected-red execution and focused green; see [canonical local evidence](test-cases.md#evidence).
 
 ## Acceptance criteria
 
@@ -126,6 +161,12 @@ publication, or authority-transfer capabilities.
 
 ## Definition of Done
 
-All implementation, expected-red, review, exact-head test, release,
-self-consumption transfer, documentation, and external evidence gates remain
-pending.
+[SUBF-0152](#subf-0152) expected-red, bounded production implementation, focused
+green, zero-warning Release build, clean format verification, direct
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+evidence, cross-runtime StructureOnly, and clean Gate 5 fresh-diff reviews are
+recorded. Exact-head and hosted evidence remain pending, so the subfeature and
+parent feature are not complete. Pull-request and hosted facts are external to
+the candidate tree and governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
+Every later task/subfeature, release, self-consumption transfer, and authority
+gate remains separately pending and unauthorized.

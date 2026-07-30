@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>MeAndAI.Protocol.Domain</RootNamespace>
+  </PropertyGroup>
+</Project>

@@ -5,7 +5,11 @@ and follow its canonical links.
 
 ## Current continuation
 
-Follow the
+Follow the current
+[domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
+the historical
+[domain-vocabulary planning handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
+the historical
 [protocol governance and execution architecture acceptance handoff](2026-07-29-protocol-governance-execution-architecture-acceptance.md),
 accepted [DEC-0035](../../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md),
 the full [architecture](../../../docs/architecture/protocol-governance-and-execution/README.md),
@@ -26,10 +30,15 @@ tests; they do not copy shared evaluators, fixtures, or transitions.
 and [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) remain
 frozen at
 [1873c98638ba4960734aadb188eb8c8d70b4bc52](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52).
-Implementation, extraction, workflow changes, consumer mutation, release
-publication, authority transfer, and PowerShell retirement remain unauthorized.
-The next allowed action after this architecture packet is integration and
-bounded exact-head validation, not C# implementation.
+Only [SUBF-0152](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+and [TEST-0220](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+have implementation authority. The [canonical local evidence](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#evidence)
+is locally converged and [TEST-0220](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+has moved to its `DotNetTestProject` owner. Exact-head and hosted evidence remain
+pending. Pull-request and hosted facts are external to the candidate tree and
+governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165). WIP
+extraction, later conformance slices, consumer mutation, release publication,
+authority transfer, and PowerShell retirement remain unauthorized.
 
 Immutable [v0.15.6](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.6)
 is published at
@@ -73,6 +82,8 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-29 - Domain-vocabulary local implementation](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md)
+- [2026-07-29 - Domain-vocabulary planning](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md)
 - [2026-07-29 - Protocol governance and execution architecture acceptance](2026-07-29-protocol-governance-execution-architecture-acceptance.md)
 - [2026-07-28 - FEAT-0059 v0.16.0 release preparation](2026-07-28-feat-0059-v0160-release-preparation.md)
 - [2026-07-28 - C# operational foundation portable packaging](2026-07-28-feat-0059-subf-0121-portable-packaging.md)

@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-28**
+Last verified: **2026-07-29**
 
 ## Verified facts
 
@@ -954,7 +954,33 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   conformance, shared execution authority, evidence/integration, adoption,
   update, release finalization, and compatibility/migration are capability
   boundaries; CLI processes are thin hosts only. C# is the implementation
-  language. Implementation authority remains withheld.
+  language. [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) merged
+  the accepted architecture at
+  [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e),
+  whose exact tree passed [main run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
+  The [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+  authorizes only [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+  and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  for fresh test-first implementation, including its route inside both existing
+  stable workflow jobs. All later slices and successor boundaries remain held.
+  Expected-red checkpoint
+  [`9a48c02266d9690e14240de0fac3c57d54d12fa6`](https://github.com/hasanmanzak/meAndAI/commit/9a48c02266d9690e14240de0fac3c57d54d12fa6)
+  followed a successful locked restore and failed only for the deliberately
+  absent `SurfaceSet` and `SurfaceKind` contracts. The
+  [canonical local evidence](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#evidence)
+  now records 52 of 52 focused Release tests passing, a zero-warning/zero-error
+  Release build, clean format verification, direct [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  passes on PowerShell 7 and Windows PowerShell 5.1, and transfer of
+  [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  to its `DotNetTestProject` owner. Final StructureOnly exited zero with zero
+  failures on PowerShell 7 in approximately 160.5 seconds and on Windows
+  PowerShell 5.1 in 275.9 seconds, whose owner observation was 273,271 ms. Gate 5
+  code/test and infrastructure fresh-diff reviews are clean after all findings
+  were resolved; the latest correction review is clean and no `Blocking`
+  finding remains. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+  is locally converged but not complete; exact-head and hosted evidence remain
+  pending. Pull-request and hosted facts are external to the candidate tree and
+  governed by [issue #165](https://github.com/hasanmanzak/meAndAI/issues/165).
 - The accepted
   [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md)
   allocates shared conformance to
@@ -991,10 +1017,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   classifies all 158 changed paths as reusable, refactor, preserve-only, or
   reject. Four of seven WIP slices have historical exact-branch evidence, the
   parent is incomplete, and no successor inherits a passing state. Do not push
-  implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160),
-  extract code, change workflows, mutate consumers,
-  publish releases, transfer authority, or retire PowerShell without a later
-  dependency-closed Definition of Ready and explicit maintainer directive.
+  implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
+  or extract its code. Outside the bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  stable-job route, do not change workflows, mutate consumers, publish releases,
+  transfer authority, or retire PowerShell without a later dependency-closed
+  Definition of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

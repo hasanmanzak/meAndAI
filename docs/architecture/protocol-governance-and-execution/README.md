@@ -3,16 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; implementation authority withheld |
+| Status | Accepted; implementation authority scoped only to [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Red-team review | [Closed at design level](red-team-review.md) |
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
-| Current baseline | [`2329f944694d24523f85b3a60352743918f0e5cd`](https://github.com/hasanmanzak/meAndAI/commit/2329f944694d24523f85b3a60352743918f0e5cd) |
+| Current baseline | [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e) |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Implementation authority | Withheld |
+| Implementation authority | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) / [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220), plus its narrow existing [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) infrastructure assertion, under the [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932) and [clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122634847) |
 
 ## 1. Outcome
 
@@ -38,25 +38,33 @@ release boundaries.
 ## 2. Architecture freeze
 
 This record and [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
-are accepted. Acceptance authorizes planning records only. Until the maintainer
-later issues a separate implementation directive for a Definition-of-Ready
-successor slice, the following remain prohibited:
+are accepted. Architecture acceptance itself authorized planning records only.
+The later [scoped directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5122419932)
+now authorizes only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
+and [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220),
+including registration of that scenario in the two existing stable jobs.
+Outside that exact boundary, the following remain prohibited:
 
 - production or test implementation;
 - moving code from the preserved draft into the target branch;
-- workflow, ruleset, or required-check changes;
+- workflow, ruleset, or required-check changes, except the authorized
+  [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
+  steps inside the existing stable jobs;
 - consumer-repository or provider mutation;
 - release publication or protocol-authority transfer; and
 - PowerShell compatibility or source retirement.
 
-Architecture commits use a no-run route such as `[skip ci]`; the existing
-workflow definition remains unchanged. The freeze ends only through the gate in
-[Section 27](#27-implementation-entry-gate).
+The architecture packet used a no-run route and left the workflow unchanged.
+[PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) is now merged at
+[`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e),
+whose exact tree passed [main run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
+Only the scoped boundary above has passed the entry gate; the architecture
+freeze remains in force everywhere else.
 
-Allowed work is limited to architecture decisions, diagrams, terminology,
-record-transition maps, red-team review, and design acceptance scenarios.
-Production/test code, catalog activation, package activation, workflow
-enforcement, cherry-picking or merging
+Outside the scoped directive, allowed work remains limited to architecture
+decisions, diagrams, terminology, record-transition maps, red-team review, and
+design acceptance scenarios. Production/test code, catalog activation, package
+activation, workflow enforcement, cherry-picking or merging
 [PR #160](https://github.com/hasanmanzak/meAndAI/pull/160),
 consumer/provider mutation,
 release work, and authority transfer are outside the freeze boundary.
@@ -271,7 +279,9 @@ architecture approval. A rule identity is distinct from:
 
 `RULE-NNNN` values are repository-local, monotonic, immutable, and never
 reused. Existing `TEST-NNNN` identities remain historical and are mapped, not
-renamed. No rule IDs are allocated during this architecture-only task.
+renamed. The accepted successor matrix allocates RULE-0001 through RULE-0005
+as the first prospective identities; that allocation grants no implementation,
+catalog-revision, normative-fragment-digest, or evaluator authority.
 
 ### 9.2 Rule descriptor
 
@@ -1330,11 +1340,11 @@ cannot reopen an architectural boundary without a new decision.
   architecture question remains open.
 - [x] All findings received so far are reconciled in the [red-team register](red-team-review.md).
 - [x] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
-- [ ] Maintainer separately authorizes an implementation feature after its own Definition of Ready.
+- [x] Maintainer separately authorizes only [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; all other slices remain unchecked by this item.
 
 ## 27. Implementation entry gate
 
-Implementation may begin only when all of the following are true:
+Test-first delivery may begin only when all of the following are true:
 
 1. this architecture and [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md)
    are explicitly accepted by the maintainer;
@@ -1345,13 +1355,21 @@ Implementation may begin only when all of the following are true:
    complete;
 5. the exact [PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
    carry-forward selection is approved;
-6. the successor feature satisfies protocol Gates 1 and 2, including numbered
-   scenarios and expected-red evidence; and
+6. the selected successor slice satisfies protocol Gates 1 and 2, including
+   numbered scenarios plus an exact expected-red design and execution route;
+   and
 7. one bounded architecture/document validation is green on the exact approved
    architecture head without starting the historical full workflow matrix; and
 8. the maintainer issues a separate explicit implementation directive.
 
-Architecture approval alone does not satisfy item 8.
+Architecture approval alone does not satisfy item 8. Passing this list admits
+only the test/project work required to capture the fresh Gate 3 expected-red
+result. Production contract code may begin only after that test fails for the
+deliberately absent contract and no unrelated infrastructure failure.
+
+For [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152),
+all eight items are satisfied. Test code may now be written solely to capture
+the fresh Gate 3 red; all later slices remain held.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).
