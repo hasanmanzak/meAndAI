@@ -963,18 +963,89 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   whose [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506)
   passed Ubuntu and Windows.
 
-  The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
-  authorizes Gate 1/2 design and expected-red planning for
+  The historical
   [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-  and [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
-  only. Follow the exact
+  [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
+  produced the accepted
   [evidence-acquisition design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
-  Bounded red-team is clean. Maintainer acceptance, accepted-design merge and
-  exact-main validation, an accepted/merged/exact-main-validated
+  [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) merged it at exact
+  main
+  [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
+  with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
+  Gate 2 design is complete but
+  [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+  and implementation remain absent.
+
+  The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+  authorizes Gate 1/2 design and expected-red planning only for
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-  typed-handoff Gate 2 packet, and a separate implementation directive remain
-  missing; no source/test/project/lock/workflow/scenario-owner change is
-  authorized.
+  and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
+  Follow the exact
+  [typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
+  It separates qualification slices from complete catalogs, uses an acyclic
+  artifact/manifest/release graph, and fixes the cumulative public inventories
+  at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
+  Policy export. Its manifest closes six typed registration lists, the
+  `27`-row Policy registration/type-contract partition, and the `35`-row full
+  component union.
+
+  [FEAT-0067](../../docs/features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+  owns routing/I/O and constructs an instruction-bound structural
+  observed result, but it does not invoke a Policy codec or own a semantic
+  cache. The exact plan-bound Conformance qualification session resolves the
+  manifest codec, invokes it once per binding/cache miss, verifies exact
+  byte/depth/node/complexity usage, and returns qualified model handles or a
+  declared rejection. Application copies those handles into its proof
+  candidate; the Conformance admission coordinator validates them without a
+  codec rerun.
+
+  The mandatory state sequence is `PlanApplicability -> CloseApplicability ->
+  PlanEvaluation -> zero-to-N AdvanceEvaluation -> EvaluationClosure ->
+  Evaluate`. Evaluation plans are non-empty, predecessor/session-stamped, and
+  single-use; Evaluate is proof-free and runs no acquisition, codec, parser,
+  index, or demand projector. Repository-tree, one governed body, and
+  repository-target-resolution use exact protocol-owned persistent binary
+  wires. Target demand is projected only after the one per-plan governed-
+  reference index, retains the internal ItemId-to-source-and-authority map, and
+  is sharded by owning repository while preserving the governed subject target.
+  CommitObject, TagRoot, and CapturedSnapshotPath cover immutable/current target
+  evidence. Captured paths are qualified against the exact
+  [FEAT-0067](../../docs/features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
+  manifest
+  identity/path/expected-content tuple retained with the private source-
+  authority binding; an opaque capture digest cannot decide Exact/WrongObject.
+  Target-derived resolution/object/anchor/line proofs use canonical framed
+  identities, and external-owner custody remains Snapshot rather than being
+  mislabeled as the subject repository. A paired target-Markdown model owns
+  historical anchors. Its successful output must pair exactly with its target
+  model, while a declared parser failure produces no set model/index invocation
+  and terminalizes dependent rules as NotEvaluated. Empty demand
+  emits no external instruction/I/O/payload/codec, but the registered target
+  index still runs once over zero target/target-Markdown models plus the
+  qualified reference capability.
+
+  Semantic producers report local generated bytes/layer nodes/additional
+  complexity only; selected rank-0 payload bytes are never counted again. The
+  target-Markdown parser admits the full 33,554,432-byte parent boundary in its
+  byte/complexity budget. Plan-global target retention is closed by a distinct
+  `projected-resource-failed` aggregate outcome at the 64-key/16,777,216-content-
+  byte/67,108,864-full-payload limits; it retains valid individual attempts but
+  mints no aggregate proof or partial parser/index product.
+
+  Qualified references/findings/evaluations remain in Conformance rather than
+  Domain; Policy contains no provider DTO, route, credential, filesystem,
+  network, or I/O surface.
+  Bounded red-team, maintainer acceptance, merge/exact-main validation, and a
+  separate implementation directive remain missing; no source/test/Gate 3/
+  project/lock/workflow/scenario-owner/
+  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  change is authorized.
+  Future first BehaviorRed states use only the exact warning-free `null!`
+  activation/export sentinel defined by the design. D first proves the real
+  export graph. RULE-0001 is deliberately later: the real D writer/codec/parser/
+  index/projector/kernel vectors must be green before the D session can mint its
+  fresh Conformance-registered input from immutable fixture data; no C runtime
+  handle/result may be consumed.
 - The accepted
   [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md)
   allocates shared conformance to
@@ -1014,11 +1085,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
   or extract its code. The bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
   stable-job route is complete. The current
-  [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-  directive authorizes no
-  workflow or scenario-owner change. Do not implement, mutate consumers,
-  publish releases, transfer authority, or retire PowerShell without a later
-  dependency-closed Definition of Ready and explicit maintainer directive.
+  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+  authorizes no workflow, scenario-owner, project, lock, test, or implementation
+  change. Do not implement, mutate consumers, publish releases, transfer
+  authority, or retire PowerShell without a later dependency-closed Definition
+  of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at
