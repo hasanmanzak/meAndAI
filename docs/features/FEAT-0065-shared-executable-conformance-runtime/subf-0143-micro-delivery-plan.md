@@ -235,11 +235,11 @@ is never implemented green; return to D/RT or report `Blocked`.
 
 | Label | Bounded task | Exit condition |
 | --- | --- | --- |
-| `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in `5fa7f7d`. |
+| `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90). |
 | `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Recovery completed: cumulative `17/17`; locked restore with six relevant lock fingerprints unchanged; zero-warning/error six-project Release build; clean format, diff, and marker/sentinel checks. Historical `13/13` remains the prior accepted content checkpoint. |
 | `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed for historical [FIND-0441](README.md#find-0441) recovery. [FIND-0442](README.md#find-0442) now has the separate current correction handoff; its feature/architecture/test/memory synchronization remains a candidate until fresh review, push, and exact-head hosted green. No successor authority is granted. |
 | `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the fresh full-diff review closed `0 Blocking / 0 Important / 0 Minor`, establishing `ReviewedLocalGreen`. |
-| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Recovery complete: exact `20/20` allowlist, zero tracked-unstaged delta, NCrunch excluded, staged diff check clean, two staged reviews `0/0/0`, tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`. Historical pushed-candidate staged evidence remains `NotEstablished`. |
+| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Recovery complete: exact `20/20` allowlist, zero tracked-unstaged delta, NCrunch excluded, staged diff check clean, two staged reviews `0/0/0`, git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`. Historical pushed-candidate staged evidence remains `NotEstablished`. |
 | `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Recovery content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) exactly matches the audited tree, is pushed, and owns draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its record-sync successor is superseded as predecessor only after the later remote-equal [FIND-0442](README.md#find-0442) correction head passes local review, push, and exact-head hosted green; full [TEST-0210](test-cases.md#test-0210) DoD is not claimed. |
 
 `[skip ci]` is not inherited posture. It may be used only as a separately
@@ -259,7 +259,7 @@ hosted evidence.
 
 ## BASE-VERIFY record
 
-- Reviewed local baseline commit: `5fa7f7d` (message: `chore: create reviewed baseline for BASE-SCOPE [skip ci]`).
+- Reviewed local baseline commit: [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90) (message: `chore: create reviewed baseline for BASE-SCOPE [skip ci]`).
 - Exact cumulative checkpoint: `13/13` at `ContractSlice=A` reproduced with filtered reds and greens.
 - Locked `packages.lock.json` fingerprints are unchanged:
   - `src/MeAndAI.Protocol.Domain/packages.lock.json`: `03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46`
@@ -341,12 +341,14 @@ remain external qualification evidence; A owns only their declared lexical and
 framing-metadata grammar plus typed projection and performs no repository lookup.
 The D packet names any family-specific exception to this oracle.
 
-Exact pushed input `7f60e0c` contained 18 static A facts, but no valid
+Exact pushed input
+[`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+contained 18 static A facts, but no valid
 `18/18` execution. Recovery consolidates the duplicate rule round-trip fact and
 retains the four FQNs above; their focused filters pass `1/1` and cumulative A
 passes `17/17` locally. These facts do not reconstruct absent historical D/RT/R
 evidence. Final local/staged reviews are complete, audited tree `4ca02623...`
-matches pushed checkpoint `f64860ef...`, and [FIND-0441](README.md#find-0441) is resolved for the
+matches pushed checkpoint [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d), and [FIND-0441](README.md#find-0441) is resolved for the
 bounded recovery boundary. The next packet remains inactive.
 
 `A-RULE-01` must prove in D/RT that a rule with both slot lists empty is valid

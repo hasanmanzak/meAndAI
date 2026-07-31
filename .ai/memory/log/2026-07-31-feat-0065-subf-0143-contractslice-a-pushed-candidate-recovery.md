@@ -17,13 +17,17 @@ grants no stage, commit, or push authority.
 
 ## Immutable candidate history
 
-- `5fa7f7d02e64032e867d7c84d42662ba080b3c90` is the historical cumulative
-  `13/13` content baseline; `9107a4936449048a057156e4714a99165ba1f24f`
+- [`5fa7f7d02e64032e867d7c84d42662ba080b3c90`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90)
+  is the historical cumulative `13/13` content baseline;
+  [`9107a4936449048a057156e4714a99165ba1f24f`](https://github.com/hasanmanzak/meAndAI/commit/9107a4936449048a057156e4714a99165ba1f24f)
   synchronized its BASE records.
-- `e0d0288a716ddf9e11dda00926a58776aa206f8b` combined grammar, number, and
+- [`e0d0288a716ddf9e11dda00926a58776aa206f8b`](https://github.com/hasanmanzak/meAndAI/commit/e0d0288a716ddf9e11dda00926a58776aa206f8b)
+  combined grammar, number, and
   graph candidate work in 723 changed lines.
-- `375da2e04a09b0ed66d33312ea5a51e64af637e5` added the rule round-trip
-  candidate in 1,226 changed lines; `7f60e0c...` added its second rule fact.
+- [`375da2e04a09b0ed66d33312ea5a51e64af637e5`](https://github.com/hasanmanzak/meAndAI/commit/375da2e04a09b0ed66d33312ea5a51e64af637e5)
+  added the rule round-trip candidate in 1,226 changed lines;
+  [`7f60e0c...`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  added its second rule fact.
 - The pushed tree therefore contained 18 static ContractSlice A facts, but it
   did not build and has no valid `18/18` green claim.
 - Per-packet red, red-team, final review, and marker/TRX evidence for those
@@ -53,7 +57,7 @@ the six-project Release build passed with zero warnings/errors; standard format,
 `git diff --check`, and marker/sentinel checks are clean. Fresh full-diff
 production/test/docs/memory review closed `0 Blocking / 0 Important / 0 Minor`.
 The recovery is `ReviewedLocalGreen`. Two independent staged reviews closed
-`0/0/0`; audited tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`
+`0/0/0`; audited git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`
 was committed as
 [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d),
 pushed, and opened as draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174).

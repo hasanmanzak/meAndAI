@@ -20,8 +20,12 @@ Last verified: **2026-07-31**
   provides the typed C# operational foundation and portable verified package
   prerequisite. Its release grants no successor implementation authority.
 - Historical ContractSlice A cumulative `13/13` content is committed at
-  `5fa7f7d` (`[skip ci]`), with BASE records synchronized by `9107a49`.
-  Exact pushed `7f60e0c` is a recovery input rather than an accepted green
+  [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90)
+  (`[skip ci]`), with BASE records synchronized by
+  [`9107a49`](https://github.com/hasanmanzak/meAndAI/commit/9107a4936449048a057156e4714a99165ba1f24f).
+  Exact pushed
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  is a recovery input rather than an accepted green
   predecessor: it contained 18 static A facts and no valid build or per-packet
   red/RT/review evidence. Bounded
   [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
@@ -29,9 +33,11 @@ Last verified: **2026-07-31**
   exact focused filter passes `1/1` and cumulative A passes `17/17` locally.
   Final local V passes locked restore with unchanged relevant lock fingerprints,
   zero-warning/error Release build, format, diff/marker checks, and fresh
-  full-diff review `0/0/0`; status is `ReviewedLocalGreen`. Audited tree
-  `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` is pushed at exact content
-  checkpoint `f64860ef456380232c23dfc4729a0d87f257483d` on draft
+  full-diff review `0/0/0`; status is `ReviewedLocalGreen`. Audited
+  git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` is pushed at exact content
+  checkpoint
+  [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
   [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Hosted
   [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
   then exposed [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442):
@@ -191,7 +197,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   micro-delivery work and later small-context agents
   operating under a frozen packet brief.
 - Affected contract and cause: multiple semantic packets were combined without
-  retained D/RT/R/V evidence; exact pushed `7f60e0c` contained 18 A facts while
+  retained D/RT/R/V evidence; exact pushed
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  contained 18 A facts while
   canonical records still reported `13/13` and the tree did not build.
 - Canonical owner and evidence: [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441),
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
@@ -201,7 +209,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
-  pushed at content checkpoint `f64860ef...` on draft
+  pushed at content checkpoint
+  [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
   [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the later
   remote-equal [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
   correction head becomes the next-packet predecessor only after local review,
@@ -1267,12 +1277,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   standard format, clean diff check, and the zero-warning/error six-project
   Release build passed; the non-gating severity-info scan is not claimed clean.
   Canonical-string coverage `Important` is closed at the historical `13/13`
-  checkpoint. Later pushed input `7f60e0c` is under
+  checkpoint. Later pushed input
+  [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+  is under
   [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
   recovery: four retained focused filters pass `1/1`, cumulative A passes
   `17/17`, and final local V plus fresh full-diff review `0/0/0` establish
   `ReviewedLocalGreen`. Audited tree `4ca02623...` is pushed at exact content
-  checkpoint `f64860ef...` on draft
+  checkpoint
+  [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+  on draft
   [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
   correction head

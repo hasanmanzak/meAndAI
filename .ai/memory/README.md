@@ -103,15 +103,20 @@ PowerShell-retirement changes remain unauthorized.
 
 The maintainer-approved micro-delivery plan now routes through bounded
 [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
-recovery. Historical cumulative `13/13` content is `5fa7f7d`, with records
-synchronized by `9107a49`. Exact pushed `7f60e0c` is recovery input, not an
+recovery. Historical cumulative `13/13` content is
+[`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90),
+with records synchronized by
+[`9107a49`](https://github.com/hasanmanzak/meAndAI/commit/9107a4936449048a057156e4714a99165ba1f24f).
+Exact pushed
+[`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+is recovery input, not an
 accepted predecessor: it contained 18 static A facts, no valid `18/18` run, and
 no retained per-packet red/RT/review evidence. Recovery consolidates the rule
 fact and now passes four exact focused filters `1/1` plus cumulative A `17/17`
 locally. Final local V passed locked restore with the six relevant lock
 fingerprints unchanged, zero-warning/error Release build, format, diff/marker
-checks, and fresh full-diff review `0/0/0`. Audited tree
-`4ca02623e1f14233e847ebf64bc52d3cfe8869b8` was committed and pushed as
+checks, and fresh full-diff review `0/0/0`. Audited
+git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` was committed and pushed as
 [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
 on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its first
 hosted validation exposed

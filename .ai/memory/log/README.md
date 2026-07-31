@@ -124,7 +124,9 @@ cumulative A `13/13`, source reviews, locked restore, unchanged locks, standard
 format, clean diff check, and zero-warning/error Release build close the
 canonical-string coverage `Important`. The non-gating severity-info scan is not
 claimed clean. Those statements close the historical `13/13` checkpoint.
-Later exact pushed candidate `7f60e0c` is not a green predecessor: its static
+Later exact pushed candidate
+[`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+is not a green predecessor: its static
 18-fact tree lacked valid build and per-packet evidence. Current
 [FIND-0441](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
 recovery retains four facts, each locally green `1/1`, and cumulative A is
