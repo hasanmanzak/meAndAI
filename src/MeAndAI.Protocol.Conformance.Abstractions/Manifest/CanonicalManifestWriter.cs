@@ -15,7 +15,6 @@ internal static class CanonicalManifestWriter
         var slice = manifest.Slice;
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
-            slice.Rules.Count != 0 ||
             manifest.SchemaRegistry.PayloadSchemas.Count != 0 ||
             manifest.SchemaRegistry.Parsers.Count != 0 ||
             manifest.SchemaRegistry.Indexes.Count != 0 ||
@@ -69,8 +68,7 @@ internal static class CanonicalManifestWriter
         writer.WriteStartObject();
         WriteCanonicalString(writer, "sliceKey", slice.SliceKey);
         WriteCanonicalString(writer, "sliceVersion", slice.SliceVersion);
-        writer.WriteStartArray("rules");
-        writer.WriteEndArray();
+        WriteRules(writer, slice.Rules);
         writer.WriteEndObject();
 
         WriteSchemaRegistry(writer, manifest.SchemaRegistry);
@@ -113,6 +111,308 @@ internal static class CanonicalManifestWriter
             budget.RetentionPolicy.Value);
         writer.WriteEndObject();
         writer.WriteEndObject();
+    }
+
+    private static void WriteRules(
+        Utf8JsonWriter writer,
+        IReadOnlyList<RuleDeclaration> rules)
+    {
+        writer.WritePropertyName("rules");
+        writer.WriteStartArray();
+        foreach (var rule in rules)
+        {
+            WriteRule(writer, rule);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteRule(
+        Utf8JsonWriter writer,
+        RuleDeclaration rule)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "ruleId", rule.RuleId.Value);
+        writer.WriteNumber("ruleRevision", rule.RuleRevision.Value);
+        writer.WriteNumber("catalogVersion", rule.CatalogVersion.Value);
+        WriteCanonicalString(writer, "normativeDigest", rule.NormativeDigest.Value);
+        WriteNormativeFragments(writer, rule.NormativeFragments);
+        WriteCanonicalStringValues(
+            writer,
+            "qualificationScenarios",
+            rule.QualificationScenarios.Select(item => item.Value));
+        WriteComponentReference(writer, "evaluator", rule.Evaluator);
+        WriteSlots(writer, "applicabilitySlots", rule.ApplicabilitySlots);
+        WriteSlots(writer, "evaluationSlots", rule.EvaluationSlots);
+        WriteExpectedSelectors(writer, rule.ExpectedSelectors);
+        WriteCanonicalStringValues(
+            writer,
+            "subjectRoles",
+            rule.SubjectRoles.Select(item => item.Value));
+        WriteCanonicalStringValues(
+            writer,
+            "surfaces",
+            rule.Surfaces.Values.Select(item => item.Value));
+        WriteCanonicalStringValues(
+            writer,
+            "snapshotKinds",
+            rule.SnapshotKinds.Select(item => item.Value));
+        WriteCanonicalStringValues(
+            writer,
+            "operations",
+            rule.Operations.Select(item => item.Value));
+        WriteFindings(writer, rule.Findings);
+        WriteCanonicalStringValues(
+            writer,
+            "evaluationFailureCodes",
+            rule.EvaluationFailureCodes.Select(item => item.Value));
+        WriteCanonicalString(writer, "introducedIn", rule.IntroducedIn);
+        if (rule.DeprecatedIn is not null)
+        {
+            WriteCanonicalString(writer, "deprecatedIn", rule.DeprecatedIn);
+        }
+
+        if (rule.RetiredIn is not null)
+        {
+            WriteCanonicalString(writer, "retiredIn", rule.RetiredIn);
+        }
+
+        WriteCanonicalStringValues(
+            writer,
+            "compatibilityAliases",
+            rule.CompatibilityAliases);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteNormativeFragments(
+        Utf8JsonWriter writer,
+        IReadOnlyList<NormativeFragmentDeclaration> fragments)
+    {
+        writer.WritePropertyName("normativeFragments");
+        writer.WriteStartArray();
+        foreach (var fragment in fragments)
+        {
+            WriteNormativeFragment(writer, fragment);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteNormativeFragment(
+        Utf8JsonWriter writer,
+        NormativeFragmentDeclaration fragment)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "path", fragment.Path);
+        WriteCanonicalString(writer, "containingBlob", fragment.ContainingBlob);
+        WriteCanonicalString(writer, "anchor", fragment.Anchor);
+        writer.WriteNumber("startLine", fragment.StartLine);
+        writer.WriteNumber("endLine", fragment.EndLine);
+        WriteCanonicalString(
+            writer,
+            "canonicalizationSchema",
+            fragment.CanonicalizationSchema);
+        writer.WriteNumber("canonicalByteLength", fragment.CanonicalByteLength);
+        WriteCanonicalString(writer, "fragmentDigest", fragment.FragmentDigest.Value);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteSlots(
+        Utf8JsonWriter writer,
+        string propertyName,
+        IReadOnlyList<EvidenceSlotDeclaration> slots)
+    {
+        writer.WritePropertyName(propertyName);
+        writer.WriteStartArray();
+        foreach (var slot in slots)
+        {
+            WriteEvidenceSlot(writer, slot);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteEvidenceSlot(
+        Utf8JsonWriter writer,
+        EvidenceSlotDeclaration slot)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "slotKey", slot.SlotKey);
+        writer.WritePropertyName("requirement");
+        WriteEvidenceRequirement(writer, slot.Requirement);
+        WriteCanonicalStringValues(
+            writer,
+            "profileSurfaces",
+            slot.ProfileSurfaces.Values.Select(item => item.Value));
+        WriteCanonicalString(writer, "materialRole", slot.MaterialRole);
+        WriteCanonicalString(writer, "targetSelectorKey", slot.TargetSelectorKey);
+        writer.WritePropertyName("capabilities");
+        writer.WriteStartArray();
+        foreach (var capability in slot.Capabilities)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(
+                writer,
+                "capabilityKey",
+                capability.CapabilityKey);
+            WriteCanonicalString(
+                writer,
+                "capabilityVersion",
+                capability.CapabilityVersion);
+            WriteComponentReference(
+                writer,
+                "interfaceType",
+                capability.InterfaceType);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+        writer.WriteEndObject();
+    }
+
+    private static void WriteEvidenceRequirement(
+        Utf8JsonWriter writer,
+        EvidenceRequirement requirement)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "key", requirement.Key);
+        WriteCanonicalString(writer, "surface", requirement.Surface.Value);
+        WriteCanonicalString(writer, "kind", requirement.Kind);
+        WriteCanonicalString(
+            writer,
+            "completenessContract",
+            requirement.CompletenessContract);
+        WriteCanonicalString(
+            writer,
+            "payloadSchemaKey",
+            requirement.PayloadSchemaKey);
+        WriteCanonicalString(
+            writer,
+            "payloadSchemaVersion",
+            requirement.PayloadSchemaVersion);
+        WriteCanonicalStringValues(
+            writer,
+            "acceptedConsistencyClasses",
+            requirement.AcceptedConsistencyClasses.Select(item => item.Value));
+        writer.WriteEndObject();
+    }
+
+    private static void WriteExpectedSelectors(
+        Utf8JsonWriter writer,
+        IReadOnlyList<ExpectedSelectorDeclaration> selectors)
+    {
+        writer.WritePropertyName("expectedSelectors");
+        writer.WriteStartArray();
+        foreach (var selector in selectors)
+        {
+            WriteExpectedSelector(writer, selector);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteExpectedSelector(
+        Utf8JsonWriter writer,
+        ExpectedSelectorDeclaration selector)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "selectorKey", selector.SelectorKey);
+        WriteCanonicalString(writer, "slotKey", selector.SlotKey);
+        WriteCanonicalString(
+            writer,
+            "selectorSchemaKey",
+            selector.SelectorSchemaKey);
+        WriteComponentReference(writer, "resolver", selector.Resolver);
+        WriteCanonicalStringValues(
+            writer,
+            "allowedParentKinds",
+            selector.AllowedParentKinds.Select(item => item.Value));
+        WriteCanonicalStringValues(
+            writer,
+            "allowedFindingCodes",
+            selector.AllowedFindingCodes.Select(item => item.Value));
+        writer.WriteEndObject();
+    }
+
+    private static void WriteFindings(
+        Utf8JsonWriter writer,
+        IReadOnlyList<FindingDeclaration> findings)
+    {
+        writer.WritePropertyName("findings");
+        writer.WriteStartArray();
+        foreach (var finding in findings)
+        {
+            WriteFinding(writer, finding);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteFinding(
+        Utf8JsonWriter writer,
+        FindingDeclaration finding)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "code", finding.Code.Value);
+        WriteCanonicalString(writer, "severity", finding.Severity.Value);
+        WriteCanonicalString(writer, "remediation", finding.Remediation.Value);
+        WriteCanonicalStringValues(
+            writer,
+            "allowedPrimaryReferenceKinds",
+            finding.AllowedPrimaryReferenceKinds.Select(item => item.Value));
+        WriteCanonicalStringValues(
+            writer,
+            "allowedRelatedReferenceKinds",
+            finding.AllowedRelatedReferenceKinds.Select(item => item.Value));
+        writer.WriteEndObject();
+    }
+
+    private static void WriteComponentReference(
+        Utf8JsonWriter writer,
+        string propertyName,
+        ComponentTypeIdentity component)
+    {
+        writer.WritePropertyName(propertyName);
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "componentKey", component.ComponentKey);
+        WriteCanonicalString(
+            writer,
+            "componentVersion",
+            component.ComponentVersion);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteCanonicalStringValues(
+        Utf8JsonWriter writer,
+        string propertyName,
+        IEnumerable<string> values)
+    {
+        writer.WritePropertyName(propertyName);
+        writer.WriteStartArray();
+        foreach (var value in values)
+        {
+            WriteCanonicalStringValue(writer, value);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteCanonicalStringValue(
+        Utf8JsonWriter writer,
+        string value)
+    {
+        var quotedUtf8 =
+            CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(value);
+        try
+        {
+            writer.WriteRawValue(
+                quotedUtf8,
+                skipInputValidation: false);
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(quotedUtf8);
+        }
     }
 
     private static void WriteActivationProof(

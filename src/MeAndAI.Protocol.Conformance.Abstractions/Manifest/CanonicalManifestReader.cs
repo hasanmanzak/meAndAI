@@ -85,10 +85,10 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("sliceVersion");
         var sliceVersion = reader.ReadString();
         reader.ExpectProperty("rules");
-        reader.ExpectEmptyArray();
+        var rules = ReadRules(ref reader);
         reader.Expect(JsonTokenType.EndObject);
 
-        return new RawSlice(sliceKey, sliceVersion);
+        return new RawSlice(sliceKey, sliceVersion, rules);
     }
 
     private static RawCacheBudget ReadEmptySchemaRegistry(
@@ -237,6 +237,354 @@ internal static class CanonicalManifestReader
         return components;
     }
 
+    private static IReadOnlyList<RawRuleDeclaration> ReadRules(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var rules = new List<RawRuleDeclaration>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest rules array must contain objects.");
+            }
+
+            reader.ExpectProperty("ruleId");
+            var ruleId = reader.ReadString();
+            reader.ExpectProperty("ruleRevision");
+            var ruleRevision = reader.ReadInt32();
+            reader.ExpectProperty("catalogVersion");
+            var catalogVersion = reader.ReadInt32();
+            reader.ExpectProperty("normativeDigest");
+            var normativeDigest = reader.ReadString();
+            reader.ExpectProperty("normativeFragments");
+            var normativeFragments = ReadNormativeFragments(ref reader);
+            reader.ExpectProperty("qualificationScenarios");
+            var qualificationScenarios = ReadStringArray(ref reader);
+            reader.ExpectProperty("evaluator");
+            var evaluator = ReadComponentReference(ref reader);
+            reader.ExpectProperty("applicabilitySlots");
+            var applicabilitySlots = ReadEvidenceSlots(ref reader);
+            reader.ExpectProperty("evaluationSlots");
+            var evaluationSlots = ReadEvidenceSlots(ref reader);
+            reader.ExpectProperty("expectedSelectors");
+            var expectedSelectors = ReadExpectedSelectors(ref reader);
+            reader.ExpectProperty("subjectRoles");
+            var subjectRoles = ReadStringArray(ref reader);
+            reader.ExpectProperty("surfaces");
+            var surfaces = ReadStringArray(ref reader);
+            reader.ExpectProperty("snapshotKinds");
+            var snapshotKinds = ReadStringArray(ref reader);
+            reader.ExpectProperty("operations");
+            var operations = ReadStringArray(ref reader);
+            reader.ExpectProperty("findings");
+            var findings = ReadFindings(ref reader);
+            reader.ExpectProperty("evaluationFailureCodes");
+            var evaluationFailureCodes = ReadStringArray(ref reader);
+            reader.ExpectProperty("introducedIn");
+            var introducedIn = reader.ReadString();
+            string? deprecatedIn = null;
+            string? retiredIn = null;
+            while (reader.TokenType == JsonTokenType.PropertyName)
+            {
+                if (reader.IsPropertyName("deprecatedIn"))
+                {
+                    reader.ExpectProperty("deprecatedIn");
+                    deprecatedIn = reader.ReadString();
+                    reader.Read();
+                    continue;
+                }
+
+                if (reader.IsPropertyName("retiredIn"))
+                {
+                    reader.ExpectProperty("retiredIn");
+                    retiredIn = reader.ReadString();
+                    reader.Read();
+                    continue;
+                }
+
+                break;
+            }
+
+            reader.ExpectProperty("compatibilityAliases");
+            var compatibilityAliases = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+
+            rules.Add(
+                new RawRuleDeclaration(
+                    ruleId,
+                    ruleRevision,
+                    catalogVersion,
+                    normativeDigest,
+                    normativeFragments,
+                    qualificationScenarios,
+                    evaluator,
+                    applicabilitySlots,
+                    evaluationSlots,
+                    expectedSelectors,
+                    subjectRoles,
+                    surfaces,
+                    snapshotKinds,
+                    operations,
+                    findings,
+                    evaluationFailureCodes,
+                    introducedIn,
+                    deprecatedIn,
+                    retiredIn,
+                    compatibilityAliases));
+        }
+
+        return rules;
+    }
+
+    private static IReadOnlyList<RawNormativeFragment> ReadNormativeFragments(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var fragments = new List<RawNormativeFragment>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest normative fragment array must contain objects.");
+            }
+
+            reader.ExpectProperty("path");
+            var path = reader.ReadString();
+            reader.ExpectProperty("containingBlob");
+            var containingBlob = reader.ReadString();
+            reader.ExpectProperty("anchor");
+            var anchor = reader.ReadString();
+            reader.ExpectProperty("startLine");
+            var startLine = reader.ReadInt32();
+            reader.ExpectProperty("endLine");
+            var endLine = reader.ReadInt32();
+            reader.ExpectProperty("canonicalizationSchema");
+            var canonicalizationSchema = reader.ReadString();
+            reader.ExpectProperty("canonicalByteLength");
+            var canonicalByteLength = reader.ReadInt64();
+            reader.ExpectProperty("fragmentDigest");
+            var fragmentDigest = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            fragments.Add(
+                new RawNormativeFragment(
+                    path,
+                    containingBlob,
+                    anchor,
+                    startLine,
+                    endLine,
+                    canonicalizationSchema,
+                    canonicalByteLength,
+                    fragmentDigest));
+        }
+
+        return fragments;
+    }
+
+    private static IReadOnlyList<string> ReadStringArray(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var values = new List<string>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            values.Add(reader.ReadString());
+        }
+
+        return values;
+    }
+
+    private static IReadOnlyList<RawEvidenceSlot> ReadEvidenceSlots(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var slots = new List<RawEvidenceSlot>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest slot array must contain objects.");
+            }
+
+            reader.ExpectProperty("slotKey");
+            var slotKey = reader.ReadString();
+            reader.ExpectProperty("requirement");
+            var requirement = ReadEvidenceRequirement(ref reader);
+            reader.ExpectProperty("profileSurfaces");
+            var profileSurfaces = ReadStringArray(ref reader);
+            reader.ExpectProperty("materialRole");
+            var materialRole = reader.ReadString();
+            reader.ExpectProperty("targetSelectorKey");
+            var targetSelectorKey = reader.ReadString();
+            reader.ExpectProperty("capabilities");
+            var capabilities = ReadCapabilities(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+
+            slots.Add(
+                new RawEvidenceSlot(
+                    slotKey,
+                    requirement,
+                    profileSurfaces,
+                    materialRole,
+                    targetSelectorKey,
+                    capabilities));
+        }
+
+        return slots;
+    }
+
+    private static RawEvidenceRequirement ReadEvidenceRequirement(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("key");
+        var key = reader.ReadString();
+        reader.ExpectProperty("surface");
+        var surface = reader.ReadString();
+        reader.ExpectProperty("kind");
+        var kind = reader.ReadString();
+        reader.ExpectProperty("completenessContract");
+        var completenessContract = reader.ReadString();
+        reader.ExpectProperty("payloadSchemaKey");
+        var payloadSchemaKey = reader.ReadString();
+        reader.ExpectProperty("payloadSchemaVersion");
+        var payloadSchemaVersion = reader.ReadString();
+        reader.ExpectProperty("acceptedConsistencyClasses");
+        var acceptedConsistencyClasses = ReadStringArray(ref reader);
+        reader.Expect(JsonTokenType.EndObject);
+
+        return new RawEvidenceRequirement(
+            key,
+            surface,
+            kind,
+            completenessContract,
+            payloadSchemaKey,
+            payloadSchemaVersion,
+            acceptedConsistencyClasses);
+    }
+
+    private static IReadOnlyList<RawCapabilityContract> ReadCapabilities(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var capabilities = new List<RawCapabilityContract>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest capability array must contain objects.");
+            }
+
+            reader.ExpectProperty("capabilityKey");
+            var capabilityKey = reader.ReadString();
+            reader.ExpectProperty("capabilityVersion");
+            var capabilityVersion = reader.ReadString();
+            reader.ExpectProperty("interfaceType");
+            var interfaceType = ReadComponentReference(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            capabilities.Add(
+                new RawCapabilityContract(
+                    capabilityKey,
+                    capabilityVersion,
+                    interfaceType));
+        }
+
+        return capabilities;
+    }
+
+    private static IReadOnlyList<RawExpectedSelector> ReadExpectedSelectors(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var selectors = new List<RawExpectedSelector>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest expected selector array must contain objects.");
+            }
+
+            reader.ExpectProperty("selectorKey");
+            var selectorKey = reader.ReadString();
+            reader.ExpectProperty("slotKey");
+            var slotKey = reader.ReadString();
+            reader.ExpectProperty("selectorSchemaKey");
+            var selectorSchemaKey = reader.ReadString();
+            reader.ExpectProperty("resolver");
+            var resolver = ReadComponentReference(ref reader);
+            reader.ExpectProperty("allowedParentKinds");
+            var allowedParentKinds = ReadStringArray(ref reader);
+            reader.ExpectProperty("allowedFindingCodes");
+            var allowedFindingCodes = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+
+            selectors.Add(
+                new RawExpectedSelector(
+                    selectorKey,
+                    slotKey,
+                    selectorSchemaKey,
+                    resolver,
+                    allowedParentKinds,
+                    allowedFindingCodes));
+        }
+
+        return selectors;
+    }
+
+    private static IReadOnlyList<RawFindingDeclaration> ReadFindings(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var findings = new List<RawFindingDeclaration>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest finding array must contain objects.");
+            }
+
+            reader.ExpectProperty("code");
+            var code = reader.ReadString();
+            reader.ExpectProperty("severity");
+            var severity = reader.ReadString();
+            reader.ExpectProperty("remediation");
+            var remediation = reader.ReadString();
+            reader.ExpectProperty("allowedPrimaryReferenceKinds");
+            var allowedPrimaryReferenceKinds = ReadStringArray(ref reader);
+            reader.ExpectProperty("allowedRelatedReferenceKinds");
+            var allowedRelatedReferenceKinds = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            findings.Add(
+                new RawFindingDeclaration(
+                    code,
+                    severity,
+                    remediation,
+                    allowedPrimaryReferenceKinds,
+                    allowedRelatedReferenceKinds));
+        }
+
+        return findings;
+    }
+
+    private static RawComponentReference ReadComponentReference(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("componentKey");
+        var componentKey = reader.ReadString();
+        reader.ExpectProperty("componentVersion");
+        var componentVersion = reader.ReadString();
+        reader.Expect(JsonTokenType.EndObject);
+
+        return new RawComponentReference(componentKey, componentVersion);
+    }
+
     private static ParsedCanonicalManifest CreateProjection(
         CatalogAuthorityKind authorityKind,
         string sourceCommit,
@@ -268,12 +616,6 @@ internal static class CanonicalManifestReader
                 Array.Empty<AdmissionProofContractDeclaration>(),
                 typedCacheBudget);
             var typedCatalogVersion = CatalogVersion.Create(catalogVersion);
-            var typedSlice = CatalogSliceDeclaration.Create(
-                slice.SliceKey,
-                slice.SliceVersion,
-                protocolVersion,
-                typedCatalogVersion,
-                Array.Empty<RuleDeclaration>());
 
             var artifactBindings = new List<ArtifactFileBinding>();
             var artifactFileNames = new HashSet<string>(StringComparer.Ordinal);
@@ -296,6 +638,7 @@ internal static class CanonicalManifestReader
             var componentKeys = new HashSet<string>(StringComparer.Ordinal);
             var usedArtifacts = new HashSet<string>(StringComparer.Ordinal);
             ComponentTypeIdentity? activationProofComponent = null;
+            var componentLookup = new Dictionary<(string, string), ComponentTypeIdentity>();
 
             foreach (var component in rawComponents)
             {
@@ -322,6 +665,8 @@ internal static class CanonicalManifestReader
                     component.ArtifactFileName);
                 componentBindings.Add(componentBinding);
                 usedArtifacts.Add(component.ArtifactFileName);
+                componentLookup[(componentIdentity.ComponentKey, componentIdentity.ComponentVersion)] =
+                    componentIdentity;
 
                 if (IsActivationProof(componentIdentity, activationProof))
                 {
@@ -351,6 +696,13 @@ internal static class CanonicalManifestReader
                     "The manifest artifactFiles array must be fully bound.");
             }
 
+            var typedSlice = CatalogSliceDeclaration.Create(
+                slice.SliceKey,
+                slice.SliceVersion,
+                protocolVersion,
+                typedCatalogVersion,
+                CreateRules(slice.Rules, componentLookup));
+
             var typedActivationProof =
                 ActivationProofContractDeclaration.Create(
                     activationProof.ContractKey,
@@ -379,6 +731,156 @@ internal static class CanonicalManifestReader
         RawActivationProof activationProof) =>
         string.Equals(component.ComponentKey, activationProof.ComponentKey, StringComparison.Ordinal) &&
         string.Equals(component.ComponentVersion, activationProof.ComponentVersion, StringComparison.Ordinal);
+
+    private static IReadOnlyList<RuleDeclaration> CreateRules(
+        IReadOnlyList<RawRuleDeclaration> rules,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        var declarations = new List<RuleDeclaration>(rules.Count);
+        foreach (var rule in rules)
+        {
+            declarations.Add(
+                RuleDeclaration.Create(
+                    RuleId.Parse(rule.RuleId),
+                    RuleRevision.Create(rule.RuleRevision),
+                    CatalogVersion.Create(rule.CatalogVersion),
+                    ExactSha256Digest.Parse(rule.NormativeDigest),
+                    CreateNormativeFragments(rule.NormativeFragments),
+                    rule.QualificationScenarios.Select(TestScenarioId.Parse).ToList(),
+                    ResolveComponentReference(rule.Evaluator, components),
+                    CreateEvidenceSlots(rule.ApplicabilitySlots, components),
+                    CreateEvidenceSlots(rule.EvaluationSlots, components),
+                    CreateExpectedSelectors(rule.ExpectedSelectors, components),
+                    rule.SubjectRoles.Select(SubjectRole.Parse).ToList(),
+                    SurfaceSet.Create(rule.Surfaces.Select(SurfaceKind.Parse)),
+                    rule.SnapshotKinds.Select(SnapshotKind.Parse).ToList(),
+                    rule.Operations.Select(ProtocolOperation.Parse).ToList(),
+                    CreateFindings(rule.Findings),
+                    rule.EvaluationFailureCodes.Select(EvaluationFailureCode.Parse).ToList(),
+                    rule.IntroducedIn,
+                    rule.DeprecatedIn is not null
+                        ? rule.DeprecatedIn
+                        : null,
+                    rule.RetiredIn is not null
+                        ? rule.RetiredIn
+                        : null,
+                    rule.CompatibilityAliases));
+        }
+
+        return declarations;
+    }
+
+    private static IReadOnlyList<NormativeFragmentDeclaration> CreateNormativeFragments(
+        IReadOnlyList<RawNormativeFragment> fragments)
+    {
+        var declarations = new List<NormativeFragmentDeclaration>(fragments.Count);
+        foreach (var fragment in fragments)
+        {
+            declarations.Add(
+                NormativeFragmentDeclaration.Create(
+                    fragment.Path,
+                    fragment.ContainingBlob,
+                    fragment.Anchor,
+                    fragment.StartLine,
+                    fragment.EndLine,
+                    fragment.CanonicalizationSchema,
+                    fragment.CanonicalByteLength,
+                    ExactSha256Digest.Parse(fragment.FragmentDigest)));
+        }
+
+        return declarations;
+    }
+
+    private static IReadOnlyList<EvidenceSlotDeclaration> CreateEvidenceSlots(
+        IReadOnlyList<RawEvidenceSlot> slots,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        var declarations = new List<EvidenceSlotDeclaration>(slots.Count);
+        foreach (var slot in slots)
+        {
+            declarations.Add(
+                EvidenceSlotDeclaration.Create(
+                    slot.SlotKey,
+                    EvidenceRequirement.Create(
+                        slot.Requirement.Key,
+                        SurfaceKind.Parse(slot.Requirement.Surface),
+                        slot.Requirement.Kind,
+                        slot.Requirement.CompletenessContract,
+                        slot.Requirement.PayloadSchemaKey,
+                        slot.Requirement.PayloadSchemaVersion,
+                        slot.Requirement.AcceptedConsistencyClasses.Select(
+                            EvidenceConsistencyClass.Parse)),
+                    SurfaceSet.Create(slot.ProfileSurfaces.Select(SurfaceKind.Parse)),
+                    slot.MaterialRole,
+                    slot.TargetSelectorKey,
+                    slot.Capabilities.Select(
+                            capability => CapabilityContractIdentity.Create(
+                                capability.CapabilityKey,
+                                capability.CapabilityVersion,
+                                ResolveComponentReference(
+                                    capability.InterfaceType,
+                                    components)))
+                        .ToList()));
+        }
+
+        return declarations;
+    }
+
+    private static IReadOnlyList<ExpectedSelectorDeclaration> CreateExpectedSelectors(
+        IReadOnlyList<RawExpectedSelector> selectors,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        var declarations = new List<ExpectedSelectorDeclaration>(selectors.Count);
+        foreach (var selector in selectors)
+        {
+            declarations.Add(
+                ExpectedSelectorDeclaration.Create(
+                    selector.SelectorKey,
+                    selector.SlotKey,
+                    selector.SelectorSchemaKey,
+                    ResolveComponentReference(selector.Resolver, components),
+                    selector.AllowedParentKinds.Select(
+                        QualifiedEvidenceReferenceKind.Parse),
+                    selector.AllowedFindingCodes.Select(FindingCode.Parse)));
+        }
+
+        return declarations;
+    }
+
+    private static IReadOnlyList<FindingDeclaration> CreateFindings(
+        IReadOnlyList<RawFindingDeclaration> findings)
+    {
+        var declarations = new List<FindingDeclaration>(findings.Count);
+        foreach (var finding in findings)
+        {
+            declarations.Add(
+                FindingDeclaration.Create(
+                    FindingCode.Parse(finding.Code),
+                    FindingSeverity.Parse(finding.Severity),
+                    RemediationKey.Parse(finding.Remediation),
+                    finding.AllowedPrimaryReferenceKinds.Select(
+                        QualifiedEvidenceReferenceKind.Parse),
+                    finding.AllowedRelatedReferenceKinds.Select(
+                        QualifiedEvidenceReferenceKind.Parse)));
+        }
+
+        return declarations;
+    }
+
+    private static ComponentTypeIdentity ResolveComponentReference(
+        RawComponentReference componentReference,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        if (!components.TryGetValue(
+            (componentReference.ComponentKey, componentReference.ComponentVersion),
+            out var component))
+        {
+            throw new FormatException(
+                "The manifest rule references a component that is not declared.");
+        }
+
+        return component;
+    }
 
     private static bool IsRuntimeAnchor(ComponentTypeIdentity component) =>
         component.ComponentVersion is "1" &&
@@ -483,6 +985,12 @@ internal static class CanonicalManifestReader
                     $"Expected policy manifest property '{expected}'.");
             }
         }
+
+        internal JsonTokenType TokenType => _reader.TokenType;
+
+        internal bool IsPropertyName(string expected) =>
+            _reader.TokenType == JsonTokenType.PropertyName &&
+            _reader.ValueTextEquals(expected);
 
         internal void ExpectEmptyArray()
         {
@@ -673,7 +1181,81 @@ internal static class CanonicalManifestReader
         }
     }
 
-    private sealed record RawSlice(string SliceKey, string SliceVersion);
+    private sealed record RawSlice(
+        string SliceKey,
+        string SliceVersion,
+        IReadOnlyList<RawRuleDeclaration> Rules);
+
+    private sealed record RawRuleDeclaration(
+        string RuleId,
+        int RuleRevision,
+        int CatalogVersion,
+        string NormativeDigest,
+        IReadOnlyList<RawNormativeFragment> NormativeFragments,
+        IReadOnlyList<string> QualificationScenarios,
+        RawComponentReference Evaluator,
+        IReadOnlyList<RawEvidenceSlot> ApplicabilitySlots,
+        IReadOnlyList<RawEvidenceSlot> EvaluationSlots,
+        IReadOnlyList<RawExpectedSelector> ExpectedSelectors,
+        IReadOnlyList<string> SubjectRoles,
+        IReadOnlyList<string> Surfaces,
+        IReadOnlyList<string> SnapshotKinds,
+        IReadOnlyList<string> Operations,
+        IReadOnlyList<RawFindingDeclaration> Findings,
+        IReadOnlyList<string> EvaluationFailureCodes,
+        string IntroducedIn,
+        string? DeprecatedIn,
+        string? RetiredIn,
+        IReadOnlyList<string> CompatibilityAliases);
+
+    private sealed record RawNormativeFragment(
+        string Path,
+        string ContainingBlob,
+        string Anchor,
+        int StartLine,
+        int EndLine,
+        string CanonicalizationSchema,
+        long CanonicalByteLength,
+        string FragmentDigest);
+
+    private sealed record RawEvidenceSlot(
+        string SlotKey,
+        RawEvidenceRequirement Requirement,
+        IReadOnlyList<string> ProfileSurfaces,
+        string MaterialRole,
+        string TargetSelectorKey,
+        IReadOnlyList<RawCapabilityContract> Capabilities);
+
+    private sealed record RawEvidenceRequirement(
+        string Key,
+        string Surface,
+        string Kind,
+        string CompletenessContract,
+        string PayloadSchemaKey,
+        string PayloadSchemaVersion,
+        IReadOnlyList<string> AcceptedConsistencyClasses);
+
+    private sealed record RawCapabilityContract(
+        string CapabilityKey,
+        string CapabilityVersion,
+        RawComponentReference InterfaceType);
+
+    private sealed record RawExpectedSelector(
+        string SelectorKey,
+        string SlotKey,
+        string SelectorSchemaKey,
+        RawComponentReference Resolver,
+        IReadOnlyList<string> AllowedParentKinds,
+        IReadOnlyList<string> AllowedFindingCodes);
+
+    private sealed record RawFindingDeclaration(
+        string Code,
+        string Severity,
+        string Remediation,
+        IReadOnlyList<string> AllowedPrimaryReferenceKinds,
+        IReadOnlyList<string> AllowedRelatedReferenceKinds);
+
+    private sealed record RawComponentReference(string ComponentKey, string ComponentVersion);
 
     private sealed record RawCacheBudget(
         int MaxDecodeEntries,
