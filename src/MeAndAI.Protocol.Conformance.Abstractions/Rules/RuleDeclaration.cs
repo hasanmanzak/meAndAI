@@ -121,6 +121,13 @@ public sealed class RuleDeclaration
             normativeFragments,
             nameof(normativeFragments),
             requireNonEmpty: true);
+        if (canonicalFragments.Count < 2)
+        {
+            throw new ArgumentException(
+                "A rule must declare at least two normative fragments.",
+                nameof(normativeFragments));
+        }
+
         var canonicalScenarios = DeclarationValidation.Canonicalize(
             qualificationScenarios,
             nameof(qualificationScenarios),

@@ -90,6 +90,29 @@ public sealed class ContractSliceARuleManifestTests
             component.Component.TypeName);
     }
 
+    [Fact]
+    [Trait("Scenario", "TEST-0210")]
+    [Trait("ContractSlice", "A")]
+    public void Enforces_canonical_multi_fragment_rule_provenance()
+    {
+        var source = CreateMinimalRuleManifest();
+        var canonicalManifest = CanonicalManifestWriter.Write(source);
+        var manifest = FinalizedPolicyManifest.ParseCanonical(canonicalManifest);
+        var rehydrated = CanonicalManifestWriter.Write(manifest);
+        Assert.Equal(canonicalManifest, rehydrated);
+
+        Assert.Throws<ArgumentException>(() => CreateRule(1));
+        Assert.Throws<ArgumentException>(() => NormativeFragmentDeclaration.Create(
+            "docs/rules/rule-1.md",
+            "6e340b9cffb37a989ca544e6bb780a2c78901d3fb",
+            "rule-fragment",
+            1,
+            2,
+            "protocol.normative-fragment.legacy",
+            2,
+            ExactSha256Digest.Parse(ProbeDigest)));
+    }
+
     private static ParsedCanonicalManifest CreateMinimalRuleManifest()
     {
         return new ParsedCanonicalManifest(
@@ -128,36 +151,14 @@ public sealed class ContractSliceARuleManifestTests
             new[] { CreateRule() });
     }
 
-    private static RuleDeclaration CreateRule()
+    private static RuleDeclaration CreateRule(int normativeFragmentCount = 2)
     {
         return RuleDeclaration.Create(
             RuleId.Parse("RULE-00001"),
             RuleRevision.Create(1),
             CatalogVersion.Create(1),
             ExactSha256Digest.Parse(ProbeDigest),
-            new[]
-            {
-                NormativeFragmentDeclaration.Create(
-                    "docs/rules/rule-1.md",
-                    "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
-                    "rule-fragment",
-                    1,
-                    2,
-                    "sha256",
-                    2,
-                    ExactSha256Digest.Parse(
-                        "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d")),
-                NormativeFragmentDeclaration.Create(
-                    "docs/rules/rule-1-metadata.md",
-                    "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
-                    "rule-metadata",
-                    10,
-                    20,
-                    "sha256",
-                    2,
-                    ExactSha256Digest.Parse(
-                        "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d")),
-            },
+            CreateNormativeFragments(normativeFragmentCount),
             new[]
             {
                 TestScenarioId.Parse("TEST-00001"),
@@ -205,6 +206,41 @@ public sealed class ContractSliceARuleManifestTests
             "2.0.0",
             "3.0.0",
             new[] { "protocol.compatibility.example" });
+    }
+
+    private static IReadOnlyList<NormativeFragmentDeclaration> CreateNormativeFragments(
+        int normativeFragmentCount)
+    {
+        var fragments = new List<NormativeFragmentDeclaration>(2)
+        {
+            NormativeFragmentDeclaration.Create(
+                "docs/rules/rule-1.md",
+                "6e340b9cffb37a989ca544e6bb780a2c78901d3fb",
+                "rule-fragment",
+                1,
+                2,
+                "protocol.normative-fragment.utf8-lines.v1",
+                2,
+                ExactSha256Digest.Parse(
+                    "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d")),
+        };
+
+        if (normativeFragmentCount > 1)
+        {
+            fragments.Add(
+                NormativeFragmentDeclaration.Create(
+                    "docs/rules/rule-1-metadata.md",
+                    "6e340b9cffb37a989ca544e6bb780a2c78901d3fb",
+                    "rule-metadata",
+                    10,
+                    20,
+                    "protocol.normative-fragment.utf8-lines.v1",
+                    2,
+                    ExactSha256Digest.Parse(
+                        "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d")));
+        }
+
+        return fragments;
     }
 
     private static EvidenceSlotDeclaration[] CreateEvidenceSlots()

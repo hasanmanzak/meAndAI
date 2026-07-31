@@ -4,6 +4,9 @@ namespace MeAndAI.Protocol.Conformance.Abstractions;
 
 public sealed class NormativeFragmentDeclaration
 {
+    private const string RequiredCanonicalizationSchema =
+        "protocol.normative-fragment.utf8-lines.v1";
+
     private NormativeFragmentDeclaration(
         string path,
         string containingBlob,
@@ -78,15 +81,16 @@ public sealed class NormativeFragmentDeclaration
             nameof(canonicalByteLength));
         ArgumentNullException.ThrowIfNull(fragmentDigest);
 
+        var canonicalSchema =
+            ValidateCanonicalizationSchema(canonicalizationSchema);
+
         return new NormativeFragmentDeclaration(
             canonicalPath,
             canonicalBlob,
             canonicalAnchor,
             startLine,
             endLine,
-            DeclarationValidation.Token(
-                canonicalizationSchema,
-                nameof(canonicalizationSchema)),
+            canonicalSchema,
             canonicalByteLength,
             fragmentDigest);
     }
@@ -123,5 +127,20 @@ public sealed class NormativeFragmentDeclaration
         }
 
         return containingBlob;
+    }
+
+    private static string ValidateCanonicalizationSchema(string? canonicalizationSchema)
+    {
+        var schema = DeclarationValidation.Token(
+            canonicalizationSchema,
+            nameof(canonicalizationSchema));
+        if (!string.Equals(schema, RequiredCanonicalizationSchema, StringComparison.Ordinal))
+        {
+            throw new ArgumentException(
+                "The canonicalization schema must be protocol.normative-fragment.utf8-lines.v1.",
+                nameof(canonicalizationSchema));
+        }
+
+        return schema;
     }
 }
