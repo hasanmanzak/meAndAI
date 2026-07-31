@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-30**
+Last verified: **2026-07-31**
 
 ## Verified facts
 
@@ -19,6 +19,12 @@ Last verified: **2026-07-30**
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   provides the typed C# operational foundation and portable verified package
   prerequisite. Its release grants no successor implementation authority.
+- Current local ContractSlice A baseline is committed at `5fa7f7d` (`[skip ci]`),
+  with no later local content edit beyond `BASE-RECORDS` synchronization.
+  `BASE-VERIFY` evidence on that commit is green for cumulative `13/13`,
+  zero-warning/error six-project Release build, clean `dotnet format`,
+  clean `git diff --check`, unchanged lock bytes, and marker/sentinel search
+  with no in-source test/behavior markers.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)

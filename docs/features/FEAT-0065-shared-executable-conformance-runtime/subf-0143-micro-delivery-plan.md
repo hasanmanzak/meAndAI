@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Prepared for maintainer review; no later ContractSlice A increment is active |
+| Status | Maintainer-approved BASE sequence is active through `BASE-VERIFY`/`BASE-RECORDS`; no later ContractSlice A increment is active |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Next-packet predecessor | `Pending`: the reviewed local `13/13` tree is not content-addressed and is not exact main |
+| Next-packet predecessor | `5fa7f7d` is the BASE-checkpoint commit for reviewed `13/13` content; parent is exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd). |
 | Git authority | None granted by this plan; stage, commit, and push each require an explicit maintainer directive |
 
 ## Purpose
@@ -20,9 +20,9 @@ ceiling. It does not activate any item below by itself and grants no B/C/D,
 workflow, publication, or release authority.
 
 The first limited `ParseCanonical` and canonical-string increments are green,
-and cumulative A last passed `13/13`. Those files are not yet an exact committed
-green baseline because the new source and test trees remain untracked. No new
-C# mutation may begin until the baseline checkpoint below is complete.
+and cumulative A last passed `13/13`. This is now the reviewed BASE
+checkpoint. No new C# mutation may begin until `BASE-RECORDS`
+synchronization is complete and `BASE-REVIEW` is authorized.
 
 ## Spark startup capsule
 
@@ -222,9 +222,9 @@ is never implemented green; return to D/RT or report `Blocked`.
 
 | Label | Bounded task | Exit condition |
 | --- | --- | --- |
-| `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Exact scope manifest; no unknown writer overlap. |
-| `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Existing `13/13` state is freshly reproducible or a specific blocker is recorded. |
-| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Complete candidate tree is stable; no later content edit is permitted without returning here. |
+| `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in `5fa7f7d`. |
+| `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Completed: cumulative `13/13` green reproduced with zero-warning/error six-project Release build, clean diff check, standard format, unchanged lock hashes, and clean marker/sentinel search (no test or source markers). |
+| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed by this edit: current bounded handoff and memory/log anchors are synchronized with exact BASE-VERIFY evidence; no later content edit is permitted without returning here. |
 | `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Final diff check clean, zero in-scope findings, verdict `0/0/0`, every observation dispositioned, and held scopes unchanged. |
 | `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Staged tree byte-equals the reviewed tree; NCrunch, temp output, and unrelated work are absent. |
 | `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Local exact commit is the immutable predecessor; no push means no hosted/Gate-7/DoD claim. |
@@ -243,6 +243,22 @@ equals that staged/reviewed tree. Immediately before push, recheck the expected
 remote head; any drift is `Blocked`. After push, record the exact remote ref and
 SHA. A local commit without push remains an immutable local predecessor, not
 hosted evidence.
+
+## BASE-VERIFY record
+
+- Reviewed local baseline commit: `5fa7f7d` (message: `chore: create reviewed baseline for BASE-SCOPE [skip ci]`).
+- Exact cumulative checkpoint: `13/13` at `ContractSlice=A` reproduced with filtered reds and greens.
+- Locked `packages.lock.json` fingerprints are unchanged:
+  - `src/MeAndAI.Protocol.Domain/packages.lock.json`: `03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46`
+  - `src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json`: `D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799`
+  - `src/MeAndAI.Protocol.Conformance/packages.lock.json`: `20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7`
+  - `src/MeAndAI.Protocol.Policy/packages.lock.json`: `C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309`
+  - `tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json`: `D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC`
+  - `tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json`: `BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0`
+- Marker/sentinel search found none in source/tests; only historical document references remain.
+- Non-code artifacts remaining untracked: `MeAndAI.Protocol.v3.ncrunchsolution.user` and `.dotnet-cli`-equivalent temporary output are excluded from content.
+
+The first `git diff --check` after this sync remains clean.
 
 ## Ordered remaining ContractSlice A queue
 

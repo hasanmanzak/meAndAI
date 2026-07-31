@@ -96,10 +96,11 @@ PowerShell-retirement changes remain unauthorized.
 
 The proposed micro-delivery plan is non-normative and non-activating until
 maintainer acceptance. If accepted, begin with its `BASE-SCOPE` through
-`BASE-CHECKPOINT` sequence. The current source/test trees are still untracked,
-so cumulative `13/13` is not yet a content-addressed green predecessor. Do not
-let a small-context agent select its own contract, evidence ordinal, FQN,
-marker, oracle, allowlist, or held-scope exception.
+`BASE-CHECKPOINT` sequence. The current source/test trees are now tracked by
+local baseline commit `5fa7f7d` (`[skip ci]`); cumulative `13/13` is now a
+content-addressed reviewed local predecessor, and `BASE-RECORDS` is synchronized.
+Do not let a small-context agent select its own contract, evidence ordinal,
+FQN, marker, oracle, allowlist, or held-scope exception.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at

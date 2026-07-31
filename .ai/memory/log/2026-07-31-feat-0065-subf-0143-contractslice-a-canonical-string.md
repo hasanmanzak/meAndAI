@@ -172,7 +172,8 @@ errors. A separate non-gating severity-info full scan exposed pre-existing flat-
 namespace/informational backlog and suggestions, so no severity-info-clean claim
 is made.
 
-This bounded evidence closes the unnumbered canonical-string coverage
+This bounded evidence closes the unnumbered canonical-string coverage and records
+the completed `BASE-RECORDS` synchronization in this log.
 `Important`. It does not complete ContractSlice A or [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
 which remains `Planned`. No later A increment is active. Remaining A,
 ContractSlice B/C/D, workflow/scenario-owner/
