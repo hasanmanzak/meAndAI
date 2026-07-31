@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded `FIND-0441` recovery of pushed grammar/number/graph/rule candidate `7f60e0c` is `ReviewedLocalGreen` with four focused `1/1`, cumulative `17/17`, and fresh review `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
+| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded `FIND-0441` recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; the remote-equal record-sync head is the next-packet predecessor, no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |

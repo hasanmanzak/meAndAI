@@ -126,8 +126,11 @@ Later exact pushed candidate `7f60e0c` is not a green predecessor: its static
 [FIND-0441](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
 recovery retains four facts, each locally green `1/1`, and cumulative A is
 locally `17/17`; final local V and fresh full-diff review `0/0/0` establish
-`ReviewedLocalGreen`, while exact staged-tree identity/checkpoint remains
-pending and unauthorized and no successor A packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+`ReviewedLocalGreen`. Audited tree `4ca02623...` is pushed at exact content
+checkpoint [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
+on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
+remote-equal record-sync head is the next-packet predecessor and no successor A
+packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Workflow/scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,

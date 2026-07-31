@@ -3,13 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Bounded recovery of exact pushed input `7f60e0c` is `ReviewedLocalGreen`: four retained grammar/number/graph/rule facts pass focused `1/1`, cumulative A passes `17/17`, and fresh review is `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, and no successor ContractSlice A increment is active |
+| Status | Bounded recovery of exact pushed input `7f60e0c` is checkpointed: four retained grammar/number/graph/rule facts pass focused `1/1`, cumulative A `17/17`, local/staged reviews `0/0/0`, audited tree `4ca02623...`, and content commit [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the remote-equal record-sync head is the next-packet predecessor and no successor ContractSlice A increment is active |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Next-packet predecessor | Pending an exact reviewed recovery checkpoint. Historical `13/13` content is `5fa7f7d`, its record sync is `9107a49`, and pushed `7f60e0c` is recovery input rather than an accepted predecessor. |
-| Git authority | None granted by this plan or the bounded recovery directive; stage, commit, and push each require an explicit maintainer directive |
+| Next-packet predecessor | The remote-equal record-sync successor to exact reviewed content checkpoint `f64860ef456380232c23dfc4729a0d87f257483d`; freeze its full SHA before any successor edit. Historical `13/13` content is `5fa7f7d`, record sync `9107a49`, and pushed `7f60e0c` remains recovery input only. |
+| Git authority | The maintainer directive authorized recovery stage/commit/push through checkpoint readiness; it is consumed by the content and record-sync pushes and grants no successor implementation authority |
 
 ## Purpose
 
@@ -25,8 +25,10 @@ grammar, number, graph, and rule work was pushed without the plan's per-packet
 red-team/review evidence and initially did not build. Its bounded recovery now
 passes the four retained exact filters `1/1` and cumulative A `17/17` locally.
 Final local V, locks/build/format/diff/marker verification, and fresh full-diff
-review `0/0/0` establish `ReviewedLocalGreen`. Exact staged-tree identity and a
-Git checkpoint remain pending and unauthorized, so no successor packet may begin.
+review `0/0/0` establish `ReviewedLocalGreen`. Two staged reviews closed
+`0/0/0`; tree `4ca02623...` matched content checkpoint `f64860ef...`, which was
+pushed on draft PR #174. Its remote-equal record-sync successor is the exact
+next-packet predecessor, but no successor packet may begin without activation.
 
 ## Spark startup capsule
 
@@ -228,10 +230,10 @@ is never implemented green; return to D/RT or report `Blocked`.
 | --- | --- | --- |
 | `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in `5fa7f7d`. |
 | `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Recovery completed: cumulative `17/17`; locked restore with six relevant lock fingerprints unchanged; zero-warning/error six-project Release build; clean format, diff, and marker/sentinel checks. Historical `13/13` remains the prior accepted content checkpoint. |
-| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed: current handoff, feature/architecture records, TEST-0210, and project memory distinguish historical missing evidence, final local V, and pending Git authority. |
+| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed: current handoff, feature/architecture records, TEST-0210, and project memory distinguish historical missing evidence, final local V, audited content checkpoint/PR, and the self-referential record-sync successor. Recovery Git authority is consumed after its push; no successor authority is granted. |
 | `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the fresh full-diff review closed `0 Blocking / 0 Important / 0 Minor`, establishing `ReviewedLocalGreen`. |
-| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Historical commits exist, but ordered reviewed-stage evidence is `NotEstablished`; no recovery staging is authorized yet. |
-| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | `7f60e0c` is an exact pushed recovery input, not a valid checkpoint. Local V/review is complete; the next predecessor remains pending exact staged-tree review and separate stage/commit/push authority. |
+| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Recovery complete: exact `20/20` allowlist, zero tracked-unstaged delta, NCrunch excluded, staged diff check clean, two staged reviews `0/0/0`, tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`. Historical pushed-candidate staged evidence remains `NotEstablished`. |
+| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Recovery content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) exactly matches the audited tree, is pushed, and owns draft PR #174. The remote-equal record-sync successor becomes the next-packet predecessor; hosted/DoD evidence is not claimed. |
 
 `[skip ci]` is not inherited posture. It may be used only as a separately
 explicit maintainer exception for an exact push; it cannot satisfy DoD, Gate 7,
@@ -335,8 +337,9 @@ Exact pushed input `7f60e0c` contained 18 static A facts, but no valid
 `18/18` execution. Recovery consolidates the duplicate rule round-trip fact and
 retains the four FQNs above; their focused filters pass `1/1` and cumulative A
 passes `17/17` locally. These facts do not reconstruct absent historical D/RT/R
-evidence. Final local V and fresh review are complete; `FIND-0441` remains the
-recovery owner only for the separately authorized staged-tree/checkpoint boundary.
+evidence. Final local/staged reviews are complete, audited tree `4ca02623...`
+matches pushed checkpoint `f64860ef...`, and `FIND-0441` is resolved for the
+bounded recovery boundary. The next packet remains inactive.
 
 `A-RULE-01` must prove in D/RT that a rule with both slot lists empty is valid
 in the then-current schema; otherwise it moves behind and joins
