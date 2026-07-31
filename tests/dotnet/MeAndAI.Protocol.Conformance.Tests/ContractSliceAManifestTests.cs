@@ -13,7 +13,6 @@ public sealed class ContractSliceAManifestTests
     internal const string MinimalCanonicalManifest = """{"schema":"protocol.policy-manifest.v1","authorityKind":"qualification-slice","sourceCommit":"0000000000000000000000000000000000000001","protocolVersion":"0.0.0","catalogVersion":1,"slice":{"sliceKey":"protocol.catalog-slice.test-empty","sliceVersion":"1","rules":[]},"schemaRegistry":{"payloadSchemas":[],"parsers":[],"indexes":[],"demandProjectors":[],"admissionProofContracts":[],"cacheBudget":{"maxDecodeEntries":1,"maxDecodeCanonicalBytes":1,"maxIndexEntries":1,"maxIndexNodes":1,"maxConcurrentDecodeAttempts":1,"maxConcurrentIndexAttempts":1,"retentionPolicy":"retain-lowest-canonical-keys"}},"activationProofContract":{"contractKey":"protocol.activation-proof.test","contractVersion":"1","proofComponent":{"componentKey":"protocol.activation-proof.test","componentVersion":"1"}},"artifactFiles":[{"fileName":"ContractSliceA.Proof.dll","byteLength":1,"artifactDigest":"6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"}],"components":[{"component":{"componentKey":"protocol.activation-proof.test","componentVersion":"1","assemblyName":"MeAndAI.Protocol.Conformance.Tests","typeName":"MeAndAI.Protocol.Conformance.Tests.ContractSliceAActivationProof"},"artifactFileName":"ContractSliceA.Proof.dll"}]}""" + "\n";
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void Parses_minimal_canonical_qualification_manifest()
     {

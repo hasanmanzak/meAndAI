@@ -76,7 +76,6 @@ public sealed class ContractSliceAPublicApiTests
     ];
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void ExportedTypesEqualTheContractSliceAInventories()
     {
@@ -93,7 +92,6 @@ public sealed class ContractSliceAPublicApiTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void DeclaredPublicSurfaceEqualsTheContractSliceASnapshot()
     {
@@ -119,7 +117,6 @@ public sealed class ContractSliceAPublicApiTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void PublicTypesHaveNoConstructionOrSerializationLeak()
     {
@@ -158,7 +155,6 @@ public sealed class ContractSliceAPublicApiTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void FriendAssembliesEqualTheCurrentContractSliceAAllowlist()
     {
@@ -177,7 +173,6 @@ public sealed class ContractSliceAPublicApiTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void StagedExportsExposeOnlyTheContractSliceASeam()
     {

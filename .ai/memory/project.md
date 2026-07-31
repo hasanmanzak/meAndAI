@@ -23,16 +23,25 @@ Last verified: **2026-07-31**
   `5fa7f7d` (`[skip ci]`), with BASE records synchronized by `9107a49`.
   Exact pushed `7f60e0c` is a recovery input rather than an accepted green
   predecessor: it contained 18 static A facts and no valid build or per-packet
-  red/RT/review evidence. Bounded `FIND-0441` recovery retains four facts; each
+  red/RT/review evidence. Bounded
+  [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery retains four facts; each
   exact focused filter passes `1/1` and cumulative A passes `17/17` locally.
   Final local V passes locked restore with unchanged relevant lock fingerprints,
   zero-warning/error Release build, format, diff/marker checks, and fresh
   full-diff review `0/0/0`; status is `ReviewedLocalGreen`. Audited tree
   `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` is pushed at exact content
   checkpoint `f64860ef456380232c23dfc4729a0d87f257483d` on draft
-  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174).
-  The remote-equal record-sync head is the next-packet predecessor; its exact
-  SHA must be frozen before successor mutation.
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Hosted
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  then exposed [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442):
+  the still-`Planned` A-D scenario carried 17 premature final `Scenario` traits.
+  The bounded correction retains every `ContractSlice=A` fact/FQN and defers
+  the [Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  to atomic final activation. Its correction head remains
+  a predecessor candidate until local review, push, and exact-head hosted
+  green; only then does the remote-equal head become the next-packet
+  predecessor whose exact SHA must be frozen before successor mutation.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -138,26 +147,65 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Active recurrence knowledge
 
+### Planned multi-slice scenario is asserted before final activation
+
+- Status: `Active`
+- Observable signature: [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  reports `planned scenario is already asserted` while only a partial
+  ContractSlice is implemented and the canonical scenario remains `Planned`.
+- Applicability: a canonical scenario decomposed into partial .NET traits whose
+  scenario-status, scenario-owner, workflow filters, and full executable route activate later.
+- Affected contract and cause: partial [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  A facts received the final
+  [Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  even though A-D and the
+  combined route were incomplete.
+- Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
+  the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
+  and the current [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
+- Fixed release or evidence: no release. Partial facts retain exact FQN and
+  `ContractSlice`; final `Scenario` traits are deferred to the same atomic
+  scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation after all A-D focused and combined green.
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  remains open
+  until this correction passes local review, push, and exact-head hosted green.
+- Required safe response: keep `PlannedDocumentation` strict, remove premature
+  final scenario traits, preserve partial-slice filters, and rerun StructureOnly
+  plus the unchanged cumulative ContractSlice filter; require exact-head hosted
+  green before accepting the correction head as a predecessor.
+- Unsafe retry boundary: do not mark a partial scenario `Passing`, weaken
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074),
+  add a scenario-ID-specific bypass, or activate scenario-owner/workflow scope early.
+- Freshness and review condition: confirmed 2026-07-31; review when partial
+  trait topology or final scenario activation changes.
+- Superseded by: `None`
+
 ### Small-context packet advancement outruns the canonical ledger
 
 - Status: `Active`
 - Observable signature: an agent reports completion or pushes a successor tree
   while the micro ledger still shows candidate/no-later-A state, recorded counts
   lag the static test inventory, or the exact pushed head does not build.
-- Applicability: SUBF-0143 micro-delivery work and later small-context agents
+- Applicability: [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  micro-delivery work and later small-context agents
   operating under a frozen packet brief.
 - Affected contract and cause: multiple semantic packets were combined without
   retained D/RT/R/V evidence; exact pushed `7f60e0c` contained 18 A facts while
   canonical records still reported `13/13` and the tree did not build.
 - Canonical owner and evidence: [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441),
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
-  and the current [recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md).
+  and the current [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
-  pushed at content checkpoint `f64860ef...` on draft PR #174; the remote-equal
-  record-sync head becomes the next-packet predecessor.
+  pushed at content checkpoint `f64860ef...` on draft
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the later
+  remote-equal [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction head becomes the next-packet predecessor only after local review,
+  push, and exact-head hosted green.
 - Required safe response: stop successor work, treat the pushed head as recovery
   input, reconcile exact diff/tests/review/records, and require an exact reviewed
   checkpoint before selecting another packet.
@@ -1091,7 +1139,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   info scan exposed pre-existing informational backlog/suggestions and is not
   claimed clean. Canonical-string coverage `Important` is closed at the
   historical `13/13` checkpoint; current grammar/number/graph/rule routing is
-  the `FIND-0441` recovery described below, and `TEST-0210` remains `Planned`.
+  the [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery described below, and
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1184,7 +1235,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   or Minor finding and canonical StructureOnly passed. Project/lock ownership,
   exact SurfaceRed, the 48-type structural surface, and focused `11/11` are
   locally complete. Renewed architecture review of the topology/parser
-  corrections and `FIND-0440` passed with `0 Blocking`, `0 Important`, and
+  corrections and
+  [FIND-0440](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
+  passed with `0 Blocking`, `0 Important`, and
   `0 Minor`. Pre-applicable-clarification BehaviorRed
   observations remain diagnostic only. The fresh post-synchronization exact-FQN
   invocation produced one reviewed canonical TRX with the sole Failed result,
@@ -1219,11 +1272,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   recovery: four retained focused filters pass `1/1`, cumulative A passes
   `17/17`, and final local V plus fresh full-diff review `0/0/0` establish
   `ReviewedLocalGreen`. Audited tree `4ca02623...` is pushed at exact content
-  checkpoint `f64860ef...` on draft PR #174; the remote-equal record-sync head
-  is the next-packet predecessor. No successor A increment is active.
-  `TEST-0210` remains
-  `Planned`. B/C/D, workflow/
-  scenario-owner/
+  checkpoint `f64860ef...` on draft
+  [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction head
+  remains a candidate until local review, push, and exact-head hosted green,
+  after which its remote-equal head becomes the next-packet predecessor. No
+  successor A increment is active.
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains
+  `Planned`. Partial facts retain `ContractSlice` only; their final `Scenario`
+  traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation, WIP extraction, consumer/release/publication/authority-transfer,
   and PowerShell-retirement changes remain held. A's canonical first BehaviorRed

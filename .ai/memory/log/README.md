@@ -6,7 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A pushed-candidate recovery handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
+[ContractSlice A planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
+the historical [ContractSlice A pushed-candidate recovery handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
 the historical [ContractSlice A canonical-string bounded-green closure handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
 [ContractSlice A topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
@@ -97,15 +98,17 @@ proof. The later [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/
 permits only one exact marker-free same-FQN xUnit `[FAIL]` bookkeeping node;
 [FIND-0440](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
 records that correction. [FIND-0439](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0439)
-fixes the parser resource/exception/component/provenance boundary. Follow the current
-[correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md).
+fixes the parser resource/exception/component/provenance boundary. The
+[topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+is historical; current routing is the
+[planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
 checkpoints. Topology/parser and RunInfo reviews passed `0 Blocking` /
 `0 Important` / `0 Minor`. Pre-applicable-clarification
 BehaviorRed observations remain diagnostic only. The fresh post-synchronization
-exact-FQN run in the current correction handoff passed review as canonical
+exact-FQN run in that historical correction handoff passed review as canonical
 BehaviorRed. The first limited ParseCanonical increment passed the original-
 oracle and final-source exact-FQN checks `1/1`, cumulative A `12/12`, format
 verification, a zero-warning/zero-error final six-project Release build, and
@@ -128,10 +131,17 @@ recovery retains four facts, each locally green `1/1`, and cumulative A is
 locally `17/17`; final local V and fresh full-diff review `0/0/0` establish
 `ReviewedLocalGreen`. Audited tree `4ca02623...` is pushed at exact content
 checkpoint [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
-on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
-remote-equal record-sync head is the next-packet predecessor and no successor A
-packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. Workflow/scenario ownership,
+on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Hosted
+[TEST-0074](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+exposed
+[FIND-0442](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
+so the current correction defers the
+[Scenario trait for TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+from partial facts while
+retaining their exact FQN and `ContractSlice`. After local review, push, and
+exact-head hosted green, its remote-equal head is the next-packet predecessor; no successor
+A packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. Workflow test-step target/filter, scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
@@ -181,6 +191,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-31 - SUBF-0143 planned-scenario-trait correction](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A pushed-candidate recovery](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A topology correction](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
 - [2026-07-30 - Evidence-contract local activation candidate](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md)

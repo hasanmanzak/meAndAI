@@ -1,4 +1,4 @@
-# 2026-07-31 - SUBF-0143 ContractSlice A pushed-candidate recovery
+# 2026-07-31 - [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) ContractSlice A pushed-candidate recovery
 
 ## Status and authority
 
@@ -57,7 +57,8 @@ The recovery is `ReviewedLocalGreen`. Two independent staged reviews closed
 was committed as
 [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d),
 pushed, and opened as draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174).
-`FIND-0441` is resolved for its bounded recovery boundary.
+[FIND-0441](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+is resolved for its bounded recovery boundary.
 
 Historical red evidence remains `NotEstablished`. A separately authorized
 record-sync commit contains this checkpoint update. Once its exact local and

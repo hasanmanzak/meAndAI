@@ -92,7 +92,6 @@ public sealed class ContractSliceAArtifactComponentGraphTests
         throwOnInvalidBytes: true);
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void Enforces_exact_binding_runtime_anchor_and_reachability_graph()
     {

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 and historical `13/13` A baseline accepted; bounded `FIND-0441` grammar/number/graph/rule recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) with focused `1/1`, cumulative `17/17`, and reviews `0/0/0`; the remote-equal record-sync head is the next-packet predecessor, no successor A packet is active, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 and historical `13/13` A baseline accepted; bounded [FIND-0441](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441) grammar/number/graph/rule recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) with focused `1/1`, cumulative `17/17`, and reviews `0/0/0`; [FIND-0442](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442) defers final scenario traits from partial facts; its correction head is a predecessor candidate and becomes the next-packet predecessor only after local review, push, and exact-head hosted green; no successor A packet is active, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,9 +11,9 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | Historical `13/13` content `5fa7f7d`, BASE record sync `9107a49`; exact pushed `7f60e0c` is recovery input only; audited recovery content is checkpointed at [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`, with its remote-equal record-sync successor used as the next-packet predecessor |
+| Current A implementation boundary | Historical `13/13` content `5fa7f7d`, BASE record sync `9107a49`; exact pushed `7f60e0c` is recovery input only; audited recovery content is checkpointed at [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`; its [FIND-0442](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442) correction head remains a candidate until local review, push, and exact-head hosted green, after which the remote-equal head becomes the next-packet predecessor |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | The corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) plus bounded [FIND-0441](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441) recovery authorized correction, verification, review, record synchronization, and the explicitly directed recovery content/record-sync checkpoint pushes. That recovery Git authority is consumed after the record-sync push; no successor A, B/C/D, workflow/scenario-owner/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, release, publication, authority-transfer, PowerShell-retirement, or further Git/implementation authority remains. |
+| Current authority | The corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) is the standing ceiling; bounded [FIND-0441](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441) recovery is historical/checkpointed predecessor context. The maintainer's current “through the technical-packet boundary” directive authorizes only the [FIND-0442](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442) topology correction, verification, review, record synchronization, commit/push, and draft-PR revalidation. Authority is consumed after that correction head is pushed and its exact-head hosted checks are green; no successor A, B/C/D, final scenario-trait/workflow/scenario-owner/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, release, publication, authority-transfer, or PowerShell-retirement work is authorized. |
 
 ## 1. Outcome
 
@@ -101,7 +101,7 @@ Outside that exact A boundary, the following remain prohibited:
   review and activation;
 - ContractSlice B, C, or D production or test implementation;
 - moving code from the preserved draft into the target branch;
-- workflow, scenario-owner, [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+- workflow, scenario-trait, scenario-owner, [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
   ruleset, or required-check activation;
 - consumer-repository or provider mutation;
 - release publication or protocol-authority transfer; and
@@ -115,8 +115,10 @@ Completed
 [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 have passed and closed their applicable implementation-entry and publication
-prerequisites. The corrected A directive is the only active successor
-implementation boundary; the architecture freeze remains in force elsewhere.
+prerequisites. The corrected A directive remains the standing ceiling, but the
+only current delivery boundary is bounded [FIND-0442](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442) correction through
+push and exact-head hosted-green verification; no successor ContractSlice A implementation increment is active,
+and the architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
 decisions, diagrams, terminology, record-transition maps, red-team review, and
@@ -1539,9 +1541,11 @@ item 10 is satisfied only by the corrected
 [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
 and only for one reviewed A red-to-green increment at a time. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; the canonical-string increment is bounded green with its
-coverage `Important` closed. Current authority adds only bounded `FIND-0441`
-recovery of pushed grammar/number/graph/rule work; no successor A, B/C/D, or
-workflow/owner/publication boundary is active.
+coverage `Important` closed. Bounded [FIND-0441](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441) recovery is historical,
+checkpointed predecessor context. Current authority adds only the
+[FIND-0442](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+premature-scenario-trait correction through push and exact-head hosted-green verification; no successor A, B/C/D, or final
+scenario-trait/workflow/scenario-owner/publication boundary is active.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).

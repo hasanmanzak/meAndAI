@@ -1,21 +1,21 @@
-# SUBF-0143 Micro-Delivery Control Plan
+# [SUBF-0143](README.md#subf-0143) Micro-Delivery Control Plan
 
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Bounded recovery of exact pushed input `7f60e0c` is checkpointed: four retained grammar/number/graph/rule facts pass focused `1/1`, cumulative A `17/17`, local/staged reviews `0/0/0`, audited tree `4ca02623...`, and content commit [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the remote-equal record-sync head is the next-packet predecessor and no successor ContractSlice A increment is active |
+| Status | Bounded recovery of exact pushed input [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5) is checkpointed: four retained grammar/number/graph/rule facts pass focused `1/1`, cumulative A `17/17`, local/staged reviews `0/0/0`, audited tree `4ca02623...`, and content commit [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); [FIND-0442](README.md#find-0442) corrects premature final-scenario traits without changing the facts' method bodies or FQNs, and its remote-equal correction head becomes the next-packet predecessor only after local review, push, and exact-head hosted green; no successor ContractSlice A increment is active |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Next-packet predecessor | The remote-equal record-sync successor to exact reviewed content checkpoint `f64860ef456380232c23dfc4729a0d87f257483d`; freeze its full SHA before any successor edit. Historical `13/13` content is `5fa7f7d`, record sync `9107a49`, and pushed `7f60e0c` remains recovery input only. |
-| Git authority | The maintainer directive authorized recovery stage/commit/push through checkpoint readiness; it is consumed by the content and record-sync pushes and grants no successor implementation authority |
+| Next-packet predecessor | After local review, push, and exact-head hosted green, use the remote-equal [FIND-0442](README.md#find-0442) correction head over exact reviewed content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d); freeze its full SHA before any successor edit. Historical `13/13` content is [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90), record sync [`9107a49`](https://github.com/hasanmanzak/meAndAI/commit/9107a4936449048a057156e4714a99165ba1f24f), and pushed [`7f60e0c`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5) remains recovery input only. |
+| Git authority | The maintainer's current “through the technical-packet boundary” directive authorizes the bounded [FIND-0442](README.md#find-0442) correction, validation, review, record synchronization, stage/commit/push, and exact-head draft-PR check. It is consumed only after that correction head is pushed and its exact-head hosted checks are green; it grants no successor implementation authority. |
 
 ## Purpose
 
 This plan changes delivery granularity, not architecture. A future Codex turn
 must receive one bounded packet rather than an instruction such as “continue
-SUBF-0143”. The standing ContractSlice A directive remains the authority
+[SUBF-0143](README.md#subf-0143)”. The standing ContractSlice A directive remains the authority
 ceiling. It does not activate any item below by itself and grants no B/C/D,
 workflow, publication, or release authority.
 
@@ -27,8 +27,9 @@ passes the four retained exact filters `1/1` and cumulative A `17/17` locally.
 Final local V, locks/build/format/diff/marker verification, and fresh full-diff
 review `0/0/0` establish `ReviewedLocalGreen`. Two staged reviews closed
 `0/0/0`; tree `4ca02623...` matched content checkpoint `f64860ef...`, which was
-pushed on draft PR #174. Its remote-equal record-sync successor is the exact
-next-packet predecessor, but no successor packet may begin without activation.
+pushed on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its later remote-equal [FIND-0442](README.md#find-0442) correction head is
+the exact next-packet predecessor only after local review, push, and exact-head
+hosted green, but no successor packet may begin without activation.
 
 ## Spark startup capsule
 
@@ -58,9 +59,12 @@ The brief requires only these targeted reads before work:
    after verifying each recurrence is still `Active` and not superseded; the
    embedded packet-row/invariant extract from this plan; and at most 80 lines of
    the current handoff. Do not open this whole plan or older handoffs.
-3. Only the exact brief-named anchors/ranges from DEC-0035, retained DEC-0032
-   and DEC-0030, then the exact architecture authority/hold rows.
-4. The FEAT-0065 DoR/DoD and TEST-0210 matrix plus only the exact canonical
+3. Only the exact brief-named anchors/ranges from
+   [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), retained
+   [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md)
+   and [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md),
+   then the exact architecture authority/hold rows.
+4. The [FEAT-0065](README.md) DoR/DoD and [TEST-0210](test-cases.md#test-0210) matrix plus only the exact canonical
    design subsection and requirement rows named by the packet.
 5. Current branch, HEAD, status, locks, packet allowlist, and the exact source,
    test, and call-site files affected by the packet.
@@ -95,7 +99,7 @@ or permission.
   convergence packets add no `[Fact]` and instead freeze an exact existing
   FQN/filter set.
 - One semantic packet adds at most one retained `[Fact]`; it reuses
-  `TEST-0210` and creates no new `TEST-NNNN`.
+  [TEST-0210](test-cases.md#test-0210) and creates no new `TEST-NNNN`.
 - Operational labels in this file are routing labels only. A transient evidence
   marker is allocated monotonically and frozen only when its exact packet is
   reviewed and activated.
@@ -115,8 +119,11 @@ or permission.
   internal ownership/resource invariant, as the accepted canonical codec did.
 - Unsupported later valid shapes continue to fail closed. Invalid documents
   are never accepted temporarily.
-- `TEST-0210` remains `Planned` through every A package. A checkpoint may be
-  described as cumulative A green, never as full `TEST-0210` green.
+- [TEST-0210](test-cases.md#test-0210) remains `Planned` through every A package. A checkpoint may be
+  described as cumulative A green, never as full [TEST-0210](test-cases.md#test-0210) green.
+- Every partial fact carries exactly its `ContractSlice` trait but no
+  `Scenario` trait for [TEST-0210](test-cases.md#test-0210). The scenario trait is added to all retained A-D
+  facts only during the atomic final scenario-status/scenario-owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) activation.
 - `MeAndAI.Protocol.v3.ncrunchsolution.user`, repository-local `.dotnet-cli`,
   TRX/temp output, `bin`, and `obj` are never staged as delivery content.
 
@@ -230,10 +237,10 @@ is never implemented green; return to D/RT or report `Blocked`.
 | --- | --- | --- |
 | `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in `5fa7f7d`. |
 | `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Recovery completed: cumulative `17/17`; locked restore with six relevant lock fingerprints unchanged; zero-warning/error six-project Release build; clean format, diff, and marker/sentinel checks. Historical `13/13` remains the prior accepted content checkpoint. |
-| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed: current handoff, feature/architecture records, TEST-0210, and project memory distinguish historical missing evidence, final local V, audited content checkpoint/PR, and the self-referential record-sync successor. Recovery Git authority is consumed after its push; no successor authority is granted. |
+| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed for historical [FIND-0441](README.md#find-0441) recovery. [FIND-0442](README.md#find-0442) now has the separate current correction handoff; its feature/architecture/test/memory synchronization remains a candidate until fresh review, push, and exact-head hosted green. No successor authority is granted. |
 | `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the fresh full-diff review closed `0 Blocking / 0 Important / 0 Minor`, establishing `ReviewedLocalGreen`. |
 | `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Recovery complete: exact `20/20` allowlist, zero tracked-unstaged delta, NCrunch excluded, staged diff check clean, two staged reviews `0/0/0`, tree `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`. Historical pushed-candidate staged evidence remains `NotEstablished`. |
-| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Recovery content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) exactly matches the audited tree, is pushed, and owns draft PR #174. The remote-equal record-sync successor becomes the next-packet predecessor; hosted/DoD evidence is not claimed. |
+| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Recovery content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) exactly matches the audited tree, is pushed, and owns draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its record-sync successor is superseded as predecessor only after the later remote-equal [FIND-0442](README.md#find-0442) correction head passes local review, push, and exact-head hosted green; full [TEST-0210](test-cases.md#test-0210) DoD is not claimed. |
 
 `[skip ci]` is not inherited posture. It may be used only as a separately
 explicit maintainer exception for an exact push; it cannot satisfy DoD, Gate 7,
@@ -266,8 +273,9 @@ hosted evidence.
 
 The first `git diff --check` after the historical BASE sync was clean. Later
 pushed candidate work superseded that working-tree state without completing the
-packet state machine; follow the current
-[recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md).
+packet state machine. That recovery handoff is now a historical checkpoint;
+follow the current
+[planned-scenario-trait correction handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
 
 ## Ordered remaining ContractSlice A queue
 
@@ -338,7 +346,7 @@ Exact pushed input `7f60e0c` contained 18 static A facts, but no valid
 retains the four FQNs above; their focused filters pass `1/1` and cumulative A
 passes `17/17` locally. These facts do not reconstruct absent historical D/RT/R
 evidence. Final local/staged reviews are complete, audited tree `4ca02623...`
-matches pushed checkpoint `f64860ef...`, and `FIND-0441` is resolved for the
+matches pushed checkpoint `f64860ef...`, and [FIND-0441](README.md#find-0441) is resolved for the
 bounded recovery boundary. The next packet remains inactive.
 
 `A-RULE-01` must prove in D/RT that a rule with both slot lists empty is valid
@@ -367,7 +375,7 @@ because its predecessor finished.
 ## Cohorts and record synchronization
 
 Use cohorts of at most three semantic packages. Each package updates this
-register, the TEST-0210 evidence section, and a packet handoff capped at 80
+register, the [TEST-0210](test-cases.md#test-0210) evidence section, and a packet handoff capped at 80
 lines; close it before the next package and link older history rather than
 loading or appending it indefinitely. Historical handoffs are never rewritten.
 
@@ -390,6 +398,6 @@ and repository/provider equivalence. Each receives its own reviewed micro plan
 only after its predecessor is green and the maintainer separately authorizes
 that boundary.
 
-Workflow/scenario-owner/TEST-0146 activation, combined/root/hosted validation,
+Workflow/scenario-trait/scenario-owner/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) activation, combined/root/hosted validation,
 WIP extraction, consumer/provider mutation, release/publication, authority
 transfer, and PowerShell retirement remain hard-held throughout this plan.

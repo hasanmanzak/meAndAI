@@ -14,7 +14,6 @@ public sealed class ContractSliceACanonicalNumberTests
         throwOnInvalidBytes: true);
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void Enforces_exact_integer_grammar_and_range()
     {

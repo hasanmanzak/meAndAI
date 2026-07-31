@@ -18,7 +18,6 @@ public sealed class ContractSliceARuleDeclarationTests
         "0000000000000000000000000000000000000001";
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void Enforces_canonical_multi_fragment_rule_provenance()
     {

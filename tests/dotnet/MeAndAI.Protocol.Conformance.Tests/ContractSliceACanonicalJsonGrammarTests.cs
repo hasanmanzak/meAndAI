@@ -35,7 +35,6 @@ public sealed class ContractSliceACanonicalJsonGrammarTests
         throwOnInvalidBytes: true);
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void Enforces_exact_document_and_slice_structural_grammar()
     {

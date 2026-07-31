@@ -18,10 +18,12 @@ the historical [evidence-acquisition design handoff](log/2026-07-30-feat-0065-su
 the historical [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
-the current [ContractSlice A pushed-candidate recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
+the current [ContractSlice A planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
+the historical [ContractSlice A pushed-candidate recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
 the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
 and the maintainer-approved
-[SUBF-0143 micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
+[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+[micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
 The product is one versioned executable protocol platform implemented in C#,
 not a collection of CLI products. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
@@ -42,8 +44,10 @@ passed both stable jobs. The prior local-candidate state and discarded
 The accepted Gate 2
 [typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
 now includes the maintainer-approved ParseCanonical-only ContractSlice A
-topology correction. Follow the current
-[correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+topology correction. Its
+[topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+is historical; follow the current
+[planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 and corrected
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
 [The append-only BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
@@ -69,7 +73,7 @@ ParseCanonical increment then passed the original-oracle and final-source exact-
 FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/error-
 free final six-project Release build, and private-byte source review. That first-
 green support review had `0 Blocking`, one unnumbered remaining-A coverage
-`Important`, and no unresolved `Minor`. The current
+`Important`, and no unresolved `Minor`. The historical
 [canonical-string handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
 preserves the second A exact-red FQN/marker and records its bounded green. The
 writer-owned
@@ -90,7 +94,8 @@ backlog/suggestions and is not claimed clean. The canonical-string coverage
 `Important` is closed, but remaining A is pending and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. At that historical checkpoint, each reviewed A source, exact
 red, and smallest green proceeded separately and no later A increment was active;
-the recovery paragraph below now owns current routing. A constructs
+the [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+correction paragraph below now owns current routing. A constructs
 no executable export and declares no kernel. B/C/D, workflow/scenario-owner/
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, consumer, release, publication, authority-transfer, and
@@ -108,10 +113,23 @@ fingerprints unchanged, zero-warning/error Release build, format, diff/marker
 checks, and fresh full-diff review `0/0/0`. Audited tree
 `4ca02623e1f14233e847ebf64bc52d3cfe8869b8` was committed and pushed as
 [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
-on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). The
-remote-equal record-sync head is the next-packet predecessor; freeze its exact
-SHA before any successor edit. `TEST-0210` stays `Planned`; no successor A
-packet is active. Do not let a
+on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its first
+hosted validation exposed
+[FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442):
+17 partial facts carried the final
+[Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+while the A-D
+scenario remained `Planned`. Follow the current
+[trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md):
+partial facts retain only `ContractSlice`, and final scenario traits join the
+atomic final scenario-status/scenario-owner/workflow-test-step target-and-filter/
+[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+activation. After local review,
+push, and exact-head hosted green, the remote-equal correction head becomes the next-packet
+predecessor; freeze its exact SHA before successor edit.
+[TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+stays
+`Planned`; no successor A packet is active. Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.
 

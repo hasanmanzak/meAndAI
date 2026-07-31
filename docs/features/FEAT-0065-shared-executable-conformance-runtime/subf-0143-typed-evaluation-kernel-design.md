@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded `FIND-0441` recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; the remote-equal record-sync head is the next-packet predecessor, no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
+| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded [FIND-0441](README.md#find-0441) recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; [FIND-0442](README.md#find-0442) defers the canonical `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to final A-D activation while partial tests retain only `ContractSlice`; its correction head is a predecessor candidate and becomes the next-packet predecessor only after local review, push, and exact-head hosted green; no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [pushed-candidate recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md); operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [planned-scenario-trait correction handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md); the pushed-candidate recovery handoff is a historical checkpoint, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -48,7 +48,7 @@ That corrected directive still does **not** authorize:
 - ContractSlice B, C, or D source/test implementation;
 - executable policy-export construction, `CatalogSliceKernel`, typed
   registration activation, or registration-mismatch behavior in A;
-- workflow, scenario-owner, or
+- workflow, scenario-trait, scenario-owner, or
   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   mutation before all four ContractSlice groups and the combined local route
   are green and separately authorized;
@@ -6087,9 +6087,19 @@ The full sibling inventory is:
 
 ## [TEST-0210](test-cases.md#test-0210) expected-red contract
 
-[TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and fresh. It is one canonical
-composed scenario divided by the additional exact trait `ContractSlice=A`,
-`B`, `C`, or `D`. No new stable test ID is allocated by this design.
+[TEST-0210](test-cases.md#test-0210) is project-neutral, table-driven, and
+fresh. It is one canonical composed scenario divided while `Planned` by the
+sole exact partition trait `ContractSlice=A`, `B`, `C`, or `D`. Before final
+activation, the activation packet freezes the complete retained-fact identity
+inventory and proves that each identity has exactly one A-D `ContractSlice`
+and no `Scenario` trait. One atomic candidate then adds
+the `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to that frozen inventory together with status, automation,
+scenario-owner, both stable workflow test steps' run-block form, solution target, and
+filter, plus
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
+Post-mutation validation proves both the ContractSlice and Scenario identity
+sets equal the frozen inventory exactly. No new stable test ID is allocated by
+this design.
 
 | Slice | Direct contract |
 | --- | --- |
@@ -6284,9 +6294,57 @@ predecessor/environment error is invalid red.
 
 After reviewed SurfaceRed, implement only that slice's complete structural
 delta until the anchor and exact API tests compile. Then add only the reviewed
-executable [TEST-0210](test-cases.md#test-0210) test for the slice's first
-semantic increment. It has `[Trait("Scenario", "TEST-0210")]` and exactly one matching
-`[Trait("ContractSlice", "<A|B|C|D>")]`.
+partial test belonging to [TEST-0210](test-cases.md#test-0210) for the slice's
+first semantic increment. While the canonical scenario remains `Planned`, the
+test has exactly one matching `[Trait("ContractSlice", "<A|B|C|D>")]` and no
+`Scenario` trait; its exact FQN and packet record preserve the parent-scenario
+link. The final activation uses this closed order:
+
+1. In the exact pre-activation parent, freeze one ordinal table `E` from every
+   retained test-method FQN to its A-D slice, its derived per-slice counts, the
+   table digest, and the parent SHA. `E` includes the exact C# verifier FQN
+   `MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory`.
+   Run `ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D` and
+   require selected = discovered = executed = passed = `|E|`, failed = skipped
+   = zero, and the executed FQN set = `E.Keys`.
+2. The verifier reflects over direct, non-skipped `[Fact]` methods in its
+   executing assembly. For `E`, `[Theory]`, inherited/generic/overloaded facts,
+   class-level partition/scenario traits, duplicate FQNs, and a second
+   handwritten count are forbidden. It requires the reflected A-D
+   ContractSlice identities to equal `E.Keys`, exactly one direct
+   ContractSlice per identity equal to `E[FQN]`, pairwise-disjoint slices, no
+   foreign A-D fact, and the cardinality equality
+   `|E| = |A| + |B| + |C| + |D|`. Its own direct Scenario-trait cardinality is
+   the phase selector: zero requires zero target Scenario traits on all `E`
+   facts; exactly one target trait requires the target Scenario identity set to
+   equal `E.Keys` with exactly one target Scenario trait per fact; any other
+   self state or any other Scenario value on an `E` fact fails. Before
+   activation, it constructs the target ID from split fragments so a planned
+   source does not assert the scenario.
+3. In one reviewed candidate with no published intermediate, add exactly one
+   literal `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to every `E` fact and change status,
+   automation, scenario-owner, both stable workflow test steps' run-block form,
+   solution target, and filter, plus
+   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+   together. No FQN, method, `E` row, slice, production, project, package, or
+   lock mutation is permitted in this activation commit. A partial mutation is
+   invalid and cannot be committed.
+4. At the candidate head, rerun the A-D ContractSlice union, then the focused
+   `Scenario` filter for [TEST-0210](test-cases.md#test-0210), then the final solution-level combined route.
+   Each applicable run must have zero failed/skipped tests and exact
+   selected/discovered/executed/passed cardinality. Both focused identity sets
+   must equal the same `E.Keys`; the always-selected verifier must prove the
+   post-activation mapping above.
+
+This C# fact is introduced as the last retained D fact before activation with
+only `ContractSlice=D`; its method body, FQN, and `E` table remain
+byte-identical in the activation commit, while only its direct trait metadata
+gains the Scenario trait that selects the final phase. It is executable
+ownership of the bijection and remains part of
+[TEST-0210](test-cases.md#test-0210); it allocates no additional stable scenario ID. [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074) retains
+the distinct lifecycle/authority check, and
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+retains workflow-invocation ownership.
 
 The structural-delta checkpoint has one reproducible, compile-green temporary
 red state and no discretionary stub behavior. In the uncommitted red worktree,
@@ -6314,14 +6372,13 @@ before creation and is empty immediately before the command. Record its
 resolved path and run exactly one test CLI invocation. Do not run a discovery
 pre-pass, `--list-tests`, retry, or second logger:
 
-In the command, `$scenarioId` denotes [TEST-0210](test-cases.md#test-0210) and
-is constructed from split fragments so the executable example does not hide a
-cross-record reference in code formatting:
-
 ```text
-$scenarioId = 'TEST-' + '0210'
-dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --results-directory "<fresh-absolute-temp-directory>" --logger "trx;LogFileName=<exact-marker>.trx" --filter "Scenario=$scenarioId&ContractSlice=<slice>&FullyQualifiedName=<exact-test-fqn>"
+dotnet test tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --results-directory "<fresh-absolute-temp-directory>" --logger "trx;LogFileName=<exact-marker>.trx" --filter "ContractSlice=<slice>&FullyQualifiedName=<exact-test-fqn>"
 ```
+
+That planned-phase filter deliberately uses only `ContractSlice` plus exact
+FQN. A `Scenario` filter for [TEST-0210](test-cases.md#test-0210) is valid only after the final atomic
+activation above.
 
 The first required `BehaviorRed` identities are:
 
@@ -6506,9 +6563,10 @@ turn the increment green.
 ### Second A increment - canonical quoted UTF-8 strings
 
 This reviewed increment remains inside [TEST-0210](test-cases.md#test-0210)
-with `[Trait("Scenario", "TEST-0210")]` and
-`[Trait("ContractSlice", "A")]`. It allocates no new stable scenario or
-public API. The exact test identity is:
+with `[Trait("ContractSlice", "A")]` and no `Scenario` trait while the parent
+scenario is `Planned`. The exact FQN and this record preserve the parent link;
+the trait is deferred to final A-D activation. The increment allocates no new
+stable scenario or public API. The exact test identity is:
 
 ```text
 MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
@@ -6658,7 +6716,7 @@ that scan clean.
 
 This evidence closes only the canonical-string coverage `Important` and this
 second A increment. [TEST-0210](test-cases.md#test-0210) remains `Planned` and
-remaining A is pending. ContractSlice B/C/D, workflow/scenario-owner/
+remaining A is pending. ContractSlice B/C/D, workflow/scenario-trait/scenario-owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), root,
 combined, hosted, WIP extraction, consumer, release, and publication scope
 remain held.
@@ -6717,23 +6775,51 @@ same exact Application assembly.
 
 ## Future combined and hosted route
 
-Only after all four focused groups and the combined local run are green may one
-authorized atomic change update [TEST-0210](test-cases.md#test-0210) Status/Automation, scenario owner,
-both stable filters, and
-[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
+Only after all four focused groups and the combined local run are green may a
+separately authorized packet execute the four-step activation order in the
+[expected-red contract](#test-0210-expected-red-contract): freeze and prove
+`E` in the exact parent; make one atomic candidate that adds the `Scenario`
+trait for [TEST-0210](test-cases.md#test-0210) to every `E` fact and updates [TEST-0210](test-cases.md#test-0210)
+Status/Automation, scenario-owner, both stable workflow test steps' run-block
+form, solution target, and filter, plus
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146);
+then prove both focused identity sets and the final combined route at the exact
+candidate head. No subset of that mutation is a valid activation.
 
 Each existing stable job retains exactly one protocol locked-restore
-invocation and one protocol test invocation. The test invocation becomes:
+invocation and one protocol test invocation. The Ubuntu step retains
+`shell: bash`, the Windows step retains `shell: pwsh`, and neither shell is
+switched. In both steps, the atomic activation changes the run scalar from
+folded `run: >-` to literal `run: |`, changes the test target from the
+Domain.Tests project to `MeAndAI.Protocol.slnx`, and installs the applicable
+exact script below. This run-block/target/filter transition is part of the
+activation and [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+contract, not an implied implementation choice.
 
 The split-fragment variables below denote [TEST-0220](test-cases.md#test-0220),
 [TEST-0221](test-cases.md#test-0221), and
-[TEST-0210](test-cases.md#test-0210), respectively:
+[TEST-0210](test-cases.md#test-0210), respectively. The exact Ubuntu Bash
+`run: |` body is:
+
+```text
+test_prefix='TEST-'
+domain_scenario="${test_prefix}0220"
+evidence_scenario="${test_prefix}0221"
+kernel_scenario="${test_prefix}0210"
+activation_verifier='MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory'
+dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=${domain_scenario}|Scenario=${evidence_scenario}|Scenario=${kernel_scenario}|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=${activation_verifier}"
+```
+
+The first Bash assignment is exactly `test_prefix='TEST-'` without a leading
+`$`; the rendering above intentionally distinguishes assignment from
+expansion. The exact Windows PowerShell `run: |` body is:
 
 ```text
 $domainScenario = 'TEST-' + '0220'
 $evidenceScenario = 'TEST-' + '0221'
 $kernelScenario = 'TEST-' + '0210'
-dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=$domainScenario|Scenario=$evidenceScenario|Scenario=$kernelScenario"
+$activationVerifier = 'MeAndAI.Protocol.Conformance.Tests.ContractSliceActivationTopologyTests.Matches_exact_contract_slice_scenario_inventory'
+dotnet test MeAndAI.Protocol.slnx --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario=$domainScenario|Scenario=$evidenceScenario|Scenario=$kernelScenario|ContractSlice=A|ContractSlice=B|ContractSlice=C|ContractSlice=D|FullyQualifiedName=$activationVerifier"
 ```
 
 One solution-level invocation may deliberately create a Domain.Tests testhost
@@ -6741,10 +6827,17 @@ and one new bounded Conformance.Tests testhost. This is not described as one OS
 process. It adds no workflow job, step, restore invocation, test invocation,
 trigger, path filter, wrapper, retry, `continue-on-error`, or timeout.
 
+The ContractSlice union and exact verifier FQN are deliberate permanent
+reachability barriers, not extra semantic inventory. The OR filter still runs
+each discovered fact once. They keep the activation-integrity fact executable
+when its own Scenario trait or another fact's Scenario trait is missing; a
+scenario-only filter cannot prove the frozen bijection.
+
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) must construct every scenario ID from split fragments, count every
 protocol restore/test invocation before positive matching, require exactly one
-full non-continued invocation per existing stable job, and reject alternate,
-wrapped, or extra commands. Hosted evidence must reconcile selected,
+full non-continued invocation per existing stable job, require the exact
+Bash/pwsh shell, literal run-block form, solution target, assignments, and
+filter terms above, and reject alternate, wrapped, or extra commands. Hosted evidence must reconcile selected,
 discovered, executed, passed, failed, and skipped counts per test project, not
 only static command text.
 
@@ -6836,7 +6929,7 @@ Before the corrected ContractSlice A topology may enter C# mutation:
   Gate 3 expected-red/green.
 - [x] Independent bounded correction red-team finds no unresolved `Blocking`
   or `Important` issue in the corrected A/C ownership and first-red contract.
-- [x] Renewed fresh-diff architecture review of `FIND-0438` and
+- [x] Renewed fresh-diff architecture review of [FIND-0438](README.md#find-0438) and
   [FIND-0439](README.md#find-0439) closed with `0 Blocking`, `0 Important`, and
   `0 Minor`; packet-consistency closure remains separate from that verdict.
 - [x] Renewed review of the append-only RunInfo evidence correction and
@@ -6875,7 +6968,7 @@ The correction red-team gate, canonical first A BehaviorRed, first limited
 ParseCanonical green, and second ContractSlice A canonical-string bounded green
 are satisfied. The canonical-string coverage `Important` is closed; remaining A
 increments are next and no full-A completion is claimed.
-[TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-owner
+[TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited
 throughout ContractSlice A.

@@ -132,7 +132,6 @@ public sealed class ContractSliceAOwnershipTests
     ];
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void DomainExportsEqualTheOrdinalUnionOfPredecessorInventories()
     {
@@ -153,7 +152,6 @@ public sealed class ContractSliceAOwnershipTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void SolutionAndProjectReferencesEqualTheContractSliceAGraph()
     {
@@ -181,7 +179,6 @@ public sealed class ContractSliceAOwnershipTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void PackageReferencesEqualTheContractSliceAGraph()
     {
@@ -218,7 +215,6 @@ public sealed class ContractSliceAOwnershipTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void LocksEqualTheContractSliceATotalGraph()
     {
@@ -255,7 +251,6 @@ public sealed class ContractSliceAOwnershipTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void EffectiveRestoreGraphsEqualTheContractSliceATotalGraph()
     {
@@ -352,7 +347,6 @@ public sealed class ContractSliceAOwnershipTests
     }
 
     [Fact]
-    [Trait("Scenario", "TEST-0210")]
     [Trait("ContractSlice", "A")]
     public void FriendAssembliesEqualTheCurrentContractSliceAMatrix()
     {

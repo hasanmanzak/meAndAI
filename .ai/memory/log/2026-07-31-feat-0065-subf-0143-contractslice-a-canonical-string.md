@@ -21,8 +21,11 @@ and PowerShell retirement remain held.
 
 ## Exact red identity
 
-The increment remains `TEST-0210` with traits `Scenario=TEST-0210` and
-`ContractSlice=A`. It allocates no stable ID or public API.
+The increment remains
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+with traits
+[Scenario=TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+and `ContractSlice=A`. It allocates no stable ID or public API.
 
 ```text
 MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
