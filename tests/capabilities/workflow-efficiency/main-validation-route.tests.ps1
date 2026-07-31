@@ -433,9 +433,14 @@ try {
             $jobsSource,
             '(?m)^  (?<id>[a-z0-9-]+):\r?$'
         ))
-        $protocolScenarioId = 'TEST-' + '0220'
+        $protocolVocabularyScenarioId = 'TEST-' + '0220'
+        $protocolEvidenceScenarioId = 'TEST-' + '0221'
+        $protocolScenarioFilter =
+            'Scenario={0}|Scenario={1}' -f
+                $protocolVocabularyScenarioId,
+                $protocolEvidenceScenarioId
         $protocolTestCommand =
-            'dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --filter "Scenario={0}"' -f $protocolScenarioId
+            'dotnet test tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj --configuration Release --no-restore --nologo --verbosity minimal --filter "{0}"' -f $protocolScenarioFilter
         $expectedProtocolCommands = @(
             'dotnet restore MeAndAI.Protocol.slnx --configfile NuGet.Config --locked-mode',
             $protocolTestCommand
@@ -476,21 +481,141 @@ try {
                 $stepSource = $jobSource.Substring(
                     $stepStart,
                     $stepEnd - $stepStart)
-                $runMatch = [regex]::Match(
-                    $stepSource,
-                    '(?ms)^        run:\s*>-\r?\n(?<body>(?:          [^\r\n]*(?:\r?\n|$))+)' )
-                if (-not $runMatch.Success) {
+                $stepLines = @($stepSource -split '\r?\n')
+                $runLineIndex = -1
+                $runValue = $null
+                for ($lineIndex = 0;
+                    $lineIndex -lt $stepLines.Count;
+                    $lineIndex++) {
+                    $runLineMatch = [regex]::Match(
+                        $stepLines[$lineIndex],
+                        '^        run:\s*(?<value>.*)$')
+                    if ($runLineMatch.Success) {
+                        $runLineIndex = $lineIndex
+                        $runValue = $runLineMatch.Groups['value'].Value.Trim()
+                        break
+                    }
+                }
+                if ($runLineIndex -lt 0) {
                     continue
                 }
-                $runLines = @(
-                    $runMatch.Groups['body'].Value -split '\r?\n' |
-                        Where-Object { $_.Length -gt 0 } |
-                        ForEach-Object { $_.Substring(10) }
-                )
+                $continuedRunLines = @()
+                for ($bodyLineIndex = $runLineIndex + 1;
+                    $bodyLineIndex -lt $stepLines.Count;
+                    $bodyLineIndex++) {
+                    $bodyLine = $stepLines[$bodyLineIndex]
+                    if ([string]::IsNullOrWhiteSpace($bodyLine)) {
+                        $continuedRunLines += ''
+                        continue
+                    }
+                    if (-not $bodyLine.StartsWith(
+                        '          ',
+                        [StringComparison]::Ordinal)) {
+                        break
+                    }
+                    $continuedRunLines += $bodyLine.Substring(10)
+                }
+                if ($runValue.StartsWith('>', [StringComparison]::Ordinal) -or
+                    $runValue.StartsWith('|', [StringComparison]::Ordinal)) {
+                    $normalizedCommand =
+                        ($continuedRunLines -join ' ').Trim()
+                    $runForm = $runValue
+                }
+                else {
+                    $normalizedCommand =
+                        ((@($runValue) + $continuedRunLines) -join ' ').Trim()
+                    $runForm = 'inline'
+                }
                 $steps += [pscustomobject]@{
-                    Command = ($runLines -join ' ').Trim()
+                    Command = $normalizedCommand
+                    RunForm = $runForm
                     Source = $stepSource
                 }
+            }
+
+            $yamlAliasLines = [regex]::Matches(
+                $jobSource,
+                '(?m)(?<![a-zA-Z0-9_''"/.*])\*[^\s\[\]{},#]+')
+            if ($yamlAliasLines.Count -ne 0) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must not use YAML aliases."
+            }
+
+            $nonCanonicalRunKeys = [regex]::Matches(
+                $jobSource,
+                '(?m)^(?:        run[ \t]+:|        (?:"run"|''run'')\s*:|        \?\s*(?:"run"|''run''|run)(?:\s|$)|      -\s*\{[^\r\n}]*?(?:"run"|''run''|run)\s*:)')
+            if ($nonCanonicalRunKeys.Count -ne 0) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must use canonical run keys."
+            }
+
+            $nonCanonicalStepItems = [regex]::Matches(
+                $jobSource,
+                '(?m)^      -(?:[ \t]+#.*)?\r?$')
+            if ($nonCanonicalStepItems.Count -ne 0) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must use canonical step items."
+            }
+
+            $protocolRestoreTargetReferences = [regex]::Matches(
+                $jobSource,
+                '(?i)\bMeAndAI\.Protocol\.slnx\b')
+            if ($protocolRestoreTargetReferences.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must reference MeAndAI.Protocol.slnx exactly once."
+            }
+
+            $allDotNetRestoreInvocations = @(
+                $steps | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+restore\b')
+                }
+            )
+            if ($allDotNetRestoreInvocations.Count -ne 2) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly two dotnet restore invocations."
+            }
+
+            $protocolRestoreInvocations = @(
+                $steps | Where-Object {
+                    $_.Command -match
+                        '(?i)\bMeAndAI\.Protocol\.slnx\b'
+                } | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+restore\b')
+                }
+            )
+            if ($protocolRestoreInvocations.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one MeAndAI.Protocol.slnx restore invocation."
+            }
+
+            $protocolTestTargetReferences = [regex]::Matches(
+                $jobSource,
+                '(?i)\bMeAndAI\.Protocol\.Domain\.Tests[\\/]MeAndAI\.Protocol\.Domain\.Tests\.csproj\b')
+            if ($protocolTestTargetReferences.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must reference the Domain test project exactly once."
+            }
+
+            $allDotNetTestInvocations = @(
+                $steps | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+test\b')
+                }
+            )
+            if ($allDotNetTestInvocations.Count -ne 2) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly two dotnet test invocations."
+            }
+
+            $protocolTestInvocations = @(
+                $steps | Where-Object {
+                    $_.Command -match
+                        '(?i)\bMeAndAI\.Protocol\.Domain\.Tests[\\/]MeAndAI\.Protocol\.Domain\.Tests\.csproj\b'
+                } | ForEach-Object {
+                    [regex]::Matches(
+                        $_.Command,
+                        '(?i)(?<![a-z0-9_.-])["'']?dotnet(?:\.exe)?["'']?\s+test\b')
+                }
+            )
+            if ($protocolTestInvocations.Count -ne 1) {
+                Add-Failure "TEST-0146 stable job '$stableJobId' must contain exactly one Domain test invocation."
             }
 
             foreach ($expectedCommand in $expectedProtocolCommands) {
@@ -503,6 +628,9 @@ try {
                 }
 
                 $candidateSource = $matchingSteps[0].Source
+                if ($matchingSteps[0].RunForm -cne '>-') {
+                    Add-Failure "TEST-0146 protocol step in '$stableJobId' uses an alternate run form: '$expectedCommand'."
+                }
                 $ifLines = [regex]::Matches(
                     $candidateSource,
                     '(?m)^        if:.*\r?$'
@@ -514,9 +642,9 @@ try {
                 if ($ifLines.Count -ne 1 -or $fullRouteLines.Count -ne 1) {
                     Add-Failure "TEST-0146 protocol step in '$stableJobId' is not bound exactly to the Full route: '$expectedCommand'."
                 }
-                if ([regex]::IsMatch(
-                    $candidateSource,
-                    '(?m)^        continue-on-error:\s*true\s*\r?$')) {
+                if ($candidateSource.IndexOf(
+                    'continue-on-error',
+                    [StringComparison]::OrdinalIgnoreCase) -ge 0) {
                     Add-Failure "TEST-0146 protocol step in '$stableJobId' is allowed to fail: '$expectedCommand'."
                 }
             }

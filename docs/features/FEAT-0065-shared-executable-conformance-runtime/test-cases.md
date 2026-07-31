@@ -13,28 +13,31 @@ produced the accepted [SUBF-0153](README.md#subf-0153)/[TEST-0221](#test-0221)
 design. [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) merged it at
 exact main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f).
-That closes Gate 2 design only; [TEST-0221](#test-0221) still has no executable
-source or run.
+That closed Gate 2 design only.
 
-The current
+The later
 [SUBF-0143](README.md#subf-0143) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only Gate 1/2 design and expected-red planning for
-[SUBF-0143](README.md#subf-0143)/[TEST-0210](#test-0210). It does not authorize
-test source, expected-red execution, product code, project/package/lock/solution
-files, workflow, scenario ownership,
-[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), or any
-later scenario. Gate 3 additionally requires maintainer acceptance, merge and
-bounded exact-main validation of the accepted [SUBF-0143](README.md#subf-0143)
-design, then a separate
-implementation directive.
+produced an accepted Gate 2 packet for
+[SUBF-0143](README.md#subf-0143)/[TEST-0210](#test-0210). It was accepted,
+merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+[TEST-0210](#test-0210) remains Planned with no executable authority.
+
+The subsequent scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+authorized [SUBF-0153](README.md#subf-0153)/[TEST-0221](#test-0221) Gate 3.
+The local activation candidate completed valid expected red and green without
+solution/project/package/reference/dependency/lock graph expansion. Candidate
+commit, exact-commit StructureOnly, PR, hosted exact-head, merge, and exact-main
+closure remain pending.
 
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0209` <a name="test-0209"></a> | [FEAT-0065](README.md) composed qualification across [SUBF-0152](README.md#subf-0152), [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), [SUBF-0144](README.md#subf-0144), and [SUBF-0154](README.md#subf-0154) | Vary rule, evidence, typed location, profile axes, acquisition state, evaluation state, debt, waiver, enforcement, and report values, including missing, duplicate, stale, unknown, malformed, and redacted data. | Invalid combinations fail construction. Valid reports preserve acquisition, per-rule evaluation, conformance verdict, and enforcement decision as four separate dimensions: incomplete/failed required acquisition creates `NotEvaluated` and aggregate `Indeterminate`, known violations remain visible, and enforcement follows the accepted phase/waiver/debt precedence. Canonical serialization, ordering, and digest are identical across supported runtimes and operating systems. | Component / contract / serialization | Nearest same-contract sibling: the [preserved WIP model scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` because it directly exercises the composed production model with typed multi-surface locations and separated result dimensions, rather than aggregating child-test results or reusing the bounded repository report. | Planned | Future composed .NET qualification tests |
-| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: qualification/complete catalog activation, normative provenance and manifest/artifact binding; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Planned | Gate 2/expected-red design candidate only; no executable source, project, owner, workflow, or run is authorized |
+| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: qualification/complete catalog activation, normative provenance and manifest/artifact binding; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Planned | Gate 2 accepted/merged/bounded exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); no executable source, project, owner, workflow, or run is authorized |
 | `TEST-0211` <a name="test-0211"></a> | [SUBF-0144](README.md#subf-0144) | Evaluate protected baseline plus valid/invalid extensions, waivers, historical debt, policy activation snapshots, previous-trusted runtime, candidate runtime, differential results, and attempted candidate self-certification. | Extensions are additive and namespaced, baseline enforcement cannot be lowered, waiver/debt effects follow the deterministic truth table, stale activation fails closed, and authority transfer remains impossible from candidate-only evidence. | Component / security / differential | Nearest same-contract sibling: [TEST-0163](../FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163); Distinct protocol-runtime bootstrap and protected-policy contract. | Planned | Future .NET qualification and differential tests |
 | `TEST-0220` <a name="test-0220"></a> | [SUBF-0152](README.md#subf-0152) | Vary exact rule identity/revision and SHA-256 values, every closed profile/outcome token, SurfaceSet order/duplicates/mutability, ExecutionProfile axes, and the new project graph. | Invalid lexical, range, null, duplicate, and cross-dimension values fail closed; valid values are immutable and ordinal-exact; SurfaceSet and profile equality are input-order independent; the Domain assembly is BCL-only and no outcome dimension implies another. | Unit / architecture / contract | Nearest siblings: [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), and preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` scalar invalid-state and independent-axis contract in the new protocol Domain assembly. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; completed slice evidence is recorded below |
-| `TEST-0221` <a name="test-0221"></a> | [SUBF-0153](README.md#subf-0153) | Vary the exact inventory-derived [evidence-acquisition design](subf-0153-evidence-contract-design.md): requirement schemas, request target, observed boundary/scope, asserted-canonical payload, typed locations, bindings/root references, requirement acquisition, pagination, context, and observed/absent/failed result variants. | Schema-identified content is immutable and content-addressed but remains an untrusted assertion until exact [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification; source/snapshot scope is structural; absent is `Incomplete`; failed has no valid context and remains `Failed`; requirement/context status is derived; invalid API, pagination, reference, schema, redaction, failure, collision, and union combinations fail construction. | Unit / architecture / contract | Same-contract classifications are fixed in the [design inventory](subf-0153-evidence-contract-design.md#distinct-test-intent-and-sibling-inventory). `Distinct` acquisition/evidence substrate rather than [SUBF-0143](README.md#subf-0143) codec/typed-model/derived-reference/finding/evaluation behavior, composed reports, or repository-only WIP. | Planned | Gate 2 design accepted/merged/exact-main validated through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171); executable source remains gated by accepted/merged/exact-main [SUBF-0143](README.md#subf-0143) Gate 2 and a separate implementation directive |
+| `TEST-0221` <a name="test-0221"></a> | [SUBF-0153](README.md#subf-0153) | Vary the exact inventory-derived [evidence-acquisition design](subf-0153-evidence-contract-design.md): requirement schemas, request target, observed boundary/scope, asserted-canonical payload, typed locations, bindings/root references, requirement acquisition, pagination, context, and observed/absent/failed result variants. | Schema-identified content is immutable and content-addressed but remains an untrusted assertion until exact [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification; source/snapshot scope is structural; absent is `Incomplete`; failed has no valid context and remains `Failed`; requirement/context status is derived; invalid API, pagination, reference, schema, redaction, failure, collision, and union combinations fail construction. | Unit / architecture / contract | Same-contract classifications are fixed in the [design inventory](subf-0153-evidence-contract-design.md#distinct-test-intent-and-sibling-inventory). `Distinct` acquisition/evidence substrate rather than [SUBF-0143](README.md#subf-0143) codec/typed-model/derived-reference/finding/evaluation behavior, composed reports, or repository-only WIP. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; local candidate focused `46/46` and combined [TEST-0220](#test-0220)/[TEST-0221](#test-0221) `98/98`; candidate commit/hosted closure pending |
 | `TEST-0222` <a name="test-0222"></a> | [SUBF-0154](README.md#subf-0154) | Seal the complete typed report after catalog evaluation and debt/waiver disposition; vary input order, culture, operating system, line endings, redaction, missing dimensions, and digest tampering. | The report is complete or fails closed; canonical bytes, collection order, and digest are schema-exact across supported runtimes and systems; raw content and credentials are absent. | Component / serialization / cross-runtime | `Distinct` from [TEST-0209](#test-0209) by canonical-byte/digest nondeterminism risk and report-sealing boundary rather than composed semantic evaluation. | Planned | Future .NET report qualification tests; implementation not authorized |
 
 ## [TEST-0210](#test-0210) Gate 2 expected-red matrix
@@ -80,9 +83,11 @@ Fresh expected-red code must directly cover these groups:
 | Negative surface | No provider DTO/object/dynamic/raw cursor/ETag/credential, I/O/adapter/parser/catalog/evaluator/finding/report/host/CLI/debt/waiver/publication/authority API. |
 | Hosted ownership plan | After focused/combined green only, Status/Automation/traits/owner/both filters/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) change atomically; each stable job retains exactly one locked-restore CLI invocation and one protocol test CLI invocation. A later Conformance.Tests project may add one distinct testhost only under the separately accepted [TEST-0210](#test-0210) budget contract. |
 
-The planned red may fail only for deliberately absent declared production
-contracts. No test source, owner transfer, command change, or red execution is
-authorized by this matrix.
+The scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+consumed this matrix. The valid reflection inventory red selected and executed
+exactly `1/1` test and failed solely because all `23` declared SliceInventory
+public types were absent. No restore, compile, predecessor, environment, or
+workflow-discovery failure contaminated the red.
 
 ## Required coverage
 
@@ -134,19 +139,48 @@ on [Ubuntu](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506/job/
 and [Windows](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506/job/90771124470).
 That closes [TEST-0220](#test-0220) and [SUBF-0152](README.md#subf-0152).
 
-[TEST-0221](#test-0221) has no executable evidence. Its Gate 2 design authority
-began with the historical
+[TEST-0221](#test-0221) Gate 2 began with the historical
 [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253).
 [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) merged the accepted
 [design](subf-0153-evidence-contract-design.md) at exact main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 and the [closure comment](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520)
-records bounded exact-main validation. That is design evidence only and does
-not satisfy [TEST-0221](#test-0221) execution.
+records bounded design validation. Its required typed-handoff predecessor was
+then accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 
-[TEST-0210](#test-0210) likewise has no executable evidence. Its current
-authority is only the
-[design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-and [Gate 2 design candidate](subf-0143-typed-evaluation-kernel-design.md).
-Preserved WIP runs remain historical oracles and do not satisfy either
-successor scenario.
+The scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+then authorized [TEST-0221](#test-0221) Gate 3. The local candidate evidence is:
+
+- expected red: the reflection inventory test selected/executed `1/1` and
+  failed solely because all `23` SliceInventory public types were absent;
+- scoped lock-file fingerprints remained unchanged:
+  `src/MeAndAI.Protocol.Domain/packages.lock.json` at `03EE...CB46` and
+  `tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json` at
+  `D206...00BC`;
+- focused [TEST-0221](#test-0221): `46/46` passing;
+- combined [TEST-0220](#test-0220)/[TEST-0221](#test-0221): `98/98` passing in
+  the existing Domain.Tests testhost;
+- Gate 5 retained only public-observable coverage and removed the private-
+  reflection oracle from the final green suite; the valid historical expected
+  red is unchanged;
+- local [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  owner/topology verification: green;
+- explicit Release build: `0` warnings and `0` errors;
+- `dotnet format` verification at severity `info`: clean; and
+- no solution, project, package, project-reference, dependency, effective-
+  restore, or lock graph expansion.
+
+[TEST-0221](#test-0221) is therefore `Passing` with Automation owned by
+`tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`
+in the local candidate. No candidate implementation commit, exact-commit
+StructureOnly result, PR, hosted Ubuntu/Windows exact-head run, merge, or
+exact-main closure is recorded yet; those remain pending and are not inferred
+from local green evidence.
+
+[TEST-0210](#test-0210) still has no executable evidence. Its Gate 2 design was
+accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+but no [SUBF-0143](README.md#subf-0143) Gate 3 directive exists. Preserved WIP
+runs remain historical oracles and do not satisfy either successor scenario.

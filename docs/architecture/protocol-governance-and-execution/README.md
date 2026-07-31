@@ -3,16 +3,16 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 accepted/merged/exact-main validated; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 design candidate active; implementation not authorized |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted/merged/exact-main; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 3 local candidate green and [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) Passing; commit/PR/hosted/exact-main closure pending |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Red-team review | [Closed at design level](red-team-review.md) |
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
-| Current baseline | [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) |
+| Current baseline | Accepted exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | Completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) is historical implementation authority; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 is historical accepted design; only [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 1/2 design and expected-red planning are active under the [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) |
+| Current authority | The scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) authorizes only [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) Gate 3 over accepted predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); local candidate green, publication/closure authority not implied |
 
 ## 1. Outcome
 
@@ -55,18 +55,40 @@ merged it at exact main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
 
-The current
+The later
 [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only Gate 1/2 design and expected-red planning for
+authorized only Gate 1/2 design and expected-red planning for
 [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
-Outside that exact design boundary, the following remain prohibited:
+That packet was accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+satisfying the typed-handoff prerequisite for
+[SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+without granting [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+Gate 3.
 
-- production or test implementation;
+The subsequent scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+authorized exactly [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/
+[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+Gate 3, its bounded predecessor inventory transition, scenario activation,
+existing stable-job combined filter, and narrow
+[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+transition. The local candidate has valid expected red `1/1` failing solely for
+the absent `23` SliceInventory types, focused green `46/46`, combined green
+`98/98`, local
+[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+green, a Release build with `0` warnings and `0` errors, clean severity-`info`
+format verification, unchanged scoped lock fingerprints `03EE...CB46` and
+`D206...00BC`, and no graph expansion.
+
+Outside that exact activation boundary, the following remain prohibited:
+
+- production or test implementation for every other slice;
 - moving code from the preserved draft into the target branch;
-- project, package, lock-file, workflow, ruleset, required-check, or scenario-
-  ownership changes;
+- project, package, dependency, lock-file, ruleset, required-check, or scenario-
+  ownership changes outside the exact [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) activation packet;
 - consumer-repository or provider mutation;
 - release publication or protocol-authority transfer; and
 - PowerShell compatibility or source retirement.
@@ -75,13 +97,14 @@ The original architecture packet used a no-run route and left the workflow
 unchanged. [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) merged it at
 [`a2be672b91cb41b88597c5123a0d5b0e9a54d34e`](https://github.com/hasanmanzak/meAndAI/commit/a2be672b91cb41b88597c5123a0d5b0e9a54d34e),
 whose exact tree passed [main run 30483054367](https://github.com/hasanmanzak/meAndAI/actions/runs/30483054367).
-Only completed
+Completed
 [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
-has passed its implementation entry gate. The architecture freeze remains in
-force for
-[SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-Gate 3 and every other
-successor implementation.
+and the current [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+local candidate have passed their applicable implementation-entry prerequisites.
+The [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+candidate is not closed: candidate commit, exact-commit StructureOnly, PR,
+hosted exact-head, merge, and exact-main evidence remain pending. The
+architecture freeze remains in force for every other successor implementation.
 
 Outside the scoped directive, allowed work remains limited to architecture
 decisions, diagrams, terminology, record-transition maps, red-team review, and
@@ -482,11 +505,14 @@ family, typed-kernel handoff, and
 [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
 plan are defined by the accepted/merged/exact-main
 [evidence-acquisition design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
-That accepted design still does not authorize implementation. Its exact
-catalog/admission/evaluation seam is closed prospectively by the separately
-reviewed
+That accepted design did not itself authorize implementation. Its exact
+catalog/admission/evaluation seam was closed prospectively by the separately
+reviewed and now accepted/merged/bounded exact-main
 [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [typed-evaluation-kernel design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
+The scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+now authorizes only the bounded [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+Gate 3 implementation over that seam.
 [FEAT-0067](../../features/FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)
 owns I/O,
 normalization, source-schema qualification, pagination, and convergence;
@@ -1455,7 +1481,7 @@ cannot reopen an architectural boundary without a new decision.
   architecture question remains open.
 - [x] All findings received so far are reconciled in the [red-team register](red-team-review.md).
 - [x] Maintainer explicitly accepts [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md).
-- [x] Maintainer separately authorized and completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; the historical [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) produced accepted design only, and the current [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) satisfies no implementation-entry item.
+- [x] Maintainer separately authorized and completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) after its own Definition of Ready; the historical [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) produced accepted design, the [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff packet was accepted/merged/bounded exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7), and the scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) satisfied the remaining [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) implementation-entry item only.
 
 ## 27. Implementation entry gate
 
@@ -1498,10 +1524,18 @@ is accepted, merged, and exact-main validated at
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f).
 Item 9's [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [typed-handoff design](../../features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
-is the active Gate 2 candidate, while its acceptance/merge/exact-main
-validation and item 10's separate implementation directive remain
-unsatisfied. No test or production code may begin; all later slices remain
-held.
+is accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+and item 10 is satisfied by the scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435).
+The local candidate completed valid expected red `1/1`, focused
+[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+`46/46`, combined [TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)/
+[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+`98/98`, zero-warning/error Release build, clean severity-`info` format, unchanged
+scoped lock fingerprints, and no graph expansion. Candidate commit,
+exact-commit StructureOnly, PR, hosted exact-head, merge, and exact-main closure
+remain pending. All later slices remain held.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).

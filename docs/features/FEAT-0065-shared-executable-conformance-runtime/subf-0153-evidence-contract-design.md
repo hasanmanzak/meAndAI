@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / second dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 design accepted, merged, and exact-main validated; typed-handoff Gate 2 closure and a separate implementation directive remain pending before Gate 3 |
+| Status | Gate 3 activated; local implementation candidate green and [TEST-0221](test-cases.md#test-0221) Passing; candidate commit, exact-commit/hosted/PR/merge/exact-main closure pending |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,21 +11,24 @@
 | Design input baseline | [c31819487e77fc878fc40fae6445bfef582719da](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | Design authority | [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) |
 | Acceptance | [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) at exact main [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) with [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520) |
+| Typed-handoff predecessor | [SUBF-0143](README.md#subf-0143) Gate 2 accepted/merged/bounded exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
+| Gate 3 authority | Scoped [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) |
+| Local candidate | Valid expected red `1/1`; focused [TEST-0221](test-cases.md#test-0221) `46/46`; combined [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) `98/98`; Gate 5 public-observable coverage strengthened and final private-reflection oracle removed; local [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) green; Release `0` warnings/`0` errors; severity-`info` format clean; scoped lock fingerprints unchanged; no graph expansion |
 
 ## Directive and hard boundary
 
-The maintainer authorized Gate 1 and Gate 2 architecture design and
+The historical maintainer directive authorized Gate 1 and Gate 2 architecture design and
 expected-red planning for [SUBF-0153](README.md#subf-0153) and
 [TEST-0221](test-cases.md#test-0221) only. This packet defines the acquisition
 and evidence substrate, its exact public contract, construction invariants,
 project and test ownership, prior-art dispositions, and future verification
 route.
 
-It does **not** authorize C# source or executable-test implementation, project
-or package changes, lock-file changes, workflow changes, scenario-ownership
-changes, expected-red execution, WIP extraction, provider or consumer
-mutation, release work, publication, authority transfer, or PowerShell
-retirement.
+That historical directive did **not** authorize C# source or executable-test
+implementation, project or package changes, lock-file changes, workflow
+changes, scenario-ownership changes, expected-red execution, WIP extraction,
+provider or consumer mutation, release work, publication, authority transfer,
+or PowerShell retirement.
 
 The continuation chain is normative:
 
@@ -44,10 +47,22 @@ Steps 1 through 3 are now complete through [PR #171](https://github.com/hasanman
 exact main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 and the [bounded closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
-Steps 4 through 6 remain open. The current
-[SUBF-0143](README.md#subf-0143) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-authorizes only the typed-handoff Gate 1/2 packet and its expected-red plan; it
-does not authorize this slice's Gate 3.
+Step 4 completed when the [SUBF-0143](README.md#subf-0143) typed-handoff Gate 2
+packet was accepted, merged, and bounded exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+Steps 5 and 6 were then satisfied by the scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435).
+That directive authorizes exactly fresh [TEST-0221](test-cases.md#test-0221)
+source and expected red, SliceInventory implementation, the bounded
+[TEST-0220](test-cases.md#test-0220) inventory transition, scenario activation,
+the existing stable-job combined filter, and the narrow
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+transition. It grants no WIP extraction, provider/consumer mutation,
+[SUBF-0143](README.md#subf-0143) Gate 3, release/publication/authority transfer,
+PowerShell retirement, or project/package/dependency/lock graph expansion.
+Local green evidence is candidate evidence only; commit, exact-commit
+StructureOnly, PR, hosted exact-head, merge, and exact-main closure remain
+separate pending gates.
 
 [SUBF-0152](README.md#subf-0152) is the completed predecessor. Its existing
 RuleId, RuleRevision, ExactSha256Digest, SurfaceKind, SnapshotKind,
@@ -849,9 +864,15 @@ the report or reinterpret ContentDigest.
 CanonicalEvidencePayload is the safe immutable structural carrier boundary.
 Evaluators do **not** receive it directly.
 
-Before either [SUBF-0153](README.md#subf-0153) or [SUBF-0143](README.md#subf-0143) implementation, a separately reviewed
-[SUBF-0143](README.md#subf-0143) typed-handoff Gate 2 design must close all requirements below. This
-is an explicit prerequisite for the [SUBF-0153](README.md#subf-0153) implementation directive.
+Before [SUBF-0153](README.md#subf-0153) Gate 3, a separately reviewed
+[SUBF-0143](README.md#subf-0143) typed-handoff Gate 2 design had to close all
+requirements below. That prerequisite was accepted, merged, and bounded
+exact-main validated at
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7)
+before the scoped [SUBF-0153](README.md#subf-0153) activation directive. The same
+typed boundary remains a prerequisite for any later
+[SUBF-0143](README.md#subf-0143) implementation; no such Gate 3 authority is
+created here.
 
 1. One [SUBF-0143](README.md#subf-0143) immutable release schema registry owns canonical schema
    membership. Each schema key/version binds one provider-neutral canonical
@@ -1092,8 +1113,9 @@ oracle.
 
 ## [TEST-0221](test-cases.md#test-0221) expected-red contract
 
-[TEST-0221](test-cases.md#test-0221) is project-neutral and table-driven. Its Gate 3 red is valid only
-after the later implementation directive.
+[TEST-0221](test-cases.md#test-0221) is project-neutral and table-driven. Its
+Gate 3 red became valid under the scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435).
 
 | Area | Required cases |
 | --- | --- |
@@ -1111,6 +1133,10 @@ after the later implementation directive.
 The focused red must fail solely because a SliceInventory contract/member is
 absent. A compile, restore, environment, workflow-discovery, or predecessor
 failure is invalid red.
+
+The local candidate satisfied this oracle: the reflection inventory test
+selected/executed exactly `1/1` and failed solely because all `23`
+SliceInventory public types were absent. No other failure was present.
 
 ## Cumulative public-API ownership transition
 
@@ -1136,25 +1162,33 @@ runs both scenarios.
 Neither scenario invokes the other or consumes the other’s result. A later
 Domain export needs another explicit cumulative-owner transition.
 
-## Future canonical execution route
+## Canonical execution route and local candidate state
 
-This route is planning, not current authority. Acceptance/merge/exact-main
-validation of this design is complete through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171).
-It may start only after the separately maintainer-accepted/merged/exact-main-
-validated [SUBF-0143](README.md#subf-0143) typed-handoff design and a separate
-implementation directive.
+Acceptance/merge/exact-main validation of this design is complete through
+[PR #171](https://github.com/hasanmanzak/meAndAI/pull/171). The separately
+maintainer-accepted/merged/bounded exact-main-validated
+[SUBF-0143](README.md#subf-0143) typed-handoff predecessor is
+[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7),
+and the scoped
+[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+opened this route. Steps 1 through 8 are complete in the local candidate. Steps
+9 through 11 remain pending; no candidate implementation commit,
+exact-commit StructureOnly result, PR, hosted exact-head run, merge, or
+exact-main closure is inferred.
 
 1. Start from the accepted exact-main predecessor with clean scoped project
    and lock files.
 2. Capture hashes of both existing lock files, run the exact locked restore,
    and prove byte-identical locks.
 3. Add fresh [TEST-0221](test-cases.md#test-0221) sources and only the bounded [TEST-0220](test-cases.md#test-0220) export-inventory
-   transition. No SliceInventory production member exists yet.
+   transition. At this red checkpoint no SliceInventory production member
+   existed.
 4. Run only the focused [TEST-0221](test-cases.md#test-0221) command. It must fail solely for absent
    SliceInventory contracts.
 5. Do not run StructureOnly, the root protocol suite, or hosted validation on
-   this transient red tree. [TEST-0221](test-cases.md#test-0221) remains Planned and
-   PlannedDocumentation, so active source is intentionally not a valid final
+   this transient red tree. During that checkpoint
+   [TEST-0221](test-cases.md#test-0221) remained Planned and
+   PlannedDocumentation, so active source was intentionally not a valid final
    authority graph. Do not publish the red tree as active PR head.
 6. Implement exactly SliceInventory/invariants without project, package,
    dependency, lock, adapter, parser, evaluator, finding, report, host, or
@@ -1165,6 +1199,7 @@ implementation directive.
    existing Domain test project, retain project-owned Scenario traits, move
    authority from PlannedDocumentation to that DotNetTestProject owner, update
    both existing stable jobs to the one combined filter, and update [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
+   This transition is complete in the local candidate.
 9. Commit the complete graph-reachable implementation/test/docs/owner/workflow
    packet. Dirty/untracked validation is diagnostic only.
 10. Run StructureOnly on that exact commit under PowerShell 7 and Windows
@@ -1207,6 +1242,12 @@ Capture each SHA-256 before restore and require exact equality afterward. A
 zero exit without byte-identical locks is not valid evidence. No solution,
 project, central-package, NuGet configuration, or lock file may change.
 
+The local candidate recorded unchanged scoped fingerprints:
+
+- `src/MeAndAI.Protocol.Domain/packages.lock.json`: `03EE...CB46`;
+- `tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json`:
+  `D206...00BC`.
+
 ### [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) exact-count and source-identity contract
 
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) inspects every normalized run command in each existing stable Full
@@ -1239,6 +1280,22 @@ $protocolFilter = @(
 ~~~
 
 Only workflow YAML contains the exact literal combined filter.
+
+The local candidate satisfied the bounded route without topology expansion:
+focused [TEST-0221](test-cases.md#test-0221) passed `46/46`, the combined
+[TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) route
+passed `98/98` in the existing Domain.Tests testhost, local
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) was
+green, Release build completed
+with `0` warnings and `0` errors, and `dotnet format` verification at severity
+`info` was clean. No solution/project/package/reference/dependency/effective-
+restore/lock graph edge, job, restore invocation, or testhost was added. This
+is local candidate evidence; the required exact-commit and hosted closure gates
+remain pending.
+
+Gate 5 strengthened the retained green suite around public-observable behavior
+and removed its private-reflection oracle. That final-suite correction does not
+rewrite the valid historical `1/1` expected-red evidence.
 
 ## Recurrence review and verification budget
 
@@ -1275,7 +1332,7 @@ If the combined route cannot fit, implementation stops for design review.
 | [FIND-0380](README.md#find-0380) | WIP records are dispositioned by exact successor owner; no code/status carry-forward. |
 | [FIND-0381](README.md#find-0381) | [SUBF-0152](README.md#subf-0152) exact-main baseline remains explicit. |
 | [FIND-0382](README.md#find-0382) | Single-invocation [SUBF-0153](README.md#subf-0153) route, existing Domain.Tests testhost, exact job evidence, and fail-closed budget remain. |
-| [FIND-0383](README.md#find-0383) | [TEST-0220](test-cases.md#test-0220) stays Passing and [TEST-0221](test-cases.md#test-0221) stays Planned until atomic activation. |
+| [FIND-0383](README.md#find-0383) | [TEST-0220](test-cases.md#test-0220) stayed Passing and [TEST-0221](test-cases.md#test-0221) stayed Planned until atomic activation; [TEST-0221](test-cases.md#test-0221) is now Passing in the local candidate under the scoped directive. |
 | [FIND-0384](README.md#find-0384) | Schema-identified content plus mandatory qualification and a release-bound typed context replace metadata-only evidence. |
 | [FIND-0385](README.md#find-0385) | Target/boundary/scope and location membership close subject/source/snapshot authority. |
 | [FIND-0386](README.md#find-0386) | Context-minted root references seal the asserted tuple; [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification verifies payload/location coherence and [SUBF-0143](README.md#subf-0143) owns parser-derived references. |
@@ -1295,7 +1352,7 @@ If the combined route cannot fit, implementation stops for design review.
 
 [FIND-0391](README.md#find-0391) is deliberately not incorporated here. It is
 an external [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md)/[TEST-0214](../FEAT-0067-evidence-acquisition-managed-consumer-integration/test-cases.md#test-0214) terminology and consumer-contract follow-up
-outside the current design-only mutation authority.
+outside the scoped [SUBF-0153](README.md#subf-0153) activation authority.
 
 ## Approval gate
 
@@ -1303,19 +1360,24 @@ Gate 2 design acceptance is complete through [PR #171](https://github.com/hasanm
 exact main
 [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
 and the [bounded closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
-Before Gate 3:
+Gate 3 entry required:
 
 - [x] bounded red-team found no unresolved Blocking issue;
 - [x] the maintainer accepted this exact design;
 - [x] the accepted design merged and passed bounded exact-main validation;
-- [ ] a separately reviewed and maintainer-accepted [SUBF-0143](README.md#subf-0143)
+- [x] a separately reviewed and maintainer-accepted [SUBF-0143](README.md#subf-0143)
   typed-handoff Gate 2 design closes every
   [sealed evaluation boundary](#sealed-typed-evaluation-boundary) requirement,
-  merges, and passes bounded exact-main validation; and
-- [ ] a new directive explicitly authorizes [TEST-0221](test-cases.md#test-0221) source, expected red,
+  merges, and passes bounded exact-main validation at
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); and
+- [x] the scoped
+  [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+  explicitly authorizes [TEST-0221](test-cases.md#test-0221) source, expected red,
   SliceInventory implementation, [TEST-0220](test-cases.md#test-0220) inventory transition, scenario
   activation, combined workflow filter, and narrow [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) change.
 
-Until then C# implementation, test execution, project/lock/workflow mutation,
-WIP extraction, consumer mutation, release, publication, and authority
-transfer remain prohibited.
+All entry conditions are satisfied and the local Gate 3 candidate is green.
+The directive grants no WIP extraction, consumer mutation, [SUBF-0143](README.md#subf-0143)
+Gate 3, release, publication, authority transfer, PowerShell retirement, or
+graph expansion. Candidate commit, exact-commit StructureOnly, PR, hosted
+exact-head, merge, and exact-main closure remain pending.

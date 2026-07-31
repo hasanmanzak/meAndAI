@@ -972,16 +972,48 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   main
   [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
   with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
-  Gate 2 design is complete but
-  [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
-  and implementation remain absent.
+  That historical directive granted no implementation authority. The later
+  [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
+  authorizes bounded Gate 3 implementation and atomic workflow/scenario-owner
+  activation for
+  [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+  and
+  [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
+  The local activation candidate is on
+  `codex/subf-0153-evidence-contract-implementation`, from predecessor
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 
-  The current [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-  authorizes Gate 1/2 design and expected-red planning only for
+  The valid red compiled the public-API reflection oracle and failed its one
+  selected test solely because the normative 23-type slice inventory was
+  absent. Discard the
+  separate `NETSDK1064` package-cache attempt; it is not red or regression
+  evidence. Final local evidence is 46 of 46 focused tests and 98 of 98
+  combined predecessor/slice tests passing, a Release build with zero warnings
+  and zero errors, and clean format verification. Lock-file hashes are
+  unchanged, and project/package/solution/lock files are unchanged.
+  [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+  is `Passing` and its current owner is the existing
+  `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`.
+  The authorized workflow/scenario-owner activation is applied, and the local
+  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation implementation is green. Gate 5 removed the private
+  `CanonicalEvidencePayload` constructor reflection oracle and strengthened
+  public-observable validation, equality, and defensive-ownership cases. These
+  facts describe only the local working-tree candidate; they do not claim a
+  candidate commit, pull request, hosted run, merge, committed exact tree, or
+  exact-head validation. Follow the
+  [current implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md).
+
+  The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
+  produced the Gate 1/2 design and expected-red planning for
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
   and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
   Follow the exact
   [typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
+  That Gate 2 packet is accepted, merged, and bounded exact-main validated at
+  [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`, with no executable source or run.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1035,11 +1067,19 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   Qualified references/findings/evaluations remain in Conformance rather than
   Domain; Policy contains no provider DTO, route, credential, filesystem,
   network, or I/O surface.
-  Bounded red-team, maintainer acceptance, merge/exact-main validation, and a
-  separate implementation directive remain missing; no source/test/Gate 3/
+  For
+  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143),
+  Gate 2 review, maintainer acceptance, merge, and bounded
+  exact-main validation are complete. Gate 3 still requires both completed
+  [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
+  merge/exact-main closure and a separate implementation directive; no
+  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  source/test/Gate 3/
   project/lock/workflow/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   change is authorized.
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned` until that separate Gate 3 authority exists.
   Future first BehaviorRed states use only the exact warning-free `null!`
   activation/export sentinel defined by the design. D first proves the real
   export graph. RULE-0001 is deliberately later: the real D writer/codec/parser/
