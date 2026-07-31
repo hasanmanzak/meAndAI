@@ -979,30 +979,32 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
   and
   [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
-  The local activation candidate is on
-  `codex/subf-0153-evidence-contract-implementation`, from predecessor
+  The historical activation candidate was developed on
+  `codex/subf-0153-evidence-contract-implementation` from predecessor
   [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
 
   The valid red compiled the public-API reflection oracle and failed its one
   selected test solely because the normative 23-type slice inventory was
   absent. Discard the
   separate `NETSDK1064` package-cache attempt; it is not red or regression
-  evidence. Final local evidence is 46 of 46 focused tests and 98 of 98
+  evidence. Historical local evidence was 46 of 46 focused tests and 98 of 98
   combined predecessor/slice tests passing, a Release build with zero warnings
   and zero errors, and clean format verification. Lock-file hashes are
   unchanged, and project/package/solution/lock files are unchanged.
   [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
   is `Passing` and its current owner is the existing
   `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`.
-  The authorized workflow/scenario-owner activation is applied, and the local
+  The authorized workflow/scenario-owner activation is applied, and the
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation implementation is green. Gate 5 removed the private
   `CanonicalEvidencePayload` constructor reflection oracle and strengthened
-  public-observable validation, equality, and defensive-ownership cases. These
-  facts describe only the local working-tree candidate; they do not claim a
-  candidate commit, pull request, hosted run, merge, committed exact tree, or
-  exact-head validation. Follow the
-  [current implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md).
+  public-observable validation, equality, and defensive-ownership cases. This
+  bounded packet subsequently completed through
+  [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main
+  [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+  and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
+  The [implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md)
+  is retained as historical pre-publication evidence.
 
   The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
   produced the Gate 1/2 design and expected-red planning for
@@ -1013,7 +1015,38 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   That Gate 2 packet is accepted, merged, and bounded exact-main validated at
   [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`, with no executable source or run.
+  remains `Planned`. Its local Gate 3 working tree now has the six-project
+  scaffold, exact SurfaceRed, cumulative-A 48-type surface, and `11/11`
+  structural checkpoint. BehaviorRed observations made before their applicable
+  [message/echo](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+  and [RunInfo](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+  clarifications remain diagnostic. The fresh post-synchronization same-FQN run
+  passed the complete corrected oracle as canonical BehaviorRed. The first
+  limited ParseCanonical increment then passed original-oracle and final-source
+  exact-FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/
+  error-free final six-project Release build, and private-byte implementation
+  review. That first-green support review had `0 Blocking`, one unnumbered
+  remaining-A coverage `Important`, and no unresolved `Minor`. The current
+  [canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
+  preserves FQN
+  `MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding`,
+  marker/TRX `TEST-0210-A-BEHAVIOR-RED-0002`, writer-owned internal
+  `CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)`, exact
+  legacy/green quoted bytes, the 1,226-byte Unicode fixture and digest, exact
+  composed `C3 A9` versus decomposed `65 CC 81` non-normalization oracle,
+  complete lexical/malformed matrix, and narrow green topology. The reader must
+  canonicalize through that same codec and compare the complete quoted token at
+  `TokenStartIndex..BytesConsumed`; it catches only `GetString()`-originated
+  `InvalidOperationException` at the decode boundary. Direct malformed .NET
+  UTF-16 is codec-argument `ArgumentException`; malformed raw/escaped public
+  documents remain `FormatException`. Seam predecessor and both exact-FQN greens
+  passed `1/1`; the exact red and bounded source review closed `0 Blocking`/
+  `0 Important`/`0 Minor`; cumulative A passed `13/13`. Locked restore,
+  unchanged six lock fingerprints, standard format, clean diff check, and the
+  zero-warning/error six-project Release build passed. The non-gating severity-
+  info scan exposed pre-existing informational backlog/suggestions and is not
+  claimed clean. Canonical-string coverage `Important` is closed; remaining A
+  is held, no later A increment is active, and `TEST-0210` remains `Planned`.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1069,19 +1102,82 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   network, or I/O surface.
   For
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143),
-  Gate 2 review, maintainer acceptance, merge, and bounded
-  exact-main validation are complete. Gate 3 still requires both completed
+  Gate 2 review, maintainer acceptance, merge, and bounded exact-main
+  validation are complete. The prerequisite
   [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-  merge/exact-main closure and a separate implementation directive; no
-  [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-  source/test/Gate 3/
-  project/lock/workflow/scenario-owner/
-  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-  change is authorized.
+  completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173)
+  at exact main
+  [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+  and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256)
+  passed. The corrected
+  [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
+  authorizes a ParseCanonical-only A topology correction, bounded correction
+  red-team, exact project/reference/lock and predecessor-ownership transition,
+  exact A expected reds, and cumulative-A C# green. A constructs no executable
+  export, validates no typed registration list, and declares no kernel; first
+  executable activation and registration-mismatch ownership begin in C.
+  The append-only
+  [BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+  makes the exact failed-result message authoritative, permits no marker outside
+  that node except at most one byte-identical run-summary adapter echo, and
+  derives `Xunit.Sdk.FailException` from the reviewed direct `Assert.Fail`
+  source plus immutable xUnit `2.9.3` lock rather than TRX.
+  The later [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+  permits at most one exact-shape marker-free same-FQN `[FAIL]` bookkeeping node
+  only with the sole Failed result, exact message, all 16 counters including
+  `error=0`, and no other diagnostic.
+  [FIND-0439](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0439)
+  fixes the remaining parser boundary: exact byte/depth/token ceilings,
+  exhaustive document-local `FormatException`, post-parse-only
+  `CatalogIncomplete`, role-reachable components with four exact runtime-anchor
+  exemptions, and trusted-envelope ownership of real commit/blob/content proof.
+  [FIND-0440](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
+  records the RunInfo evidence-contract correction; its mandatory fresh rerun
+  is now satisfied by the accepted canonical A BehaviorRed.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned` until that separate Gate 3 authority exists.
-  Future first BehaviorRed states use only the exact warning-free `null!`
-  activation/export sentinel defined by the design. D first proves the real
+  remains `Planned`. Correction red-team closed with no Blocking, Important,
+  or Minor finding and canonical StructureOnly passed. Project/lock ownership,
+  exact SurfaceRed, the 48-type structural surface, and focused `11/11` are
+  locally complete. Renewed architecture review of the topology/parser
+  corrections and `FIND-0440` passed with `0 Blocking`, `0 Important`, and
+  `0 Minor`. Pre-applicable-clarification BehaviorRed
+  observations remain diagnostic only. The fresh post-synchronization exact-FQN
+  invocation produced one reviewed canonical TRX with the sole Failed result,
+  exact marker message, one permitted `StdOut` echo, exact marker-free RunInfo,
+  Failed summary, and complete 16-counter inventory including `error=0`. The
+  first limited ParseCanonical implementation replaced the sentinel, passed the
+  original-oracle and final-source exact-FQN checks `1/1`, cumulative A `12/12`,
+  format verification, and the warning/error-free final six-project Release
+  build, and satisfied private-copy/canonical-reserialization/no-retained-raw-
+  byte source review. Equality now precedes digest/object construction. The
+  private input and writer-returned arrays are zeroed in `finally`; the
+  unretained `ArrayBufferWriter` internal buffer becomes unreachable but is not
+  explicitly zeroed. That first-green support review had `0 Blocking`, one
+  unnumbered remaining-A coverage `Important`, and no unresolved `Minor`. The
+  second A canonical-string exact-red packet and bounded-green closure are in the current
+  [handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md):
+  exact `0002` FQN/marker, behavior-preserving writer-owned codec extraction,
+  exact legacy/green bytes, raw Unicode, exact composed `C3 A9` versus decomposed
+  `65 CC 81` non-normalization, lowercase C0/DEL/C1, positive 1,226-byte fixture/
+  digest, and malformed raw/escaped input taxonomy. The reader reuses the same
+  codec for complete quoted-token comparison and narrowly maps only decode-boundary
+  `GetString()` `InvalidOperationException`. Internal malformed .NET UTF-16 remains
+  `ArgumentException`; public malformed documents are `FormatException`. Seam
+  predecessor and original-oracle/final-source greens passed `1/1`; exact red
+  and bounded source review closed `0 Blocking`/`0 Important`/`0 Minor`;
+  cumulative A passed `13/13`. Locked restore, unchanged lock fingerprints,
+  standard format, clean diff check, and the zero-warning/error six-project
+  Release build passed; the non-gating severity-info scan is not claimed clean.
+  Canonical-string coverage `Important` is closed, but remaining A is held, no
+  later A increment is active, and `TEST-0210` remains `Planned`. B/C/D, workflow/
+  scenario-owner/
+  [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation, WIP extraction, consumer/release/publication/authority-transfer,
+  and PowerShell-retirement changes remain held. A's canonical first BehaviorRed
+  used only the exact warning-free `FinalizedPolicyManifest.ParseCanonical => null!`
+  sentinel and positive minimal-manifest null predicate; the stable green source
+  now contains neither that sentinel nor the marker/null branch. B/C/D retain their
+  activation/export sentinels. C first activates an executable export; D first proves the real
   export graph. RULE-0001 is deliberately later: the real D writer/codec/parser/
   index/projector/kernel vectors must be green before the D session can mint its
   fresh Conformance-registered input from immutable fixture data; no C runtime
@@ -1124,13 +1220,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   parent is incomplete, and no successor inherits a passing state. Do not push
   implementation to [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160)
   or extract its code. The bounded [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
-  stable-job route is complete. The current
+  stable-job route is complete. The historical
   [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
   [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-  authorizes no workflow, scenario-owner, project, lock, test, or implementation
-  change. Do not implement, mutate consumers, publish releases, transfer
-  authority, or retire PowerShell without a later dependency-closed Definition
-  of Ready and explicit maintainer directive.
+  authorized no workflow, scenario-owner, project, lock, test, or implementation
+  change. It is superseded for the bounded ContractSlice A operation by the
+  corrected [exact-A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228),
+  which authorized the reviewed A project/lock/test transition and only the C#
+  implementation needed for reviewed A red-to-green increments. That authority
+  does not extend to B/C/D, workflow/scenario-owner/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+  activation, WIP extraction, consumer mutation, release/publication, authority
+  transfer, or PowerShell retirement; those scopes still require their later
+  dependency-closed Definition of Ready and explicit maintainer directive.
 
 - Immutable [v0.15.5](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.15.5)
   is published at

@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-07-30**<br>
+Last reviewed: **2026-07-31**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -15,8 +15,12 @@ the historical [architecture-acceptance handoff](log/2026-07-29-protocol-governa
 the historical [domain-vocabulary planning handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
 the historical [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
 the historical [evidence-acquisition design handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
-the current [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
-and the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md).
+the historical [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
+the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
+the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
+the current [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
+and the proposed
+[SUBF-0143 micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
 The product is one versioned executable protocol platform implemented in C#,
 not a collection of CLI products. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
 and [TEST-0220](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220)
@@ -25,59 +29,77 @@ exact main commit
 [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da),
 and [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506).
 
-The historical
 [SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-[design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253)
-produced the accepted
-[evidence-acquisition design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0153-evidence-contract-design.md).
-[PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) merged it at exact
-main
-[`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f),
-with bounded [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520).
-That historical directive granted no executable or implementation authority.
-The later
-[activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
-now authorizes bounded Gate 3 implementation plus atomic workflow/scenario-owner
-activation for
-[SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-and
-[TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221).
-On branch `codex/subf-0153-evidence-contract-implementation`, from local
-predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7), the working-tree
-candidate has a valid 1-of-1 missing-23-types red, 46-of-46 focused green,
-98-of-98 combined green, a zero-warning/zero-error Release build, clean format,
-unchanged lock hashes, and no project/package/solution/lock change.
-[TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
-is `Passing`, its current owner is the existing
-`MeAndAI.Protocol.Domain.Tests` project, and the bounded workflow/scenario-owner/
-[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-activation implementation is locally green. Gate 5 removed the private
-`CanonicalEvidencePayload` constructor oracle and strengthened public-observable
-error, equality, and defensive-ownership coverage. Discard the separate
-`NETSDK1064` cache attempt. These are local candidate facts, not a commit,
-pull-request, hosted-run, merge, committed-exact-tree, or exact-head claim.
-Follow the current implementation handoff above.
+and [TEST-0221](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221)
+are complete through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173)
+at exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd).
+[Run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256)
+passed both stable jobs. The prior local-candidate state and discarded
+`NETSDK1064` attempt remain historical only.
 
-The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
-produced the Gate 1/2 design and expected-red plan for
-[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210).
-Follow the exact
-[typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md).
-That Gate 2 packet is accepted, merged, and bounded exact-main validated at
-[`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+The accepted Gate 2
+[typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
+now includes the maintainer-approved ParseCanonical-only ContractSlice A
+topology correction. Follow the current
+[correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+and corrected
+[Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
+[The append-only BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+governs the exact TRX message/echo/type oracle.
+[The append-only RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+permits only one exact marker-free same-FQN xUnit `[FAIL]` bookkeeping node and
+keeps every other diagnostic invalid.
+[FIND-0439](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0439)
+closes the parser resource, exception, component-reachability, and trusted-
+provenance boundaries.
+[FIND-0440](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0440)
+records the RunInfo correction; its mandatory fresh rerun is now satisfied by
+the accepted post-synchronization canonical A BehaviorRed.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`, with no executable source or run.
-[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-Gate 3 may begin only after the complete
-[SUBF-0153](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
-packet merges, its exact `main` tree is validated, and a separate implementation
-directive is granted. No
-[SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
-C# source/test, Gate 3, project/package/lock/solution, workflow/scenario-owner/
+remains `Planned`; the A scaffold, exact SurfaceRed, 48-type structural surface,
+and focused `11/11` checkpoint exist locally. Topology/parser and RunInfo
+reviews passed `0 Blocking` / `0 Important` / `0 Minor`. Pre-applicable-
+clarification BehaviorRed observations are diagnostic
+only. The fresh exact-FQN run recorded in the historical
+[correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+passed the complete clarified oracle as canonical BehaviorRed. The first limited
+ParseCanonical increment then passed the original-oracle and final-source exact-
+FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/error-
+free final six-project Release build, and private-byte source review. That first-
+green support review had `0 Blocking`, one unnumbered remaining-A coverage
+`Important`, and no unresolved `Minor`. The current
+[canonical-string handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
+preserves the second A exact-red FQN/marker and records its bounded green. The
+writer-owned
+`CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)`, legacy/green byte
+probe, 1,226-byte Unicode fixture and digest, exact `é` (`C3 A9`) versus `é`
+(`65 CC 81`) non-normalization, and the lexical/malformed matrix. The reader
+re-encodes with that same codec and ordinal-compares the complete original
+quoted token without a second grammar; only `GetString()`'s
+`InvalidOperationException` is caught at that call boundary. Direct malformed
+UTF-16 remains codec-argument `ArgumentException`, while only document-caused
+codec failure maps to public `FormatException`. Its seam predecessor passed
+`1/1`, red and bounded source reviews closed `0 Blocking`/`0 Important`/
+`0 Minor`, original-oracle and final-source greens passed `1/1`, and cumulative
+A passed `13/13`. Locked restore, unchanged six lock fingerprints, standard
+format, clean diff check, and the zero-warning/error six-project Release build
+passed; the non-gating severity-info scan exposed pre-existing informational
+backlog/suggestions and is not claimed clean. The canonical-string coverage
+`Important` is closed, but remaining A is pending and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. Each reviewed A source, exact red, and smallest green proceeds
+separately, one increment at a time; no later A increment is active. A constructs
+no executable export and declares no kernel. B/C/D, workflow/scenario-owner/
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
-WIP extraction, consumer, release, publication, authority-transfer, or
-PowerShell-retirement change is authorized.
+WIP extraction, consumer, release, publication, authority-transfer, and
+PowerShell-retirement changes remain unauthorized.
+
+The proposed micro-delivery plan is non-normative and non-activating until
+maintainer acceptance. If accepted, begin with its `BASE-SCOPE` through
+`BASE-CHECKPOINT` sequence. The current source/test trees are still untracked,
+so cumulative `13/13` is not yet a content-addressed green predecessor. Do not
+let a small-context agent select its own contract, evidence ordinal, FQN,
+marker, oracle, allowlist, or held-scope exception.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at

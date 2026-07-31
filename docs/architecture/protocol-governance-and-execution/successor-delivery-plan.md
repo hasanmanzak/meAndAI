@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted/merged/exact-main at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); scoped [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) Gate 3 activation local green; commit/PR/hosted/exact-main closure pending |
+| Current authority | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; the corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) activates only reviewed bounded [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)/[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) A red-to-green increments over exact baseline [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd); the canonical-string increment is bounded green with its coverage `Important` closed, `TEST-0210` remains `Planned`, and no later A or later boundary is active |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later
@@ -27,8 +27,8 @@ produced the accepted [SUBF-0143](../../features/FEAT-0065-shared-executable-con
 typed-handoff Gate 2 design. That packet was accepted, merged, and bounded
 exact-main validated at
 [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
-It grants no [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-implementation authority.
+It granted no [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+implementation authority at design acceptance time.
 
 The subsequent scoped
 [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435)
@@ -37,15 +37,21 @@ authorized exactly [SUBF-0153](../../features/FEAT-0065-shared-executable-confor
 Gate 3, its bounded predecessor-inventory and scenario-owner transition, the
 existing stable-job combined filter, and the narrow
 [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-change. The local candidate is green with valid red `1/1`, focused `46/46`,
-combined `98/98`, local
+change. That packet completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173),
+exact main
+[`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
+and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
+
+The later corrected
+[ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
+authorizes reviewed A expected reds and only the bounded cumulative-A C# needed
+to turn each reviewed red green. The first limited ParseCanonical and second
+canonical quoted UTF-8 string increments are green, and the latter closes its
+coverage `Important`. No later A increment is active. WIP extraction,
+ContractSlice B/C/D, workflow/scenario-owner/
 [TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-green, Release `0` warnings/`0` errors, clean severity-`info` format,
-unchanged scoped lock fingerprints, and no graph expansion. WIP extraction,
-other-slice implementation, consumer mutation, release publication, authority
-transfer, and PowerShell retirement remain unauthorized. Candidate commit,
-exact-commit StructureOnly, PR, hosted exact-head, merge, and exact-main closure
-remain pending.
+activation, consumer mutation, release publication, authority transfer, and
+PowerShell retirement remain unauthorized.
 
 ## 1. Capability ownership
 
@@ -166,11 +172,11 @@ enumeration, pagination, freshness, and acquisition completeness belong to
 | Stable successor features and issue links | Satisfied by this plan |
 | First rule/specification/qualification/evidence matrix | Satisfied at design level by [the first matrix](#5-first-rulespecificationqualificationevidence-matrix) |
 | Exact WIP disposition and destination | Satisfied at design level by the [WIP extraction ledger](wip-extraction-ledger.md); no extraction is authorized |
-| Selected-slice Gate 1 and expected-red design | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)/[TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220) completed; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) Gate 3 local candidate green and [TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) Passing; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)/[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) Gate 2 accepted/merged/exact-main but has no executable authority |
+| Selected-slice Gate 1 and expected-red design | [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)/[TEST-0220](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0220) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) are complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)/[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) ContractSlice A Gate 3 proceeds one reviewed red-to-green increment at a time; first limited ParseCanonical and canonical-string greens complete, canonical-string coverage `Important` closed, no later A increment active, and `TEST-0210` remains `Planned` |
 | Feature Gate 2 design review | Completed for [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152); accepted/merged/exact-main for [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153); accepted/merged/bounded exact-main for [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); every later slice remains unsatisfied |
-| Exact accepted-head structural validation | Architecture satisfied by merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) and run 30483054367; completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) by exact main [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) and run 30511073506; [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) Gate 2 by [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171), exact main [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f), and its [closure evidence](https://github.com/hasanmanzak/meAndAI/pull/171#issuecomment-5128021520); [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 by accepted exact-main predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); the current [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) implementation candidate has no exact-commit structural evidence yet |
-| [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 | Satisfied at accepted/merged/bounded exact-main predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains Planned and [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 3 remains unauthorized |
-| Separate maintainer implementation directive | Historical [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) directive is consumed and complete; the scoped [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)/[TEST-0221](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0221) [activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) is satisfied and consumed for the local Gate 3 candidate; every other implementation boundary remains unsatisfied |
+| Exact accepted-head structural validation | Architecture satisfied by merged [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169) and run 30483054367; completed [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) by exact main [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) and run 30511073506; completed [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) by [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and run 30603364256; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 remains accepted at [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7), with the active A implementation baseline at `ff0f4f17...` |
+| [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) typed-handoff Gate 2 | Satisfied at accepted/merged/bounded exact-main predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`, and only ContractSlice A Gate 3 is active |
+| Separate maintainer implementation directive | Historical SUBF-0152 and SUBF-0153 directives are consumed and complete; the corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) applies only to separately reviewed A red-to-green increments; canonical-string consumed its bounded authority and no later A increment is active; remaining A, B/C/D, and every workflow/owner/publication boundary remain unsatisfied |
 
 The issued [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 directive names exactly one dependency-closed subfeature and its bounded

@@ -3,40 +3,64 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 design candidate; C# implementation and Gate 3 are not authorized |
+| Status | Gate 2 accepted/merged; ContractSlice A topology, evidence/parser-boundary, and standard-TRX RunInfo corrections passed renewed review with `0 Blocking` / `0 Important` / `0 Minor`; canonical BehaviorRed, first limited ParseCanonical green, and second A canonical-string bounded green accepted; the canonical-string coverage `Important` is closed, remaining A is pending, and [TEST-0210](test-cases.md#test-0210) remains `Planned`; authorized Gate 3 A in progress |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Exact-main input baseline | [`cae8854f8afee4c31e362a02637b27b488aab90f`](https://github.com/hasanmanzak/meAndAI/commit/cae8854f8afee4c31e362a02637b27b488aab90f) |
-| Design authority | [SUBF-0143](README.md#subf-0143) / [TEST-0210](test-cases.md#test-0210) [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) |
-| Accepted predecessor | [SUBF-0153](README.md#subf-0153) [evidence-acquisition design](subf-0153-evidence-contract-design.md), merged through [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) |
+| Proposed Gate 3 micro-delivery routing | [SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md); non-normative until maintainer acceptance, with operational labels that activate no work |
+| Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
+| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) |
+| Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
 
-The maintainer authorized Gate 1 and Gate 2 architecture design plus
+The historical directive authorized Gate 1 and Gate 2 architecture design plus
 expected-red planning for [SUBF-0143](README.md#subf-0143) and
-[TEST-0210](test-cases.md#test-0210) only. This packet closes the catalog,
+[TEST-0210](test-cases.md#test-0210). The later corrected
+[ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
+authorizes only the reviewed A topology correction, project/lock transition,
+exact A expected reds, and bounded cumulative-A C# implementation after this
+correction has no unresolved Blocking or Important architecture finding. This packet closes the catalog,
 release binding, provider-neutral typed model, admission, cache, applicability,
 evaluator, finding, evaluation, and aggregation handoff required by the
 accepted [SUBF-0153](README.md#subf-0153) design.
 
-It does **not** authorize:
+The append-only
+[BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
+changes only the standard-TRX evidence oracle: the failed-result message is the
+exact proof node, one run-summary adapter echo is tolerated, and assertion type
+comes from reviewed source plus the immutable xUnit lock. It changes no test,
+marker, product topology, or implementation authority. Every observation made
+before its applicable clarification remains diagnostic. The fresh post-
+synchronization same-FQN run recorded below is the canonical first A
+BehaviorRed.
 
-- C# source or executable-test implementation;
-- Gate 3 expected-red execution;
-- project, package, lock-file, solution, workflow, scenario-owner, or
+The later append-only
+[RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849)
+likewise changes evidence wording only. It distinguishes at most one locked-
+adapter, marker-free same-FQN `[FAIL]` bookkeeping node from an independent or
+contradictory diagnostic. The run observed before that distinction remains
+diagnostic and cannot be promoted retroactively.
+
+That corrected directive still does **not** authorize:
+
+- ContractSlice B, C, or D source/test implementation;
+- executable policy-export construction, `CatalogSliceKernel`, typed
+  registration activation, or registration-mismatch behavior in A;
+- workflow, scenario-owner, or
   [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-  mutation;
+  mutation before all four ContractSlice groups and the combined local route
+  are green and separately authorized;
 - extraction or cherry-picking from [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160);
 - provider, consumer, adoption, update, release, publication, or authority
   mutation; or
 - PowerShell compatibility or retirement work.
 
-Every future executable contract described here is implemented in C#.
+Every executable contract described here is implemented in C#.
 Markdown is its reviewed architecture and contract specification, not a second
-runtime or rule engine. Publication of this design, a draft pull request, local
-validation, or the word “continue” does not grant Gate 3 authority.
+runtime or rule engine. The A directive grants no later-slice authority by
+implication.
 
 ## Gate 2 outcome
 
@@ -137,8 +161,9 @@ compile artifacts containing logical keys only
 
 No compiled artifact embeds its own final digest. No manifest includes its own
 digest in the bytes that are hashed. `FinalizedPolicyManifest.ManifestDigest`
-is computed over and carried beside the private canonical manifest bytes; it
-is not a serialized manifest field. The release envelope owned by
+is computed over a private entry copy of the canonical manifest bytes and is
+carried by the sealed typed projection; the raw bytes are not retained by
+`FinalizedPolicyManifest` and the digest is not a serialized manifest field. The release envelope owned by
 [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
 binds that digest and every exact artifact digest.
 
@@ -152,13 +177,15 @@ from the exact artifact bytes named by the manifest. A caller-authored proof,
 an assembly-name assertion, an MVID assertion, or an export self-asserted
 digest is insufficient.
 
-[TEST-0210](test-cases.md#test-0210) has three ordered, friend-only proof paths and no generic test
+[TEST-0210](test-cases.md#test-0210) has four ordered, friend-only proof paths and no generic test
 origin. ContractSlice B admits only its codec-registration subset through
 `IContractSliceBActivationProofState`; it does not construct either public
-export. ContractSlice C activates a Tests-owned synthetic complete graph whose
-six registration families and all executable component types live in the Tests
-artifact; it does not reuse a real Policy registration or claim a production
-release. ContractSlice D alone may mint the non-authoritative qualification
+export. ContractSlice C owns a Tests-owned synthetic qualification export and
+a distinct synthetic complete graph; both reuse the same
+Tests-owned six registration families and executable component objects and
+artifact graph, but only the complete variant has complete-snapshot authority.
+Neither reuses a real Policy registration or claims a production release.
+ContractSlice D alone may mint the non-authoritative qualification
 mirror whose catalog, component list, codec/parser/index/projector
 declarations, budgets, and all six internal registration lists are exact-equal
 to `InitialRuleQualificationPolicy.Export`; only the activation and three
@@ -171,17 +198,74 @@ confer release/consumer authority.
 
 The manifest schema key is `protocol.policy-manifest.v1`. Its canonical bytes
 are strict UTF-8 without BOM and contain one JSON object followed by exactly one
-LF. Canonicalization is owned by [SUBF-0143](README.md#subf-0143), independently
+LF. Schema 1 permits at most `16,777,216` input bytes, JSON nesting depth `64`,
+and `1,000,000` JSON tokens including property names and scalar/container
+tokens. `ParseCanonical` checks the byte ceiling before allocating its private
+copy, then enforces the depth and token ceilings while reading; equality is
+allowed and the first value over any ceiling is `FormatException`. It adds no
+ambient, machine-dependent, or declaration-count limit. Canonicalization is
+owned by [SUBF-0143](README.md#subf-0143), independently
 of the later report serializer owned by
 [SUBF-0154](README.md#subf-0154).
 
-Canonical bytes are private implementation state. `FinalizedPolicyManifest`
-publishes their digest and safe typed projections, not raw JSON or a byte
-buffer. The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
-and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend factory each copy
-the input bytes, parse them with the exact schema below, reserialize the typed
-projection, require byte equality, and then compute `ManifestDigest`. There is
-no public manifest constructor or factory.
+Canonical input bytes are private parsing state. After the non-reading length
+ceiling check, `ParseCanonical` copies the complete `ReadOnlyMemory<byte>` at
+method entry, parses only that copy with the
+exact schema below, reserializes the typed projection, requires byte equality,
+computes `ManifestDigest`, seals immutable projections, and then discards the
+raw copy. `FinalizedPolicyManifest` publishes the digest and safe typed
+projections, not raw JSON, a byte buffer, or a retained `ReadOnlyMemory<byte>`.
+The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
+and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend call this one parser; neither implements another copy/parser path.
+There is no public manifest constructor or factory.
+
+`FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
+boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,
+invalid JSON, trailing or missing LF, alternate field order or spelling,
+unknown/duplicate/null fields, numeric or grammar failure, invalid closed
+union/cardinality, noncanonical collection order, or typed-reserialization byte
+inequality, including declaration/reference/artifact-component mapping closure
+failure observable from the document alone. It does not reference or throw the
+downstream Conformance-owned `CatalogIntegrityException`. A successfully parsed
+manifest that later conflicts with the predecessor-trusted sealed-manifest or
+release-envelope identity uses `CatalogIntegrityCode.ManifestInvalid`; a valid
+parsed artifact projection that differs from the actual loaded artifact set or
+bytes uses `CatalogIntegrityCode.ArtifactMismatch`. Raw byte rejection never
+enters a kernel or masquerades as activation evidence.
+
+The [FIND-0439](README.md#find-0439) correction makes this exception boundary
+exhaustive. `ParseCanonical` resolves every
+document-local rule/slot/requirement/profile/transition/schema/producer/
+projector/component/artifact reference, uniqueness constraint, reachability
+constraint, and DAG edge and reports any failure as `FormatException`.
+`CatalogIncomplete` begins only after successful parsing when validation needs
+predecessor-trusted snapshot state or the loaded executable export/registration
+partition; it never reclassifies a defect knowable from manifest bytes alone.
+Factory `ArgumentException` instances caused by parsed document values are
+wrapped as `FormatException`; cancellation, out-of-memory, and unexpected
+runtime failures are not caught or relabeled.
+
+A qualification slice may contain zero rules. Its payload-schema, parser,
+index, demand-projector, and admission-proof arrays may each be empty when the
+resulting declaration/reference graph is closed and no rule or declaration
+requires a missing row. The activation-proof contract, its component identity,
+one mapped positive-length artifact, and the positive cache-budget shape remain
+mandatory. Such an empty qualification slice is structural only: it is not a
+complete catalog, executable export, production-policy claim, or verdict
+authority. This is the exact minimal positive manifest fixture for the first
+ContractSlice A behavior increment.
+
+Every component row must be referenced by the activation-proof,
+admission-proof, codec, parser, index, demand-projector, selector, evaluator,
+model-implementation, or capability-interface declaration graph, except the
+four exact schema-1 runtime anchors `protocol.runtime.domain`,
+`protocol.runtime.conformance-abstractions`, `protocol.runtime.conformance`, and
+`protocol.runtime.markdig` with the exact identities declared below. A
+qualification manifest may omit any runtime anchor that its closed declaration
+graph does not require, including all four in the minimal fixture. An arbitrary
+unreferenced component, an alternate runtime-anchor identity, a component
+without exactly one artifact mapping, an artifact used by no component, or a
+reference to an undeclared component is document-local `FormatException`.
 
 The exact byte rules are:
 
@@ -189,8 +273,9 @@ The exact byte rules are:
   floating-point numbers, unknown properties, or alternate spellings;
 - field names are ASCII and appear in the schema order below;
 - strings use JSON escaping with `\"`, `\\`, `\b`, `\f`, `\n`, `\r`, and
-  `\t` where applicable, otherwise lowercase `\u00xx` only for remaining
-  controls; printable Unicode is preserved without normalization;
+  `\t` where applicable; `/` remains raw; remaining C0, `DEL`, and C1 controls
+  use lowercase `\u00xx`; every other valid Unicode scalar is emitted as its
+  raw UTF-8 bytes without normalization;
 - integers are base-10, non-negative, and have no leading zero except `0`;
 - booleans are lowercase `true` or `false`;
 - object collections are arrays in the exact canonical ordinal order below;
@@ -216,8 +301,12 @@ components
 Exactly one of `slice` or `completeCatalog` is present. The absent variant is
 omitted, never serialized as `null`. `manifestDigest`, canonical bytes, loaded
 instances, cache state, and a release-envelope digest are never serialized.
-`sourceCommit` is the exact lowercase 40-hex commit whose path/blob projections
-must match every normative fragment.
+`sourceCommit` is an exact lowercase 40-hex commit identity. `ParseCanonical`
+validates that identity and the internal normative-fragment path/blob/selector/
+digest grammar and closure only. Proof that the commit and containing blobs
+actually exist and contain the declared fragment bytes requires trusted source/
+blob evidence and remains in the predecessor-trusted qualification or release
+envelope; it is not inferred by this byte parser.
 
 The nested object field order is normative:
 
@@ -497,10 +586,10 @@ stops at the first applicable row in this order:
 
 | Code | Exact category |
 | --- | --- |
-| `ManifestInvalid` | Non-canonical bytes; schema/field/order/grammar/union failure; duplicate manifest declaration/reference row; self-digest or unknown manifest value |
-| `ArtifactMismatch` | Missing/extra/duplicate artifact file or component mapping; filename/length/digest/loaded-artifact mismatch |
+| `ManifestInvalid` | A successfully parsed sealed-manifest identity/digest/projection conflicts with the predecessor-trusted release or qualification envelope, including an envelope-supplied self-digest or unknown manifest identity. Raw schema/field/order/grammar/union/duplicate/declaration/reference/mapping rejection is the Abstractions-owned `ParseCanonical` `FormatException` contract above. |
+| `ArtifactMismatch` | A valid parsed artifact/component projection differs from the actual loaded artifact set, filename, length, digest, assembly/type binding, or loaded-artifact mapping. Document-local missing/extra/duplicate mapping is rejected earlier by `ParseCanonical`. |
 | `ActivationProofInvalid` | Wrong activation contract/type/artifact/envelope/manifest; incomplete verified-artifact set; failed export/loaded-Assembly proof |
-| `CatalogIncomplete` | Missing/extra/duplicate/retired rule; incomplete predecessor/transition/profile/baseline/rule-to-schema logical closure; cyclic/unreachable/ambiguous declared producer DAG |
+| `CatalogIncomplete` | After a successful document-local parse only: the parsed manifest conflicts with predecessor-trusted snapshot state, or the loaded executable export/registration partition is incomplete despite a document-internally closed declaration graph. Missing/extra/duplicate/retired rules, incomplete transition/profile/baseline/rule-to-schema closure, and cyclic/unreachable/ambiguous declared producer DAGs knowable from manifest bytes are earlier `ParseCanonical` `FormatException`. |
 | `RegistrationMismatch` | Export family/projection or internal registration/type-token set differs from the accepted manifest partition; logical key maps to a wrong CLR generic type/instance |
 | `PlanStateInvalid` | Invalid named/caller profile selection, target-selector cardinality, target/slot/instruction set, kernel/session stamp, phase transition, reuse, staleness, or cross-plan input |
 | `AdmissionProofInvalid` | Missing/extra/duplicate/overlapping/foreign proof or instruction identity; SlotKey multiplicity outside the exact owner-sharded instruction bijection; wrong proof kind/type/artifact/receipt/request/resolved target/route; failed proof attestation |
@@ -521,7 +610,7 @@ assembly inventory is the ordinal union of its own delta and every earlier
 delta. A public type enters once with its complete member/nullability/factory
 surface; no later slice adds a public member to an earlier type.
 
-### ContractSlice A - catalog, provenance, and activation
+### ContractSlice A - catalog, provenance, and manifest preflight
 
 `MeAndAI.Protocol.Conformance.Abstractions` delta:
 
@@ -581,9 +670,14 @@ CompleteCatalogSnapshot
 NamedExecutionProfile
 ```
 
-ContractSlice A validates activation through the reviewed internal friend
-surface. Public kernels are not exported until their complete two-phase API is
-usable in ContractSlice C.
+ContractSlice A validates canonical manifest bytes, digest and typed
+projection, declaration/reference closure, artifact/component mapping,
+catalog/provenance, predecessor/transition shape, and the negative public/friend
+surface. It constructs no executable policy export, calls no
+`IPolicyActivationProof.Proves(...)` overload, validates no internal export
+registration list, and declares or exports no kernel. First executable export
+activation and the complete `CatalogSliceKernel` public API begin together in
+ContractSlice C.
 
 ### ContractSlice B - admission and sealed capabilities
 
@@ -1262,9 +1356,20 @@ public static class InitialRuleQualificationPolicy
 }
 ```
 
+Every `ReleaseSchemaRegistry.TryGet*` validates its required key/version
+arguments with the corresponding declaration grammar. `null` throws
+`ArgumentNullException`; empty, whitespace-padded, malformed, wrong-case, or
+otherwise noncanonical text throws `ArgumentException`; over-maximum-length
+text throws `ArgumentOutOfRangeException`. A well-formed but absent identity
+returns `false` with `declaration = null`; an exact present identity returns
+`true` with a non-null declaration. These methods never trim, normalize, or
+case-fold.
+
 The activation-proof overload semantics are closed; returning `true` means all
 conditions in the matching row hold and returning `true` for only a subset is
-`ActivationProofInvalid`:
+`ActivationProofInvalid`, except for the explicitly narrower C synthetic-
+qualification negative-fixture branch defined below, which is rejected outside
+that exact friend envelope:
 
 | Overload | Exact attestation bound by the proof's private verified envelope |
 | --- | --- |
@@ -1279,9 +1384,35 @@ provider object immutability was not verified, or any byte/projection mismatch.
 The kernel independently recomputes all structural, predecessor, transition,
 registration, and receipt predicates; `true` cannot waive a failed predicate.
 
-[TEST-0210](test-cases.md#test-0210) has exactly two non-production public-export activation variants in
+ContractSlice A does not invoke any `Proves` overload. Its
+`ParseCanonical`-only behavior validates the canonical manifest projection and
+declaration/artifact graph without constructing or attesting an executable
+export. ContractSlice C is the first slice that can invoke complete-export
+attestation against the final six-list registration shape; ContractSlice D is
+the first slice that can invoke qualification-export attestation against the
+real Policy artifact. B's private codec-mirror proof remains a distinct
+non-export harness contract.
+
+[TEST-0210](test-cases.md#test-0210) has exactly three non-production public-export activation variants in
 addition to B's private codec-only proof:
 
+- ContractSlice C's synthetic-qualification manifest has `QualificationSlice`
+  authority and reuses the object-identical Tests-owned six-family registration
+  objects, logical declarations, component identities, schema graph, budgets,
+  artifacts, and immutable fixture source used by C's synthetic-complete
+  variant. Its `PolicyQualificationSliceExport` contains no real Policy type or
+  artifact and cannot produce a complete evaluation or verdict. A private
+  friend-only branch of `Proves(PolicyQualificationSliceExport)` attests the
+  exact candidate object, Tests assembly/artifact origin, fixture stamp, and
+  presented registration objects independently of their equality to the
+  manifest. That deliberately narrow test branch lets `CatalogSliceKernel`
+  classify missing/extra/duplicate/foreign/wrong-generic registration and
+  public-projection drift as `RegistrationMismatch`; the kernel, not the proof,
+  performs that comparison. It is rejected for every production envelope and
+  cannot satisfy D's real-Policy qualification-mirror semantics. The final
+  internal export factory preserves the presented six-list order and
+  multiplicity for this friend fixture; only the kernel owns manifest
+  bijection validation and `RegistrationMismatch` classification.
 - ContractSlice C's synthetic-complete manifest has
   `CompleteProtocolSnapshot` authority. Its 27 registration/type-contract rows
   preserve the production logical keys, versions, declarations, DAG, budgets,
@@ -1311,16 +1442,17 @@ addition to B's private codec-only proof:
   supplied the mirror/proofs. It cannot satisfy complete-export proof
   semantics.
 
-Both branches require the exact friend assembly identity and private fixture
+All three branches require the exact friend assembly identity and private fixture
 stamp and are rejected under a production envelope. No public origin flag,
 factory, registration seam, or authority token is added.
 
 The two nullable manifest properties are an exclusive closed union: exactly one
 is non-null and must match `AuthorityKind`. Internal
 `MeAndAI.Protocol.Application` ([FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)) and
-`MeAndAI.Protocol.Conformance.Tests` ([TEST-0210](test-cases.md#test-0210)) friend factories recompute and
-compare canonical bytes, manifest digest, declarations, and artifact order;
-they do not trust caller projections.
+`MeAndAI.Protocol.Conformance.Tests` ([TEST-0210](test-cases.md#test-0210)) friend factories obtain manifests only through
+`ParseCanonical` and compare its sealed digest/projections, declarations, and
+artifact order with their private envelope state; they do not trust caller
+projections and cannot access or revalidate discarded raw bytes.
 
 The two policy exports expose only safe logical identity publicly. Their exact
 codec/model/parser/index/evaluator/selector-resolver
@@ -1361,6 +1493,44 @@ shown `Create` factories and equality members; `ReviewedAuthorityPermalink`
 exposes only its shown `Create` factory and equality members. None inherits the
 token-family parse surface.
 
+Shared validation and value semantics are exact. All textual validation,
+equality, hash input, and textual ordering are ordinal and ASCII-exact. Inputs
+are never trimmed, case-folded, Unicode-normalized, or accepted through aliases.
+A required reference or enumerable that is `null` throws
+`ArgumentNullException`. In caller-creatable `Create` and variant factories, an
+empty or whitespace-only required string, a grammar-invalid/noncanonical
+string, a null enumerable element, a duplicate semantic key/value, an invalid
+union variant, or a cross-field/foreign-membership conflict throws
+`ArgumentException`; an empty enumerable throws `ArgumentException` only where
+that type's exact contract requires one or more elements. A non-positive value
+where positivity is required, a negative count, an invalid numeric or temporal
+range, or an over-maximum-length value throws `ArgumentOutOfRangeException`.
+Checked arithmetic overflow remains `OverflowException`. Optional nullable
+members accept `null` only where their exact signature and variant contract
+permit it. Exception category is observable; message, `ParamName`, and
+validation implementation/order are not oracles unless a type-specific rule
+explicitly says otherwise.
+
+Every declared `Parse(string value)` throws `ArgumentNullException` for `null`
+and `FormatException` for empty, whitespace-padded, malformed, unknown-closed,
+wrong-case, over-length, or otherwise noncanonical text. Its paired `TryParse`
+never throws for caller text, returns `false` with `result = null` for every
+such invalid input, and returns `true` with a non-null value exactly when
+`Parse` succeeds. `CatalogVersion.Create(0)` and negative values throw
+`ArgumentOutOfRangeException`.
+
+Every `IEquatable<T>` implementation uses all and only the type's public
+semantic state: ordinal strings, exact bytes/digests, numeric values,
+nullable-state presence, nested semantic equality, and collection elements in
+their exposed canonical order. `Equals(null)` and equality with another union
+leaf/runtime type are false. `GetHashCode()` uses the same state and ordinal
+comparers; its integer result is not stable evidence. A text value's
+`ToString()` returns exact `Value`. Only types explicitly declaring
+`IComparable<T>` expose public comparison: textual values use ordinal
+comparison, `CatalogVersion` uses numeric `Value` comparison, and
+`CompareTo(null)` returns `1`. `CatalogVersion.ToString()` returns invariant
+ASCII base-10 `Value` with no sign or leading zero.
+
 Artifact files are unique and ordered by `FileName`; component bindings are
 unique and ordered by component key/version, and physical assembly/type
 identity is also unique. FileName is a basename with no separator and
@@ -1383,7 +1553,7 @@ named profile, however, `RuleIds` must equal exactly the full subset of that
 inventory satisfying the same static planning predicate: the rule declares the
 profile's SubjectRole, Operation, and SnapshotKind, and the profile Surfaces
 intersect the rule Surfaces. Missing a compatible rule or adding an
-incompatible one is `CatalogIncomplete`; no named profile that can mint a
+incompatible one is document-local `ParseCanonical` `FormatException`; no named profile that can mint a
 `CompleteCatalogEvaluation`/verdict may narrow this closure. The designated
 baseline is one default named profile and obeys the same exact compatible-set
 rule; it is not falsely required to contain rules for incompatible Adoption,
@@ -2591,8 +2761,9 @@ scans, or performs service lookup.
 The internal export members/factories shown above are the final ContractSlice C
 source shape, not an instruction to reference later-slice types early.
 ContractSlice A introduces the public export projections with explicit
-non-public constructors and validates canonical manifest/artifact/proof
-preconditions without constructing an executable export. ContractSlice B
+non-public constructors and validates canonical manifest plus declaration/
+artifact/component preconditions without constructing an executable export or
+calling an activation-proof overload. ContractSlice B
 introduces only the final internal model-token plus codec-registration/visitor
 subset needed by its test mirror; it does not yet add an export registration
 list or six-list export factory. Its complete Tests-only causal surface is:
@@ -3951,10 +4122,16 @@ declaration key/version ordinal as its ready-node tie-breaker. Every rule-slot
 capability must resolve to one producer, and every declaration/output must be
 reachable from at least one slot; unreachable or extra registrations fail.
 The resulting codec/parser/index/demand-projector/selector/evaluator plus
-model/capability type closure is the 27-row Policy registration/type-contract partition and must
-biject with the export's internal typed registrations/type tokens and public
-`Components` list. Of those rows, 23 implementations/types are in Policy and
-four capability-interface identities are in Abstractions. The runtime
+model/capability type closure is the 27-row Policy logical producer/type-
+contract manifest partition. ContractSlice A owns its exact declaration rows,
+component identities, ordinal order, artifact mappings, DAG, reachability, and
+the 35-row manifest union below; it makes no executable-registration claim.
+ContractSlice C first requires that same 27-row partition to biject with the
+export's six internal typed registration lists, model/capability type tokens,
+and public `Components` projection. Missing, extra, duplicate, foreign, or
+wrong-generic registration/type-token rows are `RegistrationMismatch`. Of
+those rows, 23 implementations/types are in Policy and four capability-
+interface identities are in Abstractions. The runtime
 artifact-anchor partition is the exact four-row table above and must biject
 with the loaded Domain, Abstractions, Conformance, and Markdig artifacts. The
 activation-proof partition is the one exact
@@ -4203,7 +4380,8 @@ edges from the input capability producer to the projector and from the
 projector to the output slot's acquisition/schema producer. Unknown
 input/output slots or capabilities, duplicate output ownership, a projected
 applicability slot, self-dependency, cycle, unreachable output, or a rule path
-that demands the output before its inputs is `CatalogIncomplete`.
+that demands the output before its inputs is document-local `ParseCanonical`
+`FormatException`.
 
 A zero-candidate product emits no repository-target instruction, proof request,
 external call, payload, codec invocation, or historical parser invocation. The
@@ -5098,9 +5276,9 @@ to `CloseApplicability`, `PlanEvaluation`, `AdvanceEvaluation`, and `Evaluate`.
 
 ### Exact closure and projected-slot aggregation
 
-Manifest activation requires one global structural declaration per SlotKey and
-one global SlotKey owner per RequirementKey. Reusing a RequirementKey under a
-different SlotKey is `CatalogIncomplete`. This makes the public acquisition
+`ParseCanonical` requires one global structural declaration per SlotKey and one
+global SlotKey owner per RequirementKey. Reusing a RequirementKey under a
+different SlotKey is document-local `FormatException`. This makes the public acquisition
 projection reversible without adding another wrapper type.
 
 A `SealedAcquisitionAttempt` is minted for every issued instruction and keeps
@@ -5915,9 +6093,9 @@ composed scenario divided by the additional exact trait `ContractSlice=A`,
 
 | Slice | Direct contract |
 | --- | --- |
-| A | Catalog declarations, normative provenance/digests, canonical manifest, acyclic artifact/component/projector graph, predecessor transitions, exact cumulative-A exports, exact friend matrix, and negative registration surface |
+| A | Catalog declarations, normative provenance/digests, canonical manifest parse/digest/typed projection, acyclic declaration/artifact/component/projector graph, predecessor transitions, exact cumulative-A exports, exact friend matrix, and negative public surface; no executable export, typed registration list, activation, or kernel |
 | B | Cumulative-B 72 export shape; exactly the codec-registration/model-token subset; three protocol-writer-owned persistent payload wires; Tests-only private-stamp writer/qualifier/admission; decode/model cache; codec-local four-counter meter/ledger; ContextProof, Root, and codec-derived reference sealing; collision, ceiling, concurrency, cancellation, and host-failure lifecycle. B does not claim parser/index/projector/selector behavior, provider-neutral capability semantics, index cache, shared-root ledgers, or zero-candidate planning. |
-| C | Cumulative-C 95 exports; a Tests-owned synthetic-complete graph with all six registration families and synthetic parser/index/projector/selector/evaluator implementations; provider-neutral capability semantics; both Markdown parsers; repository-tree, record, governed-reference, and repository-target indexes; staged Plan/Advance/Closure API; zero-to-N rounds and owner-sharded projected-slot aggregation; index cache/shared-root ledger; retained outcomes; applicability; kernel outputs/order/flags; transition/verdict truth tables. C consumes no real Policy registration or result. |
+| C | Cumulative-C 95 exports; first executable export activation and `CatalogSliceKernel`; a Tests-owned synthetic-complete graph with all six registration families plus exact registration/type-token/public-projection bijection and mismatch negatives; synthetic parser/index/projector/selector/evaluator implementations; provider-neutral capability semantics; both Markdown parsers; repository-tree, record, governed-reference, and repository-target indexes; staged Plan/Advance/Closure API; zero-to-N rounds and owner-sharded projected-slot aggregation; index cache/shared-root ledger; retained outcomes; applicability; kernel outputs/order/flags; transition/verdict truth tables. C consumes no real Policy registration or result. |
 | D | Final cumulative 96 exports including the real qualification-only Policy entrypoint; direct real-Policy repetition of every B codec and C registration/parser/index/projector/selector/evaluator vector; fresh positive/negative/boundary/malformed RULE-0001..0005 repository/provider fixtures; exact code/provenance; overlap/co-report; sibling-equivalent outcomes. |
 
 Each slice follows its own red/review/green gate after a later implementation
@@ -5994,12 +6172,13 @@ The future executable scenario directly covers:
 The slice-specific matrix is also mandatory and may not be deferred to a later
 scenario:
 
-- A proves exact cumulative count 48, the 27-row Policy registration/type-
+- A proves exact cumulative count 48, the 27-row manifest logical producer/type-
   contract partition and 35-row full component union, the demand-projector
-  registry/manifest field order, missing/extra/duplicate projector
-  registration, input/output slot/capability closure, projected-applicability
-  rejection, producer/projector cycle and unreachable output, and the exact
-  no-extra-friend matrix.
+  declaration/manifest field order, missing/extra/duplicate projector
+  declaration or component mapping, input/output slot/capability closure,
+  projected-applicability rejection, producer/projector cycle and unreachable
+  output, canonical byte/digest/typed-projection behavior, and the exact
+  no-extra-friend matrix. It proves no executable registration or activation.
 - B proves cumulative count 72 and the non-authoritative Tests-owned codec
   mirror through private-stamp `Activate ->
   WriteCanonicalPayload -> Qualify -> Admit` mirror; golden writer byte vectors,
@@ -6019,7 +6198,12 @@ scenario:
   ContextProof/Root/codec-derived reference sealing; and no admission writer/
   codec rerun. It claims no parser/index/projector/selector, provider-capability,
   index-cache, shared-root-ledger, zero-candidate, or public-plan behavior.
-- C proves cumulative count 95, all six final registration lists,
+- C proves cumulative count 95, first executable export activation, all six
+  final registration lists and their exact count/order/bijection with the
+  27-row manifest partition, model/capability type tokens, and public
+  `Components` projection. Missing/extra/duplicate codec/parser/index/projector/
+  selector/evaluator registration, a foreign or wrong generic CLR type/instance,
+  and public projection drift are `RegistrationMismatch`. C also proves
   Tests-owned synthetic implementations for both Markdown parsers and every
   index/projector/selector/evaluator family, and
   `PlanApplicability -> CloseApplicability -> PlanEvaluation ->
@@ -6100,24 +6284,25 @@ predecessor/environment error is invalid red.
 
 After reviewed SurfaceRed, implement only that slice's complete structural
 delta until the anchor and exact API tests compile. Then add only the reviewed
-executable test for the slice's first semantic increment. It has
-`[Trait("Scenario", "`[TEST-0210](test-cases.md#test-0210)`")]` and exactly one matching
+executable [TEST-0210](test-cases.md#test-0210) test for the slice's first
+semantic increment. It has `[Trait("Scenario", "TEST-0210")]` and exactly one matching
 `[Trait("ContractSlice", "<A|B|C|D>")]`.
 
 The structural-delta checkpoint has one reproducible, compile-green temporary
 red state and no discretionary stub behavior. In the uncommitted red worktree,
-the one activation/export member used by the first increment returns `null!`
-from its declared non-null reference return/property and performs no other
-work: A uses `CatalogSliceKernel.Activate`, B uses
+the one parse/activation/export member used by the first increment returns
+`null!` from its declared non-null reference return/property and performs no
+other work: A uses `FinalizedPolicyManifest.ParseCanonical`, B uses
 `ContractSliceBAdmissionHarness.Activate`, C uses `ConformanceKernel.Activate`,
 and D uses `InitialRuleQualificationPolicy.Export`. Nullable analysis therefore
-emits no warning. The exact absent-behavior predicate is: A returned normally
-instead of throwing the declared missing-registration integrity exception; or
-B/C/D returned null instead of their exact activated harness/kernel/export.
-Only that predicate calls `Assert.Fail(exactMarker)`. A wrong exception/code or
-a non-null but structurally wrong graph uses marker-free exact assertions and
-cannot masquerade as the planned red. No throwing placeholder, `default`
-factory graph, permissive activation, clock/random input, or already-green
+emits no warning. The exact absent-behavior predicate is that A returned null
+instead of the parsed non-null manifest, or B/C/D returned null instead of
+their exact activated harness/kernel/export. Only that predicate calls
+`Assert.Fail(exactMarker)`. An exception from A's positive canonical fixture, a
+non-null but structurally wrong projection/digest, a wrong B/C/D exception/code,
+or a structurally wrong non-null graph uses marker-free exact assertions or
+propagates and cannot masquerade as the planned red. No throwing placeholder,
+`default` factory graph, permissive parse/activation, clock/random input, or already-green
 implementation is an admissible first-red predecessor. The temporary `null!`
 body and red test are removed/replaced within that slice's reviewed red-to-green
 operation and are never committed or pushed as an active red state.
@@ -6142,14 +6327,38 @@ The first required `BehaviorRed` identities are:
 
 | Slice | Exact test FQN | Exact marker and TRX filename |
 | --- | --- | --- |
-| A | `MeAndAI.Protocol.Conformance.Tests.ContractSliceAActivationTests.Rejects_manifest_with_missing_registration` | `TEST-0210-A-BEHAVIOR-RED-0001` / `TEST-0210-A-BEHAVIOR-RED-0001.trx` |
+| A | `MeAndAI.Protocol.Conformance.Tests.ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest` | `TEST-0210-A-BEHAVIOR-RED-0001` / `TEST-0210-A-BEHAVIOR-RED-0001.trx` |
 | B | `MeAndAI.Protocol.Conformance.Tests.ContractSliceBActivationTests.Activates_exact_codec_mirror` | `TEST-0210-B-BEHAVIOR-RED-0001` / `TEST-0210-B-BEHAVIOR-RED-0001.trx` |
 | C | `MeAndAI.Protocol.Conformance.Tests.ContractSliceCActivationTests.Activates_exact_synthetic_registration_graph` | `TEST-0210-C-BEHAVIOR-RED-0001` / `TEST-0210-C-BEHAVIOR-RED-0001.trx` |
 | D | `MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyExportTests.Exports_exact_real_registration_graph` | `TEST-0210-D-BEHAVIOR-RED-0001` / `TEST-0210-D-BEHAVIOR-RED-0001.trx` |
 
-These are deliberately the first topological behavior of each slice. B proves
-only codec-mirror activation before admission cases. C proves the Tests-owned
-synthetic complete registration graph before any plan/evaluator behavior. D
+The exact A fixture is the strict UTF-8 encoding of the following one-line JSON
+followed by exactly one LF and no BOM:
+
+```json
+{"schema":"protocol.policy-manifest.v1","authorityKind":"qualification-slice","sourceCommit":"0000000000000000000000000000000000000001","protocolVersion":"0.0.0","catalogVersion":1,"slice":{"sliceKey":"protocol.catalog-slice.test-empty","sliceVersion":"1","rules":[]},"schemaRegistry":{"payloadSchemas":[],"parsers":[],"indexes":[],"demandProjectors":[],"admissionProofContracts":[],"cacheBudget":{"maxDecodeEntries":1,"maxDecodeCanonicalBytes":1,"maxIndexEntries":1,"maxIndexNodes":1,"maxConcurrentDecodeAttempts":1,"maxConcurrentIndexAttempts":1,"retentionPolicy":"retain-lowest-canonical-keys"}},"activationProofContract":{"contractKey":"protocol.activation-proof.test","contractVersion":"1","proofComponent":{"componentKey":"protocol.activation-proof.test","componentVersion":"1"}},"artifactFiles":[{"fileName":"ContractSliceA.Proof.dll","byteLength":1,"artifactDigest":"6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"}],"components":[{"component":{"componentKey":"protocol.activation-proof.test","componentVersion":"1","assemblyName":"MeAndAI.Protocol.Conformance.Tests","typeName":"MeAndAI.Protocol.Conformance.Tests.ContractSliceAActivationProof"},"artifactFileName":"ContractSliceA.Proof.dll"}]}
+```
+
+A green first increment returns a non-null manifest whose authority, commit,
+protocol/catalog/slice identity, empty rule/registry arrays, positive cache
+budget, activation-proof component, artifact/component mapping and order equal
+that fixture; `CompleteCatalog` is null; `ManifestDigest` is SHA-256 of those
+exact 1,222 bytes including the LF,
+`59ef47142c3c0d1e39825bd0e2e11d8f28093bed1ad93c12e251bb95cf5a4d64`.
+Mutating the caller-owned source array after the call changes neither the
+digest nor any projection. Source review, not that black-box assertion alone,
+proves the required copy-at-entry and no-retained-raw-bytes implementation.
+
+These are deliberately the first topological behavior of each slice. A parses
+the exact minimal positive qualification manifest above, proves its SHA-256
+digest, full typed projection, and mutation-independent public result; source
+review proves copy-at-entry and discarded raw bytes. It
+constructs no export and activates no kernel. B proves only codec-mirror
+activation before admission cases. C proves the Tests-owned synthetic complete
+registration graph before any plan/evaluator behavior and is the first
+executable export/kernel activation. The old A missing-registration oracle is a
+later C registration-mismatch increment and may not reuse A's marker; its exact
+transient predecessor and C marker require review immediately before that red. D
 loads the real `InitialRuleQualificationPolicy.Export` and proves only its exact
 public/internal registration graph. The planned later FQN
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceDPolicyEvaluatorTests.Evaluates_rule_0001_against_fresh_qualified_fixture`
@@ -6166,22 +6375,39 @@ Forged-admission, false-applicability, and other end-to-end cases follow the
 same dependency-closed increment rule.
 
 The reviewed test calls `Assert.Fail(exactMarker)` only on the one exact absent-
-behavior predicate named by that increment. With the locked xUnit `2.9.3`
-contract this is `Xunit.Sdk.FailException`; the normalized TRX
-`Output/ErrorInfo/Message` equals the marker byte-for-byte. The marker occurs
-exactly once in the TRX and only in that failed result's message: never an
-attachment, another result, or an unrelated exception. The standard console
-logger may echo the same marker byte-for-byte to stdout/stderr; that incidental
-echo is recorded but is neither counted as a second result nor accepted as
-proof. Unexpected production exceptions propagate and are not caught or
-relabeled; every other incorrect non-exception outcome uses a marker-free
-assertion. Source review proves those branches before the run.
+behavior predicate named by that increment. Source review plus the immutable
+locked xUnit `2.9.3` contract proves that direct call throws
+`Xunit.Sdk.FailException`; the standard TRX schema/adapter does not serialize
+the runtime exception type and the TRX must not claim that it does. The sole
+mapped failed `UnitTestResult` has exactly one `Output/ErrorInfo/Message` node
+whose normalized text equals the marker byte-for-byte. Except for the one
+permitted run-summary echo described next, no other test-result message, stack,
+attachment, warning, error, attribute, or node contains the marker. Across
+`ResultSummary/Output/StdOut` and `StdErr`, the adapter may
+record zero or one additional byte-identical marker echo. That bounded echo is
+neither a second result nor assertion-type proof. Unexpected production
+exceptions propagate and are not caught or relabeled; every other incorrect
+non-exception outcome uses a marker-free assertion. Source review proves those
+branches before the run.
+
+`ResultSummary/RunInfos` is absent or has exactly one `RunInfo`. If present,
+that node has exactly the `computerName`, `outcome`, and `timestamp` attributes,
+`outcome="Error"`, exactly one `Text` child, and no other content. The marker is
+absent and raw `Text` matches only
+`^\[xUnit\.net [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{2}\][ ]+<exact-test-fqn>[ ]\[FAIL\]$`.
+Machine, timestamp, adapter elapsed time, and indentation are recorded but not
+equality oracles. This locked-adapter same-FQN notification is bookkeeping for
+the sole failed result, not a second result, assertion-type proof, independent
+diagnostic, or infrastructure failure. It is accepted only with the sole mapped
+Failed `UnitTestResult`, Failed summary, exact failed-result message, all 16
+counters including `error=0`, and no attachment or other diagnostic.
 
 A valid first-increment BehaviorRed has nonzero process exit and exactly one
 TRX at `<fresh-directory>/<exact-marker>.trx`. `ResultSummary/@outcome` is
 `Failed`; exactly one `UnitTestResult` maps through `testId` to one
 `UnitTest/TestMethod` composing the exact FQN above; and that result is Failed
-with the exact message/type contract above. Its counters are exactly
+with the exact node-scoped message contract above. The assertion-type contract
+is the separate reviewed-source plus immutable-lock proof above. Its counters are exactly
 `total=1`, `executed=1`, `passed=0`, `failed=1`, `error=0`, `timeout=0`,
 `aborted=0`, `inconclusive=0`, `passedButRunAborted=0`, `notRunnable=0`,
 `notExecuted=0`, `disconnected=0`, `warning=0`, `completed=0`,
@@ -6192,11 +6418,84 @@ are not equality oracles.
 The red is invalid if restore/lock bytes changed; compilation did not succeed;
 the TRX is absent, duplicated, malformed, stale, extra, or outside the fresh
 directory; the full FQN/traits/filter did not select exactly one test; any
-counter differs; the marker is absent, duplicated, misplaced within TRX, or
-attached to another exception; the assertion type differs; an unexpected exception was
-relabeled; or any NU/MSB/compiler/analyzer/project/reference/predecessor/
+counter differs; the exact failed-result message node is absent, duplicated,
+or unequal; the marker occurs anywhere outside that node and the one allowed
+run-summary echo; more than one run-summary echo exists; reviewed source no
+longer has one direct null-branch `Assert.Fail(exactMarker)` call; the immutable
+xUnit contract differs; more than one `RunInfo` exists; its attribute/child/
+outcome/text/FQN/marker contract differs; any other RunInfo, attachment,
+independent warning/error/diagnostic, stack, exception, or infrastructure text
+exists; an unexpected exception was relabeled; or any
+NU/MSB/compiler/analyzer/project/reference/predecessor/
 environment/infrastructure failure occurred. Console text never overrides
 incomplete or contradictory TRX evidence.
+
+Every run observed before its applicable append-only evidence clarification
+remains diagnostic and noncanonical even when its raw output happens to satisfy
+the corrected oracle. Only a fresh post-packet-synchronization invocation may
+become the canonical first A BehaviorRed.
+
+The fresh post-packet-synchronization A invocation used a newly created,
+initially empty external directory, the exact filter, and one TRX logger,
+exited nonzero, and left exactly one TRX at
+`D:\Temp\meandai-test-0210-a-canonical-54b33df16d7446be918f0a3cb75d3c28\TEST-0210-A-BEHAVIOR-RED-0001.trx`.
+That TRX contains exactly one mapped Failed result for
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest`,
+one normalized failed-result `ErrorInfo/Message` equal to
+`TEST-0210-A-BEHAVIOR-RED-0001`, one permitted byte-identical `StdOut` echo, and
+one exact-shape marker-free same-FQN `[FAIL]` `RunInfo` with
+`outcome="Error"`. Its `ResultSummary` is Failed and its counters are exactly
+`total=1`, `executed=1`, `passed=0`, `failed=1`, `error=0`, `timeout=0`,
+`aborted=0`, `inconclusive=0`, `passedButRunAborted=0`, `notRunnable=0`,
+`notExecuted=0`, `disconnected=0`, `warning=0`, `completed=0`, `inProgress=0`,
+and `pending=0`. The sole result's standard assertion stack is marker-free;
+there is no independent diagnostic or attachment. IDs, machine, timestamps,
+durations, indentation, absolute paths, and stack line numbers are recorded
+non-oracles. This run is the canonical first A BehaviorRed; every earlier run
+remains diagnostic. It is retained as the predecessor evidence for the first
+limited green below.
+
+The first limited ParseCanonical implementation replaced the reviewed `null!`
+sentinel. Its Release `--no-restore` production build completed with zero
+warnings and zero errors. With the original red oracle still unchanged, the
+exact same FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-91b9a19a6db741c6af2e5bac3a1a22b0\TEST-0210-A-GREEN-0001.trx`.
+The transient marker constant and null-only `Assert.Fail` branch were then
+removed, and canonical equality was moved before digest/object construction.
+Format verification and the final six-project Release build passed with zero
+warnings and zero errors. The final-source exact FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-62a34655387e4306b0bc26c9203fb97d\TEST-0210-A-GREEN-FINAL-0001.trx`,
+and the cumulative `ContractSlice=A` checkpoint passed `12/12`.
+
+That first green validates the exact 1,222-byte fixture, manifest and artifact
+digests, complete typed projection and order, null `CompleteCatalog`, and
+caller-buffer mutation independence specified above. Source review confirms the
+16 MiB length check precedes copying; parsing and hashing use only a private
+`ToArray` copy; canonical typed reserialization must equal those private input
+bytes; and no raw byte field is retained. The private input copy and writer-
+returned reserialization byte array are zeroed in `finally`; the
+`ArrayBufferWriter` internal buffer becomes unreachable and is not retained by
+the manifest but is not explicitly zeroed. The proven contract is copy-at-entry
+and no retained raw bytes, not universal buffer zeroization. This is only the
+first limited ContractSlice A behavior increment. It does not
+complete [TEST-0210](test-cases.md#test-0210), authorize a later slice, or
+satisfy any remaining A increment.
+
+The first-green support review classified the canonical-string boundary as an
+unnumbered remaining-A coverage `Important`, not a defect in that accepted first
+green. The then-current `CanonicalManifestWriter` used
+`UnsafeRelaxedJsonEscaping`; that was exact for the reviewed ASCII 1,222-byte
+fixture but was not proof of the complete string contract above. The reviewed
+second A increment below froze the exact FQN, marker, writer-owned codec
+topology, fixture matrix, and absent-behavior predicate needed to obtain that
+proof. Its bounded green evidence now closes that `Important`; ContractSlice A
+itself remains incomplete.
+
+Final support review closed with `0 Blocking`, that one unnumbered remaining-A
+coverage `Important`, and no unresolved `Minor`. The ordering Minor is closed by
+the equality-before-digest/object refactor, and the zeroization wording is
+corrected by the exact buffer-lifetime statement above. Neither observation
+downgraded the accepted first fixture green.
 
 Every later semantic increment receives a separately reviewed exact FQN,
 marker, absent-behavior predicate, single-invocation filter, and exact TRX
@@ -6204,10 +6503,165 @@ counter/result inventory before implementation. Markers are transient evidence
 labels, not stable scenario IDs. Only then may bounded production semantics
 turn the increment green.
 
+### Second A increment - canonical quoted UTF-8 strings
+
+This reviewed increment remains inside [TEST-0210](test-cases.md#test-0210)
+with `[Trait("Scenario", "TEST-0210")]` and
+`[Trait("ContractSlice", "A")]`. It allocates no new stable scenario or
+public API. The exact test identity is:
+
+```text
+MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
+```
+
+Its exact marker and TRX filename are
+`TEST-0210-A-BEHAVIOR-RED-0002`. The test is one `[Fact]`, so the exact filtered
+red still selects, executes, and fails one result only. It uses the same fresh
+external-directory, one-invocation, one-logger, failed-result message,
+optional byte-identical summary echo, optional exact marker-free same-FQN
+RunInfo, and complete 16-counter oracle as the accepted first A BehaviorRed.
+No runner observation may broaden that oracle retroactively.
+
+`CanonicalManifestWriter` remains the single serializer owner. Its internal
+`CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` returns exactly one
+validated quoted UTF-8 JSON string token. The pre-red structural extraction is
+behavior-preserving: it moves the existing `UnsafeRelaxedJsonEscaping` string
+result behind that codec, while the writer feeds the returned token through
+`Utf8JsonWriter.WriteRawValue` with input validation enabled. The original
+1,222-byte fixture and digest must remain byte-identical. This extraction adds
+no public export or friend and is not itself the semantic green.
+
+The red's exact probe is the following UTF-16 code-unit sequence:
+
+```text
+0051 0022 005C 0008 000C 000A 000D 0009 001F 007F 0085 009F 3000 D842 DF9F
+```
+
+The behavior-preserving extraction produces this exact legacy quoted-byte hex:
+
+```text
+22515C225C5C5C625C665C6E5C725C745C75303031465C75303037465C75303038355C75303039465C75333030305C75443834325C754446394622
+```
+
+Only that complete legacy result invokes `Assert.Fail` with
+`TEST-0210-A-BEHAVIOR-RED-0002`. A null result, exception, partial change,
+different byte sequence, wrong positive fixture, wrong exception category, or
+unrelated failure is marker-free and invalid red. The bounded green changes the
+same codec to this exact quoted-byte hex:
+
+```text
+22515C225C5C5C625C665C6E5C725C745C75303031665C75303037665C75303038355C7530303966E38080F0A0AE9F22
+```
+
+This means quote and backslash use their exact short escapes, slash stays raw,
+the five named C0 characters use `\b`, `\f`, `\n`, `\r`, and `\t`, the
+remaining C0 value uses lowercase `\u001f`, `DEL` and the two C1 values use
+lowercase `\u007f`, `\u0085`, and `\u009f`, and `U+3000` plus supplementary
+scalar `U+20B9F` are raw UTF-8. The codec never normalizes, replaces, or combines
+valid scalars. The non-normalization oracle also passes contextual values `é`
+(`U+00E9`) and `é` (`U+0065 U+0301`) separately: their raw strict-UTF-8 value
+bytes are respectively `C3 A9` and `65 CC 81`, remain ordinally distinct, and
+neither input may be converted to the other.
+
+The positive integration fixture changes only the original minimal fixture's
+`assemblyName` from `MeAndAI.Protocol.Conformance.Tests` to
+`MeAndAI.Protocol.　Unicode.𠮟.Tests`. Its strict UTF-8 document is exactly
+1,226 bytes including the final LF and has SHA-256
+`5195e1a4b36b8b57a96fbd774fb78c5d46878948f91ee597e66ef6f44821a928`.
+The raw byte sequences `E3 80 80` and `F0 A0 AE 9F` each occur exactly once.
+The parsed `AssemblyName` preserves the exact scalar sequence and the manifest
+digest equals that exact document. The original ASCII fixture remains an
+independent unchanged regression.
+
+The one test owns this complete labeled matrix:
+
+| Group | Exact vectors and result |
+| --- | --- |
+| Quoting | Quote and backslash use `\"` and `\\`; slash is raw. |
+| Named C0 | Backspace, form feed, LF, CR, and tab use only `\b`, `\f`, `\n`, `\r`, and `\t`. |
+| Remaining controls | Remaining C0, `DEL`, and C1 use lowercase `\u00xx`; uppercase hex, long-form alternatives for named controls, and raw C1 are lexically rejected before typed factories. |
+| Printable scalars | `U+3000` and `U+20B9F` are raw UTF-8. Contextual `é` (`U+00E9`) emits raw value bytes `C3 A9`, while `é` (`U+0065 U+0301`) emits raw value bytes `65 CC 81`; the two outputs are ordinally distinct and neither is normalized. |
+| Positive manifest | The exact 1,226-byte assembly-name fixture parses, preserves the typed value, and yields the exact digest above. |
+| Escaped printable alternatives | Escaped `U+3000` and both lowercase and uppercase valid surrogate-pair spellings for `U+20B9F` are noncanonical `FormatException`. |
+| Canonical control lexemes in an opaque field | Lowercase canonical control spellings pass lexical validation, then the typed opaque-identity factory rejects the decoded control; that document-caused `ArgumentException` is wrapped as public `FormatException`. |
+| Malformed raw UTF-8 | Isolated continuation, overlong form, UTF-8 surrogate, truncated sequence, and value above `U+10FFFF` are `FormatException`. |
+| Malformed escaped Unicode | Lone high surrogate, lone low surrogate, reversed pair, and high-surrogate-plus-ASCII are `FormatException`. |
+| Internal argument boundary | Direct `CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` input containing malformed .NET UTF-16 throws `ArgumentException`; it is not a document parse and is not relabeled. |
+
+The reader therefore distinguishes two owners. `BoundedJsonReader.ReadString`
+captures the current token's complete quoted bytes from the original private
+input using the exact half-open range `TokenStartIndex..BytesConsumed`. It calls
+`Utf8JsonReader.GetString()` and catches only an `InvalidOperationException`
+thrown by that call, translating it to `FormatException`. It then re-encodes
+the decoded value through the same
+`CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)` used by the writer
+and requires ordinal byte equality with that complete original quoted token.
+Any mismatch is `FormatException` before a typed factory. This is the sole
+lexical-canonicality oracle: no second string grammar, parser, escape scanner,
+or independently maintained allowlist exists.
+
+Public `ParseCanonical` malformed raw or escaped document bytes always fail
+with `FormatException`. When this document-owned re-encode calls the codec, only
+an `ArgumentException` caused by the decoded document value is translated to
+`FormatException`. A direct internal codec caller that supplies malformed .NET
+UTF-16 has violated an argument boundary and receives `ArgumentException`.
+Typed-factory argument failures caused by already decoded document values keep
+the existing separately owned `FormatException` wrapping rule. No test depends
+on exception-message text, and no per-negative fixture digest is required
+because the transformations and exception categories above are the exact
+oracle.
+
+Green is deliberately narrow: replace the no-op legacy codec behavior with the
+exact encoding contract, retain validated `WriteRawValue`, extend only the
+reader lexical checks needed by this matrix, and preserve every manifest
+schema/order/resource/copy/digest boundary already green. It adds no second
+serializer, public surface, project/reference/package/lock/friend change,
+normalization, executable export, registration, activation, kernel, or later-A
+behavior. Exact-FQN green, cumulative `ContractSlice=A`, zero-warning/error
+Release build, format, byte-identical locks, and fresh-diff review are required
+before this increment can close.
+
 Transient red is never pushed or published and never receives root,
 StructureOnly, combined, or hosted validation. Red source is not registered in
 scenario ownership. Production implementation may begin only after the exact
 red is reviewed and no unrelated failure exists.
+
+### Bounded green evidence
+
+The behavior-preserving seam predecessor retained the exact old FQN and passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-seam-1d7c48a903be4f31a6e2c59b708d4fa1\TEST-0210-A-SEAM-NOOP-0002.trx`.
+The valid canonical BehaviorRed then passed review with `0 Blocking`,
+`0 Important`, and `0 Minor` at
+`D:\Temp\meandai-test-0210-a-8b7f24d6c19a4e03b5f1728a90c4d6e1\TEST-0210-A-BEHAVIOR-RED-0002.trx`.
+The bounded production-source review also closed `0 Blocking`, `0 Important`,
+and `0 Minor`.
+
+With the marker and exact legacy branch still present, the original-oracle
+green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-3c6d91a5e8f247b0a1c4d7e9f2b5a630\TEST-0210-A-GREEN-0002.trx`.
+The marker and legacy branch were then removed and source search confirmed both
+absent. The final-source exact FQN passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-5e2a7c91d4f84360b8e1a3c6f9072d54\TEST-0210-A-GREEN-FINAL-0002.trx`,
+and cumulative `ContractSlice=A` passed `13/13` at
+`D:\Temp\meandai-test-0210-a-cumulative-7a3e6d20f9514bc8a2d5e7f039c6b184\TEST-0210-A-GREEN-CUMULATIVE-0002.trx`.
+
+Locked restore succeeded. The six lock SHA-256 fingerprints remain Domain
+`03EEADC5...CB46`, Abstractions `D79FF118...F799`, Conformance
+`20E6BA80...70E7`, Policy `C57F6AFA...4309`, Domain.Tests
+`D2065F11...00BC`, and Conformance.Tests `BA8D8C65...16C0`. The standard
+`dotnet format --verify-no-changes --no-restore` check and `git diff --check`
+passed, and the six-project Release build completed with zero warnings and zero
+errors. A separate non-gating severity-info full scan exposed pre-existing flat-
+namespace/informational backlog and suggestions; this record does not claim
+that scan clean.
+
+This evidence closes only the canonical-string coverage `Important` and this
+second A increment. [TEST-0210](test-cases.md#test-0210) remains `Planned` and
+remaining A is pending. ContractSlice B/C/D, workflow/scenario-owner/
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), root,
+combined, hosted, WIP extraction, consumer, release, and publication scope
+remain held.
 
 ## Public API and project-graph ownership transition
 
@@ -6301,18 +6755,29 @@ timeout, split or remove coverage, add another invocation, or weaken
 
 ## Internal implementation slices
 
-The current directive allocates no new stable IDs. A later implementation
-directive must still deliver these four independently reviewable internal
-slices in order:
+ContractSlice A has a proposed, non-normative
+[micro-delivery control plan](subf-0143-micro-delivery-plan.md). If separately
+accepted, its closed semantic packages and small-context startup capsules refine
+delivery granularity without changing the accepted A-D architecture or authority.
 
-1. **A - Catalog activation:** exact declarations, canonical manifest,
-   normative fragments, artifact proof, slice/complete separation, exports,
-   and evolution.
+The corrected A directive may deliver only separately reviewed A packets. B/C/D
+still require separate future activation, and no packet is active merely from
+this list. No directive here allocates new stable IDs; the four independently
+reviewable internal slices remain ordered:
+
+1. **A - Catalog and manifest preflight:** exact declarations, canonical
+   manifest parse/digest/typed projection, normative fragments, declaration/
+   artifact/component closure, slice/complete separation, public export
+   projections without executable construction, predecessor/evolution, and
+   negative public/friend surface. A declares no kernel and performs no export
+   activation or typed-registration validation.
 2. **B - Codec admission and typed roots:** codec-registration/model-token
    subset, persistent writer/qualifier pairs, private ticket/proof admission,
    decode/model cache, codec-local ledgers, and ContextProof/Root/codec-derived
    reference sealing.
-3. **C - Synthetic complete evaluation kernel:** Tests-owned complete six-family
+3. **C - First executable export activation and synthetic complete evaluation
+   kernel:** final six-list factory and registration/type-token/public-
+   projection bijection plus mismatch negatives; Tests-owned complete six-family
    registration graph, provider-neutral models/capabilities, both parsers,
    indexes/projector/selectors, index cache/shared ledgers, two-phase plans,
    applicability/intents, finding/evaluation minting, status, ordering, and
@@ -6346,9 +6811,10 @@ composed canonical scenario.
 These follow-ups block their respective implementation/authority claims. They
 do not create a competing schema, admission, evaluator, or verdict path.
 
-## Gate 2 completion and approval gate
+## Gate 2 completion and ContractSlice A correction gate
 
-Before this design may be accepted as Gate 2:
+The historical Gate 2 packet is accepted, merged, and exact-main validated.
+Before the corrected ContractSlice A topology may enter C# mutation:
 
 - [x] [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) and the [SUBF-0153](README.md#subf-0153) Gate 2 design are accepted, merged, and
   exact-main validated at the declared input baseline.
@@ -6361,17 +6827,55 @@ Before this design may be accepted as Gate 2:
   WIP disposition, and negative surface are exact.
 - [x] [TEST-0210](test-cases.md#test-0210) siblings, four internal slices, expected-red purity, project/
   lock/workflow transition, and unchanged Windows budget are exact.
-- [ ] Independent bounded red-team finds no unresolved `Blocking` or
-  `Important` issue in the complete packet.
-- [ ] The maintainer accepts or revises this exact design.
-- [ ] The accepted packet merges and its exact-main commit passes bounded
-  structural/document validation.
-- [ ] A separate maintainer directive explicitly authorizes the first
-  [TEST-0210](test-cases.md#test-0210) ContractSlice source, expected-red execution, project/lock changes,
-  and only the production implementation needed to turn that reviewed red
-  green.
+- [x] The historical packet's independent bounded red-team found no unresolved
+  `Blocking` or `Important` issue, the maintainer accepted it, and it merged at
+  exact main [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7).
+- [x] [SUBF-0153](README.md#subf-0153) completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), and exact-main [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) passed at the A implementation baseline.
+- [x] The maintainer approved the ParseCanonical-only A / first-activation-in-C
+  topology correction and instructed bounded red-team followed directly by A
+  Gate 3 expected-red/green.
+- [x] Independent bounded correction red-team finds no unresolved `Blocking`
+  or `Important` issue in the corrected A/C ownership and first-red contract.
+- [x] Renewed fresh-diff architecture review of `FIND-0438` and
+  [FIND-0439](README.md#find-0439) closed with `0 Blocking`, `0 Important`, and
+  `0 Minor`; packet-consistency closure remains separate from that verdict.
+- [x] Renewed review of the append-only RunInfo evidence correction and
+  [FIND-0440](README.md#find-0440) has no unresolved `Blocking` or `Important`
+  finding.
+- [x] The fresh post-packet-synchronization exact-FQN invocation produced and
+  passed review as the canonical first A BehaviorRed under the complete
+  message/echo/RunInfo/counter oracle; earlier observations remain diagnostic.
+- [x] The reviewed first limited ParseCanonical increment replaced the sentinel,
+  passed the original-oracle and final-source exact-FQN checkpoints `1/1`,
+  passed cumulative `ContractSlice=A` `12/12`, passed final format/six-project
+  Release build checks, and satisfied source review for the private-byte/
+  canonical-reserialization/no-retained-raw-byte contract.
+- [x] Final first-green support review closed with `0 Blocking`, one unnumbered
+  remaining-A coverage `Important`, and no unresolved `Minor`; the ordering
+  observation is closed and no numbered finding is opened prematurely.
+- [x] The second A canonical-string packet freezes exact FQN/marker/TRX,
+  behavior-preserving writer-owned codec extraction, legacy/green quoted bytes,
+  the 1,226-byte Unicode fixture/digest, the complete lexical/malformed matrix,
+  the internal `ArgumentException` versus public `FormatException` boundary,
+  narrow green topology, and all held scopes.
+- [x] The second A seam predecessor passed `1/1`; its valid BehaviorRed and
+  bounded source reviews closed `0 Blocking`/`0 Important`/`0 Minor`; original-
+  oracle and final-source greens passed `1/1`; cumulative A passed `13/13`;
+  locked restore, standard format, clean diff check, unchanged six lock
+  fingerprints, and zero-warning/error six-project Release build passed. The
+  canonical-string coverage `Important` is closed; the non-gating severity-info
+  scan is not claimed clean.
+- [x] The corrected [maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228), append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054), and append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) authorize each separately reviewed
+  [TEST-0210](test-cases.md#test-0210) ContractSlice A increment in the exact
+  order source/preparation -> exact red -> review -> smallest bounded green,
+  one increment at a time. That authority does not accumulate or activate
+  ContractSlice B/C/D.
 
-Until every applicable unchecked item is satisfied, C# implementation, test
-execution, project/lock/workflow/scenario-owner mutation, WIP extraction,
-consumer mutation, release, publication, authority transfer, and PowerShell
-retirement remain prohibited.
+The correction red-team gate, canonical first A BehaviorRed, first limited
+ParseCanonical green, and second ContractSlice A canonical-string bounded green
+are satisfied. The canonical-string coverage `Important` is closed; remaining A
+increments are next and no full-A completion is claimed.
+[TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-owner
+mutation, WIP extraction, consumer mutation, later slices, release,
+publication, authority transfer, and PowerShell retirement remain prohibited
+throughout ContractSlice A.
