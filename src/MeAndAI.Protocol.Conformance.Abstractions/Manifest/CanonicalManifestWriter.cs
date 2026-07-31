@@ -21,8 +21,8 @@ internal static class CanonicalManifestWriter
             manifest.SchemaRegistry.Indexes.Count != 0 ||
             manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
             manifest.SchemaRegistry.AdmissionProofContracts.Count != 0 ||
-            manifest.ArtifactFiles.Count != 1 ||
-            manifest.Components.Count != 1)
+            manifest.ArtifactFiles.Count == 0 ||
+            manifest.Components.Count == 0)
         {
             throw new InvalidOperationException(
                 "This writer increment supports only the minimal qualification slice.");

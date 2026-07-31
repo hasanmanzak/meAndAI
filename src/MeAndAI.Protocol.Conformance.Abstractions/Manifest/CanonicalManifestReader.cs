@@ -57,10 +57,10 @@ internal static class CanonicalManifestReader
         var activationProof = ReadActivationProof(ref reader);
 
         reader.ExpectProperty("artifactFiles");
-        var artifact = ReadSingleArtifact(ref reader);
+        var artifacts = ReadArtifacts(ref reader);
 
         reader.ExpectProperty("components");
-        var component = ReadSingleComponent(ref reader);
+        var components = ReadComponents(ref reader);
 
         reader.Expect(JsonTokenType.EndObject);
         reader.ExpectEndOfDocument();
@@ -73,8 +73,8 @@ internal static class CanonicalManifestReader
             slice,
             cacheBudget,
             activationProof,
-            artifact,
-            component);
+            artifacts,
+            components);
     }
 
     private static RawSlice ReadSlice(ref BoundedJsonReader reader)
@@ -159,50 +159,82 @@ internal static class CanonicalManifestReader
             componentVersion);
     }
 
-    private static RawArtifact ReadSingleArtifact(
+    private static IReadOnlyList<RawArtifact> ReadArtifacts(
         ref BoundedJsonReader reader)
     {
         reader.Expect(JsonTokenType.StartArray);
-        reader.Expect(JsonTokenType.StartObject);
-        reader.ExpectProperty("fileName");
-        var fileName = reader.ReadString();
-        reader.ExpectProperty("byteLength");
-        var byteLength = reader.ReadInt64();
-        reader.ExpectProperty("artifactDigest");
-        var artifactDigest = reader.ReadString();
-        reader.Expect(JsonTokenType.EndObject);
-        reader.Expect(JsonTokenType.EndArray);
+        var artifacts = new List<RawArtifact>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest artifactFiles array must contain objects.");
+            }
 
-        return new RawArtifact(fileName, byteLength, artifactDigest);
+            reader.ExpectProperty("fileName");
+            var fileName = reader.ReadString();
+            reader.ExpectProperty("byteLength");
+            var byteLength = reader.ReadInt64();
+            reader.ExpectProperty("artifactDigest");
+            var artifactDigest = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            artifacts.Add(
+                new RawArtifact(fileName, byteLength, artifactDigest));
+        }
+
+        if (artifacts.Count == 0)
+        {
+            throw new FormatException(
+                "The manifest artifactFiles array cannot be empty.");
+        }
+
+        return artifacts;
     }
 
-    private static RawComponent ReadSingleComponent(
+    private static IReadOnlyList<RawComponent> ReadComponents(
         ref BoundedJsonReader reader)
     {
         reader.Expect(JsonTokenType.StartArray);
-        reader.Expect(JsonTokenType.StartObject);
-        reader.ExpectProperty("component");
-        reader.Expect(JsonTokenType.StartObject);
-        reader.ExpectProperty("componentKey");
-        var componentKey = reader.ReadString();
-        reader.ExpectProperty("componentVersion");
-        var componentVersion = reader.ReadString();
-        reader.ExpectProperty("assemblyName");
-        var assemblyName = reader.ReadString();
-        reader.ExpectProperty("typeName");
-        var typeName = reader.ReadString();
-        reader.Expect(JsonTokenType.EndObject);
-        reader.ExpectProperty("artifactFileName");
-        var artifactFileName = reader.ReadString();
-        reader.Expect(JsonTokenType.EndObject);
-        reader.Expect(JsonTokenType.EndArray);
+        var components = new List<RawComponent>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest components array must contain objects.");
+            }
 
-        return new RawComponent(
-            componentKey,
-            componentVersion,
-            assemblyName,
-            typeName,
-            artifactFileName);
+            reader.ExpectProperty("component");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("componentKey");
+            var componentKey = reader.ReadString();
+            reader.ExpectProperty("componentVersion");
+            var componentVersion = reader.ReadString();
+            reader.ExpectProperty("assemblyName");
+            var assemblyName = reader.ReadString();
+            reader.ExpectProperty("typeName");
+            var typeName = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            reader.ExpectProperty("artifactFileName");
+            var artifactFileName = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            components.Add(
+                new RawComponent(
+                    componentKey,
+                    componentVersion,
+                    assemblyName,
+                    typeName,
+                    artifactFileName));
+        }
+
+        if (components.Count == 0)
+        {
+            throw new FormatException(
+                "The manifest components array cannot be empty.");
+        }
+
+        return components;
     }
 
     private static ParsedCanonicalManifest CreateProjection(
@@ -213,47 +245,13 @@ internal static class CanonicalManifestReader
         RawSlice slice,
         RawCacheBudget cacheBudget,
         RawActivationProof activationProof,
-        RawArtifact artifact,
-        RawComponent component)
+        IReadOnlyList<RawArtifact> artifacts,
+        IReadOnlyList<RawComponent> rawComponents)
     {
         try
         {
             RequirePositiveCacheBudget(cacheBudget);
 
-            var componentIdentity = ComponentTypeIdentity.Create(
-                component.ComponentKey,
-                component.ComponentVersion,
-                component.AssemblyName,
-                component.TypeName);
-            if (!string.Equals(
-                    activationProof.ComponentKey,
-                    componentIdentity.ComponentKey,
-                    StringComparison.Ordinal) ||
-                !string.Equals(
-                    activationProof.ComponentVersion,
-                    componentIdentity.ComponentVersion,
-                    StringComparison.Ordinal))
-            {
-                throw new FormatException(
-                    "The activation-proof component is not declared.");
-            }
-
-            var artifactBinding = ArtifactFileBinding.Create(
-                artifact.FileName,
-                artifact.ByteLength,
-                ExactSha256Digest.Parse(artifact.ArtifactDigest));
-            if (!string.Equals(
-                    component.ArtifactFileName,
-                    artifactBinding.FileName,
-                    StringComparison.Ordinal))
-            {
-                throw new FormatException(
-                    "The component does not map to the declared artifact.");
-            }
-
-            var componentBinding = ComponentArtifactBinding.Create(
-                componentIdentity,
-                component.ArtifactFileName);
             var typedCacheBudget = SessionCacheBudget.Create(
                 cacheBudget.MaxDecodeEntries,
                 cacheBudget.MaxDecodeCanonicalBytes,
@@ -276,19 +274,96 @@ internal static class CanonicalManifestReader
                 protocolVersion,
                 typedCatalogVersion,
                 Array.Empty<RuleDeclaration>());
+
+            var artifactBindings = new List<ArtifactFileBinding>();
+            var artifactFileNames = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var artifact in artifacts)
+            {
+                var binding = ArtifactFileBinding.Create(
+                    artifact.FileName,
+                    artifact.ByteLength,
+                    ExactSha256Digest.Parse(artifact.ArtifactDigest));
+                if (!artifactFileNames.Add(binding.FileName))
+                {
+                    throw new FormatException(
+                        "The manifest artifactFiles array contains duplicate file names.");
+                }
+
+                artifactBindings.Add(binding);
+            }
+
+            var componentBindings = new List<ComponentArtifactBinding>();
+            var componentKeys = new HashSet<string>(StringComparer.Ordinal);
+            var usedArtifacts = new HashSet<string>(StringComparer.Ordinal);
+            ComponentTypeIdentity? activationProofComponent = null;
+
+            foreach (var component in rawComponents)
+            {
+                var componentIdentity = ComponentTypeIdentity.Create(
+                    component.ComponentKey,
+                    component.ComponentVersion,
+                    component.AssemblyName,
+                    component.TypeName);
+                var componentKey = component.ComponentKey + "|" + component.ComponentVersion;
+                if (!componentKeys.Add(componentKey))
+                {
+                    throw new FormatException(
+                        "The manifest components array contains duplicate component identities.");
+                }
+
+                if (!artifactFileNames.Contains(component.ArtifactFileName))
+                {
+                    throw new FormatException(
+                        "The manifest component mapping references an undeclared artifact.");
+                }
+
+                var componentBinding = ComponentArtifactBinding.Create(
+                    componentIdentity,
+                    component.ArtifactFileName);
+                componentBindings.Add(componentBinding);
+                usedArtifacts.Add(component.ArtifactFileName);
+
+                if (IsActivationProof(componentIdentity, activationProof))
+                {
+                    activationProofComponent = componentIdentity;
+                }
+            }
+
+            if (activationProofComponent is null)
+            {
+                throw new FormatException(
+                    "The activation-proof component is not declared.");
+            }
+
+            foreach (var component in componentBindings.Select(item => item.Component))
+            {
+                if (!IsActivationProof(component, activationProof) &&
+                    !IsRuntimeAnchor(component))
+                {
+                    throw new FormatException(
+                        "The manifest component graph is not fully closed.");
+                }
+            }
+
+            if (!artifactFileNames.SetEquals(usedArtifacts))
+            {
+                throw new FormatException(
+                    "The manifest artifactFiles array must be fully bound.");
+            }
+
             var typedActivationProof =
                 ActivationProofContractDeclaration.Create(
                     activationProof.ContractKey,
                     activationProof.ContractVersion,
-                    componentIdentity);
+                    activationProofComponent);
 
             return new ParsedCanonicalManifest(
                 authorityKind,
                 sourceCommit,
                 schemaRegistry,
                 typedActivationProof,
-                Array.AsReadOnly([artifactBinding]),
-                Array.AsReadOnly([componentBinding]),
+                artifactBindings.AsReadOnly(),
+                componentBindings.AsReadOnly(),
                 typedSlice);
         }
         catch (ArgumentException exception)
@@ -298,6 +373,31 @@ internal static class CanonicalManifestReader
                 exception);
         }
     }
+
+    private static bool IsActivationProof(
+        ComponentTypeIdentity component,
+        RawActivationProof activationProof) =>
+        string.Equals(component.ComponentKey, activationProof.ComponentKey, StringComparison.Ordinal) &&
+        string.Equals(component.ComponentVersion, activationProof.ComponentVersion, StringComparison.Ordinal);
+
+    private static bool IsRuntimeAnchor(ComponentTypeIdentity component) =>
+        component.ComponentVersion is "1" &&
+        component switch
+        {
+            _ when component.ComponentKey == "protocol.runtime.domain" &&
+                component.AssemblyName == "MeAndAI.Protocol.Domain" &&
+                component.TypeName == "MeAndAI.Protocol.Domain.RuleId" => true,
+            _ when component.ComponentKey == "protocol.runtime.conformance-abstractions" &&
+                component.AssemblyName == "MeAndAI.Protocol.Conformance.Abstractions" &&
+                component.TypeName == "MeAndAI.Protocol.Conformance.Abstractions.PolicyQualificationSliceExport" => true,
+            _ when component.ComponentKey == "protocol.runtime.conformance" &&
+                component.AssemblyName == "MeAndAI.Protocol.Conformance" &&
+                component.TypeName == "MeAndAI.Protocol.Conformance.CatalogIntegrityException" => true,
+            _ when component.ComponentKey == "protocol.runtime.markdig" &&
+                component.AssemblyName == "Markdig" &&
+                component.TypeName == "Markdig.Markdown" => true,
+            _ => false,
+        };
 
     private static void RequirePositiveCacheBudget(RawCacheBudget budget)
     {
@@ -443,25 +543,66 @@ internal static class CanonicalManifestReader
         internal int ReadInt32()
         {
             Expect(JsonTokenType.Number);
-            if (!_reader.TryGetInt32(out var value))
+
+            var rawValue = ReadCanonicalIntegerToken();
+            if (rawValue[0] == (byte)'-')
             {
                 throw new FormatException(
                     "The policy manifest integer is outside Int32.");
             }
 
-            return value;
+            long value;
+            try
+            {
+                value = ParseCanonicalNonNegativeInteger(rawValue);
+            }
+            catch (Exception exception)
+            {
+                if (exception is not FormatException and not OverflowException)
+                {
+                    throw;
+                }
+
+                throw new FormatException(
+                    "The policy manifest integer is outside Int32.",
+                    exception);
+            }
+
+            if (value is < 0 or > int.MaxValue)
+            {
+                throw new FormatException(
+                    "The policy manifest integer is outside Int32.");
+            }
+
+            return (int)value;
         }
 
         internal long ReadInt64()
         {
             Expect(JsonTokenType.Number);
-            if (!_reader.TryGetInt64(out var value))
+
+            var rawValue = ReadCanonicalIntegerToken();
+            if (rawValue[0] == (byte)'-')
             {
                 throw new FormatException(
                     "The policy manifest integer is outside Int64.");
             }
 
-            return value;
+            try
+            {
+                return ParseCanonicalNonNegativeInteger(rawValue);
+            }
+            catch (Exception exception)
+            {
+                if (exception is not FormatException and not OverflowException)
+                {
+                    throw;
+                }
+
+                throw new FormatException(
+                    "The policy manifest integer is outside Int64.",
+                    exception);
+            }
         }
 
         internal void ExpectEndOfDocument()
@@ -488,6 +629,47 @@ internal static class CanonicalManifestReader
             }
 
             return true;
+        }
+
+        private ReadOnlySpan<byte> ReadCanonicalIntegerToken()
+        {
+            var tokenStart = checked((int)_reader.TokenStartIndex);
+            var tokenLength = checked((int)(_reader.BytesConsumed - _reader.TokenStartIndex));
+            return _input.Slice(tokenStart, tokenLength);
+        }
+
+        private static long ParseCanonicalNonNegativeInteger(
+            ReadOnlySpan<byte> token)
+        {
+            if (token.Length == 0)
+            {
+                throw new FormatException(
+                    "The policy manifest integer token is empty.");
+            }
+
+            if (token.Length > 1 && token[0] == (byte)'0')
+            {
+                throw new FormatException(
+                    "The policy manifest integer has leading zero.");
+            }
+
+            long value = 0;
+            foreach (var current in token)
+            {
+                if (current < (byte)'0' || current > (byte)'9')
+                {
+                    throw new FormatException(
+                        "The policy manifest integer is not canonical.");
+                }
+
+                var digit = current - (byte)'0';
+                checked
+                {
+                    value = (value * 10) + digit;
+                }
+            }
+
+            return value;
         }
     }
 
