@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted/merged, its first two bounded ContractSlice A increments green, and canonical-string coverage `Important` closed; remaining A is held and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 and historical `13/13` A baseline accepted; bounded `FIND-0441` grammar/number/graph/rule recovery is `ReviewedLocalGreen` with focused `1/1`, cumulative `17/17`, and fresh review `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,9 +11,9 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation baseline | Completed [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256); this record makes no claim about a newer remote main |
+| Current A implementation boundary | Historical `13/13` content `5fa7f7d`, BASE record sync `9107a49`; exact pushed [`7f60e0c66a49056b9e9854ccc353acfe67f65ed5`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5) is recovery input and not an accepted predecessor |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
-| Current authority | The corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) authorizes each separately reviewed A source/preparation, exact red, and smallest bounded cumulative-A C# green one increment at a time over implementation baseline [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd); the canonical-string increment consumed its bounded authority and no later A increment is active; B/C/D, workflow/scenario-owner/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP extraction, consumer, release, publication, authority-transfer, and PowerShell-retirement work remain held |
+| Current authority | The corrected [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) plus bounded [FIND-0441](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441) recovery authorizes only correction, verification, review, and record synchronization of the already-pushed grammar/number/graph/rule candidate; no successor A, B/C/D, workflow/scenario-owner/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, release, publication, authority-transfer, PowerShell-retirement, or Git checkpoint authority is granted |
 
 ## 1. Outcome
 
@@ -1539,8 +1539,9 @@ item 10 is satisfied only by the corrected
 [ContractSlice A directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228)
 and only for one reviewed A red-to-green increment at a time. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; the canonical-string increment is bounded green with its
-coverage `Important` closed, no later A increment is active, and remaining A,
-B/C/D, and every workflow/owner/publication boundary remain held.
+coverage `Important` closed. Current authority adds only bounded `FIND-0441`
+recovery of pushed grammar/number/graph/rule work; no successor A, B/C/D, or
+workflow/owner/publication boundary is active.
 
 Current gate allocation and open states are recorded in the
 [successor delivery plan](successor-delivery-plan.md#6-delivery-gates).

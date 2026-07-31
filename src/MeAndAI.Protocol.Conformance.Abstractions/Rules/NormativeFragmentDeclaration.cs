@@ -101,7 +101,10 @@ public sealed class NormativeFragmentDeclaration
             path,
             nameof(path),
             maximumLength: 1024);
-        if (System.IO.Path.IsPathRooted(value) ||
+        if (value[0] == '/' ||
+            (value.Length >= 2 &&
+             IsAsciiLetter(value[0]) &&
+             value[1] == ':') ||
             value.Contains('\\') ||
             value.Split('/').Any(segment =>
                 segment.Length == 0 || segment is "." or ".."))
@@ -113,6 +116,9 @@ public sealed class NormativeFragmentDeclaration
 
         return value;
     }
+
+    private static bool IsAsciiLetter(char value) =>
+        value is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z');
 
     private static string ValidateBlob(string? containingBlob)
     {

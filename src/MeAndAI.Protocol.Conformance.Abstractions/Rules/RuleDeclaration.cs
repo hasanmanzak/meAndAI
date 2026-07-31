@@ -121,12 +121,7 @@ public sealed class RuleDeclaration
             normativeFragments,
             nameof(normativeFragments),
             requireNonEmpty: true);
-        if (canonicalFragments.Count < 2)
-        {
-            throw new ArgumentException(
-                "A rule must declare at least two normative fragments.",
-                nameof(normativeFragments));
-        }
+        ValidateDistinctFragments(canonicalFragments);
 
         var canonicalScenarios = DeclarationValidation.Canonicalize(
             qualificationScenarios,
@@ -222,6 +217,22 @@ public sealed class RuleDeclaration
             keySelector,
             StringComparer.Ordinal,
             requireNonEmpty: true);
+
+    private static void ValidateDistinctFragments(
+        IReadOnlyList<NormativeFragmentDeclaration> fragments)
+    {
+        var identities = new HashSet<(string Path, string Anchor)>();
+
+        foreach (var fragment in fragments)
+        {
+            if (!identities.Add((fragment.Path, fragment.Anchor)))
+            {
+                throw new ArgumentException(
+                    "Normative fragments must be distinct.",
+                    nameof(fragments));
+            }
+        }
+    }
 
     private static void ValidateSharedSlots(
         IReadOnlyList<EvidenceSlotDeclaration> applicability,

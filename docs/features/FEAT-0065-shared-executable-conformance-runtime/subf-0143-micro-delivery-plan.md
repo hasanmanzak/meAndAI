@@ -3,13 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Maintainer-approved BASE sequence is active through `BASE-VERIFY`/`BASE-RECORDS`; no later ContractSlice A increment is active |
+| Status | Bounded recovery of exact pushed input `7f60e0c` is `ReviewedLocalGreen`: four retained grammar/number/graph/rule facts pass focused `1/1`, cumulative A passes `17/17`, and fresh review is `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, and no successor ContractSlice A increment is active |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Next-packet predecessor | `5fa7f7d` is the BASE-checkpoint commit for reviewed `13/13` content; parent is exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd). |
-| Git authority | None granted by this plan; stage, commit, and push each require an explicit maintainer directive |
+| Next-packet predecessor | Pending an exact reviewed recovery checkpoint. Historical `13/13` content is `5fa7f7d`, its record sync is `9107a49`, and pushed `7f60e0c` is recovery input rather than an accepted predecessor. |
+| Git authority | None granted by this plan or the bounded recovery directive; stage, commit, and push each require an explicit maintainer directive |
 
 ## Purpose
 
@@ -20,9 +20,13 @@ ceiling. It does not activate any item below by itself and grants no B/C/D,
 workflow, publication, or release authority.
 
 The first limited `ParseCanonical` and canonical-string increments are green,
-and cumulative A last passed `13/13`. This is now the reviewed BASE
-checkpoint. No new C# mutation may begin until `BASE-RECORDS`
-synchronization is complete and `BASE-REVIEW` is authorized.
+and their historical content baseline passed cumulative A `13/13`. Later
+grammar, number, graph, and rule work was pushed without the plan's per-packet
+red-team/review evidence and initially did not build. Its bounded recovery now
+passes the four retained exact filters `1/1` and cumulative A `17/17` locally.
+Final local V, locks/build/format/diff/marker verification, and fresh full-diff
+review `0/0/0` establish `ReviewedLocalGreen`. Exact staged-tree identity and a
+Git checkpoint remain pending and unauthorized, so no successor packet may begin.
 
 ## Spark startup capsule
 
@@ -223,11 +227,11 @@ is never implemented green; return to D/RT or report `Blocked`.
 | Label | Bounded task | Exit condition |
 | --- | --- | --- |
 | `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in `5fa7f7d`. |
-| `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Completed: cumulative `13/13` green reproduced with zero-warning/error six-project Release build, clean diff check, standard format, unchanged lock hashes, and clean marker/sentinel search (no test or source markers). |
-| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed by this edit: current bounded handoff and memory/log anchors are synchronized with exact BASE-VERIFY evidence; no later content edit is permitted without returning here. |
-| `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Final diff check clean, zero in-scope findings, verdict `0/0/0`, every observation dispositioned, and held scopes unchanged. |
-| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Staged tree byte-equals the reviewed tree; NCrunch, temp output, and unrelated work are absent. |
-| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Local exact commit is the immutable predecessor; no push means no hosted/Gate-7/DoD claim. |
+| `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Recovery completed: cumulative `17/17`; locked restore with six relevant lock fingerprints unchanged; zero-warning/error six-project Release build; clean format, diff, and marker/sentinel checks. Historical `13/13` remains the prior accepted content checkpoint. |
+| `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Completed: current handoff, feature/architecture records, TEST-0210, and project memory distinguish historical missing evidence, final local V, and pending Git authority. |
+| `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the fresh full-diff review closed `0 Blocking / 0 Important / 0 Minor`, establishing `ReviewedLocalGreen`. |
+| `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Historical commits exist, but ordered reviewed-stage evidence is `NotEstablished`; no recovery staging is authorized yet. |
+| `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | `7f60e0c` is an exact pushed recovery input, not a valid checkpoint. Local V/review is complete; the next predecessor remains pending exact staged-tree review and separate stage/commit/push authority. |
 
 `[skip ci]` is not inherited posture. It may be used only as a separately
 explicit maintainer exception for an exact push; it cannot satisfy DoD, Gate 7,
@@ -258,7 +262,10 @@ hosted evidence.
 - Marker/sentinel search found none in source/tests; only historical document references remain.
 - Non-code artifacts remaining untracked: `MeAndAI.Protocol.v3.ncrunchsolution.user` and `.dotnet-cli`-equivalent temporary output are excluded from content.
 
-The first `git diff --check` after this sync remains clean.
+The first `git diff --check` after the historical BASE sync was clean. Later
+pushed candidate work superseded that working-tree state without completing the
+packet state machine; follow the current
+[recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md).
 
 ## Ordered remaining ContractSlice A queue
 
@@ -272,7 +279,7 @@ here.
 | `A-GRAMMAR-STRUCT-01` | Empty-input, UTF-8/BOM, malformed-JSON, and missing/extra final-LF boundaries; exact root and slice field order; `authorityKind`/variant coherence; unknown spelling, duplicate, null, comment, whitespace, and trailing-content rejection; slice-positive plus both/neither `slice`/`completeCatalog` negatives, but no premature complete-positive claim | `ContractSliceACanonicalJsonGrammarTests.Enforces_exact_document_and_slice_structural_grammar` |
 | `A-GRAMMAR-NUMBER-01` | Canonical integer lexical form and range | `ContractSliceACanonicalNumberTests.Enforces_exact_integer_grammar_and_range` |
 | `A-GRAPH-01` | A closed fixture with one activation-proof-rooted component plus four exact role-exempt runtime anchors, one local binding per component, every artifact used by a mapping, and activation-proof root closure; it does not yet claim the production six-artifact set | `ContractSliceAArtifactComponentGraphTests.Enforces_exact_binding_runtime_anchor_and_reachability_graph` |
-| `A-RULE-01` | Minimal non-empty rule; lowercase 40-hex `sourceCommit`; at least two ordered normative fragments; fragment framing, provenance, and rule-digest integrity | `ContractSliceARuleDeclarationTests.Enforces_canonical_multi_fragment_rule_provenance` |
+| `A-RULE-01` | Minimal non-empty rule; lowercase 40-hex `sourceCommit`; one-or-more ordered normative fragments, including the retained multi-fragment vector; ordered declaration/provenance plus framing-metadata and digest grammar/projection. Fragment bytes, blob existence, content trust, and digest recomputation remain external qualification/release evidence. | `ContractSliceARuleDeclarationTests.Enforces_canonical_multi_fragment_rule_provenance` |
 | `A-SCHEMA-SLOT-01` | Payload schema codec/model/budget/failure closure together with mutually reachable evidence-slot requirement/material-role/surface grammar and an exact zero-capability positive closure | `ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure` |
 | `A-PARSER-INDEX-01` | Closed parser-to-index-to-slot-capability vertical that first resolves nonempty produced capabilities, including inputs, output model/capability, invocation scope, failure codes, and session-cache budget positivity/order/boundaries | `ContractSliceAParserIndexManifestTests.Enforces_exact_parser_index_and_slot_capability_closure` |
 | `A-FINDING-01` | Finding declaration and primary/related reference roles | `ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles` |
@@ -295,10 +302,10 @@ current handoff. `None` is exact while the packet remains a candidate.
 
 | Label | State | Frozen ordinal/FQN | Final cumulative | Review | Current handoff |
 | --- | --- | --- | --- | --- | --- |
-| `A-GRAMMAR-STRUCT-01` | Candidate | None | None | N/A | None |
-| `A-GRAMMAR-NUMBER-01` | Candidate | None | None | N/A | None |
-| `A-GRAPH-01` | Candidate | None | None | N/A | None |
-| `A-RULE-01` | Candidate | None | None | N/A | None |
+| `A-GRAMMAR-STRUCT-01` | `ReviewedLocalGreen` | Exact retained FQN; no BehaviorRed ordinal; historical red/RT `NotEstablished` | Local cumulative `17/17`; final local V complete | Fresh full-diff `0/0/0` | [Recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md) |
+| `A-GRAMMAR-NUMBER-01` | `ReviewedLocalGreen` | Exact retained FQN; no BehaviorRed ordinal; historical red/RT `NotEstablished` | Local cumulative `17/17`; final local V complete | Fresh full-diff `0/0/0` | [Recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md) |
+| `A-GRAPH-01` | `ReviewedLocalGreen` | Exact retained FQN; no BehaviorRed ordinal; historical red/RT `NotEstablished` | Local cumulative `17/17`; final local V complete | Fresh full-diff `0/0/0` | [Recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md) |
+| `A-RULE-01` | `ReviewedLocalGreen` | Exact retained FQN; no BehaviorRed ordinal; historical red/RT `NotEstablished` | Local cumulative `17/17`; final local V complete | Fresh full-diff `0/0/0` | [Recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md) |
 | `A-SCHEMA-SLOT-01` | Candidate | None | None | N/A | None |
 | `A-PARSER-INDEX-01` | Candidate | None | None | N/A | None |
 | `A-FINDING-01` | Candidate | None | None | N/A | None |
@@ -318,10 +325,18 @@ exact manifest digest and typed projection, canonical collection order and
 duplicate negatives, every newly reachable nested property's spelling/order,
 unknown/null/cardinality/optional/variant negatives, and document-caused
 factory `ArgumentException` mapping to public `FormatException`. Loaded
-artifact/predecessor conflicts stay outside the A parser. Rule `sourceCommit`,
-blob existence, and content trust also remain external qualification evidence;
-A owns only their grammar and digest closure and performs no repository lookup.
+artifact/predecessor conflicts stay outside the A parser. Rule `sourceCommit`
+proof, fragment bytes, blob existence, content trust, and digest recomputation
+remain external qualification evidence; A owns only their declared lexical and
+framing-metadata grammar plus typed projection and performs no repository lookup.
 The D packet names any family-specific exception to this oracle.
+
+Exact pushed input `7f60e0c` contained 18 static A facts, but no valid
+`18/18` execution. Recovery consolidates the duplicate rule round-trip fact and
+retains the four FQNs above; their focused filters pass `1/1` and cumulative A
+passes `17/17` locally. These facts do not reconstruct absent historical D/RT/R
+evidence. Final local V and fresh review are complete; `FIND-0441` remains the
+recovery owner only for the separately authorized staged-tree/checkpoint boundary.
 
 `A-RULE-01` must prove in D/RT that a rule with both slot lists empty is valid
 in the then-current schema; otherwise it moves behind and joins

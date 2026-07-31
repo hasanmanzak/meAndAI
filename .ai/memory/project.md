@@ -19,12 +19,16 @@ Last verified: **2026-07-31**
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   provides the typed C# operational foundation and portable verified package
   prerequisite. Its release grants no successor implementation authority.
-- Current local ContractSlice A baseline is committed at `5fa7f7d` (`[skip ci]`),
-  with no later local content edit beyond `BASE-RECORDS` synchronization.
-  `BASE-VERIFY` evidence on that commit is green for cumulative `13/13`,
-  zero-warning/error six-project Release build, clean `dotnet format`,
-  clean `git diff --check`, unchanged lock bytes, and marker/sentinel search
-  with no in-source test/behavior markers.
+- Historical ContractSlice A cumulative `13/13` content is committed at
+  `5fa7f7d` (`[skip ci]`), with BASE records synchronized by `9107a49`.
+  Exact pushed `7f60e0c` is a recovery input rather than an accepted green
+  predecessor: it contained 18 static A facts and no valid build or per-packet
+  red/RT/review evidence. Bounded `FIND-0441` recovery retains four facts; each
+  exact focused filter passes `1/1` and cumulative A passes `17/17` locally.
+  Final local V passes locked restore with unchanged relevant lock fingerprints,
+  zero-warning/error Release build, format, diff/marker checks, and fresh
+  full-diff review `0/0/0`; status is `ReviewedLocalGreen`. Exact staged-tree
+  identity and any Git checkpoint remain pending and unauthorized.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -129,6 +133,35 @@ documented project decision required when another approach better fits the
 domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Active recurrence knowledge
+
+### Small-context packet advancement outruns the canonical ledger
+
+- Status: `Active`
+- Observable signature: an agent reports completion or pushes a successor tree
+  while the micro ledger still shows candidate/no-later-A state, recorded counts
+  lag the static test inventory, or the exact pushed head does not build.
+- Applicability: SUBF-0143 micro-delivery work and later small-context agents
+  operating under a frozen packet brief.
+- Affected contract and cause: multiple semantic packets were combined without
+  retained D/RT/R/V evidence; exact pushed `7f60e0c` contained 18 A facts while
+  canonical records still reported `13/13` and the tree did not build.
+- Canonical owner and evidence: [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
+  the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
+  and the current [recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md).
+- Fixed release or evidence: no release. Four retained exact filters pass `1/1`
+  and cumulative A passes `17/17` locally; final local V and fresh full-diff
+  review `0/0/0` establish `ReviewedLocalGreen`. Staged-tree identity and a Git
+  checkpoint remain pending and unauthorized.
+- Required safe response: stop successor work, treat the pushed head as recovery
+  input, reconcile exact diff/tests/review/records, and require an exact reviewed
+  checkpoint before selecting another packet.
+- Unsafe retry boundary: do not trust completion wording or commit messages,
+  reconstruct missing red/review evidence, allocate retrospective markers, or
+  call a broken or unreviewed pushed head the next predecessor.
+- Freshness and review condition: confirmed 2026-07-31; review when the micro
+  state machine, packet brief, or checkpoint authority changes.
+- Superseded by: `None`
 
 ### Completed historical adoption issue is misclassified as malformed
 
@@ -1051,8 +1084,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   unchanged six lock fingerprints, standard format, clean diff check, and the
   zero-warning/error six-project Release build passed. The non-gating severity-
   info scan exposed pre-existing informational backlog/suggestions and is not
-  claimed clean. Canonical-string coverage `Important` is closed; remaining A
-  is held, no later A increment is active, and `TEST-0210` remains `Planned`.
+  claimed clean. Canonical-string coverage `Important` is closed at the
+  historical `13/13` checkpoint; current grammar/number/graph/rule routing is
+  the `FIND-0441` recovery described below, and `TEST-0210` remains `Planned`.
   It separates qualification slices from complete catalogs, uses an acyclic
   artifact/manifest/release graph, and fixes the cumulative public inventories
   at `48/72/95/96`, ending with `72` Abstractions, `23` Conformance, and one
@@ -1174,8 +1208,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   cumulative A passed `13/13`. Locked restore, unchanged lock fingerprints,
   standard format, clean diff check, and the zero-warning/error six-project
   Release build passed; the non-gating severity-info scan is not claimed clean.
-  Canonical-string coverage `Important` is closed, but remaining A is held, no
-  later A increment is active, and `TEST-0210` remains `Planned`. B/C/D, workflow/
+  Canonical-string coverage `Important` is closed at the historical `13/13`
+  checkpoint. Later pushed input `7f60e0c` is under
+  [FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+  recovery: four retained focused filters pass `1/1`, cumulative A passes
+  `17/17`, and final local V plus fresh full-diff review `0/0/0` establish
+  `ReviewedLocalGreen`. Exact staged-tree identity/checkpoint remains pending
+  and unauthorized; no successor A increment is active. `TEST-0210` remains
+  `Planned`. B/C/D, workflow/
   scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation, WIP extraction, consumer/release/publication/authority-transfer,

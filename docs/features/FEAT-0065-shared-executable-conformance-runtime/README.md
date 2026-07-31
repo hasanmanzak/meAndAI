@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Classification | Feature |
-| Status | [SUBF-0152](#subf-0152) and [SUBF-0153](#subf-0153) complete; [SUBF-0143](#subf-0143) Gate 2 accepted/merged, ParseCanonical-only ContractSlice A scaffold/structural checkpoint complete, canonical BehaviorRed plus the first limited ParseCanonical green accepted, and the second A canonical-string increment bounded green with its coverage `Important` closed; remaining A is pending and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
+| Status | [SUBF-0152](#subf-0152) and [SUBF-0153](#subf-0153) complete; [SUBF-0143](#subf-0143) Gate 2 and its historical `13/13` A baseline accepted; bounded recovery of pushed grammar/number/graph/rule candidate `7f60e0c` is `ReviewedLocalGreen` with four focused `1/1`, cumulative `17/17`, and fresh review `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, and [TEST-0210](test-cases.md#test-0210) stays `Planned` |
 | Target version | 0.17.0 |
 | Issue | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) |
-| Pull request | Completed [SUBF-0152](#subf-0152): [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170); accepted [SUBF-0153](#subf-0153) design: [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171); completed [SUBF-0153](#subf-0153): [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173); accepted [SUBF-0143](#subf-0143) Gate 2: [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); current A implementation baseline: [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
+| Pull request | Completed [SUBF-0152](#subf-0152): [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170); accepted [SUBF-0153](#subf-0153) design: [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171); completed [SUBF-0153](#subf-0153): [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173); accepted [SUBF-0143](#subf-0143) Gate 2: [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7); recovery input, not a green predecessor: [`7f60e0c66a49056b9e9854ccc353acfe67f65ed5`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5) |
 | Decisions | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md), partially superseded [DEC-0032](../../decisions/DEC-0032-csharp-operational-applications-and-portable-jit-distribution.md), and [DEC-0030](../../decisions/DEC-0030-distinct-test-intent-and-infrastructure-contract-boundary.md) |
 | Tests | [TEST-0209](test-cases.md#test-0209), [TEST-0210](test-cases.md#test-0210), [TEST-0211](test-cases.md#test-0211), [TEST-0220](test-cases.md#test-0220), [TEST-0221](test-cases.md#test-0221), and [TEST-0222](test-cases.md#test-0222) |
 
@@ -140,12 +140,18 @@ expected red and bounded green now pass, closing that coverage `Important`.
 This closes only the canonical-string increment, not remaining A or full
 [TEST-0210](test-cases.md#test-0210).
 
-Remaining A delivery has a proposed, non-normative, non-activating
-[SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md)
-awaiting maintainer acceptance. Its routing labels are not new protocol or
-scenario identities. The current untracked cumulative-green tree must first
-become an exact reviewed checkpoint; no later A item is active, and the plan
-grants no C# authority by itself.
+Remaining A delivery follows the maintainer-approved, non-normative
+[SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md).
+Exact pushed input
+[`7f60e0c66a49056b9e9854ccc353acfe67f65ed5`](https://github.com/hasanmanzak/meAndAI/commit/7f60e0c66a49056b9e9854ccc353acfe67f65ed5)
+advanced grammar, number, graph, and rule candidate work without retained
+per-packet red-team/review evidence and initially did not build. The bounded
+[recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md)
+records the correction: four retained exact filters pass `1/1`, cumulative A
+passes `17/17`, and final local V plus fresh full-diff review `0/0/0` establish
+`ReviewedLocalGreen`. Exact staged-tree/checkpoint remains pending and
+unauthorized; no successor A item is active and no absent historical red
+marker, TRX, or review is reconstructed.
 
 Final support review closed with `0 Blocking`, that one unnumbered remaining-A
 coverage `Important`, and no unresolved `Minor`. Its two Minor observations are
@@ -232,7 +238,8 @@ publication, or authority-transfer capabilities.
 Independent red-team labels `BRT-0143-01` through `BRT-0143-13` map one-to-one
 and in order to `FIND-0401` through `FIND-0413`. Later fresh-diff, signature,
 parser, lifecycle, and target-resolution reviews are recorded separately as
-`FIND-0414` through `FIND-0440`; the bounded first-green support observations
+`FIND-0414` through `FIND-0440`; later `FIND-0441` owns pushed-candidate
+recovery. The bounded first-green support observations
 above are deliberately unnumbered.
 
 | ID | Observation | Disposition |
@@ -313,11 +320,12 @@ above are deliberately unnumbered.
 | `FIND-0438` <a name="find-0438"></a> | The original BehaviorRed oracle required one marker across the entire TRX and an exception type serialized by TRX, while the locked xUnit/VSTest adapter legitimately echoes the message once in run-summary output and does not serialize that type. | `Blocking`, resolved by the append-only [evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054): one exact failed-result message is authoritative, at most one byte-identical summary echo is incidental, and reviewed source plus the immutable xUnit `2.9.3` lock proves the assertion type. The observed pre-clarification run remains diagnostic; the mandatory fresh same-FQN run is now satisfied by the accepted post-synchronization canonical A BehaviorRed. |
 | `FIND-0439` <a name="find-0439"></a> | ParseCanonical's document-local `FormatException` boundary overlapped later `CatalogIncomplete`, unused component/runtime-anchor acceptance was implicit, source-commit proof could be mistaken for parser authority, and whole-manifest resource ceilings were absent. | `Blocking`, resolved in the corrected design by exhaustive document-local `FormatException` precedence, post-parse-only `CatalogIncomplete`, exact role-reachable components with four named runtime-anchor exceptions, trusted-envelope ownership of real commit/blob proof, and fixed schema-1 ceilings of `16,777,216` bytes, depth `64`, and `1,000,000` JSON tokens. |
 | `FIND-0440` <a name="find-0440"></a> | The corrected marker/echo oracle did not classify xUnit/VSTest's marker-free same-FQN `RunInfo outcome="Error"` bookkeeping, while the summary matrix broadly rejected extra diagnostics. | `Blocking`, resolved in design by the append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849): at most one exact-shape marker-free same-FQN `[FAIL]` RunInfo is non-result bookkeeping only when the sole failed result, exact message, Failed summary, all 16 counters including `error=0`, and no other diagnostic remain exact. The exposing run stays diagnostic; the mandatory fresh post-sync run is now satisfied by the accepted canonical A BehaviorRed. |
+| `FIND-0441` <a name="find-0441"></a> | Exact pushed candidate `7f60e0c` was presented as complete although it combined four micro packets without retained D/RT/R/V evidence, left canonical records at `13/13`, contained 18 static A facts, and did not build; its rule candidate also carried invalid identifiers, lifecycle-token drift, an over-constrained two-fragment minimum, and a duplicate fact. | `Blocking` at staged-tree/checkpoint boundary. The bounded [recovery](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md) resolves semantic/code/count and local-V evidence: four retained exact filters pass `1/1`, cumulative A passes `17/17`, locked restore/unchanged relevant locks, zero-warning/error Release build, format/diff/marker checks, and fresh review `0/0/0` establish `ReviewedLocalGreen` without reconstructing absent historical red/review evidence. Exact staged-tree identity and any checkpoint remain pending and unauthorized, so no successor packet is active. |
 
 | Test readiness | Current state | Evidence |
 | --- | --- | --- |
-| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) and [TEST-0221](test-cases.md#test-0221) executable and complete; [TEST-0210](test-cases.md#test-0210) remains `Planned` with ContractSlice A Gate 3 in progress one reviewed increment at a time | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; the second A canonical-string exact-red contract is frozen and no later executable scenario inherits predecessor result evidence |
-| Test code | [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) exact-main complete in `MeAndAI.Protocol.Domain.Tests`; [TEST-0210](test-cases.md#test-0210) has its six-project scaffold, ownership/public-API tests, exact SurfaceRed anchor, canonical first BehaviorRed, first limited ParseCanonical implementation, and bounded-green second-A canonical-string implementation | Exact SurfaceRed is canonical; the focused A structural checkpoint passed `11/11`; pre-applicable-clarification BehaviorRed observations remain diagnostic; first and second A exact reds passed review; the second increment passed original-oracle and final-source exact-FQN `1/1`, cumulative A `13/13`, standard format verification, locked restore, unchanged six lock fingerprints, clean diff check, and a six-project Release build with zero warnings/errors; the non-gating severity-info scan exposed pre-existing backlog and suggestions and is not claimed clean |
+| Scenarios | Defined and decomposed; [TEST-0220](test-cases.md#test-0220) and [TEST-0221](test-cases.md#test-0221) executable and complete; [TEST-0210](test-cases.md#test-0210) remains `Planned` while bounded ContractSlice A pushed-candidate recovery is active | [TEST-0209](test-cases.md#test-0209) remains the feature-level composed scenario; no absent grammar/number/graph/rule red, review, marker, or TRX evidence is reconstructed and no successor packet is active |
+| Test code | [TEST-0220](test-cases.md#test-0220)/[TEST-0221](test-cases.md#test-0221) exact-main complete in `MeAndAI.Protocol.Domain.Tests`; [TEST-0210](test-cases.md#test-0210) retains its historical `13/13` baseline plus four recovery facts | Each grammar/number/graph/rule exact filter passes `1/1`, cumulative A passes `17/17`, and final local V plus fresh review `0/0/0` establish `ReviewedLocalGreen` after duplicate rule-fact consolidation; this is not hosted, checkpoint, or full TEST-0210 green evidence |
 | Baseline run | Exact A implementation baseline is [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) after completed [SUBF-0153](#subf-0153) | Exact-main [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) passed both stable jobs; local locked restore, SurfaceRed, and structural evidence are bounded A checkpoints, not merge/publication or full [TEST-0210](test-cases.md#test-0210) completion evidence |
 
 ## Decomposition and subfeature gates
@@ -325,7 +333,7 @@ above are deliberately unnumbered.
 | ID | Slice | Tracking | Dependencies | Tests/run | Self-review/findings | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | `SUBF-0142` <a name="subf-0142"></a> | Original typed rule/evidence/location/outcome/report planning slice | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | Accepted architecture | [TEST-0209](test-cases.md#test-0209) / not started | Gate 2 found mixed contracts | Superseded before implementation by [SUBF-0152](#subf-0152), [SUBF-0153](#subf-0153), [SUBF-0143](#subf-0143), and [SUBF-0154](#subf-0154); never reuse |
-| `SUBF-0143` <a name="subf-0143"></a> | [Qualification/complete catalog separation, release-bound provider-neutral typed context, persistent schema wires, topological owner-sharded target demand, sealed references, staged evaluator kernel, first common-rule slice, and deterministic aggregation](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) / corrected [ContractSlice A implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) / append-only [message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054) / append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) | Completed [SUBF-0153](#subf-0153) through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) | [TEST-0210](test-cases.md#test-0210) `Planned`; exact SurfaceRed, `11/11` structural checkpoint, canonical first BehaviorRed, first limited ParseCanonical green, reviewed second-A canonical-string BehaviorRed, original-oracle/final-source second-green `1/1`, and cumulative A `13/13` are local | Bounded canonical-string source review and red review each closed `0 Blocking`/`0 Important`/`0 Minor`; its coverage `Important` is closed; standard format, locked restore, six unchanged lock fingerprints, clean diff check, and zero-warning/error six-project Release build pass, while the non-gating severity-info scan is not clean and carries pre-existing informational backlog/suggestions; inventories remain `48/72/95/96`, final `72/23/1`, manifest `27/35` | ContractSlice A Gate 3 in progress; first limited ParseCanonical and canonical-string increments green; remaining A, B/C/D, and workflow/owner activation held |
+| `SUBF-0143` <a name="subf-0143"></a> | [Qualification/complete catalog separation, release-bound provider-neutral typed context, persistent schema wires, topological owner-sharded target demand, sealed references, staged evaluator kernel, first common-rule slice, and deterministic aggregation](subf-0143-typed-evaluation-kernel-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584) / corrected [ContractSlice A implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228) / append-only [message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054) / append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) | Completed [SUBF-0153](#subf-0153) through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) | [TEST-0210](test-cases.md#test-0210) `Planned`; historical A `13/13`; recovery grammar/number/graph/rule exact filters `1/1`, cumulative A `17/17`, final local V, and fresh review `0/0/0` | [FIND-0441](#find-0441) semantic/code/count/local-V defects are corrected and status is `ReviewedLocalGreen`; historical per-packet red/RT/review remains `NotEstablished`, while exact staged-tree/checkpoint remains pending and unauthorized; inventories remain `48/72/95/96`, final `72/23/1`, manifest `27/35` | ContractSlice A Gate 3 recovery locally reviewed; pushed `7f60e0c` is not a green predecessor; successor A, B/C/D, and workflow/owner activation held |
 | `SUBF-0144` <a name="subf-0144"></a> | Extensions, waivers, debt, qualification, and predecessor-trusted self-consumption | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [SUBF-0143](#subf-0143) | [TEST-0211](test-cases.md#test-0211) / not started | Pending | Proposed |
 | `SUBF-0152` <a name="subf-0152"></a> | [Closed rule identity, profile-axis, and outcome vocabulary](subf-0152-domain-vocabulary-design.md) in a fresh BCL-only Domain assembly | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) | [FEAT-0059](../FEAT-0059-csharp-operational-foundation/README.md); architecture [PR #169](https://github.com/hasanmanzak/meAndAI/pull/169); implementation [PR #170](https://github.com/hasanmanzak/meAndAI/pull/170) | [TEST-0220](test-cases.md#test-0220) / expected red, 52 of 52 focused Release tests, cross-runtime StructureOnly, and exact-main [run 30511073506](https://github.com/hasanmanzak/meAndAI/actions/runs/30511073506) | Gate 5 reviews and exact-main Ubuntu/Windows validation clean; zero unresolved `Blocking` findings | Complete at [`c31819487e77fc878fc40fae6445bfef582719da`](https://github.com/hasanmanzak/meAndAI/commit/c31819487e77fc878fc40fae6445bfef582719da) |
 | `SUBF-0153` <a name="subf-0153"></a> | [Evidence requirements, target/boundary scope, asserted-canonical payloads, typed locations, contexts, and acquisition-result union](subf-0153-evidence-contract-design.md) | [#165](https://github.com/hasanmanzak/meAndAI/issues/165) / historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5126219253) / [PR #171](https://github.com/hasanmanzak/meAndAI/pull/171) / [Gate 3 activation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5135051435) / [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) | Completed [SUBF-0152](#subf-0152); accepted/merged/exact-main [SUBF-0143](#subf-0143) typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) | [TEST-0221](test-cases.md#test-0221) Passing in existing Domain.Tests | Valid expected red and focused/combined green; exact-head and exact-main hosted validation passed | Complete at exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -469,9 +477,17 @@ not imply release or authority transfer.
   fingerprints, and the zero-warning/error six-project Release build passed.
   Its coverage `Important` is closed without claiming full A or a clean
   non-gating severity-info scan.
+- [x] [FIND-0441](#find-0441) local recovery finalization: locked restore and
+  relevant lock equality, zero-warning/error six-project Release build,
+  standard format, clean diff/marker checks, record synchronization, and fresh
+  full-diff review `0/0/0` establish `ReviewedLocalGreen`.
+- [ ] Separately authorized Git finalization: stage only the reviewed allowlist,
+  review exact staged-tree identity, then receive separate commit and push
+  directives. No such authority is granted here.
 
-All ContractSlice A Gate 3 entry items are satisfied. B/C/D and workflow/owner
-activation remain held throughout the bounded A implementation.
+The original ContractSlice A Gate 3 entry items remain satisfied, but the
+recovery-finalization item above blocks any successor packet. B/C/D and
+workflow/owner activation remain held throughout the bounded A implementation.
 
 ## Acceptance criteria
 
@@ -523,8 +539,12 @@ RunInfo evidence corrections passed renewed review with `0 Blocking`,
 applicable clarifications remain diagnostic only; the authoritative packet is
 synchronized and the fresh same-FQN run is accepted as canonical BehaviorRed.
 The first limited ParseCanonical and second canonical-string increments are
-green; the canonical-string coverage `Important` is closed, remaining A
-increments are pending, and [TEST-0210](test-cases.md#test-0210) remains
+green; the canonical-string coverage `Important` is closed. Later pushed
+grammar/number/graph/rule work is under [FIND-0441](#find-0441) recovery: its
+four retained filters pass `1/1`, cumulative A passes `17/17`, and final local
+V plus fresh full-diff review `0/0/0` establish `ReviewedLocalGreen`. Exact
+staged-tree/checkpoint remains pending and unauthorized, and no missing
+historical red or review evidence is claimed. [TEST-0210](test-cases.md#test-0210) remains
 `Planned`. B/C/D and
 workflow/owner activation remain unauthorized. The parent
 feature remains open because every later implementation, complete catalog,

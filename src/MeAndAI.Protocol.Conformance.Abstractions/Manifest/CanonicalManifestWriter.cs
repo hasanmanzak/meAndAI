@@ -1,12 +1,33 @@
 using System.Buffers;
 using System.Security.Cryptography;
 using System.Text.Json;
+using MeAndAI.Protocol.Domain;
 
 namespace MeAndAI.Protocol.Conformance.Abstractions;
 
 internal static class CanonicalManifestWriter
 {
     private const string SchemaKey = "protocol.policy-manifest.v1";
+
+    internal static byte[] Write(FinalizedPolicyManifest manifest)
+    {
+        ArgumentNullException.ThrowIfNull(manifest);
+
+        if (manifest.Slice is null || manifest.CompleteCatalog is not null)
+        {
+            throw new InvalidOperationException(
+                "This writer increment supports only qualification slices.");
+        }
+
+        return Write(new ParsedCanonicalManifest(
+            manifest.AuthorityKind,
+            manifest.SourceCommit,
+            manifest.SchemaRegistry,
+            manifest.ActivationProofContract,
+            manifest.ArtifactFiles,
+            manifest.Components,
+            manifest.Slice));
+    }
 
     internal static byte[] Write(ParsedCanonicalManifest manifest)
     {

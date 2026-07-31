@@ -6,7 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A canonical-string bounded-green closure handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
+[ContractSlice A pushed-candidate recovery handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
+the historical [ContractSlice A canonical-string bounded-green closure handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
 [ContractSlice A topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 the historical [evidence-contract implementation handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
@@ -119,8 +120,14 @@ boundaries. Seam predecessor, exact red, original-oracle/final-source greens,
 cumulative A `13/13`, source reviews, locked restore, unchanged locks, standard
 format, clean diff check, and zero-warning/error Release build close the
 canonical-string coverage `Important`. The non-gating severity-info scan is not
-claimed clean. Remaining A is held with no later increment active;
-[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+claimed clean. Those statements close the historical `13/13` checkpoint.
+Later exact pushed candidate `7f60e0c` is not a green predecessor: its static
+18-fact tree lacked valid build and per-packet evidence. Current
+[FIND-0441](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+recovery retains four facts, each locally green `1/1`, and cumulative A is
+locally `17/17`; final local V and fresh full-diff review `0/0/0` establish
+`ReviewedLocalGreen`, while exact staged-tree identity/checkpoint remains
+pending and unauthorized and no successor A packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Workflow/scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
@@ -171,6 +178,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-07-31 - SUBF-0143 ContractSlice A pushed-candidate recovery](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A topology correction](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
 - [2026-07-30 - Evidence-contract local activation candidate](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md)
 - [2026-07-30 - Typed-evaluation-kernel design](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md)

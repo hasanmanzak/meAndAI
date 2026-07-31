@@ -286,28 +286,34 @@ internal static class CanonicalManifestReader
             var introducedIn = reader.ReadString();
             string? deprecatedIn = null;
             string? retiredIn = null;
-            while (reader.TokenType == JsonTokenType.PropertyName)
+
+            if (!reader.Read())
             {
-                if (reader.IsPropertyName("deprecatedIn"))
-                {
-                    reader.ExpectProperty("deprecatedIn");
-                    deprecatedIn = reader.ReadString();
-                    reader.Read();
-                    continue;
-                }
-
-                if (reader.IsPropertyName("retiredIn"))
-                {
-                    reader.ExpectProperty("retiredIn");
-                    retiredIn = reader.ReadString();
-                    reader.Read();
-                    continue;
-                }
-
-                break;
+                throw new FormatException(
+                    "The rule declaration ended before compatibilityAliases.");
             }
 
-            reader.ExpectProperty("compatibilityAliases");
+            if (reader.IsPropertyName("deprecatedIn"))
+            {
+                deprecatedIn = reader.ReadString();
+                if (!reader.Read())
+                {
+                    throw new FormatException(
+                        "The rule declaration ended before compatibilityAliases.");
+                }
+            }
+
+            if (reader.IsPropertyName("retiredIn"))
+            {
+                retiredIn = reader.ReadString();
+                if (!reader.Read())
+                {
+                    throw new FormatException(
+                        "The rule declaration ended before compatibilityAliases.");
+                }
+            }
+
+            reader.RequireProperty("compatibilityAliases");
             var compatibilityAliases = ReadStringArray(ref reader);
             reader.Expect(JsonTokenType.EndObject);
 
@@ -390,7 +396,7 @@ internal static class CanonicalManifestReader
         var values = new List<string>();
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
-            values.Add(reader.ReadString());
+            values.Add(reader.ReadCurrentString());
         }
 
         return values;
@@ -599,6 +605,11 @@ internal static class CanonicalManifestReader
         try
         {
             RequirePositiveCacheBudget(cacheBudget);
+            ValidateCanonicalArtifactOrder(artifacts);
+            ValidateCanonicalComponentOrder(rawComponents);
+
+            var declarationComponentReferences =
+                CollectRuleComponentReferences(slice.Rules);
 
             var typedCacheBudget = SessionCacheBudget.Create(
                 cacheBudget.MaxDecodeEntries,
@@ -635,7 +646,10 @@ internal static class CanonicalManifestReader
             }
 
             var componentBindings = new List<ComponentArtifactBinding>();
-            var componentKeys = new HashSet<string>(StringComparer.Ordinal);
+            var componentKeys =
+                new HashSet<(string ComponentKey, string ComponentVersion)>();
+            var physicalComponentIdentities =
+                new HashSet<(string AssemblyName, string TypeName)>();
             var usedArtifacts = new HashSet<string>(StringComparer.Ordinal);
             ComponentTypeIdentity? activationProofComponent = null;
             var componentLookup = new Dictionary<(string, string), ComponentTypeIdentity>();
@@ -647,11 +661,20 @@ internal static class CanonicalManifestReader
                     component.ComponentVersion,
                     component.AssemblyName,
                     component.TypeName);
-                var componentKey = component.ComponentKey + "|" + component.ComponentVersion;
-                if (!componentKeys.Add(componentKey))
+                if (!componentKeys.Add(
+                        (componentIdentity.ComponentKey,
+                         componentIdentity.ComponentVersion)))
                 {
                     throw new FormatException(
                         "The manifest components array contains duplicate component identities.");
+                }
+
+                if (!physicalComponentIdentities.Add(
+                        (componentIdentity.AssemblyName,
+                         componentIdentity.TypeName)))
+                {
+                    throw new FormatException(
+                        "The manifest components array contains a duplicate physical type identity.");
                 }
 
                 if (!artifactFileNames.Contains(component.ArtifactFileName))
@@ -680,10 +703,37 @@ internal static class CanonicalManifestReader
                     "The activation-proof component is not declared.");
             }
 
-            foreach (var component in componentBindings.Select(item => item.Component))
+            foreach (var binding in componentBindings)
             {
-                if (!IsActivationProof(component, activationProof) &&
-                    !IsRuntimeAnchor(component))
+                var component = binding.Component;
+                var componentReference =
+                    (component.ComponentKey, component.ComponentVersion);
+                var isActivationProof =
+                    IsActivationProof(component, activationProof);
+                var isRuntimeAnchor = IsRuntimeAnchor(binding);
+                var hasRuntimeAnchorPhysicalIdentity =
+                    IsRuntimeAnchorPhysicalIdentity(component);
+                var isDeclarationReference =
+                    declarationComponentReferences.Contains(componentReference);
+
+                if ((IsRuntimeAnchorKey(component.ComponentKey) ||
+                     hasRuntimeAnchorPhysicalIdentity) &&
+                    !isRuntimeAnchor)
+                {
+                    throw new FormatException(
+                        "A runtime anchor does not have its exact schema-1 identity and artifact mapping.");
+                }
+
+                if (isRuntimeAnchor &&
+                    (isActivationProof || isDeclarationReference))
+                {
+                    throw new FormatException(
+                        "A runtime anchor cannot satisfy a functional declaration reference.");
+                }
+
+                if (!isActivationProof &&
+                    !isRuntimeAnchor &&
+                    !isDeclarationReference)
                 {
                     throw new FormatException(
                         "The manifest component graph is not fully closed.");
@@ -731,6 +781,73 @@ internal static class CanonicalManifestReader
         RawActivationProof activationProof) =>
         string.Equals(component.ComponentKey, activationProof.ComponentKey, StringComparison.Ordinal) &&
         string.Equals(component.ComponentVersion, activationProof.ComponentVersion, StringComparison.Ordinal);
+
+    private static HashSet<(string ComponentKey, string ComponentVersion)>
+        CollectRuleComponentReferences(
+            IReadOnlyList<RawRuleDeclaration> rules)
+    {
+        var references = new HashSet<(string, string)>();
+        foreach (var rule in rules)
+        {
+            references.Add(
+                (rule.Evaluator.ComponentKey, rule.Evaluator.ComponentVersion));
+            foreach (var slot in rule.ApplicabilitySlots.Concat(rule.EvaluationSlots))
+            {
+                foreach (var capability in slot.Capabilities)
+                {
+                    references.Add((
+                        capability.InterfaceType.ComponentKey,
+                        capability.InterfaceType.ComponentVersion));
+                }
+            }
+
+            foreach (var selector in rule.ExpectedSelectors)
+            {
+                references.Add((
+                    selector.Resolver.ComponentKey,
+                    selector.Resolver.ComponentVersion));
+            }
+        }
+
+        return references;
+    }
+
+    private static void ValidateCanonicalArtifactOrder(
+        IReadOnlyList<RawArtifact> artifacts)
+    {
+        for (var index = 1; index < artifacts.Count; index++)
+        {
+            if (StringComparer.Ordinal.Compare(
+                    artifacts[index - 1].FileName,
+                    artifacts[index].FileName) >= 0)
+            {
+                throw new FormatException(
+                    "The manifest artifactFiles array is not in canonical FileName order.");
+            }
+        }
+    }
+
+    private static void ValidateCanonicalComponentOrder(
+        IReadOnlyList<RawComponent> components)
+    {
+        for (var index = 1; index < components.Count; index++)
+        {
+            var previous = components[index - 1];
+            var current = components[index];
+            var keyComparison = StringComparer.Ordinal.Compare(
+                previous.ComponentKey,
+                current.ComponentKey);
+            if (keyComparison > 0 ||
+                (keyComparison == 0 &&
+                 StringComparer.Ordinal.Compare(
+                     previous.ComponentVersion,
+                     current.ComponentVersion) >= 0))
+            {
+                throw new FormatException(
+                    "The manifest components array is not in canonical key/version order.");
+            }
+        }
+    }
 
     private static IReadOnlyList<RuleDeclaration> CreateRules(
         IReadOnlyList<RawRuleDeclaration> rules,
@@ -882,21 +999,50 @@ internal static class CanonicalManifestReader
         return component;
     }
 
-    private static bool IsRuntimeAnchor(ComponentTypeIdentity component) =>
-        component.ComponentVersion is "1" &&
+    private static bool IsRuntimeAnchor(ComponentArtifactBinding binding)
+    {
+        var component = binding.Component;
+        return component.ComponentVersion is "1" &&
+            component switch
+            {
+                _ when component.ComponentKey == "protocol.runtime.domain" &&
+                    component.AssemblyName == "MeAndAI.Protocol.Domain" &&
+                    component.TypeName == "MeAndAI.Protocol.Domain.RuleId" &&
+                    binding.ArtifactFileName == "MeAndAI.Protocol.Domain.dll" => true,
+                _ when component.ComponentKey == "protocol.runtime.conformance-abstractions" &&
+                    component.AssemblyName == "MeAndAI.Protocol.Conformance.Abstractions" &&
+                    component.TypeName == "MeAndAI.Protocol.Conformance.Abstractions.PolicyQualificationSliceExport" &&
+                    binding.ArtifactFileName == "MeAndAI.Protocol.Conformance.Abstractions.dll" => true,
+                _ when component.ComponentKey == "protocol.runtime.conformance" &&
+                    component.AssemblyName == "MeAndAI.Protocol.Conformance" &&
+                    component.TypeName == "MeAndAI.Protocol.Conformance.CatalogIntegrityException" &&
+                    binding.ArtifactFileName == "MeAndAI.Protocol.Conformance.dll" => true,
+                _ when component.ComponentKey == "protocol.runtime.markdig" &&
+                    component.AssemblyName == "Markdig" &&
+                    component.TypeName == "Markdig.Markdown" &&
+                    binding.ArtifactFileName == "Markdig.dll" => true,
+                _ => false,
+            };
+    }
+
+    private static bool IsRuntimeAnchorKey(string componentKey) =>
+        componentKey is
+            "protocol.runtime.domain" or
+            "protocol.runtime.conformance-abstractions" or
+            "protocol.runtime.conformance" or
+            "protocol.runtime.markdig";
+
+    private static bool IsRuntimeAnchorPhysicalIdentity(
+        ComponentTypeIdentity component) =>
         component switch
         {
-            _ when component.ComponentKey == "protocol.runtime.domain" &&
-                component.AssemblyName == "MeAndAI.Protocol.Domain" &&
+            _ when component.AssemblyName == "MeAndAI.Protocol.Domain" &&
                 component.TypeName == "MeAndAI.Protocol.Domain.RuleId" => true,
-            _ when component.ComponentKey == "protocol.runtime.conformance-abstractions" &&
-                component.AssemblyName == "MeAndAI.Protocol.Conformance.Abstractions" &&
+            _ when component.AssemblyName == "MeAndAI.Protocol.Conformance.Abstractions" &&
                 component.TypeName == "MeAndAI.Protocol.Conformance.Abstractions.PolicyQualificationSliceExport" => true,
-            _ when component.ComponentKey == "protocol.runtime.conformance" &&
-                component.AssemblyName == "MeAndAI.Protocol.Conformance" &&
+            _ when component.AssemblyName == "MeAndAI.Protocol.Conformance" &&
                 component.TypeName == "MeAndAI.Protocol.Conformance.CatalogIntegrityException" => true,
-            _ when component.ComponentKey == "protocol.runtime.markdig" &&
-                component.AssemblyName == "Markdig" &&
+            _ when component.AssemblyName == "Markdig" &&
                 component.TypeName == "Markdig.Markdown" => true,
             _ => false,
         };
@@ -979,6 +1125,17 @@ internal static class CanonicalManifestReader
         internal void ExpectProperty(string expected)
         {
             Expect(JsonTokenType.PropertyName);
+            RequireProperty(expected);
+        }
+
+        internal void RequireProperty(string expected)
+        {
+            if (_reader.TokenType != JsonTokenType.PropertyName)
+            {
+                throw new FormatException(
+                    $"Expected policy manifest property '{expected}'.");
+            }
+
             if (!_reader.ValueTextEquals(expected))
             {
                 throw new FormatException(
@@ -1001,6 +1158,16 @@ internal static class CanonicalManifestReader
         internal string ReadString()
         {
             Expect(JsonTokenType.String);
+            return ReadCurrentString();
+        }
+
+        internal string ReadCurrentString()
+        {
+            if (_reader.TokenType != JsonTokenType.String)
+            {
+                throw new FormatException(
+                    "Expected JSON token 'String'.");
+            }
 
             string value;
             try
@@ -1122,7 +1289,7 @@ internal static class CanonicalManifestReader
             }
         }
 
-        private bool Read()
+        internal bool Read()
         {
             if (!_reader.Read())
             {

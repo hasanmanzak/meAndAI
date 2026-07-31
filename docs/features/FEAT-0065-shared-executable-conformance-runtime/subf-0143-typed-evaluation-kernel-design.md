@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; ContractSlice A topology, evidence/parser-boundary, and standard-TRX RunInfo corrections passed renewed review with `0 Blocking` / `0 Important` / `0 Minor`; canonical BehaviorRed, first limited ParseCanonical green, and second A canonical-string bounded green accepted; the canonical-string coverage `Important` is closed, remaining A is pending, and [TEST-0210](test-cases.md#test-0210) remains `Planned`; authorized Gate 3 A in progress |
+| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded `FIND-0441` recovery of pushed grammar/number/graph/rule candidate `7f60e0c` is `ReviewedLocalGreen` with four focused `1/1`, cumulative `17/17`, and fresh review `0/0/0`; exact staged-tree/checkpoint remains pending and unauthorized, no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Proposed Gate 3 micro-delivery routing | [SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md); non-normative until maintainer acceptance, with operational labels that activate no work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143 micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [pushed-candidate recovery handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md); operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |

@@ -18,8 +18,9 @@ the historical [evidence-acquisition design handoff](log/2026-07-30-feat-0065-su
 the historical [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
-the current [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
-and the proposed
+the current [ContractSlice A pushed-candidate recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
+the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
+and the maintainer-approved
 [SUBF-0143 micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
 The product is one versioned executable protocol platform implemented in C#,
 not a collection of CLI products. [SUBF-0152](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152)
@@ -87,20 +88,28 @@ format, clean diff check, and the zero-warning/error six-project Release build
 passed; the non-gating severity-info scan exposed pre-existing informational
 backlog/suggestions and is not claimed clean. The canonical-string coverage
 `Important` is closed, but remaining A is pending and [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. Each reviewed A source, exact red, and smallest green proceeds
-separately, one increment at a time; no later A increment is active. A constructs
+remains `Planned`. At that historical checkpoint, each reviewed A source, exact
+red, and smallest green proceeded separately and no later A increment was active;
+the recovery paragraph below now owns current routing. A constructs
 no executable export and declares no kernel. B/C/D, workflow/scenario-owner/
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, consumer, release, publication, authority-transfer, and
 PowerShell-retirement changes remain unauthorized.
 
-The proposed micro-delivery plan is non-normative and non-activating until
-maintainer acceptance. If accepted, begin with its `BASE-SCOPE` through
-`BASE-CHECKPOINT` sequence. The current source/test trees are now tracked by
-local baseline commit `5fa7f7d` (`[skip ci]`); cumulative `13/13` is now a
-content-addressed reviewed local predecessor, and `BASE-RECORDS` is synchronized.
-Do not let a small-context agent select its own contract, evidence ordinal,
-FQN, marker, oracle, allowlist, or held-scope exception.
+The maintainer-approved micro-delivery plan now routes through bounded
+[FIND-0441](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0441)
+recovery. Historical cumulative `13/13` content is `5fa7f7d`, with records
+synchronized by `9107a49`. Exact pushed `7f60e0c` is recovery input, not an
+accepted predecessor: it contained 18 static A facts, no valid `18/18` run, and
+no retained per-packet red/RT/review evidence. Recovery consolidates the rule
+fact and now passes four exact focused filters `1/1` plus cumulative A `17/17`
+locally. Final local V passed locked restore with the six relevant lock
+fingerprints unchanged, zero-warning/error Release build, format, diff/marker
+checks, and fresh full-diff review `0/0/0`. Recovery is `ReviewedLocalGreen`;
+exact staged-tree identity and any separately authorized checkpoint remain pending.
+`TEST-0210` stays `Planned`; no successor A packet is active. Do not let a
+small-context agent select its own contract, evidence ordinal, FQN, marker,
+oracle, allowlist, or held-scope exception.
 
 Immutable [v0.16.0](https://github.com/hasanmanzak/meAndAI/releases/tag/v0.16.0)
 is published at
