@@ -36,7 +36,6 @@ internal static class CanonicalManifestWriter
         var slice = manifest.Slice;
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
-            manifest.SchemaRegistry.Parsers.Count != 0 ||
             manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
             manifest.SchemaRegistry.AdmissionProofContracts.Count != 0 ||
             manifest.ArtifactFiles.Count == 0 ||
@@ -108,7 +107,7 @@ internal static class CanonicalManifestWriter
         writer.WritePropertyName("schemaRegistry");
         writer.WriteStartObject();
         WritePayloadSchemas(writer, registry.PayloadSchemas);
-        WriteEmptyArray(writer, "parsers");
+        WriteParsers(writer, registry.Parsers);
         WriteIndexes(writer, registry.Indexes);
         WriteEmptyArray(writer, "demandProjectors");
         WriteEmptyArray(writer, "admissionProofContracts");
@@ -136,6 +135,56 @@ internal static class CanonicalManifestWriter
         writer.WriteEndObject();
     }
 
+    private static void WriteParsers(Utf8JsonWriter writer,
+        IReadOnlyList<SemanticModelParserDeclaration> parsers)
+    {
+        writer.WriteStartArray("parsers");
+        foreach (var parser in parsers)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "parserKey", parser.ParserKey);
+            WriteCanonicalString(writer, "parserVersion", parser.ParserVersion);
+            WriteComponentReference(writer, "parser", parser.Parser);
+            writer.WriteStartArray("inputs");
+            foreach (var input in parser.Inputs)
+            {
+                var model = input.Model!;
+                writer.WriteStartObject();
+                WriteCanonicalString(writer, "kind", "model");
+                writer.WritePropertyName("model");
+                writer.WriteStartObject();
+                WriteCanonicalString(writer, "modelKey", model.ModelKey);
+                WriteCanonicalString(writer, "modelVersion", model.ModelVersion);
+                WriteComponentReference(writer, "implementationType", model.ImplementationType);
+                writer.WriteEndObject();
+                writer.WriteNumber("minimumCount", input.MinimumCount);
+                if (input.MaximumCount is int maximumCount)
+                {
+                    writer.WriteNumber("maximumCount", maximumCount);
+                }
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+            writer.WritePropertyName("outputModel");
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "modelKey", parser.OutputModel.ModelKey);
+            WriteCanonicalString(writer, "modelVersion", parser.OutputModel.ModelVersion);
+            WriteComponentReference(writer, "implementationType", parser.OutputModel.ImplementationType);
+            writer.WriteEndObject();
+            writer.WritePropertyName("budget");
+            writer.WriteStartObject();
+            writer.WriteNumber("maxBytes", parser.Budget.MaxBytes);
+            writer.WriteNumber("maxDepth", parser.Budget.MaxDepth);
+            writer.WriteNumber("maxNodes", parser.Budget.MaxNodes);
+            writer.WriteNumber("maxComplexity", parser.Budget.MaxComplexity);
+            writer.WriteEndObject();
+            WriteCanonicalStringValues(writer, "failureCodes",
+                parser.FailureCodes.Select(code => code.Value));
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
+    }
+
     private static void WriteIndexes(Utf8JsonWriter writer,
         IReadOnlyList<ContextIndexDeclaration> indexes)
     {
@@ -161,10 +210,12 @@ internal static class CanonicalManifestWriter
                     writer, "implementationType", model.ImplementationType);
                 writer.WriteEndObject();
                 writer.WriteNumber("minimumCount", input.MinimumCount);
-                writer.WriteNumber("maximumCount", input.MaximumCount!.Value);
+                if (input.MaximumCount is int maximumCount)
+                {
+                    writer.WriteNumber("maximumCount", maximumCount);
+                }
                 writer.WriteEndObject();
             }
-
             writer.WriteEndArray();
             writer.WritePropertyName("outputCapability");
             WriteCapability(writer, index.OutputCapability);

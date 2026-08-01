@@ -4,11 +4,14 @@ Last verified: **2026-08-01**
 
 ## Verified facts
 
-- Current ContractSlice A continuation: exact remote-equal hosted-green
-  predecessor
+- Current ContractSlice A continuation: strict-redraw base
   [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
-  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and Windows in
-  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833);
+  git tree identity `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  Exact implementation predecessor
+  [`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
+  git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed Ubuntu and Windows in
+  [run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988);
   publication verification was correctly skipped and the
   [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
   GitGuardian green.
@@ -19,14 +22,16 @@ Last verified: **2026-08-01**
   and three final `0/0/0` reviews remain immutable. Strict D/RT retired
   never-activated `A-PARSER-INDEX-01` as a non-live, non-reactivatable
   `RetiredBeforeActivation` tombstone and partitioned it into three ordered
-  packets. `A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed` after
-  D/RT `0/0/0`; `A-GOVERNED-REFERENCE-SLOTS-01`,
+  packets. `A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen /
+  PendingExactHeadHostedVerification`: canonical R is immutable, final focused
+  green is `1/1`, cumulative A is `20/20`, exact packet size is `666/690`, and
+  three independent post-green reviews closed `0/0/0`.
+  `A-GOVERNED-REFERENCE-SLOTS-01`,
   `A-TARGET-PARSER-INDEX-SLOT-01`, and every later packet remain
-  Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; six packets
-  are `ReviewedLocalGreen` (`30%`), a denominator correction rather than a
-  progress regression. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned` and cumulative A remains `19/19` until the active packet is
-  green. The umbrella directive still covers ordered remaining A through
+  Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; seven packets
+  are `ReviewedLocalGreen` (`35%`). [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`; no final scenario/status/owner/workflow activation is
+  claimed. The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
   [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md);
@@ -479,7 +484,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   green. The oversized next vertical was redrawn without semantic expansion;
   `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`. A later strict D/RT retired
   residual `A-PARSER-INDEX-01` before activation and replaced it with three
-  ordered live packets; only `A-PARSER-RECORD-SLOT-01` is active at `PreRed`.
+  ordered live packets; `A-PARSER-RECORD-SLOT-01` is packet-local
+  `ReviewedLocalGreen / PendingExactHeadHostedVerification`, while both redraw
+  successors remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1589,10 +1596,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   remains `Planned`. The later umbrella checkpoint authorized the strictly
   redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
   current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
-  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is
-  `MaintainerActivated / PreRed`, while both redraw successors and every later
-  packet remain Candidate/inactive. The live packet denominator is twenty and
-  current completed progress is six (`30%`).
+  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is packet-local
+  `ReviewedLocalGreen / PendingExactHeadHostedVerification`, while both redraw
+  successors and every later packet remain Candidate/inactive. The live packet
+  denominator is twenty and current completed progress is seven (`35%`), with
+  cumulative A green `20/20`.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

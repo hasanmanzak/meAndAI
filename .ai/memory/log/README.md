@@ -222,10 +222,17 @@ WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
 The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
 historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
-replaces it with three ordered live packets. Six of twenty live packets are
-`ReviewedLocalGreen` (`30%`); `A-PARSER-RECORD-SLOT-01` is
-`MaintainerActivated / PreRed`, while its two redraw successors and every later
-packet remain Candidate/inactive.
+replaces it with three ordered live packets. Seven of twenty live packets are
+`ReviewedLocalGreen` (`35%`); `A-PARSER-RECORD-SLOT-01` is packet-local
+`ReviewedLocalGreen / PendingExactHeadHostedVerification`, while its two redraw
+successors and every later packet remain Candidate/inactive. Its immutable R,
+focused `1/1`, cumulative A `20/20`, exact `666/690` packet, and three
+independent post-green `0/0/0` reviews are recorded in the
+[parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+Its exact implementation predecessor is remote-equal
+[`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
+git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, with Ubuntu and Windows green in
+[run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
 
 The historical index-slot handoff also records the occurrence behind
 [FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445):

@@ -195,7 +195,7 @@ recorded in the
 [D/RT disposition](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md#a-index-slot-01-drt-observation),
 whose historical first `0/1/0` finding and renewed RT `0/0/0` remain evidence.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-stays `Planned`; historical cumulative A remains `19/19`. Exact remote-equal
+stays `Planned`; packet-local cumulative A is now green `20/20`. Exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and Windows in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
@@ -203,9 +203,18 @@ git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and
 and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 are resolved. Strict D/RT retires never-activated `A-PARSER-INDEX-01` as a
 non-live `RetiredBeforeActivation` tombstone and replaces it with three ordered
-packets. `A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed`; the next
-two replacements and every later packet remain Candidate/inactive. Six of
-twenty live packets are `ReviewedLocalGreen` (`30%`). The
+packets. `A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen /
+PendingExactHeadHostedVerification`; the next two replacements and every later
+packet remain Candidate/inactive. Seven of twenty live packets are
+`ReviewedLocalGreen` (`35%`). Exact R, focused `1/1`, cumulative A `20/20`,
+`666/690` packet budget, validation, and three independent post-green `0/0/0`
+reviews are recorded in the
+[parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+Its exact implementation predecessor is remote-equal
+[`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
+git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, with Ubuntu and Windows green in
+[run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
+The
 packet-local evidence remains unchanged, but pushed head
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
 git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only

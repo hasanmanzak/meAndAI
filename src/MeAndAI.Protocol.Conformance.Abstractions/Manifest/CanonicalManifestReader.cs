@@ -98,7 +98,7 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("payloadSchemas");
         var payloadSchemas = ReadPayloadSchemas(ref reader);
         reader.ExpectProperty("parsers");
-        reader.ExpectEmptyArray();
+        var parsers = ReadParsers(ref reader);
         reader.ExpectProperty("indexes");
         var indexes = ReadIndexes(ref reader);
         reader.ExpectProperty("demandProjectors");
@@ -127,6 +127,7 @@ internal static class CanonicalManifestReader
 
         return new RawSchemaRegistry(
             payloadSchemas,
+            parsers,
             indexes,
             new RawCacheBudget(
                 maxDecodeEntries,
@@ -206,6 +207,42 @@ internal static class CanonicalManifestReader
         return schemas;
     }
 
+    private static IReadOnlyList<RawSemanticParser> ReadParsers(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var parsers = new List<RawSemanticParser>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException("The manifest parsers array must contain objects.");
+            }
+            reader.ExpectProperty("parserKey"); var parserKey = reader.ReadString();
+            reader.ExpectProperty("parserVersion"); var parserVersion = reader.ReadString();
+            reader.ExpectProperty("parser"); var parser = ReadComponentReference(ref reader);
+            reader.ExpectProperty("inputs"); var input = ReadSingleModelInput(ref reader);
+            reader.ExpectProperty("outputModel");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("modelKey"); var modelKey = reader.ReadString();
+            reader.ExpectProperty("modelVersion"); var modelVersion = reader.ReadString();
+            reader.ExpectProperty("implementationType"); var implementationType = ReadComponentReference(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            reader.ExpectProperty("budget");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("maxBytes"); var maxBytes = reader.ReadInt64();
+            reader.ExpectProperty("maxDepth"); var maxDepth = reader.ReadInt32();
+            reader.ExpectProperty("maxNodes"); var maxNodes = reader.ReadInt64();
+            reader.ExpectProperty("maxComplexity"); var maxComplexity = reader.ReadInt64();
+            reader.Expect(JsonTokenType.EndObject);
+            reader.ExpectProperty("failureCodes"); var failureCodes = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            parsers.Add(new RawSemanticParser(parserKey, parserVersion, parser, input,
+                modelKey, modelVersion, implementationType,
+                maxBytes, maxDepth, maxNodes, maxComplexity, failureCodes));
+        }
+        return parsers;
+    }
+
     private static IReadOnlyList<RawContextIndex> ReadIndexes(ref BoundedJsonReader reader)
     {
         reader.Expect(JsonTokenType.StartArray);
@@ -226,29 +263,7 @@ internal static class CanonicalManifestReader
             reader.ExpectProperty("invocationScope");
             var invocationScope = reader.ReadString();
             reader.ExpectProperty("inputs");
-            reader.Expect(JsonTokenType.StartArray);
-            reader.Expect(JsonTokenType.StartObject);
-            reader.ExpectProperty("kind");
-            if (reader.ReadString() != "model")
-            {
-                throw new FormatException("This parser increment requires a model index input.");
-            }
-
-            reader.ExpectProperty("model");
-            reader.Expect(JsonTokenType.StartObject);
-            reader.ExpectProperty("modelKey");
-            var modelKey = reader.ReadString();
-            reader.ExpectProperty("modelVersion");
-            var modelVersion = reader.ReadString();
-            reader.ExpectProperty("implementationType");
-            var implementationType = ReadComponentReference(ref reader);
-            reader.Expect(JsonTokenType.EndObject);
-            reader.ExpectProperty("minimumCount");
-            var minimumCount = reader.ReadInt32();
-            reader.ExpectProperty("maximumCount");
-            var maximumCount = reader.ReadInt32();
-            reader.Expect(JsonTokenType.EndObject);
-            reader.Expect(JsonTokenType.EndArray);
+            var input = ReadSingleModelInput(ref reader);
             reader.ExpectProperty("outputCapability");
             reader.Expect(JsonTokenType.StartObject);
             reader.ExpectProperty("capabilityKey");
@@ -274,12 +289,47 @@ internal static class CanonicalManifestReader
             reader.Expect(JsonTokenType.EndObject);
             indexes.Add(new RawContextIndex(
                 indexKey, indexVersion, indexer, invocationScope,
-                new RawIndexInput(modelKey, modelVersion, implementationType, minimumCount, maximumCount),
+                input,
                 new RawCapabilityContract(capabilityKey, capabilityVersion, interfaceType),
                 maxBytes, maxDepth, maxNodes, maxComplexity, failureCodes));
         }
 
         return indexes;
+    }
+
+    private static RawModelInput ReadSingleModelInput(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("kind");
+        if (reader.ReadString() != "model")
+        {
+            throw new FormatException("This parser increment requires a model component input.");
+        }
+        reader.ExpectProperty("model");
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("modelKey"); var modelKey = reader.ReadString();
+        reader.ExpectProperty("modelVersion"); var modelVersion = reader.ReadString();
+        reader.ExpectProperty("implementationType"); var implementationType = ReadComponentReference(ref reader);
+        reader.Expect(JsonTokenType.EndObject);
+        reader.ExpectProperty("minimumCount"); var minimumCount = reader.ReadInt32();
+        int? maximumCount = null;
+        if (!reader.Read())
+        {
+            throw new FormatException("The component input is incomplete.");
+        }
+        if (reader.TokenType == JsonTokenType.PropertyName)
+        {
+            reader.RequireProperty("maximumCount");
+            maximumCount = reader.ReadInt32();
+            reader.Expect(JsonTokenType.EndObject);
+        }
+        else if (reader.TokenType != JsonTokenType.EndObject)
+        {
+            throw new FormatException("Expected component input maximumCount or end of object.");
+        }
+        reader.Expect(JsonTokenType.EndArray);
+        return new RawModelInput(modelKey, modelVersion, implementationType, minimumCount, maximumCount);
     }
 
     private static RawActivationProof ReadActivationProof(
@@ -760,6 +810,7 @@ internal static class CanonicalManifestReader
                 CollectDeclarationComponentReferences(
                     slice.Rules,
                     rawSchemaRegistry.PayloadSchemas,
+                    rawSchemaRegistry.Parsers,
                     rawSchemaRegistry.Indexes);
 
             var typedCacheBudget = SessionCacheBudget.Create(
@@ -894,7 +945,7 @@ internal static class CanonicalManifestReader
                 CreatePayloadSchemas(
                     rawSchemaRegistry.PayloadSchemas,
                     componentLookup),
-                Array.Empty<SemanticModelParserDeclaration>(),
+                CreateParsers(rawSchemaRegistry.Parsers, componentLookup),
                 CreateIndexes(rawSchemaRegistry.Indexes, componentLookup),
                 Array.Empty<AcquisitionDemandProjectorDeclaration>(),
                 Array.Empty<AdmissionProofContractDeclaration>(),
@@ -943,6 +994,7 @@ internal static class CanonicalManifestReader
         CollectDeclarationComponentReferences(
             IReadOnlyList<RawRuleDeclaration> rules,
             IReadOnlyList<RawPayloadSchema> schemas,
+            IReadOnlyList<RawSemanticParser> parsers,
             IReadOnlyList<RawContextIndex> indexes)
     {
         var references = new HashSet<(string, string)>();
@@ -950,6 +1002,15 @@ internal static class CanonicalManifestReader
         {
             references.Add((schema.Codec.ComponentKey, schema.Codec.ComponentVersion));
             references.Add((schema.ImplementationType.ComponentKey, schema.ImplementationType.ComponentVersion));
+        }
+
+        foreach (var parser in parsers)
+        {
+            references.Add((parser.Parser.ComponentKey, parser.Parser.ComponentVersion));
+            references.Add((parser.Input.ImplementationType.ComponentKey,
+                parser.Input.ImplementationType.ComponentVersion));
+            references.Add((parser.OutputImplementationType.ComponentKey,
+                parser.OutputImplementationType.ComponentVersion));
         }
 
         foreach (var index in indexes)
@@ -1013,6 +1074,22 @@ internal static class CanonicalManifestReader
 
         return declarations;
     }
+
+    private static IReadOnlyList<SemanticModelParserDeclaration> CreateParsers(
+        IReadOnlyList<RawSemanticParser> parsers,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components) =>
+        parsers.Select(parser => SemanticModelParserDeclaration.Create(
+            parser.ParserKey, parser.ParserVersion,
+            ResolveComponentReference(parser.Parser, components),
+            [ComponentInputDeclaration.ForModel(
+                ModelContractIdentity.Create(parser.Input.ModelKey, parser.Input.ModelVersion,
+                    ResolveComponentReference(parser.Input.ImplementationType, components)),
+                parser.Input.MinimumCount, parser.Input.MaximumCount)],
+            ModelContractIdentity.Create(parser.OutputModelKey, parser.OutputModelVersion,
+                ResolveComponentReference(parser.OutputImplementationType, components)),
+            SemanticResourceBudget.Create(parser.MaxBytes, parser.MaxDepth, parser.MaxNodes, parser.MaxComplexity),
+            parser.FailureCodes.Select(EvaluationFailureCode.Parse)))
+        .ToArray();
 
     private static IReadOnlyList<ContextIndexDeclaration> CreateIndexes(
         IReadOnlyList<RawContextIndex> indexes,
@@ -1648,19 +1725,27 @@ internal static class CanonicalManifestReader
 
     private sealed record RawSchemaRegistry(
         IReadOnlyList<RawPayloadSchema> PayloadSchemas,
+        IReadOnlyList<RawSemanticParser> Parsers,
         IReadOnlyList<RawContextIndex> Indexes,
         RawCacheBudget CacheBudget);
 
+    private sealed record RawSemanticParser(
+        string ParserKey, string ParserVersion, RawComponentReference Parser,
+        RawModelInput Input, string OutputModelKey, string OutputModelVersion,
+        RawComponentReference OutputImplementationType,
+        long MaxBytes, int MaxDepth, long MaxNodes, long MaxComplexity,
+        IReadOnlyList<string> FailureCodes);
+
     private sealed record RawContextIndex(
         string IndexKey, string IndexVersion, RawComponentReference Indexer,
-        string InvocationScope, RawIndexInput Input,
+        string InvocationScope, RawModelInput Input,
         RawCapabilityContract OutputCapability, long MaxBytes, int MaxDepth,
         long MaxNodes, long MaxComplexity, IReadOnlyList<string> FailureCodes);
 
-    private sealed record RawIndexInput(
+    private sealed record RawModelInput(
         string ModelKey, string ModelVersion,
         RawComponentReference ImplementationType,
-        int MinimumCount, int MaximumCount);
+        int MinimumCount, int? MaximumCount);
 
     private sealed record RawPayloadSchema(
         string SchemaKey,
