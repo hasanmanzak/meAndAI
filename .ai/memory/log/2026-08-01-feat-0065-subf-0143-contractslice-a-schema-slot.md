@@ -3,7 +3,7 @@
 ## Boundary
 
 - Packet: `A-SCHEMA-SLOT-01`; packet-local `ReviewedLocalGreen` on branch `codex/subf-0143-contract-slice-a-implementation`. Commit [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8) is pushed on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580) exposed only the record-link [FIND-0444](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444), whose correction awaits exact-head verification.
-- Exact predecessor: [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032), tree `47a80b3c4c5301ac3937bcd12099940df74830b8`.
+- Exact predecessor: [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032), [exact predecessor tree](https://github.com/hasanmanzak/meAndAI/tree/47a80b3c4c5301ac3937bcd12099940df74830b8).
 - FQN: `MeAndAI.Protocol.Conformance.Tests.ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure`.
 - Marker/TRX: `TEST-0210-A-BEHAVIOR-RED-0003`; frozen reviewed red-source SHA-256 `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`.
 - Final test source is 436 lines, SHA-256 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`, with only `ContractSlice=A`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`.
