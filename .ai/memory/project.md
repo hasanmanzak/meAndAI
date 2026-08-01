@@ -4,6 +4,29 @@ Last verified: **2026-08-01**
 
 ## Verified facts
 
+- Current ContractSlice A continuation: exact remote-equal predecessor
+  [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
+  tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, passed Ubuntu and Windows
+  in exact-head hosted
+  [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
+  publication verification was correctly skipped. The separate
+  [PR #174 check suite](https://github.com/hasanmanzak/meAndAI/pull/174/checks)
+  reports GitGuardian green. This resolves
+  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444).
+  The maintainer's umbrella directive on
+  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) authorizes the
+  ordered remaining A packets through `A-CONVERGE-02` without bypassing exact
+  predecessor, D/RT, evidence, or one-mutating-packet gates. The oversized
+  parser/index candidate was strictly redrawn. `A-INDEX-SLOT-01` is
+  `ReviewedLocalGreen`: canonical R remains immutable; original-oracle and
+  topology-clean focused green passed `1/1`; cumulative A passed `19/19`; final
+  source is `377` lines / `F94B...280B`, production delta `265`, and packet
+  total `642/690`; Release build, format, diff, and six locks are clean; three
+  live final reviews each closed `0/0/0`. Six of eighteen packets are now
+  `ReviewedLocalGreen` (`33%`). [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`; `A-PARSER-INDEX-01` and every later packet remain
+  Candidate/inactive. Follow the current
+  [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
   intends to return the repository to private after outstanding hosted and
@@ -48,7 +71,8 @@ Last verified: **2026-08-01**
   [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
   are green; remote-equal
   [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
-  is the frozen `A-SCHEMA-SLOT-01` predecessor.
+  was the frozen predecessor used to activate `A-SCHEMA-SLOT-01`; it is
+  historical now that the schema-slot packet has closed.
 - `A-SCHEMA-SLOT-01` is packet-local `ReviewedLocalGreen` with exact FQN
   `ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure`
   and marker `TEST-0210-A-BEHAVIOR-RED-0003`. D/RT owns the exact
@@ -107,7 +131,7 @@ Last verified: **2026-08-01**
   They are infrastructure observations, not red/green evidence. Fresh full-
   diff review pass 2, after the pass-1 traceability correction, closed
   `0 Blocking / 0 Important / 0 Minor`. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`; `A-PARSER-INDEX-01` is the next Candidate and inactive.
+  remains `Planned`; current routing is the index-slot handoff above.
 - The schema-slot packet was pushed at
   [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
   on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Both stable
@@ -115,8 +139,10 @@ Last verified: **2026-08-01**
   failed only clickable-reference
   [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
   [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
-  owns the documentation/memory-only link correction; exact-head hosted
-  verification remains pending and the C# packet evidence is unchanged.
+  is resolved by record-only corrections at remote-equal
+  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+  and exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
+  the schema-slot C# evidence is unchanged.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -238,7 +264,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -283,7 +310,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
-  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
   recurrence set is
@@ -314,7 +342,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   invocation when `VSTEST_CONNECTION_TIMEOUT` is unset.
 - Affected contract and cause: the host connection window expired before the
   test ran, so the invocation is infrastructure evidence rather than R.
-- Canonical owner and evidence: the current
+- Canonical owner and evidence: the historical
   [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
   and exact TRX
   `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
@@ -356,7 +384,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
   the historical [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -368,18 +397,23 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
   correction head passed local review, push, and exact-head hosted green in
   [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794),
-  so it is the `A-SCHEMA-SLOT-01` predecessor. That packet is now packet-local
+  so it was the `A-SCHEMA-SLOT-01` activation predecessor. That packet is now packet-local
   `ReviewedLocalGreen` with focused `1/1`, cumulative A `18/18`, build/format/
   lock evidence. Fresh full-diff review pass 2, after the pass-1 traceability
   correction, closed `0 Blocking / 0 Important / 0 Minor`.
-- Required safe response: stop successor work, treat the pushed head as recovery
-  input, reconcile exact diff/tests/review/records, and require an exact reviewed
-  checkpoint before activating `A-PARSER-INDEX-01`; it is only the next inactive
-  Candidate.
+- Required safe response: the historical pushed head was recovery input and
+  required exact diff/test/review/record reconciliation before any successor
+  activation. That recovery is complete at exact remote-equal
+  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+  with hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+  green. The oversized next vertical was redrawn without semantic expansion;
+  `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`, and residual
+  `A-PARSER-INDEX-01` remains the next inactive Candidate.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
-- Freshness and review condition: confirmed 2026-07-31; review when the micro
+- Freshness and review condition: refreshed 2026-08-01 for the exact recovery above,
+  strict `A-INDEX-SLOT-01` redraw, and umbrella authority; review when the micro
   state machine, packet brief, or checkpoint authority changes.
 - Superseded by: `None`
 
@@ -1470,8 +1504,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   not red/green evidence. Fresh full-diff review pass 2, after the pass-1
   traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains
-  `Planned`; `A-PARSER-INDEX-01` is the next Candidate and remains inactive.
+  remains `Planned`. The later umbrella checkpoint authorized the strictly
+  redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
+  current state is `ReviewedLocalGreen`; `A-PARSER-INDEX-01` and every later
+  packet remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

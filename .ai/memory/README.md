@@ -21,7 +21,8 @@ the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat
 the historical [ContractSlice A planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
 the historical [ContractSlice A pushed-candidate recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
 the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
-the current [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+the current [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -50,8 +51,9 @@ topology correction. Its
 and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 are historical; follow the current
-[schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
-and corrected
+[index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
+and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
 [The append-only BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)
 governs the exact TRX message/echo/type oracle.
@@ -135,7 +137,7 @@ scenario remained `Planned`. The correction is complete at remote-equal
 using that commit's exact tree, with exact-head hosted
 [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
 green. It is the frozen predecessor for packet-local `ReviewedLocalGreen`
-`A-SCHEMA-SLOT-01`; follow the current
+`A-SCHEMA-SLOT-01`; its historical evidence remains in the
 [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
 Partial facts retain only `ContractSlice`; final scenario traits still join the
 atomic final scenario-status/scenario-owner/workflow-test-step target-and-filter/
@@ -154,7 +156,9 @@ outer bound, the complete oracle passing, and the parent environment remaining
 unset. Do not rerun it. Original-oracle green passed `1/1` in the exact
 `d223...` TRX, final topology-clean focused green passed `1/1` in `6423...`,
 and cumulative A passed `18/18` in `c93d...`; the exact paths and SHA-256 values
-are retained in the current handoff. Final test source is 436 lines with SHA-256
+are retained in the historical
+[schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+Final test source is 436 lines with SHA-256
 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`;
 production `256` plus test `436` is `692/700` changed lines and the estimated
 `+2` remains inside the hard cap. Release build passed with zero warnings and
@@ -178,11 +182,21 @@ and hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs
 where both stable jobs failed only clickable-reference
 [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
 [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
-owns the documentation-only correction pending exact-head hosted verification.
+is resolved at exact remote-equal
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
+tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted
+[run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+green. The oversized parser/index candidate was strictly redrawn under the hard
+line cap. `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`: original-oracle and
+topology-clean focused green passed `1/1`, cumulative A passed `19/19`, and the
+final `642/690` packet plus validation and three live `0/0/0` reviews are
+recorded in the
+[D/RT disposition](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md#a-index-slot-01-drt-observation),
+whose historical first `0/1/0` finding and renewed RT `0/0/0` remain evidence.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 stays
-`Planned`; `A-PARSER-INDEX-01` is the next Candidate and remains inactive, as
-does every later packet.
+`Planned`; six of eighteen packets are `ReviewedLocalGreen` (`33%`).
+`A-PARSER-INDEX-01` and every later packet remain Candidate/inactive.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

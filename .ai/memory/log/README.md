@@ -6,6 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice A index-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+the historical
 [ContractSlice A schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
 the historical
 [ContractSlice A planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
@@ -200,13 +202,24 @@ and hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs
 where both stable jobs failed only clickable-reference
 [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
 [FIND-0444](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
-owns the documentation-only correction pending exact-head hosted verification.
+is resolved at exact remote-equal
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
+tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted
+[run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+green. The oversized parser/index candidate was strictly redrawn under the hard
+line cap; `A-INDEX-SLOT-01` is now `ReviewedLocalGreen` after the exact
+[freeze-specification disposition](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md#a-index-slot-01-drt-observation)
+and renewed RT `0/0/0`. Original-oracle and topology-clean focused green passed
+`1/1`, cumulative A passed `19/19`, and the exact `642/690` packet plus final
+validation and review evidence is in the
+[index-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Workflow test-step target/filter, scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
-`A-PARSER-INDEX-01` is the next Candidate and remains inactive.
+Six of eighteen packets are `ReviewedLocalGreen` (`33%`). `A-PARSER-INDEX-01` and every
+later packet remain Candidate/inactive.
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)

@@ -53,7 +53,9 @@ public sealed class ComponentInputDeclaration
     private static void ValidateCounts(int minimumCount, int? maximumCount)
     {
         DeclarationValidation.NonNegative(minimumCount, nameof(minimumCount));
-        if (maximumCount is < 0 || maximumCount < minimumCount)
+        if ((minimumCount == 0 && maximumCount == 0) ||
+            maximumCount is < 0 ||
+            maximumCount < minimumCount)
         {
             throw new ArgumentOutOfRangeException(nameof(maximumCount));
         }

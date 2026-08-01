@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded [FIND-0441](README.md#find-0441) recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; [FIND-0442](README.md#find-0442) is resolved at remote-equal predecessor [`c88beef...`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032) with exact-head hosted [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794); the canonical `Scenario` trait for [TEST-0210](test-cases.md#test-0210) remains deferred to final A-D activation while partial tests retain only `ContractSlice`; `A-SCHEMA-SLOT-01` preserves its corrected [FIND-0443](README.md#find-0443) canonical R and is packet-local `ReviewedLocalGreen` at focused `1/1`, cumulative A `18/18`, and measured code/test `692/700`; fresh full-diff review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction, `A-PARSER-INDEX-01` remains Candidate/inactive, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
+| Status | Gate 2 accepted/merged; `A-SCHEMA-SLOT-01` remains packet-local and exact-head hosted green at remote-equal [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c78...`, through [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972), resolving [FIND-0444](README.md#find-0444). D/RT redrew the oversized parser/index candidate into strict `A-INDEX-SLOT-01` plus residual `A-PARSER-INDEX-01`; the historical first-pass `0/1/0` finding was corrected and renewed RT closed `0/0/0`. `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`: focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0/0/0`. Every later packet remains Candidate/inactive. Six of eighteen packets are `ReviewedLocalGreen` (`33%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [schema-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md); the planned-scenario-trait correction and pushed-candidate recovery handoffs are historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [index-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md); the schema-slot, planned-scenario-trait correction, and pushed-candidate recovery handoffs are historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793) |
+| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -120,9 +120,88 @@ controlled `300`-second timeout with no orphan process. Both are inconclusive,
 remain below the repository's reviewed `20`/`35`-minute full-validation
 budgets, and are neither pass nor fail evidence. Fresh full-diff review pass 2
 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability
-correction. `A-PARSER-INDEX-01` stays Candidate/inactive;
-workflow/status/owner/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
-and all later-scope holds remain unchanged.
+correction. Exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+closes [FIND-0444](README.md#find-0444) at remote-equal
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665).
+`A-INDEX-SLOT-01` is now `ReviewedLocalGreen`; `A-PARSER-INDEX-01` stays
+Candidate/inactive. Workflow/status/owner/
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
+later-scope holds remain unchanged.
+
+### Reviewed-local-green `A-INDEX-SLOT-01` delivery freeze
+
+The accepted design is unchanged. The delivery plan's hard line-budget gate
+redraws the next implementation into a first closed repository-tree path:
+schema/model -> exact `protocol.index.repository-tree` / `1`, `PerContext`, one
+`protocol.model.repository-tree` / `1` input at `(1,1)` -> exact
+`protocol.capability.repository-tree` / `1` -> the existing repository-tree
+slot. The exact indexer is component `protocol.index.repository-tree` / `1`,
+assembly `MeAndAI.Protocol.Policy`, type
+`MeAndAI.Protocol.Policy.Indexes.RepositoryTreeIndex`; the output capability's
+interface component is `protocol.type.capability.repository-tree` / `1`,
+assembly `MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IRepositoryTree`. Its exact budget is
+`(16777216, 64, 200000, 2000000)`, and canonical failure-code order is
+`protocol.budget.exhausted`, then
+`protocol.index.repository-tree-unavailable`. Shared `(0,0)` rejection through
+both public input factories is included. Parser rows and every other index row
+remain absent and fail closed.
+
+The exact partial Fact is
+`ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure`
+with only `ContractSlice=A`; its marker/TRX stem is
+`TEST-0210-A-BEHAVIOR-RED-0004`. Transient source must construct the otherwise
+valid graph and invoke the writer before direct factory/matrix assertions; only
+the exact current writer exception type/message may emit marker 0004. Positive
+coverage freezes byte/digest round trip, projection, `TryGetIndex`, nested field
+order, and slot/producer equality. Negatives freeze nested spelling/null/
+duplicate/order, collection order, scope/input/model/cardinality, output/
+interface, producer reachability/uniqueness, budget/failure codes, component/
+artifact references, plus explicit rejection of parser and other index rows.
+First-pass D/RT was `0 Blocking / 1 Important / 0 Minor`; the freeze was
+corrected and renewed RT closed `0 Blocking / 0 Important / 0 Minor`. Estimate
+is `540-660`, packet ceiling `690`; `700+` forces another redraw.
+`A-PARSER-INDEX-01` remains Candidate/inactive and receives no marker or
+implementation authority from this freeze.
+
+LR completed once with all six lock fingerprints unchanged. P is
+`NotApplicable`; unchanged-source predecessor proof passed schema-slot focused
+`1/1` in
+`D:\Temp\meandai-test-0210-a-index-slot-p-schema-ae918b5eb8a74a6e9126831803ab815d\TEST-0210-A-PREDECESSOR-SCHEMA-SLOT-0004.trx`
+(`4FBD396466F80A5373A33B8E3C8E0C4CA55995699B7B761AF997644057F3BE60`),
+and cumulative A passed `18/18` in
+`D:\Temp\meandai-test-0210-a-index-slot-p-cumulative-bd86c6e63c7d4c1593a9ead3903ef8b6\TEST-0210-A-PREDECESSOR-CUMULATIVE-0004.trx`
+(`8D8F84F25712CDE59845E99C88C3A34AAAA5C9E5AD5383449CB828EB23508B5E`).
+Both were fresh one-invocation `--no-restore` proofs; neither is R.
+
+The transient source is `388` lines at SHA-256
+`996CDD4A7244A39E702530DF4E45152CAE3EBBE6B430CA3E79FA63FF3756EBF0`.
+After a `0/2/0` source finding pass was corrected, two fresh reviews closed
+`0/0/0` independently and the Release `--no-restore` build was warning/error
+free. The single canonical R is
+`D:\Temp\meandai-test-0210-a-index-slot-red-a4e9fd0d6c8e44cd9e0e20c65eea37fd\TEST-0210-A-BEHAVIOR-RED-0004.trx`,
+SHA-256 `72788214F782CE347C68E646D0B3AB82E58B92F7C18EA4B2B07ED60DDC7053A4`.
+Its exact Failed result, marker Message, permitted marker-free stack, one marker
+echo, permitted same-FQN RunInfo, exact sixteen counters, no attachments, unset
+parent timeout, and no orphan testhost pass the complete BehaviorRed oracle.
+No red retry is authorized.
+
+Bounded implementation changed only the frozen four production files and one
+test. Original-oracle focused green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-original-5f90b4d8a1724f5da17984eeb4221ae6\TEST-0210-A-GREEN-ORIGINAL-0004.trx`,
+SHA-256 `66F8DC42BD29C603E8004EDAB5EF634F69659854F64618FE34889B2A8640CB4F`.
+After marker/catch removal and final LF normalization, focused green passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-lf-final-5793a27fa8f445cbb07582683c308256\TEST-0210-A-GREEN-LF-FINAL-0004.trx`,
+SHA-256 `B755D5DD4A7ED5E269410A72CB422AF0995B80362712EDDFE4FC9DE4BAFB91EE`.
+Final LF-normalized cumulative A passed `19/19` at
+`D:\Temp\meandai-test-0210-a-index-slot-green-lf-cumulative-f13b37ea9fec4fb8b973697898eaac3c\TEST-0210-A-GREEN-LF-CUMULATIVE-0004.trx`,
+SHA-256 `5BAAFF3717BFA1E5FBEC755F187766D627EBFB52A360749A2F5C06D9AFAF06E6`.
+The final source is `377` lines / SHA-256
+LF-normalized SHA-256 `F94B6138B87EBABBE8D0E4033B94CD41F6B44BF9FA37B58948513D3DA52D280B`;
+production delta is `265`, total packet size is `642/690`, Release build has
+zero warnings/errors, full format and diff checks are clean, six locks are
+unchanged, and three final live reviews each closed `0/0/0`.
 
 That corrected directive still does **not** authorize:
 

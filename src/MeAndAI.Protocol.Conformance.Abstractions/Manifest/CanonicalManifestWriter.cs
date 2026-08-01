@@ -37,7 +37,6 @@ internal static class CanonicalManifestWriter
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
             manifest.SchemaRegistry.Parsers.Count != 0 ||
-            manifest.SchemaRegistry.Indexes.Count != 0 ||
             manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
             manifest.SchemaRegistry.AdmissionProofContracts.Count != 0 ||
             manifest.ArtifactFiles.Count == 0 ||
@@ -110,7 +109,7 @@ internal static class CanonicalManifestWriter
         writer.WriteStartObject();
         WritePayloadSchemas(writer, registry.PayloadSchemas);
         WriteEmptyArray(writer, "parsers");
-        WriteEmptyArray(writer, "indexes");
+        WriteIndexes(writer, registry.Indexes);
         WriteEmptyArray(writer, "demandProjectors");
         WriteEmptyArray(writer, "admissionProofContracts");
 
@@ -134,6 +133,63 @@ internal static class CanonicalManifestWriter
             "retentionPolicy",
             budget.RetentionPolicy.Value);
         writer.WriteEndObject();
+        writer.WriteEndObject();
+    }
+
+    private static void WriteIndexes(Utf8JsonWriter writer,
+        IReadOnlyList<ContextIndexDeclaration> indexes)
+    {
+        writer.WriteStartArray("indexes");
+        foreach (var index in indexes)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "indexKey", index.IndexKey);
+            WriteCanonicalString(writer, "indexVersion", index.IndexVersion);
+            WriteComponentReference(writer, "indexer", index.Indexer);
+            WriteCanonicalString(writer, "invocationScope", index.InvocationScope.Value);
+            writer.WriteStartArray("inputs");
+            foreach (var input in index.Inputs)
+            {
+                var model = input.Model!;
+                writer.WriteStartObject();
+                WriteCanonicalString(writer, "kind", "model");
+                writer.WritePropertyName("model");
+                writer.WriteStartObject();
+                WriteCanonicalString(writer, "modelKey", model.ModelKey);
+                WriteCanonicalString(writer, "modelVersion", model.ModelVersion);
+                WriteComponentReference(
+                    writer, "implementationType", model.ImplementationType);
+                writer.WriteEndObject();
+                writer.WriteNumber("minimumCount", input.MinimumCount);
+                writer.WriteNumber("maximumCount", input.MaximumCount!.Value);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+            writer.WritePropertyName("outputCapability");
+            WriteCapability(writer, index.OutputCapability);
+            writer.WritePropertyName("budget");
+            writer.WriteStartObject();
+            writer.WriteNumber("maxBytes", index.Budget.MaxBytes);
+            writer.WriteNumber("maxDepth", index.Budget.MaxDepth);
+            writer.WriteNumber("maxNodes", index.Budget.MaxNodes);
+            writer.WriteNumber("maxComplexity", index.Budget.MaxComplexity);
+            writer.WriteEndObject();
+            WriteCanonicalStringValues(writer, "failureCodes",
+                index.FailureCodes.Select(code => code.Value));
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteCapability(Utf8JsonWriter writer,
+        CapabilityContractIdentity capability)
+    {
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "capabilityKey", capability.CapabilityKey);
+        WriteCanonicalString(writer, "capabilityVersion", capability.CapabilityVersion);
+        WriteComponentReference(writer, "interfaceType", capability.InterfaceType);
         writer.WriteEndObject();
     }
 
