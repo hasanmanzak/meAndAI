@@ -4,42 +4,34 @@ Last verified: **2026-08-01**
 
 ## Verified facts
 
-- Current ContractSlice A continuation: the last remote-equal exact-head
-  hosted-green predecessor remains
-  [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
-  git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, through
-  [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
-  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
-  remains resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R
-  is immutable; focused green passed `1/1` twice; cumulative A passed `19/19`;
-  final source is `377` lines / `F94B...280B`, production delta is `265`, packet
-  total is `642/690`, and build/format/diff/locks plus three live final reviews
-  remain green. Its pushed head
-  [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
-  git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
-  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
-  in exact-head
-  [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+- Current ContractSlice A continuation: exact remote-equal hosted-green
+  predecessor
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and Windows in
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833);
+  publication verification was correctly skipped and the
+  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
+  GitGuardian green.
   [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
-  remains `PendingExactHeadHostedVerification`. Its exact correction head
-  [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
-  git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
-  green and removed [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
-  from the failure set, while Ubuntu failed only
-  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  with twenty-three ambiguous Git tree identities in
-  [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
-  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
-  owns the local documentation/memory-only correction and is also
-  `PendingExactHeadHostedVerification`; neither hosted-failed head is an
-  activation predecessor. Six of eighteen packets remain `ReviewedLocalGreen`
-  (`33%`); [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`, `A-PARSER-INDEX-01` and every later packet remain
-  Candidate/inactive. The maintainer's umbrella directive on
-  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) still covers
-  ordered remaining A through `A-CONVERGE-02` without bypassing exact
-  predecessor, D/RT, evidence, or one-mutating-packet gates. Follow the current
-  [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
+  and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+  are resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`; its canonical R,
+  focused greens, cumulative A `19/19`, `642/690` size, locks/build/format/diff,
+  and three final `0/0/0` reviews remain immutable. Strict D/RT retired
+  never-activated `A-PARSER-INDEX-01` as a non-live, non-reactivatable
+  `RetiredBeforeActivation` tombstone and partitioned it into three ordered
+  packets. `A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed` after
+  D/RT `0/0/0`; `A-GOVERNED-REFERENCE-SLOTS-01`,
+  `A-TARGET-PARSER-INDEX-SLOT-01`, and every later packet remain
+  Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; six packets
+  are `ReviewedLocalGreen` (`30%`), a denominator correction rather than a
+  progress regression. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned` and cumulative A remains `19/19` until the active packet is
+  green. The umbrella directive still covers ordered remaining A through
+  `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
+  packet gates. Follow the current
+  [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md);
+  the [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
+  is historical.
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
   intends to return the repository to private after outstanding hosted and
@@ -144,7 +136,8 @@ Last verified: **2026-08-01**
   They are infrastructure observations, not red/green evidence. Fresh full-
   diff review pass 2, after the pass-1 traceability correction, closed
   `0 Blocking / 0 Important / 0 Minor`. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`; current routing is the index-slot handoff above.
+  remains `Planned`; the index-slot handoff is historical and current routing
+  is the parser-record-slot handoff above.
 - The schema-slot packet was pushed at
   [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
   on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Both stable
@@ -287,25 +280,30 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FEAT-0065](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md),
   existing
   [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
-  the current
+  the historical
   [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  the current
+  [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
   failed head
   [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
   and [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
   [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
   owns this recurrence-entry schema.
-- Fixed release or evidence: no release. Exact
-  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
-  / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
-  remains the last hosted-green predecessor. The bounded twelve-record
-  correction is `PendingExactHeadHostedVerification`.
+- Fixed release or evidence: no release. The bounded twelve-record correction
+  is resolved at exact remote-equal
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`,
+  with both stable jobs green in
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  The correction and later packet-denominator redraw remain separate commit
+  boundaries.
 - Required safe response: preserve the packet-local C#/test/lock evidence;
   inventory only the authorized record cohort; target every pull-request label
   at canonical [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174);
   wholly link every rendered stable identifier to its canonical record; run the
   existing [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
-  barrier and fresh record review; then commit, push, and require a new
-  remote-equal exact-head hosted green before activating a successor.
+  barrier and fresh record review; then commit, push, and require remote-equal
+  exact-head hosted green before activating a successor.
 - Unsafe retry boundary: do not treat `/checks` as a pull-request identity, do
   not partially link or code-format a governed stable identifier, do not use an
   unchanged rerun of [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
@@ -334,7 +332,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
+  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -380,7 +379,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
+  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
   recurrence set is
@@ -454,7 +454,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
   the historical [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  and the current [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
+  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -476,8 +477,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
   with hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
   green. The oversized next vertical was redrawn without semantic expansion;
-  `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`, and residual
-  `A-PARSER-INDEX-01` remains the next inactive Candidate.
+  `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`. A later strict D/RT retired
+  residual `A-PARSER-INDEX-01` before activation and replaced it with three
+  ordered live packets; only `A-PARSER-RECORD-SLOT-01` is active at `PreRed`.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1022,13 +1024,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   owns the exact reference contract. The current delivery occurrence is
   [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446):
   exact head
-  [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
-  git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, and
-  [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+  [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+  git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and
+  [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 - Fixed release or evidence: repository-only Markdown verification is the
   focused barrier; release `0.15.0` carries the historical corrected evidence.
-  The current twenty-three-occurrence correction is
-  `PendingExactHeadHostedVerification` and grants no successor authority.
+  The current twenty-three-occurrence correction is resolved at the exact head
+  above. The recurrence remains `Active`; its fixed delivery evidence does not
+  replace the canonical executable owner.
 - Required safe response: resolve a commit to its exact full SHA and link the
   label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; classify a
   non-commit tree object with the explicit `git tree identity:` prefix without
@@ -1398,7 +1401,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   exact-FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/
   error-free final six-project Release build, and private-byte implementation
   review. That first-green support review had `0 Blocking`, one unnumbered
-  remaining-A coverage `Important`, and no unresolved `Minor`. The current
+  remaining-A coverage `Important`, and no unresolved `Minor`. The historical
   [canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
   preserves FQN
   `MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding`,
@@ -1532,7 +1535,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   unretained `ArrayBufferWriter` internal buffer becomes unreachable but is not
   explicitly zeroed. That first-green support review had `0 Blocking`, one
   unnumbered remaining-A coverage `Important`, and no unresolved `Minor`. The
-  second A canonical-string exact-red packet and bounded-green closure are in the current
+  second A canonical-string exact-red packet and bounded-green closure are in the historical
   [handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md):
   exact `0002` FQN/marker, behavior-preserving writer-owned codec extraction,
   exact legacy/green bytes, raw Unicode, exact composed `C3 A9` versus decomposed
@@ -1585,8 +1588,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned`. The later umbrella checkpoint authorized the strictly
   redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
-  current state is `ReviewedLocalGreen`; `A-PARSER-INDEX-01` and every later
-  packet remain Candidate/inactive.
+  current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
+  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is
+  `MaintainerActivated / PreRed`, while both redraw successors and every later
+  packet remain Candidate/inactive. The live packet denominator is twenty and
+  current completed progress is six (`30%`).
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

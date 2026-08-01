@@ -6,6 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice A parser-record-slot activation handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+the historical
 [ContractSlice A index-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
 the historical
 [ContractSlice A schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
@@ -218,17 +220,21 @@ remains `Planned`. Workflow test-step target/filter, scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
-Six of eighteen packets are `ReviewedLocalGreen` (`33%`). `A-PARSER-INDEX-01` and every
-later packet remain Candidate/inactive.
+The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
+historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
+replaces it with three ordered live packets. Six of twenty live packets are
+`ReviewedLocalGreen` (`30%`); `A-PARSER-RECORD-SLOT-01` is
+`MaintainerActivated / PreRed`, while its two redraw successors and every later
+packet remain Candidate/inactive.
 
-The current handoff also owns
+The historical index-slot handoff also records the occurrence behind
 [FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445):
 packet-local A-index evidence remains green, while pushed
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
 with git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only
 [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
 in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
-The finding remains `PendingExactHeadHostedVerification`. Exact correction head
+Intermediate correction head
 [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
 git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
 green while Ubuntu failed only
@@ -236,12 +242,13 @@ green while Ubuntu failed only
 with twenty-three ambiguous Git tree identities in
 [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
 [FIND-0446](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
-owns their local documentation/memory-only correction and is also
-`PendingExactHeadHostedVerification`; exact
-[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
-/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
-remains the last hosted-green predecessor. The historical six-of-eighteen
-(`33%`) and `A-PARSER-INDEX-01` Candidate snapshot is unchanged.
+owns their documentation/memory-only correction. Both findings are resolved at
+exact remote-equal
+[`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
+git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
+[run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+The current activation state and denominator are in the
+[parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)

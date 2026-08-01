@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor. `A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen` with cumulative A `19/19`, but pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217). [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445) is `PendingExactHeadHostedVerification`; six of eighteen packets remain `ReviewedLocalGreen` (`33%`), [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`, and every downstream packet remains Candidate/inactive. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Exact remote-equal [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde), git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and Windows in [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833), resolving [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445) and [FIND-0446](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446). Strict redraw retires never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed` while its two redraw successors and every later packet remain Candidate/inactive. Six of twenty live packets are `ReviewedLocalGreen` (`30%`); [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,8 +11,8 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | Last hosted-green predecessor remains exact remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, through [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972). `A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen` with cumulative A `19/19`; pushed head [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217). [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445) is `PendingExactHeadHostedVerification`; six of eighteen A packets remain `ReviewedLocalGreen` (`33%`) and every downstream packet remains Candidate/inactive. |
-| Hosted correction chain | Exact correction head [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c), git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows green while Ubuntu failed only [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) with twenty-three ambiguous Git tree identities in [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450). [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445) and [FIND-0446](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446) remain `PendingExactHeadHostedVerification`; the correction is documentation/memory-only, exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) remains the predecessor, and no downstream activation is authorized. |
+| Current A implementation boundary | Exact remote-equal [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde), git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, is the hosted-green predecessor through [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833). `A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen` with cumulative A `19/19`; `A-PARSER-RECORD-SLOT-01` alone is `MaintainerActivated / PreRed`. Six of twenty live A packets are `ReviewedLocalGreen` (`30%`). |
+| Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
 
@@ -93,10 +93,12 @@ requires its own exact predecessor, D/RT, expected-red/green, review, and
 evidence gates. A owns canonical manifest parse/digest/typed projection and
 declaration/artifact/component preflight; it constructs no executable export
 and declares no kernel. First executable activation and six-list registration
-mismatch ownership remain in ContractSlice C. Six of eighteen A packets are
-`ReviewedLocalGreen` (`33%`); `A-INDEX-SLOT-01` is packet-local
-`ReviewedLocalGreen` with cumulative A `19/19`, every downstream packet remains
-Candidate/inactive, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+mismatch ownership remain in ContractSlice C. Strict D/RT retires the never-
+activated combined parser/index label and replaces it with three ordered live
+packets. Six of twenty A packets are `ReviewedLocalGreen` (`30%`);
+`A-INDEX-SLOT-01` remains at cumulative A `19/19`, only
+`A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed`, every successor
+remains Candidate/inactive, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
 
 Outside that exact A boundary, the following remain prohibited:
@@ -120,11 +122,14 @@ Completed
 and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 have passed and closed their applicable implementation-entry and publication
 prerequisites. The A umbrella directive remains the standing ceiling. Exact
-predecessor [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
-is hosted green through [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972),
-[FIND-0444](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
-is resolved. `A-INDEX-SLOT-01` is packet-local `ReviewedLocalGreen`, cumulative
-A passes `19/19`, and every downstream packet remains Candidate/inactive. The
+predecessor [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde)
+is hosted green through [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833),
+resolving [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+and [FIND-0446](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446).
+`A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen`, cumulative A stays
+`19/19`, and six of twenty live packets are green (`30%`). Never-activated
+`A-PARSER-INDEX-01` is retired; `A-PARSER-RECORD-SLOT-01` is
+`MaintainerActivated / PreRed`, while every successor remains Candidate. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1546,12 +1551,18 @@ and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/306033
 For [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143),
 item 10 is satisfied by the current A umbrella directive while retaining one
 reviewed mutating packet at a time. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; six of eighteen A packets are `ReviewedLocalGreen` (`33%`).
+remains `Planned`; six of twenty live A packets are `ReviewedLocalGreen` (`30%`).
 [FIND-0444](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
 is resolved at exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
 with hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972),
 and `A-INDEX-SLOT-01` is packet-local `ReviewedLocalGreen` with cumulative A
-`19/19`; every downstream packet remains Candidate/inactive. B/C/D and final Scenario/status/owner/
+`19/19`. Exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde)
+/ [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833)
+resolves [FIND-0445](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+and [FIND-0446](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446).
+Never-activated `A-PARSER-INDEX-01` is retired;
+`A-PARSER-RECORD-SLOT-01` is `MaintainerActivated / PreRed` and every successor
+remains Candidate/inactive. B/C/D and final Scenario/status/owner/
 workflow/publication boundaries remain held.
 
 Current gate allocation and open states are recorded in the
