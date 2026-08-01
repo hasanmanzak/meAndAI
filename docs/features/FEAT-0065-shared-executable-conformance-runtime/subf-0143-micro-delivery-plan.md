@@ -248,7 +248,7 @@ is never implemented green; return to D/RT or report `Blocked`.
 | `BASE-SCOPE` | Record branch/HEAD, tracked and untracked allowlist, excluded NCrunch/temp files, prior red/green evidence, and content/lock hashes. No mutation. | Completed; exact scope manifest and source/test trees are tracked in [`5fa7f7d`](https://github.com/hasanmanzak/meAndAI/commit/5fa7f7d02e64032e867d7c84d42662ba080b3c90). |
 | `BASE-VERIFY` | Run exact cumulative A, locked restore/hash check, Release build, standard format, marker/sentinel search, and `git diff --check`. | Recovery completed: cumulative `17/17`; locked restore with six relevant lock fingerprints unchanged; zero-warning/error six-project Release build; clean format, diff, and marker/sentinel checks. Historical `13/13` remains the prior accepted content checkpoint. |
 | `BASE-RECORDS` | After explicit record-edit authority, synchronize this plan, the current bounded handoff, and exact verification evidence before final review. | Historical recovery and [FIND-0442](README.md#find-0442) records are complete at `c88beef...`/run 30659970794. Canonical `96ff...` R is preserved; packet-local green/validation evidence is synchronized as `ReviewedLocalGreen`, and final synchronized full-diff review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability finding was corrected. |
-| `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the recovery full-diff review closed `0 Blocking / 0 Important / 0 Minor`. Schema-slot pass 1 closed semantic and budget/evidence review `0/0/0`; scope/traceability reported `0/1/0` because the handoff prematurely associated the uncommitted packet with PR #174. The handoff now identifies PR #174 only as the pending publication target; final synchronized full-diff review pass 2 closed `0 Blocking / 0 Important / 0 Minor`. |
+| `BASE-REVIEW` | After `BASE-RECORDS`, rerun `git diff --check`, then conduct parallel read-only reviews of the complete production/test/docs/memory tree; report every finding and disposition every Gate 5 observation without editing. A finding stops and routes to an explicitly authorized correction, followed by `BASE-VERIFY` as applicable, `BASE-RECORDS`, and a fresh `BASE-REVIEW`. | Historical per-packet final review remains `NotEstablished`; recovery findings were corrected and the recovery full-diff review closed `0 Blocking / 0 Important / 0 Minor`. Schema-slot pass 1 closed semantic and budget/evidence review `0/0/0`; scope/traceability reported `0/1/0` because the handoff prematurely associated the uncommitted packet with [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). At pass 2 the handoff identified [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) only as the then-pending publication target, and final synchronized full-diff review closed `0 Blocking / 0 Important / 0 Minor`; it now records pushed candidate [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8), failed hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580), and the documentation-only [FIND-0444](README.md#find-0444) correction pending exact-head verification. |
 | `BASE-STAGE` | After an explicit stage directive, stage only the reviewed allowlist; make no file edit; review the staged diff and tree identity. | Recovery complete: exact `20/20` allowlist, zero tracked-unstaged delta, NCrunch excluded, staged diff check clean, two staged reviews `0/0/0`, git tree: `4ca02623e1f14233e847ebf64bc52d3cfe8869b8`. Historical pushed-candidate staged evidence remains `NotEstablished`. |
 | `BASE-CHECKPOINT` | Commit only after an explicit commit directive; push only after a separately explicit push directive. Do not claim hosted or DoD evidence. | Recovery content checkpoint [`f64860ef456380232c23dfc4729a0d87f257483d`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) exactly matches the audited tree, is pushed, and owns draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Its record-sync successor [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032) passed local review, push, and exact-head hosted green in [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794), resolves [FIND-0442](README.md#find-0442), and is the active `A-SCHEMA-SLOT-01` predecessor; full [TEST-0210](test-cases.md#test-0210) DoD is not claimed. |
 
@@ -348,8 +348,8 @@ tree `47a80b3c4c5301ac3937bcd12099940df74830b8`. The reviewed red source
 SHA-256 is exactly
 `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`.
 The retained test is one
-`[Fact]` with only `ContractSlice=A`; `Scenario=TEST-0210` remains held. Green
-required and achieved focused `1/1` and cumulative A `18/18`, while TEST-0210
+`[Fact]` with only `ContractSlice=A`; [Scenario=TEST-0210](test-cases.md#test-0210) remains held. Green
+required and achieved focused `1/1` and cumulative A `18/18`, while [TEST-0210](test-cases.md#test-0210)
 remains `Planned`.
 
 The positive graph contains one exact `protocol.repository-tree` / `1` payload
@@ -423,7 +423,8 @@ The original-oracle exact FQN passed `1/1` at
 `D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
 SHA-256 `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
 After marker/catch removal and correction of the fixture's still-`Planned`
-`TEST-0210` literal to neutral `TEST-0001`, the topology-clean exact FQN passed
+[TEST-0210](test-cases.md#test-0210) literal to neutral
+[TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001), the topology-clean exact FQN passed
 `1/1` at
 `D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
 SHA-256 `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`.
@@ -453,7 +454,7 @@ exact total `692/700`. The estimate was exceeded by two lines, but the hard
 more-than-700 redesign threshold was not exceeded. Independent revised-design
 RT closed `0 Blocking / 0 Important / 0 Minor`.
 Public API, project/reference/package/lock/workflow files, producer positives,
-later A packets, B/C/D, scenario/status/owner/TEST-0146 activation, consumer,
+later A packets, B/C/D, scenario/status/owner/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) activation, consumer,
 release, publication, authority-transfer, and PowerShell-retirement work remain
 held.
 

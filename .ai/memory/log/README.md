@@ -151,10 +151,14 @@ hosted green at exact predecessor
 [FIND-0443](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
 and the later technically conforming `9a39...` run is also diagnostic because it
 preceded complete repository-record synchronization. Those `cf51...` and
-`9a39...` runs are exactly the FIND-0443 recurrence set. A third observation at
+`9a39...` runs are exactly the
+[FIND-0443](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+recurrence set. A third observation at
 `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`
 (SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`)
-is a separate zero-discovery VSTest infrastructure abort, not FIND-0443 or R.
+is a separate zero-discovery VSTest infrastructure abort, not
+[FIND-0443](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+or R.
 Canonical R is accepted at
 `D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
 SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
@@ -179,13 +183,24 @@ the hard cap. Build passed at zero warnings/errors, format passed, and all six
 locks remained unchanged.
 
 [TEST-0074](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
-first exposed a fixture-data `TEST-0210` literal; correction uses neutral
-`TEST-0001` and no Scenario trait. Corrected local StructureOnly was
+first exposed a fixture-data
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+literal; correction uses neutral
+[TEST-0001](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
+and no Scenario trait. Corrected local StructureOnly was
 inconclusive at a controlled 300-second active timeout with no orphan; an
 earlier full suite was inconclusive at 600 seconds, below the official
 20/35-minute budgets. These are infrastructure observations, not red/green
 evidence. Fresh full-diff review pass 2, performed after the pass-1
 traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
+The same [schema-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
+records pushed candidate
+[`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
+and hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580),
+where both stable jobs failed only clickable-reference
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
+[FIND-0444](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+owns the documentation-only correction pending exact-head hosted verification.
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Workflow test-step target/filter, scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),

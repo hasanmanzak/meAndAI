@@ -44,7 +44,7 @@ contradictory diagnostic. The run observed before that distinction remains
 diagnostic and cannot be promoted retroactively.
 
 The 2026-08-01 append-only
-[FIND-0443 assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
+[FIND-0443](README.md#find-0443) [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
 also changes evidence wording only. It aligns the packet-level oracle with this
 design's accepted same-result, marker-free standard assertion `StackTrace` and
 requires a fresh post-synchronization 0003 invocation. The exposing run and the
@@ -94,7 +94,9 @@ SHA-256
 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`.
 The temporary marker and legacy branch are absent. The fixture-only scenario
 literal exposed by [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074)
-was changed to neutral `TEST-0001`; no active `TEST-0210` source literal
+was changed to neutral
+[TEST-0001](../FEAT-0001-common-development-protocol/test-cases.md#test-0001);
+no active [TEST-0210](test-cases.md#test-0210) source literal
 remains. The measured implementation is `256` production plus `436` test lines,
 or `692/700`: two lines above the `600-690` planning estimate, but below the
 only hard stop of more than `700` changed code/test lines.

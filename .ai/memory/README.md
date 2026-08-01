@@ -161,13 +161,24 @@ production `256` plus test `436` is `692/700` changed lines and the estimated
 errors, format passed, and all six locks remained unchanged.
 
 [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
-first exposed a fixture-data `TEST-0210` literal; it is corrected to neutral
-`TEST-0001` with no `Scenario` trait. Corrected local StructureOnly was
+first exposed a fixture-data
+[TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+literal; it is corrected to neutral
+[TEST-0001](../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
+with no `Scenario` trait. Corrected local StructureOnly was
 inconclusive at a controlled 300-second active timeout with no orphan; the
 earlier full suite was likewise inconclusive at 600 seconds, below the official
 20/35-minute budgets. These are infrastructure observations, not red or green
 evidence. Fresh full-diff review pass 2, performed after the pass-1
 traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
+[A-SCHEMA-SLOT-01 handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
+now records pushed candidate
+[`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
+and hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580),
+where both stable jobs failed only clickable-reference
+[TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175).
+[FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+owns the documentation-only correction pending exact-head hosted verification.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 stays
 `Planned`; `A-PARSER-INDEX-01` is the next Candidate and remains inactive, as
