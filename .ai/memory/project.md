@@ -4,28 +4,31 @@ Last verified: **2026-08-01**
 
 ## Verified facts
 
-- Current ContractSlice A continuation: exact remote-equal predecessor
+- Current ContractSlice A continuation: the last remote-equal exact-head
+  hosted-green predecessor remains
   [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
-  tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, passed Ubuntu and Windows
-  in exact-head hosted
+  tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, through
   [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
-  publication verification was correctly skipped. The separate
-  [PR #174 check suite](https://github.com/hasanmanzak/meAndAI/pull/174/checks)
-  reports GitGuardian green. This resolves
-  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444).
-  The maintainer's umbrella directive on
-  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) authorizes the
-  ordered remaining A packets through `A-CONVERGE-02` without bypassing exact
-  predecessor, D/RT, evidence, or one-mutating-packet gates. The oversized
-  parser/index candidate was strictly redrawn. `A-INDEX-SLOT-01` is
-  `ReviewedLocalGreen`: canonical R remains immutable; original-oracle and
-  topology-clean focused green passed `1/1`; cumulative A passed `19/19`; final
-  source is `377` lines / `F94B...280B`, production delta `265`, and packet
-  total `642/690`; Release build, format, diff, and six locks are clean; three
-  live final reviews each closed `0/0/0`. Six of eighteen packets are now
-  `ReviewedLocalGreen` (`33%`). [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  remains `Planned`; `A-PARSER-INDEX-01` and every later packet remain
-  Candidate/inactive. Follow the current
+  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+  remains resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R
+  is immutable; focused green passed `1/1` twice; cumulative A passed `19/19`;
+  final source is `377` lines / `F94B...280B`, production delta is `265`, packet
+  total is `642/690`, and build/format/diff/locks plus three live final reviews
+  remain green. Its pushed head
+  [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+  tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  in exact-head
+  [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+  [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+  is `PendingExactHeadHostedVerification`, so that pushed head is not an
+  activation predecessor. Six of eighteen packets remain `ReviewedLocalGreen`
+  (`33%`); [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`, `A-PARSER-INDEX-01` and every later packet remain
+  Candidate/inactive. The maintainer's umbrella directive on
+  [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) still covers
+  ordered remaining A through `A-CONVERGE-02` without bypassing exact
+  predecessor, D/RT, evidence, or one-mutating-packet gates. Follow the current
   [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
@@ -247,6 +250,62 @@ documented project decision required when another approach better fits the
 domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 ## Active recurrence knowledge
+
+### Record synchronization reintroduces noncanonical cross-record links
+
+- Status: `Active`
+- Observable signature: an exact pushed documentation/memory synchronization
+  head makes hosted
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  report a pull-request label targeting `/pull/<number>/checks` as a non-record
+  target, or report a rendered stable identifier as not wholly covered by one
+  canonical link.
+- Applicability: current [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
+  packet/cohort record synchronization and later repository Markdown changes
+  that describe packet, pull-request, scenario, finding, commit, or hosted-run
+  evidence.
+- Affected contract and cause: record synchronization used a GitHub checks UI
+  subroute as the identity of [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174)
+  and left the exact readiness prose "Full
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  green is not claimed" outside a canonical link. This was plain readiness
+  prose, not the earlier Scenario-trait defect. The prior bounded
+  [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
+  correction had no active pre-push recurrence route for the next record cohort.
+- Canonical owner and evidence:
+  [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445),
+  [FEAT-0065](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md),
+  existing
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
+  the current
+  [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  failed head
+  [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+  and [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+  [DEC-0029](../../docs/decisions/DEC-0029-canonical-recurrence-knowledge-and-test-harness-ownership.md)
+  owns this recurrence-entry schema.
+- Fixed release or evidence: no release. Exact
+  [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+  / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+  remains the last hosted-green predecessor. The bounded twelve-record
+  correction is `PendingExactHeadHostedVerification`.
+- Required safe response: preserve the packet-local C#/test/lock evidence;
+  inventory only the authorized record cohort; target every pull-request label
+  at canonical [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174);
+  wholly link every rendered stable identifier to its canonical record; run the
+  existing [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  barrier and fresh record review; then commit, push, and require a new
+  remote-equal exact-head hosted green before activating a successor.
+- Unsafe retry boundary: do not treat `/checks` as a pull-request identity, do
+  not partially link or code-format a governed stable identifier, do not use an
+  unchanged rerun of [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
+  as correction evidence, do not create a derivative test/validator, and do not
+  combine the separate packet-denominator redraw with this hosted correction.
+- Freshness and review condition: confirmed 2026-08-01; review after the
+  [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  parsing/exact-target contract or the A-cohort record-synchronization process
+  changes.
+- Superseded by: `None`
 
 ### Planned multi-slice scenario is asserted before final activation
 

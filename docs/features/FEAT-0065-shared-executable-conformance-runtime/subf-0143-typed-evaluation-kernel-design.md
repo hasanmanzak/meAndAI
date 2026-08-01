@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; `A-SCHEMA-SLOT-01` remains packet-local and exact-head hosted green at remote-equal [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c78...`, through [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972), resolving [FIND-0444](README.md#find-0444). D/RT redrew the oversized parser/index candidate into strict `A-INDEX-SLOT-01` plus residual `A-PARSER-INDEX-01`; the historical first-pass `0/1/0` finding was corrected and renewed RT closed `0/0/0`. `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`: focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0/0/0`. Every later packet remains Candidate/inactive. Six of eighteen packets are `ReviewedLocalGreen` (`33%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged; exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor, with [FIND-0444](README.md#find-0444) resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0/0/0`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only repository-record [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217); [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`. Every later packet remains Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -123,8 +123,19 @@ closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability
 correction. Exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
 closes [FIND-0444](README.md#find-0444) at remote-equal
 [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665).
-`A-INDEX-SLOT-01` is now `ReviewedLocalGreen`; `A-PARSER-INDEX-01` stays
-Candidate/inactive. Workflow/status/owner/
+`A-INDEX-SLOT-01` remains packet-local `ReviewedLocalGreen`; its canonical R,
+focused/cumulative green, hashes, line budget, locks, and review evidence are
+unchanged. Pushed head
+[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
+[TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+[FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`, so exact
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+remains the last hosted-green predecessor. Six of eighteen packets remain
+`ReviewedLocalGreen` (`33%`); `A-PARSER-INDEX-01` stays Candidate/inactive.
+Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
 

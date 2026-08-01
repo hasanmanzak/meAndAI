@@ -3,12 +3,13 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | `A-SCHEMA-SLOT-01` remains exact-head hosted green at remote-equal predecessor [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c78...`, through [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972); [FIND-0444](README.md#find-0444) is resolved. The strictly redrawn `A-INDEX-SLOT-01` is `ReviewedLocalGreen`: canonical R is immutable, original-oracle and topology-clean focused green are `1/1`, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0 Blocking / 0 Important / 0 Minor`. `A-PARSER-INDEX-01` and all later packets remain Candidate/inactive. Six of eighteen packets are `ReviewedLocalGreen` (`33%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor; [FIND-0444](README.md#find-0444) is resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R is immutable, focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0 Blocking / 0 Important / 0 Minor`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only hosted [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175); [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`, so it is not an activation predecessor. `A-PARSER-INDEX-01` and all later packets remain Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Active predecessor | Exact remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) green; historical recovery inputs remain evidence only. |
+| Pushed hosted-failed head | [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`; exact-head [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) failed only [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) record authoring. [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`; this head is not an activation predecessor. |
 | Git authority | The maintainer's umbrella directive authorizes the ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including D/RT-required operational redraws that strictly partition accepted A semantics under the hard line cap, packet-local validation/review/record synchronization, commit/push, draft-PR updates, and hosted-check correction. A redraw neither preactivates a packet nor broadens scope. Every packet still requires its exact predecessor, synchronized ledger, accepted D/RT, and one-at-a-time mutating activation. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), merge, release, and publication remain held. |
 
 ## Purpose
@@ -636,6 +637,17 @@ hosted correction is closed at exact
 `A-INDEX-SLOT-01` is now `ReviewedLocalGreen` after corrected renewed RT
 `0/0/0`. `A-PARSER-INDEX-01` and every later packet remain Candidate/inactive
 and receive no activation from this closure.
+
+The packet-local evidence above remains authoritative and unchanged. Its pushed
+head [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
+failed only repository-record
+[TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+[FIND-0445](README.md#find-0445) owns the bounded twelve-record correction and is
+`PendingExactHeadHostedVerification`. Exact
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+remains the active predecessor; `A-PARSER-INDEX-01` remains Candidate/inactive.
 
 `A-RULE-01` must prove in D/RT that a rule with both slot lists empty is valid
 in the then-current schema; otherwise it moves behind and joins

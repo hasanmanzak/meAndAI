@@ -196,7 +196,18 @@ whose historical first `0/1/0` finding and renewed RT `0/0/0` remain evidence.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 stays
 `Planned`; six of eighteen packets are `ReviewedLocalGreen` (`33%`).
-`A-PARSER-INDEX-01` and every later packet remain Candidate/inactive.
+`A-PARSER-INDEX-01` and every later packet remain Candidate/inactive. The
+packet-local evidence remains unchanged, but pushed head
+[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only
+[TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+record authoring in
+[run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+[FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+is `PendingExactHeadHostedVerification`; exact
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+remains the last hosted-green predecessor.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

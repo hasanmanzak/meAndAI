@@ -2,8 +2,9 @@
 
 | Field | Value |
 | --- | --- |
-| State | `A-INDEX-SLOT-01` `ReviewedLocalGreen`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
-| Predecessor | Remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`; exact-head [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) Ubuntu/Windows green and publication verifier skipped; separate [PR #174 checks](https://github.com/hasanmanzak/meAndAI/pull/174/checks) report GitGuardian green |
+| State | `A-INDEX-SLOT-01` `ReviewedLocalGreen`; hosted record correction `PendingExactHeadHostedVerification` under [FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445); [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
+| Predecessor | Last hosted-green predecessor remains remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`; exact-head [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) passed Ubuntu/Windows |
+| Pushed head | [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`; exact-head [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) failed only repository-record [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), so this head is not an activation predecessor |
 | Authority | Maintainer umbrella on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) covers ordered remaining A through `A-CONVERGE-02`; exact predecessor, D/RT, evidence, and one-mutating-packet gates remain mandatory |
 | D/RT | Original parser/index candidate exceeded the hard line boundary and was strictly redrawn. First pass `0 Blocking / 1 Important / 0 Minor`: activation/RT closure were premature while exact identities, budget/failure order, full matrix, writer-first order, both `(0,0)` factories, and parser/other-index rejection were under-specified. Activation reverted to `FrozenDesign`; the complete freeze assigns all of those values and only the exact writer absent-predicate exception/message may emit the marker. Renewed RT `0 Blocking / 0 Important / 0 Minor`; only then restored `MaintainerActivated / PreRed` |
 | Identity | `TEST-0210-A-BEHAVIOR-RED-0004`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure`; only `ContractSlice=A` |
@@ -85,3 +86,33 @@ Scenario/status/owner/workflow/
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 B/C/D, WIP/consumer work, merge, release, publication,
 and authority transfer remain held.
+
+## Hosted recurrence and pending exact-head closure
+
+The packet-local C#, focused/cumulative tests, locks, source hashes, line budget,
+and review evidence remain unchanged. Exact pushed head
+[`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, made both stable jobs fail only
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+record authoring in
+[run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+Four changed-record [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174)
+links used a `/checks` subroute rather than the canonical pull-request record,
+and the exact readiness prose "Full
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+green is not claimed" left that identifier outside its canonical link. This was
+plain readiness prose, not the earlier Scenario-trait defect. The run reported six
+findings in total.
+
+[FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
+owns one bounded twelve-record documentation/memory correction and is
+`PendingExactHeadHostedVerification`. Existing
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+is the recurrence barrier; no new scenario or validator is introduced. Exact
+remote-equal
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+remains the last hosted-green predecessor until a new correction commit/tree
+passes exact-head hosted validation. Six of eighteen packets remain
+`ReviewedLocalGreen` (`33%`); `A-PARSER-INDEX-01` and every later packet remain
+Candidate/inactive.

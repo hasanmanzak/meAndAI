@@ -221,6 +221,19 @@ authority transfer, and PowerShell retirement remain unauthorized.
 Six of eighteen packets are `ReviewedLocalGreen` (`33%`). `A-PARSER-INDEX-01` and every
 later packet remain Candidate/inactive.
 
+The current handoff also owns
+[FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445):
+packet-local A-index evidence remains green, while pushed
+[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
+/ tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943` failed only
+[TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
+The finding is `PendingExactHeadHostedVerification`; exact
+[`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
+/ [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
+remains the last hosted-green predecessor. The historical six-of-eighteen
+(`33%`) and `A-PARSER-INDEX-01` Candidate snapshot is unchanged.
+
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
 packet, now satisfied by the exact-main evidence above.
