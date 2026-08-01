@@ -300,8 +300,10 @@ hosted evidence.
 The first `git diff --check` after the historical BASE sync was clean. Later
 pushed candidate work superseded that working-tree state without completing the
 packet state machine. Those recovery, planned-scenario-trait, and schema-slot
-handoffs are historical checkpoints; follow the current
-[index-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
+handoffs and the
+[index-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
+are historical checkpoints; follow the current
+[parser-record-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
 
 ## Ordered remaining ContractSlice A queue
 
