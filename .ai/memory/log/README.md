@@ -204,7 +204,7 @@ where both stable jobs failed only clickable-reference
 [FIND-0444](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
 is resolved at exact remote-equal
 [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
-tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted
+git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted
 [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
 green. The oversized parser/index candidate was strictly redrawn under the hard
 line cap; `A-INDEX-SLOT-01` is now `ReviewedLocalGreen` after the exact
@@ -224,11 +224,20 @@ later packet remain Candidate/inactive.
 The current handoff also owns
 [FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445):
 packet-local A-index evidence remains green, while pushed
-[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)
-/ tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943` failed only
+[`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
+with git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only
 [TEST-0175](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
 in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
-The finding is `PendingExactHeadHostedVerification`; exact
+The finding remains `PendingExactHeadHostedVerification`. Exact correction head
+[`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
+green while Ubuntu failed only
+[TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+with twenty-three ambiguous Git tree identities in
+[run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+[FIND-0446](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+owns their local documentation/memory-only correction and is also
+`PendingExactHeadHostedVerification`; exact
 [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
 / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
 remains the last hosted-green predecessor. The historical six-of-eighteen

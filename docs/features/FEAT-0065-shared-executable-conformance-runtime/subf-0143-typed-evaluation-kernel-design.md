@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor, with [FIND-0444](README.md#find-0444) resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0/0/0`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only repository-record [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217); [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`. Every later packet remains Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged; exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor, with [FIND-0444](README.md#find-0444) resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0/0/0`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175); exact correction head [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) made Windows green while Ubuntu failed only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450). [FIND-0445](README.md#find-0445) and [FIND-0446](README.md#find-0446) are `PendingExactHeadHostedVerification`. Every later packet remains Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -127,10 +127,19 @@ closes [FIND-0444](README.md#find-0444) at remote-equal
 focused/cumulative green, hashes, line budget, locks, and review evidence are
 unchanged. Pushed head
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
-tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
+git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
 [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
 in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
 [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`, so exact
+correction head
+[`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
+green while Ubuntu failed only
+[TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+with twenty-three ambiguous Git tree identities in
+[run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+[FIND-0446](README.md#find-0446) owns their local correction and is also
+`PendingExactHeadHostedVerification`, so exact
 [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
 / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
 remains the last hosted-green predecessor. Six of eighteen packets remain

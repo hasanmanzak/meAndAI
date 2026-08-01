@@ -7,7 +7,7 @@ Last verified: **2026-08-01**
 - Current ContractSlice A continuation: the last remote-equal exact-head
   hosted-green predecessor remains
   [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665),
-  tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, through
+  git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, through
   [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972);
   [FIND-0444](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
   remains resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R
@@ -16,12 +16,22 @@ Last verified: **2026-08-01**
   total is `642/690`, and build/format/diff/locks plus three live final reviews
   remain green. Its pushed head
   [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
-  tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
+  git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only repository-record
   [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
   in exact-head
   [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
   [FIND-0445](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445)
-  is `PendingExactHeadHostedVerification`, so that pushed head is not an
+  remains `PendingExactHeadHostedVerification`. Its exact correction head
+  [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+  git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
+  green and removed [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
+  from the failure set, while Ubuntu failed only
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  with twenty-three ambiguous Git tree identities in
+  [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+  owns the local documentation/memory-only correction and is also
+  `PendingExactHeadHostedVerification`; neither hosted-failed head is an
   activation predecessor. Six of eighteen packets remain `ReviewedLocalGreen`
   (`33%`); [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned`, `A-PARSER-INDEX-01` and every later packet remain
@@ -999,8 +1009,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 
 - Status: `Active`
 - Observable signature: [TEST-0065](../../docs/features/FEAT-0011-stability-closure/test-cases.md#test-0065)
-  reports an `UnlinkedCommitReference` for a
-  short SHA or for a commit-like hexadecimal object identity in Markdown.
+  or its repository-wide [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  owner reports an `UnlinkedCommitReference` for a short SHA or for a
+  commit-like hexadecimal object identity in Markdown.
 - Applicability: tracked Markdown and GitHub-facing evidence that names commits,
   checkpoints, blobs, or other Git objects.
 - Affected contract and cause: a human-facing commit identity is not navigable
@@ -1008,18 +1019,27 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   referenced implementation evidence is not itself invalid.
 - Canonical owner and evidence: [FIND-0284](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0284)
   / [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  owns the exact reference contract.
+  owns the exact reference contract. The current delivery occurrence is
+  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446):
+  exact head
+  [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+  git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, and
+  [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
 - Fixed release or evidence: repository-only Markdown verification is the
-  focused barrier; target release `0.15.0` carries the corrected evidence.
+  focused barrier; release `0.15.0` carries the historical corrected evidence.
+  The current twenty-three-occurrence correction is
+  `PendingExactHeadHostedVerification` and grants no successor authority.
 - Required safe response: resolve a commit to its exact full SHA and link the
-  label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; describe a
-  non-commit object without presenting its raw identity as a commit reference,
-  or use an exact content permalink when navigation is required.
+  label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; classify a
+  non-commit tree object with the explicit `git tree identity:` prefix without
+  changing its bytes or creating a false commit permalink, or use an exact
+  content permalink when navigation is required.
 - Unsafe retry boundary: do not leave a short SHA in code formatting, do not
   treat an arbitrary 40-hex object as a commit, and do not split one validator
   count into derivative findings.
-- Freshness and review condition: last confirmed 2026-07-25; review after the
-  canonical commit-reference validator contract changes.
+- Freshness and review condition: confirmed 2026-08-01 by the exact current
+  occurrence; review after the canonical commit-reference validator contract
+  or record-authoring process changes.
 - Superseded by: `None`
 
 ### Executable Case rename leaves a retired fixture path in a structural consumer

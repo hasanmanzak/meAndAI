@@ -3,13 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor; [FIND-0444](README.md#find-0444) is resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R is immutable, focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0 Blocking / 0 Important / 0 Minor`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only hosted [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175); [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`, so it is not an activation predecessor. `A-PARSER-INDEX-01` and all later packets remain Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665) / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) remains the last hosted-green predecessor; [FIND-0444](README.md#find-0444) is resolved. `A-INDEX-SLOT-01` remains `ReviewedLocalGreen`: canonical R is immutable, focused green is `1/1` twice, cumulative A is `19/19`, packet size is `642/690`, and three final live reviews closed `0 Blocking / 0 Important / 0 Minor`. Pushed [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) failed only hosted [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175); exact correction head [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) made Windows green while Ubuntu failed only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450). [FIND-0445](README.md#find-0445) and [FIND-0446](README.md#find-0446) are `PendingExactHeadHostedVerification`, so neither head is an activation predecessor. `A-PARSER-INDEX-01` and all later packets remain Candidate/inactive. Six of eighteen packets remain `ReviewedLocalGreen` (`33%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Active predecessor | Exact remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) green; historical recovery inputs remain evidence only. |
-| Pushed hosted-failed head | [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), tree `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`; exact-head [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) failed only [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) record authoring. [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`; this head is not an activation predecessor. |
+| Active predecessor | Exact remote-equal [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665), git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`, with exact-head hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) green; historical recovery inputs remain evidence only. |
+| Pushed hosted-failed head | [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`; exact-head [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) failed only [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) record authoring. [FIND-0445](README.md#find-0445) is `PendingExactHeadHostedVerification`; this head is not an activation predecessor. |
+| Hosted correction head | [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c), git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`; exact-head [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) made Windows green while Ubuntu failed only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) with twenty-three ambiguous Git tree identities. [FIND-0446](README.md#find-0446) is `PendingExactHeadHostedVerification`; this head is also not an activation predecessor. |
 | Git authority | The maintainer's umbrella directive authorizes the ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including D/RT-required operational redraws that strictly partition accepted A semantics under the hard line cap, packet-local validation/review/record synchronization, commit/push, draft-PR updates, and hosted-check correction. A redraw neither preactivates a packet nor broadens scope. Every packet still requires its exact predecessor, synchronized ledger, accepted D/RT, and one-at-a-time mutating activation. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), merge, release, and publication remain held. |
 
 ## Purpose
@@ -352,7 +353,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 
 The exact predecessor is remote-equal
 [`c73977d4af922aa66c464f6caced0d1aae473665`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
-at tree `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`; exact-head hosted run
+at git tree identity: `99095c781e67be1cbeed9fe5cfb1d7004803ce6e`; exact-head hosted run
 [30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972) is
 green. The original parser/index candidate was not activated:
 its D estimate exceeded the mandatory line boundary. The accepted redraw adds
@@ -644,7 +645,15 @@ failed only repository-record
 [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175)
 in [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
 [FIND-0445](README.md#find-0445) owns the bounded twelve-record correction and is
-`PendingExactHeadHostedVerification`. Exact
+`PendingExactHeadHostedVerification`. Exact correction head
+[`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c),
+git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`, made Windows
+green while Ubuntu failed only
+[TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+with twenty-three ambiguous Git tree identities in
+[run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
+[FIND-0446](README.md#find-0446) owns their local documentation/memory-only
+correction and is also `PendingExactHeadHostedVerification`. Exact
 [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
 / [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972)
 remains the active predecessor; `A-PARSER-INDEX-01` remains Candidate/inactive.
