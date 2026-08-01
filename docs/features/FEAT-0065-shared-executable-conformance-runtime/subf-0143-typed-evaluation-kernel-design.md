@@ -3,14 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded [FIND-0441](README.md#find-0441) recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; [FIND-0442](README.md#find-0442) defers the canonical `Scenario` trait for [TEST-0210](test-cases.md#test-0210) to final A-D activation while partial tests retain only `ContractSlice`; its correction head is a predecessor candidate and becomes the next-packet predecessor only after local review, push, and exact-head hosted green; no successor A packet is active, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
+| Status | Gate 2 accepted/merged; historical first ParseCanonical and canonical-string A increments accepted; bounded [FIND-0441](README.md#find-0441) recovery is checkpointed at [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d) / tree `4ca02623...` on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), with four focused `1/1`, cumulative `17/17`, and local/staged reviews `0/0/0`; [FIND-0442](README.md#find-0442) is resolved at remote-equal predecessor [`c88beef...`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032) with exact-head hosted [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794); the canonical `Scenario` trait for [TEST-0210](test-cases.md#test-0210) remains deferred to final A-D activation while partial tests retain only `ContractSlice`; `A-SCHEMA-SLOT-01` preserves its corrected [FIND-0443](README.md#find-0443) canonical R and is packet-local `ReviewedLocalGreen` at focused `1/1`, cumulative A `18/18`, and measured code/test `692/700`; fresh full-diff review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction, `A-PARSER-INDEX-01` remains Candidate/inactive, and [TEST-0210](test-cases.md#test-0210) remains `Planned` |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [planned-scenario-trait correction handoff](../../../.ai/memory/log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md); the pushed-candidate recovery handoff is a historical checkpoint, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current bounded [schema-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md); the planned-scenario-trait correction and pushed-candidate recovery handoffs are historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) |
+| Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793) |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
 
 ## Directive and hard boundary
@@ -42,6 +42,85 @@ likewise changes evidence wording only. It distinguishes at most one locked-
 adapter, marker-free same-FQN `[FAIL]` bookkeeping node from an independent or
 contradictory diagnostic. The run observed before that distinction remains
 diagnostic and cannot be promoted retroactively.
+
+The 2026-08-01 append-only
+[FIND-0443 assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
+also changes evidence wording only. It aligns the packet-level oracle with this
+design's accepted same-result, marker-free standard assertion `StackTrace` and
+requires a fresh post-synchronization 0003 invocation. The exposing run and the
+later `9a39...` run remain diagnostic: the latter satisfied the technical TRX
+shape but preceded complete repository index synchronization. A renewed full-
+record/source review and another fresh same-marker/FQN/ordinal invocation were
+required before bounded green authority.
+
+The third 0003 observation at
+`D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
+used a previously nonexistent directory that was empty immediately before its
+single invocation. With `VSTEST_CONNECTION_TIMEOUT` unset, the default
+90-second testhost connection timeout aborted before discovery. The TRX has no
+`UnitTestResult`, all 16 counters are zero, and one infrastructure
+`RunInfo outcome="Error"` names PID `211000`; it is invalid red and remains a
+third diagnostic observation under the existing environment-failure clause.
+
+This observation changes no design semantic and does not broaden the
+BehaviorRed result oracle. It amended only the packet-specific execution
+envelope after renewed record/source review: one new nonexistent-and-empty GUID
+directory, one otherwise identical exact-FQN-filtered `dotnet test` invocation,
+one TRX logger, `--no-restore`, `--no-build`, child-process
+`VSTEST_CONNECTION_TIMEOUT=300`, and an exact 420-second outer timeout. Neither
+timeout could be raised automatically and no automatic retry was permitted. A
+second infrastructure failure would have blocked the packet rather than
+changing the oracle or source.
+
+That one bounded replacement invocation produced canonical 0003 R at
+`D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+Its sole exact-FQN result is Failed with the exact marker message, one permitted
+nonempty marker-free standard assertion stack, one permitted byte-identical
+echo, and one exact marker-free same-FQN `[FAIL]` RunInfo. The Failed summary
+has all 16 exact counters: `total=1`, `executed=1`, and `failed=1`, with every
+other counter zero. No attachment or independent diagnostic exists. The parent
+`VSTEST_CONNECTION_TIMEOUT` remained unset after the child completed. This R
+changes neither the reviewed source nor the existing BehaviorRed oracle; all
+three earlier observations remain diagnostic. The bounded green below now
+establishes packet-local `ReviewedLocalGreen`.
+
+### `A-SCHEMA-SLOT-01` bounded-green evidence
+
+The final retained
+`ContractSliceASchemaSlotManifestTests.cs` source is exactly `436` lines with
+SHA-256
+`FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`.
+The temporary marker and legacy branch are absent. The fixture-only scenario
+literal exposed by [TEST-0074](../FEAT-0012-v082-correction/test-cases.md#test-0074)
+was changed to neutral `TEST-0001`; no active `TEST-0210` source literal
+remains. The measured implementation is `256` production plus `436` test lines,
+or `692/700`: two lines above the `600-690` planning estimate, but below the
+only hard stop of more than `700` changed code/test lines.
+
+The original-oracle green, with the temporary branch still present, passed
+`1/1` at
+`D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
+SHA-256 `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
+After topology cleanup, the final focused run passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
+SHA-256 `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`,
+and cumulative `ContractSlice=A` passed `18/18` at
+`D:\Temp\meandai-test-0210-a-cumulative-topology-retry-c93d714f03894591b62e498df55931c3\TEST-0210-A-GREEN-CUMULATIVE-0003.trx`,
+SHA-256 `920BC60B161595E97D12544836D5B6E5B271C60931FFFB0860389F81F77B9DDC`.
+
+The Release build completed with zero warnings and zero errors, standard format
+verification passed, and all six lock fingerprints remained unchanged. The
+earlier full protocol-suite run reached its controlled `600`-second outer
+timeout, and the later post-correction `-StructureOnly` run reached its
+controlled `300`-second timeout with no orphan process. Both are inconclusive,
+remain below the repository's reviewed `20`/`35`-minute full-validation
+budgets, and are neither pass nor fail evidence. Fresh full-diff review pass 2
+closed `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability
+correction. `A-PARSER-INDEX-01` stays Candidate/inactive;
+workflow/status/owner/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
+and all later-scope holds remain unchanged.
 
 That corrected directive still does **not** authorize:
 
@@ -6437,9 +6516,14 @@ locked xUnit `2.9.3` contract proves that direct call throws
 `Xunit.Sdk.FailException`; the standard TRX schema/adapter does not serialize
 the runtime exception type and the TRX must not claim that it does. The sole
 mapped failed `UnitTestResult` has exactly one `Output/ErrorInfo/Message` node
-whose normalized text equals the marker byte-for-byte. Except for the one
-permitted run-summary echo described next, no other test-result message, stack,
-attachment, warning, error, attribute, or node contains the marker. Across
+whose normalized text equals the marker byte-for-byte. The same `ErrorInfo` may
+also contain zero or one nonempty, marker-free sibling `StackTrace` containing
+the locked adapter's standard failed-result assertion stack. Its absolute paths,
+framework frames, indentation, and source line numbers are recorded non-oracles;
+it is same-result serialization rather than an independent diagnostic. No other
+`ErrorInfo` child or content is allowed. Except for the one permitted run-summary
+echo described next, no other test-result message, stack, attachment, warning,
+error, attribute, or node contains the marker. Across
 `ResultSummary/Output/StdOut` and `StdErr`, the adapter may
 record zero or one additional byte-identical marker echo. That bounded echo is
 neither a second result nor assertion-type proof. Unexpected production
@@ -6481,8 +6565,9 @@ run-summary echo; more than one run-summary echo exists; reviewed source no
 longer has one direct null-branch `Assert.Fail(exactMarker)` call; the immutable
 xUnit contract differs; more than one `RunInfo` exists; its attribute/child/
 outcome/text/FQN/marker contract differs; any other RunInfo, attachment,
-independent warning/error/diagnostic, stack, exception, or infrastructure text
-exists; an unexpected exception was relabeled; or any
+independent warning/error/diagnostic, any `StackTrace` outside the permitted
+marker-free `ErrorInfo/StackTrace`, exception, or infrastructure text exists; an
+unexpected exception was relabeled; or any
 NU/MSB/compiler/analyzer/project/reference/predecessor/
 environment/infrastructure failure occurred. Console text never overrides
 incomplete or contradictory TRX evidence.
@@ -6958,6 +7043,14 @@ Before the corrected ContractSlice A topology may enter C# mutation:
   fingerprints, and zero-warning/error six-project Release build passed. The
   canonical-string coverage `Important` is closed; the non-gating severity-info
   scan is not claimed clean.
+- [x] `A-SCHEMA-SLOT-01` preserves the accepted corrected canonical 0003 R and
+  is packet-local `ReviewedLocalGreen`: final retained source is `436` lines at
+  SHA-256 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`,
+  original-oracle and topology-clean final focused runs passed `1/1`, cumulative
+  A passed `18/18`, code/test measured `692/700`, Release build and format
+  passed, and all six lock fingerprints remained unchanged. Fresh full-diff
+  review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1
+  traceability correction.
 - [x] The corrected [maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228), append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054), and append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) authorize each separately reviewed
   [TEST-0210](test-cases.md#test-0210) ContractSlice A increment in the exact
   order source/preparation -> exact red -> review -> smallest bounded green,
@@ -6965,9 +7058,12 @@ Before the corrected ContractSlice A topology may enter C# mutation:
   ContractSlice B/C/D.
 
 The correction red-team gate, canonical first A BehaviorRed, first limited
-ParseCanonical green, and second ContractSlice A canonical-string bounded green
-are satisfied. The canonical-string coverage `Important` is closed; remaining A
-increments are next and no full-A completion is claimed.
+ParseCanonical green, second ContractSlice A canonical-string bounded green,
+and packet-local `A-SCHEMA-SLOT-01` green are satisfied. The canonical-string
+coverage `Important` is closed; fresh full-diff review pass 2 closed
+`0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction,
+`A-PARSER-INDEX-01` remains Candidate/inactive, and no full-A completion is
+claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

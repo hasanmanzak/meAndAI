@@ -6,6 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice A schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
+the historical
 [ContractSlice A planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
 the historical [ContractSlice A pushed-candidate recovery handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
 the historical [ContractSlice A canonical-string bounded-green closure handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
@@ -100,8 +102,10 @@ permits only one exact marker-free same-FQN xUnit `[FAIL]` bookkeeping node;
 records that correction. [FIND-0439](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0439)
 fixes the parser resource/exception/component/provenance boundary. The
 [topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
-is historical; current routing is the
-[planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
+and the
+[planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
+are historical; current routing is the
+[schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
@@ -136,17 +140,58 @@ checkpoint [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860e
 on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). Hosted
 [TEST-0074](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
 exposed
-[FIND-0442](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
-so the current correction defers the
+[FIND-0442](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442).
+That correction defers the
 [Scenario trait for TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 from partial facts while
-retaining their exact FQN and `ContractSlice`. After local review, push, and
-exact-head hosted green, its remote-equal head is the next-packet predecessor; no successor
-A packet is active. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+retaining their exact FQN and `ContractSlice`; it is reviewed, pushed, and
+hosted green at exact predecessor
+[`c88beef...`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032).
+`A-SCHEMA-SLOT-01` is packet-local `ReviewedLocalGreen`. Its first 0003 run remains diagnostic under
+[FIND-0443](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
+and the later technically conforming `9a39...` run is also diagnostic because it
+preceded complete repository-record synchronization. Those `cf51...` and
+`9a39...` runs are exactly the FIND-0443 recurrence set. A third observation at
+`D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`
+(SHA-256 `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`)
+is a separate zero-discovery VSTest infrastructure abort, not FIND-0443 or R.
+Canonical R is accepted at
+`D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+SHA-256 `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+The exact same-marker/FQN/ordinal oracle passed in one new-empty-directory
+invocation under the active
+[VSTest timeout recurrence](../project.md#vstest-testhost-connection-aborts-before-discovery),
+using a process-scoped 300-second child connection timeout and exact 420-second
+outer bound; the parent environment remained unset. No retry is authorized,
+and canonical R remains accepted. Original-oracle green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
+SHA-256 `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
+Final topology-clean focused green passed `1/1` at
+`D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
+SHA-256 `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`,
+and cumulative A passed `18/18` at
+`D:\Temp\meandai-test-0210-a-cumulative-topology-retry-c93d714f03894591b62e498df55931c3\TEST-0210-A-GREEN-CUMULATIVE-0003.trx`,
+SHA-256 `920BC60B161595E97D12544836D5B6E5B271C60931FFFB0860389F81F77B9DDC`.
+Final test source is 436 lines, SHA-256
+`FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`;
+production `256` plus test `436` is `692/700`, with estimated `+2` still inside
+the hard cap. Build passed at zero warnings/errors, format passed, and all six
+locks remained unchanged.
+
+[TEST-0074](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+first exposed a fixture-data `TEST-0210` literal; correction uses neutral
+`TEST-0001` and no Scenario trait. Corrected local StructureOnly was
+inconclusive at a controlled 300-second active timeout with no orphan; an
+earlier full suite was inconclusive at 600 seconds, below the official
+20/35-minute budgets. These are infrastructure observations, not red/green
+evidence. Fresh full-diff review pass 2, performed after the pass-1
+traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Workflow test-step target/filter, scenario ownership,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
+`A-PARSER-INDEX-01` is the next Candidate and remains inactive.
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
@@ -193,6 +238,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-01 - SUBF-0143 ContractSlice A schema-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
 - [2026-07-31 - SUBF-0143 planned-scenario-trait correction](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A pushed-candidate recovery](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A topology correction](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)

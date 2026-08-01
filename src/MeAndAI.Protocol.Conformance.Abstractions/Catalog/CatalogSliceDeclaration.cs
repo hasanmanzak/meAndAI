@@ -49,12 +49,40 @@ public sealed class CatalogSliceDeclaration
 
     internal static IReadOnlyList<RuleDeclaration> CanonicalRules(
         IEnumerable<RuleDeclaration>? rules,
-        string parameterName) =>
-        DeclarationValidation.Canonicalize(
+        string parameterName)
+    {
+        var canonicalRules = DeclarationValidation.Canonicalize(
             rules,
             parameterName,
             item => item.RuleId.Value,
             StringComparer.Ordinal);
+
+        var slots = new Dictionary<string, EvidenceSlotDeclaration>(StringComparer.Ordinal);
+        foreach (var slot in canonicalRules.SelectMany(rule => rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)))
+        {
+            if (slots.TryGetValue(slot.SlotKey, out var existing) &&
+                !RuleDeclaration.SlotsEqual(existing, slot))
+            {
+                throw new ArgumentException("A shared SlotKey must have one structural declaration.", parameterName);
+            }
+
+            slots[slot.SlotKey] = slot;
+        }
+
+        return canonicalRules;
+    }
+
+    internal static void ValidateSchemaSlotClosure(ReleaseSchemaRegistry registry, IEnumerable<RuleDeclaration> rules)
+    {
+        var slots = rules.SelectMany(rule => rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)).ToArray();
+        var schemas = registry.PayloadSchemas.Select(schema => (schema.SchemaKey, schema.SchemaVersion)).ToHashSet();
+        if (slots.Any(slot => slot.Capabilities.Count != 0) ||
+            !schemas.SetEquals(slots.Select(slot => (
+                slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion))))
+        {
+            throw new ArgumentException("Payload schemas, slot requirements, or capabilities are not closed.", nameof(rules));
+        }
+    }
 
     internal static void ValidateRuleVersions(
         CatalogVersion catalogVersion,

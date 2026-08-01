@@ -36,7 +36,6 @@ internal static class CanonicalManifestWriter
         var slice = manifest.Slice;
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
-            manifest.SchemaRegistry.PayloadSchemas.Count != 0 ||
             manifest.SchemaRegistry.Parsers.Count != 0 ||
             manifest.SchemaRegistry.Indexes.Count != 0 ||
             manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
@@ -47,6 +46,10 @@ internal static class CanonicalManifestWriter
             throw new InvalidOperationException(
                 "This writer increment supports only the minimal qualification slice.");
         }
+
+        CatalogSliceDeclaration.ValidateSchemaSlotClosure(
+            manifest.SchemaRegistry,
+            slice.Rules);
 
         var buffer = new ArrayBufferWriter<byte>();
         using (var writer = new Utf8JsonWriter(
@@ -105,7 +108,7 @@ internal static class CanonicalManifestWriter
     {
         writer.WritePropertyName("schemaRegistry");
         writer.WriteStartObject();
-        WriteEmptyArray(writer, "payloadSchemas");
+        WritePayloadSchemas(writer, registry.PayloadSchemas);
         WriteEmptyArray(writer, "parsers");
         WriteEmptyArray(writer, "indexes");
         WriteEmptyArray(writer, "demandProjectors");
@@ -132,6 +135,42 @@ internal static class CanonicalManifestWriter
             budget.RetentionPolicy.Value);
         writer.WriteEndObject();
         writer.WriteEndObject();
+    }
+
+    private static void WritePayloadSchemas(Utf8JsonWriter writer, IReadOnlyList<PayloadSchemaDeclaration> schemas)
+    {
+        writer.WritePropertyName("payloadSchemas");
+        writer.WriteStartArray();
+        foreach (var schema in schemas)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "schemaKey", schema.SchemaKey);
+            WriteCanonicalString(writer, "schemaVersion", schema.SchemaVersion);
+            WriteComponentReference(writer, "codec", schema.Codec);
+
+            writer.WritePropertyName("outputModel");
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "modelKey", schema.OutputModel.ModelKey);
+            WriteCanonicalString(writer, "modelVersion", schema.OutputModel.ModelVersion);
+            WriteComponentReference(writer, "implementationType", schema.OutputModel.ImplementationType);
+            writer.WriteEndObject();
+
+            writer.WriteNumber("maxBindingsPerInstruction", schema.MaxBindingsPerInstruction);
+            writer.WriteNumber(
+                "maxRetainedCanonicalBytesPerInstruction", schema.MaxRetainedCanonicalBytesPerInstruction);
+
+            writer.WritePropertyName("budget");
+            writer.WriteStartObject();
+            writer.WriteNumber("maxBytes", schema.Budget.MaxBytes);
+            writer.WriteNumber("maxDepth", schema.Budget.MaxDepth);
+            writer.WriteNumber("maxNodes", schema.Budget.MaxNodes);
+            writer.WriteNumber("maxComplexity", schema.Budget.MaxComplexity);
+            writer.WriteEndObject();
+            WriteCanonicalStringValues(writer, "codecFailureCodes", schema.CodecFailureCodes);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
     }
 
     private static void WriteRules(

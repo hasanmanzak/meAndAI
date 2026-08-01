@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-07-31**
+Last verified: **2026-08-01**
 
 ## Verified facts
 
@@ -44,10 +44,66 @@ Last verified: **2026-07-31**
   the still-`Planned` A-D scenario carried 17 premature final `Scenario` traits.
   The bounded correction retains every `ContractSlice=A` fact/FQN and defers
   the [Scenario trait for TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-  to atomic final activation. Its correction head remains
-  a predecessor candidate until local review, push, and exact-head hosted
-  green; only then does the remote-equal head become the next-packet
-  predecessor whose exact SHA must be frozen before successor mutation.
+  to atomic final activation. Local review, push, and exact-head hosted
+  [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
+  are green; remote-equal
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  is the frozen `A-SCHEMA-SLOT-01` predecessor.
+- `A-SCHEMA-SLOT-01` is packet-local `ReviewedLocalGreen` with exact FQN
+  `ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure`
+  and marker `TEST-0210-A-BEHAVIOR-RED-0003`. D/RT owns the exact
+  reviewed red-source SHA-256
+  `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`,
+  repository-tree schema, a producer-free zero-capability slot, schema/slot and
+  component closure, and global equal SlotKey reuse. All three prior 0003
+  attempts remain diagnostic. The first TRX at
+  `D:\Temp\meandai-test-0210-a-cf51d3e38d6a41c1a45c30eb5edf6e94\TEST-0210-A-BEHAVIOR-RED-0003.trx`
+  and the technically conforming rerun at
+  `D:\Temp\meandai-test-0210-a-9a39c31356614537b6a6f0eac0083c56\TEST-0210-A-BEHAVIOR-RED-0003.trx`
+  are exactly the diagnostic recurrence set for
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  and its append-only
+  [evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793)
+  respectively because the lower-level micro oracle contradicted the accepted
+  locked-adapter marker-free assertion StackTrace and because the second run
+  preceded complete repository-record synchronization. The third TRX at
+  `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`,
+  is separately a zero-discovery VSTest infrastructure abort and is neither
+  FIND-0443 nor R. Canonical R is accepted at
+  `D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+  The frozen red-source hash remained exact; the complete oracle passed in one
+  process-scoped 300-second-child / exact-420-second-outer invocation, and the
+  parent environment remained unset. No further red retry is authorized.
+  Original-oracle green passed `1/1` at
+  `D:\Temp\meandai-test-0210-a-green-d223831945254a88b29b723f0a07f3e3\TEST-0210-A-GREEN-0003.trx`,
+  SHA-256
+  `EF73BE838513986CA8FB9D41D1FC2B34D98CC3E31C650638B15158A7B115BB80`.
+  Final topology-clean focused green passed `1/1` at
+  `D:\Temp\meandai-test-0210-a-green-final-topology-64237a9f1c384c1fb5adef025948cfe0\TEST-0210-A-GREEN-FINAL-0003.trx`,
+  SHA-256
+  `A8552AF906E45AFB22A85BF0F3B61DDFD8AFA813036AA78292180C1BC32A2ACD`;
+  cumulative A passed `18/18` at
+  `D:\Temp\meandai-test-0210-a-cumulative-topology-retry-c93d714f03894591b62e498df55931c3\TEST-0210-A-GREEN-CUMULATIVE-0003.trx`,
+  SHA-256
+  `920BC60B161595E97D12544836D5B6E5B271C60931FFFB0860389F81F77B9DDC`.
+  Final test source is 436 lines, SHA-256
+  `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`;
+  production `256` plus test `436` is `692/700`, and estimated `+2` remains
+  inside the hard cap. Release build passed with zero warnings/errors, format
+  passed, and all six locks remained unchanged.
+  [TEST-0074](../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
+  first exposed a fixture-data `TEST-0210` literal; it is neutral `TEST-0001`
+  now, with no Scenario trait. Corrected local StructureOnly was inconclusive
+  at a controlled 300-second active timeout with no orphan; the earlier full
+  suite was inconclusive at 600 seconds, below official 20/35-minute budgets.
+  They are infrastructure observations, not red/green evidence. Fresh full-
+  diff review pass 2, after the pass-1 traceability correction, closed
+  `0 Blocking / 0 Important / 0 Minor`. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+  remains `Planned`; `A-PARSER-INDEX-01` is the next Candidate and inactive.
 - Previous C# operational-foundation checkpoint:
   [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
   / [SUBF-0120](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md#subf-0120)
@@ -168,14 +224,21 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   combined route were incomplete.
 - Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
-  and the current [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
+  the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
+  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation after all A-D focused and combined green.
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
-  remains open
-  until this correction passes local review, push, and exact-head hosted green.
+  correction is reviewed and pushed at exact
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032);
+  hosted [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
+  is green. During `A-SCHEMA-SLOT-01`, TEST-0074 then exposed only a fixture-
+  data `TEST-0210` literal; the correction is neutral `TEST-0001` and retains no
+  Scenario trait. The corrected 300-second StructureOnly and earlier 600-second
+  full-suite attempts expired below the official 20/35-minute budgets with no
+  orphan; both are infrastructure observations, not scenario red/green evidence.
 - Required safe response: keep `PlannedDocumentation` strict, remove premature
   final scenario traits, preserve partial-slice filters, and rerun StructureOnly
   plus the unchanged cumulative ContractSlice filter; require exact-head hosted
@@ -185,6 +248,73 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   add a scenario-ID-specific bypass, or activate scenario-owner/workflow scope early.
 - Freshness and review condition: confirmed 2026-07-31; review when partial
   trait topology or final scenario activation changes.
+- Superseded by: `None`
+
+### Frozen delivery oracle contradicts locked adapter serialization
+
+- Status: `Active`
+- Observable signature: an otherwise exact BehaviorRed TRX includes the locked
+  xUnit/VSTest adapter's marker-free assertion `StackTrace`, while a lower-level
+  packet record prohibits every sibling `ErrorInfo` child.
+- Applicability: expected-red evidence that uses direct `Assert.Fail` with the
+  immutable xUnit package and standard TRX logger.
+- Affected contract and cause: the active micro plan drifted from the accepted
+  typed design and canonical 0001/0002 evidence by calling the standard same-
+  result StackTrace an invalid sibling.
+- Canonical owner and evidence:
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
+  [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
+  the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
+  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+- Fixed release or evidence: no release. The FIND-0443 recurrence set is
+  exactly the diagnostic `cf51...` and `9a39...` 0003 TRX observations: the
+  first exposed the oracle contradiction; the second passed the technical
+  shape but preceded complete repository-record sync. The separate `c96...`
+  zero-discovery infrastructure abort is excluded and governed below. The
+  corrected oracle now has accepted canonical R at the exact `96ff...` TRX and
+  SHA-256 recorded in the verified facts above.
+- Required safe response: preserve the corrected lower-level wording and
+  accepted R; permit zero or one nonempty marker-free standard
+  `ErrorInfo/StackTrace` and validate it when present. Stop before green if any
+  record/source or locked-adapter contract diverges; do not rerun accepted R.
+- Unsafe retry boundary: do not suppress/wrap the assertion stack, relabel it as
+  infrastructure failure, retroactively promote the exposing run, or allocate a
+  new marker ordinal.
+- Freshness and review condition: confirmed 2026-08-01; review when the locked
+  adapter, logger, or BehaviorRed evidence contract changes.
+- Superseded by: `None`
+
+### VSTest testhost connection aborts before discovery
+
+- Status: `Active`
+- Observable signature: VSTest aborts its testhost connection at the default
+  90 seconds before discovery; the TRX has no `UnitTestResult`, all 16 counters
+  are zero, and one infrastructure Error RunInfo.
+- Applicability: the current single-test ContractSlice A expected-red
+  invocation when `VSTEST_CONNECTION_TIMEOUT` is unset.
+- Affected contract and cause: the host connection window expired before the
+  test ran, so the invocation is infrastructure evidence rather than R.
+- Canonical owner and evidence: the current
+  [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
+  and exact TRX
+  `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `F4190734BC91DB6879DCCC92633BBCB6DF4B9400A8CD4D47A7C6DF9030358C3A`.
+- Fixed release or evidence: no release. Accepted canonical R is
+  `D:\Temp\meandai-test-0210-a-96ff2a5352c141f78f8bebbfc0f957f0\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
+  SHA-256
+  `4B7B8398362E23B9364BBB7C11C4A538BA984B3474A52F2D95567CB340545FDE`.
+  One child-process `VSTEST_CONNECTION_TIMEOUT=300` / exact 420-second outer
+  invocation passed every oracle; its parent environment remained unset, and
+  reviewed red-source SHA-256 remained
+  `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`.
+- Required safe response: retain the diagnostic `c96...` evidence and accepted
+  `96ff...` R separately. Bounded green is now complete; do not reclassify the
+  later controlled protocol-suite timeouts as red or green evidence.
+- Unsafe retry boundary: do not pre-discover, loop, reuse evidence, persist or
+  raise either timeout, or auto-retry any further failure.
+- Freshness and review condition: confirmed 2026-08-01; review when the locked
+  VSTest/TestHost route or host execution environment changes.
 - Superseded by: `None`
 
 ### Small-context packet advancement outruns the canonical ledger
@@ -205,7 +335,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
-  and the current [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md).
+  the historical [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
+  and the current [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -213,12 +344,18 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`f64860ef...`](https://github.com/hasanmanzak/meAndAI/commit/f64860ef456380232c23dfc4729a0d87f257483d)
   on draft
   [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the later
-  remote-equal [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
-  correction head becomes the next-packet predecessor only after local review,
-  push, and exact-head hosted green.
+  remote-equal [`c88beef...`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
+  correction head passed local review, push, and exact-head hosted green in
+  [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794),
+  so it is the `A-SCHEMA-SLOT-01` predecessor. That packet is now packet-local
+  `ReviewedLocalGreen` with focused `1/1`, cumulative A `18/18`, build/format/
+  lock evidence. Fresh full-diff review pass 2, after the pass-1 traceability
+  correction, closed `0 Blocking / 0 Important / 0 Minor`.
 - Required safe response: stop successor work, treat the pushed head as recovery
   input, reconcile exact diff/tests/review/records, and require an exact reviewed
-  checkpoint before selecting another packet.
+  checkpoint before activating `A-PARSER-INDEX-01`; it is only the next inactive
+  Candidate.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1289,13 +1426,29 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   on draft
   [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174); the
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442)
-  correction head
-  remains a candidate until local review, push, and exact-head hosted green,
-  after which its remote-equal head becomes the next-packet predecessor. No
-  successor A increment is active.
+  correction is reviewed, pushed, and exact-head hosted green. Remote-equal
+  [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032)
+  is the frozen predecessor for packet-local `ReviewedLocalGreen`
+  `A-SCHEMA-SLOT-01`. Its
+  [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
+  recurrence is exactly the diagnostic `cf51...` and `9a39...` runs. The third
+  `c96...` observation is a separate zero-discovery VSTest infrastructure
+  abort. Canonical 0003 BehaviorRed is accepted at the exact `96ff...` TRX:
+  one process-scoped 300-second-child / exact-420-second-outer invocation passed
+  the complete oracle, the parent environment remained unset, and no retry is
+  authorized. Original-oracle and topology-clean focused greens passed `1/1`,
+  cumulative A passed `18/18`, final source is 436 lines at SHA-256
+  `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`,
+  code/test is `692/700`, build is zero-warning/error, format passed, and locks
+  are unchanged. TEST-0074's fixture-data literal is neutral `TEST-0001` with
+  no Scenario trait. The 300-second StructureOnly and earlier 600-second full-
+  suite expirations are infrastructure observations below official budgets,
+  not red/green evidence. Fresh full-diff review pass 2, after the pass-1
+  traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains
-  `Planned`. Partial facts retain `ContractSlice` only; their final `Scenario`
+  `Planned`; `A-PARSER-INDEX-01` is the next Candidate and remains inactive.
+  Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   activation, WIP extraction, consumer/release/publication/authority-transfer,

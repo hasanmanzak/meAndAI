@@ -51,7 +51,7 @@ internal static class CanonicalManifestReader
         var slice = ReadSlice(ref reader);
 
         reader.ExpectProperty("schemaRegistry");
-        var cacheBudget = ReadEmptySchemaRegistry(ref reader);
+        var schemaRegistry = ReadSchemaRegistry(ref reader);
 
         reader.ExpectProperty("activationProofContract");
         var activationProof = ReadActivationProof(ref reader);
@@ -71,7 +71,7 @@ internal static class CanonicalManifestReader
             protocolVersion,
             catalogVersion,
             slice,
-            cacheBudget,
+            schemaRegistry,
             activationProof,
             artifacts,
             components);
@@ -91,12 +91,12 @@ internal static class CanonicalManifestReader
         return new RawSlice(sliceKey, sliceVersion, rules);
     }
 
-    private static RawCacheBudget ReadEmptySchemaRegistry(
+    private static RawSchemaRegistry ReadSchemaRegistry(
         ref BoundedJsonReader reader)
     {
         reader.Expect(JsonTokenType.StartObject);
         reader.ExpectProperty("payloadSchemas");
-        reader.ExpectEmptyArray();
+        var payloadSchemas = ReadPayloadSchemas(ref reader);
         reader.ExpectProperty("parsers");
         reader.ExpectEmptyArray();
         reader.ExpectProperty("indexes");
@@ -125,14 +125,84 @@ internal static class CanonicalManifestReader
         reader.Expect(JsonTokenType.EndObject);
         reader.Expect(JsonTokenType.EndObject);
 
-        return new RawCacheBudget(
-            maxDecodeEntries,
-            maxDecodeCanonicalBytes,
-            maxIndexEntries,
-            maxIndexNodes,
-            maxConcurrentDecodeAttempts,
-            maxConcurrentIndexAttempts,
-            retentionPolicy);
+        return new RawSchemaRegistry(
+            payloadSchemas,
+            new RawCacheBudget(
+                maxDecodeEntries,
+                maxDecodeCanonicalBytes,
+                maxIndexEntries,
+                maxIndexNodes,
+                maxConcurrentDecodeAttempts,
+                maxConcurrentIndexAttempts,
+                retentionPolicy));
+    }
+
+    private static IReadOnlyList<RawPayloadSchema> ReadPayloadSchemas(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var schemas = new List<RawPayloadSchema>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest payloadSchemas array must contain objects.");
+            }
+
+            reader.ExpectProperty("schemaKey");
+            var schemaKey = reader.ReadString();
+            reader.ExpectProperty("schemaVersion");
+            var schemaVersion = reader.ReadString();
+            reader.ExpectProperty("codec");
+            var codec = ReadComponentReference(ref reader);
+
+            reader.ExpectProperty("outputModel");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("modelKey");
+            var modelKey = reader.ReadString();
+            reader.ExpectProperty("modelVersion");
+            var modelVersion = reader.ReadString();
+            reader.ExpectProperty("implementationType");
+            var implementationType = ReadComponentReference(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+
+            reader.ExpectProperty("maxBindingsPerInstruction");
+            var maxBindings = reader.ReadInt32();
+            reader.ExpectProperty("maxRetainedCanonicalBytesPerInstruction");
+            var maxRetainedBytes = reader.ReadInt64();
+
+            reader.ExpectProperty("budget");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("maxBytes");
+            var maxBytes = reader.ReadInt64();
+            reader.ExpectProperty("maxDepth");
+            var maxDepth = reader.ReadInt32();
+            reader.ExpectProperty("maxNodes");
+            var maxNodes = reader.ReadInt64();
+            reader.ExpectProperty("maxComplexity");
+            var maxComplexity = reader.ReadInt64();
+            reader.Expect(JsonTokenType.EndObject);
+
+            reader.ExpectProperty("codecFailureCodes");
+            var codecFailureCodes = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            schemas.Add(new RawPayloadSchema(
+                schemaKey,
+                schemaVersion,
+                codec,
+                modelKey,
+                modelVersion,
+                implementationType,
+                maxBindings,
+                maxRetainedBytes,
+                maxBytes,
+                maxDepth,
+                maxNodes,
+                maxComplexity,
+                codecFailureCodes));
+        }
+
+        return schemas;
     }
 
     private static RawActivationProof ReadActivationProof(
@@ -597,19 +667,22 @@ internal static class CanonicalManifestReader
         string protocolVersion,
         int catalogVersion,
         RawSlice slice,
-        RawCacheBudget cacheBudget,
+        RawSchemaRegistry rawSchemaRegistry,
         RawActivationProof activationProof,
         IReadOnlyList<RawArtifact> artifacts,
         IReadOnlyList<RawComponent> rawComponents)
     {
         try
         {
+            var cacheBudget = rawSchemaRegistry.CacheBudget;
             RequirePositiveCacheBudget(cacheBudget);
             ValidateCanonicalArtifactOrder(artifacts);
             ValidateCanonicalComponentOrder(rawComponents);
 
             var declarationComponentReferences =
-                CollectRuleComponentReferences(slice.Rules);
+                CollectDeclarationComponentReferences(
+                    slice.Rules,
+                    rawSchemaRegistry.PayloadSchemas);
 
             var typedCacheBudget = SessionCacheBudget.Create(
                 cacheBudget.MaxDecodeEntries,
@@ -619,13 +692,6 @@ internal static class CanonicalManifestReader
                 cacheBudget.MaxConcurrentDecodeAttempts,
                 cacheBudget.MaxConcurrentIndexAttempts,
                 CacheRetentionPolicy.Parse(cacheBudget.RetentionPolicy));
-            var schemaRegistry = ReleaseSchemaRegistry.Create(
-                Array.Empty<PayloadSchemaDeclaration>(),
-                Array.Empty<SemanticModelParserDeclaration>(),
-                Array.Empty<ContextIndexDeclaration>(),
-                Array.Empty<AcquisitionDemandProjectorDeclaration>(),
-                Array.Empty<AdmissionProofContractDeclaration>(),
-                typedCacheBudget);
             var typedCatalogVersion = CatalogVersion.Create(catalogVersion);
 
             var artifactBindings = new List<ArtifactFileBinding>();
@@ -746,12 +812,25 @@ internal static class CanonicalManifestReader
                     "The manifest artifactFiles array must be fully bound.");
             }
 
+            var schemaRegistry = ReleaseSchemaRegistry.Create(
+                CreatePayloadSchemas(
+                    rawSchemaRegistry.PayloadSchemas,
+                    componentLookup),
+                Array.Empty<SemanticModelParserDeclaration>(),
+                Array.Empty<ContextIndexDeclaration>(),
+                Array.Empty<AcquisitionDemandProjectorDeclaration>(),
+                Array.Empty<AdmissionProofContractDeclaration>(),
+                typedCacheBudget);
+
             var typedSlice = CatalogSliceDeclaration.Create(
                 slice.SliceKey,
                 slice.SliceVersion,
                 protocolVersion,
                 typedCatalogVersion,
                 CreateRules(slice.Rules, componentLookup));
+            CatalogSliceDeclaration.ValidateSchemaSlotClosure(
+                schemaRegistry,
+                typedSlice.Rules);
 
             var typedActivationProof =
                 ActivationProofContractDeclaration.Create(
@@ -783,10 +862,17 @@ internal static class CanonicalManifestReader
         string.Equals(component.ComponentVersion, activationProof.ComponentVersion, StringComparison.Ordinal);
 
     private static HashSet<(string ComponentKey, string ComponentVersion)>
-        CollectRuleComponentReferences(
-            IReadOnlyList<RawRuleDeclaration> rules)
+        CollectDeclarationComponentReferences(
+            IReadOnlyList<RawRuleDeclaration> rules,
+            IReadOnlyList<RawPayloadSchema> schemas)
     {
         var references = new HashSet<(string, string)>();
+        foreach (var schema in schemas)
+        {
+            references.Add((schema.Codec.ComponentKey, schema.Codec.ComponentVersion));
+            references.Add((schema.ImplementationType.ComponentKey, schema.ImplementationType.ComponentVersion));
+        }
+
         foreach (var rule in rules)
         {
             references.Add(
@@ -810,6 +896,36 @@ internal static class CanonicalManifestReader
         }
 
         return references;
+    }
+
+    private static IReadOnlyList<PayloadSchemaDeclaration> CreatePayloadSchemas(
+        IReadOnlyList<RawPayloadSchema> schemas,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        var declarations = new List<PayloadSchemaDeclaration>(schemas.Count);
+        foreach (var schema in schemas)
+        {
+            declarations.Add(PayloadSchemaDeclaration.Create(
+                schema.SchemaKey,
+                schema.SchemaVersion,
+                ResolveComponentReference(schema.Codec, components),
+                ModelContractIdentity.Create(
+                    schema.ModelKey,
+                    schema.ModelVersion,
+                    ResolveComponentReference(
+                        schema.ImplementationType,
+                        components)),
+                schema.MaxBindingsPerInstruction,
+                schema.MaxRetainedCanonicalBytesPerInstruction,
+                SemanticResourceBudget.Create(
+                    schema.MaxBytes,
+                    schema.MaxDepth,
+                    schema.MaxNodes,
+                    schema.MaxComplexity),
+                schema.CodecFailureCodes));
+        }
+
+        return declarations;
     }
 
     private static void ValidateCanonicalArtifactOrder(
@@ -1423,6 +1539,23 @@ internal static class CanonicalManifestReader
         IReadOnlyList<string> AllowedRelatedReferenceKinds);
 
     private sealed record RawComponentReference(string ComponentKey, string ComponentVersion);
+
+    private sealed record RawSchemaRegistry(IReadOnlyList<RawPayloadSchema> PayloadSchemas, RawCacheBudget CacheBudget);
+
+    private sealed record RawPayloadSchema(
+        string SchemaKey,
+        string SchemaVersion,
+        RawComponentReference Codec,
+        string ModelKey,
+        string ModelVersion,
+        RawComponentReference ImplementationType,
+        int MaxBindingsPerInstruction,
+        long MaxRetainedCanonicalBytesPerInstruction,
+        long MaxBytes,
+        int MaxDepth,
+        long MaxNodes,
+        long MaxComplexity,
+        IReadOnlyList<string> CodecFailureCodes);
 
     private sealed record RawCacheBudget(
         int MaxDecodeEntries,

@@ -250,7 +250,7 @@ public sealed class RuleDeclaration
         }
     }
 
-    private static bool SlotsEqual(
+    internal static bool SlotsEqual(
         EvidenceSlotDeclaration left,
         EvidenceSlotDeclaration right) =>
         left.Requirement.Equals(right.Requirement) &&
