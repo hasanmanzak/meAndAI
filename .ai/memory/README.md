@@ -132,7 +132,7 @@ hosted validation exposed
 while the A-D
 scenario remained `Planned`. The correction is complete at remote-equal
 [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032),
-[exact predecessor tree](https://github.com/hasanmanzak/meAndAI/tree/47a80b3c4c5301ac3937bcd12099940df74830b8), with exact-head hosted
+using that commit's exact tree, with exact-head hosted
 [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
 green. It is the frozen predecessor for packet-local `ReviewedLocalGreen`
 `A-SCHEMA-SLOT-01`; follow the current

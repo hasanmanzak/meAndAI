@@ -8,7 +8,7 @@
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Active predecessor | Exact remote-equal [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032), [exact predecessor tree](https://github.com/hasanmanzak/meAndAI/tree/47a80b3c4c5301ac3937bcd12099940df74830b8); historical recovery inputs remain evidence only. |
+| Active predecessor | Exact remote-equal [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032) and its exact commit tree; historical recovery inputs remain evidence only. |
 | Git authority | The maintainer explicitly authorizes `A-SCHEMA-SLOT-01` implementation through validation, review, record synchronization, allowlisted commit, normal push, draft-PR update, and exact-head hosted check. This grants no later A, B/C/D, final scenario/workflow, release, or publication authority. |
 
 ## Purpose
@@ -344,7 +344,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 
 Maintainer activation is bounded to predecessor
 [`c88beefee54f3f0d0e0e623807eb8a4c9bf48032`](https://github.com/hasanmanzak/meAndAI/commit/c88beefee54f3f0d0e0e623807eb8a4c9bf48032),
-[exact predecessor tree](https://github.com/hasanmanzak/meAndAI/tree/47a80b3c4c5301ac3937bcd12099940df74830b8). The reviewed red source
+using that exact commit tree. The reviewed red source
 SHA-256 is exactly
 `128C3CAF24BB029CBE3C85ABEB4434B54DC2D90B29EED436B8343990E91E57DB`.
 The retained test is one
