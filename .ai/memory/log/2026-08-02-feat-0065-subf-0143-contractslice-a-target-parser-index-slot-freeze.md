@@ -6,9 +6,10 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Pull request | Draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) |
 | Parent | [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) / [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) |
-| State | `A-TARGET-PARSER-INDEX-SLOT-01` is `ReviewedLocalGreen`; canonical R is immutable; local G/V/reviews are complete; the current green tree still awaits commit, push, and exact-head hosted validation |
+| State | `A-TARGET-PARSER-INDEX-SLOT-01` is exact-head hosted-green `ReviewedLocalGreen`; canonical R is immutable and G/V/reviews/hosted validation are complete |
 | Activation baseline | [FIND-0449](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449) is resolved by exact [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007), git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884), which passed Ubuntu and Windows; publication verification was correctly skipped |
 | Implementation predecessor | Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602), git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`, and [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121) passed Ubuntu and Windows |
+| Exact packet head | [`bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9), git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, passed Ubuntu and Windows in [run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026); publication verification was correctly skipped |
 | Progress | Nine of twenty packets are `ReviewedLocalGreen` (`45%`); cumulative A is `22/22`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 
 ## Frozen identity and graph
@@ -28,5 +29,5 @@
 ## Validation, review, and holds
 
 - Full Domain is `98/98`; full Conformance is `22/22`; Release build is `0 warnings / 0 errors`; format, diff, allowlist, six locks, marker, trait, and retained-source checks are green. StructureOnly passed every discovered contract in `352.7` seconds (`elapsedMs=350665`).
-- Independent code review, regression red-team, and evidence audit each closed `0 Blocking / 0 Important / 0 Minor`. The current tree may become the next predecessor only after commit, push, and exact-head Ubuntu/Windows green.
-- `A-FINDING-01` and every later packet remain Candidate/inactive. Projector/DAG, finding, selector, admission, profile/predecessor/transition, lifecycle/resource, final Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, publication, and consumer mutation remain held.
+- Independent code review, regression red-team, and evidence audit each closed `0 Blocking / 0 Important / 0 Minor`. Exact-head Ubuntu and Windows hosted validation is green, so this packet is the eligible `A-FINDING-01` predecessor.
+- `A-FINDING-01` is `FrozenDesign` on the separate [finding declaration handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md); `A-SELECTOR-01` and every later packet remain Candidate/inactive. Projector/DAG, selector, admission, profile/predecessor/transition, lifecycle/resource, final Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, publication, and consumer mutation remain held.

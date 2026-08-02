@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. `A-PARSER-RECORD-SLOT-01` and `A-GOVERNED-REFERENCE-SLOTS-01` are hosted-green `ReviewedLocalGreen`. The 0007 activation baseline is exact [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007), git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884). `A-TARGET-PARSER-INDEX-SLOT-01` is `ReviewedLocalGreen`: canonical R is immutable; focused `1/1`, cumulative A `22/22`, full Domain `98/98`, full Conformance `22/22`, validation, and three independent post-green reviews are green. The current green tree awaits commit, push, and hosted validation. Nine of twenty live packets are `ReviewedLocalGreen` (`45%`); `A-FINDING-01` and later packets remain Candidate/inactive; partial tests retain only `ContractSlice=A`; [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. `A-TARGET-PARSER-INDEX-SLOT-01` is exact-head hosted-green `ReviewedLocalGreen` at [`bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9), git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, and [run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026). `A-FINDING-01` is `FrozenDesign`: existing C# makes `R=NotApplicable`; `TestOnlyGreen`, production `0`, synthetic fixtures, and the reserved FQN are frozen. Nine of twenty live packets remain `ReviewedLocalGreen` (`45%`), cumulative A is `22/22`; `A-SELECTOR-01` and later packets remain Candidate/inactive; partial tests retain only `ContractSlice=A`; [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [target parser/index/slot reviewed-local-green handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md); the governed-reference, parser-record-slot, index-slot, schema-slot, planned-scenario-trait correction, and pushed-candidate recovery handoffs are historical or hosted-green checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [finding declaration design freeze](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md); the target-parser/index/slot and earlier handoffs are historical or hosted-green checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -148,7 +148,7 @@ packets are `ReviewedLocalGreen` (`45%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 `A-GOVERNED-REFERENCE-SLOTS-01` and `A-TARGET-PARSER-INDEX-SLOT-01` are
-`ReviewedLocalGreen`; `A-FINDING-01` and later packets remain Candidate/inactive.
+`ReviewedLocalGreen`; `A-FINDING-01` is `FrozenDesign`; `A-SELECTOR-01` and later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -425,13 +425,16 @@ governed-reference capability. The exact identities, Writer-first oracle,
 negative matrix, Catalog-only production allowlist, `180/500/680` hard caps,
 and all held boundaries are frozen in the
 [micro-delivery D/RT observation](subf-0143-micro-delivery-plan.md#a-target-parser-index-slot-01-drt-observation)
-and [current handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
+and [target packet handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
 The canonical expected red ran exactly once and remains immutable. Retained
 focused green is `1/1`, cumulative A is `22/22`, full Domain is `98/98`, full
 Conformance is `22/22`, retained source is `401` lines, and production/test
 size is `497/680`. Release build, format, locks, diff, marker/trait checks,
-StructureOnly, and three independent post-green reviews are green. The current
-tree still awaits commit, push, and exact-head hosted validation.
+StructureOnly, and three independent post-green reviews are green. Exact
+[`bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9),
+git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, passed Ubuntu and Windows in
+[run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026)
+and is the exact `A-FINDING-01` predecessor.
 
 That corrected directive still does **not** authorize:
 
@@ -7376,8 +7379,10 @@ coverage `Important` is closed; fresh full-diff review pass 2 closed
 never-activated `A-PARSER-INDEX-01` is retired,
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01` are `ReviewedLocalGreen`; nine of twenty live
-packets are green (`45%`) with cumulative A `22/22`. `A-FINDING-01` and later
-packets remain Candidate/inactive, and no full-A completion is claimed.
+packets are green (`45%`) with cumulative A `22/22`. `A-FINDING-01` is
+`FrozenDesign` on an `R=NotApplicable` / `TestOnlyGreen` / production-zero route;
+`A-SELECTOR-01` and later packets remain Candidate/inactive, and no full-A
+completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

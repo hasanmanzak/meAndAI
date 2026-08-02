@@ -240,7 +240,10 @@ git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
 Nine of twenty live packets are `ReviewedLocalGreen` (`45%`), and cumulative A
-is green `22/22`; the current green tree awaits commit, push, and hosted validation.
+is green `22/22`. `A-TARGET-PARSER-INDEX-SLOT-01` is exact-head hosted green at
+[`bdd252b...`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9),
+git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, and
+[run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026).
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
 is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
 [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
@@ -253,8 +256,9 @@ The exact governed-reference R/G evidence, focused `1/1`, validation, and
 reviews are recorded in the
 [governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; `A-FINDING-01` and every later packet remain
-Candidate/inactive. No
+remains `Planned`; `A-FINDING-01` is `FrozenDesign` at the current
+[finding declaration handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
+while `A-SELECTOR-01` and every later packet remain Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
