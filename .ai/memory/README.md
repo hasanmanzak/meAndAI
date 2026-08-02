@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-01**<br>
+Last reviewed: **2026-08-02**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -23,7 +23,8 @@ the historical [ContractSlice A pushed-candidate recovery handoff](log/2026-07-3
 the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
 the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
 the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-the current [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+the current [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -52,7 +53,7 @@ topology correction. Its
 and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 are historical; follow the current
-[parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -203,17 +204,19 @@ git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and
 and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 are resolved. Strict D/RT retires never-activated `A-PARSER-INDEX-01` as a
 non-live `RetiredBeforeActivation` tombstone and replaces it with three ordered
-packets. `A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen /
-PendingExactHeadHostedVerification`; the next two replacements and every later
-packet remain Candidate/inactive. Seven of twenty live packets are
-`ReviewedLocalGreen` (`35%`). Exact R, focused `1/1`, cumulative A `20/20`,
-`666/690` packet budget, validation, and three independent post-green `0/0/0`
-reviews are recorded in the
+packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`;
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; the target
+replacement and every later packet remain Candidate/inactive. Seven of twenty
+live packets are `ReviewedLocalGreen` (`35%`). Exact parser-record R, focused
+`1/1`, cumulative A `20/20`, `666/690` packet budget, validation, reviews, and
+hosted evidence are recorded in the historical
 [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+The current governed-reference freeze is recorded in the
+[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 Its exact implementation predecessor is remote-equal
-[`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
-git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, with Ubuntu and Windows green in
-[run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
+[`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 The
 packet-local evidence remains unchanged, but pushed head
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
@@ -232,7 +235,7 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

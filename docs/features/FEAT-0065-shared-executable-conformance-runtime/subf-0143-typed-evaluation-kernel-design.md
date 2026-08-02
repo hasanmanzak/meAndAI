@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) / [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833) resolves [FIND-0445](README.md#find-0445) and [FIND-0446](README.md#find-0446). Exact implementation predecessor [`42ce5e5...`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c), git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed Ubuntu and Windows in [run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen / PendingExactHeadHostedVerification` after immutable R, focused `1/1`, cumulative A `20/20`, exact `666/690` packet, and three independent post-green reviews `0/0/0`; its two redraw successors and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`); partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), tree `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [parser-record-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md); the index-slot, schema-slot, planned-scenario-trait correction, and pushed-candidate recovery handoffs are historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [governed-reference-slots handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md); the parser-record-slot, index-slot, schema-slot, planned-scenario-trait correction, and pushed-candidate recovery handoffs are historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -144,9 +144,11 @@ correction. Both findings are resolved by exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 Strict redraw retires never-activated `A-PARSER-INDEX-01`; seven of twenty live
-packets are `ReviewedLocalGreen` (`35%`). `A-PARSER-RECORD-SLOT-01` is
-packet-local `ReviewedLocalGreen / PendingExactHeadHostedVerification` with
-cumulative A `20/20`; both redraw successors remain Candidate/inactive.
+packets are `ReviewedLocalGreen` (`35%`). `A-PARSER-RECORD-SLOT-01` is exact-
+head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
+/ [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; target
+remains Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -233,18 +235,22 @@ Strict-redraw base
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed both stable jobs in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-Exact implementation predecessor
+Exact activation predecessor
 [`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
 git tree identity: `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed both stable jobs in
 [run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
+Exact reviewed-local-green head
+[`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+tree `05c7591565d965966285cd51226446b2f54c81bc`, passed both stable jobs in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 The accepted D/RT verdict is `0 Blocking / 0 Important / 0 Minor`. The prior
 combined `A-PARSER-INDEX-01` was never activated and is
 `RetiredBeforeActivation`; it has no FQN, marker, R, G, or V and is excluded
 from the live denominator. The three ordered replacements are
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
-`A-TARGET-PARSER-INDEX-SLOT-01`. The first is now packet-local
-`ReviewedLocalGreen / PendingExactHeadHostedVerification`; later FQNs, markers,
-and ordinals remain `None`.
+`A-TARGET-PARSER-INDEX-SLOT-01`. The first is exact-head
+`ReviewedLocalGreen`; the second is `MaintainerActivated / PreRed`; the target
+and later FQNs, markers, and ordinals remain `None`.
 
 The first replacement retains one Fact with only `ContractSlice=A`:
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure`.
@@ -292,6 +298,64 @@ Retained test source is `366` lines at SHA-256
 production is `300` gross changed lines and packet total is `666/690`.
 Release build, format, locks, diff, allowlist, traits, and retained-marker checks
 passed; three independent post-green reviews each closed `0/0/0`.
+
+### Frozen-design `A-GOVERNED-REFERENCE-SLOTS-01` closure
+
+The next frozen Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure`,
+with marker `TEST-0210-A-BEHAVIOR-RED-0006` and only `ContractSlice=A`. Exact
+predecessor is [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+tree `05c7591565d965966285cd51226446b2f54c81bc`, hosted-green in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+
+The exact cumulative shape is `2` schemas, `1` Markdown parser, `3` indexes in
+governed-reference/protocol-record/repository-tree order, and `3` slots in
+provider-governed/repository-governed/repository-tree order. Governed-reference
+is `protocol.index.governed-reference/1`, component
+`protocol.index.governed-reference/1`, assembly `MeAndAI.Protocol.Policy`, type
+`MeAndAI.Protocol.Policy.Indexes.GovernedReferenceIndex`, `PerPlan`; it consumes
+`protocol.model.markdown-document/1` through component
+`protocol.type.model.markdown-document/1`, assembly `MeAndAI.Protocol.Policy`,
+type `MeAndAI.Protocol.Policy.Models.MarkdownDocumentModel`, at `(0,null)`, then
+`protocol.capability.protocol-record-index/1` through component
+`protocol.type.capability.protocol-record-index/1`, assembly
+`MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IProtocolRecordIndex`, at `(1,null)`, produces
+`protocol.capability.governed-reference-index/1` through component
+`protocol.type.capability.governed-reference-index/1`, assembly
+`MeAndAI.Protocol.Conformance.Abstractions`, type
+`MeAndAI.Protocol.Conformance.Abstractions.IGovernedReferenceIndex`, uses budget
+`(67108864,256,1000000,10000000)`, and
+orders `protocol.budget.exhausted` before
+`protocol.index.reference-unavailable`. Both governed slots canonicalize
+governed-reference before protocol-record capability while retaining their
+exact slot/requirement keys, requirement surfaces, kind
+`protocol.evidence.governed-text-set`, completeness
+`protocol.completeness.all-governed-bodies`, schema `protocol.governed-text/1`,
+ExactSnapshot/ObjectVersionBound/BoundedNonAtomicObservation consistency order,
+Provider versus `[Repository, Provider]` profile sets, material
+`protocol.material.governed-text`, and exact provider/repository governed-body-
+set targets. Each provider field and every shared-field preservation has a
+negative drift. Components become
+`14`; artifacts stay `3`; cache stays
+`(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`.
+
+Natural R prebuilds graph and remaining Catalog arguments outside the exact
+catch. `CatalogSliceDeclaration.Create` is the first guarded expected-red
+observation: only exact `ArgumentException`, `ParamName=rules`, with Message
+equal to the runtime-created expected exception for `The parser and protocol-
+record graph is not exact.` may emit the marker; every other exception remains
+marker-free. After Catalog succeeds on green, construct `ParsedCanonicalManifest`,
+then make the writer the first serialization call. Reader/writer may generalize only index
+inputs to model/capability; parser remains exact-one model. Catalog preserves
+predecessor `2/2`, accepts only successor `3/3`, and rejects mixed counts.
+Production is limited to Reader/Writer/Catalog and one new test; hard caps are
+`145/55/110`, production `310`, test `370`, total `680`. Pipeline review
+corrected `0/3/0` to provisional `0/0/0`; fresh and renewed post-hosted reviews
+then corrected all cross-record, oracle, identity, matrix, ordering, and literal-
+assembly findings. Three independent final current-tree reviews each closed
+`0/0/0`; activation followed. The complete matrix and holds are in the
+[handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 
 That corrected directive still does **not** authorize:
 
@@ -7234,10 +7298,10 @@ and packet-local `A-SCHEMA-SLOT-01` green are satisfied. The canonical-string
 coverage `Important` is closed; fresh full-diff review pass 2 closed
 `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction,
 never-activated `A-PARSER-INDEX-01` is retired,
-`A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen /
-PendingExactHeadHostedVerification`, seven of twenty live packets are green
-(`35%`) with cumulative A `20/20`, its successors remain Candidate/inactive,
-and no full-A completion is claimed.
+`A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`, seven of twenty
+live packets are green (`35%`) with cumulative A `20/20`,
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, target and
+later packets remain Candidate/inactive, and no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

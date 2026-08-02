@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-01**
+Last verified: **2026-08-02**
 
 ## Verified facts
 
@@ -9,9 +9,9 @@ Last verified: **2026-08-01**
   git tree identity `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed
   [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
   Exact implementation predecessor
-  [`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
-  git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed Ubuntu and Windows in
-  [run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988);
+  [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+  git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in
+  [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590);
   publication verification was correctly skipped and the
   [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) suite reports
   GitGuardian green.
@@ -22,21 +22,21 @@ Last verified: **2026-08-01**
   and three final `0/0/0` reviews remain immutable. Strict D/RT retired
   never-activated `A-PARSER-INDEX-01` as a non-live, non-reactivatable
   `RetiredBeforeActivation` tombstone and partitioned it into three ordered
-  packets. `A-PARSER-RECORD-SLOT-01` is packet-local `ReviewedLocalGreen /
-  PendingExactHeadHostedVerification`: canonical R is immutable, final focused
-  green is `1/1`, cumulative A is `20/20`, exact packet size is `666/690`, and
-  three independent post-green reviews closed `0/0/0`.
-  `A-GOVERNED-REFERENCE-SLOTS-01`,
-  `A-TARGET-PARSER-INDEX-SLOT-01`, and every later packet remain
-  Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; seven packets
+  packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`:
+  canonical R is immutable, final focused green is `1/1`, cumulative A is
+  `20/20`, exact packet size is `666/690`, reviews closed `0/0/0`, and exact-head
+  hosted checks are green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
+  PreRed`; `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet
+  remain Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; seven packets
   are `ReviewedLocalGreen` (`35%`). [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned`; no final scenario/status/owner/workflow activation is
   claimed. The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
-  [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md);
-  the [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
-  is historical.
+  [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md);
+  the [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
+  and [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
+  are historical.
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
   intends to return the repository to private after outstanding hosted and
@@ -338,7 +338,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
   the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  and the current [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -385,7 +386,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
   the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  and the current [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
   recurrence set is
@@ -460,7 +462,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the historical [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
   the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-  and the current [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  and the current [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -484,15 +487,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   green. The oversized next vertical was redrawn without semantic expansion;
   `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`. A later strict D/RT retired
   residual `A-PARSER-INDEX-01` before activation and replaced it with three
-  ordered live packets; `A-PARSER-RECORD-SLOT-01` is packet-local
-  `ReviewedLocalGreen / PendingExactHeadHostedVerification`, while both redraw
-  successors remain Candidate/inactive.
+  ordered live packets; `A-PARSER-RECORD-SLOT-01` is exact-head
+  `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
+  PreRed`, and the target replacement remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
-- Freshness and review condition: refreshed 2026-08-01 for the exact recovery above,
-  strict `A-INDEX-SLOT-01` redraw, and umbrella authority; review when the micro
-  state machine, packet brief, or checkpoint authority changes.
+- Freshness and review condition: refreshed 2026-08-02 for the exact recovery,
+  strict redraw, exact parser-record hosted-green head, governed-reference
+  freeze, and umbrella authority; review when the micro state machine, packet
+  brief, or checkpoint authority changes.
 - Superseded by: `None`
 
 ### Completed historical adoption issue is misclassified as malformed
@@ -1596,9 +1600,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   remains `Planned`. The later umbrella checkpoint authorized the strictly
   redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
   current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
-  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is packet-local
-  `ReviewedLocalGreen / PendingExactHeadHostedVerification`, while both redraw
-  successors and every later packet remain Candidate/inactive. The live packet
+  never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is exact-head
+  `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
+  PreRed`, and the target replacement plus every later packet remain
+  Candidate/inactive. The live packet
   denominator is twenty and current completed progress is seven (`35%`), with
   cumulative A green `20/20`.
   Partial facts retain `ContractSlice` only; their final `Scenario`

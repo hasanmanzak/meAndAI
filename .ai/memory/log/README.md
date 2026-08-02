@@ -6,7 +6,9 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A parser-record-slot activation handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+[ContractSlice A governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
+the historical
+[ContractSlice A parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
 the historical
 [ContractSlice A index-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
 the historical
@@ -223,16 +225,19 @@ authority transfer, and PowerShell retirement remain unauthorized.
 The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
 historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
 replaces it with three ordered live packets. Seven of twenty live packets are
-`ReviewedLocalGreen` (`35%`); `A-PARSER-RECORD-SLOT-01` is packet-local
-`ReviewedLocalGreen / PendingExactHeadHostedVerification`, while its two redraw
-successors and every later packet remain Candidate/inactive. Its immutable R,
-focused `1/1`, cumulative A `20/20`, exact `666/690` packet, and three
-independent post-green `0/0/0` reviews are recorded in the
+`ReviewedLocalGreen` (`35%`); `A-PARSER-RECORD-SLOT-01` is exact-head
+`ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
+PreRed`, and the target replacement plus every later packet remain
+Candidate/inactive. Parser-record's immutable R, focused `1/1`, cumulative A
+`20/20`, exact `666/690` packet, reviews, and hosted evidence are recorded in
+the historical
 [parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+The current freeze is recorded in the
+[governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 Its exact implementation predecessor is remote-equal
-[`42ce5e550867a1b74be9072fd78b52787d41df5c`](https://github.com/hasanmanzak/meAndAI/commit/42ce5e550867a1b74be9072fd78b52787d41df5c),
-git tree identity `dc53b2f61f1468089724fd6eb798cb9d7d248570`, with Ubuntu and Windows green in
-[run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
+[`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
+git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
+[run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 
 The historical index-slot handoff also records the occurrence behind
 [FIND-0445](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0445):
@@ -255,7 +260,7 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current activation state and denominator are in the
-[parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
+[governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
@@ -302,6 +307,9 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-02 - SUBF-0143 ContractSlice A governed-reference-slots freeze](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md)
+- [2026-08-01 - SUBF-0143 ContractSlice A parser-record-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
+- [2026-08-01 - SUBF-0143 ContractSlice A index-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
 - [2026-08-01 - SUBF-0143 ContractSlice A schema-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
 - [2026-07-31 - SUBF-0143 planned-scenario-trait correction](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 - [2026-07-31 - SUBF-0143 ContractSlice A pushed-candidate recovery](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md)
