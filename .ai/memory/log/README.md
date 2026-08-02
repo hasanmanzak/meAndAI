@@ -243,13 +243,17 @@ activation baseline
 git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
-Ten of twenty live packets are `ReviewedLocalGreen` (`50%`), and cumulative A
-is green `23/23`. The exact hosted-green A-FINDING delivery and selector design
-predecessor is
-[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
-git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, with Ubuntu and Windows green in
-[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072);
+Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), and cumulative A
+is green `24/24`. The exact hosted-green selector FrozenDesign predecessor is
+[`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
+git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with Ubuntu and Windows green in
+[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904);
 publication verification was correctly skipped.
+The earlier exact A-FINDING delivery
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
+remain historical predecessor evidence.
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
 is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
 [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
@@ -266,9 +270,13 @@ remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)
 with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, focused `1/1`,
 cumulative A `23/23`, and exact-head hosted delivery complete. `A-SELECTOR-01`
-is `FrozenDesign` at the
-[selector handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md);
-every later packet remains Candidate/inactive. No
+is packet-local `ReviewedLocalGreen` at the
+[selector handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md):
+canonical R SHA-256 is `7A85D0CC4B1AAF45038E818B3687C10D5F3339EC2ECC53D9D5646C97D5F6D30A`,
+retained source is `370` lines at `56B9B30A...62B69`, production gross delta is
+`12/20`, packet size is `382/520`, and cumulative A is `24/24`; synchronized
+green commit/push/exact-head hosted validation remain pending. `A-ADMISSION-01`
+and every later packet remain Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

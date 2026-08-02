@@ -40,7 +40,7 @@ public sealed class ExpectedSelectorDeclaration
     {
         ArgumentNullException.ThrowIfNull(resolver);
 
-        return new ExpectedSelectorDeclaration(
+        var declaration = new ExpectedSelectorDeclaration(
             DeclarationValidation.Token(selectorKey, nameof(selectorKey)),
             DeclarationValidation.Token(slotKey, nameof(slotKey)),
             DeclarationValidation.Token(
@@ -57,6 +57,16 @@ public sealed class ExpectedSelectorDeclaration
                 item => item.Value,
                 StringComparer.Ordinal,
                 requireNonEmpty: true));
+
+        if (declaration.AllowedParentKinds.Contains(
+            QualifiedEvidenceReferenceKind.ExpectedSelector))
+        {
+            throw new ArgumentException(
+                "Expected selector parent kinds must be ContextProof, Root, or Derived.",
+                nameof(allowedParentKinds));
+        }
+
+        return declaration;
     }
 
     internal static IReadOnlyList<QualifiedEvidenceReferenceKind>
