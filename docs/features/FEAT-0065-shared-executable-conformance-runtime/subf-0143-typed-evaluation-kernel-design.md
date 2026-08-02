@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. Exact hosted-green A-FINDING design/implementation predecessor [`e0756ffd6ccf2080974db9d9d7dae1c2e728145a`](https://github.com/hasanmanzak/meAndAI/commit/e0756ffd6ccf2080974db9d9d7dae1c2e728145a), git tree identity `47ec9c4de659487b6c0163f93aea9d90513fc3c9`, passed [run 30764065710](https://github.com/hasanmanzak/meAndAI/actions/runs/30764065710). `A-FINDING-01` is packet-local `ReviewedLocalGreen`: existing C# makes `R=NotApplicable`; `TestOnlyGreen`, production `0`, synthetic fixtures, and the retained FQN are satisfied locally; synchronized commit/push/exact-head hosted validation remain pending. Ten of twenty live packets are `ReviewedLocalGreen` (`50%`), cumulative A is `23/23`; `A-SELECTOR-01` and later packets remain Candidate/inactive; partial tests retain only `ContractSlice=A`; [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. Exact hosted-green A-FINDING delivery and selector design predecessor [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134), git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, passed [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072). `A-FINDING-01` is exact-head `ReviewedLocalGreen`: existing C# makes `R=NotApplicable`; `TestOnlyGreen`, production `0`, synthetic fixtures, and the retained FQN are satisfied. Ten of twenty live packets are `ReviewedLocalGreen` (`50%`), cumulative A is `23/23`; `A-SELECTOR-01` is `FrozenDesign`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [finding declaration reviewed-local-green handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md); the target-parser/index/slot and earlier handoffs are historical or hosted-green checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [expected-selector frozen-design handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md); the finding and earlier handoffs are hosted-green or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -149,7 +149,7 @@ head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAnd
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 `A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`, and
 `A-FINDING-01` are `ReviewedLocalGreen`; cumulative A is `23/23`.
-`A-SELECTOR-01` and later packets remain Candidate/inactive.
+`A-SELECTOR-01` is `FrozenDesign`; later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -449,12 +449,82 @@ Focused green is `1/1` at `D7C069CC...25D`, cumulative A is `23/23` at
 Conformance is `23/23` at `B714DD...56804F`. Release build is
 `0 warnings / 0 errors`; default-severity format, diff, six locks,
 StructureOnly, publication-evidence checks, independent code red-team, and
-evidence audit are green. Exact hosted-green design/implementation predecessor
-[`e0756ffd6ccf2080974db9d9d7dae1c2e728145a`](https://github.com/hasanmanzak/meAndAI/commit/e0756ffd6ccf2080974db9d9d7dae1c2e728145a),
-git tree identity `47ec9c4de659487b6c0163f93aea9d90513fc3c9`, passed Ubuntu and Windows in
-[run 30764065710](https://github.com/hasanmanzak/meAndAI/actions/runs/30764065710).
-The synchronized packet commit/push/exact-head hosted validation remains
-pending and is the only route to activate `A-SELECTOR-01`.
+evidence audit are green. Exact hosted-green delivery
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, passed Ubuntu and Windows in
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
+and is the exact selector design predecessor.
+
+### Frozen-design `A-SELECTOR-01` contract
+
+Schema 1 already states that `ExpectedSelectorDeclaration.AllowedParentKinds`
+may contain only `ContextProof`, `Root`, and `Derived`; selector-on-selector
+nesting is invalid. Current `ExpectedSelectorDeclaration.Create` instead accepts
+`ExpectedSelector`. D/RT closed `0 Blocking / 0 Important / 0 Minor` on a
+single-production-file correction: canonicalize `allowedParentKinds` once in
+that factory, then reject any `ExpectedSelector` with `ArgumentException`,
+parameter `allowedParentKinds`, and base literal
+`Expected selector parent kinds must be ContextProof, Root, or Derived.` Exact
+observable `Message` equals
+`new ArgumentException(FrozenMessage, nameof(allowedParentKinds)).Message`, so
+framework-appended parameter text is compared portably. The
+shared canonicalizer and kind-rank helper remain unchanged because finding
+declarations legitimately use `ExpectedSelector` reference roles.
+
+The reserved one-Fact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure`;
+its only trait is `ContractSlice=A`, and its marker/TRX stem is
+`TEST-0210-A-BEHAVIOR-RED-0008`. Before any sibling assertion or writer call,
+the first action is exactly:
+
+```csharp
+_ = ExpectedSelectorDeclaration.Create(
+    "protocol.test.selector.alpha",
+    "protocol.slot.repository-tree",
+    "protocol.test.selector-schema.alpha",
+    Resolve("protocol.selector.test-alpha"),
+    [QualifiedEvidenceReferenceKind.ExpectedSelector],
+    [FindingCode.Parse("protocol.test.finding.alpha")]);
+
+Assert.Fail("TEST-0210-A-BEHAVIOR-RED-0008");
+```
+
+No catch surrounds the call; unexpected exceptions are marker-free. Green
+replaces only the marker branch with exact `ParamName` and runtime-created
+expected-`ArgumentException` `Message` equality.
+
+Production allowlist is only
+`src/MeAndAI.Protocol.Conformance.Abstractions/Rules/ExpectedSelectorDeclaration.cs`
+with target `8-18` and hard cap `20`. Test allowlist is only new
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceASelectorManifestTests.cs`
+with target `340-430` and hard cap `500`; combined hard cap is `520`.
+The exact reversed-input fixture contains alpha
+`protocol.test.selector.alpha` / `protocol.slot.repository-tree` /
+`protocol.test.selector-schema.alpha` / `protocol.selector.test-alpha/1` with
+all three allowed parents and findings `protocol.test.finding.alpha` /
+`protocol.test.finding.zeta`; and zeta
+`protocol.test.selector.zeta` / `protocol.slot.repository-governed-text` /
+`protocol.test.selector-schema.zeta` / `protocol.selector.test-zeta/1` with
+`Derived` and finding `protocol.test.finding.zeta`. Both resolver component rows use assembly
+`MeAndAI.Protocol.Conformance.Tests`, artifact `ContractSliceA.Proof.dll`, and
+types `MeAndAI.Protocol.Conformance.Tests.ContractSliceATestAlphaSelectorResolver`
+and `MeAndAI.Protocol.Conformance.Tests.ContractSliceATestZetaSelectorResolver`.
+
+The retained matrix owns input snapshot/canonical order, null/empty/null-element/
+duplicate boundaries, the three allowed and one forbidden parent kinds,
+selector ordering, declared-slot/finding and resolver-component closure, exact
+six-field wire order, and byte/digest roundtrip. Removing the entire
+`expectedSelectors` collection and both resolver rows reproduces the predecessor
+graph; selectors or either resolver left orphaned fail. Malformed-wire ownership
+is limited to the six outer fields/order, both lists, and selector-array
+ordering/null/duplicate boundaries. Nested resolver grammar receives positive
+`componentKey`/`componentVersion` order and orphan negatives only; existing
+component-reference tests retain exhaustive nested grammar. `selectorSchemaKey`
+is preserved exactly but gains no registry or whitelist here. Real five-rule
+selector inventory, schema/resolver mapping, and runtime resolution remain
+`A-CONVERGE-01` or later-packet scope. The packet
+is only `FrozenDesign`; expected-red and C# mutation require this synchronized
+freeze commit to pass exact-head hosted validation.
 
 That corrected directive still does **not** authorize:
 
@@ -7401,9 +7471,11 @@ never-activated `A-PARSER-INDEX-01` is retired,
 `A-TARGET-PARSER-INDEX-SLOT-01` and `A-FINDING-01` are `ReviewedLocalGreen`;
 ten of twenty live packets are green (`50%`) with cumulative A `23/23`.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
-production-zero route; synchronized commit/push/exact-head hosted validation
-remains pending.
-`A-SELECTOR-01` and later packets remain Candidate/inactive, and no full-A
+production-zero route and is exact-head hosted green at
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
+`A-SELECTOR-01` is `FrozenDesign`, later packets remain Candidate/inactive, and no full-A
 completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,

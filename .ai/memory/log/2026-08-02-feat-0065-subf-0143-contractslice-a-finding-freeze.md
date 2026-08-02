@@ -6,8 +6,9 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Pull request | Draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) |
 | Parent | [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) / [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) |
-| State | `A-FINDING-01` is packet-local `ReviewedLocalGreen`; `R=NotApplicable`; the authorized route was `TestOnlyGreen`; production delta is `0`; local V and reviews are complete; synchronized commit, push, and exact-head hosted validation remain pending |
+| State | `A-FINDING-01` is packet-local `ReviewedLocalGreen`; `R=NotApplicable`; the authorized route was `TestOnlyGreen`; production delta is `0`; local V, reviews, synchronized commit/push, and exact-head hosted validation are complete |
 | Exact predecessor | [`e0756ffd6ccf2080974db9d9d7dae1c2e728145a`](https://github.com/hasanmanzak/meAndAI/commit/e0756ffd6ccf2080974db9d9d7dae1c2e728145a), git tree identity `47ec9c4de659487b6c0163f93aea9d90513fc3c9`, passed Ubuntu and Windows in [run 30764065710](https://github.com/hasanmanzak/meAndAI/actions/runs/30764065710); publication verification was correctly skipped |
+| Exact delivery | [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134), git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, passed Ubuntu in `18m29s` and Windows in `15m56s` in [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072); publication verification was correctly skipped |
 | Progress | Ten of twenty packets are `ReviewedLocalGreen` (`50%`); cumulative A is `23/23`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 
 ## Frozen scope
@@ -39,5 +40,5 @@
 
 - Independent adjudication withdrew the earlier Catalog exact-pair/BehaviorRed proposal because it would steal `A-CONVERGE-01` ownership. The corrected freeze closed `0 Blocking / 0 Important / 0 Minor`: `R=NotApplicable`, `TestOnlyGreen`, production `0`, synthetic fixtures, and no real inventory or selector closure.
 - Independent code/test red-team and independent evidence audit each closed `0 Blocking / 0 Important / 0 Minor` against the exact retained source and four TRX artifacts.
-- `A-SELECTOR-01` and every later packet remain Candidate/inactive. No downstream implementation may activate before this packet is synchronized, committed, pushed, and exact-head hosted green.
+- `A-SELECTOR-01` is now `FrozenDesign` at the [selector freeze handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md); every later packet remains Candidate/inactive. No selector C# implementation may activate before the synchronized freeze commit is pushed and exact-head hosted green.
 - Final Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, publication, WIP extraction, consumer mutation, authority transfer, and PowerShell retirement remain held.

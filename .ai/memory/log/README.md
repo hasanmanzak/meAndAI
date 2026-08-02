@@ -6,6 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice A expected-selector frozen-design handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+the hosted-green
 [ContractSlice A finding declaration reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green predecessor
 [ContractSlice A target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
@@ -242,11 +244,11 @@ git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
 Ten of twenty live packets are `ReviewedLocalGreen` (`50%`), and cumulative A
-is green `23/23`. The exact hosted-green A-FINDING design/implementation
+is green `23/23`. The exact hosted-green A-FINDING delivery and selector design
 predecessor is
-[`e0756ffd6ccf2080974db9d9d7dae1c2e728145a`](https://github.com/hasanmanzak/meAndAI/commit/e0756ffd6ccf2080974db9d9d7dae1c2e728145a),
-git tree identity `47ec9c4de659487b6c0163f93aea9d90513fc3c9`, with Ubuntu and Windows green in
-[run 30764065710](https://github.com/hasanmanzak/meAndAI/actions/runs/30764065710);
+[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
+git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, with Ubuntu and Windows green in
+[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072);
 publication verification was correctly skipped.
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
 is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
@@ -263,8 +265,10 @@ reviews are recorded in the
 remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)
 with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, focused `1/1`,
-cumulative A `23/23`, and synchronized commit/push/exact-head hosted validation
-pending. `A-SELECTOR-01` and every later packet remain Candidate/inactive. No
+cumulative A `23/23`, and exact-head hosted delivery complete. `A-SELECTOR-01`
+is `FrozenDesign` at the
+[selector handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md);
+every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
