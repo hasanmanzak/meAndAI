@@ -24,7 +24,8 @@ the historical [ContractSlice A canonical-string bounded-green closure handoff](
 the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
 the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
 the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-the current [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
+the hosted-green [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
+the current [ContractSlice A target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -53,7 +54,7 @@ topology correction. Its
 and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 are historical; follow the current
-[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
+[target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -216,17 +217,23 @@ is resolved by exact
 [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
 git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
 [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
-`A-GOVERNED-REFERENCE-SLOTS-01` is now `ReviewedLocalGreen`, pending its
-current-tree commit, push, and hosted validation. Its exact R/G evidence and
-focused `1/1`, cumulative A `21/21`, validation, and reviews are recorded in the
+`A-GOVERNED-REFERENCE-SLOTS-01` is `ReviewedLocalGreen`; exact remote-equal
+[`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+passed Ubuntu and Windows in
+[run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
+Its exact R/G evidence and focused `1/1`, cumulative A `21/21`, validation, and
+reviews are recorded in the
 [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 Eight of twenty live packets are `ReviewedLocalGreen` (`40%`).
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; the target replacement and every later packet remain
-Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
+remains `Planned`; `A-TARGET-PARSER-INDEX-SLOT-01` is a
+`FrozenDesign`, and every later packet remains Candidate/inactive. No
+final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
-Its exact implementation predecessor is remote-equal
+The governed-reference packet's historical exact implementation predecessor was
+remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
 git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
@@ -257,7 +264,7 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+[target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

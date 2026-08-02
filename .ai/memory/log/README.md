@@ -6,6 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
+[ContractSlice A target parser/index/slot freeze handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
+the hosted-green
 [ContractSlice A governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
 the historical
 [ContractSlice A parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
@@ -225,8 +227,12 @@ authority transfer, and PowerShell retirement remain unauthorized.
 The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
 historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
 replaces it with three ordered live packets. `A-PARSER-RECORD-SLOT-01` and
-`A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`; the latter is pending
-current-tree commit, push, and hosted validation. Eight of twenty live packets
+`A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`. Exact remote-equal
+[`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
+git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
+passed Ubuntu and Windows in
+[run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121);
+publication verification was correctly skipped. Eight of twenty live packets
 are `ReviewedLocalGreen` (`40%`), and cumulative A is green `21/21`.
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
 is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
@@ -240,8 +246,9 @@ The exact governed-reference R/G evidence, focused `1/1`, validation, and
 reviews are recorded in the
 [governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; the target replacement plus every later packet remain
-Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
+remains `Planned`; `A-TARGET-PARSER-INDEX-SLOT-01` is a
+`FrozenDesign`, and every later packet remains Candidate/inactive. No
+final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
 Its exact implementation predecessor is remote-equal
@@ -282,7 +289,7 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current activation state and denominator are in the
-[governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+[target parser/index/slot freeze handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
@@ -329,6 +336,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-02 - SUBF-0143 ContractSlice A target parser/index/slot freeze](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A governed-reference-slots freeze](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md)
 - [2026-08-01 - SUBF-0143 ContractSlice A parser-record-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
 - [2026-08-01 - SUBF-0143 ContractSlice A index-slot packet](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
