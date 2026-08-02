@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), tree `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; [FIND-0447](README.md#find-0447) is `PendingExactHeadHostedVerification`, so no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -241,7 +241,7 @@ git tree identity: `dc53b2f61f1468089724fd6eb798cb9d7d248570`, passed both stabl
 [run 30719208988](https://github.com/hasanmanzak/meAndAI/actions/runs/30719208988).
 Exact reviewed-local-green head
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
-tree `05c7591565d965966285cd51226446b2f54c81bc`, passed both stable jobs in
+git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed both stable jobs in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 The accepted D/RT verdict is `0 Blocking / 0 Important / 0 Minor`. The prior
 combined `A-PARSER-INDEX-01` was never activated and is
@@ -305,7 +305,7 @@ The next frozen Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure`,
 with marker `TEST-0210-A-BEHAVIOR-RED-0006` and only `ContractSlice=A`. Exact
 predecessor is [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
-tree `05c7591565d965966285cd51226446b2f54c81bc`, hosted-green in
+git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, hosted-green in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 
 The exact cumulative shape is `2` schemas, `1` Markdown parser, `3` indexes in

@@ -26,8 +26,15 @@ Last verified: **2026-08-02**
   canonical R is immutable, final focused green is `1/1`, cumulative A is
   `20/20`, exact packet size is `666/690`, reviews closed `0/0/0`, and exact-head
   hosted checks are green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`; `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet
-  remain Candidate/inactive. The live denominator is `18 - 1 + 3 = 20`; seven packets
+  PreRed`; [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is `PendingExactHeadHostedVerification` after exact activation head
+  [`cf8920e...`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f)
+  made Windows green while Ubuntu failed only
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+  in [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545).
+  No R/G/V exists; expected-red and downstream activation remain held.
+  `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet remain Candidate/inactive.
+  The live denominator is `18 - 1 + 3 = 20`; seven packets
   are `ReviewedLocalGreen` (`35%`). [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned`; no final scenario/status/owner/workflow activation is
   claimed. The umbrella directive still covers ordered remaining A through
@@ -489,7 +496,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   residual `A-PARSER-INDEX-01` before activation and replaced it with three
   ordered live packets; `A-PARSER-RECORD-SLOT-01` is exact-head
   `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`, and the target replacement remains Candidate/inactive.
+  PreRed`, [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+  activation remain held. The target replacement remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1032,17 +1041,26 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   referenced implementation evidence is not itself invalid.
 - Canonical owner and evidence: [FIND-0284](../../docs/features/FEAT-0051-v0150-recurrence-prevention-modular-test-harness/README.md#find-0284)
   / [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  owns the exact reference contract. The current delivery occurrence is
-  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446):
-  exact head
+  owns the exact reference contract. Historical
+  [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
+  remains resolved at exact head
   [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
   git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and
   [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
+  The current delivery occurrence is
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447):
+  exact activation head
+  [`cf8920e6a42b9118761c30599f8fcb9f87f5335f`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f),
+  git tree identity: `1c9fc67f666a7e972ed034cdcf5ba21cb98becf5`, and
+  [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545),
+  with thirteen ambiguous Git tree labels and disposition
+  `PendingExactHeadHostedVerification`.
 - Fixed release or evidence: repository-only Markdown verification is the
   focused barrier; release `0.15.0` carries the historical corrected evidence.
-  The current twenty-three-occurrence correction is resolved at the exact head
-  above. The recurrence remains `Active`; its fixed delivery evidence does not
-  replace the canonical executable owner.
+  The historical twenty-three-occurrence correction remains resolved; the
+  current thirteen-occurrence correction is pending exact-head hosted verification.
+  The recurrence remains `Active`; delivery evidence does not replace the canonical
+  executable owner.
 - Required safe response: resolve a commit to its exact full SHA and link the
   label to `https://github.com/<owner>/<repo>/commit/<full-sha>`; classify a
   non-commit tree object with the explicit `git tree identity:` prefix without
@@ -1602,7 +1620,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
   never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is exact-head
   `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`, and the target replacement plus every later packet remain
+  PreRed`, [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+  activation remain held. The target replacement plus every later packet remain
   Candidate/inactive. The live packet
   denominator is twenty and current completed progress is seven (`35%`), with
   cumulative A green `20/20`.

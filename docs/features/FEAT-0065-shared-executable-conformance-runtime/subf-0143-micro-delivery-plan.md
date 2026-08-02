@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) / [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), tree `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; immutable R, focused `1/1`, cumulative A `20/20`, exact `666/690` packet, validation, reviews, and hosted checks are complete. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) / [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; immutable R, focused `1/1`, cumulative A `20/20`, exact `666/690` packet, validation, reviews, and hosted checks are complete. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; [FIND-0447](README.md#find-0447) is `PendingExactHeadHostedVerification`, so no R/G/V exists and expected-red/downstream activation remain held. `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`); [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -652,7 +652,7 @@ implementation cannot activate before this packet's green/review gate.
 #### Frozen-design `A-GOVERNED-REFERENCE-SLOTS-01` contract <a name="a-governed-reference-slots-01-drt-observation"></a>
 
 Exact predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
-tree `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in
+git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 The reserved Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure`;

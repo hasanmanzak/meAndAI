@@ -205,8 +205,11 @@ and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runt
 are resolved. Strict D/RT retires never-activated `A-PARSER-INDEX-01` as a
 non-live `RetiredBeforeActivation` tombstone and replaces it with three ordered
 packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`;
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; the target
-replacement and every later packet remain Candidate/inactive. Seven of twenty
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`;
+[FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+activation remain held. The target replacement and every later packet remain
+Candidate/inactive. Seven of twenty
 live packets are `ReviewedLocalGreen` (`35%`). Exact parser-record R, focused
 `1/1`, cumulative A `20/20`, `666/690` packet budget, validation, reviews, and
 hosted evidence are recorded in the historical
@@ -217,6 +220,12 @@ Its exact implementation predecessor is remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
 git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
+Exact activation head
+[`cf8920e...`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f)
+made Windows green while Ubuntu failed only
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
+in [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545);
+the current handoff owns the bounded thirteen-occurrence correction.
 The
 packet-local evidence remains unchanged, but pushed head
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
