@@ -48,6 +48,15 @@ Last verified: **2026-08-02**
   The live denominator is `18 - 1 + 3 = 20`; eight packets are
   `ReviewedLocalGreen` (`40%`). `A-TARGET-PARSER-INDEX-SLOT-01` is a
   `FrozenDesign`, and every later packet remains Candidate/inactive.
+  Exact target-freeze head
+  [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
+  git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows
+  green while Ubuntu failed only
+  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in
+  [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843).
+  [FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449)
+  is active; expected red remains held until a corrected exact head passes
+  both hosted jobs.
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
   remains `Planned`; no final scenario/status/owner/workflow activation is
   claimed, and [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -1084,6 +1093,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   head [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4),
   git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, and green
   [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+  The current delivery occurrence is
+  [FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449):
+  exact target-freeze head
+  [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
+  git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, and
+  [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843)
+  exposed one `UnlinkedCommitReference` in the target-freeze handoff. The
+  bounded correction is prepared; the occurrence remains active until a
+  corrected exact head passes both hosted jobs.
 - Fixed release or evidence: repository-only Markdown verification is the
   focused barrier; release `0.15.0` carries the historical corrected evidence.
   The historical twenty-three-occurrence correction remains resolved. The later

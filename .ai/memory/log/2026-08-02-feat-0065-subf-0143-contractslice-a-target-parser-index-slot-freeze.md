@@ -6,7 +6,7 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Pull request | Draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) |
 | Parent | [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) / [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) |
-| State | `A-GOVERNED-REFERENCE-SLOTS-01` is remote-equal exact-head hosted green; `A-TARGET-PARSER-INDEX-SLOT-01` is a `FrozenDesign` with no implementation, expected-red invocation, or green claim |
+| State | `A-GOVERNED-REFERENCE-SLOTS-01` is remote-equal exact-head hosted green; `A-TARGET-PARSER-INDEX-SLOT-01` remains a `FrozenDesign` with no implementation, expected-red invocation, or green claim. Exact freeze head [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85), git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows green while Ubuntu failed only [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843); [FIND-0449](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449) is active and expected red remains unauthorized until a corrected exact head passes both hosted jobs |
 | Predecessor | Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602), git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`; remote branch and draft PR head are equal; [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121) passed Ubuntu and Windows; publication verification was correctly skipped |
 | Progress | Eight of twenty packets are `ReviewedLocalGreen` (`40%`); cumulative A is `21/21`; target green would become `22/22` and nine of twenty (`45%`); [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 
@@ -117,7 +117,7 @@
   B/C/D, merge, release, publication, and consumer mutation remain held.
 - Preliminary read-only preparation reported `2 Blocking / 3 Important / 0
   Minor`. Disposition is exact: predecessor hosted proof is closed by
-  `6b49de76d7420c33a3707c3aeeab78b4362fb602` / run `30753246121`; the missing
+  [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602) / [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121); the missing
   schema blocker is closed by the indivisible `3/2/4/4` vertical; index input
   order is frozen to the canonical wire order; Catalog-only Writer-first
   feasibility is frozen; and the exact mutation matrix plus `180/500/680` caps

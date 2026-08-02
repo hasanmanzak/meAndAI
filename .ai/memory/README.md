@@ -225,6 +225,15 @@ passed Ubuntu and Windows in
 Its exact R/G evidence and focused `1/1`, cumulative A `21/21`, validation, and
 reviews are recorded in the
 [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+Exact target-freeze head
+[`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
+git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows
+green while Ubuntu failed only
+[TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in
+[run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843).
+[FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449)
+is active for the bounded record/memory correction; expected red remains held
+until a corrected exact head passes both hosted jobs.
 Eight of twenty live packets are `ReviewedLocalGreen` (`40%`).
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; `A-TARGET-PARSER-INDEX-SLOT-01` is a
