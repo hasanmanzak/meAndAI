@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). Strict redraw retires never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed` with [FIND-0447](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447) `PendingExactHeadHostedVerification`; no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`; [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Corrected predecessor [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4), git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, passed [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) and resolves [FIND-0447](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447). Strict redraw retires never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; renewed Writer-first D/RT closed `0/0/0` in three independent reviews and StructureOnly is green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448) pending exact-head hosted verification; no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`; [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | Exact predecessor [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed Ubuntu and Windows in [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; [FIND-0447](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447) is `PendingExactHeadHostedVerification`, so no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live A packets are green (`35%`), cumulative A `20/20`. |
+| Current A implementation boundary | Corrected predecessor [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4), git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, passed Ubuntu and Windows in [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) and resolves [FIND-0447](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447). `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; renewed Writer-first D/RT closed `0/0/0` in three independent reviews. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448) pending exact-head hosted verification, so no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live A packets are green (`35%`), cumulative A `20/20`. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -97,7 +97,9 @@ mismatch ownership remain in ContractSlice C. Strict D/RT retires the never-
 activated combined parser/index label and replaces it with three ordered live
 packets. Seven of twenty A packets are `ReviewedLocalGreen` (`35%`);
 `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen` with cumulative A
-`20/20`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`;
+`20/20`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
+[FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+pending exact-head hosted verification;
 target and every later packet remain Candidate/inactive, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
 
@@ -132,7 +134,9 @@ Exact predecessor
 is hosted green. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`,
 cumulative A is `20/20`, and seven of twenty live packets are green (`35%`).
 Never-activated `A-PARSER-INDEX-01` is retired;
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, while
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
+[FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+pending exact-head hosted verification, while
 target and every later packet remain Candidate/inactive. The
 architecture freeze remains in force elsewhere.
 
@@ -1570,7 +1574,9 @@ Exact predecessor
 is hosted green.
 Never-activated `A-PARSER-INDEX-01` is retired;
 `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen` with cumulative A
-`20/20`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`;
+`20/20`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
+[FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+pending exact-head hosted verification;
 target and every later packet remain Candidate/inactive. B/C/D and final Scenario/status/owner/
 workflow/publication boundaries remain held.
 

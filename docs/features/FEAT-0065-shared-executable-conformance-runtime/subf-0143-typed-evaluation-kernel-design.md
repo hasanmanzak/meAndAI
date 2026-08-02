@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Exact hosted-green predecessor [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689), git tree identity: `05c7591565d965966285cd51226446b2f54c81bc`, passed [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; [FIND-0447](README.md#find-0447) is `PendingExactHeadHostedVerification`, so no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Corrected predecessor [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4), git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, passed [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) and resolves [FIND-0447](README.md#find-0447). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; renewed Writer-first D/RT closed through three independent current-tree `0/0/0` reviews and StructureOnly is green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, while [FIND-0448](README.md#find-0448) is `PendingExactHeadHostedVerification`; no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -147,7 +147,8 @@ Strict redraw retires never-activated `A-PARSER-INDEX-01`; seven of twenty live
 packets are `ReviewedLocalGreen` (`35%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; target
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
+[FIND-0448](README.md#find-0448) pending exact-head hosted verification; target
 remains Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
@@ -249,7 +250,8 @@ combined `A-PARSER-INDEX-01` was never activated and is
 from the live denominator. The three ordered replacements are
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01`. The first is exact-head
-`ReviewedLocalGreen`; the second is `MaintainerActivated / PreRed`; the target
+`ReviewedLocalGreen`; the second is `MaintainerActivated / PreRed`, with
+[FIND-0448](README.md#find-0448) pending exact-head hosted verification; the target
 and later FQNs, markers, and ordinals remain `None`.
 
 The first replacement retains one Fact with only `ContractSlice=A`:
@@ -340,21 +342,32 @@ negative drift. Components become
 `14`; artifacts stay `3`; cache stays
 `(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`.
 
-Natural R prebuilds graph and remaining Catalog arguments outside the exact
-catch. `CatalogSliceDeclaration.Create` is the first guarded expected-red
-observation: only exact `ArgumentException`, `ParamName=rules`, with Message
-equal to the runtime-created expected exception for `The parser and protocol-
-record graph is not exact.` may emit the marker; every other exception remains
-marker-free. After Catalog succeeds on green, construct `ParsedCanonicalManifest`,
-then make the writer the first serialization call. Reader/writer may generalize only index
+Natural R prebuilds the graph, remaining Catalog arguments, the successful
+`CatalogSliceDeclaration.Create` result, the validation-free
+`ParsedCanonicalManifest`, and the runtime-created expected exception outside
+the exact catch. The internal production `CanonicalManifestWriter.Write(parsed)`
+boundary is the first and only guarded expected-red observation, the first
+cross-graph validation, and the first serialization call. Only its exact runtime
+`ArgumentException`, `ParamName=rules`, with Message equal to the runtime-created
+expected exception for `The parser and protocol-record graph is not exact.` may
+emit the marker; the filter also requires exact runtime type equality because
+`ArgumentNullException` derives from `ArgumentException`. Every setup, Catalog,
+writer-guard, filter-mismatch, or other exception remains marker-free. Direct
+invocation of the internal closure validator is forbidden. On green, the same
+writer result feeds all subsequent assertions. Reader/writer may generalize only index
 inputs to model/capability; parser remains exact-one model. Catalog preserves
 predecessor `2/2`, accepts only successor `3/3`, and rejects mixed counts.
 Production is limited to Reader/Writer/Catalog and one new test; hard caps are
 `145/55/110`, production `310`, test `370`, total `680`. Pipeline review
 corrected `0/3/0` to provisional `0/0/0`; fresh and renewed post-hosted reviews
-then corrected all cross-record, oracle, identity, matrix, ordering, and literal-
-assembly findings. Three independent final current-tree reviews each closed
-`0/0/0`; activation followed. The complete matrix and holds are in the
+then corrected cross-record, identity, matrix, ordering, and literal-assembly
+findings, but blocking [FIND-0448](README.md#find-0448) later proved their
+Catalog-first natural-red call unreachable. The Writer-first correction above
+closed through three independent current-tree `0/0/0` reviews and StructureOnly;
+the packet is `MaintainerActivated / PreRed`, while [FIND-0448](README.md#find-0448)
+holds R pending exact-head hosted verification. Prior `0/0/0` reviews remain
+historical rather than current authority. The
+complete matrix and holds are in the
 [handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
 
 That corrected directive still does **not** authorize:
@@ -7300,7 +7313,8 @@ coverage `Important` is closed; fresh full-diff review pass 2 closed
 never-activated `A-PARSER-INDEX-01` is retired,
 `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`, seven of twenty
 live packets are green (`35%`) with cumulative A `20/20`,
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, target and
+`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
+[FIND-0448](README.md#find-0448) pending exact-head hosted verification; target and
 later packets remain Candidate/inactive, and no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,

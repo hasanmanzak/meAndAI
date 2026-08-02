@@ -25,13 +25,15 @@ Last verified: **2026-08-02**
   packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`:
   canonical R is immutable, final focused green is `1/1`, cumulative A is
   `20/20`, exact packet size is `666/690`, reviews closed `0/0/0`, and exact-head
-  hosted checks are green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`; [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-  is `PendingExactHeadHostedVerification` after exact activation head
-  [`cf8920e...`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f)
-  made Windows green while Ubuntu failed only
-  [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
-  in [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545).
+  hosted checks are green. Renewed Writer-first D/RT closed `0/0/0` in three
+  independent current-tree reviews and StructureOnly is green.
+  `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`; [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is `PendingExactHeadHostedVerification` and holds R.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved by exact correction head
+  [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4),
+  git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, and green
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
   No R/G/V exists; expected-red and downstream activation remain held.
   `A-TARGET-PARSER-INDEX-SLOT-01` and every later packet remain Candidate/inactive.
   The live denominator is `18 - 1 + 3 = 20`; seven packets
@@ -495,9 +497,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `A-INDEX-SLOT-01` is now `ReviewedLocalGreen`. A later strict D/RT retired
   residual `A-PARSER-INDEX-01` before activation and replaced it with three
   ordered live packets; `A-PARSER-RECORD-SLOT-01` is exact-head
-  `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`, [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-  is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+  `ReviewedLocalGreen`; renewed Writer-first D/RT closed `0/0/0` in three
+  independent current-tree reviews and `A-GOVERNED-REFERENCE-SLOTS-01` is
+  `MaintainerActivated / PreRed`. [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is `PendingExactHeadHostedVerification` and holds R.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved at exact [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) / [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780); no R/G/V exists, and expected-red/downstream
   activation remain held. The target replacement remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1047,14 +1052,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
   git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and
   [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-  The current delivery occurrence is
+  The later delivery occurrence was
   [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447):
   exact activation head
   [`cf8920e6a42b9118761c30599f8fcb9f87f5335f`](https://github.com/hasanmanzak/meAndAI/commit/cf8920e6a42b9118761c30599f8fcb9f87f5335f),
   git tree identity: `1c9fc67f666a7e972ed034cdcf5ba21cb98becf5`, and
   [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545),
-  with thirteen ambiguous Git tree labels and disposition
-  `PendingExactHeadHostedVerification`.
+  with thirteen ambiguous Git tree labels. It is resolved by exact correction
+  head [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4),
+  git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, and green
+  [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
 - Fixed release or evidence: repository-only Markdown verification is the
   focused barrier; release `0.15.0` carries the historical corrected evidence.
   The historical twenty-three-occurrence correction remains resolved; the
@@ -1619,9 +1626,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   redrawn `A-INDEX-SLOT-01`, whose corrected renewed RT closed `0/0/0` and whose
   current state is `ReviewedLocalGreen`. Subsequent strict D/RT retired
   never-activated `A-PARSER-INDEX-01`; `A-PARSER-RECORD-SLOT-01` is exact-head
-  `ReviewedLocalGreen`, `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated /
-  PreRed`, [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-  is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+  `ReviewedLocalGreen`; renewed Writer-first D/RT closed `0/0/0` in three
+  independent current-tree reviews and `A-GOVERNED-REFERENCE-SLOTS-01` is
+  `MaintainerActivated / PreRed`. [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+  is `PendingExactHeadHostedVerification` and holds R.
+  [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+  is resolved at exact [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) / [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780); no R/G/V exists, and expected-red/downstream
   activation remain held. The target replacement plus every later packet remain
   Candidate/inactive. The live packet
   denominator is twenty and current completed progress is seven (`35%`), with

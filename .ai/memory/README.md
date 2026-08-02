@@ -205,9 +205,13 @@ and [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runt
 are resolved. Strict D/RT retires never-activated `A-PARSER-INDEX-01` as a
 non-live `RetiredBeforeActivation` tombstone and replaces it with three ordered
 packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`;
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`;
+renewed Writer-first D/RT closed `0/0/0` in three independent current-tree
+reviews and StructureOnly is green. `A-GOVERNED-REFERENCE-SLOTS-01` is
+`MaintainerActivated / PreRed`, while
+[FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+is `PendingExactHeadHostedVerification`.
 [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-is `PendingExactHeadHostedVerification`, no R/G/V exists, and expected-red/downstream
+is resolved at exact [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) / [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780); no R/G/V exists, and expected-red/downstream
 activation remain held. The target replacement and every later packet remain
 Candidate/inactive. Seven of twenty
 live packets are `ReviewedLocalGreen` (`35%`). Exact parser-record R, focused
