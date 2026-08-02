@@ -224,22 +224,26 @@ WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
 The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
 historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
-replaces it with three ordered live packets. Seven of twenty live packets are
-`ReviewedLocalGreen` (`35%`); `A-PARSER-RECORD-SLOT-01` is exact-head
-`ReviewedLocalGreen`. Renewed Writer-first D/RT closed `0/0/0` in three
-independent current-tree reviews and StructureOnly is green;
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, while
-[FIND-0448](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
-is `PendingExactHeadHostedVerification`.
+replaces it with three ordered live packets. `A-PARSER-RECORD-SLOT-01` and
+`A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`; the latter is pending
+current-tree commit, push, and hosted validation. Eight of twenty live packets
+are `ReviewedLocalGreen` (`40%`), and cumulative A is green `21/21`.
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-is resolved at exact [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) / [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780); no R/G/V exists, and expected-red/downstream
-activation remain held. The target replacement plus every later packet remain
-Candidate/inactive. Parser-record's immutable R, focused `1/1`, cumulative A
-`20/20`, exact `666/690` packet, reviews, and hosted evidence are recorded in
-the historical
-[parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
-The current freeze is recorded in the
+is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
+[run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+[FIND-0448](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+is resolved by exact
+[`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
+[run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
+The exact governed-reference R/G evidence, focused `1/1`, validation, and
+reviews are recorded in the
 [governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`; the target replacement plus every later packet remain
+Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
+[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+or B/C/D activation is claimed.
 Its exact implementation predecessor is remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
 git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in

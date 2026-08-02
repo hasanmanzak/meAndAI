@@ -196,7 +196,8 @@ recorded in the
 [D/RT disposition](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md#a-index-slot-01-drt-observation),
 whose historical first `0/1/0` finding and renewed RT `0/0/0` remain evidence.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-stays `Planned`; packet-local cumulative A is now green `20/20`. Exact remote-equal
+stays `Planned`; the parser-record packet's historical cumulative A is green
+`20/20`. Exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, passed Ubuntu and Windows in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
@@ -206,20 +207,25 @@ are resolved. Strict D/RT retires never-activated `A-PARSER-INDEX-01` as a
 non-live `RetiredBeforeActivation` tombstone and replaces it with three ordered
 packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`;
 renewed Writer-first D/RT closed `0/0/0` in three independent current-tree
-reviews and StructureOnly is green. `A-GOVERNED-REFERENCE-SLOTS-01` is
-`MaintainerActivated / PreRed`, while
-[FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
-is `PendingExactHeadHostedVerification`.
+reviews and StructureOnly is green.
 [FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
-is resolved at exact [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) / [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780); no R/G/V exists, and expected-red/downstream
-activation remain held. The target replacement and every later packet remain
-Candidate/inactive. Seven of twenty
-live packets are `ReviewedLocalGreen` (`35%`). Exact parser-record R, focused
-`1/1`, cumulative A `20/20`, `666/690` packet budget, validation, reviews, and
-hosted evidence are recorded in the historical
-[parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md).
-The current governed-reference freeze is recorded in the
+is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
+[run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).
+[FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+is resolved by exact
+[`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
+[run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
+`A-GOVERNED-REFERENCE-SLOTS-01` is now `ReviewedLocalGreen`, pending its
+current-tree commit, push, and hosted validation. Its exact R/G evidence and
+focused `1/1`, cumulative A `21/21`, validation, and reviews are recorded in the
 [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+Eight of twenty live packets are `ReviewedLocalGreen` (`40%`).
+[TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`; the target replacement and every later packet remain
+Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
+[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+or B/C/D activation is claimed.
 Its exact implementation predecessor is remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
 git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
@@ -229,8 +235,11 @@ Exact activation head
 made Windows green while Ubuntu failed only
 [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178)
 in [run 30744358545](https://github.com/hasanmanzak/meAndAI/actions/runs/30744358545);
-the current handoff owns the bounded thirteen-occurrence correction.
-The
+the thirteen-label correction is resolved by the exact
+[FIND-0447](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
+evidence above. The separate Writer-first activation hold is resolved by the
+exact [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
+evidence above. The
 packet-local evidence remains unchanged, but pushed head
 [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
 git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`, failed only

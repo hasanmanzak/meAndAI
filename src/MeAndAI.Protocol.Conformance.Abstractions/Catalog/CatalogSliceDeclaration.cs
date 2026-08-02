@@ -150,24 +150,53 @@ public sealed class CatalogSliceDeclaration
     private static void ValidateParserRecordSlotClosure(ReleaseSchemaRegistry registry, IReadOnlyList<RuleDeclaration> rules, IReadOnlyList<EvidenceSlotDeclaration> slots)
     {
         var evaluationSlots = rules.SelectMany(rule => rule.EvaluationSlots).ToArray();
-        if (registry.PayloadSchemas.Count != 2 || registry.Parsers.Count != 1 || registry.Indexes.Count != 2 ||
-            slots.Count != 2 || evaluationSlots.Length != 2)
+        var predecessor = registry.Indexes.Count == 2 && slots.Count == 2 && evaluationSlots.Length == 2;
+        var successor = registry.Indexes.Count == 3 && slots.Count == 3 && evaluationSlots.Length == 3;
+        if (registry.PayloadSchemas.Count != 2 || registry.Parsers.Count != 1 || (!predecessor && !successor))
         {
             throw new ArgumentException("The parser and protocol-record graph is not exact.", nameof(rules));
         }
         var governedSchema = registry.PayloadSchemas[0];
         var treeSchema = registry.PayloadSchemas[1];
         var parser = registry.Parsers[0];
-        var recordIndex = registry.Indexes[0];
-        var treeIndex = registry.Indexes[1];
-        var governedSlot = evaluationSlots[0];
-        var treeSlot = evaluationSlots[1];
+        var offset = successor ? 1 : 0;
+        var governedReferenceIndex = successor ? registry.Indexes[0] : null;
+        var recordIndex = registry.Indexes[offset];
+        var treeIndex = registry.Indexes[offset + 1];
+        var providerGovernedSlot = successor ? evaluationSlots[0] : null;
+        var repositoryGovernedSlot = evaluationSlots[offset];
+        var treeSlot = evaluationSlots[offset + 1];
         var parserInput = parser.Inputs.Count == 1 ? parser.Inputs[0] : null;
+        var governedModelInput = governedReferenceIndex?.Inputs.Count == 2 ? governedReferenceIndex.Inputs[0] : null;
+        var governedCapabilityInput = governedReferenceIndex?.Inputs.Count == 2 ? governedReferenceIndex.Inputs[1] : null;
         var recordInput = recordIndex.Inputs.Count == 1 ? recordIndex.Inputs[0] : null;
         var treeInput = treeIndex.Inputs.Count == 1 ? treeIndex.Inputs[0] : null;
         var governedModel = governedSchema.OutputModel;
         var markdownModel = parser.OutputModel;
         var treeModel = treeSchema.OutputModel;
+        var governedTopologyExact = successor
+            ? governedReferenceIndex is not null &&
+              governedReferenceIndex.IndexKey == "protocol.index.governed-reference" && governedReferenceIndex.IndexVersion == "1" &&
+              ComponentEquals(governedReferenceIndex.Indexer, "protocol.index.governed-reference", "MeAndAI.Protocol.Policy", "MeAndAI.Protocol.Policy.Indexes.GovernedReferenceIndex") &&
+              governedReferenceIndex.InvocationScope.Equals(IndexInvocationScope.PerPlan) &&
+              InputEquals(governedModelInput, markdownModel, 0, null) &&
+              InputEquals(governedCapabilityInput, recordIndex.OutputCapability, 1, null) &&
+              CapabilityEquals(governedReferenceIndex.OutputCapability, "protocol.capability.governed-reference-index",
+                  "protocol.type.capability.governed-reference-index", "MeAndAI.Protocol.Conformance.Abstractions.IGovernedReferenceIndex") &&
+              BudgetEquals(governedReferenceIndex.Budget, 67_108_864, 256, 1_000_000, 10_000_000) &&
+              CodesEqual(governedReferenceIndex.FailureCodes.Select(code => code.Value), "protocol.budget.exhausted", "protocol.index.reference-unavailable") &&
+              SlotEquals(providerGovernedSlot!, "protocol.slot.provider-governed-text", "protocol.requirement.provider-governed-text",
+                  "protocol.evidence.governed-text-set", "protocol.completeness.all-governed-bodies", "protocol.governed-text", SurfaceKind.Provider,
+                  [SurfaceKind.Provider], "protocol.material.governed-text", "protocol.target.provider-governed-body-set",
+                  [governedReferenceIndex.OutputCapability, recordIndex.OutputCapability]) &&
+              SlotEquals(repositoryGovernedSlot, "protocol.slot.repository-governed-text", "protocol.requirement.repository-governed-text",
+                  "protocol.evidence.governed-text-set", "protocol.completeness.all-governed-bodies", "protocol.governed-text", SurfaceKind.Repository,
+                  [SurfaceKind.Repository, SurfaceKind.Provider], "protocol.material.governed-text", "protocol.target.repository-governed-body-set",
+                  [governedReferenceIndex.OutputCapability, recordIndex.OutputCapability])
+            : SlotEquals(repositoryGovernedSlot, "protocol.slot.repository-governed-text", "protocol.requirement.repository-governed-text",
+                "protocol.evidence.governed-text-set", "protocol.completeness.all-governed-bodies", "protocol.governed-text", SurfaceKind.Repository,
+                [SurfaceKind.Repository, SurfaceKind.Provider], "protocol.material.governed-text", "protocol.target.repository-governed-body-set",
+                [recordIndex.OutputCapability]);
         if (governedSchema.SchemaKey != "protocol.governed-text" || governedSchema.SchemaVersion != "1" ||
             !ComponentEquals(governedSchema.Codec, "protocol.codec.governed-text", "MeAndAI.Protocol.Policy", "MeAndAI.Protocol.Policy.Codecs.GovernedTextCodec") ||
             !ModelEquals(governedModel, "protocol.model.source-text", "protocol.type.model.source-text", "MeAndAI.Protocol.Policy.Models.SourceTextModel") ||
@@ -204,11 +233,10 @@ public sealed class CatalogSliceDeclaration
             !CapabilityEquals(treeIndex.OutputCapability, "protocol.capability.repository-tree", "protocol.type.capability.repository-tree", "MeAndAI.Protocol.Conformance.Abstractions.IRepositoryTree") ||
             !BudgetEquals(treeIndex.Budget, 16_777_216, 64, 200_000, 2_000_000) ||
             !CodesEqual(treeIndex.FailureCodes.Select(code => code.Value), "protocol.budget.exhausted", "protocol.index.repository-tree-unavailable") ||
-            !SlotEquals(governedSlot, "protocol.slot.repository-governed-text", "protocol.requirement.repository-governed-text",
-                "protocol.evidence.governed-text-set", "protocol.completeness.all-governed-bodies", "protocol.governed-text", [SurfaceKind.Repository, SurfaceKind.Provider],
-                "protocol.material.governed-text", "protocol.target.repository-governed-body-set", recordIndex.OutputCapability) ||
             !SlotEquals(treeSlot, "protocol.slot.repository-tree", "protocol.requirement.repository-tree", "protocol.evidence.repository-tree",
-                "protocol.completeness.full-tree", "protocol.repository-tree", [SurfaceKind.Repository], "protocol.material.repository-tree", "protocol.target.repository-snapshot", treeIndex.OutputCapability) ||
+                "protocol.completeness.full-tree", "protocol.repository-tree", SurfaceKind.Repository, [SurfaceKind.Repository],
+                "protocol.material.repository-tree", "protocol.target.repository-snapshot", [treeIndex.OutputCapability]) ||
+            !governedTopologyExact ||
             !BudgetEquals(registry.CacheBudget, 512, 67_108_864, 128, 2_000_000) ||
             registry.CacheBudget.MaxConcurrentDecodeAttempts != 8 || registry.CacheBudget.MaxConcurrentIndexAttempts != 4 ||
             !registry.CacheBudget.RetentionPolicy.Equals(CacheRetentionPolicy.RetainLowestCanonicalKeys))
@@ -222,19 +250,22 @@ public sealed class CatalogSliceDeclaration
         capability.CapabilityKey == key && capability.CapabilityVersion == "1" && ComponentEquals(capability.InterfaceType, componentKey, "MeAndAI.Protocol.Conformance.Abstractions", type);
     private static bool InputEquals(ComponentInputDeclaration? input, ModelContractIdentity model, int minimum, int? maximum) =>
         input?.Model?.Equals(model) == true && input.Capability is null && input.MinimumCount == minimum && input.MaximumCount == maximum;
+    private static bool InputEquals(ComponentInputDeclaration? input, CapabilityContractIdentity capability, int minimum, int? maximum) =>
+        input?.Capability?.Equals(capability) == true && input.Model is null && input.MinimumCount == minimum && input.MaximumCount == maximum;
     private static bool BudgetEquals(SemanticResourceBudget budget, long bytes, int depth, long nodes, long complexity) =>
         budget.MaxBytes == bytes && budget.MaxDepth == depth && budget.MaxNodes == nodes && budget.MaxComplexity == complexity;
     private static bool BudgetEquals(SessionCacheBudget budget, int decodeEntries, long decodeBytes, int indexEntries, long indexNodes) =>
         budget.MaxDecodeEntries == decodeEntries && budget.MaxDecodeCanonicalBytes == decodeBytes && budget.MaxIndexEntries == indexEntries && budget.MaxIndexNodes == indexNodes;
     private static bool CodesEqual(IEnumerable<string> actual, params string[] expected) => actual.SequenceEqual(expected, StringComparer.Ordinal);
     private static bool SlotEquals(EvidenceSlotDeclaration slot, string key, string requirement, string kind,
-        string completeness, string schema, IReadOnlyList<SurfaceKind> surfaces, string material, string target, CapabilityContractIdentity capability) =>
-        slot.SlotKey == key && slot.Requirement.Key == requirement && slot.Requirement.Surface.Equals(SurfaceKind.Repository) &&
+        string completeness, string schema, SurfaceKind requirementSurface, IReadOnlyList<SurfaceKind> surfaces, string material, string target,
+        IReadOnlyList<CapabilityContractIdentity> capabilities) =>
+        slot.SlotKey == key && slot.Requirement.Key == requirement && slot.Requirement.Surface.Equals(requirementSurface) &&
         slot.Requirement.Kind == kind && slot.Requirement.CompletenessContract == completeness && slot.Requirement.PayloadSchemaKey == schema &&
         slot.Requirement.PayloadSchemaVersion == "1" && slot.Requirement.AcceptedConsistencyClasses.SequenceEqual(
             [EvidenceConsistencyClass.ExactSnapshot, EvidenceConsistencyClass.ObjectVersionBound, EvidenceConsistencyClass.BoundedNonAtomicObservation]) &&
         slot.ProfileSurfaces.Values.SequenceEqual(surfaces) && slot.MaterialRole == material && slot.TargetSelectorKey == target &&
-        slot.Capabilities.Count == 1 && slot.Capabilities[0].Equals(capability);
+        slot.Capabilities.SequenceEqual(capabilities);
 
     private static bool ComponentEquals(
         ComponentTypeIdentity component, string key, string assembly, string type) =>

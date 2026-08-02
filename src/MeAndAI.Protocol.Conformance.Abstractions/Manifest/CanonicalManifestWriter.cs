@@ -199,6 +199,27 @@ internal static class CanonicalManifestWriter
             writer.WriteStartArray("inputs");
             foreach (var input in index.Inputs)
             {
+                if (input.Capability is { } capability && input.Model is null)
+                {
+                    writer.WriteStartObject();
+                    WriteCanonicalString(writer, "kind", "capability");
+                    writer.WritePropertyName("capability");
+                    WriteCapability(writer, capability);
+                    writer.WriteNumber("minimumCount", input.MinimumCount);
+                    if (input.MaximumCount is int capabilityMaximumCount)
+                    {
+                        writer.WriteNumber("maximumCount", capabilityMaximumCount);
+                    }
+                    writer.WriteEndObject();
+                    continue;
+                }
+
+                if (input.Model is null || input.Capability is not null)
+                {
+                    throw new InvalidOperationException(
+                        "An index input must declare exactly one model or capability.");
+                }
+
                 var model = input.Model!;
                 writer.WriteStartObject();
                 WriteCanonicalString(writer, "kind", "model");

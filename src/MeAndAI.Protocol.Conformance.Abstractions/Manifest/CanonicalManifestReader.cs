@@ -263,7 +263,7 @@ internal static class CanonicalManifestReader
             reader.ExpectProperty("invocationScope");
             var invocationScope = reader.ReadString();
             reader.ExpectProperty("inputs");
-            var input = ReadSingleModelInput(ref reader);
+            var inputs = ReadIndexInputs(ref reader);
             reader.ExpectProperty("outputCapability");
             reader.Expect(JsonTokenType.StartObject);
             reader.ExpectProperty("capabilityKey");
@@ -289,7 +289,7 @@ internal static class CanonicalManifestReader
             reader.Expect(JsonTokenType.EndObject);
             indexes.Add(new RawContextIndex(
                 indexKey, indexVersion, indexer, invocationScope,
-                input,
+                inputs,
                 new RawCapabilityContract(capabilityKey, capabilityVersion, interfaceType),
                 maxBytes, maxDepth, maxNodes, maxComplexity, failureCodes));
         }
@@ -330,6 +330,83 @@ internal static class CanonicalManifestReader
         }
         reader.Expect(JsonTokenType.EndArray);
         return new RawModelInput(modelKey, modelVersion, implementationType, minimumCount, maximumCount);
+    }
+
+    private static IReadOnlyList<RawIndexInput> ReadIndexInputs(
+        ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var inputs = new List<RawIndexInput>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest index inputs array must contain objects.");
+            }
+
+            reader.ExpectProperty("kind");
+            var kind = reader.ReadString();
+            RawModelContract? model = null;
+            RawCapabilityContract? capability = null;
+            if (kind == "model")
+            {
+                reader.ExpectProperty("model");
+                reader.Expect(JsonTokenType.StartObject);
+                reader.ExpectProperty("modelKey");
+                var modelKey = reader.ReadString();
+                reader.ExpectProperty("modelVersion");
+                var modelVersion = reader.ReadString();
+                reader.ExpectProperty("implementationType");
+                var implementationType = ReadComponentReference(ref reader);
+                reader.Expect(JsonTokenType.EndObject);
+                model = new RawModelContract(
+                    modelKey, modelVersion, implementationType);
+            }
+            else if (kind == "capability")
+            {
+                reader.ExpectProperty("capability");
+                reader.Expect(JsonTokenType.StartObject);
+                reader.ExpectProperty("capabilityKey");
+                var capabilityKey = reader.ReadString();
+                reader.ExpectProperty("capabilityVersion");
+                var capabilityVersion = reader.ReadString();
+                reader.ExpectProperty("interfaceType");
+                var interfaceType = ReadComponentReference(ref reader);
+                reader.Expect(JsonTokenType.EndObject);
+                capability = new RawCapabilityContract(
+                    capabilityKey, capabilityVersion, interfaceType);
+            }
+            else
+            {
+                throw new FormatException(
+                    "The manifest index input kind is not supported.");
+            }
+
+            reader.ExpectProperty("minimumCount");
+            var minimumCount = reader.ReadInt32();
+            int? maximumCount = null;
+            if (!reader.Read())
+            {
+                throw new FormatException("The index input is incomplete.");
+            }
+            if (reader.TokenType == JsonTokenType.PropertyName)
+            {
+                reader.RequireProperty("maximumCount");
+                maximumCount = reader.ReadInt32();
+                reader.Expect(JsonTokenType.EndObject);
+            }
+            else if (reader.TokenType != JsonTokenType.EndObject)
+            {
+                throw new FormatException(
+                    "Expected index input maximumCount or end of object.");
+            }
+
+            inputs.Add(new RawIndexInput(
+                model, capability, minimumCount, maximumCount));
+        }
+
+        return inputs;
     }
 
     private static RawActivationProof ReadActivationProof(
@@ -1016,7 +1093,12 @@ internal static class CanonicalManifestReader
         foreach (var index in indexes)
         {
             references.Add((index.Indexer.ComponentKey, index.Indexer.ComponentVersion));
-            references.Add((index.Input.ImplementationType.ComponentKey, index.Input.ImplementationType.ComponentVersion));
+            foreach (var input in index.Inputs)
+            {
+                var inputType = input.Model?.ImplementationType ??
+                    input.Capability!.InterfaceType;
+                references.Add((inputType.ComponentKey, inputType.ComponentVersion));
+            }
             references.Add((index.OutputCapability.InterfaceType.ComponentKey, index.OutputCapability.InterfaceType.ComponentVersion));
         }
 
@@ -1099,10 +1181,7 @@ internal static class CanonicalManifestReader
             index.IndexVersion,
             ResolveComponentReference(index.Indexer, components),
             IndexInvocationScope.Parse(index.InvocationScope),
-            [ComponentInputDeclaration.ForModel(
-                ModelContractIdentity.Create(index.Input.ModelKey, index.Input.ModelVersion,
-                    ResolveComponentReference(index.Input.ImplementationType, components)),
-                index.Input.MinimumCount, index.Input.MaximumCount)],
+            index.Inputs.Select(input => CreateIndexInput(input, components)),
             CapabilityContractIdentity.Create(
                 index.OutputCapability.CapabilityKey,
                 index.OutputCapability.CapabilityVersion,
@@ -1110,6 +1189,40 @@ internal static class CanonicalManifestReader
             SemanticResourceBudget.Create(index.MaxBytes, index.MaxDepth, index.MaxNodes, index.MaxComplexity),
             index.FailureCodes.Select(EvaluationFailureCode.Parse)))
         .ToArray();
+
+    private static ComponentInputDeclaration CreateIndexInput(
+        RawIndexInput input,
+        IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components)
+    {
+        if (input.Model is { } model)
+        {
+            return ComponentInputDeclaration.ForModel(
+                ModelContractIdentity.Create(
+                    model.ModelKey,
+                    model.ModelVersion,
+                    ResolveComponentReference(
+                        model.ImplementationType,
+                        components)),
+                input.MinimumCount,
+                input.MaximumCount);
+        }
+
+        if (input.Capability is { } capability)
+        {
+            return ComponentInputDeclaration.ForCapability(
+                CapabilityContractIdentity.Create(
+                    capability.CapabilityKey,
+                    capability.CapabilityVersion,
+                    ResolveComponentReference(
+                        capability.InterfaceType,
+                        components)),
+                input.MinimumCount,
+                input.MaximumCount);
+        }
+
+        throw new FormatException(
+            "The manifest index input must declare one contract identity.");
+    }
 
     private static void ValidateCanonicalArtifactOrder(
         IReadOnlyList<RawArtifact> artifacts)
@@ -1738,9 +1851,15 @@ internal static class CanonicalManifestReader
 
     private sealed record RawContextIndex(
         string IndexKey, string IndexVersion, RawComponentReference Indexer,
-        string InvocationScope, RawModelInput Input,
+        string InvocationScope, IReadOnlyList<RawIndexInput> Inputs,
         RawCapabilityContract OutputCapability, long MaxBytes, int MaxDepth,
         long MaxNodes, long MaxComplexity, IReadOnlyList<string> FailureCodes);
+
+    private sealed record RawIndexInput(RawModelContract? Model, RawCapabilityContract? Capability,
+        int MinimumCount, int? MaximumCount);
+
+    private sealed record RawModelContract(string ModelKey, string ModelVersion,
+        RawComponentReference ImplementationType);
 
     private sealed record RawModelInput(
         string ModelKey, string ModelVersion,

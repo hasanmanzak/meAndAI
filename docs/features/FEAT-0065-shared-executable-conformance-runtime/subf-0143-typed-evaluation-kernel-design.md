@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Corrected predecessor [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4), git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, passed [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) and resolves [FIND-0447](README.md#find-0447). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`; renewed Writer-first D/RT closed through three independent current-tree `0/0/0` reviews and StructureOnly is green. `A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, while [FIND-0448](README.md#find-0448) is `PendingExactHeadHostedVerification`; no R/G/V exists and expected-red/downstream activation remain held. Target and every later packet remain Candidate/inactive. Seven of twenty live packets are `ReviewedLocalGreen` (`35%`), cumulative A is `20/20`, partial tests retain only `ContractSlice`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) remains historical. Corrected predecessor [`3fa6669...`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4), git tree identity: `5ed8c3eef36cfab99490c514b0a23ca99b681ad0`, passed [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780) and resolves [FIND-0447](README.md#find-0447). [FIND-0448](README.md#find-0448) was resolved for activation by exact [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d), git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145). Strict D/RT retired never-activated `A-PARSER-INDEX-01` and partitioned it into three ordered packets. `A-PARSER-RECORD-SLOT-01` and `A-GOVERNED-REFERENCE-SLOTS-01` are `ReviewedLocalGreen`; 0006 has immutable canonical R, focused `1/1`, cumulative A `21/21`, full Domain `98/98`, full Conformance `21/21`, validation, and three post-green `0/0/0` reviews. The current uncommitted tree has no commit or hosted-green claim; exact-head hosted verification follows push. Target and every later packet remain Candidate/inactive. Eight of twenty live packets are `ReviewedLocalGreen` (`40%`), partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -143,13 +143,12 @@ correction. Both findings are resolved by exact remote-equal
 [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-Strict redraw retires never-activated `A-PARSER-INDEX-01`; seven of twenty live
-packets are `ReviewedLocalGreen` (`35%`). `A-PARSER-RECORD-SLOT-01` is exact-
+Strict redraw retires never-activated `A-PARSER-INDEX-01`; eight of twenty live
+packets are `ReviewedLocalGreen` (`40%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
-[FIND-0448](README.md#find-0448) pending exact-head hosted verification; target
-remains Candidate/inactive.
+`A-GOVERNED-REFERENCE-SLOTS-01` is `ReviewedLocalGreen`; target remains
+Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -250,9 +249,9 @@ combined `A-PARSER-INDEX-01` was never activated and is
 from the live denominator. The three ordered replacements are
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01`. The first is exact-head
-`ReviewedLocalGreen`; the second is `MaintainerActivated / PreRed`, with
-[FIND-0448](README.md#find-0448) pending exact-head hosted verification; the target
-and later FQNs, markers, and ordinals remain `None`.
+`ReviewedLocalGreen`; the second is `ReviewedLocalGreen` without a current
+exact-head hosted claim until commit/push; the target and later FQNs, markers,
+and ordinals remain `None`.
 
 The first replacement retains one Fact with only `ContractSlice=A`:
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure`.
@@ -301,7 +300,7 @@ production is `300` gross changed lines and packet total is `666/690`.
 Release build, format, locks, diff, allowlist, traits, and retained-marker checks
 passed; three independent post-green reviews each closed `0/0/0`.
 
-### Frozen-design `A-GOVERNED-REFERENCE-SLOTS-01` closure
+### Reviewed-local-green `A-GOVERNED-REFERENCE-SLOTS-01` closure
 
 The next frozen Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure`,
@@ -363,12 +362,48 @@ corrected `0/3/0` to provisional `0/0/0`; fresh and renewed post-hosted reviews
 then corrected cross-record, identity, matrix, ordering, and literal-assembly
 findings, but blocking [FIND-0448](README.md#find-0448) later proved their
 Catalog-first natural-red call unreachable. The Writer-first correction above
-closed through three independent current-tree `0/0/0` reviews and StructureOnly;
-the packet is `MaintainerActivated / PreRed`, while [FIND-0448](README.md#find-0448)
-holds R pending exact-head hosted verification. Prior `0/0/0` reviews remain
-historical rather than current authority. The
-complete matrix and holds are in the
+closed through three independent current-tree `0/0/0` reviews and StructureOnly.
+Exact activation baseline
+[`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
+git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, passed Ubuntu and Windows in
+[run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145)
+and resolved the activation hold. The packet is now `ReviewedLocalGreen`;
+current exact-head hosted verification follows commit/push. Prior `0/0/0`
+reviews remain historical rather than current authority. The complete matrix
+and holds are in the
 [handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+
+P is `NotApplicable`. Unchanged-source predecessor focused `1/1` is
+`D:\Temp\meandai-test-0210-a-predecessor-focused-0006-561a760-clean\TEST-0210-A-PREDECESSOR-FOCUSED-0006.trx`,
+SHA-256 `8C03E5859A46F29B6BB56BA96DCBF81A210AD5B13198C82FE8A1DF62FA6BC422`;
+predecessor cumulative A `20/20` is
+`D:\Temp\meandai-test-0210-a-predecessor-cumulative-0006-561a760-r2\TEST-0210-A-PREDECESSOR-CUMULATIVE-0006-R2.trx`,
+SHA-256 `298BA6226AA5BCC5EE4731575F086224C465AC6F22055BD44FD9207BDDA9ADB3`.
+The first Socket 10055 attempt is diagnostic only, neither P nor R. Transient
+source froze at `370` lines / SHA-256
+`9CFB0ACD9081072B9187FFB9E75704DBBB4FA3094881F643A766E9C872E84075`.
+Canonical R completed the exact oracle and was not rerun:
+`D:\Temp\meandai-test-0210-a-6f79b6c0330541d49d851464e1a8349e\TEST-0210-A-BEHAVIOR-RED-0006.trx`,
+SHA-256 `938DDA74559F955F28A4470EE953DB9575A46DC9453CA27C9EE664FB90E635E2`.
+
+Original-oracle focused green `1/1` is
+`D:\Temp\meandai-test-0210-a-green-original-8bc26cee2b884f80b06ba76c4eef9834\TEST-0210-A-GREEN-ORIGINAL-0006.trx`,
+SHA-256 `06633DAF09D312609E5DF6CA1018F5209A3BB8F88437C1F4E43FCD20A79E140F`.
+Final focused green `1/1` is
+`D:\Temp\meandai-test-0210-a-green-final-ed5ec8da05d44ddba9e00a6f0a196efa\TEST-0210-A-GREEN-FINAL-0006.trx`,
+SHA-256 `CCDA68221C94F051414BE38E2099D447C1EDA5835F9E5C74E30B62C351B0DF77`;
+the parser-record predecessor regression `1/1` is
+`D:\Temp\meandai-test-0210-a-green-predecessor-9c2babadda3f4070aaf749071e62f7cb\TEST-0210-A-GREEN-PREDECESSOR-0006.trx`,
+SHA-256 `08CD02F6EFE613B4E4F8F7754E574B18C84B77F83926FDACB3982B5555F47AA5`;
+and cumulative A `21/21` is
+`D:\Temp\meandai-test-0210-a-green-cumulative-163c8a4efe0d42d89cac064a8ebd3b9a\TEST-0210-A-GREEN-CUMULATIVE-0006.trx`,
+SHA-256 `59917686763074521CB0FABD9A2AC7A8F2C4636C87B545994FF93958190587B9`.
+Retained test source is `358` lines at SHA-256
+`BBE93D8E43632363E63E5D29C4F709353B04F6BD389276126C3409DE8A10A0D1`;
+Reader/Writer/Catalog gross changed lines are `135/21/57`, production `213`,
+combined `571/680`. Locked Release build, format, diff, allowlist, locks, trait,
+and marker checks passed; full Domain is `98/98`, full Conformance is `21/21`,
+and three independent post-green reviews each closed `0/0/0`.
 
 That corrected directive still does **not** authorize:
 
@@ -7311,11 +7346,10 @@ and packet-local `A-SCHEMA-SLOT-01` green are satisfied. The canonical-string
 coverage `Important` is closed; fresh full-diff review pass 2 closed
 `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction,
 never-activated `A-PARSER-INDEX-01` is retired,
-`A-PARSER-RECORD-SLOT-01` is exact-head `ReviewedLocalGreen`, seven of twenty
-live packets are green (`35%`) with cumulative A `20/20`,
-`A-GOVERNED-REFERENCE-SLOTS-01` is `MaintainerActivated / PreRed`, with
-[FIND-0448](README.md#find-0448) pending exact-head hosted verification; target and
-later packets remain Candidate/inactive, and no full-A completion is claimed.
+`A-PARSER-RECORD-SLOT-01` and `A-GOVERNED-REFERENCE-SLOTS-01` are
+`ReviewedLocalGreen`; eight of twenty live packets are green (`40%`) with
+cumulative A `21/21`. Target and later packets remain Candidate/inactive, and
+no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited
