@@ -26,7 +26,7 @@ the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-sub
 the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
 the hosted-green [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
 the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-the current [ContractSlice A finding declaration design freeze](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
+the current [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -237,16 +237,18 @@ is resolved by exact
 [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
 git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and successful
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884).
-`A-TARGET-PARSER-INDEX-SLOT-01` is exact-head hosted-green `ReviewedLocalGreen`
-at [`bdd252b...`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9),
-git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, and
-[run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026).
-Nine of twenty live packets are `ReviewedLocalGreen` (`45%`) and cumulative A
-is `22/22`.
+The exact hosted-green design/implementation predecessor is
+[`e0756ffd6ccf2080974db9d9d7dae1c2e728145a`](https://github.com/hasanmanzak/meAndAI/commit/e0756ffd6ccf2080974db9d9d7dae1c2e728145a),
+git tree identity `47ec9c4de659487b6c0163f93aea9d90513fc3c9`, with Ubuntu and Windows green in
+[run 30764065710](https://github.com/hasanmanzak/meAndAI/actions/runs/30764065710).
+Ten of twenty live packets are `ReviewedLocalGreen` (`50%`) and cumulative A
+is `23/23`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; `A-FINDING-01` is `FrozenDesign` at the
+remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-while `A-SELECTOR-01` and every later packet remain Candidate/inactive. No
+with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, and synchronized
+commit/push/exact-head hosted validation pending. `A-SELECTOR-01` and every
+later packet remain Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
