@@ -1,4 +1,4 @@
-# ContractSlice A target parser/index/slot frozen design
+# ContractSlice A target parser/index/slot reviewed-local-green handoff
 
 | Field | Value |
 | --- | --- |
@@ -6,125 +6,27 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Pull request | Draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) |
 | Parent | [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) / [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) |
-| State | `A-GOVERNED-REFERENCE-SLOTS-01` is remote-equal exact-head hosted green; `A-TARGET-PARSER-INDEX-SLOT-01` remains a `FrozenDesign` with no implementation, expected-red invocation, or green claim. Exact freeze head [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85), git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows green while Ubuntu failed only [TEST-0178](../../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843); [FIND-0449](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449) is active and expected red remains unauthorized until a corrected exact head passes both hosted jobs |
-| Predecessor | Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602), git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`; remote branch and draft PR head are equal; [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121) passed Ubuntu and Windows; publication verification was correctly skipped |
-| Progress | Eight of twenty packets are `ReviewedLocalGreen` (`40%`); cumulative A is `21/21`; target green would become `22/22` and nine of twenty (`45%`); [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
+| State | `A-TARGET-PARSER-INDEX-SLOT-01` is `ReviewedLocalGreen`; canonical R is immutable; local G/V/reviews are complete; the current green tree still awaits commit, push, and exact-head hosted validation |
+| Activation baseline | [FIND-0449](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449) is resolved by exact [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007), git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884), which passed Ubuntu and Windows; publication verification was correctly skipped |
+| Implementation predecessor | Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602), git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`, and [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121) passed Ubuntu and Windows |
+| Progress | Nine of twenty packets are `ReviewedLocalGreen` (`45%`); cumulative A is `22/22`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 
-## Frozen identity and activation gate
+## Frozen identity and graph
 
-- Operational label remains `A-TARGET-PARSER-INDEX-SLOT-01`; its indivisible
-  vertical explicitly includes the repository-target schema/model row because
-  the parser, index, and slot cannot close without it.
-- Reserved FQN:
-  `MeAndAI.Protocol.Conformance.Tests.ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure`.
-- Marker/TRX stem: `TEST-0210-A-BEHAVIOR-RED-0007`; one Fact; only
-  `ContractSlice=A`; no `Scenario`.
-- Before canonical R, locked restore and six lock hashes must match, then the
-  unchanged predecessor Fact must pass `1/1` and cumulative A must pass `21/21`.
-  This freeze must be reviewed, committed, pushed, and exact-head hosted green
-  before the expected-red invocation is authorized.
+- FQN: `MeAndAI.Protocol.Conformance.Tests.ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure`; marker/TRX `TEST-0210-A-BEHAVIOR-RED-0007`; one Fact; only `ContractSlice=A`; no `Scenario`.
+- Exact topology is `3 schema / 2 parser / 4 index / 4 evaluation slot`, demand/admission `0/0`, `20` components, `3` artifacts, and unchanged cache `(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`. Exact `2/1/2/2` and `2/1/3/3` predecessors remain valid; hybrid or partial target verticals fail closed.
+- Orders remain schemas governed-text/target-resolution/repository-tree; parsers Markdown/target-Markdown; indexes governed-reference/protocol-record/target-resolution/repository-tree; slots provider-governed/repository-governed/target-resolution/repository-tree. The retained test owns exact identities, budgets, failures, input/cardinality order, lookups, component/artifact/cache closure, fourteen partial-removal negatives, the sole valid whole-target removal, and held-array rejection.
+- Production owner is only `CatalogSliceDeclaration.cs`; Reader/Writer are regression-only. Catalog SHA-256 is `2F370175B36BACCC0D3F328F2E23991BC15D1E2A8F6F681C37A28189F93D397B`; retained test is `401` lines at SHA-256 `3F78C84F5E65CE956AB6D1615BEE35CC161A97CE59879E888A3506C7B1631C6B`. Gross size is production `96/180`, test `401/500`, combined `497/680`.
 
-## Exact cumulative topology
+## Immutable red and green evidence
 
-- Green topology is exact `3 schema / 2 parser / 4 index / 4 evaluation slot`,
-  `0` applicability slot, `0` demand projector, `0` admission proof, `20`
-  components, `3` artifacts, and unchanged cache
-  `(512,67108864,128,2000000,8,4,retain-lowest-canonical-keys)`.
-- Canonical declaration order is exact: schemas governed-text,
-  repository-target-resolution, repository-tree; parsers markdown,
-  repository-target-markdown; indexes governed-reference, protocol-record,
-  repository-target-resolution, repository-tree; evaluation slots
-  provider-governed-text, repository-governed-text,
-  repository-target-resolution, repository-tree.
-- The target schema is `protocol.repository-target-resolution/1`; codec
-  component `protocol.codec.repository-target-resolution/1` /
-  `MeAndAI.Protocol.Policy` /
-  `MeAndAI.Protocol.Policy.Codecs.RepositoryTargetResolutionCodec`; output model
-  `protocol.model.repository-target-resolution/1` through component
-  `protocol.type.model.repository-target-resolution/1` /
-  `MeAndAI.Protocol.Policy` /
-  `MeAndAI.Protocol.Policy.Models.RepositoryTargetResolutionModel`; retention
-  `(1,33554432)`; budget `(33554432,64,500000,34054432)`; ordered failures
-  `protocol.codec.embedded-identity-mismatch`,
-  `protocol.codec.invalid-repository-target-resolution`,
-  `protocol.codec.payload-location-mismatch`,
-  `protocol.codec.resource-limit-exceeded`.
-- The target parser is `protocol.parser.repository-target-markdown/1` /
-  `MeAndAI.Protocol.Policy` /
-  `MeAndAI.Protocol.Policy.Parsers.RepositoryTargetMarkdownDocumentParser`, with
-  exact-one target-resolution model input and output model
-  `protocol.model.repository-target-markdown-document-set/1` through component
-  `protocol.type.model.repository-target-markdown-document-set/1` /
-  `MeAndAI.Protocol.Policy` /
-  `MeAndAI.Protocol.Policy.Models.RepositoryTargetMarkdownDocumentSetModel`;
-  budget `(33554432,256,1000000,34554432)`; sole failure
-  `protocol.budget.exhausted`.
-- The target index component is
-  `protocol.index.repository-target-resolution/1` /
-  `MeAndAI.Protocol.Policy` /
-  `MeAndAI.Protocol.Policy.Indexes.RepositoryTargetResolutionIndex`, `PerPlan`,
-  with canonical wire inputs target-Markdown-set model `(0,null)`,
-  target-resolution model `(0,null)`, then governed-reference capability
-  `(1,1)`; output `protocol.capability.repository-target-resolution-index/1`
-  through component `protocol.type.capability.repository-target-resolution-index/1`
-  / `MeAndAI.Protocol.Conformance.Abstractions` /
-  `MeAndAI.Protocol.Conformance.Abstractions.IRepositoryTargetResolutionIndex`;
-  budget
-  `(67108864,256,2000000,20000000)`; failures `protocol.budget.exhausted` then
-  `protocol.index.repository-target-resolution-unavailable`.
-- The target slot is `protocol.slot.repository-target-resolution`; requirement
-  `protocol.requirement.repository-target-resolution` on Repository surface;
-  kind `protocol.evidence.repository-target-resolution-set`; completeness
-  `protocol.completeness.all-projected-target-resolutions`; target schema;
-  exactly `ExactSnapshot` then `ObjectVersionBound`; Repository then Provider
-  profiles; material `protocol.material.repository-target-resolution`; selector
-  `protocol.target.repository-target-resolution-set`; and only the target-index
-  capability.
-- Existing exact `2/1/2/2` and `2/1/3/3` predecessors remain valid; only exact
-  `3/2/4/4` is added. Every hybrid count or partial target vertical fails closed.
+- Locked restore preserved all six package-lock hashes. Predecessor focused `1/1`: `C:\Users\hasan\AppData\Local\Temp\meandai-test-0210-a-predecessor-0007-9180b1f\TEST-0210-A-PREDECESSOR-FOCUSED-0007.trx`, SHA-256 `10B911AFD890CB37E5B8785A5FB30A6F3B45778E4816C46E5B44E5067F747757`; predecessor cumulative A `21/21`: sibling `TEST-0210-A-PREDECESSOR-CUMULATIVE-0007.trx`, SHA-256 `C008E18DD81E9781C983702C67802881C44757F0151583E82BBC7D2E8A0F13ED`.
+- Canonical R ran exactly once and must not be retried: `C:\Users\hasan\AppData\Local\Temp\meandai-test-0210-a-red-0007-9180b1f-7f8c31\TEST-0210-A-BEHAVIOR-RED-0007.trx`, SHA-256 `DF598554D162561D09A08D9E83C35C145A0C981B35072D011C8430257D82E346`. The exact FQN failed `1/1` in `62.8409ms`; all sixteen counters, exact marker/message, marker-free standard stack and RunInfo, one allowed stdout marker echo, no attachments, and the single-file directory oracle passed.
+- Transient green focused `1/1`: `C:\Users\hasan\AppData\Local\Temp\meandai-test-0210-a-green-transient-0007-9180b1f\TEST-0210-A-TRANSIENT-GREEN-0007.trx`, SHA-256 `75CCCA4AEFD6C38173CB45968BB8FE3BF5EA32311A6A4B903D9B1F31AE54643B`.
+- Retained focused green `1/1`: `C:\Users\hasan\AppData\Local\Temp\meandai-test-0210-a-green-retained-0007-9180b1f\TEST-0210-A-RETAINED-FOCUSED-GREEN-0007.trx`, SHA-256 `ACF5938C7A6F8558C27A0387C570496B04781D283D4C5079B8346D303B3ECDED`; retained cumulative A `22/22`: sibling `TEST-0210-A-RETAINED-CUMULATIVE-GREEN-0007.trx`, SHA-256 `EC4CFB616A952DD3A796B4E3FBD0EF47D75933F92111A906647968C3F9B6F986`.
 
-## Expected red, allowlist, budgets, and holds
+## Validation, review, and holds
 
-- Transient setup and the runtime-created expected exception are outside the
-  catch. `CanonicalManifestWriter.Write(parsed)` is the first and only guarded
-  cross-graph/serialization observation. Only exact runtime `ArgumentException`,
-  `ParamName == "rules"`, and the runtime-created message for
-  `The parser and protocol-record graph is not exact.` emit marker 0007; every
-  setup, filter mismatch, Catalog call, or other exception stays marker-free.
-- Anticipated production owner is only `CatalogSliceDeclaration.cs`; Reader and
-  Writer are regression-only. One new retained test file is allowed. A required
-  Reader/Writer/public-API/project/solution/package/lock/workflow change returns
-  the packet to D/RT.
-- Hard caps are gross changed-line counts against the exact predecessor:
-  Catalog/production `180`, retained test `500`, combined `680`. Exceeding any
-  cap requires redraw; no source packing or assertion loss.
-- Positive proof owns byte-identical write/parse/rewrite, digest/projection,
-  the exact four collection orders/lookups, full target identities, budgets,
-  failures, component/artifact/cache closure, and predecessor preservation.
-  One-at-a-time negatives own schema key/version, codec/output bindings,
-  retention, budget, and ordered failures; parser component/input/output,
-  budget, and sole failure; index component/scope, all three ordered input
-  union arms, cardinalities/omitted maxima, output, budget, and ordered
-  failures; slot key, requirement key/surface, kind, completeness,
-  schema/version, consistency/profile orders, material, selector, and sole
-  capability; missing/wrong/unused component-artifact closure; producer
-  binding; collection order; every individually or jointly partial target
-  topology; and held-array rejection. Removing the entire schema/model,
-  parser, index, and slot vertical reconstructs valid `2/1/3/3` and is the sole
-  non-negative target removal.
-- Projector/DAG, finding, selector, admission, profile/predecessor/transition,
-  lifecycle/resource, final Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
-  B/C/D, merge, release, publication, and consumer mutation remain held.
-- Preliminary read-only preparation reported `2 Blocking / 3 Important / 0
-  Minor`. Disposition is exact: predecessor hosted proof is closed by
-  [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602) / [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121); the missing
-  schema blocker is closed by the indivisible `3/2/4/4` vertical; index input
-  order is frozen to the canonical wire order; Catalog-only Writer-first
-  feasibility is frozen; and the exact mutation matrix plus `180/500/680` caps
-  close the remaining scope and implementability findings. After the final two
-  full failure-code literals were corrected, three independent current-tree
-  D/RT pass-3 reviews each closed `0 Blocking / 0 Important / 0 Minor`.
-- The first StructureOnly invocation reached its external 604-second command
-  bound without producing a result and is diagnostic only. The fresh wider-bound
-  invocation passed all discovered contracts in `608.2` seconds; protocol-
-  governance assertions reported `elapsedMs=606124`.
+- Full Domain is `98/98`; full Conformance is `22/22`; Release build is `0 warnings / 0 errors`; format, diff, allowlist, six locks, marker, trait, and retained-source checks are green. StructureOnly passed every discovered contract in `352.7` seconds (`elapsedMs=350665`).
+- Independent code review, regression red-team, and evidence audit each closed `0 Blocking / 0 Important / 0 Minor`. The current tree may become the next predecessor only after commit, push, and exact-head Ubuntu/Windows green.
+- `A-FINDING-01` and every later packet remain Candidate/inactive. Projector/DAG, finding, selector, admission, profile/predecessor/transition, lifecycle/resource, final Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, publication, and consumer mutation remain held.

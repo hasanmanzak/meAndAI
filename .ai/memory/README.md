@@ -25,7 +25,7 @@ the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-su
 the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
 the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
 the hosted-green [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-the current [ContractSlice A target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
+the current [ContractSlice A target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -54,7 +54,7 @@ topology correction. Its
 and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 are historical; follow the current
-[target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
+[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -225,19 +225,24 @@ passed Ubuntu and Windows in
 Its exact R/G evidence and focused `1/1`, cumulative A `21/21`, validation, and
 reviews are recorded in the
 [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
-Exact target-freeze head
+Historical target-freeze head
 [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
 git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows
 green while Ubuntu failed only
 [TEST-0178](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) in
 [run 30756586843](https://github.com/hasanmanzak/meAndAI/actions/runs/30756586843).
 [FIND-0449](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0449)
-is active for the bounded record/memory correction; expected red remains held
-until a corrected exact head passes both hosted jobs.
-Eight of twenty live packets are `ReviewedLocalGreen` (`40%`).
+is resolved by exact
+[`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
+git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and successful
+[run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884).
+`A-TARGET-PARSER-INDEX-SLOT-01` is `ReviewedLocalGreen`; canonical R remains
+immutable, cumulative A is `22/22`, and the current green tree awaits commit,
+push, and hosted validation. Nine of twenty live packets are
+`ReviewedLocalGreen` (`45%`).
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; `A-TARGET-PARSER-INDEX-SLOT-01` is a
-`FrozenDesign`, and every later packet remains Candidate/inactive. No
+remains `Planned`; `A-FINDING-01` and every later packet remain
+Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -273,7 +278,7 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[target parser/index/slot freeze handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
+[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

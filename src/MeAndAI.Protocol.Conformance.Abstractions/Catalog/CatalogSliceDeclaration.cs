@@ -150,31 +150,47 @@ public sealed class CatalogSliceDeclaration
     private static void ValidateParserRecordSlotClosure(ReleaseSchemaRegistry registry, IReadOnlyList<RuleDeclaration> rules, IReadOnlyList<EvidenceSlotDeclaration> slots)
     {
         var evaluationSlots = rules.SelectMany(rule => rule.EvaluationSlots).ToArray();
-        var predecessor = registry.Indexes.Count == 2 && slots.Count == 2 && evaluationSlots.Length == 2;
-        var successor = registry.Indexes.Count == 3 && slots.Count == 3 && evaluationSlots.Length == 3;
-        if (registry.PayloadSchemas.Count != 2 || registry.Parsers.Count != 1 || (!predecessor && !successor))
+        var predecessor = registry.PayloadSchemas.Count == 2 && registry.Parsers.Count == 1 &&
+            registry.Indexes.Count == 2 && slots.Count == 2 && evaluationSlots.Length == 2;
+        var governedReference = registry.PayloadSchemas.Count == 2 && registry.Parsers.Count == 1 &&
+            registry.Indexes.Count == 3 && slots.Count == 3 && evaluationSlots.Length == 3;
+        var repositoryTarget = registry.PayloadSchemas.Count == 3 && registry.Parsers.Count == 2 &&
+            registry.Indexes.Count == 4 && slots.Count == 4 && evaluationSlots.Length == 4;
+        if (!predecessor && !governedReference && !repositoryTarget)
         {
             throw new ArgumentException("The parser and protocol-record graph is not exact.", nameof(rules));
         }
+        var hasGovernedReference = governedReference || repositoryTarget;
         var governedSchema = registry.PayloadSchemas[0];
-        var treeSchema = registry.PayloadSchemas[1];
+        var targetSchema = repositoryTarget ? registry.PayloadSchemas[1] : null;
+        var treeSchema = registry.PayloadSchemas[repositoryTarget ? 2 : 1];
         var parser = registry.Parsers[0];
-        var offset = successor ? 1 : 0;
-        var governedReferenceIndex = successor ? registry.Indexes[0] : null;
-        var recordIndex = registry.Indexes[offset];
-        var treeIndex = registry.Indexes[offset + 1];
-        var providerGovernedSlot = successor ? evaluationSlots[0] : null;
-        var repositoryGovernedSlot = evaluationSlots[offset];
-        var treeSlot = evaluationSlots[offset + 1];
+        var targetParser = repositoryTarget ? registry.Parsers[1] : null;
+        var governedOffset = hasGovernedReference ? 1 : 0;
+        var targetOffset = repositoryTarget ? 1 : 0;
+        var governedReferenceIndex = hasGovernedReference ? registry.Indexes[0] : null;
+        var recordIndex = registry.Indexes[governedOffset];
+        var targetIndex = repositoryTarget ? registry.Indexes[governedOffset + 1] : null;
+        var treeIndex = registry.Indexes[governedOffset + targetOffset + 1];
+        var providerGovernedSlot = hasGovernedReference ? evaluationSlots[0] : null;
+        var repositoryGovernedSlot = evaluationSlots[governedOffset];
+        var targetSlot = repositoryTarget ? evaluationSlots[governedOffset + 1] : null;
+        var treeSlot = evaluationSlots[governedOffset + targetOffset + 1];
         var parserInput = parser.Inputs.Count == 1 ? parser.Inputs[0] : null;
+        var targetParserInput = targetParser?.Inputs.Count == 1 ? targetParser.Inputs[0] : null;
         var governedModelInput = governedReferenceIndex?.Inputs.Count == 2 ? governedReferenceIndex.Inputs[0] : null;
         var governedCapabilityInput = governedReferenceIndex?.Inputs.Count == 2 ? governedReferenceIndex.Inputs[1] : null;
         var recordInput = recordIndex.Inputs.Count == 1 ? recordIndex.Inputs[0] : null;
+        var targetMarkdownInput = targetIndex?.Inputs.Count == 3 ? targetIndex.Inputs[0] : null;
+        var targetResolutionInput = targetIndex?.Inputs.Count == 3 ? targetIndex.Inputs[1] : null;
+        var targetGovernedInput = targetIndex?.Inputs.Count == 3 ? targetIndex.Inputs[2] : null;
         var treeInput = treeIndex.Inputs.Count == 1 ? treeIndex.Inputs[0] : null;
         var governedModel = governedSchema.OutputModel;
         var markdownModel = parser.OutputModel;
+        var targetResolutionModel = targetSchema?.OutputModel;
+        var targetMarkdownModel = targetParser?.OutputModel;
         var treeModel = treeSchema.OutputModel;
-        var governedTopologyExact = successor
+        var governedTopologyExact = hasGovernedReference
             ? governedReferenceIndex is not null &&
               governedReferenceIndex.IndexKey == "protocol.index.governed-reference" && governedReferenceIndex.IndexVersion == "1" &&
               ComponentEquals(governedReferenceIndex.Indexer, "protocol.index.governed-reference", "MeAndAI.Protocol.Policy", "MeAndAI.Protocol.Policy.Indexes.GovernedReferenceIndex") &&
@@ -197,6 +213,44 @@ public sealed class CatalogSliceDeclaration
                 "protocol.evidence.governed-text-set", "protocol.completeness.all-governed-bodies", "protocol.governed-text", SurfaceKind.Repository,
                 [SurfaceKind.Repository, SurfaceKind.Provider], "protocol.material.governed-text", "protocol.target.repository-governed-body-set",
                 [recordIndex.OutputCapability]);
+        var targetTopologyExact = !repositoryTarget ||
+            targetSchema is not null && targetParser is not null && targetIndex is not null && targetSlot is not null &&
+            targetResolutionModel is not null && targetMarkdownModel is not null && governedReferenceIndex is not null &&
+            targetSchema.SchemaKey == "protocol.repository-target-resolution" && targetSchema.SchemaVersion == "1" &&
+            ComponentEquals(targetSchema.Codec, "protocol.codec.repository-target-resolution", "MeAndAI.Protocol.Policy",
+                "MeAndAI.Protocol.Policy.Codecs.RepositoryTargetResolutionCodec") &&
+            ModelEquals(targetResolutionModel, "protocol.model.repository-target-resolution",
+                "protocol.type.model.repository-target-resolution", "MeAndAI.Protocol.Policy.Models.RepositoryTargetResolutionModel") &&
+            targetSchema.MaxBindingsPerInstruction == 1 && targetSchema.MaxRetainedCanonicalBytesPerInstruction == 33_554_432 &&
+            BudgetEquals(targetSchema.Budget, 33_554_432, 64, 500_000, 34_054_432) &&
+            CodesEqual(targetSchema.CodecFailureCodes, "protocol.codec.embedded-identity-mismatch",
+                "protocol.codec.invalid-repository-target-resolution", "protocol.codec.payload-location-mismatch",
+                "protocol.codec.resource-limit-exceeded") &&
+            targetParser.ParserKey == "protocol.parser.repository-target-markdown" && targetParser.ParserVersion == "1" &&
+            ComponentEquals(targetParser.Parser, "protocol.parser.repository-target-markdown", "MeAndAI.Protocol.Policy",
+                "MeAndAI.Protocol.Policy.Parsers.RepositoryTargetMarkdownDocumentParser") &&
+            InputEquals(targetParserInput, targetResolutionModel, 1, 1) &&
+            ModelEquals(targetMarkdownModel, "protocol.model.repository-target-markdown-document-set",
+                "protocol.type.model.repository-target-markdown-document-set", "MeAndAI.Protocol.Policy.Models.RepositoryTargetMarkdownDocumentSetModel") &&
+            BudgetEquals(targetParser.Budget, 33_554_432, 256, 1_000_000, 34_554_432) &&
+            CodesEqual(targetParser.FailureCodes.Select(code => code.Value), "protocol.budget.exhausted") &&
+            targetIndex.IndexKey == "protocol.index.repository-target-resolution" && targetIndex.IndexVersion == "1" &&
+            ComponentEquals(targetIndex.Indexer, "protocol.index.repository-target-resolution", "MeAndAI.Protocol.Policy",
+                "MeAndAI.Protocol.Policy.Indexes.RepositoryTargetResolutionIndex") &&
+            targetIndex.InvocationScope.Equals(IndexInvocationScope.PerPlan) &&
+            InputEquals(targetMarkdownInput, targetMarkdownModel, 0, null) &&
+            InputEquals(targetResolutionInput, targetResolutionModel, 0, null) &&
+            InputEquals(targetGovernedInput, governedReferenceIndex.OutputCapability, 1, 1) &&
+            CapabilityEquals(targetIndex.OutputCapability, "protocol.capability.repository-target-resolution-index",
+                "protocol.type.capability.repository-target-resolution-index", "MeAndAI.Protocol.Conformance.Abstractions.IRepositoryTargetResolutionIndex") &&
+            BudgetEquals(targetIndex.Budget, 67_108_864, 256, 2_000_000, 20_000_000) &&
+            CodesEqual(targetIndex.FailureCodes.Select(code => code.Value), "protocol.budget.exhausted",
+                "protocol.index.repository-target-resolution-unavailable") &&
+            SlotEquals(targetSlot, "protocol.slot.repository-target-resolution", "protocol.requirement.repository-target-resolution",
+                "protocol.evidence.repository-target-resolution-set", "protocol.completeness.all-projected-target-resolutions",
+                "protocol.repository-target-resolution", SurfaceKind.Repository, [SurfaceKind.Repository, SurfaceKind.Provider],
+                "protocol.material.repository-target-resolution", "protocol.target.repository-target-resolution-set",
+                [targetIndex.OutputCapability], [EvidenceConsistencyClass.ExactSnapshot, EvidenceConsistencyClass.ObjectVersionBound]);
         if (governedSchema.SchemaKey != "protocol.governed-text" || governedSchema.SchemaVersion != "1" ||
             !ComponentEquals(governedSchema.Codec, "protocol.codec.governed-text", "MeAndAI.Protocol.Policy", "MeAndAI.Protocol.Policy.Codecs.GovernedTextCodec") ||
             !ModelEquals(governedModel, "protocol.model.source-text", "protocol.type.model.source-text", "MeAndAI.Protocol.Policy.Models.SourceTextModel") ||
@@ -237,6 +291,7 @@ public sealed class CatalogSliceDeclaration
                 "protocol.completeness.full-tree", "protocol.repository-tree", SurfaceKind.Repository, [SurfaceKind.Repository],
                 "protocol.material.repository-tree", "protocol.target.repository-snapshot", [treeIndex.OutputCapability]) ||
             !governedTopologyExact ||
+            !targetTopologyExact ||
             !BudgetEquals(registry.CacheBudget, 512, 67_108_864, 128, 2_000_000) ||
             registry.CacheBudget.MaxConcurrentDecodeAttempts != 8 || registry.CacheBudget.MaxConcurrentIndexAttempts != 4 ||
             !registry.CacheBudget.RetentionPolicy.Equals(CacheRetentionPolicy.RetainLowestCanonicalKeys))
@@ -259,13 +314,16 @@ public sealed class CatalogSliceDeclaration
     private static bool CodesEqual(IEnumerable<string> actual, params string[] expected) => actual.SequenceEqual(expected, StringComparer.Ordinal);
     private static bool SlotEquals(EvidenceSlotDeclaration slot, string key, string requirement, string kind,
         string completeness, string schema, SurfaceKind requirementSurface, IReadOnlyList<SurfaceKind> surfaces, string material, string target,
-        IReadOnlyList<CapabilityContractIdentity> capabilities) =>
-        slot.SlotKey == key && slot.Requirement.Key == requirement && slot.Requirement.Surface.Equals(requirementSurface) &&
-        slot.Requirement.Kind == kind && slot.Requirement.CompletenessContract == completeness && slot.Requirement.PayloadSchemaKey == schema &&
-        slot.Requirement.PayloadSchemaVersion == "1" && slot.Requirement.AcceptedConsistencyClasses.SequenceEqual(
-            [EvidenceConsistencyClass.ExactSnapshot, EvidenceConsistencyClass.ObjectVersionBound, EvidenceConsistencyClass.BoundedNonAtomicObservation]) &&
-        slot.ProfileSurfaces.Values.SequenceEqual(surfaces) && slot.MaterialRole == material && slot.TargetSelectorKey == target &&
-        slot.Capabilities.SequenceEqual(capabilities);
+        IReadOnlyList<CapabilityContractIdentity> capabilities, IReadOnlyList<EvidenceConsistencyClass>? consistencyClasses = null)
+    {
+        consistencyClasses ??=
+            [EvidenceConsistencyClass.ExactSnapshot, EvidenceConsistencyClass.ObjectVersionBound, EvidenceConsistencyClass.BoundedNonAtomicObservation];
+        return slot.SlotKey == key && slot.Requirement.Key == requirement && slot.Requirement.Surface.Equals(requirementSurface) &&
+            slot.Requirement.Kind == kind && slot.Requirement.CompletenessContract == completeness && slot.Requirement.PayloadSchemaKey == schema &&
+            slot.Requirement.PayloadSchemaVersion == "1" && slot.Requirement.AcceptedConsistencyClasses.SequenceEqual(consistencyClasses) &&
+            slot.ProfileSurfaces.Values.SequenceEqual(surfaces) && slot.MaterialRole == material && slot.TargetSelectorKey == target &&
+            slot.Capabilities.SequenceEqual(capabilities);
+    }
 
     private static bool ComponentEquals(
         ComponentTypeIdentity component, string key, string assembly, string type) =>
