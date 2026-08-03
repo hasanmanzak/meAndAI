@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact admission and projector predecessor evidence remains unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits records-only commit/push plus exact-head hosted validation. The graph-budget correction is hosted-green. |
+| Status | Gate 2 accepted/merged. Exact admission and projector predecessor evidence remains unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. The graph-budget correction is hosted-green. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -7914,8 +7914,9 @@ verification correctly skipped. `A-ADMISSION-01` remains packet-local
 run `30798854880` passed
 Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
 correctly skipped. Never-activated `A-CONVERGE-01` is retired;
-`A-FULL-MANIFEST-01` and later packets remain inactive, and no full-A completion is
-claimed.
+`A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`, with P and canonical R
+authorized but not yet executed. Later packets remain inactive, and no full-A
+completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

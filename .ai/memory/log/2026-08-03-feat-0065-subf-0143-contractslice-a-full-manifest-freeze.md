@@ -1,11 +1,11 @@
-# ContractSlice A full-manifest frozen-design handoff
+# ContractSlice A full-manifest activated pre-red handoff
 
 | Field | Value |
 | --- | --- |
 | Date | 2026-08-03 |
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
-| State | `A-FULL-MANIFEST-01` `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery`; implementation remains inactive until the bounded allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green |
-| Activation base | Exact projector record-sync successor [`e05671d8d977abaf33b86eddddfdbf3d36e4274b`](https://github.com/hasanmanzak/meAndAI/commit/e05671d8d977abaf33b86eddddfdbf3d36e4274b), git tree identity `9b9026ce5de5b974653988b644c752796b656e38`, passed Windows and Ubuntu in [run 30803483210](https://github.com/hasanmanzak/meAndAI/actions/runs/30803483210); publication verification was skipped as expected |
+| State | `A-FULL-MANIFEST-01` `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed |
+| Activation base | Exact record-delivery head [`c9841973bcbd46e8886d9cc30f58ffe6640caf63`](https://github.com/hasanmanzak/meAndAI/commit/c9841973bcbd46e8886d9cc30f58ffe6640caf63), git tree identity `d78ce0e00abf581d89cb1c0b43b9d911f544978d`, passed Windows in `15m49s` and Ubuntu in `18m35s` in [run 30815255257](https://github.com/hasanmanzak/meAndAI/actions/runs/30815255257); publication verification was skipped as expected |
 | Hosted freeze correction | The first exact records-only freeze attempt exposed only the instruction-graph budget defect recorded with immutable correction evidence in the owning feature record: `4099` edges against the `4096` ceiling. The bounded correction reduced the graph to `4089` and passed Windows in `15m41s` plus Ubuntu in `13m10s`; publication verification was correctly skipped. |
 | Progress | Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`); cumulative A is `26/26`; the parent scenario remains `Planned` |
 | Routing correction | Never-activated `A-CONVERGE-01` retires and is excluded from the denominator; `A-FULL-MANIFEST-01` replaces it one-for-one. `A-CONVERGE-02` remains the no-new-Fact final A audit. |
@@ -40,5 +40,6 @@
 ## Review disposition
 
 - Pre-freeze red-team exposed two Blocking, two Important, and one Minor issue: the current production single-rule closure, undefined proof component keys, insufficient count-only oracle, missing caps/matrix, and ambiguous FQN. The corrected route then exposed Writer-seam, generic-contract-cardinality, slot-lookup, marker-purity, activation-base, and ledger issues. After the Writer-first and generic-closure corrections above, renewed independent code/design, evidence/gate, and records/link-graph reviews each closed `0 Blocking / 0 Important / 0 Minor`.
-- Implementation-readiness review subsequently found one Blocking stale sibling assertion: the earlier admission test still rejected an independently canonical changed contract key, contradicting the frozen no-key-cardinality rule. The bounded correction above preserves uniform contract-version closure, changes only that one assertion during green, retains R unchanged, and passed three renewed independent reviews `0/0/0`; records-only commit/push and exact-head hosted validation remain before activation.
-- No implementation is active and no completion claim is made.
+- Implementation-readiness review subsequently found one Blocking stale sibling assertion: the earlier admission test still rejected an independently canonical changed contract key, contradicting the frozen no-key-cardinality rule. The bounded correction above preserves uniform contract-version closure, changes only that one assertion during green, retains R unchanged, passed three renewed independent reviews `0/0/0`, and is exact-head hosted-green. The packet is activated PreRed; P and canonical R have not yet executed.
+- No implementation mutation has yet occurred and no completion claim is made;
+  the packet remains `MaintainerActivated / PreRed`.

@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A full-manifest FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
+[ContractSlice A full-manifest activated pre-red handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
 remains individually reachable from this index through the append-only History
@@ -98,8 +98,8 @@ fixes the parser resource/exception/component/provenance boundary. The
 [topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
 and the
 [planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
-are historical; current routing is the
-[schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+and the schema-slot packet handoff are historical; current routing is the
+[full-manifest activated pre-red handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md).
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
@@ -252,9 +252,9 @@ validation passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication
 verification correctly skipped.
 Thirteen of twenty live packets are green (`65%`) and cumulative A is `26/26`.
 Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and inactive
-under `RenewedSiblingContractReviewed / PendingRecordDelivery`; implementation remains held until
-the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green;
+Its one-for-one replacement `A-FULL-MANIFEST-01` is
+`MaintainerActivated / PreRed`; P and canonical R are authorized but not yet
+executed;
 every later packet remains Candidate/inactive. The parent scenario remains
 `Planned`. No
 final `Scenario` trait, status/owner, workflow, efficiency activation,
@@ -298,7 +298,7 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current continuation state and denominator are in the full-manifest
-FrozenDesign handoff. The projector/DAG reviewed-local-green handoff,
+activated pre-red handoff. The projector/DAG reviewed-local-green handoff,
 admission-proof reviewed-local-green handoff, and target parser/index/slot
 reviewed-local-green handoff remain historical predecessor evidence.
 
@@ -347,7 +347,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-08-03 - SUBF-0143 ContractSlice A full-manifest FrozenDesign](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
+- [2026-08-03 - SUBF-0143 ContractSlice A full-manifest activated pre-red](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A projector/DAG reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A admission-proof reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A finding declaration reviewed-local-green](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)

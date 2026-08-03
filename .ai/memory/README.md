@@ -29,7 +29,7 @@ the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current records-only ContractSlice A projector/DAG state,
+the current ContractSlice A full-manifest `MaintainerActivated / PreRed` state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -59,8 +59,9 @@ and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
-is also historical. Follow the current
-[admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+is also historical. The admission-proof reviewed-local-green handoff is
+historical. Follow the current
+[full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -281,9 +282,9 @@ budget. The exact implementation identity and hosted evidence are retained in
 the canonical projector handoff. Exact-head hosted validation passed Windows in
 `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
 Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and inactive
-under `RenewedSiblingContractReviewed / PendingRecordDelivery`; implementation remains held until
-the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green.
+Its one-for-one replacement `A-FULL-MANIFEST-01` is
+`MaintainerActivated / PreRed`; P and canonical R are authorized but not yet
+executed.
 Every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
@@ -320,9 +321,10 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+[full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
+the admission-proof reviewed-local-green handoff and
 the [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
-is historical.
+are historical.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

@@ -103,13 +103,13 @@ Last verified: **2026-08-03**
   Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
   correctly skipped. Never-activated `A-CONVERGE-01` is retired and excluded
   from the denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the
-  bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green; every later packet remains
+  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed; every later packet remains
   Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
-  [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+  [full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
+  the admission-proof reviewed-local-green handoff,
   the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
@@ -422,7 +422,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current records-only projector/DAG state.
+  and the current full-manifest `MaintainerActivated / PreRed` state.
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -475,7 +475,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current records-only projector/DAG state.
+  and the current full-manifest `MaintainerActivated / PreRed` state.
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
   recurrence set is
@@ -556,7 +556,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current records-only projector/DAG state.
+  and the current full-manifest `MaintainerActivated / PreRed` state.
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -622,8 +622,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
   skipped. Never-activated `A-CONVERGE-01` is retired and excluded from the
   denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the
-  bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green; later packets remain Candidate/inactive.
+  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed; later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1810,8 +1809,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and Ubuntu in `19m00s`, with publication verification correctly skipped.
   Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
   Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the
-  bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green. Every later packet remains
+  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. Every later packet remains
   Candidate/inactive. The live denominator is twenty
   and current `ReviewedLocalGreen` progress is thirteen (`65%`), with cumulative
   A green `26/26`.
