@@ -101,7 +101,7 @@ public sealed class FinalizedPolicyManifest
                 parsed.ArtifactFiles,
                 parsed.Components,
                 parsed.Slice,
-                completeCatalog: null);
+                parsed.CompleteCatalog);
         }
         finally
         {

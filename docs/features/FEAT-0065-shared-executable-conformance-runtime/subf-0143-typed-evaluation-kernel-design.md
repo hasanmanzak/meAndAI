@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is exact-head hosted-green `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. All six A-FULL findings are resolved. |
+| Status | Gate 2 accepted/merged. Fifteen of twenty live packets are `ReviewedLocalGreen` (`75%`), cumulative A is `28/28`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is exact-head hosted-green `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is packet-local `ReviewedLocalGreen` and awaits exact-head hosted proof; `A-PREDECESSOR-01` is next Candidate/inactive. Corrected canonical R `0013` remains immutable; invalid diagnostic observation `0012` remains excluded and immutable. All six A-FULL findings are resolved. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -161,8 +161,9 @@ skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs
 `A-PROJECTOR-DAG-01` and `A-FULL-MANIFEST-01` are packet-local
 `ReviewedLocalGreen`. The projector hosted run `30798854880` passed Windows in
 `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
-Never-activated `A-CONVERGE-01` is retired; `A-COMPLETE-PROFILE-01` and later
-packets remain inactive.
+Never-activated `A-CONVERGE-01` is retired; `A-COMPLETE-PROFILE-01` is
+packet-local `ReviewedLocalGreen`, and `A-PREDECESSOR-01` and later packets
+remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -964,17 +965,40 @@ Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
 final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
-Cumulative A is `27/27`; `A-COMPLETE-PROFILE-01` is next
-Candidate/inactive.
+Cumulative A is `28/28`; `A-COMPLETE-PROFILE-01` is packet-local
+`ReviewedLocalGreen`, corrected canonical R `0013` remains accepted and
+immutable, and exact-head hosted proof is pending.
 
-### Frozen/inactive `A-COMPLETE-PROFILE-01` design
+### Gate 3 active `A-COMPLETE-PROFILE-01` D/RT correction
 
-The next packet is frozen but not activated. Its exact Fact/FQN is
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`,
-with reserved expected-red marker/TRX stem
-`TEST-0210-A-BEHAVIOR-RED-0012`, one Fact, only `ContractSlice=A`, and no
-Scenario. Its final corrected design and test red-team both closed
-`0 Blocking / 0 Important / 0 Minor`.
+The A-COMPLETE design-only predecessor builds on the recorded A-FULL delivery
+and is exact hosted-green through run `30844428072`. Gate 3 is
+active. Its corrected exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`,
+with expected-red marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0013`, one Fact,
+only `ContractSlice=A`, and no Scenario.
+
+The discovered marker `0012` / exact FQN
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`
+used `Repository + Provider` profile surfaces.
+That contradicts the frozen Provider-only axis because surface intersection
+would resolve all five rules while the fixture lists only `RULE-0003` through
+`RULE-0005`. Its TRX SHA-256
+`950F15AA946EF42E1549EF7C356E6EDF7E5F1227285FA0A39511C51E43B4CB62`
+and source SHA-256
+`2129E819F0313FE4C9AF09613B16C2F7772EACB60DEBCA21C6DDE550CFA00701`
+are retained only as an invalid diagnostic attempt. The identity is never
+retried or promoted. Green stopped, its partial mutation was removed, and the
+packet returned to D/RT. The corrected source uses only `Provider`. Renewed
+D/RT and source review closed `0/0/0`; Release build passed with zero
+warnings/errors. Its single accepted canonical R is
+`D:\Temp\meandai-test-0210-a-3f6e8a12c4b7490db2561e978a34f0cd\TEST-0210-A-BEHAVIOR-RED-0013.trx`,
+SHA-256 `34CD24791964B8602240E3B1CA31CC570E18ABA911A5E9343C4018402C724C7C`,
+with source SHA-256
+`7239A20F27B488B750E0AE29CF2B50DAA162EF283F8CFBF05736C19DEF474644`.
+The independent oracle audit closed `0/0/0`; R is never rerun. Bounded
+implementation subsequently became packet-local `ReviewedLocalGreen` without
+rerunning R.
 
 P changes only internal compile seams. `ParsedCanonicalManifest` carries
 nullable `Slice` plus optional trailing nullable `CompleteCatalog`; the parsed
@@ -1014,14 +1038,20 @@ phase, and resolves only `RULE-0003`, `RULE-0004`, and `RULE-0005`.
 
 The retained negative boundary is both/neither union arms, inventory digest
 inequality, compatible profile omission/addition, and missing/extra/non-Added
-transition rows. Existing predecessor behavior, other transition kinds,
+transition rows. Existing predecessor wire serialization/parsing and its
+version/digest semantics, other transition kinds,
 cross-version lifecycle, exhaustive malformed-wire coverage, resource bounds,
 kernel/export/registration, final activation, and B/C/D remain later. Source is
 limited to Reader, Writer, Finalized manifest, `CompleteCatalogDeclaration`, the
 new test, and the A-FULL helper visibility seam. Hard caps are `430` production,
 `240` test, and `680` combined, with mandatory redesign at `700`. Expected green
-is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`; no progress
-change occurs before packet-local green/review/evidence closure.
+is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`. Release
+build is `0/0`, format/diff are green, production is `+283/-37`, test is
+`+162/-1`, and combined additions are `445`. The initial code review's
+Existing-predecessor finding was corrected without adding Existing semantics;
+renewed code and evidence reviews closed `0/0/0`. Progress is `15/20` (`75%`).
+Exact-head hosted proof remains pending, so no hosted or full-A completion
+claim is made.
 
 That corrected directive still does **not** authorize:
 
@@ -8020,8 +8050,10 @@ verification correctly skipped. `A-ADMISSION-01` remains packet-local
 run `30798854880` passed
 Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
 correctly skipped. Never-activated `A-CONVERGE-01` is retired. A-FULL canonical
-R and bounded local green are recorded above; `A-COMPLETE-PROFILE-01` is next
-Candidate/inactive, and no full-A completion is claimed.
+R and packet-local green are recorded above; `A-COMPLETE-PROFILE-01` is
+`ReviewedLocalGreen`, cumulative A is `28/28`, and exact-head hosted proof is
+pending; corrected canonical R `0013` remains immutable and no full-A
+completion is claimed. `A-PREDECESSOR-01` is next Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is exact-head hosted-green `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. All six A-FULL findings are resolved. Every partial Fact retains only `ContractSlice=A`. |
+| Status | Fifteen of twenty live packets are `ReviewedLocalGreen` (`75%`), cumulative A is `28/28`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is exact-head hosted-green `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is packet-local `ReviewedLocalGreen` and awaits exact-head hosted proof; `A-PREDECESSOR-01` is next Candidate/inactive. Corrected canonical R `0013` remains immutable; invalid diagnostic observation `0012` remains excluded and immutable. All six A-FULL findings are resolved. Every partial Fact retains only `ContractSlice=A`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -332,7 +332,7 @@ here.
 | `A-ADMISSION-01` | Admission-proof kind/component/artifact/surface/material-role declarations | `ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure` |
 | `A-PROJECTOR-DAG-01` | Projector slot/schema/component bindings plus the mutually required acyclic, reachable, single-owner global producer graph | `ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph` |
 | `A-FULL-MANIFEST-01` | Exact production-intended declaration snapshot plus the bounded generic multi-rule/shared-slot/distinct-admission closure needed to construct it: five rules/ten normative fragments; three schema, two parser, four index, one projector; four structurally unique slots across twelve occurrences; three selectors; sixteen findings; exact proof/cache/budget/failure values; and the disjoint ordinal union of `27` logical Policy + `4` runtime-anchor + `1` activation-proof + `3` admission rows into `35` components over six artifact names. It claims no physical type/artifact or executable-registration proof. | `ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot` |
-| `A-COMPLETE-PROFILE-01` | Complete-positive branch and final exact-one union closure; genesis complete catalog, current `CompleteInventoryDigest` framing/equality, one minimal baseline/named profile with compatible-rule closure, and one mandatory Added transition per current rule | `ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions` |
+| `A-COMPLETE-PROFILE-01` | Complete-positive branch and final exact-one union closure; genesis complete catalog, current `CompleteInventoryDigest` framing/equality, one minimal baseline/named profile with compatible-rule closure, and one mandatory Added transition per current rule | `ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions` |
 | `A-PREDECESSOR-01` | Existing predecessor `catalogVersion` strictly lower than current, predecessor `manifestDigest`, predecessor `completeInventoryDigest`, and current derived inventory digest as separate exact fields | `ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests` |
 | `A-TRANSITION-01` | Expand and retest exact Unchanged/Added/Revised/Retired shapes from the already-valid genesis Added baseline | `ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes` |
 | `A-LIFECYCLE-01` | Rule lifecycle against transitions and active profiles | `ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles` |
@@ -363,7 +363,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-PROJECTOR-DAG-01` | `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, publication verification skipped | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario; test source `408` lines / `8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010` | P `NotApplicable`; predecessor `25/25`; focused `1/1` in `472ms` / `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`; cumulative A `26/26`, projector `518ms` / `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`; tuple `(3,2,4,1,4,2,2,3,26,3)` | `103` vectors; Reader `175`, Writer `32`, Catalog `155`, aggregate production `362`, test `408`, combined `770`; Release build `0 warnings / 0 errors` in `6.63s`, format green, `StructureOnly` `elapsedMs=394809`, publication-evidence `7/7` in `256.7s` without published-state claim; independent review `0/0/0`; exact-head hosted validation green | Frozen contract and retained local evidence below |
 | `A-CONVERGE-01` | `RetiredBeforeActivation` | None; never activated and excluded from the live denominator | None | Its no-new-Fact convergence classification contradicted the reserved fresh cross-partition Fact; strict D/RT redraw replaces it one-for-one | Historical routing tombstone only |
 | `A-FULL-MANIFEST-01` | Exact-head hosted-green `ReviewedLocalGreen` at correction head `canonical owning-finding correction head`, tree `canonical owning-finding correction tree`, run `30834117740`, graph `4094/4096`; final record-delivery graph `4096/4096` is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; canonical R `F586...0DB`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1` (`B11E...0489`); cumulative A `27/27` (`0392...7A90`); Conformance `27/27` (`97C0...13E2`); Domain `98/98` (`0095...016D`); source `353` / `863B...D4CA`; Catalog `456E...7EF5`; production/test/combined `77/80`, `364/620`, `441/700`; StructureOnly `484633ms`; publication evidence `7/7` in `329.3s`; hosted Windows `15m53s`, Ubuntu `17m50s`, publication skipped | All six findings resolved; canonical R preserved; no unchanged-source original-green claim; current/deferred qualification counts `[1,1,3,1,1]` / `[2,2,4,2,2]`; record closure adds only two reserved evidence relations | [Full-manifest reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
-| `A-COMPLETE-PROFILE-01` | `FrozenDesign` / inactive; activation waits for final A-FULL exact-head hosted-green delivery | Reserved ordinal `0012`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`; one Fact, only `ContractSlice=A`, no Scenario | P nullable-union compile seam, then one immutable Writer-only canonical R; green target focused/cumulative/Conformance/Domain `1/1`, `28/28`, `28/28`, `98/98` | Corrected design/test red-team `0/0/0`; production/test/combined hard caps `430/240/680`, redraw threshold `700` | Design freeze below; no implementation activation yet |
+| `A-COMPLETE-PROFILE-01` | Packet-local `ReviewedLocalGreen`; exact-head hosted proof pending | Corrected ordinal `0013`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`; one Fact, only `ContractSlice=A`, no Scenario. The discovered `0012` identity is retained only as an invalid diagnostic and is never retried or promoted. | P nullable-union compile seam; accepted Writer-only canonical R `34CD...24C7C`; focused/cumulative/Conformance/Domain `1/1`, `28/28`, `28/28`, `98/98` | Renewed D/RT/source/canonical-R and corrected implementation reviews `0/0/0`; production `+283/-37`, test `+162/-1`, combined additions `445`, below all hard caps | Corrected evidence-identity freeze and packet-local green evidence below; no hosted claim |
 | `A-PREDECESSOR-01` | Candidate | None | None | N/A | None |
 | `A-TRANSITION-01` | Candidate | None | None | N/A | None |
 | `A-LIFECYCLE-01` | Candidate | None | None | N/A | None |
@@ -815,15 +815,39 @@ correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
 final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
 
-#### Frozen/inactive `A-COMPLETE-PROFILE-01` contract <a name="a-complete-profile-01-freeze"></a>
+#### Gate 3 active `A-COMPLETE-PROFILE-01` D/RT correction <a name="a-complete-profile-01-freeze"></a>
 
-This is a design-only freeze. It may be prepared while the external A-FULL
-delivery check runs, but P, canonical R, and production/test implementation may
-not activate until the final A-FULL exact-head hosted predecessor is green.
-The exact Fact/FQN is
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`.
-Its reserved marker and TRX stem are `TEST-0210-A-BEHAVIOR-RED-0012`; it has one
-Fact, only `ContractSlice=A`, and no Scenario.
+The A-COMPLETE design-only predecessor builds on the recorded A-FULL delivery
+and is exact hosted-green through run `30844428072`; Windows and
+Ubuntu each passed in `18m11s` and publication verification was correctly
+skipped. Gate 3 then activated. The corrected exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`.
+Its marker and TRX stem are `TEST-0210-A-BEHAVIOR-RED-0013`; it has one Fact,
+only `ContractSlice=A`, and no Scenario.
+
+The first source used marker `0012` and exact FQN
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`
+and incorrectly constructed profile surfaces `Repository + Provider`, which makes all five
+rules compatible under the frozen intersection predicate while listing only
+`RULE-0003` through `RULE-0005`. Its one-result TRX at
+`D:\Temp\meandai-test-0210-a-complete-red-0012-canonical\TEST-0210-A-BEHAVIOR-RED-0012.trx`
+has SHA-256
+`950F15AA946EF42E1549EF7C356E6EDF7E5F1227285FA0A39511C51E43B4CB62`;
+the source SHA-256 was
+`2129E819F0313FE4C9AF09613B16C2F7772EACB60DEBCA21C6DDE550CFA00701`.
+That observation is an invalid diagnostic attempt, not canonical R. It is
+retained, never retried, and never promoted. Green was stopped and its partial
+domain mutation was removed. D/RT changes no accepted semantic: the corrected
+fixture has only `Provider` and allocates fresh identity `0013`. Renewed D/RT
+and source review each closed `0 Blocking / 0 Important / 0 Minor`; Release
+build passed with zero warnings/errors. The single corrected canonical R is
+`D:\Temp\meandai-test-0210-a-3f6e8a12c4b7490db2561e978a34f0cd\TEST-0210-A-BEHAVIOR-RED-0013.trx`,
+SHA-256 `34CD24791964B8602240E3B1CA31CC570E18ABA911A5E9343C4018402C724C7C`,
+with source SHA-256
+`7239A20F27B488B750E0AE29CF2B50DAA162EF283F8CFBF05736C19DEF474644`.
+Its exact one-result/counter/marker/diagnostic oracle and independent audit
+closed `0/0/0`. It remains accepted and was never rerun; the packet-local green
+result is recorded below.
 
 P is a compile-only internal seam. `ParsedCanonicalManifest.Slice` becomes
 nullable and receives a trailing optional
@@ -871,7 +895,8 @@ in that compatibility predicate.
 
 The retained Fact also rejects both/neither union arms, digest inequality,
 missing or extra compatible profile members, and missing, extra, or non-Added
-transition rows. Existing predecessor values, Unchanged/Revised/Retired shapes,
+transition rows. Existing predecessor wire serialization/parsing and its
+version/digest semantics, Unchanged/Revised/Retired shapes,
 cross-version lifecycle, exhaustive malformed-wire coverage, resource limits,
 kernel/export/registration proof, final Scenario/status/owner/workflow and
 efficiency activation, and B/C/D remain held.
@@ -880,10 +905,16 @@ The source allowlist is Reader, Writer, Finalized manifest,
 `CompleteCatalogDeclaration`, the new test, and the A-FULL helper visibility
 seam. Expected production/test/combined deltas are `322-421`, `177-227`, and
 `499-648`; hard caps are `430`, `240`, and `680`, with mandatory redesign at the
-outer `700` threshold. Corrected design and test red-team each closed
-`0 Blocking / 0 Important / 0 Minor`. Expected green counts are focused `1/1`,
-cumulative A `28/28`, Conformance `28/28`, and Domain `98/98`; packet progress
-would become `15/20` (`75%`) only after its own green/review/evidence closure.
+outer `700` threshold. Corrected D/RT/source/canonical-R audits closed `0/0/0`.
+Bounded implementation is now packet-local `ReviewedLocalGreen`: Release build
+closed `0 warnings / 0 errors`; focused, cumulative A, Conformance, and Domain
+closed `1/1`, `28/28`, `28/28`, and `98/98`; format and diff checks are green.
+Production is `+283/-37`, test is `+162/-1`, and combined additions are `445`.
+The first code review's Existing-predecessor finding was corrected without
+adding Existing domain semantics; renewed code and evidence reviews closed
+`0 Blocking / 0 Important / 0 Minor`. Canonical R `0013` was not rerun.
+Progress is `15/20` (`75%`), while exact-head hosted proof remains pending and
+no hosted, full-A, Scenario, workflow, release, or publication claim is made.
 
 #### Reviewed-local-green `A-INDEX-SLOT-01` design freeze <a name="a-index-slot-01-drt-observation"></a>
 
@@ -1594,7 +1625,9 @@ git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
 `A-ADMISSION-01`, `A-PROJECTOR-DAG-01`, and `A-FULL-MANIFEST-01` remain
 packet-local `ReviewedLocalGreen`; never-activated `A-CONVERGE-01` is
-retired/excluded, and `A-COMPLETE-PROFILE-01` is next Candidate/inactive.
+retired/excluded, and `A-COMPLETE-PROFILE-01` is packet-local
+`ReviewedLocalGreen`, cumulative A is `28/28`, and exact-head hosted proof is
+pending; corrected canonical R `0013` remains accepted and immutable.
 Hosted run `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`; publication verification was correctly skipped.
 

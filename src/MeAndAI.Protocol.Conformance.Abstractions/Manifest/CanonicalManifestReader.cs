@@ -31,10 +31,11 @@ internal static class CanonicalManifestReader
 
         reader.ExpectProperty("authorityKind");
         var authorityKind = CatalogAuthorityKind.Parse(reader.ReadString());
-        if (!authorityKind.Equals(CatalogAuthorityKind.QualificationSlice))
+        if (!authorityKind.Equals(CatalogAuthorityKind.QualificationSlice) &&
+            !authorityKind.Equals(CatalogAuthorityKind.CompleteProtocolSnapshot))
         {
             throw new FormatException(
-                "This parser increment requires qualification-slice authority.");
+                "This parser increment requires a supported catalog authority.");
         }
 
         reader.ExpectProperty("sourceCommit");
@@ -47,8 +48,18 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("catalogVersion");
         var catalogVersion = reader.ReadInt32();
 
-        reader.ExpectProperty("slice");
-        var slice = ReadSlice(ref reader);
+        RawSlice? slice = null;
+        RawCompleteCatalog? completeCatalog = null;
+        if (authorityKind.Equals(CatalogAuthorityKind.QualificationSlice))
+        {
+            reader.ExpectProperty("slice");
+            slice = ReadSlice(ref reader);
+        }
+        else
+        {
+            reader.ExpectProperty("completeCatalog");
+            completeCatalog = ReadCompleteCatalog(ref reader);
+        }
 
         reader.ExpectProperty("schemaRegistry");
         var schemaRegistry = ReadSchemaRegistry(ref reader);
@@ -71,10 +82,75 @@ internal static class CanonicalManifestReader
             protocolVersion,
             catalogVersion,
             slice,
+            completeCatalog,
             schemaRegistry,
             activationProof,
             artifacts,
             components);
+    }
+
+    private static RawCompleteCatalog ReadCompleteCatalog(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("predecessor");
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("kind");
+        var predecessorKind = reader.ReadString();
+        if (!string.Equals(predecessorKind, CatalogPredecessorKind.Genesis.Value, StringComparison.Ordinal))
+            throw new FormatException("This parser increment supports only a genesis predecessor.");
+        reader.Expect(JsonTokenType.EndObject);
+        reader.ExpectProperty("completeInventoryDigest");
+        var digest = reader.ReadString();
+        reader.ExpectProperty("baselineProfileName");
+        var baseline = reader.ReadString();
+        reader.ExpectProperty("rules");
+        var rules = ReadRules(ref reader);
+        reader.ExpectProperty("transitions");
+        var transitions = ReadTransitions(ref reader);
+        reader.ExpectProperty("namedProfiles");
+        var profiles = ReadNamedProfiles(ref reader);
+        reader.Expect(JsonTokenType.EndObject);
+        return new RawCompleteCatalog(digest, baseline, rules, transitions, profiles);
+    }
+
+    private static IReadOnlyList<RawTransition> ReadTransitions(ref BoundedJsonReader reader)
+    {
+        var items = new List<RawTransition>();
+        reader.Expect(JsonTokenType.StartArray);
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            reader.ExpectProperty("ruleId"); var ruleId = reader.ReadString();
+            reader.ExpectProperty("kind"); var kind = reader.ReadString();
+            if (!string.Equals(kind, RuleTransitionKind.Added.Value, StringComparison.Ordinal))
+                throw new FormatException("This parser increment supports only Added transitions.");
+            reader.ExpectProperty("currentRevision"); var revision = reader.ReadInt32();
+            reader.ExpectProperty("reviewedAuthority"); var authority = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            items.Add(new RawTransition(ruleId, revision, authority));
+        }
+        return items;
+    }
+
+    private static IReadOnlyList<RawNamedProfile> ReadNamedProfiles(ref BoundedJsonReader reader)
+    {
+        var items = new List<RawNamedProfile>();
+        reader.Expect(JsonTokenType.StartArray);
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            reader.ExpectProperty("name"); var name = reader.ReadString();
+            reader.ExpectProperty("axes");
+            reader.Expect(JsonTokenType.StartObject);
+            reader.ExpectProperty("subjectRole"); var role = reader.ReadString();
+            reader.ExpectProperty("operation"); var operation = reader.ReadString();
+            reader.ExpectProperty("snapshotKind"); var snapshot = reader.ReadString();
+            reader.ExpectProperty("surfaces"); var surfaces = ReadStringArray(ref reader);
+            reader.ExpectProperty("enforcementPhase"); var phase = reader.ReadString();
+            reader.Expect(JsonTokenType.EndObject);
+            reader.ExpectProperty("ruleIds"); var ruleIds = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+            items.Add(new RawNamedProfile(name, role, operation, snapshot, surfaces, phase, ruleIds));
+        }
+        return items;
     }
 
     private static RawSlice ReadSlice(ref BoundedJsonReader reader)
@@ -966,7 +1042,8 @@ internal static class CanonicalManifestReader
         string sourceCommit,
         string protocolVersion,
         int catalogVersion,
-        RawSlice slice,
+        RawSlice? slice,
+        RawCompleteCatalog? completeCatalog,
         RawSchemaRegistry rawSchemaRegistry,
         RawActivationProof activationProof,
         IReadOnlyList<RawArtifact> artifacts,
@@ -974,6 +1051,8 @@ internal static class CanonicalManifestReader
     {
         try
         {
+            var rawRules = slice?.Rules ?? completeCatalog?.Rules ??
+                throw new FormatException("The manifest catalog union is empty.");
             var cacheBudget = rawSchemaRegistry.CacheBudget;
             RequirePositiveCacheBudget(cacheBudget);
             ValidateCanonicalArtifactOrder(artifacts);
@@ -981,7 +1060,7 @@ internal static class CanonicalManifestReader
 
             var declarationComponentReferences =
                 CollectDeclarationComponentReferences(
-                    slice.Rules,
+                    rawRules,
                     rawSchemaRegistry.PayloadSchemas,
                     rawSchemaRegistry.Parsers,
                     rawSchemaRegistry.Indexes,
@@ -1076,7 +1155,7 @@ internal static class CanonicalManifestReader
 
             if (!declarationComponentReferences.IsSubsetOf(componentKeys))
                 throw new FormatException("protocol.manifest.component-closure");
-            ValidateFunctionalRoleCollisions(slice, rawSchemaRegistry, activationProof);
+            ValidateFunctionalRoleCollisions(rawRules, rawSchemaRegistry, activationProof);
 
             if (activationProofComponent is null)
             {
@@ -1126,7 +1205,7 @@ internal static class CanonicalManifestReader
                     "The manifest artifactFiles array must be fully bound.");
             }
 
-            ValidateProjectorValuesAndSlots(rawSchemaRegistry.DemandProjectors, slice.Rules);
+            ValidateProjectorValuesAndSlots(rawSchemaRegistry.DemandProjectors, rawRules);
 
             var schemaRegistry = ReleaseSchemaRegistry.Create(
                 CreatePayloadSchemas(
@@ -1140,15 +1219,47 @@ internal static class CanonicalManifestReader
                     componentLookup),
                 typedCacheBudget);
 
-            var typedSlice = CatalogSliceDeclaration.Create(
+            var typedRules = CreateRules(rawRules, componentLookup);
+            var typedSlice = slice is null ? null : CatalogSliceDeclaration.Create(
                 slice.SliceKey,
                 slice.SliceVersion,
                 protocolVersion,
                 typedCatalogVersion,
-                CreateRules(slice.Rules, componentLookup));
+                typedRules);
             CatalogSliceDeclaration.ValidateSchemaSlotClosure(
                 schemaRegistry,
-                typedSlice.Rules);
+                typedRules);
+
+            CompleteCatalogDeclaration? typedComplete = null;
+            if (completeCatalog is not null)
+            {
+                var transitions = completeCatalog.Transitions.Select(item =>
+                    RuleTransitionDeclaration.Added(
+                        RuleId.Parse(item.RuleId),
+                        RuleRevision.Create(item.CurrentRevision),
+                        ReviewedAuthorityPermalink.Create(item.ReviewedAuthority)));
+                var profiles = completeCatalog.NamedProfiles.Select(item =>
+                    NamedProfileDeclaration.Create(
+                        item.Name,
+                        ExecutionProfile.Create(
+                            SubjectRole.Parse(item.SubjectRole),
+                            ProtocolOperation.Parse(item.Operation),
+                            SnapshotKind.Parse(item.SnapshotKind),
+                            SurfaceSet.Create(item.Surfaces.Select(SurfaceKind.Parse)),
+                            EnforcementPhase.Parse(item.EnforcementPhase)),
+                        item.RuleIds.Select(RuleId.Parse)));
+                typedComplete = CompleteCatalogDeclaration.Create(
+                    protocolVersion,
+                    typedCatalogVersion,
+                    CatalogPredecessorBinding.Genesis(),
+                    completeCatalog.BaselineProfileName,
+                    typedRules,
+                    transitions,
+                    profiles);
+                if (!typedComplete.CompleteInventoryDigest.Equals(
+                        ExactSha256Digest.Parse(completeCatalog.CompleteInventoryDigest)))
+                    throw new FormatException("The complete inventory digest does not match the catalog rules.");
+            }
 
             var typedActivationProof =
                 ActivationProofContractDeclaration.Create(
@@ -1163,7 +1274,8 @@ internal static class CanonicalManifestReader
                 typedActivationProof,
                 artifactBindings.AsReadOnly(),
                 componentBindings.AsReadOnly(),
-                typedSlice);
+                typedSlice,
+                typedComplete);
         }
         catch (ArgumentException exception)
         {
@@ -1242,7 +1354,7 @@ internal static class CanonicalManifestReader
         return references;
     }
 
-    private static void ValidateFunctionalRoleCollisions(RawSlice slice, RawSchemaRegistry registry, RawActivationProof activation)
+    private static void ValidateFunctionalRoleCollisions(IReadOnlyList<RawRuleDeclaration> rules, RawSchemaRegistry registry, RawActivationProof activation)
     {
         var roles = new Dictionary<(string, string), string>();
         void Add(string role, RawComponentReference component)
@@ -1264,7 +1376,7 @@ internal static class CanonicalManifestReader
                     input.Model?.ImplementationType ?? input.Capability!.InterfaceType);
         }
         foreach (var item in registry.DemandProjectors) { Add("projector", item.Projector); Add("capability", item.InputCapability.InterfaceType); }
-        foreach (var rule in slice.Rules)
+        foreach (var rule in rules)
         {
             Add("evaluator", rule.Evaluator);
             foreach (var slot in rule.ApplicabilitySlots.Concat(rule.EvaluationSlots))
@@ -1969,6 +2081,27 @@ internal static class CanonicalManifestReader
         string SliceVersion,
         IReadOnlyList<RawRuleDeclaration> Rules);
 
+    private sealed record RawCompleteCatalog(
+        string CompleteInventoryDigest,
+        string BaselineProfileName,
+        IReadOnlyList<RawRuleDeclaration> Rules,
+        IReadOnlyList<RawTransition> Transitions,
+        IReadOnlyList<RawNamedProfile> NamedProfiles);
+
+    private sealed record RawTransition(
+        string RuleId,
+        int CurrentRevision,
+        string ReviewedAuthority);
+
+    private sealed record RawNamedProfile(
+        string Name,
+        string SubjectRole,
+        string Operation,
+        string SnapshotKind,
+        IReadOnlyList<string> Surfaces,
+        string EnforcementPhase,
+        IReadOnlyList<string> RuleIds);
+
     private sealed record RawRuleDeclaration(
         string RuleId,
         int RuleRevision,
@@ -2138,4 +2271,5 @@ internal sealed record ParsedCanonicalManifest(
     ActivationProofContractDeclaration ActivationProofContract,
     IReadOnlyList<ArtifactFileBinding> ArtifactFiles,
     IReadOnlyList<ComponentArtifactBinding> Components,
-    CatalogSliceDeclaration Slice);
+    CatalogSliceDeclaration? Slice,
+    CompleteCatalogDeclaration? CompleteCatalog = null);

@@ -221,7 +221,7 @@ public sealed class ContractSliceAFullManifestGraphTests
             [new ProducerIdentity("Schema", "protocol.governed-text", "1"), new ProducerIdentity("Schema", "protocol.repository-tree", "1")]));
     }
 
-    private static ParsedCanonicalManifest CreateManifest(
+    internal static ParsedCanonicalManifest CreateManifest(
         IReadOnlyList<RuleDeclaration>? rules = null,
         IReadOnlyList<AdmissionProofContractDeclaration>? admissions = null)
     {

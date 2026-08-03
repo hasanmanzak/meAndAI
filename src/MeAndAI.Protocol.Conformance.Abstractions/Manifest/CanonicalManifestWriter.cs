@@ -13,12 +13,6 @@ internal static class CanonicalManifestWriter
     {
         ArgumentNullException.ThrowIfNull(manifest);
 
-        if (manifest.Slice is null || manifest.CompleteCatalog is not null)
-        {
-            throw new InvalidOperationException(
-                "This writer increment supports only qualification slices.");
-        }
-
         return Write(new ParsedCanonicalManifest(
             manifest.AuthorityKind,
             manifest.SourceCommit,
@@ -26,7 +20,8 @@ internal static class CanonicalManifestWriter
             manifest.ActivationProofContract,
             manifest.ArtifactFiles,
             manifest.Components,
-            manifest.Slice));
+            manifest.Slice,
+            manifest.CompleteCatalog));
     }
 
     internal static byte[] Write(ParsedCanonicalManifest manifest)
@@ -34,8 +29,15 @@ internal static class CanonicalManifestWriter
         ArgumentNullException.ThrowIfNull(manifest);
 
         var slice = manifest.Slice;
-        if (!manifest.AuthorityKind.Equals(
-                CatalogAuthorityKind.QualificationSlice) ||
+        var complete = manifest.CompleteCatalog;
+        var validUnion =
+            (manifest.AuthorityKind.Equals(CatalogAuthorityKind.QualificationSlice) &&
+             slice is not null && complete is null) ||
+            (manifest.AuthorityKind.Equals(CatalogAuthorityKind.CompleteProtocolSnapshot) &&
+             slice is null && complete is not null);
+        if (!validUnion ||
+            (complete is not null &&
+             !complete.Predecessor.Kind.Equals(CatalogPredecessorKind.Genesis)) ||
             manifest.ArtifactFiles.Count == 0 ||
             manifest.Components.Count == 0)
         {
@@ -45,7 +47,7 @@ internal static class CanonicalManifestWriter
 
         CatalogSliceDeclaration.ValidateSchemaSlotClosure(
             manifest.SchemaRegistry,
-            slice.Rules);
+            (slice?.Rules ?? complete!.Rules));
 
         var buffer = new ArrayBufferWriter<byte>();
         using (var writer = new Utf8JsonWriter(
@@ -56,7 +58,7 @@ internal static class CanonicalManifestWriter
                        SkipValidation = false,
                    }))
         {
-            WriteManifest(writer, manifest, slice);
+            WriteManifest(writer, manifest);
         }
 
         var result = GC.AllocateUninitializedArray<byte>(
@@ -68,9 +70,10 @@ internal static class CanonicalManifestWriter
 
     private static void WriteManifest(
         Utf8JsonWriter writer,
-        ParsedCanonicalManifest manifest,
-        CatalogSliceDeclaration slice)
+        ParsedCanonicalManifest manifest)
     {
+        var slice = manifest.Slice;
+        var complete = manifest.CompleteCatalog;
         writer.WriteStartObject();
         WriteCanonicalString(writer, "schema", SchemaKey);
         WriteCanonicalString(
@@ -81,20 +84,71 @@ internal static class CanonicalManifestWriter
         WriteCanonicalString(
             writer,
             "protocolVersion",
-            slice.ProtocolVersion);
-        writer.WriteNumber("catalogVersion", slice.CatalogVersion.Value);
+            (slice?.ProtocolVersion ?? complete!.ProtocolVersion));
+        writer.WriteNumber("catalogVersion", (slice?.CatalogVersion ?? complete!.CatalogVersion).Value);
 
-        writer.WritePropertyName("slice");
-        writer.WriteStartObject();
-        WriteCanonicalString(writer, "sliceKey", slice.SliceKey);
-        WriteCanonicalString(writer, "sliceVersion", slice.SliceVersion);
-        WriteRules(writer, slice.Rules);
-        writer.WriteEndObject();
+        if (slice is not null)
+        {
+            writer.WritePropertyName("slice");
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "sliceKey", slice.SliceKey);
+            WriteCanonicalString(writer, "sliceVersion", slice.SliceVersion);
+            WriteRules(writer, slice.Rules);
+            writer.WriteEndObject();
+        }
+        else
+        {
+            WriteCompleteCatalog(writer, complete!);
+        }
 
         WriteSchemaRegistry(writer, manifest.SchemaRegistry);
         WriteActivationProof(writer, manifest.ActivationProofContract);
         WriteArtifactFiles(writer, manifest.ArtifactFiles);
         WriteComponents(writer, manifest.Components);
+        writer.WriteEndObject();
+    }
+
+    private static void WriteCompleteCatalog(Utf8JsonWriter writer, CompleteCatalogDeclaration catalog)
+    {
+        writer.WritePropertyName("completeCatalog");
+        writer.WriteStartObject();
+        writer.WritePropertyName("predecessor");
+        writer.WriteStartObject();
+        WriteCanonicalString(writer, "kind", catalog.Predecessor.Kind.Value);
+        writer.WriteEndObject();
+        WriteCanonicalString(writer, "completeInventoryDigest", catalog.CompleteInventoryDigest.Value);
+        WriteCanonicalString(writer, "baselineProfileName", catalog.BaselineProfileName);
+        WriteRules(writer, catalog.Rules);
+        writer.WritePropertyName("transitions");
+        writer.WriteStartArray();
+        foreach (var transition in catalog.Transitions)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "ruleId", transition.RuleId.Value);
+            WriteCanonicalString(writer, "kind", transition.Kind.Value);
+            writer.WriteNumber("currentRevision", transition.CurrentRevision!.Value);
+            WriteCanonicalString(writer, "reviewedAuthority", transition.ReviewedAuthority!.Value);
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
+        writer.WritePropertyName("namedProfiles");
+        writer.WriteStartArray();
+        foreach (var profile in catalog.NamedProfiles)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "name", profile.Name);
+            writer.WritePropertyName("axes");
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "subjectRole", profile.Axes.SubjectRole.Value);
+            WriteCanonicalString(writer, "operation", profile.Axes.Operation.Value);
+            WriteCanonicalString(writer, "snapshotKind", profile.Axes.SnapshotKind.Value);
+            WriteCanonicalStringValues(writer, "surfaces", profile.Axes.Surfaces.Values.Select(item => item.Value));
+            WriteCanonicalString(writer, "enforcementPhase", profile.Axes.EnforcementPhase.Value);
+            writer.WriteEndObject();
+            WriteCanonicalStringValues(writer, "ruleIds", profile.RuleIds.Select(item => item.Value));
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
         writer.WriteEndObject();
     }
 

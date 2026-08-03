@@ -91,6 +91,8 @@ public sealed class CompleteCatalogDeclaration
         }
 
         ValidateProfileMembership(canonicalRules, canonicalProfiles);
+        ValidateGenesisTransitions(predecessor, canonicalRules, canonicalTransitions);
+        ValidateProfileCompatibility(canonicalRules, canonicalProfiles);
 
         return new CompleteCatalogDeclaration(
             canonicalProtocolVersion,
@@ -159,6 +161,62 @@ public sealed class CompleteCatalogDeclaration
             {
                 throw new ArgumentException(
                     "A named profile references a rule outside the catalog.",
+                    nameof(profiles));
+            }
+        }
+    }
+
+    private static void ValidateGenesisTransitions(
+        CatalogPredecessorBinding predecessor,
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<RuleTransitionDeclaration> transitions)
+    {
+        if (!predecessor.Kind.Equals(CatalogPredecessorKind.Genesis))
+        {
+            return;
+        }
+
+        if (predecessor.CatalogVersion is not null ||
+            predecessor.ManifestDigest is not null ||
+            predecessor.CompleteInventoryDigest is not null ||
+            transitions.Count != rules.Count)
+        {
+            throw new ArgumentException("This increment supports only complete genesis transitions.", nameof(transitions));
+        }
+
+        for (var index = 0; index < rules.Count; index++)
+        {
+            var rule = rules[index];
+            var transition = transitions[index];
+            if (!transition.RuleId.Equals(rule.RuleId) ||
+                !transition.Kind.Equals(RuleTransitionKind.Added) ||
+                transition.PreviousRevision is not null ||
+                !Equals(transition.CurrentRevision, rule.RuleRevision) ||
+                transition.ReviewedAuthority is null)
+            {
+                throw new ArgumentException(
+                    "A complete genesis catalog requires one Added transition per current rule.",
+                    nameof(transitions));
+            }
+        }
+    }
+
+    private static void ValidateProfileCompatibility(
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<NamedProfileDeclaration> profiles)
+    {
+        foreach (var profile in profiles)
+        {
+            var compatible = rules.Where(rule =>
+                rule.SubjectRoles.Contains(profile.Axes.SubjectRole) &&
+                rule.Operations.Contains(profile.Axes.Operation) &&
+                rule.SnapshotKinds.Contains(profile.Axes.SnapshotKind) &&
+                rule.Surfaces.Values.Intersect(profile.Axes.Surfaces.Values).Any())
+                .Select(rule => rule.RuleId);
+            if (!profile.RuleIds.SequenceEqual(compatible))
+            {
+                throw new ArgumentException(
+                    "A named profile must contain exactly its compatible rules.",
                     nameof(profiles));
             }
         }
