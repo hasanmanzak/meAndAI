@@ -302,8 +302,8 @@ The bounded records-only correction is exact-head hosted-green at
 `canonical owning-finding correction tree`, and run `30834117740`;
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction graph is `4094/4096`. This record closure
-adds only the two reserved evidence relations, so its proposed delivery graph is
-`4096/4096` and awaits exact-head hosted proof.
+adds only the two reserved evidence relations, so its final delivery graph is
+`4096/4096` and is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
 `A-COMPLETE-PROFILE-01` and every later packet remain
 Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,

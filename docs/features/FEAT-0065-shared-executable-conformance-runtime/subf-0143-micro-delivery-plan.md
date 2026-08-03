@@ -362,8 +362,8 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-ADMISSION-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0009`; exact FQN; canonical R `2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`; transient source `7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC` | P `NotApplicable`; predecessor selector `1/1` (`CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`) and cumulative `24/24` (`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`); original-oracle `1/1` (`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`); retained focused `1/1` (`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`); cumulative A `25/25` (`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`); full Domain `98/98` (`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`); full Conformance `25/25` (`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`); source `339` lines / `AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`; production/test/packet `186/310`, `339/370`, `525/680`; Release build `0/0`, format/diff/six locks, StructureOnly, and publication-evidence green; exact hosted implementation [`c1653d45...`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8) / tree `7f547daa...` / [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538); record delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326) green | Reconciled D/RT, independent final code/test red-team, and evidence/hash/counter/scope audit each `0/0/0`; Reader `85/145`, Writer `35/55`, Catalog `66/110`; later packets inactive | [Admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) |
 | `A-PROJECTOR-DAG-01` | `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, publication verification skipped | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario; test source `408` lines / `8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010` | P `NotApplicable`; predecessor `25/25`; focused `1/1` in `472ms` / `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`; cumulative A `26/26`, projector `518ms` / `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`; tuple `(3,2,4,1,4,2,2,3,26,3)` | `103` vectors; Reader `175`, Writer `32`, Catalog `155`, aggregate production `362`, test `408`, combined `770`; Release build `0 warnings / 0 errors` in `6.63s`, format green, `StructureOnly` `elapsedMs=394809`, publication-evidence `7/7` in `256.7s` without published-state claim; independent review `0/0/0`; exact-head hosted validation green | Frozen contract and retained local evidence below |
 | `A-CONVERGE-01` | `RetiredBeforeActivation` | None; never activated and excluded from the live denominator | None | Its no-new-Fact convergence classification contradicted the reserved fresh cross-partition Fact; strict D/RT redraw replaces it one-for-one | Historical routing tombstone only |
-| `A-FULL-MANIFEST-01` | Exact-head hosted-green `ReviewedLocalGreen` at correction head `canonical owning-finding correction head`, tree `canonical owning-finding correction tree`, run `30834117740`, graph `4094/4096`; proposed record-delivery graph `4096/4096` awaits exact-head hosted proof | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; canonical R `F586...0DB`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1` (`B11E...0489`); cumulative A `27/27` (`0392...7A90`); Conformance `27/27` (`97C0...13E2`); Domain `98/98` (`0095...016D`); source `353` / `863B...D4CA`; Catalog `456E...7EF5`; production/test/combined `77/80`, `364/620`, `441/700`; StructureOnly `484633ms`; publication evidence `7/7` in `329.3s`; hosted Windows `15m53s`, Ubuntu `17m50s`, publication skipped | All six findings resolved; canonical R preserved; no unchanged-source original-green claim; current/deferred qualification counts `[1,1,3,1,1]` / `[2,2,4,2,2]`; record closure adds only two reserved evidence relations | [Full-manifest reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
-| `A-COMPLETE-PROFILE-01` | Candidate | None | None | N/A | None |
+| `A-FULL-MANIFEST-01` | Exact-head hosted-green `ReviewedLocalGreen` at correction head `canonical owning-finding correction head`, tree `canonical owning-finding correction tree`, run `30834117740`, graph `4094/4096`; final record-delivery graph `4096/4096` is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; canonical R `F586...0DB`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1` (`B11E...0489`); cumulative A `27/27` (`0392...7A90`); Conformance `27/27` (`97C0...13E2`); Domain `98/98` (`0095...016D`); source `353` / `863B...D4CA`; Catalog `456E...7EF5`; production/test/combined `77/80`, `364/620`, `441/700`; StructureOnly `484633ms`; publication evidence `7/7` in `329.3s`; hosted Windows `15m53s`, Ubuntu `17m50s`, publication skipped | All six findings resolved; canonical R preserved; no unchanged-source original-green claim; current/deferred qualification counts `[1,1,3,1,1]` / `[2,2,4,2,2]`; record closure adds only two reserved evidence relations | [Full-manifest reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
+| `A-COMPLETE-PROFILE-01` | `FrozenDesign` / inactive; activation waits for final A-FULL exact-head hosted-green delivery | Reserved ordinal `0012`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`; one Fact, only `ContractSlice=A`, no Scenario | P nullable-union compile seam, then one immutable Writer-only canonical R; green target focused/cumulative/Conformance/Domain `1/1`, `28/28`, `28/28`, `98/98` | Corrected design/test red-team `0/0/0`; production/test/combined hard caps `430/240/680`, redraw threshold `700` | Design freeze below; no implementation activation yet |
 | `A-PREDECESSOR-01` | Candidate | None | None | N/A | None |
 | `A-TRANSITION-01` | Candidate | None | None | N/A | None |
 | `A-LIFECYCLE-01` | Candidate | None | None | N/A | None |
@@ -813,7 +813,77 @@ StructureOnly passed in `484633ms`; publication evidence passed `7/7` in
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
-proposed delivery graph of `4096/4096` that awaits exact-head hosted proof.
+final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
+
+#### Frozen/inactive `A-COMPLETE-PROFILE-01` contract <a name="a-complete-profile-01-freeze"></a>
+
+This is a design-only freeze. It may be prepared while the external A-FULL
+delivery check runs, but P, canonical R, and production/test implementation may
+not activate until the final A-FULL exact-head hosted predecessor is green.
+The exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`.
+Its reserved marker and TRX stem are `TEST-0210-A-BEHAVIOR-RED-0012`; it has one
+Fact, only `ContractSlice=A`, and no Scenario.
+
+P is a compile-only internal seam. `ParsedCanonicalManifest.Slice` becomes
+nullable and receives a trailing optional
+`CompleteCatalogDeclaration? CompleteCatalog = null`, preserving existing call
+sites. Before any Slice dereference, the current qualification-only Writer
+guard adds `slice is null || manifest.CompleteCatalog is not null` and preserves
+the exact `InvalidOperationException` message
+`This writer increment supports only the minimal qualification slice.` The
+A-FULL `CreateManifest` helper changes only from private to internal. Public API
+delta, friend-assembly grant delta, runtime behavior delta, and complete wire
+support in P are all zero. P must pass Release build before R.
+
+Canonical R derives an otherwise-valid fixture from the A-FULL helper, creates
+the valid genesis complete declaration outside the guarded call, and replaces
+the union exactly with authority `CompleteProtocolSnapshot`, `Slice=null`, and
+that `CompleteCatalog`. Only one `CanonicalManifestWriter.Write(parsed)` call is
+inside the guard. Only the exact exception type and message above may execute
+the sole direct `Assert.Fail(exactMarker)`. Reader, Finalized projection, wire
+mutation, and every other assertion remain outside R. The marker occurs once in
+source and only in the expected failed result/allowed identical summary echo.
+
+Green implements the exact `slice | completeCatalog` union in Writer and Reader,
+propagates both nullable arms through `FinalizedPolicyManifest`, and proves
+Writer -> Reader -> Writer byte identity plus manifest digest. Root field order
+is `schema`, `authorityKind`, `sourceCommit`, `protocolVersion`,
+`catalogVersion`, the single union member, `schemaRegistry`,
+`activationProofContract`, `artifactFiles`, `components`. Complete-catalog
+field order is `predecessor`, `completeInventoryDigest`, `baselineProfileName`,
+`rules`, `transitions`, `namedProfiles`.
+
+The exact positive snapshot is protocol `0.17.0`, catalog version `1`, Genesis,
+current rules `RULE-0001` through `RULE-0005` at revision `1`, and exactly five
+Added transitions using the exact ContractSlice A Gate 3 directive authority
+already frozen earlier in this record.
+The independent inventory frame is `104` bytes: the 35-byte
+`meandai.complete-rule-inventory.v1\n` prefix, a four-byte big-endian count, and
+five `(nine-byte RuleId, four-byte big-endian revision)` rows. Its exact SHA-256
+is `c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`.
+The baseline/named profile is
+`protocol.profile.consumer-provider-exact-commit-conformance-audit` with
+Consumer, Conformance, ExactCommit, Provider, and Audit axes; compatibility is
+the exact role/operation/snapshot match plus surface intersection and resolves
+exactly `RULE-0003` through `RULE-0005`. Enforcement phase does not participate
+in that compatibility predicate.
+
+The retained Fact also rejects both/neither union arms, digest inequality,
+missing or extra compatible profile members, and missing, extra, or non-Added
+transition rows. Existing predecessor values, Unchanged/Revised/Retired shapes,
+cross-version lifecycle, exhaustive malformed-wire coverage, resource limits,
+kernel/export/registration proof, final Scenario/status/owner/workflow and
+efficiency activation, and B/C/D remain held.
+
+The source allowlist is Reader, Writer, Finalized manifest,
+`CompleteCatalogDeclaration`, the new test, and the A-FULL helper visibility
+seam. Expected production/test/combined deltas are `322-421`, `177-227`, and
+`499-648`; hard caps are `430`, `240`, and `680`, with mandatory redesign at the
+outer `700` threshold. Corrected design and test red-team each closed
+`0 Blocking / 0 Important / 0 Minor`. Expected green counts are focused `1/1`,
+cumulative A `28/28`, Conformance `28/28`, and Domain `98/98`; packet progress
+would become `15/20` (`75%`) only after its own green/review/evidence closure.
 
 #### Reviewed-local-green `A-INDEX-SLOT-01` design freeze <a name="a-index-slot-01-drt-observation"></a>
 

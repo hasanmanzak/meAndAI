@@ -120,8 +120,8 @@ Last verified: **2026-08-03**
   `canonical owning-finding correction tree`, and run `30834117740`;
   Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
   correctly skipped, and that correction graph is `4094/4096`. This records-only
-  closure adds the two reserved evidence relations; its proposed delivery graph
-  is `4096/4096` and awaits exact-head hosted proof. Fourteen of twenty live
+  closure adds the two reserved evidence relations; its final delivery graph
+  is `4096/4096` and is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped. Fourteen of twenty live
   packets are green (`70%`).
   `A-COMPLETE-PROFILE-01` and every later packet remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
@@ -649,8 +649,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is exact-head hosted-green at `canonical owning-finding correction head`,
   tree `canonical owning-finding correction tree`, and run `30834117740`,
   with graph `4094/4096`. This records-only closure adds the two reserved
-  evidence relations; its proposed delivery graph is `4096/4096` and awaits
-  exact-head hosted proof.
+  evidence relations; its final delivery graph is `4096/4096` and is closed
+  by the exact evidence in the canonical owning finding; Windows passed in
+  `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
+  skipped.
   `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1845,8 +1847,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `canonical owning-finding correction head`, tree
   `canonical owning-finding correction tree`, and run `30834117740`,
   with graph `4094/4096`. This records-only closure adds the two reserved
-  evidence relations; its proposed delivery graph is `4096/4096` and awaits
-  exact-head hosted proof. The live denominator is twenty and current
+  evidence relations; its final delivery graph is `4096/4096` and is closed
+  by the exact evidence in the canonical owning finding; Windows passed in
+  `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
+  skipped. The live denominator is twenty and current
   `ReviewedLocalGreen` progress is fourteen (`70%`). `A-COMPLETE-PROFILE-01`
   and every later packet remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`

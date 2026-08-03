@@ -963,9 +963,65 @@ hosted-green `ReviewedLocalGreen` at correction head
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
-proposed delivery graph of `4096/4096` that awaits exact-head hosted proof.
+final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
 Cumulative A is `27/27`; `A-COMPLETE-PROFILE-01` is next
 Candidate/inactive.
+
+### Frozen/inactive `A-COMPLETE-PROFILE-01` design
+
+The next packet is frozen but not activated. Its exact Fact/FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions`,
+with reserved expected-red marker/TRX stem
+`TEST-0210-A-BEHAVIOR-RED-0012`, one Fact, only `ContractSlice=A`, and no
+Scenario. Its final corrected design and test red-team both closed
+`0 Blocking / 0 Important / 0 Minor`.
+
+P changes only internal compile seams. `ParsedCanonicalManifest` carries
+nullable `Slice` plus optional trailing nullable `CompleteCatalog`; the parsed
+Writer guard checks `slice is null || manifest.CompleteCatalog is not null`
+before any dereference and retains the current exact qualification-only
+`InvalidOperationException` message. The A-FULL fixture factory becomes
+internal. Public API, friend grants, complete serialization, parsing, and
+runtime behavior remain unchanged in P.
+
+Canonical R builds every factory value outside the guard, derives its graph from
+the A-FULL fixture, and replaces only the authority/union with exact
+`CompleteProtocolSnapshot`, `Slice=null`, and a valid genesis
+`CompleteCatalog`. It then invokes only the parsed Writer. Reader and Finalized
+projection do not enter R; only the frozen exception type/message may emit the
+single marker.
+
+Green adds the complete branch without weakening the exact-one union. The root
+encodes exactly one of `slice` or `completeCatalog`; shared rules still feed the
+existing schema/slot/component closure. The complete body has ordered
+`predecessor`, `completeInventoryDigest`, `baselineProfileName`, `rules`,
+`transitions`, and `namedProfiles`. The Reader reconstructs the same declaration,
+compares the serialized inventory digest to the independently derived digest,
+and `FinalizedPolicyManifest` retains the selected union arm. Writer -> Reader
+-> Writer bytes and manifest digest must be identical.
+
+This packet admits only Genesis catalog version `1` at protocol `0.17.0`, the
+five current revision-1 rules, and one Added transition per rule with the exact
+ContractSlice A Gate 3 directive authority already frozen earlier in this
+record.
+The inventory frame is exactly `104` bytes and hashes to
+`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`.
+The sole baseline/named profile
+`protocol.profile.consumer-provider-exact-commit-conformance-audit` has axes
+Consumer, Conformance, ExactCommit, Provider, and Audit; exact compatibility is
+role/operation/snapshot equality plus surface intersection, ignores enforcement
+phase, and resolves only `RULE-0003`, `RULE-0004`, and `RULE-0005`.
+
+The retained negative boundary is both/neither union arms, inventory digest
+inequality, compatible profile omission/addition, and missing/extra/non-Added
+transition rows. Existing predecessor behavior, other transition kinds,
+cross-version lifecycle, exhaustive malformed-wire coverage, resource bounds,
+kernel/export/registration, final activation, and B/C/D remain later. Source is
+limited to Reader, Writer, Finalized manifest, `CompleteCatalogDeclaration`, the
+new test, and the A-FULL helper visibility seam. Hard caps are `430` production,
+`240` test, and `680` combined, with mandatory redesign at `700`. Expected green
+is focused `1/1`, cumulative/Conformance `28/28`, and Domain `98/98`; no progress
+change occurs before packet-local green/review/evidence closure.
 
 That corrected directive still does **not** authorize:
 
