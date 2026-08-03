@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Exact admission predecessor and first-freeze hosted evidence remain unchanged. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation is green. LR/P/R/C# is the next inactive phase. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, [TEST-0210](test-cases.md#test-0210) remains `Planned`, and later packets remain Candidate/inactive. Every partial Fact retains only `ContractSlice=A`. |
+| Status | Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, [TEST-0210](test-cases.md#test-0210) remains `Planned`, and `A-CONVERGE-01` plus later packets remain Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. Every partial Fact retains only `ContractSlice=A`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
 | Accepted A origin | Exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
-| Semantic implementation predecessor | Exact admission record-evidence delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326). The separate corrected projector/DAG freeze-gate checkpoint is owned by the canonical design routing and current packet row below: its records are immutable, its exact committed graph has `4091` edges, and exact-head hosted validation is green. LR/P/R/C# is the next inactive phase. |
+| Semantic implementation predecessor | Exact admission record-evidence delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326). The separate corrected projector/DAG freeze-gate checkpoint remains its immutable design predecessor; the current projector has exact packet-local implementation/evidence. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly skipped. |
 | Historical hosted-failed head | [`bfa961d1f661588dc48f337720cae2ef741887a7`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7), git tree identity: `07ceea87ae934c53e64eb2bd9e3ecf2904fa3943`; exact-head [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) failed only [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175) record authoring. [FIND-0445](README.md#find-0445) is resolved at strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde); this historical head is not an activation predecessor. |
 | Historical hosted-failed correction head | [`43c1800b551c0f7d337a20dd290390094d72311c`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c), git tree identity: `2d550a6a894f6dcaa43b73bf156cb72d7c13e9e3`; exact-head [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) made Windows green while Ubuntu failed only [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) with twenty-three ambiguous Git tree identities. [FIND-0446](README.md#find-0446) is resolved at strict-redraw base [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde); this historical head is also not an activation predecessor. |
 | Git authority | The maintainer's umbrella directive authorizes the ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including D/RT-required operational redraws that strictly partition accepted A semantics under the hard line cap, packet-local validation/review/record synchronization, commit/push, draft-PR updates, and hosted-check correction. A redraw neither preactivates a packet nor broadens scope. Every packet still requires its exact predecessor, synchronized ledger, accepted D/RT, and one-at-a-time mutating activation. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), merge, release, and publication remain held. |
@@ -358,7 +358,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-FINDING-01` | `ReviewedLocalGreen` | `R=NotApplicable`; no ordinal/marker/TRX; `ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles`; `TestOnlyGreen`; production `0` | Focused `1/1` (`D7C069CC...25D`); cumulative A `23/23` (`8B7046AA...CD3`); source `420` lines / `19DDFF...1CAF`; production `0`, packet `420/420`; full Domain `98/98` (`8B59FC...3CDB`); full Conformance `23/23` (`B714DD...56804F`); Release build `0/0`; default-severity format/diff/six locks, StructureOnly, and publication-evidence checks green | Corrected D/RT `0/0/0`; independent code red-team and evidence audit each `0/0/0`; synthetic fixtures only; real five-rule inventory and selector closure held | [Finding declaration reviewed-local-green handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md) |
 | `A-SELECTOR-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0008`; exact FQN; canonical R `7A85...D30A`, transient source `FC04...B8F55` | Focused `1/1` (`98B2...DDB2`); cumulative A `24/24` (`527D...8D35`); source `370` lines / `56B9...2B69`; production `12/20` / `F4AA...AAAF`; packet `382/520`; full Domain `98/98` (`8DEB...F478`); full Conformance `24/24` (`7356...5532`); Release build `0/0`; format/diff/six locks, StructureOnly, and publication-evidence green; exact [`2bbd36f...`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5) / tree `fe543889...` / [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693) hosted green | D/RT, canonical-R audit, independent code review, and evidence/scope audit each `0/0/0`; real five-rule selector inventory held | [Expected-selector reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md) |
 | `A-ADMISSION-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0009`; exact FQN; canonical R `2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`; transient source `7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC` | P `NotApplicable`; predecessor selector `1/1` (`CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`) and cumulative `24/24` (`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`); original-oracle `1/1` (`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`); retained focused `1/1` (`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`); cumulative A `25/25` (`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`); full Domain `98/98` (`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`); full Conformance `25/25` (`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`); source `339` lines / `AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`; production/test/packet `186/310`, `339/370`, `525/680`; Release build `0/0`, format/diff/six locks, StructureOnly, and publication-evidence green; exact hosted implementation [`c1653d45...`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8) / tree `7f547daa...` / [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538); record delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326) green | Reconciled D/RT, independent final code/test red-team, and evidence/hash/counter/scope audit each `0/0/0`; Reader `85/145`, Writer `35/55`, Catalog `66/110`; later packets inactive | [Admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) |
-| `A-PROJECTOR-DAG-01` | Corrected `FrozenDesign`; renewed D/RT `0/0/0`, exact graph `4091`, exact-head hosted green; LR/P/R/C# next inactive | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario | P `NotApplicable`; predecessor `25/25`; fully green successor expected focused `1/1`, cumulative A `26/26`, tuple `(3,2,4,1,4,2,2,3,26,3)` | Enumerated `103` vectors; mapped role/DAG diagnostics; production Reader/Writer/Catalog hard caps `175/70/170`, aggregate `380`; test hard cap `410`; combined green acceptance `770`; `771-799` refactor stop, `800+` redraw | Current frozen contract below |
+| `A-PROJECTOR-DAG-01` | `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, publication verification skipped | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario; test source `408` lines / `8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010` | P `NotApplicable`; predecessor `25/25`; focused `1/1` in `472ms` / `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`; cumulative A `26/26`, projector `518ms` / `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`; tuple `(3,2,4,1,4,2,2,3,26,3)` | `103` vectors; Reader `175`, Writer `32`, Catalog `155`, aggregate production `362`, test `408`, combined `770`; Release build `0 warnings / 0 errors` in `6.63s`, format green, `StructureOnly` `elapsedMs=394809`, publication-evidence `7/7` in `256.7s` without published-state claim; independent review `0/0/0`; exact-head hosted validation green | Frozen contract and retained local evidence below |
 | `A-CONVERGE-01` | Candidate | None | None | N/A | None |
 | `A-COMPLETE-PROFILE-01` | Candidate | None | None | N/A | None |
 | `A-PREDECESSOR-01` | Candidate | None | None | N/A | None |
@@ -625,9 +625,10 @@ format, diff, marker, scope, all six locks, and full StructureOnly
 [TEST-0189](../FEAT-0052-v0151-declarative-bundle-source-mapping/test-cases.md#test-0189)
 passed in `242.5` seconds without claiming published-state evidence.
 Independent final code/test red-team and evidence/hash/counter/scope audit each
-closed `0 Blocking / 0 Important / 0 Minor`. This establishes packet-local
-`ReviewedLocalGreen`: twelve of twenty packets are green (`60%`), cumulative A
-is `25/25`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`.
+closed `0 Blocking / 0 Important / 0 Minor`. Admission remains packet-local
+`ReviewedLocalGreen`; after its projector successor, thirteen of twenty packets
+are green (`65%`), cumulative A is `26/26`, and
+[TEST-0210](test-cases.md#test-0210) remains `Planned`.
 Exact hosted-green implementation delivery
 [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
 git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, passed Ubuntu in
@@ -691,10 +692,36 @@ Reader, Writer, and Catalog with hard caps `175`, `70`, and `170`, aggregate
 hard cap `380`; the one new test has hard cap `410`, and combined green acceptance
 cap is `770`. A measured `771-799` stops acceptance for readability-preserving
 refactor to `770` or lower; `800+` requires redraw. The fully green successor has exact tuple
-`(3,2,4,1,4,2,2,3,26,3)` and cumulative A `26/26`. Renewed D/RT closed `0/0/0`;
-the exact committed graph is `4091` and exact-head hosted validation is green;
-LR/P/R/C# is the next inactive phase.
-`A-CONVERGE-01` and all later packets remain Candidate/inactive.
+`(3,2,4,1,4,2,2,3,26,3)` and cumulative A `26/26`. That frozen contract is
+implemented with exact packet-local evidence, and the packet is
+`ReviewedLocalGreen`. P is `NotApplicable`; unchanged-source predecessor focused
+`1/1` has TRX SHA-256
+`5144216718A515CDF7B96B47C1F99E93CC2E4E28AC9407D9F9D8BF6B211D5EDC`, and
+predecessor cumulative A `25/25` has TRX SHA-256
+`3A4AAD033A9F0F8E7E1F4365866867B56143CFECC950C028C75D2C0C5C32EF8A`.
+Immutable R source SHA-256 is
+`8CA46746908FF177E0041B37BACFC344B555784C9E793F2B272C020F288C7E2A`; its sole
+canonical failed `1/1` TRX SHA-256 is
+`E8CF388ECF27BC37B79AE51966D3A123CED82CD80432C6F860CB2DA14A03C006`, and R was
+never rerun. Final production source SHA-256 values are Reader
+`6700C1E03629E576155F6AA55BB87AAC2DEBD800BAE8B3ABDB9FA99AB792E04E`, Writer
+`69242E672FEC8606E82CEC9DAFB1C0F8318D33F69B38C582B0BC4714F7EE0D41`, and
+Catalog `8428DAA4E2A4C5C4193C0A271B802DED3F15AC4AA199D644A9D787B45B4B7FDA`.
+Canonical test source is `408` lines at SHA-256
+`8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010`;
+focused `1/1` passed in `472ms` at TRX SHA-256
+`8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`,
+and cumulative A `26/26` passed with projector duration `518ms` at TRX SHA-256
+`74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`.
+Release build passed with `0 warnings / 0 errors` in `6.63s`; format is green;
+`StructureOnly` passed with `elapsedMs=394809`; publication-evidence passed
+`7/7` in `256.7s` without claiming published-state evidence; independent review
+closed `0 Blocking / 0 Important / 0 Minor`. Realized Reader `175`, Writer `32`,
+Catalog `155`, aggregate production `362`, test `408`, and combined `770`
+satisfy the frozen caps. Hosted run `30798854880` passed Windows in `14m58s` and
+Ubuntu in `19m00s`; publication verification was correctly skipped.
+`A-CONVERGE-01` and all later packets remain
+Candidate/inactive.
 
 #### Reviewed-local-green `A-INDEX-SLOT-01` design freeze <a name="a-index-slot-01-drt-observation"></a>
 
@@ -1388,8 +1415,8 @@ StructureOnly and three independent post-green reviews are green. Exact
 [`bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9`](https://github.com/hasanmanzak/meAndAI/commit/bdd252bb74a2d8ee87664cb0d34b5c893d34a7b9),
 git tree identity `b95ac0da13e26c168d03525a0d2f7c63127e9885`, passed Ubuntu and Windows in
 [run 30762028026](https://github.com/hasanmanzak/meAndAI/actions/runs/30762028026).
-Twelve of twenty packets are `ReviewedLocalGreen` (`60%`), and cumulative A is
-`25/25`. Historical selector green delivery
+Thirteen of twenty packets are `ReviewedLocalGreen` (`65%`), and cumulative A
+is `26/26`. Historical selector green delivery
 [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
 git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
 [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693),
@@ -1403,9 +1430,10 @@ exact hosted boundary is admission record-evidence delivery
 git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
 `17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-ADMISSION-01` remains packet-local `ReviewedLocalGreen`;
-`A-PROJECTOR-DAG-01` is `FrozenDesign`, and every later packet remains
-Candidate/inactive.
+`A-ADMISSION-01` and `A-PROJECTOR-DAG-01` remain packet-local
+`ReviewedLocalGreen`; `A-CONVERGE-01` and every later packet remain
+Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and
+Ubuntu in `19m00s`; publication verification was correctly skipped.
 
 The packet-local evidence above remains authoritative and unchanged. Its pushed
 head [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7)

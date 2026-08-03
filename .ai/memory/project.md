@@ -45,8 +45,9 @@ Last verified: **2026-08-03**
   Its exact R/G evidence plus focused `1/1`, cumulative A `21/21`, validation,
   and reviews are retained in the
   [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
-  The live denominator is `18 - 1 + 3 = 20`; twelve packets are
-  `ReviewedLocalGreen` (`60%`). The exact hosted-green admission frozen-design
+  At the admission checkpoint the live denominator was `18 - 1 + 3 = 20`;
+  twelve packets were `ReviewedLocalGreen` (`60%`). The exact hosted-green
+  admission frozen-design
   predecessor is
   [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
   git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with successful
@@ -63,7 +64,7 @@ Last verified: **2026-08-03**
   publication verification was correctly skipped. The exact hosted-green
   finding delivery [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
-  remains historical predecessor evidence. Cumulative A is `25/25`.
+  remains historical predecessor evidence. Cumulative A is `26/26`.
   `A-FINDING-01` is packet-local `ReviewedLocalGreen` on its
   `R=NotApplicable`, `TestOnlyGreen`, production-zero route; synchronized
   commit, push, and exact-head hosted validation are complete.
@@ -89,10 +90,20 @@ Last verified: **2026-08-03**
   validation are complete. `A-ADMISSION-01` is packet-local
   `ReviewedLocalGreen`, with exact LR/R/G/V and hosted predecessor evidence
   retained unchanged by the bounded records-only correction.
-  `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
-  is green. LR/P/R/C# is the next inactive phase; every later packet remains
-  Candidate/inactive.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`: predecessor
+  focused/cumulative are exact `1/1` and `25/25`; immutable R is
+  `E8CF388ECF27BC37B79AE51966D3A123CED82CD80432C6F860CB2DA14A03C006`;
+  canonical focused/cumulative green are
+  `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`
+  and `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`;
+  build/format/StructureOnly and the seven-scenario publication suite are green;
+  final review is `0/0/0`; and the combined packet is accepted at exact
+  `770/770`. The exact implementation identity and hosted evidence are retained
+  in the canonical projector handoff. Exact-head hosted validation passed
+  Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
+  correctly skipped. `A-CONVERGE-01` is the next
+  Candidate/inactive packet, and
+  every later packet remains Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
@@ -602,10 +613,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
   and hosted predecessor evidence remain exact after the bounded records-only
   correction.
-  `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
-  is green. LR/P/R/C# is the next inactive phase; later packets remain
-  Candidate/inactive.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
+  implementation identity and hosted evidence are retained in the canonical
+  projector handoff. Exact cumulative A is `26/26`, final review is `0/0/0`,
+  and combined budget is `770/770`; exact-head hosted validation passed Windows
+  in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
+  skipped. `A-CONVERGE-01` is the next Candidate/inactive
+  packet, and later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1786,12 +1800,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
   and hosted predecessor evidence remain exact after the bounded records-only
   correction.
-  `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
-  is green. LR/P/R/C# is the next inactive phase; every later packet remains
-  Candidate/inactive. The live denominator is twenty
-  and current `ReviewedLocalGreen` progress is twelve (`60%`), with cumulative
-  A green `25/25`.
+  `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
+  implementation identity and hosted evidence are retained in the canonical
+  projector handoff. Exact-head hosted validation passed Windows in `14m58s`
+  and Ubuntu in `19m00s`, with publication verification correctly skipped.
+  `A-CONVERGE-01` is the next
+  Candidate/inactive packet, and
+  every later packet remains Candidate/inactive. The live denominator is twenty
+  and current `ReviewedLocalGreen` progress is thirteen (`65%`), with cumulative
+  A green `26/26`.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

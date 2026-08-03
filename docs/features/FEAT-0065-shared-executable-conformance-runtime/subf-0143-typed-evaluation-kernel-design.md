@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact admission predecessor and first-freeze hosted evidence remain unchanged. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation is green. LR/P/R/C# is the next inactive phase. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, `A-CONVERGE-01` and later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current records-only projector/DAG state; the [projector/DAG freeze-gate handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md) is the current checkpoint, admission and earlier handoffs remain exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); the projector/DAG freeze-gate handoff remains the immutable design predecessor, while current packet-local `ReviewedLocalGreen` retains exact packet-local implementation/evidence; admission and earlier handoffs remain exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -143,13 +143,13 @@ correction. Both findings are resolved by exact remote-equal
 [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-Strict redraw retires never-activated `A-PARSER-INDEX-01`; twelve of twenty live
-packets are `ReviewedLocalGreen` (`60%`). `A-PARSER-RECORD-SLOT-01` is exact-
+Strict redraw retires never-activated `A-PARSER-INDEX-01`; thirteen of twenty
+live packets are `ReviewedLocalGreen` (`65%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
-`A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`, and
-`A-FINDING-01`, `A-SELECTOR-01`, and `A-ADMISSION-01` are
-`ReviewedLocalGreen`; cumulative A is `25/25`. The exact admission FrozenDesign
+`A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`,
+`A-FINDING-01`, `A-SELECTOR-01`, `A-ADMISSION-01`, and `A-PROJECTOR-DAG-01`
+are `ReviewedLocalGreen`; cumulative A is `26/26`. The exact admission FrozenDesign
 predecessor is [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
@@ -158,10 +158,11 @@ The exact admission record-evidence delivery is
 git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
 `17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-PROJECTOR-DAG-01` is `FrozenDesign`; its corrected freeze records are
-committed and pushed, and exact-head hosted validation is green. LR/P/R/C# is
-the next inactive phase.
-Later packets remain Candidate/inactive.
+`A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact
+packet-local implementation/evidence. Hosted run `30798854880` passed
+Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was
+correctly skipped. `A-CONVERGE-01`
+and later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -791,9 +792,34 @@ hard cap is `410`, and combined green acceptance cap is `770`. A measured
 `770` or lower; `800+` forces design redraw. Assertions, diagnostics, or semantic
 vectors may not be compressed away to fit. Fully green successor tuple is
 `(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`.
-Exact evidence remains unchanged after the bounded records-only correction.
-Renewed D/RT is closed `0/0/0`; the corrected committed graph is `4091` and
-exact-head hosted validation is green. LR/P/R/C# is the next inactive phase.
+That frozen contract has exact packet-local implementation/evidence, and the
+packet is
+`ReviewedLocalGreen`. P is `NotApplicable`; unchanged-source predecessor focused
+`1/1` has TRX SHA-256
+`5144216718A515CDF7B96B47C1F99E93CC2E4E28AC9407D9F9D8BF6B211D5EDC`, and
+predecessor cumulative A `25/25` has TRX SHA-256
+`3A4AAD033A9F0F8E7E1F4365866867B56143CFECC950C028C75D2C0C5C32EF8A`.
+Immutable R source SHA-256 is
+`8CA46746908FF177E0041B37BACFC344B555784C9E793F2B272C020F288C7E2A`; its sole
+canonical failed `1/1` TRX SHA-256 is
+`E8CF388ECF27BC37B79AE51966D3A123CED82CD80432C6F860CB2DA14A03C006`, and R was
+never rerun. Final production source SHA-256 values are Reader
+`6700C1E03629E576155F6AA55BB87AAC2DEBD800BAE8B3ABDB9FA99AB792E04E`, Writer
+`69242E672FEC8606E82CEC9DAFB1C0F8318D33F69B38C582B0BC4714F7EE0D41`, and
+Catalog `8428DAA4E2A4C5C4193C0A271B802DED3F15AC4AA199D644A9D787B45B4B7FDA`.
+Canonical retained test source is `408` lines at SHA-256
+`8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010`;
+focused `1/1` passed in `472ms` at TRX SHA-256
+`8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`,
+and cumulative A `26/26` passed with projector duration `518ms` at TRX SHA-256
+`74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`.
+Release build passed with `0 warnings / 0 errors` in `6.63s`; format is green;
+`StructureOnly` passed with `elapsedMs=394809`; publication-evidence passed
+`7/7` in `256.7s` without claiming published-state evidence; independent review
+closed `0 Blocking / 0 Important / 0 Minor`. Realized Reader `175`, Writer `32`,
+Catalog `155`, aggregate production `362`, test `408`, and combined `770`
+satisfy the frozen caps. Hosted run `30798854880` passed Windows in `14m58s` and
+Ubuntu in `19m00s`; publication verification was correctly skipped.
 
 That corrected directive still does **not** authorize:
 
@@ -7763,9 +7789,9 @@ coverage `Important` is closed; fresh full-diff review pass 2 closed
 `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction,
 never-activated `A-PARSER-INDEX-01` is retired,
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
-`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`, and
-`A-ADMISSION-01` are `ReviewedLocalGreen`; twelve of twenty live packets are
-green (`60%`) with cumulative A `25/25`.
+`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`,
+`A-ADMISSION-01`, and `A-PROJECTOR-DAG-01` are `ReviewedLocalGreen`; thirteen
+of twenty live packets are green (`65%`) with cumulative A `26/26`.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
 production-zero route and is exact-head hosted green at
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
@@ -7782,8 +7808,13 @@ git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, and
 [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326),
 with Windows green in `17m10s`, Ubuntu green in `19m02s`, and publication
 verification correctly skipped. `A-ADMISSION-01` remains packet-local
-`ReviewedLocalGreen`; `A-PROJECTOR-DAG-01` is `FrozenDesign`. Later packets
-remain Candidate/inactive, and no full-A completion is claimed.
+`ReviewedLocalGreen`. `A-PROJECTOR-DAG-01` is packet-local
+`ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted
+run `30798854880` passed
+Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
+correctly skipped. `A-CONVERGE-01`
+and later packets remain Candidate/inactive, and no full-A completion is
+claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

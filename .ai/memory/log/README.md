@@ -245,8 +245,9 @@ activation baseline
 git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
-Twelve of twenty live packets are `ReviewedLocalGreen` (`60%`), and cumulative A
-is green `25/25`. The exact hosted-green admission frozen-design predecessor is
+At that admission checkpoint, twelve of twenty live packets were
+`ReviewedLocalGreen` (`60%`) and cumulative A was green `25/25`. The exact
+hosted-green admission frozen-design predecessor is
 [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
@@ -294,11 +295,15 @@ with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
 `0/0/0`; its immutable implementation and record-delivery identities remain in
 that handoff. The corrected
 [projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
-retains the exact predecessor and first-freeze hosted evidence.
-`A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-`0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
-is green. LR/P/R/C# is the next inactive phase.
-Every later packet remains Candidate/inactive. No
+now retains the frozen design, immutable R, bounded C# green, exact local
+validation, and final `0/0/0` review evidence. `A-PROJECTOR-DAG-01` is
+packet-local `ReviewedLocalGreen`; its exact implementation identity and hosted
+evidence are retained in that canonical projector handoff. Exact-head hosted
+validation passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication
+verification correctly skipped.
+Thirteen of twenty live packets are green (`65%`) and cumulative A is `26/26`.
+`A-CONVERGE-01` is the next Candidate/inactive packet, and every later packet
+remains Candidate/inactive. The parent scenario remains `Planned`. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -341,7 +346,7 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current continuation state and denominator are in the
-[projector/DAG FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
+[projector/DAG reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
 the [admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
 is its hosted-green predecessor, and
 the [target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)

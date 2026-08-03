@@ -250,8 +250,8 @@ It follows the exact hosted-green finding delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
-Twelve of twenty live packets are `ReviewedLocalGreen` (`60%`) and cumulative A
-is `25/25`.
+Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`) and cumulative A
+is `26/26`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
@@ -271,15 +271,17 @@ The immutable admission implementation delivery is
 git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in `18m12s`,
 Windows passed in `17m28s`, and publication verification was correctly skipped
 in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
-The bounded records-only correction
-retains the exact hosted-green admission predecessor and first-freeze failure
-evidence. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign` with marker
+The bounded records-only correction retains the exact hosted-green admission
+predecessor and first-freeze failure evidence. `A-PROJECTOR-DAG-01` is now
+packet-local `ReviewedLocalGreen` with immutable marker
 `TEST-0210-A-BEHAVIOR-RED-0010`, exact FQN, 26/3 successor, 25/3 reproduction,
-the enumerated 103-case role-aware producer-DAG contract, and revised 770-line
-hard cap. Renewed D/RT closed `0/0/0`; the corrected exact committed graph is
-`4091` and exact-head hosted validation is green; LR/P/R/C# is the next inactive
-phase. Every later packet remains
-Candidate/inactive. No
+the enumerated 103-case role-aware producer-DAG contract, exact `26/26`
+cumulative green, final `0/0/0` review, and accepted `770/770` combined line
+budget. The exact implementation identity and hosted evidence are retained in
+the canonical projector handoff. Exact-head hosted validation passed Windows in
+`14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
+`A-CONVERGE-01` is the next Candidate/inactive packet. Every later packet
+remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
