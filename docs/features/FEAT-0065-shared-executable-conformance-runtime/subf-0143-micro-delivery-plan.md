@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired and excluded from the denominator; its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending records-only commit/push and exact-head hosted validation. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. Every partial Fact retains only `ContractSlice=A`. |
+| Status | Exact admission and projector predecessor evidence remains unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits records-only commit/push plus exact-head hosted validation. The graph-budget correction is hosted-green. Every partial Fact retains only `ContractSlice=A`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -361,7 +361,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-ADMISSION-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0009`; exact FQN; canonical R `2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`; transient source `7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC` | P `NotApplicable`; predecessor selector `1/1` (`CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`) and cumulative `24/24` (`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`); original-oracle `1/1` (`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`); retained focused `1/1` (`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`); cumulative A `25/25` (`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`); full Domain `98/98` (`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`); full Conformance `25/25` (`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`); source `339` lines / `AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`; production/test/packet `186/310`, `339/370`, `525/680`; Release build `0/0`, format/diff/six locks, StructureOnly, and publication-evidence green; exact hosted implementation [`c1653d45...`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8) / tree `7f547daa...` / [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538); record delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326) green | Reconciled D/RT, independent final code/test red-team, and evidence/hash/counter/scope audit each `0/0/0`; Reader `85/145`, Writer `35/55`, Catalog `66/110`; later packets inactive | [Admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) |
 | `A-PROJECTOR-DAG-01` | `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, publication verification skipped | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario; test source `408` lines / `8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010` | P `NotApplicable`; predecessor `25/25`; focused `1/1` in `472ms` / `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`; cumulative A `26/26`, projector `518ms` / `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`; tuple `(3,2,4,1,4,2,2,3,26,3)` | `103` vectors; Reader `175`, Writer `32`, Catalog `155`, aggregate production `362`, test `408`, combined `770`; Release build `0 warnings / 0 errors` in `6.63s`, format green, `StructureOnly` `elapsedMs=394809`, publication-evidence `7/7` in `256.7s` without published-state claim; independent review `0/0/0`; exact-head hosted validation green | Frozen contract and retained local evidence below |
 | `A-CONVERGE-01` | `RetiredBeforeActivation` | None; never activated and excluded from the live denominator | None | Its no-new-Fact convergence classification contradicted the reserved fresh cross-partition Fact; strict D/RT redraw replaces it one-for-one | Historical routing tombstone only |
-| `A-FULL-MANIFEST-01` | `FrozenDesign`; inactive pending records-only commit/push and exact-head hosted validation | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; one Fact, only `ContractSlice=A`, no Scenario | None until canonical R and bounded green | Renewed code/design, evidence/gate, and records/link-graph reviews each `0 Blocking / 0 Important / 0 Minor` | [Full-manifest FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
+| `A-FULL-MANIFEST-01` | `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery`; inactive until records-only commit/push and exact-head hosted green | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; one Fact, only `ContractSlice=A`, no Scenario | None until canonical R and bounded green | Prior `0/0/0` reopened by the stale changed-key sibling assertion; three renewed reviews closed `0/0/0`; records-only commit/push and exact-head hosted validation remain pending | [Full-manifest FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
 | `A-COMPLETE-PROFILE-01` | Candidate | None | None | N/A | None |
 | `A-PREDECESSOR-01` | Candidate | None | None | N/A | None |
 | `A-TRANSITION-01` | Candidate | None | None | N/A | None |
@@ -743,8 +743,9 @@ unique slots rather than flattened occurrence positions; and applicability and
 evaluation sets remain separate. Admission accepts the exact three kinds with
 distinct proof-component identities plus surfaces/material roles derived from
 the complete slot union. Generic production imposes neither admission contract-
-key cardinality nor a zero-applicability rule. Initial catalog counts, zero
-applicability, and the three exact contract keys remain test-owned.
+key cardinality nor a zero-applicability rule, while all three contracts retain
+one common contract version. Initial catalog counts, zero applicability, and
+the three exact contract keys remain test-owned.
 
 The exact proof component keys/version are activation
 `protocol.activation-proof.release-envelope` / `1` and admissions
@@ -774,14 +775,19 @@ The sole new file is
 The exact Fact is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`;
 its only trait is `ContractSlice=A`, with no Scenario. Production target/hard
-caps are `40-60/80`; test target/hard caps are `450-550/620`; combined hard cap
-is `700`. The same Fact proves equal repeated SlotKeys accepted; divergent
+caps are `40-60/80`; the new test target is `450-550` with retained-source hard
+cap `608`. The only sibling allowlist entry is
+`ContractSliceAAdmissionProofManifestTests.cs`, gross-delta hard cap `12`, whose
+changed-Observed-key rejection becomes a positive parse/write byte round-trip
+during green while its mixed-version rejection remains. It stays unchanged
+through P/R. Aggregate test and combined hard caps remain `620/700`. The same
+Fact proves equal repeated SlotKeys accepted; divergent
 repeated SlotKey, missing proof kind, reused proof component, and derived
 surface/material-role mismatch rejected; and shared contract keys across kinds
 accepted. It asserts exact component-key-to-artifact bindings and the named
 distribution Policy `23`, Conformance.Abstractions `5`, Application `4`, Domain
 `1`, Conformance `1`, and Markdig `1`. Project, solution, package, lock,
-workflow, public/friend API, sibling test, filesystem/Git/provider I/O,
+workflow, public/friend API, every other sibling test, filesystem/Git/provider I/O,
 physical CLR/artifact verification, executable export/registration, and every
 held downstream scope remain excluded.
 
@@ -1494,9 +1500,10 @@ git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
 `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` remain packet-local
 `ReviewedLocalGreen`; never-activated `A-CONVERGE-01` is retired/excluded,
-`A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review
-`0/0/0`, pending records-only commit/push and exact-head hosted validation; every
-later packet remains Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and
+`A-FULL-MANIFEST-01` is `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery`:
+its graph-budget correction is hosted-green, while the bounded
+admission sibling allowlist correction passed renewed review `0/0/0` and now awaits records-only commit/push plus exact-head hosted validation before R; every later packet remains
+Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`; publication verification was correctly skipped.
 
 The packet-local evidence above remains authoritative and unchanged. Its pushed

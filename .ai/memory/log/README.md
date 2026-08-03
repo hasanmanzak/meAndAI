@@ -253,8 +253,8 @@ verification correctly skipped.
 Thirteen of twenty live packets are green (`65%`) and cumulative A is `26/26`.
 Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
 Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and inactive
-after renewed records-only review `0/0/0`, pending records-only commit/push and
-exact-head hosted validation;
+under `RenewedSiblingContractReviewed / PendingRecordDelivery`; implementation remains held until
+the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits this records-only commit/push plus exact-head hosted green;
 every later packet remains Candidate/inactive. The parent scenario remains
 `Planned`. No
 final `Scenario` trait, status/owner, workflow, efficiency activation,

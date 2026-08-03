@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` retires before activation; its one-for-one semantic-regression replacement `A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending records-only commit/push and exact-head hosted validation. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. |
+| Status | Gate 2 accepted/merged. Exact admission and projector predecessor evidence remains unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is `FrozenDesign / RenewedSiblingContractReviewed / PendingRecordDelivery` and inactive until the bounded admission sibling allowlist correction has completed renewed `0/0/0` review and now awaits records-only commit/push plus exact-head hosted validation. The graph-budget correction is hosted-green. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -849,8 +849,9 @@ initial-release counts in reusable production code:
   separate, while occurrence counts remain visible to the exact snapshot test.
 - admission closure requires exactly the Observed, Failed, and NoInput kinds,
   three distinct proof-component identities, and surfaces/material roles equal
-  to the complete canonical slot union. It imposes no contract-key cardinality,
-  no zero-applicability rule, and no selector/finding count.
+  to the complete canonical slot union. All contracts share one contract
+  version, but independently canonical contract keys have no cardinality rule.
+  It imposes no zero-applicability rule and no selector/finding count.
 - five rules, twelve occurrences, three selectors, sixteen findings,
   twenty-seven logical Policy rows, thirty-five component rows, and six
   artifacts remain exact initial-catalog assertions in the retained Fact; they
@@ -907,10 +908,16 @@ Actual artifact/type/registration proof remains with activation and later
 slices.
 
 The production allowlist is only `CatalogSliceDeclaration.cs`, target/hard
-gross delta `40-60/80`. The sole test allowlist is
-`ContractSliceAFullManifestGraphTests.cs`, target/hard `450-550/620`; combined
-hard cap is `700`. Project, solution, package, lock, workflow, public/friend API,
-sibling-test, and all held downstream scope remain unchanged. P is
+gross delta `40-60/80`. Test scope is the new
+`ContractSliceAFullManifestGraphTests.cs`, target `450-550` and retained-source
+hard cap `608`, plus only the existing
+`ContractSliceAAdmissionProofManifestTests.cs` changed-key assertion correction,
+gross-delta hard cap `12`. The aggregate test hard cap remains `620`; combined
+hard cap remains `700`. The sibling stays unchanged through P/R. Green converts
+only its changed-Observed-key rejection into a positive parse/write byte
+round-trip; its mixed-version rejection remains. Project, solution, package,
+lock, workflow, public/friend API, every other sibling test, and held downstream
+scope remain unchanged. P is
 `NotApplicable`; unchanged projector focused `1/1` and cumulative A `26/26`
 precede the one canonical R. Green targets focused `1/1` and cumulative A
 `27/27`.
