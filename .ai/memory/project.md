@@ -113,10 +113,16 @@ Last verified: **2026-08-03**
   `0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
   full Conformance is `27/27`, full Domain is `98/98`, StructureOnly passed with
   `elapsedMs=484633`, and publication evidence passed `7/7` in `329.3s` without
-  a published-state claim. Implementation commit/push completed; the first
-  hosted head passed Windows and failed Ubuntu only on the instruction-graph
-  edge budget, and the bounded records-only correction remains pending exact-
-  head hosted proof. Fourteen of twenty live packets are green (`70%`).
+  a published-state claim. The first hosted implementation head passed Windows
+  and failed Ubuntu only on the instruction-graph edge budget. The bounded
+  records-only correction is exact-head hosted-green at
+  `daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
+  `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`;
+  Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
+  correctly skipped, and that correction graph is `4094/4096`. This records-only
+  closure adds the two reserved evidence relations; its proposed delivery graph
+  is `4096/4096` and awaits exact-head hosted proof. Fourteen of twenty live
+  packets are green (`70%`).
   `A-COMPLETE-PROFILE-01` and every later packet remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
@@ -638,9 +644,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `ReviewedLocalGreen`; immutable R, bounded generic green, the sibling-
   assertion corrections, the fixture-topology correction, exact `27/27`
   cumulative validation, and final long checks are retained in its canonical
-  handoff. Implementation commit/push completed; the first hosted head passed
-  Windows and failed Ubuntu only on the instruction-graph edge budget, and the
-  bounded records-only correction remains pending exact-head hosted proof.
+  handoff. The first hosted implementation head passed Windows and failed Ubuntu
+  only on the instruction-graph edge budget. The bounded records-only correction
+  is exact-head hosted-green at `daeaa64947fc9e0165d542d25f3333664eb7eb34`,
+  tree `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`,
+  with graph `4094/4096`. This records-only closure adds the two reserved
+  evidence relations; its proposed delivery graph is `4096/4096` and awaits
+  exact-head hosted proof.
   `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1827,11 +1837,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   projector handoff. Exact-head hosted validation passed Windows in `14m58s`
   and Ubuntu in `19m00s`, with publication verification correctly skipped.
   Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-  Its one-for-one replacement `A-FULL-MANIFEST-01` is packet-local
+  Its one-for-one replacement `A-FULL-MANIFEST-01` is exact-head hosted-green
   `ReviewedLocalGreen`; canonical R remains immutable, final focused is `1/1`,
-  and final cumulative A is `27/27`. Implementation commit/push completed; the
-  first hosted head passed Windows and failed Ubuntu only on the instruction-
-  graph edge budget, and the bounded records-only correction remains pending
+  and final cumulative A is `27/27`. The first hosted implementation head passed
+  Windows and failed Ubuntu only on the instruction-graph edge budget. The
+  bounded records-only correction is exact-head hosted-green at
+  `daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
+  `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`,
+  with graph `4094/4096`. This records-only closure adds the two reserved
+  evidence relations; its proposed delivery graph is `4096/4096` and awaits
   exact-head hosted proof. The live denominator is twenty and current
   `ReviewedLocalGreen` progress is fourteen (`70%`). `A-COMPLETE-PROFILE-01`
   and every later packet remain Candidate/inactive.

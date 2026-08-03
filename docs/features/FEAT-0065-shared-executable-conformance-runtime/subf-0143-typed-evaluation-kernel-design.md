@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. Three implementation findings are resolved; the delivery-time graph finding and bounded records-only hosted correction remain in progress. |
+| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is exact-head hosted-green `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. All six A-FULL findings are resolved. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -956,10 +956,15 @@ Focused, cumulative A, full Conformance, and full Domain passed `1/1`, `27/27`,
 and `0095818A237CB1E84FBDC1F4C4B6279CC5422FC1DDBB9C0CBAA496B00FA5016D`.
 StructureOnly passed in `484633ms`; publication-evidence passed `7/7` in
 `329.3s` without a published-state claim. Realized production/test/combined
-gross deltas are `77/80`, `364/620`, and `441/700`. The packet is
-`ReviewedLocalGreen`; implementation commit/push completed, and the bounded
-records-only graph correction remains pending exact-head hosted proof. Cumulative
-A is `27/27`; `A-COMPLETE-PROFILE-01` is next
+gross deltas are `77/80`, `364/620`, and `441/700`. The packet is exact-head
+hosted-green `ReviewedLocalGreen` at correction head
+`daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
+`3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`.
+Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
+correctly skipped, and that correction head's graph is `4094/4096`. This
+records-only closure adds only the reserved two evidence relations, producing a
+proposed delivery graph of `4096/4096` that awaits exact-head hosted proof.
+Cumulative A is `27/27`; `A-COMPLETE-PROFILE-01` is next
 Candidate/inactive.
 
 That corrected directive still does **not** authorize:

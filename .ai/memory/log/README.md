@@ -266,8 +266,12 @@ cumulative A is `27/27` at
 StructureOnly passed with `elapsedMs=484633`, and publication evidence passed
 `7/7` in `329.3s` without a published-state claim. Implementation commit/push
 completed; the first hosted head passed Windows and failed Ubuntu only on the
-instruction-graph edge budget, and the bounded records-only correction remains
-pending exact-head hosted proof. `A-COMPLETE-PROFILE-01` and
+instruction-graph edge budget. The bounded records-only correction is exact-head
+hosted-green at `daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
+`3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`, with graph
+`4094/4096`. This record closure adds only the two reserved evidence relations;
+its proposed delivery graph is `4096/4096` and awaits exact-head hosted proof.
+`A-COMPLETE-PROFILE-01` and
 every later packet remain Candidate/inactive. The parent scenario remains
 `Planned`. No
 final `Scenario` trait, status/owner, workflow, efficiency activation,
