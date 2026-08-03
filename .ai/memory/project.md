@@ -46,11 +46,10 @@ Last verified: **2026-08-03**
   and reviews are retained in the
   [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
   The live denominator is `18 - 1 + 3 = 20`; eleven packets are
-  `ReviewedLocalGreen` (`55%`). The exact hosted-green selector FrozenDesign
-  predecessor is
-  [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-  git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with successful
-  [run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904);
+  `ReviewedLocalGreen` (`55%`). The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
+  [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
   publication verification was correctly skipped. The exact hosted-green
   finding delivery [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
@@ -76,8 +75,11 @@ Last verified: **2026-08-03**
   `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
   [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   with canonical R, production `12/20`, packet `382/520`, and cumulative A
-  `24/24`; synchronized green commit/push/exact-head hosted validation remain
-  pending. `A-ADMISSION-01` and every later packet remain Candidate/inactive.
+  `24/24`; synchronized green commit/push/exact-head hosted validation are
+  complete. `A-ADMISSION-01` is `FrozenDesign` at the
+  [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+  with freeze delivery and LR/R/G/V pending; every later packet remains
+  Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
@@ -555,17 +557,19 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0448](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
   is resolved at exact [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d) /
   [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
-  The exact hosted-green selector FrozenDesign predecessor is
-  [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-  git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with successful
-  [run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904).
+  The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
+  [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
   The earlier exact hosted-green finding delivery remains
   [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
   `A-FINDING-01` and `A-SELECTOR-01` are packet-local `ReviewedLocalGreen`; the
   latter is at the
   [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md)
-  with synchronized delivery and hosted proof pending. `A-ADMISSION-01` and
+  with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
+  `FrozenDesign` at the
+  [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
   later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1722,10 +1726,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is resolved at exact [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
   git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
   [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
-  The exact hosted-green selector FrozenDesign predecessor is
-  [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-  git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with successful run
-  [30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904).
+  The exact hosted-green selector delivery is
+  [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+  git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful run
+  [30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
   The exact hosted-green finding delivery
   [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
@@ -1734,8 +1738,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md);
   `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
   [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-  with synchronized delivery and hosted proof pending. `A-ADMISSION-01` and
-  every later packet remain Candidate/inactive. The live denominator is twenty
+  with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
+  `FrozenDesign` at the
+  [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+  every later packet remains Candidate/inactive. The live denominator is twenty
   and current `ReviewedLocalGreen` progress is eleven (`55%`), with cumulative
   A green `24/24`.
   Partial facts retain `ContractSlice` only; their final `Scenario`

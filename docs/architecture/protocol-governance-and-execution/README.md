@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Exact hosted-green selector-freeze predecessor [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c), git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, and [run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904) remain the hosted boundary. Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), cumulative A is `24/24`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at its [handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md), with synchronized green commit/push/exact-head hosted delivery pending. `A-ADMISSION-01` and later packets remain Candidate/inactive. B/C/D plus final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held, and no completion/DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5), git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, and [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693) are the hosted boundary. Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), cumulative A is `24/24`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; `A-SELECTOR-01` is exact-head `ReviewedLocalGreen` at its [handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md). `A-ADMISSION-01` is `FrozenDesign` at its [handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md), with freeze delivery and LR/R/G/V pending; later packets remain Candidate/inactive. B/C/D plus final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held, and no completion/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | Exact [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c), git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, passed [run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904) on Ubuntu and Windows; publication verification was correctly skipped. Eleven of twenty live A packets are `ReviewedLocalGreen` (`55%`), cumulative A is `24/24`; `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`, its green delivery is pending, and `A-ADMISSION-01` plus later packets remain Candidate/inactive. |
+| Current A implementation boundary | Exact [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5), git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, passed [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693) on Ubuntu and Windows; publication verification was correctly skipped. Eleven of twenty live A packets are `ReviewedLocalGreen` (`55%`), cumulative A is `24/24`; `A-SELECTOR-01` is exact-head `ReviewedLocalGreen`, `A-ADMISSION-01` is `FrozenDesign`, and later packets remain Candidate/inactive. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -106,11 +106,11 @@ git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, with successful
 [run 30748757145](https://github.com/hasanmanzak/meAndAI/actions/runs/30748757145).
 Exact remote-equal [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602)
 passed Ubuntu and Windows in [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
-Exact hosted-green selector-freeze predecessor [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, and
-[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904)
-remain the hosted boundary. `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`
-with green delivery pending; `A-ADMISSION-01` and every later packet remain Candidate/inactive,
+Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, and
+[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693)
+are the hosted boundary. `A-SELECTOR-01` is exact-head `ReviewedLocalGreen`;
+`A-ADMISSION-01` is `FrozenDesign`, and every later packet remains Candidate/inactive,
 and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
 
@@ -154,9 +154,8 @@ git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
 resolve [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448).
 Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602)
 passed hosted [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
-`A-FINDING-01` is exact-head `ReviewedLocalGreen`; `A-SELECTOR-01` is
-packet-local `ReviewedLocalGreen` with green delivery pending, and `A-ADMISSION-01`
-plus later packets remain Candidate/inactive. The
+`A-FINDING-01` and `A-SELECTOR-01` are exact-head `ReviewedLocalGreen`;
+`A-ADMISSION-01` is `FrozenDesign`, and later packets remain Candidate/inactive. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1601,12 +1600,12 @@ git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
 resolve [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448).
 Exact [`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602)
 passed hosted [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
-Exact hosted-green selector-freeze predecessor [`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, and
-[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904)
-remain the hosted boundary; `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`
-with green delivery pending, and `A-ADMISSION-01` plus later packets remain
-Candidate/inactive. B/C/D, final Scenario/status/owner/
+Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, and
+[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693)
+are the hosted boundary; `A-SELECTOR-01` is exact-head `ReviewedLocalGreen`,
+`A-ADMISSION-01` is `FrozenDesign`, and later packets remain Candidate/inactive.
+B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 activation, and publication boundaries remain held; no completion/DoD is claimed.
 

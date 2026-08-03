@@ -6,7 +6,9 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A expected-selector frozen-design handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+[ContractSlice A admission-proof FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+the exact-head hosted-green
+[ContractSlice A expected-selector reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green
 [ContractSlice A finding declaration reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green predecessor
@@ -244,10 +246,10 @@ git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
 Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), and cumulative A
-is green `24/24`. The exact hosted-green selector FrozenDesign predecessor is
-[`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with Ubuntu and Windows green in
-[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904);
+is green `24/24`. The exact hosted-green selector delivery is
+[`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
+[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
 publication verification was correctly skipped.
 The earlier exact A-FINDING delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
@@ -275,8 +277,11 @@ is packet-local `ReviewedLocalGreen` at the
 canonical R SHA-256 is `7A85D0CC4B1AAF45038E818B3687C10D5F3339EC2ECC53D9D5646C97D5F6D30A`,
 retained source is `370` lines at `56B9B30A...62B69`, production gross delta is
 `12/20`, packet size is `382/520`, and cumulative A is `24/24`; synchronized
-green commit/push/exact-head hosted validation remain pending. `A-ADMISSION-01`
-and every later packet remain Candidate/inactive. No
+green commit/push/exact-head hosted validation are complete. `A-ADMISSION-01`
+is `FrozenDesign` at the
+[admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+with freeze delivery and LR/R/G/V pending; every later packet remains
+Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

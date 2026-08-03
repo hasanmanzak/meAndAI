@@ -238,10 +238,10 @@ is resolved by exact
 [`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
 git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and successful
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884).
-The exact hosted-green selector FrozenDesign predecessor is
-[`c97c317fb0d5e734597f43f605fe4f1718aa6d1c`](https://github.com/hasanmanzak/meAndAI/commit/c97c317fb0d5e734597f43f605fe4f1718aa6d1c),
-git tree identity `7fa1748c59902f027f1bd8ca4cdd66b72194f98e`, with Ubuntu and Windows green in
-[run 30769530904](https://github.com/hasanmanzak/meAndAI/actions/runs/30769530904).
+The exact hosted-green selector delivery is
+[`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
+git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
+[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
 It follows the exact hosted-green finding delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
@@ -256,9 +256,11 @@ hosted delivery complete. `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`
 at the
 [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md):
 canonical R is exact, production gross delta is `12/20`, retained test source is
-`370` lines, cumulative A is `24/24`, and synchronized green commit/push/exact-
-head hosted validation remain pending. `A-ADMISSION-01` and every later packet
-remain Candidate/inactive. No
+`370` lines, cumulative A is `24/24`, and exact-head hosted delivery is complete.
+`A-ADMISSION-01` is `FrozenDesign` at the
+[admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+with freeze delivery and LR/R/G/V pending; every later packet remains
+Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
