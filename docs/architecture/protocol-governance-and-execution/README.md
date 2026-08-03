@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; thirteen of twenty live packets are green (`65%`), cumulative A is `26/26`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. Exact packet-local implementation and git tree evidence is retained; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly skipped. `A-CONVERGE-01` is next and remains `Candidate`/inactive. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; thirteen of twenty live packets are green (`65%`), cumulative A is `26/26`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. Exact packet-local implementation and git tree evidence is retained; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly skipped. Never-activated `A-CONVERGE-01` is retired/excluded; one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending records-only commit/push and exact-head hosted validation. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; progress is `13/20` (`65%`) and cumulative A is `26/26`. Exact packet-local implementation and git tree evidence is retained; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly skipped. `A-CONVERGE-01` is next and remains `Candidate`/inactive. |
+| Current A implementation boundary | `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; progress is `13/20` (`65%`) and cumulative A is `26/26`. Exact packet-local implementation and git tree evidence is retained; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly skipped. Never-activated `A-CONVERGE-01` is retired/excluded; one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending records-only commit/push and exact-head hosted validation. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -99,8 +99,11 @@ packets. Thirteen of twenty A packets are `ReviewedLocalGreen` (`65%`);
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, and `A-SELECTOR-01` are
 `ReviewedLocalGreen`; `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` are packet-local
-`ReviewedLocalGreen`, with cumulative A `26/26`. `A-CONVERGE-01` is next and
-remains `Candidate`/inactive.
+`ReviewedLocalGreen`, with cumulative A `26/26`. Never-activated
+`A-CONVERGE-01` is retired/excluded; one-for-one replacement
+`A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only
+review `0/0/0`, pending records-only commit/push and exact-head hosted
+validation.
 [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
 is resolved at exact
 [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
@@ -121,9 +124,12 @@ D/RT `0/0/0` and exact committed graph `4091` as historical design evidence.
 `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`.
 Exact packet-local implementation and git tree evidence is retained; hosted run
 `30798854880` passed Windows in `14m58s` and Ubuntu in
-`19m00s`, with publication verification correctly skipped. `A-CONVERGE-01` is next
-and remains `Candidate`/inactive. Every later packet
-remains inactive, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+`19m00s`, with publication verification correctly skipped. Never-activated
+`A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is
+`FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending
+records-only commit/push and exact-head hosted validation. Every later packet
+remains inactive, and
+[TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
 
 Outside that exact A boundary, the following remain prohibited:
@@ -172,7 +178,10 @@ passed hosted [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/r
 Exact packet-local implementation and git tree evidence is retained; hosted run
 `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`, with publication verification correctly skipped.
-`A-CONVERGE-01` is next and remains `Candidate`/inactive. Later packets remain inactive. The
+Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
+`A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only
+review `0/0/0`, pending records-only commit/push and exact-head hosted
+validation. Later packets remain inactive. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1633,7 +1642,10 @@ packet-local `ReviewedLocalGreen`, cumulative A is `26/26`, and progress is
 retained;
 hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with
 publication verification correctly skipped.
-`A-CONVERGE-01` is next and remains `Candidate`/inactive. Later packets remain inactive.
+Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
+`A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only
+review `0/0/0`, pending records-only commit/push and exact-head hosted
+validation. Later packets remain inactive.
 B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 activation, and publication boundaries remain held; no completion/DoD is claimed.

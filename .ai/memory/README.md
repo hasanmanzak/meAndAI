@@ -280,8 +280,11 @@ cumulative green, final `0/0/0` review, and accepted `770/770` combined line
 budget. The exact implementation identity and hosted evidence are retained in
 the canonical projector handoff. Exact-head hosted validation passed Windows in
 `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
-`A-CONVERGE-01` is the next Candidate/inactive packet. Every later packet
-remains Candidate/inactive. No
+Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
+Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and inactive
+after renewed records-only review `0/0/0`, pending records-only commit/push and
+exact-head hosted validation.
+Every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

@@ -101,9 +101,11 @@ Last verified: **2026-08-03**
   `770/770`. The exact implementation identity and hosted evidence are retained
   in the canonical projector handoff. Exact-head hosted validation passed
   Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
-  correctly skipped. `A-CONVERGE-01` is the next
-  Candidate/inactive packet, and
-  every later packet remains Candidate/inactive.
+  correctly skipped. Never-activated `A-CONVERGE-01` is retired and excluded
+  from the denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
+  `FrozenDesign` and inactive after renewed records-only review `0/0/0`, pending
+  records-only commit/push and exact-head hosted validation; every later packet
+  remains Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
@@ -618,8 +620,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   projector handoff. Exact cumulative A is `26/26`, final review is `0/0/0`,
   and combined budget is `770/770`; exact-head hosted validation passed Windows
   in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
-  skipped. `A-CONVERGE-01` is the next Candidate/inactive
-  packet, and later packets remain Candidate/inactive.
+  skipped. Never-activated `A-CONVERGE-01` is retired and excluded from the
+  denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
+  `FrozenDesign` and inactive after renewed records-only review `0/0/0`, pending
+  records-only commit/push and exact-head hosted validation; later packets
+  remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1804,9 +1809,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   implementation identity and hosted evidence are retained in the canonical
   projector handoff. Exact-head hosted validation passed Windows in `14m58s`
   and Ubuntu in `19m00s`, with publication verification correctly skipped.
-  `A-CONVERGE-01` is the next
-  Candidate/inactive packet, and
-  every later packet remains Candidate/inactive. The live denominator is twenty
+  Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
+  Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and
+  inactive after renewed records-only review `0/0/0`, pending records-only
+  commit/push and exact-head hosted validation. Every later packet remains
+  Candidate/inactive. The live denominator is twenty
   and current `ReviewedLocalGreen` progress is thirteen (`65%`), with cumulative
   A green `26/26`.
   Partial facts retain `ContractSlice` only; their final `Scenario`

@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+[ContractSlice A full-manifest FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
 the exact-head hosted-green
 [ContractSlice A expected-selector reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green
@@ -197,9 +197,7 @@ the hard cap. Build passed at zero warnings/errors, format passed, and all six
 locks remained unchanged.
 
 [TEST-0074](../../../docs/features/FEAT-0012-v082-correction/test-cases.md#test-0074)
-first exposed a fixture-data
-[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-literal; correction uses neutral
+first exposed a parent-scenario fixture-data literal; correction uses neutral
 [TEST-0001](../../../docs/features/FEAT-0001-common-development-protocol/test-cases.md#test-0001)
 and no Scenario trait. Corrected local StructureOnly was
 inconclusive at a controlled 300-second active timeout with no orphan; an
@@ -225,9 +223,8 @@ and renewed RT `0/0/0`. Original-oracle and topology-clean focused green passed
 `1/1`, cumulative A passed `19/19`, and the exact `642/690` packet plus final
 validation and review evidence is in the
 [index-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md).
-[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. Workflow test-step target/filter, scenario ownership,
-[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+The parent scenario remains `Planned`. Workflow test-step target/filter,
+scenario ownership, efficiency activation,
 WIP extraction, B/C/D implementation, consumer mutation, release publication,
 authority transfer, and PowerShell retirement remain unauthorized.
 The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
@@ -278,8 +275,8 @@ git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
 The exact governed-reference R/G evidence, focused `1/1`, validation, and
 reviews are recorded in the
 [governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
-[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
+The parent scenario remains `Planned`; `A-FINDING-01` is packet-local
+`ReviewedLocalGreen` at the
 [finding declaration handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)
 with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, focused `1/1`,
 cumulative A `23/23`, and exact-head hosted delivery complete. `A-SELECTOR-01`
@@ -289,12 +286,10 @@ canonical R SHA-256 is `7A85D0CC4B1AAF45038E818B3687C10D5F3339EC2ECC53D9D5646C97
 retained source is `370` lines at `56B9B30A...62B69`, production gross delta is
 `12/20`, packet size is `382/520`, and cumulative A was `24/24`; synchronized
 green commit/push/exact-head hosted validation are complete. `A-ADMISSION-01`
-is packet-local `ReviewedLocalGreen` at the
-[admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+is packet-local `ReviewedLocalGreen` at its canonical admission handoff,
 with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
 `0/0/0`; its immutable implementation and record-delivery identities remain in
-that handoff. The corrected
-[projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
+that handoff. The corrected canonical projector-DAG handoff
 now retains the frozen design, immutable R, bounded C# green, exact local
 validation, and final `0/0/0` review evidence. `A-PROJECTOR-DAG-01` is
 packet-local `ReviewedLocalGreen`; its exact implementation identity and hosted
@@ -302,10 +297,13 @@ evidence are retained in that canonical projector handoff. Exact-head hosted
 validation passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication
 verification correctly skipped.
 Thirteen of twenty live packets are green (`65%`) and cumulative A is `26/26`.
-`A-CONVERGE-01` is the next Candidate/inactive packet, and every later packet
-remains Candidate/inactive. The parent scenario remains `Planned`. No
-final `Scenario` trait, status/owner, workflow,
-[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
+Its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign` and inactive
+after renewed records-only review `0/0/0`, pending records-only commit/push and
+exact-head hosted validation;
+every later packet remains Candidate/inactive. The parent scenario remains
+`Planned`. No
+final `Scenario` trait, status/owner, workflow, efficiency activation,
 or B/C/D activation is claimed.
 Historical governed-reference-slots evidence retains exact implementation
 predecessor
@@ -345,12 +343,10 @@ exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-The current continuation state and denominator are in the
-[projector/DAG reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
-the [admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
-is its hosted-green predecessor, and
-the [target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
-is historical.
+The current continuation state and denominator are in the full-manifest
+FrozenDesign handoff. The projector/DAG reviewed-local-green handoff,
+admission-proof reviewed-local-green handoff, and target parser/index/slot
+reviewed-local-green handoff remain historical predecessor evidence.
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)
@@ -397,6 +393,9 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-03 - SUBF-0143 ContractSlice A full-manifest FrozenDesign](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
+- [2026-08-03 - SUBF-0143 ContractSlice A projector/DAG reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
+- [2026-08-03 - SUBF-0143 ContractSlice A admission-proof reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A finding declaration reviewed-local-green](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A target parser/index/slot reviewed-local-green](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A governed-reference-slots freeze](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md)

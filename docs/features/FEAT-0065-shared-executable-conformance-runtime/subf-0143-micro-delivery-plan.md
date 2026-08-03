@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, [TEST-0210](test-cases.md#test-0210) remains `Planned`, and `A-CONVERGE-01` plus later packets remain Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. Every partial Fact retains only `ContractSlice=A`. |
+| Status | Exact admission and projector frozen-design predecessor evidence remain unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact packet-local implementation/evidence. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired and excluded from the denominator; its one-for-one replacement `A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review `0/0/0`, pending records-only commit/push and exact-head hosted validation. Hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped. Every partial Fact retains only `ContractSlice=A`. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -165,7 +165,7 @@ or handoff files.
 non-live routing tombstone used only to preserve why a never-activated label was
 redrawn. Such a row has no FQN, marker, ordinal, R, G, or V, cannot be
 reactivated, and is excluded from the live denominator. The physical ledger
-therefore contains the retired tombstone plus twenty live packet rows.
+therefore contains the two retired tombstones plus twenty live packet rows.
 
 ## One semantic packet as seven small tasks
 
@@ -201,8 +201,9 @@ therefore contains the retired tombstone plus twenty live packet rows.
 If existing production behavior already satisfies a regression packet, R is
 `NotApplicable` and G is `TestOnlyGreen`: do not manufacture a red, add the
 direct retained test with no production delta, review the source, and finalize
-the already-green contract. Audit/convergence packets may mark both R and G
-`NotApplicable` and add no `[Fact]`. If a regression test exposes a defect,
+the already-green contract. Pure audit packets may mark both R and G
+`NotApplicable` and add no `[Fact]`; `A-CONVERGE-02` is the final A instance.
+An operational label does not override a direct semantic regression. If a regression test exposes a defect,
 stop and create a separately frozen semantic packet.
 
 D may bind only requirements already present in the canonical design. If exact
@@ -329,7 +330,7 @@ here.
 | `A-SELECTOR-01` | Selector-to-slot/schema/resolver/finding closure | `ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure` |
 | `A-ADMISSION-01` | Admission-proof kind/component/artifact/surface/material-role declarations | `ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure` |
 | `A-PROJECTOR-DAG-01` | Projector slot/schema/component bindings plus the mutually required acyclic, reachable, single-owner global producer graph | `ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph` |
-| `A-CONVERGE-01` | Test-only production six-artifact-set/bijection; exact five-rule/normative inventory; exact three schema, two parser, four index, and one projector declarations/values, four slots, selectors/findings, proof contracts, caches/budgets/failure codes, and ordinal/reference relationships; and the disjoint ordinal union of `27` Policy + `4` runtime-anchor + `1` activation-proof + `3` admission rows into the exact `35` component snapshot | `ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_six_artifact_27_35_snapshot` |
+| `A-FULL-MANIFEST-01` | Exact production-intended declaration snapshot plus the bounded generic multi-rule/shared-slot/distinct-admission closure needed to construct it: five rules/ten normative fragments; three schema, two parser, four index, one projector; four structurally unique slots across twelve occurrences; three selectors; sixteen findings; exact proof/cache/budget/failure values; and the disjoint ordinal union of `27` logical Policy + `4` runtime-anchor + `1` activation-proof + `3` admission rows into `35` components over six artifact names. It claims no physical type/artifact or executable-registration proof. | `ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot` |
 | `A-COMPLETE-PROFILE-01` | Complete-positive branch and final exact-one union closure; genesis complete catalog, current `CompleteInventoryDigest` framing/equality, one minimal baseline/named profile with compatible-rule closure, and one mandatory Added transition per current rule | `ContractSliceACompleteCatalogProfileTests.Enforces_exact_genesis_catalog_inventory_digest_profile_and_added_transitions` |
 | `A-PREDECESSOR-01` | Existing predecessor `catalogVersion` strictly lower than current, predecessor `manifestDigest`, predecessor `completeInventoryDigest`, and current derived inventory digest as separate exact fields | `ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests` |
 | `A-TRANSITION-01` | Expand and retest exact Unchanged/Added/Revised/Retired shapes from the already-valid genesis Added baseline | `ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes` |
@@ -359,7 +360,8 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-SELECTOR-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0008`; exact FQN; canonical R `7A85...D30A`, transient source `FC04...B8F55` | Focused `1/1` (`98B2...DDB2`); cumulative A `24/24` (`527D...8D35`); source `370` lines / `56B9...2B69`; production `12/20` / `F4AA...AAAF`; packet `382/520`; full Domain `98/98` (`8DEB...F478`); full Conformance `24/24` (`7356...5532`); Release build `0/0`; format/diff/six locks, StructureOnly, and publication-evidence green; exact [`2bbd36f...`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5) / tree `fe543889...` / [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693) hosted green | D/RT, canonical-R audit, independent code review, and evidence/scope audit each `0/0/0`; real five-rule selector inventory held | [Expected-selector reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md) |
 | `A-ADMISSION-01` | `ReviewedLocalGreen` | `TEST-0210-A-BEHAVIOR-RED-0009`; exact FQN; canonical R `2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`; transient source `7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC` | P `NotApplicable`; predecessor selector `1/1` (`CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`) and cumulative `24/24` (`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`); original-oracle `1/1` (`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`); retained focused `1/1` (`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`); cumulative A `25/25` (`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`); full Domain `98/98` (`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`); full Conformance `25/25` (`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`); source `339` lines / `AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`; production/test/packet `186/310`, `339/370`, `525/680`; Release build `0/0`, format/diff/six locks, StructureOnly, and publication-evidence green; exact hosted implementation [`c1653d45...`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8) / tree `7f547daa...` / [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538); record delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326) green | Reconciled D/RT, independent final code/test red-team, and evidence/hash/counter/scope audit each `0/0/0`; Reader `85/145`, Writer `35/55`, Catalog `66/110`; later packets inactive | [Admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) |
 | `A-PROJECTOR-DAG-01` | `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, publication verification skipped | `TEST-0210-A-BEHAVIOR-RED-0010`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`; one Fact, only `ContractSlice=A`, no Scenario; test source `408` lines / `8E919A438CD9D6B13021AAFB50481E3567E3B40A95F45B059E71E00C71843010` | P `NotApplicable`; predecessor `25/25`; focused `1/1` in `472ms` / `8F708B1AEEA6848DCA134CC3C653423F3AABC705708CC07C0E4C6173829A4546`; cumulative A `26/26`, projector `518ms` / `74A9A6AD9F152976156D11450F813487FE9E1ECD23F8DE5F6134A2894FBED005`; tuple `(3,2,4,1,4,2,2,3,26,3)` | `103` vectors; Reader `175`, Writer `32`, Catalog `155`, aggregate production `362`, test `408`, combined `770`; Release build `0 warnings / 0 errors` in `6.63s`, format green, `StructureOnly` `elapsedMs=394809`, publication-evidence `7/7` in `256.7s` without published-state claim; independent review `0/0/0`; exact-head hosted validation green | Frozen contract and retained local evidence below |
-| `A-CONVERGE-01` | Candidate | None | None | N/A | None |
+| `A-CONVERGE-01` | `RetiredBeforeActivation` | None; never activated and excluded from the live denominator | None | Its no-new-Fact convergence classification contradicted the reserved fresh cross-partition Fact; strict D/RT redraw replaces it one-for-one | Historical routing tombstone only |
+| `A-FULL-MANIFEST-01` | `FrozenDesign`; inactive pending records-only commit/push and exact-head hosted validation | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; one Fact, only `ContractSlice=A`, no Scenario | None until canonical R and bounded green | Renewed code/design, evidence/gate, and records/link-graph reviews each `0 Blocking / 0 Important / 0 Minor` | [Full-manifest FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
 | `A-COMPLETE-PROFILE-01` | Candidate | None | None | N/A | None |
 | `A-PREDECESSOR-01` | Candidate | None | None | N/A | None |
 | `A-TRANSITION-01` | Candidate | None | None | N/A | None |
@@ -412,7 +414,7 @@ Independent code red-team and evidence audit each closed
 Real Policy finding codes/counts/pairs, exact five-rule inventory, Catalog
 inventory enforcement, selector closure, evaluator output, and emitted qualified
 references are prohibited here. They remain owned by `A-SELECTOR-01`,
-`A-CONVERGE-01`, and later runtime packets. Corrected D/RT closed
+`A-FULL-MANIFEST-01`, and later runtime packets. Corrected D/RT closed
 `0 Blocking / 0 Important / 0 Minor`; see the
 [finding declaration reviewed-local-green handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md).
 
@@ -492,7 +494,7 @@ boundaries. Nested resolver grammar receives a positive `componentKey` then
 `componentVersion` order assertion plus orphan negatives; existing component
 tests retain exhaustive nested grammar. `selectorSchemaKey` is an exact
 preserved token here, not a new registry/whitelist closure. Real Policy selector
-inventory and schema/resolver assignments remain `A-CONVERGE-01` or later
+inventory and schema/resolver assignments remain `A-FULL-MANIFEST-01` or later
 runtime scope. See the
 [expected-selector reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md).
 
@@ -720,8 +722,68 @@ closed `0 Blocking / 0 Important / 0 Minor`. Realized Reader `175`, Writer `32`,
 Catalog `155`, aggregate production `362`, test `408`, and combined `770`
 satisfy the frozen caps. Hosted run `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`; publication verification was correctly skipped.
-`A-CONVERGE-01` and all later packets remain
-Candidate/inactive.
+`A-FULL-MANIFEST-01` and all later packets remain inactive.
+
+#### Frozen-design `A-FULL-MANIFEST-01` contract <a name="a-full-manifest-01-freeze"></a>
+
+The never-activated `A-CONVERGE-01` label is retired and excluded from the live
+denominator. Its reserved direct five-rule/six-artifact/thirty-five-component
+Fact is a semantic regression, not a no-new-Fact audit. The one-for-one
+replacement is `A-FULL-MANIFEST-01`; `A-CONVERGE-02` remains the only final A
+audit/convergence checkpoint.
+
+The current production closure is the canonical expected-red owner: it assumes
+one rule, four evaluation-slot occurrences, two selectors, two findings, and
+one shared admission contract identity. The accepted initial declaration has
+five rules, twelve occurrences over four structurally equal reusable slots,
+three selectors, sixteen findings, and three distinct admission identities.
+Green changes only `CatalogSliceDeclaration.cs`: repeated SlotKeys remain
+structurally identical; closure uses exact SlotKey lookup over structurally
+unique slots rather than flattened occurrence positions; and applicability and
+evaluation sets remain separate. Admission accepts the exact three kinds with
+distinct proof-component identities plus surfaces/material roles derived from
+the complete slot union. Generic production imposes neither admission contract-
+key cardinality nor a zero-applicability rule. Initial catalog counts, zero
+applicability, and the three exact contract keys remain test-owned.
+
+The exact proof component keys/version are activation
+`protocol.activation-proof.release-envelope` / `1` and admissions
+`protocol.admission-proof.observed`, `protocol.admission-proof.failed`, and
+`protocol.admission-proof.no-input`, each version `1`; their contract keys are
+respectively `protocol.activation.release-envelope`, `protocol.admission.observed`,
+`protocol.admission.failed`, and `protocol.admission.no-input`.
+
+P is `NotApplicable` after one locked restore, unchanged projector focused
+`1/1`, cumulative A `26/26`, and six equal lock fingerprints. R marker and TRX
+stem are exactly `TEST-0210-A-BEHAVIOR-RED-0011`. R constructs registry/rules/
+artifacts/components, the successful `CatalogSliceDeclaration.Create` result,
+and validation-free `ParsedCanonicalManifest` outside the guard, then invokes
+only `CanonicalManifestWriter.Write(parsed)` inside it. Only exact runtime type
+`ArgumentException`, parameter `rules`, and message equal to
+`new ArgumentException("Admission-proof contracts require the exact selector topology.", "rules").Message`
+may execute the sole direct `Assert.Fail(exactMarker)`. R runs once. Its TRX
+contains the marker only in the sole failed result ErrorInfo/Message plus at
+most one byte-identical summary echo; permitted stack and RunInfo are marker-
+free, and no other result, diagnostic, or attachment contains it. Green removes the
+marker/catch, proves the exact ordered declaration projection and
+Writer -> Reader -> Writer bytes/digest, then passes focused `1/1` and cumulative
+A `27/27`.
+
+The sole new file is
+`tests/dotnet/MeAndAI.Protocol.Conformance.Tests/ContractSliceAFullManifestGraphTests.cs`.
+The exact Fact is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`;
+its only trait is `ContractSlice=A`, with no Scenario. Production target/hard
+caps are `40-60/80`; test target/hard caps are `450-550/620`; combined hard cap
+is `700`. The same Fact proves equal repeated SlotKeys accepted; divergent
+repeated SlotKey, missing proof kind, reused proof component, and derived
+surface/material-role mismatch rejected; and shared contract keys across kinds
+accepted. It asserts exact component-key-to-artifact bindings and the named
+distribution Policy `23`, Conformance.Abstractions `5`, Application `4`, Domain
+`1`, Conformance `1`, and Markdig `1`. Project, solution, package, lock,
+workflow, public/friend API, sibling test, filesystem/Git/provider I/O,
+physical CLR/artifact verification, executable export/registration, and every
+held downstream scope remain excluded.
 
 #### Reviewed-local-green `A-INDEX-SLOT-01` design freeze <a name="a-index-slot-01-drt-observation"></a>
 
@@ -1431,8 +1493,10 @@ git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green
 `17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
 `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` remain packet-local
-`ReviewedLocalGreen`; `A-CONVERGE-01` and every later packet remain
-Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and
+`ReviewedLocalGreen`; never-activated `A-CONVERGE-01` is retired/excluded,
+`A-FULL-MANIFEST-01` is `FrozenDesign`/inactive after renewed records-only review
+`0/0/0`, pending records-only commit/push and exact-head hosted validation; every
+later packet remains Candidate/inactive. Hosted run `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`; publication verification was correctly skipped.
 
 The packet-local evidence above remains authoritative and unchanged. Its pushed
@@ -1468,9 +1532,11 @@ packets combine before activation. No line cap overrides this semantic rule.
 already-green regressions; they do not force expected-red. `A-RESOURCE-01`
 waits until the full grammar can produce the equality fixtures. It must
 reconcile the declared depth-64 ceiling with actual reachable nesting and must
-not invent a structurally invalid depth-64 success fixture. `A-CONVERGE-01`
-owns no production fix: a missing invariant returns to its owner or receives a
-new frozen packet. Neither convergence checkpoint manufactures red evidence.
+not invent a structurally invalid depth-64 success fixture. The retired
+`A-CONVERGE-01` candidate never activates. `A-FULL-MANIFEST-01` is the direct
+semantic owner of the bounded generic multi-rule/shared-slot/distinct-admission
+closure exposed by its exact snapshot. `A-CONVERGE-02` owns no production fix
+and manufactures no red evidence.
 
 The live queue has 20 routing packages. The retired combined-label tombstone is
 not counted. Each semantic package expands into the seven
