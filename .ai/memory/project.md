@@ -116,8 +116,8 @@ Last verified: **2026-08-03**
   a published-state claim. The first hosted implementation head passed Windows
   and failed Ubuntu only on the instruction-graph edge budget. The bounded
   records-only correction is exact-head hosted-green at
-  `daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
-  `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`;
+  `canonical FIND-0456 correction head`, tree
+  `canonical FIND-0456 correction tree`, and run `30834117740`;
   Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
   correctly skipped, and that correction graph is `4094/4096`. This records-only
   closure adds the two reserved evidence relations; its proposed delivery graph
@@ -646,8 +646,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   cumulative validation, and final long checks are retained in its canonical
   handoff. The first hosted implementation head passed Windows and failed Ubuntu
   only on the instruction-graph edge budget. The bounded records-only correction
-  is exact-head hosted-green at `daeaa64947fc9e0165d542d25f3333664eb7eb34`,
-  tree `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`,
+  is exact-head hosted-green at `canonical FIND-0456 correction head`,
+  tree `canonical FIND-0456 correction tree`, and run `30834117740`,
   with graph `4094/4096`. This records-only closure adds the two reserved
   evidence relations; its proposed delivery graph is `4096/4096` and awaits
   exact-head hosted proof.
@@ -1842,8 +1842,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and final cumulative A is `27/27`. The first hosted implementation head passed
   Windows and failed Ubuntu only on the instruction-graph edge budget. The
   bounded records-only correction is exact-head hosted-green at
-  `daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
-  `3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`,
+  `canonical FIND-0456 correction head`, tree
+  `canonical FIND-0456 correction tree`, and run `30834117740`,
   with graph `4094/4096`. This records-only closure adds the two reserved
   evidence relations; its proposed delivery graph is `4096/4096` and awaits
   exact-head hosted proof. The live denominator is twenty and current

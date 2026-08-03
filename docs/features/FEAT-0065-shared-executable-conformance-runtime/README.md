@@ -667,8 +667,8 @@ final focused/cumulative A/full Conformance/full Domain are `1/1`, `27/27`,
 publication-evidence suite passed `7/7` in `329.3s` without a published-state
 claim. All six A-FULL findings are resolved. The implementation and bounded
 records-only graph correction are exact-head hosted-green at correction head
-`daeaa64947fc9e0165d542d25f3333664eb7eb34`, tree
-`3efef2997a517770a07ed16257ffdd87fa4f66cd`, and run `30834117740`;
+`canonical FIND-0456 correction head`, tree
+`canonical FIND-0456 correction tree`, and run `30834117740`;
 Windows passed in `15m53s`, Ubuntu in `17m50s`, and publication verification
 was correctly skipped;
 `A-COMPLETE-PROFILE-01` is next Candidate/inactive.
