@@ -7887,9 +7887,12 @@ filter terms above, and reject alternate, wrapped, or extra commands. Hosted evi
 discovered, executed, passed, failed, and skipped counts per test project, not
 only static command text.
 
-The Windows job retains its unchanged 35-minute timeout and existing coverage.
-If the exact hosted head does not fit, stop for design review; do not raise the
-timeout, split or remove coverage, add another invocation, or weaken
+The Windows job retained its 35-minute timeout until the exact hosted head did
+not fit and required design review. The reviewed single-job ceiling is now 45
+minutes with coverage, topology, and invocation count unchanged. If a later
+exact hosted head still does not fit, stop for design review again; do not
+automatically raise the timeout, split or remove coverage, add another
+invocation, or weaken
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146).
 
 ## Internal implementation slices
