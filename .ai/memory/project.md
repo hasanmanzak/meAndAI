@@ -90,8 +90,9 @@ Last verified: **2026-08-03**
   `ReviewedLocalGreen`, with exact LR/R/G/V and hosted predecessor evidence
   retained unchanged by the bounded records-only correction.
   `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head
-  hosted green remain before LR/P/R/C#. Every later packet remains Candidate/inactive.
+  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
+  is green. LR/P/R/C# is the next inactive phase; every later packet remains
+  Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
@@ -602,8 +603,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and hosted predecessor evidence remain exact after the bounded records-only
   correction.
   `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head
-  hosted green remain before LR/P/R/C#. Later packets remain Candidate/inactive.
+  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
+  is green. LR/P/R/C# is the next inactive phase; later packets remain
+  Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1785,8 +1787,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   and hosted predecessor evidence remain exact after the bounded records-only
   correction.
   `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-  `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head
-  hosted green remain before LR/P/R/C#. Every later packet remains Candidate/inactive. The live denominator is twenty
+  `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
+  is green. LR/P/R/C# is the next inactive phase; every later packet remains
+  Candidate/inactive. The live denominator is twenty
   and current `ReviewedLocalGreen` progress is twelve (`60%`), with cumulative
   A green `25/25`.
   Partial facts retain `ContractSlice` only; their final `Scenario`

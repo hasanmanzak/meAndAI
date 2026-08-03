@@ -276,8 +276,9 @@ retains the exact hosted-green admission predecessor and first-freeze failure
 evidence. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign` with marker
 `TEST-0210-A-BEHAVIOR-RED-0010`, exact FQN, 26/3 successor, 25/3 reproduction,
 the enumerated 103-case role-aware producer-DAG contract, and revised 770-line
-hard cap. Renewed D/RT closed `0/0/0`; exact committed-tree graph evidence below
-4096 and hosted green remain required before LR/P/R/C#. Every later packet remains
+hard cap. Renewed D/RT closed `0/0/0`; the corrected exact committed graph is
+`4091` and exact-head hosted validation is green; LR/P/R/C# is the next inactive
+phase. Every later packet remains
 Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),

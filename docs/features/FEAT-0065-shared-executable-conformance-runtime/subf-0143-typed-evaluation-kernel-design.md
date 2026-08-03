@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact admission predecessor and first-freeze hosted evidence remain unchanged. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head hosted green remain before LR/P/R/C#. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Exact admission predecessor and first-freeze hosted evidence remain unchanged. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation is green. LR/P/R/C# is the next inactive phase. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current records-only projector/DAG state; the [admission handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current records-only projector/DAG state; the [projector/DAG freeze-gate handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md) is the current checkpoint, admission and earlier handoffs remain exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -158,8 +158,9 @@ The exact admission record-evidence delivery is
 git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
 `17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-PROJECTOR-DAG-01` is `FrozenDesign`; its LR/P/R/C# activation remains held
-until the freeze records are committed, pushed, and exact-head hosted green.
+`A-PROJECTOR-DAG-01` is `FrozenDesign`; its corrected freeze records are
+committed and pushed, and exact-head hosted validation is green. LR/P/R/C# is
+the next inactive phase.
 Later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
@@ -791,8 +792,8 @@ hard cap is `410`, and combined green acceptance cap is `770`. A measured
 vectors may not be compressed away to fit. Fully green successor tuple is
 `(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`.
 Exact evidence remains unchanged after the bounded records-only correction.
-Renewed D/RT is closed `0/0/0`; LR/P/R/C# remain held until the corrected
-committed tree is graph-valid below 4096 and exact-head hosted green.
+Renewed D/RT is closed `0/0/0`; the corrected committed graph is `4091` and
+exact-head hosted validation is green. LR/P/R/C# is the next inactive phase.
 
 That corrected directive still does **not** authorize:
 

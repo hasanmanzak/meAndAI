@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-ADMISSION-01` is fully synchronized packet-local `ReviewedLocalGreen`; its exact evidence remains unchanged. Twelve of twenty live packets remain green (`60%`), cumulative A remains `25/25`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head hosted green remain before LR/P/R/C#. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-ADMISSION-01` is fully synchronized packet-local `ReviewedLocalGreen`; its exact evidence remains unchanged. Twelve of twenty live packets remain green (`60%`), cumulative A remains `25/25`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation is green. LR/P/R/C# is the next inactive phase. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | The corrected records-only projector/DAG state retains the exact hosted-green admission predecessor and first-freeze failure evidence. Progress stays `12/20` (`60%`) and cumulative A `25/25`; renewed D/RT closed `0/0/0`, while exact committed graph below 4096 and hosted green remain before projector LR/P/R/C#. |
+| Current A implementation boundary | The corrected records-only projector/DAG state retains the exact hosted-green admission predecessor and first-freeze failure evidence. Progress stays `12/20` (`60%`) and cumulative A `25/25`; renewed D/RT closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation is green. Projector LR/P/R/C# is the next inactive phase. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -116,8 +116,9 @@ git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, passed Ubuntu in
 `18m12s` and Windows in `17m28s` in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538);
 publication verification was correctly skipped. Its exact record delivery
 remains unchanged. `A-PROJECTOR-DAG-01` remains
-records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, while exact committed-
-tree graph evidence below 4096 and exact-head hosted green remain before LR/P/R/C#. Every later packet
+records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, while the exact
+committed-tree graph has `4091` edges and exact-head hosted validation is green. LR/P/R/C# is the
+next inactive phase. Every later packet
 remains inactive, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
 
@@ -165,8 +166,8 @@ passed hosted [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/r
 `A-ADMISSION-01` remains packet-local `ReviewedLocalGreen`; its immutable
 implementation and record evidence remain unchanged. `A-PROJECTOR-DAG-01`
 remains records-only `FrozenDesign`; renewed D/RT
-closed `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-
-head hosted green remain before LR/P/R/C#. Later packets remain inactive. The
+closed `0/0/0`, the exact committed graph is `4091`, and exact-head hosted
+validation is green. LR/P/R/C# is the next inactive phase. Later packets remain inactive. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1622,8 +1623,8 @@ publication verification was correctly skipped. Its exact record delivery
 remains unchanged. `A-ADMISSION-01` is synchronized
 packet-local `ReviewedLocalGreen`, cumulative A remains `25/25`, and
 `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-`0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head
-hosted green remain before LR/P/R/C#. Later packets remain inactive.
+`0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
+is green. LR/P/R/C# is the next inactive phase. Later packets remain inactive.
 B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 activation, and publication boundaries remain held; no completion/DoD is claimed.

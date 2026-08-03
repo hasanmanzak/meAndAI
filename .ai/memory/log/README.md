@@ -296,8 +296,8 @@ that handoff. The corrected
 [projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
 retains the exact predecessor and first-freeze hosted evidence.
 `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
-`0/0/0`, while an exact committed graph below 4096 and exact-head hosted green
-remain before LR/P/R/C#.
+`0/0/0`, the exact committed graph is `4091`, and exact-head hosted validation
+is green. LR/P/R/C# is the next inactive phase.
 Every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
