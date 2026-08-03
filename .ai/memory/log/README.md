@@ -7,33 +7,13 @@ and follow its canonical links.
 
 Follow the current
 [ContractSlice A full-manifest FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
-the exact-head hosted-green
-[ContractSlice A expected-selector reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-the hosted-green
-[ContractSlice A finding declaration reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-the hosted-green predecessor
-[ContractSlice A target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-the hosted-green
-[ContractSlice A governed-reference-slots handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-the historical
-[ContractSlice A parser-record-slot handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-the historical
-[ContractSlice A index-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-the historical
-[ContractSlice A schema-slot packet handoff](2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-the historical
-[ContractSlice A planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-the historical [ContractSlice A pushed-candidate recovery handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
-the historical [ContractSlice A canonical-string bounded-green closure handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
-[ContractSlice A topology-correction handoff](2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
-the historical [evidence-contract implementation handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
-the historical [evidence-acquisition design handoff](2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
-the historical [domain-vocabulary implementation handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
-[domain-vocabulary planning handoff](2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
-the historical
-[protocol governance and execution architecture acceptance handoff](2026-07-29-protocol-governance-execution-architecture-acceptance.md),
-accepted [DEC-0035](../../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md),
+and the active architecture records below. Every dated predecessor handoff
+remains individually reachable from this index through the append-only History
+list or a retained canonical body pointer; it is not duplicated in this
+current-routing paragraph.
+The active architecture set comprises accepted
+[DEC-0035](../../../docs/decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md),
 the full [architecture](../../../docs/architecture/protocol-governance-and-execution/README.md),
 [successor plan](../../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md),
 and [WIP extraction ledger](../../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md).
@@ -231,39 +211,13 @@ The index-slot snapshot's six-of-eighteen (`33%`) routing denominator is
 historical. Strict redraw later retires never-activated `A-PARSER-INDEX-01` and
 replaces it with three ordered live packets. `A-PARSER-RECORD-SLOT-01` and
 `A-GOVERNED-REFERENCE-SLOTS-01` and `A-TARGET-PARSER-INDEX-SLOT-01` are
-`ReviewedLocalGreen`. Exact remote-equal
-[`6b49de76d7420c33a3707c3aeeab78b4362fb602`](https://github.com/hasanmanzak/meAndAI/commit/6b49de76d7420c33a3707c3aeeab78b4362fb602),
-git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
-passed Ubuntu and Windows in
-[run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121);
-publication verification was correctly skipped. Exact hosted-green 0007
-activation baseline
-[`9180b1ff300534ab38d34d2227ab2f79878c9007`](https://github.com/hasanmanzak/meAndAI/commit/9180b1ff300534ab38d34d2227ab2f79878c9007),
-git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
-[run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
-form the exact hosted-green 0007 activation baseline.
+`ReviewedLocalGreen`. Their immutable commit, git-tree, and hosted-run evidence
+remains in the dated canonical handoffs indexed below rather than being
+duplicated in this current-routing summary.
 At that admission checkpoint, twelve of twenty live packets were
-`ReviewedLocalGreen` (`60%`) and cumulative A was green `25/25`. The exact
-hosted-green admission frozen-design predecessor is
-[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
-git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
-[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
-publication verification was correctly skipped. The immutable admission
-implementation delivery is
-[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
-git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in `18m12s`,
-Windows passed in `17m28s`, and publication verification was correctly skipped
-in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
-The earlier exact selector delivery is
-[`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
-git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
-[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
-publication verification was correctly skipped.
-The earlier exact A-FINDING delivery
-[`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
-git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
-[run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
-remain historical predecessor evidence.
+`ReviewedLocalGreen` (`60%`) and cumulative A was green `25/25`. Admission,
+selector, and finding frozen-design/implementation predecessor identities and
+hosted results likewise remain immutable in their dated canonical handoffs.
 [FIND-0447](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0447)
 is resolved at exact [`3fa66695eb978954b321545e2d226c1effa6ead4`](https://github.com/hasanmanzak/meAndAI/commit/3fa66695eb978954b321545e2d226c1effa6ead4) /
 [run 30746985780](https://github.com/hasanmanzak/meAndAI/actions/runs/30746985780).

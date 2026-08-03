@@ -6,6 +6,7 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | State | `A-FULL-MANIFEST-01` `FrozenDesign`; renewed records-only review is `0 Blocking / 0 Important / 0 Minor`; inactive until records-only commit/push and exact-head hosted validation close |
 | Activation base | Exact projector record-sync successor [`e05671d8d977abaf33b86eddddfdbf3d36e4274b`](https://github.com/hasanmanzak/meAndAI/commit/e05671d8d977abaf33b86eddddfdbf3d36e4274b), git tree identity `9b9026ce5de5b974653988b644c752796b656e38`, passed Windows and Ubuntu in [run 30803483210](https://github.com/hasanmanzak/meAndAI/actions/runs/30803483210); publication verification was skipped as expected |
+| Hosted freeze correction | The first exact records-only freeze attempt exposed only the instruction-graph budget defect recorded in the owning feature record: the committed graph was `4099` edges against the immutable `4096` ceiling. The bounded records-only correction is pending exact-head hosted proof; implementation remains inactive. |
 | Progress | Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`); cumulative A is `26/26`; the parent scenario remains `Planned` |
 | Routing correction | Never-activated `A-CONVERGE-01` retires and is excluded from the denominator; `A-FULL-MANIFEST-01` replaces it one-for-one. `A-CONVERGE-02` remains the no-new-Fact final A audit. |
 
