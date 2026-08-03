@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A admission-proof FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+[ContractSlice A admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
 the exact-head hosted-green
 [ContractSlice A expected-selector reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green
@@ -245,8 +245,12 @@ activation baseline
 git tree identity: `1ebabf4091d9ee9d2a77ef9eb22fa7be1bc4c434`, and
 [run 30758284884](https://github.com/hasanmanzak/meAndAI/actions/runs/30758284884)
 form the exact hosted-green 0007 activation baseline.
-Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), and cumulative A
-is green `24/24`. The exact hosted-green selector delivery is
+Twelve of twenty live packets are `ReviewedLocalGreen` (`60%`), and cumulative A
+is green `25/25`. The exact hosted-green admission frozen-design predecessor is
+[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
+publication verification was correctly skipped. The earlier exact selector delivery is
 [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
 git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
 [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
@@ -276,16 +280,18 @@ is packet-local `ReviewedLocalGreen` at the
 [selector handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md):
 canonical R SHA-256 is `7A85D0CC4B1AAF45038E818B3687C10D5F3339EC2ECC53D9D5646C97D5F6D30A`,
 retained source is `370` lines at `56B9B30A...62B69`, production gross delta is
-`12/20`, packet size is `382/520`, and cumulative A is `24/24`; synchronized
+`12/20`, packet size is `382/520`, and cumulative A was `24/24`; synchronized
 green commit/push/exact-head hosted validation are complete. `A-ADMISSION-01`
-is `FrozenDesign` at the
+is packet-local `ReviewedLocalGreen` at the
 [admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-with freeze delivery and LR/R/G/V pending; every later packet remains
-Candidate/inactive. No
+with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
+`0/0/0`; implementation commit/push/exact-head hosted delivery remain pending.
+Every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
-Its exact implementation predecessor is remote-equal
+Historical governed-reference-slots evidence retains exact implementation
+predecessor
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
 git tree identity `05c7591565d965966285cd51226446b2f54c81bc`, with Ubuntu and Windows green in
 [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
@@ -322,8 +328,10 @@ exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-The current activation state and denominator are in the
-[target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
+The current continuation state and denominator are in the
+[admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+the [target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
+is historical.
 
 The historical prerequisite was the complete
 [SUBF-0153](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153)

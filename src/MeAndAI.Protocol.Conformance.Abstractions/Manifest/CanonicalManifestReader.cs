@@ -104,7 +104,7 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("demandProjectors");
         reader.ExpectEmptyArray();
         reader.ExpectProperty("admissionProofContracts");
-        reader.ExpectEmptyArray();
+        var admissionProofContracts = ReadAdmissionProofContracts(ref reader);
         reader.ExpectProperty("cacheBudget");
 
         reader.Expect(JsonTokenType.StartObject);
@@ -129,6 +129,7 @@ internal static class CanonicalManifestReader
             payloadSchemas,
             parsers,
             indexes,
+            admissionProofContracts,
             new RawCacheBudget(
                 maxDecodeEntries,
                 maxDecodeCanonicalBytes,
@@ -137,6 +138,45 @@ internal static class CanonicalManifestReader
                 maxConcurrentDecodeAttempts,
                 maxConcurrentIndexAttempts,
                 retentionPolicy));
+    }
+
+    private static IReadOnlyList<RawAdmissionProofContract>
+        ReadAdmissionProofContracts(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var contracts = new List<RawAdmissionProofContract>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new FormatException(
+                    "The manifest admissionProofContracts array must contain objects.");
+            }
+
+            reader.ExpectProperty("contractKey");
+            var contractKey = reader.ReadString();
+            reader.ExpectProperty("contractVersion");
+            var contractVersion = reader.ReadString();
+            reader.ExpectProperty("kind");
+            var kind = reader.ReadString();
+            reader.ExpectProperty("proofComponent");
+            var proofComponent = ReadComponentReference(ref reader);
+            reader.ExpectProperty("surfaces");
+            var surfaces = ReadStringArray(ref reader);
+            reader.ExpectProperty("materialRoles");
+            var materialRoles = ReadStringArray(ref reader);
+            reader.Expect(JsonTokenType.EndObject);
+
+            contracts.Add(new RawAdmissionProofContract(
+                contractKey,
+                contractVersion,
+                kind,
+                proofComponent,
+                surfaces,
+                materialRoles));
+        }
+
+        return contracts;
     }
 
     private static IReadOnlyList<RawPayloadSchema> ReadPayloadSchemas(ref BoundedJsonReader reader)
@@ -889,6 +929,24 @@ internal static class CanonicalManifestReader
                     rawSchemaRegistry.PayloadSchemas,
                     rawSchemaRegistry.Parsers,
                     rawSchemaRegistry.Indexes);
+            var admissionProofComponentReferences =
+                rawSchemaRegistry.AdmissionProofContracts
+                    .Select(contract => (
+                        contract.ProofComponent.ComponentKey,
+                        contract.ProofComponent.ComponentVersion))
+                    .ToHashSet();
+            if (admissionProofComponentReferences.Overlaps(
+                    declarationComponentReferences) ||
+                admissionProofComponentReferences.Contains((
+                    activationProof.ComponentKey,
+                    activationProof.ComponentVersion)))
+            {
+                throw new FormatException(
+                    "An admission-proof component cannot satisfy another declaration.");
+            }
+
+            declarationComponentReferences.UnionWith(
+                admissionProofComponentReferences);
 
             var typedCacheBudget = SessionCacheBudget.Create(
                 cacheBudget.MaxDecodeEntries,
@@ -1025,7 +1083,9 @@ internal static class CanonicalManifestReader
                 CreateParsers(rawSchemaRegistry.Parsers, componentLookup),
                 CreateIndexes(rawSchemaRegistry.Indexes, componentLookup),
                 Array.Empty<AcquisitionDemandProjectorDeclaration>(),
-                Array.Empty<AdmissionProofContractDeclaration>(),
+                CreateAdmissionProofContracts(
+                    rawSchemaRegistry.AdmissionProofContracts,
+                    componentLookup),
                 typedCacheBudget);
 
             var typedSlice = CatalogSliceDeclaration.Create(
@@ -1189,6 +1249,20 @@ internal static class CanonicalManifestReader
             SemanticResourceBudget.Create(index.MaxBytes, index.MaxDepth, index.MaxNodes, index.MaxComplexity),
             index.FailureCodes.Select(EvaluationFailureCode.Parse)))
         .ToArray();
+
+    private static IReadOnlyList<AdmissionProofContractDeclaration>
+        CreateAdmissionProofContracts(
+            IReadOnlyList<RawAdmissionProofContract> contracts,
+            IReadOnlyDictionary<(string, string), ComponentTypeIdentity>
+                components) =>
+        contracts.Select(contract => AdmissionProofContractDeclaration.Create(
+                contract.ContractKey,
+                contract.ContractVersion,
+                AdmissionProofKind.Parse(contract.Kind),
+                ResolveComponentReference(contract.ProofComponent, components),
+                SurfaceSet.Create(contract.Surfaces.Select(SurfaceKind.Parse)),
+                contract.MaterialRoles))
+            .ToArray();
 
     private static ComponentInputDeclaration CreateIndexInput(
         RawIndexInput input,
@@ -1840,7 +1914,16 @@ internal static class CanonicalManifestReader
         IReadOnlyList<RawPayloadSchema> PayloadSchemas,
         IReadOnlyList<RawSemanticParser> Parsers,
         IReadOnlyList<RawContextIndex> Indexes,
+        IReadOnlyList<RawAdmissionProofContract> AdmissionProofContracts,
         RawCacheBudget CacheBudget);
+
+    private sealed record RawAdmissionProofContract(
+        string ContractKey,
+        string ContractVersion,
+        string Kind,
+        RawComponentReference ProofComponent,
+        IReadOnlyList<string> Surfaces,
+        IReadOnlyList<string> MaterialRoles);
 
     private sealed record RawSemanticParser(
         string ParserKey, string ParserVersion, RawComponentReference Parser,

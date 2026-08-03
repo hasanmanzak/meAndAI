@@ -27,7 +27,8 @@ the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-
 the hosted-green [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
 the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-the current [ContractSlice A expected-selector frozen-design handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+the current [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -55,8 +56,10 @@ topology correction. Its
 [topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
 and
 [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
-are historical; follow the current
-[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
+are historical; the hosted-green
+[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
+is also historical. Follow the current
+[admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -246,8 +249,8 @@ It follows the exact hosted-green finding delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
-Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`) and cumulative A
-is `24/24`.
+Twelve of twenty live packets are `ReviewedLocalGreen` (`60%`) and cumulative A
+is `25/25`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
@@ -257,10 +260,13 @@ at the
 [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md):
 canonical R is exact, production gross delta is `12/20`, retained test source is
 `370` lines, cumulative A is `24/24`, and exact-head hosted delivery is complete.
-`A-ADMISSION-01` is `FrozenDesign` at the
+`A-ADMISSION-01` is packet-local `ReviewedLocalGreen` at the
 [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-with freeze delivery and LR/R/G/V pending; every later packet remains
-Candidate/inactive. No
+after exact frozen-design predecessor [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+Admission implementation commit/push/exact-head hosted delivery remain pending;
+every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -296,7 +302,9 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md).
+[admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+the [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
+is historical.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.

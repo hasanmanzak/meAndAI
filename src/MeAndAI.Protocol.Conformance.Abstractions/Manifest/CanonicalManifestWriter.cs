@@ -37,7 +37,6 @@ internal static class CanonicalManifestWriter
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
             manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
-            manifest.SchemaRegistry.AdmissionProofContracts.Count != 0 ||
             manifest.ArtifactFiles.Count == 0 ||
             manifest.Components.Count == 0)
         {
@@ -110,7 +109,9 @@ internal static class CanonicalManifestWriter
         WriteParsers(writer, registry.Parsers);
         WriteIndexes(writer, registry.Indexes);
         WriteEmptyArray(writer, "demandProjectors");
-        WriteEmptyArray(writer, "admissionProofContracts");
+        WriteAdmissionProofContracts(
+            writer,
+            registry.AdmissionProofContracts);
 
         var budget = registry.CacheBudget;
         writer.WritePropertyName("cacheBudget");
@@ -133,6 +134,38 @@ internal static class CanonicalManifestWriter
             budget.RetentionPolicy.Value);
         writer.WriteEndObject();
         writer.WriteEndObject();
+    }
+
+    private static void WriteAdmissionProofContracts(
+        Utf8JsonWriter writer,
+        IReadOnlyList<AdmissionProofContractDeclaration> contracts)
+    {
+        writer.WriteStartArray("admissionProofContracts");
+        foreach (var contract in contracts)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "contractKey", contract.ContractKey);
+            WriteCanonicalString(
+                writer,
+                "contractVersion",
+                contract.ContractVersion);
+            WriteCanonicalString(writer, "kind", contract.Kind.Value);
+            WriteComponentReference(
+                writer,
+                "proofComponent",
+                contract.ProofComponent);
+            WriteCanonicalStringValues(
+                writer,
+                "surfaces",
+                contract.Surfaces.Values.Select(surface => surface.Value));
+            WriteCanonicalStringValues(
+                writer,
+                "materialRoles",
+                contract.MaterialRoles);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
     }
 
     private static void WriteParsers(Utf8JsonWriter writer,

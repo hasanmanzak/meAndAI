@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5), git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, passed [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693). `A-SELECTOR-01` is exact-head `ReviewedLocalGreen`; `A-ADMISSION-01` is `FrozenDesign` after reconciled D/RT `0/0/0`, with freeze delivery and all LR/R/G/V work pending. Eleven of twenty live packets are `ReviewedLocalGreen` (`55%`), cumulative A is `24/24`; later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5), git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, passed [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693). The exact `A-ADMISSION-01` FrozenDesign predecessor [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd), git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, passed Ubuntu in `17m46s` and Windows in `12m15s` in [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978); publication verification was correctly skipped. `A-ADMISSION-01` is packet-local `ReviewedLocalGreen`; twelve of twenty live packets are `ReviewedLocalGreen` (`60%`) and cumulative A is `25/25`. Its synchronized implementation commit/push and exact-head hosted delivery remain pending; later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [expected-selector reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md); the selector design predecessor and earlier handoffs are hosted-green or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md); the [selector handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -143,15 +143,18 @@ correction. Both findings are resolved by exact remote-equal
 [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-Strict redraw retires never-activated `A-PARSER-INDEX-01`; eleven of twenty live
-packets are `ReviewedLocalGreen` (`55%`). `A-PARSER-RECORD-SLOT-01` is exact-
+Strict redraw retires never-activated `A-PARSER-INDEX-01`; twelve of twenty live
+packets are `ReviewedLocalGreen` (`60%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 `A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`, and
-`A-FINDING-01` and `A-SELECTOR-01` are `ReviewedLocalGreen`; cumulative A is
-`24/24`. Selector exact-head delivery is complete; `A-ADMISSION-01` is
-`FrozenDesign` with synchronized freeze delivery and LR/R/G/V pending. Later
-packets remain Candidate/inactive.
+`A-FINDING-01`, `A-SELECTOR-01`, and `A-ADMISSION-01` are
+`ReviewedLocalGreen`; cumulative A is `25/25`. The exact admission FrozenDesign
+predecessor is [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+The admission implementation commit/push and exact-head hosted delivery remain
+pending. Later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -563,9 +566,15 @@ git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`; Ubuntu passed in
 `17m11s`, Windows passed in `14m43s`, and publication verification was correctly
 skipped in [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
 
-### Frozen-design `A-ADMISSION-01` contract
+### Reviewed-local-green `A-ADMISSION-01` contract and evidence
 
-The exact predecessor is the selector delivery above. R is
+The exact FrozenDesign predecessor is
+[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, which passed Ubuntu in
+`17m46s` and Windows in `12m15s` in
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
+publication verification was correctly skipped. This is the hosted design
+predecessor, not the still-pending admission implementation delivery. R is
 `Applicable / BehaviorRed`, P is `NotApplicable`, marker/TRX stem is
 `TEST-0210-A-BEHAVIOR-RED-0009`, and the one-Fact FQN is
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure`.
@@ -582,7 +591,8 @@ existing `ContractSliceA.Proof.dll`; every row has the exact Repository+Provider
 surface union and the complete canonical slot-role union. The graph changes
 from twenty-two to twenty-five components while retaining three artifacts.
 Removing all three rows and components reproduces the selector predecessor;
-partial/orphaned/overlapping topology fails closed.
+partial, split-key/version, orphaned, shared, activation/functional-overlapping,
+or unmapped topology fails closed.
 
 Only `CanonicalManifestReader.cs`, `CanonicalManifestWriter.cs`,
 `CatalogSliceDeclaration.cs`, and one new admission test are allowed. Reader,
@@ -593,8 +603,52 @@ partition closure, six-field wire order, Writer/Reader byte and digest
 roundtrip, forty-two outer-wire mutations, orphan negatives, and predecessor
 reproduction. Real Application proof rows and the six-artifact/thirty-five-row
 inventory remain `A-CONVERGE-01`; runtime admission and all later behavior stay
-held. Reconciled D/RT closed `0 Blocking / 0 Important / 0 Minor`; see the
-[admission FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md).
+held. Reconciled D/RT closed `0 Blocking / 0 Important / 0 Minor`.
+
+Locked restore ran once and all six lock fingerprints remained unchanged;
+`P` remained `NotApplicable`, while predecessor revalidation passed selector
+focused `1/1` at SHA-256 `CEF622D01BD7AFC6DDF057CAF872F7922BCCAAAA3556AFFF658095B7D5B437B4`
+and cumulative A `24/24` at
+`DE9231E844691362042F8EBDDFC6833CE2BB99D219864404D08189CD62683BB8`.
+Canonical R ran exactly once at the reserved FQN and failed only with the exact
+marker. Its external TRX SHA-256 is
+`2D7B35424911010D120424E6BFDBDBB07C8A265444D8CFE8FF5007FD941EEE76`;
+the transient source is
+`7898CFADE43DD8176DFCB2F8C5C864D00EBCEB066C260C8FC9AE8C2C9C3B3CAC`.
+Reader/Writer/Catalog prehashes are respectively
+`5E1C3CCCD3AF91E6E9CC952057FCB3ADD999C717169624B75D74CD4A3E70B550`,
+`409B40B6AE4121714607707724546AD20EF284CE2510F4F8D488F1B9D9D56DA1`,
+and `2F370175B36BACCC0D3F328F2E23991BC15D1E2A8F6F681C37A28189F93D397B`.
+The TRX has `total/executed/failed=1/1/1`, every other one of the sixteen
+counters zero, no attachment, and no independent diagnostic.
+
+The original oracle passed `1/1` at SHA-256
+`39A9F362E5FEF02A39B283F8879F75A8E0BD87C616DFD9C9EF9CBB9C2F825AFF`.
+Retained focused green is `1/1` at SHA-256
+`3250DA7332E81D3A732AD4E6E3266126EDFA53D9282AC2293944C42E143FD4CA`;
+cumulative A is `25/25` at
+`F5163E4F1D190519D534FCFF1DC5010E0DBA4EFD9DF788302EEDFB31DA53AAB5`;
+full Domain is `98/98` at
+`5DE82E15A344C3A87133878892B2B4DDE7B3860B5E77E5697734629879EFD0E3`;
+and full Conformance is `25/25` at
+`12CACAF9D5BD9BE9240E75ECA29E329243543851E132B05C8BFCAED984B1E9A1`.
+The retained test is `339/370` lines at SHA-256
+`AEFF47E643F97AB31DB69CDB24810F766B078A989D05E5D56E52015B924A9F97`.
+Reader, Writer, and Catalog gross sizes/hashes are `85/145` at
+`25512694EA4B8D1E81265A23493307F76E7CDA5E887E2F0CE9E89C542F702949`,
+`35/55` at `94C659B148C40334628AE90D67213143E1417E6DD9487C74E539139C88DC20AD`,
+and `66/110` at
+`10C1D55F28120DD1D4CE816CFED35A7BF9BB686B37E0232196DA84C0CB05B238`.
+Production/test/combined totals are `186/310`, `339/370`, and `525/680`.
+Release build is `0 warnings / 0 errors`;
+format, diff, marker scan, scope, and locks are green. Full `StructureOnly`
+passed with `elapsedMs=370203`; the seven-test publication-evidence suite passed
+in `242.5` seconds without claiming published-state evidence. Independent final
+code/test and evidence/hash/counter/scope reviews each closed
+`0 Blocking / 0 Important / 0 Minor`. Exact evidence is retained in the
+[admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md).
+`A-ADMISSION-01` is packet-local `ReviewedLocalGreen`; its synchronized
+implementation commit/push and exact-head hosted delivery remain pending.
 
 That corrected directive still does **not** authorize:
 
@@ -7538,20 +7592,22 @@ coverage `Important` is closed; fresh full-diff review pass 2 closed
 `0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction,
 never-activated `A-PARSER-INDEX-01` is retired,
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
-`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, and `A-SELECTOR-01` are
-`ReviewedLocalGreen`; eleven of twenty live packets are green (`55%`) with
-cumulative A `24/24`.
+`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`, and
+`A-ADMISSION-01` are `ReviewedLocalGreen`; twelve of twenty live packets are
+green (`60%`) with cumulative A `25/25`.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
 production-zero route and is exact-head hosted green at
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
-The current exact hosted boundary is selector green delivery
-[`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
-git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, and
-[run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693).
-`A-ADMISSION-01` is `FrozenDesign` with freeze delivery and LR/R/G/V pending;
-later packets remain Candidate/inactive, and no full-A completion is claimed.
+The current exact hosted predecessor is the admission FrozenDesign delivery
+[`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
+git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
+[run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+It is not the admission implementation delivery. `A-ADMISSION-01` is
+packet-local `ReviewedLocalGreen`; its synchronized implementation commit/push
+and exact-head hosted delivery remain pending. Later packets remain
+Candidate/inactive, and no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

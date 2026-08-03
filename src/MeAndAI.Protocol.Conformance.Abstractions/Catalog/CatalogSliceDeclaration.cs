@@ -82,11 +82,12 @@ public sealed class CatalogSliceDeclaration
         var schemas = registry.PayloadSchemas.Select(schema => (schema.SchemaKey, schema.SchemaVersion)).ToHashSet();
         if (!schemas.SetEquals(slots.Select(slot => (
                 slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion))) ||
-            registry.DemandProjectors.Count != 0 ||
-            registry.AdmissionProofContracts.Count != 0)
+            registry.DemandProjectors.Count != 0)
         {
             throw new ArgumentException("Payload schemas, slot requirements, or capabilities are not closed.", nameof(rules));
         }
+
+        ValidateAdmissionProofClosure(registry, canonicalRules, slots);
 
         if (registry.Parsers.Count != 0)
         {
@@ -144,6 +145,69 @@ public sealed class CatalogSliceDeclaration
             !schema.OutputModel.Equals(model))
         {
             throw new ArgumentException("The repository-tree index and slot capability graph is not exact.", nameof(rules));
+        }
+    }
+
+    private static void ValidateAdmissionProofClosure(
+        ReleaseSchemaRegistry registry,
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<EvidenceSlotDeclaration> slots)
+    {
+        var contracts = registry.AdmissionProofContracts;
+        if (contracts.Count == 0)
+        {
+            return;
+        }
+
+        var rule = rules.Count == 1 ? rules[0] : null;
+        if (registry.PayloadSchemas.Count != 3 ||
+            registry.Parsers.Count != 2 ||
+            registry.Indexes.Count != 4 ||
+            rule is null ||
+            rule.ApplicabilitySlots.Count != 0 ||
+            rule.EvaluationSlots.Count != 4 ||
+            rule.EvaluationSlots.Select(slot => slot.SlotKey)
+                .Distinct(StringComparer.Ordinal).Count() != 4 ||
+            slots.Count != 4 ||
+            rule.ExpectedSelectors.Count != 2 ||
+            rule.Findings.Count != 2 ||
+            contracts.Count != 3)
+        {
+            throw new ArgumentException(
+                "Admission-proof contracts require the exact selector topology.",
+                nameof(rules));
+        }
+
+        var expectedSurfaces = SurfaceSet.Create(
+            slots.SelectMany(slot => slot.ProfileSurfaces.Values).Distinct());
+        var expectedMaterialRoles = slots
+            .Select(slot => slot.MaterialRole)
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(role => role, StringComparer.Ordinal)
+            .ToArray();
+        var kinds = contracts.Select(contract => contract.Kind.Value)
+            .ToHashSet(StringComparer.Ordinal);
+        var proofComponents = contracts.Select(contract => (
+                contract.ProofComponent.ComponentKey,
+                contract.ProofComponent.ComponentVersion))
+            .ToHashSet();
+        var contractIdentities = contracts.Select(contract => (
+                contract.ContractKey,
+                contract.ContractVersion))
+            .ToHashSet();
+        if (!kinds.SetEquals(
+                new[] { "observed", "failed", "no-input" }) ||
+            contractIdentities.Count != 1 ||
+            proofComponents.Count != 3 ||
+            contracts.Any(contract =>
+                !contract.Surfaces.Equals(expectedSurfaces) ||
+                !contract.MaterialRoles.SequenceEqual(
+                    expectedMaterialRoles,
+                    StringComparer.Ordinal)))
+        {
+            throw new ArgumentException(
+                "Admission-proof contracts are not closed over kinds, surfaces, and material roles.",
+                nameof(rules));
         }
     }
 
