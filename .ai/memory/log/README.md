@@ -295,9 +295,14 @@ with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
 [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
 git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, and
 [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538)
-are immutable hosted-green evidence. The record-evidence sync commit/push and
-exact-head hosted validation remain pending. `A-PROJECTOR-DAG-01` and every
-later packet remain Candidate/inactive until that gate is green. No
+are immutable hosted-green evidence. Exact record-evidence delivery
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in `17m10s`
+and Ubuntu in `19m02s` in
+[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
+`A-PROJECTOR-DAG-01` is records-only `FrozenDesign` at the
+[projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
+LR/P/R/C# remain pending and every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -340,7 +345,9 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current continuation state and denominator are in the
-[admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
+[projector/DAG FrozenDesign handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
+the [admission-proof reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
+is its hosted-green predecessor, and
 the [target parser/index/slot reviewed-local-green handoff](2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is historical.
 

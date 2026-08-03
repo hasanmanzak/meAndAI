@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Strict-redraw and earlier packet evidence remain historical. Exact hosted-green selector delivery [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5), git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, passed [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693). The exact `A-ADMISSION-01` FrozenDesign predecessor [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd), git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, passed Ubuntu in `17m46s` and Windows in `12m15s` in [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978); publication verification was correctly skipped and it remains the design predecessor. Exact hosted-green admission implementation delivery [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8), git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, passed Ubuntu in `18m12s` and Windows in `17m28s` in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538); publication verification was correctly skipped. `A-ADMISSION-01` remains packet-local `ReviewedLocalGreen`; twelve of twenty live packets are `ReviewedLocalGreen` (`60%`) and cumulative A is `25/25`. Its synchronized record-evidence commit/push and exact-head hosted validation remain pending; later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Exact hosted-green admission record-evidence delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in `17m10s` and Ubuntu in `19m02s` in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326); publication verification was correctly skipped. `A-PROJECTOR-DAG-01` is `FrozenDesign`; LR/P/R/C# remain held until this freeze-record cohort is committed, pushed, and exact-head hosted green. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md); the [selector handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md); the [admission handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -153,13 +153,14 @@ head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAnd
 predecessor is [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
-The exact admission implementation delivery is
-[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
-git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, with Ubuntu green in
-`18m12s`, Windows green in `17m28s`, and publication verification correctly
-skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
-Its synchronized record-evidence commit/push and exact-head hosted validation
-remain pending. Later packets remain Candidate/inactive.
+The exact admission record-evidence delivery is
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
+`17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
+skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
+`A-PROJECTOR-DAG-01` is `FrozenDesign`; its LR/P/R/C# activation remains held
+until the freeze records are committed, pushed, and exact-head hosted green.
+Later packets remain Candidate/inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -652,14 +653,48 @@ in `242.5` seconds without claiming published-state evidence. Independent final
 code/test and evidence/hash/counter/scope reviews each closed
 `0 Blocking / 0 Important / 0 Minor`. Exact evidence is retained in the
 [admission-proof reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md).
-Exact hosted-green implementation delivery
-[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
-git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, passed Ubuntu in
-`18m12s` and Windows in `17m28s` in
-[run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538);
+Exact hosted-green admission record-evidence delivery
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in
+`17m10s` and Ubuntu in `19m02s` in
+[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326);
 publication verification was correctly skipped. `A-ADMISSION-01` remains
-packet-local `ReviewedLocalGreen`; its synchronized record-evidence commit/push
-and exact-head hosted validation remain pending.
+packet-local `ReviewedLocalGreen`.
+
+### Frozen-design `A-PROJECTOR-DAG-01` boundary
+
+The next packet adds the single declaration
+`protocol.projector.repository-target-resolution-demand/1` with component
+`MeAndAI.Protocol.Policy.Demands.RepositoryTargetResolutionDemandProjector` in
+the existing Policy artifact. It consumes
+`protocol.capability.governed-reference-index/1` from the provider- and
+repository-governed-text input slots, projects the evaluation-only
+repository-target-resolution output slot, and names opaque demand-frame token
+`protocol.repository-target-resolution-demand/1`. That token is neither a
+payload-schema declaration nor a producer-graph node. Its exact budget is
+`(33554432,64,100000,5000000)` and its sole failure is
+`protocol.budget.exhausted`.
+
+The exact one-Fact FQN is
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph`;
+its only trait is `ContractSlice=A`, no Scenario is active, and its immutable
+BehaviorRed marker/TRX stem is `TEST-0210-A-BEHAVIOR-RED-0010`. P is
+`NotApplicable`. Fully valid successor creation and all count preconditions are
+outside the catch; only the existing Writer's exact `InvalidOperationException`
+and exact legacy message may emit the marker. Reader is excluded and canonical
+R is never rerun.
+
+The matrix has exactly `103` vectors: `50` projector-wire, `4` array-envelope,
+`27` identity/collection/budget, and the exact numbered `22` component/DAG
+mutations in the [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md). Removing the projector
+declaration and component together must reproduce predecessor bytes. Production
+may change only Reader, Writer, and Catalog, with hard caps `145`, `70`, and
+`110`, aggregate production hard cap `300`; the one test hard cap is `390`, the
+combined hard cap is `690`, and `700+` requires redraw. Fully green successor
+tuple is `(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`. Exact
+details are retained in the [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md).
+LR/P/R/C# remain held until this records-only freeze is committed, pushed, and
+exact-head hosted green.
 
 That corrected directive still does **not** authorize:
 
@@ -4732,13 +4767,32 @@ The production activation contract is
 component in its own exact fixture envelope; it never changes a production
 manifest or export.
 
-Activation derives unique producer tables for every model and capability.
-Schema nodes are roots; parser/index edges come from every declared input.
-Unresolved inputs, duplicate producers, self-edges, input/output identity
-collisions, and cycles fail. Kahn ordering uses component key/version then
-declaration key/version ordinal as its ready-node tie-breaker. Every rule-slot
-capability must resolve to one producer, and every declaration/output must be
-reachable from at least one slot; unreachable or extra registrations fail.
+The document-local producer graph derives unique producer tables for every model
+and capability, but its node universe is exactly the payload-schema, semantic-
+model-parser, context-index, and acquisition-demand-projector declarations.
+Model and capability identities, slots, selectors, evaluators, proof contracts,
+components, artifacts, and demand-frame schema tokens are not graph nodes.
+Edges are prerequisite to dependent: model/capability producers point to every
+consuming parser or index; the governed-reference capability producer points to
+the repository-target projector; and that projector points to the output slot
+requirement's repository-target-resolution schema producer. The exact graph has
+ten nodes: three schema, two parser, four index, and one projector.
+
+Roots are computed as producer nodes with indegree zero. The exact positive
+ten-node successor roots are governed-text and repository-tree schemas; the
+repository-target-resolution schema is projected and therefore is not a
+successor root. Jointly removing the projector declaration and its component
+removes that inbound edge, so the valid nine-node predecessor has governed-text,
+repository-target-resolution, and repository-tree schema roots. For the
+structurally unique union of every rule's applicability and evaluation slots,
+validation seeds each slot's schema and capability producers, walks prerequisite
+edges in reverse, and requires the union of all slot closures to equal all
+producer nodes. Unresolved inputs, duplicate producer owners,
+duplicate output-slot projector owners, ambiguous component-to-artifact owners,
+self-edges, input/output identity collisions, cycles, or unreachable producers
+fail. Kahn ordering uses component key/version, declaration key/version, then
+family rank `Schema < Parser < Index < Projector` as its total ready-node
+comparator. Every rule-slot capability must resolve to one producer.
 The resulting codec/parser/index/demand-projector/selector/evaluator plus
 model/capability type closure is the 27-row Policy logical producer/type-
 contract manifest partition. ContractSlice A owns its exact declaration rows,
@@ -4757,7 +4811,10 @@ activation-proof partition is the one exact
 activation-proof type/artifact. The admission-proof partition is the exact
 `AdmissionProofContractDeclaration` component set and must biject with the
 activated observed/failed/no-input proof types/artifacts. The four partitions
-are component-key/type disjoint; their ordinal union must equal the manifest
+are component-key/type disjoint; one functional component identity cannot serve
+two declaration roles across activation proof, admission proof, payload codec,
+model type, parser, index, capability type, projector, selector resolver, or
+evaluator. Their ordinal union must equal the manifest
 `components` and component/artifact mappings exactly. No partition may absorb,
 omit, or duplicate another. The initial production union is therefore exactly
 35 component rows: 27 Policy registration/type-contract rows, four runtime
@@ -4991,15 +5048,18 @@ SlotKey, target structural order, demand kind, owning repository identity, then
 first ItemId; duplicate owner shards, item overlap/gap, or any other repeated
 SlotKey is `PlanStateInvalid`.
 
-Projection runs only after all active input slots and their declared
+At runtime, projection runs only after all active input slots and their declared
 capability are terminal and qualified. One output slot has at most one
-projector. Projected slots are evaluation-only. The activation DAG contains
-edges from the input capability producer to the projector and from the
-projector to the output slot's acquisition/schema producer. Unknown
-input/output slots or capabilities, duplicate output ownership, a projected
-applicability slot, self-dependency, cycle, unreachable output, or a rule path
-that demands the output before its inputs is document-local `ParseCanonical`
-`FormatException`.
+projector, and projected slots are evaluation-only. The manifest dependency
+edges are the same document-local governed-reference-producer to projector and
+projector to repository-target-resolution-schema-producer edges frozen above.
+Unknown input/output slots or capabilities, duplicate output ownership, a
+projected applicability slot, self-dependency, cycle, unreachable output, or a
+rule path that demands the output before its inputs is document-local
+`ParseCanonical` `FormatException`. ContractSlice A proves only the canonical
+manifest bytes, typed projection, bindings, ownership, DAG, reachability, and
+order; ContractSlice C first activates registrations and observes runtime
+execution order.
 
 A zero-candidate product emits no repository-target instruction, proof request,
 external call, payload, codec invocation, or historical parser invocation. The
@@ -6804,8 +6864,9 @@ scenario:
   contract partition and 35-row full component union, the demand-projector
   declaration/manifest field order, missing/extra/duplicate projector
   declaration or component mapping, input/output slot/capability closure,
-  projected-applicability rejection, producer/projector cycle and unreachable
-  output, canonical byte/digest/typed-projection behavior, and the exact
+  projected-applicability rejection, the exact numbered twenty-two topology
+  mutations in the current FrozenDesign handoff, computed successor/predecessor
+  roots, canonical byte/digest/typed-projection behavior, and the exact
   no-extra-friend matrix. It proves no executable registration or activation.
 - B proves cumulative count 72 and the non-authoritative Tests-owned codec
   mirror through private-stamp `Activate ->
@@ -7616,15 +7677,14 @@ The admission FrozenDesign delivery
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
 It remains the design predecessor, not the admission implementation delivery.
-The current exact hosted implementation boundary is
-[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
-git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, and
-[run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538),
-with Ubuntu green in `18m12s`, Windows green in `17m28s`, and publication
+The current exact hosted boundary is admission record-evidence delivery
+[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
+git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, and
+[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326),
+with Windows green in `17m10s`, Ubuntu green in `19m02s`, and publication
 verification correctly skipped. `A-ADMISSION-01` remains packet-local
-`ReviewedLocalGreen`; its synchronized record-evidence commit/push and
-exact-head hosted validation remain pending. Later packets remain
-Candidate/inactive, and no full-A completion is claimed.
+`ReviewedLocalGreen`; `A-PROJECTOR-DAG-01` is `FrozenDesign`. Later packets
+remain Candidate/inactive, and no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited
