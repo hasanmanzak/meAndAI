@@ -36,7 +36,6 @@ internal static class CanonicalManifestWriter
         var slice = manifest.Slice;
         if (!manifest.AuthorityKind.Equals(
                 CatalogAuthorityKind.QualificationSlice) ||
-            manifest.SchemaRegistry.DemandProjectors.Count != 0 ||
             manifest.ArtifactFiles.Count == 0 ||
             manifest.Components.Count == 0)
         {
@@ -108,7 +107,7 @@ internal static class CanonicalManifestWriter
         WritePayloadSchemas(writer, registry.PayloadSchemas);
         WriteParsers(writer, registry.Parsers);
         WriteIndexes(writer, registry.Indexes);
-        WriteEmptyArray(writer, "demandProjectors");
+        WriteDemandProjectors(writer, registry.DemandProjectors);
         WriteAdmissionProofContracts(
             writer,
             registry.AdmissionProofContracts);
@@ -134,6 +133,35 @@ internal static class CanonicalManifestWriter
             budget.RetentionPolicy.Value);
         writer.WriteEndObject();
         writer.WriteEndObject();
+    }
+
+    private static void WriteDemandProjectors(Utf8JsonWriter writer,
+        IReadOnlyList<AcquisitionDemandProjectorDeclaration> projectors)
+    {
+        writer.WriteStartArray("demandProjectors");
+        foreach (var projector in projectors)
+        {
+            writer.WriteStartObject();
+            WriteCanonicalString(writer, "projectorKey", projector.ProjectorKey);
+            WriteCanonicalString(writer, "projectorVersion", projector.ProjectorVersion);
+            WriteComponentReference(writer, "projector", projector.Projector);
+            writer.WritePropertyName("inputCapability");
+            WriteCapability(writer, projector.InputCapability);
+            WriteCanonicalStringValues(writer, "inputSlotKeys", projector.InputSlotKeys);
+            WriteCanonicalString(writer, "outputSlotKey", projector.OutputSlotKey);
+            WriteCanonicalString(writer, "demandSchemaKey", projector.DemandSchemaKey);
+            WriteCanonicalString(writer, "demandSchemaVersion", projector.DemandSchemaVersion);
+            writer.WritePropertyName("budget");
+            writer.WriteStartObject();
+            writer.WriteNumber("maxBytes", projector.Budget.MaxBytes);
+            writer.WriteNumber("maxDepth", projector.Budget.MaxDepth);
+            writer.WriteNumber("maxNodes", projector.Budget.MaxNodes);
+            writer.WriteNumber("maxComplexity", projector.Budget.MaxComplexity);
+            writer.WriteEndObject();
+            WriteCanonicalStringValues(writer, "failureCodes", projector.FailureCodes.Select(code => code.Value));
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
     }
 
     private static void WriteAdmissionProofContracts(

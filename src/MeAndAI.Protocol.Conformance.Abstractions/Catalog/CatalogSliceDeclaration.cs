@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using MeAndAI.Protocol.Domain;
 
 namespace MeAndAI.Protocol.Conformance.Abstractions;
@@ -74,25 +75,26 @@ public sealed class CatalogSliceDeclaration
         return canonicalRules;
     }
 
-    internal static void ValidateSchemaSlotClosure(ReleaseSchemaRegistry registry, IEnumerable<RuleDeclaration> rules)
+    internal static ProducerGraphValidationResult ValidateSchemaSlotClosure(ReleaseSchemaRegistry registry, IEnumerable<RuleDeclaration> rules)
     {
         var canonicalRules = rules.ToArray();
         var slots = canonicalRules.SelectMany(
             rule => rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)).ToArray();
         var schemas = registry.PayloadSchemas.Select(schema => (schema.SchemaKey, schema.SchemaVersion)).ToHashSet();
         if (!schemas.SetEquals(slots.Select(slot => (
-                slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion))) ||
-            registry.DemandProjectors.Count != 0)
+                slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion))))
         {
             throw new ArgumentException("Payload schemas, slot requirements, or capabilities are not closed.", nameof(rules));
         }
 
+        var graph = ValidateProducerGraph(registry, slots);
+        ValidateProjectorClosure(registry, canonicalRules);
         ValidateAdmissionProofClosure(registry, canonicalRules, slots);
 
         if (registry.Parsers.Count != 0)
         {
             ValidateParserRecordSlotClosure(registry, canonicalRules, slots);
-            return;
+            return graph;
         }
 
         var capabilitySlots = slots.Where(slot => slot.Capabilities.Count != 0).ToArray();
@@ -104,7 +106,7 @@ public sealed class CatalogSliceDeclaration
                     "Payload schemas, slot requirements, or capabilities are not closed.", nameof(rules));
             }
 
-            return;
+            return graph;
         }
 
         var index = registry.Indexes.Count == 1 ? registry.Indexes[0] : null;
@@ -145,6 +147,145 @@ public sealed class CatalogSliceDeclaration
             !schema.OutputModel.Equals(model))
         {
             throw new ArgumentException("The repository-tree index and slot capability graph is not exact.", nameof(rules));
+        }
+
+        return graph;
+    }
+
+    private static ProducerGraphValidationResult ValidateProducerGraph(
+        ReleaseSchemaRegistry registry,
+        IReadOnlyList<EvidenceSlotDeclaration> slots)
+    {
+        var nodes = new List<ProducerIdentity>();
+        var sortKeys = new List<string>();
+        var schemas = new Dictionary<(string, string), int>();
+        var models = new Dictionary<(string, string), int>();
+        var capabilities = new Dictionary<(string, string), int>();
+        static void Own(Dictionary<(string, string), int> owners, (string, string) identity, int id)
+        { if (!owners.TryAdd(identity, id)) throw new FormatException("protocol.manifest.producer-owner"); }
+        static int Owner(Dictionary<(string, string), int> owners, (string, string) identity) =>
+            owners.TryGetValue(identity, out var id) ? id : throw new FormatException("protocol.manifest.producer-owner");
+        var id = 0;
+        foreach (var schema in registry.PayloadSchemas)
+        {
+            nodes.Add(new ProducerIdentity("Schema", schema.SchemaKey, schema.SchemaVersion));
+            sortKeys.Add($"{schema.Codec.ComponentKey}\0{schema.Codec.ComponentVersion}\0{schema.SchemaKey}\0{schema.SchemaVersion}\00");
+            Own(schemas, (schema.SchemaKey, schema.SchemaVersion), id);
+            Own(models, (schema.OutputModel.ModelKey, schema.OutputModel.ModelVersion), id++);
+        }
+        var parserStart = id;
+        foreach (var parser in registry.Parsers)
+        {
+            nodes.Add(new ProducerIdentity("Parser", parser.ParserKey, parser.ParserVersion));
+            sortKeys.Add($"{parser.Parser.ComponentKey}\0{parser.Parser.ComponentVersion}\0{parser.ParserKey}\0{parser.ParserVersion}\01");
+            Own(models, (parser.OutputModel.ModelKey, parser.OutputModel.ModelVersion), id++);
+        }
+        var indexStart = id;
+        foreach (var index in registry.Indexes)
+        {
+            nodes.Add(new ProducerIdentity("Index", index.IndexKey, index.IndexVersion));
+            sortKeys.Add($"{index.Indexer.ComponentKey}\0{index.Indexer.ComponentVersion}\0{index.IndexKey}\0{index.IndexVersion}\02");
+            Own(capabilities, (index.OutputCapability.CapabilityKey, index.OutputCapability.CapabilityVersion), id++);
+        }
+        var projectorStart = id;
+        if (registry.DemandProjectors.Select(item => item.OutputSlotKey).Distinct(StringComparer.Ordinal).Count() !=
+            registry.DemandProjectors.Count) throw new FormatException("protocol.manifest.producer-owner");
+        foreach (var projector in registry.DemandProjectors)
+        {
+            nodes.Add(new ProducerIdentity("Projector", projector.ProjectorKey, projector.ProjectorVersion));
+            sortKeys.Add($"{projector.Projector.ComponentKey}\0{projector.Projector.ComponentVersion}\0{projector.ProjectorKey}\0{projector.ProjectorVersion}\03");
+        }
+        var edges = Enumerable.Range(0, nodes.Count).Select(_ => new HashSet<int>()).ToArray();
+        var reverse = Enumerable.Range(0, nodes.Count).Select(_ => new HashSet<int>()).ToArray();
+        var indegrees = new int[nodes.Count];
+        void Link(int source, int target)
+        {
+            if (edges[source].Add(target)) { reverse[target].Add(source); indegrees[target]++; }
+        }
+        void ConnectInputs(IEnumerable<ComponentInputDeclaration> inputs, int target)
+        {
+            foreach (var input in inputs)
+            {
+                if (input.Model is { } model)
+                    Link(Owner(models, (model.ModelKey, model.ModelVersion)), target);
+                else if (input.Capability is { } capability)
+                    Link(Owner(capabilities, (capability.CapabilityKey, capability.CapabilityVersion)), target);
+            }
+        }
+        for (var i = 0; i < registry.Parsers.Count; i++) ConnectInputs(registry.Parsers[i].Inputs, parserStart + i);
+        for (var i = 0; i < registry.Indexes.Count; i++) ConnectInputs(registry.Indexes[i].Inputs, indexStart + i);
+        for (var i = 0; i < registry.DemandProjectors.Count; i++)
+        {
+            var projector = registry.DemandProjectors[i];
+            Link(Owner(capabilities, (projector.InputCapability.CapabilityKey, projector.InputCapability.CapabilityVersion)), projectorStart + i);
+            var output = slots.FirstOrDefault(slot => slot.SlotKey == projector.OutputSlotKey)
+                ?? throw new FormatException("protocol.manifest.projector-slot");
+            Link(projectorStart + i, Owner(schemas, (output.Requirement.PayloadSchemaKey, output.Requirement.PayloadSchemaVersion)));
+        }
+        var seeds = new HashSet<int>();
+        foreach (var slot in slots)
+        {
+            seeds.Add(Owner(schemas, (slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion)));
+            foreach (var capability in slot.Capabilities)
+                seeds.Add(Owner(capabilities, (capability.CapabilityKey, capability.CapabilityVersion)));
+        }
+        var remaining = (int[])indegrees.Clone();
+        var roots = Enumerable.Range(0, nodes.Count).Where(id => remaining[id] == 0).ToArray();
+        var pending = new PriorityQueue<int, string>(StringComparer.Ordinal);
+        foreach (var root in roots) pending.Enqueue(root, sortKeys[root]);
+        var processed = 0;
+        while (pending.TryDequeue(out var node, out _))
+        {
+            processed++;
+            foreach (var successor in edges[node])
+                if (--remaining[successor] == 0) pending.Enqueue(successor, sortKeys[successor]);
+        }
+        if (processed != nodes.Count) throw new FormatException("protocol.manifest.producer-cycle");
+        var closure = new HashSet<int>(seeds);
+        var frontier = new Stack<int>(seeds);
+        while (frontier.TryPop(out var node))
+        {
+            foreach (var predecessor in reverse[node])
+                if (closure.Add(predecessor)) frontier.Push(predecessor);
+        }
+        if (closure.Count != nodes.Count) throw new FormatException("protocol.manifest.producer-unreachable");
+        return new ProducerGraphValidationResult(roots.Select(id => nodes[id]).ToFrozenSet());
+    }
+
+    private static void ValidateProjectorClosure(
+        ReleaseSchemaRegistry registry,
+        IReadOnlyList<RuleDeclaration> rules)
+    {
+        if (registry.DemandProjectors.Count == 0) return;
+        var projector = registry.DemandProjectors.Count == 1 ? registry.DemandProjectors[0] : null;
+        if (projector is null ||
+            projector.ProjectorKey != "protocol.projector.repository-target-resolution-demand" ||
+            projector.ProjectorVersion != "1" ||
+            !ComponentEquals(projector.Projector, "protocol.projector.repository-target-resolution-demand",
+                "MeAndAI.Protocol.Policy", "MeAndAI.Protocol.Policy.Demands.RepositoryTargetResolutionDemandProjector") ||
+            !CapabilityEquals(projector.InputCapability, "protocol.capability.governed-reference-index",
+                "protocol.type.capability.governed-reference-index", "MeAndAI.Protocol.Conformance.Abstractions.IGovernedReferenceIndex") ||
+            !projector.InputSlotKeys.SequenceEqual(
+                ["protocol.slot.provider-governed-text", "protocol.slot.repository-governed-text"], StringComparer.Ordinal) ||
+            projector.OutputSlotKey != "protocol.slot.repository-target-resolution" ||
+            projector.DemandSchemaKey != "protocol.repository-target-resolution-demand" ||
+            projector.DemandSchemaVersion != "1" ||
+            !BudgetEquals(projector.Budget, 33_554_432, 64, 100_000, 5_000_000) ||
+            !CodesEqual(projector.FailureCodes.Select(code => code.Value), "protocol.budget.exhausted"))
+        {
+            throw new FormatException("protocol.manifest.projector-value");
+        }
+        var applicability = rules.SelectMany(rule => rule.ApplicabilitySlots).ToArray();
+        var evaluation = rules.SelectMany(rule => rule.EvaluationSlots).ToArray();
+        var output = evaluation.FirstOrDefault(slot => slot.SlotKey == projector.OutputSlotKey);
+        if (output is null ||
+            applicability.Any(slot => slot.SlotKey == projector.OutputSlotKey) ||
+            output.Requirement.PayloadSchemaKey != "protocol.repository-target-resolution" ||
+            output.Requirement.PayloadSchemaVersion != "1" ||
+            projector.InputSlotKeys.Any(key => !evaluation.Any(slot =>
+                slot.SlotKey == key && slot.Capabilities.Contains(projector.InputCapability))))
+        {
+            throw new FormatException("protocol.manifest.projector-slot");
         }
     }
 
@@ -408,3 +549,7 @@ public sealed class CatalogSliceDeclaration
         }
     }
 }
+
+internal readonly record struct ProducerIdentity(string Family, string Key, string Version);
+
+internal sealed record ProducerGraphValidationResult(IReadOnlySet<ProducerIdentity> ProducerRootIdentities);

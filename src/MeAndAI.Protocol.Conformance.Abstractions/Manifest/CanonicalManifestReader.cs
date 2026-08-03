@@ -102,7 +102,7 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("indexes");
         var indexes = ReadIndexes(ref reader);
         reader.ExpectProperty("demandProjectors");
-        reader.ExpectEmptyArray();
+        var demandProjectors = ReadDemandProjectors(ref reader);
         reader.ExpectProperty("admissionProofContracts");
         var admissionProofContracts = ReadAdmissionProofContracts(ref reader);
         reader.ExpectProperty("cacheBudget");
@@ -129,6 +129,7 @@ internal static class CanonicalManifestReader
             payloadSchemas,
             parsers,
             indexes,
+            demandProjectors,
             admissionProofContracts,
             new RawCacheBudget(
                 maxDecodeEntries,
@@ -138,6 +139,50 @@ internal static class CanonicalManifestReader
                 maxConcurrentDecodeAttempts,
                 maxConcurrentIndexAttempts,
                 retentionPolicy));
+    }
+
+    private static IReadOnlyList<RawDemandProjector> ReadDemandProjectors(ref BoundedJsonReader reader)
+    {
+        try { reader.Expect(JsonTokenType.StartArray); }
+        catch (FormatException exception) { throw new FormatException("protocol.manifest.projector-array-envelope", exception); }
+        var projectors = new List<RawDemandProjector>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+                throw new FormatException("protocol.manifest.projector-array-envelope");
+            try
+            {
+                reader.ExpectProperty("projectorKey"); var key = reader.ReadString();
+                reader.ExpectProperty("projectorVersion"); var version = reader.ReadString();
+                reader.ExpectProperty("projector"); var projector = ReadComponentReference(ref reader);
+                reader.ExpectProperty("inputCapability"); reader.Expect(JsonTokenType.StartObject);
+                reader.ExpectProperty("capabilityKey"); var capabilityKey = reader.ReadString();
+                reader.ExpectProperty("capabilityVersion"); var capabilityVersion = reader.ReadString();
+                reader.ExpectProperty("interfaceType"); var interfaceType = ReadComponentReference(ref reader);
+                reader.Expect(JsonTokenType.EndObject);
+                reader.ExpectProperty("inputSlotKeys"); var inputs = ReadNullableStringArray(ref reader);
+                reader.ExpectProperty("outputSlotKey"); var output = reader.ReadString();
+                reader.ExpectProperty("demandSchemaKey"); var schemaKey = reader.ReadString();
+                reader.ExpectProperty("demandSchemaVersion"); var schemaVersion = reader.ReadString();
+                reader.ExpectProperty("budget"); reader.Expect(JsonTokenType.StartObject);
+                reader.ExpectProperty("maxBytes"); var maxBytes = reader.ReadInt64();
+                reader.ExpectProperty("maxDepth"); var maxDepth = reader.ReadInt32();
+                reader.ExpectProperty("maxNodes"); var maxNodes = reader.ReadInt64();
+                reader.ExpectProperty("maxComplexity"); var maxComplexity = reader.ReadInt64();
+                reader.Expect(JsonTokenType.EndObject);
+                reader.ExpectProperty("failureCodes"); var failures = ReadNullableStringArray(ref reader);
+                reader.Expect(JsonTokenType.EndObject);
+                var row = new RawDemandProjector(key, version, projector,
+                    new RawCapabilityContract(capabilityKey, capabilityVersion, interfaceType), inputs,
+                    output, schemaKey, schemaVersion, maxBytes, maxDepth, maxNodes, maxComplexity, failures);
+                if (projectors.Any(item => item.HasSameValues(row)))
+                    throw new FormatException("protocol.manifest.projector-array-envelope");
+                projectors.Add(row);
+            }
+            catch (FormatException exception) when (exception.Message != "protocol.manifest.projector-array-envelope")
+            { throw new FormatException("protocol.manifest.projector-row-wire", exception); }
+        }
+        return projectors;
     }
 
     private static IReadOnlyList<RawAdmissionProofContract>
@@ -716,6 +761,17 @@ internal static class CanonicalManifestReader
         return values;
     }
 
+    private static IReadOnlyList<string?> ReadNullableStringArray(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartArray);
+        var values = new List<string?>();
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+            values.Add(reader.TokenType == JsonTokenType.Null
+                ? null
+                : reader.ReadCurrentString());
+        return values;
+    }
+
     private static IReadOnlyList<RawEvidenceSlot> ReadEvidenceSlots(
         ref BoundedJsonReader reader)
     {
@@ -928,23 +984,14 @@ internal static class CanonicalManifestReader
                     slice.Rules,
                     rawSchemaRegistry.PayloadSchemas,
                     rawSchemaRegistry.Parsers,
-                    rawSchemaRegistry.Indexes);
+                    rawSchemaRegistry.Indexes,
+                    rawSchemaRegistry.DemandProjectors);
             var admissionProofComponentReferences =
                 rawSchemaRegistry.AdmissionProofContracts
                     .Select(contract => (
                         contract.ProofComponent.ComponentKey,
                         contract.ProofComponent.ComponentVersion))
                     .ToHashSet();
-            if (admissionProofComponentReferences.Overlaps(
-                    declarationComponentReferences) ||
-                admissionProofComponentReferences.Contains((
-                    activationProof.ComponentKey,
-                    activationProof.ComponentVersion)))
-            {
-                throw new FormatException(
-                    "An admission-proof component cannot satisfy another declaration.");
-            }
-
             declarationComponentReferences.UnionWith(
                 admissionProofComponentReferences);
 
@@ -1009,8 +1056,8 @@ internal static class CanonicalManifestReader
 
                 if (!artifactFileNames.Contains(component.ArtifactFileName))
                 {
-                    throw new FormatException(
-                        "The manifest component mapping references an undeclared artifact.");
+                    throw new FormatException(component.ComponentKey.StartsWith("protocol.projector.", StringComparison.Ordinal)
+                        ? "protocol.manifest.artifact-owner" : "The manifest component mapping references an undeclared artifact.");
                 }
 
                 var componentBinding = ComponentArtifactBinding.Create(
@@ -1026,6 +1073,10 @@ internal static class CanonicalManifestReader
                     activationProofComponent = componentIdentity;
                 }
             }
+
+            if (!declarationComponentReferences.IsSubsetOf(componentKeys))
+                throw new FormatException("protocol.manifest.component-closure");
+            ValidateFunctionalRoleCollisions(slice, rawSchemaRegistry, activationProof);
 
             if (activationProofComponent is null)
             {
@@ -1065,8 +1116,7 @@ internal static class CanonicalManifestReader
                     !isRuntimeAnchor &&
                     !isDeclarationReference)
                 {
-                    throw new FormatException(
-                        "The manifest component graph is not fully closed.");
+                    throw new FormatException("protocol.manifest.component-closure");
                 }
             }
 
@@ -1076,13 +1126,15 @@ internal static class CanonicalManifestReader
                     "The manifest artifactFiles array must be fully bound.");
             }
 
+            ValidateProjectorValuesAndSlots(rawSchemaRegistry.DemandProjectors, slice.Rules);
+
             var schemaRegistry = ReleaseSchemaRegistry.Create(
                 CreatePayloadSchemas(
                     rawSchemaRegistry.PayloadSchemas,
                     componentLookup),
                 CreateParsers(rawSchemaRegistry.Parsers, componentLookup),
                 CreateIndexes(rawSchemaRegistry.Indexes, componentLookup),
-                Array.Empty<AcquisitionDemandProjectorDeclaration>(),
+                CreateDemandProjectors(rawSchemaRegistry.DemandProjectors, componentLookup),
                 CreateAdmissionProofContracts(
                     rawSchemaRegistry.AdmissionProofContracts,
                     componentLookup),
@@ -1132,7 +1184,8 @@ internal static class CanonicalManifestReader
             IReadOnlyList<RawRuleDeclaration> rules,
             IReadOnlyList<RawPayloadSchema> schemas,
             IReadOnlyList<RawSemanticParser> parsers,
-            IReadOnlyList<RawContextIndex> indexes)
+            IReadOnlyList<RawContextIndex> indexes,
+            IReadOnlyList<RawDemandProjector> projectors)
     {
         var references = new HashSet<(string, string)>();
         foreach (var schema in schemas)
@@ -1162,6 +1215,8 @@ internal static class CanonicalManifestReader
             references.Add((index.OutputCapability.InterfaceType.ComponentKey, index.OutputCapability.InterfaceType.ComponentVersion));
         }
 
+        foreach (var projector in projectors) { references.Add((projector.Projector.ComponentKey, projector.Projector.ComponentVersion)); references.Add((projector.InputCapability.InterfaceType.ComponentKey, projector.InputCapability.InterfaceType.ComponentVersion)); }
+
         foreach (var rule in rules)
         {
             references.Add(
@@ -1186,6 +1241,77 @@ internal static class CanonicalManifestReader
 
         return references;
     }
+
+    private static void ValidateFunctionalRoleCollisions(RawSlice slice, RawSchemaRegistry registry, RawActivationProof activation)
+    {
+        var roles = new Dictionary<(string, string), string>();
+        void Add(string role, RawComponentReference component)
+        {
+            var key = (component.ComponentKey, component.ComponentVersion);
+            if (roles.TryGetValue(key, out var existing) && existing != role)
+                throw new FormatException("protocol.manifest.functional-role-collision");
+            roles[key] = role;
+        }
+        Add("activation", new RawComponentReference(activation.ComponentKey, activation.ComponentVersion));
+        foreach (var item in registry.AdmissionProofContracts) Add("admission", item.ProofComponent);
+        foreach (var item in registry.PayloadSchemas) { Add("codec", item.Codec); Add("model", item.ImplementationType); }
+        foreach (var item in registry.Parsers) { Add("parser", item.Parser); Add("model", item.Input.ImplementationType); Add("model", item.OutputImplementationType); }
+        foreach (var item in registry.Indexes)
+        {
+            Add("index", item.Indexer); Add("capability", item.OutputCapability.InterfaceType);
+            foreach (var input in item.Inputs)
+                Add(input.Model is null ? "capability" : "model",
+                    input.Model?.ImplementationType ?? input.Capability!.InterfaceType);
+        }
+        foreach (var item in registry.DemandProjectors) { Add("projector", item.Projector); Add("capability", item.InputCapability.InterfaceType); }
+        foreach (var rule in slice.Rules)
+        {
+            Add("evaluator", rule.Evaluator);
+            foreach (var slot in rule.ApplicabilitySlots.Concat(rule.EvaluationSlots))
+                foreach (var capability in slot.Capabilities) Add("capability", capability.InterfaceType);
+            foreach (var selector in rule.ExpectedSelectors) Add("selector", selector.Resolver);
+        }
+    }
+
+    private static void ValidateProjectorValuesAndSlots(IReadOnlyList<RawDemandProjector> projectors, IReadOnlyList<RawRuleDeclaration> rules)
+    {
+        if (projectors.Count == 0) return;
+        var projector = projectors.SingleOrDefault(item => item.ProjectorKey == "protocol.projector.repository-target-resolution-demand" &&
+            item.ProjectorVersion == "1");
+        if (projector is null && projectors.Count == 1)
+            throw new FormatException("protocol.manifest.projector-value");
+        if (projector is null) return;
+        if (projector.Projector != new RawComponentReference("protocol.projector.repository-target-resolution-demand", "1") ||
+            projector.InputCapability != new RawCapabilityContract("protocol.capability.governed-reference-index", "1", new RawComponentReference("protocol.type.capability.governed-reference-index", "1")) ||
+            !projector.InputSlotKeys.SequenceEqual(["protocol.slot.provider-governed-text", "protocol.slot.repository-governed-text"], StringComparer.Ordinal) ||
+            projector.OutputSlotKey != "protocol.slot.repository-target-resolution" ||
+            projector.DemandSchemaKey != "protocol.repository-target-resolution-demand" || projector.DemandSchemaVersion != "1" ||
+            (projector.MaxBytes, projector.MaxDepth, projector.MaxNodes, projector.MaxComplexity) != (33_554_432, 64, 100_000, 5_000_000) ||
+            !projector.FailureCodes.SequenceEqual(["protocol.budget.exhausted"], StringComparer.Ordinal))
+            throw new FormatException("protocol.manifest.projector-value");
+
+        var applicability = rules.SelectMany(item => item.ApplicabilitySlots).ToArray();
+        var evaluation = rules.SelectMany(item => item.EvaluationSlots).ToArray();
+        var inputSlotsValid = projector.InputSlotKeys.All(key => evaluation.Any(slot =>
+            slot.SlotKey == key && slot.Capabilities.Any(capability =>
+                capability.CapabilityKey == projector.InputCapability.CapabilityKey &&
+                capability.CapabilityVersion == projector.InputCapability.CapabilityVersion)));
+        if (!inputSlotsValid || applicability.Any(slot => slot.SlotKey == projector.OutputSlotKey) ||
+            !evaluation.Any(slot => slot.SlotKey == projector.OutputSlotKey))
+            throw new FormatException("protocol.manifest.projector-slot");
+    }
+
+    private static IReadOnlyList<AcquisitionDemandProjectorDeclaration> CreateDemandProjectors(IReadOnlyList<RawDemandProjector> projectors, IReadOnlyDictionary<(string, string), ComponentTypeIdentity> components) =>
+        projectors.Select(item => AcquisitionDemandProjectorDeclaration.Create(
+            item.ProjectorKey, item.ProjectorVersion,
+            ResolveComponentReference(item.Projector, components),
+            CapabilityContractIdentity.Create(item.InputCapability.CapabilityKey,
+                item.InputCapability.CapabilityVersion,
+                ResolveComponentReference(item.InputCapability.InterfaceType, components)),
+            item.InputSlotKeys.Select(value => value!), item.OutputSlotKey,
+            item.DemandSchemaKey, item.DemandSchemaVersion,
+            SemanticResourceBudget.Create(item.MaxBytes, item.MaxDepth, item.MaxNodes, item.MaxComplexity),
+            item.FailureCodes.Select(value => EvaluationFailureCode.Parse(value!)))).ToArray();
 
     private static IReadOnlyList<PayloadSchemaDeclaration> CreatePayloadSchemas(
         IReadOnlyList<RawPayloadSchema> schemas,
@@ -1329,6 +1455,10 @@ internal static class CanonicalManifestReader
                      previous.ComponentVersion,
                      current.ComponentVersion) >= 0))
             {
+                if (previous.ComponentKey == current.ComponentKey &&
+                    previous.ComponentVersion == current.ComponentVersion &&
+                    previous.ComponentKey.StartsWith("protocol.projector.", StringComparison.Ordinal))
+                    throw new FormatException("protocol.manifest.component-closure");
                 throw new FormatException(
                     "The manifest components array is not in canonical key/version order.");
             }
@@ -1914,8 +2044,17 @@ internal static class CanonicalManifestReader
         IReadOnlyList<RawPayloadSchema> PayloadSchemas,
         IReadOnlyList<RawSemanticParser> Parsers,
         IReadOnlyList<RawContextIndex> Indexes,
+        IReadOnlyList<RawDemandProjector> DemandProjectors,
         IReadOnlyList<RawAdmissionProofContract> AdmissionProofContracts,
         RawCacheBudget CacheBudget);
+
+    private sealed record RawDemandProjector(
+        string ProjectorKey, string ProjectorVersion, RawComponentReference Projector, RawCapabilityContract InputCapability,
+        IReadOnlyList<string?> InputSlotKeys, string OutputSlotKey, string DemandSchemaKey, string DemandSchemaVersion, long MaxBytes,
+        int MaxDepth, long MaxNodes, long MaxComplexity, IReadOnlyList<string?> FailureCodes)
+    {
+        internal bool HasSameValues(RawDemandProjector other) => this with { InputSlotKeys = other.InputSlotKeys, FailureCodes = other.FailureCodes } == other && InputSlotKeys.SequenceEqual(other.InputSlotKeys, StringComparer.Ordinal) && FailureCodes.SequenceEqual(other.FailureCodes, StringComparer.Ordinal);
+    }
 
     private sealed record RawAdmissionProofContract(
         string ContractKey,
