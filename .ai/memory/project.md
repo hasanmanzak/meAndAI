@@ -51,6 +51,11 @@ Last verified: **2026-08-03**
   [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
   git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with successful
   [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
   The exact hosted-green selector delivery is
   [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
   git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
@@ -84,9 +89,11 @@ Last verified: **2026-08-03**
   validation are complete. `A-ADMISSION-01` is packet-local
   `ReviewedLocalGreen` at the
   [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  with exact LR/R/G/V evidence and cumulative A `25/25`; its implementation
-  commit/push/exact-head hosted delivery remains pending. Every later packet
-  remains Candidate/inactive.
+  with exact LR/R/G/V evidence and cumulative A `25/25`; immutable
+  implementation delivery `c1653d45...` / tree `7f547daa...` / run
+  `30778711538` is hosted green. The record-evidence sync commit/push and
+  exact-head hosted validation remain pending. `A-PROJECTOR-DAG-01` and every
+  later packet remain Candidate/inactive until that gate is green.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
@@ -574,6 +581,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   The exact hosted-green admission frozen-design predecessor is
   [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd) /
   [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
   The exact hosted-green selector delivery is
   [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
   git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful
@@ -587,8 +599,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
   packet-local `ReviewedLocalGreen` at the
   [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
-  its implementation commit/push/exact-head hosted delivery remains pending,
-  and later packets remain Candidate/inactive.
+  immutable implementation delivery `c1653d45...` / tree `7f547daa...` / run
+  `30778711538` is hosted green. The record-evidence sync commit/push and
+  exact-head hosted validation remain pending; `A-PROJECTOR-DAG-01` and later
+  packets remain Candidate/inactive until that gate is green.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1748,6 +1762,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
   git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with successful run
   [30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
+  The immutable admission implementation delivery is
+  [`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+  git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in
+  `18m12s`, Windows passed in `17m28s`, and publication verification was
+  correctly skipped in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
   The exact hosted-green selector delivery is
   [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
   git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with successful run
@@ -1763,8 +1782,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
   packet-local `ReviewedLocalGreen` at the
   [admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md);
-  implementation commit/push/exact-head hosted delivery remains pending, and
-  every later packet remains Candidate/inactive. The live denominator is twenty
+  immutable implementation delivery `c1653d45...` / tree `7f547daa...` / run
+  `30778711538` is hosted green. The record-evidence sync commit/push and
+  exact-head hosted validation remain pending; `A-PROJECTOR-DAG-01` and every
+  later packet remain Candidate/inactive until that gate is green. The live denominator is twenty
   and current `ReviewedLocalGreen` progress is twelve (`60%`), with cumulative
   A green `25/25`.
   Partial facts retain `ContractSlice` only; their final `Scenario`

@@ -265,8 +265,14 @@ canonical R is exact, production gross delta is `12/20`, retained test source is
 after exact frozen-design predecessor [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
-Admission implementation commit/push/exact-head hosted delivery remain pending;
-every later packet remains Candidate/inactive. No
+The immutable admission implementation delivery is
+[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in `18m12s`,
+Windows passed in `17m28s`, and publication verification was correctly skipped
+in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
+The record-evidence sync commit/push and exact-head hosted validation remain
+pending; `A-PROJECTOR-DAG-01` and every later packet remain Candidate/inactive
+until that gate is green. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

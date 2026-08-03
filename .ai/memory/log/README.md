@@ -250,7 +250,13 @@ is green `25/25`. The exact hosted-green admission frozen-design predecessor is
 [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, with Ubuntu and Windows green in
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978);
-publication verification was correctly skipped. The earlier exact selector delivery is
+publication verification was correctly skipped. The immutable admission
+implementation delivery is
+[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in `18m12s`,
+Windows passed in `17m28s`, and publication verification was correctly skipped
+in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
+The earlier exact selector delivery is
 [`2bbd36f5dd9ee975778063719fe8f879873e00d5`](https://github.com/hasanmanzak/meAndAI/commit/2bbd36f5dd9ee975778063719fe8f879873e00d5),
 git tree identity `fe543889cc68fad6a61139f0125a41ca4050ce40`, with Ubuntu and Windows green in
 [run 30772197693](https://github.com/hasanmanzak/meAndAI/actions/runs/30772197693);
@@ -285,8 +291,13 @@ green commit/push/exact-head hosted validation are complete. `A-ADMISSION-01`
 is packet-local `ReviewedLocalGreen` at the
 [admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
 with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
-`0/0/0`; implementation commit/push/exact-head hosted delivery remain pending.
-Every later packet remains Candidate/inactive. No
+`0/0/0`. Exact implementation delivery
+[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
+git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, and
+[run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538)
+are immutable hosted-green evidence. The record-evidence sync commit/push and
+exact-head hosted validation remain pending. `A-PROJECTOR-DAG-01` and every
+later packet remain Candidate/inactive until that gate is green. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
