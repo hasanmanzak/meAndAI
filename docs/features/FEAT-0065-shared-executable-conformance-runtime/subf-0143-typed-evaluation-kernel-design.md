@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact hosted-green admission record-evidence delivery [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in `17m10s` and Ubuntu in `19m02s` in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326); publication verification was correctly skipped. `A-PROJECTOR-DAG-01` is `FrozenDesign`; LR/P/R/C# remain held until this freeze-record cohort is committed, pushed, and exact-head hosted green. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
+| Status | Gate 2 accepted/merged. Exact admission predecessor and first-freeze hosted evidence remain unchanged. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed `0/0/0`, while exact committed-tree graph evidence below 4096 and exact-head hosted green remain before LR/P/R/C#. Twelve of twenty live packets remain `ReviewedLocalGreen` (`60%`), cumulative A remains `25/25`, later packets remain Candidate/inactive, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
 | Test | [TEST-0210](test-cases.md#test-0210) |
-| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md); the [admission handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
+| Gate 3 micro-delivery routing | Maintainer-approved [SUBF-0143](README.md#subf-0143) [micro-delivery control plan](subf-0143-micro-delivery-plan.md); current records-only projector/DAG state; the [admission handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) and earlier handoffs are exact deliveries or historical checkpoints, and operational labels remain non-normative and activate no unstated work |
 | Exact-main implementation baseline | [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd) |
 | Design and Gate 3 authority | Historical [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584); corrected ContractSlice A [implementation directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228); current umbrella authority on draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) for ordered A-only delivery through `A-CONVERGE-02`; append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054); append-only [BehaviorRed RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849); append-only [assertion-stack clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5150679793). B/C/D, merge, release, and publication remain outside that authority. |
 | Completed predecessor | [SUBF-0153](README.md#subf-0153) / [TEST-0221](test-cases.md#test-0221), merged through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173) and exact-main validated by [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -684,17 +684,115 @@ outside the catch; only the existing Writer's exact `InvalidOperationException`
 and exact legacy message may emit the marker. Reader is excluded and canonical
 R is never rerun.
 
-The matrix has exactly `103` vectors: `50` projector-wire, `4` array-envelope,
-`27` identity/collection/budget, and the exact numbered `22` component/DAG
-mutations in the [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md). Removing the projector
-declaration and component together must reproduce predecessor bytes. Production
-may change only Reader, Writer, and Catalog, with hard caps `145`, `70`, and
-`110`, aggregate production hard cap `300`; the one test hard cap is `390`, the
-combined hard cap is `690`, and `700+` requires redraw. Fully green successor
-tuple is `(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`. Exact
-details are retained in the [projector/DAG FrozenDesign handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md).
-LR/P/R/C# remain held until this records-only freeze is committed, pushed, and
-exact-head hosted green.
+The matrix has exactly `103` unique one-at-a-time canonical-byte negatives.
+Validation precedence is array envelope; projector-row wire grammar; raw
+component/artifact resolution and role ownership; locate the one required exact
+projector key/version and validate that row's values; raw projector-slot
+preflight before typed rule factories; generic producer DAG over every producer,
+including extra projector rows; remaining projector cardinality/extra-row
+rejection; then historical exact selector/admission/parser topology. Each
+fixture must reach its owned layer, and every retained negative asserts its
+mapped stable diagnostic rather than accepting an arbitrary `FormatException`.
+
+The `50` projector-row wire negatives are the ten fields, each independently
+missing, duplicated, `null`, or Boolean-wrong-type (`40`), one extra field, and
+each of nine adjacent field swaps. The four array-envelope negatives are a null
+array, object instead of array, one null element, and two byte-identical exact
+projector rows. An empty array is not negative: removing both declaration and
+component must byte-reproduce the valid `25`-component predecessor.
+
+The exact `27` value/local negatives are:
+
+1. alternate `projectorKey`;
+2. projector version `2`;
+3. alternate projector component key with its binding atomically renamed and
+   the old binding removed;
+4. projector component version `2` with its binding atomically versioned;
+5. protocol-record capability key with the governed interface retained;
+6. input capability version `2`;
+7. protocol-record interface component with the governed capability retained;
+8. a fully mapped version-2 governed interface component with a distinct
+   physical test type;
+9. existing repository-tree evaluation slot as output;
+10. alternate demand-schema key;
+11. demand-schema version `2`;
+12. empty `inputSlotKeys`;
+13. one null input-slot element;
+14. duplicate provider input slot;
+15. exact input-slot reversal;
+16. provider input replaced by well-formed unknown `protocol.slot.unknown`;
+17. output slot appended to inputs;
+18. provider governed-text rule slot removed while its projector key remains;
+19. repository governed-text rule slot removed while its projector key remains;
+20. empty failure-code array;
+21. one null failure-code element;
+22. duplicate `protocol.budget.exhausted`;
+23. canonical superset adding `protocol.projector.unexpected-failure`;
+24. `maxBytes` changed to generically valid value `1`;
+25. `maxDepth` changed to generically valid value `1`;
+26. `maxNodes` changed to generically valid value `1`; and
+27. `maxComplexity` changed to generically valid value `1`.
+
+The exact `22` component/DAG negatives are:
+
+1. remove only the projector component binding;
+2. duplicate that component binding;
+3. add one fully mapped declaration-free projector component;
+4. map the projector component to undeclared `Missing.Projector.dll`;
+5. remove only the projector declaration while retaining its binding;
+6. through 12. reuse respectively the activation proof, observed admission
+   proof, governed-text codec, source model, Markdown parser,
+   governed-reference index, and governed-reference capability component as
+   projector, removing the original projector binding in every case;
+13. and 14. remove governed-reference capability from respectively provider
+   and repository governed-text input slot;
+15. remove the governed-reference index declaration and its implementation
+   binding while retaining its capability-type binding and consumers;
+16. add a fully mapped second index with the same output capability;
+17. add a fully mapped second projector with the same output slot;
+18. move the projected output slot to applicability;
+19. add target-resolution capability input to governed-reference index, forming
+   the frozen five-producer/five-edge cycle;
+20. add a fully mapped unused parser that consumes a reachable model and
+   produces an otherwise unconsumed distinct model;
+21. reuse a selector-resolver component as projector and remove the original
+   projector binding; and
+22. reuse the evaluator component as projector and remove the original
+   projector binding.
+
+Component ownership is a role-aware `(key,version) -> role` table over activation
+proof, admission proof, codec, model, parser, index, capability, projector,
+selector, and evaluator. Repetition inside one role is legal; use by a second
+role emits `protocol.manifest.functional-role-collision`. The four envelope and
+50 wire cases emit `protocol.manifest.projector-array-envelope` and
+`protocol.manifest.projector-row-wire`. Component/DAG rows 1-3 and 5 emit
+`protocol.manifest.component-closure`; row 4 emits
+`protocol.manifest.artifact-owner`; rows 6-12 and 21-22 emit the role-collision
+token. Value rows 1-17 and 20-27 emit `protocol.manifest.projector-value`, while
+value rows 18-19 and topology rows 13-14 and 18 emit
+`protocol.manifest.projector-slot`. Topology rows 15-17 emit
+`protocol.manifest.producer-owner`, row 19 emits
+`protocol.manifest.producer-cycle`, and row 20 emits
+`protocol.manifest.producer-unreachable`.
+
+Reader performs the raw component/artifact/role, required-projector value, and
+projector-slot preflight after parsing raw registry/rule records but before
+`CreateRules`, so factory exceptions cannot mask projector diagnostics. Catalog's
+generic producer-DAG validation then runs over every producer before remaining
+extra-projector/cardinality and legacy exact-topology guards. A friend-test-only
+internal result exposes the production-computed root identities, never execution
+order; C still owns first runtime ordering.
+
+Production may change only Reader, Writer, and Catalog. Revised readable-code
+hard caps are `175`, `70`, and `170`, aggregate production `380`; the one test
+hard cap is `410`, and combined green acceptance cap is `770`. A measured
+`771-799` stops green acceptance for readability-preserving refactor back to
+`770` or lower; `800+` forces design redraw. Assertions, diagnostics, or semantic
+vectors may not be compressed away to fit. Fully green successor tuple is
+`(3,2,4,1,4,2,2,3,26,3)` and cumulative A becomes `26/26`.
+Exact evidence remains unchanged after the bounded records-only correction.
+Renewed D/RT is closed `0/0/0`; LR/P/R/C# remain held until the corrected
+committed tree is graph-valid below 4096 and exact-head hosted green.
 
 That corrected directive still does **not** authorize:
 
@@ -6865,7 +6963,7 @@ scenario:
   declaration/manifest field order, missing/extra/duplicate projector
   declaration or component mapping, input/output slot/capability closure,
   projected-applicability rejection, the exact numbered twenty-two topology
-  mutations in the current FrozenDesign handoff, computed successor/predecessor
+  mutations in the current frozen contract, computed successor/predecessor
   roots, canonical byte/digest/typed-projection behavior, and the exact
   no-extra-friend matrix. It proves no executable registration or activation.
 - B proves cumulative count 72 and the non-authoritative Tests-owned codec

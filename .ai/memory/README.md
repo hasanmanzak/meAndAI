@@ -29,7 +29,7 @@ the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current [ContractSlice A projector/DAG FrozenDesign handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md),
+the current records-only ContractSlice A projector/DAG state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -271,16 +271,14 @@ The immutable admission implementation delivery is
 git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`; Ubuntu passed in `18m12s`,
 Windows passed in `17m28s`, and publication verification was correctly skipped
 in [run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538).
-The admission record-evidence delivery is exact
-[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
-git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`; Windows passed in `17m10s`,
-Ubuntu passed in `19m02s`, and publication verification was correctly skipped
-in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-PROJECTOR-DAG-01` is now records-only `FrozenDesign` at its
-[projector-DAG handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md),
-with marker `TEST-0210-A-BEHAVIOR-RED-0010`, exact FQN, 26/3 successor, 25/3
-reproduction predecessor, document-local producer DAG, and 690-line hard cap;
-LR/P/R/C# remain pending. Every later packet remains Candidate/inactive. No
+The bounded records-only correction
+retains the exact hosted-green admission predecessor and first-freeze failure
+evidence. `A-PROJECTOR-DAG-01` remains records-only `FrozenDesign` with marker
+`TEST-0210-A-BEHAVIOR-RED-0010`, exact FQN, 26/3 successor, 25/3 reproduction,
+the enumerated 103-case role-aware producer-DAG contract, and revised 770-line
+hard cap. Renewed D/RT closed `0/0/0`; exact committed-tree graph evidence below
+4096 and hosted green remain required before LR/P/R/C#. Every later packet remains
+Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

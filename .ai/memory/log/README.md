@@ -291,18 +291,14 @@ green commit/push/exact-head hosted validation are complete. `A-ADMISSION-01`
 is packet-local `ReviewedLocalGreen` at the
 [admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
 with exact LR/R/G/V evidence, cumulative A `25/25`, and independent reviews
-`0/0/0`. Exact implementation delivery
-[`c1653d45c99eb01291bc571e93d74db80d94d9e8`](https://github.com/hasanmanzak/meAndAI/commit/c1653d45c99eb01291bc571e93d74db80d94d9e8),
-git tree identity `7f547daa92ca22d4f4f288e5ac8a97f890185bd7`, and
-[run 30778711538](https://github.com/hasanmanzak/meAndAI/actions/runs/30778711538)
-are immutable hosted-green evidence. Exact record-evidence delivery
-[`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce),
-git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in `17m10s`
-and Ubuntu in `19m02s` in
-[run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-PROJECTOR-DAG-01` is records-only `FrozenDesign` at the
-[projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md);
-LR/P/R/C# remain pending and every later packet remains Candidate/inactive. No
+`0/0/0`; its immutable implementation and record-delivery identities remain in
+that handoff. The corrected
+[projector-DAG handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
+retains the exact predecessor and first-freeze hosted evidence.
+`A-PROJECTOR-DAG-01` remains records-only `FrozenDesign`; renewed D/RT closed
+`0/0/0`, while an exact committed graph below 4096 and exact-head hosted green
+remain before LR/P/R/C#.
+Every later packet remains Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

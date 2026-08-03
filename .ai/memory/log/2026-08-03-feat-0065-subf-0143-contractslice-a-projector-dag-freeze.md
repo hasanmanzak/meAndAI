@@ -6,8 +6,9 @@
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Pull request | Draft [PR #174](https://github.com/hasanmanzak/meAndAI/pull/174) |
 | Parent | [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) / [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) |
-| State | `A-PROJECTOR-DAG-01` `FrozenDesign`; D/RT accepted and maintainer-activated under the standing A-through-`A-CONVERGE-02` directive; LR/P/R/C# remain pending |
+| State | `A-PROJECTOR-DAG-01` corrected `FrozenDesign`; renewed D/RT closed `0/0/0`, while exact committed-tree graph evidence below `4096` and exact-head hosted green remain required before LR/P/R/C# |
 | Exact predecessor | [`b735853a2153338fd97c366bcd8c212f78bc1bce`](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, passed Windows in `17m10s` and Ubuntu in `19m02s` in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326); publication verification was correctly skipped |
+| First freeze attempt | Exact [`a3f0ed94b26c6fad872c9ab94102471809f7a7c9`](https://github.com/hasanmanzak/meAndAI/commit/a3f0ed94b26c6fad872c9ab94102471809f7a7c9) passed Windows in `16m59s`; Ubuntu exposed only [FIND-0450](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0450) in [run 30784254717](https://github.com/hasanmanzak/meAndAI/actions/runs/30784254717). Exact diagnostic graph was `4113` edges against the immutable `4096` budget; no C# or workflow failed. |
 | Admission parent | [Reviewed-local-green admission handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md) |
 | Progress | Twelve of twenty live packets are `ReviewedLocalGreen` (`60%`); cumulative A remains `25/25`; [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned` |
 
@@ -32,44 +33,16 @@
 ## Frozen matrix, allowlist, and caps
 
 - Exact projector wire order is `projectorKey`, `projectorVersion`, `projector`, `inputCapability`, `inputSlotKeys`, `outputSlotKey`, `demandSchemaKey`, `demandSchemaVersion`, `budget`, `failureCodes`; existing nested component/capability/budget field owners remain authoritative.
-- The retained Fact owns 103 unique one-at-a-time canonical-byte negatives: 50 outer wire-shape cases, four array-envelope cases, twenty-seven identity/collection/budget cases, and the following exact twenty-two component/DAG topology cases. Every mutation differs from positive bytes, remains valid JSON at the intended layer, is uniqueness-counted, and fails only through `FinalizedPolicyManifest.ParseCanonical` with `FormatException`.
-
-| # | Exact base-fixture mutation | Sole owned invariant |
-| ---: | --- | --- |
-| 1 | Remove only the new projector component binding | Projector component must resolve |
-| 2 | Duplicate the exact projector component binding | Component mapping key/version is unique |
-| 3 | Add one mapped `protocol.projector.repository-target-resolution-demand.extra/1` component with no declaration | Functional component mappings cannot be declaration-free extras |
-| 4 | Change only the projector binding artifact to undeclared `Missing.Projector.dll` | Every component maps to one declared artifact |
-| 5 | Remove only the projector declaration while retaining its exact component binding | Projector component cannot be orphaned |
-| 6 | Reuse `protocol.activation-proof.test/1` as the projector component | Projector and activation-proof roles are disjoint |
-| 7 | Reuse `protocol.admission-proof.test-observed/1` as the projector component | Projector and admission-proof roles are disjoint |
-| 8 | Reuse `protocol.codec.governed-text/1` as the projector component | Projector and payload-codec roles are disjoint |
-| 9 | Reuse `protocol.type.model.source-text/1` as the projector component | Projector and model-type roles are disjoint |
-| 10 | Reuse `protocol.parser.markdown/1` as the projector component | Projector and parser roles are disjoint |
-| 11 | Reuse `protocol.index.governed-reference/1` as the projector component | Projector and index roles are disjoint |
-| 12 | Reuse `protocol.type.capability.governed-reference-index/1` as the projector component | Projector and capability-type roles are disjoint |
-| 13 | Remove governed-reference capability only from provider-governed-text slot | Every projector input slot declares its input capability |
-| 14 | Remove governed-reference capability only from repository-governed-text slot | Every projector input slot declares its input capability |
-| 15 | Remove governed-reference index declaration and only its implementation binding while retaining the governed-reference capability-type binding and all consumers | Every consumed capability has exactly one producer |
-| 16 | Add a fully mapped second index declaration with a distinct index component but the same governed-reference output capability | Capability producer ownership is unique |
-| 17 | Add a fully mapped second projector with a distinct component but the same repository-target-resolution output slot | Output-slot projector ownership is unique |
-| 18 | Move repository-target-resolution slot from evaluation to applicability while retaining the projector | Projected outputs are evaluation-only |
-| 19 | Add repository-target-resolution capability as an input to governed-reference index | Reject the exact target-index -> governed-index -> projector -> target-schema -> target-parser -> target-index cycle |
-| 20 | Add a fully mapped unused schema/model producer pair referenced by no applicability or evaluation slot dependency | Closed but slot-unreachable producers are rejected |
-| 21 | Remove provider-governed-text slot from the rule while retaining it in projector input keys | Every projector input slot resolves |
-| 22 | Remove repository-governed-text slot from the rule while retaining it in projector input keys | Every projector input slot resolves |
-
-The seven role-collision rows are the exact projector-delta representatives;
-prior packets retain their own selector/evaluator/proof and producer-family
-collision coverage. The positive successor asserts the two computed roots and
-the byte-reproduced predecessor asserts its three computed roots.
+- The retained Fact owns exactly 103 unique negatives: 50 row-wire, four array-envelope, 27 exact value/local, and 22 component/DAG cases. The previously unnamed 31 cases and all 22 revised topology rows are now enumerated in the [typed design](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md#frozen-design-a-projector-dag-01-boundary). Empty projector array is the valid predecessor, never an envelope negative. Selector/evaluator collision rows replace the two rule-slot-removal topology rows; those slot cases now live in the 27-value group. Role-collision fixtures remove the original projector binding, and the unused-producer row is a reachable-input/unconsumed-output parser so forward traversal cannot falsely pass it.
+- Validation precedence is envelope -> row wire -> raw component/artifact resolution and role ownership -> required exact projector row/value -> raw projector-slot preflight before typed rule factories -> all-row producer DAG -> remaining extra/cardinality rejection -> legacy topology. Reader owns the raw preflight so factory failures cannot mask projector diagnostics; Catalog owns the generic DAG and later guards. Stable tokens cover array envelope, row wire, component closure, artifact owner, projector value, role collision, slot, producer owner, cycle, and reverse reachability exactly as mapped in the typed design. The role-aware table covers activation, admission, codec, model, parser, index, capability, projector, selector, and evaluator; same-role repetition remains legal. A friend-test-only internal result exposes production-computed roots, not runtime order.
+- The positive successor asserts its two production-computed roots and the byte-reproduced predecessor asserts three. The exact successor graph and predecessor remain otherwise unchanged.
 - Production allowlist is only `CanonicalManifestReader.cs`, `CanonicalManifestWriter.cs`, and `CatalogSliceDeclaration.cs`; one new test file is allowed. Public API, project/package/lock/workflow files and every other source/test are held.
-- The dependency rationale approves a bounded exception to the normal 450-line target: Reader planning ceiling `145`, Writer `70`, Catalog `110`, aggregate production gross hard cap `300`, retained new-test hard cap `390` physical lines, combined hard cap `690`; `700+` forces redraw. Assertions or semantic vectors may not be removed merely to fit.
+- Readable-code hard caps are Reader `175`, Writer `70`, Catalog `170`, aggregate production `380`, retained new test `410`, and combined green acceptance `770`. A measured `771-799` stops acceptance for readability-preserving refactor to `770` or lower; `800+` forces redraw. Assertions, diagnostics, or semantic vectors may not be removed or compressed away merely to fit.
 - The records-only freeze cohort is the finite thirteen-record synchronization exception: five memory records (memory README, admission handoff, this projector handoff, log README, and project memory), three architecture records, and five feature/design/test/index records. Older handoffs remain immutable. No C#, executable test, project, lock, package, or workflow enters this freeze commit.
 
 ## Red-team disposition and holds
 
 - Independent node/edge/reachability review originally found three Blocking, three Important, and one Minor design ambiguity; the exact node universe, projected-schema root rule, reverse slot closure, separated owner tables, total Kahn comparator, A-vs-C observability boundary, demand-schema disposition, and exact cycle/unreachable matrix above resolve them.
 - Independent ownership/record review found one hosted-predecessor Blocking and four Important items; the [exact hosted-green predecessor](https://github.com/hasanmanzak/meAndAI/commit/b735853a2153338fd97c366bcd8c212f78bc1bce), explicit projector-vs-convergence/A-vs-C ownership, Writer-first validation-free R, demand token disposition, and finite record-cap/history exception resolve them.
-- Independent evidence/budget review found two Blocking, six Important, and one Minor items; exact predecessor, 0010/FQN, 26/3 successor, joint declaration+component reproduction, Reader exclusion from R, 103-vector matrix, and corrected 690 hard cap resolve them. Current D/RT verdict is `0 Blocking / 0 Important / 0 Minor`; Protocol Gate 5 has no additional observation.
+- Post-commit feasibility review found two Blocking, two Important, and one Minor issue: unnamed 31-case membership, missing selector/evaluator role collisions, DAG failures masked by legacy guards, risky caps, and no production-root observation seam. The first renewed review then found exact-value precedence masking role/output-owner rows, incomplete diagnostic mapping, a cycle-cardinality label, and an ambiguous 771-799 band. Exact matrix enumeration, raw role/value/slot precedence, all-row DAG ordering, ten mapped tokens, the five-producer cycle label, internal roots, and the explicit refactor band resolve them. Three second-renewed independent reviews closed `0 Blocking / 0 Important / 0 Minor`; the bounded current-tree publication-evidence suite passed all seven owned scenarios in `281.7s`. Exact committed-tree graph and hosted validation remain required before LR/P/R/C#.
 - B/C/D, all later A packets, Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), merge, release, publication, consumer mutation, WIP extraction, and PowerShell retirement remain held. No DoD, full [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) green, hosted projector evidence, or publication claim is made.
