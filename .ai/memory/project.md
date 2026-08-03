@@ -64,7 +64,7 @@ Last verified: **2026-08-03**
   publication verification was correctly skipped. The exact hosted-green
   finding delivery [`2430a67e...`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134) /
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
-  remains historical predecessor evidence. Cumulative A is `26/26`.
+  remains historical predecessor evidence. Cumulative A is `27/27`.
   `A-FINDING-01` is packet-local `ReviewedLocalGreen` on its
   `R=NotApplicable`, `TestOnlyGreen`, production-zero route; synchronized
   commit, push, and exact-head hosted validation are complete.
@@ -103,12 +103,23 @@ Last verified: **2026-08-03**
   Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
   correctly skipped. Never-activated `A-CONVERGE-01` is retired and excluded
   from the denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed; every later packet remains
-  Candidate/inactive.
+  packet-local `ReviewedLocalGreen`. Canonical R ran once and is immutable at
+  `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
+  the post-fix sentinel is diagnostic only. [FIND-0454](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0454) corrected two stale
+  applicability sibling negatives without changing production or R, and
+  [FIND-0455](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0455) removed the still-`Planned` scenario literal only from the
+  FullManifest fixture/snapshot. Final FullManifest is `1/1` at
+  `B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+  cumulative A is `27/27` at
+  `0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+  full Conformance is `27/27`, full Domain is `98/98`, StructureOnly passed with
+  `elapsedMs=484633`, and publication evidence passed `7/7` in `329.3s` without
+  a published-state claim. Fourteen of twenty live packets are green (`70%`).
+  `A-COMPLETE-PROFILE-01` and every later packet remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current
-  [full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
+  [full-manifest reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
   the admission-proof reviewed-local-green handoff,
   the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
@@ -414,15 +425,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-  the hosted-green [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-  the hosted-green [target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-  the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-  the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-  the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current full-manifest `MaintainerActivated / PreRed` state.
+  the historical schema-slot handoff,
+  the historical index-slot handoff,
+  the historical parser-record-slot handoff,
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
+  the hosted-green selector reviewed-local-green handoff,
+  the hosted-green admission-proof reviewed-local-green handoff,
+  and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. Partial facts retain exact FQN and
   `ContractSlice`; final `Scenario` traits are deferred to the same atomic
   scenario-status/scenario-owner/workflow-test-step target-and-filter/[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -467,15 +478,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
-  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  the historical schema-slot handoff,
+  the historical index-slot handoff,
   the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
   the hosted-green [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
   the hosted-green [target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
   the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current full-manifest `MaintainerActivated / PreRed` state.
+  and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
   recurrence set is
@@ -556,7 +567,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-  and the current full-manifest `MaintainerActivated / PreRed` state.
+  and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
   review `0/0/0` establish `ReviewedLocalGreen`. Audited tree `4ca02623...` is
@@ -617,12 +628,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   correction.
   `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
   implementation identity and hosted evidence are retained in the canonical
-  projector handoff. Exact cumulative A is `26/26`, final review is `0/0/0`,
+  projector handoff. Exact cumulative A is now `27/27`, final review is `0/0/0`,
   and combined budget is `770/770`; exact-head hosted validation passed Windows
   in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
   skipped. Never-activated `A-CONVERGE-01` is retired and excluded from the
   denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed; later packets remain Candidate/inactive.
+  `ReviewedLocalGreen`; immutable R, bounded generic green, the sibling-
+  assertion corrections, the fixture-topology correction, exact `27/27`
+  cumulative validation, and final long checks are retained in its canonical
+  handoff. `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1808,11 +1822,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   projector handoff. Exact-head hosted validation passed Windows in `14m58s`
   and Ubuntu in `19m00s`, with publication verification correctly skipped.
   Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-  Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. Every later packet remains
-  Candidate/inactive. The live denominator is twenty
-  and current `ReviewedLocalGreen` progress is thirteen (`65%`), with cumulative
-  A green `26/26`.
+  Its one-for-one replacement `A-FULL-MANIFEST-01` is packet-local
+  `ReviewedLocalGreen`; canonical R remains immutable, final focused is `1/1`,
+  and final cumulative A is `27/27`. The live denominator is twenty and current
+  `ReviewedLocalGreen` progress is fourteen (`70%`). `A-COMPLETE-PROFILE-01`
+  and every later packet remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

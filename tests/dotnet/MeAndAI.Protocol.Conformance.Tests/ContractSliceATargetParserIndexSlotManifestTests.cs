@@ -246,7 +246,7 @@ public sealed class ContractSliceATargetParserIndexSlotManifestTests
             "\"components\":[" + string.Join(",", bindings.SelectMany(item => ComponentKey(item) == "protocol.index.repository-target-resolution" ? new[] { item.GetRawText(), ReplaceRequired(targetBinding, "protocol.index.repository-target-resolution", "protocol.index.repository-target-resolution-unused") } : new[] { item.GetRawText() })) + "]");
         var artifacts = root.GetProperty("artifactFiles").EnumerateArray().Select(item => item.GetRawText()).ToArray();
         RejectMany(text, "\"artifactFiles\":[" + string.Join(",", artifacts) + "]", "\"artifactFiles\":[" + string.Join(",", artifacts) + "," + ReplaceRequired(artifacts[^1], "MeAndAI.Protocol.Policy.dll", "Unused.dll") + "]");
-        RejectMany(text, "\"applicabilitySlots\":[]", "\"applicabilitySlots\":[" + slotText + "]");
+        AssertAccepted(ReplaceRequired(text, "\"applicabilitySlots\":[]", "\"applicabilitySlots\":[" + slotText + "]"));
         RejectMany(text, "\"demandProjectors\":[]", "\"demandProjectors\":[{}]");
         RejectMany(text, "\"admissionProofContracts\":[]", "\"admissionProofContracts\":[{}]");
     }

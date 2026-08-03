@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Exact admission and projector predecessor evidence remains unchanged. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`. Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`), cumulative A is `26/26`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. The graph-budget correction is hosted-green. |
+| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. The three A-FULL findings are resolved. Synchronized commit/push and exact-head hosted validation remain pending. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -143,8 +143,8 @@ correction. Both findings are resolved by exact remote-equal
 [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, and hosted-green
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-Strict redraw retires never-activated `A-PARSER-INDEX-01`; thirteen of twenty
-live packets are `ReviewedLocalGreen` (`65%`). `A-PARSER-RECORD-SLOT-01` is exact-
+Strict redraw retires never-activated `A-PARSER-INDEX-01`; fourteen of twenty
+live packets are `ReviewedLocalGreen` (`70%`). `A-PARSER-RECORD-SLOT-01` is exact-
 head `ReviewedLocalGreen` at [`fca0778...`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689)
 / [run 30722890590](https://github.com/hasanmanzak/meAndAI/actions/runs/30722890590).
 `A-GOVERNED-REFERENCE-SLOTS-01`, `A-TARGET-PARSER-INDEX-SLOT-01`,
@@ -158,11 +158,11 @@ The exact admission record-evidence delivery is
 git tree identity `fc5ae301331f55f1435b4262c300489e3cbcff2f`, with Windows green in
 `17m10s`, Ubuntu green in `19m02s`, and publication verification correctly
 skipped in [run 30781516326](https://github.com/hasanmanzak/meAndAI/actions/runs/30781516326).
-`A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen` with exact
-packet-local implementation/evidence. Hosted run `30798854880` passed
-Windows in `14m58s` and Ubuntu in `19m00s`; publication verification was
-correctly skipped. Never-activated `A-CONVERGE-01` is retired;
-`A-FULL-MANIFEST-01` and later packets remain inactive.
+`A-PROJECTOR-DAG-01` and `A-FULL-MANIFEST-01` are packet-local
+`ReviewedLocalGreen`. The projector hosted run `30798854880` passed Windows in
+`14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
+Never-activated `A-CONVERGE-01` is retired; `A-COMPLETE-PROFILE-01` and later
+packets remain inactive.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -821,7 +821,7 @@ Catalog `155`, aggregate production `362`, test `408`, and combined `770`
 satisfy the frozen caps. Hosted run `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`; publication verification was correctly skipped.
 
-### Frozen-design `A-FULL-MANIFEST-01` correction
+### Reviewed-local-green `A-FULL-MANIFEST-01` correction
 
 The inactive `A-CONVERGE-01` routing label is retired before activation. Its
 reserved fresh full-manifest Fact was incompatible with a no-new-Fact
@@ -829,16 +829,16 @@ convergence classification. `A-FULL-MANIFEST-01` replaces it one-for-one in the
 twenty-packet live denominator. `A-CONVERGE-02` remains the final A audit and
 adds no Fact.
 
-The replacement is not `TestOnlyGreen`. The current
-`CatalogSliceDeclaration` closure rejects the accepted initial manifest before
-Writer/Reader because it assumes exactly one rule, four evaluation-slot
+The replacement was not `TestOnlyGreen`. The pre-green
+`CatalogSliceDeclaration` closure rejected the accepted initial manifest before
+Writer/Reader because it assumed exactly one rule, four evaluation-slot
 occurrences, two selectors, two findings, and one shared admission contract
 identity. The accepted declaration has five rules, twelve slot occurrences
 over four structurally equal reusable SlotKeys, three selectors, sixteen
 findings, and three distinct admission contract identities. That current
-restriction is the sole expected-red seam.
+restriction was the sole expected-red seam.
 
-Green generalizes the already-accepted declaration mechanics without embedding
+Green generalized the already-accepted declaration mechanics without embedding
 initial-release counts in reusable production code:
 
 - `CanonicalRules` continues to reject two declarations of one SlotKey unless
@@ -910,17 +910,56 @@ slices.
 The production allowlist is only `CatalogSliceDeclaration.cs`, target/hard
 gross delta `40-60/80`. Test scope is the new
 `ContractSliceAFullManifestGraphTests.cs`, target `450-550` and retained-source
-hard cap `608`, plus only the existing
+hard cap `608`, plus the existing
 `ContractSliceAAdmissionProofManifestTests.cs` changed-key assertion correction,
-gross-delta hard cap `12`. The aggregate test hard cap remains `620`; combined
-hard cap remains `700`. The sibling stays unchanged through P/R. Green converts
-only its changed-Observed-key rejection into a positive parse/write byte
-round-trip; its mixed-version rejection remains. Project, solution, package,
-lock, workflow, public/friend API, every other sibling test, and held downstream
-scope remain unchanged. P is
-`NotApplicable`; unchanged projector focused `1/1` and cumulative A `26/26`
-precede the one canonical R. Green targets focused `1/1` and cumulative A
-`27/27`.
+gross-delta hard cap `12`. The stale-sibling finding added only the two owning
+assertions in `ContractSliceAGovernedReferenceSlotsManifestTests.cs` and
+`ContractSliceATargetParserIndexSlotManifestTests.cs`, gross `3+2=5`; it added
+no production behavior. The aggregate test hard cap remains `620`; combined
+hard cap remains `700`. The admission sibling stayed unchanged through P/R and
+green converted only its changed-Observed-key rejection into a positive
+parse/write byte round-trip; its mixed-version rejection remains. Project,
+solution, package, lock, workflow, public/friend API, every other sibling test,
+and held downstream scope remain unchanged. P was `NotApplicable`; unchanged
+projector focused `1/1` and cumulative A `26/26` preceded the one canonical R.
+
+Canonical R is immutable at TRX SHA-256
+`F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`.
+The terminal-sentinel finding records why unchanged-source original green is not claimed: after
+the production correction, the unchanged transient source failed marker-free
+only at its terminal missing-behavior sentinel, TRX SHA-256
+`AA5F050091E0DAD737B7639C2CFF42E36854C97A924DD61E14D7D34C9CE20010`.
+Removing only that terminal line changed source and passed `1/1` at TRX SHA-256
+`264F9BEA27ED1B458C8E74AF0448D710356B95218E385F8DF7EFCB2E06128986`;
+it is a corrected-original checkpoint only. Final retained green removes the
+marker, catch, and sentinel entirely.
+
+The stale-sibling finding first exposed cumulative `25/27` at TRX SHA-256
+`700CB92C90BB7C8FF031767D2A6B7C9E25C2A416828CD1D1720AF5695658BF97`.
+The two corrected sibling proofs are SHA-256
+`8FFB1E412D0311510E0ADB0A94AA6D0FEC1518D94683CE7790FDA44DBCD955F9`
+and `884B7478FC4C0DCE166D1FB72E84F9305D072631E3063DFEC42479F24B964EEF`.
+The qualification-lifecycle finding then removed five premature planned scenario semantic-evidence
+entries. Current per-rule qualification counts are `[1,1,3,1,1]`, total `7`;
+the deferred final atomic activation adds that scenario to every rule and changes
+them to `[2,2,4,2,2]`, total `12`.
+
+Final A-FULL source is `353` lines at SHA-256
+`863BDCDBED53BF3D08C1009CE86842DF8D8B058D49D9BFF5D72B3D5C1A67D4CA`;
+Catalog is SHA-256
+`456EFCCC3E34A84473CB265B5E3494690D72867C329E3FFE33E2151F70027EF5`.
+Focused, cumulative A, full Conformance, and full Domain passed `1/1`, `27/27`,
+`27/27`, and `98/98`, at respective TRX SHA-256
+`B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+`0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+`97C0B960F3EC0CABB32803D4394D3D23685B57D2E0B046DA99929EEBF69E13E2`,
+and `0095818A237CB1E84FBDC1F4C4B6279CC5422FC1DDBB9C0CBAA496B00FA5016D`.
+StructureOnly passed in `484633ms`; publication-evidence passed `7/7` in
+`329.3s` without a published-state claim. Realized production/test/combined
+gross deltas are `77/80`, `364/620`, and `441/700`. The packet is
+`ReviewedLocalGreen`; synchronized commit/push and exact-head hosted validation
+remain pending. Cumulative A is `27/27`; `A-COMPLETE-PROFILE-01` is next
+Candidate/inactive.
 
 That corrected directive still does **not** authorize:
 
@@ -6792,11 +6831,11 @@ The exact per-rule declaration projection is:
 
 | Rule | Surfaces / snapshot kinds | Evaluation slots | Expected selectors | Qualification scenarios |
 | --- | --- | --- | --- | --- |
-| RULE-0001 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree | `protocol.selector.feature-readme`, SlotKey `protocol.slot.repository-tree`, schema `protocol.selector.relative-child.v1`, feature-readme resolver, parent Derived, finding `protocol.feature.readme-missing`; `protocol.selector.feature-test-cases`, the same SlotKey/schema, feature-test-cases resolver, parent Derived, finding `protocol.feature.test-cases-missing` | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0002 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree; repository-governed-text | `protocol.selector.decision-record`, SlotKey `protocol.slot.repository-governed-text`, schema `protocol.selector.decision-record-by-id.v1`, decision-record resolver, parent Derived, finding `protocol.decision.record-missing` | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0003 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0004 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), [TEST-0210](test-cases.md#test-0210) |
-| RULE-0005 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178), [TEST-0210](test-cases.md#test-0210) |
+| RULE-0001 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree | `protocol.selector.feature-readme`, SlotKey `protocol.slot.repository-tree`, schema `protocol.selector.relative-child.v1`, feature-readme resolver, parent Derived, finding `protocol.feature.readme-missing`; `protocol.selector.feature-test-cases`, the same SlotKey/schema, feature-test-cases resolver, parent Derived, finding `protocol.feature.test-cases-missing` | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) |
+| RULE-0002 rev 1 | Repository / ExactCommit, Candidate, ProviderFullInventory, CapturedEvidence | repository-tree; repository-governed-text | `protocol.selector.decision-record`, SlotKey `protocol.slot.repository-governed-text`, schema `protocol.selector.decision-record-by-id.v1`, decision-record resolver, parent Derived, finding `protocol.decision.record-missing` | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) |
+| RULE-0003 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) |
+| RULE-0004 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) |
+| RULE-0005 rev 1 | Repository + Provider / ExactCommit, Candidate, ProviderEvent, ProviderFullInventory, CapturedEvidence | repository-governed-text; provider-governed-text; repository-target-resolution | none | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) |
 
 The evaluator component is the matching `protocol.evaluator.rule-NNNN` entry;
 CatalogVersion is 1; normative fragments/digests are the exact earlier table;
@@ -6807,7 +6846,7 @@ failure, never evaluator-authored text.
 
 The exact qualification links are:
 
-| Rule | Canonical existing siblings | Fresh typed qualification |
+| Rule | Canonical existing siblings | Deferred final activation |
 | --- | --- | --- |
 | [RULE-0001](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0001) | [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004) | [TEST-0210](test-cases.md#test-0210) |
 | [RULE-0002](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0002) | [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005) | [TEST-0210](test-cases.md#test-0210) |
@@ -6815,8 +6854,12 @@ The exact qualification links are:
 | [RULE-0004](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0004) | [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177) | [TEST-0210](test-cases.md#test-0210) |
 | [RULE-0005](../../architecture/protocol-governance-and-execution/successor-delivery-plan.md#rule-0005) | [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178) | [TEST-0210](test-cases.md#test-0210) |
 
-The older scenarios remain their own canonical semantic owners. [TEST-0210](test-cases.md#test-0210)
-directly executes fresh C# fixtures; it never consumes a sibling result.
+The current admitted counts are `[1,1,3,1,1]`, total `7`. The older scenarios
+remain their own canonical semantic owners. While [TEST-0210](test-cases.md#test-0210)
+is `Planned`, its deferred column is not part of `QualificationScenarios`.
+Final atomic activation appends it to all five declarations, yielding
+`[2,2,4,2,2]`, total `12`. The scenario directly executes fresh C# fixtures; it
+never consumes a sibling result.
 [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176) retains provider enumeration, pagination, freshness, and I/O
 ownership. [TEST-0210](test-cases.md#test-0210) receives only already sealed provider-neutral material.
 
@@ -7891,8 +7934,9 @@ coverage `Important` is closed; fresh full-diff review pass 2 closed
 never-activated `A-PARSER-INDEX-01` is retired,
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`,
-`A-ADMISSION-01`, and `A-PROJECTOR-DAG-01` are `ReviewedLocalGreen`; thirteen
-of twenty live packets are green (`65%`) with cumulative A `26/26`.
+`A-ADMISSION-01`, `A-PROJECTOR-DAG-01`, and `A-FULL-MANIFEST-01` are
+`ReviewedLocalGreen`; fourteen of twenty live packets are green (`70%`) with
+cumulative A `27/27`.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
 production-zero route and is exact-head hosted green at
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
@@ -7913,10 +7957,9 @@ verification correctly skipped. `A-ADMISSION-01` remains packet-local
 `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted
 run `30798854880` passed
 Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
-correctly skipped. Never-activated `A-CONVERGE-01` is retired;
-`A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`, with P and canonical R
-authorized but not yet executed. Later packets remain inactive, and no full-A
-completion is claimed.
+correctly skipped. Never-activated `A-CONVERGE-01` is retired. A-FULL canonical
+R and bounded local green are recorded above; `A-COMPLETE-PROFILE-01` is next
+Candidate/inactive, and no full-A completion is claimed.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

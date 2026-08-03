@@ -170,7 +170,7 @@ public sealed class ContractSliceAGovernedReferenceSlotsManifestTests
             "\"evaluationSlots\":[" + slots[0].GetRawText() + "," + string.Join(",", slots.Select(item => item.GetRawText())) + "]");
         RejectInside(text, slots[0].GetRawText(),
             ("protocol.slot.provider-governed-text", "protocol.slot.repository-target-resolution"));
-        RejectMany(text, "\"applicabilitySlots\":[]", "\"applicabilitySlots\":[" + slots[0].GetRawText() + "]");
+        AssertAccepted(ReplaceRequired(text, "\"applicabilitySlots\":[]", "\"applicabilitySlots\":[" + slots[0].GetRawText() + "]"));
         RejectMany(text, "\"demandProjectors\":[]", "\"demandProjectors\":[{}]");
         RejectMany(text, "\"admissionProofContracts\":[]", "\"admissionProofContracts\":[{}]");
         var bindings = root.GetProperty("components").EnumerateArray().ToArray();
@@ -340,6 +340,7 @@ public sealed class ContractSliceAGovernedReferenceSlotsManifestTests
         Array.ForEach(mutations, mutation => Reject(document, container, ReplaceRequired(container, mutation.Old, mutation.New)));
     private static void RejectMany(string document, string oldText, params string[] replacements) =>
         Array.ForEach(replacements, replacement => AssertPublicFormatException(ReplaceRequired(document, oldText, replacement)));
+    private static void AssertAccepted(string manifest) { var bytes = Encoding.UTF8.GetBytes(manifest); var parsed = FinalizedPolicyManifest.ParseCanonical(bytes); Assert.Equal(bytes, CanonicalManifestWriter.Write(parsed)); }
     private static void RejectRemove(string document, string item)
     {
         var marker = document.Contains(item + ",", StringComparison.Ordinal) ? item + "," : "," + item;

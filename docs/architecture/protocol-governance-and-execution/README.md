@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; thirteen of twenty live packets are green (`65%`), cumulative A is `26/26`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. The A-FULL graph-budget correction is exact-head hosted-green. `A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; fourteen of twenty live packets are green (`70%`), cumulative A is `27/27`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. P is `NotApplicable`, canonical R ran once and remains immutable, and focused/cumulative/full-suite/local-governance evidence plus independent review are green. No hosted or immutable A-FULL implementation claim exists yet. `A-COMPLETE-PROFILE-01` is the next Candidate/inactive packet. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; progress is `13/20` (`65%`) and cumulative A is `26/26`. The A-FULL graph-budget correction is exact-head hosted-green. `A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`; P and canonical R are authorized but not yet executed. |
+| Current A implementation boundary | `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; progress is `14/20` (`70%`) and cumulative A is `27/27`. Local evidence and independent review are green; hosted and immutable A-FULL implementation evidence remain pending. `A-COMPLETE-PROFILE-01` is next Candidate/inactive. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -95,14 +95,16 @@ declaration/artifact/component preflight; it constructs no executable export
 and declares no kernel. First executable activation and six-list registration
 mismatch ownership remain in ContractSlice C. Strict D/RT retires the never-
 activated combined parser/index label and replaces it with three ordered live
-packets. Thirteen of twenty A packets are `ReviewedLocalGreen` (`65%`);
+packets. Fourteen of twenty A packets are `ReviewedLocalGreen` (`70%`);
 `A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
 `A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, and `A-SELECTOR-01` are
 `ReviewedLocalGreen`; `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` are packet-local
-`ReviewedLocalGreen`, with cumulative A `26/26`. Never-activated
+`ReviewedLocalGreen` predecessor evidence at cumulative A `26/26`. Never-activated
 `A-CONVERGE-01` is retired/excluded; one-for-one replacement
-`A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`:
-its corrected design and record-delivery activation base are exact-head hosted-green; P and canonical R have not yet executed.
+`A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`, advancing current
+cumulative A to `27/27`; its local evidence and independent review are green,
+but hosted and immutable A-FULL implementation evidence remain pending.
+`A-COMPLETE-PROFILE-01` is next Candidate/inactive.
 [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
 is resolved at exact
 [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
@@ -124,10 +126,11 @@ D/RT `0/0/0` and exact committed graph `4091` as historical design evidence.
 Exact packet-local implementation and git tree evidence is retained; hosted run
 `30798854880` passed Windows in `14m58s` and Ubuntu in
 `19m00s`, with publication verification correctly skipped. Never-activated
-`A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is
-`MaintainerActivated / PreRed`; its corrected design and record-delivery
-activation base are exact-head hosted-green, while P and canonical R have not
-yet executed. Every later packet remains inactive,
+`A-CONVERGE-01` is retired/excluded. `A-FULL-MANIFEST-01` is packet-local
+`ReviewedLocalGreen`; current cumulative A is `27/27` and progress is `14/20`
+(`70%`). Its local evidence and independent review are green, but no hosted or
+immutable A-FULL implementation claim exists yet. `A-COMPLETE-PROFILE-01` is
+next Candidate/inactive and every later packet remains inactive,
 and
 [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
@@ -164,8 +167,8 @@ is hosted green. `A-PARSER-RECORD-SLOT-01` and
 `A-GOVERNED-REFERENCE-SLOTS-01` and `A-TARGET-PARSER-INDEX-SLOT-01` are
 `ReviewedLocalGreen`; `A-FINDING-01` and `A-SELECTOR-01` are packet-local
 `ReviewedLocalGreen`; `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` are packet-local
-`ReviewedLocalGreen`, cumulative A is `26/26`, and thirteen of twenty live packets
-are green (`65%`). Never-activated
+`ReviewedLocalGreen` predecessor evidence at cumulative A `26/26`; fourteen of
+twenty live packets are green (`70%`). Never-activated
 `A-PARSER-INDEX-01` is retired. Exact
 [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
 git tree identity: `8f120c396bd531e7b33d9c00a1265e0a7be6d1ba`, and successful
@@ -179,8 +182,11 @@ Exact packet-local implementation and git tree evidence is retained; hosted run
 `30798854880` passed Windows in `14m58s` and
 Ubuntu in `19m00s`, with publication verification correctly skipped.
 Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
-`A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`:
-its corrected design and record-delivery activation base are exact-head hosted-green; P and canonical R have not yet executed. Later packets remain inactive. The
+`A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`, advancing current
+cumulative A to `27/27`; its local evidence and independent review are green,
+but hosted and immutable A-FULL implementation evidence remain pending.
+`A-COMPLETE-PROFILE-01` is next Candidate/inactive and later packets remain
+inactive. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1602,7 +1608,7 @@ and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/306033
 For [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143),
 item 10 is satisfied by the current A umbrella directive while retaining one
 reviewed mutating packet at a time. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; thirteen of twenty live A packets are `ReviewedLocalGreen` (`65%`).
+remains `Planned`; fourteen of twenty live A packets are `ReviewedLocalGreen` (`70%`).
 [FIND-0444](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0444)
 is resolved at exact [`c73977d...`](https://github.com/hasanmanzak/meAndAI/commit/c73977d4af922aa66c464f6caced0d1aae473665)
 with hosted [run 30704338972](https://github.com/hasanmanzak/meAndAI/actions/runs/30704338972),
@@ -1636,14 +1642,17 @@ publication verification was correctly skipped. Its exact record delivery
 remains unchanged. The preceding projector records-only freeze retains renewed
 D/RT `0/0/0` and exact committed graph `4091` as historical design evidence.
 `A-ADMISSION-01` and `A-PROJECTOR-DAG-01` are synchronized
-packet-local `ReviewedLocalGreen`, cumulative A is `26/26`, and progress is
-`13/20` (`65%`). Exact packet-local implementation and git tree evidence is
+packet-local `ReviewedLocalGreen` predecessor evidence at cumulative A `26/26`.
+Exact packet-local implementation and git tree evidence is
 retained;
 hosted run `30798854880` passed Windows in `14m58s` and Ubuntu in `19m00s`, with
 publication verification correctly skipped.
 Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
-`A-FULL-MANIFEST-01` is `MaintainerActivated / PreRed`:
-its corrected design and record-delivery activation base are exact-head hosted-green; P and canonical R have not yet executed. Later packets remain inactive.
+`A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; current cumulative A
+is `27/27` and progress is `14/20` (`70%`). Its local evidence and independent
+review are green, but no hosted or immutable A-FULL implementation claim exists
+yet. `A-COMPLETE-PROFILE-01` is next Candidate/inactive; later packets remain
+inactive.
 B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 activation, and publication boundaries remain held; no completion/DoD is claimed.

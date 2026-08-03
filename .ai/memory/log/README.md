@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A full-manifest activated pre-red handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
+[ContractSlice A full-manifest reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
 remains individually reachable from this index through the append-only History
@@ -99,7 +99,7 @@ fixes the parser resource/exception/component/provenance boundary. The
 and the
 [planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 and the schema-slot packet handoff are historical; current routing is the
-[full-manifest activated pre-red handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md).
+`full-manifest reviewed-local-green handoff`.
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
@@ -250,12 +250,22 @@ packet-local `ReviewedLocalGreen`; its exact implementation identity and hosted
 evidence are retained in that canonical projector handoff. Exact-head hosted
 validation passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication
 verification correctly skipped.
-Thirteen of twenty live packets are green (`65%`) and cumulative A is `26/26`.
+Fourteen of twenty live packets are green (`70%`) and cumulative A is `27/27`.
 Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
 Its one-for-one replacement `A-FULL-MANIFEST-01` is
-`MaintainerActivated / PreRed`; P and canonical R are authorized but not yet
-executed;
-every later packet remains Candidate/inactive. The parent scenario remains
+packet-local `ReviewedLocalGreen`. Canonical R is immutable at
+`F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
+the post-fix sentinel remains diagnostic, and the corrected-original green is
+`264F9BEA27ED1B458C8E74AF0448D710356B95218E385F8DF7EFCB2E06128986`.
+[FIND-0454](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0454) preserves the first FullManifest green while correcting only two
+stale applicability sibling assertions; [FIND-0455](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0455) removes only premature
+planned-scenario literals from the fixture. Final FullManifest is `1/1` at
+`B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+cumulative A is `27/27` at
+`0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+StructureOnly passed with `elapsedMs=484633`, and publication evidence passed
+`7/7` in `329.3s` without a published-state claim. `A-COMPLETE-PROFILE-01` and
+every later packet remain Candidate/inactive. The parent scenario remains
 `Planned`. No
 final `Scenario` trait, status/owner, workflow, efficiency activation,
 or B/C/D activation is claimed.
@@ -298,7 +308,7 @@ exact remote-equal
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
 The current continuation state and denominator are in the full-manifest
-activated pre-red handoff. The projector/DAG reviewed-local-green handoff,
+reviewed-local-green handoff. The projector/DAG reviewed-local-green handoff,
 admission-proof reviewed-local-green handoff, and target parser/index/slot
 reviewed-local-green handoff remain historical predecessor evidence.
 
@@ -347,7 +357,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-08-03 - SUBF-0143 ContractSlice A full-manifest activated pre-red](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
+- [2026-08-03 - SUBF-0143 ContractSlice A full-manifest reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A projector/DAG reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A admission-proof reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
 - [2026-08-02 - SUBF-0143 ContractSlice A finding declaration reviewed-local-green](2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md)

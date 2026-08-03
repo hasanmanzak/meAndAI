@@ -60,26 +60,39 @@ public sealed class CatalogSliceDeclaration
             item => item.RuleId.Value,
             StringComparer.Ordinal);
 
-        var slots = new Dictionary<string, EvidenceSlotDeclaration>(StringComparer.Ordinal);
-        foreach (var slot in canonicalRules.SelectMany(rule => rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)))
+        _ = UniqueSlots(
+            canonicalRules.SelectMany(rule =>
+                rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)),
+            parameterName);
+
+        return canonicalRules;
+    }
+
+    private static EvidenceSlotDeclaration[] UniqueSlots(
+        IEnumerable<EvidenceSlotDeclaration> slots,
+        string parameterName)
+    {
+        var unique = new Dictionary<string, EvidenceSlotDeclaration>(StringComparer.Ordinal);
+        foreach (var slot in slots)
         {
-            if (slots.TryGetValue(slot.SlotKey, out var existing) &&
+            if (unique.TryGetValue(slot.SlotKey, out var existing) &&
                 !RuleDeclaration.SlotsEqual(existing, slot))
             {
                 throw new ArgumentException("A shared SlotKey must have one structural declaration.", parameterName);
             }
 
-            slots[slot.SlotKey] = slot;
+            unique[slot.SlotKey] = slot;
         }
 
-        return canonicalRules;
+        return unique.Values.OrderBy(slot => slot.SlotKey, StringComparer.Ordinal).ToArray();
     }
 
     internal static ProducerGraphValidationResult ValidateSchemaSlotClosure(ReleaseSchemaRegistry registry, IEnumerable<RuleDeclaration> rules)
     {
         var canonicalRules = rules.ToArray();
-        var slots = canonicalRules.SelectMany(
-            rule => rule.ApplicabilitySlots.Concat(rule.EvaluationSlots)).ToArray();
+        var applicabilitySlots = UniqueSlots(canonicalRules.SelectMany(rule => rule.ApplicabilitySlots), nameof(rules));
+        var evaluationSlots = UniqueSlots(canonicalRules.SelectMany(rule => rule.EvaluationSlots), nameof(rules));
+        var slots = UniqueSlots(applicabilitySlots.Concat(evaluationSlots), nameof(rules));
         var schemas = registry.PayloadSchemas.Select(schema => (schema.SchemaKey, schema.SchemaVersion)).ToHashSet();
         if (!schemas.SetEquals(slots.Select(slot => (
                 slot.Requirement.PayloadSchemaKey, slot.Requirement.PayloadSchemaVersion))))
@@ -88,7 +101,7 @@ public sealed class CatalogSliceDeclaration
         }
 
         var graph = ValidateProducerGraph(registry, slots);
-        ValidateProjectorClosure(registry, canonicalRules);
+        ValidateProjectorClosure(registry, applicabilitySlots, evaluationSlots);
         ValidateAdmissionProofClosure(registry, canonicalRules, slots);
 
         if (registry.Parsers.Count != 0)
@@ -254,7 +267,8 @@ public sealed class CatalogSliceDeclaration
 
     private static void ValidateProjectorClosure(
         ReleaseSchemaRegistry registry,
-        IReadOnlyList<RuleDeclaration> rules)
+        IReadOnlyList<EvidenceSlotDeclaration> applicability,
+        IReadOnlyList<EvidenceSlotDeclaration> evaluation)
     {
         if (registry.DemandProjectors.Count == 0) return;
         var projector = registry.DemandProjectors.Count == 1 ? registry.DemandProjectors[0] : null;
@@ -275,8 +289,6 @@ public sealed class CatalogSliceDeclaration
         {
             throw new FormatException("protocol.manifest.projector-value");
         }
-        var applicability = rules.SelectMany(rule => rule.ApplicabilitySlots).ToArray();
-        var evaluation = rules.SelectMany(rule => rule.EvaluationSlots).ToArray();
         var output = evaluation.FirstOrDefault(slot => slot.SlotKey == projector.OutputSlotKey);
         if (output is null ||
             applicability.Any(slot => slot.SlotKey == projector.OutputSlotKey) ||
@@ -300,25 +312,6 @@ public sealed class CatalogSliceDeclaration
             return;
         }
 
-        var rule = rules.Count == 1 ? rules[0] : null;
-        if (registry.PayloadSchemas.Count != 3 ||
-            registry.Parsers.Count != 2 ||
-            registry.Indexes.Count != 4 ||
-            rule is null ||
-            rule.ApplicabilitySlots.Count != 0 ||
-            rule.EvaluationSlots.Count != 4 ||
-            rule.EvaluationSlots.Select(slot => slot.SlotKey)
-                .Distinct(StringComparer.Ordinal).Count() != 4 ||
-            slots.Count != 4 ||
-            rule.ExpectedSelectors.Count != 2 ||
-            rule.Findings.Count != 2 ||
-            contracts.Count != 3)
-        {
-            throw new ArgumentException(
-                "Admission-proof contracts require the exact selector topology.",
-                nameof(rules));
-        }
-
         var expectedSurfaces = SurfaceSet.Create(
             slots.SelectMany(slot => slot.ProfileSurfaces.Values).Distinct());
         var expectedMaterialRoles = slots
@@ -332,14 +325,12 @@ public sealed class CatalogSliceDeclaration
                 contract.ProofComponent.ComponentKey,
                 contract.ProofComponent.ComponentVersion))
             .ToHashSet();
-        var contractIdentities = contracts.Select(contract => (
-                contract.ContractKey,
-                contract.ContractVersion))
-            .ToHashSet();
-        if (!kinds.SetEquals(
+        var contractVersions = contracts.Select(contract => contract.ContractVersion).ToHashSet(StringComparer.Ordinal);
+        if (contracts.Count != 3 ||
+            !kinds.SetEquals(
                 new[] { "observed", "failed", "no-input" }) ||
-            contractIdentities.Count != 1 ||
             proofComponents.Count != 3 ||
+            contractVersions.Count != 1 ||
             contracts.Any(contract =>
                 !contract.Surfaces.Equals(expectedSurfaces) ||
                 !contract.MaterialRoles.SequenceEqual(
@@ -354,7 +345,8 @@ public sealed class CatalogSliceDeclaration
 
     private static void ValidateParserRecordSlotClosure(ReleaseSchemaRegistry registry, IReadOnlyList<RuleDeclaration> rules, IReadOnlyList<EvidenceSlotDeclaration> slots)
     {
-        var evaluationSlots = rules.SelectMany(rule => rule.EvaluationSlots).ToArray();
+        var evaluationSlots = UniqueSlots(
+            rules.SelectMany(rule => rule.EvaluationSlots), nameof(rules));
         var predecessor = registry.PayloadSchemas.Count == 2 && registry.Parsers.Count == 1 &&
             registry.Indexes.Count == 2 && slots.Count == 2 && evaluationSlots.Length == 2;
         var governedReference = registry.PayloadSchemas.Count == 2 && registry.Parsers.Count == 1 &&
@@ -377,10 +369,13 @@ public sealed class CatalogSliceDeclaration
         var recordIndex = registry.Indexes[governedOffset];
         var targetIndex = repositoryTarget ? registry.Indexes[governedOffset + 1] : null;
         var treeIndex = registry.Indexes[governedOffset + targetOffset + 1];
-        var providerGovernedSlot = hasGovernedReference ? evaluationSlots[0] : null;
-        var repositoryGovernedSlot = evaluationSlots[governedOffset];
-        var targetSlot = repositoryTarget ? evaluationSlots[governedOffset + 1] : null;
-        var treeSlot = evaluationSlots[governedOffset + targetOffset + 1];
+        EvidenceSlotDeclaration RequiredSlot(string key) =>
+            evaluationSlots.SingleOrDefault(slot => slot.SlotKey == key) ??
+            throw new ArgumentException("The parser and protocol-record graph is not exact.", nameof(rules));
+        var providerGovernedSlot = hasGovernedReference ? RequiredSlot("protocol.slot.provider-governed-text") : null;
+        var repositoryGovernedSlot = RequiredSlot("protocol.slot.repository-governed-text");
+        var targetSlot = repositoryTarget ? RequiredSlot("protocol.slot.repository-target-resolution") : null;
+        var treeSlot = RequiredSlot("protocol.slot.repository-tree");
         var parserInput = parser.Inputs.Count == 1 ? parser.Inputs[0] : null;
         var targetParserInput = targetParser?.Inputs.Count == 1 ? targetParser.Inputs[0] : null;
         var governedModelInput = governedReferenceIndex?.Inputs.Count == 2 ? governedReferenceIndex.Inputs[0] : null;

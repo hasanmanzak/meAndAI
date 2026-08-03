@@ -130,8 +130,10 @@ public sealed class ContractSliceAAdmissionProofManifestTests
         var functionalOverlap = RewriteAdmissions(bytes, writer => WriteAdmissions(writer,
             failedProof: "protocol.evaluator.test-rule"));
         RejectGraph(RewriteComponents(functionalOverlap, [ProofKeys[1]]));
-        RejectGraph(RewriteAdmissions(bytes, writer => WriteAdmissions(writer,
-            observedContractKey: "protocol.test.admission-proo")));
+        var distinctContractKey = RewriteAdmissions(bytes, writer => WriteAdmissions(writer,
+            observedContractKey: "protocol.test.admission-proo"));
+        var distinctContractKeyManifest = FinalizedPolicyManifest.ParseCanonical(distinctContractKey);
+        Assert.Equal(distinctContractKey, CanonicalManifestWriter.Write(distinctContractKeyManifest));
         RejectGraph(RewriteAdmissions(bytes, writer => WriteAdmissions(writer,
             observedContractVersion: "0")));
         RejectGraph(RewriteComponents(bytes, [], badArtifact: true));

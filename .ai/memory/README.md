@@ -29,7 +29,7 @@ the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current ContractSlice A full-manifest `MaintainerActivated / PreRed` state,
+the current ContractSlice A full-manifest `ReviewedLocalGreen` state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -61,7 +61,7 @@ are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is also historical. The admission-proof reviewed-local-green handoff is
 historical. Follow the current
-[full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
+[full-manifest reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -251,8 +251,8 @@ It follows the exact hosted-green finding delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
-Thirteen of twenty live packets are `ReviewedLocalGreen` (`65%`) and cumulative A
-is `26/26`.
+Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`) and cumulative A
+is `27/27`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
@@ -283,9 +283,20 @@ the canonical projector handoff. Exact-head hosted validation passed Windows in
 `14m58s` and Ubuntu in `19m00s`; publication verification was correctly skipped.
 Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
 Its one-for-one replacement `A-FULL-MANIFEST-01` is
-`MaintainerActivated / PreRed`; P and canonical R are authorized but not yet
-executed.
-Every later packet remains Candidate/inactive. No
+packet-local `ReviewedLocalGreen`. Canonical R ran once and remains immutable at
+SHA-256 `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
+the post-fix sentinel is diagnostic only, and the corrected-original green is
+`264F9BEA27ED1B458C8E74AF0448D710356B95218E385F8DF7EFCB2E06128986`.
+[FIND-0454](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0454) corrected only two stale applicability sibling assertions after the
+immutable `25/27` observation, and [FIND-0455](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0455) removed only premature planned-
+scenario fixture literals. Final FullManifest is `1/1` at
+`B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
+cumulative A is `27/27` at
+`0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
+full Conformance is `27/27`, full Domain is `98/98`, StructureOnly is green at
+`elapsedMs=484633`, and publication evidence is `7/7` in `329.3s` without a
+published-state claim. `A-COMPLETE-PROFILE-01` and every later packet remain
+Candidate/inactive. No
 final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -321,7 +332,7 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-[full-manifest activated pre-red handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
+`full-manifest reviewed-local-green handoff`;
 the admission-proof reviewed-local-green handoff and
 the [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 are historical.
