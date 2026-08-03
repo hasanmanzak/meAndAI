@@ -267,8 +267,8 @@ StructureOnly passed with `elapsedMs=484633`, and publication evidence passed
 `7/7` in `329.3s` without a published-state claim. Implementation commit/push
 completed; the first hosted head passed Windows and failed Ubuntu only on the
 instruction-graph edge budget. The bounded records-only correction is exact-head
-hosted-green at `canonical FIND-0456 correction head`, tree
-`canonical FIND-0456 correction tree`, and run `30834117740`, with graph
+hosted-green at `canonical owning-finding correction head`, tree
+`canonical owning-finding correction tree`, and run `30834117740`, with graph
 `4094/4096`. This record closure adds only the two reserved evidence relations;
 its proposed delivery graph is `4096/4096` and awaits exact-head hosted proof.
 `A-COMPLETE-PROFILE-01` and

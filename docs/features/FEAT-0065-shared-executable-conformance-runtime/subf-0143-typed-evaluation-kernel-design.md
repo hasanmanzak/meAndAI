@@ -958,8 +958,8 @@ StructureOnly passed in `484633ms`; publication-evidence passed `7/7` in
 `329.3s` without a published-state claim. Realized production/test/combined
 gross deltas are `77/80`, `364/620`, and `441/700`. The packet is exact-head
 hosted-green `ReviewedLocalGreen` at correction head
-`canonical FIND-0456 correction head`, tree
-`canonical FIND-0456 correction tree`, and run `30834117740`.
+`canonical owning-finding correction head`, tree
+`canonical owning-finding correction tree`, and run `30834117740`.
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a

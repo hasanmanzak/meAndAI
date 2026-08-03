@@ -298,8 +298,8 @@ full Conformance is `27/27`, full Domain is `98/98`, StructureOnly is green at
 published-state claim. Implementation commit/push completed; the first hosted
 head passed Windows and failed Ubuntu only on the instruction-graph edge budget.
 The bounded records-only correction is exact-head hosted-green at
-`canonical FIND-0456 correction head`, tree
-`canonical FIND-0456 correction tree`, and run `30834117740`;
+`canonical owning-finding correction head`, tree
+`canonical owning-finding correction tree`, and run `30834117740`;
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction graph is `4094/4096`. This record closure
 adds only the two reserved evidence relations, so its proposed delivery graph is
