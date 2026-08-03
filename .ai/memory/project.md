@@ -44,7 +44,7 @@ Last verified: **2026-08-03**
   [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
   Its exact R/G evidence plus focused `1/1`, cumulative A `21/21`, validation,
   and reviews are retained in the
-  [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+  governed-reference-slots handoff.
   At the admission checkpoint the live denominator was `18 - 1 + 3 = 20`;
   twelve packets were `ReviewedLocalGreen` (`60%`). The exact hosted-green
   admission frozen-design
@@ -105,16 +105,18 @@ Last verified: **2026-08-03**
   from the denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
   packet-local `ReviewedLocalGreen`. Canonical R ran once and is immutable at
   `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
-  the post-fix sentinel is diagnostic only. [FIND-0454](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0454) corrected two stale
-  applicability sibling negatives without changing production or R, and
-  [FIND-0455](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0455) removed the still-`Planned` scenario literal only from the
-  FullManifest fixture/snapshot. Final FullManifest is `1/1` at
+  the post-fix sentinel is diagnostic only. Two bounded corrections changed
+  stale applicability sibling negatives and a premature planned-scenario
+  literal without changing production or R. Final FullManifest is `1/1` at
   `B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
   cumulative A is `27/27` at
   `0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
   full Conformance is `27/27`, full Domain is `98/98`, StructureOnly passed with
   `elapsedMs=484633`, and publication evidence passed `7/7` in `329.3s` without
-  a published-state claim. Fourteen of twenty live packets are green (`70%`).
+  a published-state claim. Implementation commit/push completed; the first
+  hosted head passed Windows and failed Ubuntu only on the instruction-graph
+  edge budget, and the bounded records-only correction remains pending exact-
+  head hosted proof. Fourteen of twenty live packets are green (`70%`).
   `A-COMPLETE-PROFILE-01` and every later packet remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
@@ -122,7 +124,7 @@ Last verified: **2026-08-03**
   [full-manifest reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
   the admission-proof reviewed-local-green handoff,
   the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-  [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
+  finding declaration reviewed-local-green handoff,
   the [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
   and [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
   are historical.
@@ -481,11 +483,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the historical schema-slot handoff,
   the historical index-slot handoff,
   the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-  the hosted-green [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-  the hosted-green [target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-  the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-  the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+  the hosted-green admission-proof reviewed-local-green handoff,
   and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. The
   [FIND-0443](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0443)
@@ -562,11 +564,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
   the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
   the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-  the hosted-green [governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-  the hosted-green [target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-  the hosted-green [finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
+  the hosted-green governed-reference-slots handoff,
+  the hosted-green target parser/index/slot handoff,
+  the hosted-green finding declaration reviewed-local-green handoff,
   the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-  the hosted-green [admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+  the hosted-green admission-proof reviewed-local-green handoff,
   and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
   and cumulative A passes `17/17` locally; final local V and fresh full-diff
@@ -636,7 +638,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `ReviewedLocalGreen`; immutable R, bounded generic green, the sibling-
   assertion corrections, the fixture-topology correction, exact `27/27`
   cumulative validation, and final long checks are retained in its canonical
-  handoff. `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
+  handoff. Implementation commit/push completed; the first hosted head passed
+  Windows and failed Ubuntu only on the instruction-graph edge budget, and the
+  bounded records-only correction remains pending exact-head hosted proof.
+  `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1810,7 +1815,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072)
   remains historical predecessor evidence.
   `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
-  [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md);
+  finding declaration handoff;
   `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
   [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
@@ -1824,7 +1829,10 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
   Its one-for-one replacement `A-FULL-MANIFEST-01` is packet-local
   `ReviewedLocalGreen`; canonical R remains immutable, final focused is `1/1`,
-  and final cumulative A is `27/27`. The live denominator is twenty and current
+  and final cumulative A is `27/27`. Implementation commit/push completed; the
+  first hosted head passed Windows and failed Ubuntu only on the instruction-
+  graph edge budget, and the bounded records-only correction remains pending
+  exact-head hosted proof. The live denominator is twenty and current
   `ReviewedLocalGreen` progress is fourteen (`70%`). `A-COMPLETE-PROFILE-01`
   and every later packet remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`

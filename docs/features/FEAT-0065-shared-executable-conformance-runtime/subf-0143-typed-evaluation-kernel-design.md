@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. The three A-FULL findings are resolved. Synchronized commit/push and exact-head hosted validation remain pending. |
+| Status | Gate 2 accepted/merged. Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`), cumulative A is `27/27`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; `A-COMPLETE-PROFILE-01` is next Candidate/inactive. Three implementation findings are resolved; the delivery-time graph finding and bounded records-only hosted correction remain in progress. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -957,8 +957,9 @@ and `0095818A237CB1E84FBDC1F4C4B6279CC5422FC1DDBB9C0CBAA496B00FA5016D`.
 StructureOnly passed in `484633ms`; publication-evidence passed `7/7` in
 `329.3s` without a published-state claim. Realized production/test/combined
 gross deltas are `77/80`, `364/620`, and `441/700`. The packet is
-`ReviewedLocalGreen`; synchronized commit/push and exact-head hosted validation
-remain pending. Cumulative A is `27/27`; `A-COMPLETE-PROFILE-01` is next
+`ReviewedLocalGreen`; implementation commit/push completed, and the bounded
+records-only graph correction remains pending exact-head hosted proof. Cumulative
+A is `27/27`; `A-COMPLETE-PROFILE-01` is next
 Candidate/inactive.
 
 That corrected directive still does **not** authorize:

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; fourteen of twenty live packets are green (`70%`), cumulative A is `27/27`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. P is `NotApplicable`, canonical R ran once and remains immutable, and focused/cumulative/full-suite/local-governance evidence plus independent review are green. No hosted or immutable A-FULL implementation claim exists yet. `A-COMPLETE-PROFILE-01` is the next Candidate/inactive packet. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; fourteen of twenty live packets are green (`70%`), cumulative A is `27/27`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. P is `NotApplicable`, canonical R ran once and remains immutable, and focused/cumulative/full-suite/local-governance evidence plus independent review are green. Implementation commit/push completed at the exact failed hosted head; its bounded records-only graph correction remains pending exact-head hosted proof. `A-COMPLETE-PROFILE-01` is the next Candidate/inactive packet. Later packets, B/C/D, and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no completion/DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; progress is `14/20` (`70%`) and cumulative A is `27/27`. Local evidence and independent review are green; hosted and immutable A-FULL implementation evidence remain pending. `A-COMPLETE-PROFILE-01` is next Candidate/inactive. |
+| Current A implementation boundary | `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; progress is `14/20` (`70%`) and cumulative A is `27/27`. Local evidence and independent review are green; implementation commit/push completed and the bounded records-only graph correction remains pending exact-head hosted proof. `A-COMPLETE-PROFILE-01` is next Candidate/inactive. |
 | Hosted correction chain | Historical [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7) / [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217) exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then [`43c1800...`](https://github.com/hasanmanzak/meAndAI/commit/43c1800b551c0f7d337a20dd290390094d72311c) / [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450) exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -103,7 +103,7 @@ packets. Fourteen of twenty A packets are `ReviewedLocalGreen` (`70%`);
 `A-CONVERGE-01` is retired/excluded; one-for-one replacement
 `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`, advancing current
 cumulative A to `27/27`; its local evidence and independent review are green,
-but hosted and immutable A-FULL implementation evidence remain pending.
+while its bounded records-only graph correction remains pending exact-head hosted proof.
 `A-COMPLETE-PROFILE-01` is next Candidate/inactive.
 [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
 is resolved at exact
@@ -128,8 +128,9 @@ Exact packet-local implementation and git tree evidence is retained; hosted run
 `19m00s`, with publication verification correctly skipped. Never-activated
 `A-CONVERGE-01` is retired/excluded. `A-FULL-MANIFEST-01` is packet-local
 `ReviewedLocalGreen`; current cumulative A is `27/27` and progress is `14/20`
-(`70%`). Its local evidence and independent review are green, but no hosted or
-immutable A-FULL implementation claim exists yet. `A-COMPLETE-PROFILE-01` is
+(`70%`). Its local evidence and independent review are green. Implementation
+commit/push completed at the exact failed hosted head; its bounded records-only
+graph correction remains pending exact-head hosted proof. `A-COMPLETE-PROFILE-01` is
 next Candidate/inactive and every later packet remains inactive,
 and
 [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
@@ -184,7 +185,7 @@ Ubuntu in `19m00s`, with publication verification correctly skipped.
 Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
 `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`, advancing current
 cumulative A to `27/27`; its local evidence and independent review are green,
-but hosted and immutable A-FULL implementation evidence remain pending.
+while its bounded records-only graph correction remains pending exact-head hosted proof.
 `A-COMPLETE-PROFILE-01` is next Candidate/inactive and later packets remain
 inactive. The
 architecture freeze remains in force elsewhere.
@@ -1650,8 +1651,9 @@ publication verification correctly skipped.
 Never-activated `A-CONVERGE-01` is retired/excluded. One-for-one replacement
 `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`; current cumulative A
 is `27/27` and progress is `14/20` (`70%`). Its local evidence and independent
-review are green, but no hosted or immutable A-FULL implementation claim exists
-yet. `A-COMPLETE-PROFILE-01` is next Candidate/inactive; later packets remain
+review are green. Implementation commit/push completed at the exact failed hosted
+head; its bounded records-only graph correction remains pending exact-head hosted
+proof. `A-COMPLETE-PROFILE-01` is next Candidate/inactive; later packets remain
 inactive.
 B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
