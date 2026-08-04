@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Fifteen of twenty live packets are `ReviewedLocalGreen` (`75%`), cumulative A is `28/28`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` and `A-COMPLETE-PROFILE-01` are exact-head hosted-green `ReviewedLocalGreen`. A-COMPLETE is proven at commit `canonical owning-finding correction head`, tree `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was correctly skipped. `A-PREDECESSOR-01` is next Candidate/inactive. Corrected canonical R `0013` remains immutable; invalid diagnostic observation `0012` remains excluded and immutable. All six A-FULL findings are resolved; no full-A completion or DoD is claimed. |
+| Status | Gate 2 accepted/merged. Fifteen of twenty live packets are `ReviewedLocalGreen` (`75%`), cumulative A is `28/28`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded; `A-FULL-MANIFEST-01` and `A-COMPLETE-PROFILE-01` are exact-head hosted-green `ReviewedLocalGreen`. A-COMPLETE is proven at commit `canonical owning-finding correction head`, tree `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was correctly skipped. `A-PREDECESSOR-01` is `FrozenDesign`/inactive; later packets remain Candidate/inactive. Corrected canonical R `0013` remains immutable; invalid diagnostic observation `0012` remains excluded and immutable. All six A-FULL findings are resolved; no full-A completion or DoD is claimed. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -167,8 +167,9 @@ exact-head hosted-green `ReviewedLocalGreen` at commit
 `canonical owning-finding correction head`, tree
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows
 passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
-correctly skipped. `A-PREDECESSOR-01` and later packets remain
-Candidate/inactive; no full-A completion or DoD is claimed.
+correctly skipped. `A-PREDECESSOR-01` is `FrozenDesign`/inactive;
+`A-TRANSITION-01` and later packets remain Candidate/inactive; no full-A
+completion or DoD is claimed.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
 later-scope holds remain unchanged.
@@ -976,8 +977,88 @@ Cumulative A is `28/28`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
 owning finding;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, publication verification was
 correctly skipped, and corrected canonical R `0013` remains accepted and
-immutable. `A-PREDECESSOR-01` is next Candidate/inactive; [TEST-0210](test-cases.md#test-0210)
+immutable. `A-PREDECESSOR-01` is `FrozenDesign`/inactive; later packets remain
+Candidate/inactive; [TEST-0210](test-cases.md#test-0210)
 remains `Planned`, and no full-A completion or DoD is claimed.
+
+### Frozen `A-PREDECESSOR-01` canonical boundary
+
+The direct parent Phase-2 records-only delivery hosted check is green. Its
+immutable attached check on the existing draft PR satisfies the predecessor
+gate; this freeze does not claim hosted evidence for its own future delivery
+head. The packet remains inactive: P/R/G/V are all `None`,
+P is only forecast `NotApplicable` after activation, and the next available
+BehaviorRed ordinal would be `0014`; no ordinal or marker is allocated here.
+
+An Existing predecessor serializes exactly `kind`, `catalogVersion`,
+`manifestDigest`, and `completeInventoryDigest` in that order. Its version is
+strictly lower than the enclosing complete catalog: `2/1` and non-adjacent
+`3/1` are positive; equal and higher predecessor versions fail closed. The
+current five-rule revision-1 inventory is `104` bytes with digest
+`c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3`;
+the four-rule revision-1 predecessor inventory is `91` bytes with digest
+`52cf1f9c6ecc7e8b652d047f595bb4c66fac53735f9637cb3edbd0c54c8e8554`.
+The `44`-byte UTF-8/no-BOM, one-terminal-LF seed
+`meandai.test-0210.a.predecessor-manifest.v1\n` hashes to
+`6fb963fcdf35683f2172ea62e383401f36f5c41660c59e0c594852ccb64108df`.
+It is an opaque field-separation/round-trip vector, never parsed as a canonical
+predecessor manifest and never treated as authenticity evidence.
+
+The current catalog is rebuilt from the A-FULL rules property by property via
+`RuleDeclaration.Create`, changing only `CatalogVersion`. The four-rule
+predecessor frame remains an external canonical digest fixture; no predecessor
+catalog is activated. `CompleteCatalogDeclaration` owns only strict-lower
+validation. Existing transition carriers stay constructible, but this increment
+keeps Reader and Writer restricted to Added/current-rule transitions and rejects
+non-Added/deferred transition shapes so the later transition packet retains a
+natural boundary.
+
+The frozen clone is exactly the current 20-argument API; `currentCatalogVersion`
+is v2 or v3 and no other argument changes:
+
+```csharp
+RuleDeclaration.Create(
+    rule.RuleId,
+    rule.RuleRevision,
+    currentCatalogVersion,
+    rule.NormativeDigest,
+    rule.NormativeFragments,
+    rule.QualificationScenarios,
+    rule.Evaluator,
+    rule.ApplicabilitySlots,
+    rule.EvaluationSlots,
+    rule.ExpectedSelectors,
+    rule.SubjectRoles,
+    rule.Surfaces,
+    rule.SnapshotKinds,
+    rule.Operations,
+    rule.Findings,
+    rule.EvaluationFailureCodes,
+    rule.IntroducedIn,
+    rule.DeprecatedIn,
+    rule.RetiredIn,
+    rule.CompatibilityAliases)
+```
+
+The future R is Writer-only: all construction precedes one guarded
+`CanonicalManifestWriter.Write(parsedExisting)` call, which must fail with the
+exact `InvalidOperationException` message `This writer increment supports only
+the minimal qualification slice.` Activation first revalidates that `0014` is
+still next, then allocates it and its exact marker atomically. Reader failures
+cannot emit the activation-allocated marker.
+The green contract adds the exact `32`-negative matrix frozen in the test
+contract. Production ownership is limited to `CanonicalManifestReader.cs`,
+`CanonicalManifestWriter.cs`, and `CompleteCatalogDeclaration.cs`; test
+ownership is limited to `ContractSliceAPredecessorManifestTests.cs` and the
+obsolete six-line equal-version Writer cleanup in
+`ContractSliceACompleteCatalogProfileTests.cs`. Gross production/test/combined
+caps are `160/440/600`; `601+` returns to D/RT and `700+` requires redesign.
+The `600` D/RT exception is indivisible: separating Reader wire parsing, Writer
+canonical emission, Catalog strict ordering, or the exact boundary matrix would
+create a temporarily accepted or emitted noncanonical Existing manifest. The
+per-file caps and cleanup allocation are mapped by basename in the control plan.
+Transition semantics, authenticity/coherence, lifecycle truth, public API,
+project/friend/lock/workflow changes, and kernel activation remain held.
 
 ### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
 
@@ -8076,7 +8157,8 @@ exact-head hosted-green `ReviewedLocalGreen` at commit
 passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
 correctly skipped. Cumulative A is `28/28`, corrected canonical R `0013`
 remains immutable, and no full-A completion or DoD is claimed.
-`A-PREDECESSOR-01` is next Candidate/inactive.
+`A-PREDECESSOR-01` is `FrozenDesign`/inactive; later packets remain
+Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited
