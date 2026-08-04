@@ -55,9 +55,8 @@ and
 are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is also historical. The admission-proof reviewed-local-green handoff is
-historical. Follow the current
-[predecessor-manifest reviewed-local-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
-the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
+historical. Follow the umbrella authority persisted on
+[draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
 [The append-only BehaviorRed evidence clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054)

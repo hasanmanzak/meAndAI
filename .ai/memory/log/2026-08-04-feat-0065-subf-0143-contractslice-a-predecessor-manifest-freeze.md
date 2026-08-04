@@ -37,6 +37,6 @@
 - The implementation delivery head must pass hosted validation before the
   transition packet can activate.
 - Transition semantics, predecessor authenticity/coherence, lifecycle truth,
-  parent Scenario/status/owner/workflow/[TEST-0146](../../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
-  and all later slices remain held.
+  parent Scenario/status/owner/workflow activation, runtime-efficiency
+  integration, and all later slices remain held.
 - Merge, release, publication, authority transfer, and retirement remain held.
