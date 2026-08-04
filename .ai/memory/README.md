@@ -11,20 +11,10 @@ on 2026-07-29. Follow the accepted
 [architecture](../../docs/architecture/protocol-governance-and-execution/README.md),
 [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md),
 [WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md),
-the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
-the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
-the historical [ContractSlice A planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
-the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-the historical [ContractSlice A parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
-the hosted-green [ContractSlice A governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md),
-the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md),
-the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
-the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current ContractSlice A predecessor-manifest packet-local
-`ReviewedLocalGreen` / hosted-pending state,
+the accepted and historical delivery evidence cataloged by the canonical
+continuation route below,
+the current ContractSlice A predecessor-manifest exact-head hosted-green
+`ReviewedLocalGreen` state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -51,7 +41,8 @@ now includes the maintainer-approved ParseCanonical-only ContractSlice A
 topology correction. Its
 [topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
 and
-[planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
+the related historical correction evidence cataloged by the
+[canonical log index](log/README.md)
 are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is also historical. The admission-proof reviewed-local-green handoff is
@@ -85,9 +76,9 @@ ParseCanonical increment then passed the original-oracle and final-source exact-
 FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/error-
 free final six-project Release build, and private-byte source review. That first-
 green support review had `0 Blocking`, one unnumbered remaining-A coverage
-`Important`, and no unresolved `Minor`. The historical
-[canonical-string handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
-preserves the second A exact-red FQN/marker and records its bounded green. The
+`Important`, and no unresolved `Minor`. The historical correction evidence
+cataloged by the [canonical log index](log/README.md) preserves the second A
+exact-red FQN/marker and records its bounded green. The
 writer-owned
 `CanonicalManifestQuotedUtf8Codec.EncodeQuotedUtf8(string)`, legacy/green byte
 probe, 1,226-byte Unicode fixture and digest, exact `é` (`C3 A9`) versus `é`
@@ -224,8 +215,7 @@ git tree identity: `15cb1b6d048b40436a676df53472d4ad9dc23441`,
 passed Ubuntu and Windows in
 [run 30753246121](https://github.com/hasanmanzak/meAndAI/actions/runs/30753246121).
 Its exact R/G evidence and focused `1/1`, cumulative A `21/21`, validation, and
-reviews are recorded in the
-[governed-reference-slots handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md).
+reviews are cataloged by the [canonical log index](log/README.md).
 Historical target-freeze head
 [`e1dc05637e316cb27d54050b06dfa26683fecb85`](https://github.com/hasanmanzak/meAndAI/commit/e1dc05637e316cb27d54050b06dfa26683fecb85),
 git tree identity: `4d60d8814d28fe025248540fd3ad0237b22d37e7`, made Windows
@@ -248,16 +238,15 @@ git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 At the historical full-manifest checkpoint, fourteen of twenty live packets
 were `ReviewedLocalGreen` (`70%`) and cumulative A was `27/27`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
-[finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
-with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, and exact-head
-hosted delivery complete. `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`
-at the
-[selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md):
-canonical R is exact, production gross delta is `12/20`, retained test source is
-`370` lines, cumulative A is `24/24`, and exact-head hosted delivery is complete.
-`A-ADMISSION-01` is packet-local `ReviewedLocalGreen` at the
-[admission handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
+remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen`; its exact
+evidence is cataloged by the [canonical log index](log/README.md), with
+`R=NotApplicable`, `TestOnlyGreen`, production delta `0`, and exact-head hosted
+delivery complete. `A-SELECTOR-01` is packet-local `ReviewedLocalGreen`; its
+exact evidence is cataloged by the [canonical log index](log/README.md):
+canonical R is exact, production gross delta is `12/20`, retained test source
+is `370` lines, cumulative A is `24/24`, and exact-head hosted delivery is
+complete. `A-ADMISSION-01` is packet-local `ReviewedLocalGreen`; its exact
+evidence is cataloged by the [canonical log index](log/README.md),
 after exact frozen-design predecessor [`f298e87f98cb0896904a21078e2e3f391b2b8dcd`](https://github.com/hasanmanzak/meAndAI/commit/f298e87f98cb0896904a21078e2e3f391b2b8dcd),
 git tree identity `6debfc2f3648ec7972d3e1f21d1f1cc224b35a4a`, and
 [run 30774470978](https://github.com/hasanmanzak/meAndAI/actions/runs/30774470978).
@@ -307,12 +296,15 @@ run recorded in the canonical feature finding; its git tree identity is recorded
 there.
 Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
 was correctly skipped, and the implementation tree graph is `4095/4096`.
-`A-PREDECESSOR-01` is packet-local `ReviewedLocalGreen` with its implementation
-delivery hosted check pending; canonical R `0014` is immutable and was not
-rerun. Focused and retained validation are `1/1`; cumulative A and full
+`A-PREDECESSOR-01` is exact-head hosted-green `ReviewedLocalGreen` at the
+bounded correction identity in the canonical owning finding; Ubuntu passed in
+`19m00s`, Windows in `35m20s`, publication verification was correctly skipped,
+and its graph is `351 nodes / 4096 edges`. Canonical R `0014` is immutable and was not rerun.
+Focused and retained validation are `1/1`; cumulative A and full
 Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
 are `ReviewedLocalGreen` (`80%`). The parent scenario remains `Planned`.
-`A-TRANSITION-01` is next but remains Candidate/inactive. No final `Scenario`
+`A-TRANSITION-01` is next but remains Candidate/inactive until this records-only
+delivery head becomes exact-hosted-green. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

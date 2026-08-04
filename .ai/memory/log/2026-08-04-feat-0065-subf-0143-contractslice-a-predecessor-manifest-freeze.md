@@ -1,14 +1,14 @@
-# ContractSlice A predecessor-manifest reviewed-local-green handoff
+# ContractSlice A predecessor-manifest exact-head hosted-green handoff
 
 | Field | Value |
 | --- | --- |
 | Date | 2026-08-04 |
 | Scope | Existing-predecessor manifest packet only |
-| State | Packet-local ReviewedLocalGreen; implementation delivery hosted check pending |
+| State | Exact-head hosted-green ReviewedLocalGreen at the bounded correction identity recorded in the canonical owning finding |
 | Progress | Sixteen of twenty live packets; eighty percent |
 | Cumulative A | Twenty-nine of twenty-nine |
 | Parent scenario | Planned |
-| Next packet | Transition packet remains Candidate and inactive |
+| Next packet | Transition packet remains Candidate and inactive until this records-only delivery head becomes exact-hosted-green |
 
 ## Retained evidence
 
@@ -27,15 +27,21 @@
 - Release build, format, diff, six lock fingerprints, and StructureOnly
   (`elapsedMs=419847`) are green. Three independent final reviews closed
   `0 Blocking / 0 Important / 0 Minor`.
+- The exact bounded correction head passed Ubuntu in `19m00s` and Windows in
+  `35m20s`; publication verification was correctly skipped and the exact
+  instruction graph is `351 nodes / 4096 edges`.
 - The canonical R path and all TRX/source hashes are retained in the canonical
-  feature records.
+  feature records. The canonical owning finding retains the exact implementation,
+  exposing-run, correction, tree, and hosted-run identities.
 
 ## Continuation boundary
 
 - This closes only packet-local predecessor behavior; it does not complete
   ContractSlice A.
-- The implementation delivery head must pass hosted validation before the
-  transition packet can activate.
+- The implementation correction head is exact-hosted-green. This records-only
+  synchronization makes no hosted claim for its own delivery head; that
+  distinct head must pass hosted validation before the transition packet can
+  activate.
 - Transition semantics, predecessor authenticity/coherence, lifecycle truth,
   parent Scenario/status/owner/workflow activation, runtime-efficiency
   integration, and all later slices remain held.
