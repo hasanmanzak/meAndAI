@@ -36,8 +36,7 @@ internal static class CanonicalManifestWriter
             (manifest.AuthorityKind.Equals(CatalogAuthorityKind.CompleteProtocolSnapshot) &&
              slice is null && complete is not null);
         if (!validUnion ||
-            (complete is not null &&
-             !complete.Predecessor.Kind.Equals(CatalogPredecessorKind.Genesis)) ||
+            (complete is not null && !HasCurrentAddedTransitions(complete)) ||
             manifest.ArtifactFiles.Count == 0 ||
             manifest.Components.Count == 0)
         {
@@ -66,6 +65,30 @@ internal static class CanonicalManifestWriter
         buffer.WrittenSpan.CopyTo(result);
         result[^1] = (byte)'\n';
         return result;
+    }
+
+    private static bool HasCurrentAddedTransitions(CompleteCatalogDeclaration catalog)
+    {
+        if (catalog.Transitions.Count != catalog.Rules.Count)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < catalog.Rules.Count; index++)
+        {
+            var rule = catalog.Rules[index];
+            var transition = catalog.Transitions[index];
+            if (!transition.RuleId.Equals(rule.RuleId) ||
+                !transition.Kind.Equals(RuleTransitionKind.Added) ||
+                transition.PreviousRevision is not null ||
+                !Equals(transition.CurrentRevision, rule.RuleRevision) ||
+                transition.ReviewedAuthority is null)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void WriteManifest(
@@ -115,6 +138,15 @@ internal static class CanonicalManifestWriter
         writer.WritePropertyName("predecessor");
         writer.WriteStartObject();
         WriteCanonicalString(writer, "kind", catalog.Predecessor.Kind.Value);
+        if (catalog.Predecessor.Kind.Equals(CatalogPredecessorKind.Existing))
+        {
+            writer.WriteNumber("catalogVersion", catalog.Predecessor.CatalogVersion!.Value);
+            WriteCanonicalString(writer, "manifestDigest", catalog.Predecessor.ManifestDigest!.Value);
+            WriteCanonicalString(
+                writer,
+                "completeInventoryDigest",
+                catalog.Predecessor.CompleteInventoryDigest!.Value);
+        }
         writer.WriteEndObject();
         WriteCanonicalString(writer, "completeInventoryDigest", catalog.CompleteInventoryDigest.Value);
         WriteCanonicalString(writer, "baselineProfileName", catalog.BaselineProfileName);

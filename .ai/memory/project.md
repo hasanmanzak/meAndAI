@@ -131,14 +131,16 @@ Last verified: **2026-08-04**
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
-  Conformance is `28/28`, and full Domain is `98/98`. Fifteen of twenty live
-  packets are green (`75%`). The parent scenario remains `Planned`.
-  `A-PREDECESSOR-01` is next but remains Candidate/inactive.
+  `4095/4096`. `A-PREDECESSOR-01` is now packet-local `ReviewedLocalGreen` with
+  its implementation delivery hosted check pending; canonical R `0014` is
+  accepted, immutable, and was not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
+  Sixteen of twenty live packets are green (`80%`). The parent scenario remains
+  `Planned`. `A-TRANSITION-01` is next but remains Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
-  packet gates. Follow the current complete-profile reviewed-local-green
-  handoff;
+  packet gates. Follow the current
+  [predecessor-manifest reviewed-local-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md);
   the admission-proof reviewed-local-green handoff,
   the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   finding declaration reviewed-local-green handoff,
@@ -670,10 +672,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
-  Conformance is `28/28`, and full Domain is `98/98`. Fifteen of twenty live
-  packets are green (`75%`). The parent scenario remains `Planned`.
-  `A-PREDECESSOR-01` is next but remains Candidate/inactive.
+  `4095/4096`. `A-PREDECESSOR-01` is now packet-local `ReviewedLocalGreen` with
+  its implementation delivery hosted check pending; canonical R `0014` is
+  accepted, immutable, and was not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
+  Sixteen of twenty live packets are green (`80%`). The parent scenario remains
+  `Planned`. `A-TRANSITION-01` is next but remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1876,11 +1880,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
-  Conformance is `28/28`, and full Domain is `98/98`. The live denominator is
-  twenty and current `ReviewedLocalGreen` progress is fifteen (`75%`).
-  The parent scenario remains `Planned`. `A-PREDECESSOR-01` is next but remains
-  Candidate/inactive.
+  `4095/4096`. `A-PREDECESSOR-01` is now packet-local `ReviewedLocalGreen` with
+  its implementation delivery hosted check pending; canonical R `0014` is
+  accepted, immutable, and was not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
+  The live denominator is twenty and current `ReviewedLocalGreen` progress is
+  sixteen (`80%`). The parent scenario remains `Planned`. `A-TRANSITION-01` is
+  next but remains Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

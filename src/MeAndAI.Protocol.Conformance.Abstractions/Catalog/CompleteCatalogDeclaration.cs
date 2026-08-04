@@ -57,6 +57,7 @@ public sealed class CompleteCatalogDeclaration
             nameof(protocolVersion));
         ArgumentNullException.ThrowIfNull(catalogVersion);
         ArgumentNullException.ThrowIfNull(predecessor);
+        ValidatePredecessorVersion(catalogVersion, predecessor);
         var canonicalBaseline = DeclarationValidation.Token(
             baselineProfileName,
             nameof(baselineProfileName));
@@ -103,6 +104,19 @@ public sealed class CompleteCatalogDeclaration
             canonicalRules,
             canonicalTransitions,
             canonicalProfiles);
+    }
+
+    private static void ValidatePredecessorVersion(
+        CatalogVersion catalogVersion,
+        CatalogPredecessorBinding predecessor)
+    {
+        if (predecessor.Kind.Equals(CatalogPredecessorKind.Existing) &&
+            predecessor.CatalogVersion!.CompareTo(catalogVersion) >= 0)
+        {
+            throw new ArgumentException(
+                "An existing predecessor catalog version must be lower than the current catalog version.",
+                nameof(predecessor));
+        }
     }
 
     private static ExactSha256Digest ComputeInventoryDigest(

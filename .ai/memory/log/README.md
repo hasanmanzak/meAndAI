@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A complete-profile reviewed-local-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md),
+[ContractSlice A predecessor-manifest reviewed-local-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
 remains individually reachable from this index through the append-only History
@@ -99,7 +99,7 @@ fixes the parser resource/exception/component/provenance boundary. The
 and the
 [planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 and the schema-slot packet handoff are historical; current routing is the
-`complete-profile reviewed-local-green handoff`.
+`predecessor-manifest reviewed-local-green handoff`.
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
@@ -279,10 +279,12 @@ run recorded in the canonical feature finding; its git tree identity is recorded
 there.
 Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
 was correctly skipped, and the implementation tree graph is `4095/4096`.
-Focused validation is `1/1`, cumulative A is `28/28`, full Conformance is
-`28/28`, and full Domain is `98/98`. Fifteen of twenty live packets are green
-(`75%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. `A-PREDECESSOR-01` is next but remains Candidate/inactive.
+`A-PREDECESSOR-01` is packet-local `ReviewedLocalGreen` with its implementation
+delivery hosted check pending; canonical R `0014` is immutable and was not
+rerun. Focused and retained validation are `1/1`; cumulative A and full
+Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
+are green (`80%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. `A-TRANSITION-01` is next but remains Candidate/inactive.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
 workflow, efficiency activation,
 or B/C/D activation is claimed.
@@ -374,6 +376,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-04 - SUBF-0143 ContractSlice A predecessor-manifest reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A complete-profile reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A full-manifest reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A projector/DAG reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)

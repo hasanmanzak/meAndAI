@@ -23,7 +23,8 @@ the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current ContractSlice A complete-profile `ReviewedLocalGreen` state,
+the current ContractSlice A predecessor-manifest packet-local
+`ReviewedLocalGreen` / hosted-pending state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -54,7 +55,8 @@ and
 are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is also historical. The admission-proof reviewed-local-green handoff is
-historical. Follow the current complete-profile reviewed-local-green handoff,
+historical. Follow the current
+[predecessor-manifest reviewed-local-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -306,10 +308,12 @@ run recorded in the canonical feature finding; its git tree identity is recorded
 there.
 Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
 was correctly skipped, and the implementation tree graph is `4095/4096`.
-Focused validation is `1/1`, cumulative A is `28/28`, full Conformance is
-`28/28`, and full Domain is `98/98`. Fifteen of twenty live packets are
-`ReviewedLocalGreen` (`75%`). The parent scenario remains `Planned`.
-`A-PREDECESSOR-01` is next but remains Candidate/inactive. No final `Scenario`
+`A-PREDECESSOR-01` is packet-local `ReviewedLocalGreen` with its implementation
+delivery hosted check pending; canonical R `0014` is immutable and was not
+rerun. Focused and retained validation are `1/1`; cumulative A and full
+Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
+are `ReviewedLocalGreen` (`80%`). The parent scenario remains `Planned`.
+`A-TRANSITION-01` is next but remains Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -331,8 +335,9 @@ publication verification was correctly skipped, and the correction graph is
 `350/4092`.
 The records-only delivery adds exactly the two reserved immutable-evidence
 relations and prospectively validates at `350/4094`, but does not claim hosted
-proof for its own future head. `A-PREDECESSOR-01` remains Candidate/inactive
-until this delivery head is exact-hosted-green.
+proof for its own future head. At that historical checkpoint,
+`A-PREDECESSOR-01` remained Candidate/inactive until the delivery head became
+exact-hosted-green.
 The governed-reference packet's historical exact implementation predecessor was
 remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),

@@ -93,12 +93,7 @@ internal static class CanonicalManifestReader
     {
         reader.Expect(JsonTokenType.StartObject);
         reader.ExpectProperty("predecessor");
-        reader.Expect(JsonTokenType.StartObject);
-        reader.ExpectProperty("kind");
-        var predecessorKind = reader.ReadString();
-        if (!string.Equals(predecessorKind, CatalogPredecessorKind.Genesis.Value, StringComparison.Ordinal))
-            throw new FormatException("This parser increment supports only a genesis predecessor.");
-        reader.Expect(JsonTokenType.EndObject);
+        var predecessor = ReadPredecessor(ref reader);
         reader.ExpectProperty("completeInventoryDigest");
         var digest = reader.ReadString();
         reader.ExpectProperty("baselineProfileName");
@@ -110,7 +105,29 @@ internal static class CanonicalManifestReader
         reader.ExpectProperty("namedProfiles");
         var profiles = ReadNamedProfiles(ref reader);
         reader.Expect(JsonTokenType.EndObject);
-        return new RawCompleteCatalog(digest, baseline, rules, transitions, profiles);
+        return new RawCompleteCatalog(predecessor, digest, baseline, rules, transitions, profiles);
+    }
+
+    private static RawPredecessor ReadPredecessor(ref BoundedJsonReader reader)
+    {
+        reader.Expect(JsonTokenType.StartObject);
+        reader.ExpectProperty("kind");
+        var kind = reader.ReadString();
+        if (string.Equals(kind, CatalogPredecessorKind.Genesis.Value, StringComparison.Ordinal))
+        {
+            reader.Expect(JsonTokenType.EndObject);
+            return new RawPredecessor(kind, null, null, null);
+        }
+        if (!string.Equals(kind, CatalogPredecessorKind.Existing.Value, StringComparison.Ordinal))
+        {
+            throw new FormatException("The catalog predecessor kind is not supported.");
+        }
+
+        reader.ExpectProperty("catalogVersion"); var version = reader.ReadInt32();
+        reader.ExpectProperty("manifestDigest"); var manifestDigest = reader.ReadString();
+        reader.ExpectProperty("completeInventoryDigest"); var inventoryDigest = reader.ReadString();
+        reader.Expect(JsonTokenType.EndObject);
+        return new RawPredecessor(kind, version, manifestDigest, inventoryDigest);
     }
 
     private static IReadOnlyList<RawTransition> ReadTransitions(ref BoundedJsonReader reader)
@@ -1237,7 +1254,8 @@ internal static class CanonicalManifestReader
                     RuleTransitionDeclaration.Added(
                         RuleId.Parse(item.RuleId),
                         RuleRevision.Create(item.CurrentRevision),
-                        ReviewedAuthorityPermalink.Create(item.ReviewedAuthority)));
+                        ReviewedAuthorityPermalink.Create(item.ReviewedAuthority))).ToArray();
+                ValidateCurrentAddedTransitions(typedRules, transitions);
                 var profiles = completeCatalog.NamedProfiles.Select(item =>
                     NamedProfileDeclaration.Create(
                         item.Name,
@@ -1247,11 +1265,17 @@ internal static class CanonicalManifestReader
                             SnapshotKind.Parse(item.SnapshotKind),
                             SurfaceSet.Create(item.Surfaces.Select(SurfaceKind.Parse)),
                             EnforcementPhase.Parse(item.EnforcementPhase)),
-                        item.RuleIds.Select(RuleId.Parse)));
+                        item.RuleIds.Select(RuleId.Parse))).ToArray();
+                var predecessor = completeCatalog.Predecessor.Kind == CatalogPredecessorKind.Genesis.Value
+                    ? CatalogPredecessorBinding.Genesis()
+                    : CatalogPredecessorBinding.Existing(
+                        CatalogVersion.Create(completeCatalog.Predecessor.CatalogVersion!.Value),
+                        ExactSha256Digest.Parse(completeCatalog.Predecessor.ManifestDigest!),
+                        ExactSha256Digest.Parse(completeCatalog.Predecessor.CompleteInventoryDigest!));
                 typedComplete = CompleteCatalogDeclaration.Create(
                     protocolVersion,
                     typedCatalogVersion,
-                    CatalogPredecessorBinding.Genesis(),
+                    predecessor,
                     completeCatalog.BaselineProfileName,
                     typedRules,
                     transitions,
@@ -1282,6 +1306,29 @@ internal static class CanonicalManifestReader
             throw new FormatException(
                 "A policy manifest value is not canonical.",
                 exception);
+        }
+    }
+
+    private static void ValidateCurrentAddedTransitions(
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<RuleTransitionDeclaration> transitions)
+    {
+        if (transitions.Count != rules.Count)
+        {
+            throw new FormatException("A complete catalog requires one Added transition per current rule.");
+        }
+
+        for (var index = 0; index < rules.Count; index++)
+        {
+            var transition = transitions[index];
+            if (!transition.RuleId.Equals(rules[index].RuleId) ||
+                !transition.Kind.Equals(RuleTransitionKind.Added) ||
+                transition.PreviousRevision is not null ||
+                !Equals(transition.CurrentRevision, rules[index].RuleRevision) ||
+                transition.ReviewedAuthority is null)
+            {
+                throw new FormatException("A complete catalog requires one Added transition per current rule.");
+            }
         }
     }
 
@@ -2082,11 +2129,14 @@ internal static class CanonicalManifestReader
         IReadOnlyList<RawRuleDeclaration> Rules);
 
     private sealed record RawCompleteCatalog(
+        RawPredecessor Predecessor,
         string CompleteInventoryDigest,
         string BaselineProfileName,
         IReadOnlyList<RawRuleDeclaration> Rules,
         IReadOnlyList<RawTransition> Transitions,
         IReadOnlyList<RawNamedProfile> NamedProfiles);
+
+    private sealed record RawPredecessor(string Kind, int? CatalogVersion, string? ManifestDigest, string? CompleteInventoryDigest);
 
     private sealed record RawTransition(
         string RuleId,

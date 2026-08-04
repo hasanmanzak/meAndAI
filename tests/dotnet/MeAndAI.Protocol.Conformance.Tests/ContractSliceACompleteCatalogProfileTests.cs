@@ -91,12 +91,6 @@ public sealed class ContractSliceACompleteCatalogProfileTests
         RejectCatalog(rules,
             [RuleTransitionDeclaration.Unchanged(rules[0].RuleId, rules[0].RuleRevision, Authority),
              .. Added(rules).Skip(1)], [profile]);
-        var existing = CompleteCatalogDeclaration.Create(
-            "0.17.0", CatalogVersion.Create(1),
-            CatalogPredecessorBinding.Existing(
-                CatalogVersion.Create(1), catalog.CompleteInventoryDigest, catalog.CompleteInventoryDigest),
-            ProfileName, rules, Added(rules), [profile]);
-        RejectWrite(parsed with { CompleteCatalog = existing });
         _ = Catalog(rules, Added(rules), [Profile(EnforcementPhase.FullBlocking, rules.Skip(2))]);
     }
 
