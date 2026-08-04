@@ -39,12 +39,12 @@ The accepted Gate 2
 [typed-evaluation-kernel design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md)
 now includes the maintainer-approved ParseCanonical-only ContractSlice A
 topology correction. Its
-[topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+topology-correction handoff in the [canonical log index](log/README.md)
 and
 the related historical correction evidence cataloged by the
 [canonical log index](log/README.md)
 are historical; the hosted-green
-[target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
+target parser/index/slot reviewed-local-green handoff in the canonical log index
 is also historical. The admission-proof reviewed-local-green handoff is
 historical. Follow the umbrella authority persisted on
 [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
@@ -70,7 +70,7 @@ and focused `11/11` checkpoint exist locally. Topology/parser and RunInfo
 reviews passed `0 Blocking` / `0 Important` / `0 Minor`. Pre-applicable-
 clarification BehaviorRed observations are diagnostic
 only. The fresh exact-FQN run recorded in the historical
-[correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md)
+correction handoff in the canonical log index
 passed the complete clarified oracle as canonical BehaviorRed. The first limited
 ParseCanonical increment then passed the original-oracle and final-source exact-
 FQN checks `1/1`, cumulative A `12/12`, format verification, a warning/error-
@@ -133,7 +133,7 @@ using that commit's exact tree, with exact-head hosted
 [run 30659970794](https://github.com/hasanmanzak/meAndAI/actions/runs/30659970794)
 green. It is the frozen predecessor for packet-local `ReviewedLocalGreen`
 `A-SCHEMA-SLOT-01`; its historical evidence remains in the
-[schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+schema-slot handoff in the canonical log index.
 Partial facts retain only `ContractSlice`; final scenario traits still join the
 atomic final scenario-status/scenario-owner/workflow-test-step target-and-filter/
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
@@ -152,7 +152,7 @@ unset. Do not rerun it. Original-oracle green passed `1/1` in the exact
 `d223...` TRX, final topology-clean focused green passed `1/1` in `6423...`,
 and cumulative A passed `18/18` in `c93d...`; the exact paths and SHA-256 values
 are retained in the historical
-[schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md).
+schema-slot handoff in the canonical log index.
 Final test source is 436 lines with SHA-256
 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`;
 production `256` plus test `436` is `692/700` changed lines and the estimated
@@ -170,7 +170,7 @@ earlier full suite was likewise inconclusive at 600 seconds, below the official
 20/35-minute budgets. These are infrastructure observations, not red or green
 evidence. Fresh full-diff review pass 2, performed after the pass-1
 traceability correction, closed `0 Blocking / 0 Important / 0 Minor`.
-[A-SCHEMA-SLOT-01 handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
+A-SCHEMA-SLOT-01 handoff in the canonical log index
 now records pushed candidate
 [`3b93c9e4...`](https://github.com/hasanmanzak/meAndAI/commit/3b93c9e4b93e19baa150b57d8a2c99c4038689d8)
 and hosted [run 30699069580](https://github.com/hasanmanzak/meAndAI/actions/runs/30699069580),
@@ -296,15 +296,17 @@ run recorded in the canonical feature finding; its git tree identity is recorded
 there.
 Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
 was correctly skipped, and the implementation tree graph is `4095/4096`.
-`A-PREDECESSOR-01` is exact-head hosted-green `ReviewedLocalGreen` at the
-bounded correction identity in the canonical owning finding; Ubuntu passed in
-`19m00s`, Windows in `35m20s`, publication verification was correctly skipped,
-and its graph is `351 nodes / 4096 edges`. Canonical R `0014` is immutable and was not rerun.
+`A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor
+recorded in the canonical owning finding. Its subsequent records
+synchronization also passed exact-head hosted validation; publication
+verification was correctly skipped. Canonical R `0014` is immutable and was not rerun.
 Focused and retained validation are `1/1`; cumulative A and full
 Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
 are `ReviewedLocalGreen` (`80%`). The parent scenario remains `Planned`.
-`A-TRANSITION-01` is next but remains Candidate/inactive until this records-only
-delivery head becomes exact-hosted-green. No final `Scenario`
+`A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, design/red-team
+reviews are `0/0/0`, expected red has not run, and implementation awaits
+freeze-delivery hosted green. `A-LIFECYCLE-01`, `A-RESOURCE-01`, and
+`A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
@@ -360,11 +362,10 @@ with twenty-three ambiguous Git tree identities in
 [run 30714966450](https://github.com/hasanmanzak/meAndAI/actions/runs/30714966450).
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
-findings close at the exact hosted-green predecessor above. Follow the current
-`complete-profile reviewed-local-green handoff`;
-the admission-proof reviewed-local-green handoff and
-the [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
-are historical.
+findings close at the exact hosted-green predecessor above. Follow the
+[canonical log index](log/README.md) for the current transition FrozenDesign
+handoff. The complete-profile, admission-proof, and target parser/index/slot
+reviewed-local-green handoffs cataloged there are historical.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,
 oracle, allowlist, or held-scope exception.
@@ -387,7 +388,7 @@ delivery, review, test, and publication evidence for
 
 [FEAT-0059](../../docs/features/FEAT-0059-csharp-operational-foundation/README.md)
 is the completed shared technical prerequisite. Follow the historical
-[portable-package completion handoff](log/2026-07-28-feat-0059-subf-0121-portable-packaging.md)
+portable-package completion handoff in the canonical log index
 for its slice evidence. Its release does not authorize any successor feature,
 consumer change, or authority migration.
 
@@ -398,7 +399,7 @@ consumer change, or authority migration.
 [TEST-0180](../../docs/features/FEAT-0048-v0143-shared-merge-evidence/test-cases.md#test-0180),
 and [issue #117](https://github.com/hasanmanzak/meAndAI/issues/117) own the
 bounded v0.14.3 API-2026 merge-evidence propagation correction. Follow the
-[v0.14.3 handoff](log/2026-07-24-v0143-shared-merge-evidence.md).
+v0.14.3 handoff in the canonical log index.
 
 [FEAT-0049](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/README.md)
 / [BUG-0032](https://github.com/hasanmanzak/meAndAI/issues/119),
@@ -406,7 +407,7 @@ bounded v0.14.3 API-2026 merge-evidence propagation correction. Follow the
 [TEST-0181](../../docs/features/FEAT-0049-v0144-paged-array-response-normalization/test-cases.md#test-0181),
 and [issue #119](https://github.com/hasanmanzak/meAndAI/issues/119) own the
 bounded `v0.14.4` runtime-shape correction. Follow the
-[v0.14.4 handoff](log/2026-07-24-v0144-paged-array-normalization.md).
+v0.14.4 handoff in the canonical log index.
 
 [FEAT-0050](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/README.md)
 / [BUG-0033](https://github.com/hasanmanzak/meAndAI/issues/121),
@@ -414,7 +415,7 @@ bounded `v0.14.4` runtime-shape correction. Follow the
 [TEST-0182](../../docs/features/FEAT-0050-v0145-bare-document-basename-links/test-cases.md#test-0182),
 and [issue #121](https://github.com/hasanmanzak/meAndAI/issues/121) own the
 bounded `v0.14.5` basename-label correction. Follow the
-[v0.14.5 handoff](log/2026-07-25-v0145-bare-document-basename-links.md).
+v0.14.5 handoff in the canonical log index.
 
 This directory is the portable, curated handoff between the maintainer and AI
 collaborators. It is not the common memory of consuming projects. Each consumer

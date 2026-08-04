@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Architecture design |
-| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-PREDECESSOR-01` is now exact-head hosted-green predecessor evidence at the correction identity in the canonical owning finding; A-COMPLETE remains immutable predecessor history. Sixteen of twenty live packets are `ReviewedLocalGreen` (`80%`), cumulative A is `29/29`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-TRANSITION-01` and later packets remain Candidate/inactive until this records-only delivery head becomes exact-hosted-green. B/C/D and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no A completion or DoD is claimed. |
+| Status | Accepted; [SUBF-0152](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0152) and [SUBF-0153](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0153) complete; [SUBF-0143](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143) Gate 2 accepted. `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor recorded in the canonical owning finding; A-COMPLETE remains immutable predecessor history. Sixteen of twenty live packets are `ReviewedLocalGreen` (`80%`), cumulative A is `29/29`, and [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, reviews are `0/0/0`, expected red has not run, and implementation awaits freeze-delivery hosted green. Later A packets remain Candidate/inactive. B/C/D and final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) remain held; no A completion or DoD is claimed. |
 | Owning epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Owning task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -11,7 +11,7 @@
 | Successor allocation | [Successor delivery and qualification plan](successor-delivery-plan.md) |
 | Preserved WIP disposition | [Exact extraction ledger](wip-extraction-ledger.md) |
 | Accepted Gate-2 baseline | Exact-main typed-handoff predecessor [`23d27478af09446363bcb299dee24957e3a206a7`](https://github.com/hasanmanzak/meAndAI/commit/23d27478af09446363bcb299dee24957e3a206a7) |
-| Current A implementation boundary | `A-PREDECESSOR-01` is exact-head hosted-green predecessor evidence at the correction identity in the canonical owning finding; A-COMPLETE remains immutable predecessor history. Progress is `16/20` (`80%`) and cumulative A is `29/29`. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; `A-TRANSITION-01` and later packets remain Candidate/inactive until this records-only delivery head becomes exact-hosted-green, and no A completion or DoD is claimed. |
+| Current A implementation boundary | `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor recorded in the canonical owning finding; A-COMPLETE remains immutable predecessor history. Progress is `16/20` (`80%`) and cumulative A is `29/29`. [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`; `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, expected red has not run, and implementation awaits freeze-delivery hosted green. Later A packets remain Candidate/inactive, and no A completion or DoD is claimed. |
 | Hosted correction chain | Historical `bfa961d...` / run `30712296217` exposed [TEST-0175](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), then `43c1800...` / run `30714966450` exposed [TEST-0178](../../features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178). Their exact links remain canonical in the owning findings. The bounded documentation/memory correction at exact [`25e26f9...`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde) closes both findings; publication verification was correctly skipped. |
 | Preserved implementation input | [`1873c98638ba4960734aadb188eb8c8d70b4bc52`](https://github.com/hasanmanzak/meAndAI/commit/1873c98638ba4960734aadb188eb8c8d70b4bc52) on [draft PR #160](https://github.com/hasanmanzak/meAndAI/pull/160) |
 | Current authority | The maintainer's umbrella directive, persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174), authorizes ordered remaining ContractSlice A delivery through `A-CONVERGE-02`, including strict D/RT redraws, expected-red/green, review, record synchronization, commit/push, PR updates, and hosted-check correction. It does not bypass exact predecessor, D/RT, evidence, or one-mutating-packet gates. B/C/D, final Scenario/status/owner/workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), WIP, consumer, merge, release, publication, authority transfer, and PowerShell retirement remain held. |
@@ -112,11 +112,11 @@ graph is `4096/4096` and is closed by the exact evidence in the canonical owning
 `canonical owning-finding correction head`, tree
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
-correctly skipped. Current cumulative A is `29/29`; `A-PREDECESSOR-01` is
-exact-head hosted-green `ReviewedLocalGreen` at the correction identity in the
-canonical owning finding, with Ubuntu `19m00s`, Windows `35m20s`, and graph
-`351 nodes / 4096 edges`; `A-TRANSITION-01` and later packets remain Candidate/inactive until
-this records-only delivery head becomes exact-hosted-green.
+correctly skipped. Current cumulative A is `29/29`; `A-PREDECESSOR-01` is the
+immutable exact hosted-green activation predecessor recorded in the canonical
+owning finding. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`,
+reviews are `0/0/0`, expected red has not run, and implementation awaits
+freeze-delivery hosted green. Later A packets remain Candidate/inactive.
 [FIND-0448](../../features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0448)
 is resolved at exact
 [`561a760401cf7312a15cadea3e6bf9f56b488d5d`](https://github.com/hasanmanzak/meAndAI/commit/561a760401cf7312a15cadea3e6bf9f56b488d5d),
@@ -152,10 +152,11 @@ skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
 tree `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification
 was correctly skipped. Current cumulative A is `29/29` and progress is `16/20`
-(`80%`). `A-PREDECESSOR-01` is exact-head hosted-green `ReviewedLocalGreen` at
-the correction identity in the canonical owning finding; `A-TRANSITION-01` and
-every later packet remain Candidate/inactive until this records-only delivery
-head becomes exact-hosted-green,
+(`80%`). `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+predecessor recorded in the canonical owning finding. `A-TRANSITION-01` is
+`FrozenDesign`/inactive at ordinal `0015`, expected red has not run, and
+implementation awaits freeze-delivery hosted green. Every later A packet
+remains Candidate/inactive,
 and
 [TEST-0210](../../features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`.
@@ -219,10 +220,11 @@ graph is `4096/4096` and is closed by the exact evidence in the canonical owning
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
 correctly skipped. Current cumulative A is `29/29`, progress is `16/20` (`80%`),
-and `A-PREDECESSOR-01` is exact-head hosted-green `ReviewedLocalGreen` at the
-correction identity in the canonical owning finding; `A-TRANSITION-01` and
-later packets remain Candidate/inactive until this records-only delivery head
-becomes exact-hosted-green. The
+and `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+predecessor recorded in the canonical owning finding. `A-TRANSITION-01` is
+`FrozenDesign`/inactive at ordinal `0015`, expected red has not run, and
+implementation awaits freeze-delivery hosted green. Later A packets remain
+Candidate/inactive. The
 architecture freeze remains in force elsewhere.
 
 Outside the scoped directive, allowed work remains limited to architecture
@@ -1697,10 +1699,11 @@ skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
 tree `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, and publication verification
 was correctly skipped. Current cumulative A is `29/29` and progress is `16/20`
-(`80%`). `A-PREDECESSOR-01` is exact-head hosted-green `ReviewedLocalGreen` at
-the correction identity in the canonical owning finding; `A-TRANSITION-01` and
-later packets remain Candidate/inactive until this records-only delivery head
-becomes exact-hosted-green.
+(`80%`). `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+predecessor recorded in the canonical owning finding. `A-TRANSITION-01` is
+`FrozenDesign`/inactive at ordinal `0015`, expected red has not run, and
+implementation awaits freeze-delivery hosted green. Later A packets remain
+Candidate/inactive.
 B/C/D, final Scenario/status/owner/
 workflow/[TEST-0146](../../features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
 activation, and publication boundaries remain held; no completion/DoD is claimed.

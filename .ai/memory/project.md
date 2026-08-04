@@ -84,7 +84,7 @@ Last verified: **2026-08-04**
   claimed, and [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
   plus B/C/D remain held. `A-FINDING-01` is packet-local `ReviewedLocalGreen`;
   `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
-  [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+  selector handoff in the canonical log index,
   with canonical R, production `12/20`, packet `382/520`, and historical
   cumulative A `24/24`; synchronized green commit/push/exact-head hosted
   validation are complete. `A-ADMISSION-01` is packet-local
@@ -131,24 +131,25 @@ Last verified: **2026-08-04**
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is now exact-head hosted-green
-  `ReviewedLocalGreen` at the bounded correction identity in the canonical
-  owning finding; Ubuntu passed in `19m00s`, Windows in `35m20s`, publication
-  verification was correctly skipped, and its graph is `351 nodes / 4096 edges`. Canonical R
+  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+  predecessor recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R
   `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
   Sixteen of twenty live packets are green (`80%`). The parent scenario remains
-  `Planned`. `A-TRANSITION-01` is next but remains Candidate/inactive until
-  this records-only delivery head becomes exact-hosted-green.
+  `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`,
+  reviews are `0/0/0`, expected red has not run, and implementation awaits
+  freeze-delivery hosted green. Later A packets remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
-  packet gates. Follow the current
-  [predecessor-manifest exact-head hosted-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md);
-  the admission-proof reviewed-local-green handoff,
-  the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+  packet gates. Follow the current [canonical log index](log/README.md). The
+  [predecessor-manifest exact-head hosted-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)
+  is immutable history; the admission-proof reviewed-local-green handoff,
+  the selector reviewed-local-green handoff in the canonical log index,
   finding declaration reviewed-local-green handoff,
-  the [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md)
-  and [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md)
+  the parser-record-slot handoff in the canonical log index
+  and index-slot handoff in the canonical log index
   are historical.
 - Repository: [hasanmanzak/meAndAI](https://github.com/hasanmanzak/meAndAI)
 - Visibility: public temporarily for hosted-CI continuity; the maintainer
@@ -399,9 +400,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   existing
   [TEST-0175](../../docs/features/FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175),
   the historical
-  [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
+  index-slot handoff in the canonical log index,
   the current
-  [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  parser-record-slot handoff in the canonical log index,
   failed head
   [`bfa961d...`](https://github.com/hasanmanzak/meAndAI/commit/bfa961d1f661588dc48f337720cae2ef741887a7),
   and [run 30712296217](https://github.com/hasanmanzak/meAndAI/actions/runs/30712296217).
@@ -448,7 +449,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   combined route were incomplete.
 - Canonical owner and evidence: [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
-  the historical [trait-correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
+  the historical trait-correction handoff in the [canonical log index](log/README.md),
   the historical schema-slot handoff,
   the historical index-slot handoff,
   the historical parser-record-slot handoff,
@@ -504,11 +505,11 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   the [typed design](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md),
   the historical schema-slot handoff,
   the historical index-slot handoff,
-  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  the historical parser-record-slot handoff in the canonical log index,
   the hosted-green governed-reference-slots handoff,
   the hosted-green target parser/index/slot handoff,
   the hosted-green finding declaration reviewed-local-green handoff,
-  the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+  the hosted-green selector reviewed-local-green handoff in the canonical log index,
   the hosted-green admission-proof reviewed-local-green handoff,
   and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. The
@@ -542,7 +543,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
 - Affected contract and cause: the host connection window expired before the
   test ran, so the invocation is infrastructure evidence rather than R.
 - Canonical owner and evidence: the historical
-  [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md)
+  schema-slot handoff in the canonical log index
   and exact TRX
   `D:\Temp\meandai-test-0210-a-c96f8fa926734506b50d17637e4e2dbe\TEST-0210-A-BEHAVIOR-RED-0003.trx`,
   SHA-256
@@ -582,14 +583,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [FIND-0442](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0442),
   [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210),
   the [micro plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md),
-  the historical [planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-  the historical [schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
-  the historical [index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
-  the historical [parser-record-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-parser-record-slot.md),
+  the historical planned-scenario-trait correction handoff in the canonical log index,
+  the historical schema-slot handoff in the canonical log index,
+  the historical index-slot handoff in the canonical log index,
+  the historical parser-record-slot handoff in the canonical log index,
   the hosted-green governed-reference-slots handoff,
   the hosted-green target parser/index/slot handoff,
   the hosted-green finding declaration reviewed-local-green handoff,
-  the hosted-green [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+  the hosted-green selector reviewed-local-green handoff in the canonical log index,
   the hosted-green admission-proof reviewed-local-green handoff,
   and the current full-manifest `ReviewedLocalGreen` state.
 - Fixed release or evidence: no release. Four retained exact filters pass `1/1`
@@ -645,7 +646,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
   `A-FINDING-01` and `A-SELECTOR-01` are packet-local `ReviewedLocalGreen`; the
   latter is at the
-  [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md)
+  selector handoff in the canonical log index
   with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
   packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
   and hosted predecessor evidence remain exact after the bounded records-only
@@ -675,15 +676,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is now exact-head hosted-green
-  `ReviewedLocalGreen` at the bounded correction identity in the canonical
-  owning finding; Ubuntu passed in `19m00s`, Windows in `35m20s`, publication
-  verification was correctly skipped, and its graph is `351 nodes / 4096 edges`. Canonical R
+  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+  predecessor recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R
   `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
   Sixteen of twenty live packets are green (`80%`). The parent scenario remains
-  `Planned`. `A-TRANSITION-01` is next but remains Candidate/inactive until
-  this records-only delivery head becomes exact-hosted-green.
+  `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`,
+  reviews are `0/0/0`, expected red has not run, and implementation awaits
+  freeze-delivery hosted green. Later A packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -984,7 +986,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   encoding can mask the second dependency until a hosted Windows runner sets a
   preamble-bearing value.
 - Canonical owner and evidence: the
-  [v0.13.1 stdin correction](log/2026-07-23-v0131-hosted-windows-stdin-encoding-correction.md)
+  v0.13.1 stdin correction in the canonical log index
   owns batch-reader framing; [SUBF-0106](../../docs/features/FEAT-0055-v0154-utf8-workflow-dispatch/README.md#subf-0106)
   / [TEST-0153](../../docs/features/FEAT-0037-v0126-instruction-graph-adoption-containment/test-cases.md#test-0153)
   / [issue #137](https://github.com/hasanmanzak/meAndAI/issues/137) owns lifecycle
@@ -1614,7 +1616,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main
   [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd),
   and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256).
-  The [implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md)
+  The implementation handoff in the canonical log index
   is retained as historical pre-publication evidence.
 
   The separate [design-only directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5128172584)
@@ -1638,7 +1640,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   error-free final six-project Release build, and private-byte implementation
   review. That first-green support review had `0 Blocking`, one unnumbered
   remaining-A coverage `Important`, and no unresolved `Minor`. The historical
-  [canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md)
+  canonical-string bounded-green closure handoff in the canonical log index
   preserves FQN
   `MeAndAI.Protocol.Conformance.Tests.ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding`,
   marker/TRX `TEST-0210-A-BEHAVIOR-RED-0002`, writer-owned internal
@@ -1772,7 +1774,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   explicitly zeroed. That first-green support review had `0 Blocking`, one
   unnumbered remaining-A coverage `Important`, and no unresolved `Minor`. The
   second A canonical-string exact-red packet and bounded-green closure are in the historical
-  [handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md):
+  handoff in the canonical log index:
   exact `0002` FQN/marker, behavior-preserving writer-owned codec extraction,
   exact legacy/green bytes, raw Unicode, exact composed `C3 A9` versus decomposed
   `65 CC 81` non-normalization, lowercase C0/DEL/C1, positive 1,226-byte fixture/
@@ -1859,7 +1861,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
   finding declaration handoff;
   `A-SELECTOR-01` is packet-local `ReviewedLocalGreen` at the
-  [selector handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
+  selector handoff in the canonical log index,
   with synchronized delivery and hosted proof complete. `A-ADMISSION-01` is
   packet-local `ReviewedLocalGreen`; its exact implementation, record delivery,
   and hosted predecessor evidence remain exact after the bounded records-only
@@ -1886,16 +1888,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is now exact-head hosted-green
-  `ReviewedLocalGreen` at the bounded correction identity in the canonical
-  owning finding; Ubuntu passed in `19m00s`, Windows in `35m20s`, publication
-  verification was correctly skipped, and its graph is `351 nodes / 4096 edges`. Canonical R
+  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
+  predecessor recorded in the canonical owning finding. Its subsequent records
+  synchronization also passed exact-head hosted validation; publication
+  verification was correctly skipped. Canonical R
   `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
   The live denominator is twenty and current `ReviewedLocalGreen` progress is
   sixteen (`80%`). The parent scenario remains `Planned`. `A-TRANSITION-01` is
-  next but remains Candidate/inactive until this records-only delivery head
-  becomes exact-hosted-green.
+  `FrozenDesign`/inactive at ordinal `0015`, reviews are `0/0/0`, expected red
+  has not run, and implementation awaits freeze-delivery hosted green. Later A
+  packets remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)
