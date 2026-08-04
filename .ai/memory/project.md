@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-03**
+Last verified: **2026-08-04**
 
 ## Verified facts
 
@@ -102,8 +102,9 @@ Last verified: **2026-08-03**
   in the canonical projector handoff. Exact-head hosted validation passed
   Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
   correctly skipped. Never-activated `A-CONVERGE-01` is retired and excluded
-  from the denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
-  packet-local `ReviewedLocalGreen`. Canonical R ran once and is immutable at
+  from the denominator. Its historical one-for-one replacement
+  `A-FULL-MANIFEST-01` is packet-local `ReviewedLocalGreen`. Canonical R ran
+  once and is immutable at
   `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
   the post-fix sentinel is diagnostic only. Two bounded corrections changed
   stale applicability sibling negatives and a premature planned-scenario
@@ -121,13 +122,23 @@ Last verified: **2026-08-03**
   Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
   correctly skipped, and that correction graph is `4094/4096`. This records-only
   closure adds the two reserved evidence relations; its final delivery graph
-  is `4096/4096` and is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped. Fourteen of twenty live
-  packets are green (`70%`).
-  `A-COMPLETE-PROFILE-01` and every later packet remain Candidate/inactive.
+  is `4096/4096` and is closed by the exact evidence in the canonical owning
+  finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication
+  verification was correctly skipped.
+  `A-COMPLETE-PROFILE-01` is now exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
+  Conformance is `28/28`, and full Domain is `98/98`. Fifteen of twenty live
+  packets are green (`75%`). The parent scenario remains `Planned`.
+  `A-PREDECESSOR-01` is next but remains Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
-  packet gates. Follow the current
-  [full-manifest reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md);
+  packet gates. Follow the current complete-profile reviewed-local-green
+  handoff;
   the admission-proof reviewed-local-green handoff,
   the [selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
   finding declaration reviewed-local-green handoff,
@@ -636,11 +647,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   correction.
   `A-PROJECTOR-DAG-01` is packet-local `ReviewedLocalGreen`; its exact
   implementation identity and hosted evidence are retained in the canonical
-  projector handoff. Exact cumulative A is now `27/27`, final review is `0/0/0`,
+  projector handoff. At that historical projector checkpoint, cumulative A was
+  `27/27`, final review was `0/0/0`,
   and combined budget is `770/770`; exact-head hosted validation passed Windows
   in `14m58s` and Ubuntu in `19m00s`, with publication verification correctly
   skipped. Never-activated `A-CONVERGE-01` is retired and excluded from the
-  denominator. Its one-for-one replacement `A-FULL-MANIFEST-01` is
+  denominator. Its historical one-for-one replacement `A-FULL-MANIFEST-01` is
   `ReviewedLocalGreen`; immutable R, bounded generic green, the sibling-
   assertion corrections, the fixture-topology correction, exact `27/27`
   cumulative validation, and final long checks are retained in its canonical
@@ -652,15 +664,23 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   evidence relations; its final delivery graph is `4096/4096` and is closed
   by the exact evidence in the canonical owning finding; Windows passed in
   `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
-  skipped.
-  `A-COMPLETE-PROFILE-01` and later packets remain Candidate/inactive.
+  skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
+  Conformance is `28/28`, and full Domain is `98/98`. Fifteen of twenty live
+  packets are green (`75%`). The parent scenario remains `Planned`.
+  `A-PREDECESSOR-01` is next but remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
-- Freshness and review condition: refreshed 2026-08-03 for the exact recovery,
-  strict redraw, exact parser-record hosted-green head, governed-reference
-  freeze, and umbrella authority; review when the micro state machine, packet
-  brief, or checkpoint authority changes.
+- Freshness and review condition: refreshed 2026-08-04 for the exact recovery,
+  strict redraw, exact parser-record and complete-profile hosted-green heads,
+  governed-reference freeze, and umbrella authority; review when the micro
+  state machine, packet brief, or checkpoint authority changes.
 - Superseded by: `None`
 
 ### Completed historical adoption issue is misclassified as malformed
@@ -1839,7 +1859,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   projector handoff. Exact-head hosted validation passed Windows in `14m58s`
   and Ubuntu in `19m00s`, with publication verification correctly skipped.
   Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-  Its one-for-one replacement `A-FULL-MANIFEST-01` is exact-head hosted-green
+  Its historical one-for-one replacement `A-FULL-MANIFEST-01` is exact-head hosted-green
   `ReviewedLocalGreen`; canonical R remains immutable, final focused is `1/1`,
   and final cumulative A is `27/27`. The first hosted implementation head passed
   Windows and failed Ubuntu only on the instruction-graph edge budget. The
@@ -1850,9 +1870,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   evidence relations; its final delivery graph is `4096/4096` and is closed
   by the exact evidence in the canonical owning finding; Windows passed in
   `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly
-  skipped. The live denominator is twenty and current
-  `ReviewedLocalGreen` progress is fourteen (`70%`). `A-COMPLETE-PROFILE-01`
-  and every later packet remain Candidate/inactive.
+  skipped. `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+  `ReviewedLocalGreen` at the exact implementation commit and replacement
+  hosted run recorded in the canonical feature finding; its git tree identity
+  is recorded there.
+  Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
+  verification was correctly skipped, and the implementation tree graph is
+  `4095/4096`. Focused validation is `1/1`, cumulative A is `28/28`, full
+  Conformance is `28/28`, and full Domain is `98/98`. The live denominator is
+  twenty and current `ReviewedLocalGreen` progress is fifteen (`75%`).
+  The parent scenario remains `Planned`. `A-PREDECESSOR-01` is next but remains
+  Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

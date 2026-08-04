@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-03**<br>
+Last reviewed: **2026-08-04**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -29,7 +29,7 @@ the hosted-green [ContractSlice A target parser/index/slot handoff](log/2026-08-
 the hosted-green [ContractSlice A finding declaration reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
 the hosted-green [ContractSlice A expected-selector reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-selector-freeze.md),
 the hosted-green [ContractSlice A admission-proof reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md),
-the current ContractSlice A full-manifest `ReviewedLocalGreen` state,
+the current ContractSlice A complete-profile `ReviewedLocalGreen` state,
 and the maintainer-approved
 [SUBF-0143](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 [micro-delivery control plan](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md).
@@ -60,8 +60,7 @@ and
 are historical; the hosted-green
 [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 is also historical. The admission-proof reviewed-local-green handoff is
-historical. Follow the current
-[full-manifest reviewed-local-green handoff](log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
+historical. Follow the current complete-profile reviewed-local-green handoff,
 the umbrella authority persisted on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174),
 and the corrected historical
 [Gate 3 directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228).
@@ -251,8 +250,8 @@ It follows the exact hosted-green finding delivery
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
 git tree identity `893e6f6dc1a6f0a246dc209be650f906e5f5c702`, and
 [run 30767103072](https://github.com/hasanmanzak/meAndAI/actions/runs/30767103072).
-Fourteen of twenty live packets are `ReviewedLocalGreen` (`70%`) and cumulative A
-is `27/27`.
+At the historical full-manifest checkpoint, fourteen of twenty live packets
+were `ReviewedLocalGreen` (`70%`) and cumulative A was `27/27`.
 [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`; `A-FINDING-01` is packet-local `ReviewedLocalGreen` at the
 [finding declaration handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-finding-freeze.md),
@@ -287,9 +286,10 @@ packet-local `ReviewedLocalGreen`. Canonical R ran once and remains immutable at
 SHA-256 `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
 the post-fix sentinel is diagnostic only, and the corrected-original green is
 `264F9BEA27ED1B458C8E74AF0448D710356B95218E385F8DF7EFCB2E06128986`.
-The two bounded sibling/fixture corrections changed only stale applicability
-assertions and premature planned-scenario fixture literals after the immutable
-`25/27` observation. Final FullManifest is `1/1` at
+The historical `A-FULL-MANIFEST-01` checkpoint retained two bounded
+sibling/fixture corrections that changed only stale applicability assertions
+and premature planned-scenario fixture literals after the immutable `25/27`
+observation. Final FullManifest is `1/1` at
 `B11EBABED2AE2D938B65F3C8202694B88364DA1AF0E2DDADBCC69754EC450489`,
 cumulative A is `27/27` at
 `0392900A44314848BD0EDBC7425A0ABE5767B2E960726AD29DBF5AC78AB77A90`,
@@ -303,10 +303,20 @@ The bounded records-only correction is exact-head hosted-green at
 Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction graph is `4094/4096`. This record closure
 adds only the two reserved evidence relations, so its final delivery graph is
-`4096/4096` and is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
-`A-COMPLETE-PROFILE-01` and every later packet remain
-Candidate/inactive. No
-final `Scenario` trait, status/owner, workflow,
+`4096/4096` and is closed by the exact evidence in the canonical owning
+finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication
+verification was correctly skipped.
+`A-COMPLETE-PROFILE-01` is now exact-head hosted-green
+`ReviewedLocalGreen` at the exact implementation commit and replacement hosted
+run recorded in the canonical feature finding; its git tree identity is recorded
+there.
+Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
+was correctly skipped, and the implementation tree graph is `4095/4096`.
+Focused validation is `1/1`, cumulative A is `28/28`, full Conformance is
+`28/28`, and full Domain is `98/98`. Fifteen of twenty live packets are
+`ReviewedLocalGreen` (`75%`). The parent scenario remains `Planned`.
+`A-PREDECESSOR-01` is next but remains Candidate/inactive. No final `Scenario`
+trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
 The governed-reference packet's historical exact implementation predecessor was
@@ -341,7 +351,7 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the current
-`full-manifest reviewed-local-green handoff`;
+`complete-profile reviewed-local-green handoff`;
 the admission-proof reviewed-local-green handoff and
 the [target parser/index/slot reviewed-local-green handoff](log/2026-08-02-feat-0065-subf-0143-contractslice-a-target-parser-index-slot-freeze.md)
 are historical.

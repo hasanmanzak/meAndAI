@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A full-manifest reviewed-local-green handoff](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md),
+[ContractSlice A complete-profile reviewed-local-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
 remains individually reachable from this index through the append-only History
@@ -99,7 +99,7 @@ fixes the parser resource/exception/component/provenance boundary. The
 and the
 [planned-scenario-trait correction handoff](2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md)
 and the schema-slot packet handoff are historical; current routing is the
-`full-manifest reviewed-local-green handoff`.
+`complete-profile reviewed-local-green handoff`.
 [SUBF-0143](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#subf-0143)
 A correction red-team and canonical StructureOnly are clean; scaffold,
 SurfaceRed, the 48-type structural surface, and focused `11/11` are local
@@ -250,9 +250,9 @@ packet-local `ReviewedLocalGreen`; its exact implementation identity and hosted
 evidence are retained in that canonical projector handoff. Exact-head hosted
 validation passed Windows in `14m58s` and Ubuntu in `19m00s`, with publication
 verification correctly skipped.
-Fourteen of twenty live packets are green (`70%`) and cumulative A is `27/27`.
-Never-activated `A-CONVERGE-01` is retired and excluded from the denominator.
-Its one-for-one replacement `A-FULL-MANIFEST-01` is
+The historical `A-FULL-MANIFEST-01` checkpoint followed retirement of the
+never-activated `A-CONVERGE-01`, which remains excluded from the denominator.
+`A-FULL-MANIFEST-01` is
 packet-local `ReviewedLocalGreen`. Canonical R is immutable at
 `F586F5BC8FFD5964EB1857512FA089FC8E5E5D3A054E39F28850057BE75DC0DB`;
 the post-fix sentinel remains diagnostic, and the corrected-original green is
@@ -270,11 +270,21 @@ instruction-graph edge budget. The bounded records-only correction is exact-head
 hosted-green at `canonical owning-finding correction head`, tree
 `canonical owning-finding correction tree`, and run `30834117740`, with graph
 `4094/4096`. This record closure adds only the two reserved evidence relations;
-its final delivery graph is `4096/4096` and is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
-`A-COMPLETE-PROFILE-01` and
-every later packet remain Candidate/inactive. The parent scenario remains
-`Planned`. No
-final `Scenario` trait, status/owner, workflow, efficiency activation,
+its final delivery graph is `4096/4096` and is closed by the exact evidence in
+the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`,
+and publication verification was correctly skipped.
+`A-COMPLETE-PROFILE-01` is now exact-head hosted-green
+`ReviewedLocalGreen` at the exact implementation commit and replacement hosted
+run recorded in the canonical feature finding; its git tree identity is recorded
+there.
+Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
+was correctly skipped, and the implementation tree graph is `4095/4096`.
+Focused validation is `1/1`, cumulative A is `28/28`, full Conformance is
+`28/28`, and full Domain is `98/98`. Fifteen of twenty live packets are green
+(`75%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. `A-PREDECESSOR-01` is next but remains Candidate/inactive.
+The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
+workflow, efficiency activation,
 or B/C/D activation is claimed.
 Historical governed-reference-slots evidence retains exact implementation
 predecessor
@@ -364,6 +374,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-04 - SUBF-0143 ContractSlice A complete-profile reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A full-manifest reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A projector/DAG reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-projector-dag-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A admission-proof reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-admission-freeze.md)
