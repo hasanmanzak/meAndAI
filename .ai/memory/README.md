@@ -11,15 +11,9 @@ on 2026-07-29. Follow the accepted
 [architecture](../../docs/architecture/protocol-governance-and-execution/README.md),
 [successor plan](../../docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md),
 [WIP extraction ledger](../../docs/architecture/protocol-governance-and-execution/wip-extraction-ledger.md),
-the historical [architecture-acceptance handoff](log/2026-07-29-protocol-governance-execution-architecture-acceptance.md),
-the historical [domain-vocabulary planning handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary.md),
-the historical [domain-vocabulary implementation handoff](log/2026-07-29-feat-0065-subf-0152-domain-vocabulary-implementation.md),
-the historical [evidence-acquisition design handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-design.md),
-the historical [evidence-contract implementation handoff](log/2026-07-30-feat-0065-subf-0153-evidence-contract-implementation.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](log/2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 the historical [ContractSlice A topology-correction handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-topology-correction.md),
 the historical [ContractSlice A planned-scenario-trait correction handoff](log/2026-07-31-feat-0065-subf-0143-planned-scenario-trait-correction.md),
-the historical [ContractSlice A pushed-candidate recovery handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-pushed-candidate-recovery.md),
 the historical [ContractSlice A canonical-string bounded-green closure handoff](log/2026-07-31-feat-0065-subf-0143-contractslice-a-canonical-string.md),
 the historical [ContractSlice A schema-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-schema-slot.md),
 the historical [ContractSlice A index-slot handoff](log/2026-08-01-feat-0065-subf-0143-contractslice-a-index-slot.md),
@@ -319,6 +313,23 @@ Focused validation is `1/1`, cumulative A is `28/28`, full Conformance is
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
+The exact record-delivery closure reached the full `4096/4096` instruction-graph
+budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
+ceiling after every emitted suite result was successful, so successor activation
+remains held. The bounded working tree removes six redundant root-memory
+navigation relations whose targets remain in the canonical history index and
+changes only the measured Windows job ceiling from 45 to 55 minutes after a
+second test-first infrastructure review; topology, invocation count, coverage,
+and all packet semantics remain unchanged. Exact-head hosted evidence is still
+pending.
+The exact same-owner timeout oracle produced one deliberate failure in
+`482.2s` while Windows remained at 45 minutes and passed in `447.4s` after only
+that bound became 55. Root StructureOnly passed in `437.1s`, publication
+evidence passed `7/7` in `293.8s` without a published-state claim, and the exact
+workflow route/efficiency owner passed. Final independent reviews closed
+`0/0/0`; exact-head hosted evidence remains pending. The prospective full-tree identity case now
+passes at `350/4092`; immutable correction evidence is projected to use only
+two reserved relations and yield `350/4094`.
 The governed-reference packet's historical exact implementation predecessor was
 remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
