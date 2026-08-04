@@ -315,21 +315,24 @@ trait, status/owner, workflow,
 or B/C/D activation is claimed.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
-ceiling after every emitted suite result was successful, so successor activation
-remains held. The bounded working tree removes six redundant root-memory
-navigation relations whose targets remain in the canonical history index and
-changes only the measured Windows job ceiling from 45 to 55 minutes after a
-second test-first infrastructure review; topology, invocation count, coverage,
-and all packet semantics remain unchanged. Exact-head hosted evidence is still
-pending.
+ceiling after every emitted suite result was successful. The bounded correction
+removed six redundant root-memory navigation relations whose targets remain in
+the canonical history index and changed only the measured Windows job ceiling
+from 45 to 55 minutes after a second test-first infrastructure review; topology,
+invocation count, coverage, and all packet semantics remain unchanged.
 The exact same-owner timeout oracle produced one deliberate failure in
 `482.2s` while Windows remained at 45 minutes and passed in `447.4s` after only
 that bound became 55. Root StructureOnly passed in `437.1s`, publication
 evidence passed `7/7` in `293.8s` without a published-state claim, and the exact
 workflow route/efficiency owner passed. Final independent reviews closed
-`0/0/0`; exact-head hosted evidence remains pending. The prospective full-tree identity case now
-passes at `350/4092`; immutable correction evidence is projected to use only
-two reserved relations and yield `350/4094`.
+`0/0/0`. The canonical feature finding retains the exact immutable correction
+identity and hosted run. Ubuntu passed in `19m24s`, Windows in `42m54s`,
+publication verification was correctly skipped, and the correction graph is
+`350/4092`.
+The records-only delivery adds exactly the two reserved immutable-evidence
+relations and prospectively validates at `350/4094`, but does not claim hosted
+proof for its own future head. `A-PREDECESSOR-01` remains Candidate/inactive
+until this delivery head is exact-hosted-green.
 The governed-reference packet's historical exact implementation predecessor was
 remote-equal
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
