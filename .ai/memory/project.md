@@ -146,7 +146,9 @@ Last verified: **2026-08-07**
   history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
   hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
   `0`, one Fact with only `ContractSlice=A`, and no Scenario.
-  `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
+  `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`;
+  no red or implementation evidence exists yet. `A-CONVERGE-02` remains
+  Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current [canonical log index](log/README.md). The
@@ -697,7 +699,8 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
   hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
   `0`, one Fact with only `ContractSlice=A`, and no Scenario.
-  `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
+  `A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016`; no red or
+  implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1915,8 +1918,9 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
   history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
   hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
-  `0`, one Fact with only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and
-  `A-CONVERGE-02` remain Candidate/inactive.
+  `0`, one Fact with only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` is
+  `FrozenDesign`/inactive at ordinal `0016` with no red or implementation
+  evidence. `A-CONVERGE-02` remains Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

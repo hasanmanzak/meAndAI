@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze delivery remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
+| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze/implementation/records deliveries remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`; no red or implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -173,9 +173,10 @@ canonical owning finding. The records synchronization that opened the design
 freeze also passed exact-head hosted validation. Canonical R `0014` and `0015`
 are accepted, immutable, and were not rerun. Synchronized `A-TRANSITION-01` is
 immutable exact hosted-green predecessor history at ordinal `0015`.
-The lifecycle freeze and implementation deliveries are exact-hosted-green.
-`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
-Candidate/inactive; no
+The lifecycle freeze, implementation, and records deliveries are exact-hosted-green.
+`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`.
+`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with no red or
+implementation evidence; `A-CONVERGE-02` remains Candidate/inactive; no
 full-A completion or DoD is claimed.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
@@ -989,10 +990,10 @@ history recorded in the canonical owning finding; its subsequent records
 synchronization is exact-head hosted-green.
 Canonical R `0014` and `0015` are accepted, immutable, and were not rerun.
 Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
-history at ordinal `0015`. The lifecycle freeze delivery is exact-hosted-green;
-`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and
-`A-CONVERGE-02` remain
-Candidate/inactive;
+history at ordinal `0015`. The lifecycle freeze/implementation/records deliveries are exact-hosted-green;
+`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`.
+`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with no red or
+implementation evidence; `A-CONVERGE-02` remains Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210)
 remains `Planned`, and no full-A completion or DoD is claimed.
 
@@ -1209,10 +1210,11 @@ the lifecycle records-only freeze delivery also passed Ubuntu in `20m44s` and
 Windows in `46m51s`. The exact lifecycle implementation identity recorded in
 the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`, with
 publication correctly skipped.
-Resource limits, public/friend/project/lock/workflow changes, final activation,
+Resource implementation, public/friend/project/lock/workflow changes, final activation,
 B/C/D, merge, release, and publication remain held. `A-LIFECYCLE-01` is exact
-implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
-Candidate/inactive.
+implementation-head hosted-green `ReviewedLocalGreen`. `A-RESOURCE-01` is
+`FrozenDesign`/inactive at ordinal `0016` with no red or implementation
+evidence; `A-CONVERGE-02` remains Candidate/inactive.
 
 ### `A-LIFECYCLE-01` operational boundary and local-green closure <a name="a-lifecycle-01-freeze"></a>
 
@@ -1493,12 +1495,20 @@ confer release/consumer authority.
 
 The manifest schema key is `protocol.policy-manifest.v1`. Its canonical bytes
 are strict UTF-8 without BOM and contain one JSON object followed by exactly one
-LF. Schema 1 permits at most `16,777,216` input bytes, JSON nesting depth `64`,
-and `1,000,000` JSON tokens including property names and scalar/container
-tokens. `ParseCanonical` checks the byte ceiling before allocating its private
-copy, then enforces the depth and token ceilings while reading; equality is
-allowed and the first value over any ceiling is `FormatException`. It adds no
-ambient, machine-dependent, or declaration-count limit. Canonicalization is
+LF. Schema 1 permits at most `16,777,216` input bytes, reachable JSON container
+depth `9`, and `1,000,000` JSON tokens including property names and scalar/
+container tokens. The root object has depth `1`; only an object or array start
+increments depth. `ParseCanonical` checks the byte ceiling before allocating
+its private copy, then enforces the depth and token ceilings while reading;
+equality is allowed. Byte and token one-over values retain their exact resource
+`FormatException` boundaries: byte one-over owns exact message `The canonical
+policy manifest exceeds the byte ceiling.` and token one-over owns exact message
+`The policy manifest exceeds the JSON token ceiling.`; both have null inner
+exception. A tenth container is not a grammar-valid schema-1 manifest; it is
+rejected first through outer `FormatException` message `The policy manifest is
+not canonical JSON.` with a `JsonException` inner exception.
+It adds no ambient, machine-dependent, declaration-count, or collection-count
+limit. Canonicalization is
 owned by [SUBF-0143](README.md#subf-0143), independently
 of the later report serializer owned by
 [SUBF-0154](README.md#subf-0154).
@@ -1513,6 +1523,21 @@ projections, not raw JSON, a byte buffer, or a retained `ReadOnlyMemory<byte>`.
 The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-0068-protocol-release-finalizer-authority-transfer/README.md)
 and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend call this one parser; neither implements another copy/parser path.
 There is no public manifest constructor or factory.
+
+`A-RESOURCE-01` freezes three independent `ParseCanonical` carriers. Byte
+equality/one-over uses qualification compatibility aliases while staying below
+the token ceiling. Token equality/one-over uses sorted unique fixed-width
+aliases while staying below the byte ceiling. Depth equality reuses the full
+manifest graph at exact reachable depth `9`; depth one-over replaces its
+deepest `componentKey` string scalar with an object, creating a tenth container
+without pretending that the result is grammar-valid. The unchanged reader's
+legacy `Expected JSON token 'String'.` error ownership is the sole expected-red
+seam. Green changes only `CanonicalManifestReader.MaximumDepth` from `64` to
+`9`, so the JSON reader owns that one-over before schema scalar parsing. A
+fresh parent samples the exact focused `dotnet test` process tree every `100ms`
+from root launch through exit. Green custody requires duration at most `90s`
+and sampled aggregate working set at most `1,610,612,736` bytes (`1.5 GiB`);
+unobservable descendants or either exceeded cap reopen D/RT.
 
 `FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
 boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,
@@ -8353,8 +8378,9 @@ or DoD is claimed. `A-PREDECESSOR-01` is immutable exact hosted-green
 predecessor history recorded in the canonical owning finding. Synchronized
 `A-TRANSITION-01` is immutable exact hosted-green predecessor history at ordinal
 `0015`. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` on its
-production-zero `TestOnlyGreen` route; `A-RESOURCE-01` and `A-CONVERGE-02`
-remain Candidate/inactive.
+production-zero `TestOnlyGreen` route. `A-RESOURCE-01` is `FrozenDesign`/
+inactive at ordinal `0016` with no red or implementation evidence;
+`A-CONVERGE-02` remains Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

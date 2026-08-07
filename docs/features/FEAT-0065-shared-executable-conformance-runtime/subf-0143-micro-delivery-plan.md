@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze delivery remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Corrected canonical R `0013` and predecessor canonical R `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. Every partial Fact retains only `ContractSlice=A`; no full-A completion or DoD is claimed. |
+| Status | Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze/implementation/records deliveries remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`; no red or implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive. Corrected canonical R `0013` and predecessor canonical R `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. Every partial Fact retains only `ContractSlice=A`; no full-A completion or DoD is claimed. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -336,7 +336,7 @@ here.
 | `A-PREDECESSOR-01` | Existing predecessor `catalogVersion` strictly lower than current, predecessor `manifestDigest`, predecessor `completeInventoryDigest`, and current derived inventory digest as separate exact fields | `ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests` |
 | `A-TRANSITION-01` | Frozen Existing carrier at protocol `0.18.0`: sorted Unchanged/Revised/Unchanged/Retired/Added variants; strict Reader grammar, canonical Writer emission, and RuleId-based current/absent Catalog membership; exact `91+7` retained negatives | `ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; ordinal `0015`; marker `TEST-0210-A-BEHAVIOR-RED-0015` |
 | `A-LIFECYCLE-01` | Frozen already-green lifecycle regression: introduced/deprecated boundaries, retired-current exclusion, retired transition absence, and deprecated-active exact profile retention; no predecessor lifecycle delta inference | `ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`; `R=NotApplicable`; `TestOnlyGreen`; production `0` |
-| `A-RESOURCE-01` | Only after full collection grammar: input-byte and reachable-depth ceilings plus token-ceiling equality/one-over through a collection-heavy fixture; no independent collection/declaration-count ceiling | FQN freezes in D only after the reachable-depth contract is resolved |
+| `A-RESOURCE-01` | Frozen schema-1 input-byte, reachable-container-depth, and token equality/one-over through three independent sequential carriers; no independent collection/declaration-count ceiling | `MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`; ordinal `0016`; marker `TEST-0210-A-BEHAVIOR-RED-0016` |
 | `A-CONVERGE-02` | Full A coverage, API/friend/hold audit, and completion recommendation | No new behavior or forced red; cumulative evidence only |
 
 ### Packet evidence ledger
@@ -366,8 +366,8 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-COMPLETE-PROFILE-01` | Exact-head hosted-green `ReviewedLocalGreen` at the implementation identity recorded in the canonical owning finding; Windows `44m13s`, Ubuntu `11m50s`, publication verification skipped | Corrected ordinal `0013`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`; one Fact, only `ContractSlice=A`, no Scenario. The discovered `0012` identity is retained only as an invalid diagnostic and is never retried or promoted. | P nullable-union compile seam; accepted Writer-only canonical R `34CD...24C7C`; focused/cumulative/Conformance/Domain `1/1`, `28/28`, `28/28`, `98/98` | Renewed D/RT/source/canonical-R and corrected implementation reviews `0/0/0`; production `+283/-37`, test `+162/-1`, combined additions `445`, below all hard caps | Corrected evidence-identity freeze and packet-local plus exact-head hosted-green evidence below; no full-A completion, final activation, or DoD claim |
 | `A-PREDECESSOR-01` | Immutable exact hosted-green predecessor history | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests`; ordinal `0014`; marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0014`; one Fact, only `ContractSlice=A`, no Scenario | P `NotApplicable`; accepted immutable R `DCC53EBC...0F5567`; focused/retained/cumulative A/Conformance/Domain `1/1`, `1/1`, `29/29`, `29/29`, `98/98`; V local and exact-head hosted green | D/RT and three independent final reviews `0/0/0`; Reader/Writer/Catalog production gross `70/36/14`, production/test/combined `120/416/536`; StructureOnly and locks green | Canonical owning finding retains exact implementation, correction, and records-head evidence |
 | `A-TRANSITION-01` | Immutable exact hosted-green predecessor history | `0015`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; accepted immutable canonical R; one Fact, only `ContractSlice=A`, no Scenario | Marker-free focused `1/1`, retained predecessor `1/1`, cumulative A and Conformance `30/30`, Domain `98/98`; exact `91+7` matrix; implementation and synchronized records heads exact-hosted-green | D/RT and final reviews `0/0/0`; Reader/Writer/Catalog additions `98/12/55`, production/test/combined `165/351/516`; exact predecessor cleanup `+0/-73` separate | [FIND-0461](README.md#find-0461) resolved; the canonical transition handoff retains exact closure evidence |
-| `A-LIFECYCLE-01` | Exact implementation-head hosted-green `ReviewedLocalGreen`; immutable identities in the canonical handoff | `R=NotApplicable`; no ordinal/marker/red TRX; `MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`; `TestOnlyGreen`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1`; cumulative A and full Conformance `31/31`; Domain `98/98`; source `266` lines / `704F...EDCF`; production `0`; Ubuntu `19m36s`, Windows `36m02s`, publication skipped | Initial post-green review `0/1/0`; bounded N4 correction; fresh code/test and evidence/scope reviews each `0/0/0`; build/format/diff/fifteen locks green | [Lifecycle ReviewedLocalGreen handoff](../../../.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md) |
-| `A-RESOURCE-01` | Candidate | None | None | N/A | None |
+| `A-LIFECYCLE-01` | Exact implementation-head hosted-green `ReviewedLocalGreen`; immutable identities in the canonical handoff | `R=NotApplicable`; no ordinal/marker/red TRX; `MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`; `TestOnlyGreen`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1`; cumulative A and full Conformance `31/31`; Domain `98/98`; source `266` lines / `704F...EDCF`; production `0`; Ubuntu `19m36s`, Windows `36m02s`, publication skipped | Initial post-green review `0/1/0`; bounded N4 correction; fresh code/test and evidence/scope reviews each `0/0/0`; build/format/diff/fifteen locks green | Canonical memory history |
+| `A-RESOURCE-01` | `FrozenDesign` / inactive | `0016`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`; one Fact, only `ContractSlice=A`, no Scenario | None; P=`NotApplicable`; no red or green execution yet | D/RT pending on this records tree; implementation remains gated by exact-head hosted green | [Resource-boundary FrozenDesign handoff](../../../.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md) |
 | `A-CONVERGE-02` | Candidate | None | None | N/A | None |
 
 #### Exact-head hosted-green `A-PREDECESSOR-01` contract and evidence
@@ -519,7 +519,8 @@ atomic Writer guard/serializer, atomic Reader raw/parser/projection/validator,
 the exact `91+7` green matrix, exact predecessor cleanup, then focused,
 retained, cumulative, review, and evidence closure. That closure is now the
 immutable exact hosted-green freeze predecessor for `A-LIFECYCLE-01`;
-`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
+`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016`; no red or
+implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive.
 
 That order completed locally. [FIND-0461](README.md#find-0461) records the marker-free console-only
 fixture diagnostic and bounded removal of inherited
@@ -575,8 +576,9 @@ renewed D/RT rather than manufacturing red. That unchanged-production oracle
 passed `1/1`; after one review-owned N4 specificity correction, retained source
 is `266` lines / `704F...EDCF`, focused is `1/1`, cumulative A and full
 Conformance are `31/31`, Domain is `98/98`, production remains `0`, and fresh
-code/test plus evidence/scope reviews each closed `0/0/0`. `A-RESOURCE-01` and
-`A-CONVERGE-02` remain Candidate/inactive. Progress is `18/20` (`90%`).
+code/test plus evidence/scope reviews each closed `0/0/0`. `A-RESOURCE-01` is
+`FrozenDesign`/inactive at ordinal `0016` with no red or implementation
+evidence. `A-CONVERGE-02` remains Candidate/inactive. Progress is `18/20` (`90%`).
 
 #### Reviewed-local-green `A-FINDING-01` design and evidence <a name="a-finding-01-freeze"></a>
 
@@ -1851,7 +1853,8 @@ remain accepted, immutable, and were not rerun.
 in the canonical owning finding. Synchronized `A-TRANSITION-01` is immutable
 exact hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
 exact implementation-head hosted-green `ReviewedLocalGreen` on its production-zero `TestOnlyGreen` route;
-`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive;
+`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016`; no red or
+implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210) remains `Planned`, and no full-A completion,
 final activation, B/C/D, or DoD is claimed.
 Hosted run `30798854880` passed Windows in `14m58s` and
@@ -1888,13 +1891,35 @@ packets combine before activation. No line cap overrides this semantic rule.
 
 `A-GRAMMAR-STRUCT-01` and `A-GRAMMAR-NUMBER-01` are first reviewed as likely
 already-green regressions; they do not force expected-red. `A-RESOURCE-01`
-waits until the full grammar can produce the equality fixtures. It must
-reconcile the declared depth-64 ceiling with actual reachable nesting and must
-not invent a structurally invalid depth-64 success fixture. The retired
+waited until the full grammar could produce the equality fixtures. Its frozen
+contract sets the reachable schema-1 container ceiling to `9`: the full graph
+is the equality fixture, while a deepest-scalar-to-object mutation creates the
+tenth container solely to prove error ownership. It does not invent a valid
+depth-10 manifest. Byte and token equality/one-over use independent carriers
+that stay comfortably below the other resource ceiling. The retired
 `A-CONVERGE-01` candidate never activates. `A-FULL-MANIFEST-01` is the direct
 semantic owner of the bounded generic multi-rule/shared-slot/distinct-admission
 closure exposed by its exact snapshot. `A-CONVERGE-02` owns no production fix
 and manufactures no red evidence.
+
+`A-RESOURCE-01-D` freezes exact FQN
+`MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`.
+P is `NotApplicable`. R is ordinal `0016` with exact marker/TRX stem
+`TEST-0210-A-BEHAVIOR-RED-0016`; unchanged production must expose only legacy
+`FormatException` message `Expected JSON token 'String'.` with no inner
+exception. G changes only `CanonicalManifestReader.MaximumDepth` from `64` to
+`9` and requires the tenth container to become outer `FormatException` message
+`The policy manifest is not canonical JSON.` with `JsonException` inner
+evidence. Byte one-over owns exact `FormatException` message `The canonical
+policy manifest exceeds the byte ceiling.` with null inner exception; token
+one-over owns exact `FormatException` message `The policy manifest exceeds the
+JSON token ceiling.` with null inner exception. Production is exactly `+1/-1`, new test additions are capped at
+`650`, and combined additions at `651`; any wider change renews D/RT. Large
+carriers run sequentially with deterministic fixed-width aliases, streaming
+token counts, and a fresh parent sampling the focused `dotnet test` process
+tree every `100ms`. Green custody requires at most `90s` duration, sampled
+aggregate working set at most `1,610,612,736` bytes (`1.5 GiB`), and observable
+descendants; a failed measurement or cap breach renews D/RT.
 
 The live queue has 20 routing packages. The retired combined-label tombstone is
 not counted. Each semantic package expands into the seven

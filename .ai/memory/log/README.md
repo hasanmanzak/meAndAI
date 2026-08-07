@@ -6,9 +6,8 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A lifecycle ReviewedLocalGreen handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md),
-the immutable
-[ContractSlice A predecessor-manifest exact-head hosted-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
+[ContractSlice A resource-boundary FrozenDesign handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md),
+the immutable ContractSlice A predecessor-manifest exact-head hosted-green handoff,
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
 remains individually reachable from this index through the append-only History
@@ -297,7 +296,9 @@ remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
 hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
 implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, one Fact carrying
 only `ContractSlice=A`, no Scenario, and source `266` lines.
-`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
+`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with its exact FQN
+and three independent byte/depth/token carriers; `A-CONVERGE-02` remains
+Candidate/inactive. No red or implementation evidence is claimed by the freeze.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
 workflow, efficiency activation,
 or B/C/D activation is claimed.
@@ -339,7 +340,7 @@ exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-The current continuation state is the transition reviewed-local-green handoff above.
+The current continuation state is the resource-boundary FrozenDesign handoff above.
 The full-manifest and projector/DAG reviewed-local-green handoffs,
 admission-proof reviewed-local-green handoff, and target parser/index/slot
 reviewed-local-green handoff remain historical predecessor evidence.
@@ -389,6 +390,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-07 - ContractSlice A lifecycle ReviewedLocalGreen](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-green.md)
 - [2026-08-07 - ContractSlice A lifecycle FrozenDesign](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md)
 - [2026-08-04 - ContractSlice A transition reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A predecessor-manifest exact-head hosted-green](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)

@@ -312,8 +312,9 @@ packets are `ReviewedLocalGreen` (`90%`). The parent scenario remains
 predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
 implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
 `0`, one Fact carrying only `ContractSlice=A`, and no Scenario.
-`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
-trait, status/owner, workflow,
+`A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`; no
+red or implementation evidence exists yet. `A-CONVERGE-02` remains
+Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
