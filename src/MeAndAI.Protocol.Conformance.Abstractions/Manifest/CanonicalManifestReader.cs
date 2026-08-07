@@ -138,12 +138,59 @@ internal static class CanonicalManifestReader
         {
             reader.ExpectProperty("ruleId"); var ruleId = reader.ReadString();
             reader.ExpectProperty("kind"); var kind = reader.ReadString();
-            if (!string.Equals(kind, RuleTransitionKind.Added.Value, StringComparison.Ordinal))
-                throw new FormatException("This parser increment supports only Added transitions.");
-            reader.ExpectProperty("currentRevision"); var revision = reader.ReadInt32();
-            reader.ExpectProperty("reviewedAuthority"); var authority = reader.ReadString();
-            reader.Expect(JsonTokenType.EndObject);
-            items.Add(new RawTransition(ruleId, revision, authority));
+            int? previousRevision = null;
+            int? currentRevision = null;
+            string? authority = null;
+            switch (kind)
+            {
+                case "unchanged":
+                    reader.ExpectProperty("previousRevision");
+                    previousRevision = reader.ReadInt32();
+                    reader.ExpectProperty("currentRevision");
+                    currentRevision = reader.ReadInt32();
+                    if (!reader.Read())
+                    {
+                        throw new FormatException("The transition object is incomplete.");
+                    }
+                    if (reader.TokenType != JsonTokenType.EndObject)
+                    {
+                        reader.RequireProperty("reviewedAuthority");
+                        authority = reader.ReadString();
+                        reader.Expect(JsonTokenType.EndObject);
+                    }
+                    break;
+                case "added":
+                    reader.ExpectProperty("currentRevision");
+                    currentRevision = reader.ReadInt32();
+                    reader.ExpectProperty("reviewedAuthority");
+                    authority = reader.ReadString();
+                    reader.Expect(JsonTokenType.EndObject);
+                    break;
+                case "revised":
+                    reader.ExpectProperty("previousRevision");
+                    previousRevision = reader.ReadInt32();
+                    reader.ExpectProperty("currentRevision");
+                    currentRevision = reader.ReadInt32();
+                    reader.ExpectProperty("reviewedAuthority");
+                    authority = reader.ReadString();
+                    reader.Expect(JsonTokenType.EndObject);
+                    break;
+                case "retired":
+                    reader.ExpectProperty("previousRevision");
+                    previousRevision = reader.ReadInt32();
+                    reader.ExpectProperty("reviewedAuthority");
+                    authority = reader.ReadString();
+                    reader.Expect(JsonTokenType.EndObject);
+                    break;
+                default:
+                    throw new FormatException("The rule transition kind is not supported.");
+            }
+            items.Add(new RawTransition(
+                ruleId,
+                kind,
+                previousRevision,
+                currentRevision,
+                authority));
         }
         return items;
     }
@@ -1250,12 +1297,9 @@ internal static class CanonicalManifestReader
             CompleteCatalogDeclaration? typedComplete = null;
             if (completeCatalog is not null)
             {
-                var transitions = completeCatalog.Transitions.Select(item =>
-                    RuleTransitionDeclaration.Added(
-                        RuleId.Parse(item.RuleId),
-                        RuleRevision.Create(item.CurrentRevision),
-                        ReviewedAuthorityPermalink.Create(item.ReviewedAuthority))).ToArray();
-                ValidateCurrentAddedTransitions(typedRules, transitions);
+                var transitions = completeCatalog.Transitions
+                    .Select(ProjectTransition)
+                    .ToArray();
                 var profiles = completeCatalog.NamedProfiles.Select(item =>
                     NamedProfileDeclaration.Create(
                         item.Name,
@@ -1309,26 +1353,45 @@ internal static class CanonicalManifestReader
         }
     }
 
-    private static void ValidateCurrentAddedTransitions(
-        IReadOnlyList<RuleDeclaration> rules,
-        IReadOnlyList<RuleTransitionDeclaration> transitions)
+    private static RuleTransitionDeclaration ProjectTransition(
+        RawTransition transition)
     {
-        if (transitions.Count != rules.Count)
+        var ruleId = RuleId.Parse(transition.RuleId);
+        var authority = transition.ReviewedAuthority is null
+            ? null
+            : ReviewedAuthorityPermalink.Create(transition.ReviewedAuthority);
+        switch (transition.Kind)
         {
-            throw new FormatException("A complete catalog requires one Added transition per current rule.");
-        }
-
-        for (var index = 0; index < rules.Count; index++)
-        {
-            var transition = transitions[index];
-            if (!transition.RuleId.Equals(rules[index].RuleId) ||
-                !transition.Kind.Equals(RuleTransitionKind.Added) ||
-                transition.PreviousRevision is not null ||
-                !Equals(transition.CurrentRevision, rules[index].RuleRevision) ||
-                transition.ReviewedAuthority is null)
-            {
-                throw new FormatException("A complete catalog requires one Added transition per current rule.");
-            }
+            case "unchanged":
+                var previous = RuleRevision.Create(transition.PreviousRevision!.Value);
+                var current = RuleRevision.Create(transition.CurrentRevision!.Value);
+                if (!previous.Equals(current))
+                {
+                    throw new FormatException(
+                        "An unchanged transition requires equal revisions.");
+                }
+                return RuleTransitionDeclaration.Unchanged(
+                    ruleId,
+                    previous,
+                    authority);
+            case "added":
+                return RuleTransitionDeclaration.Added(
+                    ruleId,
+                    RuleRevision.Create(transition.CurrentRevision!.Value),
+                    authority!);
+            case "revised":
+                return RuleTransitionDeclaration.Revised(
+                    ruleId,
+                    RuleRevision.Create(transition.PreviousRevision!.Value),
+                    RuleRevision.Create(transition.CurrentRevision!.Value),
+                    authority!);
+            case "retired":
+                return RuleTransitionDeclaration.Retired(
+                    ruleId,
+                    RuleRevision.Create(transition.PreviousRevision!.Value),
+                    authority!);
+            default:
+                throw new FormatException("The rule transition kind is not supported.");
         }
     }
 
@@ -2140,8 +2203,10 @@ internal static class CanonicalManifestReader
 
     private sealed record RawTransition(
         string RuleId,
-        int CurrentRevision,
-        string ReviewedAuthority);
+        string Kind,
+        int? PreviousRevision,
+        int? CurrentRevision,
+        string? ReviewedAuthority);
 
     private sealed record RawNamedProfile(
         string Name,

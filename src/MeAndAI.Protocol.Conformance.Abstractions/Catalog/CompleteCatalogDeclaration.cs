@@ -92,7 +92,7 @@ public sealed class CompleteCatalogDeclaration
         }
 
         ValidateProfileMembership(canonicalRules, canonicalProfiles);
-        ValidateGenesisTransitions(predecessor, canonicalRules, canonicalTransitions);
+        ValidateTransitions(predecessor, canonicalRules, canonicalTransitions);
         ValidateProfileCompatibility(canonicalRules, canonicalProfiles);
 
         return new CompleteCatalogDeclaration(
@@ -179,6 +179,60 @@ public sealed class CompleteCatalogDeclaration
             }
         }
     }
+
+    private static void ValidateTransitions(
+        CatalogPredecessorBinding predecessor,
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<RuleTransitionDeclaration> transitions)
+    {
+        if (predecessor.Kind.Equals(CatalogPredecessorKind.Genesis))
+        {
+            ValidateGenesisTransitions(predecessor, rules, transitions);
+            return;
+        }
+
+        ValidateExistingTransitions(rules, transitions);
+    }
+
+    private static void ValidateExistingTransitions(
+        IReadOnlyList<RuleDeclaration> rules,
+        IReadOnlyList<RuleTransitionDeclaration> transitions)
+    {
+        var currentRules = rules.ToDictionary(
+            rule => rule.RuleId.Value,
+            StringComparer.Ordinal);
+        var representedCurrentRules = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var transition in transitions)
+        {
+            if (transition.Kind.Equals(RuleTransitionKind.Retired))
+            {
+                if (currentRules.ContainsKey(transition.RuleId.Value))
+                {
+                    throw InvalidExistingTransitions(nameof(transitions));
+                }
+
+                continue;
+            }
+
+            if (!currentRules.TryGetValue(transition.RuleId.Value, out var currentRule) ||
+                !representedCurrentRules.Add(transition.RuleId.Value) ||
+                transition.CurrentRevision is null ||
+                !transition.CurrentRevision.Equals(currentRule.RuleRevision))
+            {
+                throw InvalidExistingTransitions(nameof(transitions));
+            }
+        }
+
+        if (representedCurrentRules.Count != currentRules.Count)
+        {
+            throw InvalidExistingTransitions(nameof(transitions));
+        }
+    }
+
+    private static ArgumentException InvalidExistingTransitions(string parameterName) =>
+        new(
+            "An existing catalog requires exactly one current transition per current rule and Retired transitions only for absent rules.",
+            parameterName);
 
     private static void ValidateGenesisTransitions(
         CatalogPredecessorBinding predecessor,

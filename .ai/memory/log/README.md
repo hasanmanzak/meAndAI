@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A transition FrozenDesign handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md),
+[ContractSlice A transition reviewed-local-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md),
 the immutable
 [ContractSlice A predecessor-manifest exact-head hosted-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
@@ -284,14 +284,13 @@ was correctly skipped, and the implementation tree graph is `4095/4096`.
 `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor
 recorded in the canonical owning finding. Its subsequent records head passed
 Ubuntu in `12m57s` and Windows in `47m19s`; publication verification was
-correctly skipped. Canonical R `0014` is immutable and was not rerun.
-Focused and retained validation are `1/1`; cumulative A and full
-Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
-are green (`80%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal
-`0015`, design and red-team reviews are `0/0/0`, expected red has not run, and
-implementation remains held until this freeze-delivery head becomes
-exact-hosted-green. `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02`
+correctly skipped. Canonical R `0014` and `0015` are immutable and were not
+rerun. Focused and retained validation are `1/1`; cumulative A and full
+Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
+packets are green (`85%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
+remains `Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at
+ordinal `0015`; no hosted implementation evidence is claimed yet.
+`A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02`
 remain Candidate/inactive.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
 workflow, efficiency activation,
@@ -334,7 +333,7 @@ exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-The current continuation state is the transition FrozenDesign handoff above.
+The current continuation state is the transition reviewed-local-green handoff above.
 The full-manifest and projector/DAG reviewed-local-green handoffs,
 admission-proof reviewed-local-green handoff, and target parser/index/slot
 reviewed-local-green handoff remain historical predecessor evidence.
@@ -384,7 +383,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
-- [2026-08-04 - ContractSlice A transition FrozenDesign](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md)
+- [2026-08-04 - ContractSlice A transition reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A predecessor-manifest exact-head hosted-green](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A complete-profile reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md)
 - [2026-08-03 - SUBF-0143 ContractSlice A full-manifest reviewed-local-green](2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)

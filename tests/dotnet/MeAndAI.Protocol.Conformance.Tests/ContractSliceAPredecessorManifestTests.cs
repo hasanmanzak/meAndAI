@@ -14,7 +14,6 @@ public sealed class ContractSliceAPredecessorManifestTests
     private const string ManifestDigest = "6fb963fcdf35683f2172ea62e383401f36f5c41660c59e0c594852ccb64108df";
     private const string PredecessorInventoryDigest = "52cf1f9c6ecc7e8b652d047f595bb4c66fac53735f9637cb3edbd0c54c8e8554";
     private const string CurrentInventoryDigest = "c013e4b9937f225163f58e41b893600b87d88faf6340678a79242041443f8af3";
-    private const string LegacyWriterMessage = "This writer increment supports only the minimal qualification slice.";
     private static readonly ReviewedAuthorityPermalink Authority = ReviewedAuthorityPermalink.Create(
         "https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228");
 
@@ -40,7 +39,6 @@ public sealed class ContractSliceAPredecessorManifestTests
 
         AssertPredecessorWireCases(canonicalBytes, predecessorJson);
         AssertVersionBoundaries(existingTwo, canonicalBytes, predecessorJson);
-        AssertTransitionBoundaries(existingTwo, canonicalBytes);
     }
 
     private static ParsedCanonicalManifest CreateExistingManifest(
@@ -244,56 +242,8 @@ public sealed class ContractSliceAPredecessorManifestTests
         return exception;
     }
 
-    private static void AssertTransitionBoundaries(
-        ParsedCanonicalManifest validManifest,
-        byte[] canonicalBytes)
-    {
-        var catalog = validManifest.CompleteCatalog!;
-        var canonicalTransitions = TransitionArray(Added(catalog.Rules));
-        var cases = TransitionCases(catalog.Rules);
-        Assert.Equal(6, cases.Length);
-        foreach (var transitions in cases)
-        {
-            var invalidCatalog = CreateExistingCatalog(
-                catalog.CatalogVersion,
-                CatalogVersion.Create(1),
-                catalog.Rules,
-                transitions);
-            Assert.Equal(transitions.Length, invalidCatalog.Transitions.Count);
-            AssertLegacyWriterRejection(validManifest with { CompleteCatalog = invalidCatalog });
-            Assert.Throws<FormatException>(() =>
-                FinalizedPolicyManifest.ParseCanonical(
-                    ReplaceExact(canonicalBytes, canonicalTransitions, TransitionArray(transitions))));
-        }
-    }
 
-    private static RuleTransitionDeclaration[][] TransitionCases(
-        IReadOnlyList<RuleDeclaration> rules)
-    {
-        var added = Added(rules);
-        var first = rules[0];
-        return
-        [
-            added[..^1],
-            [.. added, RuleTransitionDeclaration.Added(
-                RuleId.Parse("RULE-9999"), RuleRevision.Create(1), Authority)],
-            [RuleTransitionDeclaration.Added(
-                first.RuleId, RuleRevision.Create(2), Authority), .. added.Skip(1)],
-            [RuleTransitionDeclaration.Unchanged(
-                first.RuleId, first.RuleRevision, Authority), .. added.Skip(1)],
-            [RuleTransitionDeclaration.Revised(
-                first.RuleId, first.RuleRevision, RuleRevision.Create(2), Authority), .. added.Skip(1)],
-            [RuleTransitionDeclaration.Retired(
-                first.RuleId, first.RuleRevision, Authority), .. added.Skip(1)],
-        ];
-    }
 
-    private static void AssertLegacyWriterRejection(ParsedCanonicalManifest manifest)
-    {
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-            CanonicalManifestWriter.Write(manifest));
-        Assert.Equal(LegacyWriterMessage, exception.Message);
-    }
 
     private static byte[] InventoryFrame(IEnumerable<RuleDeclaration> rules)
     {
@@ -352,30 +302,7 @@ public sealed class ContractSliceAPredecessorManifestTests
         return result;
     }
 
-    private static string TransitionArray(IEnumerable<RuleTransitionDeclaration> transitions) =>
-        "[" + string.Join(",", transitions.Select(TransitionJson)) + "]";
 
-    private static string TransitionJson(RuleTransitionDeclaration transition)
-    {
-        var fields = new List<string>
-        {
-            $"\"ruleId\":\"{transition.RuleId.Value}\"",
-            $"\"kind\":\"{transition.Kind.Value}\"",
-        };
-        if (transition.PreviousRevision is not null)
-        {
-            fields.Add($"\"previousRevision\":{transition.PreviousRevision.Value}");
-        }
-        if (transition.CurrentRevision is not null)
-        {
-            fields.Add($"\"currentRevision\":{transition.CurrentRevision.Value}");
-        }
-        if (transition.ReviewedAuthority is not null)
-        {
-            fields.Add($"\"reviewedAuthority\":\"{transition.ReviewedAuthority.Value}\"");
-        }
-        return Object(fields);
-    }
 
     private static byte[] ReplaceExact(byte[] source, string original, string replacement)
     {

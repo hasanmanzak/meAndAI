@@ -97,7 +97,7 @@ passed both stable jobs.
 | ID | Related slice | Scenario | Expected result | Level | Intent review | Status | Automation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TEST-0209` <a name="test-0209"></a> | [FEAT-0065](README.md) composed qualification across [SUBF-0152](README.md#subf-0152), [SUBF-0153](README.md#subf-0153), [SUBF-0143](README.md#subf-0143), [SUBF-0144](README.md#subf-0144), and [SUBF-0154](README.md#subf-0154) | Vary rule, evidence, typed location, profile axes, acquisition state, evaluation state, debt, waiver, enforcement, and report values, including missing, duplicate, stale, unknown, malformed, and redacted data. | Invalid combinations fail construction. Valid reports preserve acquisition, per-rule evaluation, conformance verdict, and enforcement decision as four separate dimensions: incomplete/failed required acquisition creates `NotEvaluated` and aggregate `Indeterminate`, known violations remain visible, and enforcement follows the accepted phase/waiver/debt precedence. Canonical serialization, ordering, and digest are identical across supported runtimes and operating systems. | Component / contract / serialization | Nearest same-contract sibling: the [preserved WIP model scenario](https://github.com/hasanmanzak/meAndAI/blob/1873c98638ba4960734aadb188eb8c8d70b4bc52/docs/features/FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` because it directly exercises the composed production model with typed multi-surface locations and separated result dimensions, rather than aggregating child-test results or reusing the bounded repository report. | Planned | Future composed .NET qualification tests |
-| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: A canonical manifest/digest/typed-projection and declaration/artifact/component preflight without executable export; first qualification/complete export activation in C; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Planned | Sixteen of twenty live packets are `ReviewedLocalGreen` (`80%`) and cumulative A is `29/29`; partial Facts retain only `ContractSlice=A`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor recorded in the canonical owning finding; A-FULL and A-COMPLETE remain immutable hosted predecessor history. Canonical R `0014` is accepted, immutable, and was not rerun. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, reviews are `0/0/0`, expected red has not run, and implementation awaits freeze-delivery hosted green. `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive. Current qualification counts remain `[1,1,3,1,1]`; the parent scenario remains deferred to final atomic activation. Final Scenario/status/owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, and publication remain held; no full-A completion or DoD is claimed. |
+| `TEST-0210` <a name="test-0210"></a> | [SUBF-0143](README.md#subf-0143) | Execute the exact [typed-evaluation-kernel design](subf-0143-typed-evaluation-kernel-design.md) through ContractSlice A-D: A canonical manifest/digest/typed-projection and declaration/artifact/component preflight without executable export; first qualification/complete export activation in C; persistent writer/qualifier pairs, plan-bound Conformance qualification/cache, proof-candidate admission, provider-neutral capability/reference contracts; staged zero-to-N evaluation rounds with typed owner-sharded repository-target demand; retained acquisition outcomes; then kernel outputs, aggregation, and fresh RULE-0001..0005 repository/provider qualification. | The real five-rule Policy export is qualification-only and cannot mint a complete-baseline verdict; Application owns route/I/O but no protocol encoder; only exact instruction-bound proof candidates or kernel-synthesized absence enter the sealed context; repository/provider material shares compiled semantics while retaining distinct qualified locations; false applicability avoids evaluation-only evidence, unresolved remains NotEvaluated, acquisition Complete/Incomplete/Failed remains independent from rule status, empty repository-target demand performs no external I/O while the registered target index still produces the empty capability, external owners remain item custody rather than subject scope, independently metered four-counter producer/cache behavior is deterministic, integrity defects abort, and only the kernel mints referenced findings/evaluations. | Unit / component / qualification | Nearest same-contract siblings are [TEST-0004](../FEAT-0001-common-development-protocol/test-cases.md#test-0004), [TEST-0005](../FEAT-0001-common-development-protocol/test-cases.md#test-0005), [TEST-0175](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0175), [TEST-0176](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0176), [TEST-0177](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0177), and [TEST-0178](../FEAT-0047-v0142-clickable-cross-record-references/test-cases.md#test-0178); all are `Distinct`, and [TEST-0210](#test-0210) executes fresh fixtures rather than consuming sibling results. | Planned | Seventeen of twenty live packets are `ReviewedLocalGreen` (`85%`) and cumulative A is `30/30`; partial Facts retain only `ContractSlice=A`. `A-PREDECESSOR-01` remains the immutable exact hosted-green activation predecessor; A-FULL and A-COMPLETE remain immutable hosted predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen`; `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive. Current qualification counts remain `[1,1,3,1,1]`; the parent scenario remains deferred to final atomic activation. Final Scenario/status/owner/workflow/[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146), B/C/D, merge, release, and publication remain held; no full-A completion or DoD is claimed. |
 | `TEST-0211` <a name="test-0211"></a> | [SUBF-0144](README.md#subf-0144) | Evaluate protected baseline plus valid/invalid extensions, waivers, historical debt, policy activation snapshots, previous-trusted runtime, candidate runtime, differential results, and attempted candidate self-certification. | Extensions are additive and namespaced, baseline enforcement cannot be lowered, waiver/debt effects follow the deterministic truth table, stale activation fails closed, and authority transfer remains impossible from candidate-only evidence. | Component / security / differential | Nearest same-contract sibling: [TEST-0163](../FEAT-0041-v0132-exact-head-owner-attestation/test-cases.md#test-0163); Distinct protocol-runtime bootstrap and protected-policy contract. | Planned | Future .NET qualification and differential tests |
 | `TEST-0220` <a name="test-0220"></a> | [SUBF-0152](README.md#subf-0152) | Vary exact rule identity/revision and SHA-256 values, every closed profile/outcome token, SurfaceSet order/duplicates/mutability, ExecutionProfile axes, and the new project graph. | Invalid lexical, range, null, duplicate, and cross-dimension values fail closed; valid values are immutable and ordinal-exact; SurfaceSet and profile equality are input-order independent; the Domain assembly is BCL-only and no outcome dimension implies another. | Unit / architecture / contract | Nearest siblings: [TEST-0191](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0191), [TEST-0192](../FEAT-0059-csharp-operational-foundation/test-cases.md#test-0192), and preserved [TEST-0195](../FEAT-0060-any-consumer-governance-cli/test-cases.md#test-0195); `Distinct` scalar invalid-state and independent-axis contract in the new protocol Domain assembly. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; completed slice evidence is recorded below |
 | `TEST-0221` <a name="test-0221"></a> | [SUBF-0153](README.md#subf-0153) | Vary the exact inventory-derived [evidence-acquisition design](subf-0153-evidence-contract-design.md): requirement schemas, request target, observed boundary/scope, asserted-canonical payload, typed locations, bindings/root references, requirement acquisition, pagination, context, and observed/absent/failed result variants. | Schema-identified content is immutable and content-addressed but remains an untrusted assertion until exact [FEAT-0067](../FEAT-0067-evidence-acquisition-managed-consumer-integration/README.md) qualification; source/snapshot scope is structural; absent is `Incomplete`; failed has no valid context and remains `Failed`; requirement/context status is derived; invalid API, pagination, reference, schema, redaction, failure, collision, and union combinations fail construction. | Unit / architecture / contract | Same-contract classifications are fixed in the [design inventory](subf-0153-evidence-contract-design.md#distinct-test-intent-and-sibling-inventory). `Distinct` acquisition/evidence substrate rather than [SUBF-0143](README.md#subf-0143) codec/typed-model/derived-reference/finding/evaluation behavior, composed reports, or repository-only WIP. | Passing | `tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj`; completed through [PR #173](https://github.com/hasanmanzak/meAndAI/pull/173), exact main [`ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd`](https://github.com/hasanmanzak/meAndAI/commit/ff0f4f17ea65a9774f42b4c9ce660eeaa213b7fd), and [run 30603364256](https://github.com/hasanmanzak/meAndAI/actions/runs/30603364256) |
@@ -855,13 +855,13 @@ Never-activated `A-CONVERGE-01` is retired; `A-COMPLETE-PROFILE-01` is
 exact-head hosted-green `ReviewedLocalGreen` at the implementation identity
 recorded in the canonical owning finding; Windows
 passed in `44m13s`, Ubuntu in `11m50s`, publication verification was correctly
-skipped. Cumulative A is `29/29`; corrected canonical R `0013` and
-`A-PREDECESSOR-01` canonical R `0014` remain immutable. `A-PREDECESSOR-01` is
+skipped. Cumulative A is now `30/30`; canonical R `0013`, `0014`, and `0015`
+remain immutable and were not rerun. `A-PREDECESSOR-01` is
 the immutable exact hosted-green activation predecessor recorded in the
 canonical owning finding. Its subsequent records synchronization also passed
-exact-head hosted validation. `A-TRANSITION-01` is `FrozenDesign`/inactive at
-ordinal `0015`, reviews are `0/0/0`, expected red has not run, and
-implementation awaits freeze-delivery hosted green. Later A packets remain
+exact-head hosted validation. `A-TRANSITION-01` is packet-local
+`ReviewedLocalGreen` at ordinal `0015`; its implementation has no hosted claim
+yet. Later A packets remain
 Candidate/inactive;
 [TEST-0210](#test-0210) remains `Planned`, and no full-A completion, final
 activation, B/C/D, or DoD is claimed.
@@ -1206,13 +1206,13 @@ final delivery graph of `4096/4096` that is closed by the exact evidence in the 
 commit `canonical owning-finding correction head`, tree
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows
 passed in `44m13s`, Ubuntu in `11m50s`, publication verification was correctly
-skipped. Cumulative A is `29/29`; corrected canonical R `0013` and
-`A-PREDECESSOR-01` canonical R `0014` remain immutable. `A-PREDECESSOR-01` is
+skipped. Cumulative A is now `30/30`; canonical R `0013`, `0014`, and `0015`
+remain immutable and were not rerun. `A-PREDECESSOR-01` is
 the immutable exact hosted-green activation predecessor recorded in the
 canonical owning finding; its subsequent records synchronization also passed
-exact-head hosted validation. `A-TRANSITION-01` is `FrozenDesign`/inactive at
-ordinal `0015`, reviews are `0/0/0`, expected red has not run, and
-implementation awaits freeze-delivery hosted green. Later A packets remain
+exact-head hosted validation. `A-TRANSITION-01` is packet-local
+`ReviewedLocalGreen` at ordinal `0015`; its implementation has no hosted claim
+yet. Later A packets remain
 Candidate/inactive;
 [TEST-0210](#test-0210) remains `Planned`, and no full-A completion or DoD is
 claimed.
@@ -1306,18 +1306,20 @@ graph is `351 nodes / 4096 edges`. The subsequent records synchronization is
 also exact-head hosted-green at the identity in the canonical owning finding.
 `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor;
 that distinct gate permits the transition design freeze below. Transition
-implementation remains held until the freeze-delivery head is hosted-green.
+the transition packet is now local green, while its implementation delivery has
+no hosted claim yet.
 
-### `A-TRANSITION-01` frozen expected-red contract <a name="a-transition-01-freeze"></a>
+### `A-TRANSITION-01` reviewed-local-green contract and evidence <a name="a-transition-01-freeze"></a>
 
 The predecessor records-head gate is exact-hosted-green at the identity in the
-canonical owning finding. The transition packet is `FrozenDesign`/inactive with
+canonical owning finding, and the distinct freeze-delivery head also passed
+hosted validation before implementation. The transition packet is now
+packet-local `ReviewedLocalGreen` with
 exact FQN
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`,
-ordinal `0015`, and marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0015`. It is one
-Fact with only `ContractSlice=A` and no Scenario. D and independent red-team
-each closed `0/0/0`; P is `NotApplicable`. Expected red has not run, and
-implementation waits for the freeze-delivery head to become hosted-green.
+canonical-R ordinal `0015`, one Fact, only `ContractSlice=A`, and no Scenario.
+D, independent red-team, final code/test, and evidence/scope reviews each
+closed `0/0/0`; P is `NotApplicable`. No hosted implementation claim is made.
 
 The valid Existing fixture is protocol `0.18.0`, current/predecessor catalog
 versions `2/1`, current rules `RULE-0001`, `RULE-0002`, `RULE-0003`, and
@@ -1332,7 +1334,23 @@ legacy `InvalidOperationException` plus exact legacy message is the sole marker
 emitter. Type/message mismatch, Reader failure, setup failure, and all other
 exceptions are marker-free. The exact-FQN TRX must contain one selected,
 discovered, executed, and failed result, zero passed/skipped, and satisfy the
-established sixteen-part oracle. R runs once and is never rerun.
+established sixteen-part oracle. The accepted canonical R is
+`D:\Temp\meandai-test-0210-a-d396aa32b6504bf8b8d782f93f1ae9b9\TEST-0210-A-BEHAVIOR-RED-0015.trx`,
+SHA-256 `8E08CAF887D69FF38B247960501AF470DB0DC840154586DF2D4A78CD77D8780E`,
+with transient source `353` lines / SHA-256
+`5593A547D7347224081A28755D6F09B70D8CC5C7C5269B5DDBD1D756DEEBC428`.
+The complete oracle passed; R ran once and was never rerun.
+
+The first post-production exact-FQN validation then failed marker-free and
+console-only with `FormatException: protocol.manifest.component-closure`; no
+TRX was requested or produced. [FIND-0461](README.md#find-0461) classifies the test-fixture defect:
+retired current `RULE-0004` still inherited the A-FULL component binding
+`protocol.evaluator.rule-0004`, and Reader correctly rejected the orphan. The
+bounded test-only correction removed only that mapping and retained the shared
+Policy artifact. Corrected original-oracle source `364` lines / SHA-256
+`17FD5051B63EB14D44BDF501E108FC15D3FC10E1D666C853C52BC5FC630C5B09`
+passed the exact FQN `1/1` console-only. This diagnostic and checkpoint do not
+replace or rerun canonical R.
 
 Reader owns exactly `91` syntactically valid single-object negative mutations:
 required-field missing/duplicate/null/wrong-type matrices for each variant;
@@ -1353,6 +1371,28 @@ exactly `73` physical deletions, audited independently and never netted. The new
 test owns `CreateMixedTransitionManifest()` and every helper; lifecycle may
 consume that seam unchanged. Public API, workflow, lifecycle, resource,
 authenticity/coherence, and all downstream activation remain held.
+
+Final custody cleanup removed the marker, legacy message, and guard. The
+marker-free source is `351` lines / SHA-256
+`44A7F1B6A016105D088005DFECC6AE8B516890295890B7AA5FF10C13F5A1E4C6`.
+Realized Catalog/Reader/Writer additions are `55/98/12`, production additions
+are `165/240`, new-test additions are `351/450`, and combined additions are
+`516/690`. Predecessor cleanup is exact `+0/-73`, `410 -> 337`, and never
+netted. Marker-free focused and retained predecessor runs are `1/1`; cumulative
+A and full Conformance are `30/30` with equal identity sets; Domain is `98/98`.
+The exact local V artifacts are:
+
+- focused `D:\Temp\a-transition-green-final-b499d81a22d745938d2f47176fb48e83\TEST-0210-A-GREEN-FINAL-0015.trx`, SHA-256 `4379CF7870B15513B1F2066A3A0830AD19770B2E55C690AF4B5C3226DEA0A04C`;
+- retained predecessor `D:\Temp\a-predecessor-retained-final-18688052cc844581bcd792e39afac5e5\TEST-0210-A-PREDECESSOR-RETAINED-FINAL.trx`, SHA-256 `DFA4FD289FD342CBA76797FCA53BF71CF91AE4EDBFE672703EB0C9634DED94F8`, at predecessor test-source SHA-256 `AFC1D669C574D88C30DCF6C2F4DBB0E719867BA781489D09DBEF020F359BB26E`;
+- cumulative A `D:\Temp\a-transition-final-cumulative-0f450a6aa3da4f74974a53f6465a9999\TEST-0210-A-TRANSITION-CUMULATIVE.trx`, SHA-256 `E3AF629531B429E4775668676E9B2CB2E9F95204E291244591E8130A8AAF1EE0`;
+- full Conformance `D:\Temp\a-transition-full-conformance-15680ab0d73c400b8a1e71c38aa315cf\TEST-0210-A-TRANSITION-CONFORMANCE-FULL.trx`, SHA-256 `69C6596C0F4B50BC093C4F4370C5C9498001F51365DCA95E5673D7DF99E3B85F`;
+- Domain `D:\Temp\a-transition-final-domain-c2688059d17e456789cc0232da7a5c24\TEST-0210-A-TRANSITION-DOMAIN.trx`, SHA-256 `F75A09C4865FCDAB8288FD90423E59CAA1FB990B91D5651F73C2BA2967BDE959`.
+
+Release build is zero warnings/errors, format/diff/all `15` locks are green,
+and pass TRX oracles contain no diagnostic, attachment, or orphan testhost.
+Seventeen of twenty live packets are now `ReviewedLocalGreen` (`85%`).
+`A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive;
+the parent scenario, full A, and every downstream hold remain unchanged.
 
 ### `A-COMPLETE-PROFILE-01` corrected expected-red contract
 

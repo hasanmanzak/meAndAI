@@ -299,13 +299,14 @@ was correctly skipped, and the implementation tree graph is `4095/4096`.
 `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor
 recorded in the canonical owning finding. Its subsequent records
 synchronization also passed exact-head hosted validation; publication
-verification was correctly skipped. Canonical R `0014` is immutable and was not rerun.
+verification was correctly skipped. Canonical R `0014` and `0015` are
+immutable and were not rerun.
 Focused and retained validation are `1/1`; cumulative A and full
-Conformance are `29/29`; full Domain is `98/98`. Sixteen of twenty live packets
-are `ReviewedLocalGreen` (`80%`). The parent scenario remains `Planned`.
-`A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, design/red-team
-reviews are `0/0/0`, expected red has not run, and implementation awaits
-freeze-delivery hosted green. `A-LIFECYCLE-01`, `A-RESOURCE-01`, and
+Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
+packets are `ReviewedLocalGreen` (`85%`). The parent scenario remains
+`Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at ordinal
+`0015`; no hosted implementation evidence is claimed yet. `A-LIFECYCLE-01`,
+`A-RESOURCE-01`, and
 `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
@@ -363,8 +364,8 @@ with twenty-three ambiguous Git tree identities in
 [FIND-0446](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md#find-0446)
 owns their documentation/memory-only object classification correction; both
 findings close at the exact hosted-green predecessor above. Follow the
-[canonical log index](log/README.md) for the current transition FrozenDesign
-handoff. The complete-profile, admission-proof, and target parser/index/slot
+[canonical log index](log/README.md) for the current transition
+`ReviewedLocalGreen` handoff. The complete-profile, admission-proof, and target parser/index/slot
 reviewed-local-green handoffs cataloged there are historical.
 Do not let a
 small-context agent select its own contract, evidence ordinal, FQN, marker,

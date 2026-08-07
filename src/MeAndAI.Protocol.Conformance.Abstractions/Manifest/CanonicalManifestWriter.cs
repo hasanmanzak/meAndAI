@@ -36,7 +36,6 @@ internal static class CanonicalManifestWriter
             (manifest.AuthorityKind.Equals(CatalogAuthorityKind.CompleteProtocolSnapshot) &&
              slice is null && complete is not null);
         if (!validUnion ||
-            (complete is not null && !HasCurrentAddedTransitions(complete)) ||
             manifest.ArtifactFiles.Count == 0 ||
             manifest.Components.Count == 0)
         {
@@ -65,30 +64,6 @@ internal static class CanonicalManifestWriter
         buffer.WrittenSpan.CopyTo(result);
         result[^1] = (byte)'\n';
         return result;
-    }
-
-    private static bool HasCurrentAddedTransitions(CompleteCatalogDeclaration catalog)
-    {
-        if (catalog.Transitions.Count != catalog.Rules.Count)
-        {
-            return false;
-        }
-
-        for (var index = 0; index < catalog.Rules.Count; index++)
-        {
-            var rule = catalog.Rules[index];
-            var transition = catalog.Transitions[index];
-            if (!transition.RuleId.Equals(rule.RuleId) ||
-                !transition.Kind.Equals(RuleTransitionKind.Added) ||
-                transition.PreviousRevision is not null ||
-                !Equals(transition.CurrentRevision, rule.RuleRevision) ||
-                transition.ReviewedAuthority is null)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private static void WriteManifest(
@@ -158,8 +133,18 @@ internal static class CanonicalManifestWriter
             writer.WriteStartObject();
             WriteCanonicalString(writer, "ruleId", transition.RuleId.Value);
             WriteCanonicalString(writer, "kind", transition.Kind.Value);
-            writer.WriteNumber("currentRevision", transition.CurrentRevision!.Value);
-            WriteCanonicalString(writer, "reviewedAuthority", transition.ReviewedAuthority!.Value);
+            if (transition.PreviousRevision is not null)
+            {
+                writer.WriteNumber("previousRevision", transition.PreviousRevision.Value);
+            }
+            if (transition.CurrentRevision is not null)
+            {
+                writer.WriteNumber("currentRevision", transition.CurrentRevision.Value);
+            }
+            if (transition.ReviewedAuthority is not null)
+            {
+                WriteCanonicalString(writer, "reviewedAuthority", transition.ReviewedAuthority.Value);
+            }
             writer.WriteEndObject();
         }
         writer.WriteEndArray();

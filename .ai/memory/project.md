@@ -134,13 +134,13 @@ Last verified: **2026-08-04**
   `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
   predecessor recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
-  verification was correctly skipped. Canonical R
-  `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
-  Sixteen of twenty live packets are green (`80%`). The parent scenario remains
-  `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`,
-  reviews are `0/0/0`, expected red has not run, and implementation awaits
-  freeze-delivery hosted green. Later A packets remain Candidate/inactive.
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
+  Seventeen of twenty live packets are green (`85%`). The parent scenario
+  remains `Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at
+  ordinal `0015`; no hosted implementation evidence is claimed yet. Later A
+  packets remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current [canonical log index](log/README.md). The
@@ -679,13 +679,13 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
   predecessor recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
-  verification was correctly skipped. Canonical R
-  `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
-  Sixteen of twenty live packets are green (`80%`). The parent scenario remains
-  `Planned`. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`,
-  reviews are `0/0/0`, expected red has not run, and implementation awaits
-  freeze-delivery hosted green. Later A packets remain Candidate/inactive.
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
+  Seventeen of twenty live packets are green (`85%`). The parent scenario
+  remains `Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at
+  ordinal `0015`; no hosted implementation evidence is claimed yet. Later A
+  packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1891,14 +1891,14 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
   predecessor recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
-  verification was correctly skipped. Canonical R
-  `0014` is accepted, immutable, and was not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `29/29`; full Domain is `98/98`.
+  verification was correctly skipped. Canonical R `0014` and `0015` are
+  accepted, immutable, and were not rerun. Focused and retained validation are
+  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   The live denominator is twenty and current `ReviewedLocalGreen` progress is
-  sixteen (`80%`). The parent scenario remains `Planned`. `A-TRANSITION-01` is
-  `FrozenDesign`/inactive at ordinal `0015`, reviews are `0/0/0`, expected red
-  has not run, and implementation awaits freeze-delivery hosted green. Later A
-  packets remain Candidate/inactive.
+  seventeen (`85%`). The parent scenario remains `Planned`. `A-TRANSITION-01`
+  is packet-local `ReviewedLocalGreen` at ordinal `0015`; no hosted
+  implementation evidence is claimed yet. Later A packets remain
+  Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

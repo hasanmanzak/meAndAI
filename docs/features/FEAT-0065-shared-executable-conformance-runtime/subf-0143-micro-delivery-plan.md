@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Delivery control for [SUBF-0143](README.md#subf-0143); operational labels below are not new protocol IDs |
-| Status | Sixteen of twenty live packets are `ReviewedLocalGreen` (`80%`), cumulative A is `29/29`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor recorded in the canonical owning finding; A-FULL and A-COMPLETE remain immutable hosted predecessor history. Canonical R `0014` is accepted, immutable, and was not rerun. `A-TRANSITION-01` is `FrozenDesign`/inactive at ordinal `0015`, design/red-team reviews are `0/0/0`, expected red has not run, and implementation awaits freeze-delivery hosted green. `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive. Corrected canonical R `0013` also remains immutable; invalid diagnostic observation `0012` remains excluded and immutable. All six A-FULL findings are resolved. Every partial Fact retains only `ContractSlice=A`; no full-A completion or DoD is claimed. |
+| Status | Seventeen of twenty live packets are `ReviewedLocalGreen` (`85%`), cumulative A is `30/30`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01` remains the immutable exact hosted-green activation predecessor; A-FULL and A-COMPLETE remain immutable hosted predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen`; `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive. Corrected canonical R `0013` and predecessor canonical R `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. Every partial Fact retains only `ContractSlice=A`; no full-A completion or DoD is claimed. |
 | Parent scenario | [TEST-0210](test-cases.md#test-0210), always `ContractSlice=A` until A closes |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Canonical design | [Typed evaluation kernel design](subf-0143-typed-evaluation-kernel-design.md) |
@@ -307,7 +307,7 @@ the [parser-record-slot handoff](../../../.ai/memory/log/2026-08-01-feat-0065-su
 and the [governed-reference-slots handoff](../../../.ai/memory/log/2026-08-02-feat-0065-subf-0143-contractslice-a-governed-reference-slots.md)
 are historical checkpoints; the target-parser, admission, projector, and
 [full-manifest reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md)
-are also historical. Follow the current transition FrozenDesign contract below.
+are also historical. Follow the current transition `ReviewedLocalGreen` evidence below.
 
 ## Ordered remaining ContractSlice A queue
 
@@ -365,7 +365,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-FULL-MANIFEST-01` | Exact-head hosted-green `ReviewedLocalGreen` at correction head `canonical owning-finding correction head`, tree `canonical owning-finding correction tree`, run `30834117740`, graph `4094/4096`; final record-delivery graph `4096/4096` is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped | Ordinal `0011`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot`; canonical R `F586...0DB`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1` (`B11E...0489`); cumulative A `27/27` (`0392...7A90`); Conformance `27/27` (`97C0...13E2`); Domain `98/98` (`0095...016D`); source `353` / `863B...D4CA`; Catalog `456E...7EF5`; production/test/combined `77/80`, `364/620`, `441/700`; StructureOnly `484633ms`; publication evidence `7/7` in `329.3s`; hosted Windows `15m53s`, Ubuntu `17m50s`, publication skipped | All six findings resolved; canonical R preserved; no unchanged-source original-green claim; current/deferred qualification counts `[1,1,3,1,1]` / `[2,2,4,2,2]`; record closure adds only two reserved evidence relations | [Full-manifest reviewed-local-green handoff](../../../.ai/memory/log/2026-08-03-feat-0065-subf-0143-contractslice-a-full-manifest-freeze.md) |
 | `A-COMPLETE-PROFILE-01` | Exact-head hosted-green `ReviewedLocalGreen` at the implementation identity recorded in the canonical owning finding; Windows `44m13s`, Ubuntu `11m50s`, publication verification skipped | Corrected ordinal `0013`; exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions`; one Fact, only `ContractSlice=A`, no Scenario. The discovered `0012` identity is retained only as an invalid diagnostic and is never retried or promoted. | P nullable-union compile seam; accepted Writer-only canonical R `34CD...24C7C`; focused/cumulative/Conformance/Domain `1/1`, `28/28`, `28/28`, `98/98` | Renewed D/RT/source/canonical-R and corrected implementation reviews `0/0/0`; production `+283/-37`, test `+162/-1`, combined additions `445`, below all hard caps | Corrected evidence-identity freeze and packet-local plus exact-head hosted-green evidence below; no full-A completion, final activation, or DoD claim |
 | `A-PREDECESSOR-01` | Immutable exact hosted-green activation predecessor | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests`; ordinal `0014`; marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0014`; one Fact, only `ContractSlice=A`, no Scenario | P `NotApplicable`; accepted immutable R `DCC53EBC...0F5567`; focused/retained/cumulative A/Conformance/Domain `1/1`, `1/1`, `29/29`, `29/29`, `98/98`; V local and exact-head hosted green | D/RT and three independent final reviews `0/0/0`; Reader/Writer/Catalog production gross `70/36/14`, production/test/combined `120/416/536`; StructureOnly and locks green | Canonical owning finding retains exact implementation, correction, and records-head evidence |
-| `A-TRANSITION-01` | `FrozenDesign` / inactive | `0015`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0015`; one Fact, only `ContractSlice=A`, no Scenario | None; expected red has not run | D/RT `0/0/0`; Reader/Writer/Catalog caps `125/45/70`, production `240`, retained test `377`, gross tests `450`, combined `690`; exact `73` predecessor deletions separate | Indexed design freeze; implementation evidence None |
+| `A-TRANSITION-01` | `ReviewedLocalGreen` | `0015`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; accepted immutable canonical R; one Fact, only `ContractSlice=A`, no Scenario | Marker-free focused `1/1`, retained predecessor `1/1`, cumulative A and Conformance `30/30`, Domain `98/98`; exact `91+7` matrix | D/RT and final reviews `0/0/0`; Reader/Writer/Catalog additions `98/12/55`, production/test/combined `165/351/516`; exact predecessor cleanup `+0/-73` separate | [FIND-0461](README.md#find-0461) resolved; local evidence complete, hosted implementation evidence not yet claimed |
 | `A-LIFECYCLE-01` | Candidate | None | None | N/A | None |
 | `A-RESOURCE-01` | Candidate | None | None | N/A | None |
 | `A-CONVERGE-02` | Candidate | None | None | N/A | None |
@@ -455,19 +455,19 @@ correction and subsequent records synchronization are both hosted-green at the
 identities in the canonical owning finding; publication verification was
 correctly skipped. `A-PREDECESSOR-01` is the immutable exact hosted-green
 activation predecessor. That distinct gate now permits the transition design
-freeze below; transition implementation remains held until the freeze-delivery
-head is itself hosted-green.
+freeze below. The freeze-delivery head subsequently passed hosted validation;
+the transition is now local green, with no hosted implementation claim yet.
 
-#### FrozenDesign `A-TRANSITION-01` operational contract <a name="a-transition-01-freeze"></a>
+#### ReviewedLocalGreen `A-TRANSITION-01` contract and evidence <a name="a-transition-01-freeze"></a>
 
 The predecessor records-head gate is now exact-hosted-green at the identity in
-the canonical owning finding. The packet is `FrozenDesign`/inactive with exact
+the canonical owning finding. The packet is packet-local `ReviewedLocalGreen`
+with exact
 FQN
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`,
 ordinal `0015`, marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0015`, one Fact, only
-`ContractSlice=A`, and no Scenario. D and independent red-team each closed
-`0/0/0`. P is `NotApplicable`; expected red has not run. Implementation cannot
-start until this freeze-delivery head is exact-hosted-green.
+`ContractSlice=A`, and no Scenario. D, independent red-team, final code/test,
+and evidence/scope reviews each closed `0/0/0`. P is `NotApplicable`.
 
 The positive carrier is protocol `0.18.0`, current/predecessor catalog versions
 `2/1`, current `RULE-0001`, `RULE-0002`, `RULE-0003`, `RULE-0005`, and sorted
@@ -489,7 +489,10 @@ Canonical R performs all valid setup outside one guard and assigns only from
 `CanonicalManifestWriter.Write(parsedExisting)` inside it. Only exact legacy
 `InvalidOperationException` and exact legacy message may emit the marker. The
 exact-FQN run must have one selected/discovered/executed/failed result, zero
-passed/skipped, and satisfy all sixteen TRX oracles. R runs once only.
+passed/skipped, and satisfy all sixteen TRX oracles. Accepted canonical R is
+SHA-256 `8E08CAF887D69FF38B247960501AF470DB0DC840154586DF2D4A78CD77D8780E`
+with source `353` lines / `5593A547D7347224081A28755D6F09B70D8CC5C7C5269B5DDBD1D756DEEBC428`.
+R ran once and was never rerun.
 
 Green owns exactly `91` Reader vectors and `7` direct Catalog vectors. Reader
 enumerates required-field four-way matrices for every variant, optional
@@ -514,6 +517,19 @@ atomic Writer guard/serializer, atomic Reader raw/parser/projection/validator,
 the exact `91+7` green matrix, exact predecessor cleanup, then focused,
 retained, cumulative, review, and evidence closure. `A-LIFECYCLE-01`,
 `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive.
+
+That order completed locally. [FIND-0461](README.md#find-0461) records the marker-free console-only
+fixture diagnostic and bounded removal of inherited
+`protocol.evaluator.rule-0004`; it produced no TRX and is not green evidence.
+Corrected original-oracle source `364` / `17FD5051B63EB14D44BDF501E108FC15D3FC10E1D666C853C52BC5FC630C5B09`
+passed `1/1` console-only. Final marker-free source is `351` /
+`44A7F1B6A016105D088005DFECC6AE8B516890295890B7AA5FF10C13F5A1E4C6`.
+Focused and retained predecessor runs are `1/1`; cumulative A and Conformance
+are `30/30`; Domain is `98/98`. Reader/Writer/Catalog additions are `98/12/55`,
+production/test/combined additions are `165/351/516`, and predecessor cleanup
+is exact `+0/-73` separately. Release build, format, diff, `15` locks, pass TRX
+oracles, and final reviews are green. This local evidence makes no hosted,
+publication, full-A, or DoD claim.
 
 #### Reviewed-local-green `A-FINDING-01` design and evidence <a name="a-finding-01-freeze"></a>
 
@@ -1780,13 +1796,12 @@ retired/excluded. The current exact hosted predecessor boundary is
 `canonical owning-finding correction head`,
 tree `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, publication verification was
-correctly skipped. Cumulative A is now `29/29`; canonical R `0013` and
-`A-PREDECESSOR-01` canonical R `0014` remain accepted and immutable.
+correctly skipped. Cumulative A is now `30/30`; canonical R `0013`, `0014`,
+and `0015` remain accepted, immutable, and were not rerun.
 `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor
-recorded in the canonical owning finding. `A-TRANSITION-01` is
-`FrozenDesign`/inactive at ordinal `0015`, reviews are `0/0/0`, expected red has
-not run, and implementation awaits freeze-delivery hosted green. Later A
-packets remain Candidate/inactive;
+recorded in the canonical owning finding. `A-TRANSITION-01` is packet-local
+`ReviewedLocalGreen` at ordinal `0015`; its implementation has no hosted claim
+yet. Later A packets remain Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210) remains `Planned`, and no full-A completion,
 final activation, B/C/D, or DoD is claimed.
 Hosted run `30798854880` passed Windows in `14m58s` and
