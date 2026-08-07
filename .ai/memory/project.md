@@ -1,6 +1,6 @@
 # Project Snapshot
 
-Last verified: **2026-08-04**
+Last verified: **2026-08-07**
 
 ## Verified facts
 
@@ -138,15 +138,16 @@ Last verified: **2026-08-04**
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
-  `ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
-  hosted validation before `A-LIFECYCLE-01` activation. Later A
-  packets remain Candidate/inactive.
+  remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
+  hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
+  `FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
+  delta `0`; implementation waits for exact hosted-green freeze delivery.
+  `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
   packet gates. Follow the current [canonical log index](log/README.md). The
-  [predecessor-manifest exact-head hosted-green handoff](log/2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)
-  is immutable history; the admission-proof reviewed-local-green handoff,
+  predecessor-manifest exact-head hosted-green handoff indexed there is
+  immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
   finding declaration reviewed-local-green handoff,
   the parser-record-slot handoff in the canonical log index
@@ -684,14 +685,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
-  `ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
-  hosted validation before `A-LIFECYCLE-01` activation. Later A
-  packets remain Candidate/inactive.
+  remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
+  hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
+  `FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
+  delta `0`; implementation waits for exact hosted-green freeze delivery.
+  `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
-- Freshness and review condition: refreshed 2026-08-04 for the exact recovery,
+- Freshness and review condition: refreshed 2026-08-07 for the exact recovery,
   strict redraw, exact parser-record and complete-profile hosted-green heads,
   governed-reference freeze, and umbrella authority; review when the micro
   state machine, packet brief, or checkpoint authority changes.
@@ -1897,11 +1899,12 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   The live denominator is twenty and current `ReviewedLocalGreen` progress is
-  seventeen (`85%`). The parent scenario remains `Planned`. `A-TRANSITION-01`
-  is exact implementation-head hosted-green `ReviewedLocalGreen` at ordinal
-  `0015`; its records-only closure head must pass hosted validation before
-  `A-LIFECYCLE-01` activation. Later A packets remain
-  Candidate/inactive.
+  seventeen (`85%`). The parent scenario remains `Planned`. Synchronized
+  `A-TRANSITION-01` is immutable exact hosted-green predecessor history at
+  ordinal `0015`. `A-LIFECYCLE-01` is `FrozenDesign`/inactive with
+  `R=NotApplicable`, `TestOnlyGreen`, and production delta `0`; implementation
+  waits for exact hosted-green freeze delivery. `A-RESOURCE-01` and
+  `A-CONVERGE-02` remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

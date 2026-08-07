@@ -304,11 +304,11 @@ immutable and were not rerun.
 Focused and retained validation are `1/1`; cumulative A and full
 Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
 packets are `ReviewedLocalGreen` (`85%`). The parent scenario remains
-`Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
-`ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
-hosted validation before `A-LIFECYCLE-01` activation. `A-LIFECYCLE-01`,
-`A-RESOURCE-01`, and
-`A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
+`Planned`. Synchronized `A-TRANSITION-01` is immutable exact hosted-green
+predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
+`FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
+delta `0`; implementation waits for exact hosted-green freeze delivery.
+`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

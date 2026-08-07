@@ -6,7 +6,7 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A transition reviewed-local-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md),
+[ContractSlice A lifecycle FrozenDesign handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md),
 the immutable
 [ContractSlice A predecessor-manifest exact-head hosted-green handoff](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md),
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
@@ -288,11 +288,11 @@ correctly skipped. Canonical R `0014` and `0015` are immutable and were not
 rerun. Focused and retained validation are `1/1`; cumulative A and full
 Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
 packets are green (`85%`). [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
-`ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
-hosted validation before `A-LIFECYCLE-01` activation.
-`A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02`
-remain Candidate/inactive.
+remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
+hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
+`FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
+delta `0`; implementation waits for exact hosted-green freeze delivery.
+`A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
 workflow, efficiency activation,
 or B/C/D activation is claimed.
@@ -384,6 +384,7 @@ conversations while disallowing force pushes and deletion.
 
 ## History
 
+- [2026-08-07 - ContractSlice A lifecycle FrozenDesign](2026-08-07-feat-0065-subf-0143-contractslice-a-lifecycle-freeze.md)
 - [2026-08-04 - ContractSlice A transition reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-transition-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A predecessor-manifest exact-head hosted-green](2026-08-04-feat-0065-subf-0143-contractslice-a-predecessor-manifest-freeze.md)
 - [2026-08-04 - SUBF-0143 ContractSlice A complete-profile reviewed-local-green](2026-08-04-feat-0065-subf-0143-contractslice-a-complete-profile-freeze.md)
