@@ -367,7 +367,7 @@ current handoff. `None` is exact while the packet remains a candidate.
 | `A-PREDECESSOR-01` | Immutable exact hosted-green predecessor history | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests`; ordinal `0014`; marker/TRX stem `TEST-0210-A-BEHAVIOR-RED-0014`; one Fact, only `ContractSlice=A`, no Scenario | P `NotApplicable`; accepted immutable R `DCC53EBC...0F5567`; focused/retained/cumulative A/Conformance/Domain `1/1`, `1/1`, `29/29`, `29/29`, `98/98`; V local and exact-head hosted green | D/RT and three independent final reviews `0/0/0`; Reader/Writer/Catalog production gross `70/36/14`, production/test/combined `120/416/536`; StructureOnly and locks green | Canonical owning finding retains exact implementation, correction, and records-head evidence |
 | `A-TRANSITION-01` | Immutable exact hosted-green predecessor history | `0015`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; accepted immutable canonical R; one Fact, only `ContractSlice=A`, no Scenario | Marker-free focused `1/1`, retained predecessor `1/1`, cumulative A and Conformance `30/30`, Domain `98/98`; exact `91+7` matrix; implementation and synchronized records heads exact-hosted-green | D/RT and final reviews `0/0/0`; Reader/Writer/Catalog additions `98/12/55`, production/test/combined `165/351/516`; exact predecessor cleanup `+0/-73` separate | [FIND-0461](README.md#find-0461) resolved; the canonical transition handoff retains exact closure evidence |
 | `A-LIFECYCLE-01` | Exact implementation-head hosted-green `ReviewedLocalGreen`; immutable identities in the canonical handoff | `R=NotApplicable`; no ordinal/marker/red TRX; `MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`; `TestOnlyGreen`; one Fact, only `ContractSlice=A`, no Scenario | Focused `1/1`; cumulative A and full Conformance `31/31`; Domain `98/98`; source `266` lines / `704F...EDCF`; production `0`; Ubuntu `19m36s`, Windows `36m02s`, publication skipped | Initial post-green review `0/1/0`; bounded N4 correction; fresh code/test and evidence/scope reviews each `0/0/0`; build/format/diff/fifteen locks green | Canonical memory history |
-| `A-RESOURCE-01` | `FrozenDesign` / inactive | `0016`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`; one Fact, only `ContractSlice=A`, no Scenario | None; P=`NotApplicable`; no red or green execution yet | D/RT pending on this records tree; implementation remains gated by exact-head hosted green | [Resource-boundary FrozenDesign handoff](../../../.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md) |
+| `A-RESOURCE-01` | `FrozenDesign` / inactive | `0016`; `MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`; one Fact, only `ContractSlice=A`, no Scenario | None; P=`NotApplicable`; no red or green execution yet | D/RT pending on this records tree; implementation remains gated by exact-head hosted green | Canonical memory history |
 | `A-CONVERGE-02` | Candidate | None | None | N/A | None |
 
 #### Exact-head hosted-green `A-PREDECESSOR-01` contract and evidence
@@ -1902,24 +1902,8 @@ semantic owner of the bounded generic multi-rule/shared-slot/distinct-admission
 closure exposed by its exact snapshot. `A-CONVERGE-02` owns no production fix
 and manufactures no red evidence.
 
-`A-RESOURCE-01-D` freezes exact FQN
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`.
-P is `NotApplicable`. R is ordinal `0016` with exact marker/TRX stem
-`TEST-0210-A-BEHAVIOR-RED-0016`; unchanged production must expose only legacy
-`FormatException` message `Expected JSON token 'String'.` with no inner
-exception. G changes only `CanonicalManifestReader.MaximumDepth` from `64` to
-`9` and requires the tenth container to become outer `FormatException` message
-`The policy manifest is not canonical JSON.` with `JsonException` inner
-evidence. Byte one-over owns exact `FormatException` message `The canonical
-policy manifest exceeds the byte ceiling.` with null inner exception; token
-one-over owns exact `FormatException` message `The policy manifest exceeds the
-JSON token ceiling.` with null inner exception. Production is exactly `+1/-1`, new test additions are capped at
-`650`, and combined additions at `651`; any wider change renews D/RT. Large
-carriers run sequentially with deterministic fixed-width aliases, streaming
-token counts, and a fresh parent sampling the focused `dotnet test` process
-tree every `100ms`. Green custody requires at most `90s` duration, sampled
-aggregate working set at most `1,610,612,736` bytes (`1.5 GiB`), and observable
-descendants; a failed measurement or cap breach renews D/RT.
+The ledger above and [canonical design](subf-0143-typed-evaluation-kernel-design.md#canonical-manifest-contract)
+freeze `A-RESOURCE-01-D/R/G`; any variance renews D/RT.
 
 The live queue has 20 routing packages. The retired combined-label tombstone is
 not counted. Each semantic package expands into the seven

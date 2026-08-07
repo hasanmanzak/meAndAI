@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze/implementation/records deliveries remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`; no red or implementation evidence exists yet. `A-CONVERGE-02` remains Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
+| Status | Gate 2 accepted/merged; `18/20` packets are `ReviewedLocalGreen` (`90%`) and cumulative A is `31/31`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; partial Facts retain only `ContractSlice=A`. Lifecycle records are immutable exact-hosted-green predecessor history. `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and R=`0016`, with no execution; `A-CONVERGE-02` is Candidate/inactive. Canonical R `0013`-`0015` remain immutable, invalid `0012` remains excluded, and retired `A-CONVERGE-01` stays excluded. Final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1524,20 +1524,18 @@ The `MeAndAI.Protocol.Application` internal factory used by [FEAT-0068](../FEAT-
 and the `MeAndAI.Protocol.Conformance.Tests` [TEST-0210](test-cases.md#test-0210) friend call this one parser; neither implements another copy/parser path.
 There is no public manifest constructor or factory.
 
-`A-RESOURCE-01` freezes three independent `ParseCanonical` carriers. Byte
-equality/one-over uses qualification compatibility aliases while staying below
-the token ceiling. Token equality/one-over uses sorted unique fixed-width
-aliases while staying below the byte ceiling. Depth equality reuses the full
-manifest graph at exact reachable depth `9`; depth one-over replaces its
-deepest `componentKey` string scalar with an object, creating a tenth container
-without pretending that the result is grammar-valid. The unchanged reader's
-legacy `Expected JSON token 'String'.` error ownership is the sole expected-red
-seam. Green changes only `CanonicalManifestReader.MaximumDepth` from `64` to
-`9`, so the JSON reader owns that one-over before schema scalar parsing. A
-fresh parent samples the exact focused `dotnet test` process tree every `100ms`
-from root launch through exit. Green custody requires duration at most `90s`
-and sampled aggregate working set at most `1,610,612,736` bytes (`1.5 GiB`);
-unobservable descendants or either exceeded cap reopen D/RT.
+`A-RESOURCE-01` freezes independent sequential byte/token/depth carriers:
+qualification aliases, sorted unique fixed-width aliases, and the full depth-9
+graph with deepest `componentKey` scalar replaced by a tenth container. Legacy
+R owns exact `Expected JSON token 'String'.` with no inner exception; G changes
+only `CanonicalManifestReader.MaximumDepth` from `64` to `9`. Production is
+`+1/-1`; test/combined additions are capped at `650/651`. A fresh parent samples
+the exact focused process tree every `100ms` from root launch through root exit;
+observable descendants, at most `90s`, and at most `1,610,612,736` bytes
+(`1.5 GiB`) are mandatory. Carriers are in-memory and sequential, use pre-sized
+and released buffers plus streaming token counts, and use no disk fixture,
+`JsonDocument`, naive repeated concatenation, ambient value, or parallel
+million-token construction. Any variance reopens D/RT.
 
 `FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
 boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,

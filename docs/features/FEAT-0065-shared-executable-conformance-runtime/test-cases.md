@@ -1440,38 +1440,11 @@ future production need still stops for renewed D/RT.
 
 ### `A-RESOURCE-01` FrozenDesign contract <a name="a-resource-01-freeze"></a>
 
-The exact FQN is
-`MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`.
-It will contain one Fact, only `ContractSlice=A`, and no Scenario. D is frozen;
-P is `NotApplicable`; R owns ordinal `0016` and marker/TRX stem
-`TEST-0210-A-BEHAVIOR-RED-0016`; G is bounded to the retained test plus the
-single reader depth-constant correction.
-
-Three independent sequential carriers prove byte, token, and reachable-depth
-equality/one-over. Byte construction remains comfortably below the token
-ceiling; token construction remains comfortably below the byte ceiling. The
-valid full-manifest carrier reaches exact container depth `9`. Because no
-grammar-valid schema-1 depth-`10` manifest exists, the one-over oracle replaces
-only its deepest `componentKey` scalar with an object and tests error ownership:
-unchanged production yields legacy `Expected JSON token 'String'.` with no
-inner exception; green yields outer `The policy manifest is not canonical
-JSON.` with a `JsonException` inner exception.
-
-Byte equality passes and byte one-over throws exact `FormatException` message
-`The canonical policy manifest exceeds the byte ceiling.` with null inner
-exception. Token equality passes and token one-over throws exact
-`FormatException` message `The policy manifest exceeds the JSON token ceiling.`
-with null inner exception.
-
-The production delta is exactly `MaximumDepth = 64` to `9`; every other budget
-and surface remains unchanged. Test/combined addition caps are `650/651` and
-production is exactly `+1/-1`. A fresh parent samples the exact focused
-`dotnet test` process tree every `100ms` from root launch through root exit.
-Green custody requires duration at most `90s`, sampled aggregate working set at
-most `1,610,612,736` bytes (`1.5 GiB`), and observable descendants; a failed
-measurement or cap breach reopens D/RT.
-No red source, implementation, progress increment, or completion is claimed by
-this records-only freeze.
+D freezes the [ledger](subf-0143-micro-delivery-plan.md#packet-evidence-ledger) FQN/trait and R=`0016`
+/ `TEST-0210-A-BEHAVIOR-RED-0016`. Carriers, oracles, `MaximumDepth 64 -> 9`,
+caps, and measurement are canonical in the
+[design](subf-0143-typed-evaluation-kernel-design.md#canonical-manifest-contract).
+No execution or completion is claimed.
 
 ### `A-COMPLETE-PROFILE-01` corrected expected-red contract
 
