@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Seventeen of twenty live packets are `ReviewedLocalGreen` (`85%`), cumulative A is `30/30`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, and synchronized `A-TRANSITION-01` remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is `FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production delta `0`; implementation waits for this freeze delivery to become exact hosted-green. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
+| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze delivery remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -173,8 +173,9 @@ canonical owning finding. The records synchronization that opened the design
 freeze also passed exact-head hosted validation. Canonical R `0014` and `0015`
 are accepted, immutable, and were not rerun. Synchronized `A-TRANSITION-01` is
 immutable exact hosted-green predecessor history at ordinal `0015`.
-`A-LIFECYCLE-01` is FrozenDesign/inactive and awaits exact hosted-green freeze
-delivery; `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive; no
+The lifecycle freeze delivery is exact-hosted-green. `A-LIFECYCLE-01` is
+packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
+Candidate/inactive; no
 full-A completion or DoD is claimed.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
@@ -978,7 +979,7 @@ Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
 final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
-Cumulative A is now `30/30`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+Cumulative A is now `31/31`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
 `ReviewedLocalGreen` at the implementation identity recorded in the canonical
 owning finding;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, publication verification was
@@ -988,8 +989,9 @@ history recorded in the canonical owning finding; its subsequent records
 synchronization is exact-head hosted-green.
 Canonical R `0014` and `0015` are accepted, immutable, and were not rerun.
 Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
-history at ordinal `0015`. `A-LIFECYCLE-01` is FrozenDesign/inactive and awaits
-exact hosted-green freeze delivery; `A-RESOURCE-01` and `A-CONVERGE-02` remain
+history at ordinal `0015`. The lifecycle freeze delivery is exact-hosted-green;
+`A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and
+`A-CONVERGE-02` remain
 Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210)
 remains `Planned`, and no full-A completion or DoD is claimed.
@@ -1202,17 +1204,19 @@ Conformance are `30/30`; Domain is `98/98`. Reader/Writer/Catalog additions are
 cleanup is exact `+0/-73` separately. Release build, format, diff, `15` locks,
 pass TRX oracles, and final reviews are green.
 
-The implementation and synchronized records delivery are exact-hosted-green.
+The implementation and synchronized records delivery are exact-hosted-green;
+the lifecycle records-only freeze delivery also passed Ubuntu in `20m44s` and
+Windows in `46m51s`, with publication correctly skipped.
 Resource limits, public/friend/project/lock/workflow changes, final activation,
 B/C/D, merge, release, and publication remain held. `A-LIFECYCLE-01` is
-FrozenDesign/inactive; `A-RESOURCE-01` and `A-CONVERGE-02` remain
+packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
 Candidate/inactive.
 
-### FrozenDesign `A-LIFECYCLE-01` operational boundary <a name="a-lifecycle-01-freeze"></a>
+### `A-LIFECYCLE-01` operational boundary and local-green closure <a name="a-lifecycle-01-freeze"></a>
 
 The synchronized A-TRANSITION records delivery is the immutable exact
 hosted-green activation predecessor recorded in the canonical lifecycle
-handoff. The lifecycle packet owns one future test Fact at exact FQN
+handoff. The lifecycle packet owns one test Fact at exact FQN
 `MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`,
 only `ContractSlice=A`, and no Scenario. R is `NotApplicable`, no ordinal,
 marker, or red TRX is allocated, G is `TestOnlyGreen`, and production delta is
@@ -1238,9 +1242,12 @@ ArgumentException category/message.
 Only new `ContractSliceALifecycleManifestTests.cs` may change. Production and
 all existing tests/helpers plus public/friend/project/package/lock/workflow
 surfaces are locked. Target test size is `320`, hard test/combined cap is `420`,
-and production cap is `0`. The unchanged-production original oracle must be
-green; any failure or production need stops for renewed D/RT. Progress remains
-`17/20` (`85%`) and cumulative A `30/30` until local V closes.
+and production cap is `0`. The unchanged-production original oracle passed
+`1/1`. After one review-owned N4 specificity correction, retained source is
+`266` lines / `704F...EDCF`, focused is `1/1`, cumulative A and full
+Conformance are `31/31`, Domain is `98/98`, production remains `0`, and fresh
+code/test plus evidence/scope reviews each closed `0/0/0`. Progress is `18/20`
+(`90%`); any future production need still reopens D/RT.
 
 ### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
 
@@ -8337,13 +8344,15 @@ exact-head hosted-green `ReviewedLocalGreen` at commit
 `canonical owning-finding correction head`, tree
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows
 passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
-correctly skipped. Cumulative A is `30/30`; canonical R `0013`, `0014`, and
+correctly skipped. The lifecycle freeze delivery is exact-hosted-green;
+cumulative A is `31/31`; canonical R `0013`, `0014`, and
 `0015` remain immutable and were not rerun, and no full-A completion
 or DoD is claimed. `A-PREDECESSOR-01` is immutable exact hosted-green
 predecessor history recorded in the canonical owning finding. Synchronized
 `A-TRANSITION-01` is immutable exact hosted-green predecessor history at ordinal
-`0015`. `A-LIFECYCLE-01` is FrozenDesign/inactive and awaits exact hosted-green
-freeze delivery; `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
+`0015`. `A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen` on its
+production-zero `TestOnlyGreen` route; `A-RESOURCE-01` and `A-CONVERGE-02`
+remain Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,
 publication, authority transfer, and PowerShell retirement remain prohibited

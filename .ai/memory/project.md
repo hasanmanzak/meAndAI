@@ -135,13 +135,15 @@ Last verified: **2026-08-07**
   history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
-  accepted, immutable, and were not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
-  Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
-  hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
-  `FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
-  delta `0`; implementation waits for exact hosted-green freeze delivery.
+  accepted, immutable, and were not rerun. The lifecycle freeze head passed
+  Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
+  correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and
+  full Conformance are `31/31`; full Domain is `98/98`. Eighteen of twenty live
+  packets are green (`90%`). The parent scenario remains `Planned`.
+  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
+  history at ordinal `0015`. `A-LIFECYCLE-01` is packet-local
+  `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
+  `0`, one Fact with only `ContractSlice=A`, and no Scenario.
   `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
@@ -682,13 +684,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
-  accepted, immutable, and were not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
-  Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
-  hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
-  `FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
-  delta `0`; implementation waits for exact hosted-green freeze delivery.
+  accepted, immutable, and were not rerun. The lifecycle freeze head passed
+  Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
+  correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and
+  full Conformance are `31/31`; full Domain is `98/98`. Eighteen of twenty live
+  packets are green (`90%`). The parent scenario remains `Planned`.
+  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
+  history at ordinal `0015`. `A-LIFECYCLE-01` is packet-local
+  `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
+  `0`, one Fact with only `ContractSlice=A`, and no Scenario.
   `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1897,13 +1901,15 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
   accepted, immutable, and were not rerun. Focused and retained validation are
-  `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
-  The live denominator is twenty and current `ReviewedLocalGreen` progress is
-  seventeen (`85%`). The parent scenario remains `Planned`. Synchronized
-  `A-TRANSITION-01` is immutable exact hosted-green predecessor history at
-  ordinal `0015`. `A-LIFECYCLE-01` is `FrozenDesign`/inactive with
-  `R=NotApplicable`, `TestOnlyGreen`, and production delta `0`; implementation
-  waits for exact hosted-green freeze delivery. `A-RESOURCE-01` and
+  `1/1`; lifecycle focused validation is `1/1`; cumulative A and full
+  Conformance are `31/31`; full Domain is `98/98`. The lifecycle freeze head
+  passed Ubuntu in `20m44s` and Windows in `46m51s`, with publication correctly
+  skipped. The live denominator is twenty and current `ReviewedLocalGreen`
+  progress is eighteen (`90%`). The parent scenario remains `Planned`.
+  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
+  history at ordinal `0015`. `A-LIFECYCLE-01` is packet-local
+  `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
+  `0`, one Fact with only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and
   `A-CONVERGE-02` remain Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/

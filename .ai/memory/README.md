@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-04**<br>
+Last reviewed: **2026-08-07**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -301,13 +301,15 @@ recorded in the canonical owning finding. Its subsequent records
 synchronization also passed exact-head hosted validation; publication
 verification was correctly skipped. Canonical R `0014` and `0015` are
 immutable and were not rerun.
-Focused and retained validation are `1/1`; cumulative A and full
-Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
-packets are `ReviewedLocalGreen` (`85%`). The parent scenario remains
+The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
+`20m44s`, Windows in `46m51s`, and publication verification was correctly
+skipped. Lifecycle focused validation is `1/1`; cumulative A and full
+Conformance are `31/31`; full Domain is `98/98`. Eighteen of twenty live
+packets are `ReviewedLocalGreen` (`90%`). The parent scenario remains
 `Planned`. Synchronized `A-TRANSITION-01` is immutable exact hosted-green
-predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
-`FrozenDesign`/inactive with `R=NotApplicable`, `TestOnlyGreen`, and production
-delta `0`; implementation waits for exact hosted-green freeze delivery.
+predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is packet-local
+`ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
+`0`, one Fact carrying only `ContractSlice=A`, and no Scenario.
 `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
