@@ -131,15 +131,16 @@ Last verified: **2026-08-04**
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
-  predecessor recorded in the canonical owning finding. Its subsequent records
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at
-  ordinal `0015`; no hosted implementation evidence is claimed yet. Later A
+  remains `Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
+  `ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
+  hosted validation before `A-LIFECYCLE-01` activation. Later A
   packets remain Candidate/inactive.
   The umbrella directive still covers ordered remaining A through
   `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
@@ -676,15 +677,16 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
-  predecessor recorded in the canonical owning finding. Its subsequent records
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   Seventeen of twenty live packets are green (`85%`). The parent scenario
-  remains `Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at
-  ordinal `0015`; no hosted implementation evidence is claimed yet. Later A
+  remains `Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
+  `ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
+  hosted validation before `A-LIFECYCLE-01` activation. Later A
   packets remain Candidate/inactive.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
@@ -1888,16 +1890,17 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   is recorded there.
   Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication
   verification was correctly skipped, and the implementation tree graph is
-  `4095/4096`. `A-PREDECESSOR-01` is the immutable exact hosted-green activation
-  predecessor recorded in the canonical owning finding. Its subsequent records
+  `4095/4096`. `A-PREDECESSOR-01` is immutable exact hosted-green predecessor
+  history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
   accepted, immutable, and were not rerun. Focused and retained validation are
   `1/1`; cumulative A and full Conformance are `30/30`; full Domain is `98/98`.
   The live denominator is twenty and current `ReviewedLocalGreen` progress is
   seventeen (`85%`). The parent scenario remains `Planned`. `A-TRANSITION-01`
-  is packet-local `ReviewedLocalGreen` at ordinal `0015`; no hosted
-  implementation evidence is claimed yet. Later A packets remain
+  is exact implementation-head hosted-green `ReviewedLocalGreen` at ordinal
+  `0015`; its records-only closure head must pass hosted validation before
+  `A-LIFECYCLE-01` activation. Later A packets remain
   Candidate/inactive.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/

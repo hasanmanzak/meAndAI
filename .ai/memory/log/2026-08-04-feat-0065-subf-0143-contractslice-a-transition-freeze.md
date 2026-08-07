@@ -5,8 +5,8 @@
 | Date | 2026-08-04 |
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Parent | ContractSlice A typed-kernel subfeature and its planned scenario |
-| State | `A-TRANSITION-01` is packet-local `ReviewedLocalGreen`; downstream packets remain inactive |
-| Activation predecessor | `A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor recorded in the canonical owning finding |
+| State | `A-TRANSITION-01` is exact implementation-head hosted-green `ReviewedLocalGreen`; this records-only closure head remains pending |
+| Activation predecessor | The `A-TRANSITION-01` records-only closure head must pass exact hosted validation before `A-LIFECYCLE-01` activation; `A-PREDECESSOR-01` remains immutable predecessor history |
 | Identity | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes`; canonical-R ordinal `0015` |
 | Review | Design, red-team, final code/test, and evidence/scope reviews each closed `0 Blocking / 0 Important / 0 Minor` |
 | Progress | Seventeen of twenty live packets are `ReviewedLocalGreen` (`85%`); cumulative A is `30/30`; the parent scenario remains `Planned` |
@@ -39,6 +39,24 @@ workflowRunId=30901158080
 workflowConclusion=success
 ubuntuJobDuration=00:19:52
 windowsJobDuration=00:38:52
+publicationJobConclusion=skipped
+```
+
+The implementation head is exact-hosted-green:
+
+```text
+implementationHeadSha=33f59e94a8cd169dd70cf023d29410429b432734
+implementationGitTreeIdentity=2287f7c190d3039e4bcb223ec14d51a85fbd5da5
+implementationHostedRunId=31168496243
+hostedRunStatus=completed
+hostedRunConclusion=success
+ubuntuJobId=92834713390
+ubuntuJobConclusion=success
+ubuntuJobDuration=00:16:53
+windowsJobId=92834713316
+windowsJobConclusion=success
+windowsJobDuration=00:42:00
+publicationJobId=92834714073
 publicationJobConclusion=skipped
 ```
 
@@ -82,5 +100,5 @@ publicationJobConclusion=skipped
 - Retained predecessor `1/1` evidence is `D:\Temp\a-predecessor-retained-final-18688052cc844581bcd792e39afac5e5\TEST-0210-A-PREDECESSOR-RETAINED-FINAL.trx`, SHA-256 `DFA4FD289FD342CBA76797FCA53BF71CF91AE4EDBFE672703EB0C9634DED94F8`.
 - Cumulative A `30/30` evidence is `D:\Temp\a-transition-final-cumulative-0f450a6aa3da4f74974a53f6465a9999\TEST-0210-A-TRANSITION-CUMULATIVE.trx`, SHA-256 `E3AF629531B429E4775668676E9B2CB2E9F95204E291244591E8130A8AAF1EE0`. Full Conformance is the identical `30/30` identity set at SHA-256 `69C6596C0F4B50BC093C4F4370C5C9498001F51365DCA95E5673D7DF99E3B85F`; full Domain is `98/98` at SHA-256 `F75A09C4865FCDAB8288FD90423E59CAA1FB990B91D5651F73C2BA2967BDE959`.
 - All three pass TRX oracles have exact counters, no diagnostics or attachments, and no orphan testhost. Full Release build is `0` warnings/errors; format, diff, all `15` lock fingerprints, and final reviews are green.
-- This record makes no hosted claim for the implementation worktree or its future commit. Exact implementation and record-delivery identities belong to the later hosted evidence closure.
+- The implementation head is exact-hosted-green. This records-only delivery makes no hosted claim for its own future head; that distinct head must pass hosted validation before `A-LIFECYCLE-01` activation.
 - `A-LIFECYCLE-01`, `A-RESOURCE-01`, and `A-CONVERGE-02` remain Candidate/inactive. B/C/D, final activation, merge, release, publication, consumer mutation, and authority transfer remain held.

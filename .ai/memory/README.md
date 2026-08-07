@@ -296,7 +296,7 @@ run recorded in the canonical feature finding; its git tree identity is recorded
 there.
 Windows passed in `44m13s`, Ubuntu passed in `11m50s`, publication verification
 was correctly skipped, and the implementation tree graph is `4095/4096`.
-`A-PREDECESSOR-01` is the immutable exact hosted-green activation predecessor
+`A-PREDECESSOR-01` is immutable exact hosted-green predecessor history
 recorded in the canonical owning finding. Its subsequent records
 synchronization also passed exact-head hosted validation; publication
 verification was correctly skipped. Canonical R `0014` and `0015` are
@@ -304,8 +304,9 @@ immutable and were not rerun.
 Focused and retained validation are `1/1`; cumulative A and full
 Conformance are `30/30`; full Domain is `98/98`. Seventeen of twenty live
 packets are `ReviewedLocalGreen` (`85%`). The parent scenario remains
-`Planned`. `A-TRANSITION-01` is packet-local `ReviewedLocalGreen` at ordinal
-`0015`; no hosted implementation evidence is claimed yet. `A-LIFECYCLE-01`,
+`Planned`. `A-TRANSITION-01` is exact implementation-head hosted-green
+`ReviewedLocalGreen` at ordinal `0015`; its records-only closure head must pass
+hosted validation before `A-LIFECYCLE-01` activation. `A-LIFECYCLE-01`,
 `A-RESOURCE-01`, and
 `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,
