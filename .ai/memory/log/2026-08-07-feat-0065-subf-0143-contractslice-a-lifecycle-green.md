@@ -5,7 +5,7 @@
 | Date | 2026-08-07 |
 | Branch | `codex/subf-0143-contract-slice-a-implementation` |
 | Parent | ContractSlice A typed-kernel subfeature and its planned scenario |
-| State | `A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen` |
+| State | `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` |
 | Identity | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles`; `R=NotApplicable`; no ordinal, marker, red TRX, or Scenario |
 | Green route | `TestOnlyGreen`; one new Fact with only `ContractSlice=A`; production delta `0` |
 | Progress | Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`); cumulative A and full Conformance are `31/31`; the parent scenario remains `Planned` |
@@ -28,6 +28,24 @@ publicationJobId=92875607244
 publicationJobConclusion=skipped
 ```
 
+The bounded lifecycle implementation is also exact-head hosted-green:
+
+```text
+implementationCommitSha=eb6229d9abd8e60f16fc1f59e88c325bf991673e
+implementationTreeSha=3605fd843a3750c12e8ac45ad32c33dc2778bcbb
+workflowRunId=31189635595
+workflowStatus=completed
+workflowConclusion=success
+ubuntuJobId=92902871822
+ubuntuJobConclusion=success
+ubuntuJobDuration=00:19:36
+windowsJobId=92902872328
+windowsJobConclusion=success
+windowsJobDuration=00:36:02
+publicationJobId=92902872728
+publicationJobConclusion=skipped
+```
+
 ## Exact local-green evidence
 
 - The unchanged-production original oracle passed exact focused `1/1` before review at source `263` lines / SHA-256 `2C0687BCD56A3101CB3777835ECB05CF845BE38C6CB70F4CF3158014354CF109`; its TRX SHA-256 is `00544D67BA5087379FC15F88AAEFED43D378350F62BBD90FD1AD72715EF97FAD`.
@@ -47,4 +65,4 @@ publicationJobConclusion=skipped
 - No predecessor lifecycle values are inferred; deprecation does not imply Revised; retirement remains an absent-current Retired transition.
 - The implementation allowlist contains only the new lifecycle test. Production, existing tests/helpers, public/friend/project/package/lock/workflow surfaces, and final activation remain unchanged.
 - `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. B/C/D, final scenario/status/owner/workflow/efficiency activation, merge, release, publication, consumer mutation, and authority transfer remain held.
-- This handoff makes no implementation-head hosted claim. Exact-head hosted validation follows scoped commit and push before resource design may freeze.
+- This handoff synchronizes the immutable implementation-head hosted evidence. `A-RESOURCE-01` may freeze only after this records-only synchronization commit itself passes exact-head hosted validation.

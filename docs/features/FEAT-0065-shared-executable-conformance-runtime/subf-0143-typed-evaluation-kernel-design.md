@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze delivery remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
+| Status | Gate 2 accepted/merged. Eighteen of twenty live packets are `ReviewedLocalGreen` (`90%`), cumulative A is `31/31`, partial tests retain only `ContractSlice=A`, and [TEST-0210](test-cases.md#test-0210) remains `Planned`. Never-activated `A-CONVERGE-01` is retired/excluded. `A-PREDECESSOR-01`, A-FULL, A-COMPLETE, synchronized `A-TRANSITION-01`, and the lifecycle freeze delivery remain immutable exact hosted-green predecessor history. Canonical R `0015` is accepted, immutable, and was not rerun. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta `0`, one Fact carrying only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. Canonical R `0013` and `0014` also remain immutable; invalid diagnostic observation `0012` remains excluded and immutable. No full-A completion or DoD is claimed. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -173,8 +173,8 @@ canonical owning finding. The records synchronization that opened the design
 freeze also passed exact-head hosted validation. Canonical R `0014` and `0015`
 are accepted, immutable, and were not rerun. Synchronized `A-TRANSITION-01` is
 immutable exact hosted-green predecessor history at ordinal `0015`.
-The lifecycle freeze delivery is exact-hosted-green. `A-LIFECYCLE-01` is
-packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
+The lifecycle freeze and implementation deliveries are exact-hosted-green.
+`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
 Candidate/inactive; no
 full-A completion or DoD is claimed.
 Workflow/status/owner/
@@ -990,7 +990,7 @@ synchronization is exact-head hosted-green.
 Canonical R `0014` and `0015` are accepted, immutable, and were not rerun.
 Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
 history at ordinal `0015`. The lifecycle freeze delivery is exact-hosted-green;
-`A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and
+`A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and
 `A-CONVERGE-02` remain
 Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210)
@@ -1206,10 +1206,12 @@ pass TRX oracles, and final reviews are green.
 
 The implementation and synchronized records delivery are exact-hosted-green;
 the lifecycle records-only freeze delivery also passed Ubuntu in `20m44s` and
-Windows in `46m51s`, with publication correctly skipped.
+Windows in `46m51s`. The exact lifecycle implementation identity recorded in
+the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`, with
+publication correctly skipped.
 Resource limits, public/friend/project/lock/workflow changes, final activation,
-B/C/D, merge, release, and publication remain held. `A-LIFECYCLE-01` is
-packet-local `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
+B/C/D, merge, release, and publication remain held. `A-LIFECYCLE-01` is exact
+implementation-head hosted-green `ReviewedLocalGreen`; `A-RESOURCE-01` and `A-CONVERGE-02` remain
 Candidate/inactive.
 
 ### `A-LIFECYCLE-01` operational boundary and local-green closure <a name="a-lifecycle-01-freeze"></a>
@@ -8350,7 +8352,7 @@ cumulative A is `31/31`; canonical R `0013`, `0014`, and
 or DoD is claimed. `A-PREDECESSOR-01` is immutable exact hosted-green
 predecessor history recorded in the canonical owning finding. Synchronized
 `A-TRANSITION-01` is immutable exact hosted-green predecessor history at ordinal
-`0015`. `A-LIFECYCLE-01` is packet-local `ReviewedLocalGreen` on its
+`0015`. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` on its
 production-zero `TestOnlyGreen` route; `A-RESOURCE-01` and `A-CONVERGE-02`
 remain Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner

@@ -303,12 +303,14 @@ verification was correctly skipped. Canonical R `0014` and `0015` are
 immutable and were not rerun.
 The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
-skipped. Lifecycle focused validation is `1/1`; cumulative A and full
+skipped. The exact lifecycle implementation identity recorded in the canonical
+handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
+correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and full
 Conformance are `31/31`; full Domain is `98/98`. Eighteen of twenty live
 packets are `ReviewedLocalGreen` (`90%`). The parent scenario remains
 `Planned`. Synchronized `A-TRANSITION-01` is immutable exact hosted-green
-predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is packet-local
-`ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
+predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
+implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
 `0`, one Fact carrying only `ContractSlice=A`, and no Scenario.
 `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive. No final `Scenario`
 trait, status/owner, workflow,

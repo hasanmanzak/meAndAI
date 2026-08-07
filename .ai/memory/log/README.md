@@ -286,14 +286,16 @@ recorded in the canonical owning finding. Its subsequent records head passed
 Ubuntu in `12m57s` and Windows in `47m19s`; publication verification was
 correctly skipped. Canonical R `0014` and `0015` are immutable and were not
 rerun. The lifecycle records-only freeze head passed Ubuntu in `20m44s` and
-Windows in `46m51s`; publication verification was correctly skipped. The
+Windows in `46m51s`. The exact lifecycle implementation identity recorded in the
+canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`;
+publication verification was correctly skipped. The
 marker-free lifecycle packet is `TestOnlyGreen` with production delta `0`:
 focused validation is `1/1`, cumulative A and full Conformance are `31/31`, and
 full Domain is `98/98`. Eighteen of twenty live packets are green (`90%`).
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
-hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is
-packet-local `ReviewedLocalGreen` with `R=NotApplicable`, one Fact carrying
+hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
+implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, one Fact carrying
 only `ContractSlice=A`, no Scenario, and source `266` lines.
 `A-RESOURCE-01` and `A-CONVERGE-02` remain Candidate/inactive.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
