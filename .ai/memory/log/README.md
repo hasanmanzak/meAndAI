@@ -6,7 +6,9 @@ and follow its canonical links.
 ## Current continuation
 
 Follow the current
-[ContractSlice A resource-boundary FrozenDesign handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md),
+[ContractSlice A convergence V1 diagnostic and corrected-V2 FrozenDesign handoff](2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md),
+the immutable
+[ContractSlice A resource-boundary handoff](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md),
 the immutable ContractSlice A predecessor-manifest exact-head hosted-green handoff,
 the accepted Gate 2 [typed-evaluation-kernel design handoff](2026-07-30-feat-0065-subf-0143-typed-handoff-design.md),
 and the active architecture records below. Every dated predecessor handoff
@@ -287,7 +289,7 @@ correctly skipped. Canonical R `0014` and `0015` are immutable and were not
 rerun. The lifecycle records-only freeze head passed Ubuntu in `20m44s` and
 Windows in `46m51s`. The exact lifecycle implementation identity recorded in the
 canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`;
-publication verification was correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-RESOURCE-01` is exact-head hosted-green at accepted immutable R=`0024` through run `31264791256`; its full immutable evidence is owned by [the resource freeze ledger](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md). `A-CONVERGE-02` is `FrozenDesign`/inactive pending its records/design head.
+publication verification was correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; Domain is `98/98`. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-RESOURCE-01` is exact-head hosted-green at immutable R=`0024`; its evidence is in [the resource freeze ledger](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md). `A-CONVERGE-02`: V1 immutable diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending; use the convergence handoff above.
 Historical governed-reference-slots evidence retains exact implementation
 predecessor
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
@@ -326,7 +328,7 @@ exact remote-equal
 [`25e26f908e1f123640c758e42e1db92d5eea6dde`](https://github.com/hasanmanzak/meAndAI/commit/25e26f908e1f123640c758e42e1db92d5eea6dde),
 git tree identity: `9a0dc5bb9b41c9509366ab92bc7de642724938b6`, with Ubuntu and Windows green in
 [run 30716919833](https://github.com/hasanmanzak/meAndAI/actions/runs/30716919833).
-The current continuation state is the resource-boundary FrozenDesign handoff above.
+The current continuation is the convergence handoff above.
 The full-manifest and projector/DAG reviewed-local-green handoffs,
 admission-proof reviewed-local-green handoff, and target parser/index/slot
 reviewed-local-green handoff remain historical predecessor evidence.

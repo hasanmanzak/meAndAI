@@ -6,7 +6,7 @@
 | Parent epic | [EPIC-0002 / issue #163](https://github.com/hasanmanzak/meAndAI/issues/163) |
 | Architecture task | [TASK-0003 / issue #164](https://github.com/hasanmanzak/meAndAI/issues/164) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
-| Current authority | The maintainer authorizes ordered A-only delivery through `A-CONVERGE-02` on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). A is `19/20` (`95%`) and `32/32`; `A-RESOURCE-01` is exact-head hosted green at accepted immutable R=`0024` through run `31264791256`; `A-CONVERGE-02` is FrozenDesign/inactive pending its records/design head. B/C/D, final activation, merge, release and publication remain held. |
+| Current authority | A-only delivery through `A-CONVERGE-02` is authorized on [draft PR #174](https://github.com/hasanmanzak/meAndAI/pull/174). A `19/20` (`95%`), `32/32`; Resource R=`0024` hosted green; Converge V1 diagnostic/no success, V2 FrozenDesign/corrected-design hosted pending. B/C/D, final activation, merge, release and publication held. |
 
 This plan allocates the accepted architecture to stable delivery records. It
 did not itself authorize implementation. The later

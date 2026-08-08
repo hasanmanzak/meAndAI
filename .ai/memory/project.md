@@ -139,7 +139,7 @@ Last verified: **2026-08-08**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. `A-RESOURCE-01` is exact-head hosted-green at accepted immutable R=`0024` through run `31264791256`; `A-CONVERGE-02` is `FrozenDesign`/inactive pending its records/design head. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; Domain is `98/98`. `A-RESOURCE-01` is exact-head hosted-green at immutable R=`0024`; `A-CONVERGE-02`: V1 immutable diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
