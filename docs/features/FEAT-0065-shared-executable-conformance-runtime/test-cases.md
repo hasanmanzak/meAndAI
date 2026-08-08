@@ -1424,7 +1424,7 @@ green, Release build/format, and renewed reviews are complete locally. Exact
 artifact paths, metrics, SHA-256 identities, diagnostic causes, and green
 evidence are canonical only in
 `.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md`.
-Exact `885ad0ba01f99ed44e325fa974a6cb62e89b4986` passed Ubuntu `18m51s` and
+Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986) passed Ubuntu `18m51s` and
 Windows `43m06s` in run `31264791256`,
 with publication verification skipped. R was not rerun.
 
@@ -1439,7 +1439,8 @@ Domain `98/98`, six locks, Release build, format, diff, StructureOnly,
 publication-evidence and two final `0/0/0` reviews are mandatory.
 
 The exact A-RESOURCE records-delivery head
-`885ad0ba01f99ed44e325fa974a6cb62e89b4986` is hosted green on both stable
+[`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
+is hosted green on both stable
 jobs with publication skipped. This FrozenDesign delivery remains inactive
 until its own records/design head is hosted green. V yields `CompletionRecommended`; only the
 exact atomic `COHORT-SYNC-A-FINAL` changes every live route to `20/20` while A

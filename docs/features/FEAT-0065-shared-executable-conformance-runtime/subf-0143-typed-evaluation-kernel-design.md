@@ -1508,14 +1508,15 @@ green, Release build/format, and renewed reviews are complete locally. Exact
 artifact paths, metrics, SHA-256 identities, diagnostic causes, and green
 evidence are canonical only in
 `.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md`.
-Exact `885ad0ba01f99ed44e325fa974a6cb62e89b4986` passed Ubuntu `18m51s` and
+Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986) passed Ubuntu `18m51s` and
 Windows `43m06s` in run `31264791256`,
 with publication verification skipped. R was not rerun.
 
 ### `A-CONVERGE-02` frozen audit contract <a name="a-converge-02-freeze"></a>
 
 The exact `A-RESOURCE-01` records-delivery head
-`885ad0ba01f99ed44e325fa974a6cb62e89b4986` passed both stable hosted jobs,
+[`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
+passed both stable hosted jobs,
 with publication verification skipped, and is synchronized as
 `ReviewedLocalGreen`. V remains prohibited until the commit containing this
 freeze and every synchronized live route is itself exact-head hosted green;
