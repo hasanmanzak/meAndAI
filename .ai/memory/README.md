@@ -305,17 +305,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and full
-Conformance are `32/32`; full Domain is `98/98`. Eighteen of twenty live
-packets are `ReviewedLocalGreen` (`95%`). The parent scenario remains
-`Planned`. Synchronized `A-TRANSITION-01` is immutable exact hosted-green
-predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
-implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
-`0`, one Fact carrying only `ContractSlice=A`, and no Scenario.
-`A-RESOURCE-01` is local `ReviewedLocalGreen` at exact FQN and accepted immutable R=`0024`; `0016` cadence-diagnostic through `0023` exit-code diagnostic remain immutable, canonical R and bounded local green are accepted, and hosted checks are pending. `A-CONVERGE-02` remains
-Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
-[TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
-or B/C/D activation is claimed.
+correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. `A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024` (`0016`-`0023` diagnostics), hosted pending; `A-CONVERGE-02` is Candidate/inactive. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

@@ -139,21 +139,7 @@ Last verified: **2026-08-07**
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
   the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and
-  full Conformance are `32/32`; full Domain is `98/98`. Eighteen of twenty live
-  packets are green (`95%`). The parent scenario remains `Planned`.
-  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
-  history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
-  hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
-  `0`, one Fact with only `ContractSlice=A`, and no Scenario.
-  `A-RESOURCE-01` is local `ReviewedLocalGreen` at exact FQN and accepted immutable R=`0024`;
-  `0016` cadence-diagnostic through `0023` exit-code diagnostic remain immutable;
-  canonical R and bounded local green are accepted, with hosted checks pending.
-  `A-CONVERGE-02` remains
-  Candidate/inactive.
-  The umbrella directive still covers ordered remaining A through
-  `A-CONVERGE-02` without bypassing predecessor, D/RT, evidence, or one-mutating-
-  packet gates. Follow the current [canonical log index](log/README.md). The
+  correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. `A-RESOURCE-01` is local green at accepted immutable R=`0024`, hosted pending; `A-CONVERGE-02` is Candidate/inactive. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held. Follow the current [canonical log index](log/README.md). The
   predecessor-manifest exact-head hosted-green handoff indexed there is
   immutable history; the admission-proof reviewed-local-green handoff,
   the selector reviewed-local-green handoff in the canonical log index,
@@ -693,17 +679,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   accepted, immutable, and were not rerun. The lifecycle freeze head passed
   Ubuntu in `20m44s` and Windows in `46m51s`; publication verification was
   correctly skipped. The exact lifecycle implementation identity recorded in
-  the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-  correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and
-  full Conformance are `32/32`; full Domain is `98/98`. Eighteen of twenty live
-  packets are green (`95%`). The parent scenario remains `Planned`.
-  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
-  history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
-  hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
-  `0`, one Fact with only `ContractSlice=A`, and no Scenario.
-  `A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` is
-  cadence-diagnostic, `0017` is PowerShell-host diagnostic, and `0018` is
-  Job-identity diagnostic; `0019` is xUnit-stderr diagnostic; `0020` is stdout-shape diagnostic; `0021` is TRX-validator diagnostic; `0022` is ExitTime diagnostic; and `0023` is exit-code diagnostic. Canonical R and bounded local green are accepted, with hosted checks pending. `A-CONVERGE-02` remains Candidate/inactive.
+  the canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was correctly skipped.
 - Unsafe retry boundary: do not trust completion wording or commit messages,
   reconstruct missing red/review evidence, allocate retrospective markers, or
   call a broken or unreviewed pushed head the next predecessor.
@@ -1910,19 +1886,7 @@ domain. Avoid a large universal bootstrapper or semantic AI-memory validator.
   history recorded in the canonical owning finding. Its subsequent records
   synchronization also passed exact-head hosted validation; publication
   verification was correctly skipped. Canonical R `0014` and `0015` are
-  accepted, immutable, and were not rerun. Focused and retained validation are
-  `1/1`; lifecycle focused validation is `1/1`; cumulative A and full
-  Conformance are `32/32`; full Domain is `98/98`. The lifecycle freeze head
-  passed Ubuntu in `20m44s` and Windows in `46m51s`. The exact lifecycle
-  implementation identity recorded in the canonical handoff passed Ubuntu in
-  `19m36s` and Windows in `36m02s`, with publication correctly
-  skipped. The live denominator is twenty and current `ReviewedLocalGreen`
-  progress is eighteen (`95%`). The parent scenario remains `Planned`.
-  Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
-  history at ordinal `0015`. `A-LIFECYCLE-01` is exact implementation-head
-  hosted-green `ReviewedLocalGreen`, `R=NotApplicable`, `TestOnlyGreen`, production delta
-  `0`, one Fact with only `ContractSlice=A`, and no Scenario. `A-RESOURCE-01` is
-  local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` cadence-diagnostic through `0023` exit-code diagnostic remain immutable; canonical R and bounded local green are accepted, with hosted checks pending. `A-CONVERGE-02` remains Candidate/inactive.
+  accepted, immutable, and were not rerun.
   Partial facts retain `ContractSlice` only; their final `Scenario`
   traits are deferred. B/C/D, workflow/scenario-trait/scenario-owner/
   [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146)

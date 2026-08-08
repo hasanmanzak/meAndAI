@@ -287,22 +287,7 @@ correctly skipped. Canonical R `0014` and `0015` are immutable and were not
 rerun. The lifecycle records-only freeze head passed Ubuntu in `20m44s` and
 Windows in `46m51s`. The exact lifecycle implementation identity recorded in the
 canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`;
-publication verification was correctly skipped. The
-marker-free lifecycle packet is `TestOnlyGreen` with production delta `0`:
-focused validation is `1/1`, cumulative A and full Conformance are `32/32`, and
-full Domain is `98/98`. Nineteen of twenty live packets are green (`95%`).
-[TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
-remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
-hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
-implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, one Fact carrying
-only `ContractSlice=A`, no Scenario, and source `266` lines.
-`A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024` (`0016` cadence-diagnostic; `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic) with its exact FQN
-and three independent byte/depth/token carriers; canonical R and bounded local
-green are accepted, hosted checks are pending, and `A-CONVERGE-02` remains
-Candidate/inactive.
-The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
-workflow, efficiency activation,
-or B/C/D activation is claimed.
+publication verification was correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) remains `Planned`. `A-RESOURCE-01` is local green at accepted immutable R=`0024`; its full immutable evidence is owned by [the resource freeze ledger](2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md). Hosted checks are pending and `A-CONVERGE-02` is Candidate/inactive.
 Historical governed-reference-slots evidence retains exact implementation
 predecessor
 [`fca0778663238b83bb2ede7cba5ab52012414689`](https://github.com/hasanmanzak/meAndAI/commit/fca0778663238b83bb2ede7cba5ab52012414689),
