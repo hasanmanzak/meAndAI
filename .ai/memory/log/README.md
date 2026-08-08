@@ -289,16 +289,17 @@ Windows in `46m51s`. The exact lifecycle implementation identity recorded in the
 canonical handoff passed Ubuntu in `19m36s` and Windows in `36m02s`;
 publication verification was correctly skipped. The
 marker-free lifecycle packet is `TestOnlyGreen` with production delta `0`:
-focused validation is `1/1`, cumulative A and full Conformance are `31/31`, and
-full Domain is `98/98`. Eighteen of twenty live packets are green (`90%`).
+focused validation is `1/1`, cumulative A and full Conformance are `32/32`, and
+full Domain is `98/98`. Nineteen of twenty live packets are green (`95%`).
 [TEST-0210](../../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210)
 remains `Planned`. Synchronized `A-TRANSITION-01` is immutable exact
 hosted-green predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
 implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, one Fact carrying
 only `ContractSlice=A`, no Scenario, and source `266` lines.
-`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with its exact FQN
-and three independent byte/depth/token carriers; `A-CONVERGE-02` remains
-Candidate/inactive. No red or implementation evidence is claimed by the freeze.
+`A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024` (`0016` cadence-diagnostic; `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic) with its exact FQN
+and three independent byte/depth/token carriers; canonical R and bounded local
+green are accepted, hosted checks are pending, and `A-CONVERGE-02` remains
+Candidate/inactive.
 The parent scenario remains `Planned`. No final `Scenario` trait, status/owner,
 workflow, efficiency activation,
 or B/C/D activation is claimed.

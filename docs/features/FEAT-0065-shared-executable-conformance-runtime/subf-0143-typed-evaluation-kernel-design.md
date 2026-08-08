@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted/merged; `18/20` packets are `ReviewedLocalGreen` (`90%`) and cumulative A is `31/31`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; partial Facts retain only `ContractSlice=A`. Lifecycle records are immutable exact-hosted-green predecessor history. `A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and R=`0016`, with no execution; `A-CONVERGE-02` is Candidate/inactive. Canonical R `0013`-`0015` remain immutable, invalid `0012` remains excluded, and retired `A-CONVERGE-01` stays excluded. Final activation and DoD remain held. |
+| Status | Gate 2 accepted/merged; `19/20` packets are `ReviewedLocalGreen` (`95%`) and cumulative A is `32/32`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; partial Facts retain only `ContractSlice=A`. Lifecycle records are immutable exact-hosted-green predecessor history. `A-RESOURCE-01` is local `ReviewedLocalGreen` at exact FQN with accepted immutable R=`0024`; `0016` cadence-diagnostic and `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic; canonical R and bounded local green are accepted, with hosted checks pending; `A-CONVERGE-02` is Candidate/inactive. Canonical R `0013`-`0015` remain immutable, invalid `0012` remains excluded, and retired `A-CONVERGE-01` stays excluded. Final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -175,8 +175,7 @@ are accepted, immutable, and were not rerun. Synchronized `A-TRANSITION-01` is
 immutable exact hosted-green predecessor history at ordinal `0015`.
 The lifecycle freeze, implementation, and records deliveries are exact-hosted-green.
 `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`.
-`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with no red or
-implementation evidence; `A-CONVERGE-02` remains Candidate/inactive; no
+`A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` cadence-diagnostic and `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic; canonical R and bounded local green are accepted, with hosted checks pending. `A-CONVERGE-02` remains Candidate/inactive; no
 full-A completion or DoD is claimed.
 Workflow/status/owner/
 [TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146) and all
@@ -980,7 +979,7 @@ Windows passed in `15m53s`, Ubuntu in `17m50s`, publication verification was
 correctly skipped, and that correction head's graph is `4094/4096`. This
 records-only closure adds only the reserved two evidence relations, producing a
 final delivery graph of `4096/4096` that is closed by the exact evidence in the canonical owning finding; Windows passed in `17m28s`, Ubuntu in `12m28s`, and publication verification was correctly skipped.
-Cumulative A is now `31/31`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
+Cumulative A is now `32/32`; `A-COMPLETE-PROFILE-01` is exact-head hosted-green
 `ReviewedLocalGreen` at the implementation identity recorded in the canonical
 owning finding;
 Windows passed in `44m13s`, Ubuntu in `11m50s`, publication verification was
@@ -992,8 +991,7 @@ Canonical R `0014` and `0015` are accepted, immutable, and were not rerun.
 Synchronized `A-TRANSITION-01` is immutable exact hosted-green predecessor
 history at ordinal `0015`. The lifecycle freeze/implementation/records deliveries are exact-hosted-green;
 `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen`.
-`A-RESOURCE-01` is `FrozenDesign`/inactive at ordinal `0016` with no red or
-implementation evidence; `A-CONVERGE-02` remains Candidate/inactive;
+`A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` cadence-diagnostic and `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic; canonical R and bounded local green are accepted, with hosted checks pending. `A-CONVERGE-02` remains Candidate/inactive;
 [TEST-0210](test-cases.md#test-0210)
 remains `Planned`, and no full-A completion or DoD is claimed.
 
@@ -1213,8 +1211,7 @@ publication correctly skipped.
 Resource implementation, public/friend/project/lock/workflow changes, final activation,
 B/C/D, merge, release, and publication remain held. `A-LIFECYCLE-01` is exact
 implementation-head hosted-green `ReviewedLocalGreen`. `A-RESOURCE-01` is
-`FrozenDesign`/inactive at ordinal `0016` with no red or implementation
-evidence; `A-CONVERGE-02` remains Candidate/inactive.
+local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` cadence-diagnostic and `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic; canonical R and bounded local green are accepted, with hosted checks pending. `A-CONVERGE-02` remains Candidate/inactive.
 
 ### `A-LIFECYCLE-01` operational boundary and local-green closure <a name="a-lifecycle-01-freeze"></a>
 
@@ -1249,9 +1246,9 @@ surfaces are locked. Target test size is `320`, hard test/combined cap is `420`,
 and production cap is `0`. The unchanged-production original oracle passed
 `1/1`. After one review-owned N4 specificity correction, retained source is
 `266` lines / `704F...EDCF`, focused is `1/1`, cumulative A and full
-Conformance are `31/31`, Domain is `98/98`, production remains `0`, and fresh
-code/test plus evidence/scope reviews each closed `0/0/0`. Progress is `18/20`
-(`90%`); any future production need still reopens D/RT.
+Conformance are `32/32`, Domain is `98/98`, production remains `0`, and fresh
+code/test plus evidence/scope reviews each closed `0/0/0`. Progress is `19/20`
+(`95%`); any future production need still reopens D/RT.
 
 ### Exact-head hosted-green `A-COMPLETE-PROFILE-01` closure
 
@@ -1536,6 +1533,85 @@ observable descendants, at most `90s`, and at most `1,610,612,736` bytes
 and released buffers plus streaming token counts, and use no disk fixture,
 `JsonDocument`, naive repeated concatenation, ambient value, or parallel
 million-token construction. Any variance reopens D/RT.
+
+The first `0016` invocation produced no TRX/report and stopped only because its
+managed multi-fence sampler missed cadence by `302.5221ms`; it is immutable
+infrastructure-diagnostic evidence and never authorizes G. Corrected R=`0018`
+retains the exact FQN and behavior but samples creation-time Job members through
+native handle identity/working-set calls; post-build dry exact capture is `9.903ms`.
+The first `0017` invocation then used Windows PowerShell 5.1 and stopped in
+`Add-Type` before evidence-directory creation or `dotnet test` because that host
+cannot compile the runner's C# 6+ get-only auto-properties. It is immutable
+PowerShell-host infrastructure evidence and never authorizes G. Corrected
+R=`0019` adds an explicit PowerShell 7 precondition without changing the frozen
+FQN, carrier, oracle, caps, or production boundary. The first `0018` invocation
+then produced sole exact BehaviorRed TRX (`1/1/0/1`, `3.841319s`, SHA-256
+`89D881785929221FC28A718815286A863B6AA8940A8833337A8FE2F92BC7E6CF`) but no
+sampler report because persistent Job PID `80408` lost exact metrics between
+adjacent fences. It is immutable Job-identity diagnostic and never authorizes G.
+Corrected R=`0020` keeps stable live-member identity fail-closed while allowing
+only bounded `32 x 1ms` fence stabilization; successful partial captures remain
+in the audit union while only complete fences set aggregate memory. It adds a
+direct `<=50ms` canonical capture gate, an OS-enforced `1.5 GiB` Job memory
+cap/native peak evidence, and requires exit-churn dry validation.
+The first `0019` invocation produced sole exact BehaviorRed TRX (`1/1/0/1`,
+`3.8481559s`, SHA-256
+`F50CD0C3D9CC36FEB177C21C0857FAC680825699FAD1027FF6FF843F27BB548F`) but no
+sampler report because the console oracle rejected xUnit's sole exact-FQN
+`[FAIL]` stderr summary. Separate list/pass/fail probes isolated that contract;
+the transient failing Fact was removed before rebuilding. It is immutable
+xUnit-stderr diagnostic and never authorizes G. The first `0020` invocation
+produced sole exact BehaviorRed TRX (`1/1/0/1`, `4.0820838s`, SHA-256
+`852A8156F0A9D0E61F7A04722DF91FADAB3EC1CF7863776FA59C47AFD20F26C4`) but no
+sampler report because the stdout oracle required one raw marker occurrence while
+canonical output contains a marker-only diagnostic line and a second occurrence
+inside the exact TRX result-path line. The transient probe that established that
+shape was removed before rebuilding; `0020` is immutable stdout-shape diagnostic
+and never authorizes G. The first `0021` invocation produced sole exact
+BehaviorRed TRX (`1/1/0/1`, `4.2296268s`, SHA-256
+`F6DFDBC58600EF5268B70E1BC2469ECEB1BB35908CB024C482519CB35F23B3BE`) but no
+sampler report. Offline replay proved PowerShell expression precedence had
+collapsed eleven ResultSummary adapter regex expressions into one pattern.
+`0021` is immutable TRX-validator diagnostic and never authorizes G. Corrected
+array/CR handling passes the full `0021` TRX offline. The first `0022` invocation
+produced sole exact BehaviorRed TRX (`1/1/0/1`, `4.5237249s`, SHA-256
+`E925D18B325972902093B430CC2A4C3AA6ED16191535B71438426F055CBE63C7`) and that
+TRX passes offline, but no sampler report exists because the atomic Job process
+exposes null PowerShell `Process.ExitTime`. The dry atomic child reproduced the
+null without dotnet test. `0022` is immutable ExitTime diagnostic and never
+authorizes G. The first `0023` invocation produced exact BehaviorRed TRX
+(`1/1/0/1`, `4.6141616s`, SHA-256
+`A13D6BA2D871250CB35C0C75CE63E19764949255CDB1176A34FE8A00205A3B91`)
+and sampler report SHA-256
+`4009CDEA4542E35EA37D78EE9D3A97C4F389CC054CACF0898696573CA54E30B4`.
+Its console/TRX/custody/cadence/memory evidence passes, but the report contains
+`exitCode: null`; PowerShell `$null -ne 0` failed open. Both independent reviews
+returned `1/0/0`. `0023` is immutable exit-code diagnostic and never authorizes
+G. Accepted immutable R=`0024` reads the typed exit code from the retained native process
+handle through `GetExitCodeProcess`, fails closed on API failure or
+`STILL_ACTIVE`, and accepts only a nonzero `System.Int32`. The validation child
+proves native zero; null, zero, `Int64`, and string probes are rejected. Fresh
+Release build passed with no warnings/errors. Mutation-free validation passed
+`4,916` churn captures at `20.206ms` maximum, with portable-PDB source SHA-256
+`08A465CE2B6FEECB4C67A1A5BF6C48F987005E218394888B5D52F49A430B1A8B` and
+runner SHA-256
+`8BCCD373B3553EA5D1C79EB989A7C0C85BB7614F71F3BBB7A271D5B233C71734`.
+The single accepted canonical R report/TRX SHA-256 values are
+`0A87EC24D540BAA434C6A0C51BDC17F642851D027B9838EDD88CFA659434FD8F` and
+`221DE7EA48C6C548F40DC4B07F54CD1F7B8608CBA14A38AE4AC342A627E1D61B`.
+It proves exact `1/1/0/1`, typed native `exitCode=1`, `65` samples, exact
+conhost/dotnet/testhost closure, and all frozen time/cadence/memory ceilings;
+two immutable-artifact reviews accepted it `0/0/0`, and it was not rerun.
+Bounded G changes only private `MaximumDepth 64 -> 9` (`+1/-1`) and the
+marker-free test. The inner-exception oracle uses
+`IsAssignableFrom<JsonException>` because the frozen contract says “a
+`JsonException`” and the runtime supplies its `JsonReaderException` subtype.
+Focused green is `1/1`; cumulative A and full Conformance are `32/32`; Domain is
+`98/98`; Release build/format and two fresh post-green reviews pass. Test and
+production SHA-256 values are
+`CCBA4CA72FBF1CCA9F6F9366F619CBED46E912ACF0EBE8BB27E67EF2F7171E15` and
+`59778EBB360B46833130FBCF7EC7995D17137A98F4857812331379681DBA8D86`.
+Hosted checks remain pending.
 
 `FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
 boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,
@@ -8370,14 +8446,13 @@ exact-head hosted-green `ReviewedLocalGreen` at commit
 `canonical owning-finding correction git tree identity`, and run `canonical owning-finding replacement run`; Windows
 passed in `44m13s`, Ubuntu in `11m50s`, and publication verification was
 correctly skipped. The lifecycle freeze delivery is exact-hosted-green;
-cumulative A is `31/31`; canonical R `0013`, `0014`, and
+cumulative A is `32/32`; canonical R `0013`, `0014`, and
 `0015` remain immutable and were not rerun, and no full-A completion
 or DoD is claimed. `A-PREDECESSOR-01` is immutable exact hosted-green
 predecessor history recorded in the canonical owning finding. Synchronized
 `A-TRANSITION-01` is immutable exact hosted-green predecessor history at ordinal
 `0015`. `A-LIFECYCLE-01` is exact implementation-head hosted-green `ReviewedLocalGreen` on its
-production-zero `TestOnlyGreen` route. `A-RESOURCE-01` is `FrozenDesign`/
-inactive at ordinal `0016` with no red or implementation evidence;
+production-zero `TestOnlyGreen` route. `A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024`; `0016` cadence-diagnostic and `0017` PowerShell-host diagnostic and `0018` Job-identity diagnostic and `0019` xUnit-stderr diagnostic and `0020` stdout-shape diagnostic and `0021` TRX-validator diagnostic and `0022` ExitTime diagnostic and `0023` exit-code diagnostic; canonical R and bounded local green are accepted, with hosted checks pending;
 `A-CONVERGE-02` remains Candidate/inactive.
 [TEST-0210](test-cases.md#test-0210) remains `Planned`. Workflow/scenario-trait/scenario-owner
 mutation, WIP extraction, consumer mutation, later slices, release,

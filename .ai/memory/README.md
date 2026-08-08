@@ -306,14 +306,13 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
 correctly skipped. Lifecycle focused validation is `1/1`; cumulative A and full
-Conformance are `31/31`; full Domain is `98/98`. Eighteen of twenty live
-packets are `ReviewedLocalGreen` (`90%`). The parent scenario remains
+Conformance are `32/32`; full Domain is `98/98`. Eighteen of twenty live
+packets are `ReviewedLocalGreen` (`95%`). The parent scenario remains
 `Planned`. Synchronized `A-TRANSITION-01` is immutable exact hosted-green
 predecessor history at ordinal `0015`. `A-LIFECYCLE-01` is exact
 implementation-head hosted-green `ReviewedLocalGreen` with `R=NotApplicable`, `TestOnlyGreen`, production delta
 `0`, one Fact carrying only `ContractSlice=A`, and no Scenario.
-`A-RESOURCE-01` is `FrozenDesign`/inactive at exact FQN and ordinal `0016`; no
-red or implementation evidence exists yet. `A-CONVERGE-02` remains
+`A-RESOURCE-01` is local `ReviewedLocalGreen` at exact FQN and accepted immutable R=`0024`; `0016` cadence-diagnostic through `0023` exit-code diagnostic remain immutable, canonical R and bounded local green are accepted, and hosted checks are pending. `A-CONVERGE-02` remains
 Candidate/inactive. No final `Scenario` trait, status/owner, workflow,
 [TEST-0146](../../docs/features/FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
 or B/C/D activation is claimed.

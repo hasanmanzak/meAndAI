@@ -8,7 +8,7 @@ internal static class CanonicalManifestReader
 {
     internal const int MaximumByteLength = 16_777_216;
 
-    private const int MaximumDepth = 64;
+    private const int MaximumDepth = 9;
     private const int MaximumTokenCount = 1_000_000;
     private const string SchemaKey = "protocol.policy-manifest.v1";
 
