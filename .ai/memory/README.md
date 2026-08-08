@@ -305,7 +305,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; Domain is `98/98`. `A-RESOURCE-01` is exact-head hosted-green at immutable R=`0024`; `A-CONVERGE-02`: V1 immutable diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held.
+correctly skipped. A is `19/20` (`95%`), `32/32`; Domain `98/98`; Resource R=`0024` hosted green. Converge V1/V2 are diagnostics; V3 is `FrozenDesign`/inactive pending exact-head hosted design delivery after D/RT `0/0/0`. Parent scenario/final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource R=`0024` hosted green; Converge V1 diagnostic/no success, V2 `FrozenDesign`/corrected-design hosted pending after renewed D/RT `0/0/0`. Final activation/DoD held. |
+| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2 diagnostic; V3 `FrozenDesign`/hosted pending after D/RT `0/0/0`. Final activation/DoD held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1512,21 +1512,27 @@ Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanza
 Windows `43m06s` in run `31264791256`,
 with publication verification skipped. R was not rerun.
 
-### `A-CONVERGE-02` corrected V2 frozen audit contract <a name="a-converge-02-freeze"></a>
+### `A-CONVERGE-02` corrected V3 audit contract <a name="a-converge-02-freeze"></a>
 
 Resource head
 [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
-is hosted-green `ReviewedLocalGreen`. V1 D/RT closed `0/0/0`; its sole run later
-failed closed on standard TRX `completed=0`, so it is immutable diagnostic/no
-success. Corrected V2 D/RT closed `0/0/0`; V2 remains frozen until this exact
-corrected-design/live-route head is hosted green.
+is hosted-green. V1 is immutable diagnostic/no success. V2 design head
+[`7bf97ad149511a4d13a44da0c2a048d300818602`](https://github.com/hasanmanzak/meAndAI/commit/7bf97ad149511a4d13a44da0c2a048d300818602)
+passed Ubuntu `19m37s` and Windows `37m52s` in
+[run 31273865409](https://github.com/hasanmanzak/meAndAI/actions/runs/31273865409),
+with publication skipped, but its sole
+authorized launcher admission failed at the outer sandbox with exact
+`CreateProcessAsUserW failed: 5` before any shell/child/root. V2 is therefore
+`AttemptInvalidated/NoInvocation/NoSuccess`; same-V2 retry is prohibited.
+V3 D/RT is `0/0/0`, but V3 remains inactive until this synchronized design
+commit itself is exact-head hosted green.
 
 This pure audit packet has P/R/G `NotApplicable`, not `TestOnlyGreen`, and an
 empty executable allowlist. It adds no Fact/FQN/marker/ordinal/TRX or code,
 test, project, package, lock, workflow, scenario/status/owner mutation. V1's
 failure requires the exact twelve-path corrected-design cohort below; it
-records V1, freezes V2, retains `19/20`, and changes no history. Only fully
-green V2 produces `CompletionRecommended`; no intermediate record claims
+records V1/V2, freezes V3, retains `19/20`, and changes no history. Only fully
+green V3 produces `CompletionRecommended`; no intermediate record claims
 `20/20`.
 
 One atomic code-free `COHORT-SYNC-A-FINAL` commit then owns the only global
@@ -1607,15 +1613,45 @@ exactly the five `ContractSliceAPublicApiTests` plus six
 `F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6`,
 and the class-union filter must select and pass `11/11`.
 
-Materialize the exact fenced bytes below in one fresh external `.ps1`, record
-its SHA-256 in the handoff, and invoke that file once and uninterrupted from
-repository root with `pwsh -NoProfile -File`; piecemeal execution or rerun is
-not evidence. The exact corrected V2 PowerShell 7 script is:
+After the synchronized V3 design head is hosted green, preflight the exact
+head/clean status and PowerShell `7.6.4`; require both the fixed script path and
+fixed evidence root below to be absent. The competing-process set is exactly
+`pwsh.exe` or `powershell.exe`, excluding the preflight PID, whose non-null
+command line contains the exact V3 script path or root name by ordinal-ignore-
+case comparison; a nonzero set blocks materialization without consuming V3.
+Materialize the fence once at
+`D:\Temp\meandai-aconverge-v3-2f34c958ccd74d51ad3da23ac17e50b4.ps1`,
+then require canonical LF plus one terminal LF, exactly `9,244` bytes, and
+SHA-256 `D03FD93432FA3BAF53338ADD7CF71A222F49BE84432C801A945D8B41ED29E48E`
+while the root remains absent and the same process set remains zero. Invoke one pre-authorized
+`require_escalated` tool call from repository root, substituting the literal
+hosted-green forty-character head for `<HEAD>`, with exact command
+`& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoProfile -File 'D:\Temp\meandai-aconverge-v3-2f34c958ccd74d51ad3da23ac17e50b4.ps1' -ExpectedHead '<HEAD>'; exit $LASTEXITCODE`.
+No wrapper/fallback/retry is permitted; every admitted tool call, including an
+outer admission failure, consumes the attempt. The exact V3 PowerShell script is:
 
 ```powershell
+param([Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $ExpectedHead)
 $ErrorActionPreference = 'Stop'
-if ($PSVersionTable.PSVersion -lt [Version]'7.4') { throw 'A-CONVERGE V2 requires PowerShell 7.4 or later.' }
+$root = 'D:\Temp\meandai-test-0210-a-converge-v3-2f34c958ccd74d51ad3da23ac17e50b4'
+if (Test-Path -LiteralPath $root) { throw 'Fresh V3 evidence root already exists.' }
+[void][IO.Directory]::CreateDirectory($root)
+$entryPath = Join-Path $root 'entry.json'
+$entry = [ordered]@{ schema = 1; attempt = 'V3'; state = 'Entered'; enteredUtc = [DateTime]::UtcNow.ToString('O'); completedUtc = $null; pid = $PID }
+[IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
+Write-Output ('A-CONVERGE-V3-ENTERED=' + $root)
+$expectedPwsh = 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe'
+if ($PSVersionTable.PSVersion -ne [Version]'7.6.4') { throw 'A-CONVERGE V3 requires exact PowerShell 7.6.4.' }
+$pwsh = [IO.Path]::GetFullPath((Join-Path $PSHOME 'pwsh.exe'))
+if ($pwsh -cne $expectedPwsh -or -not [IO.File]::Exists($pwsh)) { throw 'A-CONVERGE V3 PowerShell identity mismatch.' }
 $PSNativeCommandUseErrorActionPreference = $true
+function Assert-SourceIdentity {
+  $head = (& git rev-parse HEAD).Trim()
+  if ($head -cne $ExpectedHead) { throw 'V3 source HEAD mismatch.' }
+  $status = @(& git status --porcelain=v1 --untracked-files=all)
+  if (@($status | Where-Object { $_ -cne '?? MeAndAI.Protocol.v3.ncrunchsolution.user' }).Count) { throw 'V3 tracked source is dirty.' }
+}
+Assert-SourceIdentity
 $c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
 $d = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
 & dotnet build MeAndAI.Protocol.slnx -c Release --no-restore --nologo
@@ -1629,8 +1665,6 @@ Assert-Set $a 32 'C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B
 Assert-Set $u 11 'F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6' 'API/ownership'
 Assert-Set $domain 98 'FABE8953F91FC735BCB4A74DF1AD00A01F3B37DE4DAC21841F381BC9845A132B' 'Domain'
 $resource = @('MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings')
-$root = Join-Path ([IO.Path]::GetTempPath()) ('meandai-test-0210-a-converge-' + [Guid]::NewGuid().ToString('N'))
-if (Test-Path -LiteralPath $root) { throw 'Fresh evidence root already exists.' }; [void][IO.Directory]::CreateDirectory($root)
 function Invoke-Run([string] $p, [string] $file, [string] $f = '') { $x = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--nologo'); if ($f) { $x += @('--filter', $f) }; $x += @('--logger', "trx;LogFileName=$file", '--results-directory', $root); & dotnet @x }
 Invoke-Run $c 'resource.trx' 'FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings'
 Invoke-Run $c 'a.trx' 'ContractSlice=A'
@@ -1649,36 +1683,61 @@ function Assert-Trx([string] $file, [string[]] $expected) {
     if ($definition.Count -ne 1 -or $entry.Count -ne 1) { throw "$file definition/entry/result identity mismatch." }
   }
   if (@($r | Where-Object { [string]$_.outcome -cne 'Passed' }).Count) { throw "$file has a non-passing result." }
-  $k = $trx.SelectSingleNode('//*[local-name()="Counters"]'); foreach ($n in @('total','executed','passed')) { if ([int]$k.$n -ne $expected.Count) { throw "$file/$n mismatch." } }
-  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','completed','inProgress','pending')) { if ([int]$k.$n) { throw "$file/$n is nonzero." } }
+  $counters = @($trx.SelectNodes('//*[local-name()="Counters"]')); if ($counters.Count -ne 1) { throw "$file Counters cardinality mismatch." }; $k = $counters[0]
+  if ($k.Attributes.Count -ne 16) { throw "$file Counters attribute-count mismatch." }
+  foreach ($n in @('total','executed','passed')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne $expected.Count) { throw "$file/$n mismatch." } }
+  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','completed','inProgress','pending')) { $x = $k.Attributes.GetNamedItem($n); $v = 0; if ($null -eq $x -or -not [int]::TryParse($x.Value, [ref]$v) -or $v -ne 0) { throw "$file/$n mismatch." } }
   if (@($trx.SelectNodes('//*[local-name()="ResultFiles"]/* | //*[local-name()="CollectorDataEntries"]/* | //*[local-name()="RunInfo"]')).Count) { throw "$file has a diagnostic or attachment." }
 }
 Assert-Trx 'resource.trx' $resource; Assert-Trx 'a.trx' $a; Assert-Trx 'api-ownership.trx' $u; Assert-Trx 'conformance.trx' $a; Assert-Trx 'domain.trx' $domain
 & dotnet format MeAndAI.Protocol.slnx --verify-no-changes --no-restore
-& pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
-& pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
+& $pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
+& $pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
 $locks = [ordered]@{
   'src/MeAndAI.Protocol.Domain/packages.lock.json' = '03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46'; 'src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json' = 'D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799'; 'src/MeAndAI.Protocol.Conformance/packages.lock.json' = '20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7'; 'src/MeAndAI.Protocol.Policy/packages.lock.json' = 'C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309'; 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json' = 'D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC'; 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json' = 'BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0'
 }
 foreach ($x in $locks.GetEnumerator()) { if ((Get-FileHash -LiteralPath $x.Key -Algorithm SHA256).Hash -cne $x.Value) { throw "Lock mismatch: $($x.Key)" } }
 & git diff --check
+Assert-SourceIdentity
+$expectedFiles = @('a.trx','api-ownership.trx','conformance.trx','domain.trx','entry.json','resource.trx')
+function Assert-RootInventory {
+  $items = @(Get-ChildItem -LiteralPath $root -Force)
+  if (@($items | Where-Object { $_.PSIsContainer -or $_ -isnot [IO.FileInfo] -or ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) }).Count) { throw 'V3 evidence root has a non-regular entry.' }
+  [string[]] $actualFiles = @($items | ForEach-Object Name); [Array]::Sort($actualFiles, [StringComparer]::Ordinal)
+  if ($actualFiles.Count -ne $expectedFiles.Count) { throw 'V3 evidence-root inventory count mismatch.' }
+  for ($i = 0; $i -lt $expectedFiles.Count; $i++) { if ($actualFiles[$i] -cne $expectedFiles[$i]) { throw 'V3 evidence-root inventory name mismatch.' } }
+}
+Assert-RootInventory
+$entry['state'] = 'Completed'; $entry['completedUtc'] = [DateTime]::UtcNow.ToString('O')
+[IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
+Assert-RootInventory
+$sealedEntry = Get-Content -LiteralPath $entryPath -Raw | ConvertFrom-Json
+if ([int]$sealedEntry.schema -ne 1 -or [string]$sealedEntry.attempt -cne 'V3' -or [string]$sealedEntry.state -cne 'Completed' -or [int]$sealedEntry.pid -ne $PID) { throw 'V3 completed-entry identity mismatch.' }
+$entered = [DateTimeOffset]::ParseExact([string]$sealedEntry.enteredUtc, 'O', [Globalization.CultureInfo]::InvariantCulture); $completed = [DateTimeOffset]::ParseExact([string]$sealedEntry.completedUtc, 'O', [Globalization.CultureInfo]::InvariantCulture)
+if ($completed -lt $entered) { throw 'V3 completed-entry chronology mismatch.' }
+Write-Output ('A-CONVERGE-V3-COMPLETED=' + $root)
 ```
 
-V2 owns build, format, diff, StructureOnly, publication, and six lock oracles;
+Attempt classification is fail closed: absent root means outer/pre-entry
+failure; root without `entry.json` means entry-write failure; a malformed or
+missing entry is invalid evidence; valid `Entered` with null `completedUtc`
+means in-script failure; only child exit `0`, exact final six regular files, and
+the parsed identity/chronology-valid `Completed` entry can mean success. Every
+admitted attempt consumes authority and is never retried.
+
+V3 owns build, format, diff, StructureOnly, publication, and six lock oracles;
 every exit must be zero. Final production/test/docs/memory and evidence/scope
 reviews must each close `0/0/0` after the final record edit.
 
-V1 is immutable and never rerun. Exact head
+V1 exact head
 [`7c698d78374678a9f3d2264edc8d451effeaffe0`](https://github.com/hasanmanzak/meAndAI/commit/7c698d78374678a9f3d2264edc8d451effeaffe0)
-passed Ubuntu `20m00s`, Windows `47m15s`; [run 31269244100](https://github.com/hasanmanzak/meAndAI/actions/runs/31269244100)
-skipped publication. Its retained script ran once, exited `1` after five passes
-on `resource.trx/completed mismatch.`, and stopped before later gates. All V1
-paths, hashes, counters, and custody live only in the owning convergence ledger;
-V1 contributes no success. V2 expects `total/executed/passed=N` and all thirteen
-other counters zero; it requires its frozen SHA, fresh path/root, hosted gate,
-and one invocation.
+and [run 31269244100](https://github.com/hasanmanzak/meAndAI/actions/runs/31269244100)
+are immutable diagnostic/no success. V2 is likewise immutable
+`AttemptInvalidated/NoInvocation/NoSuccess`; their detailed custody is owned by
+the convergence ledger. V3 preserves every audit oracle and adds entry/root
+custody plus the exact one-attempt launcher above.
 
-A fully green corrected V2 audit produces `CompletionRecommended`; only the atomic sync above
+A fully green V3 audit produces `CompletionRecommended`; only the atomic sync above
 advances the routing denominator to `20/20`, while cumulative A remains
 `32/32`. This recommends ContractSlice A completion only; [TEST-0210](test-cases.md#test-0210)
 stays `Planned`. Scenario/status/owner, both combined workflow filters,
@@ -8512,7 +8571,4 @@ verification correctly skipped. `A-ADMISSION-01` remains packet-local
 run `30798854880` passed
 Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
 correctly skipped. Never-activated `A-CONVERGE-01` is retired. Current A state
-is routed by the header and owning freeze ledger. [TEST-0210](test-cases.md#test-0210)
-remains `Planned`; Converge V1 is immutable diagnostic/no success and V2 is
-FrozenDesign/corrected-design hosted pending. Workflow, final activation, later slices, release and
-publication remain prohibited throughout ContractSlice A.
+and all downstream holds are routed by the header and owning freeze ledger.
