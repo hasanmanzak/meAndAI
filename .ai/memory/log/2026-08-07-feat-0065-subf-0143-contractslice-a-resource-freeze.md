@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Date | 2026-08-07 |
-| State | `A-RESOURCE-01` is local `ReviewedLocalGreen`; hosted checks are pending |
+| State | `A-RESOURCE-01` is exact-head hosted-green `ReviewedLocalGreen` |
 | Identity | Exact FQN `MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings`; one Fact; only `ContractSlice=A`; no Scenario |
-| Route | P=`NotApplicable`; accepted immutable R=`0024` / `TEST-0210-A-BEHAVIOR-RED-0024`; `0016` cadence-infrastructure diagnostic, `0017` PowerShell-host diagnostic, `0018` Job-identity diagnostic, `0019` xUnit-stderr diagnostic, `0020` stdout-shape diagnostic, `0021` TRX-validator diagnostic, `0022` ExitTime diagnostic, and `0023` exit-code diagnostic; G is the bounded test plus `MaximumDepth 64 -> 9`; local green/reviews are complete and hosted checks are pending |
+| Route | P=`NotApplicable`; accepted immutable R=`0024` / `TEST-0210-A-BEHAVIOR-RED-0024`; `0016` cadence-infrastructure diagnostic, `0017` PowerShell-host diagnostic, `0018` Job-identity diagnostic, `0019` xUnit-stderr diagnostic, `0020` stdout-shape diagnostic, `0021` TRX-validator diagnostic, `0022` ExitTime diagnostic, and `0023` exit-code diagnostic; G is the bounded test plus `MaximumDepth 64 -> 9`; local green/reviews and exact-head hosted checks are complete |
 
 The records-head gate that permits this design freeze is exact-hosted-green:
 
@@ -118,7 +118,11 @@ warnings/errors; format verification passes. Test SHA-256 is
 production SHA-256 is
 `59778EBB360B46833130FBCF7EC7995D17137A98F4857812331379681DBA8D86`.
 Fresh post-green code/test and evidence/scope reviews both closed `0/0/0`.
-Canonical R=`0024` and bounded local green are accepted; hosted checks are
-pending. `A-CONVERGE-02`, B/C/D,
+Canonical R=`0024` and bounded local green are accepted. Exact
+[`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
+passed Ubuntu `18m51s` and Windows `43m06s` in
+[run 31264791256](https://github.com/hasanmanzak/meAndAI/actions/runs/31264791256);
+publication verification was skipped. `A-CONVERGE-02` is FrozenDesign/inactive
+pending its records/design head. B/C/D,
 final activation, merge, release, publication, consumer mutation, and authority
 transfer remain held.

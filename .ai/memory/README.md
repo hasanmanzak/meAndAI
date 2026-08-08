@@ -1,7 +1,7 @@
 # Project-local AI Memory
 
 Scope: **this `meAndAI` repository only**<br>
-Last reviewed: **2026-08-07**<br>
+Last reviewed: **2026-08-08**<br>
 Protocol version: **0.16.0**<br>
 Latest immutable release before this unmerged development: **0.16.0**
 
@@ -305,7 +305,7 @@ The lifecycle records-only freeze head is exact-hosted-green: Ubuntu passed in
 `20m44s`, Windows in `46m51s`, and publication verification was correctly
 skipped. The exact lifecycle implementation identity recorded in the canonical
 handoff passed Ubuntu in `19m36s` and Windows in `36m02s`; publication verification was
-correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. `A-RESOURCE-01` is local `ReviewedLocalGreen` at accepted immutable R=`0024` (`0016`-`0023` diagnostics), hosted pending; `A-CONVERGE-02` is Candidate/inactive. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held.
+correctly skipped. ContractSlice A is `19/20` (`95%`) and `32/32`; full Domain is `98/98`. `A-RESOURCE-01` is exact-head hosted-green `ReviewedLocalGreen` at accepted immutable R=`0024` (`0016`-`0023` diagnostics) through run `31264791256`; `A-CONVERGE-02` is `FrozenDesign`/inactive pending its records/design head. [TEST-0210](../../docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md#test-0210) and final activation remain held.
 The exact record-delivery closure reached the full `4096/4096` instruction-graph
 budget. Ubuntu passed in `19m52s`; Windows reached its exact 45-minute job
 ceiling after every emitted suite result was successful. The bounded correction

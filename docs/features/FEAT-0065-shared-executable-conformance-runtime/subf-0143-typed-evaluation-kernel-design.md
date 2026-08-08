@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; A is `19/20` (`95%`) and `32/32`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; `A-RESOURCE-01` is local green at accepted immutable R=`0024` (`0016`-`0023` diagnostics), hosted pending; `A-CONVERGE-02` Candidate/inactive. Final activation and DoD remain held. |
+| Status | Gate 2 accepted; A is `19/20` (`95%`) and `32/32`. [TEST-0210](test-cases.md#test-0210) remains `Planned`; `A-RESOURCE-01` is exact-head hosted green at accepted immutable R=`0024` (`0016`-`0023` diagnostics) through run `31264791256`; `A-CONVERGE-02` is `FrozenDesign`/inactive pending this records/design head. Final activation and DoD remain held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1508,7 +1508,177 @@ green, Release build/format, and renewed reviews are complete locally. Exact
 artifact paths, metrics, SHA-256 identities, diagnostic causes, and green
 evidence are canonical only in
 `.ai/memory/log/2026-08-07-feat-0065-subf-0143-contractslice-a-resource-freeze.md`.
-Hosted checks remain pending; R was not rerun.
+Exact `885ad0ba01f99ed44e325fa974a6cb62e89b4986` passed Ubuntu `18m51s` and
+Windows `43m06s` in run `31264791256`,
+with publication verification skipped. R was not rerun.
+
+### `A-CONVERGE-02` frozen audit contract <a name="a-converge-02-freeze"></a>
+
+The exact `A-RESOURCE-01` records-delivery head
+`885ad0ba01f99ed44e325fa974a6cb62e89b4986` passed both stable hosted jobs,
+with publication verification skipped, and is synchronized as
+`ReviewedLocalGreen`. V remains prohibited until the commit containing this
+freeze and every synchronized live route is itself exact-head hosted green;
+until then this packet is frozen but inactive.
+Strict D/RT closed `0 Blocking / 0 Important / 0 Minor` on this exact command,
+inventory, digest, allowlist, and hold set.
+
+This is a pure audit packet: P, R, and G are each `NotApplicable`; it is not
+`TestOnlyGreen`. It adds no Fact, FQN, marker, ordinal, TRX, production, test,
+project, package, lock, workflow, or scenario/status/owner mutation. Its
+code/test/project/package/lock/workflow allowlist is empty. The packet may edit
+only this design, the micro-delivery plan, and the [TEST-0210](test-cases.md#test-0210)
+evidence record before V. V produces `CompletionRecommended` while the global
+routing truth remains `19/20`. No intermediate record may claim `20/20`.
+
+One atomic code-free `COHORT-SYNC-A-FINAL` commit then owns the only global
+transition to `20/20`. Its exact allowlist is:
+
+```text
+.ai/memory/README.md
+.ai/memory/log/README.md
+.ai/memory/project.md
+.ai/memory/log/2026-08-08-feat-0065-subf-0143-contractslice-a-converge.md
+docs/architecture/protocol-governance-and-execution/README.md
+docs/architecture/protocol-governance-and-execution/successor-delivery-plan.md
+docs/architecture/protocol-governance-and-execution/transition-register.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/README.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-micro-delivery-plan.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/subf-0143-typed-evaluation-kernel-design.md
+docs/features/FEAT-0065-shared-executable-conformance-runtime/test-cases.md
+docs/features/README.md
+```
+
+The handoff is at most `80` lines and `4` Markdown links, with at most `2`
+repository-relative outgoing links; no other new node or link relation is
+allowed. The sync changes each live current tuple exactly once to A audit
+complete/recommended, `20/20`, cumulative `32/32`, [TEST-0210](test-cases.md#test-0210)
+`Planned`, and all activation/B/C/D holds retained; it rewrites no historical
+evidence. `git diff --check`, StructureOnly, graph limits `4096` edges and
+`4,194,304` parsed bytes, and two final reviews `0/0/0` must close on the exact
+atomic tree before commit. Until that commit is exact-head hosted green, the
+authoritative state remains local completion recommended / hosted pending.
+
+Discovery is frozen to Release `--no-restore --no-build --list-tests --filter
+"ContractSlice=A"`. Sorting the exact FQNs ordinally, joining with LF, and
+adding one final LF yields `32` names and SHA-256
+`C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92`.
+Each exact FQN is prefix `MeAndAI.Protocol.Conformance.Tests.` plus one
+suffix below; the reconstructed full names, not the suffixes alone, own the digest:
+
+```text
+ContractSliceAAdmissionProofManifestTests.Enforces_admission_proof_declarations_with_exact_kind_component_and_artifact_closure
+ContractSliceAArtifactComponentGraphTests.Enforces_exact_binding_runtime_anchor_and_reachability_graph
+ContractSliceACanonicalJsonGrammarTests.Enforces_exact_document_and_slice_structural_grammar
+ContractSliceACanonicalNumberTests.Enforces_exact_integer_grammar_and_range
+ContractSliceACanonicalStringTests.Enforces_exact_canonical_manifest_string_encoding
+ContractSliceACompleteCatalogProfileTests.Enforces_exact_provider_profile_genesis_catalog_inventory_digest_and_added_transitions
+ContractSliceAFindingManifestTests.Enforces_finding_declarations_with_exact_reference_roles
+ContractSliceAFullManifestGraphTests.Full_declaration_graph_equals_the_exact_five_rule_six_artifact_thirty_five_component_snapshot
+ContractSliceAGovernedReferenceSlotsManifestTests.Enforces_exact_governed_reference_index_and_dual_governed_text_slot_capability_closure
+ContractSliceAIndexSlotManifestTests.Enforces_exact_repository_tree_index_and_slot_capability_closure
+ContractSliceALifecycleManifestTests.Enforces_rule_lifecycle_against_transitions_and_active_profiles
+ContractSliceAManifestTests.Parses_minimal_canonical_qualification_manifest
+ContractSliceAOwnershipTests.DomainExportsEqualTheOrdinalUnionOfPredecessorInventories
+ContractSliceAOwnershipTests.EffectiveRestoreGraphsEqualTheContractSliceATotalGraph
+ContractSliceAOwnershipTests.FriendAssembliesEqualTheCurrentContractSliceAMatrix
+ContractSliceAOwnershipTests.LocksEqualTheContractSliceATotalGraph
+ContractSliceAOwnershipTests.PackageReferencesEqualTheContractSliceAGraph
+ContractSliceAOwnershipTests.SolutionAndProjectReferencesEqualTheContractSliceAGraph
+ContractSliceAParserRecordSlotManifestTests.Enforces_exact_markdown_parser_protocol_record_index_and_slot_capability_closure
+ContractSliceAPredecessorManifestTests.Enforces_existing_predecessor_version_and_exact_digests
+ContractSliceAProjectorDagManifestTests.Enforces_exact_projector_bindings_and_global_producer_graph
+ContractSliceAPublicApiTests.DeclaredPublicSurfaceEqualsTheContractSliceASnapshot
+ContractSliceAPublicApiTests.ExportedTypesEqualTheContractSliceAInventories
+ContractSliceAPublicApiTests.FriendAssembliesEqualTheCurrentContractSliceAAllowlist
+ContractSliceAPublicApiTests.PublicTypesHaveNoConstructionOrSerializationLeak
+ContractSliceAPublicApiTests.StagedExportsExposeOnlyTheContractSliceASeam
+ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings
+ContractSliceARuleDeclarationTests.Enforces_canonical_multi_fragment_rule_provenance
+ContractSliceASchemaSlotManifestTests.Enforces_exact_schema_and_zero_capability_evidence_slot_closure
+ContractSliceASelectorManifestTests.Enforces_expected_selectors_with_exact_slot_schema_resolver_and_finding_closure
+ContractSliceATargetParserIndexSlotManifestTests.Enforces_exact_repository_target_schema_parser_index_and_slot_capability_closure
+ContractSliceATransitionManifestTests.Enforces_exact_unchanged_added_revised_and_retired_transition_shapes
+```
+
+The focused predecessor FQN is the resource test above and must pass `1/1`.
+The main `ContractSlice=A` run and unfiltered full Conformance run must each
+pass `32/32`; full Domain must pass `98/98`. The API/friend/hold subset is
+exactly the five `ContractSliceAPublicApiTests` plus six
+`ContractSliceAOwnershipTests` FQNs above; the same LF framing yields SHA-256
+`F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6`,
+and the class-union filter must select and pass `11/11`.
+
+Materialize the exact fenced bytes below in one fresh external `.ps1`, record
+its SHA-256 in the handoff, and invoke that file once and uninterrupted from
+repository root with `pwsh -NoProfile -File`; piecemeal execution or rerun is
+not evidence. The exact V PowerShell 7 script is:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion -lt [Version]'7.4') { throw 'A-CONVERGE V requires PowerShell 7.4 or later.' }
+$PSNativeCommandUseErrorActionPreference = $true
+$c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
+$d = 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/MeAndAI.Protocol.Domain.Tests.csproj'
+& dotnet build MeAndAI.Protocol.slnx -c Release --no-restore --nologo
+function Get-Digest([string[]] $v) { [Array]::Sort($v, [StringComparer]::Ordinal); $b = [Text.Encoding]::UTF8.GetBytes(($v -join "`n") + "`n"); [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($b)) }
+function Get-Discovery([string] $p, [string] $f = '') { $a = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--list-tests', '--nologo'); if ($f) { $a += @('--filter', $f) }; $o = & dotnet @a 2>&1; [string[]] @($o | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -like 'MeAndAI.Protocol.*.Tests.*' }) }
+function Assert-Set([string[]] $v, [int] $n, [string] $h, [string] $name) { if ($v.Count -ne $n -or (Get-Digest $v) -cne $h) { throw "$name discovery mismatch." } }
+$a = @(Get-Discovery $c 'ContractSlice=A')
+$u = @($a | Where-Object { $_ -like '*.ContractSliceAPublicApiTests.*' -or $_ -like '*.ContractSliceAOwnershipTests.*' })
+$domain = @(Get-Discovery $d)
+Assert-Set $a 32 'C42DF0B847DF11078C904346CA5D033084797B5386450527E3F8D99612F08B92' 'A'
+Assert-Set $u 11 'F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6' 'API/ownership'
+Assert-Set $domain 98 'FABE8953F91FC735BCB4A74DF1AD00A01F3B37DE4DAC21841F381BC9845A132B' 'Domain'
+$resource = @('MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings')
+$root = Join-Path ([IO.Path]::GetTempPath()) ('meandai-test-0210-a-converge-' + [Guid]::NewGuid().ToString('N'))
+if (Test-Path -LiteralPath $root) { throw 'Fresh evidence root already exists.' }; [void][IO.Directory]::CreateDirectory($root)
+function Invoke-Run([string] $p, [string] $file, [string] $f = '') { $x = @('test', $p, '-c', 'Release', '--no-restore', '--no-build', '--nologo'); if ($f) { $x += @('--filter', $f) }; $x += @('--logger', "trx;LogFileName=$file", '--results-directory', $root); & dotnet @x }
+Invoke-Run $c 'resource.trx' 'FullyQualifiedName=MeAndAI.Protocol.Conformance.Tests.ContractSliceAResourceManifestTests.Enforces_exact_manifest_byte_reachable_depth_and_token_ceilings'
+Invoke-Run $c 'a.trx' 'ContractSlice=A'
+Invoke-Run $c 'api-ownership.trx' 'FullyQualifiedName~ContractSliceAPublicApiTests|FullyQualifiedName~ContractSliceAOwnershipTests'
+Invoke-Run $c 'conformance.trx'
+Invoke-Run $d 'domain.trx'
+function Assert-Trx([string] $file, [string[]] $expected) {
+  [xml] $trx = Get-Content -LiteralPath (Join-Path $root $file) -Raw
+  $r = @($trx.SelectNodes('//*[local-name()="UnitTestResult"]')); $d = @($trx.SelectNodes('//*[local-name()="UnitTest"]')); $e = @($trx.SelectNodes('//*[local-name()="TestEntry"]'))
+  [string[]] $rn = @($r | ForEach-Object { [string]$_.testName }); [string[]] $dn = @($d | ForEach-Object { [string]$_.name }); $h = Get-Digest $expected
+  if ($r.Count -ne $expected.Count -or $d.Count -ne $expected.Count -or $e.Count -ne $expected.Count -or (Get-Digest $rn) -cne $h -or (Get-Digest $dn) -cne $h) { throw "$file FQN-set mismatch." }
+  if (@($r | ForEach-Object { [string]$_.executionId } | Sort-Object -Unique).Count -ne $expected.Count) { throw "$file result executionId uniqueness mismatch." }
+  foreach ($result in $r) {
+    $definition = @($d | Where-Object { [string]$_.id -ceq [string]$result.testId -and [string]$_.name -ceq [string]$result.testName })
+    $entry = @($e | Where-Object { [string]$_.testId -ceq [string]$result.testId -and [string]$_.executionId -ceq [string]$result.executionId })
+    if ($definition.Count -ne 1 -or $entry.Count -ne 1) { throw "$file definition/entry/result identity mismatch." }
+  }
+  if (@($r | Where-Object { [string]$_.outcome -cne 'Passed' }).Count) { throw "$file has a non-passing result." }
+  $k = $trx.SelectSingleNode('//*[local-name()="Counters"]'); foreach ($n in @('total','executed','passed','completed')) { if ([int]$k.$n -ne $expected.Count) { throw "$file/$n mismatch." } }
+  foreach ($n in @('failed','error','timeout','aborted','inconclusive','passedButRunAborted','notRunnable','notExecuted','disconnected','warning','inProgress','pending')) { if ([int]$k.$n) { throw "$file/$n is nonzero." } }
+  if (@($trx.SelectNodes('//*[local-name()="ResultFiles"]/* | //*[local-name()="CollectorDataEntries"]/* | //*[local-name()="RunInfo"]')).Count) { throw "$file has a diagnostic or attachment." }
+}
+Assert-Trx 'resource.trx' $resource; Assert-Trx 'a.trx' $a; Assert-Trx 'api-ownership.trx' $u; Assert-Trx 'conformance.trx' $a; Assert-Trx 'domain.trx' $domain
+& dotnet format MeAndAI.Protocol.slnx --verify-no-changes --no-restore
+& pwsh -NoProfile -File tests/protocol.tests.ps1 -StructureOnly
+& pwsh -NoProfile -File tests/capabilities/publication-evidence/post-publication-evidence.tests.ps1
+$locks = [ordered]@{
+  'src/MeAndAI.Protocol.Domain/packages.lock.json' = '03EEADC5EF377C17F787AB65F41FB4C8A9C936BB7F7F4171111FDEEC8A81CB46'; 'src/MeAndAI.Protocol.Conformance.Abstractions/packages.lock.json' = 'D79FF11818ABFE0B6CA9CAEC111778169AA36A04709BCA3E0EC0AB84325BF799'; 'src/MeAndAI.Protocol.Conformance/packages.lock.json' = '20E6BA80BFB6EDE58228D28560A03B6143F3D163AC5E06720491458FEA9570E7'; 'src/MeAndAI.Protocol.Policy/packages.lock.json' = 'C57F6AFAEBA953E49D3B6D2CB85E82C00E6A40631507426B1616E57B94724309'; 'tests/dotnet/MeAndAI.Protocol.Domain.Tests/packages.lock.json' = 'D2065F11ED7030EE7DFA7A757FBA2A0D420DAC2F32D0105DFA93D3F78F9B00BC'; 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/packages.lock.json' = 'BA8D8C653CF0CFD2398F9E43F7AB87ED268A9B77EC5FC2E0F81D2BD7849016C0'
+}
+foreach ($x in $locks.GetEnumerator()) { if ((Get-FileHash -LiteralPath $x.Key -Algorithm SHA256).Hash -cne $x.Value) { throw "Lock mismatch: $($x.Key)" } }
+& git diff --check
+```
+
+The same V script owns the zero-warning/error build, format, diff,
+StructureOnly, bounded publication-evidence, and six exact-path lock-hash
+oracles; no prose-only success substitutes for their zero exit.
+Final production/test/docs/memory and evidence/scope reviews must each close
+`0/0/0` after the final record edit.
+
+Successful audit produces `CompletionRecommended`; only the atomic sync above
+advances the routing denominator to `20/20`, while cumulative A remains
+`32/32`. This recommends ContractSlice A completion only; [TEST-0210](test-cases.md#test-0210)
+stays `Planned`. Scenario/status/owner, both combined workflow filters,
+[TEST-0146](../FEAT-0035-test-runtime-efficiency/test-cases.md#test-0146),
+B/C/D, merge, release, and publication remain held.
+
 `FinalizedPolicyManifest.ParseCanonical` is the Abstractions-owned byte
 boundary. It throws `FormatException` for empty input, BOM, invalid UTF-8,
 invalid JSON, trailing or missing LF, alternate field order or spelling,
@@ -8335,5 +8505,8 @@ verification correctly skipped. `A-ADMISSION-01` remains packet-local
 `ReviewedLocalGreen` with exact packet-local implementation/evidence; hosted
 run `30798854880` passed
 Windows in `14m58s` and Ubuntu in `19m00s`, with publication verification
-correctly skipped. Never-activated `A-CONVERGE-01` is retired. A-FULL canonical
-Current A state is routed by the header and owning freeze ledger. [TEST-0210](test-cases.md#test-0210) remains `Planned`; `A-CONVERGE-02` is Candidate/inactive. Workflow, final activation, later slices, release and publication remain prohibited throughout ContractSlice A.
+correctly skipped. Never-activated `A-CONVERGE-01` is retired. Current A state
+is routed by the header and owning freeze ledger. [TEST-0210](test-cases.md#test-0210)
+remains `Planned`; `A-CONVERGE-02` is `FrozenDesign`/inactive pending this
+records/design head. Workflow, final activation, later slices, release and
+publication remain prohibited throughout ContractSlice A.
