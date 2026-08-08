@@ -4,8 +4,8 @@
 | --- | --- |
 | Date | 2026-08-08 |
 | Scope | ContractSlice A convergence audit |
-| Contract | Corrected V3 audit contract in the owning typed design |
-| State | V1 diagnostic; V2 `AttemptInvalidated/NoInvocation/NoSuccess`; V3 `FrozenDesign`/inactive, D/RT `0/0/0`, hosted gate pending |
+| Contract | Corrected V4 audit contract in the owning typed design |
+| State | V1/V2/V3 diagnostic; V4 `FrozenDesign`/inactive; D/RT `0/0/0`; exact-head hosted design gate pending |
 | Progress | A `19/20` (`95%`); cumulative A `32/32`; Domain `98/98` |
 | Scenario | Parent scenario remains `Planned` |
 | Route | P/R/G `NotApplicable`; no `COHORT-SYNC-A-FINAL`; A stays `19/20` |
@@ -35,6 +35,27 @@ created `2026-08-08T19:54:58.4635350Z`, `6,068` bytes, SHA-256
 Its authorized launcher admission returned exact `CreateProcessAsUserW failed:
 5` in `0.1s` before the outer shell existed. No child, root, exit code, or
 stdout/stderr exists. V2 is immutable attempt-invalidated evidence and is never
-retried. V3 freezes a predeclared root, entry marker, new script identity, and
-one exact escalated launcher; D/RT is `0/0/0`, but activation remains held until
-this exact synchronized design head is hosted green.
+retried.
+
+## V3 final-sealing diagnostic
+
+V3 design head
+[`4f332a8321e911e78b02df82eab817de681f7ed6`](https://github.com/hasanmanzak/meAndAI/commit/4f332a8321e911e78b02df82eab817de681f7ed6)
+passed Ubuntu `19m34s` and Windows `48m04s` in run `31277744559`; publication
+was skipped. Its sole invocation exited `1` after `780.5s` and is never rerun.
+
+| V3 evidence | Exact identity |
+| --- | --- |
+| Script | `D:\Temp\meandai-aconverge-v3-2f34c958ccd74d51ad3da23ac17e50b4.ps1`; `9,244` bytes; SHA-256 `D03FD93432FA3BAF53338ADD7CF71A222F49BE84432C801A945D8B41ED29E48E`; created/write `2026-08-08T21:39:15.3406702Z` / `2026-08-08T21:39:15.3433062Z` |
+| Evidence root | `D:\Temp\meandai-test-0210-a-converge-v3-2f34c958ccd74d51ad3da23ac17e50b4`; exactly six regular files |
+| Entry | `151` bytes / `04EA801C57139664BC273BD85AE1A24E3A120D4AECA7700BCF0243DB055269CE`; schema `1`, attempt `V3`, state `Completed`, entered/completed `2026-08-08T21:41:02.3857958Z` / `2026-08-08T21:54:01.4468830Z`, PID `209224`; no terminal COMPLETED marker |
+| Results | Release build `0 warnings / 0 errors`; `1/1`, `32/32`, `11/11`, `32/32`, `98/98`; format, StructureOnly `442.072s`, publication evidence `7/7`, locks, diff, source and both inventory gates green |
+| TRX hashes | resource `27E148E007FA8097A15CBF6612BB70FD9487F5B2AFC14D4E18BA256D8E82A914`; A `A14088BF251C640168244282315C17D1B4CB173A8731A52D3A44BFDC605A9C75`; API/ownership `2441EDA86787CD37936435E0381440223D99DEB2762EC5FBE72124E2DE599A5A`; Conformance `3E49441CFA9E96397A021B86A26F15FB89B2BAB535046EA51F438EB5B8138014`; Domain `1710A761000E24449988BF2E270A1F60A61FF6AFBEEF42B227EC9B21FFC6912F` |
+| First failure | Default `ConvertFrom-Json` coerced ISO strings to `DateTime`; culture text `08/08/2026 21:41:02` failed invariant `ParseExact('O')`; chronology and terminal success marker were not reached |
+
+V3 is immutable `InScriptFailure/NoSuccess`. V4 changes only final timestamp
+sealing to preserve exact strings; all other audit oracles and holds remain.
+
+| V4 design delivery check | Result |
+| --- | --- |
+| Exact-tree local gates | StructureOnly green; publication evidence `7/7` including the fresh commit-reference recurrence, no publication claim; D/RT/content/scope reviews `0/0/0` |

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Classification | Subfeature / third dependency-closed [FEAT-0065](README.md) design slice |
-| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2 diagnostic; V3 `FrozenDesign`/hosted pending after D/RT `0/0/0`. Final activation/DoD held. |
+| Status | Gate 2 accepted; A `19/20` (`95%`), `32/32`; [TEST-0210](test-cases.md#test-0210) `Planned`; Resource hosted green; V1/V2/V3 diagnostic; V4 `FrozenDesign`/inactive, D/RT `0/0/0`, exact-head hosted design gate pending. Final activation/DoD held. |
 | Parent | [FEAT-0065](README.md) |
 | Tracking | [Issue #165](https://github.com/hasanmanzak/meAndAI/issues/165) |
 | Decision | [DEC-0035](../../decisions/DEC-0035-protocol-owned-governance-and-execution-architecture.md) |
@@ -1512,7 +1512,7 @@ Exact [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanza
 Windows `43m06s` in run `31264791256`,
 with publication verification skipped. R was not rerun.
 
-### `A-CONVERGE-02` corrected V3 audit contract <a name="a-converge-02-freeze"></a>
+### `A-CONVERGE-02` corrected V4 audit contract <a name="a-converge-02-freeze"></a>
 
 Resource head
 [`885ad0ba01f99ed44e325fa974a6cb62e89b4986`](https://github.com/hasanmanzak/meAndAI/commit/885ad0ba01f99ed44e325fa974a6cb62e89b4986)
@@ -1523,16 +1523,16 @@ passed Ubuntu `19m37s` and Windows `37m52s` in
 with publication skipped, but its sole
 authorized launcher admission failed at the outer sandbox with exact
 `CreateProcessAsUserW failed: 5` before any shell/child/root. V2 is therefore
-`AttemptInvalidated/NoInvocation/NoSuccess`; same-V2 retry is prohibited.
-V3 D/RT is `0/0/0`, but V3 remains inactive until this synchronized design
-commit itself is exact-head hosted green.
+`AttemptInvalidated/NoInvocation/NoSuccess`; same-V2 retry is prohibited. V3
+passed its hosted gate and every audit validation, then exited `1` because
+default `ConvertFrom-Json` coerced exact ISO strings to culture-formatted
+`DateTime` text before `ParseExact('O')`. V3 is immutable no-success/no-retry.
 
 This pure audit packet has P/R/G `NotApplicable`, not `TestOnlyGreen`, and an
 empty executable allowlist. It adds no Fact/FQN/marker/ordinal/TRX or code,
-test, project, package, lock, workflow, scenario/status/owner mutation. V1's
-failure requires the exact twelve-path corrected-design cohort below; it
-records V1/V2, freezes V3, retains `19/20`, and changes no history. Only fully
-green V3 produces `CompletionRecommended`; no intermediate record claims
+test, project, package, lock, workflow, scenario/status/owner mutation. The
+exact twelve-path cohort records V1/V2/V3 and freezes V4 while retaining
+`19/20`. Only fully green V4 produces `CompletionRecommended`; no intermediate record claims
 `20/20`.
 
 One atomic code-free `COHORT-SYNC-A-FINAL` commit then owns the only global
@@ -1613,43 +1613,44 @@ exactly the five `ContractSliceAPublicApiTests` plus six
 `F58C362D6CA12A4C67AFCD1C75573063A89F2909088BA11DFA9BAF247E68B0C6`,
 and the class-union filter must select and pass `11/11`.
 
-After the synchronized V3 design head is hosted green, preflight the exact
+After the synchronized V4 design head is hosted green, preflight the exact
 head/clean status and PowerShell `7.6.4`; require both the fixed script path and
 fixed evidence root below to be absent. The competing-process set is exactly
 `pwsh.exe` or `powershell.exe`, excluding the preflight PID, whose non-null
-command line contains the exact V3 script path or root name by ordinal-ignore-
-case comparison; a nonzero set blocks materialization without consuming V3.
+command line contains the exact V4 script path or root name by ordinal-ignore-
+case comparison; a nonzero set blocks materialization without consuming V4.
 Materialize the fence once at
-`D:\Temp\meandai-aconverge-v3-2f34c958ccd74d51ad3da23ac17e50b4.ps1`,
-then require canonical LF plus one terminal LF, exactly `9,244` bytes, and
-SHA-256 `D03FD93432FA3BAF53338ADD7CF71A222F49BE84432C801A945D8B41ED29E48E`
+`D:\Temp\meandai-aconverge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a.ps1`,
+then require canonical LF plus one terminal LF, exactly `10,338` bytes, SHA-256
+`2232F691F8671CD256A79D2AE381423469CB046B4FC43F0F5DDEB289816C5019`,
+and AST `1,774` tokens / `69` top-level statements / `0` errors
 while the root remains absent and the same process set remains zero. Invoke one pre-authorized
 `require_escalated` tool call from repository root, substituting the literal
 hosted-green forty-character head for `<HEAD>`, with exact command
-`& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoProfile -File 'D:\Temp\meandai-aconverge-v3-2f34c958ccd74d51ad3da23ac17e50b4.ps1' -ExpectedHead '<HEAD>'; exit $LASTEXITCODE`.
+`& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoProfile -File 'D:\Temp\meandai-aconverge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a.ps1' -ExpectedHead '<HEAD>'; exit $LASTEXITCODE`.
 No wrapper/fallback/retry is permitted; every admitted tool call, including an
-outer admission failure, consumes the attempt. The exact V3 PowerShell script is:
+outer admission failure, consumes the attempt. The exact V4 PowerShell script is:
 
 ```powershell
 param([Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $ExpectedHead)
 $ErrorActionPreference = 'Stop'
-$root = 'D:\Temp\meandai-test-0210-a-converge-v3-2f34c958ccd74d51ad3da23ac17e50b4'
-if (Test-Path -LiteralPath $root) { throw 'Fresh V3 evidence root already exists.' }
+$root = 'D:\Temp\meandai-test-0210-a-converge-v4-91a7c6e4c5e349a0b22e3f37d5d0f84a'
+if (Test-Path -LiteralPath $root) { throw 'Fresh V4 evidence root already exists.' }
 [void][IO.Directory]::CreateDirectory($root)
 $entryPath = Join-Path $root 'entry.json'
-$entry = [ordered]@{ schema = 1; attempt = 'V3'; state = 'Entered'; enteredUtc = [DateTime]::UtcNow.ToString('O'); completedUtc = $null; pid = $PID }
+$entry = [ordered]@{ schema = 1; attempt = 'V4'; expectedHead = $ExpectedHead; state = 'Entered'; enteredUtc = [DateTime]::UtcNow.ToString('O'); completedUtc = $null; pid = $PID }
 [IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
-Write-Output ('A-CONVERGE-V3-ENTERED=' + $root)
+Write-Output ('A-CONVERGE-V4-ENTERED=' + $root)
 $expectedPwsh = 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.4.0_x64__8wekyb3d8bbwe\pwsh.exe'
-if ($PSVersionTable.PSVersion -ne [Version]'7.6.4') { throw 'A-CONVERGE V3 requires exact PowerShell 7.6.4.' }
+if ($PSVersionTable.PSVersion -ne [Version]'7.6.4') { throw 'A-CONVERGE V4 requires exact PowerShell 7.6.4.' }
 $pwsh = [IO.Path]::GetFullPath((Join-Path $PSHOME 'pwsh.exe'))
-if ($pwsh -cne $expectedPwsh -or -not [IO.File]::Exists($pwsh)) { throw 'A-CONVERGE V3 PowerShell identity mismatch.' }
+if ($pwsh -cne $expectedPwsh -or -not [IO.File]::Exists($pwsh)) { throw 'A-CONVERGE V4 PowerShell identity mismatch.' }
 $PSNativeCommandUseErrorActionPreference = $true
 function Assert-SourceIdentity {
   $head = (& git rev-parse HEAD).Trim()
-  if ($head -cne $ExpectedHead) { throw 'V3 source HEAD mismatch.' }
+  if ($head -cne $ExpectedHead) { throw 'V4 source HEAD mismatch.' }
   $status = @(& git status --porcelain=v1 --untracked-files=all)
-  if (@($status | Where-Object { $_ -cne '?? MeAndAI.Protocol.v3.ncrunchsolution.user' }).Count) { throw 'V3 tracked source is dirty.' }
+  if (@($status | Where-Object { $_ -cne '?? MeAndAI.Protocol.v3.ncrunchsolution.user' }).Count) { throw 'V4 tracked source is dirty.' }
 }
 Assert-SourceIdentity
 $c = 'tests/dotnet/MeAndAI.Protocol.Conformance.Tests/MeAndAI.Protocol.Conformance.Tests.csproj'
@@ -1702,42 +1703,48 @@ Assert-SourceIdentity
 $expectedFiles = @('a.trx','api-ownership.trx','conformance.trx','domain.trx','entry.json','resource.trx')
 function Assert-RootInventory {
   $items = @(Get-ChildItem -LiteralPath $root -Force)
-  if (@($items | Where-Object { $_.PSIsContainer -or $_ -isnot [IO.FileInfo] -or ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) }).Count) { throw 'V3 evidence root has a non-regular entry.' }
+  if (@($items | Where-Object { $_.PSIsContainer -or $_ -isnot [IO.FileInfo] -or ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) }).Count) { throw 'V4 evidence root has a non-regular entry.' }
   [string[]] $actualFiles = @($items | ForEach-Object Name); [Array]::Sort($actualFiles, [StringComparer]::Ordinal)
-  if ($actualFiles.Count -ne $expectedFiles.Count) { throw 'V3 evidence-root inventory count mismatch.' }
-  for ($i = 0; $i -lt $expectedFiles.Count; $i++) { if ($actualFiles[$i] -cne $expectedFiles[$i]) { throw 'V3 evidence-root inventory name mismatch.' } }
+  if ($actualFiles.Count -ne $expectedFiles.Count) { throw 'V4 evidence-root inventory count mismatch.' }
+  for ($i = 0; $i -lt $expectedFiles.Count; $i++) { if ($actualFiles[$i] -cne $expectedFiles[$i]) { throw 'V4 evidence-root inventory name mismatch.' } }
 }
 Assert-RootInventory
 $entry['state'] = 'Completed'; $entry['completedUtc'] = [DateTime]::UtcNow.ToString('O')
-[IO.File]::WriteAllText($entryPath, (($entry | ConvertTo-Json -Compress) + "`n"), [Text.UTF8Encoding]::new($false))
+$completedText = ($entry | ConvertTo-Json -Compress) + "`n"
+$sealedEntry = $completedText | ConvertFrom-Json -DateKind String
+$names = @($sealedEntry.PSObject.Properties.Name); $expectedNames = @('schema','attempt','expectedHead','state','enteredUtc','completedUtc','pid')
+if ($names.Count -ne $expectedNames.Count) { throw 'V4 completed-entry property count mismatch.' }
+for ($i = 0; $i -lt $expectedNames.Count; $i++) { if ($names[$i] -cne $expectedNames[$i]) { throw 'V4 completed-entry property order mismatch.' } }
+if ([int]$sealedEntry.schema -ne 1 -or [string]$sealedEntry.attempt -cne 'V4' -or [string]$sealedEntry.expectedHead -cne $ExpectedHead -or [string]$sealedEntry.state -cne 'Completed' -or [int]$sealedEntry.pid -ne $PID) { throw 'V4 completed-entry identity mismatch.' }
+$style = [Globalization.DateTimeStyles]::AssumeUniversal -bor [Globalization.DateTimeStyles]::AdjustToUniversal; $pattern = "yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'"; $stamps = @()
+foreach ($name in @('enteredUtc','completedUtc')) { $value = $sealedEntry.$name; $parsed = [DateTimeOffset]::MinValue; if ($value -isnot [string] -or $value -notmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$' -or -not [DateTimeOffset]::TryParseExact($value, $pattern, [Globalization.CultureInfo]::InvariantCulture, $style, [ref]$parsed) -or $value -cne $parsed.UtcDateTime.ToString('O', [Globalization.CultureInfo]::InvariantCulture)) { throw "V4 $name lexical mismatch." }; $stamps += $parsed }
+if ($stamps[1] -lt $stamps[0]) { throw 'V4 completed-entry chronology mismatch.' }
+[IO.File]::WriteAllText($entryPath, $completedText, [Text.UTF8Encoding]::new($false))
 Assert-RootInventory
-$sealedEntry = Get-Content -LiteralPath $entryPath -Raw | ConvertFrom-Json
-if ([int]$sealedEntry.schema -ne 1 -or [string]$sealedEntry.attempt -cne 'V3' -or [string]$sealedEntry.state -cne 'Completed' -or [int]$sealedEntry.pid -ne $PID) { throw 'V3 completed-entry identity mismatch.' }
-$entered = [DateTimeOffset]::ParseExact([string]$sealedEntry.enteredUtc, 'O', [Globalization.CultureInfo]::InvariantCulture); $completed = [DateTimeOffset]::ParseExact([string]$sealedEntry.completedUtc, 'O', [Globalization.CultureInfo]::InvariantCulture)
-if ($completed -lt $entered) { throw 'V3 completed-entry chronology mismatch.' }
-Write-Output ('A-CONVERGE-V3-COMPLETED=' + $root)
+$readBack = [IO.File]::ReadAllText($entryPath, [Text.UTF8Encoding]::new($false, $true))
+if ($readBack -cne $completedText) { throw 'V4 completed-entry byte mismatch.' }
+Write-Output ('A-CONVERGE-V4-COMPLETED=' + $root)
 ```
 
-Attempt classification is fail closed: absent root means outer/pre-entry
+V4 attempt classification is fail closed: absent root means outer/pre-entry
 failure; root without `entry.json` means entry-write failure; a malformed or
 missing entry is invalid evidence; valid `Entered` with null `completedUtc`
 means in-script failure; only child exit `0`, exact final six regular files, and
 the parsed identity/chronology-valid `Completed` entry can mean success. Every
 admitted attempt consumes authority and is never retried.
 
-V3 owns build, format, diff, StructureOnly, publication, and six lock oracles;
+V4 owns build, format, diff, StructureOnly, publication, and six lock oracles;
 every exit must be zero. Final production/test/docs/memory and evidence/scope
 reviews must each close `0/0/0` after the final record edit.
 
 V1 exact head
 [`7c698d78374678a9f3d2264edc8d451effeaffe0`](https://github.com/hasanmanzak/meAndAI/commit/7c698d78374678a9f3d2264edc8d451effeaffe0)
 and [run 31269244100](https://github.com/hasanmanzak/meAndAI/actions/runs/31269244100)
-are immutable diagnostic/no success. V2 is likewise immutable
-`AttemptInvalidated/NoInvocation/NoSuccess`; their detailed custody is owned by
-the convergence ledger. V3 preserves every audit oracle and adds entry/root
-custody plus the exact one-attempt launcher above.
+are immutable diagnostic/no success. V2 and V3 are likewise immutable
+diagnostics; their detailed custody is owned by the convergence ledger. V4
+preserves every audit oracle and changes only culture-safe timestamp sealing.
 
-A fully green V3 audit produces `CompletionRecommended`; only the atomic sync above
+A fully green V4 audit produces `CompletionRecommended`; only the atomic sync above
 advances the routing denominator to `20/20`, while cumulative A remains
 `32/32`. This recommends ContractSlice A completion only; [TEST-0210](test-cases.md#test-0210)
 stays `Planned`. Scenario/status/owner, both combined workflow filters,
@@ -8502,54 +8509,17 @@ Before the corrected ContractSlice A topology may enter C# mutation:
 - [x] Renewed review of the append-only RunInfo evidence correction and
   [FIND-0440](README.md#find-0440) has no unresolved `Blocking` or `Important`
   finding.
-- [x] The fresh post-packet-synchronization exact-FQN invocation produced and
-  passed review as the canonical first A BehaviorRed under the complete
-  message/echo/RunInfo/counter oracle; earlier observations remain diagnostic.
-- [x] The reviewed first limited ParseCanonical increment replaced the sentinel,
-  passed the original-oracle and final-source exact-FQN checkpoints `1/1`,
-  passed cumulative `ContractSlice=A` `12/12`, passed final format/six-project
-  Release build checks, and satisfied source review for the private-byte/
-  canonical-reserialization/no-retained-raw-byte contract.
-- [x] Final first-green support review closed with `0 Blocking`, one unnumbered
-  remaining-A coverage `Important`, and no unresolved `Minor`; the ordering
-  observation is closed and no numbered finding is opened prematurely.
-- [x] The second A canonical-string packet freezes exact FQN/marker/TRX,
-  behavior-preserving writer-owned codec extraction, legacy/green quoted bytes,
-  the 1,226-byte Unicode fixture/digest, the complete lexical/malformed matrix,
-  the internal `ArgumentException` versus public `FormatException` boundary,
-  narrow green topology, and all held scopes.
-- [x] The second A seam predecessor passed `1/1`; its valid BehaviorRed and
-  bounded source reviews closed `0 Blocking`/`0 Important`/`0 Minor`; original-
-  oracle and final-source greens passed `1/1`; cumulative A passed `13/13`;
-  locked restore, standard format, clean diff check, unchanged six lock
-  fingerprints, and zero-warning/error six-project Release build passed. The
-  canonical-string coverage `Important` is closed; the non-gating severity-info
-  scan is not claimed clean.
-- [x] `A-SCHEMA-SLOT-01` preserves the accepted corrected canonical 0003 R and
-  is packet-local `ReviewedLocalGreen`: final retained source is `436` lines at
-  SHA-256 `FC43FDDA4B273BFCBED442FB145E28BA207EE433A08A9D3E43BEA88574154480`,
-  original-oracle and topology-clean final focused runs passed `1/1`, cumulative
-  A passed `18/18`, code/test measured `692/700`, Release build and format
-  passed, and all six lock fingerprints remained unchanged. Fresh full-diff
-  review pass 2 closed `0 Blocking / 0 Important / 0 Minor` after the pass-1
-  traceability correction.
+- [x] Historical first-red, ParseCanonical, canonical-string, and
+  `A-SCHEMA-SLOT-01` green/review evidence is owned by the micro-delivery ledger;
+  it adds no current authority.
 - [x] The corrected [maintainer directive](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139269228), append-only [BehaviorRed message/echo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5139945054), and append-only [RunInfo clarification](https://github.com/hasanmanzak/meAndAI/issues/165#issuecomment-5140224849) authorize each separately reviewed
   [TEST-0210](test-cases.md#test-0210) ContractSlice A increment in the exact
   order source/preparation -> exact red -> review -> smallest bounded green,
   one increment at a time. That authority does not accumulate or activate
   ContractSlice B/C/D.
 
-The correction red-team gate, canonical first A BehaviorRed, first limited
-ParseCanonical green, second ContractSlice A canonical-string bounded green,
-and packet-local `A-SCHEMA-SLOT-01` green are satisfied. The canonical-string
-coverage `Important` is closed; fresh full-diff review pass 2 closed
-`0 Blocking / 0 Important / 0 Minor` after the pass-1 traceability correction.
-At the historical A-FULL checkpoint, never-activated `A-PARSER-INDEX-01` was retired;
-`A-PARSER-RECORD-SLOT-01`, `A-GOVERNED-REFERENCE-SLOTS-01`, and
-`A-TARGET-PARSER-INDEX-SLOT-01`, `A-FINDING-01`, `A-SELECTOR-01`,
-`A-ADMISSION-01`, `A-PROJECTOR-DAG-01`, and `A-FULL-MANIFEST-01` were
-`ReviewedLocalGreen`; fourteen of twenty live packets were green (`70%`) with
-cumulative A `27/27`.
+Historical Gate-2 through A-FULL packet status and review evidence is owned by
+the micro-delivery ledger.
 `A-FINDING-01` retained its `R=NotApplicable` / `TestOnlyGreen` /
 production-zero route and is exact-head hosted green at
 [`2430a67e0140a6c8ce0f26eaebae8aed35259134`](https://github.com/hasanmanzak/meAndAI/commit/2430a67e0140a6c8ce0f26eaebae8aed35259134),
